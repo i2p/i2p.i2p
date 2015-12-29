@@ -6,9 +6,10 @@ import java.util.Set;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -171,21 +172,23 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private Hash pickTarget() {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
-        boolean isKeyCert = false;
+        Certificate keyCert = null;
         if (!_isRouterInfo) {
-            LeaseSet ls = _facade.lookupLeaseSetLocally(_key);
-            if (ls != null &&
-                ls.getDestination().getCertificate().getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY)
-                isKeyCert = true;
+            Destination dest = _facade.lookupDestinationLocally(_key);
+            if (dest != null) {
+                Certificate cert = dest.getCertificate();
+                if (cert.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY)
+                    keyCert = cert;
+            }
         }
-        if (isKeyCert) {
+        if (keyCert != null) {
             while (true) {
                 List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
                 if (peers.isEmpty())
                     break;
                 Hash peer = peers.get(0);
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
-                if (ri != null && StoreJob.supportsKeyCerts(ri))
+                if (ri != null && StoreJob.supportsCert(ri, keyCert))
                     return peer;
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": Skipping verify w/ router that doesn't support key certs " + peer);
@@ -212,6 +215,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
         m.setReplyTunnel(replyTunnelInfo.getReceiveTunnelId(0));
         m.setFrom(replyTunnelInfo.getPeer(0));
         m.setSearchKey(_key);
+        m.setSearchType(_isRouterInfo ? DatabaseLookupMessage.Type.RI : DatabaseLookupMessage.Type.LS);
         return m;
     }
     
@@ -253,7 +257,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     getContext().profileManager().dbLookupSuccessful(_target, delay);
                     if (_sentTo != null)
                         getContext().profileManager().dbStoreSuccessful(_sentTo);
-                    getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
+                    getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Verify success for " + _key);
                     if (_isRouterInfo)
@@ -286,7 +290,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             // though it is the real problem.
             if (_target != null && !_target.equals(_sentTo))
                 getContext().profileManager().dbLookupFailed(_target);
-            getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
+            getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay);
             resend();
         }        
         public void setMessage(I2NPMessage message) { _message = message; }
@@ -324,7 +328,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             getContext().profileManager().dbLookupFailed(_target);
             //if (_sentTo != null)
             //    getContext().profileManager().dbStoreFailed(_sentTo);
-            getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime, 0);
+            getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Verify timed out for: " + _key);
             if (_ignore.size() < MAX_PEERS_TO_TRY) {

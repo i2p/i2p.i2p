@@ -1,0 +1,79 @@
+# Last Modified: Sun Dec 06 12:30:32 2015
+# vim:syntax=apparmor et ts=4 sw=4
+
+  #include <abstractions/base>
+  #include <abstractions/fonts>
+  #include <abstractions/nameservice>
+  #include <abstractions/ssl_certs>
+
+  network inet stream,
+  network inet dgram,
+  network inet6 stream,
+  network inet6 dgram,
+
+  # Needed by Java
+  @{PROC}                                                 r,
+  owner @{PROC}/[0-9]*/                                   r,
+  owner @{PROC}/[0-9]*/status                             r,
+  @{PROC}/[0-9]*/net/ipv6_route                           r,
+  @{PROC}/[0-9]*/net/if_inet6                             r,
+  /sys/devices/system/cpu/                                r,
+  /sys/devices/system/cpu/**                              r,
+
+  /etc/ssl/certs/java/**                                  r,
+  /etc/timezone                                           r,
+  /usr/share/javazi/**                                    r,
+
+  /etc/java-*-openjdk/**                                  r,
+  /usr/lib/jvm/default-java/jre/bin/java                  rix,
+  /usr/lib/jvm/java-*-openjdk-*/jre/bin/java              rix,
+  /usr/lib/jvm/java-*-openjdk-*/jre/bin/keytool           rix,
+
+  # Oracle Java is needed on the Raspberry Pi and is included in Raspbian's repositories
+  /usr/lib/jvm/jdk-*-oracle-*/jre/bin/java                rix,
+  /usr/lib/jvm/jdk-*-oracle-*/jre/bin/keytool             rix,
+
+  # */client/classes.jsa is only found (and needed) in 32-bit JVMs.
+  /usr/lib/jvm/java-*-openjdk-*/jre/lib/i386/client/classes.jsa m,
+  /usr/lib/jvm/java-*-oracle-*/jre/lib/i386/client/classes.jsa m,
+
+  # needed for I2P's graphs
+  /usr/share/java/java-atk-wrapper.jar                    r,
+
+  # I2P specific
+  /usr/share/i2p/**                                       r,
+
+  # Used by some plugins
+  /usr/share/java/eclipse-ecj-*.jar                       r,
+
+  # Tanuki java wrapper
+  /etc/i2p/wrapper.config                                 r,
+  /usr/sbin/wrapper                                       rix,
+  /usr/share/java/wrapper*.jar                            r,
+
+  # 'm' is needed by the I2P-Bote plugin
+  /{,lib/live/mount/overlay/}tmp/                         rwm,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/** rw,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*           rwk,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*/**        rw,
+  # Scrypt used by I2P-Bote
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwkm,
+  # /graphs in the router console
+  owner /{,lib/live/mount/overlay/}tmp/imageio[0-9]*.tmp  rwk,
+
+  # Prevent spamming the logs
+  deny /dev/tty                                           rw,
+  deny /{,lib/live/mount/overlay/}var/tmp/                r,
+  deny @{PROC}/[0-9]*/fd/                                 r,
+  deny /usr/sbin/                                         r,
+  deny /var/cache/fontconfig/                             wk,
+
+  # Some versions of the Tanuki wrapper package will try to load these jars but
+  # they are  not needed by I2P. The deny rule here will prevent the logs from
+  # being spammed.
+  deny /usr/share/java/hamcrest*.jar                      r,
+  deny /usr/share/java/junit*.jar                         r,

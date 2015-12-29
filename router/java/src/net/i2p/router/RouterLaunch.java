@@ -7,6 +7,9 @@ package net.i2p.router;
  *
  *  Setup of wrapper.log file is moved to WorkingDir.java
  *  Until WorkingDir is called, the existing stdout / stderr will be used.
+ *
+ *  Not recommended for embedded use. Instantiate Router() yourself.
+ *
  */
 public class RouterLaunch {
 

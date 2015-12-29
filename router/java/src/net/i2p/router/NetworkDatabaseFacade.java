@@ -14,9 +14,10 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 
 /**
@@ -51,18 +52,51 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract LeaseSet lookupLeaseSetLocally(Hash key);
     public abstract void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs);
     public abstract RouterInfo lookupRouterInfoLocally(Hash key);
+
+    /**
+     *  Lookup using the client's tunnels
+     *  Succeeds even if LS validation fails due to unsupported sig type
+     *
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @since 0.9.16
+     */
+    public abstract void lookupDestination(Hash key, Job onFinishedJob, long timeoutMs, Hash fromLocalDest);
+
+    /**
+     *  Lookup locally in netDB and in badDest cache
+     *  Succeeds even if LS validation failed due to unsupported sig type
+     *
+     *  @since 0.9.16
+     */
+    public abstract Destination lookupDestinationLocally(Hash key);
+
     /** 
-     * return the leaseSet if another leaseSet already existed at that key 
+     * @return the leaseSet if another leaseSet already existed at that key 
      *
      * @throws IllegalArgumentException if the data is not valid
      */
     public abstract LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException;
+
     /** 
-     * return the routerInfo if another router already existed at that key 
+     * @return the routerInfo if another router already existed at that key 
      *
      * @throws IllegalArgumentException if the data is not valid
      */
     public abstract RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException;
+
+    /** 
+     *  @return the old entry if it already existed at that key 
+     *  @throws IllegalArgumentException if the data is not valid
+     *  @since 0.9.16
+     */
+    public DatabaseEntry store(Hash key, DatabaseEntry entry) throws IllegalArgumentException {
+        if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+            return store(key, (RouterInfo) entry);
+        if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
+            return store(key, (LeaseSet) entry);
+        throw new IllegalArgumentException("unknown type");
+    }
+
     /**
      * @throws IllegalArgumentException if the local router is not valid
      */
@@ -101,4 +135,12 @@ public abstract class NetworkDatabaseFacade implements Service {
      *  @since IPv6
      */
     public boolean floodfillEnabled() { return false; };
+
+    /**
+     *  Is it permanently negative cached?
+     *
+     *  @param key only for Destinations; for RouterIdentities, see Banlist
+     *  @since 0.9.16
+     */
+    public boolean isNegativeCachedForever(Hash key) { return false; }
 }

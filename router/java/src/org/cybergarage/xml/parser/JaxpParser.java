@@ -21,18 +21,21 @@
 
 package org.cybergarage.xml.parser;
 
+import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.cybergarage.xml.Node;
 import org.cybergarage.xml.Parser;
 import org.cybergarage.xml.ParserException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 
@@ -116,8 +119,27 @@ public class JaxpParser extends Parser
 		org.cybergarage.xml.Node root = null;
 		
 		try {
+			// https://www.owasp.org/index.php/XML_External_Entity_%28XXE%29_Processing
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setValidating(false);
+			factory.setNamespaceAware(true);
+			factory.setExpandEntityReferences(false);
+			try {
+				try {
+				    factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+				} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+				} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+				} catch (ParserConfigurationException pce) {}
+				try {
+				    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+				} catch (ParserConfigurationException pce) {}
+			} catch (AbstractMethodError ame) {}   // FreeBSD
 			DocumentBuilder builder = factory.newDocumentBuilder();
+			builder.setEntityResolver(new BlankingResolver());
 			InputSource inSrc = new InputSource(new NullFilterInputStream(inStream));
 			Document doc = builder.parse(inSrc);
 
@@ -161,6 +183,52 @@ public class JaxpParser extends Parser
 				// try again
 			}
 			return rv;
+		}
+
+		/** @since 0.9.22 */
+		@Override
+		public int read(byte[] b) throws IOException {
+			return this.read(b, 0, b.length);
+		}
+
+		/** @since 0.9.22 */
+		@Override
+		public int read(byte[] b, int off, int len) throws IOException {
+			if (b == null) {
+				throw new NullPointerException();
+			} else if (off < 0 || len < 0 || len > b.length - off) {
+				throw new IndexOutOfBoundsException();
+			} else if (len == 0) {
+				return 0;
+			}
+
+			int rv = this.read();
+			if (-1 == rv) {
+				return -1;
+			}
+
+			int i = 1;
+			b[off] = (byte) rv;
+			for (; i < len; i++) {
+				rv = this.read();
+				if (-1 == rv) {
+					break;
+				}
+				b[off + i] = (byte) rv;
+			}
+			return i;
+		}
+	}
+
+	/**
+	 *  I2P -
+	 *  http://stackoverflow.com/questions/5883542/disable-xml-validation-based-on-external-dtd-xsd
+	 */
+	private static class BlankingResolver implements EntityResolver {
+                private static final byte[] DUMMY = new byte[0];
+
+		public InputSource resolveEntity(String arg0, String arg1) {
+			return new InputSource(new ByteArrayInputStream(DUMMY));
 		}
 	}
 }

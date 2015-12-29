@@ -3,6 +3,7 @@ package net.i2p.crypto;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.spec.ECField;
@@ -42,8 +43,8 @@ class ECConstants {
         if (Security.getProvider("BC") == null) {
             try {
                 Class<?> cls = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
-                Constructor<?> con = cls.getConstructor(new Class[0]);
-                Provider bc = (Provider)con.newInstance(new Object[0]);
+                Constructor<?> con = cls.getConstructor();
+                Provider bc = (Provider)con.newInstance();
                 Security.addProvider(bc);
                 log("Added BC provider");
                 loaded = true;
@@ -123,6 +124,7 @@ class ECConstants {
     Gy= 07192b95 ffc8da78 631011ed 6b24cdd5 73f977a1 1e794811
     */
 
+    /*
     private static final ECParms PARM_P192 = new ECParms(
         // P N Seed B Gx Gy
             "6277101735386680763835789423207666416083908700390324961279",
@@ -132,6 +134,7 @@ class ECConstants {
             "188da80e b03090f6 7cbf20eb 43a18800 f4ff0afd 82ff1012",
             "07192b95 ffc8da78 631011ed 6b24cdd5 73f977a1 1e794811"
     );
+    */
 
 
     /*
@@ -276,7 +279,7 @@ class ECConstants {
             AlgorithmParameters ap;
             try {
                 ap = AlgorithmParameters.getInstance("EC");
-            } catch (Exception e) {
+            } catch (GeneralSecurityException e) {
                 if (BC_AVAILABLE) {
                     log("Named curve " + name + " is not available, trying BC", e);
                     ap = AlgorithmParameters.getInstance("EC", "BC");
@@ -290,7 +293,7 @@ class ECConstants {
             ECParameterSpec rv = ap.getParameterSpec(ECParameterSpec.class);
             log("Named curve " + name + " loaded");
             return rv;
-        } catch (Exception e) {
+        } catch (GeneralSecurityException e) {
             log("Named curve " + name + " is not available", e);
             return null;
         }
@@ -318,17 +321,17 @@ class ECConstants {
     // standard curve names
     // first is OpenJDK 6/7
     // second is BC
-    public static final ECParameterSpec P192_SPEC = genSpec("secp192r1", "P-192", PARM_P192);
+    //public static final ECParameterSpec P192_SPEC = genSpec("secp192r1", "P-192", PARM_P192);
     public static final ECParameterSpec P256_SPEC = genSpec("secp256r1", "P-256", PARM_P256);
     public static final ECParameterSpec P384_SPEC = genSpec("secp384r1", "P-384", PARM_P384);
     public static final ECParameterSpec P521_SPEC = genSpec("secp521r1", "P-521", PARM_P521);
 
     // Koblitz
-    public static final ECParameterSpec K163_SPEC = genSpec("sect163k1", "K-163", null);
-    public static final ECParameterSpec K233_SPEC = genSpec("sect233k1", "K-233", null);
-    public static final ECParameterSpec K283_SPEC = genSpec("sect283k1", "K-283", null);
-    public static final ECParameterSpec K409_SPEC = genSpec("sect409k1", "K-409", null);
-    public static final ECParameterSpec K571_SPEC = genSpec("sect571k1", "K-571", null);
+    //public static final ECParameterSpec K163_SPEC = genSpec("sect163k1", "K-163", null);
+    //public static final ECParameterSpec K233_SPEC = genSpec("sect233k1", "K-233", null);
+    //public static final ECParameterSpec K283_SPEC = genSpec("sect283k1", "K-283", null);
+    //public static final ECParameterSpec K409_SPEC = genSpec("sect409k1", "K-409", null);
+    //public static final ECParameterSpec K571_SPEC = genSpec("sect571k1", "K-571", null);
 
 
 }

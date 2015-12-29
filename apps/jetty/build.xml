@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.ver" value="8.1.15.v20140411" />
+    <property name="jetty.ver" value="8.1.17.v20150415" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="41ec2b5e5605c038fb28d1f118669f06b4479e71" />
+    <property name="jetty.sha1" value="ce7bcd1bdcdac4cf130467f6d55155b9e1517e71" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.6" />
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
-    <property name="tomcat.ver" value="6.0.41" />
+    <property name="tomcat.ver" value="6.0.44" />
     <property name="tomcat2.lib" value="apache-tomcat-${tomcat.ver}/lib" />
     <property name="tomcat2.lib.small" value="apache-tomcat/lib" />
 
@@ -149,9 +149,14 @@
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over,
              needed for old plugins and things. We add tomcat-juli below.
           -->
+      <!--
+        * Removed in 0.9.24, see ticket #1679
+        * Jetty now uses tomcat-juli (added below to commons-logging.jar), not commons-logging proper,
+        * and no known plugins use it either.
         <jar destfile="jettylib/commons-logging.jar" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="META-INF/LICENSE.txt META-INF/NOTICE.txt" src="../../installer/lib/launch4j/lib/commons-logging.jar" />
         </jar>
+      -->
         <ant target="copyTomcatLib" />
     </target>
 
@@ -277,8 +282,6 @@
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <!-- old jetty 5 classes blow up the build if you forgot to do distclean -->
-        <delete dir="build/obj/org" />
         <copy todir="build/obj" file="resources/log4j.properties" />
         <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" >
             <manifest>

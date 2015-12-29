@@ -30,11 +30,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
@@ -102,25 +102,26 @@ public abstract class TransportImpl implements Transport {
         _unreachableEntries = new HashMap<Hash, Long>(32);
         _wasUnreachableEntries = new HashMap<Hash, Long>(32);
         _localAddresses = new ConcurrentHashSet<InetAddress>(4);
-        _context.simpleScheduler().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
+        _context.simpleTimer2().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
     /**
      * How many peers are we connected to?
-     * For NTCP, this is the same as active,
-     * but SSU actually looks at idle time for countActivePeers()
      */
-    public int countPeers() { return countActivePeers(); }
+    public abstract int countPeers();
 
     /**
-     * How many peers active in the last few minutes?
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
      */
-    public int countActivePeers() { return 0; }
+    public abstract int countActivePeers();
 
     /**
-     * How many peers are we actively sending messages to (this minute)
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
      */
-    public int countActiveSendPeers() { return 0; }
+    public abstract int countActiveSendPeers();
 
     /** ...and 50/100/150/200/250 for BW Tiers K/L/M/N/O */
     private static final int MAX_CONNECTION_FACTOR = 50;
@@ -140,12 +141,35 @@ public abstract class TransportImpl implements Transport {
         else // shouldn't happen
             maxProp = "i2np." + style.toLowerCase(Locale.US) + ".maxConnections";
         int def = MAX_CONNECTION_FACTOR;
-        RouterInfo ri = _context.router().getRouterInfo();
-        if (ri != null) {
-            char bw = ri.getBandwidthTier().charAt(0);
-            if (bw > Router.CAPABILITY_BW12 && bw <= Router.CAPABILITY_BW256)
-                def *= (1 + bw - Router.CAPABILITY_BW12);
-        }
+        // get it from here, not the RI, to avoid deadlock
+        String caps = _context.router().getCapabilities();
+
+            char bw = caps.charAt(0);
+            switch (bw) {
+                case Router.CAPABILITY_BW12:
+                case 'u':  // unknown
+                default:
+                    break;
+                case Router.CAPABILITY_BW32:
+                    def *= 2;
+                    break;
+                case Router.CAPABILITY_BW64:
+                    def *= 3;
+                    break;
+                case Router.CAPABILITY_BW128:
+                    def *= 4;
+                    break;
+                case Router.CAPABILITY_BW256:
+                    def *= 7;
+                    break;
+                case Router.CAPABILITY_BW512:
+                    def *= 9;
+                    break;
+                case Router.CAPABILITY_BW_UNLIMITED:
+                    def *= 12;
+                    break;
+            }
+
         if (_context.netDb().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {
             def *= 17; def /= 10;  // 425 for Class O ff
@@ -350,9 +374,9 @@ public abstract class TransportImpl implements Transport {
                           + "): " + allTime + "ms/" + sendTime + "ms after failing on: "
                           + msg.getFailedTransports() + " and succeeding on " + getStyle());
             if ( (allTime > 60*1000) && (sendSuccessful) ) {
-                // WTF!!@#
+                // VERY slow
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("WTF, more than a minute slow? " + msg.getMessageType()
+                    _log.warn("Severe latency? More than a minute slow? " + msg.getMessageType()
                               + " of id " + msg.getMessageId() + " (send begin on "
                               + new Date(msg.getSendBegin()) + " / created on "
                               + new Date(msg.getCreated()) + "): " + msg);
@@ -474,7 +498,7 @@ public abstract class TransportImpl implements Transport {
             _listener.messageReceived(inMsg, remoteIdent, remoteIdentHash);
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("WTF! Null listener! this = " + toString(), new Exception("Null listener"));
+                _log.error("Null listener! this = " + toString(), new Exception("Null listener"));
         }
     }
 
@@ -531,6 +555,7 @@ public abstract class TransportImpl implements Transport {
      *  with the same IP length (4 or 16) with the given one.
      *  TODO: Allow multiple addresses of the same length.
      *  Calls listener.transportAddressChanged()
+     *  To remove all IPv4 or IPv6 addresses, use removeAddress(boolean).
      *
      *  @param address null to remove all
      */
@@ -543,6 +568,7 @@ public abstract class TransportImpl implements Transport {
             boolean isIPv6 = TransportUtil.isIPv6(address);
             for (RouterAddress ra : _currentAddresses) {
                 if (isIPv6 == TransportUtil.isIPv6(ra))
+                    // COWAL
                     _currentAddresses.remove(ra);
             }
             _currentAddresses.add(address);
@@ -551,6 +577,60 @@ public abstract class TransportImpl implements Transport {
              _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
         if (_listener != null)
             _listener.transportAddressChanged();
+    }
+
+    /**
+     *  Remove only this address.
+     *  Calls listener.transportAddressChanged().
+     *  To remove all IPv4 or IPv6 addresses, use removeAddress(boolean).
+     *  To remove all IPv4 and IPv6 addresses, use replaceAddress(null).
+     *
+     *  @since 0.9.20
+     */
+    protected void removeAddress(RouterAddress address) {
+        if (_log.shouldWarn())
+             _log.warn("Removing address " + address, new Exception());
+        boolean changed = _currentAddresses.remove(address);
+            changed = true;
+        if (changed) {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
+            if (_listener != null)
+                _listener.transportAddressChanged();
+        } else {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " no addresses removed");
+        }
+    }
+
+    /**
+     *  Remove all existing addresses with the specified IP length (4 or 16).
+     *  Calls listener.transportAddressChanged().
+     *  To remove all IPv4 and IPv6 addresses, use replaceAddress(null).
+     *
+     *  @param ipv6 true to remove all IPv6 addresses, false to remove all IPv4 addresses
+     *  @since 0.9.20
+     */
+    protected void removeAddress(boolean ipv6) {
+        if (_log.shouldWarn())
+             _log.warn("Removing addresses, ipv6? " + ipv6, new Exception());
+        boolean changed = false;
+        for (RouterAddress ra : _currentAddresses) {
+            if (ipv6 == TransportUtil.isIPv6(ra)) {
+                // COWAL
+                if (_currentAddresses.remove(ra))
+                    changed = true;
+            }
+        }
+        if (changed) {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " now has " + _currentAddresses.size() + " addresses");
+            if (_listener != null)
+                _listener.transportAddressChanged();
+        } else {
+            if (_log.shouldWarn())
+                 _log.warn(getStyle() + " no addresses removed");
+        }
     }
 
     /**
@@ -668,13 +748,31 @@ public abstract class TransportImpl implements Transport {
      *  This can be called before startListening() to set an initial address,
      *  or after the transport is running.
      *
-     *  This implementation does nothing. Transports should override if they want notification.
-     *
      *  @param source defined in Transport.java
      *  @param ip typ. IPv4 or IPv6 non-local; may be null to indicate IPv4 failure or port info only
      *  @param port 0 for unknown or unchanged
      */
-    public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}
+    public abstract void externalAddressReceived(AddressSource source, byte[] ip, int port);
+
+    /**
+     *  Notify a transport of an external address change.
+     *  This may be from a local interface, UPnP, a config change, etc.
+     *  This should not be called if the ip didn't change
+     *  (from that source's point of view), or is a local address.
+     *  May be called multiple times for IPv4 or IPv6.
+     *  The transport should also do its own checking on whether to accept
+     *  notifications from this source.
+     *
+     *  This can be called after the transport is running.
+     *
+     *  TODO externalAddressRemoved(source, ip, port)
+     *
+     *  This implementation does nothing. Transports should override if they want notification.
+     *
+     *  @param source defined in Transport.java
+     *  @since 0.9.20
+     */
+    public void externalAddressRemoved(AddressSource source, boolean ipv6) {}
 
     /**
      *  Notify a transport of the results of trying to forward a port.
@@ -703,15 +801,34 @@ public abstract class TransportImpl implements Transport {
     public void renderStatusHTML(Writer out) throws IOException {}
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { renderStatusHTML(out); }
 
-    public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
+    /**
+     *  Previously returned short, now enum as of 0.9.20
+     */
+    public abstract Status getReachabilityStatus();
 
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability() {}
 
-    public boolean isBacklogged(Hash dest) { return false; }
-    public boolean isEstablished(Hash dest) { return false; }
+    /**
+     *  @since 0.9.20
+     */
+    protected boolean isIPv4Firewalled() {
+        return TransportUtil.isIPv4Firewalled(_context, getStyle());
+    }
+
+    public boolean isBacklogged(Hash peer) { return false; }
+    public boolean isEstablished(Hash peer) { return false; }
+
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    public void mayDisconnect(Hash peer) {}
 
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
@@ -729,9 +846,9 @@ public abstract class TransportImpl implements Transport {
 
     /** called when we can't reach a peer */
     public void markUnreachable(Hash peer) {
-        short status = _context.commSystem().getReachabilityStatus();
-        if (status == CommSystemFacade.STATUS_DISCONNECTED ||
-            status == CommSystemFacade.STATUS_HOSED)
+        Status status = _context.commSystem().getStatus();
+        if (status == Status.DISCONNECTED ||
+            status == Status.HOSED)
             return;
         Long now = Long.valueOf(_context.clock().now());
         synchronized (_unreachableEntries) {
@@ -874,7 +991,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s) {
+    protected String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
@@ -882,7 +999,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s, Object o) {
+    protected String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 

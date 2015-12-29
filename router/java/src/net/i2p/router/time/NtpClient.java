@@ -55,7 +55,8 @@ class NtpClient {
     /** difference between the unix epoch and jan 1 1900 (NTP uses that) */
     private final static double SECONDS_1900_TO_EPOCH = 2208988800.0;
     private final static int NTP_PORT = 123;
-    
+    private static final int DEFAULT_TIMEOUT = 10*1000;
+
     /**
      * Query the ntp servers, returning the current time from first one we find
      *
@@ -84,7 +85,7 @@ class NtpClient {
      * @throws IllegalArgumentException if none of the servers are reachable
      * @since 0.7.12
      */
-    public static long[] currentTimeAndStratum(String serverNames[]) {
+    public static long[] currentTimeAndStratum(String serverNames[], int perServerTimeout) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
         ArrayList<String> names = new ArrayList<String>(serverNames.length);
@@ -92,7 +93,7 @@ class NtpClient {
             names.add(serverNames[i]);
         Collections.shuffle(names);
         for (int i = 0; i < names.size(); i++) {
-            long[] rv = currentTimeAndStratum(names.get(i));
+            long[] rv = currentTimeAndStratum(names.get(i), perServerTimeout);
             if (rv != null && rv[0] > 0)
                 return rv;
         }
@@ -105,7 +106,7 @@ class NtpClient {
      * @return milliseconds since january 1, 1970 (UTC), or -1 on error
      */
     public static long currentTime(String serverName) {
-         long[] la = currentTimeAndStratum(serverName);
+         long[] la = currentTimeAndStratum(serverName, DEFAULT_TIMEOUT);
          if (la != null)
              return la[0];
          return -1;
@@ -116,10 +117,11 @@ class NtpClient {
      * @return time in rv[0] and stratum in rv[1], or null for error
      * @since 0.7.12
      */
-    private static long[] currentTimeAndStratum(String serverName) {
+    private static long[] currentTimeAndStratum(String serverName, int timeout) {
+        DatagramSocket socket = null;
         try {
             // Send request
-            DatagramSocket socket = new DatagramSocket();
+            socket = new DatagramSocket();
             InetAddress address = InetAddress.getByName(serverName);
             byte[] buf = new NtpMessage().toByteArray();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, NTP_PORT);
@@ -134,13 +136,8 @@ class NtpClient {
 
             // Get response
             packet = new DatagramPacket(buf, buf.length);
-            socket.setSoTimeout(10*1000);
-            try {
-                socket.receive(packet);
-            } catch (InterruptedIOException iie) {
-                socket.close();
-                return null;
-            }
+            socket.setSoTimeout(timeout);
+            socket.receive(packet);
 
             // Immediately record the incoming timestamp
             double destinationTimestamp = (System.currentTimeMillis()/1000.0) + SECONDS_1900_TO_EPOCH;
@@ -152,7 +149,6 @@ class NtpClient {
             //                        (msg.receiveTimestamp-msg.transmitTimestamp);
             double localClockOffset = ((msg.receiveTimestamp - msg.originateTimestamp) +
                                        (msg.transmitTimestamp - destinationTimestamp)) / 2;
-            socket.close();
 
             // Stratum must be between 1 (atomic) and 15 (maximum defined value)
             // Anything else is right out, treat such responses like errors
@@ -169,10 +165,13 @@ class NtpClient {
         } catch (IOException ioe) {
             //ioe.printStackTrace();
             return null;
+        } finally {
+            if (socket != null)
+                socket.close();
         }
     }
     
-/****/
+/****
     public static void main(String[] args) throws IOException {
         // Process command-line args
         if(args.length <= 0) {
@@ -203,5 +202,5 @@ class NtpClient {
         "more details.");
         
     }
-/****/
+****/
 }

@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -21,6 +24,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate the runtime operation and configuration of a single I2PTunnel.
@@ -39,8 +43,18 @@ public class TunnelController implements Logging {
     private final I2PTunnel _tunnel;
     private final List<String> _messages;
     private List<I2PSession> _sessions;
-    private boolean _running;
-    private boolean _starting;
+    private volatile TunnelState _state;
+
+    /** @since 0.9.19 */
+    private enum TunnelState {
+        START_ON_LOAD,
+        STARTING,
+        RUNNING,
+        STOPPING,
+        STOPPED,
+        DESTROYING,
+        DESTROYED,
+    }
     
     public static final String KEY_BACKUP_DIR = "i2ptunnel-keyBackup";
 
@@ -68,6 +82,7 @@ public class TunnelController implements Logging {
     private static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
     private static final String OPT_TAGS_SEND = PFX_OPTION + "crypto.tagsToSend";
     private static final String OPT_LOW_TAGS = PFX_OPTION + "crypto.lowTagThreshold";
+    private static final String OPT_SIG_TYPE = PFX_OPTION + I2PClient.PROP_SIGTYPE;
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -80,14 +95,34 @@ public class TunnelController implements Logging {
     public static final String TYPE_SOCKS_IRC = "socksirctunnel";
     public static final String TYPE_STD_CLIENT = "client";
     public static final String TYPE_STD_SERVER = "server";
+    /** Client in the UI and I2P side but a server on the localhost side */
     public static final String TYPE_STREAMR_CLIENT = "streamrclient";
+    /** Server in the UI and I2P side but a client on the localhost side */
     public static final String TYPE_STREAMR_SERVER = "streamrserver";
+
+    /**
+     *  This is guaranteed to be available.
+     *  @since 0.9.17
+     */
+    public static final SigType PREFERRED_SIGTYPE;
+    static {
+        if (SystemVersion.isARM() || SystemVersion.isGNU() || SystemVersion.isAndroid()) {
+            if (SigType.ECDSA_SHA256_P256.isAvailable())
+                PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256;
+            else
+                PREFERRED_SIGTYPE = SigType.DSA_SHA1;
+        } else {
+            PREFERRED_SIGTYPE = SigType.EdDSA_SHA512_Ed25519;
+        }
+    }
 
     /**
      * Create a new controller for a tunnel out of the specific config options.
      * The config may contain a large number of options - only ones that begin in
      * the prefix should be used (and, in turn, that prefix should be stripped off
      * before being interpreted by this controller)
+     * 
+     * Defaults in config properties are not recommended, they may or may not be honored.
      * 
      * @param config original key=value mapping non-null
      * @param prefix beginning of key values that are relevant to this tunnel
@@ -97,6 +132,7 @@ public class TunnelController implements Logging {
     }
 
     /**
+     * Defaults in config properties are not recommended, they may or may not be honored.
      * 
      * @param config original key=value mapping non-null
      * @param prefix beginning of key values that are relevant to this tunnel
@@ -109,11 +145,10 @@ public class TunnelController implements Logging {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelController.class);
         setConfig(config, prefix);
         _messages = new ArrayList<String>(4);
-        _running = false;
         boolean keyOK = true;
         if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
             keyOK = createPrivateKey();
-        _starting = keyOK && getStartOnLoad();
+        _state = keyOK && getStartOnLoad() ? TunnelState.START_ON_LOAD : TunnelState.STOPPED;
     }
     
     /**
@@ -121,15 +156,12 @@ public class TunnelController implements Logging {
      */
     private boolean createPrivateKey() {
         I2PClient client = I2PClientFactory.createClient();
-        String filename = getPrivKeyFile();
-        if ( (filename == null) || (filename.trim().length() <= 0) ) {
+        File keyFile = getPrivateKeyFile();
+        if (keyFile == null) {
             log("No filename specified for the private key");
             return false;
         }
         
-        File keyFile = new File(getPrivKeyFile());
-        if (!keyFile.isAbsolute())
-            keyFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), getPrivKeyFile());
         if (keyFile.exists()) {
             //log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
             return true;
@@ -141,14 +173,14 @@ public class TunnelController implements Logging {
         FileOutputStream fos = null;
         try {
             fos = new SecureFileOutputStream(keyFile);
-            SigType stype = I2PClient.DEFAULT_SIGTYPE;
-            String st = _config.getProperty(PFX_OPTION + I2PClient.PROP_SIGTYPE);
+            SigType stype = PREFERRED_SIGTYPE;
+            String st = _config.getProperty(OPT_SIG_TYPE);
             if (st != null) {
                 SigType type = SigType.parseSigType(st);
-                if (type != null)
+                if (type != null && type.isAvailable())
                     stype = type;
                 else
-                    log("Unsupported sig type " + st);
+                    log("Unsupported sig type " + st + ", reverting to " + stype);
             }
             Destination dest = client.createDestination(fos, stype);
             String destStr = dest.toBase64();
@@ -161,8 +193,10 @@ public class TunnelController implements Logging {
             if (backupDir.isDirectory() || backupDir.mkdir()) {
                 String name = b32 + '-' + I2PAppContext.getGlobalContext().clock().now() + ".dat";
                 File backup = new File(backupDir, name);
-                if (FileUtil.copy(keyFile, backup, false, true))
+                if (FileUtil.copy(keyFile, backup, false, true)) {
+                    SecureFileOutputStream.setPerms(backup);
                     log("Private key backup saved to " + backup.getAbsolutePath());
+                }
             }
         } catch (I2PException ie) {
             if (_log.shouldLog(Log.ERROR))
@@ -181,9 +215,11 @@ public class TunnelController implements Logging {
     }
     
     public void startTunnelBackground() {
-        if (_running) return;
-        _starting = true;
-        new I2PAppThread(new Runnable() { public void run() { startTunnel(); } }).start();
+        synchronized (this) {
+            if (_state != TunnelState.STOPPED && _state != TunnelState.START_ON_LOAD)
+                return;
+        }
+        new I2PAppThread(new Runnable() { public void run() { startTunnel(); } }, "Tunnel Starter " + getName()).start();
     }
     
     /**
@@ -191,31 +227,40 @@ public class TunnelController implements Logging {
      *
      */
     public void startTunnel() {
-        _starting = true;
+        synchronized (this) {
+            if (_state != TunnelState.STOPPED && _state != TunnelState.START_ON_LOAD) {
+                if (_state == TunnelState.RUNNING) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Already running");
+                    log("Tunnel " + getName() + " is already running");
+                }
+                return;
+            }
+            changeState(TunnelState.STARTING);
+        }
         try {
             doStartTunnel();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             _log.error("Error starting the tunnel " + getName(), e);
             log("Error starting the tunnel " + getName() + ": " + e.getMessage());
             // if we don't acquire() then the release() in stopTunnel() won't work
             acquire();
             stopTunnel();
         }
-        _starting = false;
     }
 
     /**
      *  @throws IllegalArgumentException via methods in I2PTunnel
      */
     private void doStartTunnel() {
-        if (_running) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Already running");
-            log("Tunnel " + getName() + " is already running");
-            return;
+        synchronized (this) {
+            if (_state != TunnelState.STARTING)
+                return;
         }
+
         String type = getType(); 
         if ( (type == null) || (type.length() <= 0) ) {
+            changeState(TunnelState.STOPPED);
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot start the tunnel - no type specified");
             return;
@@ -225,6 +270,7 @@ public class TunnelController implements Logging {
         if (type.endsWith("server") || getPersistentClientKey()) {
             boolean ok = createPrivateKey();
             if (!ok) {
+                changeState(TunnelState.STOPPED);
                 log("Failed to start tunnel " + getName() + " as the private key file could not be created");
                 return;
             }
@@ -256,12 +302,13 @@ public class TunnelController implements Logging {
         } else if (TYPE_STREAMR_SERVER.equals(type)) {
             startStreamrServer();
         } else {
+            changeState(TunnelState.STOPPED);
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot start tunnel - unknown type [" + type + "]");
             return;
         }
         acquire();
-        _running = true;
+        changeState(TunnelState.RUNNING);
     }
     
     private void startHttpClient() {
@@ -387,10 +434,9 @@ public class TunnelController implements Logging {
      * Note the fact that we are no longer using some sessions, and if
      * no other tunnels are using them, close them.
      */
-    private void release() {
-        if (_sessions != null && !_sessions.isEmpty()) {
-            for (int i = 0; i < _sessions.size(); i++) {
-                I2PSession s = _sessions.get(i);
+    private void release(Collection<I2PSession> sessions) {
+        if (!sessions.isEmpty()) {
+            for (I2PSession s : sessions) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Releasing session " + s);
                 TunnelControllerGroup group = TunnelControllerGroup.getInstance();
@@ -402,6 +448,22 @@ public class TunnelController implements Logging {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No sessions to release? for " + getName());
         }
+    }
+
+    /** 
+     *  Get all the sessions we may be using.
+     *
+     *  @return a copy, non-null
+     *  @since 0.9.15
+     */
+    private Collection<I2PSession> getAllSessions() {
+        // We use _sessions AND the tunnel sessions as
+        // _sessions will be null for delay-open tunnels - see acquire().
+        // We want the current sessions.
+        Set<I2PSession> sessions = new HashSet<I2PSession>(_tunnel.getSessions());
+        if (_sessions != null)
+            sessions.addAll(_sessions);
+        return sessions;
     }
     
     private void startClient() {
@@ -458,6 +520,7 @@ public class TunnelController implements Logging {
     
     /**
      *  These are the ones stored with a prefix of "option."
+     *  Defaults in config properties are not honored.
      *
      *  @return keys with the "option." prefix stripped, non-null
      *  @since 0.9.1 Much better than getClientOptions()
@@ -487,6 +550,17 @@ public class TunnelController implements Logging {
         String proxies = getProxyList();
         if (proxies != null)
             opts.setProperty(PROP_PROXIES, proxies);
+        // Ditto spoof host. Since 0.9.15.
+        String spoofhost = getSpoofedHost();
+        if (spoofhost != null)
+            opts.setProperty(PROP_SPOOFED_HOST, spoofhost);
+        // Ditto target host/port. Since 0.9.15.
+        String targethost = getTargetHost();
+        if (targethost != null)
+            opts.setProperty(PROP_TARGET_HOST, targethost);
+        String targetport = getTargetPort();
+        if (targetport != null)
+            opts.setProperty(PROP_TARGET_PORT, targetport);
         _tunnel.setClientOptions(opts);
     }
     
@@ -510,10 +584,43 @@ public class TunnelController implements Logging {
         }
     }
 
+    /**
+     *  May be restarted with restartTunnel() or startTunnel() later.
+     *  This may not release all resources. In particular, the I2PSocketManager remains
+     *  and it may have timer threads that continue running.
+     */
     public void stopTunnel() {
+        synchronized (this) {
+            if (_state != TunnelState.STARTING && _state != TunnelState.RUNNING)
+                return;
+            changeState(TunnelState.STOPPING);
+        }
+        // I2PTunnel removes the session in close(),
+        // so save the sessions to pass to release() and TCG
+        Collection<I2PSession> sessions = getAllSessions();
         _tunnel.runClose(new String[] { "forced", "all" }, this);
-        release();
-        _running = false;
+        release(sessions);
+        changeState(TunnelState.STOPPED);
+    }
+
+    /**
+     *  May NOT be restarted with restartTunnel() or startTunnel() later.
+     *  This should release all resources.
+     *
+     *  @since 0.9.17
+     */
+    public void destroyTunnel() {
+        synchronized (this) {
+            if (_state != TunnelState.RUNNING)
+                return;
+            changeState(TunnelState.DESTROYING);
+        }
+        // I2PTunnel removes the session in close(),
+        // so save the sessions to pass to release() and TCG
+        Collection<I2PSession> sessions = getAllSessions();
+        _tunnel.runClose(new String[] { "destroy", "all" }, this);
+        release(sessions);
+        changeState(TunnelState.DESTROYED);
     }
     
     public void restartTunnel() {
@@ -552,16 +659,42 @@ public class TunnelController implements Logging {
                 if (!_config.containsKey(OPT_LOW_TAGS))
                     _config.setProperty(OPT_LOW_TAGS, "14");
             }
+            // same default logic as in EditBean.getSigType()
+            if (!isClient(type) ||
+                type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
+                type.equals(TYPE_SOCKS_IRC) || type.equals(TYPE_STREAMR_CLIENT) ||
+                (type.equals(TYPE_HTTP_CLIENT) && Boolean.valueOf(getSharedClient()))) {
+                if (!_config.containsKey(OPT_SIG_TYPE))
+                    _config.setProperty(OPT_SIG_TYPE, PREFERRED_SIGTYPE.name());
+            }
         }
 
         // tell i2ptunnel, who will tell the TunnelTask, who will tell the SocketManager
         setSessionOptions();
-        if (_running && _sessions != null) {
-            for (I2PSession s : _sessions) {
-                // tell the router via the session
-                if (!s.isClosed()) {
-                    s.updateOptions(_tunnel.getClientOptions());
+
+        synchronized (this) {
+            if (_state != TunnelState.RUNNING) {
+                if (_log.shouldLog(Log.DEBUG)) {
+                    _log.debug("Not running, not updating sessions");
                 }
+                return;
+            }
+        }
+        // Running, so check sessions
+        Collection<I2PSession> sessions = getAllSessions();
+        if (sessions.isEmpty()) {
+             if (_log.shouldLog(Log.DEBUG))
+                 _log.debug("Running but no sessions to update");
+        }
+        for (I2PSession s : sessions) {
+            // tell the router via the session
+            if (!s.isClosed()) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Session is open, updating: " + s);
+                s.updateOptions(_tunnel.getClientOptions());
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Session is closed, not updating: " + s);
             }
         }
     }
@@ -584,6 +717,34 @@ public class TunnelController implements Logging {
     public String getDescription() { return _config.getProperty(PROP_DESCR); }
     public String getI2CPHost() { return _config.getProperty(PROP_I2CP_HOST); }
     public String getI2CPPort() { return _config.getProperty(PROP_I2CP_PORT); }
+
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     *
+     *  @since 0.9.17
+     */
+    public boolean isClient() {
+        return isClient(getType());
+    }
+
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     *
+     *  @since 0.9.17 moved from IndexBean
+     */
+    public static boolean isClient(String type) {
+        return TYPE_STD_CLIENT.equals(type) || 
+               TYPE_HTTP_CLIENT.equals(type) ||
+               TYPE_SOCKS.equals(type) ||
+               TYPE_SOCKS_IRC.equals(type) ||
+               TYPE_CONNECT.equals(type) ||
+               TYPE_STREAMR_CLIENT.equals(type) ||
+               TYPE_IRC_CLIENT.equals(type);
+    }
 
     /**
      *  These are the ones with a prefix of "option."
@@ -609,7 +770,12 @@ public class TunnelController implements Logging {
     public String getTargetHost() { return _config.getProperty(PROP_TARGET_HOST); }
     public String getTargetPort() { return _config.getProperty(PROP_TARGET_PORT); }
     public String getSpoofedHost() { return _config.getProperty(PROP_SPOOFED_HOST); }
+
+    /**
+     *  Probably not absolute. May be null. getPrivateKeyFile() recommended.
+     */
     public String getPrivKeyFile() { return _config.getProperty(PROP_FILE); }
+
     public String getListenPort() { return _config.getProperty(PROP_LISTEN_PORT); }
     public String getTargetDestination() { return _config.getProperty(PROP_DEST); }
     public String getProxyList() { return _config.getProperty(PROP_PROXIES); }
@@ -619,46 +785,84 @@ public class TunnelController implements Logging {
     public boolean getStartOnLoad() { return Boolean.parseBoolean(_config.getProperty(PROP_START, "true")); }
     public boolean getPersistentClientKey() { return Boolean.parseBoolean(_config.getProperty(OPT_PERSISTENT)); }
 
+    /**
+     *  Does not necessarily exist.
+     *  @return absolute path or null if unset
+     *  @since 0.9.17
+     */
+    public File getPrivateKeyFile() {
+        String f = getPrivKeyFile();
+        if (f == null)
+            return null;
+        f = f.trim();
+        if (f.length() == 0)
+            return null;
+        File rv = new File(f);
+        if (!rv.isAbsolute())
+            rv = new File(I2PAppContext.getGlobalContext().getConfigDir(), f);
+        return rv;
+    }
+
+    /**
+     *  Returns null if not running.
+     *  @return Base64 or null
+     */
     public String getMyDestination() {
-        if (_tunnel != null) {
-            List<I2PSession> sessions = _tunnel.getSessions();
-            for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = sessions.get(i);
-                Destination dest = session.getMyDestination();
-                if (dest != null)
-                    return dest.toBase64();
-            }
-        }
+        Destination dest = getDestination();
+        if (dest != null)
+            return dest.toBase64();
         return null;
     }
     
     /**
+     *  Returns null if not running.
      *  @return "{52 chars}.b32.i2p" or null
      */
     public String getMyDestHashBase32() {
+        Destination dest = getDestination();
+        if (dest != null)
+            return dest.toBase32();
+        return null;
+    }
+    
+    /**
+     *  Returns null if not running.
+     *  @return Destination or null
+     *  @since 0.9.17
+     */
+    public Destination getDestination() {
         if (_tunnel != null) {
             List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
                 I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
-                    return dest.toBase32();
+                    return dest;
             }
         }
         return null;
     }
     
-    public boolean getIsRunning() { return _running; }
-    public boolean getIsStarting() { return _starting; }
+    public boolean getIsRunning() { return _state == TunnelState.RUNNING; }
+    public boolean getIsStarting() { return _state == TunnelState.START_ON_LOAD || _state == TunnelState.STARTING; }
+
     /** if running but no open sessions, we are in standby */
     public boolean getIsStandby() {
-        if (!_running)
-            return false;
+        synchronized (this) {
+            if (_state != TunnelState.RUNNING)
+                return false;
+        }
+
         for (I2PSession sess : _tunnel.getSessions()) {
             if (!sess.isClosed())
                 return false;
         }
         return true;
+    }
+
+    /** @since 0.9.19 */
+    private synchronized void changeState(TunnelState state) {
+        _state = state;
     }
     
     /**
@@ -780,7 +984,7 @@ public class TunnelController implements Logging {
      *
      */
     public void log(String s) {
-        synchronized (this) {
+        synchronized (_messages) {
             _messages.add(s);
             while (_messages.size() > 10)
                 _messages.remove(0);
@@ -795,11 +999,19 @@ public class TunnelController implements Logging {
      * @return list of messages pulled off (each is a String, earliest first)
      */
     public List<String> clearMessages() { 
-        List<String> rv = null;
-        synchronized (this) {
+        List<String> rv;
+        synchronized (_messages) {
             rv = new ArrayList<String>(_messages);
             _messages.clear();
         }
         return rv;
+    }
+
+    /**
+     * @since 0.9.15
+     */
+    @Override
+    public String toString() { 
+        return "TC " + getType() + ' ' + getName() + " for " + _tunnel + ' ' + _state;
     }
 }

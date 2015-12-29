@@ -11,6 +11,7 @@ package net.i2p.data;
 
 import java.util.Arrays;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
 
 /**
@@ -47,7 +48,7 @@ public abstract class DatabaseEntry extends DataStructureImpl {
 
     protected volatile Signature _signature;
     protected volatile Hash _currentRoutingKey;
-    protected volatile byte[] _routingKeyGenMod;
+    protected volatile long _routingKeyGenMod;
 
     /**
      * A common interface to the timestamp of the two subclasses.
@@ -67,9 +68,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      * and getIdentity() in RouterInfo.
      *
      * @return KAC or null
-     * @since 0.8.2
+     * @since 0.8.2, public since 0.9.17
      */
-    protected abstract KeysAndCert getKeysAndCert();
+    public abstract KeysAndCert getKeysAndCert();
 
     /**
      * A common interface to the Hash of the two subclasses.
@@ -97,6 +98,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
 
     /**
      * Returns the raw payload data, excluding the signature, to be signed by sign().
+     *
+     * Most callers should use writeBytes() or toByteArray() instead.
+     *
      * FIXME RouterInfo throws DFE and LeaseSet returns null
      * @return null on error ???????????????????????
      */
@@ -106,11 +110,15 @@ public abstract class DatabaseEntry extends DataStructureImpl {
      * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.
      * This only calculates a new one when necessary though (if the generator's key modifier changes)
      *
+     * @throws IllegalStateException if not in RouterContext
      */
     public Hash getRoutingKey() {
-        RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
-        byte[] mod = gen.getModData();
-        if (!Arrays.equals(mod, _routingKeyGenMod)) {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        if (!ctx.isRouterContext())
+            throw new IllegalStateException("Not in router context");
+        RoutingKeyGenerator gen = ctx.routingKeyGenerator();
+        long mod = gen.getLastChanged();
+        if (mod != _routingKeyGenMod) {
             _currentRoutingKey = gen.getRoutingKey(getHash());
             _routingKeyGenMod = mod;
         }
@@ -118,15 +126,15 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     }
 
     /**
-     * @deprecated unused
+     * @throws IllegalStateException if not in RouterContext
      */
-    public void setRoutingKey(Hash key) {
-        _currentRoutingKey = key;
-    }
-
     public boolean validateRoutingKey() {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        if (!ctx.isRouterContext())
+            throw new IllegalStateException("Not in router context");
+        RoutingKeyGenerator gen = ctx.routingKeyGenerator();
         Hash destKey = getHash();
-        Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(destKey);
+        Hash rk = gen.getRoutingKey(destKey);
         return rk.equals(getRoutingKey());
     }
 
@@ -159,8 +167,12 @@ public abstract class DatabaseEntry extends DataStructureImpl {
             throw new IllegalStateException();
         byte[] bytes = getBytes();
         if (bytes == null) throw new DataFormatException("Not enough data to sign");
+        if (key == null)
+            throw new DataFormatException("No signing key");
         // now sign with the key 
         _signature = DSAEngine.getInstance().sign(bytes, key);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + key.getType() + " key");
     }
 
     /**

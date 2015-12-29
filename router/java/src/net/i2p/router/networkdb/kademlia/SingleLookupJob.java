@@ -1,7 +1,7 @@
 package net.i2p.router.networkdb.kademlia;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
@@ -42,7 +42,7 @@ class SingleLookupJob extends JobImpl {
             Hash peer = _dsrm.getReply(i);
             if (peer.equals(getContext().routerHash())) // us
                 continue;
-            if (peer.equals(from)) // wtf
+            if (peer.equals(from)) // unusual?
                 continue;
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
             if (ri == null)

@@ -81,7 +81,9 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         int length = length();
         _data = new byte[length];
         int read = read(in, _data);
-        if (read != length) throw new DataFormatException("Not enough bytes to read the data");
+        if (read != length)
+            throw new DataFormatException("EOF reading " + getClass().getSimpleName() +
+                                          ", read: " + read + ", required: " + length);
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {

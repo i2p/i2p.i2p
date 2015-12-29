@@ -35,14 +35,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +51,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -80,7 +82,7 @@ import net.i2p.util.OrderedProperties;
  *  An I2PTunnel tracks one or more I2PTunnelTasks and one or more I2PSessions.
  *  Usually one of each.
  *
- *  Todo: Most events are not listened to elsewhere, so error propagation is poor
+ *  TODO: Most events are not listened to elsewhere, so error propagation is poor
  */
 public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private final Log _log;
@@ -105,7 +107,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     private static final String nocli_args[] = { "-nocli", "-die"};
 
-    private final List<I2PTunnelTask> tasks = new ArrayList<I2PTunnelTask>();
+    private final List<I2PTunnelTask> tasks = new CopyOnWriteArrayList<I2PTunnelTask>();
     private int next_task_id = 1;
 
     private final Set<ConnectionEventListener> listeners = new CopyOnWriteArraySet<ConnectionEventListener>();
@@ -120,6 +122,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         new LongOpt("nogui", LongOpt.NO_ARGUMENT, null, NOGUI),
         new LongOpt("wait", LongOpt.NO_ARGUMENT, null, 'w')
     };
+
+    /** @since 0.9.17 */
+    private enum CloseMode { NORMAL, FORCED, DESTROY }
 
     public static void main(String[] args) {
         try {
@@ -255,7 +260,15 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         }
 
         if (gui) {
-            new I2PTunnelGUI(this);
+            // removed from source, now in i2p.scripts
+            //new I2PTunnelGUI(this);
+            try {
+                Class<?> cls = Class.forName("net.i2p.i2ptunnel.I2PTunnelGUI");
+                Constructor<?> con = cls.getConstructor(I2PTunnel.class);
+                con.newInstance(this);
+            } catch (Throwable t) {
+                throw new UnsupportedOperationException("GUI is not available, try -cli", t);
+            }
         } else if (cli) {
             try {
                 System.out.println("Enter 'help' for help.");
@@ -306,19 +319,33 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             "    -w, -wait, --wait   :  do not run the command line interface or GUI";
     }
 
-    /** @return A copy, non-null */
+    /**
+     *  @return A copy, unmodifiable, non-null
+     */
     List<I2PSession> getSessions() { 
-            return new ArrayList<I2PSession>(_sessions); 
+        if (_sessions.isEmpty())
+            return Collections.emptyList();
+        return new ArrayList<I2PSession>(_sessions); 
     }
 
+    /**
+     *  @param session null ok
+     */
     void addSession(I2PSession session) { 
         if (session == null) return;
-        _sessions.add(session);
+        boolean added = _sessions.add(session);
+        if (added && _log.shouldLog(Log.INFO))
+            _log.info(getPrefix() + " session added: " + session, new Exception());
     }
 
+    /**
+     *  @param session null ok
+     */
     void removeSession(I2PSession session) { 
         if (session == null) return;
-        _sessions.remove(session);
+        boolean removed = _sessions.remove(session);
+        if (removed && _log.shouldLog(Log.INFO))
+            _log.info(getPrefix() + " session removed: " + session, new Exception());
     }
     
     /**
@@ -334,6 +361,11 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             tsk.setId(next_task_id);
             next_task_id++;
             tasks.add(tsk);
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix() + " adding task: " + tsk);
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix() + " not adding task that isn't open: " + tsk);
         }
     }
 
@@ -426,7 +458,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
               "  auth <username> <password>\n" +
               "  client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]\n" +
               "  clientoptions [-acx] [key=value ]*\n" +
-              "  close [forced] <jobnumber>|all\n" +
+              "  close [forced|destroy] <jobnumber>|all\n" +
               "  config [-s] <i2phost> <i2pport>\n" +
               "  connectclient <port> [<sharedClient>] [<proxy>]\n" +
               "  genkeys <privkeyfile> [<pubkeyfile>]\n" +
@@ -506,6 +538,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * Generic options used for clients and servers.
      * This DOES update a running TunnelTask, but NOT the session.
      * A more efficient runClientOptions().
+     *
+     * Defaults in opts properties are not recommended, they may or may not be honored.
      *
      * @param opts non-null
      * @since 0.9.1
@@ -852,13 +886,13 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             if (portNum <= 0)
                 throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
                 String privateKeyFile = null;
                 if (args.length >= 4)
                     privateKeyFile = args[3];
-                task = new I2PTunnelClient(portNum, args[1], l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PTunnelClient(portNum, args[1], l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -931,10 +965,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelHTTPClient(clientPort, l, ownDest, proxy, this, this);
+                I2PTunnelClientBase task = new I2PTunnelHTTPClient(clientPort, l, ownDest, proxy, this, this);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("httpclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1000,10 +1034,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
-                task = new I2PTunnelConnectClient(_port, l, ownDest, proxy, this, this);
+                I2PTunnelClientBase task = new I2PTunnelConnectClient(_port, l, ownDest, proxy, this, this);
+                task.startRunning();
                 addtask(task);
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create a CONNECT client connecting to the router at " + host + ':'+ port +
@@ -1062,13 +1096,13 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             }
 
-            I2PTunnelTask task;
             ownDest = !isShared;
             try {
                 String privateKeyFile = null;
                 if (args.length >= 4)
                     privateKeyFile = args[3];
-                task = new I2PTunnelIRCClient(_port, args[1], l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PTunnelIRCClient(_port, args[1], l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("ircclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1125,7 +1159,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             if (args.length == 3)
                 privateKeyFile = args[2];
             try {
-                I2PTunnelTask task = new I2PSOCKSTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PSOCKSTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1172,7 +1207,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             if (args.length == 3)
                 privateKeyFile = args[2];
             try {
-                I2PTunnelTask task = new I2PSOCKSIRCTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                I2PTunnelClientBase task = new I2PSOCKSIRCTunnel(_port, l, ownDest, this, this, privateKeyFile);
+                task.startRunning();
                 addtask(task);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
@@ -1291,25 +1327,30 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * @param l logger to receive events and output
      */
     private void runConfig(String args[], Logging l) {
-        if (args.length >= 2) {
+        if (args.length >= 1) {
             int i = 0;
-            if (args[0].equals("-s")) {
+            boolean ssl = args[0].equals("-s");
+            if (ssl) {
                 _clientOptions.setProperty("i2cp.SSL", "true");
                 i++;
             } else {
                 _clientOptions.remove("i2cp.SSL");
             }
-            host = args[i++];
-            listenHost = host;
-            port = args[i];
+            if (i < args.length) {
+                host = args[i++];
+                listenHost = host;
+            }
+            if (i < args.length)
+                port = args[i];
+            l.log("New setting: " + host + ' ' + port + (ssl ? " SSL" : " non-SSL"));
             notifyEvent("configResult", "ok");
         } else {
             boolean ssl = Boolean.parseBoolean(_clientOptions.getProperty("i2cp.SSL"));
             l.log("Usage:\n" +
-                  "  config [-s] <i2phost> <i2pport>\n" +
-                  "  sets the connection to the i2p router.\n" +
-                  "Current setting:\n" +
-                  "  " + host + ' ' + port + (ssl ? " SSL" : ""));
+                  "  config [-s] [<i2phost>] [<i2pport>]\n" +
+                  "  Sets the address and port of the I2P router.\n" +
+                  "  Use -s for SSL.\n" +
+                  "Current setting: " + host + ' ' + port + (ssl ? " SSL" : " non-SSL"));
             notifyEvent("configResult", "error");
         }
     }
@@ -1475,7 +1516,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         if (tasks.isEmpty()) {
             System.exit(0);
         }
-        l.log("There are running tasks. Try 'list'.");
+        l.log("There are running tasks. Try 'list' or 'close all'.");
         //notifyEvent("quitResult", "error");
     }
 
@@ -1502,27 +1543,34 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      *
      * Sets the event "closeResult" = "ok" after the closing is complete
      *
-     * @param args {jobNumber}, {"forced", jobNumber}, {"forced", "all"}
+     * @param args {jobNumber}, {"forced", jobNumber}, {"forced", "all"}, {"destroy", jobNumber}, {"destroy", "all"}
      * @param l logger to receive events and output
      */
     public void runClose(String args[], Logging l) {
         if (args.length == 0 || args.length > 2) {
-            l.log("close [forced] <jobnumber>|all\n" +
+            l.log("close [forced|destroy] <jobnumber>|all\n" +
                   "   stop running tasks. either only one or all.\n"
                   + "   use 'forced' to also stop tasks with active connections.\n"
                   + "   use the 'list' command to show the job numbers");
             notifyEvent("closeResult", "error");
         } else {
             int argindex = 0; // parse optional 'forced' keyword
-            boolean forced = false;
+            CloseMode mode = CloseMode.NORMAL;
             if (args[argindex].equalsIgnoreCase("forced")) {
-                forced = true;
+                mode = CloseMode.FORCED;
+                argindex++;
+            } else if (args[argindex].equalsIgnoreCase("destroy")) {
+                mode = CloseMode.DESTROY;
                 argindex++;
             }
             if (args[argindex].equalsIgnoreCase("all")) {
                 boolean error = false;
+                if (tasks.isEmpty()) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getPrefix() + " runClose(all) no tasks");
+                }
                 for (I2PTunnelTask t : tasks) {
-                    if (!closetask(t, forced, l)) {
+                    if (!closetask(t, mode, l)) {
                         notifyEvent("closeResult", "error");
                         error = true;
                     } else if (!error) { // If there's an error, don't hide it
@@ -1531,7 +1579,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 }
             } else {
                 try {
-                    if (!closetask(Integer.parseInt(args[argindex]), forced, l)) {
+                    if (!closetask(Integer.parseInt(args[argindex]), mode, l)) {
                         notifyEvent("closeResult", "error");
                     } else {
                         notifyEvent("closeResult", "ok");
@@ -1556,7 +1604,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private void runRun(String args[], Logging l) {
         if (args.length == 1) {
             try {
-                BufferedReader br = new BufferedReader(new FileReader(args[0]));
+                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
                     runCommand(line, l);
@@ -1622,7 +1670,14 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private void runPing(String allargs, Logging l) {
         if (allargs.length() != 0) {
             _clientOptions.setProperty(I2Ping.PROP_COMMAND, allargs);
-            I2PTunnelTask task = new I2Ping(l, ownDest, this, this);
+            if (ownDest) {
+                if (!_clientOptions.containsKey("inbound.nickname"))
+                    _clientOptions.setProperty("inbound.nickname", "I2Ping");
+                if (!_clientOptions.containsKey("outbound.nickname"))
+                    _clientOptions.setProperty("outbound.nickname", "I2Ping");
+            }
+            I2PTunnelClientBase task = new I2Ping(l, ownDest, this, this);
+            task.startRunning();
             addtask(task);
             notifyEvent("pingTaskId", Integer.valueOf(task.getId()));
         } else {
@@ -1636,7 +1691,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * closure)
      *
      */
-    private boolean closetask(int num, boolean forced, Logging l) {
+    private boolean closetask(int num, CloseMode mode, Logging l) {
         boolean closed = false;
 
         _log.debug(getPrefix() + "closetask(): looking for task " + num);
@@ -1645,7 +1700,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix() + "closetask(): parsing task " + id + " (" + t.toString() + ")");
                 if (id == num) {
-                    closed = closetask(t, forced, l);
+                    closed = closetask(t, mode, l);
                     break;
                 } else if (id > num) {
                     break;
@@ -1659,17 +1714,23 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * (optionally forcing closure)
      *
      */
-    private boolean closetask(I2PTunnelTask t, boolean forced, Logging l) {
+    private boolean closetask(I2PTunnelTask t, CloseMode mode, Logging l) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Closing task " + t.getId() + (forced ? " forced..." : "..."));
+            _log.info("Closing task " + t.getId() + " mode: " + mode);
         //l.log("Closing task " + t.getId() + (forced ? " forced..." : "..."));
-        if (t.close(forced)) {
+        boolean success;
+        if (mode == CloseMode.NORMAL)
+            success = t.close(false);
+        else if (mode == CloseMode.FORCED)
+            success = t.close(true);
+        else  // DESTROY
+            success = t.destroy();
+        if (success) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Task " + t.getId() + " closed.");
             //l.log("Task " + t.getId() + " closed.");
-            return true;
         }
-        return false;
+        return success;
     }
 
     /**
@@ -1693,7 +1754,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     public void log(String s) {
         System.out.println(s);
-        _log.info(getPrefix() + "Display: " + s);
+        //if (_log.shouldLog(Log.INFO))
+        //    _log.info(getPrefix() + "Display: " + s);
     }
 
     /**
@@ -1711,8 +1773,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             l.log("Generating new keys...");
             I2PClient client = I2PClientFactory.createClient();
             Destination d = client.createDestination(writeTo);
-            l.log("Secret key saved.\n" +
-                  "Public key: " + d.toBase64());
+            l.log("New destination: " + d.toBase32());
             writeTo.flush();
             writeTo.close();
             writePubKey(d, pubDest, l);
@@ -1735,7 +1796,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         try {
             Destination d = new Destination();
             d.readBytes(readFrom);
-            l.log("Public key: " + d.toBase64());
+            l.log("Destination: " + d.toBase32());
             readFrom.close();
             writePubKey(d, pubDest, l);
         } catch (I2PException ex) {
@@ -1750,7 +1811,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * Deprecated - only used by CLI
      *
      * @param d Destination to write
-     * @param o stream to write the destination to
+     * @param o stream to write the destination to, or null for noop
      * @param l logger to send messages to
      */
     private static void writePubKey(Destination d, OutputStream o, Logging l) throws I2PException, IOException {
@@ -1812,7 +1873,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             try {
                 result.fromByteArray(content);
                 return result;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 if (log.shouldLog(Log.INFO)) 
                     log.info("File is not a binary destination - trying base64");
                 try {

@@ -28,13 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+import java.io.Flushable;
 import java.util.Random;
 
 import net.i2p.util.RandomSource;
 
 //import net.metanotion.io.block.BlockFile;
 
-public class SkipList {
+public class SkipList implements Flushable {
 	/** the probability of each next higher level */
 	protected static final int P = 2;
 	private static final int MIN_SLOTS = 4;

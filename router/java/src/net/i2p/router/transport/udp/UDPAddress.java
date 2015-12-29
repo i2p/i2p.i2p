@@ -4,9 +4,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import net.i2p.data.Base64;
-import net.i2p.data.RouterAddress;
+import net.i2p.data.router.RouterAddress;
 import net.i2p.data.SessionKey;
+import net.i2p.router.transport.TransportUtil;
 import net.i2p.util.LHMCache;
 import net.i2p.util.SystemVersion;
 
@@ -17,7 +20,7 @@ class UDPAddress {
     private final String _host;
     private InetAddress _hostAddress;
     private final int _port;
-    private byte[] _introKey;
+    private final byte[] _introKey;
     private String _introHosts[];
     private InetAddress _introAddresses[];
     private int _introPorts[];
@@ -62,9 +65,10 @@ class UDPAddress {
         if (addr == null) {
             _host = null;
             _port = 0;
+            _introKey = null;
             return;
         }
-        _host = addr.getOption(PROP_HOST);
+        _host = addr.getHost();
         _port = addr.getPort();
         try { 
             String mtu = addr.getOption(PROP_MTU);
@@ -78,6 +82,10 @@ class UDPAddress {
             byte[] ik = Base64.decode(key.trim());
             if (ik != null && ik.length == SessionKey.KEYSIZE_BYTES)
                 _introKey = ik;
+            else
+                _introKey = null;
+        } else {
+            _introKey = null;
         }
         
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
@@ -95,7 +103,7 @@ class UDPAddress {
             int p;
             try { 
                 p = Integer.parseInt(port); 
-                if (p < UDPTransport.MIN_PEER_PORT || p > 65535) continue;
+                if (!TransportUtil.isValidPort(p)) continue;
             } catch (NumberFormatException nfe) {
                 continue;
             }
@@ -167,6 +175,9 @@ class UDPAddress {
      */
     public int getPort() { return _port; }
 
+    /**
+     *  @return shouldn't be null but will be if invalid
+     */
     byte[] getIntroKey() { return _introKey; }
     
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
@@ -253,12 +264,9 @@ class UDPAddress {
         }
         if (rv == null) {
             try {
-                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
-                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
-                    return null;
                 rv = InetAddress.getByName(host);
-                if (isIPv4 ||
-                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                if (InetAddressUtils.isIPv4Address(host) ||
+                    InetAddressUtils.isIPv6Address(host)) {
                     synchronized (_inetAddressCache) {
                         _inetAddressCache.put(host, rv);
                     }

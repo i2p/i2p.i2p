@@ -1,10 +1,31 @@
+# It's not recommended to modify this file because it will be
+# overwritten during package upgrades.  If you want to make changes, the
+# best way is to create a file "/etc/systemd/system/i2p.service.d/foo.conf"
+# and make your changes there. This file will be parsed after the file
+# i2p.service itself is parsed.
+#
+# For more info about custom unit files, see systemd.unit(5) or
+# http://fedoraproject.org/wiki/Systemd#How_do_I_customize_a_unit_file.2F_add_a_custom_unit_file.3F
+
+# For example, if you want to increase I2P's open-files-limit to 10000,
+# you need to increase systemd's LimitNOFILE setting, so create a file named
+# "/etc/systemd/system/i2p.service.d/limits.conf" containing:
+#	[Service]
+#	LimitNOFILE=10000
+
+# Don't forget to reload systemd daemon after you change unit configuration:
+# root> systemctl --system daemon-reload
+
 [Unit]
 Description=load-balanced unspoofable packet switching network
-After=network.target
+After=local-fs.target network.target time-sync.target
 
 [Service]
 Type=forking
 EnvironmentFile=/etc/default/i2p
+RuntimeDirectory=i2p
+RuntimeDirectoryMode=750
+PIDFile=/run/i2p/i2p.pid
 Environment="I2P_ARGS=/etc/i2p/wrapper.config \
  wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
  wrapper.java.additional.10=-Dwrapper.logfile=/var/log/i2p/wrapper.log \
@@ -16,11 +37,12 @@ Environment="I2P_ARGS=/etc/i2p/wrapper.config \
  wrapper.daemonize=TRUE" TZ=UTC
 User=i2psvc
 PermissionsStartOnly=true
-ExecStartPre=/bin/mkdir -p /run/i2p /tmp/i2p-daemon
+AppArmorProfile=system_i2p
+ExecStartPre=/bin/mkdir -p /tmp/i2p-daemon
 ExecStartPre=/bin/chown -R ${I2PUSER}:${I2PUSER} /var/log/i2p /run/i2p /tmp/i2p-daemon
 ExecStartPre=/bin/chmod 750 /var/log/i2p
 ExecStart=/usr/sbin/wrapper "$I2P_ARGS"
-ExecStopPost=/bin/rm -rf /run/i2p /tmp/i2p-daemon
+ExecStopPost=/bin/rm -rf /run/i2p
 
 [Install]
 WantedBy=multi-user.target

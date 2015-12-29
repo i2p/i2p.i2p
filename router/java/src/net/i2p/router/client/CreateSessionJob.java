@@ -26,25 +26,20 @@ import net.i2p.util.Log;
  */
 class CreateSessionJob extends JobImpl {
     private final Log _log;
-    private final ClientConnectionRunner _runner;
+    private final SessionConfig _config;
     
-    public CreateSessionJob(RouterContext context, ClientConnectionRunner runner) {
+    public CreateSessionJob(RouterContext context, SessionConfig config) {
         super(context);
         _log = context.logManager().getLog(CreateSessionJob.class);
-        _runner = runner;
+        _config = config;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("CreateSessionJob for runner " + _runner + " / config: " + _runner.getConfig());
+            _log.debug("CreateSessionJob for config: " + config);
     }
     
     public String getName() { return "Request tunnels for a new client"; }
+
     public void runJob() {
-        SessionConfig cfg = _runner.getConfig();
-        if ( (cfg == null) || (cfg.getDestination() == null) ) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("No session config on runner " + _runner);
-            return;
-        }
-        Hash dest = cfg.getDestination().calculateHash();
+        Hash dest = _config.getDestination().calculateHash();
         if (_log.shouldLog(Log.INFO))
             _log.info("Requesting lease set for destination " + dest);
         ClientTunnelSettings settings = new ClientTunnelSettings(dest);
@@ -61,10 +56,10 @@ class CreateSessionJob extends JobImpl {
         // XXX props.putAll(Router.getInstance().getConfigMap());
         
         // override them by the client's settings
-        props.putAll(cfg.getOptions());
+        props.putAll(_config.getOptions());
         
         // and load 'em up (using anything not yet set as the software defaults)
         settings.readFromProperties(props);
-        getContext().tunnelManager().buildTunnels(cfg.getDestination(), settings);
+        getContext().tunnelManager().buildTunnels(_config.getDestination(), settings);
     }
 }

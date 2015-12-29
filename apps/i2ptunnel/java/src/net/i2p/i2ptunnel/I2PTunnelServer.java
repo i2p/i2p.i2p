@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Properties;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 
 import net.i2p.I2PException;
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
@@ -44,14 +46,14 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     protected final Log _log;
     protected final I2PSocketManager sockMgr;
-    protected I2PServerSocket i2pss;
+    protected volatile I2PServerSocket i2pss;
 
     private final Object lock = new Object();
     protected final Object slock = new Object();
     protected final Object sslLock = new Object();
 
-    protected final InetAddress remoteHost;
-    protected final int remotePort;
+    protected InetAddress remoteHost;
+    protected int remotePort;
     private final boolean _usePool;
     protected final Logging l;
     private I2PSSLSocketFactory _sslFactory;
@@ -78,6 +80,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected I2PTunnelTask task;
     protected boolean bidir;
     private ThreadPoolExecutor _executor;
+    protected volatile ThreadPoolExecutor _clientExecutor;
     private final Map<Integer, InetSocketAddress> _socketMap = new ConcurrentHashMap<Integer, InetSocketAddress>(4);
 
     /** unused? port should always be specified */
@@ -212,7 +215,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         try {
             I2PSocketManager rv = I2PSocketManagerFactory.createDisconnectedManager(privData, getTunnel().host,
                                                                                     portNum, props);
-            rv.setName("Server");
+            rv.setName("I2PTunnel Server");
             getTunnel().addSession(rv.getSession());
             return rv;
         } catch (I2PSessionException ise) {
@@ -265,6 +268,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      *  Copy input stream to a byte array, so we can retry
      *  @since 0.7.10
      */
+/****
     private static ByteArrayInputStream copyOfInputStream(InputStream is) throws IOException {
         byte[] buf = new byte[128];
         ByteArrayOutputStream os = new ByteArrayOutputStream(768);
@@ -279,6 +283,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
         return new ByteArrayInputStream(os.toByteArray());
     }
+****/
     
     /**
      * Start running the I2PTunnelServer.
@@ -314,6 +319,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         return readTimeout;
     }
 
+    /**
+     *  Note that the tunnel can be reopened after this by calling startRunning().
+     *  This does not release all resources. In particular, the I2PSocketManager remains
+     *  and it may have timer threads that continue running.
+     *
+     *  To release all resources permanently, call destroy().
+     */
     public synchronized boolean close(boolean forced) {
         if (!open) return true;
         if (task != null) {
@@ -328,16 +340,20 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 return false;
             }
             l.log("Stopping tunnels for server at " + this.remoteHost + ':' + this.remotePort);
+            open = false;
             try {
-                if (i2pss != null) i2pss.close();
-                getTunnel().removeSession(sockMgr.getSession());
-                sockMgr.getSession().destroySession();
+                if (i2pss != null) {
+                    i2pss.close();
+                    i2pss = null;
+                }
+                I2PSession session = sockMgr.getSession();
+                getTunnel().removeSession(session);
+                session.destroySession();
             } catch (I2PException ex) {
                 _log.error("Error destroying the session", ex);
                 //System.exit(1);
             }
             //l.log("Server shut down.");
-            open = false;
             if (_usePool && _executor != null) {
                 _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
                 _executor.shutdownNow();
@@ -347,7 +363,22 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
+     *  Note that the tunnel cannot be reopened after this by calling startRunning(),
+     *  as it will destroy the underlying socket manager.
+     *  This releases all resources.
+     *
+     *  @since 0.9.17
+     */
+    @Override
+    public synchronized boolean destroy() {
+        close(true);
+        sockMgr.destroySocketManager();
+        return true;
+    }
+
+    /**
      *  Update the I2PSocketManager.
+     *  And since 0.9.15, the target host and port.
      *
      *  @since 0.9.1
      */
@@ -357,6 +388,27 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             return;
         Properties props = tunnel.getClientOptions();
         sockMgr.setDefaultOptions(sockMgr.buildOptions(props));
+        // see TunnelController.setSessionOptions()
+        String h = props.getProperty(TunnelController.PROP_TARGET_HOST);
+        if (h != null) {
+            try {
+                remoteHost = InetAddress.getByName(h);
+            } catch (UnknownHostException uhe) {
+                l.log("Unknown host: " + h);
+            }
+        }
+        String p = props.getProperty(TunnelController.PROP_TARGET_PORT);
+        if (p != null) {
+            try {
+                int port = Integer.parseInt(p);
+                if (port > 0 && port <= 65535)
+                    remotePort = port;
+                else
+                    l.log("Bad port: " + port);
+            } catch (NumberFormatException nfe) {
+                l.log("Bad port: " + p);
+            }
+        }
         buildSocketMap(props);
     }
 
@@ -409,7 +461,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      *  hands each I2P socket to the executor or runs it in-line.
      */
     public void run() {
-        I2PServerSocket i2pS_S = sockMgr.getServerSocket();
+        i2pss = sockMgr.getServerSocket();
         if (_log.shouldLog(Log.WARN)) {
             if (_usePool)
                 _log.warn("Starting executor with " + getHandlerCount() + " threads max");
@@ -419,9 +471,22 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (_usePool) {
             _executor = new CustomThreadPoolExecutor(getHandlerCount(), "ServerHandler pool " + remoteHost + ':' + remotePort);
         }
+        TunnelControllerGroup tcg = TunnelControllerGroup.getInstance();
+        if (tcg != null) {
+            _clientExecutor = tcg.getClientExecutor();
+        } else {
+            // Fallback in case TCG.getInstance() is null, never instantiated
+            // and we were not started by TCG.
+            // Maybe a plugin loaded before TCG? Should be rare.
+            // Never shut down.
+            _clientExecutor = new TunnelControllerGroup.CustomThreadPoolExecutor();
+        }
         while (open) {
             try {
-                final I2PSocket i2ps = i2pS_S.accept();
+                I2PServerSocket ci2pss = i2pss;
+                if (ci2pss == null)
+                    throw new I2PException("I2PServerSocket closed");
+                final I2PSocket i2ps = ci2pss.accept();
                 if (i2ps == null) throw new I2PException("I2PServerSocket closed");
                 if (_usePool) {
                     try {
@@ -448,13 +513,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             } catch (ConnectException ce) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error accepting", ce);
-                // not killing the server..
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ie) {}
+                open = false;
+                break;
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // streaming borkage
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Uncaught exception accepting", e);
@@ -464,7 +527,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 } catch (InterruptedException ie) {}
             }
         }
-        if (_executor != null)
+        if (_executor != null && !_executor.isTerminating() && !_executor.isShutdown())
             _executor.shutdownNow();
     }
     
@@ -507,10 +570,25 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
 
         public void run() {
-            blockingHandle(_i2ps);   
+            try {
+                blockingHandle(_i2ps);   
+            } catch (Throwable t) {
+                _log.error("Uncaught error in i2ptunnel server", t);
+            }
         }
     }
     
+    /**
+     *  This is run in a thread from a limited-size thread pool via Handler.run(),
+     *  except for a standard server (this class, no extension, as determined in getUsePool()),
+     *  it is run directly in the acceptor thread (see run()).
+     *
+     *  In either case, this method and any overrides must spawn a thread and return quickly.
+     *  If blocking while reading the headers (as in HTTP and IRC), the thread pool
+     *  may be exhausted.
+     *
+     *  See PROP_USE_POOL, DEFAULT_USE_POOL, PROP_HANDLER_COUNT, DEFAULT_HANDLER_COUNT
+     */
     protected void blockingHandle(I2PSocket socket) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
@@ -525,7 +603,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             afterSocket = getTunnel().getContext().clock().now();
             Thread t = new I2PTunnelRunner(s, socket, slock, null, null,
                                            null, (I2PTunnelRunner.FailCallback) null);
-            t.start();
+            // run in the unlimited client pool
+            //t.start();
+            _clientExecutor.execute(t);
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;

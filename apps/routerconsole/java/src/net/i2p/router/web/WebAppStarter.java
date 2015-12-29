@@ -35,7 +35,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class WebAppStarter {
 
     private static final Map<String, Long> warModTimes = new ConcurrentHashMap<String, Long>();
-    static final Map INIT_PARAMS = new HashMap(4);
+    static final Map<String, String> INIT_PARAMS = new HashMap<String, String>(4);
     //static private Log _log;
 
     static {

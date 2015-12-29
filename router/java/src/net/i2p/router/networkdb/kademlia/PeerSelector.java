@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.SelectionCollector;
 import net.i2p.router.RouterContext;
@@ -112,15 +112,14 @@ class PeerSelector {
     
     /** UNUSED */
     private class MatchSelectionCollector implements SelectionCollector<Hash> {
-        private TreeMap<BigInteger, Hash> _sorted;
-        private Hash _key;
-        private Set<Hash> _toIgnore;
+        private final TreeMap<BigInteger, Hash> _sorted;
+        private final Hash _key;
+        private final Set<Hash> _toIgnore;
         private int _matches;
         public MatchSelectionCollector(Hash key, Set<Hash> toIgnore) {
             _key = key;
             _sorted = new TreeMap<BigInteger, Hash>();
             _toIgnore = toIgnore;
-            _matches = 0;
         }
         public void add(Hash entry) {
             // deadlock seen here, and we don't mark profiles failing anymore
@@ -131,7 +130,7 @@ class PeerSelector {
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
             if (info == null)
                 return;
-            if (info.getIdentity().isHidden())
+            if (info.isHidden())
                 return;
             
             BigInteger diff = HashDistance.getDistance(_key, entry);

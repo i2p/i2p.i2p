@@ -87,19 +87,12 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
 
     private void init(boolean verify, InputStream privData, String privkeyname, Logging l) {
         this.l = l;
-        int portNum = 7654;
-        if (getTunnel().port != null) {
-            try {
-                portNum = Integer.parseInt(getTunnel().port);
-            } catch (NumberFormatException nfe) {
-                _log.log(Log.CRIT, "Invalid port specified [" + getTunnel().port + "], reverting to " + portNum);
-            }
-        }
 
         // create i2pclient
         I2PClient client = I2PClientFactory.createClient();
 
         try {
+            // FIXME this may not pick up non-default I2CP host/port settings from tunnel
             _session = client.createSession(privData, getTunnel().getClientOptions());
             connected(_session);
         } catch(I2PSessionException exc) {
@@ -195,6 +188,7 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
      *  Sink Methods
      *
      * @param to
+     * @throws RuntimeException if session is closed
      *
      */
     public void send(Destination to, byte[] data) {

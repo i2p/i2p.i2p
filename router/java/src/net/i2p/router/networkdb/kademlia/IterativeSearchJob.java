@@ -13,12 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.XORComparator;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
@@ -28,6 +28,8 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
+import net.i2p.util.NativeBigInteger;
+import net.i2p.util.SystemVersion;
 
 /**
  * A traditional Kademlia search that continues to search
@@ -67,16 +69,24 @@ class IterativeSearchJob extends FloodSearchJob {
     private final Hash _fromLocalDest;
     /** testing */
     private static Hash _alwaysQueryHash;
-
+    /** Max number of peers to query */
+    private final int _totalSearchLimit;
+    
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
-    private static final int TOTAL_SEARCH_LIMIT = 7;
+    private static final int TOTAL_SEARCH_LIMIT = 5;
+    /** Max number of peers to query if we are ff */
+    private static final int TOTAL_SEARCH_LIMIT_WHEN_FF = 3;
     /** TOTAL_SEARCH_LIMIT * SINGLE_SEARCH_TIME, plus some extra */
     private static final int MAX_SEARCH_TIME = 30*1000;
     /**
      *  The time before we give up and start a new search - much shorter than the message's expire time
      *  Longer than the typ. response time of 1.0 - 1.5 sec, but short enough that we move
      *  on to another peer quickly.
+     */
+    private final long _singleSearchTime;
+    /** 
+     * The default single search time
      */
     private static final long SINGLE_SEARCH_TIME = 3*1000;
     /** the actual expire time for a search message */
@@ -86,10 +96,19 @@ class IterativeSearchJob extends FloodSearchJob {
      *  For now, we don't do concurrent, but we keep SINGLE_SEARCH_TIME very short,
      *  so we have effective concurrency in that we fail a search quickly.
      */
+    private final int _maxConcurrent;
+    /**
+     * The default _maxConcurrent
+     */
     private static final int MAX_CONCURRENT = 1;
 
-    /** testing */
-    private static final String PROP_ENCRYPT_RI = "router.encryptRouterLookups";
+    public static final String PROP_ENCRYPT_RI = "router.encryptRouterLookups";
+
+    /** only on fast boxes, for now */
+    public static final boolean DEFAULT_ENCRYPT_RI =
+            SystemVersion.isX86() && /* SystemVersion.is64Bit() && */
+            !SystemVersion.isApache() && !SystemVersion.isGNU() &&
+            NativeBigInteger.isNative();
 
     /**
      *  Lookup using exploratory tunnels
@@ -114,12 +133,18 @@ class IterativeSearchJob extends FloodSearchJob {
         _expiration = _timeoutMs + ctx.clock().now();
         _rkey = ctx.routingKeyGenerator().getRoutingKey(key);
         _toTry = new TreeSet<Hash>(new XORComparator<Hash>(_rkey));
+        int totalSearchLimit = (facade.floodfillEnabled() && ctx.router().getUptime() > 30*60*1000) ?
+                            TOTAL_SEARCH_LIMIT_WHEN_FF : TOTAL_SEARCH_LIMIT;
+        _totalSearchLimit = ctx.getProperty("netdb.searchLimit", totalSearchLimit);
+        _singleSearchTime = ctx.getProperty("netdb.singleSearchTime", SINGLE_SEARCH_TIME);
+        _maxConcurrent = ctx.getProperty("netdb.maxConcurrent", MAX_CONCURRENT);
         _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
-        _failedPeers = new HashSet<Hash>(TOTAL_SEARCH_LIMIT);
-        _sentTime = new ConcurrentHashMap<Hash, Long>(TOTAL_SEARCH_LIMIT);
+        _failedPeers = new HashSet<Hash>(_totalSearchLimit);
+        _sentTime = new ConcurrentHashMap<Hash, Long>(_totalSearchLimit);
         _fromLocalDest = fromLocalDest;
         if (fromLocalDest != null && !isLease && _log.shouldLog(Log.WARN))
             _log.warn("Search for RI " + key + " down client tunnel " + fromLocalDest, new Exception());
+        // all createRateStat in FNDF
     }
 
     @Override
@@ -136,9 +161,9 @@ class IterativeSearchJob extends FloodSearchJob {
         if (ks != null) {
             // Ideally we would add the key to an exclude list, so we don't try to query a ff peer for itself,
             // but we're passing the rkey not the key, so we do it below instead in certain cases.
-            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, TOTAL_SEARCH_LIMIT, ks);
+            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, _totalSearchLimit, ks);
         } else {
-            floodfillPeers = new ArrayList<Hash>(TOTAL_SEARCH_LIMIT);
+            floodfillPeers = new ArrayList<Hash>(_totalSearchLimit);
         }
 
         // For testing or local networks... we will
@@ -173,11 +198,17 @@ class IterativeSearchJob extends FloodSearchJob {
                 floodfillPeers.add(iter.next());
             }
         }
-        _toTry.addAll(floodfillPeers);
-        // don't ask ourselves or the target
-        _toTry.remove(getContext().routerHash());
-        _toTry.remove(_key);
-        if (_toTry.isEmpty()) {
+        final boolean empty;
+        // outside sync to avoid deadlock
+        final Hash us = getContext().routerHash();
+        synchronized(this) {
+            _toTry.addAll(floodfillPeers);
+            // don't ask ourselves or the target
+            _toTry.remove(us);
+            _toTry.remove(_key);
+            empty = _toTry.isEmpty();
+        }
+        if (empty) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": ISJ for " + _key + " had no peers to send to");
             // no floodfill peers, fail
@@ -213,23 +244,26 @@ class IterativeSearchJob extends FloodSearchJob {
         }
         while (true) {
             Hash peer;
+            final int done, pend;
             synchronized (this) {
                 if (_dead) return;
-                int pend = _unheardFrom.size();
-                if (pend >= MAX_CONCURRENT)
+                pend = _unheardFrom.size();
+                if (pend >= _maxConcurrent)
                     return;
-                int done = _failedPeers.size();
-                if (done >= TOTAL_SEARCH_LIMIT) {
-                    failed();
-                    return;
-                }
-                // even if pend and todo are empty, we don't fail, as there may be more peers
-                // coming via newPeerToTry()
-                if (done + pend >= TOTAL_SEARCH_LIMIT)
-                    return;
+                done = _failedPeers.size();
+            }
+            if (done >= _totalSearchLimit) {
+                failed();
+                return;
+            }
+            // even if pend and todo are empty, we don't fail, as there may be more peers
+            // coming via newPeerToTry()
+            if (done + pend >= _totalSearchLimit)
+                return;
+            synchronized(this) {
                 if (_alwaysQueryHash != null &&
-                    !_unheardFrom.contains(_alwaysQueryHash) &&
-                    !_failedPeers.contains(_alwaysQueryHash)) {
+                        !_unheardFrom.contains(_alwaysQueryHash) &&
+                        !_failedPeers.contains(_alwaysQueryHash)) {
                     // For testing or local networks... we will
                     // pretend that the specified router is floodfill, and always closest-to-the-key.
                     // May be set after startup but can't be changed or unset later.
@@ -253,9 +287,11 @@ class IterativeSearchJob extends FloodSearchJob {
      */
     private void sendQuery(Hash peer) {
             TunnelManagerFacade tm = getContext().tunnelManager();
+            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
             TunnelInfo outTunnel;
             TunnelInfo replyTunnel;
             boolean isClientReplyTunnel;
+            boolean isDirect;
             if (_fromLocalDest != null) {
                 outTunnel = tm.selectOutboundTunnel(_fromLocalDest, peer);
                 if (outTunnel == null)
@@ -264,12 +300,26 @@ class IterativeSearchJob extends FloodSearchJob {
                 isClientReplyTunnel = replyTunnel != null;
                 if (!isClientReplyTunnel)
                     replyTunnel = tm.selectInboundExploratoryTunnel(peer);
+                isDirect = false;
+            } else if ((!_isLease) && ri != null && getContext().commSystem().isEstablished(peer)) {
+                // If it's a RI lookup, not from a client, and we're already connected, just ask directly
+                // This also saves the ElG encryption for us and the decryption for the ff
+                // There's no anonymity reason to use an expl. tunnel... the main reason
+                // is to limit connections to the ffs. But if we're already connected,
+                // do it the fast and easy way.
+                outTunnel = null;
+                replyTunnel = null;
+                isClientReplyTunnel = false;
+                isDirect = true;
+                getContext().statManager().addRateData("netDb.RILookupDirect", 1);
             } else {
                 outTunnel = tm.selectOutboundExploratoryTunnel(peer);
                 replyTunnel = tm.selectInboundExploratoryTunnel(peer);
                 isClientReplyTunnel = false;
+                isDirect = false;
+                getContext().statManager().addRateData("netDb.RILookupDirect", 0);
             }
-            if ( (replyTunnel == null) || (outTunnel == null) ) {
+            if ((!isDirect) && (replyTunnel == null || outTunnel == null)) {
                 failed();
                 return;
             }
@@ -280,7 +330,7 @@ class IterativeSearchJob extends FloodSearchJob {
             // if it happens to be closest to itself and we are using zero-hop exploratory tunnels.
             // If we don't, the OutboundMessageDistributor ends up logging erors for
             // not being able to send to the floodfill, if we don't have an older netdb entry.
-            if (outTunnel.getLength() <= 1) {
+            if (outTunnel != null && outTunnel.getLength() <= 1) {
                 if (peer.equals(_key)) {
                     failed(peer, false);
                     if (_log.shouldLog(Log.WARN))
@@ -296,10 +346,15 @@ class IterativeSearchJob extends FloodSearchJob {
             }
             
             DatabaseLookupMessage dlm = new DatabaseLookupMessage(getContext(), true);
-            dlm.setFrom(replyTunnel.getPeer(0));
+            if (isDirect) {
+                dlm.setFrom(getContext().routerHash());
+            } else {
+                dlm.setFrom(replyTunnel.getPeer(0));
+                dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
+            }
             dlm.setMessageExpiration(getContext().clock().now() + SINGLE_SEARCH_MSG_TIME);
-            dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
             dlm.setSearchKey(_key);
+            dlm.setSearchType(_isLease ? DatabaseLookupMessage.Type.LS : DatabaseLookupMessage.Type.RI);
             
             if (_log.shouldLog(Log.INFO)) {
                 int tries;
@@ -309,16 +364,21 @@ class IterativeSearchJob extends FloodSearchJob {
                 _log.info(getJobId() + ": ISJ try " + tries + " for " +
                           (_isLease ? "LS " : "RI ") +
                           _key + " to " + peer +
+                          " direct? " + isDirect +
                           " reply via client tunnel? " + isClientReplyTunnel);
             }
             long now = getContext().clock().now();
             _sentTime.put(peer, Long.valueOf(now));
 
             I2NPMessage outMsg = null;
-            if (_isLease || getContext().getBooleanProperty(PROP_ENCRYPT_RI)) {
+            if (isDirect) {
+                // never wrap
+            } else if (_isLease ||
+                       (getContext().getProperty(PROP_ENCRYPT_RI, DEFAULT_ENCRYPT_RI) &&
+                        getContext().jobQueue().getMaxLag() < 300)) {
                 // Full ElG is fairly expensive so only do it for LS lookups
+                // and for RI lookups on fast boxes.
                 // if we have the ff RI, garlic encrypt it
-                RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
                 if (ri != null) {
                     // request encrypted reply
                     if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
@@ -347,12 +407,24 @@ class IterativeSearchJob extends FloodSearchJob {
             }
             if (outMsg == null)
                 outMsg = dlm;
-            getContext().tunnelDispatcher().dispatchOutbound(outMsg, outTunnel.getSendTunnelId(0), peer);
+            if (isDirect) {
+                OutNetMessage m = new OutNetMessage(getContext(), outMsg, outMsg.getMessageExpiration(),
+                                                    OutNetMessage.PRIORITY_MY_NETDB_LOOKUP, ri);
+                // Should always succeed, we are connected already
+                //m.setOnFailedReplyJob(onFail);
+                //m.setOnFailedSendJob(onFail);
+                //m.setOnReplyJob(onReply);
+                //m.setReplySelector(selector);
+                //getContext().messageRegistry().registerPending(m);
+                getContext().commSystem().processMessage(m);
+            } else {
+                getContext().tunnelDispatcher().dispatchOutbound(outMsg, outTunnel.getSendTunnelId(0), peer);
+            }
 
             // The timeout job is always run (never cancelled)
             // Note that the timeout is much shorter than the message expiration (see above)
             Job j = new IterativeTimeoutJob(getContext(), peer, this);
-            long expire = Math.min(_expiration, now + SINGLE_SEARCH_TIME);
+            long expire = Math.min(_expiration, now + _singleSearchTime);
             j.getTiming().setStartAfter(expire);
             getContext().jobQueue().addJob(j);
 
@@ -457,15 +529,18 @@ class IterativeSearchJob extends FloodSearchJob {
             _dead = true;
         }
         _facade.complete(_key);
-        if (getContext().commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_DISCONNECTED)
+        if (getContext().commSystem().getStatus() != Status.DISCONNECTED)
             _facade.lookupFailed(_key);
         getContext().messageRegistry().unregisterPending(_out);
         int tries;
+        final List<Hash> unheard;
         synchronized(this) {
             tries = _unheardFrom.size() + _failedPeers.size();
-            // blame the unheard-from (others already blamed in failed() above)
-            for (Hash h : _unheardFrom)
-                getContext().profileManager().dbLookupFailed(h);
+            unheard = new ArrayList<Hash>(_unheardFrom);
+        }
+        // blame the unheard-from (others already blamed in failed() above)
+        for (Hash h : unheard) {
+            getContext().profileManager().dbLookupFailed(h);
         }
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO)) {
@@ -473,8 +548,11 @@ class IterativeSearchJob extends FloodSearchJob {
             _log.info(getJobId() + ": ISJ for " + _key + " failed with " + timeRemaining + " remaining after " + time +
                       ", peers queried: " + tries);
         }
-        getContext().statManager().addRateData("netDb.failedTime", time, 0);
-        getContext().statManager().addRateData("netDb.failedRetries", Math.max(0, tries - 1), 0);
+        if (tries > 0) {
+            // don't bias the stats with immediate fails
+            getContext().statManager().addRateData("netDb.failedTime", time);
+            getContext().statManager().addRateData("netDb.failedRetries", tries - 1);
+        }
         for (Job j : _onFailed) {
             getContext().jobQueue().addJob(j);
         }
@@ -507,8 +585,8 @@ class IterativeSearchJob extends FloodSearchJob {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": ISJ for " + _key + " successful after " + time +
                       ", peers queried: " + tries);
-        getContext().statManager().addRateData("netDb.successTime", time, 0);
-        getContext().statManager().addRateData("netDb.successRetries", tries - 1, 0);
+        getContext().statManager().addRateData("netDb.successTime", time);
+        getContext().statManager().addRateData("netDb.successRetries", tries - 1);
         for (Job j : _onFind) {
             getContext().jobQueue().addJob(j);
         }

@@ -84,9 +84,11 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
  *  a huge load for a page full of graphs if there's a problem
  */
 if (!rendered) {
-    if (stat != null)
+    if (stat != null) {
+        stat = net.i2p.data.DataHelper.stripHTML(stat);
         response.sendError(403, "The stat " + stat + " is not available, it must be enabled for graphing on the stats configuration page.");
-    else
+    } else {
         response.sendError(403, "No stat specified");
+    }
 }
 %>

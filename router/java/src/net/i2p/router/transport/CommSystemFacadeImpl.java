@@ -17,11 +17,12 @@ import java.util.Locale;
 import java.util.Vector;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.util.Addresses;
@@ -78,10 +79,21 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _manager.restart();
     }
     
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to or received a message from in the last five minutes.
+     */
     @Override
     public int countActivePeers() { return _manager.countActivePeers(); }
+
+    /**
+     *  How many peers are we currently connected to, that we have
+     *  sent a message to in the last minute.
+     *  Unused for anything, to be removed.
+     */
     @Override
     public int countActiveSendPeers() { return _manager.countActiveSendPeers(); } 
+
     @Override
     public boolean haveInboundCapacity(int pct) { return _manager.haveInboundCapacity(pct); } 
     @Override
@@ -93,6 +105,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * @param percentToInclude 1-100
      * @return Framed average clock skew of connected peers in milliseconds, or the clock offset if we cannot answer.
      * Average is calculated over the middle "percentToInclude" peers.
+     *
+     * A positive number means our clock is ahead of theirs.
+     *
      * Todo: change Vectors to milliseconds
      */
     @Override
@@ -140,23 +155,34 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     @Override
-    public boolean isBacklogged(Hash dest) { 
-        return _manager.isBacklogged(dest); 
+    public boolean isBacklogged(Hash peer) { 
+        return _manager.isBacklogged(peer); 
     }
     
     @Override
-    public boolean isEstablished(Hash dest) { 
-        return _manager.isEstablished(dest); 
+    public boolean isEstablished(Hash peer) { 
+        return _manager.isEstablished(peer); 
     }
     
     @Override
-    public boolean wasUnreachable(Hash dest) { 
-        return _manager.wasUnreachable(dest); 
+    public boolean wasUnreachable(Hash peer) { 
+        return _manager.wasUnreachable(peer); 
     }
     
     @Override
-    public byte[] getIP(Hash dest) { 
-        return _manager.getIP(dest); 
+    public byte[] getIP(Hash peer) { 
+        return _manager.getIP(peer); 
+    }
+    
+    /**
+     * Tell the comm system that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(Hash peer) {
+        _manager.mayDisconnect(peer); 
     }
     
     @Override
@@ -164,13 +190,16 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.getMostRecentErrorMessages(); 
     }
 
+    /**
+     *  @since 0.9.20
+     */
     @Override
-    public short getReachabilityStatus() { 
+    public Status getStatus() { 
         if (!_netMonitorStatus)
-            return STATUS_DISCONNECTED;
-        short rv = _manager.getReachabilityStatus(); 
-        if (rv != STATUS_HOSED && _context.router().isHidden())
-            return STATUS_OK;
+            return Status.DISCONNECTED;
+        Status rv = _manager.getReachabilityStatus(); 
+        if (rv != Status.HOSED && _context.router().isHidden())
+            return Status.OK;
         return rv; 
     }
 
@@ -178,6 +207,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * @deprecated unused
      */
     @Override
+    @Deprecated
     public void recheckReachability() { _manager.recheckReachability(); }
 
     @Override
@@ -220,7 +250,75 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             if (udp != null)
                 port = udp.getRequestedPort();
         }
-        _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+        if (ip != null || port > 0)
+            _manager.externalAddressReceived(Transport.AddressSource.SOURCE_SSU, ip, port);
+        else
+            notifyRemoveAddress(false);
+    }
+
+    /** 
+     *  Tell other transports our address changed
+     *
+     *  @param address non-null; but address's host/IP may be null
+     *  @since 0.9.20
+     */
+    @Override
+    public void notifyRemoveAddress(RouterAddress address) {
+        // just keep this simple for now, multiple v4 or v6 addresses not yet supported
+        notifyRemoveAddress(address != null &&
+                            address.getIP() != null &&
+                            address.getIP().length == 16);
+    }
+
+    /** 
+     *  Tell other transports our address changed
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    public void notifyRemoveAddress(boolean ipv6) {
+        _manager.externalAddressRemoved(Transport.AddressSource.SOURCE_SSU, ipv6);
+    }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  Do not call from transport constructor. Transport must be ready to be started.
+     *
+     *  Following transport methods will be called:
+     *    setListener()
+     *    externalAddressReceived() (zero or more times, one for each known address)
+     *    startListening();
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public void registerTransport(Transport t) {
+        _manager.registerAndStart(t);
+    }
+
+    /**
+     *  Pluggable transports. Not for NTCP or SSU.
+     *
+     *  Following transport methods will be called:
+     *    setListener(null)
+     *    stoptListening();
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public void unregisterTransport(Transport t) {
+        _manager.stopAndUnregister(t);
+    }
+
+    /**
+     *  Hook for pluggable transport creation.
+     *
+     *  @since 0.9.16
+     */
+    @Override
+    public DHSessionKeyBuilder.Factory getDHFactory() {
+        return _manager.getDHFactory();
     }
     
     /*
@@ -236,7 +334,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     private static final int LOOKUP_TIME = 30*60*1000;
 
     private void startGeoIP() {
-        _context.simpleScheduler().addEvent(new QueueAll(), START_DELAY);
+        _context.simpleTimer2().addEvent(new QueueAll(), START_DELAY);
     }
 
     /**
@@ -254,7 +352,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                     continue;
                 _geoIP.add(ip);
             }
-            _context.simpleScheduler().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
+            _context.simpleTimer2().addPeriodicEvent(new Lookup(), 5000, LOOKUP_TIME);
         }
     }
 
@@ -301,15 +399,42 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      *  Are we in a bad place
      *  @since 0.8.13
      */
+    @Override
     public boolean isInBadCountry() {
         String us = getOurCountry();
-        return us != null && (BadCountries.contains(us) || _context.getBooleanProperty("router.forceBadCountry"));
+        return (us != null && BadCountries.contains(us)) || _context.getBooleanProperty("router.forceBadCountry");
+    }
+
+    /**
+     *  Are they in a bad place
+     *  @param peer non-null
+     *  @since 0.9.16
+     */
+    @Override
+    public boolean isInBadCountry(Hash peer) {
+        String c = getCountry(peer);
+        return c != null && BadCountries.contains(c);
+    }
+
+    /**
+     *  Are they in a bad place
+     *  @param ri non-null
+     *  @since 0.9.16
+     */
+    @Override
+    public boolean isInBadCountry(RouterInfo ri) {
+        byte[] ip = getIP(ri);
+        if (ip == null)
+            return false;
+        String c = _geoIP.get(ip);
+        return c != null && BadCountries.contains(c);
     }
 
     /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the IP from the netDb.
      *
+     *  @param peer not ourselves - use getOurCountry() for that
      *  @return two-letter lower-case country code or null
      */
     @Override
@@ -321,19 +446,35 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
         if (ri == null)
             return null;
-        ip = getIP(ri);
+        ip = getValidIP(ri);
         if (ip != null)
             return _geoIP.get(ip);
         return null;
     }
 
+    /**
+     *  Return first IP (v4 or v6) we find, any transport.
+     *  Not validated, may be local, etc.
+     */
     private static byte[] getIP(RouterInfo ri) {
-        // Return first IP (v4 or v6) we find, any transport
-        // Assume IPv6 doesn't have geoIP for now
         for (RouterAddress ra : ri.getAddresses()) {
             byte[] rv = ra.getIP();
-            //if (rv != null && rv.length == 4)
             if (rv != null)
+                return rv;
+        }
+        return null;
+    }
+
+    /**
+     *  Return first valid IP (v4 or v6) we find, any transport.
+     *  Local and other invalid IPs will not be returned.
+     *
+     *  @since 0.9.18
+     */
+    private static byte[] getValidIP(RouterInfo ri) {
+        for (RouterAddress ra : ri.getAddresses()) {
+            byte[] rv = ra.getIP();
+            if (rv != null && TransportUtil.isPubliclyRoutable(rv, true))
                 return rv;
         }
         return null;
@@ -370,7 +511,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         buf.append("<tt>");
         boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
         if (found)
-            buf.append("<a title=\"").append(_("NetDb entry")).append("\" href=\"netdb?r=").append(h).append("\">");
+            buf.append("<a title=\"").append(_t("NetDb entry")).append("\" href=\"netdb?r=").append(h).append("\">");
         buf.append(h);
         if (found)
             buf.append("</a>");
@@ -390,7 +531,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /**
      *  Translate
      */
-    private final String _(String s) {
+    private final String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
@@ -406,7 +547,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
 
     /** @since 0.7.12 */
     private void startTimestamper() {
-        _context.simpleScheduler().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
+        _context.simpleTimer2().addPeriodicEvent(new Timestamper(), TIME_START_DELAY,  TIME_REPEAT_DELAY);
     }
 
     /**
@@ -419,7 +560,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         public void timeReached() {
              // use the same % as in RouterClock so that check will never fail
              // This is their our offset w.r.t. them...
-             long peerOffset = getFramedAveragePeerClockSkew(50);
+             long peerOffset = getFramedAveragePeerClockSkew(33);
              if (peerOffset == 0)
                  return;
              long currentOffset = _context.clock().getOffset();

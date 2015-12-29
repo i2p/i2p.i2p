@@ -109,8 +109,12 @@ public class FileUtil {
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
-                if (entry.getName().indexOf("..") != -1) {
+                if (entry.getName().contains("..")) {
                     System.err.println("ERROR: Refusing to extract a zip entry with '..' in it [" + entry.getName() + "]");
+                    return false;
+                }
+                if (entry.getName().indexOf(0) >= 0) {
+                    System.err.println("ERROR: Refusing to extract a zip entry with null in it [" + entry.getName() + "]");
                     return false;
                 }
                 File target = new File(targetDir, entry.getName());
@@ -296,9 +300,9 @@ public class FileUtil {
         if (!_failedOracle) {
             try {
                 Class<?> p200 = Class.forName("java.util.jar.Pack200", true, ClassLoader.getSystemClassLoader());
-                Method newUnpacker = p200.getMethod("newUnpacker", (Class[]) null);
+                Method newUnpacker = p200.getMethod("newUnpacker");
                 Object unpacker = newUnpacker.invoke(null,(Object[])  null);
-                Method unpack = unpacker.getClass().getMethod("unpack", new Class[] {InputStream.class, JarOutputStream.class});
+                Method unpack = unpacker.getClass().getMethod("unpack", InputStream.class, JarOutputStream.class);
                 // throws IOException
                 unpack.invoke(unpacker, new Object[] {in, out});
                 return;
@@ -317,9 +321,9 @@ public class FileUtil {
         if (!_failedApache) {
             try {
                 Class<?> p200 = Class.forName("org.apache.harmony.unpack200.Archive", true, ClassLoader.getSystemClassLoader());
-                Constructor<?> newUnpacker = p200.getConstructor(new Class[] {InputStream.class, JarOutputStream.class});
-                Object unpacker = newUnpacker.newInstance(new Object[] {in, out});
-                Method unpack = unpacker.getClass().getMethod("unpack", (Class[]) null);
+                Constructor<?> newUnpacker = p200.getConstructor(InputStream.class, JarOutputStream.class);
+                Object unpacker = newUnpacker.newInstance(in, out);
+                Method unpack = unpacker.getClass().getMethod("unpack");
                 // throws IOException or Pack200Exception
                 unpack.invoke(unpacker, (Object[]) null);
                 return;
@@ -480,11 +484,12 @@ public class FileUtil {
         boolean success = false;
         boolean isWindows = SystemVersion.isWindows();
         // overwrite fails on windows
-        if (!isWindows)
+        boolean exists = to.exists();
+        if (!isWindows || !exists)
             success = from.renameTo(to);
         if (!success) {
-            to.delete();
-            success = from.renameTo(to);
+            if (exists && to.delete())
+                success = from.renameTo(to);
             if (!success) {
                 // hard way
                 success = copy(from, to, true, true);
@@ -496,12 +501,12 @@ public class FileUtil {
     }
 
     /**
-     * Usage: FileUtil (delete path | copy source dest | unzip path.zip)
+     * Usage: FileUtil (delete path | copy source dest | rename from to | unzip path.zip)
      *
      */
     public static void main(String args[]) {
         if ( (args == null) || (args.length < 2) ) {
-            System.err.println("Usage: delete path | copy source dest | unzip path.zip");
+            System.err.println("Usage: delete path | copy source dest | rename from to | unzip path.zip");
             //testRmdir();
         } else if ("delete".equals(args[0])) {
             boolean deleted = FileUtil.rmdir(args[1], false);
@@ -523,6 +528,12 @@ public class FileUtil {
                 System.err.println("Unzipped [" + args[1] + "] to [" + to + "]");
             else
                 System.err.println("Error unzipping [" + args[1] + "] to [" + to + "]");
+        } else if ("rename".equals(args[0])) {
+            boolean success = rename(new File(args[1]), new File(args[2]));
+            if (!success) 
+                System.err.println("Error renaming [" + args[1] + "] to [" + args[2] + "]");
+        } else {
+            System.err.println("Usage: delete path | copy source dest | rename from to | unzip path.zip");
         }
     }
     

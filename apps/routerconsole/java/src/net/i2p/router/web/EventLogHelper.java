@@ -12,11 +12,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.util.EventLog;
+import net.i2p.util.SystemVersion;
 
 /**
  *  /events.jsp
@@ -32,6 +32,7 @@ public class EventLogHelper extends FormHandler {
     private static final String ALL = "all";
     private static final String[] _events = new String[] {
         EventLog.ABORTED, _x("Aborted startup"),
+        EventLog.BECAME_FLOODFILL, _x("Enabled floodfill"),
         EventLog.CHANGE_IP, _x("Changed IP"),
         EventLog.CHANGE_PORT, _x("Changed port"),
         EventLog.CLOCK_SHIFT, _x("Clock shifted"),
@@ -41,7 +42,9 @@ public class EventLogHelper extends FormHandler {
         EventLog.INSTALL_FAILED, _x("Install failed"),
         EventLog.NETWORK, _x("Network error"),
         EventLog.NEW_IDENT, _x("New router identity"),
+        EventLog.NOT_FLOODFILL, _x("Disabled floodfill"),
         EventLog.OOM, _x("Out of memory error"),
+        EventLog.REACHABILITY, _x("Reachability change"),
         EventLog.REKEYED, _x("New router identity"),
         EventLog.RESEED, _x("Reseeded router"),
         EventLog.SOFT_RESTART, _x("Soft restart"),
@@ -63,7 +66,7 @@ public class EventLogHelper extends FormHandler {
     public void setContextId(String contextId) {
         super.setContextId(contextId);
         for (int i = 0; i < _events.length; i += 2) {
-            _xevents.put(_events[i], _(_events[i + 1]));
+            _xevents.put(_events[i], _t(_events[i + 1]));
         }
     }
     
@@ -96,27 +99,27 @@ public class EventLogHelper extends FormHandler {
         // So just use the "shared/console nonce".
         String nonce = CSSHelper.getNonce();
         try {
-            _out.write("<br><h3>" + _("Display Events") + "</h3>");
+            _out.write("<br><h3>" + _t("Display Events") + "</h3>");
             _out.write("<form action=\"events\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_("Events since") + ": <select name=\"from\">");
+            _out.write(_t("Events since") + ": <select name=\"from\">");
             for (int i = 0; i < _times.length; i++) {
                 writeOption(_times[i]);
             }
             _out.write("</select><br>");
-            _out.write(_("Event type") + ": <select name=\"type\">");
+            _out.write(_t("Event type") + ": <select name=\"type\">");
             // sorted by translated display string
             Map<String, String> events = new TreeMap<String, String>(Collator.getInstance());
             for (int i = 0; i < _events.length; i += 2) {
                 events.put(_xevents.get(_events[i]), _events[i]);
             }
-            writeOption(_("All events"), ALL);
+            writeOption(_t("All events"), ALL);
             for (Map.Entry<String, String> e : events.entrySet()) {
                 writeOption(e.getKey(), e.getValue());
             }
             _out.write("</select>" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _("Filter events") + "\"></div></form>");
+                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Filter events") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -142,7 +145,7 @@ public class EventLogHelper extends FormHandler {
              _out.write(" selected=\"selected\"");
          _out.write(">");
          if (age == 0)
-             _out.write(_("All events"));
+             _out.write(_t("All events"));
          else
              _out.write(DataHelper.formatDuration2(age));
          _out.write("</option>\n");
@@ -160,24 +163,25 @@ public class EventLogHelper extends FormHandler {
         String xev = _xevents.get(_event);
         if (xev == null)
             xev = _event;
+        xev = DataHelper.escapeHTML(xev);
         if (events.isEmpty()) {
             if (isAll) {
                 if (_age == 0)
-                    return _("No events found");
-                return _("No events found in previous {0}", DataHelper.formatDuration2(_age));
+                    return _t("No events found");
+                return _t("No events found in previous {0}", DataHelper.formatDuration2(_age));
             }
             if (_age == 0)
-                return _("No \"{0}\" events found", xev);
-            return _("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
+                return _t("No \"{0}\" events found", xev);
+            return _t("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
         }
         StringBuilder buf = new StringBuilder(2048);
         buf.append("<table><tr><th>");
-        buf.append(_("Time"));
+        buf.append(_t("Time"));
         buf.append("</th><th>");
         if (isAll) {
-            buf.append(_("Event"));
+            buf.append(_t("Event"));
             buf.append("</th><th>");
-            buf.append(_("Details"));
+            buf.append(_t("Details"));
         } else {
             buf.append(xev);
         }
@@ -185,9 +189,7 @@ public class EventLogHelper extends FormHandler {
 
         SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
         // the router sets the JVM time zone to UTC but saves the original here so we can get it
-        String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-        if (systemTimeZone != null)
-            fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+        fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
 
         List<Map.Entry<Long, String>> entries = new ArrayList<Map.Entry<Long, String>>(events.entrySet());
         Collections.reverse(entries);
@@ -198,7 +200,7 @@ public class EventLogHelper extends FormHandler {
             buf.append(fmt.format(new Date(time)));
             buf.append("</td><td>");
             if (isAll) {
-                 String[] s = event.split(" ", 2);
+                 String[] s = DataHelper.split(event, " ", 2);
                  String xs = _xevents.get(s[0]);
                  if (xs == null)
                      xs = s[0];

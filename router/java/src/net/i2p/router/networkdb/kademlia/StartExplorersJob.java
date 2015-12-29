@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -42,6 +42,8 @@ class StartExplorersJob extends JobImpl {
     private static final int MIN_ROUTERS = 250;
     /** explore slowly if we have more than this many routers */
     private static final int MAX_ROUTERS = 800;
+    private static final long MAX_LAG = 100;
+    private static final long MAX_MSG_DELAY = 1500;
     
     public StartExplorersJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
@@ -50,8 +52,12 @@ class StartExplorersJob extends JobImpl {
     }
     
     public String getName() { return "Start Explorers Job"; }
+
     public void runJob() {
         if (! (_facade.floodfillEnabled() ||
+               getContext().jobQueue().getMaxLag() > MAX_LAG ||
+               getContext().throttle().getMessageDelay() > MAX_MSG_DELAY ||
+               // message delay limit also?
                getContext().router().gracefulShutdownInProgress())) {
             int num = MAX_PER_RUN;
             if (_facade.getDataStore().size() < LOW_ROUTERS)

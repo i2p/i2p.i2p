@@ -32,6 +32,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -146,6 +147,23 @@ public class PluginStarter implements Runnable {
             } while (mgr.isUpdateInProgress(TYPE_DUMMY));
         }
 
+        String proxyHost = ctx.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+        int proxyPort = ConfigUpdateHandler.proxyPort(ctx);
+        if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+            proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+            ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+            mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
+                                     " - " +
+                                     Messages.getString("HTTP client proxy tunnel must be running", ctx));
+            return;
+        }
+        if (ctx.commSystem().isDummy()) {
+            mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
+                                     " - " +
+                                     "VM Comm System");
+            return;
+        }
+
         Log log = ctx.logManager().getLog(PluginStarter.class);
         int updated = 0;
         for (Map.Entry<String, String> entry : toUpdate.entrySet()) {
@@ -246,9 +264,11 @@ public class PluginStarter implements Runnable {
      *  @return true on success
      *  @throws just about anything, caller would be wise to catch Throwable
      */
+    @SuppressWarnings("deprecation")
     public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
+        String iconfile = null;
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot start nonexistent plugin: " + appName);
             disablePlugin(appName);
@@ -275,6 +295,9 @@ public class PluginStarter implements Runnable {
         }
 
         Properties props = pluginProperties(ctx, appName);
+
+
+
 
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
@@ -322,9 +345,11 @@ public class PluginStarter implements Runnable {
         if (tfiles != null) {
             for (int i = 0; i < tfiles.length; i++) {
                 String name = tfiles[i].getName();
-                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i])))
+                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i]))) {
+                    // deprecated
                     ctx.router().setConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name, tfiles[i].getAbsolutePath());
                     // we don't need to save
+                }
             }
         }
 
@@ -368,6 +393,16 @@ public class PluginStarter implements Runnable {
                         log.error("Error resolving '" + fileNames[i] + "' in '" + webappDir, ioe);
                     }
                 }
+                // Check for iconfile in plugin.properties
+                String icfile = ConfigClientsHelper.stripHTML(props, "console-icon");
+                if (icfile != null && !icfile.contains("..")) {
+                    StringBuilder buf = new StringBuilder(32);
+                    buf.append('/').append(appName);
+                    if (!icfile.startsWith("/"))
+                        buf.append('/');
+                    buf.append(icfile);
+                    iconfile = buf.toString();
+                }
             }
         } else {
             log.error("No console web server to start plugins?");
@@ -388,7 +423,7 @@ public class PluginStarter implements Runnable {
                             addPath(f.toURI().toURL());
                             log.error("INFO: Adding translation plugin to classpath: " + f);
                             added = true;
-                        } catch (Exception e) {
+                        } catch (RuntimeException e) {
                             log.error("Plugin " + appName + " bad classpath element: " + f, e);
                         }
                     }
@@ -397,7 +432,6 @@ public class PluginStarter implements Runnable {
                     Translate.clearCache();
             }
         }
-
         // add summary bar link
         String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
@@ -407,10 +441,7 @@ public class PluginStarter implements Runnable {
             String tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
             if (tip == null)
                 tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip");
-            if (tip != null)
-                NavHelper.registerApp(name, url, tip);
-            else
-                NavHelper.registerApp(name, url);
+            NavHelper.registerApp(name, url, tip, iconfile);
         }
 
         return true;
@@ -515,7 +546,7 @@ public class PluginStarter implements Runnable {
 
         boolean deleted = FileUtil.rmdir(pluginDir, false);
         Properties props = pluginProperties();
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator<?> iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (name.startsWith(PREFIX + appName + '.'))
                 iter.remove();
@@ -671,9 +702,21 @@ public class PluginStarter implements Runnable {
         for(ClientAppConfig app : apps) {
             // If the client is a running ClientApp that we want to stop,
             // bypass all the logic below.
-            ClientApp ca = ctx.routerAppManager().getClientApp(app.className, LoadClientAppsJob.parseArgs(app.args));
-            if (ca != null && ca.getState() == ClientAppState.RUNNING) {
-                if (action.equals("stop")) {
+            if (action.equals("stop")) {
+                String[] argVal = LoadClientAppsJob.parseArgs(app.args);
+                // We must do all the substitution just as when started, so the
+                // argument array comparison in getClientApp() works.
+                // Do this after parsing so we don't need to worry about quoting
+                for (int i = 0; i < argVal.length; i++) {
+                    if (argVal[i].indexOf("$") >= 0) {
+                        argVal[i] = argVal[i].replace("$I2P", ctx.getBaseDir().getAbsolutePath());
+                        argVal[i] = argVal[i].replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
+                        argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
+                    }
+                }
+                ClientApp ca = ctx.routerAppManager().getClientApp(app.className, argVal);
+                if (ca != null) {
+                    // even if (ca.getState() != ClientAppState.RUNNING), we do this, we don't want to fall thru
                     try {
                         ca.shutdown(LoadClientAppsJob.parseArgs(app.stopargs));
                     } catch (Throwable t) {
@@ -831,12 +874,13 @@ public class PluginStarter implements Runnable {
             }
         }
 
+        boolean isClientThreadRunning = isClientThreadRunning(pluginName, ctx);
         if (log.shouldLog(Log.DEBUG))
-            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + isWarRunning + "; jobs running? " + isJobRunning);
-        return isClientThreadRunning(pluginName) || isWarRunning || isJobRunning;
+            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning + "; webapp running? " + isWarRunning + "; jobs running? " + isJobRunning);
+        return isClientThreadRunning || isWarRunning || isJobRunning;
         //
         //if (log.shouldLog(Log.DEBUG))
-        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
+        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp running? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
         //return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
         //
     }
@@ -846,14 +890,32 @@ public class PluginStarter implements Runnable {
      * @param pluginName
      * @return true if running
      */
-    private static boolean isClientThreadRunning(String pluginName) {
+    private static boolean isClientThreadRunning(String pluginName, RouterContext ctx) {
         ThreadGroup group = pluginThreadGroups.get(pluginName);
         if (group == null)
             return false;
+        boolean rv = group.activeCount() > 0;
         
-        Thread[] activeThreads = new Thread[1];
-        group.enumerate(activeThreads);
-        return activeThreads[0] != null;
+        // Plugins start before the eepsite, and will create the static Timer thread
+        // in RolloverFileOutputStream, which never stops. Don't count it.
+        if (rv) {
+            Log log = ctx.logManager().getLog(PluginStarter.class);
+            Thread[] activeThreads = new Thread[128];
+            int count = group.enumerate(activeThreads);
+            boolean notRollover = false;
+            for (int i = 0; i < count; i++) {
+                if (activeThreads[i] != null) {
+                    String name = activeThreads[i].getName();
+                    if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name))
+                        notRollover = true;
+                    if (log.shouldLog(Log.DEBUG))
+                        log.debug("Found " + activeThreads[i].getState() + " thread for " + pluginName + ": " + name);
+                }
+            }
+            rv = notRollover;
+        }
+
+        return rv;
     }
     
     /**
@@ -899,7 +961,7 @@ public class PluginStarter implements Runnable {
                 urls.add(f.toURI().toURL());
                 if (log.shouldLog(Log.WARN))
                     log.warn("INFO: Adding plugin to classpath: " + f);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
             }
         }
@@ -914,7 +976,7 @@ public class PluginStarter implements Runnable {
     private static void addPath(URL u) throws Exception {
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> urlClass = URLClassLoader.class;
-        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        Method method = urlClass.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(urlClassLoader, new Object[]{u});
     }

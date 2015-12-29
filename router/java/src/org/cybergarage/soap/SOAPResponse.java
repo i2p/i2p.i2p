@@ -34,21 +34,21 @@ public class SOAPResponse extends HTTPResponse
 	public SOAPResponse()
 	{
 		setRootNode(SOAP.createEnvelopeBodyNode());
-		setContentType(XML.CONTENT_TYPE);
+		setContentType(XML.DEFAULT_CONTENT_TYPE);
 	}
 
 	public SOAPResponse(HTTPResponse httpRes)
 	{
 		super(httpRes);
 		setRootNode(SOAP.createEnvelopeBodyNode());
-		setContentType(XML.CONTENT_TYPE);
+		setContentType(XML.DEFAULT_CONTENT_TYPE);
 	}
 
 	public SOAPResponse(SOAPResponse soapRes)
 	{
 		super(soapRes);
 		setEnvelopeNode(soapRes.getEnvelopeNode());
-		setContentType(XML.CONTENT_TYPE);
+		setContentType(XML.DEFAULT_CONTENT_TYPE);
 	}
 
 	////////////////////////////////////////////////

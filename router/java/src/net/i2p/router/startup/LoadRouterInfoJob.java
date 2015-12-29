@@ -15,18 +15,31 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.crypto.KeyGenerator;
+import net.i2p.crypto.SigType;
+import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.data.router.RouterPrivateKeyFile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
+import net.i2p.router.networkdb.kademlia.PersistentDataStore;
 import net.i2p.util.Log;
 
-public class LoadRouterInfoJob extends JobImpl {
+/**
+ *  Run once or twice at startup by StartupJob,
+ *  and then runs BootCommSystemJob
+ */
+class LoadRouterInfoJob extends JobImpl {
     private final Log _log;
     private RouterInfo _us;
     private static final AtomicBoolean _keyLengthChecked = new AtomicBoolean();
@@ -45,6 +58,7 @@ public class LoadRouterInfoJob extends JobImpl {
         if (_us == null) {
             RebuildRouterInfoJob r = new RebuildRouterInfoJob(getContext());
             r.rebuildRouterInfo(false);
+            // run a second time
             getContext().jobQueue().addJob(this);
             return;
         } else {
@@ -54,26 +68,29 @@ public class LoadRouterInfoJob extends JobImpl {
         }
     }
     
+    /**
+     *  Loads router.info and either router.keys.dat or router.keys.
+     *
+     *  See CreateRouterInfoJob for file formats
+     */
     private void loadRouterInfo() {
-        String routerInfoFile = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
         RouterInfo info = null;
-        String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
-        
-        File rif = new File(getContext().getRouterDir(), routerInfoFile);
+        File rif = new File(getContext().getRouterDir(), CreateRouterInfoJob.INFO_FILENAME);
         boolean infoExists = rif.exists();
-        File rkf = new File(getContext().getRouterDir(), keyFilename);
+        File rkf = new File(getContext().getRouterDir(), CreateRouterInfoJob.KEYS_FILENAME);
         boolean keysExist = rkf.exists();
+        File rkf2 = new File(getContext().getRouterDir(), CreateRouterInfoJob.KEYS2_FILENAME);
+        boolean keys2Exist = rkf2.exists();
         
         InputStream fis1 = null;
-        InputStream fis2 = null;
         try {
             // if we have a routerinfo but no keys, things go bad in a hurry:
             // CRIT   ...rkdb.PublishLocalRouterInfoJob: Internal error - signing private key not known?  rescheduling publish for 30s
-            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known?  wtf
+            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known? Impossible?
             // CRIT   ...sport.udp.EstablishmentManager: Error in the establisher java.lang.NullPointerException
             // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
             // so pretend the RI isn't there if there is no keyfile
-            if (infoExists && keysExist) {
+            if (infoExists && (keys2Exist || keysExist)) {
                 fis1 = new BufferedInputStream(new FileInputStream(rif));
                 info = new RouterInfo();
                 info.readBytes(fis1);
@@ -82,32 +99,60 @@ public class LoadRouterInfoJob extends JobImpl {
                     throw new DataFormatException("Our RouterInfo has a bad signature");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
-                _us = info;
+                // don't reuse if family name changed
+                if (DataHelper.eq(info.getOption(FamilyKeyCrypto.OPT_NAME),
+                                  getContext().getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME))) {
+                    _us = info;
+                } else {
+                    _log.logAlways(Log.WARN, "NetDb family name changed");
+                }
             }
             
-            if (keysExist) {
-                fis2 = new BufferedInputStream(new FileInputStream(rkf));
-                PrivateKey privkey = new PrivateKey();
-                privkey.readBytes(fis2);
-                if (shouldRebuild(privkey)) {
-                    _us = null;
+            if (keys2Exist || keysExist) {
+                KeyData kd = readKeyData(rkf, rkf2);
+                PublicKey pubkey = kd.routerIdentity.getPublicKey();
+                SigningPublicKey signingPubKey = kd.routerIdentity.getSigningPublicKey();
+                PrivateKey privkey = kd.privateKey;
+                SigningPrivateKey signingPrivKey = kd.signingPrivateKey;
+                SigType stype = signingPubKey.getType();
+
+                // check if the sigtype config changed
+                SigType cstype = CreateRouterInfoJob.getSigTypeConfig(getContext());
+                boolean sigTypeChanged = stype != cstype;
+                if (sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) {
+                    // Not explicitly configured, and default has changed
+                    // Give a 25% chance of rekeying for each restart
+                    // TODO reduce to ~3 (i.e. increase probability) in future release
+                    if (getContext().random().nextInt(4) > 0) {
+                        sigTypeChanged = false;
+                        if (_log.shouldWarn())
+                            _log.warn("Deferring RI rekey from " + stype + " to " + cstype);
+                    }
+                }
+
+                if (sigTypeChanged || shouldRebuild(privkey)) {
+                    if (_us != null) {
+                        Hash h = _us.getIdentity().getHash();
+                        _log.logAlways(Log.WARN, "Deleting old router identity " + h.toBase64());
+                        // the netdb hasn't started yet, but we want to delete the RI
+                        File f = PersistentDataStore.getRouterInfoFile(getContext(), h);
+                        f.delete();
+                        // the banlist can be called at any time
+                        getContext().banlist().banlistRouterForever(h, "Our previous identity");
+                        _us = null;
+                    }
+                    if (sigTypeChanged)
+                        _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new signature type " + cstype);
                     // windows... close before deleting
                     if (fis1 != null) {
                         try { fis1.close(); } catch (IOException ioe) {}
                         fis1 = null;
                     }
-                    try { fis2.close(); } catch (IOException ioe) {}
-                    fis2 = null;
                     rif.delete();
                     rkf.delete();
+                    rkf2.delete();
                     return;
                 }
-                SigningPrivateKey signingPrivKey = new SigningPrivateKey();
-                signingPrivKey.readBytes(fis2);
-                PublicKey pubkey = new PublicKey();
-                pubkey.readBytes(fis2);
-                SigningPublicKey signingPubKey = new SigningPublicKey();
-                signingPubKey.readBytes(fis2);
                 
                 getContext().keyManager().setKeys(pubkey, privkey, signingPubKey, signingPrivKey);
             }
@@ -119,12 +164,9 @@ public class LoadRouterInfoJob extends JobImpl {
                 try { fis1.close(); } catch (IOException ioe2) {}
                 fis1 = null;
             }
-            if (fis2 != null) {
-                try { fis2.close(); } catch (IOException ioe2) {}
-                fis2 = null;
-            }
             rif.delete();
             rkf.delete();
+            rkf2.delete();
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Corrupt router info or keys at " + rif.getAbsolutePath() + " / " + rkf.getAbsolutePath(), dfe);
             _us = null;
@@ -133,15 +175,11 @@ public class LoadRouterInfoJob extends JobImpl {
                 try { fis1.close(); } catch (IOException ioe) {}
                 fis1 = null;
             }
-            if (fis2 != null) {
-                try { fis2.close(); } catch (IOException ioe) {}
-                fis2 = null;
-            }
             rif.delete();
             rkf.delete();
+            rkf2.delete();
         } finally {
             if (fis1 != null) try { fis1.close(); } catch (IOException ioe) {}
-            if (fis2 != null) try { fis2.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -173,5 +211,69 @@ public class LoadRouterInfoJob extends JobImpl {
         if (!uselong && haslong)
             _log.logAlways(Log.WARN, "Rebuilding RouterInfo with faster key");
         return uselong != haslong;
+    }
+
+    /** @since 0.9.16 */
+    public static class KeyData {
+        public final RouterIdentity routerIdentity;
+        public final PrivateKey privateKey;
+        public final SigningPrivateKey signingPrivateKey;
+
+        public KeyData(RouterIdentity ri, PrivateKey pk, SigningPrivateKey spk) {
+            routerIdentity = ri;
+            privateKey = pk;
+            signingPrivateKey = spk;
+        }
+    }
+
+    /**
+     *  @param rkf1 in router.keys format, tried second
+     *  @param rkf2 in eepPriv.dat format, tried first
+     *  @return non-null, throws IOE if neither exisits
+     *  @since 0.9.16
+     */
+    public static KeyData readKeyData(File rkf1, File rkf2) throws DataFormatException, IOException {
+        RouterIdentity ri;
+        PrivateKey privkey;
+        SigningPrivateKey signingPrivKey;
+        if (rkf2.exists()) {
+            RouterPrivateKeyFile pkf = new RouterPrivateKeyFile(rkf2);
+            ri = pkf.getRouterIdentity();
+            if (!pkf.validateKeyPairs())
+                throw new DataFormatException("Key pairs invalid");
+            privkey = pkf.getPrivKey();
+            signingPrivKey = pkf.getSigningPrivKey();
+        } else {
+            InputStream fis = null;
+            try {
+                fis = new BufferedInputStream(new FileInputStream(rkf1));
+                privkey = new PrivateKey();
+                privkey.readBytes(fis);
+                signingPrivKey = new SigningPrivateKey();
+                signingPrivKey.readBytes(fis);
+                PublicKey pubkey = new PublicKey();
+                pubkey.readBytes(fis);
+                SigningPublicKey signingPubKey = new SigningPublicKey();
+                signingPubKey.readBytes(fis);
+
+                // validate
+                try {
+                    if (!pubkey.equals(KeyGenerator.getPublicKey(privkey)))
+                        throw new DataFormatException("Key pairs invalid");
+                    if (!signingPubKey.equals(KeyGenerator.getSigningPublicKey(signingPrivKey)))
+                        throw new DataFormatException("Key pairs invalid");
+                } catch (IllegalArgumentException iae) {
+                    throw new DataFormatException("Key pairs invalid", iae);
+                }
+
+                ri = new RouterIdentity();
+                ri.setPublicKey(pubkey);
+                ri.setSigningPublicKey(signingPubKey);
+                ri.setCertificate(Certificate.NULL_CERT);
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            }
+        }
+        return new KeyData(ri, privkey, signingPrivKey);
     }
 }

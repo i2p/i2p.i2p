@@ -27,15 +27,18 @@ package i2p.susi.dns;
 import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureFileOutputStream;
 
 public class SubscriptionsBean extends BaseBean
@@ -70,7 +73,7 @@ public class SubscriptionsBean extends BaseBean
 			StringBuilder buf = new StringBuilder();
 			BufferedReader br = null;
 			try {
-				br = new BufferedReader( new FileReader( file ) );
+				br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 				String line;
 				while( ( line = br.readLine() ) != null ) {
 					buf.append( line );
@@ -107,11 +110,13 @@ public class SubscriptionsBean extends BaseBean
                                     urls.add(line);
 			}
 			Collections.sort(urls);
-			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
+			PrintWriter out = new PrintWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8"));
 			for (String url : urls) {
 				out.println(url);
 			}
 			out.close();
+                        if (out.checkError())
+                            throw new IOException("Failed write to " + file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,7 +128,7 @@ public class SubscriptionsBean extends BaseBean
 		if( action != null ) {
                         if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
 			    (serial != null && serial.equals(lastSerial))) {
-				if (action.equals(_("Save"))) {
+				if (action.equals(_t("Save"))) {
 					save();
 				/*******
 					String nonce = System.getProperty("addressbook.nonce");
@@ -134,23 +139,24 @@ public class SubscriptionsBean extends BaseBean
 						// with the correct parameters will kick off a
 						// config reload and fetch.
 				*******/
-					if (content != null && content.length() > 2) {
-						message = _("Subscriptions saved, updating addressbook from subscription sources now.");
+					if (content != null && content.length() > 2 &&
+					    _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) > 0) {
+						message = _t("Subscriptions saved, updating addressbook from subscription sources now.");
 						          // + "<img height=\"1\" width=\"1\" alt=\"\" " +
 						          // "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
 						_context.namingService().requestUpdate(null);
 					} else {
-						message = _("Subscriptions saved.");
+						message = _t("Subscriptions saved.");
 					}
-				} else if (action.equals(_("Reload"))) {
+				} else if (action.equals(_t("Reload"))) {
 					reloadSubs();
-					message = _("Subscriptions reloaded.");
+					message = _t("Subscriptions reloaded.");
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+				message = _t("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
                                           + ' ' +
-                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
+                                          _t("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		if( message.length() > 0 )
@@ -160,7 +166,7 @@ public class SubscriptionsBean extends BaseBean
 
 	public void setContent(String content) {
 		// will come from form with \r\n line endings
-		this.content = content;
+		this.content = DataHelper.stripHTML(content);
 	}
 
 	public String getContent()

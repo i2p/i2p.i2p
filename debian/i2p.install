@@ -1,3 +1,6 @@
 pkg-temp/i2prouter usr/bin
 pkg-temp/wrapper.config etc/i2p
 pkg-temp/locale usr/share/i2p
+debian/apparmor/i2p etc/apparmor.d/abstractions
+debian/apparmor/usr.bin.i2prouter etc/apparmor.d
+debian/apparmor/system_i2p etc/apparmor.d

@@ -17,6 +17,7 @@ package org.cybergarage.util;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 public final class Debug
 {
@@ -24,6 +25,9 @@ public final class Debug
 
 	/** I2P this is all static so have the UPnPManager call this */
 	public static void initialize(I2PAppContext ctx) {
+                // don't keep static ref on android, just skip it
+                if (SystemVersion.isAndroid())
+                    return;
 		_log = ctx.logManager().getLog(Debug.class);
 		// org.cybergarage.util.Debug=DEBUG at startup
 		enabled = _log.shouldLog(Log.DEBUG);

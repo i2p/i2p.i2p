@@ -29,6 +29,9 @@ public class Payload extends DataStructureImpl {
     private byte[] _encryptedData;
     private byte[] _unencryptedData;
 
+    /** So we don't OOM on I2CP protocol errors. Actual max is smaller. */
+    private static final int MAX_LENGTH = 64*1024;
+
     public Payload() {
     }
 
@@ -51,8 +54,11 @@ public class Payload extends DataStructureImpl {
      * 
      * Deprecated.
      * Unless you are doing encryption, use setEncryptedData() instead.
+     * @throws IllegalArgumentException if bigger than 64KB
      */
     public void setUnencryptedData(byte[] data) {
+        if (data.length > MAX_LENGTH)
+            throw new IllegalArgumentException();
         _unencryptedData = data;
     }
 
@@ -61,8 +67,13 @@ public class Payload extends DataStructureImpl {
         return _encryptedData;
     }
 
-    /** the real data */
+    /**
+     * the real data
+     * @throws IllegalArgumentException if bigger than 64KB
+     */
     public void setEncryptedData(byte[] data) {
+        if (data.length > MAX_LENGTH)
+            throw new IllegalArgumentException();
         _encryptedData = data;
     }
 
@@ -77,7 +88,7 @@ public class Payload extends DataStructureImpl {
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         int size = (int) DataHelper.readLong(in, 4);
-        if (size < 0) throw new DataFormatException("payload size out of range (" + size + ")");
+        if (size < 0 || size > MAX_LENGTH) throw new DataFormatException("payload size out of range (" + size + ")");
         _encryptedData = new byte[size];
         int read = read(in, _encryptedData);
         if (read != size) throw new DataFormatException("Incorrect number of bytes read in the payload structure");

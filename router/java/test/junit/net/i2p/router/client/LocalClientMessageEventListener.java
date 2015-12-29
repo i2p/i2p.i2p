@@ -9,7 +9,9 @@ package net.i2p.router.client;
  */
 
 import java.util.Date;
+import java.util.Locale;
 
+import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
@@ -20,7 +22,11 @@ import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
+import net.i2p.data.i2cp.HostLookupMessage;
+import net.i2p.data.i2cp.HostReplyMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
+import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.RouterContext;
 
 /**
@@ -38,7 +44,7 @@ class LocalClientMessageEventListener extends ClientMessageEventListener {
      *  Immediately send a fake leaseset
      */
     @Override
-    protected void startCreateSessionJob() {
+    protected void startCreateSessionJob(SessionConfig config) {
         long exp = _context.clock().now() + 10*60*1000;
         LeaseSet ls = new LeaseSet();
         Lease lease = new Lease();
@@ -48,7 +54,7 @@ class LocalClientMessageEventListener extends ClientMessageEventListener {
         Date date = new Date(exp);
         lease.setEndDate(date);
         ls.addLease(lease);
-        _runner.requestLeaseSet(ls, exp, null, null);
+        _runner.requestLeaseSet(config.getDestination().calculateHash(), ls, exp, null, null);
     }
 
     /**
@@ -71,6 +77,40 @@ class LocalClientMessageEventListener extends ClientMessageEventListener {
             msg = new DestReplyMessage(d);
         else
             msg = new DestReplyMessage(h);
+        try {
+            _runner.doSend(msg);
+        } catch (I2CPMessageException ime) {
+            ime.printStackTrace();
+        }
+    }
+
+    /**
+     *  Look only in current local dests
+     */
+    @Override
+    protected void handleHostLookup(HostLookupMessage message) {
+        Hash h = message.getHash();
+        String name = message.getHostname();
+        long reqID = message.getReqID();
+        SessionId sessID = message.getSessionId();
+        if (h == null && name != null && name.length() == 60) {
+            // convert a b32 lookup to a hash lookup
+            String nlc = name.toLowerCase(Locale.US);
+            if (nlc.endsWith(".b32.i2p")) {
+                byte[] b = Base32.decode(nlc.substring(0, 52));
+                if (b != null && b.length == Hash.HASH_LENGTH) {
+                    h = Hash.create(b);
+                }
+            }
+        }
+        Destination d = null;
+        if (h != null)
+            d = ((LocalClientConnectionRunner)_runner).localLookup(h);
+        HostReplyMessage msg;
+        if (d != null)
+            msg = new HostReplyMessage(sessID, d, reqID);
+        else
+            msg = new HostReplyMessage(sessID, HostReplyMessage.RESULT_FAILURE, reqID);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {

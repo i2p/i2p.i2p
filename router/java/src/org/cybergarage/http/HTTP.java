@@ -69,16 +69,15 @@ public class HTTP
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String CHARSET = "charset";
 	public static final String CONTENT_LENGTH = "Content-Length";
+	public static final String CONTENT_LANGUAGE = "Content-Language";
 	public static final String CONTENT_RANGE = "Content-Range";
 	public static final String CONTENT_RANGE_BYTES = "bytes"; 
-	// Thanks for Brent Hills (10/20/04)
 	public static final String RANGE = "Range";
 	public static final String TRANSFER_ENCODING = "Transfer-Encoding";
 	public static final String CHUNKED = "Chunked";
 	public static final String LOCATION = "Location";
 	public static final String SERVER = "Server";
-
-		 
+	
 	public static final String ST = "ST";
 	public static final String MX = "MX";
 	public static final String MAN = "MAN";
@@ -90,6 +89,9 @@ public class HTTP
 	public static final String SEQ = "SEQ";
 	public final static String CALLBACK = "CALLBACK";
 	public final static String TIMEOUT = "TIMEOUT";
+	
+	public final static String BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG";
+	
 	// Thanks for Brent Hills (10/20/04)
 	public final static String MYNAME = "MYNAME";
 

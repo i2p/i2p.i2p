@@ -62,9 +62,9 @@ public class DHSessionKeyBuilder {
     private final static String PROP_DH_PRECALC_MIN = "crypto.dh.precalc.min";
     private final static String PROP_DH_PRECALC_MAX = "crypto.dh.precalc.max";
     private final static String PROP_DH_PRECALC_DELAY = "crypto.dh.precalc.delay";
-    private final static int DEFAULT_DH_PRECALC_MIN = 15;
-    private final static int DEFAULT_DH_PRECALC_MAX = 40;
-    private final static int DEFAULT_DH_PRECALC_DELAY = 200;
+    private final static int DEFAULT_DH_PRECALC_MIN = 20;
+    private final static int DEFAULT_DH_PRECALC_MAX = 60;
+    private final static int DEFAULT_DH_PRECALC_DELAY = 25;
 
     /**
      * Create a new public/private value pair for the DH exchange.
@@ -123,14 +123,6 @@ public class DHSessionKeyBuilder {
         int read = DataHelper.read(in, Y);
         if (read != 256) {
             return null;
-        }
-        if (1 == (Y[0] & 0x80)) {
-            // high bit set, need to inject an additional byte to keep 2s complement
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("High bit set");
-            byte Y2[] = new byte[257];
-            System.arraycopy(Y, 0, Y2, 1, 256);
-            Y = Y2;
         }
         return new NativeBigInteger(1, Y);
     }
@@ -217,17 +209,7 @@ public class DHSessionKeyBuilder {
     public void setPeerPublicValue(byte val[]) throws InvalidPublicParameterException {
         if (val.length != 256)
             throw new IllegalArgumentException("Peer public value must be exactly 256 bytes");
-
-        if (1 == (val[0] & 0x80)) {
-            // high bit set, need to inject an additional byte to keep 2s complement
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("High bit set");
-            byte val2[] = new byte[257];
-            System.arraycopy(val, 0, val2, 1, 256);
-            val = val2;
-        }
         setPeerPublicValue(new NativeBigInteger(1, val));
-        //_peerValue = new NativeBigInteger(val);
     }
 
     public synchronized BigInteger getPeerPublicValue() {
@@ -283,7 +265,7 @@ public class DHSessionKeyBuilder {
      * Side effect - sets extraExchangedBytes to the next 32 bytes.
      */
     private final SessionKey calculateSessionKey(BigInteger myPrivateValue, BigInteger publicPeerValue) {
-        //long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         SessionKey key = new SessionKey();
         BigInteger exchangedKey = publicPeerValue.modPow(myPrivateValue, CryptoConstants.elgp);
         // surprise! leading zero byte half the time!
@@ -312,10 +294,10 @@ public class DHSessionKeyBuilder {
             //    _log.debug("Storing " + remaining.length + " bytes from the end of the DH exchange");
         }
         key.setData(val);
-        //long end = System.currentTimeMillis();
-        //long diff = end - start;
+        long end = System.currentTimeMillis();
+        long diff = end - start;
         
-        //_context.statManager().addRateData("crypto.dhCalculateSessionTime", diff, diff);
+        I2PAppContext.getGlobalContext().statManager().addRateData("crypto.dhCalculateSessionTime", diff);
         //if (diff > 1000) {
         //    if (_log.shouldLog(Log.WARN)) _log.warn("Generating session key took too long (" + diff + " ms");
         //} else {
@@ -436,8 +418,23 @@ public class DHSessionKeyBuilder {
          * or pulls a prebuilt one from the queue.
          */
         public DHSessionKeyBuilder getBuilder();
+
+        /**
+         * Return an unused DH key builder
+         * to be put back onto the queue for reuse.
+         *
+         * @param builder must not have a peerPublicValue set
+         * @since 0.9.16
+         */
+        public void returnUnused(DHSessionKeyBuilder builder);
     }
 
+    /**
+     *  Try to keep DH pairs at the ready.
+     *  It's important to do this in a separate thread, because if we run out,
+     *  the pairs are generated in the NTCP Pumper thread,
+     *  and it can fall behind.
+     */
     public static class PrecalcRunner extends I2PThread implements Factory {
         private final I2PAppContext _context;
         private final Log _log;
@@ -447,16 +444,17 @@ public class DHSessionKeyBuilder {
         private final LinkedBlockingQueue<DHSessionKeyBuilder> _builders;
         private volatile boolean _isRunning;
 
-        /** check every 30 seconds whether we have less than the minimum */
-        private long _checkDelay = 30 * 1000;
+        /** check periodically whether we have less than the minimum */
+        private long _checkDelay = 10 * 1000;
 
         public PrecalcRunner(I2PAppContext ctx) {
             super("DH Precalc");
             _context = ctx;
             _log = ctx.logManager().getLog(DHSessionKeyBuilder.class);
             ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
-            //ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*60*1000 });        
+            ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*60*1000 });        
             ctx.statManager().createRateStat("crypto.DHUsed", "Need a DH from the queue", "Encryption", new long[] { 60*60*1000 });
+            ctx.statManager().createRateStat("crypto.DHReused", "Unused DH requeued", "Encryption", new long[] { 60*60*1000 });
             ctx.statManager().createRateStat("crypto.DHEmpty", "DH queue empty", "Encryption", new long[] { 60*60*1000 });
 
             // add to the defaults for every 128MB of RAM, up to 512MB
@@ -472,7 +470,8 @@ public class DHSessionKeyBuilder {
                 _log.debug("DH Precalc (minimum: " + _minSize + " max: " + _maxSize + ", delay: "
                            + _calcDelay + ")");
             _builders = new LinkedBlockingQueue<DHSessionKeyBuilder>(_maxSize);
-            setPriority(Thread.MIN_PRIORITY);
+            if (!SystemVersion.isWindows())
+                setPriority(Thread.NORM_PRIORITY - 1);
         }
         
         /**
@@ -506,9 +505,10 @@ public class DHSessionKeyBuilder {
                             break;
                         long curCalc = System.currentTimeMillis() - curStart;
                         // for some relief...
-                        try {
-                            Thread.sleep(_calcDelay + (curCalc * 3));
-                        } catch (InterruptedException ie) { // nop
+                        if (!interrupted()) {
+                            try {
+                                Thread.sleep(Math.min(200, Math.max(10, _calcDelay + (curCalc * 3))));
+                            } catch (InterruptedException ie) {}
                         }
                     }
                 }
@@ -536,12 +536,14 @@ public class DHSessionKeyBuilder {
          * @since 0.9 moved from DHSKB
          */
         public DHSessionKeyBuilder getBuilder() {
-            _context.statManager().addRateData("crypto.DHUsed", 1, 0);
+            _context.statManager().addRateData("crypto.DHUsed", 1);
             DHSessionKeyBuilder builder = _builders.poll();
             if (builder == null) {
                 if (_log.shouldLog(Log.INFO)) _log.info("No more builders, creating one now");
-                _context.statManager().addRateData("crypto.DHEmpty", 1, 0);
+                _context.statManager().addRateData("crypto.DHEmpty", 1);
                 builder = precalc();
+                // stop sleeping, wake up, make some more
+                this.interrupt();
             }
             return builder;
         }
@@ -551,7 +553,7 @@ public class DHSessionKeyBuilder {
             DHSessionKeyBuilder builder = new DHSessionKeyBuilder(_context);
             long end = System.currentTimeMillis();
             long diff = end - start;
-            _context.statManager().addRateData("crypto.dhGeneratePublicTime", diff, diff);
+            _context.statManager().addRateData("crypto.dhGeneratePublicTime", diff);
             if (diff > 1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Took more than a second (" + diff + "ms) to generate local DH value");
@@ -559,6 +561,23 @@ public class DHSessionKeyBuilder {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Took " + diff + "ms to generate local DH value");
             }
             return builder;
+        }
+
+        /**
+         * Return an unused DH key builder
+         * to be put back onto the queue for reuse.
+         *
+         * @param builder must not have a peerPublicValue set
+         * @since 0.9.16
+         */
+        public void returnUnused(DHSessionKeyBuilder builder) {
+            if (builder.getPeerPublicValue() != null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("builder returned used");
+                return;
+            }
+            _context.statManager().addRateData("crypto.DHReused", 1);
+            _builders.offer(builder);
         }
 
         /** @return true if successful, false if full */

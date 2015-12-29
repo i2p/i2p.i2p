@@ -24,8 +24,8 @@ import net.i2p.util.SystemVersion;
 
 /**
  * A class for retrieveing details about the CPU using the CPUID assembly instruction.
- * A good resource for information about the CPUID instruction can be found here:
- * http://www.paradicesoftware.com/specs/cpuid/index.htm
+ *
+ * Ref: http://en.wikipedia.org/wiki/Cpuid
  *
  * @author Iakin
 */
@@ -79,8 +79,11 @@ public class CPUID {
     {
         loadNative();
     }
-    //A class that can (amongst other things I assume) represent the state of the
-    //different CPU registers after a call to the CPUID assembly method
+
+    /**
+     *  A class that can (amongst other things I assume) represent the state of the
+     *  different CPU registers after a call to the CPUID assembly method
+     */
     protected static class CPUIDResult {
         final int EAX;
         final int EBX;
@@ -124,51 +127,75 @@ public class CPUID {
 
         return sb.toString();
     }
+
+    /** @return 0-15 */
     static int getCPUFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 8) & 0xf;
     }
+
+    /** @return 0-15 */
     static int getCPUModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 4) & 0xf;
     }
+
+    /**
+     *  Only valid if family == 15, or, for Intel only, family == 6.
+     *  Left shift by 4 and then add model to get full model.
+     *  @return 0-15
+     */
     static int getCPUExtendedModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 16) & 0xf;
     }
+
+    /** @return 0-15 */
     static int getCPUType()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 12) & 0xf;
     }
+
+    /**
+     *  Only valid if family == 15.
+     *  Add family to get full family.
+     *  @return 0-255
+     */
     static int getCPUExtendedFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 20) & 0xff;
     }
+
+    /** @return 0-15 */
     static int getCPUStepping()
     {
         CPUIDResult c = doCPUID(1);
         return c.EAX & 0xf;
     }
+
     static int getEDXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.EDX;
     }
+
     static int getECXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.ECX;
     }
+
     static int getExtendedEBXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EBX;
     }
+
     static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
@@ -180,6 +207,40 @@ public class CPUID {
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EDX;
+    }
+
+    /**
+     *  The model name string, up to 48 characters, as reported by
+     *  the processor itself.
+     *
+     *  @return trimmed string, null if unsupported
+     *  @since 0.9.16
+     */
+    static String getCPUModelName() {
+        CPUIDResult c = doCPUID(0x80000000);
+        long maxSupported = c.EAX & 0xFFFFFFFFL;
+        if (maxSupported < 0x80000004L)
+            return null;
+        StringBuilder buf = new StringBuilder(48);
+        int[] regs = new int[4];
+        for (int fn = 0x80000002; fn <= 0x80000004; fn++) {
+            c = doCPUID(fn);
+            regs[0] = c.EAX;
+            regs[1] = c.EBX;
+            regs[2] = c.ECX;
+            regs[3] = c.EDX;
+            for (int i = 0; i < 4; i++) {
+                int reg = regs[i];
+                for (int j = 0; j < 4; j++) {
+                    char ch = (char) (reg & 0xff);
+                    if (ch == 0)
+                        return buf.toString().trim();
+                    buf.append(ch);
+                    reg >>= 8;
+                }
+            }
+        }
+        return buf.toString().trim();
     }
 
     /**
@@ -213,9 +274,25 @@ public class CPUID {
             System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
         }
         System.out.println(" **CPUInfo**");
-        System.out.println("CPU Vendor: " + getCPUVendorID());
-        System.out.println("CPU Family: " + getCPUFamily());
-        System.out.println("CPU Model: " + getCPUModel());
+        String mname = getCPUModelName();
+        if (mname != null)
+            System.out.println("CPU Model Name: " + mname);
+        String vendor = getCPUVendorID();
+        System.out.println("CPU Vendor: " + vendor);
+        // http://en.wikipedia.org/wiki/Cpuid
+        // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
+        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
+        int family = getCPUFamily();
+        int model = getCPUModel();
+        if (family == 15 ||
+            (family == 6 && "GenuineIntel".equals(vendor))) {
+            model += getCPUExtendedModel() << 4;
+        }
+        if (family == 15) {
+            family += getCPUExtendedFamily();
+        }
+        System.out.println("CPU Family: " + family);
+        System.out.println("CPU Model: " + model);
         System.out.println("CPU Stepping: " + getCPUStepping());
         System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
 
@@ -229,6 +306,7 @@ public class CPUID {
         System.out.println("CPU has SSE4.1: " + c.hasSSE41());
         System.out.println("CPU has SSE4.2: " + c.hasSSE42());
         System.out.println("CPU has SSE4A: " + c.hasSSE4A());
+        System.out.println("CPU has AES-NI: " + c.hasAES());
         if(c instanceof IntelCPUInfo){
             System.out.println("\n **Intel-info**");
             System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());

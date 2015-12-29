@@ -1,12 +1,15 @@
 package net.i2p.data;
 
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException; 
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -24,6 +27,7 @@ import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * This helper class reads and writes files in the
@@ -38,7 +42,7 @@ import net.i2p.util.RandomSource;
  *     - Certificate if length != 0
  *  - Private key (256 bytes)
  *  - Signing Private key (20 bytes, or length specified by key certificate)
- * Total 663 bytes
+ * Total: 663 or more bytes
  *</pre>
  *
  * @author welterde, zzz
@@ -48,11 +52,11 @@ public class PrivateKeyFile {
     
     private static final int HASH_EFFORT = VerifiedDestination.MIN_HASHCASH_EFFORT;
     
-    private final File file;
+    protected final File file;
     private final I2PClient client;
-    private Destination dest;
-    private PrivateKey privKey;
-    private SigningPrivateKey signingPrivKey; 
+    protected Destination dest;
+    protected PrivateKey privKey;
+    protected SigningPrivateKey signingPrivKey; 
 
     /**
      *  Create a new PrivateKeyFile, or modify an existing one, with various
@@ -166,10 +170,15 @@ public class PrivateKeyFile {
                 usage();
                 return;
             }
-            System.out.println(pkf);
-            pkf.write();
-            verifySignature(pkf.getDestination());
-        } catch (Exception e) {
+            if (mode != 0) {
+                System.out.println(pkf);
+                pkf.write();
+                verifySignature(pkf.getDestination());
+            }
+        } catch (I2PException e) {
+            e.printStackTrace();
+            System.exit(1);
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -224,6 +233,16 @@ public class PrivateKeyFile {
      */
     public PrivateKeyFile(File file, PublicKey pubkey, SigningPublicKey spubkey, Certificate cert,
                           PrivateKey pk, SigningPrivateKey spk) {
+        this(file, pubkey, spubkey, cert, pk, spk, null);
+    }
+    
+    /**
+     *  @param padding null OK, must be non-null if spubkey length < 128
+     *  @throws IllegalArgumentException on mismatch of spubkey and spk types
+     *  @since 0.9.16
+     */
+    public PrivateKeyFile(File file, PublicKey pubkey, SigningPublicKey spubkey, Certificate cert,
+                          PrivateKey pk, SigningPrivateKey spk, byte[] padding) {
         if (spubkey.getType() != spk.getType())
             throw new IllegalArgumentException("Signing key type mismatch");
         this.file = file;
@@ -232,6 +251,8 @@ public class PrivateKeyFile {
         this.dest.setPublicKey(pubkey);
         this.dest.setSigningPublicKey(spubkey);
         this.dest.setCertificate(cert);
+        if (padding != null)
+            this.dest.setPadding(padding);
         this.privKey = pk;
         this.signingPrivKey = spk;
     }
@@ -241,9 +262,9 @@ public class PrivateKeyFile {
      */
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
         if(!this.file.exists()) {
-            FileOutputStream out = null;
+            OutputStream out = null;
             try {
-                out = new FileOutputStream(this.file);
+                out = new SecureFileOutputStream(this.file);
                 if (this.client != null)
                     this.client.createDestination(out);
                 else
@@ -257,7 +278,10 @@ public class PrivateKeyFile {
         return getDestination();
     }
     
-    /** Also sets the local privKey and signingPrivKey */
+    /**
+     *  If the destination is not set, read it in from the file.
+     *  Also sets the local privKey and signingPrivKey.
+     */
     public Destination getDestination() throws I2PSessionException, IOException, DataFormatException {
         if (dest == null) {
             I2PSession s = open();
@@ -338,7 +362,7 @@ public class PrivateKeyFile {
         HashCash hc;
         try {
             hc = HashCash.mintCash(resource, effort);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             return null;
         }
         System.out.println("Generation took: " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
@@ -361,7 +385,7 @@ public class PrivateKeyFile {
         hcs = hcs.substring(0, end1) + hcs.substring(start2);
         System.out.println("Short Hashcash is: " + hcs);
 
-        c.setPayload(hcs.getBytes());
+        c.setPayload(DataHelper.getUTF8(hcs));
         return c;
     }
     
@@ -371,7 +395,9 @@ public class PrivateKeyFile {
         Destination d2;
         try {
             d2 = pkf2.getDestination();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return null;
+        } catch (IOException e) {
             return null;
         }
         if (d2 == null)
@@ -385,7 +411,10 @@ public class PrivateKeyFile {
         System.arraycopy(this.dest.getPublicKey().getData(), 0, data, 0, PublicKey.KEYSIZE_BYTES);
         System.arraycopy(this.dest.getSigningPublicKey().getData(), 0, data, PublicKey.KEYSIZE_BYTES, SigningPublicKey.KEYSIZE_BYTES);
         byte[] payload = new byte[Hash.HASH_LENGTH + Signature.SIGNATURE_BYTES];
-        byte[] sig = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2).getData();
+        Signature sign = DSAEngine.getInstance().sign(new ByteArrayInputStream(data), spk2);
+        if (sign == null)
+            return null;
+        byte[] sig = sign.getData();
         System.arraycopy(sig, 0, payload, 0, Signature.SIGNATURE_BYTES);
         // Add dest2's Hash for reference
         byte[] h2 = d2.calculateHash().getData();
@@ -408,9 +437,9 @@ public class PrivateKeyFile {
     }
 
     public I2PSession open(Properties opts) throws I2PSessionException, IOException {
-        FileInputStream in = null;
+        InputStream in = null;
         try {
-            in = new FileInputStream(this.file);
+            in = new BufferedInputStream(new FileInputStream(this.file));
             I2PSession s = this.client.createSession(in, opts);
             return s;
         } finally {
@@ -424,17 +453,33 @@ public class PrivateKeyFile {
      *  Copied from I2PClientImpl.createDestination()
      */
     public void write() throws IOException, DataFormatException {
-        FileOutputStream out = null;
+        OutputStream out = null;
         try {
-            out = new FileOutputStream(this.file);
+            out = new SecureFileOutputStream(this.file);
             this.dest.writeBytes(out);
             this.privKey.writeBytes(out);
             this.signingPrivKey.writeBytes(out);
-            out.flush();
         } finally {
             if (out != null) {
                 try { out.close(); } catch (IOException ioe) {}
             }
+        }
+    }
+
+    /**
+     *  Verify that the PublicKey matches the PrivateKey, and
+     *  the SigningPublicKey matches the SigningPrivateKey.
+     *
+     *  @return success
+     *  @since 0.9.16
+     */
+    public boolean validateKeyPairs() {
+        try {
+            if (!dest.getPublicKey().equals(KeyGenerator.getPublicKey(privKey)))
+                return false;
+            return dest.getSigningPublicKey().equals(KeyGenerator.getSigningPublicKey(signingPrivKey));
+        } catch (IllegalArgumentException iae) {
+            return false;
         }
     }
 
@@ -461,7 +506,7 @@ public class PrivateKeyFile {
         long low = Long.MAX_VALUE;
         try {
             low = HashCash.estimateTime(hashEffort);
-        } catch (Exception e) {}
+        } catch (NoSuchAlgorithmException e) {}
         // takes a lot longer than the estimate usually...
         // maybe because the resource string is much longer than used in the estimate?
         return "It is estimated that generating a HashCash Certificate with value " + hashEffort +

@@ -28,7 +28,7 @@ class ACKSender implements Runnable {
     private static final long POISON_PS = -9999999999l;
     
     /** how frequently do we want to send ACKs to a peer? */
-    static final int ACK_FREQUENCY = 350;
+    static final int ACK_FREQUENCY = 250;
     
     public ACKSender(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -84,7 +84,18 @@ class ACKSender implements Runnable {
     }
     
     public void run() {
+        try {
+            run2();
+        } finally {
+            // prevent OOM on thread death
+            if (_alive) {
+                _alive = false;
+                _log.error("ACK Sender died");
+            }
+        }
+    }
 
+    private void run2() {
         // we use a Set to strip out dups that come in on the Queue
         Set<PeerState> notYet = new HashSet<PeerState>();
         while (_alive) {
@@ -137,7 +148,7 @@ class ACKSender implements Runnable {
                         try {
                             // bulk operations may throw an exception
                             _peersToACK.addAll(notYet);
-                        } catch (Exception e) {}
+                        } catch (RuntimeException e) {}
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("sleeping, pending size = " + notYet.size());
                         notYet.clear();
@@ -157,7 +168,7 @@ class ACKSender implements Runnable {
                 
                 if (wanted < 0) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("wtf, why are we acking something they dont want?  remaining=" + remaining + ", peer=" + peer + ", bitfields=" + ackBitfields);
+                        _log.warn("why are we acking something they dont want?  remaining=" + remaining + ", peer=" + peer + ", bitfields=" + ackBitfields);
                     continue;
                 }
                 
@@ -177,7 +188,7 @@ class ACKSender implements Runnable {
                     ack.setMessageType(PacketBuilder.TYPE_ACK);
                     
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Sending ACK for " + ackBitfields);
+                        _log.info("Sending " + ackBitfields + " to " + peer);
                     // locking issues, we ignore the result, and acks are small,
                     // so don't even bother allocating
                     //peer.allocateSendingBytes(ack.getPacket().getLength(), true);

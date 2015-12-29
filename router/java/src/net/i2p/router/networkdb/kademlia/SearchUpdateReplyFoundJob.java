@@ -5,7 +5,7 @@ import java.util.Date;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -18,24 +18,26 @@ import net.i2p.util.Log;
 /**
  * Called after a match to a db search is found
  *
+ * Used only by SearchJob which is only used by ExploreJob
  */
 class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
-    private Log _log;
+    private final Log _log;
     private I2NPMessage _message;
-    private Hash _peer;
-    private SearchState _state;
-    private KademliaNetworkDatabaseFacade _facade;
-    private SearchJob _job;
-    private TunnelInfo _outTunnel;
-    private TunnelInfo _replyTunnel;
-    private boolean _isFloodfillPeer;
-    private long _sentOn;
+    private final Hash _peer;
+    private final SearchState _state;
+    private final KademliaNetworkDatabaseFacade _facade;
+    private final SearchJob _job;
+    private final TunnelInfo _outTunnel;
+    private final TunnelInfo _replyTunnel;
+    private final boolean _isFloodfillPeer;
+    private final long _sentOn;
     
     public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, 
                                      SearchState state, KademliaNetworkDatabaseFacade facade, 
                                      SearchJob job) {
         this(context, peer, state, facade, job, null, null);
     }
+
     public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, 
                                      SearchState state, KademliaNetworkDatabaseFacade facade, 
                                      SearchJob job, TunnelInfo outTunnel, TunnelInfo replyTunnel) {
@@ -52,6 +54,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     }
     
     public String getName() { return "Update Reply Found for Kademlia Search"; }
+
     public void runJob() {
         if (_isFloodfillPeer)
             _job.decrementOutstandingFloodfillSearches();
@@ -59,7 +62,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
         I2NPMessage message = _message;
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Reply from " + _peer.toBase64() 
-                      + " with message " + message.getClass().getName());
+                      + " with message " + message.getClass().getSimpleName());
         
         long howLong = System.currentTimeMillis() - _sentOn;
         // assume requests are 1KB (they're almost always much smaller, but tunnels have a fixed size)
@@ -78,40 +81,27 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
         
         if (message instanceof DatabaseStoreMessage) {
             long timeToReply = _state.dataFound(_peer);
-            
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             DatabaseEntry entry = msg.getEntry();
-            if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-                try {
-                    _facade.store(msg.getKey(), (LeaseSet) entry);
-                    getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
-                } catch (IllegalArgumentException iae) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.warn("Peer " + _peer + " sent us an invalid leaseSet: " + iae.getMessage());
-                    getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
-                }
-            } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": dbStore received on search containing router " 
-                              + msg.getKey() + " with publishDate of " 
-                              + new Date(entry.getDate()));
-                try {
-                    _facade.store(msg.getKey(), (RouterInfo) entry);
-                    getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
-                } catch (IllegalArgumentException iae) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.warn("Peer " + _peer + " sent us an invalid routerInfo: " + iae.getMessage());
-                    getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
-                }
-            } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error(getJobId() + ": Unknown db store type?!@ " + entry.getType());
+            try {
+                _facade.store(msg.getKey(), entry);
+                getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
+            } catch (UnsupportedCryptoException iae) {
+                // don't blame the peer
+                getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
+                _state.abort();
+                // searchNext() will call fail()
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Peer " + _peer + " sent us invalid data: ", iae);
+                // blame the peer
+                getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
             }
         } else if (message instanceof DatabaseSearchReplyMessage) {
             _job.replyFound((DatabaseSearchReplyMessage)message, _peer);
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": WTF, reply job matched a strange message: " + message);
+                _log.error(getJobId() + ": What?! Reply job matched a strange message: " + message);
             return;
         }
         

@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -31,6 +33,8 @@ import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
 /**
+ *  Stores through this always request a reply.
+ *
  *  Unused directly - see FloodfillStoreJob
  */
 class StoreJob extends JobImpl {
@@ -170,8 +174,8 @@ class StoreJob extends JobImpl {
                     _state.addSkipped(peer);
                     skipped++;
                 } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
-                           ((LeaseSet)_state.getData()).getDestination().getCertificate().getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY &&
-                           !supportsKeyCerts((RouterInfo)ds)) {
+                           !supportsCert((RouterInfo)ds,
+                                         ((LeaseSet)_state.getData()).getDestination().getCertificate())) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Skipping router that doesn't support key certs " + peer);
                     _state.addSkipped(peer);
@@ -289,7 +293,8 @@ class StoreJob extends JobImpl {
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
         }
         msg.setEntry(_state.getData());
-        msg.setMessageExpiration(getContext().clock().now() + _timeoutMs);
+        long now = getContext().clock().now();
+        msg.setMessageExpiration(now + _timeoutMs);
 
         if (router.getIdentity().equals(getContext().router().getRouterInfo().getIdentity())) {
             // don't send it to ourselves
@@ -301,7 +306,7 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send store timeout is " + responseTime);
 
-        sendStore(msg, router, getContext().clock().now() + responseTime);
+        sendStore(msg, router, now + responseTime);
     }
     
     /**
@@ -311,14 +316,14 @@ class StoreJob extends JobImpl {
      */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         if (msg.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-            getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
+            getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1);
             // if it is an encrypted leaseset...
             if (getContext().keyRing().get(msg.getKey()) != null)
                 sendStoreThroughGarlic(msg, peer, expiration);
             else
                 sendStoreThroughClient(msg, peer, expiration);
         } else {
-            getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
+            getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1);
             sendDirect(msg, peer, expiration);
         }
     }
@@ -511,23 +516,29 @@ class StoreJob extends JobImpl {
      * @since 0.7.10
      */
     private static boolean supportsEncryption(RouterInfo ri) {
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_ENCRYPTION_VERSION) >= 0;
     }
 
-    private static final String MIN_KEYCERT_VERSION = "0.9.12";
-
     /**
-     * Does he support key certs (assumed with a non-DSA key)?
+     * Does this router understand this cert?
+     * @return true if not a key cert
      * @since 0.9.12
      */
-    public static boolean supportsKeyCerts(RouterInfo ri) {
-        String v = ri.getOption("router.version");
-        if (v == null)
+    public static boolean supportsCert(RouterInfo ri, Certificate cert) {
+        if (cert.getCertificateType() != Certificate.CERTIFICATE_TYPE_KEY)
+            return true;
+        SigType type;
+        try {
+            type = cert.toKeyCertificate().getSigType();
+        } catch (DataFormatException dfe) {
             return false;
-        return VersionComparator.comp(v, MIN_KEYCERT_VERSION) >= 0;
+        }
+        if (type == null)
+            return false;
+        String v = ri.getVersion();
+        String since = type.getSupportedSince();
+        return VersionComparator.comp(v, since) >= 0;
     }
 
     private static final String MIN_BIGLEASESET_VERSION = "0.9";
@@ -537,9 +548,7 @@ class StoreJob extends JobImpl {
      * @since 0.9.12
      */
     public static boolean supportsBigLeaseSets(RouterInfo ri) {
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_BIGLEASESET_VERSION) >= 0;
     }
 
@@ -549,9 +558,9 @@ class StoreJob extends JobImpl {
      *
      */
     private class SendSuccessJob extends JobImpl implements ReplyJob {
-        private RouterInfo _peer;
-        private TunnelInfo _sendThrough;
-        private int _msgSize;
+        private final RouterInfo _peer;
+        private final TunnelInfo _sendThrough;
+        private final int _msgSize;
         
         public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer) {
             this(enclosingContext, peer, null, 0);
@@ -607,8 +616,8 @@ class StoreJob extends JobImpl {
      *
      */
     private class FailedJob extends JobImpl {
-        private RouterInfo _peer;
-        private long _sendOn;
+        private final RouterInfo _peer;
+        private final long _sendOn;
 
         public FailedJob(RouterContext enclosingContext, RouterInfo peer, long sendOn) {
             super(enclosingContext);
@@ -627,7 +636,7 @@ class StoreJob extends JobImpl {
             _state.replyTimeout(hash);
 
             getContext().profileManager().dbStoreFailed(hash);
-            getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn, 0);
+            getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn);
             
             sendNext();
         }

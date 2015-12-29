@@ -8,6 +8,7 @@ package net.i2p.router;
  *
  */
 
+import net.i2p.router.RouterClock;
 import net.i2p.util.Clock;
 
 /**

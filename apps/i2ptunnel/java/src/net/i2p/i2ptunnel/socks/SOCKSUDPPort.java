@@ -64,6 +64,10 @@ public class SOCKSUDPPort implements Source, Sink {
         this.udpsource.stop();
     }
 
+    /**
+     *  May throw RuntimeException from underlying sink
+     *  @throws RuntimeException
+     */
     public void send(Destination from, byte[] data) {
         this.wrapper.send(from, data);
     }

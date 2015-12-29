@@ -7,12 +7,17 @@ import net.i2p.data.SessionKey;
 //import net.i2p.util.Log;
 
 /**
- * Read and write the reply to a tunnel build message record.
+ * Class that creates an encrypted tunnel build message record.
  *
  * The reply record is the same size as the request record (528 bytes).
+ *
+ * When decrypted:
+ *
+ *<pre>
  * Bytes 0-31 contain the hash of bytes 32-527
  * Bytes 32-526 contain random data.
  * Byte 527 contains the reply.
+ *</pre>
  */
 public class BuildResponseRecord {
 
@@ -20,10 +25,12 @@ public class BuildResponseRecord {
      * Create a new encrypted response
      *
      * @param status the response 0-255
+     * @param replyIV 16 bytes
      * @param responseMessageId unused except for debugging
      * @return a 528-byte response record
      */
-    public static byte[] create(I2PAppContext ctx, int status, SessionKey replyKey, byte replyIV[], long responseMessageId) {
+    public static EncryptedBuildRecord create(I2PAppContext ctx, int status, SessionKey replyKey,
+                                              byte replyIV[], long responseMessageId) {
         //Log log = ctx.logManager().getLog(BuildResponseRecord.class);
         byte rv[] = new byte[TunnelBuildReplyMessage.RECORD_SIZE];
         ctx.random().nextBytes(rv, Hash.HASH_LENGTH, TunnelBuildReplyMessage.RECORD_SIZE - Hash.HASH_LENGTH - 1);
@@ -35,6 +42,6 @@ public class BuildResponseRecord {
         ctx.aes().encrypt(rv, 0, rv, 0, replyKey, replyIV, rv.length);
         //if (log.shouldLog(Log.DEBUG))
         //    log.debug(responseMessageId + ": after encrypt: " + Base64.encode(rv, 0, 128));
-        return rv;
+        return new EncryptedBuildRecord(rv);
     }
 }

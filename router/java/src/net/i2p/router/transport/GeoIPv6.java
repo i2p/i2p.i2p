@@ -170,7 +170,7 @@ class GeoIPv6 {
                         if (buf.charAt(0) == '#') {
                             continue;
                         }
-                        String[] s = buf.split(",");
+                        String[] s = DataHelper.split(buf, ",");
                         String ips1 = s[0].replace("\"", "").trim();
                         String ips2 = s[1].replace("\"", "").trim();
                         byte[] ip1 = InetAddress.getByName(ips1).getAddress();

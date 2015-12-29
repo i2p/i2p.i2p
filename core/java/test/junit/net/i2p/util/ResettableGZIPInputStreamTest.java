@@ -45,7 +45,7 @@ public class ResettableGZIPInputStreamTest extends TestCase {
             
         }
         
-        byte orig[] = "ho ho ho, merry christmas".getBytes();
+        byte orig[] = DataHelper.getASCII("ho ho ho, merry christmas");
         ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
         GZIPOutputStream o = new GZIPOutputStream(baos);
         o.write(orig);

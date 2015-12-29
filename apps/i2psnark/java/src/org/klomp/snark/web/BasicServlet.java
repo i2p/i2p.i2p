@@ -181,11 +181,10 @@ class BasicServlet extends HttpServlet
         HttpContent r = null;
         if (_warBase != null && pathInContext.startsWith(_warBase)) {
             r = new JarContent(pathInContext);
-        } else if (!pathInContext.contains("..") &&
-                   !pathInContext.endsWith("/")) {
-            File f = new File(_resourceBase, pathInContext);
+        } else {
+            File f = getResource(pathInContext);
             // exists && !directory
-            if (f.isFile())
+            if (f != null && f.isFile())
                 r = new FileContent(f);
         }
         return r;
@@ -283,7 +282,12 @@ class BasicServlet extends HttpServlet
                 {
                     if (content.getLastModified()/1000 <= ifmsl/1000)
                     {
-                        response.reset();
+                        try {
+                            response.reset();
+                        } catch (IllegalStateException ise) {
+                            // committed
+                            return true;
+                        }
                         response.setStatus(304);
                         response.flushBuffer();
                         return false;
@@ -354,6 +358,7 @@ class BasicServlet extends HttpServlet
             writeHeaders(response, content, content_length);
             response.setStatus(416);
             response.setHeader("Content-Range", InclusiveByteRange.to416HeaderRangeString(content_length));
+            in.close();
             return;
         }
 
@@ -555,14 +560,17 @@ class BasicServlet extends HttpServlet
     /**
      *  Simple version of URIUtil.encodePath()
      */
-    protected static String encodePath(String path) throws MalformedURLException {
-        try {
-            URI uri = new URI(null, null, path, null);
-            return uri.toString();
-        } catch (URISyntaxException use) {
-            // for ease of use, since a USE is not an IOE but a MUE is...
-            throw new MalformedURLException(use.getMessage());
-        }
+    protected static String encodePath(String path) /* throws MalformedURLException */ {
+        // Does NOT handle a ':' correctly, throws MUE.
+        // Can't convert to %3a before hand or the % gets escaped
+        //try {
+        //    URI uri = new URI(null, null, path, null);
+        //    return uri.toString();
+        //} catch (URISyntaxException use) {
+        //    // for ease of use, since a USE is not an IOE but a MUE is...
+        //    throw new MalformedURLException(use.getMessage());
+        //}
+        return URIUtil.encodePath(path);
     }
 
     /**

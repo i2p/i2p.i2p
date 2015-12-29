@@ -9,6 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
@@ -36,6 +44,9 @@ public class TunnelControllerGroup implements ClientApp {
     static final String DEFAULT_CONFIG_FILE = "i2ptunnel.config";
     
     private final List<TunnelController> _controllers;
+    private final ReadWriteLock _controllersLock;
+    private boolean _controllersLoaded;
+    private final Object _controllersLoadedLock = new Object();
     private final String _configFile;
     
     private static final String REGISTERED_NAME = "i2ptunnel";
@@ -49,6 +60,21 @@ public class TunnelControllerGroup implements ClientApp {
     private final Map<I2PSession, Set<TunnelController>> _sessions;
     
     /**
+     *  We keep a pool of socket handlers for all clients,
+     *  as there is no need for isolation on the client side.
+     *  Extending classes may use it for other purposes.
+     *
+     *  May also be used by servers, carefully,
+     *  as there is no limit on threads.
+     */
+    private ThreadPoolExecutor _executor;
+    private static final AtomicLong _executorThreadCount = new AtomicLong();
+    private final Object _executorLock = new Object();
+    /** how long to wait before dropping an idle thread */
+    private static final long HANDLER_KEEPALIVE_MS = 2*60*1000;
+
+
+    /**
      *  In I2PAppContext will instantiate if necessary and always return non-null.
      *  As of 0.9.4, when in RouterContext, will return null (except in Android)
      *  if the TCG has not yet been started by the router.
@@ -61,7 +87,8 @@ public class TunnelControllerGroup implements ClientApp {
                 I2PAppContext ctx = I2PAppContext.getGlobalContext();
                 if (SystemVersion.isAndroid() || !ctx.isRouterContext()) {
                     _instance = new TunnelControllerGroup(ctx, null, null);
-                    _instance.startup();
+                    if (!SystemVersion.isAndroid())
+                        _instance.startup();
                 } // else wait for the router to start it
             }
             return _instance; 
@@ -75,6 +102,7 @@ public class TunnelControllerGroup implements ClientApp {
      *  @param mgr may be null
      *  @param args one arg, the config file, if not absolute will be relative to the context's config dir,
      *              if empty or null, the default is i2ptunnel.config
+     *  @throws IllegalArgumentException if too many args
      *  @since 0.9.4
      */
     public TunnelControllerGroup(I2PAppContext context, ClientAppManager mgr, String[] args) {
@@ -83,6 +111,7 @@ public class TunnelControllerGroup implements ClientApp {
         _mgr = mgr;
         _log = _context.logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList<TunnelController>();
+        _controllersLock = new ReentrantReadWriteLock(true);
         if (args == null || args.length <= 0)
             _configFile = DEFAULT_CONFIG_FILE;
         else if (args.length == 1)
@@ -121,7 +150,20 @@ public class TunnelControllerGroup implements ClientApp {
      *  @since 0.9.4
      */
     public void startup() {
-        loadControllers(_configFile);
+        try {
+            loadControllers(_configFile);
+        } catch (IllegalArgumentException iae) {
+            if (DEFAULT_CONFIG_FILE.equals(_configFile) && !_context.isRouterContext()) {
+                // for i2ptunnel command line
+                synchronized (_controllersLoadedLock) {
+                    _controllersLoaded = true;
+                }
+                _log.logAlways(Log.WARN, "Not in router context and no preconfigured tunnels");
+            } else {
+                throw iae;
+            }
+        }
+        startControllers();
         if (_mgr != null)
             _mgr.register(this);
             // RouterAppManager registers its own shutdown hook
@@ -206,46 +248,80 @@ public class TunnelControllerGroup implements ClientApp {
             if (_instance == this)
                 _instance = null;
         }
-/// fixme static
-        I2PTunnelClientBase.killClientExecutor();
+        killClientExecutor();
         changeState(STOPPED);
     }
     
     /**
-     * Load up all of the tunnels configured in the given file (but do not start
-     * them)
+     * Load up all of the tunnels configured in the given file.
+     * Prior to 0.9.20, also started the tunnels.
+     * As of 0.9.20, does not start the tunnels, you must call startup()
+     * or getInstance() instead of loadControllers().
      *
      * DEPRECATED for use outside this class. Use startup() or getInstance().
      *
      * @throws IllegalArgumentException if unable to load from file
      */
     public synchronized void loadControllers(String configFile) {
-        changeState(STARTING);
-        Properties cfg = loadConfig(configFile);
-        int i = 0; 
-        while (true) {
-            String type = cfg.getProperty("tunnel." + i + ".type");
-            if (type == null) 
-                break;
-            TunnelController controller = new TunnelController(cfg, "tunnel." + i + ".");
-            _controllers.add(controller);
-            i++;
+        synchronized (_controllersLoadedLock) {
+            if (_controllersLoaded)
+                return;
         }
+
+        Properties cfg = loadConfig(configFile);
+        int i = 0;
+        _controllersLock.writeLock().lock();
+        try {
+            while (true) {
+                String type = cfg.getProperty("tunnel." + i + ".type");
+                if (type == null)
+                    break;
+                TunnelController controller = new TunnelController(cfg, "tunnel." + i + ".");
+                _controllers.add(controller);
+                i++;
+            }
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
+
+        synchronized (_controllersLoadedLock) {
+            _controllersLoaded = true;
+        }
+        if (i > 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(i + " controllers loaded from " + configFile);
+        } else {
+            _log.logAlways(Log.WARN, "No i2ptunnel configurations found in " + configFile);
+        }
+    }
+
+    /**
+     * Start all of the tunnels. Must call loadControllers() first.
+     * @since 0.9.20
+     */
+    private synchronized void startControllers() {
+        changeState(STARTING);
         I2PAppThread startupThread = new I2PAppThread(new StartControllers(), "Startup tunnels");
         startupThread.start();
-        
-        if (_log.shouldLog(Log.INFO))
-            _log.info(i + " controllers loaded from " + configFile);
         changeState(RUNNING);
     }
     
     private class StartControllers implements Runnable {
         public void run() {
             synchronized(TunnelControllerGroup.this) {
-                for (int i = 0; i < _controllers.size(); i++) {
-                    TunnelController controller = _controllers.get(i);
-                    if (controller.getStartOnLoad())
-                        controller.startTunnel();
+                _controllersLock.readLock().lock();
+                try {
+                    if (_controllers.size() <= 0) {
+                        _log.logAlways(Log.WARN, "No configured tunnels to start");
+                        return;
+                    }
+                    for (int i = 0; i < _controllers.size(); i++) {
+                        TunnelController controller = _controllers.get(i);
+                        if (controller.getStartOnLoad())
+                            controller.startTunnelBackground();
+                    }
+                } finally {
+                    _controllersLock.readLock().unlock();
                 }
             }
         }
@@ -260,6 +336,7 @@ public class TunnelControllerGroup implements ClientApp {
     public synchronized void reloadControllers() {
         unloadControllers();
         loadControllers(_configFile);
+        startControllers();
     }
     
     /**
@@ -268,19 +345,40 @@ public class TunnelControllerGroup implements ClientApp {
      *
      */
     public synchronized void unloadControllers() {
-        stopAllControllers();
-        _controllers.clear();
+        synchronized (_controllersLoadedLock) {
+            if (!_controllersLoaded)
+                return;
+        }
+
+        _controllersLock.writeLock().lock();
+        try {
+            destroyAllControllers();
+            _controllers.clear();
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
+
+        synchronized (_controllersLoadedLock) {
+            _controllersLoaded = false;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("All controllers stopped and unloaded");
     }
-    
+
     /**
      * Add the given tunnel to the set of known controllers (but dont add it to
      * a config file or start it or anything)
      *
      */
-    public synchronized void addController(TunnelController controller) { _controllers.add(controller); }
-    
+    public synchronized void addController(TunnelController controller) {
+        _controllersLock.writeLock().lock();
+        try {
+            _controllers.add(controller);
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
+    }
+
     /**
      * Stop and remove the given tunnel
      *
@@ -290,26 +388,51 @@ public class TunnelControllerGroup implements ClientApp {
         if (controller == null) return new ArrayList<String>();
         controller.stopTunnel();
         List<String> msgs = controller.clearMessages();
-        _controllers.remove(controller);
+        _controllersLock.writeLock().lock();
+        try {
+            _controllers.remove(controller);
+        } finally {
+            _controllersLock.writeLock().unlock();
+        }
         msgs.add("Tunnel " + controller.getName() + " removed");
         return msgs;
     }
     
     /**
-     * Stop all tunnels
+     * Stop all tunnels. May be restarted.
      *
      * @return list of messages the tunnels generate when stopped
      */
     public synchronized List<String> stopAllControllers() {
         List<String> msgs = new ArrayList<String>();
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                controller.stopTunnel();
+                msgs.addAll(controller.clearMessages());
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_controllers.size() + " controllers stopped");
+        } finally {
+            _controllersLock.readLock().unlock();
+        }
+        return msgs;
+    }
+    
+    /**
+     *  Stop all tunnels. They may not be restarted, you must reload.
+     *  Caller must synch. Caller must clear controller list.
+     *
+     *  @since 0.9.17
+     */
+    private void destroyAllControllers() {
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = _controllers.get(i);
-            controller.stopTunnel();
-            msgs.addAll(controller.clearMessages());
+            controller.destroyTunnel();
         }
         if (_log.shouldLog(Log.INFO))
             _log.info(_controllers.size() + " controllers stopped");
-        return msgs;
     }
     
     /**
@@ -319,14 +442,19 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized List<String> startAllControllers() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            controller.startTunnelBackground();
-            msgs.addAll(controller.clearMessages());
-        }
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                controller.startTunnelBackground();
+                msgs.addAll(controller.clearMessages());
+            }
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_controllers.size() + " controllers started");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_controllers.size() + " controllers started");
+        } finally {
+            _controllersLock.readLock().unlock();
+        }
         return msgs;
     }
     
@@ -337,13 +465,18 @@ public class TunnelControllerGroup implements ClientApp {
      */
     public synchronized List<String> restartAllControllers() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            controller.restartTunnel();
-            msgs.addAll(controller.clearMessages());
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                controller.restartTunnel();
+                msgs.addAll(controller.clearMessages());
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_controllers.size() + " controllers restarted");
+        } finally {
+            _controllersLock.readLock().unlock();
         }
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_controllers.size() + " controllers restarted");
         return msgs;
     }
     
@@ -352,11 +485,16 @@ public class TunnelControllerGroup implements ClientApp {
      *
      * @return list of messages the tunnels have generated
      */
-    public synchronized List<String> clearAllMessages() {
+    public List<String> clearAllMessages() {
         List<String> msgs = new ArrayList<String>();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            msgs.addAll(controller.clearMessages());
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                msgs.addAll(controller.clearMessages());
+            }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
         return msgs;
     }
@@ -383,10 +521,15 @@ public class TunnelControllerGroup implements ClientApp {
             parent.mkdirs();
         
         Properties map = new OrderedProperties();
-        for (int i = 0; i < _controllers.size(); i++) {
-            TunnelController controller = _controllers.get(i);
-            Properties cur = controller.getConfig("tunnel." + i + ".");
-            map.putAll(cur);
+        _controllersLock.readLock().lock();
+        try {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = _controllers.get(i);
+                Properties cur = controller.getConfig("tunnel." + i + ".");
+                map.putAll(cur);
+            }
+        } finally {
+            _controllersLock.readLock().unlock();
         }
         
         DataHelper.storeProps(map, cfgFile);
@@ -420,12 +563,26 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Retrieve a list of tunnels known
+     * Retrieve a list of tunnels known.
+     *
+     * Side effect: if the tunnels have not been loaded from config yet, they
+     * will be.
      *
      * @return list of TunnelController objects
+     * @throws IllegalArgumentException if unable to load config from file
      */
-    public synchronized List<TunnelController> getControllers() {
-        return new ArrayList<TunnelController>(_controllers);
+    public List<TunnelController> getControllers() {
+        synchronized (_controllersLoadedLock) {
+            if (!_controllersLoaded)
+                loadControllers(_configFile);
+        }
+
+        _controllersLock.readLock().lock();
+        try {
+            return new ArrayList<TunnelController>(_controllers);
+        } finally {
+            _controllersLock.readLock().unlock();
+        }
     }
     
     
@@ -483,6 +640,61 @@ public class TunnelControllerGroup implements ClientApp {
             } catch (I2PSessionException ise) {
                 _log.error("Error closing the client session", ise);
             }
+        }
+    }
+
+    /**
+     *  @return non-null
+     *  @since 0.8.8 Moved from I2PTunnelClientBase in 0.9.18
+     */
+    ThreadPoolExecutor getClientExecutor() {
+        synchronized (_executorLock) {
+            if (_executor == null)
+                _executor = new CustomThreadPoolExecutor();
+        }
+        return _executor;
+    }
+
+    /**
+     *  @since 0.8.8 Moved from I2PTunnelClientBase in 0.9.18
+     */
+    private void killClientExecutor() {
+        synchronized (_executorLock) {
+            if (_executor != null) {
+                _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+                _executor.shutdownNow();
+                _executor = null;
+            }
+        }
+        // kill the shared client, so that on restart in android
+        // we won't latch onto the old one
+        I2PTunnelClientBase.killSharedClient();
+    }
+
+    /**
+     *  Not really needed for now but in case we want to add some hooks like afterExecute().
+     *  Package private for fallback in case TCG.getInstance() is null, never instantiated
+     *  but a plugin still needs it... should be rare.
+     *
+     *  @since 0.9.18 Moved from I2PTunnelClientBase
+     */
+    static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
+        public CustomThreadPoolExecutor() {
+             super(0, Integer.MAX_VALUE, HANDLER_KEEPALIVE_MS, TimeUnit.MILLISECONDS,
+                   new SynchronousQueue<Runnable>(), new CustomThreadFactory());
+        }
+    }
+
+    /**
+     *  Just to set the name and set Daemon
+     *  @since 0.9.18 Moved from I2PTunnelClientBase
+     */
+    private static class CustomThreadFactory implements ThreadFactory {
+        public Thread newThread(Runnable r) {
+            Thread rv = Executors.defaultThreadFactory().newThread(r);
+            rv.setName("I2PTunnel Client Runner " + _executorThreadCount.incrementAndGet());
+            rv.setDaemon(true);
+            return rv;
         }
     }
 }

@@ -105,7 +105,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
         byte[] data = doWriteMessage();
         try {
             DataHelper.writeLong(out, 4, data.length);
-            DataHelper.writeLong(out, 1, getType());
+            out.write((byte) getType());
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to write the message length or type", dfe);
         }
@@ -127,4 +127,15 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
             throw new DataFormatException("Error writing the message", ime);
         }
     }
+
+    /**
+     * Return the SessionId for this type of message.
+     * Most but not all message types include a SessionId.
+     * The ones that do already define getSessionId(), but some return a SessionId and
+     * some return a long, so we define a new method here.
+     *
+     * @return null always. Extending classes with a SessionId must override.
+     * @since 0.9.21
+     */
+    public SessionId sessionId() { return null; }
 }

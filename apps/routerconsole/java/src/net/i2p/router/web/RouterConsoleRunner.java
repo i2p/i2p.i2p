@@ -15,11 +15,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.concurrent.Executors;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
@@ -30,13 +26,15 @@ import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
-import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
+import net.i2p.router.news.NewsManager;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -121,7 +119,9 @@ public class RouterConsoleRunner implements RouterApp {
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
                                         "Usage: [[port host[,host]] [-s sslPort [host[,host]]] [webAppsDir]]";
 
+    /** this is for the handlers only. We will adjust for the connectors and acceptors below. */
     private static final int MIN_THREADS = 1;
+    /** this is for the handlers only. We will adjust for the connectors and acceptors below. */
     private static final int MAX_THREADS = 24;
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
@@ -209,6 +209,7 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.4 */
     public synchronized void startup() {
         changeState(STARTING);
+        checkJavaVersion();
         startTrayApp(_context);
         startConsole();
     }
@@ -285,6 +286,31 @@ public class RouterConsoleRunner implements RouterApp {
         }
     }
 
+    /** @since 0.9.17 */
+    private void checkJavaVersion() {
+        boolean noJava7 = !SystemVersion.isJava7();
+        boolean noPack200 = !FileUtil.isPack200Supported();
+        if (noJava7 || noPack200) {
+            String s = "Java version: " + System.getProperty("java.version") +
+                       " OS: " + System.getProperty("os.name") + ' ' +
+                       System.getProperty("os.arch") + ' ' +
+                       System.getProperty("os.version");
+            net.i2p.util.Log log = _context.logManager().getLog(RouterConsoleRunner.class);
+            log.logAlways(net.i2p.util.Log.WARN, s);
+            System.out.println("Warning: " + s);
+            if (noJava7) {
+                s = "Java 7 will be required by late 2015, please upgrade soon";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+            if (noPack200) {
+                s = "Pack200 will be required by late 2015, please upgrade Java soon";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+        }
+    }
+
     /**
      *  http://irc.codehaus.org/display/JETTY/Porting+to+jetty6
      *
@@ -317,19 +343,45 @@ public class RouterConsoleRunner implements RouterApp {
         _server = new Server();
         _server.setGracefulShutdown(1000);
 
-        try {
-            ThreadPool ctp = new CustomThreadPoolExecutor();
-            // Gone in Jetty 7
-            //ctp.prestartAllCoreThreads();
-            _server.setThreadPool(ctp);
-        } catch (Throwable t) {
+        // In Jetty 6, QTP was not concurrent, so we switched to
+        // ThreadPoolExecutor with a fixed-size queue, a set maxThreads,
+        // and a RejectedExecutionPolicy of CallerRuns.
+        // Unfortunately, CallerRuns causes lockups in Jetty NIO (ticket #1395)
+        // In addition, no flavor of TPE gives us what QTP does:
+        // - TPE direct handoff (which we were using) never queues.
+        //   This doesn't provide any burst management when maxThreads is reached.
+        //   CallerRuns was an attempt to work around that.
+        // - TPE unbounded queue does not adjust the number of threads.
+        //   This doesn't provide automatic resource management.
+        // - TPE bounded queue does not add threads until the queue is full.
+        //   This doesn't provide good responsiveness to even small bursts.
+        // QTP adds threads as soon as the queue is non-empty.
+        // QTP as of Jetty 7 uses concurrent.
+        // QTP unbounded queue is the default in Jetty.
+        // So switch back to QTP with a bounded queue.
+        //
+        // ref:
+        // http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ThreadPoolExecutor.html
+        // https://wiki.eclipse.org/Jetty/Howto/High_Load
+        //
+        //try {
+        //    ThreadPool ctp = new CustomThreadPoolExecutor();
+        //    // Gone in Jetty 7
+        //    //ctp.prestartAllCoreThreads();
+        //    _server.setThreadPool(ctp);
+        //} catch (Throwable t) {
             // class not found...
-            System.out.println("INFO: Jetty concurrent ThreadPool unavailable, using QueuedThreadPool");
-            QueuedThreadPool qtp = new QueuedThreadPool(MAX_THREADS);
-            qtp.setMinThreads(MIN_THREADS);
+            //System.out.println("INFO: Jetty concurrent ThreadPool unavailable, using QueuedThreadPool");
+            LinkedBlockingQueue<Runnable> lbq = new LinkedBlockingQueue<Runnable>(4*MAX_THREADS);
+            QueuedThreadPool qtp = new QueuedThreadPool(lbq);
+            // min and max threads will be set below
+            //qtp.setMinThreads(MIN_THREADS);
+            //qtp.setMaxThreads(MAX_THREADS);
             qtp.setMaxIdleTimeMs(MAX_IDLE_TIME);
+            qtp.setName(THREAD_NAME);
+            qtp.setDaemon(true);
             _server.setThreadPool(qtp);
-        }
+        //}
 
         HandlerCollection hColl = new HandlerCollection();
         ContextHandlerCollection chColl = new ContextHandlerCollection();
@@ -464,6 +516,10 @@ public class RouterConsoleRunner implements RouterApp {
                     sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                     // the X.509 cert password (if not present, verifyKeyStore() returned false)
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                    sslFactory.addExcludeProtocols(I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.toArray(
+                                                   new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
+                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
+                                                      new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
@@ -522,6 +578,10 @@ public class RouterConsoleRunner implements RouterApp {
                 System.err.println("Unable to bind routerconsole to any address on port " + _listenPort + (sslPort > 0 ? (" or SSL port " + sslPort) : ""));
                 return;
             }
+            // Each address spawns a Connector and an Acceptor thread
+            // If the min is less than this, we have no thread for the handlers or the expiration thread.
+            qtp.setMinThreads(MIN_THREADS + (2 * boundAddresses));
+            qtp.setMaxThreads(MAX_THREADS + (2 * boundAddresses));
 
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
@@ -570,8 +630,9 @@ public class RouterConsoleRunner implements RouterApp {
                 }
             }
             if (error) {
+                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : "7657");
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
-                               "If your console is still accessible at http://127.0.0.1:" + _listenPort + "/,\n" +
+                               "If your console is still accessible at http://127.0.0.1:" + port + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");
@@ -647,6 +708,8 @@ public class RouterConsoleRunner implements RouterApp {
         
             ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
+            NewsManager nm = new NewsManager(_context, _mgr, null);
+            nm.startup();
         
             if (PluginStarter.pluginsEnabled(_context)) {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
@@ -698,6 +761,13 @@ public class RouterConsoleRunner implements RouterApp {
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
+                // export cert, fails silently
+                File dir = new SecureDirectory(_context.getConfigDir(), "certificates");
+                dir.mkdir();
+                dir = new SecureDirectory(dir, "console");
+                dir.mkdir();
+                File certFile = new File(dir, "console.local.crt");
+                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {
@@ -833,6 +903,7 @@ public class RouterConsoleRunner implements RouterApp {
      * Just to set the name and set Daemon
      * @since Jetty 6
      */
+/*****
     private static class CustomThreadPoolExecutor extends ExecutorThreadPool {
         public CustomThreadPoolExecutor() {
              super(new ThreadPoolExecutor(
@@ -843,11 +914,13 @@ public class RouterConsoleRunner implements RouterApp {
                   );
         }
     }
+*****/
 
     /**
      * Just to set the name and set Daemon
      * @since Jetty 6
      */
+/*****
     private static class CustomThreadFactory implements ThreadFactory {
 
         public Thread newThread(Runnable r) {
@@ -857,5 +930,6 @@ public class RouterConsoleRunner implements RouterApp {
             return rv;
         }
     }
+*****/
 
 }

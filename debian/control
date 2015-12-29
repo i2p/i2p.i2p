@@ -1,7 +1,7 @@
 Source: i2p
 Maintainer: Kill Your TV <killyourtv@i2pmail.org>
 Section: net
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 Priority: optional
 Bugs: mailto:killyourtv@i2pmail.org
 Homepage: https://geti2p.net
@@ -9,9 +9,10 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
  ,debconf
- ,default-jdk | openjdk-7-jdk | openjdk-6-jdk
+ ,default-jdk | openjdk-7-jdk
+ ,dh-apparmor
  ,gettext
- ,libgmp3-dev
+ ,libgmp-dev (>= 2:5.0.5)
 # uncomment the next line for official builds
 # ,libservice-wrapper-java
  ,libcommons-logging-java
@@ -71,7 +72,7 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless | java7-runtime-headless | java6-runtime-headless, libecj-java
+ openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless, libecj-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
@@ -86,7 +87,7 @@ Suggests: tor
  ,mail-reader
  ,news-reader
  ,polipo
- ,privox
+ ,privoxy
  ,robert
  ,syndie
  ,www-browser

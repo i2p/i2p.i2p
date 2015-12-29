@@ -69,7 +69,7 @@ public final class ByteCache {
     /**
      * Get a cache responsible for objects of the given size.
      * Warning, if you store the result in a static field, the cleaners will
-     * not operate after a restart on Android, as the old context's SimpleScheduler will have shut down.
+     * not operate after a restart on Android, as the old context's SimpleTimer2 will have shut down.
      * TODO tie this to the context or clean up all calls.
      *
      * @param cacheSize how large we want the cache to grow 
@@ -123,7 +123,7 @@ public final class ByteCache {
         _maxCached = maxCachedEntries;
         _entrySize = entrySize;
         _lastOverflow = -1;
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY + (entrySize % 777));   //stagger
+        SimpleTimer2.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY + (entrySize % 777));   //stagger
         I2PAppContext.getGlobalContext().statManager().createRateStat("byteCache.memory." + entrySize, "Memory usage (B)", "Router", new long[] { 10*60*1000 });
     }
     

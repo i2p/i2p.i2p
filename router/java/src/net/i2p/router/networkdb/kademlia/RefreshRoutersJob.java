@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -32,7 +32,7 @@ class RefreshRoutersJob extends JobImpl {
      *  Don't go faster as this overloads the expl. OBEP / IBGW
      */
     private final static long RERUN_DELAY_MS = 3*1000;
-    private final static long EXPIRE = 60*60*1000;
+    private final static long EXPIRE = 2*60*60*1000;
     
     public RefreshRoutersJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade) {
         super(ctx);

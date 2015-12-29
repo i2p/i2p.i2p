@@ -41,7 +41,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.util.SystemVersion;
 
 /**
  * data structure to hold a single message, mostly used with folder view and sorting
@@ -88,6 +89,10 @@ class Mail {
 		error = "";
 	}
 
+	/**
+         *  This may or may not contain the body also.
+         *  @return may be null
+         */
 	public synchronized ReadBuffer getHeader() {
 		return header;
 	}
@@ -103,6 +108,10 @@ class Mail {
 		return header != null;
 	}
 
+	/**
+         *  This contains the header also.
+         *  @return may be null
+         */
 	public synchronized ReadBuffer getBody() {
 		return body;
 	}
@@ -118,7 +127,7 @@ class Mail {
 			part = new MailPart(rb);
 		} catch (DecodingException de) {
 			Debug.debug(Debug.ERROR, "Decode error: " + de);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			Debug.debug(Debug.ERROR, "Parse error: " + e);
 		}
 	}
@@ -182,7 +191,7 @@ class Mail {
 				address.indexOf( "\r" ) != -1 )
 			return false;
 		
-		String[] tokens = address.split( "[ \t]+" );
+		String[] tokens = DataHelper.split(address, "[ \t]+");
 
 		int addresses = 0;
 		
@@ -200,7 +209,7 @@ class Mail {
 	 */
 	public static String getAddress(String address )
 	{
-		String[] tokens = address.split( "[ \t]+" );
+		String[] tokens = DataHelper.split(address, "[ \t]+");
 
 		for( int i = 0; i < tokens.length; i++ ) {
 			if( tokens[i].matches( "^[^@< \t]+@[^> \t]+$" ) )
@@ -224,7 +233,7 @@ class Mail {
 	public static boolean getRecipientsFromList( ArrayList<String> recipients, String text, boolean ok )
 	{
 		if( text != null && text.length() > 0 ) {			
-			String[] ccs = text.split( "," );
+			String[] ccs = DataHelper.split(text, ",");
 			for( int i = 0; i < ccs.length; i++ ) {
 				String recipient = ccs[i].trim();
 				if( validateAddress( recipient ) ) {
@@ -267,12 +276,9 @@ class Mail {
 		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
-		String systemTimeZone = I2PAppContext.getGlobalContext().getProperty("i2p.systemTimeZone");
-		if (systemTimeZone != null) {
-			TimeZone tz = TimeZone.getTimeZone(systemTimeZone);
-			localDateFormatter.setTimeZone(tz);
-			longLocalDateFormatter.setTimeZone(tz);
-		}
+		TimeZone tz = SystemVersion.getSystemTimeZone();
+		localDateFormatter.setTimeZone(tz);
+		longLocalDateFormatter.setTimeZone(tz);
 		DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );
 		
 		error = "";
@@ -283,14 +289,14 @@ class Mail {
 			Encoding html = EncodingFactory.getEncoding( "HTML" );
 			
 			if( html == null ) {
-				error += "HTML encoder not found.<br>";
+				error += "HTML encoder not found.\n";
 				ok = false;
 			}
 			
 			Encoding hl = EncodingFactory.getEncoding( "HEADERLINE" );
 
 			if( hl == null ) {
-				error += "Header line encoder not found.<br>";
+				error += "Header line encoder not found.\n";
 				ok = false;
 			}
 
@@ -369,7 +375,7 @@ class Mail {
 					}
 				}
 				catch( Exception e ) {
-					error += "Error parsing mail header: " + e.getClass().getName() + "<br>";
+					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
 				}		
 			}
 		}

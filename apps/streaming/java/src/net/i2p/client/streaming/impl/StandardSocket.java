@@ -193,7 +193,15 @@ class StandardSocket extends Socket {
         I2PSocketOptions opts = _socket.getOptions();
         if (opts == null)
             return 0;
-        return (int) opts.getReadTimeout();
+        long rv = opts.getReadTimeout();
+        // Java Socket: 0 is forever, and we don't exactly have nonblocking
+        if (rv > Integer.MAX_VALUE)
+            rv = Integer.MAX_VALUE;
+        else if (rv < 0)
+            rv = 0;
+        else if (rv == 0)
+            rv = 1;
+        return (int) rv;
     }
 
     /**
@@ -309,6 +317,9 @@ class StandardSocket extends Socket {
         I2PSocketOptions opts = _socket.getOptions();
         if (opts == null)
             throw new SocketException("No options");
+        // Java Socket: 0 is forever
+        if (timeout == 0)
+            timeout = -1;
         opts.setReadTimeout(timeout);
     }
 

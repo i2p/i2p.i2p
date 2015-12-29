@@ -2,6 +2,7 @@ package net.i2p.crypto;
 
 import gnu.crypto.hash.Sha256Standalone;
 
+import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,6 +21,7 @@ public final class SHA256Generator {
     private final LinkedBlockingQueue<MessageDigest> _digests;
 
     private static final boolean _useGnu;
+
     static {
         boolean useGnu = false;
         try {
@@ -53,13 +55,13 @@ public final class SHA256Generator {
 
     /**
      * Calculate the hash and cache the result.
+     * @param source what to hash
      */
     public final Hash calculateHash(byte[] source, int start, int len) {
         MessageDigest digest = acquire();
         digest.update(source, start, len);
         byte rv[] = digest.digest();
         release(digest);
-        //return new Hash(rv);
         return Hash.create(rv);
     }
     
@@ -71,9 +73,13 @@ public final class SHA256Generator {
     public final void calculateHash(byte[] source, int start, int len, byte out[], int outOffset) {
         MessageDigest digest = acquire();
         digest.update(source, start, len);
-        byte rv[] = digest.digest();
-        release(digest);
-        System.arraycopy(rv, 0, out, outOffset, rv.length);
+        try {
+            digest.digest(out, outOffset, Hash.HASH_LENGTH);
+        } catch (DigestException e) {
+            throw new RuntimeException(e);
+        } finally {
+            release(digest);
+        }
     }
     
     private MessageDigest acquire() {

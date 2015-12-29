@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 /**
@@ -57,7 +58,7 @@ public class EepGetAndAddNamingService extends EepGetNamingService {
                         try {
                             fos = new FileOutputStream(f, true);
                             String line = hostname + '=' + rv.toBase64() + System.getProperty("line.separator");
-                            fos.write(line.getBytes());
+                            fos.write(DataHelper.getASCII(line));
                         } catch (IOException ioe) {
                             System.err.println("Error appending: " + ioe);
                         } finally {

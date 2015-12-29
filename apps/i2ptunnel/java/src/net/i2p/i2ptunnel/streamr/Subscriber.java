@@ -2,9 +2,11 @@ package net.i2p.i2ptunnel.streamr;
 
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.udp.*;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.Log;
 
 /**
  * server-mode
@@ -19,10 +21,18 @@ public class Subscriber implements Sink {
         this.subscriptions = new ConcurrentHashSet<Destination>();
     }
 
+    /**
+     *  Doesn't really "send" anywhere, just subscribes or unsubscribes the destination
+     *
+     *  @param dest to subscribe or unsubscribe
+     *  @param data must be a single byte, 0 to subscribe, 1 to unsubscribe
+     */
     public void send(Destination dest, byte[] data) {
         if(dest == null || data.length < 1) {
             // invalid packet
-            // TODO: write to log
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+            if (log.shouldWarn())
+                log.warn("bad subscription from " + dest);
         } else {
             byte ctrl = data[0];
             if(ctrl == 0) {
@@ -40,7 +50,9 @@ public class Subscriber implements Sink {
                     multi.remove(dest);
             } else {
                 // invalid packet
-                // TODO: write to log
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+                if (log.shouldWarn())
+                    log.warn("bad subscription from " + dest);
             }
         }
     }

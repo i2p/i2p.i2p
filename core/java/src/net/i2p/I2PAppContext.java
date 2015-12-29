@@ -12,9 +12,6 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
-import net.i2p.crypto.DummyDSAEngine;
-import net.i2p.crypto.DummyElGamalEngine;
-//import net.i2p.crypto.DummyPooledRandomSource;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
@@ -22,12 +19,10 @@ import net.i2p.crypto.HMACGenerator;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
-import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.stat.StatManager;
-import net.i2p.update.UpdateManager;
 import net.i2p.util.Clock;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
@@ -35,7 +30,6 @@ import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PProperties;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
-//import net.i2p.util.PooledRandomSource;
 import net.i2p.util.PortMapper;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
@@ -76,7 +70,7 @@ public class I2PAppContext {
     protected final I2PProperties _overrideProps;
     
     private StatManager _statManager;
-    private SessionKeyManager _sessionKeyManager;
+    protected SessionKeyManager _sessionKeyManager;
     private NamingService _namingService;
     private ElGamalEngine _elGamalEngine;
     private ElGamalAESEngine _elGamalAESEngine;
@@ -87,16 +81,16 @@ public class I2PAppContext {
     private SHA256Generator _sha;
     protected Clock _clock; // overridden in RouterContext
     private DSAEngine _dsa;
-    private RoutingKeyGenerator _routingKeyGenerator;
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
+    @SuppressWarnings("deprecation")
     private SimpleScheduler _simpleScheduler;
     private SimpleTimer _simpleTimer;
     private SimpleTimer2 _simpleTimer2;
     private final PortMapper _portMapper;
     private volatile boolean _statManagerInitialized;
-    private volatile boolean _sessionKeyManagerInitialized;
+    protected volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
     private volatile boolean _elGamalEngineInitialized;
     private volatile boolean _elGamalAESEngineInitialized;
@@ -107,7 +101,6 @@ public class I2PAppContext {
     private volatile boolean _shaInitialized;
     protected volatile boolean _clockInitialized; // used in RouterContext
     private volatile boolean _dsaInitialized;
-    private volatile boolean _routingKeyGeneratorInitialized;
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
     protected volatile boolean _keyRingInitialized; // used in RouterContext
@@ -127,7 +120,7 @@ public class I2PAppContext {
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
                          _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
-                         _lock13 = new Object(), _lock14 = new Object(), _lock15 = new Object(), _lock16 = new Object(),
+                         _lock13 = new Object(), _lock14 = new Object(), _lock16 = new Object(),
                          _lock17 = new Object(), _lock18 = new Object(), _lock19 = new Object(), _lock20 = new Object();
 
     /**
@@ -413,9 +406,11 @@ public class I2PAppContext {
                 } else if (_tmpDir.mkdir()) {
                     _tmpDir.deleteOnExit();
                 } else {
-                    System.err.println("Could not create temp dir " + _tmpDir.getAbsolutePath());
+                    System.err.println("WARNING: Could not create temp dir " + _tmpDir.getAbsolutePath());
                     _tmpDir = new SecureDirectory(_routerDir, "tmp");
-                    _tmpDir.mkdir();
+                    _tmpDir.mkdirs();
+                    if (!_tmpDir.exists())
+                        System.err.println("ERROR: Could not create temp dir " + _tmpDir.getAbsolutePath());
                 }
             }
         }
@@ -538,7 +533,7 @@ public class I2PAppContext {
      * @return set of Strings containing the names of defined system properties
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public Set<String> getPropertyNames() { 
+    public Set<String> getPropertyNames() { 
         // clone to avoid ConcurrentModificationException
         Set<String> names = new HashSet<String>((Set<String>) (Set) ((Properties) System.getProperties().clone()).keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         if (_overrideProps != null)
@@ -599,6 +594,9 @@ public class I2PAppContext {
      * For client crypto within the router,
      * use RouterContext.clientManager.getClientSessionKeyManager(dest)
      *
+     * As of 0.9.15, this returns a dummy SessionKeyManager in I2PAppContext.
+     * The dummy SKM does NOT handle session tags.
+     * Overridden in RouterContext to return the full TransientSessionKeyManager.
      */
     public SessionKeyManager sessionKeyManager() { 
         if (!_sessionKeyManagerInitialized)
@@ -606,11 +604,11 @@ public class I2PAppContext {
         return _sessionKeyManager;
     }
 
-    private void initializeSessionKeyManager() {
+    protected void initializeSessionKeyManager() {
         synchronized (_lock3) {
             if (_sessionKeyManager == null) 
                 //_sessionKeyManager = new PersistentSessionKeyManager(this);
-                _sessionKeyManager = new TransientSessionKeyManager(this);
+                _sessionKeyManager = new SessionKeyManager(this);
             _sessionKeyManagerInitialized = true;
         }
     }
@@ -651,12 +649,8 @@ public class I2PAppContext {
 
     private void initializeElGamalEngine() {
         synchronized (_lock5) {
-            if (_elGamalEngine == null) {
-                if ("off".equals(getProperty("i2p.encryption", "on")))
-                    _elGamalEngine = new DummyElGamalEngine(this);
-                else
-                    _elGamalEngine = new ElGamalEngine(this);
-            }
+            if (_elGamalEngine == null)
+                _elGamalEngine = new ElGamalEngine(this);
             _elGamalEngineInitialized = true;
         }
     }
@@ -796,12 +790,8 @@ public class I2PAppContext {
 
     private void initializeDSA() {
         synchronized (_lock12) {
-            if (_dsa == null) {
-                if ("off".equals(getProperty("i2p.encryption", "on")))
-                    _dsa = new DummyDSAEngine(this);
-                else
-                    _dsa = new DSAEngine(this);
-            }
+            if (_dsa == null)
+                _dsa = new DSAEngine(this);
             _dsaInitialized = true;
         }
     }
@@ -849,19 +839,13 @@ public class I2PAppContext {
      * may want to test out how things react when peers don't agree on 
      * how to skew.
      *
+     * As of 0.9.16, returns null in I2PAppContext.
+     * You must be in RouterContext to get a generator.
+     *
+     * @return null always
      */
     public RoutingKeyGenerator routingKeyGenerator() {
-        if (!_routingKeyGeneratorInitialized)
-            initializeRoutingKeyGenerator();
-        return _routingKeyGenerator;
-    }
-
-    private void initializeRoutingKeyGenerator() {
-        synchronized (_lock15) {
-            if (_routingKeyGenerator == null)
-                _routingKeyGenerator = new RoutingKeyGenerator(this);
-            _routingKeyGeneratorInitialized = true;
-        }
+        return null;
     }
     
     /**
@@ -893,14 +877,8 @@ public class I2PAppContext {
 
     private void initializeRandom() {
         synchronized (_lock17) {
-            if (_random == null) {
-                //if (true)
-                    _random = new FortunaRandomSource(this);
-                //else if ("true".equals(getProperty("i2p.weakPRNG", "false")))
-                //    _random = new DummyPooledRandomSource(this);
-                //else
-                //    _random = new PooledRandomSource(this);
-            }
+            if (_random == null)
+                _random = new FortunaRandomSource(this);
             _randomInitialized = true;
         }
     }
@@ -961,13 +939,18 @@ public class I2PAppContext {
     /**
      * Use instead of SimpleScheduler.getInstance()
      * @since 0.9 to replace static instance in the class
+     * @deprecated in 0.9.20, use simpleTimer2()
      */
+    @SuppressWarnings("deprecation")
     public SimpleScheduler simpleScheduler() {
         if (!_simpleSchedulerInitialized)
             initializeSimpleScheduler();
         return _simpleScheduler;
     }
 
+    /**
+     * @deprecated in 0.9.20
+     */
     private void initializeSimpleScheduler() {
         synchronized (_lock18) {
             if (_simpleScheduler == null)

@@ -9,7 +9,7 @@ import java.util.Set;
  *  Maintain a list of bad places.
  *  @since 0.8.13
  */
-abstract class BadCountries {
+public abstract class BadCountries {
 
     private static final Set<String> _countries;
 

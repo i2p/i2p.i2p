@@ -60,9 +60,20 @@ public interface I2CPMessage extends DataStructure {
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException;
 
     /**
-     * Return the unique identifier for this type of APIMessage, as specified in the 
+     * Return the unique identifier for this type of message, as specified in the 
      * network specification document under #ClientAccessLayerMessages
-     * @return unique identifier for this type of APIMessage
+     * @return unique identifier for this type of message
      */
     public int getType();
+
+    /**
+     * Return the SessionId for this type of message.
+     * Most but not all message types include a SessionId.
+     * The ones that do already define getSessionId(), but some return a SessionId and
+     * some return a long, so we define a new method here.
+     *
+     * @return SessionId or null if this message type does not include a SessionId
+     * @since 0.9.21
+     */
+    public SessionId sessionId();
 }

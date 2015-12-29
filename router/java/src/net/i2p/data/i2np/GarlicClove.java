@@ -89,8 +89,8 @@ public class GarlicClove extends DataStructureImpl {
      */
     public int readBytes(byte source[], int offset) throws DataFormatException {
         int cur = offset;
-        _instructions = new DeliveryInstructions();
-        cur += _instructions.readBytes(source, cur);
+        _instructions = DeliveryInstructions.create(source, offset);
+        cur += _instructions.getSize();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read instructions: " + _instructions);
         try {
@@ -158,7 +158,7 @@ public class GarlicClove extends DataStructureImpl {
             if (m.length <= 0)
                 throw new RuntimeException("foo, returned 0 length");
             out.write(m);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new DataFormatException("Unable to write the clove: " + _msg + " to " + out, e);
         }
         DataHelper.writeLong(out, 4, _cloveId);
@@ -187,7 +187,7 @@ public class GarlicClove extends DataStructureImpl {
             byte m[] = _msg.toByteArray();
             System.arraycopy(m, 0, rv, offset, m.length);
             offset += m.length;
-        } catch (Exception e) { throw new RuntimeException("Unable to write: " + _msg + ": " + e.getMessage()); }
+        } catch (RuntimeException e) { throw new RuntimeException("Unable to write: " + _msg + ": " + e.getMessage()); }
         DataHelper.toLong(rv, offset, 4, _cloveId);
         offset += 4;
         DataHelper.toDate(rv, offset, _expiration.getTime());

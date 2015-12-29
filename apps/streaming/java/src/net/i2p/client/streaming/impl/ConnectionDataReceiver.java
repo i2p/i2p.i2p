@@ -204,7 +204,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         //if ( (!ackOnly) && (packet.getSequenceNum() <= 0) ) {
         if (isFirst) {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
-            packet.setOptionalFrom(con.getSession().getMyDestination());
+            packet.setOptionalFrom();
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
         }
         packet.setLocalPort(con.getLocalPort());

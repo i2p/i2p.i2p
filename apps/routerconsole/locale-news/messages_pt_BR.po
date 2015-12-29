@@ -6,7 +6,7 @@
 # Translators:
 # blueboy, 2013
 # blueboy, 2013
-# blueboy, 2014
+# blueboy, 2014-2015
 # blueboy, 2013-2014
 # thefabio <thefabioluiz@bol.com.br>, 2014
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-03-15 18:10+0000\n"
+"PO-Revision-Date: 2015-04-05 13:58+0000\n"
 "Last-Translator: blueboy\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "Seja bem-vindo à I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "Por favor, {0}tenha paciência{1}: a I2P está sendo inicializada e procurando por nodos."
+msgstr "Por favor, {0}tenha paciência{1}: o roteador I2P está sendo inicializado e em busca de pares."
 
 #, java-format
 msgid ""
@@ -66,4 +66,4 @@ msgstr "Uma vez que você tenha um destino de \"clientes compartilhados\" listad
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr "Aponte seu cliente IRC para {0}localhost:6668{1} e diga oi para nós em {2}#i2p{3}."
+msgstr "Aponte seu cliente IRC para {0}localhost:6668{1} e dê um oi para nós em {2}#i2p{3}."

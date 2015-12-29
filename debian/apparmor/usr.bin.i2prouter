@@ -1,0 +1,54 @@
+# Last Modified: Sun Dec 06 12:30:32 2015
+# vim:syntax=apparmor et ts=8 sw=4
+
+#include <tunables/global>
+
+/usr/bin/i2prouter flags=(complain) {
+  #include <abstractions/i2p>
+  capability sys_ptrace,
+
+  /usr/bin/i2prouter                    r,
+
+  @{PROC}/1/comm                        r,
+  owner @{PROC}/[0-9]*/                 r,
+  owner @{PROC}/[0-9]*/stat             r,
+  owner @{PROC}/[0-9]*/cmdline          r,
+  @{PROC}/uptime                        r,
+  @{PROC}/sys/kernel/pid_max            r,
+
+  /bin/{,b,d}ash                        rix,
+  /bin/cat                              rix,
+  /bin/grep                             rix,
+  /bin/mkdir                            rix,
+  /bin/ps                               rix,
+  /bin/rm                               rix,
+  /bin/sed                              rix,
+  /bin/sleep                            rix,
+  /bin/uname                            rix,
+  /bin/which                            rix,
+  /etc/default/i2p                      r,
+  /etc/lsb-release                      r,
+
+  /usr/bin/{,g,m}awk                    rix,
+  /usr/bin/cut                          rix,
+  /usr/bin/dirname                      rix,
+  /usr/bin/expr                         rix,
+  /usr/bin/id                           rix,
+  /usr/bin/ldd                          rix,
+  /usr/bin/tail                         rix,
+  /usr/bin/tr                           rix,
+
+  @{HOME}/.java/fonts/**                r,
+  owner  @{HOME}/.i2p/                  rw,
+  owner  @{HOME}/.i2p/**                rwk,
+  owner  @{HOME}/.i2p/eepsite/cgi-bin/** rix,
+
+  # Prevent spamming the logs
+  deny owner @{HOME}/.java/             wk,
+  deny @{HOME}/.fontconfig/             wk,
+  deny @{HOME}/.java/fonts/**           wk,
+
+  # Site-specific additions and overrides. See local/README for details.
+  #include <local/usr.bin.i2prouter>
+}
+

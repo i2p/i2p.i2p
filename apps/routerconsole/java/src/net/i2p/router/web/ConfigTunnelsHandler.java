@@ -10,16 +10,12 @@ import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the tunnel config form and act
- * upon the values.  Holy crap, this is UUUUGLY
+ * upon the values.
  *
  */
 public class ConfigTunnelsHandler extends FormHandler {
-    private Map _settings;
+
     private boolean _shouldSave;
-    
-    public ConfigTunnelsHandler() {
-        _shouldSave = false;
-    }
     
     @Override
     protected void processForm() {
@@ -31,11 +27,9 @@ public class ConfigTunnelsHandler extends FormHandler {
     }
     
     public void setShouldsave(String moo) { 
-        if ( (moo != null) && (moo.equals(_("Save changes"))) )
+        if ( (moo != null) && (moo.equals(_t("Save changes"))) )
             _shouldSave = true; 
     }
-    
-    public void setSettings(Map settings) { _settings = new HashMap(settings); }
     
     /**
      * The user made changes to the network config and wants to save them, so
@@ -44,7 +38,7 @@ public class ConfigTunnelsHandler extends FormHandler {
      */
     private void saveChanges() {
         boolean saveRequired = false;
-        Map<String, String> changes = new HashMap();
+        Map<String, String> changes = new HashMap<String, String>();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Saving changes, with props = " + _settings + ".");
@@ -133,16 +127,17 @@ public class ConfigTunnelsHandler extends FormHandler {
         if (updated > 0)
             // the count isn't really correct anyway, since we don't check for actual changes
             //addFormNotice("Updated settings for " + updated + " pools.");
-            addFormNotice(_("Updated settings for all pools."));
+            addFormNotice(_t("Updated settings for all pools."));
         
         if (saveRequired) {
             boolean saved = _context.router().saveConfig(changes, null);
             if (saved) 
-                addFormNotice(_("Exploratory tunnel configuration saved successfully."));
+                addFormNotice(_t("Exploratory tunnel configuration saved successfully."));
             else
-                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+                addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
+
     private static final int getInt(Object val) { 
         if (val == null) return 0;
         String str = null;

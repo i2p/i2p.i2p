@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2013-11-11 11:17+0000\n"
-"Last-Translator: polearnik <polearnik@mail.ru>\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-03-29 14:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/"
 "ro/)\n"
 "Language: ro\n"
@@ -90,3 +90,17 @@ msgid ""
 msgstr ""
 "Routere în bandă largă, precum și routere, cu o mulțime de torente/plugin-"
 "uri active, ar putea avea nevoie pentru a avea această valoare marita."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""

@@ -8,11 +8,18 @@ package net.i2p.router.networkdb;
  *
  */
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.data.DataFormatException;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
@@ -30,15 +37,16 @@ public class PublishLocalRouterInfoJob extends JobImpl {
 
     /**
      *  Don't store if somebody else stored it recently.
+     *  Must be less than PUBLISH_DELAY * 3 / 16 (see getDelay())
      */
-    private static final long MIN_PUBLISH_DELAY = 25*60*1000;
+    private static final long MIN_PUBLISH_DELAY = 9*60*1000;
 
     /**
      *  Too short and the network puts a big connection load on the
      *  floodfills since we store directly.
      *  Too long and the floodfill will drop us - timeout is 60 minutes.
      */
-    private static final long PUBLISH_DELAY = MIN_PUBLISH_DELAY * 5 / 3;
+    private static final long PUBLISH_DELAY = 52*60*1000;
 
     /** this needs to be long enough to give us time to start up,
         but less than 20m (when we start accepting tunnels and could be a IBGW)
@@ -47,7 +55,8 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         we can't build IB exploratory tunnels.
      */
     private static final long FIRST_TIME_DELAY = 90*1000;
-    boolean _notFirstTime;
+    private volatile boolean _notFirstTime;
+    private final AtomicInteger _runCount = new AtomicInteger();
     
     public PublishLocalRouterInfoJob(RouterContext ctx) {
         super(ctx);
@@ -55,6 +64,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     }
     
     public String getName() { return "Publish Local Router Info"; }
+
     public void runJob() {
         long last = getContext().netDb().getLastRouterInfoPublishTime();
         long now = getContext().clock().now();
@@ -63,18 +73,49 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             requeue(last + delay - now);
             return;
         }
-        RouterInfo ri = new RouterInfo(getContext().router().getRouterInfo());
+        RouterInfo oldRI = getContext().router().getRouterInfo();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Old routerInfo contains " + ri.getAddresses().size() 
-                       + " addresses and " + ri.getOptionsMap().size() + " options");
-        Properties stats = getContext().statPublisher().publishStatistics();
-        stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
+            _log.debug("Old routerInfo contains " + oldRI.getAddresses().size() 
+                       + " addresses and " + oldRI.getOptionsMap().size() + " options");
         try {
+            List<RouterAddress> oldAddrs = new ArrayList<RouterAddress>(oldRI.getAddresses());
+            List<RouterAddress> newAddrs = getContext().commSystem().createAddresses();
+            int count = _runCount.incrementAndGet();
+            RouterInfo ri = new RouterInfo(oldRI);
+            if (_notFirstTime && (count % 4) != 0 && oldAddrs.size() == newAddrs.size()) {
+                // 3 times out of 4, we don't republish if everything is the same...
+                // If something changed, including the cost, then publish,
+                // otherwise don't.
+                boolean different = !oldRI.getCapabilities().equals(ri.getCapabilities());
+                if (!different) {
+                    Comparator<RouterAddress> comp = new AddrComparator();
+                    Collections.sort(oldAddrs, comp);
+                    Collections.sort(newAddrs, comp);
+                    for (int i = 0; i < oldAddrs.size(); i++) {
+                        // deepEquals() includes cost
+                        if (!oldAddrs.get(i).deepEquals(newAddrs.get(i))) {
+                            different = true;
+                            break;
+                        }
+                    }
+                    if (!different) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Not republishing early because costs and caps and addresses are the same");
+                        requeue(getDelay());
+                        return;
+                    }
+                }
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Republishing early because addresses or costs or caps have changed -" +
+                              " oldCaps: " + oldRI.getCapabilities() + " newCaps: " + ri.getCapabilities() +
+                              " old:\n" +
+                              oldAddrs + "\nnew:\n" + newAddrs);
+            }
             ri.setPublished(getContext().clock().now());
+            Properties stats = getContext().statPublisher().publishStatistics();
             ri.setOptions(stats);
-            ri.setAddresses(getContext().commSystem().createAddresses());
+            ri.setAddresses(newAddrs);
 
-            getContext().router().addCapabilities(ri);
             SigningPrivateKey key = getContext().keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  rescheduling publish for 30s");
@@ -98,8 +139,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             _log.error("Error signing the updated local router info!", dfe);
         }
         if (_notFirstTime) {
-            long delay = getDelay();
-            requeue(delay);
+            requeue(getDelay());
         } else {
             requeue(FIRST_TIME_DELAY);
             _notFirstTime = true;
@@ -107,6 +147,29 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     }
 
     private long getDelay() {
-        return (PUBLISH_DELAY * 3 / 4) + getContext().random().nextLong(PUBLISH_DELAY / 4);
+        long rv = (PUBLISH_DELAY * 3 / 4) + getContext().random().nextLong(PUBLISH_DELAY / 4);
+        // run 4x as often as usual publish time (see above)
+        rv /= 4;
+        return rv;
+    }
+
+    /**
+     *  Arbitrary sort so we can attempt to compare costs between two RIs to see if they have changed
+     *
+     *  @since 0.9.18
+     */
+    private static class AddrComparator implements Comparator<RouterAddress>, Serializable {
+        public int compare(RouterAddress l, RouterAddress r) {
+            int c = l.getTransportStyle().compareTo(r.getTransportStyle());
+            if (c != 0)
+                return c;
+            String lh = l.getHost();
+            String rh = r.getHost();
+            if (lh == null)
+                return rh == null ? 0 : -1;
+            if (rh == null)
+                return 1;
+            return lh.compareTo(rh);
+        }
     }
 }

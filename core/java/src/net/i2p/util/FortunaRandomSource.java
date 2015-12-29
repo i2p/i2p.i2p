@@ -11,6 +11,7 @@ package net.i2p.util;
 
 import gnu.crypto.prng.AsyncFortunaStandalone;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
@@ -27,13 +28,18 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     private double _nextGaussian;
     private boolean _haveNextGaussian;
 
+    /**
+     *  May block up to 10 seconds or forever
+     */
     public FortunaRandomSource(I2PAppContext context) {
         super(context);
         _fortuna = new AsyncFortunaStandalone(context);
         byte seed[] = new byte[1024];
+        // may block for 10 seconds
         if (initSeed(seed)) {
             _fortuna.seed(seed);
         } else {
+            // may block forever
             SecureRandom sr = new SecureRandom();
             sr.nextBytes(seed);
             _fortuna.seed(seed);
@@ -257,8 +263,14 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     /** reseed the fortuna */
     @Override
     public void feedEntropy(String source, byte[] data, int offset, int len) {
-        synchronized(_fortuna) {
-            _fortuna.addRandomBytes(data, offset, len);
+        try {
+            synchronized(_fortuna) {
+                _fortuna.addRandomBytes(data, offset, len);
+            }
+        } catch (RuntimeException e) {
+            // AIOOBE seen, root cause unknown, ticket #1576
+            Log log = _context.logManager().getLog(FortunaRandomSource.class);
+            log.warn("feedEntropy()", e);
         }
     }
     
@@ -279,6 +291,6 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
                 rand.nextBytes(buf);
                 System.out.write(buf);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 }

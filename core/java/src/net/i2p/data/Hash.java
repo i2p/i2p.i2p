@@ -104,4 +104,11 @@ public class Hash extends SimpleDataStructure {
         }
         return _base64ed;
     }
+
+    /**
+     *  @since 0.9.17
+     */
+    public static void clearCache() {
+        _cache.clear();
+    }
 }

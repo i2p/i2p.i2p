@@ -16,6 +16,7 @@ package net.i2p.jetty;
 // limitations under the License.
 // ========================================================================
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,11 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.util.I2PAppThread;
+import net.i2p.util.PortMapper;
 
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.xml.XmlConfiguration;
@@ -44,13 +49,15 @@ public class JettyStart implements ClientApp {
     private final ClientAppManager _mgr;
     private final String[] _args;
     private final List<LifeCycle> _jettys;
+    private final I2PAppContext _context;
     private volatile ClientAppState _state;
+    private volatile int _port;
 
     /**
      *  All args must be XML file names.
      *  Does not support any of the other argument types from org.mortbay.start.Main.
      *
-     *  @param context unused, may be null
+     *  @param context may be null
      *  @param mgr may be null e.g. for use in plugins
      */
     public JettyStart(I2PAppContext context, ClientAppManager mgr, String[] args) throws Exception {
@@ -58,6 +65,7 @@ public class JettyStart implements ClientApp {
         _mgr = mgr;
         _args = args;
         _jettys = new ArrayList<LifeCycle>(args.length);
+        _context = context;
         parseArgs(args);
         _state = INITIALIZED;
     }
@@ -65,12 +73,16 @@ public class JettyStart implements ClientApp {
     /**
      *  Modified from XmlConfiguration.main()
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void parseArgs(String[] args) throws Exception {
         Properties properties=new Properties();
         XmlConfiguration last=null;
+        InputStream in = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].toLowerCase().endsWith(".properties")) {
-                properties.load(Resource.newResource(args[i]).getInputStream());
+                in = Resource.newResource(args[i]).getInputStream();
+                properties.load(in);
+                in.close();
             } else {
                 XmlConfiguration configuration = new XmlConfiguration(Resource.newResource(args[i]).getURL());
                 if (last!=null)
@@ -88,7 +100,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    public void startup() {
+    public synchronized void startup() {
         if (_state != INITIALIZED)
             return;
         if (_jettys.isEmpty()) {
@@ -98,7 +110,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    private class Starter extends Thread {
+    private class Starter extends I2PAppThread {
         public Starter() {
             super("JettyStarter");
             changeState(STARTING);
@@ -112,6 +124,22 @@ public class JettyStart implements ClientApp {
                 if (!lc.isRunning()) {
                     try {
                         lc.start();
+                        if (_context != null && _context.portMapper().getPort(PortMapper.SVC_EEPSITE) <= 0) {
+                            if (lc instanceof Server) {
+                                Server server = (Server) lc;
+                                Connector[] connectors = server.getConnectors();
+                                if (connectors.length > 0) {
+                                    int port = connectors[0].getPort();
+                                    if (port > 0) {
+                                        _port = port;
+                                        String host = connectors[0].getHost();
+                                        if (host.equals("0.0.0.0") || host.equals("::"))
+                                            host = "127.0.0.1";
+                                        _context.portMapper().register(PortMapper.SVC_EEPSITE, host, port);
+                                    }
+                                }
+                            }
+                        }
                     } catch (Exception e) {
                         changeState(START_FAILED, e);
                         return;
@@ -134,7 +162,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    private class Stopper extends Thread {
+    private class Stopper extends I2PAppThread {
         public Stopper() {
             super("JettyStopper");
             changeState(STOPPING);
@@ -149,6 +177,10 @@ public class JettyStart implements ClientApp {
                         changeState(STOPPING, e);
                     }
                 }
+            }
+            if (_context != null && _port > 0 && _context.portMapper().getPort(PortMapper.SVC_EEPSITE) == _port) {
+                _port = 0;
+                _context.portMapper().unregister(PortMapper.SVC_EEPSITE);
             }
             changeState(STOPPED);
         }

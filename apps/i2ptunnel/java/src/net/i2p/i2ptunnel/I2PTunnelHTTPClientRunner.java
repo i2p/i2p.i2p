@@ -33,6 +33,9 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
         super(s, i2ps, slock, initialI2PData, null, sockList, onFail);
     }
 
+    /**
+     *  Only call once!
+     */
     @Override
     protected OutputStream getSocketOut() throws IOException { 
         OutputStream raw = super.getSocketOut();
@@ -86,7 +89,8 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
             // ignore
         }
         t1.join(30*1000);
-        t2.join(30*1000);
+        // t2 = fromI2P now run inline
+        //t2.join(30*1000);
     }
     
 }

@@ -1,3 +1,1558 @@
+2015-12-21 zzz
+ * SSU: Hand all messages pending after establishment to the
+   outbound queue at once, for efficiency.
+   Don't sort outbound messages by size, keep priority order instead.
+
+2015-12-20 zzz
+ * BuildHandler: Additional fixes (ticket #1738)
+ * CertUtil: Add methods to export private keys
+ * Console: Sybil tool enhancementsrivate keys
+ * Transports:
+   - Disconnect faster when first message is a
+     tunnel build request which we reject
+   - Display SSU sent/received messages, not packets,
+     on /peers to be consistent with NTCP
+
+2015-12-18 zzz
+ * BuildHandler: Fix NPE (ticket #1738)
+
+2015-12-16 zzz
+ * Profiles:
+   - Don't use same family in a tunnel
+   - Reduce IPv6 mask from 8 to 6
+
+2015-12-13 zzz
+ * Data: Optimize router info writes, disable caching
+
+2015-12-12 zzz
+ * Router:
+   - Add family public key to router info (ticket #1510)
+   - More deadlock prevention (ticket #1722)
+
+2015-12-11 zzz
+ * Logs: Windows line ending fixes
+ * Router:
+   - Fix family verification, partially hook into netdb store()
+   - Limit wait for NTP to 45 seconds (ticket #1725)
+   - Increase lookup cache max sizes,
+     reduce max lookup depth, and increase non-floodfill profile bonus
+     to attempt to reduce load on floodfills
+   - Don't let context clock shifts affect calculated uptime
+ * Transport: More deadlock prevention (ticket #1722)
+ * SSU: Fix outbound IPv6 errors on Windows without a real v6 address
+   when explict host is set. Validate addresses before confirming that
+   we have an IPv6 address. Possibly related to ticket #1538.
+ * Wrapper: Listen for Windows Service shutdown events to stop router
+
+2015-12-10 zzz
+ * Router:
+   - Change addCapabilities() to getCapabilities()
+   - Add netdb family sign/verify utility (ticket #1510)
+ * RouterInfo:
+   - Remove addCapability() and delCapability()
+ * StatPublisher:
+   - Remove Service interface, not required
+   - Consolidate getCapabilities() and network ID here
+   - Add family signatures
+
+2015-12-08 str4d
+ * Core: Fill in basic datastructure length tests
+ * Ministreaming: Add unit tests
+ * Streaming:
+   - Add more unit tests
+   - Separate out integration tests
+
+2015-12-08 zzz
+ * Crypto: Consolidate certificate import methods
+
+2015-12-06 zzz
+ * Console: Don't force profile creation when loading floodfill tab
+ * Installer: Add wrapper deadlock detection to default wrapper.config
+ * NetDb: Stub out a "family" indicator (ticket #1510)
+ * Profiles: More changes to reduce memory usage
+ * Startup: Increase rekey probability
+ * Sybil tool: Tweaks and enhancements
+
+2015-12-04 zzz
+ * Console: Fix NPE on /profiles
+ * Profiles:
+   - Fix first heard about to be earliest, undeprecate
+   - Fixup first heard about at profile readin
+   - Persist good/bad lookup/store DBHistory stats added in 0.7.8
+   - Remove unused DBHistory methods and fields to save memory
+   - Change bonus longs to ints to save memory
+   - Extend profile expiration time from 3 days to 15
+   - Consolidate getLong()
+   - Synch fixes
+ * Sybil tool: Tweaks and enhancements
+
+2015-12-03 zzz
+ * Console: Add experimental Sybil analysis tool
+ * NetDb: Fix deadlock (ticket #1722)
+
+2015-12-01 zzz
+ * i2psnark:
+   - Consolidate default tunnel length definition
+   - Increase max peers and uploaders per torrent
+   - Increase default max total uploaders
+   - Increase max peers sent and returned in DHT
+* SAM:
+   - Don't map keys to upper case in parser, corrupts I2CP options
+   - Register SSL and UDP ports with PortMapper
+* SSU: Allow IP and port in relay request if it matches the source
+* Transport: Interrupt DH refiller thread when pool is empty,
+  to speed refilling and reduce pumper stalls
+
+2015-11-30 zzz
+ * SAM:
+   - Timeout for first command after HELLO
+   - Send error message if no NAME key in LOOKUP
+   - Destination caching enhancements
+   - Client: Add SSL forward support, handle header line in forwarded stream
+
+2015-11-29 zzz
+ * i2ptunnel:
+   - Change preferred sig type to Ed
+   - Set permissions on backup tunnel keys file
+
+2015-11-28 zzz
+ * i2psnark:
+   - Fix NPE caused by URL-to-URI conversion in -2 (ticket #1715)
+   - Increase max pieces to 32K
+   - BEP 21 support (upload_only)
+ * SAM:
+   - Fix parser to allow spaces in quoted values (tickets #1325, #1488)
+   - Handle UTF-8 in ReadLine (ticket #1488)
+   - 3.2 complete (ticket #1574)
+
+2015-11-27 zzz
+ * SAM:
+   - Use DataHelper to load/store sam.keys
+   - Move sam.keys to config dir (ticket #677)
+
+2015-11-27 zzz
+Prop from i2p.i2p.zzz.sam:
+ * PasswordManager: new methods for use by SAM
+ * SAM:
+   - Use getopt for SAM args processing
+   - Change default host from 0.0.0.0 to 127.0.0.1
+   - Add SSL support with -s option (ticket #1106)
+   - Add -c configfile option, default sam.config
+   - Add protocol and port notification (ticket #1323)
+   - Add authorization options in HELLO (ticket #1106)
+   - Add AUTH commands: ENABLE, DISABLE, ADD, REMOVE
+   - Add PING, PONG commands (tickets #1572, #1573)
+   - Add QUIT, STOP, EXIT commands
+   - Add SSL option for STREAM FORWARD
+   - Move DatagramServer from SAMv3Handler to its own file
+   - Make DatagramServer a Handler, register with bridge
+   - Use ReadLine with timeout for SAMHandlerFactory
+   - Support parallel STREAM ACCEPTs
+   - Add HEADER option for RAW forwarding
+   - Better exception handling
+   - Extensive enhancements to Java client for testing
+   - Bump version to 3.2 (ticket #1574)
+ * Streaming: Fix recognition of PoisonPacket in ConnectionHandler
+
+2015-11-22 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Build:
+   - More release checks
+   - Add systray dependency tracking to build
+   - Remove commons-logging classes from commons-logging.jar (ticket #1679)
+ * Lint:
+   - Replace URL with URI where possible
+   - Don't use DataHelper.fromLong() for 1-byte reads, for efficiency
+   - Don't catch Exception, catch RuntimeException or checked exception.
+ * i2psnark:
+   - Minor details page reformatting
+   - Add skipped length on details page
+ * NewsManager: Make it a ClientApp, not a RouterApp
+ * Profiles: Don't allow creation of our own profile
+ * Router: Revert JobTiming being a clock shift listener, not needed
+ * SSU:
+   - Support extended options
+   - Add support for requesting a relay tag via
+     Session Request extended options (ticket #1465)
+ * Tunnels:
+   - Locking fixes
+   - Don't set stats in our own profile
+   - Minor optimizations
+ * Utils:
+   - Centralize time zone code in DataHelper
+   - Add caching string split()
+
+2015-11-21 zzz
+  * Console: Fix escaping of plugin description on /configclients (ticket #1711)
+
+* 2015-11-19 0.9.23 released
+
+2015-11-19 str4d
+  * build.xml: Stop building SUD and SU2 update files in "ant release" (ticket #1709)
+
+2015-11-15 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-11-03.
+ * Translation updates
+
+2015-11-13 zab
+ * Interrupt() when cancelling scheduled tasks (tickets #1694, #1705)
+
+2015-11-13 zzz
+ * Console: Fix lifetime participating bandwidth display (ticket #1706)
+
+2015-11-12 zzz
+ * Console /configclients:
+   = Fix filtering and escaping
+   - Fix autostart setting on new client, was inverted
+
+2015-11-11 zzz
+ * i2psnark:
+   - Change log level to hide socket closed error at tunnel shutdown (ticket #1687)
+   - Increase max pieces
+ * Timers: State fix 4th try (tickets #1694, #1705)
+
+2015-11-05 zzz
+ * I2CP: Fix additional connections getting rejected during tunnel open (tickets #1650, #1698)
+ * Streaming: Split blacklist into one for EC and one for Ed
+
+2015-11-04 zzz
+ * Threads: More conversions to I2PAppThread
+ * Timers: Improve OutboundMessageRegistry locking (ticket #1694)
+
+2015-11-02 z3r0fox
+ * EepGet: Fix command line filename selection (ticket #1616)
+
+2015-11-01 zzz
+ * Utils: Double IP lookup cache size (ticket #1700)
+
+2015-10-31 zzz
+ * Convert remaining Threads to I2PThread or I2PAppThread
+ * UPnP: Fix deadlock in callbacks (ticket #1699)
+
+2015-10-30 zzz
+ * Router: Fix cascading I2CP error (ticket #1692)
+
+2015-10-21 zzz
+ * i2psnark: More consistency and torrent links in messages
+ * Router: Increase timer thread priority
+
+2015-10-17 zzz
+ * Crypto:
+   - Consolidate duplicate unlimited strength crypto check code
+   - Disable TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+
+2015-10-16 zzz
+ * Console: Add Java 6 warning to summary bar
+ * i2psnark:
+   - Fix deadlock (ticket #1432)
+   - Add "smart sort" option, set sort based on language (tickets #637, #1303)
+   - Don't balloon files on ARM (ticket #1684)
+
+2015-10-14 zzz
+ * Update:
+   - Require Java 7 to download dev builds (ticket #1669)
+   - Fix persistence of the available dev version
+
+2015-10-13 zzz
+ * Startup: Delete our old RI from netDB when rekeying
+
+2015-10-11 zzz
+ * Crypto: Test for broken Gentoo ECDSA support
+
+2015-10-10 zzz
+ * i2psnark: Increase max piece size to 16 MB, max files to 999,
+   close files faster based on file count (tickets #1626, #1671)
+ * JobQueue: Only adjust timing for negative clock shifts
+ * NamingServices: Add support for lookups prefixed with "www."
+ * Startup: Increase rekey probability
+
+2015-10-08 zzz
+ * SimpleTimer2: Additional fix for uncaught IllegalStateException
+   affecting streaming timers (ticket #1672)
+
+2015-10-02 zzz
+ * Router: Don't check config files for reload on Android
+
+2015-09-28 zzz
+ * Addressbook: Fix isValidDest() for EC/Ed dests
+ * i2psnark: Support adding plain base 32 hashes
+ * Susimail: Hide headers and buttons if search results are empty
+
+2015-09-27 dg
+ * Router: Fix soft restarts for 'massive' clock jumps (over +150s or -61s) and recover from standby
+   and hibernate (ticket #1014).
+
+2015-09-27 zzz
+ * Console:
+   - Export SSL cert on creation
+   - New /certs page to show local SSL certs
+   - Show 'none' if no leasesets
+ * SimpleTimer2: Fix bug in forceReschedule() that caused subsequent uncaught IllegalStateException,
+   affected streaming timers
+ * Streaming: Move throttler from context timer to streaming timer
+ * Tunnels: Use max of 2 not-failing peers in an exploratory tunnel,
+   use high cap for the rest; change outbound exploratory
+   default length from 2 + 0-1 to 3+0.
+ * Util: Speed up IP address validation by using Apache's implementation (ticket #1198)
+
+2015-09-25 dg
+ * Rename _() for translation to _t() for Java 9 compatibility (ticket #1456)
+
+2015-09-24 zzz
+  - Rename bad .torrent files instead of deleting them
+
+2015-09-20 dg
+ * /configreseed: Add 'Reset URL list' button for revert to default hosts (ticket #1554, thanks dzirtt@gmail.com)
+
+2015-09-19 zzz
+ * i2psnark: Add recheck/start/stop buttons to details page (ticket #372)
+
+2015-09-18 zzz
+ * EepGet:
+   - Send Accept-Encoding: gzip even when proxied
+   - Fix man page (ticket #1631)
+ * i2psnark:
+   - Don't display "Tracker Error" if torrent is stopped (ticket #1654)
+   - Improve directory listing efficiency (ticket #1079)
+ * i2ptunnel:
+   - Pass Accept-Encoding header through HTTP client and server proxies,
+     to allow end-to-end compression
+   - Don't do transparent response compression if response
+     Content-Encoding indicates it is already compressed
+ * Streaming: Move remaining timers from the context to streaming's SimpleTimer2
+
+2015-09-17 zzz
+ * i2psnark:
+   - Store magnet parameters across restart (ticket #1485)
+   - Don't delete torrent config file after error on initial startup (tickets #1575, #1658)
+
+2015-09-16 zzz
+ * Build:
+   - Include geoip in update files for next release
+   - Add created-by string to release torrents
+ * i2psnark:
+   - Store torrent added and completed times in config files, display on details page
+   - Add metainfo creation command line support for created-by string
+ * Profiles: Bias slightly away from floodfills
+
+2015-09-15 zzz
+ * Console:
+   - Store news feed items separately on disk in XML, like a real feed reader
+   - Limit display to 2 news items in summary bar, /home and /console
+   - New /news page to show all news (ticket #1425)
+
+* 2015-09-12 0.9.22 released
+
+2015-09-11 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-09-02.
+ * Translation updates pulled from Transifex
+
+2015-09-04 zzz
+ * UPnP: Fix "content not allowed in trailing section"
+   (tickets #481, #1653)
+
+2015-08-31 zzz
+ * Data: Cache P256 and Ed255i9 key certificates
+ * i2psnark: Change default sig type to Ed25519
+
+2015-08-29 zzz
+ * Router:
+   - Change default RI sig type to Ed25519, with a 10% chance od
+     rekeying from DSA at each restart
+   - Don't initialize KeyManager before selecting sig type
+   - Don't log KeyManager error when changing sig type
+
+2015-08-25 zzz
+ * i2psnark:
+   - Return partial piece to coordinator after reject
+   - Fix tracking of downloaded portion of piece after reject
+   - Send reject on receipt of bad request
+   - Mark piece unrequested after receiving bad data, so it
+     will be requested again, but not from the same peer
+   - Fix NPE in Request constructor on error
+   - Fix stuck before completion due to reject handling (ticket #1633)
+   - Fix orphaned temp files due to reject handling (ticket #1635)
+
+2015-08-02 zzz
+ * Console: Fix SSL excluded ciphers (thx lazyg)
+ * SU3File: Add keystore password command line option
+
+* 2015-07-31 0.9.21 released
+
+2015-07-27 zzz
+ * Update: Fix processing of translated news su3 files
+
+2015-07-26 zzz
+ * Update translations
+
+2015-07-25 zzz
+ * i2psnark: Fix total_size in metadata message (ticket #1618)
+ * NetDB: Fix NPE (ticket #1619)
+
+2015-07-21 str4d
+ * Core: Throw DFE in Certificate.create() instead of AIOOBE (ticket #1016)
+
+2015-07-21 str4d
+ * Core: Fix parsing bug in KeyCertificate
+
+2015-07-16 zzz
+ * Console: Add dates to news headings
+
+2015-07-12 zzz
+ * Findbugs all over
+
+2015-07-08 zzz
+ * Tunnels: New Bloom filter size, increase bandwidth limit (ticket #1505)
+
+2015-07-07 zzz
+ * Crypto: Check for error return from sign()
+ * i2psnark: Tweak dest display in footer
+ * Streaming: New config to add to DSA-only list
+ * Updates: New news URL
+
+2015-07-05 zzz
+ * SSU: Compete better with NTCP for outbound bandwidth allocations
+ * Transport: Adjust thread priorities to prevent I/O stalling
+
+2015-06-29 zzz
+ * Transport: More fixes for SSU stalling
+
+2015-06-28 zzz
+ * Apache Tomcat 6.0.44
+
+2015-06-25 zzz
+ * Console: Use registered host/port for eepsite link (ticket #1604)
+ * Jetty starter: Register host/port when started
+ * PortMapper: Add hostname support
+
+2015-06-24 zzz
+ * Transport: Add failsafe to prevent complete SSU stall waiting
+   for bandwidth limiter
+
+2015-06-23 zzz
+ * Console: Fix NPE on /configtunnels
+ * GeoIP: Add countries and flags for Asia/Pacific, Bonaire, St. Barts,
+   St. Maarten, South Sudan
+ * I2CP: Don't try to decrypt an LS before it's encrypted (ticket #1608)
+ * Router: Increase default outbound bandwidth to 60 KBps;
+   raise class L/M boundary to match so defaulted routers are still L
+
+2015-06-22 dg
+ * NetDB: Partially revert last NetDB change: flood because we don't want
+   to create a hole in the DHT before publisher resends to somebody else.
+
+2015-06-20 dg
+ * I2PSnark: Auto-start now only starts torrents which were running at shutdown (#766)
+ * NetDB: Don't say we stored, and don't flood, if we're shutting down
+
+2015-06-19 zzz
+ * I2CP: Fix simple session lookups, broken in prop
+ * I2PSocketEepGet: Do hostname lookups in-session for efficiency
+ * Tunnels: Increase default max tunnels
+
+2015-06-18 zzz
+ * I2CP:
+   - Don't send the first LS request to the client until we have
+     at least one OB tunnel, so the client waits until we are ready.
+   - Fixes to prevent multiple pending LS requests
+   - Move client-side implementation classes to
+     new package net.i2p.client.impl, leaving only the
+     factories and interfaces in net.i2p.client
+ * Update: Add language param to news fetch for translated news (ticket #1425)
+
+2015-06-17 zzz
+Prop from i2p.i2p.zzz.multisess:
+ * Router, I2CP, Streaming, i2ptunnel:
+   - Multisession support and multiple destinations in one tunnel pool
+   - Connections to Hardcoded blacklist of destinations that do not
+     support ECDSA will use the DSA session
+   - Change shared clients to ECDSA by default, with a DSA subsession
+   - Add support for 'aliased' local destinations that use the same tunnel pools
+   - No UI or config support, no server support, may be added later
+   - Catch uncaught exceptions in ClientConnectionRunner and stop connection
+   - When socket is closed, set sessionID and LS to null,
+     close subsession and set its sessionID and LS to null
+   - Checks on client side for null session ID
+   - Check for null session in Destroy Session message
+
+2015-06-13 zzz
+ * i2psnark: Fix NPE (ticket #1602)
+ * NetDB:
+   - Improve routing of DatabaseStoreMessage acks
+   - Send our own RI unsolicited in reply if we aren't floodfill
+   - Don't ack or flood a store of an unknown type
+   - Don't say we stored, and don't flood if we're shutting down
+ * PeerTestJob: Don't generate zero reply token
+ * Timestamper: Reduce NTP timeouts to shorten startup time
+   when NTP is blocked
+ * Tunnels: More checks of messages received down exploratory tunnels
+
+2015-06-08 dg
+ * Language fixes
+ * Make netDb.storeFloodNew graphable for testing (#1195)
+ * Directly connect to nearby floodfills to share our RI
+   to speed up integration of new floodfills (#1195)
+ * Silence Irc{Inbound,Outbound}Filter warnings about 'no streams'
+   when we can't connect to an IRC server. Change to WARN.
+
+2015-06-07 zzz
+ * Logs: Correct wrapper.config location when running as a service
+ * NetDB: Fix early NPE
+ * SSU: Possible fix for NPE in establisher
+
+2015-06-06 zzz
+ * Console: Add indication of current ff status on /configadvanced,
+   change immediately when config changes, force republish
+
+2015-06-06 str4d
+ * newsxml: Don't use XXX for parsing dates on Android
+
+2015-06-04 str4d
+ * i2ptunnel:
+   - Don't connect manager to router in constructor (ticket #815)
+   - Don't call startup() in chained constructor (ticket #1593)
+
+2015-06-03 zzz
+Prop from i2p.i2p.zzz.sam:
+ * I2CP: Set keepalive on sockets (ticket #1573)
+ * SAM:
+   - Close sockets and stop tunnels when router-side SAM stops (ticket #1572)
+   - Better checks for quoting status message strings (ticket #1488)
+   - Set encoding for sam.keys file
+   - Don't throw NPE on rare stream errors
+   - Comment out unused dumpProperties()
+   - Cleanups, log tweaks, thread name tweaks
+   - Set keepalive on sockets (ticket #1573)
+Prop from i2p.i2p.zzz.test2:
+ * Console:
+   -  Don't allow unbanning of all-zero hash
+   -  Nicer "move" icons on /configsidebar, add tooltips
+   -  Prevent bad line-wrap of very long menu items
+ * HTTP Client: Greatly simplify decompression by using InflaterOutputStream
+ * I2CP: Prevent sending messages before handshake with router is complete
+ * i2psnark:
+   - Add support for fast extensions (BEP 6)
+   - Don't say 'download finished' unless we downloaded something
+   - Don't lose sort param when hiding peers
+ * i2ptunnel: Strip top-level supercookies too
+ * LogWriter: Write dup message to wrapper log and crit buf also (ticket #1585)
+ * Reseed: Only log reseed network disconnected warning once
+ * Router: Add gzip and translate caches to clearCaches()
+ * Susidns, addressbook: Don't attempt to fetch subscriptions if
+   HTTP proxy is down (ticket #1530)
+ * SSU: More synchronization in PeerState
+ * Stats: Reduce number of rates in required stats to save memory
+ * UPnP: Only log network disconnected warning once
+
+* 2015-06-02 0.9.20 released
+
+2015-05-31 zzz
+ * Fortuna: Catch AIOOBE (ticket #1576)
+
+2015-05-30 zzz
+ * i2ptunnel: Fix +/- variance config (ticket #1587)
+
+2015-05-29 zzz
+ * HTTP client: Fix occasional truncation of compressed responses
+
+2015-05-27 zzz
+ * Banlist: Ban all-zero hash
+ * DataHelper: Add year output to formatDuration()
+ * Graphs: prevent NaNs if we are skewed ahead of system time
+ * NetDb: Drop all-zero lookups and stores, add stats
+ * SSU:
+   - Fix debug logging of dumped packets
+   - Drop sessions with bad clock skew, banlist peer, add stats
+   - Drop sessions with corrupt DSM, banlist peer, add stats
+
+2015-05-23 zzz
+ * I2CP: Add an INIT state for session, so a newly created session
+   isn't treated as CLOSED and immediately replaced by i2ptunnel,
+   which caused dup shared clients in a race at startup
+   (possible related tickets #642, #650, #815, #1545)
+
+2015-05-21 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-05-06.
+ * Translation updates
+
+2015-05-13 zzz
+ * Console: Fix URLs caught in XSS filter on /confighome (ticket #1569)
+ * i2psnark: Fix deletion of single-file torrent outside snark dir (ticket #1544)
+ * NTCP: Catch race in Reader (ticket #1534)
+
+2015-02-12 dg
+ * Job Queue/stats: add stat/graph for amount of scheduled jobs (router.tunnelBacklog)
+ * FloodfillMonitorJob:
+   - Use avg of router.tunnelBacklog instead of current backlog
+ * Some language/spelling fixes
+
+2015-05-11 zzz
+ * Util: Fix corruption of cached ReusableGZIPInputStreams
+
+2015-05-09 zzz
+ * i2ptunnel: Improve error handling in UDP tunnels
+ * Plugins: Add support for custom icons (ticket #1550)
+
+2015-05-08 zzz
+ * Reseed: Don't reseed while shutting down (ticket #1565)
+
+2015-05-07 zzz
+ * SAM: Close datagram or raw session when underlying
+   I2P session closes (tickets #1455, #1563)
+ * Update: Add support for su3-signed development builds (ticket #1381)
+
+2015-05-06 zzz
+ * Datagram: Convert IOE to DFE and throw on error (ticket #1562)
+ * Naming services: Export address books with Windows
+   line endings on Windows (ticket #1557)
+ * Transport: Add config to force IPv4 (only) to firewalled (ticket #1541)
+
+2015-05-04 zzz
+ * i2ptunnel:
+   - Close input stream when HTTP client decompressor
+     terminates (ticket #1506)
+   - Add Connection: close headers to errors and proxy.i2p responses
+     where it was missing (ticket #1531)
+
+2015-05-03 zzz
+ * Console: Add floodfill configuration form to /configadvanced
+ * Router: Allow class M to become floodfill;
+   add bandwidth classes P and X (ticket #1447)
+ * SusiDNS: Add export button
+
+2015-05-02 zzz
+ * Console: Fix Indonesian translations
+ * Jetty 8.1.17.v20150415
+ * Transports: Cleanup of ticket #1458 fixes
+
+2015-04-30 zzz
+ * Transports: Correctly handle IPv4 firewalled, IPv6 not (ticket #1458)
+
+2015-04-29 zzz
+ * Clock: Make forward slewing work better
+ * I2CP: Periodically send a SetDate message to external clients
+ * Transports:
+   - Fix clock skew calculations
+   - Track IPv4/v6 reachability separately (ticket #1458)
+
+2015-04-28 zzz
+ * JobQueueRunner: Don't call System.exit() on OOM,
+   let the shutdown progress normally;
+   Make it an I2PThread instead of a Runner so we can
+   call fireOOM() for consistent logging (ticket #1549)
+ * Router: Don't add OOM listener on Android so
+   we don't hang onto the context
+
+2015-04-27 zzz
+ * NamingService: Add export methods
+ * SusiDNS: Add export support, no UI yet
+ * Transports:
+   - Convert internal state to enums, prep for tracking
+     IPv4/v6 reachability separately (ticket #1458)
+   - Don't set TCP keepalive for IPv6
+
+2015-04-26 zzz
+ * i2ptunnel: Reduce sleep time in runners to reduce latency
+
+2015-04-25 zzz
+ * I2PSSLSocketFactory: Add hostname verification
+ * SSLEepGet:
+   - Rework recent setSoTimeout code changes, as they broke SNI
+   - Add option to save certs even if no errors
+   - Add option to disable hostname verification
+
+2015-04-24 zzz
+ * Util: Catch and convert OOM in I2PThread.start()
+ * i2ptunnel:
+   - Fix Socks and SocksIRC tunnels not starting
+   - Fix shutdown of client tunnels on server socket errors,
+ * Updates: Fail fast if HTTP proxy is not running (ticket #1530)
+
+2015-04-23 zzz
+ * Streaming:
+   - Reduce min RTO for quicker recovery after packet loss
+   - Reduce default initial ack delay
+   - More efficient checking for input buffer overflow
+
+2015-04-22 zzz
+ * i2psnark: Fix deletion of config files, cleanup old ones (ticket #1498)
+ * I2PSocketEepGet: Fix i2psnark NPE caused by -6 (ticket #1543)
+ * NTCP: Reduce min send finisher threads to 1
+ * PortMapper: Status output for /debug
+
+2015-04-21 zzz
+ * i2ptunnel: Log uncaught errors in thread pool
+ * Reseed: Disable non-su3 reseeding
+ * Router timestamper:
+   - Add country-to-continent mapping
+   - Add continent zones as fallback
+   - Don't start threads in constructors
+ * Transports: Reduce idle timeouts
+
+2015-04-20 zzz
+ * Blockfile: Unroll recursive initialization
+ * EepGet: Set soTimeout for non-proxied fetches to enforce
+   header timeout and prevent long reseed hangs
+ * Reseed:
+   - Honor SSL/non-SSL setting when custom reseed list is set (ticket #1136)
+   - Remove all default HTTP URLs (ticket #1514)
+
+2015-04-17 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console: Set session cookies to HttpOnly
+ * i2psnark: Remove extra mime types in i2psnark web.xml;
+   added to Jetty's default by now, or in our mime.properties file
+ * i2ptunnel:
+   - Send HTTP server port 443 traffic to the server
+     transparently, to support HTTPS over the same tunnel, if so configured
+   - Add check for total header size in HTTP server
+   - Return specific error pages to client on errors
+     in HTTP header processing in the HTTP server (ticket #1507)
+ * Jetty:
+   -  Add extensive help to jetty-ssl.xml
+   -  Set session cookies to HttpOnly in all webapps
+ * JobQueue: Make number of runners configurable
+ * Router: Move update extraction code to new class in tasks/
+ * Tunnels:
+   - Add bloom filter warning if high bandwidth but low memory
+   - Add new Bloom filter size, increase bandwidth limit (ticket #1505)
+   - Add config to disable Bloom filter for testing
+
+2015-04-16 zzz
+ * I2CP: Run DistributeLocal jobs inline (ticket #1506)
+ * i2psnark: Increase max tunnels to 10
+ * i2ptunnel: Don't start tunnels in constructors (ticket #815)
+ * NetDB: Reduce max search depth
+ * Transport: Fix active peer count for NTCP
+
+2015-04-15 tuna
+ * SimpleScheduler: Deprecated, functionality moved to SimpleTimer2 (ticket #1069)
+
+2015-04-13 zzz
+ * Router: Fix NPE on bad share bandwidth config (ticket #1524)
+ * Streaming: Handle reset packets without a FROM field, validate
+              signature using connection's destination
+ * Update: Don't log an error for the "dummy" updater (ticket #1525)
+
+* 2015-04-12 0.9.19 released
+
+2015-04-11 zzz
+ * Updates after review
+
+2015-04-09 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-04-07.
+ * Translation updates
+
+2015-04-05 zzz
+ * IRC Server: Better timeout handling reading initial lines (ticket #723)
+
+2015-04-04 zzz
+ * i2ptunnel:
+   - Better timeout handling when reading headers in HTTP server (ticket #723)
+   - Fix NoSuchElementException processing proxyList caused by 03-31 checkin
+ * Streaming:
+   - Fix read timeout on input stream (ticket #723)
+   - Fix read() returning 0 instead of -1 on read timeout (ticket #335)
+
+2015-04-03 zzz
+ * i2ptunnel: Fix stopping tunnel on bad args when starting
+ * wrapper.config: Remove old mortbay Jetty parameters
+
+2015-04-01 zzz
+ * I2CP: Allow larger client clock skew (ticket #1503)
+ * i2psnark: Fix changing data directory on Windows (ticket #1503)
+
+2015-03-31 zzz
+ * API: Fix some client-side APIs to honor defaults in Properties;
+   add javadocs to specify where we do and don't (ticket #1491)
+ * i2ptunnel: Fix multiple SSL outproxies in HTTP client
+
+2015-03-29 zzz
+ * I2CP: Prevent NPE (ticket #1503)
+
+2015-03-25 zzz
+ * i2ptunnel HTTP client: Replace all getBytes() calls
+   with a Writer or getBytes("UTF-8") (ticket #457)
+
+2015-03-24 zzz
+ * Streaming: Throw I2PSocketException when connection is reset,
+   display new error page in HTTP client (ticket #643)
+
+2015-03-23 zzz
+ * Javadoc: Add missing package.html files (ticket #1109)
+ * Summary bar: linkify news headings, remove 'show news' link
+
+2015-03-22 zzz
+ * Console: Better status feedback on manual reseed from URL
+ * NetDB: Don't become floodfill w/o ECDSA support
+ * Reseed: Better status feedback and cleanup in summary bar
+
+2015-03-21 zzz
+ * Console: Support plugin installation from local file
+
+2015-03-20 zzz
+ * Reseed:
+  - Move multipart form support from susimail to jetty-i2p.jar
+    so console can use it
+  - Finish manual reseed from local file
+
+2015-03-19 zzz
+ * Reseed (ticket #1369):
+  - Add form to manually reseed from zip or su3 URL
+  - Add form to manually reseed from local zip or su3 file
+  - Add form to create reseed zip file to share
+  - Backend support and refactoring in reseed code
+
+2015-03-18 zzz
+ * NetDB:
+  - Send exploratory lookups directly to the floodfill if
+    we are already connected to him
+  - Don't encrypt RI lookups when overloaded
+  - Don't explore when overloaded
+  - Don't publish non-ff RI on exit if we are coming right back
+ * Router: Allow disabling the setting of some System properties, for embedded applications
+ * StatisticsManager: Publish dummy LS count if we just started
+ * Streaming: Reduce min RTO again
+ * Tunnels: Drop instead of reject requests on high job lag
+ * UPnP: Update to cyberlink 3.0
+
+2015-03-16 zzz
+ * Apache Tomcat 6.0.43
+ * NetDB: Send RI lookups directly to the floodfill if
+   we are already connected to him
+ * Router:
+   - Republish RI early if capabilities change
+   - Increase exploratory tunnel quantity if floodfill
+ * Throttle: Reject tunnels based on job lag
+
+2015-03-15 zzz
+ * Job Queue:
+   - Fix overload dropping
+   - Add drop count to job stats
+   - Decrease overload threshold again
+ * NetDb: Track flood success
+
+2015-03-13 zzz
+ * i2psnark:
+   - Auto-reduce tunnel quantity based on peer count
+   - Increase max tunnels
+ * Job Queue:
+   - Drop garlic message decryption jobs on overload
+   - Decrease overload threshold
+
+2015-03-13 dg
+ * Router: create router.integratedPeers (floodfills) stat, and 
+   allow graphing of it.
+
+2015-03-08 zzz
+ * i2psnark: Increase min and default bandwidth
+ * Throttle: Tweak messages during probabalistic rejection
+ * Transport: Add missing bogons to IP validity check
+
+* 2015-02-22 0.9.18 released
+
+2015-02-18 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-02-04.
+
+2015-02-15 dg
+ * FloodfillMonitorJob: 
+   - Use lifetime average value for job lag
+   - Change the job lag limit to less than 25ms
+   - Consider and set the limit of backlogged tunnels to less than 5
+
+2015-02-10 dg
+ * I2PSnark, Jetty, SAM, crypto: findbugs resource leaks.
+
+2015-02-07 zzz
+ * SSU: Limit range for valid clock skew
+ * Transport: Ban routers if they are too old and we are non-DSA
+
+2015-02-06 zzz
+ * NetDB: Reduce max job lag for floodfill
+ * NTCP: Block IP for a while when incoming connection is dropped before
+   receiving a message. Possible workaround for tickets #551, #1075, #1411.
+ * Transport:
+   - Decrease DH refiller initial delay and increase buffer size
+     to reduce chance of running out on high-bandwidth routers
+   - Add event log for reachability change
+
+2015-02-01 zzz
+ * Crypto: Catch IAE in generateCertificate()
+ * NetDB: Don't flood an RI back to itself. While Java ffs self-flood,
+   other implementations may not.
+ * OCMOSJ: Pick a OB tunnel at random, not with the OBEP closest
+   to the lease, as that may be hurting connection reliability.
+ * Router: Call warmupCrypto() earlier in the initialization
+
+2015-01-31 zzz
+ * Console:
+   - Don't display invalid IPv6 addresses as options on /confignet
+   - Disable changing log path
+ * NetDb:
+   - Encrypt lookups for 32-bit x86 also
+   - Disable floodfill in laptop mode
+ * PRNG: Don't hang forever at startup waiting for SecureRandom init
+ * Transport: Set 4 MBps max bw due to bloom filter
+
+2015-01-30 zzz
+ * HTTP Proxy: More error page changes
+ * NTCP: Throttle event pumper if looping too fast (tickets #551, #1075, #1411)
+
+2015-01-29 zzz
+ * SSU:
+   - Fix replaceExternalAddress churn when firewalled
+   - Sort introducers in router address, so we won't force a republish
+     due to a different ordering of the same introducers
+   - Don't publish an address if we need introducers but don't have any,
+     so the user won't see a 'firewalled with inbound NTCP enabled' message
+   - Fix transition from firewalled to non-firewalled
+
+2015-01-28 zzz
+ * UPnP:
+  - Rescan for devices periodically and when reachability changes (tickets #661, #959)
+  - Callback when device removed
+  - Consolidate callbacks
+  - Clear ignored devices after primary device removed
+    to allow one to be promoted on rescan
+  - Don't put "I2P" in registered protocol name
+  - Add uptime to UPnP info
+  - HTML escaping
+  - Remove static log on Android
+
+2015-01-11 zzz
+ * i2psnark: Skip incompatible welterde tracker if we are ECDSA
+ * I2PTunnel: Add option for multihoming optimization
+
+2015-01-10 zzz
+ * NetDB: Stubs for bandwidth estimation during reseed (ticket #935)
+
+2015-01-09 zzz
+ * NetDB: Publish RI faster when costs change (ticket #1437)
+
+2015-01-08 zzz
+ * Console, i2ptunnel, proxy: Renaming of various things to "hidden services"
+
+2015-01-07 zzz
+ * ClientAppConfig: Start i2ptunnel sooner (ticket #1162)
+ * NetDB: Possible fixes for reseed completion not recognized (ticket #1384)
+ * Router:
+   - Add startup/shutdown state machine
+   - Don't reset uptime after a soft restart
+ * Startup: Accept tunnels after 10 minutes instead of 20 (ticket #1152)
+ * Tunnels:
+   - Cleanup, catch more cases of zero-hop configuration
+   - Temporarily increase exploratory tunnel quantity at startup,
+     so that netdb refresh will work better
+
+2015-01-05 zzz
+ * Blocklist:
+   - Rewrite to read and merge multiple files
+   - Include in update, use version in base dir too
+   - Increase limits
+   - Bug fixes
+ * EepGet: Change command line default to 0 retries
+ * Latency reduction all over:
+   - SSU: Reduce ack delay
+   - Streaming: Reduce min RTO and flusher delay
+   - Tunnels: Reduce GW batching time
+ * Streaming:
+   - Add API for sending/receiving payload in ping/pong
+   - Fix PcapWriter
+ * UrlLauncher:
+   - Configure browser with routerconsole.browser (ticket #1159)
+   - Convert to ClientApp interface
+
+2015-01-03 zzz
+ * I2CP: Use configured leaseset keys if available
+ * I2PTunnel: Persist leaseset keys
+
+2014-12-15 zzz
+ * Console: Prevent two-word translations from splitting across lines in summary bar
+ * Crypto: EdDSA cleanups
+ * i2psnark: Unchoke new peer sooner
+ * SSU: reduce log level of uncaught errors processing I2NP message
+ * SU3:
+   - Don't require specification of sig type when signing
+   - Implement 'extract -k'
+   - Fix getContentOffset()
+   - Fail on excess data after signature
+ * Tunnels: Raise concurrent build limit
+
+2014-12-08 zzz
+ * HTTP Proxy: Fix parsing of ECDSA address helper
+ * NetDB: Increase lookup throttle time
+
+2014-12-05 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console:
+   - Show b32 for local leasesets also on netdb LS tab
+ * Data:
+   - Disallow duplicate keys in a Mapping
+   - Add RouterInfo.getVersion()
+ * I2NP:
+   - Move some data structures away from ByteArray; offsets were always zero
+     - New BuildRequestRecord constructors
+     - BuildRequestRecord field becomes final byte[222]
+     - IV becomes byte[16]
+     - Build record becomes EncryptedBuildRecord
+   - Remove extra copy in BuildRequestRecord.encryptRecord()
+   - Remove unused BuildRequestRecord.readOurIdentityMatches()
+   - DatabaseStoreMessage: Mask the unused bits in the type field for future use
+ * i2psnark: Reduce auto-stop threshold for update torrent
+ * I2PTunnel: Reduce i2ptunnel threads, more thread pooling.
+   - Move client pool from static inI2PTunnelClientBase to TCG.
+   - Use client pool for some server threads
+   - Run some things inline that were formerly threads
+ * KeyGenerator: main() test improvements
+ * Logger: Configurable flush interval
+ * Plugins: Another fix for restarting a ClientApp plugin
+ * Profiles: Change slice selection argument from an int to an enum for clarity
+ * SusiMail:
+   - Add save-as button
+   - Fix encoding for filename in Content-Disposition header
+ * Transport:
+   - Disallow standard I2P application ports as the router port
+   - Increase default class O conn. limits to 350 NTCP, 1050 SSU
+ * Update: Use last-modified instead of last-checked for the next
+   if-modified-since fetch, to fix failing to fetch the latest news
+
+* 2014-11-30 0.9.17 released
+
+2014-11-28 kytv
+ * Updated PO files from Transifex
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-11-05.
+
+2014-11-26 zzz
+ * BuildRequestor: Reduce delay when client build can't find
+   a paired tunnel (ticket #1412)
+ * Data:
+   - Fix NPE on unknown sig type in destination
+   - Fix hashcode and equals for typed data
+ * Tunnels: Disallow changing allowZeroHop setting for exploratory
+
+2014-11-24 zzz
+ * i2ptunnel: Fix automatic setting of random key
+ * PrivateKeyFile: Don't rewrite file in main() if no options
+
+2014-11-23 zzz
+ * Reseed hosts update
+
+2014-11-22 zzz
+ * PeerSelector: If non-DSA, don't use incompatible peers
+   for exploratory tunnels or closest-hop in client tunnels
+ * SAM: Fix v3 bug accepting incoming connections
+
+2014-11-17 zzz
+ * NetDB: Exclude A1/A2 "countries" from auto-floodfill
+
+2014-11-15 zzz
+ * I2NP:
+   - Set lookup type flags even if no reply tunnel specified
+   - Reduce object churn when writing some messages
+
+2014-11-13 zzz
+ * I2PTunnel:
+   - Fix bug that left server acceptor thread running after close
+   - Add destroy() methods to release all resources when closing a tunnel for good,
+     particularly the streaming timer threads
+   - Use COWAL to prevent concurrency problems
+ * PluginStarter: Simplify detection of active threads
+ * Streaming:
+   - Don't return null from accept() any more; actually throw
+     ConnectException as the Javadocs have always specified
+   - Throw ConnectException from accept() if interrupted; previously caught and ignored
+   - Throw exceptions from ConnectionHandler.accept(), not higher up
+   - Close ServerSocket when ConnectionManager is shut down
+   - Synchronize setActive(), clear queue when starting to accept,
+     better handling of calls that don't change state
+
+2014-11-12 zzz
+ * Data: Clear more caches when under memory pressure and at shutdown
+ * Plugins: Fix bug in stopping a ClientApp plugin with $parameters in the args
+
+2014-11-09 zzz
+ * i2psnark: Fix tracker config form issues
+ * Router, i2ptunnel: Add option for per-pool persistent random key,
+   so peer ordering does not change across restarts
+
+2014-11-08 zzz
+ * EdDSA: Bump minimum router version to 0.9.17
+ * i2psnark: Add support for specifying data dir in add form (ticket #1028)
+ * ProfileOrganizer: More efficient slice calculation
+ * SSU: Fix bug preventing inbound connection from non-DSA router (ticket #1408)
+ * Transports: If non-DSA, check for compatibility before connecting out
+
+2014-11-06 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Blockfile:
+   - Add block size to superblock
+   - Add span size to skiplist block
+   - Bump version to 1.2
+ * Console:
+   - Log warnings for Java 6 or no Pack200
+   - Add ECDSA warning to sidebar
+   - Don't disable updates when restarting from /configupdate
+   - Recognize router.newsRefreshFrequency=0 as "never"
+ * Crypto: Drop dummy crypto stubs
+ * i2psnark:
+   - Convert '+' to ' ' in magnet dn param
+   - Fix NPE when deleting torrent if the data directory
+     was deleted out from under us (ticket #1407)
+   - Add new opentrackers, remove welterde
+   - Support multiple default opentrackers
+   - Don't link to opentrackers at the top
+ * i2ptunnel:
+   - ECDSA default for all new server tunnels
+   - ECDSA default for streamr client tunnels
+   - Fix display of server destination on edit page when not running (privkey file path wasn't absolute)
+   - Fix display of persistent client key b32 on edit page when not running
+   - Fix display of server sig type on edit page when we have a privkey file
+ * jbigi: Save and report extracted library name
+ * Reseed: SSL-only by default
+ * Router:
+   - Make recognition of a hidden router consistent,
+     whether specified in the caps or the cert
+   - Job Queue: Only drop lookup jobs if lagged
+ * SSU:
+   - Don't resend ACKS that are too old (ticket #772)
+   - Dont OOM if ACK sender dies
+   - Don't publish direct info if introducers are required
+ * SU3File: Show content and file types in showversion
+ * Transports:
+   - Consolidate port checking code
+   - Disallow SSDP port
+ * Update: Implement signed news in su3 format with trusted signers,
+   wrapping an Atom XML format
+ * Util:
+   - Use write-sync-close-rename for config file writing
+   - Null check in zip entry name
+
+2014-11-04 zzz
+ * SSU: Fix corruption of ack-only packets containing bitfields
+
+* 2014-11-01 0.9.16 released
+
+2014-10-30 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-10-07.
+ * Arabic, Chinese, Czech, Dutch, French, German, Russian, and Spanish
+   translation updates from Transifex
+
+2014-10-30 zzz
+ * Router: Fix rare NPE building garlic message (ticket #1403)
+
+2014-10-26 zzz
+ * SSU: Fix ACK Sender thread dying on corrupt packet
+
+2014-10-24 zzz
+ * i2ptunnel: Fix description entered via wizard
+
+2014-10-23 zzz
+ * SessionKeyManager:
+   - Raise inbound limit
+   - Delete oldest tagsets when limit is hit
+   - Don't delete recent tagsets when limit is hit
+ * SSL: Don't prohibit SSLv3 ciphers if that's all we have
+
+2014-10-20 zzz
+ * Console: Fix lockups (ticket #1395)
+ * Eepsite Jetty: Switch back to QueuedThreadPool (ticket #1395)
+
+2014-10-17 zzz
+ * NTCP: Deadlock fix 3rd try (ticket #1394)
+
+2014-10-16 zzz
+ * NTCP: Deadlock fix 2nd try (ticket #1394)
+
+2014-10-15 zzz
+ * Console, I2CP, i2ptunnel, SSLEepGet: Set allowed SSL
+   protocols and ciphers. Disable SSLv3 and older ciphers.
+   Enable TLSv1.1 and TLSv1.2 on Java 7,
+   where it is disabled by default client-side.
+
+2014-10-14 zzz
+ * I2NP: Implement DatabaseLookupMessage search type field
+
+2014-10-13 zzz
+ * i2ptunnel: Set default sig type to ECDSA-P256 for client types
+   Standard, IRC, and Socks IRC, if non-shared.
+
+2014-10-10 zzz
+ * Banlist: Remove unused banlist tracking in the profile
+   causing deadlock (ticket #1394)
+ * GeoIP:
+   - Don't rate peers in some countries as high capacity
+   - Don't enable auto-floodfill in some countries
+   - Don't prefer floodfills in some countries
+
+2014-10-08 zzz
+ * UPnP: Comment out unused parsers
+
+2014-10-07 zzz
+ * CPUID: Remove Intel model 2 again, this is spoofed in the VM
+ * Graphs: Catch an error caused by missing fonts
+ * i2ptunnel: Handle named sig types from i2ptunnel.config in the GUI
+ * SSU: Improve handling of socket that gets closed (ticket #1385)
+ * Startup: Delay ReadConfigJob another minute
+
+2014-10-05 zzz
+ * Crypto: EdDSA cleanup
+
+2014-10-04 zzz
+ * i2psnark: Disable changing types for predefined trackers
+ * i2ptunnel: Fix js confirm for delete button
+
+2014-10-03 zzz
+ * Console: New add-to-addressbook links on leaseset page
+ * CPUID: Fix Intel processor identification
+ * i2psnark: Fix adding magnet links with % encoding (ticket #1391)
+
+2014-09-30 zzz
+ * Logs: Fix displayed filename when empty (ticket #1386)
+ * SAM: Fix v3 LS publish, broken in -4 (ticket #1390)
+
+2014-09-29 zzz
+ * CPUID:
+   - Fix main() model and family calculation
+   - Add model string fetch from processor
+   - AMD model string tweaks
+ * i2psnark: Show subdirectory in table header on details page
+
+2014-09-27 zzz
+ * CPUID:
+   - Fix model and family calculations
+   - Fix most AMD family 15 IDs
+   - Add AMD Llano, Jaguar, Bulldozer 2
+   - Add Intel Ivy Bridge, Haswell, Broadwell, Penryn,
+     Pineview, Cedarview, Bay Trail, Avoton, and others
+   - Set best-guess capabilities for most Intel processors
+   - Supply best-guess model string in most cases
+   - Processors listed above, and some others, may see crypto speedups as a result
+
+2014-09-26 zzz
+ * EdDSA: Use our PRNG by default for keygen
+ * i2psnark:
+   - Increase default to 3 hops (ticket #966)
+   - Show info hash on details page
+ * NetDB: Increase max age of RIs to reduce number refreshed after restart
+ * SAM:
+   - Don't publish LS for DIRECTION=CREATE
+   - Set default tunnel name
+ * Tests: Fix junit compile fails due to data structure moves
+ * Transport: Hooks for pluggable transports (ticket #1170)
+
+2014-09-23 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Addressbook: Improve parser efficiency
+ * Data structures: Move several router-only classes from i2p.jar to
+   net.i2p.data.router in router.jar. This will break existing
+   versions of the i2pcontrol plugin.
+ * HTTP Client: Add error page for unsupported encryption
+ * I2CP:
+   - Verify crypto key pair in LS
+   - Verfiy same dest as before in LS
+   - Enforce strict authorization when auth is enabled
+ * i2psnark:
+   - Set-all priority buttons (ticket #1376)
+   - Comment out command-line code
+   - Consolidate and clean up parameters code
+   - Click to sort by column
+   - Display upload ratio when sorted by ratio, and on details page (ticket #1298)
+   - Consolidate code for creating img entities
+   - Switch from checkbox to radio for tracker configuration form
+   - Sort themes in config form
+   - Consolidate HTML header code
+   - Set no-cache headers
+   - Don't set HTML headers for redirects
+ * I2PTunnelGUI: Test tool deleted, moved to i2p.scripts
+ * Jetty 8.1.16.v20140903
+ * KeyGenerator: Add support for converting
+   all signing key types from private to public
+ * NetDB:
+   - Encrypt RI lookups and request encrypted reply on
+     faster boxes, to prevent scraping by OBEPs and IBGWs
+   - Encrypt exploratory lookups too
+   - Better handling of unsupported encryption in destinations
+   - Implement handling of unsupported encryption in router identities
+   - Banlist forever all RIs with unsupported encryption
+   - New negative cache of all dests with unsupported encryption
+   - New methods for destination lookup that will succeed even if
+     the LS is expired or encryption is unsupported
+   - Use new dest lookup so client will get the right error code
+     later, rather than failing with no LS when we really got it
+     but just couldn't verify it.
+   - Don't auto-enable floodfill if ARM or if ElG decrypt is too slow
+ * NTCP EstablishState:
+   - Prep for future enhancements by refactoring to a state machine model
+   - Reduce object churn; use SimpleByteCache
+   - Synchronization
+ * OCMOSJ: Detect unsupported encryption on dest and return the correct failure code
+     through I2CP to streaming to i2ptunnel
+ * PrivateKeyFile:
+   - New constructor with padding
+   - New router extension to add getRouterIdentity()
+   - Add validateKeyPairs()
+ * Router:
+   - New router.sigType config
+   - Generate / regenerate router keys based on config
+   - New router.keys.dat file in PKF format for sig types and padding
+   - Fix RouterInfo.readBytes() signature verification with sig types
+   - Catch unset padding in KeysAndCert.writeBytes()
+   - Catch key errors in ReadRouterJob
+   - Show RI sig type on /netdb in console
+   - Move some things from Router to startup classes
+   - Startup classes package private
+   - Buffer readin of key files
+   - Remove configurability of router.info and router.keys file locations
+   - Consolidate router keys readin code
+   - Update killKeys file list
+   - Validate router key pairs read in from file
+   - Don't try to use an unavailable sig type for the router,
+     even if it's the default
+ * RoutingKeyGenerator:
+   - Move from core to RouterKeyGenerator in router.jar
+   - Leave RoutingKeyGenerator as a simple abstract class
+   - DatabaseEntry now uses timestamp instead of mod data
+     to determine if mod data has changed. Don't expose
+     mod data to DatabaseEntry any more.
+   - I2PAppContext.routingKeyGenerator() now returns null;
+     you must be in RouterContext to get a generator.
+ * SSU:
+   - Implement bundling of multiple fragments in a single data message.
+     This has always been in the spec and implemented in the receive side
+     since the beginning, so it is compatible with all versions.
+   - OutboundMessageState: Fix SSU Output Queue errors in PacketBuilder:
+     Remove all buffer caching as it can't be made thread-safe.
+     Just allocate buffer in constructor and let GC handle it
+     Do fragmenting in constructor and make all fragment fields final
+     Don't track per-fragment retransmissions as it wasn't used
+     Move ack tracking from an array to a long
+     Sync all ack methods; Entire class now thread-safe
+   - InboundMessageState: Rewrite PartialBitfield for efficiency, less space and object churn
+   - PeerState.fetchPartialACKs() improvements
+   - Don't allow more than 10 bytes when reading in bitfield
+   - Don't send a corrupt ack packet if the partial ack got completed (race)
+ * Streaming: Re-enable message status override, but treat LS lookup failure
+     as a soft failure for now.
+ * Transports:
+   - Handle RI sig types
+   - Banlist unsupported RI sig types
+   - Return unused DH keypairs to the pool
+ * Tunnels:
+   - Enforce request record timestamp
+   - Randomize timestamp to prevent hop detection at top of hour
+
+2014-09-22 zzz
+ * SSU: Fix 100% CPU after socket failure
+ * UPnP: Catch reported error on FreeBSD
+
+* 2014-09-20 0.9.15 released
+
+2014-09-17 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-09-04.
+ * Translations:
+   - updates pulled from Transifex (cs, es, fi, fr, ja, nb, pl, ro, ru, uk)
+   - en po files updated and pushed to Transifex
+
+2014-09-16 zzz
+ * i2psnark: Don't send HTML-only headers for icons (2nd try)
+
+2014-09-13 zzz
+ * i2ptunnel:
+   - Fixes for stopping client tunnels
+   - Fix status display for shared clients
+
+2014-09-12 zzz
+ * i2psnark: Escape fixes
+ * i2ptunnel: Fix updating session options on a running delay-open client tunnel
+
+2014-09-09 zzz
+ * i2psnark: Escape fixes
+
+2014-08-31 zzz
+ * Build: Add support for bundling router infos in the package
+ * I2PTunnel: Allow changing of spoof host and target host/port without
+              restarting server tunnel
+
+2014-08-30 zzz
+ * Console:
+  - Re-enable plugin installation by default
+  - Don't show configuration section or update-all button if no plugins installed
+  - Show unavailable crypto on /logs
+ * Router: Log warnings for unavailable crypto at startup
+ * RouterInfo: Backport fix for verification of EdDSA RI sig type
+
+2014-08-28 zzz
+ * Streaming: Fix verify of Ed25519 signatures in CLOSE packets
+
+2014-08-27 zzz
+ * i2psnark:
+   - Persist uploaded count (tickets #1034, #1298)
+   - Don't retry announce if we get back HTML
+   - Recognize Vuze tracker rejections
+   - Don't retry rejected announces unless seeding
+   - Better UI handling of announces with ports or full destination
+ * NetDB: Don't abort initialization on an unsupported RI sig type
+ * Streaming: Fix P521 and RSA sig types
+
+2014-08-23 zzz
+ * Console, i2psnark, i2ptunnel: Escape fixes and cleanups
+ * SSU: Drop peer tests as Bob from unestablished Alices
+
+2014-08-22 zzz
+ * SigTypes:
+   - Add isSupportedSince(), use in floodfill selection
+   - Handle mixed-case 25519 enum
+   - Fix 25519 type code
+   - Add dup type code check
+
+2014-08-21 str4d
+ * Add Ed25519 SigType
+
+2014-08-21 zzz
+ * i2psnark:
+   - Escape control chars in encodePath()
+   - Increase max piece size to 8 MB (ticket #1347)
+ * i2ptunnel: Add local SSL support for std. and IRC client tunnels (ticket #1107)
+
+2014-08-19 zzz
+ * i2psnark:
+   - Don't filter create torrent form, and
+     fix exception on ':' in file names (ticket #1342)
+   - Don't remap file names on torrents we created, and
+     save remap setting in torrent config file (tickets #571, 771)
+   - Escaping fixes since names may not be remapped
+   - Use better encodePath() from Jetty
+   - Don't say create torrent succeeded when it didn't
+   - Add more sanity checks for base path of created torrent
+
+2014-08-18 zzz
+ * i2psnark:
+   - Don't send HTML-only headers for icons
+   - Catch IllegalStateException for icons
+ * Tunnels: Use consistent tunnel pair for Delivery Status Message
+   to reduce network connections (ticket #1350)
+
+2014-08-15 zzz
+ * Console: Escaping fix (ticket #1348)
+ * I2CP: Lookup synch cleanups
+
+2014-08-13 dg
+ * Console, EventLog: add BECAME_FLOODFILL and NOT_FLOODFILL, they are now shown
+   at the /events page when the router changes its floodfill state
+
+2014-08-13 zzz
+ * Console: Escaping fix (ticket #1346)
+ * i2psnark: Fix add torrent NPE
+
+2014-08-10 zzz
+Prop from i2p.i2p.zzz.snarkconfig:
+ * i2psnark:
+   - Move config file and DHT persistence file to a config dir
+   - Move per-torrent configuration from "zmeta" in the main config file
+     to a per-torrent config file (ticket #1132)
+   - Split timestamp and bitfield into separate configs
+   - Fix misspelling of autoStart config
+   - Remove two unused SnarkManager methods
+   - Refactor file deletion in prep for better file name handling (ticket #571)
+   - Don't use canonical files in directory listings,
+     for speed and to avoid file comparison problems (tickets #1079, #1148)
+   - Set base file/dir in Storage constructor, make final,
+     in prep for arbitrary locations (ticket #1028)
+   - Add missing nonce protection for file priority setting
+   - Add torrent mime type
+
+2014-08-10 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Console: Show share options below 30% (ticket #1329)
+ * Crypto: Move TransientSessionKeyManager from core to router.
+   I2PAppContext will return the dummy SessionKeyManager which
+   is sufficient for non-tag uses (e.g. Bote).
+   Client use of end-to-end encryption using SessionTags was
+   disabled in release 0.6, 2005-07-27.
+ * KeysAndCert: Change hashcode to prevent possible collisions
+   caused by apps with zeroed pubkey
+ * Plugins: Start of SU3 support (ticket #1227)
+ * SAM:
+   - Don't spawn a thread for each transmitted datagram
+   - Set protocol field for raw and signed datagrams
+   - Enforce a 60s timeout for HELLO
+   - Use naming service cache to reduce Destination object churn
+   - Get Log object from the log manager
+ * SigType: Add static isAvailable() methods
+ * SSU: Speed up introductions by responding to HolePunch (ticket #1333)
+ * SU3File:
+   - Add support for XML and NEWS types
+   - Fix NPE on EOF reading input
+   - Add -x option to bypass signature verification
+   - Add -k option to use specified private key cert for verification
+   - Don't verify signature in showversion
+ * UPnP: Disable external entities in XML parser
+
+2014-08-10 zzz
+ * Console: Hide client delete buttons unless advanced on /configclients
+
+* 2014-08-09 0.9.14.1 released
+
+2014-08-07 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-08-06.
+
+2014-08-03 zzz
+ * Console:
+   - Fix update buttons
+   - Don't filter parameter names starting with "nofilter_"
+   - Re-allow configadvanced, news URL, and unsigned update URL if routerconsole.advanced=true
+   - Re-allow plugin install if routerconsole.advanced=true or routerconsole.enablePluginInstall=true
+   - Only allow whitelisted plugin signers, unless routerconsole.allowUntrustedPlugins=true
+   - Re-allow clients.config changes if routerconsole.advanced=true or routerconsole.enableClientChange=true
+   - More escaping
+ * i2psnark: Fix add torrent form
+
+2014-07-31 zzz
+ * ExecNamingService: Remove
+ * Plugins: Add whitelist of keys
+
+* 2014-07-26 0.9.14 released
+
+2014-07-26 zzz
+ * Console:
+   - Fix several XSS issues (thx Exodus Intelligence)
+   - Add Content-Security-Policy and X-XSS-Protection headers
+   - Disable changing news feed URL from UI
+   - Disable plugin install from UI
+   - Disable setting unsigned update URL from UI
+   - Disable /configadvanced
+ * DataHelper: Disallow \r in storeProps() (thx joernchen of Phenoelit)
+ * ExecNamingService: Disable (thx joernchen of Phenoelit)
+ * Startup: Add susimail.config to migrated files
+
+2014-07-23 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2014-07-02.
+
+2014-07-19 zzz
+ * i2psnark: Don't prefer leeches during end game, to
+   prevent slowdowns or stalls
+ * SAM: Add support for RAW on the bridge socket in v3 (ticket #1334)
+ * Streaming; Disable fail-fast for now.
+ * SusiMail: Better error message on decode fail
+
+2014-07-15 str4d
+ * I2CP: Stubs for I2CP connections over Unix domain sockets
+
+2014-07-11 zzz
+ * Datagrams:
+  - Redefine the repliable datagram signature for non-DSA_SHA1 sig types;
+    was the sig of the SHA-256 of the payload, now the sig of the payload itself.
+
 2014-07-03 zzz
  * Base64:
   - Catch numerous decoding errors that were previously misdecoded (ticket #1318)
@@ -3300,7 +4855,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     - Use new synchronized change-and-save-config methods
       to eliminate races with ReadConfigJob
   * Tunnels:
-    - When a peer is shitlisted, fail all our tunnels where
+    - When a peer is banlisted, fail all our tunnels where
       that peer is the adjacent hop. In particular this
       will remove outbound tunnels when we can't contact
       the first hop, and enable quicker recovery.
@@ -3819,7 +5374,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2011-09-30 zzz
   * logs.jsp: Add wrapper version
-  * Shitlist: Shorten time
+  * Banlist: Shorten time
   * Wrapper: Update armv7 to 3.5.12
 
 2011-09-30 kytv
@@ -3910,7 +5465,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     tunnels from being expired and causing high CPU usage
 
 2011-09-08 zzz
-  * Blocklist: Include IP in shitlist reason
+  * Blocklist: Include IP in banlist reason
   * Ministreaming: Drop old classes replaced by streaming
     years ago.
   * NTCP: Hopefully fix race NPE, thx devzero
@@ -6082,7 +7637,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Transport clock skews:
       - Store and report UDP clock skews even for large values, so
         a badly skewed local clock will be reported to the console
-      - Don't shitlist for NTCP clock skew if we don't know what time it is
+      - Don't banlist for NTCP clock skew if we don't know what time it is
       - If NTP hasn't worked yet, have NTCP or SSU update the clock one time
       - Include failed clock skew in NTCP skew vector if there aren't many connections
       - Don't include NTCP clock skews for non-established connections
@@ -6444,7 +7999,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * addressbook: Move class to net.i2p.addressbook
     * build: Take two test scripts out of the installer
     * i2psnark: Bye TPB
-    * Shitlist: Fix bug from two checkins ago, all were forever
+    * Banlist: Fix bug from two checkins ago, all were forever
 
 2009-11-14 zzz
     * HTTP Proxy:
@@ -6459,7 +8014,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2009-11-11 zzz
     * Console: Some colon cleansing
     * FloodfillPeerSelector: Adjustments
-    * Shitlist: Move HTML renderer to router console,
+    * Banlist: Move HTML renderer to router console,
       add cause parameter for ease of translation,
       tag all causes
 
@@ -6807,13 +8362,13 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * logs.jsp: Add system encoding
     * Ministreaming: Cleanups, deprecation, move demos out of the lib
     * netdb.jsp: Flags for leases
-    * NTCP: Clean up clock skew shitlist message
+    * NTCP: Clean up clock skew banlist message
     * profiles.jsp:
       - Rename the Failing column
       - Reduce the time cutoff again to 90m (was 2h)
     * readme*html: localhost -> 127.0.0.1
     * Router: Don't do some things when we are shutting down
-    * Shitlist: Clean up expire message
+    * Banlist: Clean up expire message
     * Stats:
       - Fix BufferedStatsLog so it works at all
       - Don't instantiate BufferedStatsLog unless stats.logFilters
@@ -6879,7 +8434,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
            including our own
         2) It randomly dies after a while
     * Console:
-      - Rename the shitlist and the blocklist
+      - Rename the banlist and the blocklist
       - Try to reduce servlet problems on iframe
       - Select server or client icon for local dests
     * EepHead: New
@@ -7614,7 +9169,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
         spiff up tunnels.jsp and profiles.jsp.
         Existing installs can get files with 'ant updaterWIthGeoIP'
         or in the console docs bundle 'ant consoleDocs'
-      - Use flags for shitlist and peers.jsp too
+      - Use flags for banlist and peers.jsp too
       - Tweak tunnels.jsp to show class letters
       - Hide in-progress details on tunnels.jsp
       - Add a little color to confignav
@@ -8095,7 +9650,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Plug in-progress build leak
 
 2009-02-07 zzz
-    * ClientConnectionRunner, Shitlist, TunnelDispatcher:
+    * ClientConnectionRunner, Banlist, TunnelDispatcher:
       Update using concurrent
     * Streaming ConnectionHandler: Bound SYN queue and
       use concurrent to prevent blowup
@@ -8243,13 +9798,13 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Floodfills periodically shuffle their KBuckets, and
         FloodfillPeerSelector sorts more keys, so that
         exploration works well
-    * Shitlist: Reduce max time to 30m (was 60m)
+    * Banlist: Reduce max time to 30m (was 60m)
     * Streaming:
       - Reduce default initial window size from 12 to 6,
          to account for the MTU increase in the last release
          and try to limit initial packet loss
       - Reduce fast retransmit threshold from 3 to 2
-    * Transport: Don't shitlist a peer if we are at our
+    * Transport: Don't banlist a peer if we are at our
       connection limit
 
 2009-01-03 zzz
@@ -8373,7 +9928,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-11-21 zzz
     * Cache DNS and negative DNS for 5m (was 1m and forever)
-    * Delay shitlist cleaner at startup
+    * Delay banlist cleaner at startup
     * Strip wrapper properties from client config
     * Define multiple cert type
     * Prohibit negative maxSends in streaming
@@ -8581,7 +10136,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * configpeer.jsp: Add blocklist info
     * help.jsp: Add link to German FAQ
     * tunnels.jsp: Fix inactive participating count
-    * SearchReplyJob: Don't look up references to shitlisted peers
+    * SearchReplyJob: Don't look up references to banlisted peers
     * TunnelPeerSelector: Avoid a peer for 20s after a reject or timeout
 
 2008-09-20 zzz
@@ -8644,7 +10199,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2008-09-06 zzz
     * EepGet command line: Fix byte counts after a failed resume
     * NTCP: Mark unreachable on outbound connection timeout
-    * Shitlist: Fix partial shitlisting (still unused though)
+    * Banlist: Fix partial banlisting (still unused though)
     * Summary Bar: Warn if firewalled and floodfill
     * Throttle: Combine current and last bw measurement,
       reduce default max tunnels to 2500 (was 3000)
@@ -8688,16 +10243,16 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2008-08-04 zzz
     * Floodfill Peer Selector:
       - Avoid peers whose netdb is old, or have a recent failed store,
-        or are forever-shitlisted
+        or are forever-banlisted
 
 2008-07-30 zzz
     * Blocklists:
       - New, disabled by default, except for blocking of
-        forever-shitlisted peers. See source for instructions
+        forever-banlisted peers. See source for instructions
         and file format.
     * Transport - Reject peers from inbound connections:
       - Check IP against blocklist
-      - Check router hash against forever-shitlist, then block IP
+      - Check router hash against forever-banlist, then block IP
 
 2008-07-16 zzz
     * configpeer.jsp: New
@@ -8729,7 +10284,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       - Change some logging from WARN to INFO
       - Clean up toString()
     * SSU:
-      - Try to pick better introducers by checking shitlist,
+      - Try to pick better introducers by checking banlist,
         wasUnreachable list, failing list, and idle times
       - To keep introducer connections up and valid,
         periodically send a "ping" (a data packet with no data and no acks)
@@ -8816,8 +10371,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-06-07 zzz
     * NetDb: Tweak some logging on lease problems
-    * Shitlist:
-      - Add shitlistForever() and isShitlistedForever(), unused for now
+    * Banlist:
+      - Add banlistForever() and isBanlistedForever(), unused for now
       - Sort the HTML output by router hash
     * netdb.jsp:
       - Sort the lease HTML output by dest hash, local first
@@ -8859,7 +10414,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
         (for SAM for example). Defaults to true of course.
     * Logging: Move common WARN output to DEBUG so we can ask users to
         set the default log level to WARN without massive spewage
-    * ProfileOrganizer: Restrict !isSelectable() (i.e. shitlisted) peers from the High Capacity tier,
+    * ProfileOrganizer: Restrict !isSelectable() (i.e. banlisted) peers from the High Capacity tier,
       not just the Fast tier, since we don't use them for tunnels anyway
     * SAM: Add some compiler flexibility to two obscure makefiles
     * i2psnark: Change displayed peer idents to match that shown by bytemonsoon
@@ -9022,7 +10577,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2008-04-17 zzz
     * Reachability:
       - Track unreachable peers persistently
-        (i.e. separately from shitlist, and not cleared when they contact us)
+        (i.e. separately from banlist, and not cleared when they contact us)
       - Exclude detected unreachable peers from inbound tunnels
       - Exclude detected unreachable peers from selected leases
       - Exclude detected unreachable floodfill peers from lookups
@@ -9030,15 +10585,15 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-04-16 zzz
     * SSU/Reachability:
-      - Extend shitlist time from 4-8m to 40-60m
-      - Add some shitlist logging
-      - Don't shitlist twice when unreachable on all transports
+      - Extend banlist time from 4-8m to 40-60m
+      - Add some banlist logging
+      - Don't banlist twice when unreachable on all transports
       - Exclude netDb-listed unreachable peers from inbound tunnels;
         this won't help much since there are very few of these now
       - Remove 10s delay on inbound UDP connections used for the
         0.6.1.10 transition
       - Track and display UDP connection direction on peers.jsp
-      - Show shitlist status in-line on profiles.jsp
+      - Show banlist status in-line on profiles.jsp
 
 2008-04-15 zzz
     * SSU Reachability/PeerTestManager:
@@ -9136,7 +10691,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 
 2008-03-14 zzz
     * Floodfill Search:
-       - Prefer heard-from, unfailing, unshitlisted floodfill peers
+       - Prefer heard-from, unfailing, unbanlisted floodfill peers
 
 2008-03-14 zzz
     * ProfileOrganizer:
@@ -9921,8 +11476,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       new "identlog.txt" text file in the I2P install directory.  For
       debugging purposes, publish the count of how many identities the
       router has cycled through, though not the identities itself.
-    * Cleaned up the way the multitransport shitlisting worked, and
-      added per-transport shitlists
+    * Cleaned up the way the multitransport banlisting worked, and
+      added per-transport banlists
     * When dropping a router reference locally, first fire a netDb
       lookup for the entry
     * Take the peer selection filters into account when organizing the
@@ -9952,7 +11507,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       even if those shouldn't exist)
 
 2006-07-14  jrandom
-    * Improve the multitransport shitlisting (thanks Complication!)
+    * Improve the multitransport banlisting (thanks Complication!)
     * Allow routers with a capacity of 16-32KBps to be used in tunnels under
       the default configuration (thanks for the stats Complication!)
     * Properly allow older router references to load on startup
@@ -9974,7 +11529,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       GNU/Classpath based JVMs
     * Adjust the Fortuna PRNG's pooling system to reduce contention on
       refill with a background thread to refill the output buffer
-    * Add per-transport support for the shitlist
+    * Add per-transport support for the banlist
     * Add a new async pumped tunnel gateway to reduce tunnel dispatcher
       contention
 
@@ -10044,7 +11599,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * SSU modifications to cut down on unnecessary connection failures
 
 2006-05-16  jrandom
-    * Further shitlist randomizations
+    * Further banlist randomizations
     * Adjust the stats monitored for detecting cpu overload when dropping new
       tunnel requests
 
@@ -10257,7 +11812,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       picker.
     * Cut down on subsequent streaming lib reset packets transmitted
     * Use a larger MTU more often
-    * Allow netDb searches to query shitlisted peers, as the queries are
+    * Allow netDb searches to query banlisted peers, as the queries are
       indirect.
     * Add an option to disable non-floodfill netDb searches (non-floodfill
       searches are used by default, but can be disabled by adding
@@ -10319,7 +11874,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       searches outside the floodfill set)
     * Fix to the SSU IP detection code so we won't use introducers when we
       don't need them (thanks Complication!)
-    * Add a brief shitlist to i2psnark so it doesn't keep on trying to reach
+    * Add a brief banlist to i2psnark so it doesn't keep on trying to reach
       peers given to it
     * Don't let netDb searches wander across too many peers
     * Don't use the 1s bandwidth usage in the tunnel participation throttle,
@@ -10878,7 +12433,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       left to the (work in progress) web UI.
 
 2005-12-14  jrandom
-    * Fix to drop peer references when we shitlist people again (thanks zzz!)
+    * Fix to drop peer references when we banlist people again (thanks zzz!)
     * Further I2PSnark fixes to deal with arbitrary torrent info attributes
       (thanks Complication!)
 
@@ -10977,7 +12532,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       separate jdom or rome, as they're inside syndie.war.
 
 2005-11-30  jrandom
-    * Don't let the TCP transport alone shitlist a peer, since other
+    * Don't let the TCP transport alone banlist a peer, since other
       transports may be working.  Also display whether TCP connections are
       inbound or outbound on the peers page.
     * Fixed some substantial bugs in the SSU introducers where we wouldn't
@@ -11045,7 +12600,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       address (read: SSU IP or port).  This only offers minimal additional
       protection against trivial attackers, but should provide functional
       improvement for people who have periodic IP changes, since their new
-      router address would not be shitlisted while their old one would be.
+      router address would not be banlisted while their old one would be.
     * Added further infrastructure for restricted route operation, but its use
       is not recommended.
 
@@ -11193,10 +12748,10 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Improved the bandwidth throtting on tunnel participation, especially for
       low bandwidth peers.
     * Improved failure handling in SSU with proactive reestablishment of
-      failing idle peers, and rather than shitlisting a peer who failed too
+      failing idle peers, and rather than banlisting a peer who failed too
       much, drop the SSU session and allow a new attempt (which, if it fails,
-      will cause a shitlisting)
-    * Clarify the cause of the shitlist on the profiles page, and include
+      will cause a banlisting)
+    * Clarify the cause of the banlist on the profiles page, and include
       bandwidth limiter info at the bottom of the peers page.
 
 2005-10-26  jrandom
@@ -11209,7 +12764,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2005-10-25  jrandom
     * Defer netDb searches for newly referenced peers until we actually want
       them
-    * Ignore netDb references to peers on our shitlist
+    * Ignore netDb references to peers on our banlist
     * Set the timeout for end to end client messages to the max delay after
       finding the leaseSet, so we don't have as many expired messages floating
       around.
@@ -11424,7 +12979,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       reseeding - useful on OSes that make it hard to create dot files.
       Thanks Complication (and anon)!
     * Fixed the installer version string (thanks Frontier!)
-    * Added cleaner rejection of invalid IP addresses, shitlist those who send
+    * Added cleaner rejection of invalid IP addresses, banlist those who send
       us invalid IP addresses, verify again that we are not sending invalid IP
       addresses, and log an error if it happens. (Thanks Complication, ptm,
       and adab!)
@@ -11452,7 +13007,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       instead of k/cwin)
     * Limit the number of inbound SSU sessions being built at once (using
       half of the i2np.udp.maxConcurrentEstablish config prop)
-    * Don't shitlist on a message send failure alone (unless there aren't any
+    * Don't banlist on a message send failure alone (unless there aren't any
       common transports).
     * More careful bandwidth bursting
 
@@ -11589,7 +13144,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2005-09-13  jrandom
     * More careful error handling with introductions (thanks dust!)
     * Fix the forceIntroducers checkbox on config.jsp (thanks Complication!)
-    * Hide the shitlist on the summary so it doesn't confuse new users.
+    * Hide the banlist on the summary so it doesn't confuse new users.
 
 2005-09-12  comwiz
     * Migrated the router tests to junit
@@ -11696,8 +13251,8 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
 2005-08-24  jrandom
     * Catch errors with corrupt tunnel messages more gracefully (no need to
       kill the thread and cause an OOM...)
-    * Don't skip shitlisted peers for netDb store messages, as they aren't
-      necessarily shitlisted by other people (though they probably are).
+    * Don't skip banlisted peers for netDb store messages, as they aren't
+      necessarily banlisted by other people (though they probably are).
     * Adjust the netDb store per-peer timeout based on each particular peer's
       profile (timeout = 4x their average netDb store response time)
     * Don't republish leaseSets to *failed* peers - send them to peers who
@@ -11740,14 +13295,14 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       netDb.
     * Don't overwrite the status with 'unknown' unless we haven't had a valid
       status in a while.
-    * Make sure to avoid shitlisted peers for peer testing.
+    * Make sure to avoid banlisted peers for peer testing.
     * When we get an unknown result to a peer test, try again soon afterwards.
     * When a peer tells us that our address is different from what we expect,
       if we've done a recent peer test with a result of OK, fire off a peer
       test to make sure our IP/port is still valid.  If our test is old or the
       result was not OK, accept their suggestion, but queue up a peer test for
       later.
-    * Don't try to do a netDb store to a shitlisted peer, and adjust the way
+    * Don't try to do a netDb store to a banlisted peer, and adjust the way
       we monitor netDb store progress (to clear up the high netDb.storePeers
       stat)
 
@@ -12379,7 +13934,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
     * Fix a fencepost in the tunnel building so that e.g. a variance of
       2 means +/- 2, not +/- 1 (thanks dm!)
     * Avoid an NPE on client disconnect
-    * Never select a shitlisted peer to participate in a tunnel
+    * Never select a banlisted peer to participate in a tunnel
     * Have netDb store messages timeout after 10s, not the full 60s (duh)
     * Keep session tags around for a little longer, just in case (grr)
     * Cleaned up some closing event issues on the streaming lib
@@ -13229,7 +14784,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       (thanks Jonva!)
 
 2004-10-04  jrandom
-    * Update the shitlist to reject a peer for an exponentially increasing
+    * Update the banlist to reject a peer for an exponentially increasing
       period of time (with an upper bounds of an hour).
     * Various minor stat and debugging fixes
 
@@ -13243,7 +14798,7 @@ i2psnark: Fix ConnectionAcceptor not restarting after tunnel
       such as "dbResponseTime" or "tunnelTestResponseTime".
 
 2004-10-02  jrandom
-    * Assure that we quickly fail messages bound for shitlisted peers.
+    * Assure that we quickly fail messages bound for banlisted peers.
     * Address a race on startup where the first peer contacted could hang the
       router (thanks Romster!)
     * Only whine about an intermittent inability to query the time server once

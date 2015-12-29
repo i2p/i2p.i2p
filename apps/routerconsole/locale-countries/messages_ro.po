@@ -2,24 +2,23 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# CimpianAlin <Predator@windowslive.com>, 2013
+# CimpianAlin <inactive+CimpianAlin@transifex.com>, 2013
+# titus <titus0818@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-19 23:02+0000\n"
-"PO-Revision-Date: 2013-11-06 09:54+0000\n"
-"Last-Translator: polearnik <polearnik@mail.ru>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/"
-"ro/)\n"
-"Language: ro\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-19 20:01+0000\n"
+"Last-Translator: titus <titus0818@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
-"2:1));\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
 msgid "Anonymous Proxy"
 msgstr "Proxy anonim"
@@ -53,6 +52,9 @@ msgstr "Antilele Olandeze"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr "Regiunea Asia/Pacific"
 
 msgid "Antarctica"
 msgstr "Antarctica"
@@ -105,6 +107,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr "Saint Barthélemy"
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
@@ -113,6 +118,9 @@ msgstr "Brunei Darussalam"
 
 msgid "Bolivia"
 msgstr "Bolivia"
+
+msgid "Bonaire"
+msgstr "Bonaire"
 
 msgid "Brazil"
 msgstr "Brazilia"
@@ -141,14 +149,11 @@ msgstr "Canada"
 msgid "Cocos (Keeling) Islands"
 msgstr "Insulele Cocos (Keeling)"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Republica Democrată Congo"
+msgid "Congo"
+msgstr "Congo"
 
 msgid "Central African Republic"
 msgstr "Republica Central Africană"
-
-msgid "Congo"
-msgstr "Congo"
 
 msgid "Switzerland"
 msgstr "Elveția"
@@ -246,8 +251,8 @@ msgstr "Fiji"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Insulele Falkland (Malvine)"
 
-msgid "Federated States of Micronesia"
-msgstr "Statele Federate ale Microneziei"
+msgid "Micronesia"
+msgstr "Micronesia"
 
 msgid "Faroe Islands"
 msgstr "Insulele Feroe"
@@ -348,8 +353,8 @@ msgstr "British Indian Ocean Territory"
 msgid "Iraq"
 msgstr "Irak"
 
-msgid "Islamic Republic of Iran"
-msgstr "Republica Islamică Iran"
+msgid "Iran"
+msgstr "Iran"
 
 msgid "Iceland"
 msgstr "Islanda"
@@ -387,8 +392,8 @@ msgstr "Comore"
 msgid "Saint Kitts and Nevis"
 msgstr "Sfântul Kitts și Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Republica Populară Democrată Coreea"
+msgid "North Korea"
+msgstr "Korea de Nord"
 
 msgid "Republic of Korea"
 msgstr "Republica Coreea"
@@ -432,8 +437,8 @@ msgstr "Luxemburg"
 msgid "Latvia"
 msgstr "Letonia"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Jamahiriya Arabă Libiană"
+msgid "Libya"
+msgstr "Libia"
 
 msgid "Morocco"
 msgstr "Maroc"
@@ -441,8 +446,8 @@ msgstr "Maroc"
 msgid "Monaco"
 msgstr "Monaco"
 
-msgid "Republic of Moldova"
-msgstr "Republica Moldova"
+msgid "Moldova"
+msgstr "Moldova"
 
 msgid "Montenegro"
 msgstr "Muntenegru"
@@ -456,8 +461,8 @@ msgstr "Madagascar"
 msgid "Marshall Islands"
 msgstr "Insulele Marshall"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Fosta Republică Iugoslavă a Macedoniei"
+msgid "Macedonia"
+msgstr "Macedonia"
 
 msgid "Mali"
 msgstr "Mali"
@@ -468,8 +473,8 @@ msgstr "Myanmar"
 msgid "Mongolia"
 msgstr "Mongolia"
 
-msgid "Macao"
-msgstr "Macao"
+msgid "Macau"
+msgstr "Macau"
 
 msgid "Northern Mariana Islands"
 msgstr "Insulele Mariane de Nord"
@@ -648,14 +653,20 @@ msgstr "Somalia"
 msgid "Suriname"
 msgstr "Suriname"
 
+msgid "South Sudan"
+msgstr "Sudanul de Sud"
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome și Principe"
 
 msgid "El Salvador"
 msgstr "El Salvador"
 
-msgid "Syrian Arab Republic"
-msgstr "Republica Arabă Siriană"
+msgid "Sint Maarten"
+msgstr "Sint Maarten"
+
+msgid "Syria"
+msgstr "Siria"
 
 msgid "Swaziland"
 msgstr "Swaziland"
@@ -705,8 +716,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Taiwan"
 
-msgid "United Republic of Tanzania"
-msgstr "Republica Unită Tanzania"
+msgid "Tanzania"
+msgstr "Tanzania"
 
 msgid "Ukraine"
 msgstr "Ucraina"
@@ -726,8 +737,8 @@ msgstr "Uruguay"
 msgid "Uzbekistan"
 msgstr "Uzbekistan"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Sfântul Scaun (Cetatea Vaticanului)"
+msgid "Vatican"
+msgstr "Vatican"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Sfântul Vincent și Grenadine"
@@ -738,7 +749,7 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Insulele Virgine"
 
-msgid "Viet Nam"
+msgid "Vietnam"
 msgstr "Vietnam"
 
 msgid "Vanuatu"

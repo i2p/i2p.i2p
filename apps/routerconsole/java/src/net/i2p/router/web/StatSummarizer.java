@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -192,8 +193,22 @@ public class StatSummarizer implements Runnable {
             try {
                 _sem.acquire();
             } catch (InterruptedException ie) {}
-            return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
+            try {
+                return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                     periodCount, end, showCredit);
+            } catch (NoClassDefFoundError ncdfe) {
+                //  java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
+                //  at java.lang.Class.forName0(Native Method)
+                //  at java.lang.Class.forName(Class.java:270)
+                //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
+                _isDisabled = true;
+                _isRunning = false;
+                String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
+                _log.logAlways(Log.WARN, s);
+                IOException ioe = new IOException(s);
+                ioe.initCause(ncdfe);
+                throw ioe;
+            }
         } finally {
             _sem.release();
         }
@@ -245,8 +260,8 @@ public class StatSummarizer implements Runnable {
         for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(rate)) {
                 lsnr.getData().exportXml(out);
-                out.write(("<!-- Rate: " + lsnr.getRate().getRateStat().getName() + " for period " + lsnr.getRate().getPeriod() + " -->\n").getBytes());
-                out.write(("<!-- Average data source name: " + lsnr.getName() + " event count data source name: " + lsnr.getEventName() + " -->\n").getBytes());
+                out.write(DataHelper.getUTF8("<!-- Rate: " + lsnr.getRate().getRateStat().getName() + " for period " + lsnr.getRate().getPeriod() + " -->\n"));
+                out.write(DataHelper.getUTF8("<!-- Average data source name: " + lsnr.getName() + " event count data source name: " + lsnr.getEventName() + " -->\n"));
                 return true;
             }
         }
@@ -268,8 +283,22 @@ public class StatSummarizer implements Runnable {
             try {
                 _sem.acquire();
             } catch (InterruptedException ie) {}
-            return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
+            try {
+                return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                         periodCount, end, showCredit);
+            } catch (NoClassDefFoundError ncdfe) {
+                //  java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
+                //  at java.lang.Class.forName0(Native Method)
+                //  at java.lang.Class.forName(Class.java:270)
+                //  at sun.font.FontManagerFactory$1.run(FontManagerFactory.java:82)
+                _isDisabled = true;
+                _isRunning = false;
+                String s = "Error rendering - disabling graph generation. Install ttf-dejavu font package?";
+                _log.logAlways(Log.WARN, s);
+                IOException ioe = new IOException(s);
+                ioe.initCause(ncdfe);
+                throw ioe;
+            }
         } finally {
             _sem.release();
         }
@@ -301,7 +330,7 @@ public class StatSummarizer implements Runnable {
         else if (height <= 0)
             height = GraphHelper.DEFAULT_Y;
         txLsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount,
-                         end, showCredit, rxLsnr, _("Bandwidth usage"));
+                         end, showCredit, rxLsnr, _t("Bandwidth usage"));
         return true;
     }
     
@@ -347,7 +376,7 @@ public class StatSummarizer implements Runnable {
     private static final boolean IS_WIN = SystemVersion.isWindows();
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         // the RRD font doesn't have zh chars, at least on my system
         // Works on 1.5.9 except on windows
         if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))

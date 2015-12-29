@@ -56,9 +56,9 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  of moving the default bandwidth class from L to M, or maybe
      *  adjusting bandwidth class boundaries.
      */
-    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 40;
+    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 60;
     public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 96;
-    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 40;
+    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 60;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
     
@@ -70,6 +70,12 @@ public class FIFOBandwidthRefiller implements Runnable {
     public static final int MIN_INBOUND_BANDWIDTH_PEAK = 3;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 3KBps during burst */
     public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 3;
+    /**
+     *  Max for reasonable Bloom filter false positive rate.
+     *  Do not increase without adding a new Bloom filter size!
+     *  See util/DecayingBloomFilter and tunnel/BloomFilterIVValidator.
+     */
+    public static final int MAX_OUTBOUND_BANDWIDTH = 16384;
     
     /** 
      * how often we replenish the queues.  
@@ -199,7 +205,9 @@ public class FIFOBandwidthRefiller implements Runnable {
         int out = _context.getProperty(PROP_OUTBOUND_BANDWIDTH, DEFAULT_OUTBOUND_BANDWIDTH);
         if (out != _outboundKBytesPerSecond) {
             // bandwidth was specified *and* changed
-                if ( (out <= 0) || (out >= MIN_OUTBOUND_BANDWIDTH) )
+                if (out >= MAX_OUTBOUND_BANDWIDTH)
+                    _outboundKBytesPerSecond = MAX_OUTBOUND_BANDWIDTH;
+                else if ( (out <= 0) || (out >= MIN_OUTBOUND_BANDWIDTH) )
                     _outboundKBytesPerSecond = out;
                 else
                     _outboundKBytesPerSecond = MIN_OUTBOUND_BANDWIDTH;

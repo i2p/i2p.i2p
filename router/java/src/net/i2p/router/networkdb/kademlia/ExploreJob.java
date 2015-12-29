@@ -15,6 +15,8 @@ import java.util.Set;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -71,15 +73,15 @@ class ExploreJob extends SearchJob {
      * and PeerSelector doesn't include the floodfill peers,
      * so we add the ff peers ourselves and then use the regular PeerSelector.
      *
-     * TODO should we encrypt this also like we do for normal lookups?
-     * Could the OBEP capture it and reply with a reference to a hostile peer?
-     *
-     * @param replyTunnelId tunnel to receive replies through
-     * @param replyGateway gateway for the reply tunnel
+     * @param replyTunnelId tunnel to receive replies through, or our router hash if replyGateway is null
+     * @param replyGateway gateway for the reply tunnel, if null, we are sending direct, do not encrypt
      * @param expiration when the search should stop
+     * @param peer the peer to send it to
+     *
+     * @return a DatabaseLookupMessage or GarlicMessage or null on error
      */
     @Override
-    protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration) {
+    protected I2NPMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration, RouterInfo peer) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway);
@@ -87,7 +89,8 @@ class ExploreJob extends SearchJob {
         //msg.setDontIncludePeers(getState().getClosestAttempted(MAX_CLOSEST));
         Set<Hash> dontIncludePeers = getState().getClosestAttempted(MAX_CLOSEST);
         msg.setMessageExpiration(expiration);
-        msg.setReplyTunnel(replyTunnelId);
+        if (replyTunnelId != null)
+            msg.setReplyTunnel(replyTunnelId);
         
         int available = MAX_CLOSEST - dontIncludePeers.size();
         if (available > 0) {
@@ -97,6 +100,8 @@ class ExploreJob extends SearchJob {
             if (dontIncludePeers.add(Hash.FAKE_HASH))
                 available--;
         }
+        // supported as of 0.9.16. TODO remove fake hash above
+        msg.setSearchType(DatabaseLookupMessage.Type.EXPL);
 
         KBucketSet<Hash> ks = _facade.getKBuckets();
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(getState().getTarget());
@@ -127,7 +132,29 @@ class ExploreJob extends SearchJob {
             _log.debug("Peers we don't want to hear about: " + dontIncludePeers);
         
         msg.setDontIncludePeers(dontIncludePeers);
-        return msg;
+
+        // Now encrypt if we can
+        I2NPMessage outMsg;
+        if (replyTunnelId != null &&
+            getContext().getProperty(IterativeSearchJob.PROP_ENCRYPT_RI, IterativeSearchJob.DEFAULT_ENCRYPT_RI)) {
+            // request encrypted reply?
+            if (DatabaseLookupMessage.supportsEncryptedReplies(peer)) {
+                MessageWrapper.OneTimeSession sess;
+                sess = MessageWrapper.generateSession(getContext());
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": Requesting encrypted reply from " + peer.getIdentity().calculateHash() +
+                              ' ' + sess.key + ' ' + sess.tag);
+                msg.setReplySession(sess.key, sess.tag);
+            }
+            // may be null
+            outMsg = MessageWrapper.wrap(getContext(), msg, peer);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getJobId() + ": Encrypted exploratory DLM for " + getState().getTarget() + " to " +
+                           peer.getIdentity().calculateHash());
+        } else {
+            outMsg = msg;
+        }
+        return outMsg;
     }
     
     /** max # of concurrent searches */

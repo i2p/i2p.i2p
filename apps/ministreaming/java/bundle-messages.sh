@@ -25,12 +25,12 @@ then
 fi
 
 # on windows, one must specify the path of commnad find
-# since windows has its own retarded version of find.
+# since windows has its own version of find.
 if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-# set LG2 to the language you need in envrionment varibales to enable this
+# set LG2 to the language you need in environment variables to enable this
 
 # add ../java/ so the refs will work in the po file
 JPATHS="../java/src"
@@ -51,8 +51,8 @@ do
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
 
-	if [ -s build/obj/net/i2p/streaming/messages_$LG.class -a \
-	     build/obj/net/i2p/streaming/messages_$LG.class -nt $i -a \
+	if [ -s build/obj/net/i2p/client/streaming/messages_$LG.class -a \
+	     build/obj/net/i2p/client/streaming/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
 	then
 		continue
@@ -63,13 +63,13 @@ do
 	 	echo "Updating the $i file from the tags..."
 		# extract strings from java and jsp files, and update messages.po files
 		# translate calls must be one of the forms:
-		# _("foo")
+		# _t("foo")
 		# _x("foo")
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean poupdate.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_ --keyword=_x \
+	                 --keyword=_t --keyword=_x \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then

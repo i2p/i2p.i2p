@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.PortMapper;
 
@@ -24,6 +25,7 @@ public class HomeHelper extends HelperBase {
     static final String PROP_OLDHOME = "routerconsole.oldHomePage";
     private static final String PROP_SEARCH = "routerconsole.showSearch";
 
+    // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "action_log.png" + S +
@@ -36,6 +38,7 @@ public class HomeHelper extends HelperBase {
         _x("Website") + S + _x("Local web server") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         "";
 
+    // No commas allowed in text strings!
     static final String DEFAULT_FAVORITES =
         "anoncoin.i2p" + S + _x("The Anoncoin project") + S + "http://anoncoin.i2p/" + S + I + "anoncoin_32.png" + S +
         _x("Bug Reports") + S + _x("Bug tracker") + S + "http://trac.i2p2.i2p/report/1" + S + I + "bug.png" + S +
@@ -43,26 +46,29 @@ public class HomeHelper extends HelperBase {
         _x("Dev Forum") + S + _x("Development forum") + S + "http://zzz.i2p/" + S + I + "group_gear.png" + S +
         _x("diftracker") + S + _x("Bittorrent tracker") + S + "http://diftracker.i2p/" + S + I + "magnet.png" + S +
         "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "box_open.png" + S +
+        "exchanged.i2p" + S + _x("Anonymous cryptocurrency exchange") + S + "http://exchanged.i2p/" + S + I + "exchanged.png" + S +
         _x("FAQ") + S + _x("Frequently Asked Questions") + S + "http://i2p-projekt.i2p/faq" + S + I + "question.png" + S +
         _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "group.png" + S +
         _x("Anonymous Git Hosting") + S + _x("A public anonymous Git hosting site - supports pulling via Git and HTTP and pushing via SSH") + S + "http://git.repo.i2p/" + S + I + "git-logo.png" + S +
         "hiddengate.i2p" + S + _x("HiddenGate") + S + "http://hiddengate.i2p/" + S + I + "hglogo32.png" + S +
+        _x("I2P Wiki") + S + _x("Anonymous wiki - share the knowledge") + S + "http://i2pwiki.i2p/" + S + I + "i2pwiki_logo.png" + S +
         "Ident " + _x("Microblog") + S + _x("Your premier microblogging service on I2P") + S + "http://id3nt.i2p/" + S + I + "ident_icon_blue.png" + S +
         _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "education.png" + S +
-        "jisko.i2p" + S + _x("Simple and fast microblogging website") + S + "http://jisko.i2p/" + S + I + "jisko_console_icon.png" + S +
+        //"jisko.i2p" + S + _x("Simple and fast microblogging website") + S + "http://jisko.i2p/" + S + I + "jisko_console_icon.png" + S +
         //_x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "education.png" + S +
         "killyourtv.i2p" + S + _x("Debian and Tahoe-LAFS repositories") + S + "http://killyourtv.i2p/" + S + I + "television_delete.png" + S +
         _x("Free Web Hosting") + S + _x("Free eepsite hosting with PHP and MySQL") + S + "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
         _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "paste_plain.png" + S +
-        "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "world.png" + S +
+        _x("Planet I2P") + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "world.png" + S +
         _x("Plugins") + S + _x("Add-on directory") + S + "http://plugins.i2p/" + S + I + "plugin.png" + S +
         _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
         _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "info_rhombus.png" + S +
+        _x("Russian News Feed") + S + "lenta.i2p" + S + "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +
         //"Salt" + S + "salt.i2p" + S + "http://salt.i2p/" + S + I + "salt_console.png" + S +
         "stats.i2p" + S + _x("I2P Network Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "chart_line.png" + S +
         _x("Technical Docs") + S + _x("Technical documentation") + S + "http://i2p-projekt.i2p/how" + S + I + "education.png" + S +
         _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "billiard_marker.png" + S +
-        _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "billiard_marker.png" + S +
+        //_x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "billiard_marker.png" + S +
         _x("Sponge's main site") + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "user_astronaut.png" + S +
         "";
 
@@ -97,16 +103,15 @@ public class HomeHelper extends HelperBase {
     }
 
     public String getConfigHome() {
-        boolean oldHome = _context.getBooleanProperty(PROP_OLDHOME);
-        return oldHome ? "checked=\"true\"" : "";
+        return getChecked(PROP_OLDHOME);
     }
 
     public String getProxyStatus() {
         int port = _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY);
         if (port <= 0)
-            return _("The HTTP proxy is not up");
+            return _t("The HTTP proxy is not up");
         return "<img src=\"http://console.i2p/onepixel.png?" + _context.random().nextInt() + "\"" +
-               " alt=\"" + _("Your browser is not properly configured to use the HTTP proxy at {0}",
+               " alt=\"" + _t("Your browser is not properly configured to use the HTTP proxy at {0}",
                              _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST) + ':' + port) +
                "\">";
     }
@@ -129,8 +134,10 @@ public class HomeHelper extends HelperBase {
         return renderConfig(apps);
     }
 
+    private static final String SS = Character.toString(S);
+
     static Collection<App> buildApps(RouterContext ctx, String config) {
-        String[] args = config.split("" + S);
+        String[] args = DataHelper.split(config, SS);
         Set<App> apps = new TreeSet<App>(new AppComparator());
         for (int i = 0; i < args.length - 3; i += 4) {
             String name = Messages.getString(args[i], ctx);
@@ -143,7 +150,7 @@ public class HomeHelper extends HelperBase {
     }
 
     static Collection<App> buildSearchApps(String config) {
-        String[] args = config.split("" + S);
+        String[] args = DataHelper.split(config, SS);
         Set<App> apps = new TreeSet<App>(new AppComparator());
         for (int i = 0; i < args.length - 1; i += 2) {
             String name = args[i];
@@ -166,13 +173,22 @@ public class HomeHelper extends HelperBase {
         ctx.router().saveConfig(prop, buf.toString());
     }
 
-    private static String renderApps(Collection<App> apps) {
+    private String renderApps(Collection<App> apps) {
+        String website = _t("Website");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
         for (App app : apps) {
+            String url;
+            if (app.name.equals(website) && app.url.equals("http://127.0.0.1:7658/")) {
+                // fixup eepsite link
+                url = "http://" + _context.portMapper().getHost(PortMapper.SVC_EEPSITE, "127.0.0.1") +
+                      ':' + _context.portMapper().getPort(PortMapper.SVC_EEPSITE, 7658) + '/';
+            } else {
+                url = app.url;
+            }
             buf.append("<div class=\"app\">" +
                        "<div class=\"appimg\">" +
-                       "<a href=\"").append(app.url).append("\">" +
+                       "<a href=\"").append(url).append("\">" +
                        "<img class=\"");
             // toopie is 54x68, not 16x16, needs special alignment and sizing
             if (app.icon.endsWith("/itoopie_sm.png"))
@@ -183,7 +199,7 @@ public class HomeHelper extends HelperBase {
                        "</div>" +
                        "<table class=\"app\"><tr class=\"app\"><td class=\"app\">" +
                        "<div class=\"applabel\">" +
-                       "<a href=\"").append(app.url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +
+                       "<a href=\"").append(url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +
                        "</div>" +
                        "</td></tr></table>" +
                        "</div>\n");
@@ -195,11 +211,11 @@ public class HomeHelper extends HelperBase {
     private String renderConfig(Collection<App> apps) {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table><tr><th>")
-           .append(_("Remove"))
+           .append(_t("Remove"))
            .append("</th><th colspan=\"2\">")
-           .append(_("Name"))
+           .append(_t("Name"))
            .append("</th><th>")
-           .append(_("URL"))
+           .append(_t("URL"))
            .append("</th></tr>\n");
         for (App app : apps) {
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
@@ -209,17 +225,22 @@ public class HomeHelper extends HelperBase {
                 buf.append("<img height=\"16\" alt=\"\" src=\"").append(app.icon).append("\">");
             }
             buf.append("</td><td align=\"left\">")
-               .append(app.name)
-               .append("</td><td align=\"left\"><a href=\"")
-               .append(app.url.replace("&", "&amp;"))
-               .append("\">")
-               .append(app.url.replace("&", "&amp;"))
-               .append("</a></td></tr>\n");
+               .append(DataHelper.escapeHTML(app.name))
+               .append("</td><td align=\"left\"><a href=\"");
+            String url = DataHelper.escapeHTML(app.url);
+            buf.append(url)
+               .append("\">");
+            // truncate before escaping
+            if (app.url.length() > 50)
+                buf.append(DataHelper.escapeHTML(app.url.substring(0, 48))).append("&hellip;");
+            else
+                buf.append(url);
+            buf.append("</a></td></tr>\n");
         }
         buf.append("<tr><td colspan=\"2\" align=\"center\"><b>")
-           .append(_("Add")).append(":</b>" +
-                   "</td><td align=\"left\"><input type=\"text\" name=\"name\"></td>" +
-                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"url\"></td></tr>");
+           .append(_t("Add")).append(":</b>" +
+                   "</td><td align=\"left\"><input type=\"text\" name=\"nofilter_name\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"nofilter_url\"></td></tr>");
         buf.append("</table>\n");
         return buf.toString();
     }

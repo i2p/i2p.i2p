@@ -8,24 +8,18 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 
-import net.i2p.client.I2PClient;
+import net.i2p.I2PException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
-import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
-import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
-import net.i2p.i2ptunnel.I2PTunnelHTTPServer;
-import net.i2p.i2ptunnel.I2PTunnelIRCClient;
-import net.i2p.i2ptunnel.I2PTunnelServer;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.Addresses;
@@ -40,6 +34,11 @@ import net.i2p.util.Addresses;
 public class EditBean extends IndexBean {
     public EditBean() { super(); }
     
+    /**
+     *  Is it a client or server in the UI and I2P side?
+     *  Note that a streamr client is a UI and I2P client but a server on the localhost side.
+     *  Note that a streamr server is a UI and I2P server but a client on the localhost side.
+     */
     public static boolean staticIsClient(int tunnel) {
         TunnelControllerGroup group = TunnelControllerGroup.getInstance();
         if (group == null)
@@ -55,36 +54,20 @@ public class EditBean extends IndexBean {
     }
     
     public String getTargetHost(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getTargetHost() != null)
-            return tun.getTargetHost();
-        else
-            return "127.0.0.1";
+        return DataHelper.escapeHTML(_helper.getTargetHost(tunnel));
     }
 
     public String getTargetPort(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getTargetPort() != null)
-            return tun.getTargetPort();
-        else
-            return "";
+        int port = _helper.getTargetPort(tunnel);
+        return port > 0 ? "" + port : "";
     }
 
     public String getSpoofedHost(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getSpoofedHost() != null)
-            return tun.getSpoofedHost();
-        else
-            return "";
+        return DataHelper.escapeHTML(_helper.getSpoofedHost(tunnel));
     }
 
     public String getPrivateKeyFile(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null && tun.getPrivKeyFile() != null)
-            return tun.getPrivKeyFile();
-        if (tunnel < 0)
-            tunnel = _group == null ? 999 : _group.getControllers().size();
-        return "i2ptunnel" + tunnel + "-privKeys.dat";
+        return _helper.getPrivateKeyFile(tunnel);
     }
     
     public String getNameSignature(int tunnel) {
@@ -107,182 +90,193 @@ public class EditBean extends IndexBean {
                 //System.err.println("Signing " + spoof + " with " + Base64.encode(privKey.getData()));
                 Signature sig = _context.dsa().sign(spoof.getBytes("UTF-8"), privKey);
                 return Base64.encode(sig.getData());
-            } catch (Exception e) {}
+            } catch (I2PException e) {
+            } catch (IOException e) {}
         }
         return "";
     }
     
     public boolean startAutomatically(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getStartOnLoad();
-        else
-            return false;
+        return _helper.shouldStartAutomatically(tunnel);
     }
     
     public boolean isSharedClient(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return Boolean.parseBoolean(tun.getSharedClient());
-        else
-            return false;
+        return _helper.isSharedClient(tunnel);
     }
     
     public boolean shouldDelay(int tunnel) {
-        return getProperty(tunnel, "i2p.streaming.connectDelay", 0) > 0;
+        return _helper.shouldDelayConnect(tunnel);
     }
     
     public boolean isInteractive(int tunnel) {
-        return getProperty(tunnel, "i2p.streaming.maxWindowSize", 128) == 16;
+        return _helper.isInteractive(tunnel);
     }
     
     public int getTunnelDepth(int tunnel, int defaultLength) {
-        return getProperty(tunnel, "inbound.length", defaultLength);
+        return _helper.getTunnelDepth(tunnel, defaultLength);
     }
     
     public int getTunnelQuantity(int tunnel, int defaultQuantity) {
-        return getProperty(tunnel, "inbound.quantity", defaultQuantity);
+        return _helper.getTunnelQuantity(tunnel, defaultQuantity);
     }
    
     public int getTunnelBackupQuantity(int tunnel, int defaultBackupQuantity) {
-        return getProperty(tunnel, "inbound.backupQuantity", defaultBackupQuantity);
+        return _helper.getTunnelBackupQuantity(tunnel, defaultBackupQuantity);
     }
   
     public int getTunnelVariance(int tunnel, int defaultVariance) {
-        return getProperty(tunnel, "inbound.lengthVariance", defaultVariance);
+        return _helper.getTunnelVariance(tunnel, defaultVariance);
     }
     
     public boolean getReduce(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.reduceOnIdle");
+        return _helper.getReduceOnIdle(tunnel, false);
     }
     
     public int getReduceCount(int tunnel) {
-        return getProperty(tunnel, "i2cp.reduceQuantity", 1);
+        return _helper.getReduceCount(tunnel, 1);
     }
     
     public int getReduceTime(int tunnel) {
-        return getProperty(tunnel, "i2cp.reduceIdleTime", 20*60*1000) / (60*1000);
+        return _helper.getReduceTime(tunnel, 20);
     }
     
     public int getCert(int tunnel) {
-        return 0;
+        return _helper.getCert(tunnel);
     }
     
     public int getEffort(int tunnel) {
-        return 23;
+        return _helper.getEffort(tunnel);
     }
     
     public String getSigner(int tunnel) {
-        return "";
+        return _helper.getSigner(tunnel);
     }
     
     public boolean getEncrypt(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
+        return _helper.getEncrypt(tunnel);
     }
     
-    /** @since 0.9.12 */
-    public int getSigType(int tunnel) {
-        return getProperty(tunnel, I2PClient.PROP_SIGTYPE, 0);
+    /**
+     *  @param newTunnelType used if tunnel < 0
+     *  @since 0.9.12
+     */
+    public int getSigType(int tunnel, String newTunnelType) {
+        return _helper.getSigType(tunnel, newTunnelType);
     }
     
     /** @since 0.9.12 */
     public boolean isSigTypeAvailable(int code) {
-        SigType type = SigType.getByCode(code);
-        return type != null && type.isAvailable();
+        return SigType.isAvailable(code);
     }
     
+    /**
+     *  Random keys, hidden in forms
+     *  @since 0.9.18
+     */
+    public String getKey1(int tunnel) {
+        return _helper.getInboundRandomKey(tunnel);
+    }
+
+    public String getKey2(int tunnel) {
+        return _helper.getOutboundRandomKey(tunnel);
+    }
+
+    public String getKey3(int tunnel) {
+        return _helper.getLeaseSetSigningPrivateKey(tunnel);
+    }
+
+    public String getKey4(int tunnel) {
+        return _helper.getLeaseSetPrivateKey(tunnel);
+    }
+
     /** @since 0.8.9 */
     public boolean getDCC(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelIRCClient.PROP_DCC);
+        return _helper.getDCC(tunnel);
     }
 
     public String getEncryptKey(int tunnel) {
-        return getProperty(tunnel, "i2cp.leaseSetKey", "");
+        return _helper.getEncryptKey(tunnel);
     }
     
     public String getAccessMode(int tunnel) {
-        if (getBooleanProperty(tunnel, PROP_ENABLE_ACCESS_LIST))
-            return "1";
-        if (getBooleanProperty(tunnel, PROP_ENABLE_BLACKLIST))
-            return "2";
-        return "0";
+        return Integer.toString(_helper.getAccessMode(tunnel));
     }
     
     public String getAccessList(int tunnel) {
-        return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
+        return _helper.getAccessList(tunnel);
     }
     
     public String getJumpList(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
-                           I2PTunnelHTTPClient.DEFAULT_JUMP_SERVERS).replace(",", "\n");
+        return _helper.getJumpList(tunnel);
     }
     
     public boolean getClose(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.closeOnIdle");
+        return _helper.getCloseOnIdle(tunnel, false);
     }
     
     public int getCloseTime(int tunnel) {
-        return getProperty(tunnel, "i2cp.closeIdleTime", 30*60*1000) / (60*1000);
+        return _helper.getCloseTime(tunnel, 30);
     }
     
     public boolean getNewDest(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.newDestOnResume") &&
-               getBooleanProperty(tunnel, "i2cp.closeOnIdle") &&
-               !getBooleanProperty(tunnel, "persistentClientKey");
+        return _helper.getNewDest(tunnel);
     }
     
     public boolean getPersistentClientKey(int tunnel) {
-        return getBooleanProperty(tunnel, "persistentClientKey");
+        return _helper.getPersistentClientKey(tunnel);
     }
     
     public boolean getDelayOpen(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.delayOpen");
+        return _helper.getDelayOpen(tunnel);
     }
 
     /** @since 0.9.14 */
     public boolean getAllowUserAgent(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_USER_AGENT);
+        return _helper.getAllowUserAgent(tunnel);
     }
 
     /** @since 0.9.14 */
     public boolean getAllowReferer(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_REFERER);
+        return _helper.getAllowReferer(tunnel);
     }
 
     /** @since 0.9.14 */
     public boolean getAllowAccept(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_ACCEPT);
+        return _helper.getAllowAccept(tunnel);
     }
 
     /** @since 0.9.14 */
     public boolean getAllowInternalSSL(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_INTERNAL_SSL);
+        return _helper.getAllowInternalSSL(tunnel);
+    }
+
+    /** @since 0.9.18 */
+    public boolean getMultihome(int tunnel) {
+        return _helper.getMultihome(tunnel);
     }
 
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH, "false") != "false";
+        return _helper.getProxyAuth(tunnel) != "false";
     }
-    
+    // TODO think
     public boolean getOutproxyAuth(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH) &&
+        return _helper.getOutproxyAuth(tunnel) &&
                getOutproxyUsername(tunnel).length() > 0 &&
                getOutproxyPassword(tunnel).length() > 0;
     }
     
     public String getOutproxyUsername(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, "");
+        return _helper.getOutproxyUsername(tunnel);
     }
     
     public String getOutproxyPassword(int tunnel) {
-        if (getOutproxyUsername(tunnel).length() <= 0)
-            return "";
-        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, "");
+        return _helper.getOutproxyPassword(tunnel);
     }
 
     /** @since 0.9.11 */
     public String getSslProxies(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPClient.PROP_SSL_OUTPROXIES, "");
+        return _helper.getSslProxies(tunnel);
     }
     
     /**
@@ -290,101 +284,65 @@ public class EditBean extends IndexBean {
      *  @since 0.9.11
      */
     public boolean getUseOutproxyPlugin(int tunnel) {
-        return Boolean.parseBoolean(getProperty(tunnel, I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, "true"));
+        return _helper.getUseOutproxyPlugin(tunnel);
     }
 
     /** all of these are @since 0.8.3 */
-    public String getLimitMinute(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_MIN, "0");
+    public int getLimitMinute(int tunnel) {
+        return _helper.getLimitMinute(tunnel);
     }
 
-    public String getLimitHour(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_HOUR, "0");
+    public int getLimitHour(int tunnel) {
+        return _helper.getLimitHour(tunnel);
     }
 
-    public String getLimitDay(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_CONNS_DAY, "0");
+    public int getLimitDay(int tunnel) {
+        return _helper.getLimitDay(tunnel);
     }
 
-    public String getTotalMinute(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_MIN, "0");
+    public int getTotalMinute(int tunnel) {
+        return _helper.getTotalMinute(tunnel);
     }
 
-    public String getTotalHour(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_HOUR, "0");
+    public int getTotalHour(int tunnel) {
+        return _helper.getTotalHour(tunnel);
     }
 
-    public String getTotalDay(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, "0");
+    public int getTotalDay(int tunnel) {
+        return _helper.getTotalDay(tunnel);
     }
 
-    public String getMaxStreams(int tunnel) {
-        return getProperty(tunnel, PROP_MAX_STREAMS, "0");
+    public int getMaxStreams(int tunnel) {
+        return _helper.getMaxStreams(tunnel);
     }
 
     /**
      * POST limits
      * @since 0.9.9
      */
-    public String getPostMax(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_MAX, "0");
+    public int getPostMax(int tunnel) {
+        return _helper.getPostMax(tunnel);
     }
 
-    public String getPostTotalMax(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX, "0");
+    public int getPostTotalMax(int tunnel) {
+        return _helper.getPostTotalMax(tunnel);
     }
 
     public int getPostCheckTime(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_WINDOW, I2PTunnelHTTPServer.DEFAULT_POST_WINDOW) / 60;
+        return _helper.getPostCheckTime(tunnel);
     }
 
     public int getPostBanTime(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_BAN_TIME, I2PTunnelHTTPServer.DEFAULT_POST_BAN_TIME) / 60;
+        return _helper.getPostBanTime(tunnel);
     }
 
     public int getPostTotalBanTime(int tunnel) {
-        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME, I2PTunnelHTTPServer.DEFAULT_POST_TOTAL_BAN_TIME) / 60;
+        return _helper.getPostTotalBanTime(tunnel);
     }
     
     /** @since 0.9.13 */
     public boolean getUniqueLocal(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelServer.PROP_UNIQUE_LOCAL);
-    }
-
-    private int getProperty(int tunnel, String prop, int def) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null) {
-                String s = opts.getProperty(prop);
-                if (s == null) return def;
-                try {
-                    return Integer.parseInt(s);
-                } catch (NumberFormatException nfe) {}
-            }
-        }
-        return def;
-    }
-    
-    private String getProperty(int tunnel, String prop, String def) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null)
-                return opts.getProperty(prop, def);
-        }
-        return def;
-    }
-    
-    /** default is false */
-    private boolean getBooleanProperty(int tunnel, String prop) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts != null)
-                return Boolean.parseBoolean(opts.getProperty(prop));
-        }
-        return false;
+        return _helper.getUniqueLocal(tunnel);
     }
     
     /** @since 0.8.3 */
@@ -404,7 +362,7 @@ public class EditBean extends IndexBean {
 
     public String getI2CPHost(int tunnel) {
         if (_context.isRouterContext())
-            return _("internal");
+            return _t("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPHost();
@@ -414,7 +372,7 @@ public class EditBean extends IndexBean {
     
     public String getI2CPPort(int tunnel) {
         if (_context.isRouterContext())
-            return _("internal");
+            return _t("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPPort();
@@ -423,49 +381,7 @@ public class EditBean extends IndexBean {
     }
 
     public String getCustomOptions(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null) {
-            Properties opts = getOptions(tun);
-            if (opts == null) return "";
-            boolean isMD5Proxy = TunnelController.TYPE_HTTP_CLIENT.equals(tun.getType()) ||
-                                 TunnelController.TYPE_CONNECT.equals(tun.getType());
-            Map<String, String> sorted = new TreeMap<String, String>();
-            for (Map.Entry<Object, Object> e : opts.entrySet()) {
-                String key = (String)e.getKey();
-                if (_noShowSet.contains(key))
-                    continue;
-                // leave in for HTTP and Connect so it can get migrated to MD5
-                // hide for SOCKS until migrated to MD5
-                if ((!isMD5Proxy) &&
-                    _nonProxyNoShowSet.contains(key))
-                    continue;
-                sorted.put(key, (String)e.getValue());
-            }
-            if (sorted.isEmpty())
-                return "";
-            StringBuilder buf = new StringBuilder(64);
-            boolean space = false;
-            for (Map.Entry<String, String> e : sorted.entrySet()) {
-                if (space)
-                    buf.append(' ');
-                else
-                    space = true;
-                buf.append(e.getKey()).append('=').append(e.getValue());
-            }
-            return buf.toString();
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Retrieve the client options from the tunnel
-     *
-     * @return map of name=val to be used as I2P session options
-     */
-    private static Properties getOptions(TunnelController controller) {
-        if (controller == null) return null;
-        return controller.getClientOptionProps();
+        return _helper.getCustomOptionsString(tunnel);
     }
 
     private static final String PROP_ADVANCED = "routerconsole.advanced";
@@ -494,11 +410,11 @@ public class EditBean extends IndexBean {
              if (i <= 3) {
                  buf.append(" (");
                  if (i == 1)
-                     buf.append(_("lower bandwidth and reliability"));
+                     buf.append(_t("lower bandwidth and reliability"));
                  else if (i == 2)
-                     buf.append(_("standard bandwidth and reliability"));
+                     buf.append(_t("standard bandwidth and reliability"));
                  else if (i == 3)
-                     buf.append(_("higher bandwidth and reliability"));
+                     buf.append(_t("higher bandwidth and reliability"));
                  buf.append(')');
              }
              buf.append("</option>\n");

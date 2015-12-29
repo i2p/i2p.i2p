@@ -1,7 +1,12 @@
 package net.i2p.i2ptunnel.udp;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 
 /**
  *
@@ -10,22 +15,25 @@ import java.net.DatagramPacket;
 public class UDPSource implements Source, Runnable {
     public static final int MAX_SIZE = 15360;
 
+    /**
+     *  @throws RuntimeException on DatagramSocket IOException
+     */
     public UDPSource(int port) {
         // create udp-socket
         try {
             this.sock = new DatagramSocket(port);
-        } catch(Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("failed to listen...", e);
         }
         
         // create thread
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
 
     /** use socket from UDPSink */
     public UDPSource(DatagramSocket sock) {
         this.sock = sock;
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
     
     public void setSink(Sink sink) {
@@ -55,7 +63,9 @@ public class UDPSource implements Source, Runnable {
                 this.sink.send(null, nbuf);
                 //System.out.print("i");
             } catch(Exception e) {
-                e.printStackTrace();
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+                if (log.shouldWarn())
+                    log.warn("error sending", e);
                 break;
             }
         }

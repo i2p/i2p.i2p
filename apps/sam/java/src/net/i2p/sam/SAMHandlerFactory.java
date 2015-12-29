@@ -9,14 +9,15 @@ package net.i2p.sam;
  */
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
-import java.nio.ByteBuffer;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.PasswordManager;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -24,7 +25,9 @@ import net.i2p.util.VersionComparator;
  */
 class SAMHandlerFactory {
 
-    private static final String VERSION = "3.1";
+    private static final String VERSION = "3.2";
+
+    private static final int HELLO_TIMEOUT = 60*1000;
 
     /**
      * Return the right SAM handler depending on the protocol version
@@ -35,34 +38,34 @@ class SAMHandlerFactory {
      * @throws SAMException if the connection handshake (HELLO message) was malformed
      * @return A SAM protocol handler, or null if the client closed before the handshake
      */
-    public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps) throws SAMException {
+    public static SAMHandler createSAMHandler(SocketChannel s, Properties i2cpProps,
+                                              SAMBridge parent) throws SAMException {
         String line;
-        StringTokenizer tok;
-        Log log = new Log(SAMHandlerFactory.class);
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(SAMHandlerFactory.class);
 
         try {
-            line = DataHelper.readLine(s.socket().getInputStream());
-            if (line == null) {
-                log.debug("Connection closed by client");
-                return null;
-            }
-            tok = new StringTokenizer(line.trim(), " ");
+            Socket sock = s.socket();
+            sock.setKeepAlive(true);
+            StringBuilder buf = new StringBuilder(128);
+            ReadLine.readLine(sock, buf, HELLO_TIMEOUT);
+            sock.setSoTimeout(0);
+            line = buf.toString();
+        } catch (SocketTimeoutException e) {
+            throw new SAMException("Timeout waiting for HELLO VERSION", e);
         } catch (IOException e) {
             throw new SAMException("Error reading from socket", e);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new SAMException("Unexpected error", e);
         }
+        if (log.shouldDebug())
+            log.debug("New message received: [" + line + ']');
 
         // Message format: HELLO VERSION [MIN=v1] [MAX=v2]
-        if (tok.countTokens() < 2) {
+        Properties props = SAMUtils.parseParams(line);
+        if (!"HELLO".equals(props.remove(SAMUtils.COMMAND)) ||
+            !"VERSION".equals(props.remove(SAMUtils.OPCODE))) {
             throw new SAMException("Must start with HELLO VERSION");
         }
-        if (!tok.nextToken().equals("HELLO") ||
-            !tok.nextToken().equals("VERSION")) {
-            throw new SAMException("Must start with HELLO VERSION");
-        }
-
-        Properties props = SAMUtils.parseParams(tok);
 
         String minVer = props.getProperty("MIN");
         if (minVer == null) {
@@ -84,6 +87,20 @@ class SAMHandlerFactory {
             SAMHandler.writeString("HELLO REPLY RESULT=NOVERSION\n", s);
             return null;
         }
+
+        if (Boolean.parseBoolean(i2cpProps.getProperty(SAMBridge.PROP_AUTH))) {
+            String user = props.getProperty("USER");
+            String pw = props.getProperty("PASSWORD");
+            if (user == null || pw == null)
+                throw new SAMException("USER and PASSWORD required");
+            String savedPW = i2cpProps.getProperty(SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX);
+            if (savedPW == null)
+                throw new SAMException("Authorization failed");
+            PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
+            if (!pm.checkHash(savedPW, pw))
+                throw new SAMException("Authorization failed");
+        }
+
         // Let's answer positively
         if (!SAMHandler.writeString("HELLO REPLY RESULT=OK VERSION=" + ver + "\n", s))
             throw new SAMException("Error writing to socket");       
@@ -96,13 +113,13 @@ class SAMHandlerFactory {
         try {
             switch (verMajor) {
             case 1:
-                handler = new SAMv1Handler(s, verMajor, verMinor, i2cpProps);
+                handler = new SAMv1Handler(s, verMajor, verMinor, i2cpProps, parent);
                 break;
             case 2:
-                handler = new SAMv2Handler(s, verMajor, verMinor, i2cpProps);
+                handler = new SAMv2Handler(s, verMajor, verMinor, i2cpProps, parent);
                 break;
             case 3:
-            	handler = new SAMv3Handler(s, verMajor, verMinor, i2cpProps);
+            	handler = new SAMv3Handler(s, verMajor, verMinor, i2cpProps, parent);
             	break;
             default:
                 log.error("BUG! Trying to initialize the wrong SAM version!");
@@ -122,6 +139,9 @@ class SAMHandlerFactory {
         if (VersionComparator.comp(VERSION, minVer) >= 0 &&
             VersionComparator.comp(VERSION, maxVer) <= 0)
             return VERSION;
+        if (VersionComparator.comp("3.1", minVer) >= 0 &&
+            VersionComparator.comp("3.1", maxVer) <= 0)
+            return "3.1";
         // in VersionComparator, "3" < "3.0" so
         // use comparisons carefully
         if (VersionComparator.comp("3.0", minVer) >= 0 &&

@@ -18,7 +18,7 @@ import net.i2p.data.DataHelper;
 
 public class ResettableGZIPOutputStreamTest extends TestCase {
     public void testResettableGZIPOutputStream() throws Exception{
-        byte b[] = "hi, how are you today?".getBytes();
+        byte b[] = DataHelper.getASCII("hi, how are you today?");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ResettableGZIPOutputStream o = new ResettableGZIPOutputStream(baos);
         o.write(b);

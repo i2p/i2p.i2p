@@ -108,7 +108,8 @@ class PartialPiece implements Comparable<PartialPiece> {
 
     /**
      *  Convert this PartialPiece to a request for the next chunk.
-     *  Used by PeerState only.
+     *  Used by PeerState only. This depends on the downloaded value
+     *  as set by setDownloaded() or read().
      */
 
     public Request getRequest() {
@@ -128,14 +129,16 @@ class PartialPiece implements Comparable<PartialPiece> {
     }
 
     /**
-     *  How many bytes are good - only valid by setDownloaded()
+     *  How many bytes are good - as set by setDownloaded() or read()
      */
     public int getDownloaded() {
          return this.off;
     }
 
     /**
-     *  Call this before returning a PartialPiece to the PeerCoordinator
+     *  Call this if necessary before returning a PartialPiece to the PeerCoordinator.
+     *  We do not use a bitmap to track individual chunks received.
+     *  Any chunks after a 'hole' will be lost.
      *  @since 0.9.1
      */
     public void setDownloaded(int offset) {
@@ -191,11 +194,20 @@ class PartialPiece implements Comparable<PartialPiece> {
     
     /**
      *  Blocking.
+     *  If offset matches the previous downloaded amount
+     *  (as set by a previous call to read() or setDownlaoded()),
+     *  the downloaded amount will be incremented by len.
+     *
      *  @since 0.9.1
      */
-    public void read(DataInputStream din, int off, int len) throws IOException {
+    public void read(DataInputStream din, int offset, int len) throws IOException {
         if (bs != null) {
-            din.readFully(bs, off, len);
+            din.readFully(bs, offset, len);
+            synchronized (this) {
+                // only works for in-order chunks
+                if (this.off == offset)
+                    this.off += len;
+            }
         } else {
             // read in fully before synching on raf
             ByteArray ba;
@@ -211,8 +223,11 @@ class PartialPiece implements Comparable<PartialPiece> {
             synchronized (this) {
                 if (raf == null)
                     createTemp();
-                raf.seek(off);
+                raf.seek(offset);
                 raf.write(tmp);
+                // only works for in-order chunks
+                if (this.off == offset)
+                    this.off += len;
             }
             if (ba != null)
                 _cache.release(ba, false);

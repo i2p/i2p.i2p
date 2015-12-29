@@ -3,9 +3,12 @@ package net.i2p.i2ptunnel.udp;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionListener;
 import net.i2p.client.datagram.I2PDatagramDissector;
+import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 
 /**
  *
@@ -33,7 +36,7 @@ public class I2PSource implements Source, Runnable {
         this.sess.setSessionListener(new Listener());
         
         // create thread
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
     
     public void setSink(Sink sink) {
@@ -47,7 +50,8 @@ public class I2PSource implements Source, Runnable {
     public void run() {
         // create dissector
         I2PDatagramDissector diss = new I2PDatagramDissector();
-        while(true) {
+        _running = true;
+        while (_running) {
             try {
                 // get id
                 int id = this.queue.take();
@@ -70,7 +74,10 @@ public class I2PSource implements Source, Runnable {
                 }
                 //System.out.print("r");
             } catch(Exception e) {
-                e.printStackTrace();
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+                if (log.shouldWarn())
+                    log.warn("error sending", e);
+                break;
             }
         }
     }
@@ -90,11 +97,15 @@ public class I2PSource implements Source, Runnable {
         }
 
         public void disconnected(I2PSession arg0) {
-            // ignore
+            _running = false;
+            thread.interrupt();
         }
 
         public void errorOccurred(I2PSession arg0, String arg1, Throwable arg2) {
-            // ignore
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+            log.error(arg1, arg2);
+            _running = false;
+            thread.interrupt();
         }
         
     }
@@ -105,4 +116,5 @@ public class I2PSource implements Source, Runnable {
     protected final Thread thread;
     protected final boolean verify;
     protected final boolean raw;
+    private volatile boolean _running;
 }

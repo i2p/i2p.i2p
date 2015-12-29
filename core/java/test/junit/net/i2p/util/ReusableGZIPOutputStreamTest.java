@@ -19,7 +19,7 @@ import net.i2p.data.DataHelper;
 public class ReusableGZIPOutputStreamTest extends TestCase {
     public void testReusableGZIPOutputStream() throws Exception{
         {
-            byte b[] = "hi, how are you today?".getBytes();
+            byte b[] = DataHelper.getASCII("hi, how are you today?");
             ReusableGZIPOutputStream o = ReusableGZIPOutputStream.acquire();
             o.write(b);
             o.finish();

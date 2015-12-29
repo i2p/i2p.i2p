@@ -14,19 +14,19 @@ import net.i2p.data.DataHelper;
  */
 public class Rate {
     //private final static Log _log = new Log(Rate.class);
-    private double _currentTotalValue;
+    private float _currentTotalValue;
     // was long, save space
     private int _currentEventCount;
-    private long _currentTotalEventTime;
-    private double _lastTotalValue;
+    private int _currentTotalEventTime;
+    private float _lastTotalValue;
     // was long, save space
     private int _lastEventCount;
-    private long _lastTotalEventTime;
-    private double _extremeTotalValue;
+    private int _lastTotalEventTime;
+    private float _extremeTotalValue;
     // was long, save space
     private int _extremeEventCount;
-    private long _extremeTotalEventTime;
-    private double _lifetimeTotalValue;
+    private int _extremeTotalEventTime;
+    private float _lifetimeTotalValue;
     private long _lifetimeEventCount;
     private long _lifetimeTotalEventTime;
     private RateSummaryListener _summaryListener;
@@ -227,10 +227,10 @@ public class Rate {
             // ok ok, lets coalesce
 
             // how much were we off by?  (so that we can sample down the measured values)
-            double periodFactor = measuredPeriod / (double)_period;
+            float periodFactor = measuredPeriod / (float)_period;
             _lastTotalValue = _currentTotalValue / periodFactor;
             _lastEventCount = (int) (0.499999 + (_currentEventCount / periodFactor));
-            _lastTotalEventTime = (long) (_currentTotalEventTime / periodFactor);
+            _lastTotalEventTime = (int) (_currentTotalEventTime / periodFactor);
             _lastCoalesceDate = now;
             if (_currentEventCount == 0)
                 correctedTotalValue = 0;
@@ -244,7 +244,7 @@ public class Rate {
                 _extremeTotalEventTime = _lastTotalEventTime;
             }
 
-            _currentTotalValue = 0.0D;
+            _currentTotalValue = 0.0f;
             _currentEventCount = 0;
             _currentTotalEventTime = 0;
         }
@@ -505,16 +505,16 @@ public class Rate {
         _period = PersistenceHelper.getInt(props, prefix, ".period");
         _creationDate = PersistenceHelper.getLong(props, prefix, ".creationDate");
         _lastCoalesceDate = PersistenceHelper.getLong(props, prefix, ".lastCoalesceDate");
-        _currentTotalValue = PersistenceHelper.getDouble(props, prefix, ".currentTotalValue");
+        _currentTotalValue = (float)PersistenceHelper.getDouble(props, prefix, ".currentTotalValue");
         _currentEventCount = PersistenceHelper.getInt(props, prefix, ".currentEventCount");
-        _currentTotalEventTime = PersistenceHelper.getLong(props, prefix, ".currentTotalEventTime");
-        _lastTotalValue = PersistenceHelper.getDouble(props, prefix, ".lastTotalValue");
+        _currentTotalEventTime = (int)PersistenceHelper.getLong(props, prefix, ".currentTotalEventTime");
+        _lastTotalValue = (float)PersistenceHelper.getDouble(props, prefix, ".lastTotalValue");
         _lastEventCount = PersistenceHelper.getInt(props, prefix, ".lastEventCount");
-        _lastTotalEventTime = PersistenceHelper.getLong(props, prefix, ".lastTotalEventTime");
-        _extremeTotalValue = PersistenceHelper.getDouble(props, prefix, ".extremeTotalValue");
+        _lastTotalEventTime = (int)PersistenceHelper.getLong(props, prefix, ".lastTotalEventTime");
+        _extremeTotalValue = (float)PersistenceHelper.getDouble(props, prefix, ".extremeTotalValue");
         _extremeEventCount = PersistenceHelper.getInt(props, prefix, ".extremeEventCount");
-        _extremeTotalEventTime = PersistenceHelper.getLong(props, prefix, ".extremeTotalEventTime");
-        _lifetimeTotalValue = PersistenceHelper.getDouble(props, prefix, ".lifetimeTotalValue");
+        _extremeTotalEventTime = (int)PersistenceHelper.getLong(props, prefix, ".extremeTotalEventTime");
+        _lifetimeTotalValue = (float)PersistenceHelper.getDouble(props, prefix, ".lifetimeTotalValue");
         _lifetimeEventCount = PersistenceHelper.getLong(props, prefix, ".lifetimeEventCount");
         _lifetimeTotalEventTime = PersistenceHelper.getLong(props, prefix, ".lifetimeTotalEventTime");
 

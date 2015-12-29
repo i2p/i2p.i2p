@@ -287,9 +287,9 @@ public class AESInputStream extends FilterInputStream {
         log.setMinimumPriority(Log.DEBUG);
         byte orig[] = new byte[1024 * 32];
         RandomSource.getInstance().nextBytes(orig);
-        //byte orig[] = "you are my sunshine, my only sunshine".getBytes();
+        //byte orig[] = DataHelper.getASCII("you are my sunshine, my only sunshine");
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();
-        byte iv[] = "there once was a".getBytes();
+        byte iv[] = DataHelper.getASCII("there once was a");
 
         for (int i = 0; i < 20; i++) {
             runTest(ctx, orig, key, iv);

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 
 /**
@@ -63,7 +64,7 @@ public class SOCKSServerFactory {
             case 'H':
             case 'P':
                 DataOutputStream out = new DataOutputStream(s.getOutputStream());
-                out.write(ERR_REQUEST_DENIED.getBytes());
+                out.write(DataHelper.getASCII(ERR_REQUEST_DENIED));
                 throw new SOCKSException("HTTP request to socks");
             default:
                 throw new SOCKSException("SOCKS protocol version not supported (" + Integer.toHexString(socksVer) + ")");

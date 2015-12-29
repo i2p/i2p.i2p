@@ -1,7 +1,6 @@
 package net.i2p.data.i2np;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 
 /**
  *  Base for TBM, TBRM, VTBM, VTBRM
@@ -18,7 +17,7 @@ import net.i2p.data.ByteArray;
  *  @since 0.8.8
  */
 public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
-    protected ByteArray _records[];
+    protected EncryptedBuildRecord _records[];
     protected int RECORD_COUNT;
     public static final int MAX_RECORD_COUNT = 8;
     
@@ -31,14 +30,14 @@ public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
         super(context);
         if (records > 0) {
             RECORD_COUNT = records;
-            _records = new ByteArray[records];
+            _records = new EncryptedBuildRecord[records];
         }
         // else will be initialized by readMessage()
     }
 
-    public void setRecord(int index, ByteArray record) { _records[index] = record; }
+    public void setRecord(int index, EncryptedBuildRecord record) { _records[index] = record; }
 
-    public ByteArray getRecord(int index) { return _records[index]; }
+    public EncryptedBuildRecord getRecord(int index) { return _records[index]; }
 
     /** @since 0.7.12 */
     public int getRecordCount() { return RECORD_COUNT; }
@@ -57,7 +56,7 @@ public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
             int off = offset + (i * RECORD_SIZE);
             byte rec[] = new byte[RECORD_SIZE];
             System.arraycopy(data, off, rec, 0, RECORD_SIZE);
-            setRecord(i, new ByteArray(rec));
+            setRecord(i, new EncryptedBuildRecord(rec));
         }
     }
     
@@ -66,7 +65,7 @@ public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
         if (remaining < 0)
             throw new I2NPMessageException("Not large enough (too short by " + remaining + ")");
         for (int i = 0; i < RECORD_COUNT; i++) {
-            System.arraycopy(_records[i].getData(), _records[i].getOffset(), out, curIndex, RECORD_SIZE);
+            System.arraycopy(_records[i].getData(), 0, out, curIndex, RECORD_SIZE);
             curIndex += RECORD_SIZE;
         }
         return curIndex;

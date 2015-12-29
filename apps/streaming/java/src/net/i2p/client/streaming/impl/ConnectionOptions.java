@@ -129,7 +129,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     static final int INITIAL_WINDOW_SIZE = 6;
     static final int DEFAULT_MAX_SENDS = 8;
     public static final int DEFAULT_INITIAL_RTT = 8*1000;    
-    public static final int DEFAULT_INITIAL_ACK_DELAY = 1000;  
+    private static final int MAX_RTT = 60*1000;    
+    private static final int DEFAULT_INITIAL_ACK_DELAY = 750;  
     static final int MIN_WINDOW_SIZE = 1;
     private static final boolean DEFAULT_ANSWER_PINGS = true;
     private static final int DEFAULT_INACTIVITY_TIMEOUT = 90*1000;
@@ -226,7 +227,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * clearly from the math above that was not correct.
      * (Before 0.6.2, the reply leaseSet was bundled with every message, so it didn't even
      * fit in TWO tunnel messages - more like 2 1/3)
-     *
+     * <p/>
      * Now, it's not clear how often we will get the ideal situation (no reply leaseSet bundling,
      * no key bundling, and especially not having a small message ahead of you, which will then cause
      * fragmentation for all subsequent messages until the queue is emptied - BatchedPreprocessor
@@ -234,7 +235,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * messages in a new stream are much larger due to the leaseSet and key bundling.
      * But for long-lived streams (like with i2psnark) this should pay dividends.
      * The tunnel.batch* stats should provide some data for test comparisons.
-     *
+     * <p/>
      * As MTU and MRU are identical and are negotiated to the lowest value
      * for the two ends, you can't do widespread testing of a higher value.
      * Unless we change to allow MTU and MRU to be different,
@@ -243,7 +244,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * So let's try 1730 for release 0.6.5. This will allow for 738 testing as well,
      * with i2p.streaming.maxMessageSize=738 (in configadvanced.jsp, or in i2ptunnel, or
      * i2psnark, for example).
-     *
+     * <p/>
      * Not that an isolated single packet is very common, but
      * in this case, 960 was 113.3% total overhead.
      * Compared to 738 (38.8% overhead) and 1730 (18.4%).
@@ -264,6 +265,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     /**
      *  Sets max buffer size, connect timeout, read timeout, and write timeout
      *  from properties. Does not set local port or remote port.
+     *
+     *  As of 0.9.19, defaults in opts are honored.
+     *
      *  @param opts may be null
      */
     public ConnectionOptions(Properties opts) {
@@ -388,66 +392,68 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     
     /**
      *  Note: NOT part of the interface
+     *
+     *  As of 0.9.19, defaults in opts are honored.
      */
     @Override
     public void setProperties(Properties opts) {
         super.setProperties(opts);
         if (opts == null) return;
-        if (opts.containsKey(PROP_MAX_WINDOW_SIZE))
+        if (opts.getProperty(PROP_MAX_WINDOW_SIZE) != null)
             setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
-        if (opts.containsKey(PROP_CONNECT_DELAY))
+        if (opts.getProperty(PROP_CONNECT_DELAY) != null)
             setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
-        if (opts.containsKey(PROP_PROFILE))
+        if (opts.getProperty(PROP_PROFILE) != null)
             setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
-        if (opts.containsKey(PROP_MAX_MESSAGE_SIZE))
+        if (opts.getProperty(PROP_MAX_MESSAGE_SIZE) != null)
             setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
-        if (opts.containsKey(PROP_INITIAL_RECEIVE_WINDOW))
+        if (opts.getProperty(PROP_INITIAL_RECEIVE_WINDOW) != null)
             setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
-        if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
+        if (opts.getProperty(PROP_INITIAL_RESEND_DELAY) != null)
             setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
-        if (opts.containsKey(PROP_INITIAL_ACK_DELAY))
+        if (opts.getProperty(PROP_INITIAL_ACK_DELAY) != null)
             setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, DEFAULT_INITIAL_ACK_DELAY));
-        if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
+        if (opts.getProperty(PROP_INITIAL_WINDOW_SIZE) != null)
             setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
-        if (opts.containsKey(PROP_MAX_RESENDS))
+        if (opts.getProperty(PROP_MAX_RESENDS) != null)
             setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
         // handled in super()
-        //if (opts.containsKey(PROP_WRITE_TIMEOUT))
+        //if (opts.getProperty(PROP_WRITE_TIMEOUT))
         //    setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
-        if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
+        if (opts.getProperty(PROP_INACTIVITY_TIMEOUT) != null)
             setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, DEFAULT_INACTIVITY_TIMEOUT));
-        if (opts.containsKey(PROP_INACTIVITY_ACTION))
+        if (opts.getProperty(PROP_INACTIVITY_ACTION) != null)
             setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, DEFAULT_INACTIVITY_ACTION));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
-        if (opts.contains(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR))
+        if (opts.getProperty(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR) != null)
             setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR,
                                                           DEFAULT_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR));
-        if (opts.contains(PROP_SLOW_START_GROWTH_RATE_FACTOR))
+        if (opts.getProperty(PROP_SLOW_START_GROWTH_RATE_FACTOR) != null)
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR,
                                                 DEFAULT_SLOW_START_GROWTH_RATE_FACTOR));
-        if (opts.containsKey(PROP_CONNECT_TIMEOUT))
+        if (opts.getProperty(PROP_CONNECT_TIMEOUT) != null)
             // overrides default in super()
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DEFAULT_CONNECT_TIMEOUT));
-        if (opts.containsKey(PROP_ANSWER_PINGS))
+        if (opts.getProperty(PROP_ANSWER_PINGS) != null)
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
-        if (opts.containsKey(PROP_ENFORCE_PROTO))
+        if (opts.getProperty(PROP_ENFORCE_PROTO) != null)
             setEnforceProtocol(getBool(opts, PROP_ENFORCE_PROTO, DEFAULT_ENFORCE_PROTO));
-        if (opts.containsKey(PROP_DISABLE_REJ_LOG))
+        if (opts.getProperty(PROP_DISABLE_REJ_LOG) != null)
             setDisableRejectLogging(getBool(opts, PROP_DISABLE_REJ_LOG, false));
         initLists(opts);
-        if (opts.containsKey(PROP_MAX_CONNS_MIN))
+        if (opts.getProperty(PROP_MAX_CONNS_MIN) != null)
             _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
-        if (opts.containsKey(PROP_MAX_CONNS_HOUR))
+        if (opts.getProperty(PROP_MAX_CONNS_HOUR) != null)
             _maxConnsPerHour = getInt(opts, PROP_MAX_CONNS_HOUR, 0);
-        if (opts.containsKey(PROP_MAX_CONNS_DAY))
+        if (opts.getProperty(PROP_MAX_CONNS_DAY) != null)
             _maxConnsPerDay = getInt(opts, PROP_MAX_CONNS_DAY, 0);
-        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_MIN))
+        if (opts.getProperty(PROP_MAX_TOTAL_CONNS_MIN) != null)
             _maxTotalConnsPerMinute = getInt(opts, PROP_MAX_TOTAL_CONNS_MIN, 0);
-        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_HOUR))
+        if (opts.getProperty(PROP_MAX_TOTAL_CONNS_HOUR) != null)
             _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
-        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_DAY))
+        if (opts.getProperty(PROP_MAX_TOTAL_CONNS_DAY) != null)
             _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
-        if (opts.containsKey(PROP_MAX_STREAMS))
+        if (opts.getProperty(PROP_MAX_STREAMS) != null)
             _maxConns = getInt(opts, PROP_MAX_STREAMS, 0);
         
         _rto = getInt(opts, PROP_INITIAL_RTO, INITIAL_RTO);
@@ -540,7 +546,11 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @return round trip time estimate in ms
      */
     public synchronized int getRTT() { return _rtt; }
-    public void setRTT(int ms) { 
+
+    /**
+     *  not public, use updateRTT()
+     */
+    private void setRTT(int ms) { 
         synchronized (_trend) {
             _trend[0] = _trend[1];
             _trend[1] = _trend[2];
@@ -554,8 +564,8 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         
         synchronized(this) {
             _rtt = ms; 
-            if (_rtt > 60*1000)
-                _rtt = 60*1000;
+            if (_rtt > MAX_RTT)
+                _rtt = MAX_RTT;
         }
     }
 
@@ -563,6 +573,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
 
     /** used in TCB @since 0.9.8 */
     synchronized int getRTTDev() { return _rttDev; }
+
     private synchronized void setRTTDev(int rttDev) { _rttDev = rttDev; }
     
     /** 
@@ -613,6 +624,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
     }
     
+    /**
+     *  @param measuredValue must be positive
+     */
     public synchronized void updateRTT(int measuredValue) {
         switch(_initState) {
         case INIT:

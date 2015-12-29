@@ -16,7 +16,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Performance Graphs")%></h1>
+<h1><%=intl._t("I2P Performance Graphs")%></h1>
 <div class="main" id="main">
  <div class="graphspanel">
  <div class="widepanel">

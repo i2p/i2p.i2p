@@ -41,15 +41,18 @@ public class SessionConfig extends DataStructureImpl {
     private Properties _options;
 
     /** 
-     * if the client authorized this session more than the specified period ago, 
-     * refuse it, since it may be a replay attack
+     * If the client authorized this session more than the specified period ago, 
+     * refuse it, since it may be a replay attack.
      *
+     * Really? See also ClientManager.REQUEST_LEASESET_TIMEOUT.
+     * If I2CP replay attacks are a thing, there's a lot more to do.
      */
-    private final static long OFFSET_VALIDITY = 30 * 1000;
+    private final static long OFFSET_VALIDITY = 3*60*1000;
 
     public SessionConfig() {
         this(null);
     }
+
     public SessionConfig(Destination dest) {
         _destination = dest;
         _creationDate = new Date(Clock.getInstance().now());
@@ -91,6 +94,10 @@ public class SessionConfig extends DataStructureImpl {
      * Configure the session with the given options;
      * keys and values 255 bytes (not chars) max each
      *
+     * Defaults in SessionConfig options are, in general, NOT honored.
+     * Defaults are not serialized out-of-JVM, and the router does not recognize defaults in-JVM.
+     * Client side must promote defaults to the primary map.
+     *
      * @param options Properties for this session
      */
     public void setOptions(Properties options) {
@@ -114,11 +121,18 @@ public class SessionConfig extends DataStructureImpl {
     public void signSessionConfig(SigningPrivateKey signingKey) throws DataFormatException {
         byte data[] = getBytes();
         if (data == null) throw new DataFormatException("Unable to retrieve bytes for signing");
+        if (signingKey == null)
+            throw new DataFormatException("No signing key");
         _signature = DSAEngine.getInstance().sign(data, signingKey);
+        if (_signature == null)
+            throw new DataFormatException("Signature failed with " + signingKey.getType() + " key");
     }
 
     /**
      * Verify that the signature matches the destination's signing public key.
+     *
+     * Note that this also returns false if the creation date is too far in the
+     * past or future. See tooOld() and getCreationDate().
      *
      * @return true only if the signature matches
      */
@@ -154,6 +168,9 @@ public class SessionConfig extends DataStructureImpl {
         return ok;
     }
 
+    /**
+     *  Misnamed, could be too old or too far in the future.
+     */
     public boolean tooOld() {
         long now = Clock.getInstance().now();
         long earliestValid = now - OFFSET_VALIDITY;

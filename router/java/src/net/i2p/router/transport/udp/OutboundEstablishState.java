@@ -3,10 +3,11 @@ package net.i2p.router.transport.udp;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -41,6 +42,7 @@ class OutboundEstablishState {
     private SessionKey _sessionKey;
     private SessionKey _macKey;
     private Signature _receivedSignature;
+    // includes trailing padding to mod 16
     private byte[] _receivedEncryptedSignature;
     private byte[] _receivedIV;
     // SessionConfirmed messages
@@ -54,6 +56,8 @@ class OutboundEstablishState {
     private RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;
     private final RouterIdentity _remotePeer;
+    private final boolean _allowExtendedOptions;
+    private final boolean _needIntroduction;
     private final SessionKey _introKey;
     private final Queue<OutNetMessage> _queuedMessages;
     private OutboundState _currentState;
@@ -99,15 +103,23 @@ class OutboundEstablishState {
     /** max delay including backoff */
     private static final long MAX_DELAY = 15*1000;
 
+    private static final long WAIT_FOR_HOLE_PUNCH_DELAY = 500;
+
     /**
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
+     *  @param remotePeer must have supported sig type
+     *  @param allowExtendedOptions are we allowed to send extended options to Bob?
+     *  @param needIntroduction should we ask Bob to be an introducer for us?
+               ignored unless allowExtendedOptions is true
      *  @param introKey Bob's introduction key, as published in the netdb
      *  @param addr non-null
      */
     public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
                                   RemoteHostId remoteHostId,
-                                  RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
+                                  RouterIdentity remotePeer, boolean allowExtendedOptions,
+                                  boolean needIntroduction,
+                                  SessionKey introKey, UDPAddress addr,
                                   DHSessionKeyBuilder.Factory dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
@@ -120,6 +132,8 @@ class OutboundEstablishState {
         }
         _claimedAddress = claimedAddress;
         _remoteHostId = remoteHostId;
+        _allowExtendedOptions = allowExtendedOptions;
+        _needIntroduction = needIntroduction;
         _remotePeer = remotePeer;
         _introKey = introKey;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
@@ -152,6 +166,19 @@ class OutboundEstablishState {
 
     /** @return -1 if unset */
     public long getIntroNonce() { return _introductionNonce; }
+
+    /**
+     *  Are we allowed to send extended options to this peer?
+     *  @since 0.9.24
+     */
+    public boolean isExtendedOptionsAllowed() { return _allowExtendedOptions; }
+
+    /**
+     *  Should we ask this peer to be an introducer for us?
+     *  Ignored unless allowExtendedOptions is true
+     *  @since 0.9.24
+     */
+    public boolean needIntroduction() { return _needIntroduction; }
     
     /**
      *  Queue a message to be sent after the session is established.
@@ -196,14 +223,16 @@ class OutboundEstablishState {
     /** caller must synch - only call once */
     private void prepareSessionRequest() {
         _keyBuilder = _keyFactory.getBuilder();
-        _sentX = new byte[UDPPacketReader.SessionRequestReader.X_LENGTH];
         byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
-        if (X.length == 257)
+        if (X.length == 257) {
+            _sentX = new byte[256];
             System.arraycopy(X, 1, _sentX, 0, _sentX.length);
-        else if (X.length == 256)
-            System.arraycopy(X, 0, _sentX, 0, _sentX.length);
-        else
+        } else if (X.length == 256) {
+            _sentX = X;
+        } else {
+            _sentX = new byte[256];
             System.arraycopy(X, 0, _sentX, _sentX.length - X.length, X.length);
+        }
     }
 
     public synchronized byte[] getSentX() {
@@ -245,8 +274,20 @@ class OutboundEstablishState {
         _alicePort = reader.readPort();
         _receivedRelayTag = reader.readRelayTag();
         _receivedSignedOnTime = reader.readSignedOnTime();
-        _receivedEncryptedSignature = new byte[Signature.SIGNATURE_BYTES + 8];
-        reader.readEncryptedSignature(_receivedEncryptedSignature, 0);
+        // handle variable signature size
+        SigType type = _remotePeer.getSigningPublicKey().getType();
+        if (type == null) {
+            // shouldn't happen, we only connect to supported peers
+            fail();
+            packetReceived();
+            return;
+        }
+        int sigLen = type.getSigLen();
+        int mod = sigLen % 16;
+        int pad = (mod == 0) ? 0 : (16 - mod);
+        int esigLen = sigLen + pad;
+        _receivedEncryptedSignature = new byte[esigLen];
+        reader.readEncryptedSignature(_receivedEncryptedSignature, 0, esigLen);
         _receivedIV = new byte[UDPPacket.IV_SIZE];
         reader.readIV(_receivedIV, 0);
         
@@ -322,6 +363,11 @@ class OutboundEstablishState {
         _receivedEncryptedSignature = null;
         _receivedIV = null;
         _receivedSignature = null;
+        if (_keyBuilder != null) {
+            if (_keyBuilder.getPeerPublicValue() == null)
+                _keyFactory.returnUnused(_keyBuilder);
+            _keyBuilder = null;
+        }
         // sure, there's a chance the packet was corrupted, but in practice
         // this means that Bob doesn't know his external port, so give up.
         _currentState = OutboundState.OB_STATE_VALIDATION_FAILED;
@@ -351,7 +397,9 @@ class OutboundEstablishState {
      * decrypt the signature (and subsequent pad bytes) with the 
      * additional layer of encryption using the negotiated key along side
      * the packet's IV
+     *
      *  Caller must synch on this.
+     *  Only call this once! Decrypts in-place.
      */
     private void decryptSignature() {
         if (_receivedEncryptedSignature == null) throw new NullPointerException("encrypted signature is null! this=" + this.toString());
@@ -359,11 +407,20 @@ class OutboundEstablishState {
         if (_receivedIV == null) throw new NullPointerException("IV is null!");
         _context.aes().decrypt(_receivedEncryptedSignature, 0, _receivedEncryptedSignature, 0, 
                                _sessionKey, _receivedIV, _receivedEncryptedSignature.length);
-        byte signatureBytes[] = new byte[Signature.SIGNATURE_BYTES];
-        System.arraycopy(_receivedEncryptedSignature, 0, signatureBytes, 0, Signature.SIGNATURE_BYTES);
-        _receivedSignature = new Signature(signatureBytes);
+        // handle variable signature size
+        SigType type = _remotePeer.getSigningPublicKey().getType();
+        // if type == null throws NPE
+        int sigLen = type.getSigLen();
+        int mod = sigLen % 16;
+        if (mod != 0) {
+            byte signatureBytes[] = new byte[sigLen];
+            System.arraycopy(_receivedEncryptedSignature, 0, signatureBytes, 0, sigLen);
+            _receivedSignature = new Signature(type, signatureBytes);
+        } else {
+            _receivedSignature = new Signature(type, _receivedEncryptedSignature);
+        }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Decrypted received signature: " + Base64.encode(signatureBytes));
+            _log.debug("Decrypted received signature: " + Base64.encode(_receivedSignature.getData()));
     }
 
     /**
@@ -556,7 +613,7 @@ class OutboundEstablishState {
     public synchronized void introduced(byte bobIP[], int bobPort) {
         if (_currentState != OutboundState.OB_STATE_PENDING_INTRO)
             return; // we've already successfully been introduced, so don't overwrite old settings
-        _nextSend = _context.clock().now() + 500; // wait briefly for the hole punching
+        _nextSend = _context.clock().now() + WAIT_FOR_HOLE_PUNCH_DELAY; // wait briefly for the hole punching
         _currentState = OutboundState.OB_STATE_INTRODUCED;
         if (_claimedAddress != null && bobPort == _bobPort && DataHelper.eq(bobIP, _bobIP)) {
             // he's who he said he was
@@ -569,6 +626,24 @@ class OutboundEstablishState {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Introduced to " + _remoteHostId + ", now lets get on with establishing");
+    }
+
+    /**
+     *  Accelerate response to RelayResponse if we haven't sent it yet.
+     *
+     *  @return true if we should send the SessionRequest now
+     *  @since 0.9.15
+     */
+    synchronized boolean receiveHolePunch() {
+        if (_currentState != OutboundState.OB_STATE_INTRODUCED)
+            return false;
+        if (_requestSentCount > 0)
+            return false;
+        long now = _context.clock().now();
+        if (_log.shouldLog(Log.INFO))
+            _log.info(toString() + " accelerating SessionRequest by " + (_nextSend - now) + " ms");
+        _nextSend = now;
+        return true;
     }
     
     /** how long have we been trying to establish this session? */

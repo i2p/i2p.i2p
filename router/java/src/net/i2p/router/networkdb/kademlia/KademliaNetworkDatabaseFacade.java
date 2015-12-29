@@ -19,14 +19,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.crypto.SigType;
+import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.KeyCertificate;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterIdentity;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.RejectTrimmer;
 import net.i2p.kademlia.SelectionCollector;
@@ -34,6 +40,7 @@ import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.peermanager.PeerProfile;
@@ -56,13 +63,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** Clock independent time of when we started up */
     private long _started;
     private StartExplorersJob _exploreJob;
-    private HarvesterJob _harvestJob;
     /** when was the last time an exploration found something new? */
     private long _lastExploreNew;
     protected final PeerSelector _peerSelector;
     protected final RouterContext _context;
     private final ReseedChecker _reseedChecker;
     private volatile long _lastRIPublishTime;
+    private NegativeLookupCache _negativeCache;
 
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
@@ -155,6 +162,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _reseedChecker = new ReseedChecker(context);
         context.statManager().createRateStat("netDb.lookupDeferred", "how many lookups are deferred?", "NetworkDatabase", new long[] { 60*60*1000 });
         context.statManager().createRateStat("netDb.exploreKeySet", "how many keys are queued for exploration?", "NetworkDatabase", new long[] { 60*60*1000 });
+        context.statManager().createRateStat("netDb.negativeCache", "Aborted lookup, already cached", "NetworkDatabase", new long[] { 60*60*1000l });
         // following are for StoreJob
         context.statManager().createRateStat("netDb.storeRouterInfoSent", "How many routerInfo store messages have we sent?", "NetworkDatabase", new long[] { 60*60*1000l });
         context.statManager().createRateStat("netDb.storeLeaseSetSent", "How many leaseSet store messages have we sent?", "NetworkDatabase", new long[] { 60*60*1000l });
@@ -164,6 +172,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         context.statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*60*1000l });
         // following is for RepublishLeaseSetJob
         context.statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for DatabaseStoreMessage
+        context.statManager().createRateStat("netDb.DSMAllZeros", "Store with zero key", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for HandleDatabaseLookupMessageJob
+        context.statManager().createRateStat("netDb.DLMAllZeros", "Lookup with zero key", "NetworkDatabase", new long[] { 60*60*1000l });
     }
     
     @Override
@@ -200,7 +212,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void removeFromExploreKeys(Collection<Hash> toRemove) {
         if (!_initialized) return;
         _exploreKeys.removeAll(toRemove);
-        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
 
     public void queueForExploration(Collection<Hash> keys) {
@@ -208,7 +220,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         for (Iterator<Hash> iter = keys.iterator(); iter.hasNext() && _exploreKeys.size() < MAX_EXPLORE_QUEUE; ) {
             _exploreKeys.add(iter.next());
         }
-        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
     
     public synchronized void shutdown() {
@@ -223,6 +235,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //_ds = null;
         _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
         // _exploreKeys = null;
+        _negativeCache.clear();
     }
     
     public synchronized void restart() {
@@ -262,6 +275,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //_ds = new TransientDataStore();
 //        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
+        _negativeCache = new NegativeLookupCache(_context);
         
         createHandlers();
         
@@ -298,10 +312,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // No rush, it only runs every 30m.
             _exploreJob.getTiming().setStartAfter(_context.clock().now() + EXPLORE_JOB_DELAY);
             _context.jobQueue().addJob(_exploreJob);
-            // if configured to do so, periodically try to get newer routerInfo stats
-            if (_harvestJob == null && _context.getBooleanProperty(HarvesterJob.PROP_ENABLED))
-                _harvestJob = new HarvesterJob(_context, this);
-            _context.jobQueue().addJob(_harvestJob);
         } else {
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
@@ -480,7 +490,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /**
-     *  Lookup using exploratory tunnels
+     *  Lookup using exploratory tunnels.
+     *  Use lookupDestination() if you don't need the LS or need it validated.
      */
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         lookupLeaseSet(key, onFindJob, onFailedLookupJob, timeoutMs, null);
@@ -488,6 +499,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     /**
      *  Lookup using the client's tunnels
+     *  Use lookupDestination() if you don't need the LS or need it validated.
+     *
      *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      *  @since 0.9.10
      */
@@ -500,6 +513,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.debug("leaseSet found locally, firing " + onFindJob);
             if (onFindJob != null)
                 _context.jobQueue().addJob(onFindJob);
+        } else if (isNegativeCached(key)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Negative cached, not searching: " + key);
+            if (onFailedLookupJob != null)
+                _context.jobQueue().addJob(onFailedLookupJob);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("leaseSet not found locally, running search");
@@ -509,6 +527,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.debug("after lookupLeaseSet");
     }
     
+    /**
+     *  Use lookupDestination() if you don't need the LS or need it validated.
+     */
     public LeaseSet lookupLeaseSetLocally(Hash key) {
         if (!_initialized) return null;
         DatabaseEntry ds = _ds.get(key);
@@ -531,6 +552,47 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return null;
         }
     }
+
+    /**
+     *  Lookup using the client's tunnels
+     *  Succeeds even if LS validation and store fails due to unsupported sig type, expired, etc.
+     *
+     *  Note that there are not separate success and fail jobs. Caller must call
+     *  lookupDestinationLocally() in the job to determine success.
+     *
+     *  @param onFinishedJob non-null
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @since 0.9.16
+     */
+    public void lookupDestination(Hash key, Job onFinishedJob, long timeoutMs, Hash fromLocalDest) {
+        if (!_initialized) return;
+        Destination d = lookupDestinationLocally(key);
+        if (d != null) {
+            _context.jobQueue().addJob(onFinishedJob);
+        } else {
+            search(key, onFinishedJob, onFinishedJob, timeoutMs, true, fromLocalDest);
+        }
+    }
+
+    /**
+     *  Lookup locally in netDB and in badDest cache
+     *  Succeeds even if LS validation fails due to unsupported sig type, expired, etc.
+     *
+     *  @since 0.9.16
+     */
+    public Destination lookupDestinationLocally(Hash key) {
+        if (!_initialized) return null;
+        DatabaseEntry ds = _ds.get(key);
+        if (ds != null) {
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+                LeaseSet ls = (LeaseSet)ds;
+                return ls.getDestination();
+            }
+        } else {
+            return _negativeCache.getBadDest(key);
+        }
+        return null;
+    }
     
     public void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         if (!_initialized) return;
@@ -538,6 +600,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (ri != null) {
             if (onFindJob != null)
                 _context.jobQueue().addJob(onFindJob);
+        } else if (_context.banlist().isBanlistedForever(key)) {
+            if (onFailedLookupJob != null)
+                _context.jobQueue().addJob(onFailedLookupJob);
         } else {
             search(key, onFindJob, onFailedLookupJob, timeoutMs, false);
         }
@@ -582,7 +647,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         try {
             store(h, localLeaseSet);
         } catch (IllegalArgumentException iae) {
-            _log.error("wtf, locally published leaseSet is not valid?", iae);
+            _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
@@ -694,9 +759,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Unlike for RouterInfos, this is only called once, when stored.
      * After that, LeaseSet.isCurrent() is used.
      *
+     * @throws UnsupportedCryptoException if that's why it failed.
      * @return reason why the entry is not valid, or null if it is valid
      */
-    private String validate(Hash key, LeaseSet leaseSet) {
+    private String validate(Hash key, LeaseSet leaseSet) throws UnsupportedCryptoException {
         if (!key.equals(leaseSet.getDestination().calculateHash())) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid store attempt! key does not match leaseSet.destination!  key = "
@@ -704,9 +770,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return "Key does not match leaseSet.destination - " + key.toBase64();
         }
         if (!leaseSet.verifySignature()) {
+            // throws UnsupportedCryptoException
+            processStoreFailure(key, leaseSet);
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid leaseSet signature!  leaseSet = " + leaseSet);
-            return "Invalid leaseSet signature on " + leaseSet.getDestination().calculateHash().toBase64();
+                _log.warn("Invalid leaseSet signature! " + leaseSet);
+            return "Invalid leaseSet signature on " + key;
         }
         long earliest = leaseSet.getEarliestLeaseDate();
         long latest = leaseSet.getLatestLeaseDate();
@@ -722,7 +790,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                           + " first exp. " + new Date(earliest)
                           + " last exp. " + new Date(latest),
                           new Exception("Rejecting store"));
-            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
+            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash()
                    + " expired " + DataHelper.formatDuration(age) + " ago";
         }
         if (latest > now + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
@@ -739,9 +807,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     /**
-     * Store the leaseSet
+     * Store the leaseSet.
+     *
+     * If the store fails due to unsupported crypto, it will negative cache
+     * the hash until restart.
      *
      * @throws IllegalArgumentException if the leaseSet is not valid
+     * @throws UnsupportedCryptoException if that's why it failed.
      * @return previous entry or null
      */
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
@@ -798,6 +870,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      *
      * Call this only on first store, to check the key and signature once
      *
+     * If the store fails due to unsupported crypto, it will banlist
+     * the router hash until restart and then throw UnsupportedCrytpoException.
+     *
+     * @throws UnsupportedCryptoException if that's why it failed.
      * @return reason why the entry is not valid, or null if it is valid
      */
     private String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
@@ -807,6 +883,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return "Key does not match routerInfo.identity";
         }
         if (!routerInfo.isValid()) {
+            // throws UnsupportedCryptoException
+            processStoreFailure(key, routerInfo);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature";
@@ -816,6 +894,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad network: " + routerInfo);
             return "Not in our network";
+        }
+        FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+        if (fkc != null) {
+            boolean validFamily = fkc.verify(routerInfo);
+            if (!validFamily) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad family sig: " + routerInfo.getHash());
+            }
+            // todo store in RI
         }
         return validate(routerInfo);
     }
@@ -892,15 +979,29 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     /**
-     * store the routerInfo
+     * Store the routerInfo.
+     *
+     * If the store fails due to unsupported crypto, it will banlist
+     * the router hash until restart and then throw UnsupportedCrytpoException.
      *
      * @throws IllegalArgumentException if the routerInfo is not valid
+     * @throws UnsupportedCryptoException if that's why it failed.
      * @return previous entry or null
      */
     public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         return store(key, routerInfo, true);
     }
 
+    /**
+     * Store the routerInfo.
+     *
+     * If the store fails due to unsupported crypto, it will banlist
+     * the router hash until restart and then throw UnsupportedCrytpoException.
+     *
+     * @throws IllegalArgumentException if the routerInfo is not valid
+     * @throws UnsupportedCryptoException if that's why it failed.
+     * @return previous entry or null
+     */
     RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
         
@@ -934,6 +1035,59 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _kb.add(key);
         return rv;
     }
+
+    /**
+     *  If the validate fails, call this
+     *  to determine if it was because of unsupported crypto.
+     *
+     *  If so, this will banlist-forever the router hash or permanently negative cache the dest hash,
+     *  and then throw the exception. Otherwise it does nothing.
+     *
+     *  @throws UnsupportedCryptoException if that's why it failed.
+     *  @since 0.9.16
+     */
+    private void processStoreFailure(Hash h, DatabaseEntry entry) throws UnsupportedCryptoException {
+        if (entry.getHash().equals(h)) {
+            if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+                LeaseSet ls = (LeaseSet) entry;
+                Destination d = ls.getDestination();
+                Certificate c = d.getCertificate();
+                if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+                    try {
+                        KeyCertificate kc = c.toKeyCertificate();
+                        SigType type = kc.getSigType();
+                        if (type == null || !type.isAvailable()) {
+                            failPermanently(d);
+                            String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Unsupported sig type " + stype + " for destination " + h);
+                            throw new UnsupportedCryptoException("Sig type " + stype);
+                        }
+                    } catch (DataFormatException dfe) {}
+                }
+            } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                RouterInfo ri = (RouterInfo) entry;
+                RouterIdentity id = ri.getIdentity();
+                Certificate c = id.getCertificate();
+                if (c.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+                    try {
+                        KeyCertificate kc = c.toKeyCertificate();
+                        SigType type = kc.getSigType();
+                        if (type == null || !type.isAvailable()) {
+                            String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
+                            _context.banlist().banlistRouterForever(h, "Unsupported signature type " + stype);
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Unsupported sig type " + stype + " for router " + h);
+                            throw new UnsupportedCryptoException("Sig type " + stype);
+                        }
+                    } catch (DataFormatException dfe) {}
+                }
+            }
+        }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Verify fail, cause unknown: " + entry);
+    }
+
     
     /**
      *   Final remove for a leaseset.
@@ -1005,8 +1159,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * without any match)
      *
      * Unused - called only by FNDF.searchFull() from FloodSearchJob which is overridden - don't use this.
+     *
+     * @throws UnsupportedOperationException always
      */
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
+        throw new UnsupportedOperationException();
+/****
         if (!_initialized) return null;
         boolean isNew = true;
         SearchJob searchJob = null;
@@ -1031,6 +1189,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _context.statManager().addRateData("netDb.lookupDeferred", deferred, searchJob.getExpiration()-_context.clock().now());
         }
         return searchJob;
+****/
     }
     
     /**
@@ -1100,6 +1259,47 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return;
         }
         _context.jobQueue().addJob(new StoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
+    }
+
+    /**
+     *  Increment in the negative lookup cache
+     *
+     *  @param key for Destinations or RouterIdentities
+     *  @since 0.9.4 moved from FNDF to KNDF in 0.9.16
+     */
+    void lookupFailed(Hash key) {
+        _negativeCache.lookupFailed(key);
+    }
+
+    /**
+     *  Is the key in the negative lookup cache?
+     *&
+     *  @param key for Destinations or RouterIdentities
+     *  @since 0.9.4 moved from FNDF to KNDF in 0.9.16
+     */
+    boolean isNegativeCached(Hash key) {
+        boolean rv = _negativeCache.isCached(key);
+        if (rv)
+            _context.statManager().addRateData("netDb.negativeCache", 1);
+        return rv;
+    }
+
+    /**
+     *  Negative cache until restart
+     *  @since 0.9.16
+     */
+    void failPermanently(Destination dest) {
+        _negativeCache.failPermanently(dest);
+    }
+
+    /**
+     *  Is it permanently negative cached?
+     *
+     *  @param key only for Destinations; for RouterIdentities, see Banlist
+     *  @since 0.9.16
+     */
+    public boolean isNegativeCachedForever(Hash key) {
+        return _negativeCache.getBadDest(key) != null;
     }
 
     /**

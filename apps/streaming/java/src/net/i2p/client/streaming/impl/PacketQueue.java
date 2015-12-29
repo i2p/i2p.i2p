@@ -1,5 +1,6 @@
 package net.i2p.client.streaming.impl;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,11 +26,9 @@ import net.i2p.util.SimpleTimer2;
  *<p>
  * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
-class PacketQueue implements SendMessageStatusListener {
+class PacketQueue implements SendMessageStatusListener, Closeable {
     private final I2PAppContext _context;
     private final Log _log;
-    private final I2PSession _session;
-    private final ConnectionManager _connectionManager;
     private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     private final Map<Long, Connection> _messageStatusMap;
     private volatile boolean _dead;
@@ -44,14 +43,13 @@ class PacketQueue implements SendMessageStatusListener {
     private static final int FINAL_TAGS_TO_SEND = 4;
     private static final int FINAL_TAG_THRESHOLD = 2;
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
+    private static final boolean ENABLE_STATUS_LISTEN = true;
 
-    public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
+    public PacketQueue(I2PAppContext context, SimpleTimer2 timer) {
         _context = context;
-        _session = session;
-        _connectionManager = mgr;
         _log = context.logManager().getLog(PacketQueue.class);
         _messageStatusMap = new ConcurrentHashMap<Long, Connection>(16);
-        new RemoveExpired();
+        new RemoveExpired(timer);
         // all createRateStats in ConnectionManager
     }
 
@@ -84,17 +82,10 @@ class PacketQueue implements SendMessageStatusListener {
         //if (tagsSent == null)
         //    tagsSent = new HashSet(0);
 
-        // cache this from before sendMessage
-        String conStr = null;
-        if (_log.shouldLog(Log.DEBUG))
-            conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
         if (packet.getAckTime() > 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Not resending " + packet);
             return false;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending... " + packet);
         }
     
         ByteArray ba = _cache.acquire();
@@ -107,7 +98,7 @@ class PacketQueue implements SendMessageStatusListener {
             int size = 0;
             long beforeWrite = System.currentTimeMillis();
             if (packet.shouldSign())
-                size = packet.writeSignedPacket(buf, 0, _context, _session.getPrivateKey());
+                size = packet.writeSignedPacket(buf, 0);
             else
                 size = packet.writePacket(buf, 0);
             long writeTime = System.currentTimeMillis() - beforeWrite;
@@ -134,7 +125,7 @@ class PacketQueue implements SendMessageStatusListener {
                 if (con != null) {
                     if (con.isInbound())
                         options.setSendLeaseSet(false);
-                    else
+                    else if (ENABLE_STATUS_LISTEN)
                         listenForStatus = true;
                 }
                 options.setTagsToSend(INITIAL_TAGS_TO_SEND);
@@ -161,14 +152,15 @@ class PacketQueue implements SendMessageStatusListener {
                     options.setTagThreshold(thresh);
                 }
             }
+            I2PSession session = packet.getSession();
             if (listenForStatus) {
-                long id = _session.sendMessage(packet.getTo(), buf, 0, size,
+                long id = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options, this);
                 _messageStatusMap.put(Long.valueOf(id), packet.getConnection());
                 sent = true;
             } else {
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size,
+                sent = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options);
             }
@@ -204,16 +196,11 @@ class PacketQueue implements SendMessageStatusListener {
             //packet.setKeyUsed(keyUsed);
             //packet.setTagsSent(tagsSent);
             packet.incrementSends();
-            if (_log.shouldLog(Log.DEBUG)) {
-                String msg = "SEND " + packet
-                             + " send # " + packet.getNumSends()
-                             + " sendTime: " + (end-begin)
-                             + " con: " + conStr;
-                _log.debug(msg);
-            }
             Connection c = packet.getConnection();
-            String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
-            _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+            if (c != null && _log.shouldDebug()) {
+                String suffix = "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO();
+                c.getConnectionManager().getPacketHandler().displayPacket(packet, "SEND", suffix);
+            }
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
                 packet.logTCPDump();
@@ -266,6 +253,20 @@ class PacketQueue implements SendMessageStatusListener {
                 _messageStatusMap.remove(id);
                 break;
 
+            case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
+                // Ideally we would like to make this a hard failure,
+                // but it caused far too many fast-fails that were then
+                // resolved by the user clicking reload in his browser.
+                // Until the LS fetch is faster and more reliable,
+                // or we increase the timeout for it,
+                // we can't treat this one as a hard fail.
+                // Let the streaming retransmission paper over the problem.
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("LS lookup (soft) failure for msg " + msgId + " on " + con);
+                _messageStatusMap.remove(id);
+                break;
+
+
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL:
             case MessageStatusMessage.STATUS_SEND_FAILURE_ROUTER:
             case MessageStatusMessage.STATUS_SEND_FAILURE_NETWORK:
@@ -279,7 +280,6 @@ class PacketQueue implements SendMessageStatusListener {
             case MessageStatusMessage.STATUS_SEND_FAILURE_DESTINATION:
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED_LEASESET:
-            case MessageStatusMessage.STATUS_SEND_FAILURE_NO_LEASESET:
             case SendMessageStatusListener.STATUS_CANCELLED:
                 if (con.getHighestAckedThrough() >= 0) {
                     // a retxed SYN succeeded before the first SYN failed
@@ -328,8 +328,8 @@ class PacketQueue implements SendMessageStatusListener {
      */
     private class RemoveExpired extends SimpleTimer2.TimedEvent {
         
-        public RemoveExpired() {
-             super(_context.simpleTimer2(), REMOVE_EXPIRED_TIME);
+        public RemoveExpired(SimpleTimer2 timer) {
+             super(timer, REMOVE_EXPIRED_TIME);
         }
 
         public void timeReached() {

@@ -104,7 +104,8 @@ public class Destination extends KeysAndCert {
     }
 
     /**
-     *  deprecated, used only by Packet.java in streaming
+     *  Deprecated, used only by Packet.java in streaming.
+     *  Broken for sig types P521 and RSA before 0.9.15
      *  @return the written length (NOT the new offset)    
      */    
     public int writeBytes(byte target[], int offset) {
@@ -115,8 +116,9 @@ public class Destination extends KeysAndCert {
             System.arraycopy(_padding, 0, target, cur, _padding.length);
             cur += _padding.length;
         }
-        System.arraycopy(_signingKey.getData(), 0, target, cur, _signingKey.length());
-        cur += _signingKey.length();
+        int spkTrunc = Math.min(SigningPublicKey.KEYSIZE_BYTES, _signingKey.length());
+        System.arraycopy(_signingKey.getData(), 0, target, cur, spkTrunc);
+        cur += spkTrunc;
         cur += _certificate.writeBytes(target, cur);
         return cur - offset;
     }

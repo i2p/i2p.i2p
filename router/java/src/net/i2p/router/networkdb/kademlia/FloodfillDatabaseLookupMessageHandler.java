@@ -9,7 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.HandlerJobBuilder;
@@ -43,7 +43,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
-        _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
+        _context.statManager().addRateData("netDb.lookupsReceived", 1);
 
         DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
         if (!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())) {

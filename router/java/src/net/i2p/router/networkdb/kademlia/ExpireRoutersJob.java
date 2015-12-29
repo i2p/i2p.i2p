@@ -12,8 +12,8 @@ import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -43,7 +43,7 @@ class ExpireRoutersJob extends JobImpl {
     public String getName() { return "Expire Routers Job"; }
 
     public void runJob() {
-        if (getContext().commSystem().getReachabilityStatus() != CommSystemFacade.STATUS_DISCONNECTED) {
+        if (getContext().commSystem().getStatus() != Status.DISCONNECTED) {
             int removed = expireKeys();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Routers expired: " + removed);

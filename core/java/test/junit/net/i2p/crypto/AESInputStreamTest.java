@@ -23,7 +23,7 @@ import net.i2p.util.RandomSource;
 public class AESInputStreamTest extends TestCase {
     public void testMultiple() throws Exception{
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();
-        byte iv[] = "there once was a".getBytes();
+        byte iv[] = DataHelper.getASCII("there once was a");
         
         int[] sizes = {1024 * 32, 20, 3, 0};
         
@@ -70,7 +70,7 @@ public class AESInputStreamTest extends TestCase {
         RandomSource.getInstance().nextBytes(orig);
         
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();
-        byte iv[] = "there once was a".getBytes();
+        byte iv[] = DataHelper.getASCII("there once was a");
         
         ByteArrayOutputStream origStream = new ByteArrayOutputStream(512);
         AESOutputStream out = new AESOutputStream(ctx, origStream, key, iv);

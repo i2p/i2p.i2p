@@ -15,8 +15,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import net.i2p.client.I2PClient;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  * Listen for connections on the specified port, and toss them onto the client manager's
@@ -64,7 +66,9 @@ class ClientListenerRunner implements Runnable {
             return new ServerSocket(_port, 0, InetAddress.getByName(listenInterface));
         }
     }
-                
+
+    public void run() { runServer(); }
+
     /** 
      * Start up the socket listener, listens for connections, and
      * fires those connections off via {@link #runConnection runConnection}.  
@@ -72,16 +76,21 @@ class ClientListenerRunner implements Runnable {
      * failure.
      *
      */
-    public void runServer() {
+    protected void runServer() {
         _running = true;
         int curDelay = 1000;
+        final String portMapperService = (this instanceof SSLClientListenerRunner) ? PortMapper.SVC_I2CP_SSL
+                                                                                   : PortMapper.SVC_I2CP;
         while (_running) {
             try {
                 _socket = getServerSocket();
                 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ServerSocket created, before accept: " + _socket);
-                
+                if (_port > 0) {
+                    // not for DomainClientListenerRunner
+                    _context.portMapper().register(portMapperService, _socket.getInetAddress().getHostAddress(), _port);
+                }                
                 curDelay = 1000;
                 _listening = true;
                 while (_running) {
@@ -90,6 +99,7 @@ class ClientListenerRunner implements Runnable {
                         if (validate(socket)) {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Connection received");
+                            socket.setKeepAlive(true);
                             runConnection(socket);
                         } else {
                             if (_log.shouldLog(Log.WARN))
@@ -99,18 +109,23 @@ class ClientListenerRunner implements Runnable {
                             } catch (IOException ioe) {}
                         }
                     } catch (IOException ioe) {
-                        if (_context.router().isAlive()) 
+                        if (isAlive()) 
                             _log.error("Server error accepting", ioe);
                     } catch (Throwable t) {
-                        if (_context.router().isAlive()) 
+                        if (isAlive()) 
                             _log.error("Fatal error running client listener - killing the thread!", t);
                         _listening = false;
                         return;
                     }
                 }
             } catch (IOException ioe) {
-                if (_context.router().isAlive()) 
+                if (isAlive()) 
                     _log.error("Error listening on port " + _port, ioe);
+            } finally {
+                if (_port > 0) {
+                    // not for DomainClientListenerRunner
+                    _context.portMapper().unregister(portMapperService);
+                }                
             }
             
             _listening = false;
@@ -119,7 +134,7 @@ class ClientListenerRunner implements Runnable {
                 _socket = null; 
             }
             
-            if (!_context.router().isAlive()) break;
+            if (!isAlive()) break;
             
             if (curDelay < 60*1000)
                 _log.error("Error listening, waiting " + (curDelay/1000) + "s before we try again");
@@ -129,11 +144,20 @@ class ClientListenerRunner implements Runnable {
             curDelay = Math.min(curDelay*3, 60*1000);
         }
 
-        if (_context.router().isAlive())
+        if (isAlive())
             _log.error("CANCELING I2CP LISTEN", new Exception("I2CP Listen cancelled!!!"));
         _running = false;
     }
     
+    /** 
+     *  Just so unit tests don't NPE, where router could be null.
+     *  @since 0.9.20
+     */
+    private boolean isAlive() {
+        Router r = _context.router();
+        return r == null || r.isAlive();
+    }	
+
     /** give the i2cp client 5 seconds to show that they're really i2cp clients */
     protected final static int CONNECT_TIMEOUT = 5*1000;
     private final static int LOOP_DELAY = 250;
@@ -173,5 +197,4 @@ class ClientListenerRunner implements Runnable {
             _socket = null;
         } catch (IOException ioe) {}
     }
-    public void run() { runServer(); }
 }

@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterAddress;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterAddress;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.kademlia.KBucketSet;
 import net.i2p.kademlia.SelectionCollector;
 import net.i2p.kademlia.XORComparator;
@@ -245,6 +245,10 @@ class FloodfillPeerSelector extends PeerSelector {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Old: " + entry);
+            } else if (info != null && _context.commSystem().isInBadCountry(info)) {
+                badff.add(entry);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Bad country: " + entry);
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 double maxGoodRespTime = MAX_GOOD_RESP_TIME;

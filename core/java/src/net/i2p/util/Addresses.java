@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import net.i2p.I2PAppContext;
 
 /**
@@ -60,10 +62,16 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning: When includeLocal is false,
+     *  all returned addresses should be routable, but they are not necessarily
+     *  appropriate for external use. For example, Teredo and 6to4 addresses
+     *  are included with IPv6 results. Additional validation is recommended.
+     *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
      *  @return a sorted set of all addresses including wildcard
      *  @param includeLocal whether to include local
      *  @param includeIPv6 whether to include IPV6
-     *  @return an array of all addresses
+     *  @return a Set of all addresses
      *  @since 0.8.3
      */
     public static SortedSet<String> getAddresses(boolean includeLocal, boolean includeIPv6) {
@@ -71,11 +79,17 @@ public abstract class Addresses {
     }
 
     /**
+     *  Warning: When includeSiteLocal and includeLoopbackAndWildcard are false,
+     *  all returned addresses should be routable, but they are not necessarily
+     *  appropriate for external use. For example, Teredo and 6to4 addresses
+     *  are included with IPv6 results. Additional validation is recommended.
+     *  See e.g. TransportUtil.isPubliclyRoutable().
+     *
      *  @return a sorted set of all addresses
      *  @param includeSiteLocal whether to include private like 192.168.x.x
      *  @param includeLoopbackAndWildcard whether to include 127.x.x.x and 0.0.0.0
      *  @param includeIPv6 whether to include IPV6
-     *  @return an array of all addresses
+     *  @return a Set of all addresses
      *  @since 0.9.4
      */
     public static SortedSet<String> getAddresses(boolean includeSiteLocal,
@@ -117,7 +131,15 @@ public abstract class Addresses {
                     }
                 }
             }
-        } catch (SocketException e) {}
+        } catch (SocketException e) {
+        } catch (java.lang.Error e) {
+            // Windows, possibly when IPv6 only...
+            // https://bugs.openjdk.java.net/browse/JDK-8046500
+            // java.lang.Error: IP Helper Library GetIfTable function failed
+            //   at java.net.NetworkInterface.getAll(Native Method)
+            //   at java.net.NetworkInterface.getNetworkInterfaces(Unknown Source)
+            //   at net.i2p.util.Addresses.getAddresses ...
+        }
 
         if (includeLoopbackAndWildcard) {
             if (haveIPv4)
@@ -229,10 +251,10 @@ public abstract class Addresses {
         I2PAppContext ctx = I2PAppContext.getCurrentContext();
         if (ctx != null && ctx.isRouterContext()) {
             long maxMemory = SystemVersion.getMaxMemory();
-            long min = 128;
+            long min = 256;
             long max = 4096;
-            // 512 nominal for 128 MB
-            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (256*1024))));
+            // 1024 nominal for 128 MB
+            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (128*1024))));
         } else {
             size = 32;
         }
@@ -260,12 +282,9 @@ public abstract class Addresses {
         }
         if (rv == null) {
             try {
-                boolean isIPv4 = host.replaceAll("[0-9\\.]", "").length() == 0;
-                if (isIPv4 && host.replaceAll("[0-9]", "").length() != 3)
-                    return null;
                 rv = InetAddress.getByName(host).getAddress();
-                if (isIPv4 ||
-                    host.replaceAll("[0-9a-fA-F:]", "").length() == 0) {
+                if (InetAddressUtils.isIPv4Address(host) ||
+                    InetAddressUtils.isIPv6Address(host)) {
                     synchronized (_IPAddress) {
                         _IPAddress.put(host, rv);
                     }

@@ -11,7 +11,7 @@ package net.i2p.router.message;
 import java.util.Date;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -43,22 +43,40 @@ public class SendMessageDirectJob extends JobImpl {
     private boolean _sent;
     private long _searchOn;
     
+    /**
+     * @param toPeer may be ourselves
+     */
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, int timeoutMs, int priority) {
         this(ctx, message, toPeer, null, null, null, null, timeoutMs, priority);
     }
 
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
+    /**
+     * @param toPeer may be ourselves
+     * @param onSuccess may be null
+     * @param onFail may be null
+     * @param selector be null
+     */
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess,
+                                Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         this(ctx, message, toPeer, null, onSuccess, onFail, selector, timeoutMs, priority);
     }
 
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
+    /**
+     * @param toPeer may be ourselves
+     * @param onSend may be null
+     * @param onSuccess may be null
+     * @param onFail may be null
+     * @param selector be null
+     */
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess,
+                                Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         super(ctx);
         _log = getContext().logManager().getLog(SendMessageDirectJob.class);
         _message = message;
         _targetHash = toPeer;
         if (timeoutMs < 10*1000) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Very little time given [" + timeoutMs + "], resetting to 5s", new Exception("stingy bastard"));
+                _log.warn("Very little time given [" + timeoutMs + "], resetting to 5s", new Exception("stingy caller!"));
             _expiration = ctx.clock().now() + 10*1000;
         } else {
             _expiration = timeoutMs + ctx.clock().now();

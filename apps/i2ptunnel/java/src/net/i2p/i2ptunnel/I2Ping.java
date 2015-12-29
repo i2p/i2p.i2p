@@ -4,8 +4,9 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -67,7 +69,7 @@ public class I2Ping extends I2PTunnelClientBase {
         // Notify constructor that port is ready
         synchronized (this) {
             listenerReady = true;
-            notify();
+            notifyAll();
         }
         l.log("*** I2Ping results:");
         try {
@@ -92,7 +94,7 @@ public class I2Ping extends I2PTunnelClientBase {
       int localPort = 0;
       int remotePort = 0;
       boolean error = false;
-      String[] argv = cmd.split(" ");
+      String[] argv = DataHelper.split(cmd, " ");
       Getopt g = new Getopt("ping", argv, "t:m:n:chl:f:p:");
       int c;
       while ((c = g.getopt()) != -1) {
@@ -157,7 +159,7 @@ public class I2Ping extends I2PTunnelClientBase {
       }
 
       if (hostListFile != null) {
-            BufferedReader br = new BufferedReader(new FileReader(hostListFile));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(hostListFile), "UTF-8"));
             String line;
             List<PingHandler> pingHandlers = new ArrayList<PingHandler>();
             int i = 0;

@@ -250,7 +250,12 @@ div.newsheadings {
 
 div.newsheadings li {
      list-style: none outside url('images/newsbullet_mini.png');
-     margin: 0 -4px 2px 8px;
+     margin: 4px -4px 2px 10px;
+     line-height: 120%;
+}
+
+div.newsheadings li:first-child {
+     margin-top: 0;
 }
 
 div.tunnels {
@@ -1088,7 +1093,7 @@ button:active {
      padding: 2px 5px;
      color: #001;
      font-size: 7pt;
-     width: 310px;
+     width: 330px;
      text-align: right;
      float: right;
      vertical-align: middle;

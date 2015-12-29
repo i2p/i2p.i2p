@@ -1,8 +1,8 @@
 package net.i2p.router.transport.udp;
 
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SipHash;
 
 /**
@@ -17,7 +17,7 @@ class IPThrottler {
     public IPThrottler(int max, long time) {
         _max = max;
         _counter = new ObjectCounter<Integer>();
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), time);
+        SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(), time);
     }
 
     /**

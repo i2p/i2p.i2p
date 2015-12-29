@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.crypto.SigType;
 
 /**
  * KeysAndCert has a public key, a signing key, and a certificate.
@@ -51,6 +52,22 @@ public class KeysAndCert extends DataStructureImpl {
         _certificate = cert;
     }
 
+    /**
+     *  @return null if not set or unknown
+     *  @since 0.9.17
+     */
+    public SigType getSigType() {
+        if (_certificate == null)
+            return null;
+        if (_certificate.getCertificateType() == Certificate.CERTIFICATE_TYPE_KEY) {
+            try {
+                KeyCertificate kcert = _certificate.toKeyCertificate();
+                return kcert.getSigType();
+            } catch (DataFormatException dfe) {}
+        }
+        return SigType.DSA_SHA1;
+    }
+
     public PublicKey getPublicKey() {
         return _publicKey;
     }
@@ -75,6 +92,13 @@ public class KeysAndCert extends DataStructureImpl {
         if (_signingKey != null)
             throw new IllegalStateException();
         _signingKey = key;
+    }
+    
+    /**
+     * @since 0.9.16
+     */
+    public byte[] getPadding() {
+        return _padding;
     }
     
     /**
@@ -114,6 +138,8 @@ public class KeysAndCert extends DataStructureImpl {
         _publicKey.writeBytes(out);
         if (_padding != null)
             out.write(_padding);
+        else if (_signingKey.length() < SigningPublicKey.KEYSIZE_BYTES)
+            throw new DataFormatException("No padding set");
         _signingKey.writeTruncatedBytes(out);
         _certificate.writeBytes(out);
     }
@@ -130,17 +156,19 @@ public class KeysAndCert extends DataStructureImpl {
                && DataHelper.eq(_certificate, ident._certificate);
     }
     
-    /** the public key has enough randomness in it to use it by itself for speed */
+    /** the signing key has enough randomness in it to use it by itself for speed */
     @Override
     public int hashCode() {
-        if (_publicKey == null)
+        // don't use public key, some app devs thinking of using
+        // an all-zeros or leading-zeros public key for destinations
+        if (_signingKey == null)
             return 0;
-        return _publicKey.hashCode();
+        return _signingKey.hashCode();
     }
     
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(256);
         buf.append('[').append(getClass().getSimpleName()).append(": ");
         buf.append("\n\tHash: ").append(getHash().toBase64());
         buf.append("\n\tCertificate: ").append(_certificate);

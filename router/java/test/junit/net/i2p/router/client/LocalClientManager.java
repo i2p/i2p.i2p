@@ -36,9 +36,10 @@ class LocalClientManager extends ClientManager {
 
     @Override
     protected void startListeners() {
-        _listener = new LocalClientListenerRunner(_ctx, this, _port);
-        Thread t = new I2PThread(_listener, "ClientListener:" + _port, true);
+        ClientListenerRunner listener = new LocalClientListenerRunner(_ctx, this, _port);
+        Thread t = new I2PThread(listener, "ClientListener:" + _port, true);
         t.start();
+        _listeners.add(listener);
         _isStarted = true;
     }
 
@@ -57,12 +58,12 @@ class LocalClientManager extends ClientManager {
         if (runner != null) {
             runner.receiveMessage(toDest, fromDest, payload);
             if (sender != null)
-                sender.updateMessageDeliveryStatus(msgId, messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
+                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
         } else {
             // remote.  ignore.
             System.out.println("Message " + msgId + " is targeting a REMOTE destination - DROPPED");
             if (sender != null)
-                sender.updateMessageDeliveryStatus(msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
+                sender.updateMessageDeliveryStatus(fromDest, msgId, messageNonce, MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE);
         }
     }
 
@@ -72,7 +73,7 @@ class LocalClientManager extends ClientManager {
         ClientManager mgr = new LocalClientManager(ctx, port);
         mgr.start();
         System.out.println("Listening on port " + port);
-        try { Thread.sleep(5*60*1000); } catch (InterruptedException ie) {}
+        try { Thread.sleep(60*60*1000); } catch (InterruptedException ie) {}
         System.out.println("Done listening on port " + port);
     }
 }

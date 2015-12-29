@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io.block;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -57,13 +58,14 @@ import net.i2p.util.Log;
  *    free list start (unsigned int)
  *    is mounted (unsigned short) 0 = no, 1 = yes
  *    span size (unsigned short)
+ *    block size (unsigned int)
  *
  * Metaindex skiplist is on page 2
  *
  * Pages are 1 KB and are numbered starting from 1.
  * e.g. the Metaindex skiplist is at offset 1024 bytes
  */
-public class BlockFile {
+public class BlockFile implements Closeable {
 	public static final int PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
 	public final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
@@ -71,7 +73,9 @@ public class BlockFile {
 	public final RandomAccessInterface file;
 
 	private static final int MAJOR = 0x01;
-	private static final int MINOR = 0x01;
+	private static final int MINOR = 0x02;
+	private static final int MIN_MAJOR = 0x01;
+	private static final int MIN_MINOR = 0x01;
 	// I2P changed magic number, format changed, magic numbers now on all pages
 	private static final long MAGIC_BASE = 0x3141de4932500000L;   // 0x3141de I 2 P 00 00
 	private static final long MAGIC = MAGIC_BASE | (MAJOR << 8) | MINOR;
@@ -109,6 +113,8 @@ public class BlockFile {
 		file.writeInt(	freeListStart);
 		file.writeShort(mounted);
 		file.writeShort(spanSize);
+		// added in version 1.2
+		file.writeInt(PAGESIZE);
 	}
 
 	private void readSuperBlock() throws IOException {
@@ -118,6 +124,7 @@ public class BlockFile {
 		freeListStart	= file.readUnsignedInt();
 		mounted			= file.readUnsignedShort();
 		spanSize		= file.readUnsignedShort();
+		// assume 1024 page size
 	}
 
 	/**
@@ -140,7 +147,7 @@ public class BlockFile {
 			bf.bfck(true);
 			bf.close();
 			raif.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -293,9 +300,13 @@ public class BlockFile {
 
 		readSuperBlock();
 		if(magicBytes != MAGIC) {
-			if((magicBytes & MAGIC_BASE) == MAGIC_BASE) {
-				throw new IOException("Expected " + MAJOR + '.' + MINOR +
-				                      " but got " + (magicBytes >> 8 & 0xff) + '.' + (magicBytes & 0xff));
+			if ((magicBytes & MAGIC_BASE) == MAGIC_BASE) {
+				long major = (magicBytes >> 8) & 0xff;
+				long minor = magicBytes & 0xff;
+				if (major < MIN_MAJOR ||
+				    (major == MIN_MAJOR && minor < MIN_MINOR))
+				    throw new IOException("Expected " + MAJOR + '.' + MINOR +
+				                          " but got " + major + '.' + minor);
 			} else {
 				throw new IOException("Bad magic number");
 			}

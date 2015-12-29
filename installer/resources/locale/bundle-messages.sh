@@ -19,12 +19,12 @@ then
 fi
 
 # on windows, one must specify the path of commnad find
-# since windows has its own retarded version of find.
+# since windows has its own version of find.
 if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-# set LG2 to the language you need in envrionment varibales to enable this
+# set LG2 to the language you need in environment variables to enable this
 
 JPATHS=".."
 for i in po/messages_*.po

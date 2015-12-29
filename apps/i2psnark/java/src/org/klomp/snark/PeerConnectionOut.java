@@ -22,15 +22,15 @@ package org.klomp.snark;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-//import net.i2p.util.SimpleScheduler;
 //import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
@@ -43,7 +43,7 @@ class PeerConnectionOut implements Runnable
   private boolean quit;
 
   // Contains Messages.
-  private final List<Message> sendQueue = new ArrayList<Message>();
+  private final BlockingQueue<Message> sendQueue = new LinkedBlockingQueue<Message>();
   
   private static final AtomicLong __id = new AtomicLong();
   private final long _id;
@@ -125,6 +125,16 @@ class PeerConnectionOut implements Runnable
                             if (state.choking) {
                               it.remove();
                               //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                              if (peer.supportsFast()) {
+                                  Message r = new Message();
+                                  r.type = Message.REJECT;
+                                  r.piece = nm.piece;
+                                  r.begin = nm.begin;
+                                  r.length = nm.length;
+                                  if (_log.shouldLog(Log.DEBUG))
+                                      _log.debug("Send " + peer + ": " + r);
+                                   r.sendMessage(dout);
+                              }
                             }
                             nm = null;
                           }
@@ -142,8 +152,8 @@ class PeerConnectionOut implements Runnable
                             it.remove();
                           }
                       }
-                    if (m == null && !sendQueue.isEmpty()) {
-                      m = sendQueue.remove(0);
+                    if (m == null) {
+                      m = sendQueue.poll();
                       //SimpleTimer.getInstance().removeEvent(m.expireEvent);
                     }
                   }
@@ -160,6 +170,8 @@ class PeerConnectionOut implements Runnable
                 lastSent = System.currentTimeMillis();
 
                 // Remove all piece messages after sending a choke message.
+                // FiXME this causes REJECT messages to be sent before sending the CHOKE;
+                // BEP 6 recommends sending them after.
                 if (m.type == Message.CHOKE)
                   removeMessage(Message.PIECE);
 
@@ -234,7 +246,7 @@ class PeerConnectionOut implements Runnable
   {
     synchronized(sendQueue)
       {
-        sendQueue.add(m);
+        sendQueue.offer(m);
         sendQueue.notifyAll();
       }
   }
@@ -278,11 +290,22 @@ class PeerConnectionOut implements Runnable
         while (it.hasNext())
           {
             Message m = it.next();
-            if (m.type == type)
-              {
+            if (m.type == type) {
                 it.remove();
                 removed = true;
-              }
+                if (type == Message.PIECE && peer.supportsFast()) {
+                    Message r = new Message();
+                    r.type = Message.REJECT;
+                    r.piece = m.piece;
+                    r.begin = m.begin;
+                    r.length = m.length;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Send " + peer + ": " + r);
+                    try {
+                        r.sendMessage(dout);
+                    } catch (IOException ioe) {}
+                }
+            }
           }
         sendQueue.notifyAll();
       }
@@ -297,7 +320,7 @@ class PeerConnectionOut implements Runnable
     synchronized(sendQueue)
       {
         if(sendQueue.isEmpty())
-          sendQueue.add(m);
+          sendQueue.offer(m);
         sendQueue.notifyAll();
       }
   }
@@ -350,12 +373,19 @@ class PeerConnectionOut implements Runnable
 
   void sendBitfield(BitField bitfield)
   {
-    Message m = new Message();
-    m.type = Message.BITFIELD;
-    m.data = bitfield.getFieldBytes();
-    m.off = 0;
-    m.len = m.data.length;
-    addMessage(m);
+    boolean fast = peer.supportsFast();
+    if (fast && bitfield.complete()) {
+        sendHaveAll();
+    } else if (fast && bitfield.count() <= 0) {
+        sendHaveNone();
+    } else {
+       Message m = new Message();
+       m.type = Message.BITFIELD;
+       m.data = bitfield.getFieldBytes();
+       m.off = 0;
+       m.len = m.data.length;
+       addMessage(m);
+    }
   }
 
   /** reransmit requests not received in 7m */
@@ -480,7 +510,6 @@ class PeerConnectionOut implements Runnable
     m.len = length;
     // since we have the data already loaded, queue a timeout to remove it
     // no longer prefetched
-    //SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     addMessage(m);
   }
 
@@ -511,7 +540,8 @@ class PeerConnectionOut implements Runnable
   }
 
   /**
-   *  Remove all Request messages from the queue
+   *  Remove all Request messages from the queue.
+   *  Does not send a cancel message.
    *  @since 0.8.2
    */
   void cancelRequestMessages() {
@@ -523,9 +553,12 @@ class PeerConnectionOut implements Runnable
       }
   }
 
-  // Called by the PeerState when the other side doesn't want this
-  // request to be handled anymore. Removes any pending Piece Message
-  // from out send queue.
+  /**
+   *  Called by the PeerState when the other side doesn't want this
+   *  request to be handled anymore. Removes any pending Piece Message
+   *  from out send queue.
+   *  Does not send a cancel message.
+   */
   void cancelRequest(int piece, int begin, int length)
   {
     synchronized (sendQueue)
@@ -559,6 +592,52 @@ class PeerConnectionOut implements Runnable
     Message m = new Message();
     m.type = Message.PORT;
     m.piece = port;
+    addMessage(m);
+  }
+
+  /**
+   *  Unused
+   *  @since 0.9.21
+   */
+  void sendSuggest(int piece) {
+    Message m = new Message();
+    m.type = Message.SUGGEST;
+    m.piece = piece;
+    addMessage(m);
+  }
+
+  /** @since 0.9.21 */
+  private void sendHaveAll() {
+    Message m = new Message();
+    m.type = Message.HAVE_ALL;
+    addMessage(m);
+  }
+
+  /** @since 0.9.21 */
+  private void sendHaveNone() {
+    Message m = new Message();
+    m.type = Message.HAVE_NONE;
+    addMessage(m);
+  }
+
+  /** @since 0.9.21 */
+  void sendReject(int piece, int begin, int length) {
+    Message m = new Message();
+    m.type = Message.REJECT;
+    m.piece = piece;
+    m.begin = begin;
+    m.length = length;
+    addMessage(m);
+  }
+
+  /**
+   *  Unused
+   *  @since 0.9.21
+   */
+  void sendAllowedFast(int piece) {
+    Message m = new Message();
+    m.type = Message.ALLOWED_FAST;
+    m.piece = piece;
     addMessage(m);
   }
 }

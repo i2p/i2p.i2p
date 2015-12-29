@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io.block.index;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -50,7 +51,7 @@ import net.i2p.util.Log;
  *
  * Always fits on one page.
  */
-public class BSkipList extends SkipList {
+public class BSkipList extends SkipList implements Closeable {
 	private static final long MAGIC = 0x536b69704c697374l;  // "SkipList"
 	public int firstSpanPage = 0;
 	public int firstLevelPage = 0;
@@ -82,6 +83,8 @@ public class BSkipList extends SkipList {
 		size = bf.file.readUnsignedInt();
 		int spans = bf.file.readInt();
 		int levelCount = bf.file.readInt();
+                // two byte spansize as of version 1.2, ignore for now
+                // int ss = bf.file.readUnsignedShort(); if (ss > 0) ...
 		//System.out.println(size + " " + spans); 
 
 		this.fileOnly = fileOnly;
@@ -89,7 +92,9 @@ public class BSkipList extends SkipList {
 			first = new IBSkipSpan(bf, this, firstSpanPage, key, val);
 		else
 			first = new BSkipSpan(bf, this, firstSpanPage, key, val);
-		stack = new BSkipLevels(bf, firstLevelPage, this);
+		BSkipLevels bstack = new BSkipLevels(bf, firstLevelPage, this);
+		bstack.initializeLevels();
+		stack = bstack;
 		int total = 0;
 		for (BSkipSpan ss : spanHash.values()) {
 			total += ss.nKeys;
@@ -171,6 +176,8 @@ public class BSkipList extends SkipList {
 		bf.file.writeInt(0);
 		bf.file.writeInt(1);
 		bf.file.writeInt(1);
+                // added in version 1.2
+		bf.file.writeShort(spanSize);
 		BSkipSpan.init(bf, firstSpan, spanSize);
 		BSkipLevels.init(bf, firstLevel, firstSpan, 4);
 	}

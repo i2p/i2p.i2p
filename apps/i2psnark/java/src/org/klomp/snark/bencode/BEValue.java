@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 
 /**
  * Holds different types that a bencoded byte array can represent.
@@ -208,7 +209,7 @@ public class BEValue
           } else if (bin) {
               buf.append(bs.length).append(" bytes: ").append(Base64.encode(bs));
           } else {
-              buf.append('"').append(new String(bs)).append('"');
+              buf.append('"').append(DataHelper.getUTF8(bs)).append('"');
           }
           valueString = buf.toString();
         } else

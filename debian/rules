@@ -103,6 +103,11 @@ createcopyright:
 override_dh_compress:
 	dh_compress -X.xsl -X.xml
 
+override_dh_install:
+	dh_install --list-missing
+	dh_apparmor --profile-name=system_i2p -pi2p
+	dh_apparmor --profile-name=usr.bin.i2prouter -pi2p
+
 override_dh_installchangelogs:
 	dh_installchangelogs history.txt
 

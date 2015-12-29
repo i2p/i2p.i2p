@@ -33,7 +33,7 @@ import net.i2p.util.SimpleTimer2;
  *
  * Unused directly - see PumpedTunnelGateway, ThrottledPumpedTunnelGateway, and TunnelGatewayZeroHop overrides.
  */
-class TunnelGateway {
+abstract class TunnelGateway {
     protected final RouterContext _context;
     protected final Log _log;
     protected final List<PendingGatewayMessage> _queue;

@@ -4,6 +4,15 @@
     "http://java.sun.com/j2ee/dtds/web-app_2.2.dtd">
 
 <web-app>
+    <filter>
+        <filter-name>XSSFilter</filter-name>
+        <filter-class>net.i2p.servlet.filters.XSSFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>XSSFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- precompiled servlets -->
 
     <!-- yeah we could do this in a handler but this is easier -->
@@ -23,10 +32,14 @@
         <url-pattern>/wizard</url-pattern>
     </servlet-mapping>
 
+    <!-- this webapp doesn't actually use sessions or cookies -->
     <session-config>
         <session-timeout>
             30
         </session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
     </session-config>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

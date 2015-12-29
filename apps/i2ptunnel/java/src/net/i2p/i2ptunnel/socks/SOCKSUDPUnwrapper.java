@@ -30,6 +30,8 @@ public class SOCKSUDPUnwrapper implements Source, Sink {
 
     /**
      *
+     *  May throw RuntimeException from underlying sink
+     *  @throws RuntimeException
      */
     public void send(Destination ignored_from, byte[] data) {
         SOCKSHeader h;

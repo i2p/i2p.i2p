@@ -45,11 +45,16 @@ public interface IntelCPUInfo extends CPUInfo {
      * @return true if the CPU implements at least a Atom level instruction/feature set.
      */
     public boolean IsAtomCompatible();
+
     /**
+     * Supports the SSE 3 instructions.
      * @return true if the CPU implements at least a Core2 level instruction/feature set.
      */
     public boolean IsCore2Compatible();
+
     /**
+     * Supports the SSE 3, 4.1, 4.2 instructions.
+     * In general, this requires 45nm or smaller process.
      * @return true if the CPU implements at least a Corei level instruction/feature set.
      */
     public boolean IsCoreiCompatible();

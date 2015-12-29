@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Svistwarrior273 <romanbeno273@gmail.com>, 2014
+# Roman 'Kaktuxista' Benji <romanbeno273@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-04-12 08:54+0000\n"
-"Last-Translator: Svistwarrior273 <romanbeno273@gmail.com>\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/I2P/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,6 +51,9 @@ msgstr "Holandské Antily"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "Antarktída"
@@ -103,6 +106,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "Bermudy"
 
@@ -111,6 +117,9 @@ msgstr "Brunej"
 
 msgid "Bolivia"
 msgstr "Bolívia"
+
+msgid "Bonaire"
+msgstr ""
 
 msgid "Brazil"
 msgstr "Brazília"
@@ -139,14 +148,11 @@ msgstr "Kanada"
 msgid "Cocos (Keeling) Islands"
 msgstr "Kokosové ostrovy"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Konžská demokratická republika"
+msgid "Congo"
+msgstr "Kongo"
 
 msgid "Central African Republic"
 msgstr "Stredoafrická republika"
-
-msgid "Congo"
-msgstr "Kongo"
 
 msgid "Switzerland"
 msgstr "Švajčiarsko"
@@ -244,8 +250,8 @@ msgstr "Fidži"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Falklandy (Malvíny)"
 
-msgid "Federated States of Micronesia"
-msgstr "Mikronézske federatívne štáty"
+msgid "Micronesia"
+msgstr ""
 
 msgid "Faroe Islands"
 msgstr "Faerské ostrovy"
@@ -346,8 +352,8 @@ msgstr "Britské indickooceánske územie"
 msgid "Iraq"
 msgstr "Irak"
 
-msgid "Islamic Republic of Iran"
-msgstr "Iránska islamská republika"
+msgid "Iran"
+msgstr ""
 
 msgid "Iceland"
 msgstr "Island"
@@ -385,8 +391,8 @@ msgstr "Komory"
 msgid "Saint Kitts and Nevis"
 msgstr "Svätý Krištof a Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Kórejská ľudovodemokratická republika"
+msgid "North Korea"
+msgstr ""
 
 msgid "Republic of Korea"
 msgstr "Kórejská republika"
@@ -430,8 +436,8 @@ msgstr "Luxembursko"
 msgid "Latvia"
 msgstr "Lotyšsko"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Líbya"
+msgid "Libya"
+msgstr ""
 
 msgid "Morocco"
 msgstr "Maroko"
@@ -439,8 +445,8 @@ msgstr "Maroko"
 msgid "Monaco"
 msgstr "Monako"
 
-msgid "Republic of Moldova"
-msgstr "Moldavská republika"
+msgid "Moldova"
+msgstr ""
 
 msgid "Montenegro"
 msgstr "Montenegro"
@@ -454,8 +460,8 @@ msgstr "Madagaskar"
 msgid "Marshall Islands"
 msgstr "Marshallove ostrovy"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Bývalá juhoslovanská republika Macedónsko"
+msgid "Macedonia"
+msgstr ""
 
 msgid "Mali"
 msgstr "Mali"
@@ -466,8 +472,8 @@ msgstr "Mjanmarsko"
 msgid "Mongolia"
 msgstr "Mongolsko"
 
-msgid "Macao"
-msgstr "Macao"
+msgid "Macau"
+msgstr ""
 
 msgid "Northern Mariana Islands"
 msgstr "Severné Mariány"
@@ -646,14 +652,20 @@ msgstr "Somálsko"
 msgid "Suriname"
 msgstr "Surinam"
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "Svätý Tomáš a Princov ostrov"
 
 msgid "El Salvador"
 msgstr "Salvádor"
 
-msgid "Syrian Arab Republic"
-msgstr "Sýrska arabská republika"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr ""
 
 msgid "Swaziland"
 msgstr "Svazijsko"
@@ -703,8 +715,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Taiwan"
 
-msgid "United Republic of Tanzania"
-msgstr "Tanzánijská zjednotená republika"
+msgid "Tanzania"
+msgstr ""
 
 msgid "Ukraine"
 msgstr "Ukrajina"
@@ -724,8 +736,8 @@ msgstr "Uruguaj"
 msgid "Uzbekistan"
 msgstr "Uzbekistan"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Vatikánsky mestský štát"
+msgid "Vatican"
+msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Svätý Vincent a Grenadíny"
@@ -736,8 +748,8 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Panenské ostrovy"
 
-msgid "Viet Nam"
-msgstr "Vietnam"
+msgid "Vietnam"
+msgstr ""
 
 msgid "Vanuatu"
 msgstr "Vanuatu"

@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class TestCreateSessionStream {
@@ -40,12 +41,12 @@ public class TestCreateSessionStream {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.debug("line read for valid version: " + line);
             String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + destName + " " + conOptions + "\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.info("Response to creating the session with destination " + destName + ": " + line);
             _log.debug("The above should contain SESSION STATUS RESULT=OK\n\n\n");

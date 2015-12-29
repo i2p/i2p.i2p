@@ -49,7 +49,7 @@ public class DataMessage extends FastI2NPMessageImpl {
         long size = DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
         if (size > MAX_SIZE)
-            throw new I2NPMessageException("wtf, size=" + size);
+            throw new I2NPMessageException("too large msg, size=" + size);
         _data = new byte[(int)size];
         System.arraycopy(data, curIndex, _data, 0, (int)size);
     }
@@ -70,8 +70,7 @@ public class DataMessage extends FastI2NPMessageImpl {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
         } else {
-            byte len[] = DataHelper.toLong(4, _data.length);
-            System.arraycopy(len, 0, out, curIndex, 4);
+            DataHelper.toLong(out, curIndex, 4, _data.length);
             curIndex += 4;
             System.arraycopy(_data, 0, out, curIndex, _data.length);
             curIndex += _data.length;

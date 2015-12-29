@@ -25,6 +25,8 @@ case "$1" in
             echo >> $conffile
             echo "RUN_DAEMON=" >> $conffile
             echo "I2PUSER=" >> $conffile
+            echo "ULIMIT=" >> $conffile
+            echo "CONFINE_WITH_APPARMOR=" >> $conffile
             echo "# The next value is also wrapper.java.maxmemory in /etc/i2p/wrapper.config" >> $conffile
             echo "MEMORYLIMIT=" >> $conffile
         fi
@@ -35,6 +37,8 @@ case "$1" in
         I2PUSER="$RET"
         db_get i2p/memory
         MEMORYLIMIT="$RET"
+        db_get i2p/aa
+        CONFINE_WITH_APPARMOR="$RET"
 
         cp -a -f $conffile $conffile.tmp
 
@@ -46,17 +50,20 @@ case "$1" in
             echo "I2PUSER=" >> $conffile
         test -z "$MEMORYLIMIT" || grep -Eq '^ *MEMORYLIMIT=' $conffile || \
             echo "MEMORYLIMIT=" >> $conffile
+        test -z "$ULIMIT" || grep -Eq '^ *ULIMIT=' $conffile || \
+            echo "ULIMIT=" >> $conffile
+        test -z "$CONFINE_WITH_APPARMOR" || grep -Eq '^ *CONFINE_WITH_APPARMOR=' $conffile || \
+            echo "CONFINE_WITH_APPARMOR=" >> $conffile
 
         if [ -z $RUN_DAEMON ]; then
             RUN_DAEMON="false"
             I2PUSER="i2psvc"
         fi
 
-
-
         sed -e "s/^ *RUN_DAEMON=.*/RUN_DAEMON=\"$RUN_DAEMON\"/" \
             -e "s/^ *I2PUSER=.*/I2PUSER=\"$I2PUSER\"/" \
             -e "s/^ *MEMORYLIMIT=.*/MEMORYLIMIT=\"$MEMORYLIMIT\"/" \
+            -e "s/^ *CONFINE_WITH_APPARMOR=.*/CONFINE_WITH_APPARMOR=\"$CONFINE_WITH_APPARMOR\"/" \
             < $conffile > $conffile.tmp
         mv -f $conffile.tmp $conffile
 
@@ -64,13 +71,13 @@ case "$1" in
             sed -e "s/User=.*/User=$I2PUSER/" < "$systemdservice" > "$systemdservice.tmp"
             mv -f "$systemdservice.tmp" "$systemdservice"
             chmod 0644 -f "$systemdservice"
-            if [ -x /bin/systemctl ]; then
-                    systemctl --system daemon-reload
-                    if [ $RUN_DAEMON = 'true' ]; then
-                            systemctl enable i2p.service
-                    else
-                            systemctl disable i2p.service
-                    fi
+            if grep -q 'systemd' /proc/1/comm > /dev/null 2>&1; then
+                systemctl --system daemon-reload
+                if [ $RUN_DAEMON = 'true' ]; then
+                    systemctl enable i2p.service
+                else
+                    systemctl disable i2p.service
+                fi
             fi
         fi
 
@@ -117,3 +124,4 @@ esac
 #DEBHELPER#
 
 exit 0
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

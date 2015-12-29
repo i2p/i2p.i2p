@@ -18,11 +18,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -618,11 +621,33 @@ public class BlockfileNamingService extends DummyNamingService {
     ////////// Start NamingService API
 
     /*
+     *
+     * Will strip a "www." prefix and retry if lookup fails
+     *
+     * @param hostname upper/lower case ok
      * @param options If non-null and contains the key "list", lookup in
      *                that list only, otherwise all lists
      */
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        Destination rv = lookup2(hostname, lookupOptions, storedOptions);
+        if (rv == null) {
+            // if hostname starts with "www.", strip and try again
+            // but not for www.i2p
+            hostname = hostname.toLowerCase(Locale.US);
+            if (hostname.startsWith("www.") && hostname.length() > 7) {
+                hostname = hostname.substring(4);
+                rv = lookup2(hostname, lookupOptions, storedOptions);
+            }
+        }
+        return rv;
+    }
+
+    /*
+     * @param options If non-null and contains the key "list", lookup in
+     *                that list only, otherwise all lists
+     */
+    private Destination lookup2(String hostname, Properties lookupOptions, Properties storedOptions) {
         String listname = null;
         if (lookupOptions != null)
             listname = lookupOptions.getProperty("list");
@@ -860,7 +885,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter = sl.find(beginWith);
                 else
                     iter = sl.iterator();
-                Map<String, Destination> rv = new HashMap<String, Destination>();
+                Map<String, Destination> rv = new TreeMap<String, Destination>();
                 for (int i = 0; i < skip && iter.hasNext(); i++) {
                     // don't bother validating here
                     iter.next();
@@ -892,6 +917,188 @@ public class BlockfileNamingService extends DummyNamingService {
                 return Collections.emptyMap();
             } finally {
                 deleteInvalid();
+            }
+        }
+    }
+
+    /**
+     * @param options If non-null and contains the key "list", get
+     *                from that list (default "hosts.txt", NOT all lists)
+     *                Key "skip": skip that many entries
+     *                Key "limit": max number to return
+     *                Key "search": return only those matching substring
+     *                Key "startsWith": return only those starting with
+     *                                  ("[0-9]" allowed)
+     *                Key "beginWith": start here in the iteration
+     *                Don't use both startsWith and beginWith.
+     *                Search, startsWith, and beginWith values must be lower case.
+     *  @since 0.9.20
+     */
+    @Override
+    public Map<String, String> getBase64Entries(Properties options) {
+        String listname = FALLBACK_LIST;
+        String search = null;
+        String startsWith = null;
+        String beginWith = null;
+        int limit = Integer.MAX_VALUE;
+        int skip = 0;
+        if (options != null) {
+            String ln = options.getProperty("list");
+            if (ln != null)
+                listname = ln;
+            search = options.getProperty("search");
+            startsWith = options.getProperty("startsWith");
+            beginWith = options.getProperty("beginWith");
+            if (beginWith == null && startsWith != null) {
+                if (startsWith.equals("[0-9]"))
+                    beginWith = "0";
+                else
+                    beginWith = startsWith;
+            }
+            String lim = options.getProperty("limit");
+            try {
+                limit = Integer.parseInt(lim);
+            } catch (NumberFormatException nfe) {}
+            String sk = options.getProperty("skip");
+            try {
+                skip = Integer.parseInt(sk);
+            } catch (NumberFormatException nfe) {}
+        }
+        synchronized(_bf) {
+            if (_isClosed)
+                return Collections.emptyMap();
+            try {
+                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No skiplist found for lookup in " + listname);
+                    return Collections.emptyMap();
+                }
+                SkipIterator iter;
+                if (beginWith != null)
+                    iter = sl.find(beginWith);
+                else
+                    iter = sl.iterator();
+                Map<String, String> rv = new TreeMap<String, String>();
+                for (int i = 0; i < skip && iter.hasNext(); i++) {
+                    // don't bother validating here
+                    iter.next();
+                }
+                for (int i = 0; i < limit && iter.hasNext(); ) {
+                    String key = (String) iter.nextKey();
+                    if (startsWith != null) {
+                        if (startsWith.equals("[0-9]")) {
+                            if (key.charAt(0) > '9')
+                                break;
+                        } else if (!key.startsWith(startsWith)) {
+                            break;
+                        }
+                    }
+                    DestEntry de = (DestEntry) iter.next();
+                    if (!validate(key, de, listname))
+                        continue;
+                    if (search != null && key.indexOf(search) < 0)
+                        continue;
+                    rv.put(key, de.dest.toBase64());
+                    i++;
+                }
+                return rv;
+            } catch (IOException ioe) {
+                _log.error("DB lookup error", ioe);
+                return Collections.emptyMap();
+            } catch (RuntimeException re) {
+                _log.error("DB lookup error", re);
+                return Collections.emptyMap();
+            } finally {
+                deleteInvalid();
+            }
+        }
+    }
+
+    /**
+     * @param options If non-null and contains the key "list", get
+     *                from that list (default "hosts.txt", NOT all lists)
+     *                Key "skip": skip that many entries
+     *                Key "limit": max number to return
+     *                Key "search": return only those matching substring
+     *                Key "startsWith": return only those starting with
+     *                                  ("[0-9]" allowed)
+     *                Key "beginWith": start here in the iteration
+     *                Don't use both startsWith and beginWith.
+     *                Search, startsWith, and beginWith values must be lower case.
+     *  @since 0.9.20
+     */
+    @Override
+    public Set<String> getNames(Properties options) {
+        String listname = FALLBACK_LIST;
+        String search = null;
+        String startsWith = null;
+        String beginWith = null;
+        int limit = Integer.MAX_VALUE;
+        int skip = 0;
+        if (options != null) {
+            String ln = options.getProperty("list");
+            if (ln != null)
+                listname = ln;
+            search = options.getProperty("search");
+            startsWith = options.getProperty("startsWith");
+            beginWith = options.getProperty("beginWith");
+            if (beginWith == null && startsWith != null) {
+                if (startsWith.equals("[0-9]"))
+                    beginWith = "0";
+                else
+                    beginWith = startsWith;
+            }
+            String lim = options.getProperty("limit");
+            try {
+                limit = Integer.parseInt(lim);
+            } catch (NumberFormatException nfe) {}
+            String sk = options.getProperty("skip");
+            try {
+                skip = Integer.parseInt(sk);
+            } catch (NumberFormatException nfe) {}
+        }
+        synchronized(_bf) {
+            if (_isClosed)
+                return Collections.emptySet();
+            try {
+                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No skiplist found for lookup in " + listname);
+                    return Collections.emptySet();
+                }
+                SkipIterator iter;
+                if (beginWith != null)
+                    iter = sl.find(beginWith);
+                else
+                    iter = sl.iterator();
+                Set<String> rv = new HashSet<String>();
+                for (int i = 0; i < skip && iter.hasNext(); i++) {
+                    iter.next();
+                }
+                for (int i = 0; i < limit && iter.hasNext(); ) {
+                    String key = (String) iter.nextKey();
+                    if (startsWith != null) {
+                        if (startsWith.equals("[0-9]")) {
+                            if (key.charAt(0) > '9')
+                                break;
+                        } else if (!key.startsWith(startsWith)) {
+                            break;
+                        }
+                    }
+                    if (search != null && key.indexOf(search) < 0)
+                        continue;
+                    rv.add(key);
+                    i++;
+                }
+                return rv;
+            } catch (IOException ioe) {
+                _log.error("DB lookup error", ioe);
+                return Collections.emptySet();
+            } catch (RuntimeException re) {
+                _log.error("DB lookup error", re);
+                return Collections.emptySet();
             }
         }
     }

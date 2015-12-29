@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.router.RouterIdentity;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
@@ -94,7 +94,7 @@ public class InNetMessagePool implements Service {
      * @return previous builder for this message type, or null
      * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
      */
-    public HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
+    public synchronized HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
         _handlerJobBuilders[i2npMessageType] = builder;
         return old;
@@ -103,8 +103,10 @@ public class InNetMessagePool implements Service {
     /**
      * @return previous builder for this message type, or null
      * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
+     * @deprecated unused
      */
-    public HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
+    @Deprecated
+    public synchronized HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
         _handlerJobBuilders[i2npMessageType] = null;
         return old;
@@ -434,7 +436,7 @@ public class InNetMessagePool implements Service {
                     
                 } catch (OutOfMemoryError oome) {
                     throw oome;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     if (_log.shouldLog(Log.CRIT))
                         _log.log(Log.CRIT, "Error in the tunnel gateway dispatcher", e);
                 }
@@ -467,7 +469,7 @@ public class InNetMessagePool implements Service {
                     
                 } catch (OutOfMemoryError oome) {
                     throw oome;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     if (_log.shouldLog(Log.CRIT))
                         _log.log(Log.CRIT, "Error in the tunnel data dispatcher", e);
                 }

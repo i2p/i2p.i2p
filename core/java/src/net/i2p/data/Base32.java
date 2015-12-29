@@ -56,6 +56,7 @@ public class Base32 {
     };
 
     private final static byte BAD_ENCODING = -9; // Indicates error in encoding
+
     /** Defeats instantiation. */
     private Base32() { // nop
     }
@@ -71,7 +72,7 @@ public class Base32 {
     private static void runApp(String args[]) {
         String cmd = args[0].toLowerCase(Locale.US);
         if ("encodestring".equals(cmd)) {
-            System.out.println(encode(args[1].getBytes()));
+            System.out.println(encode(DataHelper.getUTF8(args[1])));
             return;
         }
         InputStream in = System.in;
@@ -100,8 +101,8 @@ public class Base32 {
     }
 
     private static byte[] read(InputStream in) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-        byte buf[] = new byte[4096];
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
+        byte buf[] = new byte[64];
         while (true) {
             int read = in.read(buf);
             if (read < 0) break;
@@ -117,7 +118,7 @@ public class Base32 {
     }
 
     private static void decode(InputStream in, OutputStream out) throws IOException {
-        byte decoded[] = decode(new String(read(in)));
+        byte decoded[] = decode(DataHelper.getUTF8(read(in)));
         if (decoded == null) {
             System.out.println("FAIL");
             return;
@@ -136,13 +137,19 @@ public class Base32 {
     }
 
     /**
+     *  Returns lower case.
+     *  Does not add trailing '='.
+     *
      *  @param source if null will return ""
      */
     public static String encode(String source) {
-        return (source != null ? encode(source.getBytes()) : "");
+        return (source != null ? encode(DataHelper.getUTF8(source)) : "");
     }
 
     /**
+     * Returns lower case.
+     * Does not add trailing '='.
+     *
      * @param source The data to convert non-null
      */
     public static String encode(byte[] source) {
@@ -182,6 +189,8 @@ public class Base32 {
     /**
      * Decodes data from Base32 notation and
      * returns it as a string.
+     * Case-insensitive.
+     * Does not allow trailing '='.
      *
      * @param s the string to decode, if null returns null
      * @return The data as a string or null on failure
@@ -190,15 +199,18 @@ public class Base32 {
         byte[] b = decode(s);
         if (b == null)
             return null;
-        return new String(b);
+        return DataHelper.getUTF8(b);
     }
 
     /**
+     * Case-insensitive.
+     * Does not allow trailing '='.
+     *
      * @param s non-null
      * @return decoded data, null on error
      */
     public static byte[] decode(String s) {
-        return decode(s.getBytes());
+        return decode(DataHelper.getASCII(s));
     }
 
     private final static byte[] dmask = { (byte) 0xf8, (byte) 0x7c, (byte) 0x3e, (byte) 0x1f,

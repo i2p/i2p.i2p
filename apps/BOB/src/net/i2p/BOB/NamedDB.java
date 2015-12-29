@@ -64,7 +64,7 @@ public class NamedDB {
 	}
 
 	/**
-	 * Find objects in the array, returns it's index or throws exception
+	 * Find objects in the array, returns its index or throws exception
 	 * @param key
 	 * @return an objects index
 	 * @throws ArrayIndexOutOfBoundsException when key does not exist

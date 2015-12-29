@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.VariableTunnelBuildMessage;
@@ -82,7 +81,7 @@ abstract class BuildRequestor {
                 else if (isIB && i == len - 1)
                     id = ctx.tunnelDispatcher().getNewIBEPID();
                 else
-                    id = ctx.random().nextLong(TunnelId.MAX_ID_VALUE);
+                    id = 1 + ctx.random().nextLong(TunnelId.MAX_ID_VALUE - 1);
                 cfg.getConfig(i).setReceiveTunnelId(DataHelper.toLong(4, id));
             }
             
@@ -90,7 +89,7 @@ abstract class BuildRequestor {
                 cfg.getConfig(i-1).setSendTunnelId(cfg.getConfig(i).getReceiveTunnelId());
             byte iv[] = new byte[16];
             ctx.random().nextBytes(iv);
-            cfg.getConfig(i).setReplyIV(new ByteArray(iv));
+            cfg.getConfig(i).setReplyIV(iv);
             cfg.getConfig(i).setReplyKey(ctx.keyGenerator().generateSessionKey());
         }
         // This is in BuildExecutor.buildTunnel() now
@@ -139,6 +138,7 @@ abstract class BuildRequestor {
                     pairedTunnel = mgr.selectOutboundTunnel();
                     if (pairedTunnel != null &&
                         pairedTunnel.getLength() <= 1 &&
+                        mgr.getOutboundSettings().getLength() > 0 &&
                         mgr.getOutboundSettings().getLength() + mgr.getOutboundSettings().getLengthVariance() > 0) {
                         // don't build using a zero-hop expl.,
                         // as it is both very bad for anonomyity,
@@ -151,6 +151,7 @@ abstract class BuildRequestor {
                     pairedTunnel = mgr.selectInboundTunnel();
                     if (pairedTunnel != null &&
                         pairedTunnel.getLength() <= 1 &&
+                        mgr.getInboundSettings().getLength() > 0 &&
                         mgr.getInboundSettings().getLength() + mgr.getInboundSettings().getLengthVariance() > 0) {
                         // ditto
                         pairedTunnel = null;
@@ -166,7 +167,10 @@ abstract class BuildRequestor {
             exec.buildComplete(cfg, pool);
             // Not even an exploratory tunnel? We are in big trouble.
             // Let's not spin through here too fast.
-            try { Thread.sleep(250); } catch (InterruptedException ie) {}
+            // But don't let a client tunnel waiting for exploratories slow things down too much,
+            // as there may be other tunnel pools who can build
+            int ms = pool.getSettings().isExploratory() ? 250 : 25;
+            try { Thread.sleep(ms); } catch (InterruptedException ie) {}
             return false;
         }
         
@@ -236,9 +240,7 @@ abstract class BuildRequestor {
         RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
         if (ri == null)
             return false;
-        String v = ri.getOption("router.version");
-        if (v == null)
-            return false;
+        String v = ri.getVersion();
         return VersionComparator.comp(v, MIN_VARIABLE_VERSION) >= 0;
     }
 

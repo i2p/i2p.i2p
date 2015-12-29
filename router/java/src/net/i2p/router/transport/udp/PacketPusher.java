@@ -37,14 +37,13 @@ class PacketPusher implements Runnable {
     public void run() {
         while (_alive) {
             try {
-                UDPPacket packets[] = _fragments.getNextVolley();
+                List<UDPPacket> packets = _fragments.getNextVolley();
                 if (packets != null) {
-                    for (int i = 0; i < packets.length; i++) {
-                        if (packets[i] != null) // null for ACKed fragments
-                            send(packets[i]);
+                    for (int i = 0; i < packets.size(); i++) {
+                         send(packets.get(i));
                     }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.error("SSU Output Queue Error", e);
             }
         }

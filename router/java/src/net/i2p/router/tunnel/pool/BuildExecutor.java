@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.RouterInfo;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.data.router.RouterInfo;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.stat.Rate;
@@ -43,7 +43,7 @@ class BuildExecutor implements Runnable {
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
     private volatile boolean _isRunning;
     private boolean _repoll;
-    private static final int MAX_CONCURRENT_BUILDS = 10;
+    private static final int MAX_CONCURRENT_BUILDS = 13;
     /** accept replies up to a minute after we gave up on them */
     private static final long GRACE_PERIOD = 60*1000;
 
@@ -106,7 +106,7 @@ class BuildExecutor implements Runnable {
     }
 
     private int allowed() {
-        if (_context.commSystem().getReachabilityStatus() == CommSystemFacade.STATUS_DISCONNECTED)
+        if (_context.commSystem().getStatus() == Status.DISCONNECTED)
             return 0;
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
@@ -129,8 +129,10 @@ class BuildExecutor implements Runnable {
                 }
             }
         }
-        if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
-        else if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
+        if (allowed < 2)
+            allowed = 2; // Never choke below 2 builds (but congestion may)
+        else if (allowed > MAX_CONCURRENT_BUILDS)
+             allowed = MAX_CONCURRENT_BUILDS;
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
         // expire any REALLY old requests
@@ -285,6 +287,26 @@ class BuildExecutor implements Runnable {
 
     public void run() {
         _isRunning = true;
+        try {
+            run2();
+        } catch (NoSuchMethodError nsme) {
+            // http://zzz.i2p/topics/1668
+            // https://gist.github.com/AlainODea/1375759b8720a3f9f094
+            // at ObjectCounter.objects()
+            String s = "Fatal error:" +
+                       "\nJava 8 compiler used with JRE version " + System.getProperty("java.version") +
+                       " and no bootclasspath specified." +
+                       "\nUpdate to Java 8 or contact packager." +
+                       "\nStop I2P now, it will not build tunnels.";
+            _log.log(Log.CRIT, s, nsme);
+            System.out.println(s);
+            throw nsme;
+        } finally {
+            _isRunning = false;
+        }
+    }
+
+    private void run2() {
         List<TunnelPool> wanted = new ArrayList<TunnelPool>(MAX_CONCURRENT_BUILDS);
         List<TunnelPool> pools = new ArrayList<TunnelPool>(8);
         
@@ -423,7 +445,6 @@ class BuildExecutor implements Runnable {
         
         if (_log.shouldLog(Log.WARN))
             _log.warn("Done building");
-        _isRunning = false;
     }
     
     /**

@@ -9,7 +9,7 @@
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
-<%@include file="summary.jsi" %><h1><%=intl._("I2P Router Job Queue")%></h1>
+<%@include file="summary.jsi" %><h1><%=intl._t("I2P Router Job Queue")%></h1>
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.JobQueueHelper" id="jobQueueHelper" scope="request" />
  <jsp:setProperty name="jobQueueHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

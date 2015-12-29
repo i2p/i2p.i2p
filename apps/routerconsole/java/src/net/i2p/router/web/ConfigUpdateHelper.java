@@ -33,10 +33,12 @@ public class ConfigUpdateHelper extends HelperBase {
         the update page at some point */
     public static String getNewsURL(I2PAppContext ctx) {
         String url = ctx.getProperty(ConfigUpdateHandler.PROP_NEWS_URL);
-        if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL))
+        if (url != null && !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL) &&
+            !url.equals(ConfigUpdateHandler.DEFAULT_NEWS_URL) &&
+            !url.equals(ConfigUpdateHandler.OLD_DEFAULT_NEWS_URL_SU3))
             return url;
         else
-            return ConfigUpdateHandler.DEFAULT_NEWS_URL;
+            return ConfigUpdateHandler.DEFAULT_NEWS_URL_SU3;
     }
 
     public String getUpdateURL() {
@@ -49,13 +51,13 @@ public class ConfigUpdateHelper extends HelperBase {
 
     public String getProxyHost() {
         if (isInternal())
-            return _("internal") + "\" readonly=\"readonly";
+            return _t("internal") + "\" readonly=\"readonly";
         return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
     }
 
     public String getProxyPort() {
         if (isInternal())
-            return _("internal") + "\" readonly=\"readonly";
+            return _t("internal") + "\" readonly=\"readonly";
         return Integer.toString(ConfigUpdateHandler.proxyPort(_context));
     }
 
@@ -88,10 +90,14 @@ public class ConfigUpdateHelper extends HelperBase {
     }
     
     public String getUpdateUnsigned() {
-        if (_context.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED))
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"checked\" >";
-        else
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
+        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" " +
+               getChecked(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED) + '>';
+    }
+    
+    /** @since 0.9.20 */
+    public String getUpdateDevSU3() {
+        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" " +
+               getChecked(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3) + '>';
     }
     
     private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l,
@@ -105,6 +111,8 @@ public class ConfigUpdateHelper extends HelperBase {
         long ms = ConfigUpdateHandler.DEFAULT_REFRESH_FREQ;
         try { 
             ms = Long.parseLong(freq);
+            if (ms <= 0)
+                ms = -1;
         } catch (NumberFormatException nfe) {}
 
         StringBuilder buf = new StringBuilder(256);
@@ -115,9 +123,9 @@ public class ConfigUpdateHelper extends HelperBase {
                 buf.append("\" selected=\"selected");
             
             if (PERIODS[i] == -1)
-                buf.append("\">").append(_("Never")).append("</option>\n");
+                buf.append("\">").append(_t("Never")).append("</option>\n");
             else
-                buf.append("\">").append(_("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
+                buf.append("\">").append(_t("Every")).append(' ').append(DataHelper.formatDuration2(PERIODS[i])).append("</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();
@@ -135,14 +143,14 @@ public class ConfigUpdateHelper extends HelperBase {
         buf.append("<option value=\"notify\"");
         if ("notify".equals(policy) || _dontInstall)
             buf.append(" selected=\"selected\"");
-        buf.append('>').append(_("Notify only")).append("</option>");
+        buf.append('>').append(_t("Notify only")).append("</option>");
 
         buf.append("<option value=\"download\"");
         if (_dontInstall)
             buf.append(" disabled=\"disabled\"");
         else if ("download".equals(policy))
             buf.append(" selected=\"selected\"");
-        buf.append('>').append(_("Download and verify only")).append("</option>");
+        buf.append('>').append(_t("Download and verify only")).append("</option>");
         
         if (_context.hasWrapper()) {
             buf.append("<option value=\"install\"");
@@ -150,7 +158,7 @@ public class ConfigUpdateHelper extends HelperBase {
                 buf.append(" disabled=\"disabled\"");
             else if ("install".equals(policy))
                 buf.append(" selected=\"selected\"");
-            buf.append('>').append(_("Download, verify, and restart")).append("</option>");
+            buf.append('>').append(_t("Download, verify, and restart")).append("</option>");
         }
         
         buf.append("</select>\n");
@@ -163,6 +171,11 @@ public class ConfigUpdateHelper extends HelperBase {
 
     public String getZipURL() {
         return _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL, "");
+    }
+
+    /** @since 0.9.20 */
+    public String getDevSU3URL() {
+        return _context.getProperty(ConfigUpdateHandler.PROP_DEV_SU3_URL, "");
     }
 
     public String getNewsStatus() { 

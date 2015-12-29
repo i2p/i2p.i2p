@@ -5,6 +5,9 @@ package net.i2p.util;
  */
 
 import java.lang.reflect.Field;
+import java.util.TimeZone;
+
+import net.i2p.I2PAppContext;
 
 /**
  * Methods to find out what system we are running on
@@ -18,6 +21,8 @@ public abstract class SystemVersion {
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
     private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
                                           System.getProperty("os.arch").equals("amd64");
+    private static final boolean _isGentoo = System.getProperty("os.version").contains("gentoo") ||
+                                             System.getProperty("os.version").contains("hardened");  // Funtoo
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
@@ -26,6 +31,8 @@ public abstract class SystemVersion {
 
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
+    private static final boolean _oneDotEight;
+    private static final boolean _oneDotNine;
     private static final int _androidSDK;
 
     static {
@@ -60,9 +67,13 @@ public abstract class SystemVersion {
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
             _oneDotSeven = _androidSDK >= 19;
+            _oneDotEight = false;
+            _oneDotNine = false;
         } else {
             _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
-            _oneDotSeven = VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
+            _oneDotSeven = _oneDotSix && VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
+            _oneDotEight = _oneDotSeven && VersionComparator.comp(System.getProperty("java.version"), "1.8") >= 0;
+            _oneDotNine = _oneDotEight && VersionComparator.comp(System.getProperty("java.version"), "1.9") >= 0;
         }
     }
 
@@ -90,6 +101,13 @@ public abstract class SystemVersion {
      */
     public static boolean isGNU() {
         return _isGNU;
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    public static boolean isGentoo() {
+        return _isGentoo;
     }
 
     /**
@@ -125,6 +143,24 @@ public abstract class SystemVersion {
      */
     public static boolean isJava7() {
         return _oneDotSeven;
+    }
+
+    /**
+     *
+     *  @return true if Java 1.8 or higher, false for Android.
+     *  @since 0.9.15
+     */
+    public static boolean isJava8() {
+        return _oneDotEight;
+    }
+
+    /**
+     *
+     *  @return true if Java 1.9 or higher, false for Android.
+     *  @since 0.9.23
+     */
+    public static boolean isJava9() {
+        return _oneDotNine;
     }
 
     /**
@@ -169,4 +205,59 @@ public abstract class SystemVersion {
             maxMemory = 96*1024*1024l;
         return maxMemory;
     }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone() {
+        return getSystemTimeZone(I2PAppContext.getGlobalContext());
+    }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone(I2PAppContext ctx) {
+        String systemTimeZone = ctx.getProperty("i2p.systemTimeZone");
+        if (systemTimeZone != null)
+            return TimeZone.getTimeZone(systemTimeZone);
+        return TimeZone.getDefault();
+    }
+
+    /**
+     *  @since 0.9.24
+     */
+/****
+    public static void main(String[] args) {
+        System.out.println("64 bit   : " + is64Bit());
+        System.out.println("Java 6   : " + isJava6());
+        System.out.println("Java 7   : " + isJava7());
+        System.out.println("Java 8   : " + isJava8());
+        System.out.println("Java 9   : " + isJava9());
+        System.out.println("Android  : " + isAndroid());
+        if (isAndroid())
+            System.out.println("  Version: " + getAndroidVersion());
+        System.out.println("Apache   : " + isApache());
+        System.out.println("ARM      : " + isARM());
+        System.out.println("Mac      : " + isMac());
+        System.out.println("Gentoo   : " + isGentoo());
+        System.out.println("GNU      : " + isGNU());
+        System.out.println("Windows  : " + isWindows());
+        System.out.println("Wrapper  : " + hasWrapper());
+        System.out.println("x86      : " + isX86());
+        System.out.println("Max mem  : " + getMaxMemory());
+
+    }
+****/
 }

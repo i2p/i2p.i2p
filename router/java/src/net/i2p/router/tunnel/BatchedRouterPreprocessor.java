@@ -11,8 +11,8 @@ import net.i2p.router.RouterContext;
  *
  */
 class BatchedRouterPreprocessor extends BatchedPreprocessor {
-    private TunnelCreatorConfig _config;
-    protected HopConfig _hopConfig;
+    private final TunnelCreatorConfig _config;
+    protected final HopConfig _hopConfig;
     private final long _sendDelay;
     
     /** 
@@ -24,22 +24,24 @@ class BatchedRouterPreprocessor extends BatchedPreprocessor {
     /** This goes in router advanced config */
     public static final String PROP_ROUTER_BATCH_FREQUENCY = "router.batchFrequency";
     /** for client OBGWs only (our data) */
-    public static final int OB_CLIENT_BATCH_FREQ = 100;
+    public static final int OB_CLIENT_BATCH_FREQ = 75;
     /** for exploratory OBGWs only (our tunnel tests and build messages) */
-    public static final int OB_EXPL_BATCH_FREQ = 150;
+    public static final int OB_EXPL_BATCH_FREQ = 100;
     /** for IBGWs for efficiency (not our data) */
-    public static final int DEFAULT_BATCH_FREQUENCY = 250;
+    public static final int DEFAULT_BATCH_FREQUENCY = 175;
     
     /** for OBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         super(ctx, getName(cfg));
         _config = cfg;
+        _hopConfig = null;
         _sendDelay = initialSendDelay();
     }
 
     /** for IBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, HopConfig cfg) {
         super(ctx, getName(cfg));
+        _config = null;
         _hopConfig = cfg;
         _sendDelay = initialSendDelay();
     }

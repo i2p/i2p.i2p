@@ -28,6 +28,11 @@ public class NewsHelper extends ContentHelper {
     public static final String PROP_LAST_CHECKED = "routerconsole.newsLastChecked";
     /** @since 0.9.4 */
     public static final String PROP_LAST_UPDATED = "routerconsole.newsLastUpdated";
+    /**
+     * Default true
+     * @since 0.9.21
+     */
+    public static final String PROP_TRANSLATE = "routerconsole.newsTranslate";
     public static final String NEWS_FILE = "docs/news.xml";
 
     /**
@@ -51,11 +56,13 @@ public class NewsHelper extends ContentHelper {
         return mgr.isUpdateInProgress(ROUTER_SIGNED) ||
                mgr.isUpdateInProgress(ROUTER_SIGNED_SU3) ||
                mgr.isUpdateInProgress(ROUTER_UNSIGNED) ||
+               mgr.isUpdateInProgress(ROUTER_DEV_SU3) ||
                mgr.isUpdateInProgress(TYPE_DUMMY);
     }
 
     /**
-     *  Will be false if already downloaded
+     *  Release update only.
+     *  Will be false if already downloaded.
      *  @since 0.9.4 moved from NewsFetcher
      */
     public static boolean isUpdateAvailable() {
@@ -66,7 +73,8 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  Available version, will be null if already downloaded
+     *  Release update only.
+     *  Available version, will be null if already downloaded.
      *  @return null if none
      *  @since 0.9.4 moved from NewsFetcher
      */
@@ -80,6 +88,7 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Release update only.
      *  Translated message about new version available but constrained
      *  @return null if none
      *  @since 0.9.9
@@ -91,7 +100,30 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  Already downloaded but not installed version
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.23
+     */
+    public static String unsignedUpdateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_UNSIGNED, "");
+    }
+
+    /**
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.23
+     */
+    public static String devSU3UpdateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_DEV_SU3, "");
+    }
+
+    /**
+     *  Release update only.
+     *  Already downloaded but not installed version.
      *  @return null if none
      *  @since 0.9.4
      */
@@ -105,13 +137,14 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
-     *  Will be false if already downloaded
+     *  Will be false if already downloaded or if dev update disabled.
      *  @since 0.9.4 moved from NewsFetcher
      */
-    public static boolean isUnsignedUpdateAvailable() {
+    public static boolean isUnsignedUpdateAvailable(RouterContext ctx) {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return false;
-        return mgr.getUpdateAvailable(ROUTER_UNSIGNED) != null;
+        return mgr.getUpdateAvailable(ROUTER_UNSIGNED) != null &&
+               ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
     }
 
     /**
@@ -133,6 +166,38 @@ public class NewsHelper extends ContentHelper {
         ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
         if (mgr == null) return null;
         return formatUnsignedVersion(mgr.getUpdateDownloaded(ROUTER_UNSIGNED));
+    }
+
+    /**
+     *  Will be false if already downloaded or if dev update disabled.
+     *  @since 0.9.20
+     */
+    public static boolean isDevSU3UpdateAvailable(RouterContext ctx) {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return false;
+        return mgr.getUpdateAvailable(ROUTER_DEV_SU3) != null &&
+               ctx.getBooleanProperty(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3);
+    }
+
+    /**
+     *  @return null if none
+     *  @since 0.9.20
+     */
+    public static String devSU3UpdateVersion() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateAvailable(ROUTER_DEV_SU3);
+    }
+
+    /**
+     *  Already downloaded but not installed version
+     *  @return null if none
+     *  @since 0.9.20
+     */
+    public static String devSU3VersionDownloaded() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateDownloaded(ROUTER_DEV_SU3);
     }
 
     /**
@@ -161,37 +226,12 @@ public class NewsHelper extends ContentHelper {
         return mgr.getStatus();
     }
 
-    private static final String BUNDLE_NAME = "net.i2p.router.news.messages";
-
     /**
      *  If we haven't downloaded news yet, use the translated initial news file
      */
     @Override
     public String getContent() {
-        File news = new File(_page);
-        if (!news.exists()) {
-            _page = (new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml")).getAbsolutePath();
-            // don't use super, translate on-the-fly
-            Reader reader = null;
-            try {
-                char[] buf = new char[512];
-                StringBuilder out = new StringBuilder(2048);
-                reader = new TranslateReader(_context, BUNDLE_NAME, new FileInputStream(_page));
-                int len;
-                while((len = reader.read(buf)) > 0) {
-                    out.append(buf, 0, len);
-                }
-                return out.toString();
-            } catch (IOException ioe) {
-                return "";
-            } finally {
-                try {
-                    if (reader != null)
-                        reader.close();
-                } catch (IOException foo) {}
-            }
-        }
-        return super.getContent();
+        return NewsFeedHelper.getEntries(_context, 0, 2);
     }
 
     /**
@@ -269,7 +309,10 @@ public class NewsHelper extends ContentHelper {
                  buf.append(" <a href=\"/?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Show news", ctx));
              }
-             buf.append("</a>");
+             buf.append("</a>" +
+                        " - <a href=\"/news\">")
+                .append(Messages.getString("Show all news", ctx))
+                .append("</a>");
          }
          return buf.toString();
     }

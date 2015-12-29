@@ -22,6 +22,7 @@
 package net.i2p.addressbook;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +31,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import net.i2p.data.DataHelper;
 
 /**
  *  A class to iterate through a hosts.txt or config file without
@@ -41,7 +44,7 @@ import java.util.NoSuchElementException;
  *
  *  @since 0.8.7
  */
-class ConfigIterator implements Iterator<Map.Entry<String, String>> {
+class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
 
     private BufferedReader input;
     private ConfigEntry next;
@@ -54,11 +57,9 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>> {
     /**
      *  An iterator over the key/value pairs in the file.
      */
-    public ConfigIterator(File file) {
-        try {
+    public ConfigIterator(File file) throws IOException {
             FileInputStream fileStream = new FileInputStream(file);
-            input = new BufferedReader(new InputStreamReader(fileStream));
-        } catch (IOException ioe) {}
+            input = new BufferedReader(new InputStreamReader(fileStream, "UTF-8"));
     }
 
     public boolean hasNext() {
@@ -70,7 +71,7 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>> {
             String inputLine = input.readLine();
             while (inputLine != null) {
                 inputLine = ConfigParser.stripComments(inputLine);
-                String[] splitLine = inputLine.split("=");
+                String[] splitLine = DataHelper.split(inputLine, "=");
                 if (splitLine.length == 2) {
                     next = new ConfigEntry(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
                     return true;

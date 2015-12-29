@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -66,7 +67,7 @@ class SAMStreamSession {
     private final AtomicInteger lastNegativeId = new AtomicInteger();;
 
     // Can we create outgoing connections?
-    protected boolean canCreate;
+    protected final boolean canCreate;
 
     /** 
      * should we flush every time we get a STREAM SEND, or leave that up to
@@ -81,7 +82,7 @@ class SAMStreamSession {
      * Create a new SAM STREAM session.
      *
      * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
-     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
+     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
      * @throws IOException
@@ -97,7 +98,7 @@ class SAMStreamSession {
      * Create a new SAM STREAM session.
      *
      * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
-     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
+     * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data
      * @throws IOException
@@ -107,9 +108,35 @@ class SAMStreamSession {
     public SAMStreamSession(InputStream destStream, String dir,
                             Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
         this.recv = recv;
-        _log = new Log(getClass());
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+
+        boolean canReceive;
+        boolean startAcceptor;
+        if (dir.equals("BOTH")) {
+            canCreate = true;
+            canReceive = true;
+            startAcceptor = true;
+        } else if (dir.equals("__v3__")) {
+            // we are super to SAMv3StreamSession, don't start thread, he handles it
+            canCreate = true;
+            canReceive = true;
+            startAcceptor = false;
+        } else if (dir.equals("CREATE")) {
+            canCreate = true;
+            canReceive = false;
+            startAcceptor = false;
+        } else if (dir.equals("RECEIVE")) {
+            canCreate = false;
+            canReceive = true;
+            startAcceptor = true;
+        } else {
+            _log.error("BUG! Wrong direction passed to SAMStreamSession: "
+                       + dir);
+            throw new SAMException("BUG! Wrong direction specified!");
+        }
+
         if (_log.shouldLog(Log.DEBUG))
-	        _log.debug("SAM STREAM session instantiated");
+            _log.debug("SAM STREAM session instantiated");
 
         Properties allprops = (Properties) System.getProperties().clone();
         allprops.putAll(props);
@@ -121,6 +148,12 @@ class SAMStreamSession {
             i2cpPort = Integer.parseInt(port);
         } catch (NumberFormatException nfe) {
             throw new SAMException("Invalid I2CP port specified [" + port + "]");
+        }
+        if (!canReceive)
+            allprops.setProperty("i2cp.dontPublishLeaseSet", "true");
+        if (!allprops.containsKey("inbound.nickname") && !allprops.containsKey("outbound.nickname")) {
+            allprops.setProperty("inbound.nickname", "SAM TCP Client");
+            allprops.setProperty("outbound.nickname", "SAM TCP Client");
         }
 
         if (_log.shouldLog(Log.DEBUG))
@@ -137,21 +170,8 @@ class SAMStreamSession {
 
         forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
         
-        boolean canReceive = false;
-        if (dir.equals("BOTH")) {
-            canCreate = true;
-            canReceive = true;
-        } else if (dir.equals("CREATE")) {
-            canCreate = true;
-        } else if (dir.equals("RECEIVE")) {
-            canReceive = true;
-        } else {
-            _log.error("BUG! Wrong direction passed to SAMStreamSession: "
-                       + dir);
-            throw new SAMException("BUG! Wrong direction specified!");
-        }
 
-        if (canReceive) {
+        if (startAcceptor) {
             server = new SAMStreamSessionServer();
             Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
 
@@ -206,8 +226,7 @@ class SAMStreamSession {
             return false;
         }
 
-        Destination d = new Destination();
-        d.fromBase64(dest);
+        Destination d = SAMUtils.getDest(dest);
 
         I2PSocketOptions opts = socketMgr.buildOptions(props);
         if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)

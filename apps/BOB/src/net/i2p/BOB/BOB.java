@@ -38,7 +38,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer2;
 
 /**
@@ -119,15 +118,16 @@ public class BOB implements Runnable, ClientApp {
 	public final static String PROP_BOB_HOST = "BOB.host";
 	public final static String PROP_CFG_VER = "BOB.CFG.VER";
 
+	/** unused when started via the ClientApp interface */
 	private static BOB _bob;
 
-	private NamedDB database;
-	private Properties props = new Properties();
-	private AtomicBoolean spin = new AtomicBoolean(true);
+	private final NamedDB database;
+	private final Properties props = new Properties();
+	private final AtomicBoolean spin = new AtomicBoolean(true);
 	private static final String P_RUNNING = "RUNNING";
 	private static final String P_STARTING = "STARTING";
 	private static final String P_STOPPING = "STOPPING";
-	private AtomicBoolean lock = new AtomicBoolean(false);
+	private final AtomicBoolean lock = new AtomicBoolean(false);
 	// no longer used.
 	// private static int maxConnections = 0;
 
@@ -143,8 +143,9 @@ public class BOB implements Runnable, ClientApp {
 	 * Stop BOB gracefully
 	 * @deprecated unused
 	 */
-	public static void stop() {
-		_bob.shutdown(null);
+	public synchronized static void stop() {
+		if (_bob != null)
+			_bob.shutdown(null);
 	}
 
 	/**
@@ -189,7 +190,7 @@ public class BOB implements Runnable, ClientApp {
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public synchronized static void main(String[] args) {
 		try {
 			_bob = new BOB(I2PAppContext.getGlobalContext(), null, args);
 			_bob.startup();
@@ -212,9 +213,7 @@ public class BOB implements Runnable, ClientApp {
 		// Re-reading the config file in each thread is pretty damn stupid.
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
 		// This is here just to ensure there is no interference with our threadgroups.
-		SimpleScheduler Y1 = SimpleScheduler.getInstance();
 		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
-		i = Y1.hashCode();
 		i = Y2.hashCode();
 		{
 			File cfg = new File(configLocation);
@@ -248,11 +247,11 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey("inbound.length")) {
-			props.setProperty("inbound.length", "1");
+			props.setProperty("inbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("outbound.length")) {
-			props.setProperty("outbound.length", "1");
+			props.setProperty("outbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("inbound.lengthVariance")) {
@@ -339,7 +338,7 @@ public class BOB implements Runnable, ClientApp {
 
 				if (g) {
 					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
-					Thread t = new Thread(conn_c);
+					Thread t = new I2PAppThread(conn_c);
 					t.setName("BOB.DoCMDS " + i);
 					t.start();
 					i++;

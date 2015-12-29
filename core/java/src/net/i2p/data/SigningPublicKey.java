@@ -12,6 +12,7 @@ package net.i2p.data;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import net.i2p.crypto.SigType;
 
@@ -113,7 +114,8 @@ public class SigningPublicKey extends SimpleDataStructure {
     }
 
     /**
-     *  Up-convert this from an untyped (type 0) SPK to a typed SPK based on the Key Cert given
+     *  Up-convert this from an untyped (type 0) SPK to a typed SPK based on the Key Cert given.
+     *  The type of the returned key will be null if the kcert sigtype is null.
      *
      *  @throws IllegalArgumentException if this is already typed to a different type
      *  @since 0.9.12
@@ -126,6 +128,9 @@ public class SigningPublicKey extends SimpleDataStructure {
             return this;
         if (_type != SigType.DSA_SHA1)
             throw new IllegalArgumentException("Cannot convert " + _type + " to " + newType);
+        // unknown type, keep the 128 bytes of data
+        if (newType == null)
+            return new SigningPublicKey(null, _data);
         int newLen = newType.getPubkeyLen();
         if (newLen == SigType.DSA_SHA1.getPubkeyLen())
             return new SigningPublicKey(newType, _data);
@@ -145,7 +150,7 @@ public class SigningPublicKey extends SimpleDataStructure {
      *  Get the portion of this (type 0) SPK that is really padding based on the Key Cert type given,
      *  if any
      *
-     *  @return leading padding length > 0 or null
+     *  @return leading padding length > 0 or null if no padding or type is unknown
      *  @throws IllegalArgumentException if this is already typed to a different type
      *  @since 0.9.12
      */
@@ -153,7 +158,7 @@ public class SigningPublicKey extends SimpleDataStructure {
         if (_data == null)
             throw new IllegalStateException();
         SigType newType = kcert.getSigType();
-        if (_type == newType)
+        if (_type == newType || newType == null)
             return null;
         if (_type != SigType.DSA_SHA1)
             throw new IllegalStateException("Cannot convert " + _type + " to " + newType);
@@ -192,5 +197,31 @@ public class SigningPublicKey extends SimpleDataStructure {
         }
         buf.append(']');
         return buf.toString();
+    }
+
+    /**
+     *  @since 0.9.17
+     */
+    public static void clearCache() {
+        _cache.clear();
+    }
+
+    /**
+     *  @since 0.9.17
+     */
+    @Override
+    public int hashCode() {
+        return DataHelper.hashCode(_type) ^ super.hashCode();
+    }
+
+    /**
+     *  @since 0.9.17
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || !(obj instanceof SigningPublicKey)) return false;
+        SigningPublicKey s = (SigningPublicKey) obj;
+        return _type == s._type && Arrays.equals(_data, s._data);
     }
 }

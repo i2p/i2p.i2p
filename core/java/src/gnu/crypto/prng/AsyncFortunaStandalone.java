@@ -56,7 +56,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         _isRunning = true;
         _refillThread = new I2PThread(this, "PRNG");
         _refillThread.setDaemon(true);
-        _refillThread.setPriority(Thread.MIN_PRIORITY+1);
+        _refillThread.setPriority(Thread.NORM_PRIORITY - 2);
         _refillThread.start();
     }
 

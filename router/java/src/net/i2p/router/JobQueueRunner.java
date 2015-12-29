@@ -1,9 +1,11 @@
 package net.i2p.router;
 
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /** a do run run run a do run run */
-class JobQueueRunner implements Runnable {
+class JobQueueRunner extends I2PThread {
     private final Log _log;
     private final RouterContext _context;
     private volatile boolean _keepRunning;
@@ -12,18 +14,19 @@ class JobQueueRunner implements Runnable {
     private volatile Job _lastJob;
     private volatile long _lastBegin;
     private volatile long _lastEnd;
-    private volatile int _state;
+    //private volatile int _state;
     
     public JobQueueRunner(RouterContext context, int id) {
         _context = context;
         _id = id;
         _keepRunning = true;
         _log = _context.logManager().getLog(JobQueueRunner.class);
+        setPriority(NORM_PRIORITY + 1);
         // all createRateStat in JobQueue
         //_state = 1;
     }
     
-    final int getState() { return _state; }
+    //final int getState() { return _state; }
     
     public Job getCurrentJob() { return _currentJob; }
     public Job getLastJob() { return _lastJob; }
@@ -115,14 +118,12 @@ class JobQueueRunner implements Runnable {
                 //if ( (jobNum % 10) == 0)
                 //    System.gc();
             } catch (Throwable t) {
-                if (_log.shouldLog(Log.CRIT))
-                    _log.log(Log.CRIT, "WTF, error running?", t);
+                _log.log(Log.CRIT, "error running?", t);
             }
         }
         //_state = 16;
         if (_context.router().isAlive())
-            if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, "Queue runner " + _id + " exiting");
+            _log.log(Log.CRIT, "Queue runner " + _id + " exiting");
         _context.jobQueue().removeRunner(_id);
         //_state = 17;
     }
@@ -134,21 +135,15 @@ class JobQueueRunner implements Runnable {
             _currentJob.runJob();
             //_state = 19;
         } catch (OutOfMemoryError oom) {
-            //_state = 20;
             try {
-                if (_log.shouldLog(Log.CRIT))
-                    _log.log(Log.CRIT, "Router ran out of memory, shutting down", oom);
-                _log.log(Log.CRIT, _currentJob.getClass().getName());
-                _context.router().shutdown(Router.EXIT_OOM);
-            } catch (Throwable t) {	
-                System.err.println("***Router ran out of memory, shutting down hard");
-            }
-            try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-            System.exit(-1);
+                if (SystemVersion.isAndroid())
+                    _context.router().shutdown(Router.EXIT_OOM);
+                else
+                    fireOOM(oom);
+            } catch (Throwable t) {}
         } catch (Throwable t) {
             //_state = 21;
-            if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, "Error processing job [" + _currentJob.getName() 
+            _log.log(Log.CRIT, "Error processing job [" + _currentJob.getName() 
                                    + "] on thread " + _id + ": " + t.getMessage(), t);
             //if (_log.shouldLog(Log.ERROR))
             //    _log.error("The above job was enqueued by: ", _currentJob.getAddedBy());

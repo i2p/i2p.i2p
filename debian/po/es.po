@@ -1,18 +1,19 @@
-# Spanish debconf translation
-# Copyright (C) 2011 The I2P Project
-# This file is distributed under the same license as the i2p package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# Adolfo Jayme Barrientos <fitoschido@gmail.com>, 2013.
-# mixxy <m1xxy@mail.i2p>, 2011.
-#   <punkibastardo@gmail.com>, 2011.
+# Adolfo Jayme Barrientos, 2013
+# mixxy <m1xxy@mail.i2p>, 2011
+# punkibastardo <punkibastardo@gmail.com>, 2011
+# strel, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2013-02-04 02:40+0000\n"
-"Last-Translator: Adolfo Jayme Barrientos <fitoschido@gmail.com>\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-03-29 23:53+0000\n"
+"Last-Translator: strel\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/I2P/language/"
 "es/)\n"
 "Language: es\n"
@@ -90,3 +91,19 @@ msgid ""
 msgstr ""
 "Los enrutadores con ancho de banda alto, además de los enrutadores con "
 "muchos torrents/complementos activos, pueden necesitar aumentar este valor."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "Ejecutar el demonio I2P confinado con AppArmor"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""
+"Con esta opción habilitada I2P sera encerrada con AppArmor, restringiendo a "
+"qué ficheros y directorios se puede acceder por I2P."

@@ -42,6 +42,8 @@ import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.eddsa.EdDSAEngine;
+import net.i2p.crypto.eddsa.EdDSAKey;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
@@ -51,8 +53,8 @@ import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 
 /**
- *  Sign and verify using DSA-SHA1.
- *  Also contains methods to sign and verify using a SHA-256 Hash, used by Syndie only.
+ *  Sign and verify using DSA-SHA1 and other signature algorithms.
+ *  Also contains methods to sign and verify using a SHA-256 Hash.
  *
  *  The primary implementation is code from TheCryto.
  *  As of 0.8.7, also included is an alternate implementation using java.security libraries, which
@@ -67,6 +69,8 @@ import net.i2p.util.NativeBigInteger;
  *  Signature, SigningPublicKey, and SigningPrivateKey. See Javadocs for individual
  *  methods for the supported types. Methods encountering an unsupported type
  *  will throw an IllegalArgumentException.
+ *
+ *  EdDSA support added in 0.9.15
  */
 public class DSAEngine {
     private final Log _log;
@@ -85,7 +89,7 @@ public class DSAEngine {
     }
 
     /**
-     *  Verify using DSA-SHA1 or ECDSA.
+     *  Verify using any sig type.
      *  Uses TheCrypto code for DSA-SHA1 unless configured to use the java.security libraries.
      */
     public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
@@ -157,6 +161,8 @@ public class DSAEngine {
     /**
      *  Generic signature type.
      *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
+     *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @since 0.9.9
      */
@@ -182,6 +188,8 @@ public class DSAEngine {
      *  Generic signature type.
      *  If you have a Java pubkey, use this, so you don't lose the key parameters,
      *  which may be different than the ones defined in SigType.
+     *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
      *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @param pubKey Java key
@@ -249,7 +257,7 @@ public class DSAEngine {
                     _log.warn("Took too long to verify the signature (" + diff + "ms)");
             }
             return ok;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             _log.log(Log.CRIT, "Error verifying the signature", e);
             return false;
         }
@@ -277,8 +285,8 @@ public class DSAEngine {
             try {
                 return altSign(data, offset, length, signingKey);
             } catch (GeneralSecurityException gse) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(type + " Sign Fail", gse);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error(type + " Sign Fail", gse);
                 return null;
             }
         }
@@ -331,6 +339,8 @@ public class DSAEngine {
     /**
      *  Generic signature type.
      *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
+     *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @return null on error
      *  @since 0.9.9
@@ -355,6 +365,8 @@ public class DSAEngine {
      *  Generic signature type.
      *  If you have a Java privkey, use this, so you don't lose the key parameters,
      *  which may be different than the ones defined in SigType.
+     *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
      *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @param privKey Java key
@@ -491,7 +503,8 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic verify DSA_SHA1, ECDSA, or RSA
+     *  Generic verify any type.
+     *
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9 added off/len 0.9.12
      */
@@ -503,7 +516,11 @@ public class DSAEngine {
         if (type == SigType.DSA_SHA1)
             return altVerifySigSHA1(signature, data, offset, len, verifyingKey);
 
-        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new EdDSAEngine(type.getDigestInstance());
+        else
+            jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
         jsig.initVerify(pubKey);
         jsig.update(data, offset, len);
@@ -513,6 +530,9 @@ public class DSAEngine {
 
     /**
      *  Generic raw verify any type
+     *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
+     *
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9
      */
@@ -531,6 +551,8 @@ public class DSAEngine {
      *  If you have a Java pubkey, use this, so you don't lose the key parameters,
      *  which may be different than the ones defined in SigType.
      *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
+     *
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @param verifyingKey Java key
      *  @since 0.9.9
@@ -543,7 +565,11 @@ public class DSAEngine {
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
         String algo = getRawAlgo(type);
-        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
+        else
+            jsig = java.security.Signature.getInstance(algo);
         jsig.initVerify(pubKey);
         jsig.update(hash.getData());
         boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
@@ -570,7 +596,8 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic sign DSA_SHA1, ECDSA, or RSA
+     *  Generic sign any type.
+     *
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9 added off/len 0.9.12
      */
@@ -580,7 +607,11 @@ public class DSAEngine {
         if (type == SigType.DSA_SHA1)
             return altSignSHA1(data, offset, len, privateKey);
 
-        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new EdDSAEngine(type.getDigestInstance());
+        else
+            jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
         jsig.initSign(privKey, _context.random());
         jsig.update(data, offset, len);
@@ -588,7 +619,10 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic raw verify any type
+     *  Generic raw sign any type.
+     *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
+     *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
      *  @since 0.9.9
@@ -601,7 +635,10 @@ public class DSAEngine {
     }
 
     /**
-     *  Generic raw verify any type
+     *  Generic raw sign any type.
+     *
+     *  Warning, nonstandard for EdDSA, double-hashes, not recommended.
+     *
      *  @param hash SHA1Hash, Hash, Hash384, or Hash512
      *  @param type returns a Signature of this type
      *  @throws GeneralSecurityException if algorithm unvailable or on other errors
@@ -613,7 +650,11 @@ public class DSAEngine {
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
-        java.security.Signature jsig = java.security.Signature.getInstance(algo);
+        java.security.Signature jsig;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
+            jsig = new EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
+        else
+            jsig = java.security.Signature.getInstance(algo);
         jsig.initSign(privKey, _context.random());
         jsig.update(hash.getData());
         return SigUtil.fromJavaSig(jsig.sign(), type);
@@ -640,6 +681,8 @@ public class DSAEngine {
                 return "NONEwithDSA";
             case EC:
                 return "NONEwithECDSA";
+            case EdDSA:
+                return "NONEwithEdDSA";
             case RSA:
                 return "NONEwithRSA";
             default:
@@ -653,6 +696,8 @@ public class DSAEngine {
             return "NONEwithDSA";
         if (key instanceof ECKey)
             return "NONEwithECDSA";
+        if (key instanceof EdDSAKey)
+            return "NONEwithEdDSA";
         if (key instanceof RSAKey)
             return "NONEwithRSA";
         throw new UnsupportedOperationException("Raw signatures unsupported for " + key.getClass().getName());

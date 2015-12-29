@@ -78,7 +78,7 @@ public abstract class TrayManager {
         return image;
     }
     
-    protected static String _(String s) {
-        return DesktopguiTranslator._(s);
+    protected static String _t(String s) {
+        return DesktopguiTranslator._t(s);
     }
 }

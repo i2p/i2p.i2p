@@ -74,10 +74,11 @@ public class MetaInfo
    *  @param files null for single-file torrent
    *  @param lengths null for single-file torrent
    *  @param announce_list may be null
+   *  @param created_by may be null
    */
   MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length, boolean privateTorrent,
-           List<List<String>> announce_list)
+           List<List<String>> announce_list, String created_by)
   {
     this.announce = announce;
     this.name = name;
@@ -91,8 +92,8 @@ public class MetaInfo
     this.privateTorrent = privateTorrent;
     this.announce_list = announce_list;
     this.comment = null;
-    this.created_by = null;
-    this.creation_date = 0;
+    this.created_by = created_by;
+    this.creation_date = I2PAppContext.getGlobalContext().clock().now();
 
     // TODO if we add a parameter for other keys
     //if (other != null) {
@@ -444,7 +445,7 @@ public class MetaInfo
 
   /**
    * The creation date (ms) or zero.
-   * Not available for locally-created torrents.
+   * As of 0.9.19, available for locally-created torrents.
    * @since 0.9.7
    */
   public long getCreationDate() {
@@ -595,6 +596,14 @@ public class MetaInfo
             m.put("announce", announce);
         if (announce_list != null)
             m.put("announce-list", announce_list);
+        // misc. optional  top-level stuff
+        if (comment != null)
+            m.put("comment", comment);
+        if (created_by != null)
+            m.put("created by", created_by);
+        if (creation_date != 0)
+            m.put("creation date", creation_date / 1000);
+
         Map<String, BEValue> info = createInfoMap();
         m.put("info", info);
         // don't save this locally, we should only do this once

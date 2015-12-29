@@ -80,6 +80,10 @@ Public domain except as listed below:
    Copyright (c) 1998 by Aaron M. Renn (arenn@urbanophile.com)
    See licenses/LICENSE-LGPLv2.1.txt
 
+   HostnameVerifier:
+   From Apache HttpClient 4.4.1 and HttpCore 4.4.1
+   See licenses/LICENSE-Apache2.0.txt
+
 
 Router (router.jar):
 Public domain except as listed below:
@@ -87,7 +91,7 @@ Public domain except as listed below:
    From freenet
    See licenses/LICENSE-GPLv2.txt
 
-   UPnP subsystem (CyberLink) 2.1:
+   UPnP subsystem (CyberLink) 3.0:
    Copyright (C) 2003-2010 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
@@ -137,7 +141,7 @@ Installer:
 
 
 
-Java Service Wrapper Community Edition 32-bit 3.5.19:
+Java Service Wrapper Community Edition 32-bit 3.5.25:
    Copyright (C) 1999-2011 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
@@ -182,7 +186,7 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 8.1.15.v20140411:
+   Jetty 8.1.17.v20150415:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
@@ -248,8 +252,8 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 6.0.41:
-   Copyright 1999-2014 The Apache Software Foundation
+   Tomcat 6.0.44:
+   Copyright 1999-2015 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 

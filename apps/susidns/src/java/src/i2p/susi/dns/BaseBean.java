@@ -142,7 +142,7 @@ public class BaseBean
      * @since 0.9.13 moved from subclasses
      */
     public void setAction(String action) {
-        this.action = action;
+        this.action = DataHelper.stripHTML(action);
     }
 
     /**
@@ -158,14 +158,14 @@ public class BaseBean
      * @since 0.9.13 moved from subclasses
      */
     public void setSerial(String serial) {
-        this.serial = serial;
+        this.serial = DataHelper.stripHTML(serial);
     }
 
     /**
      * Translate
      * @since 0.9.13 moved from subclasses
      */
-    protected static String _(String s) {
+    protected static String _t(String s) {
         return Messages.getString(s);
     }
 
@@ -173,7 +173,7 @@ public class BaseBean
      * Translate
      * @since 0.9.13 moved from subclasses
      */
-    protected static String _(String s, Object o) {
+    protected static String _t(String s, Object o) {
         return Messages.getString(s, o);
     }
 
@@ -181,7 +181,7 @@ public class BaseBean
      * Translate
      * @since 0.9.13 moved from subclasses
      */
-    protected static String _(String s, Object o, Object o2) {
+    protected static String _t(String s, Object o, Object o2) {
         return Messages.getString(s, o, o2);
     }
 

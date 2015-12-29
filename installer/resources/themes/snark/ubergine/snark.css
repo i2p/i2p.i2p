@@ -366,6 +366,10 @@ table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
      width: 16px;
 }
 
+td.snarkFileIcon:first-child {
+     text-align: center;
+}
+
 .snarkFileName {
      padding: 4px 0px !important; 
      text-align: left !important;
@@ -526,6 +530,40 @@ a:hover {
      font-weight: bold;
 }
 
+a.control, a.controld {
+     background: #989;
+     border: 1px inset #bbb;
+     border-radius: 4px;
+     color: #000;
+     font-weight: bold;
+     margin: 2px 4px;
+     padding: 3px 4px;	
+     text-shadow: 0px 0px #410;
+     white-space: nowrap;
+}
+
+a.controld {
+     color: #444;
+     font-weight: normal;
+}
+
+a.controld img {
+     display: none;
+}
+
+a.control:hover {
+     background-color: #f60;
+     border: 1px outset #bbb;
+     color: #fff;
+     text-shadow: 0px 1px 5px #f00;
+}
+
+a.control:active {
+     background: #000 !important;
+     color: #f60 !important;
+     text-shadow: 0 !important;
+}
+
 input {
      font-size: 8.5pt;
      font-weight: bold;
@@ -598,6 +636,14 @@ input[type=radio] {
 
 input.default { width: 1px; height: 1px; visibility: hidden; }
 
+input.disabled, input.disabled:hover {
+     background-color: #989;
+     border: 1px inset #bbb;
+     color: #444;
+     font-weight: normal;
+     text-shadow: 0px 0px 0px #444;
+}
+
 input.accept {
      background: #989 url('../../console/images/accept.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
@@ -606,12 +652,6 @@ input.accept {
 
 input.add {
      background: #989 url('../../console/images/add.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
-}
-
-input.create {
-     background: #989 url('images/create.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
      min-height: 22px;
 }
@@ -636,6 +676,18 @@ input.delete {
 
 input.reload {
      background: #989 url('../../console/images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.starttorrent {
+     background: #989 url('images/start.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.stoptorrent {
+     background: #989 url('images/stop.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
      min-height: 22px;
 }

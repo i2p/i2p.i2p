@@ -2,25 +2,28 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# ducki2p <ducki2p@gmail.com>, 2011.
-# foo <foo@bar>, 2009.
-#   <jerobben@gmail.com>, 2012.
-#   <random901@zoho.com>, 2012.
+# Aman Elarbi <aman.elarbi@gmail.com>, 2014
+# ducki2p <ducki2p@gmail.com>, 2011
+# foo <foo@bar>, 2009
+# Jrnr601 <jerobben@gmail.com>, 2012
+# Desirius <martinjefmeyers@gmail.com>, 2014
+# Nathan Follens, 2015
+# attesor <random901@zoho.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2012-08-25 19:21+0000\n"
-"Last-Translator: attesor <random901@zoho.com>\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-25 16:54+0000\n"
+"Last-Translator: Nathan Follens\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/I2P/language/nl/)\n"
-"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Anonymous Proxy"
 msgstr "Anonieme Proxy"
@@ -54,6 +57,9 @@ msgstr "Nederlandse Antillen"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "Antarctica"
@@ -106,6 +112,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr "Sint-Bartholomeus"
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
@@ -114,6 +123,9 @@ msgstr "Brunei"
 
 msgid "Bolivia"
 msgstr "Bolivia"
+
+msgid "Bonaire"
+msgstr "Bonaire"
 
 msgid "Brazil"
 msgstr "Brazilië"
@@ -140,16 +152,13 @@ msgid "Canada"
 msgstr "Canada"
 
 msgid "Cocos (Keeling) Islands"
-msgstr ""
-
-msgid "The Democratic Republic of the Congo"
-msgstr "Congo, Democratische Republiek"
-
-msgid "Central African Republic"
-msgstr "Centraal-Afrikaanse Republiek"
+msgstr "Cocoseilanden (Keelingeilanden)"
 
 msgid "Congo"
 msgstr "Congo"
+
+msgid "Central African Republic"
+msgstr "Centraal-Afrikaanse Republiek"
 
 msgid "Switzerland"
 msgstr "Zwitserland"
@@ -176,7 +185,7 @@ msgid "Costa Rica"
 msgstr "Costa Rica"
 
 msgid "Serbia and Montenegro"
-msgstr ""
+msgstr "Servië en Montenegro"
 
 msgid "Cuba"
 msgstr "Cuba"
@@ -185,10 +194,10 @@ msgid "Cape Verde"
 msgstr "Kaapverdië"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
 msgid "Christmas Island"
-msgstr ""
+msgstr "Christmas Eiland"
 
 msgid "Cyprus"
 msgstr "Cyprus"
@@ -224,7 +233,7 @@ msgid "Egypt"
 msgstr "Egypte"
 
 msgid "Western Sahara"
-msgstr ""
+msgstr "West-Sahara"
 
 msgid "Eritrea"
 msgstr "Eritrea"
@@ -247,8 +256,8 @@ msgstr "Fiji"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Falklandeilanden"
 
-msgid "Federated States of Micronesia"
-msgstr "Federale Staten van Micronesia"
+msgid "Micronesia"
+msgstr "Micronesië"
 
 msgid "Faroe Islands"
 msgstr "Faeröer"
@@ -272,7 +281,7 @@ msgid "French Guiana"
 msgstr "Frans-Guyana"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
 msgstr "Ghana"
@@ -349,8 +358,8 @@ msgstr "Brits Territorium in de Indische Oceaan"
 msgid "Iraq"
 msgstr "Iraq"
 
-msgid "Islamic Republic of Iran"
-msgstr "Islamitische Republiek Iran"
+msgid "Iran"
+msgstr "Iran"
 
 msgid "Iceland"
 msgstr "IJsland"
@@ -388,8 +397,8 @@ msgstr "Comoren"
 msgid "Saint Kitts and Nevis"
 msgstr "Saint Kitts en Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr ""
+msgid "North Korea"
+msgstr "Noord-Korea"
 
 msgid "Republic of Korea"
 msgstr "Republiek Korea"
@@ -433,7 +442,7 @@ msgstr "Luxemburg"
 msgid "Latvia"
 msgstr "Letland"
 
-msgid "Libyan Arab Jamahiriya"
+msgid "Libya"
 msgstr "Libië"
 
 msgid "Morocco"
@@ -442,8 +451,8 @@ msgstr "Marokko"
 msgid "Monaco"
 msgstr "Monaco"
 
-msgid "Republic of Moldova"
-msgstr "Republiek Moldavië"
+msgid "Moldova"
+msgstr "Moldavië"
 
 msgid "Montenegro"
 msgstr "Montenegro"
@@ -457,8 +466,8 @@ msgstr "Madagaskar"
 msgid "Marshall Islands"
 msgstr "Marshalleilanden"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Voormalige Joegoslavische Republiek Macedonië"
+msgid "Macedonia"
+msgstr "Macedonië"
 
 msgid "Mali"
 msgstr "Mali"
@@ -469,7 +478,7 @@ msgstr "Myanmar"
 msgid "Mongolia"
 msgstr "Mongolië"
 
-msgid "Macao"
+msgid "Macau"
 msgstr "Macau"
 
 msgid "Northern Mariana Islands"
@@ -569,7 +578,7 @@ msgid "Saint Pierre and Miquelon"
 msgstr "Saint-Pierre en Miquelon"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "Pitcairneilanden"
 
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
@@ -590,7 +599,7 @@ msgid "Qatar"
 msgstr "Qatar"
 
 msgid "Réunion"
-msgstr ""
+msgstr "Reunion"
 
 msgid "Romania"
 msgstr "Roemenië"
@@ -623,13 +632,13 @@ msgid "Singapore"
 msgstr "Singapore"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "Sint-Helena"
 
 msgid "Slovenia"
 msgstr "Slovenië"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Spitsbergen en Jan Mayen"
 
 msgid "Slovakia"
 msgstr "Slowakije"
@@ -649,13 +658,19 @@ msgstr "Somalië"
 msgid "Suriname"
 msgstr "Suriname"
 
+msgid "South Sudan"
+msgstr "Zuid-Soedan"
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tomé en Principe"
 
 msgid "El Salvador"
 msgstr "El Salvador"
 
-msgid "Syrian Arab Republic"
+msgid "Sint Maarten"
+msgstr "Sint Maarten"
+
+msgid "Syria"
 msgstr "Syrië"
 
 msgid "Swaziland"
@@ -706,8 +721,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Taiwan"
 
-msgid "United Republic of Tanzania"
-msgstr "Verenigde Republiek Tanzania"
+msgid "Tanzania"
+msgstr "Tanzanië"
 
 msgid "Ukraine"
 msgstr "Oekraïne"
@@ -727,11 +742,11 @@ msgstr "Uruguay"
 msgid "Uzbekistan"
 msgstr "Oezbekistan"
 
-msgid "Holy See (Vatican City State)"
+msgid "Vatican"
 msgstr "Vaticaanstad"
 
 msgid "Saint Vincent and the Grenadines"
-msgstr "Saint Vincent en de Grenadines"
+msgstr "Sint Vincent en de Grenadines"
 
 msgid "Venezuela"
 msgstr "Venezuela"
@@ -739,8 +754,8 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Virgin-eilanden"
 
-msgid "Viet Nam"
-msgstr "Viet Nam"
+msgid "Vietnam"
+msgstr "Vietnam"
 
 msgid "Vanuatu"
 msgstr "Vanuatu"
@@ -765,4 +780,3 @@ msgstr "Zambia"
 
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
-

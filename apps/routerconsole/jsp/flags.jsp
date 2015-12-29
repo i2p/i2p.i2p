@@ -12,7 +12,9 @@
  *  with headers set so the browser caches.
  */
 String c = request.getParameter("c");
-if (c != null && c.length() > 0) {
+if (c != null &&
+    (c.length() == 2 || c.length() == 7) &&
+    c.replaceAll("[a-z0-9_]", "").length() == 0) {
     java.io.OutputStream cout = response.getOutputStream();
     String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
     String file = "docs" + java.io.File.separatorChar + "icons" + java.io.File.separatorChar +

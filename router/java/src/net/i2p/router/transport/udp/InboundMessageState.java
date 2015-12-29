@@ -39,6 +39,9 @@ class InboundMessageState implements CDQEntry {
     private static final long MAX_RECEIVE_TIME = 10*1000;
     public static final int MAX_FRAGMENTS = 64;
     
+    /** 10 */
+    public static final int MAX_PARTIAL_BITFIELD_BYTES = (MAX_FRAGMENTS / 7) + 1;
+
     private static final int MAX_FRAGMENT_SIZE = UDPPacket.MAX_PACKET_SIZE;
     private static final ByteCache _fragmentCache = ByteCache.getInstance(64, MAX_FRAGMENT_SIZE);
     
@@ -69,10 +72,14 @@ class InboundMessageState implements CDQEntry {
         _log = ctx.logManager().getLog(InboundMessageState.class);
         _messageId = messageId;
         _from = from;
-        if (data.readMessageIsLast(dataFragment))
-            _fragments = new ByteArray[1 + data.readMessageFragmentNum(dataFragment)];
-        else
+        if (data.readMessageIsLast(dataFragment)) {
+            int num = 1 + data.readMessageFragmentNum(dataFragment);
+            if (num > MAX_FRAGMENTS)
+                throw new DataFormatException("corrupt - too many fragments: " + num);
+            _fragments = new ByteArray[num];
+        } else {
             _fragments = new ByteArray[MAX_FRAGMENTS];
+        }
         _lastFragment = -1;
         _completeSize = -1;
         _receiveBegin = ctx.clock().now();
@@ -86,7 +93,7 @@ class InboundMessageState implements CDQEntry {
      *
      * @return true if the data was ok, false if it was corrupt
      */
-    public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
+    public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) throws DataFormatException {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
         if ( (fragmentNum < 0) || (fragmentNum >= _fragments.length)) {
             if (_log.shouldLog(Log.WARN))
@@ -219,58 +226,82 @@ class InboundMessageState implements CDQEntry {
         return _completeSize;
     }
 
+    /** FIXME synch here or PeerState.fetchPartialACKs() */
     public ACKBitfield createACKBitfield() {
-        return new PartialBitfield(_messageId, _fragments);
+        int last = _lastFragment;
+        int sz = (last >= 0) ? last + 1 : _fragments.length;
+        return new PartialBitfield(_messageId, _fragments, sz);
     }
     
     /**
-     *  A true partial bitfield that is not complete.
+     *  A true partial bitfield that is probably not complete.
+     *  fragmentCount() will return 64 if unknown.
      */
     private static final class PartialBitfield implements ACKBitfield {
         private final long _bitfieldMessageId;
-        private final boolean _fragmentsReceived[];
+        private final int _ackCount;
+        private final int _highestReceived;
+        // bitfield, 1 for acked
+        private final long _fragmentAcks;
         
         /**
          *  @param data each element is non-null or null for received or not
+         *  @param size size of data to use
          */
-        public PartialBitfield(long messageId, Object data[]) {
+        public PartialBitfield(long messageId, Object data[], int size) {
+            if (size > MAX_FRAGMENTS)
+                throw new IllegalArgumentException();
             _bitfieldMessageId = messageId;
-            boolean fragmentsRcvd[] = null;
-            for (int i = data.length - 1; i >= 0; i--) {
+            int ackCount = 0;
+            int highestReceived = -1;
+            long acks = 0;
+            for (int i = 0; i < size; i++) {
                 if (data[i] != null) {
-                    if (fragmentsRcvd == null)
-                        fragmentsRcvd = new boolean[i+1];
-                    fragmentsRcvd[i] = true;
+                    acks |= mask(i);
+                    ackCount++;
+                    highestReceived = i;
                 }
             }
-            if (fragmentsRcvd == null)
-                _fragmentsReceived = new boolean[0];
-            else
-                _fragmentsReceived = fragmentsRcvd;
+            _fragmentAcks = acks;
+            _ackCount = ackCount;
+            _highestReceived = highestReceived;
         }
 
-        public int fragmentCount() { return _fragmentsReceived.length; }
+        /**
+         *  @param fragment 0-63
+         */
+        private static long mask(int fragment) {
+            return 1L << fragment;
+        }
+
+        public int fragmentCount() { return _highestReceived + 1; }
+
+        public int ackCount() { return _ackCount; }
+
+        public int highestReceived() { return _highestReceived; }
 
         public long getMessageId() { return _bitfieldMessageId; }
 
         public boolean received(int fragmentNum) { 
-            if ( (fragmentNum < 0) || (fragmentNum >= _fragmentsReceived.length) )
+            if (fragmentNum < 0 || fragmentNum > _highestReceived)
                 return false;
-            return _fragmentsReceived[fragmentNum];
+            return (_fragmentAcks & mask(fragmentNum)) != 0;
         }
 
-        /** @return false always */
-        public boolean receivedComplete() { return false; }
+        public boolean receivedComplete() { return _ackCount == _highestReceived + 1; }
         
         @Override
         public String toString() { 
             StringBuilder buf = new StringBuilder(64);
-            buf.append("Partial ACK of ");
+            buf.append("OB Partial ACK of ");
             buf.append(_bitfieldMessageId);
-            buf.append(" with ACKs for: ");
-            for (int i = 0; i < _fragmentsReceived.length; i++)
-                if (_fragmentsReceived[i])
-                    buf.append(i).append(" ");
+            buf.append(" highest: ").append(_highestReceived);
+            buf.append(" with ").append(_ackCount).append(" ACKs for: [");
+            for (int i = 0; i <= _highestReceived; i++) {
+                if (received(i))
+                    buf.append(i).append(' ');
+            }
+            buf.append("] / ").append(_highestReceived + 1);
             return buf.toString();
         }
     }
@@ -311,7 +342,8 @@ class InboundMessageState implements CDQEntry {
             buf.append(" completely received with ");
             //buf.append(getCompleteSize()).append(" bytes");
             // may display -1 but avoid cascaded exceptions after release
-            buf.append(_completeSize).append(" bytes");
+            buf.append(_completeSize).append(" bytes in ");
+            buf.append(_lastFragment + 1).append(" fragments");
         } else {
             for (int i = 0; i <= _lastFragment; i++) {
                 buf.append(" fragment ").append(i);

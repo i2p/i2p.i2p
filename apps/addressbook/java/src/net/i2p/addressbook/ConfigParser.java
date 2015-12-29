@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
@@ -64,10 +65,11 @@ class ConfigParser {
         if (inputLine.startsWith(";")) {
             return "";
         }
-        if (inputLine.split("#").length > 0) {
-            return inputLine.split("#")[0];
+        int hash = inputLine.indexOf('#');
+        if (hash >= 0) {
+            return inputLine.substring(0, hash);
         } else {
-            return "";
+            return inputLine;
         }
     }
 
@@ -92,7 +94,7 @@ class ConfigParser {
         inputLine = input.readLine();
         while (inputLine != null) {
             inputLine = stripComments(inputLine);
-            String[] splitLine = inputLine.split("=");
+            String[] splitLine = DataHelper.split(inputLine, "=");
             if (splitLine.length == 2) {
                 result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
             }
@@ -115,7 +117,7 @@ class ConfigParser {
     public static Map<String, String>  parse(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
-                fileStream));
+                fileStream, "UTF-8"));
         Map<String, String>  rv = parse(input);
         try {
             fileStream.close();
@@ -204,7 +206,7 @@ class ConfigParser {
     public static List<String> parseSubscriptions(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
-                fileStream));
+                fileStream, "UTF-8"));
         List<String> rv = parseSubscriptions(input);
         try {
             fileStream.close();

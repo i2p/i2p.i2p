@@ -21,11 +21,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -201,14 +203,14 @@ public class MUXlisten implements Runnable {
 							// I2P -> TCP
 							SS = socketManager.getServerSocket();
 							I2Plistener conn = new I2Plistener(SS, socketManager, info, database, _log, lives);
-							t = new Thread(tg, conn, "BOBI2Plistener " + N);
+							t = new I2PAppThread(tg, conn, "BOBI2Plistener " + N);
 							t.start();
 						}
 
 						if (come_in) {
 							// TCP -> I2P
 							TCPlistener conn = new TCPlistener(listener, socketManager, info, database, _log, lives);
-							q = new Thread(tg, conn, "BOBTCPlistener " + N);
+							q = new I2PAppThread(tg, conn, "BOBTCPlistener " + N);
 							q.start();
 						}
 

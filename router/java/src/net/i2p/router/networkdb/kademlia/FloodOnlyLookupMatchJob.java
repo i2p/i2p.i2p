@@ -2,10 +2,10 @@ package net.i2p.router.networkdb.kademlia;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
@@ -62,6 +62,9 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
             } else {
                 getContext().netDb().store(dsm.getKey(), (RouterInfo) dsm.getEntry());
             }
+        } catch (UnsupportedCryptoException uce) {
+            _search.failed();
+            return;
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(_search.getJobId() + ": Received an invalid store reply", iae);

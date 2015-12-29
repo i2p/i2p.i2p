@@ -6,9 +6,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -36,11 +38,20 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private volatile SimpleTimer2.TimedEvent _resendEvent;
     
     /** not bound to a connection */
-    public PacketLocal(I2PAppContext ctx, Destination to) {
-        this(ctx, to, null);
+    public PacketLocal(I2PAppContext ctx, Destination to, I2PSession session) {
+        super(session);
+        _context = ctx;
+        _createdOn = ctx.clock().now();
+        _log = ctx.logManager().getLog(PacketLocal.class);
+        _to = to;
+        _connection = null;
+        _lastSend = -1;
+        _cancelledOn = -1;
     }
 
+    /** bound to a connection */
     public PacketLocal(I2PAppContext ctx, Destination to, Connection con) {
+        super(con.getSession());
         _context = ctx;
         _createdOn = ctx.clock().now();
         _log = ctx.logManager().getLog(PacketLocal.class);
@@ -189,8 +200,50 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     public int getNACKs() { return _nackCount.get(); }
     
     public void setResendPacketEvent(SimpleTimer2.TimedEvent evt) { _resendEvent = evt; }
+
+    /**
+     * Sign and write the packet to the buffer (starting at the offset) and return
+     * the number of bytes written.
+     *
+     * @param buffer data to be written
+     * @param offset starting point in the buffer
+     * @return Count of bytes written
+     * @throws IllegalStateException if there is data missing or otherwise b0rked
+     * @since 0.9.20 moved from Packet
+     */
+    public int writeSignedPacket(byte buffer[], int offset) throws IllegalStateException {
+        setFlag(FLAG_SIGNATURE_INCLUDED);
+        SigningPrivateKey key = _session.getPrivateKey();
+        int size = writePacket(buffer, offset, key.getType().getSigLen());
+        _optionSignature = _context.dsa().sign(buffer, offset, size, key);
+        if (_optionSignature == null)
+            throw new IllegalStateException("Signature failed");
+        //if (false) {
+        //    Log l = ctx.logManager().getLog(Packet.class);
+        //    l.error("Signing: " + toString());
+        //    l.error(Base64.encode(buffer, 0, size));
+        //    l.error("Signature: " + Base64.encode(_optionSignature.getData()));
+        //}
+        // jump into the signed data and inject the signature where we 
+        // previously placed a bunch of zeroes
+        int signatureOffset = offset 
+                              //+ 4 // sendStreamId
+                              //+ 4 // receiveStreamId
+                              //+ 4 // sequenceNum
+                              //+ 4 // ackThrough
+                              //+ 1 // resendDelay
+                              //+ 2 // flags
+                              //+ 2 // optionSize
+                              + 21
+                              + (_nacks != null ? 4*_nacks.length + 1 : 1)
+                              + (isFlagSet(FLAG_DELAY_REQUESTED) ? 2 : 0)
+                              + (isFlagSet(FLAG_FROM_INCLUDED) ? _optionFrom.size() : 0)
+                              + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
+        System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, _optionSignature.length());
+        return size;
+    }
     
-	@Override
+    @Override
     public StringBuilder formatAsString() {
         StringBuilder buf = super.formatAsString();
         
@@ -216,7 +269,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
             Connection con = _connection;
             if (con != null) {
                 buf.append(" from ");
-                Destination local = con.getSession().getMyDestination();
+                Destination local = _session.getMyDestination();
                 if (local != null)
                     buf.append(local.calculateHash().toBase64().substring(0,4));
                 else
@@ -233,7 +286,7 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         }
         return buf;
     }
-    
+
     ////// begin WriteStatus methods
 
     /**

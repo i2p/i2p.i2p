@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# plazmism <gomidori@live.jp>, 2013-2014
+# タカハシ <gomidori@live.jp>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-02-05 11:54+0000\n"
-"Last-Translator: plazmism <gomidori@live.jp>\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,6 +51,9 @@ msgstr "オランダ領アンティル諸島"
 
 msgid "Angola"
 msgstr "アンゴラ"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "南極"
@@ -103,6 +106,9 @@ msgstr "ブルンジ"
 msgid "Benin"
 msgstr "ベナン"
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "バミューダ"
 
@@ -111,6 +117,9 @@ msgstr "ブルネイ・ダルサラーム"
 
 msgid "Bolivia"
 msgstr "ボリビア"
+
+msgid "Bonaire"
+msgstr ""
 
 msgid "Brazil"
 msgstr "ブラジル"
@@ -139,14 +148,11 @@ msgstr "カナダ"
 msgid "Cocos (Keeling) Islands"
 msgstr "ココス（キーリング）諸島"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "コンゴ民主共和国"
+msgid "Congo"
+msgstr "コンゴ"
 
 msgid "Central African Republic"
 msgstr "中央アフリカ共和国"
-
-msgid "Congo"
-msgstr "コンゴ"
 
 msgid "Switzerland"
 msgstr "スイス"
@@ -244,8 +250,8 @@ msgstr "フィジー"
 msgid "Falkland Islands (Malvinas)"
 msgstr "フォークランド諸島 (マルビナス)"
 
-msgid "Federated States of Micronesia"
-msgstr "ミクロネシア連邦"
+msgid "Micronesia"
+msgstr ""
 
 msgid "Faroe Islands"
 msgstr "フェロー諸島"
@@ -346,8 +352,8 @@ msgstr "イギリス領インド洋地域"
 msgid "Iraq"
 msgstr "イラク"
 
-msgid "Islamic Republic of Iran"
-msgstr "イラン・イスラム共和国"
+msgid "Iran"
+msgstr ""
 
 msgid "Iceland"
 msgstr "アイスランド"
@@ -385,8 +391,8 @@ msgstr "コモロ"
 msgid "Saint Kitts and Nevis"
 msgstr "セントクリストファー・ネイビス"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "朝鮮民主主義人民共和国"
+msgid "North Korea"
+msgstr ""
 
 msgid "Republic of Korea"
 msgstr "大韓民国"
@@ -430,8 +436,8 @@ msgstr "ルクセンブルク"
 msgid "Latvia"
 msgstr "ラトビア"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "リビア"
+msgid "Libya"
+msgstr ""
 
 msgid "Morocco"
 msgstr "モロッコ"
@@ -439,8 +445,8 @@ msgstr "モロッコ"
 msgid "Monaco"
 msgstr "モナコ"
 
-msgid "Republic of Moldova"
-msgstr "モルダビア共和国"
+msgid "Moldova"
+msgstr ""
 
 msgid "Montenegro"
 msgstr "モンテネグロ"
@@ -454,8 +460,8 @@ msgstr "マダガスカル"
 msgid "Marshall Islands"
 msgstr "マーシャル諸島"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "マケドニア・旧ユーゴスラビア共和国"
+msgid "Macedonia"
+msgstr ""
 
 msgid "Mali"
 msgstr "マリ"
@@ -466,8 +472,8 @@ msgstr "ミャンマー"
 msgid "Mongolia"
 msgstr "モンゴル"
 
-msgid "Macao"
-msgstr "マカオ"
+msgid "Macau"
+msgstr ""
 
 msgid "Northern Mariana Islands"
 msgstr "北マリアナ諸島連邦"
@@ -646,14 +652,20 @@ msgstr "ソマリア"
 msgid "Suriname"
 msgstr "スリナム"
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "サントメ・プリンシペ"
 
 msgid "El Salvador"
 msgstr "エルサルバドル"
 
-msgid "Syrian Arab Republic"
-msgstr "シリア・アラブ共和国"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr ""
 
 msgid "Swaziland"
 msgstr "スワジランド"
@@ -703,8 +715,8 @@ msgstr "ツバル"
 msgid "Taiwan"
 msgstr "台湾"
 
-msgid "United Republic of Tanzania"
-msgstr "タンザニア連合共和国"
+msgid "Tanzania"
+msgstr ""
 
 msgid "Ukraine"
 msgstr "ウクライナ"
@@ -724,8 +736,8 @@ msgstr "ウルグアイ"
 msgid "Uzbekistan"
 msgstr "ウズベキスタン"
 
-msgid "Holy See (Vatican City State)"
-msgstr "教皇庁 (ヴァチカン市国)"
+msgid "Vatican"
+msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "セントビンセントおよびグレナディーン諸島"
@@ -736,8 +748,8 @@ msgstr "ベネズエラ"
 msgid "Virgin Islands"
 msgstr "バージン諸島"
 
-msgid "Viet Nam"
-msgstr "ベトナム"
+msgid "Vietnam"
+msgstr ""
 
 msgid "Vanuatu"
 msgstr "バヌアツ"

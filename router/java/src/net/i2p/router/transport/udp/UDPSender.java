@@ -28,13 +28,17 @@ class UDPSender {
     private volatile boolean _keepRunning;
     private final Runner _runner;
     private final boolean _dummy;
+    private final SocketListener _endpoint;
 
     private static final int TYPE_POISON = 99999;
 
+    // Queue needs to be big enough that we can compete with NTCP for
+    // bandwidth requests, and so CoDel can work well.
+    // When full, packets back up into the PacketPusher thread, pre-CoDel.
     private static final int MIN_QUEUE_SIZE = 64;
     private static final int MAX_QUEUE_SIZE = 384;
     
-    public UDPSender(RouterContext ctx, DatagramSocket socket, String name) {
+    public UDPSender(RouterContext ctx, DatagramSocket socket, String name, SocketListener lsnr) {
         _context = ctx;
         _dummy = false; // ctx.commSystem().isDummy();
         _log = ctx.logManager().getLog(UDPSender.class);
@@ -44,6 +48,7 @@ class UDPSender {
         _socket = socket;
         _runner = new Runner();
         _name = name;
+        _endpoint = lsnr;
         _context.statManager().createRateStat("udp.pushTime", "How long a UDP packet takes to get pushed out", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendQueueSize", "How many packets are queued on the UDP sender", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendQueueFailed", "How often it was unable to add a new packet to the queue", "udp", UDPTransport.RATES);
@@ -52,6 +57,7 @@ class UDPSender {
         //_context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendFailsafe", "limiter stuck?", "udp", new long[] { 24*60*60*1000L });
         // used in RouterWatchdog
         _context.statManager().createRequiredRateStat("udp.sendException", "Send fails (Windows exception?)", "udp", new long[] { 60*1000, 10*60*1000 });
 
@@ -69,6 +75,9 @@ class UDPSender {
         _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_CREAT, "session created packet size", "udp", UDPTransport.RATES);
     }
     
+    /**
+     *  Cannot be restarted (socket is final)
+     */
     public synchronized void startup() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting the runner: " + _name);
@@ -78,6 +87,8 @@ class UDPSender {
     }
     
     public synchronized void shutdown() {
+        if (!_keepRunning)
+            return;
         _keepRunning = false;
         _outboundQueue.clear();
         UDPPacket poison = UDPPacket.acquire(_context, false);
@@ -187,9 +198,11 @@ class UDPSender {
             packet.release();
             return;
         }
+        packet.requestOutboundBandwidth();
         try {
             _outboundQueue.put(packet);
         } catch (InterruptedException ie) {
+            packet.release();
             return;
         }
         //size = _outboundQueue.size();
@@ -221,10 +234,19 @@ class UDPSender {
                     // ?? int size2 = packet.getPacket().getLength();
                     if (size > 0) {
                         //_context.bandwidthLimiter().requestOutbound(req, size, "UDP sender");
-                        FIFOBandwidthLimiter.Request req =
-                              _context.bandwidthLimiter().requestOutbound(size, 0, "UDP sender");
-                        while (req.getPendingRequested() > 0)
-                            req.waitForNextAllocation();
+                        FIFOBandwidthLimiter.Request req = packet.getBandwidthRequest();
+                        if (req != null) {
+                            // failsafe, don't wait forever
+                            int waitCount = 0;
+                            while (req.getPendingRequested() > 0 && waitCount++ < 5) {
+                                req.waitForNextAllocation();
+                            }
+                            if (waitCount >= 5) {
+                                // tell FBL we didn't send it, but send it anyway
+                                req.abort();
+                                _context.statManager().addRateData("udp.sendFailsafe", 1);
+                            }
+                        }
                     }
                     
                     long afterBW = _context.clock().now();
@@ -265,16 +287,23 @@ class UDPSender {
                         _context.statManager().addRateData("udp.sendPacketSize", size, packet.getLifetime());
                     } catch (IOException ioe) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Error sending", ioe);
+                            _log.warn("Error sending to " + packet.getPacket().getAddress(), ioe);
                         _context.statManager().addRateData("udp.sendException", 1, packet.getLifetime());
+                        if (_socket.isClosed()) {
+                            if (_keepRunning) {
+                                _keepRunning = false;
+                                _endpoint.fail();
+                            }
+                        }
                     }
                     
                     // back to the cache
                     packet.release();
                 }
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Stop sending...");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Stop sending on " + _endpoint);
+            _outboundQueue.clear();
         }
         
         /** @return next packet in queue. Will discard any packet older than MAX_HEAD_LIFETIME */

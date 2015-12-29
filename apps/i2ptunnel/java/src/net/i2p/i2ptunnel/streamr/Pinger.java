@@ -1,6 +1,9 @@
 package net.i2p.i2ptunnel.streamr;
 
 import net.i2p.i2ptunnel.udp.*;
+import net.i2p.I2PAppContext;
+import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
 
 /**
  *
@@ -9,7 +12,7 @@ import net.i2p.i2ptunnel.udp.*;
 public class Pinger implements Source, Runnable {
 
     public Pinger() {
-        this.thread = new Thread(this);
+        this.thread = new I2PAppThread(this);
     }
 
     public void setSink(Sink sink) {
@@ -30,7 +33,9 @@ public class Pinger implements Source, Runnable {
         // send unsubscribe-message
         byte[] data = new byte[1];
         data[0] = 1;
-        this.sink.send(null, data);
+        try {
+            this.sink.send(null, data);
+        } catch (RuntimeException re) {}
     }
     
     public void run() {
@@ -40,7 +45,14 @@ public class Pinger implements Source, Runnable {
         int i = 0;
         while(this.running) {
             //System.out.print("p");
-            this.sink.send(null, data);
+            try {
+                this.sink.send(null, data);
+            } catch (RuntimeException re) {
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+                if (log.shouldWarn())
+                    log.warn("error sending", re);
+                break;
+            }
             synchronized(this.waitlock) {
                 int delay = 10000;
                 if (i < 5) {
@@ -49,7 +61,9 @@ public class Pinger implements Source, Runnable {
                 }
                 try {
                     this.waitlock.wait(delay);
-                } catch(InterruptedException ie) {}
+                } catch(InterruptedException ie) {
+                    break;
+                }
             }
         }
     }

@@ -43,13 +43,13 @@ class Request
    */
   Request(PartialPiece piece, int off, int len)
   {
-    // Sanity check
-    if (off < 0 || len <= 0 || off + len > piece.getLength())
-      throw new IndexOutOfBoundsException("Illegal Request " + toString());
-
     this.piece = piece;
     this.off = off;
     this.len = len;
+
+    // Sanity check
+    if (off < 0 || len <= 0 || off + len > piece.getLength())
+      throw new IndexOutOfBoundsException("Illegal Request " + toString());
   }
 
   /**

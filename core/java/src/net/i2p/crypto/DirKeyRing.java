@@ -14,9 +14,11 @@ import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import net.i2p.util.SystemVersion;
+
 /**
- *  Dumb storage in a directory for testing.
- *  No sanitization of filenames, unsafe.
+ *  Simple storage of each cert in a separate file in a directory.
+ *  Limited sanitization of filenames.
  *
  *  @since 0.9.9
  */
@@ -30,7 +32,11 @@ class DirKeyRing implements KeyRing {
 
     /**
      *  Cert must be in the file (escaped keyName).crt,
-     *  and have a CN == keyName
+     *  and have a CN == keyName.
+     *
+     *  CN check unsupported on Android.
+     *
+     *  @return null if file doesn't exist, throws on all other errors
      */
     public PublicKey getKey(String keyName, String scope, SigType type)
                             throws GeneralSecurityException, IOException {
@@ -43,20 +49,19 @@ class DirKeyRing implements KeyRing {
         File kd = new File(sd, fileName + ".crt");
         if (!kd.exists())
             return null;
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(kd);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            cert.checkValidity();
+        X509Certificate cert = CertUtil.loadCert(kd);
+        if (!SystemVersion.isAndroid()) {
+            // getSubjectValue() unsupported on Android.
+            // Any cert problems will be caught in non-Android testing.
             String cn = CertUtil.getSubjectValue(cert, "CN");
             if (!keyName.equals(cn))
                 throw new GeneralSecurityException("CN mismatch: " + cn);
-            return cert.getPublicKey();
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
+        return cert.getPublicKey();
     }
 
+    /**
+     *  Unimplemented, unused.
+     */
     public void setKey(String keyName, String scope, PublicKey key) {}
 }

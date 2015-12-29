@@ -24,12 +24,15 @@ import net.i2p.I2PAppContext;
  * For periodic events, use addPeriodicEvent(). Unlike SimpleTimer,
  * uncaught Exceptions will not prevent subsequent executions.
  *
+ * @deprecated in 0.9.20, use SimpleTimer2 instead
+ *
  * @author zzz
  */
 public class SimpleScheduler {
 
     /**
      *  If you have a context, use context.simpleScheduler() instead
+     *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
     public static SimpleScheduler getInstance() {
         return I2PAppContext.getGlobalContext().simpleScheduler();
@@ -46,6 +49,7 @@ public class SimpleScheduler {
     /**
      *  To be instantiated by the context.
      *  Others should use context.simpleTimer() instead
+     *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
     public SimpleScheduler(I2PAppContext context) {
         this(context, "SimpleScheduler");
@@ -54,6 +58,7 @@ public class SimpleScheduler {
     /**
      *  To be instantiated by the context.
      *  Others should use context.simpleTimer() instead
+     *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
     private SimpleScheduler(I2PAppContext context, String name) {
         _log = context.logManager().getLog(SimpleScheduler.class);

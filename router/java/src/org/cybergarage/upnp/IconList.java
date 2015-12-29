@@ -17,7 +17,7 @@ package org.cybergarage.upnp;
 
 import java.util.Vector;
 
-public class IconList extends Vector<Icon> 
+public class IconList extends Vector<Icon>
 {
 	////////////////////////////////////////////////
 	//	Constants

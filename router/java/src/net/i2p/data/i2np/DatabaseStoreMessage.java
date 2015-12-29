@@ -18,7 +18,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.RouterInfo;
+import net.i2p.data.router.RouterInfo;
 import net.i2p.data.TunnelId;
 
 /**
@@ -103,9 +103,17 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         int curIndex = offset;
         
         _key = Hash.create(data, curIndex);
+        // i2pd bug? Generally followed by corrupt gzipped content.
+        // Fast-fail here to save resources.
+        if (_key.equals(Hash.FAKE_HASH)) {
+            // createRateStat in KNDF
+            _context.statManager().addRateData("netDb.DSMAllZeros", 1);
+            throw new I2NPMessageException("DSM all zeros");
+        }
         curIndex += Hash.HASH_LENGTH;
         
-        type = (int)DataHelper.fromLong(data, curIndex, 1);
+        // as of 0.9.18, ignore other 7 bits of the type byte, in preparation for future options
+        int dbType = data[curIndex] & 0x01;
         curIndex++;
         
         _replyToken = DataHelper.fromLong(data, curIndex, 4);
@@ -124,7 +132,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             _replyGateway = null;
         }
         
-        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
+        if (dbType == DatabaseEntry.KEY_TYPE_LEASESET) {
             _dbEntry = new LeaseSet();
             try {
                 _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
@@ -133,7 +141,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
-        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else {   // dbType == DatabaseEntry.KEY_TYPE_ROUTERINFO
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
@@ -154,8 +162,6 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
             } catch (IOException ioe) {
                 throw new I2NPMessageException("Corrupt compressed routerInfo size = " + compressedSize, ioe);
             }
-        } else {
-            throw new I2NPMessageException("Invalid type of key read from the structure - " + type);
         }
         //if (!key.equals(_dbEntry.getHash()))
         //    throw new I2NPMessageException("Hash mismatch in DSM");
@@ -204,16 +210,14 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         System.arraycopy(getKey().getData(), 0, out, curIndex, Hash.HASH_LENGTH);
         curIndex += Hash.HASH_LENGTH;
         out[curIndex++] = (byte) type;
-        byte tok[] = DataHelper.toLong(4, _replyToken);
-        System.arraycopy(tok, 0, out, curIndex, 4);
+        DataHelper.toLong(out, curIndex, 4, _replyToken);
         curIndex += 4;
         
         if (_replyToken > 0) {
             long replyTunnel = 0;
             if (_replyTunnel != null)
                 replyTunnel = _replyTunnel.getTunnelId();
-            byte id[] = DataHelper.toLong(4, replyTunnel);
-            System.arraycopy(id, 0, out, curIndex, 4);
+            DataHelper.toLong(out, curIndex, 4, replyTunnel);
             curIndex += 4;
             System.arraycopy(_replyGateway.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
             curIndex += Hash.HASH_LENGTH;
@@ -221,9 +225,8 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         
         // _byteCache initialized in calculateWrittenLength
         if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-            byte len[] = DataHelper.toLong(2, _byteCache.length);
-            out[curIndex++] = len[0];
-            out[curIndex++] = len[1];
+            DataHelper.toLong(out, curIndex, 2, _byteCache.length);
+            curIndex += 2;
         }
         System.arraycopy(_byteCache, 0, out, curIndex, _byteCache.length);
         curIndex += _byteCache.length;
@@ -260,7 +263,7 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseStoreMessage: ");
         buf.append("\n\tExpiration: ").append(new Date(_expiration));
-        buf.append("\n\tUnique ID: ").append(_uniqueId);
+        buf.append("\n\tUnique ID: ").append(getUniqueId());
         if (_replyToken != 0) {
             buf.append("\n\tReply token: ").append(_replyToken);
             buf.append("\n\tReply tunnel: ").append(_replyTunnel);
