@@ -17,3 +17,5 @@ subprojects {
         }
     }
 }
+
+//apply from: file('gradle/update.gradle')

@@ -1,0 +1,78 @@
+task prepUpdateRouter(type: Copy) {
+    dependsOn ':core:jar', ':router:jar'
+    // Pass in paths as a closure, so they are not executed during configuration
+    from {[
+        project(':core').jar.archivePath,
+        project(':router').jar.archivePath
+    ]}
+    into 'pkg-temp/lib'
+}
+
+task prepUpdateSmall(type: Copy) {
+    dependsOn prepUpdateRouter
+    dependsOn ':apps:ministreaming:jar', ':apps:streaming:jar'
+    dependsOn ':apps:routerconsole:jar', ':apps:i2ptunnel:i2ptunnelJar'
+    dependsOn ':apps:routerconsole:war', ':apps:i2ptunnel:war'
+    dependsOn ':apps:addressbook:war'
+    // Base dir
+    into 'pkg-temp'
+    into('lib') {
+        from {[
+            project(':apps:ministreaming').jar.archivePath,
+            project(':apps:streaming').jar.archivePath,
+            project(':apps:routerconsole').jar.archivePath,
+            project(':apps:i2ptunnel').i2ptunnelJar.archivePath,
+        ]}
+        // pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater
+        // name without version so we can overwrite if we upgrade
+        from('apps/jrobin/jrobin-1.5.9.1.jar') {
+            rename { 'jrobin.jar' }
+        }
+    }
+    into('webapps') {
+        from {[
+            project(':apps:routerconsole').war.archivePath,
+            project(':apps:i2ptunnel').war.archivePath,
+            project(':apps:addressbook').war.archivePath,
+        ]}
+    }
+}
+
+task prepUpdate(type: Copy) {
+    dependsOn prepUpdateSmall
+    dependsOn ':apps:BOB:jar', ':apps:sam:jar'
+    dependsOn ':apps:i2psnark:i2psnarkJar', ':apps:systray:jar'
+    //dependsOn ':apps:desktopgui:jar'
+    dependsOn ':apps:susidns:war', ':apps:susimail:war'
+    dependsOn ':apps:i2psnark:war'
+    // Base dir
+    into 'pkg-temp'
+    into('lib') {
+        from {[
+            project(':apps:BOB').jar.archivePath,
+            project(':apps:sam').jar.archivePath,
+            project(':apps:i2psnark').i2psnarkJar.archivePath,
+            // include systray changes in 0.7.5
+            project(':apps:systray').jar.archivePath,
+            // removed from updater in 0.9
+            //project(':apps:desktopgui').jar.archivePath,
+        ]}
+        // as of 0.7.12; someday, we can remove these from the updater
+        from 'apps/susidns/src/WEB-INF/lib/jstl.jar'
+        from 'apps/susidns/src/WEB-INF/lib/standard.jar'
+    }
+    into('webapps') {
+        from {[
+            project(':apps:susidns').war.archivePath,
+            project(':apps:susimail').war.archivePath,
+            project(':apps:i2psnark').war.archivePath,
+        ]}
+    }
+    from('history.txt') {
+        filter(org.apache.tools.ant.filters.HeadFilter, lines:1500)
+    }
+    doLast {
+        String more = '\n\n----------------\n\nEARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE'
+        ant.concat(more, append: 'true', destfile: 'pkg-temp/history.txt')
+    }
+}
