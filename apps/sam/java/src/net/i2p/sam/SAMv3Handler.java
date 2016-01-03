@@ -509,18 +509,17 @@ class SAMv3Handler extends SAMv1Handler
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
 				}
 
-				dest = props.getProperty("DESTINATION");
+				dest = (String) props.remove("DESTINATION");
 				if (dest == null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("SESSION DESTINATION parameter not specified");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"DESTINATION not specified\"\n");
 				}
-				props.remove("DESTINATION");
 
 				if (dest.equals("TRANSIENT")) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("TRANSIENT destination requested");
-					String sigTypeStr = props.getProperty("SIGNATURE_TYPE");
+					String sigTypeStr = (String) props.remove("SIGNATURE_TYPE");
 					SigType sigType;
 					if (sigTypeStr != null) {
 						sigType = SigType.parseSigType(sigTypeStr);
@@ -528,7 +527,6 @@ class SAMv3Handler extends SAMv1Handler
 							return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"SIGNATURE_TYPE "
 							                   + sigTypeStr + " unsupported\"\n");
 						}
-						props.remove("SIGNATURE_TYPE");
 					} else {
 						sigType = SigType.DSA_SHA1;
 					}
@@ -544,22 +542,20 @@ class SAMv3Handler extends SAMv1Handler
 				}
 
 
-				nick = props.getProperty("ID");
+				nick = (String) props.remove("ID");
 				if (nick == null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("SESSION ID parameter not specified");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"ID not specified\"\n");
 				}
-				props.remove("ID");
 
 
-				String style = props.getProperty("STYLE");
+				String style = (String) props.remove("STYLE");
 				if (style == null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("SESSION STYLE parameter not specified");
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
 				}
-				props.remove("STYLE");
 
 				// Unconditionally override what the client may have set
 				// (iMule sets BestEffort) as None is more efficient
@@ -663,7 +659,7 @@ class SAMv3Handler extends SAMv1Handler
 			return false;
 		}
 
-		nick = props.getProperty("ID");
+		nick = (String) props.remove("ID");
 		if (nick == null) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("SESSION ID parameter not specified");
@@ -672,7 +668,6 @@ class SAMv3Handler extends SAMv1Handler
 			} catch (IOException e) {}
 			return false ;
 		}
-		props.remove("ID");
 
 		rec = sSessionsHash.get(nick);
 
@@ -733,14 +728,13 @@ class SAMv3Handler extends SAMv1Handler
 				return false;
 			}
 		
-			String dest = props.getProperty("DESTINATION");
+			String dest = (String) props.remove("DESTINATION");
 			if (dest == null) {
 				notifyStreamResult(verbose, "I2P_ERROR", "Destination not specified in STREAM CONNECT message");
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("Destination not specified in STREAM CONNECT message");
 				return false;
 			}
-			props.remove("DESTINATION");
 
 			try {
 				((SAMv3StreamSession)streamSession).connect( this, dest, props );

@@ -230,13 +230,12 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
                 }
                 
-                dest = props.getProperty("DESTINATION");
+                dest = (String) props.remove("DESTINATION");
                 if (dest == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION DESTINATION parameter not specified");
                     return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"DESTINATION not specified\"\n");
                 }
-                props.remove("DESTINATION");
                 
                 String destKeystream = null;
                 
@@ -261,13 +260,12 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     }
                 }
                 
-                String style = props.getProperty("STYLE");
+                String style = (String) props.remove("STYLE");
                 if (style == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION STYLE parameter not specified");
                     return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
                 }
-                props.remove("STYLE");
                 
 		// Unconditionally override what the client may have set
 		// (iMule sets BestEffort) as None is more efficient
@@ -279,7 +277,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 } else if (style.equals("DATAGRAM")) {
                     datagramSession = new SAMDatagramSession(destKeystream, props,this);
                 } else if (style.equals("STREAM")) {
-                    String dir = props.getProperty("DIRECTION");
+                    String dir = (String) props.remove("DIRECTION");
                     if (dir == null) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("No DIRECTION parameter in STREAM session, defaulting to BOTH");
@@ -289,8 +287,6 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Unknown DIRECTION parameter value: [" + dir + "]");
                         return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown DIRECTION parameter\"\n");
-                    } else {
-                        props.remove("DIRECTION");
                     }
                 
                     streamSession = newSAMStreamSession(destKeystream, dir,props);
@@ -732,7 +728,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
         int id;
         {
-            String strid = props.getProperty("ID");
+            String strid = (String) props.remove("ID");
             if (strid == null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ID not specified in STREAM SEND message");
@@ -750,15 +746,13 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
                 return false;
             }
-            props.remove("ID");
         }
 
-        String dest = props.getProperty("DESTINATION");
+        String dest = (String) props.remove("DESTINATION");
         if (dest == null) {
             _log.debug("Destination not specified in RAW SEND message");
             return false;
         }
-        props.remove("DESTINATION");
 
         try {
             try {
