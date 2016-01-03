@@ -36,8 +36,8 @@ import net.i2p.util.Log;
 abstract class SAMMessageSession implements Closeable {
 
     protected final Log _log;
-    private I2PSession session;
-    private SAMMessageSessionHandler handler;
+    private final I2PSession session;
+    private final SAMMessageSessionHandler handler;
 
     /**
      * Initialize a new SAM message-based session.
@@ -49,9 +49,7 @@ abstract class SAMMessageSession implements Closeable {
      * @throws I2PSessionException 
      */
     protected SAMMessageSession(String dest, Properties props) throws IOException, DataFormatException, I2PSessionException {
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
-        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(dest));
-        initSAMMessageSession(bais, props);
+        this(new ByteArrayInputStream(Base64.decode(dest)), props);
     }
 
     /**
@@ -64,16 +62,12 @@ abstract class SAMMessageSession implements Closeable {
      * @throws I2PSessionException 
      */
     protected SAMMessageSession(InputStream destStream, Properties props) throws IOException, DataFormatException, I2PSessionException {
-        _log = new Log(getClass());
-        initSAMMessageSession(destStream, props);
-    }
-
-    private void initSAMMessageSession (InputStream destStream, Properties props) throws IOException, DataFormatException, I2PSessionException {
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Initializing SAM message-based session");
 
         handler = new SAMMessageSessionHandler(destStream, props);
-
+        session = handler.getSession();
         // FIXME don't start threads in constructors
         Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
         t.start();
@@ -196,6 +190,7 @@ abstract class SAMMessageSession implements Closeable {
      */
     class SAMMessageSessionHandler implements Runnable, I2PSessionMuxedListener {
 
+        private final I2PSession _session;
         private final Object runningLock = new Object();
         private volatile boolean stillRunning = true;
                 
@@ -215,15 +210,23 @@ abstract class SAMMessageSession implements Closeable {
                 props.setProperty("inbound.nickname", "SAM UDP Client");
                 props.setProperty("outbound.nickname", "SAM UDP Client");
             }
-            session = client.createSession(destStream, props);
+            _session = client.createSession(destStream, props);
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connecting I2P session...");
-            session.connect();
+            _session.connect();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("I2P session connected");
 
-            session.addMuxedSessionListener(this, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
+            _session.addMuxedSessionListener(this, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
+        }
+
+        /**
+         * The session.
+         * @since 0.9.25
+         */
+        public final I2PSession getSession() {
+            return _session;
         }
 
         /**
