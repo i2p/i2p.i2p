@@ -26,7 +26,7 @@ import net.i2p.util.VersionComparator;
  */
 class SAMHandlerFactory {
 
-    private static final String VERSION = "3.2";
+    private static final String VERSION = "3.3";
 
     private static final int HELLO_TIMEOUT = 60*1000;
 
@@ -143,6 +143,9 @@ class SAMHandlerFactory {
         if (VersionComparator.comp(VERSION, minVer) >= 0 &&
             VersionComparator.comp(VERSION, maxVer) <= 0)
             return VERSION;
+        if (VersionComparator.comp("3.2", minVer) >= 0 &&
+            VersionComparator.comp("3.2", maxVer) <= 0)
+            return "3.2";
         if (VersionComparator.comp("3.1", minVer) >= 0 &&
             VersionComparator.comp("3.1", maxVer) <= 0)
             return "3.1";
