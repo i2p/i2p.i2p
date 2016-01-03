@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.util.CDQEntry;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
@@ -22,19 +22,19 @@ import net.i2p.util.SystemVersion;
  *
  */
 class UDPPacket implements CDQEntry {
-    private I2PAppContext _context;
+    private RouterContext _context;
     private final DatagramPacket _packet;
     private volatile short _priority;
     private volatile long _initializeTime;
-    private volatile long _expiration;
+    //private volatile long _expiration;
     private final byte[] _data;
     private final byte[] _validateBuf;
     private final byte[] _ivBuf;
     private volatile int _markedType;
-    private volatile RemoteHostId _remoteHost;
-    private volatile boolean _released;
-    private volatile Exception _releasedBy;
-    private volatile Exception _acquiredBy;
+    private RemoteHostId _remoteHost;
+    private boolean _released;
+    //private volatile Exception _releasedBy;
+    //private volatile Exception _acquiredBy;
     private long _enqueueTime;
     private long _receivedTime;
     //private long _beforeValidate;
@@ -43,6 +43,7 @@ class UDPPacket implements CDQEntry {
     //private long _afterHandlingTime;
     private int _validateCount;
     // private boolean _isInbound;
+    private FIFOBandwidthLimiter.Request _bandwidthRequest;
   
     //  Warning - this mixes contexts in a multi-router JVM
     private static final Queue<UDPPacket> _packetCache;
@@ -84,25 +85,45 @@ class UDPPacket implements CDQEntry {
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
     public static final int PAYLOAD_TYPE_TEST = 7;
-    public static final int MAX_PAYLOAD_TYPE = PAYLOAD_TYPE_TEST;
     /** @since 0.8.1 */
     public static final int PAYLOAD_TYPE_SESSION_DESTROY = 8;
+    public static final int MAX_PAYLOAD_TYPE = PAYLOAD_TYPE_SESSION_DESTROY;
     
+    // various flag fields for use in the header
+    /**
+     *  Defined in the spec from the beginning, Unused
+     *  @since 0.9.24
+     */
+    public static final byte HEADER_FLAG_REKEY = (1 << 3);
+    /**
+     *  Defined in the spec from the beginning, Used starting in 0.9.24
+     *  @since 0.9.24
+     */
+    public static final byte HEADER_FLAG_EXTENDED_OPTIONS = (1 << 2);
+
+    // Extended options for session request
+    public static final int SESS_REQ_MIN_EXT_OPTIONS_LENGTH = 2;
+    // bytes 0-1 are flags
+    /**
+     * set to 1 to request a session tag, i.e. we want him to be an introducer for us
+     */
+    public static final int SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG = 0x01;
+
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);
     public static final byte DATA_FLAG_ACK_BITFIELDS = (1 << 6);
-    // unused
+    /** unused */
     public static final byte DATA_FLAG_ECN = (1 << 4);
     public static final byte DATA_FLAG_WANT_ACKS = (1 << 3);
     public static final byte DATA_FLAG_WANT_REPLY = (1 << 2);
-    // unused
+    /** unused */
     public static final byte DATA_FLAG_EXTENDED = (1 << 1);
     
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);
     
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
 
-    private UDPPacket(I2PAppContext ctx) {
+    private UDPPacket(RouterContext ctx) {
         //ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _data = new byte[MAX_PACKET_SIZE];
@@ -112,7 +133,7 @@ class UDPPacket implements CDQEntry {
         init(ctx);
     }
 
-    private void init(I2PAppContext ctx) {
+    private synchronized void init(RouterContext ctx) {
         _context = ctx;
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
@@ -146,20 +167,20 @@ class UDPPacket implements CDQEntry {
   ****/
 
     /** */
-    public DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
-    public short getPriority() { verifyNotReleased(); return _priority; }
-    public long getExpiration() { verifyNotReleased(); return _expiration; }
-    public long getBegin() { verifyNotReleased(); return _initializeTime; }
+    public synchronized DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
+    public synchronized short getPriority() { verifyNotReleased(); return _priority; }
+    //public long getExpiration() { verifyNotReleased(); return _expiration; }
+    public synchronized long getBegin() { verifyNotReleased(); return _initializeTime; }
     public long getLifetime() { /** verifyNotReleased(); */ return _context.clock().now() - _initializeTime; }
-    public void resetBegin() { _initializeTime = _context.clock().now(); }
+    public synchronized void resetBegin() { _initializeTime = _context.clock().now(); }
     /** flag this packet as a particular type for accounting purposes */
-    public void markType(int type) { verifyNotReleased(); _markedType = type; }
+    public synchronized void markType(int type) { verifyNotReleased(); _markedType = type; }
     /** 
      * flag this packet as a particular type for accounting purposes, with
      * 1 implying the packet is an ACK, otherwise it is a data packet
      *
      */
-    public int getMarkedType() { verifyNotReleased(); return _markedType; }
+    public synchronized int getMarkedType() { verifyNotReleased(); return _markedType; }
     
     private int _messageType;
     private int _fragmentCount;
@@ -174,7 +195,7 @@ class UDPPacket implements CDQEntry {
     /** only for debugging and stats */
     void setFragmentCount(int count) { _fragmentCount = count; }
 
-    RemoteHostId getRemoteHost() {
+    synchronized RemoteHostId getRemoteHost() {
         if (_remoteHost == null) {
             //long before = System.currentTimeMillis();
             InetAddress addr = _packet.getAddress();
@@ -193,7 +214,7 @@ class UDPPacket implements CDQEntry {
      * MAC matches, false otherwise.
      *
      */
-    public boolean validate(SessionKey macKey) {
+    public synchronized boolean validate(SessionKey macKey) {
         verifyNotReleased(); 
         //_beforeValidate = _context.clock().now();
         boolean eq = false;
@@ -231,7 +252,7 @@ class UDPPacket implements CDQEntry {
                     str.append("\n\tCalc HMAC: ").append(Base64.encode(calc, 0, MAC_SIZE));
                     str.append("\n\tRead HMAC: ").append(Base64.encode(_data, _packet.getOffset(), MAC_SIZE));
                     str.append("\n\tUsing key: ").append(macKey.toBase64());
-                    if (DataHelper.eq(macKey.getData(), 0, ((RouterContext)_context).routerHash().getData(), 0, 32))
+                    if (DataHelper.eq(macKey.getData(), 0, _context.routerHash().getData(), 0, 32))
                         str.append(" (Intro)");
                     else
                         str.append(" (Session)");
@@ -242,7 +263,7 @@ class UDPPacket implements CDQEntry {
         } else {
             Log log = _context.logManager().getLog(UDPPacket.class);
             if (log.shouldLog(Log.WARN))
-                log.warn("Payload length is " + payloadLength + ", too short!\n" +
+                log.warn("Payload length is " + payloadLength + ", too short! From: " + getRemoteHost() + '\n' +
                          net.i2p.util.HexDump.dump(_data, _packet.getOffset(), _packet.getLength()));
         }
         
@@ -256,7 +277,7 @@ class UDPPacket implements CDQEntry {
      * with the decrypted data (leaving the MAC and IV unaltered)
      * 
      */
-    public void decrypt(SessionKey cipherKey) {
+    public synchronized void decrypt(SessionKey cipherKey) {
         verifyNotReleased(); 
         System.arraycopy(_data, MAC_SIZE, _ivBuf, 0, IV_SIZE);
         int len = _packet.getLength();
@@ -279,7 +300,7 @@ class UDPPacket implements CDQEntry {
     public void setEnqueueTime(long now) { _enqueueTime = now; }
 
     /** a packet handler has pulled it off the inbound queue */
-    void received() { _receivedTime = _context.clock().now(); }
+    synchronized void received() { _receivedTime = _context.clock().now(); }
 
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
     //void beforeReceiveFragments() { _beforeReceiveFragments = _context.clock().now(); }
@@ -293,13 +314,47 @@ class UDPPacket implements CDQEntry {
     public long getEnqueueTime() { return _enqueueTime; }
 
     /** a packet handler has pulled it off the inbound queue */
-    long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
+    synchronized long getTimeSinceReceived() { return (_receivedTime > 0 ? _context.clock().now() - _receivedTime : 0); }
 
     /** a packet handler has decrypted and verified the packet and is about to parse out the good bits */
     //long getTimeSinceReceiveFragments() { return (_beforeReceiveFragments > 0 ? _context.clock().now() - _beforeReceiveFragments : 0); }
     /** a packet handler has finished parsing out the good bits */
     //long getTimeSinceHandling() { return (_afterHandlingTime > 0 ? _context.clock().now() - _afterHandlingTime : 0); }
     
+    /**
+     *  So that we can compete with NTCP, we want to request bandwidth
+     *  in parallel, on the way into the queue, not on the way out.
+     *  Call before enqueueing.
+     *  @since 0.9.21
+     *  @deprecated unused
+     */
+    public synchronized void requestInboundBandwidth() {
+        verifyNotReleased();
+        _bandwidthRequest = _context.bandwidthLimiter().requestInbound(_packet.getLength(), "UDP receiver");
+    }
+    
+    /**
+     *  So that we can compete with NTCP, we want to request bandwidth
+     *  in parallel, on the way into the queue, not on the way out.
+     *  Call before enqueueing.
+     *  @since 0.9.21
+     */
+    public synchronized void requestOutboundBandwidth() {
+        verifyNotReleased();
+        _bandwidthRequest = _context.bandwidthLimiter().requestOutbound(_packet.getLength(), 0, "UDP sender");
+    }
+    
+    /**
+     *  So that we can compete with NTCP, we want to request bandwidth
+     *  in parallel, on the way into the queue, not on the way out.
+     *  Call after dequeueing.
+     *  @since 0.9.21
+     */
+    public synchronized FIFOBandwidthLimiter.Request getBandwidthRequest() {
+        verifyNotReleased();
+        return _bandwidthRequest;
+    }
+
     // Following 5: All used only for stats in PacketHandler, commented out
 
     /** when it was pulled off the endpoint receive queue */
@@ -339,20 +394,24 @@ class UDPPacket implements CDQEntry {
     /**
      *  @param inbound unused
      */
-    public static UDPPacket acquire(I2PAppContext ctx, boolean inbound) {
+    public static UDPPacket acquire(RouterContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
             rv = _packetCache.poll();
-            if (rv != null)
-                rv.init(ctx);
+            if (rv != null) {
+                synchronized(rv) {
+                    if (!rv._released) {
+                        Log log = rv._context.logManager().getLog(UDPPacket.class);
+                        log.error("Unreleased cached packet", new Exception());
+                        rv = null;
+                    } else {
+                        rv.init(ctx);
+                    }
+                }
+            }
         }
         if (rv == null)
             rv = new UDPPacket(ctx);
-        //if (rv._acquiredBy != null) {
-        //    _log.log(Log.CRIT, "Already acquired!  current stack trace is:", new Exception());
-        //    _log.log(Log.CRIT, "Earlier acquired:", rv._acquiredBy);
-        //}
-        //rv._acquiredBy = new Exception("acquired on");
         return rv;
     }
 
@@ -364,13 +423,20 @@ class UDPPacket implements CDQEntry {
         release();
     }
 
-    public void release() {
+    public synchronized void release() {
         verifyNotReleased();
         _released = true;
         //_releasedBy = new Exception("released by");
         //_acquiredBy = null;
         //
         //_dataCache.release(_dataBuf);
+        if (_bandwidthRequest != null) {
+            synchronized(_bandwidthRequest) {
+                if (_bandwidthRequest.getPendingRequested() > 0)
+                    _bandwidthRequest.abort();
+            }
+            _bandwidthRequest = null;
+        }
         if (!CACHE)
             return;
         _packetCache.offer(this);
@@ -385,7 +451,7 @@ class UDPPacket implements CDQEntry {
             _packetCache.clear();
     }
 
-    private void verifyNotReleased() {
+    private synchronized void verifyNotReleased() {
         if (!CACHE) return;
         if (_released) {
             Log log = _context.logManager().getLog(UDPPacket.class);

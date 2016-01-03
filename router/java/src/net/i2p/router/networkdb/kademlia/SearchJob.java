@@ -94,7 +94,7 @@ class SearchJob extends JobImpl {
                      Job onSuccess, Job onFailure, long timeoutMs, boolean keepStats, boolean isLease) {
         super(context);
         if ( (key == null) || (key.getData() == null) ) 
-            throw new IllegalArgumentException("Search for null key?  wtf");
+            throw new IllegalArgumentException("Search for null key?");
         _log = getContext().logManager().getLog(getClass());
         _facade = facade;
         _state = new SearchState(getContext(), key);
@@ -425,7 +425,7 @@ class SearchJob extends JobImpl {
         Hash to = router.getIdentity().getHash();
         TunnelInfo inTunnel = getContext().tunnelManager().selectInboundExploratoryTunnel(to);
         if (inTunnel == null) {
-            _log.warn("No tunnels to get search replies through!  wtf!");
+            _log.warn("No tunnels to get search replies through!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
@@ -436,7 +436,7 @@ class SearchJob extends JobImpl {
         
         //RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
         //if (inGateway == null) {
-        //    _log.error("We can't find the gateway to our inbound tunnel?! wtf");
+        //    _log.error("We can't find the gateway to our inbound tunnel?!");
         //    getContext().jobQueue().addJob(new FailedJob(getContext(), router));
         //    return;
         //}
@@ -445,10 +445,14 @@ class SearchJob extends JobImpl {
         long expiration = getContext().clock().now() + timeout;
 
         I2NPMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration, router);	
-	
+        if (msg == null) {
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+            return;
+        }
+
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel == null) {
-            _log.warn("No tunnels to send search out through!  wtf!");
+            _log.warn("No tunnels to send search out through! Impossible?");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }        
@@ -480,6 +484,10 @@ class SearchJob extends JobImpl {
         // use the 4-arg one so we pick up the override in ExploreJob
         //I2NPMessage msg = buildMessage(expiration);
         I2NPMessage msg = buildMessage(null, router.getIdentity().getHash(), expiration, router);	
+        if (msg == null) {
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+            return;
+        }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Sending router search directly to " + router.getIdentity().getHash()
@@ -773,10 +781,10 @@ class SearchJob extends JobImpl {
     }
     
     private static class Search {
-        private Job _onFind;
-        private Job _onFail;
-        private long _expiration;
-        private boolean _isLease;
+        private final Job _onFind;
+        private final Job _onFail;
+        private final long _expiration;
+        private final boolean _isLease;
         
         public Search(Job onFind, Job onFail, long expiration, boolean isLease) {
             _onFind = onFind;

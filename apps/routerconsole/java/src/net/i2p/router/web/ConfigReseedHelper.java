@@ -56,34 +56,26 @@ public class ConfigReseedHelper extends HelperBase {
         if ((mode == 0 && (!disabled) && (!required)) ||
             (mode == 1 && (!disabled) && required) ||
             (mode == 2 && disabled))
-            return "checked=\"checked\"";
+            return CHECKED;
         return "";
     }
 
     public String getEnable() {
-        return checked(Reseeder.PROP_PROXY_ENABLE);
+        return getChecked(Reseeder.PROP_PROXY_ENABLE);
     }
 
     /** @since 0.8.9 */
     public String getAuth() {
-        return checked(Reseeder.PROP_PROXY_AUTH_ENABLE);
+        return getChecked(Reseeder.PROP_PROXY_AUTH_ENABLE);
     }
 
     public String getSenable() {
-        return checked(Reseeder.PROP_SPROXY_ENABLE);
+        return getChecked(Reseeder.PROP_SPROXY_ENABLE);
     }
 
     /** @since 0.8.9 */
     public String getSauth() {
-        return checked(Reseeder.PROP_SPROXY_AUTH_ENABLE);
-    }
-
-    /** @since 0.8.9 */
-    private String checked(String prop) {
-        boolean enabled =  _context.getBooleanProperty(prop);
-        if (enabled)
-            return "checked=\"checked\"";
-        return "";
+        return getChecked(Reseeder.PROP_SPROXY_AUTH_ENABLE);
     }
 
     public String getReseedURL() {

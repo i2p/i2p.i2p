@@ -15,10 +15,11 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PException;
@@ -49,6 +50,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
     protected final long _id;
     private static final AtomicLong __id = new AtomicLong();
+    private static final int FIRST_READ_TIMEOUT = 60*1000;
     
     /**
      * Create a new SAM version 1 handler.  This constructor expects
@@ -98,14 +100,15 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         String domain = null;
         String opcode = null;
         boolean canContinue = false;
-        StringTokenizer tok;
         Properties props;
+        final StringBuilder buf = new StringBuilder(128);
 
         this.thread.setName("SAMv1Handler " + _id);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SAM handling started");
 
         try {
+            boolean gotFirstLine = false;
             while (true) {
                 if (shouldStop()) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -122,43 +125,39 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 	_log.info("Connection closed by client");
                 	break;
                 }
-                java.io.InputStream is = clientSocketChannel.socket().getInputStream();
-                if (is == null) {
-                	_log.info("Connection closed by client");
-                	break;
-                }
-                msg = DataHelper.readLine(is);
-                if (msg == null) {
-                    _log.info("Connection closed by client (line read : null)");
+                buf.setLength(0);
+                // first time, set a timeout
+                try {
+                    Socket sock = clientSocketChannel.socket();
+                    ReadLine.readLine(sock, buf, gotFirstLine ? 0 : FIRST_READ_TIMEOUT);
+                    sock.setSoTimeout(0);
+                } catch (SocketTimeoutException ste) {
+                    writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
                     break;
                 }
-                msg = msg.trim();
+                msg = buf.toString();
 
                 if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug("New message received: [" + msg + "]");
+                    _log.debug("New message received: [" + msg + ']');
                 }
-
-                if(msg.equals("")) {
+                props = SAMUtils.parseParams(msg);
+                domain = (String) props.remove(SAMUtils.COMMAND);
+                if (domain == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Ignoring newline");
                     continue;
                 }
-
-                tok = new StringTokenizer(msg, " ");
-                if (tok.countTokens() < 2) {
-                    // This is not a correct message, for sure
+                opcode = (String) props.remove(SAMUtils.OPCODE);
+                if (opcode == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Error in message format");
                     break;
                 }
-                domain = tok.nextToken();
-                opcode = tok.nextToken();
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Parsing (domain: \"" + domain
                                + "\"; opcode: \"" + opcode + "\")");
                 }
-                props = SAMUtils.parseParams(tok);
-
+                gotFirstLine = true;
                 if (domain.equals("STREAM")) {
                     canContinue = execStreamMessage(opcode, props);
                 } else if (domain.equals("DATAGRAM")) {
@@ -370,16 +369,11 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     /* Parse and execute a NAMING message */
   protected boolean execNamingMessage(String opcode, Properties props) {
         if (opcode.equals("LOOKUP")) {
-            if (props.isEmpty()) {
-                _log.debug("No parameters specified in NAMING LOOKUP message");
-                return false;
-            }
-            
             String name = props.getProperty("NAME");
             if (name == null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Name to resolve not specified in NAMING message");
-                return false;
+                return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=\"\" MESSAGE=\"Must specify NAME\"\n");
             }
 
             Destination dest = null ;
@@ -1012,10 +1006,10 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             msg = msg.replace("\r", " ");
             if (!msg.startsWith("\"")) {
                 msg = msg.replace("\"", "");
-                if (msg.contains("\"") || msg.contains("\t"))
+                if (msg.contains(" ") || msg.contains("\t"))
                     msg = '"' + msg + '"';
             }
-            rv = " MESSAGE=\"" + msg + "\"";
+            rv = " MESSAGE=" + msg;
         } else {
             rv = "";
         }

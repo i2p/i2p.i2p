@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Hash;
@@ -30,13 +31,13 @@ import net.i2p.util.Log;
  */
 public class TunnelPool {
     private final List<PooledTunnelCreatorConfig> _inProgress = new ArrayList<PooledTunnelCreatorConfig>();
-    private final RouterContext _context;
-    private final Log _log;
+    protected final RouterContext _context;
+    protected final Log _log;
     private TunnelPoolSettings _settings;
     private final List<TunnelInfo> _tunnels;
     private final TunnelPeerSelector _peerSelector;
     private final TunnelPoolManager _manager;
-    private volatile boolean _alive;
+    protected volatile boolean _alive;
     private long _lifetimeProcessed;
     private TunnelInfo _lastSelected;
     private long _lastSelectionPeriod;
@@ -118,19 +119,15 @@ public class TunnelPool {
         }
     }
 
-    void refreshSettings() {
-        if (!_settings.isExploratory()) {
+    private void refreshSettings() {
+        if (!_settings.isExploratory())
             return; // don't override client specified settings
-        } else {
-            if (_settings.isExploratory()) {
-                Properties props = new Properties();
-                props.putAll(_context.router().getConfigMap());
-                if (_settings.isInbound())
-                    _settings.readFromProperties(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY, props);
-                else
-                    _settings.readFromProperties(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY, props);
-            }
-        }
+        Properties props = new Properties();
+        props.putAll(_context.router().getConfigMap());
+        if (_settings.isInbound())
+            _settings.readFromProperties(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY, props);
+        else
+            _settings.readFromProperties(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY, props);
     }
     
     /** 
@@ -412,11 +409,17 @@ public class TunnelPool {
     public List<PooledTunnelCreatorConfig> listPending() { synchronized (_inProgress) { return new ArrayList<PooledTunnelCreatorConfig>(_inProgress); } }
     
     /** duplicate of size(), let's pick one */
-    int getTunnelCount() { synchronized (_tunnels) { return _tunnels.size(); } }
+    int getTunnelCount() { return size(); }
     
     public TunnelPoolSettings getSettings() { return _settings; }
 
     void setSettings(TunnelPoolSettings settings) { 
+        if (settings != null && _settings != null) {
+            if (!(settings.isExploratory() || _settings.isExploratory())) {
+                settings.getAliases().addAll(_settings.getAliases());
+                settings.setAliasOf(_settings.getAliasOf());
+            }
+        }
         _settings = settings; 
         if (_settings != null) {
             if (_log.shouldLog(Log.INFO))
@@ -606,12 +609,18 @@ public class TunnelPool {
         if (_settings.isInbound() && !_settings.isExploratory()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(toString() + ": refreshing leaseSet on tunnel expiration (but prior to grace timeout)");
-            LeaseSet ls = null;
+            LeaseSet ls;
             synchronized (_tunnels) {
                 ls = locked_buildNewLeaseSet();
             }
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                Set<Hash> aliases = _settings.getAliases();
+                if (aliases != null && !aliases.isEmpty()) {
+                    for (Hash h : aliases) {
+                        _context.clientManager().requestLeaseSet(h, ls);
+                    }
+                }
             }
         }
     }
@@ -710,7 +719,7 @@ public class TunnelPool {
      *
      * @return null on failure
      */
-    private LeaseSet locked_buildNewLeaseSet() {
+    protected LeaseSet locked_buildNewLeaseSet() {
         if (!_alive)
             return null;
 
@@ -749,7 +758,7 @@ public class TunnelPool {
             TunnelId inId = tunnel.getReceiveTunnelId(0);
             Hash gw = tunnel.getPeer(0);
             if ( (inId == null) || (gw == null) ) {
-                _log.error(toString() + ": wtf, tunnel has no inbound gateway/tunnelId? " + tunnel);
+                _log.error(toString() + ": broken? tunnel has no inbound gateway/tunnelId? " + tunnel);
                 continue;
             }
             Lease lease = new Lease();
@@ -1159,7 +1168,7 @@ public class TunnelPool {
             int j = peers.size() - 1 - i;
             cfg.setPeer(j, peers.get(i));
             HopConfig hop = cfg.getConfig(j);
-            hop.setCreation(_context.clock().now());
+            hop.setCreation(now);
             hop.setExpiration(expiration);
             hop.setIVKey(_context.keyGenerator().generateSessionKey());
             hop.setLayerKey(_context.keyGenerator().generateSessionKey());

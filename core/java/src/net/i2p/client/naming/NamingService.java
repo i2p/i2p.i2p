@@ -536,8 +536,8 @@ public abstract class NamingService {
         String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL);
         try {
             Class<?> cls = Class.forName(impl);
-            Constructor<?> con = cls.getConstructor(new Class[] { I2PAppContext.class });
-            instance = (NamingService)con.newInstance(new Object[] { context });
+            Constructor<?> con = cls.getConstructor(I2PAppContext.class);
+            instance = (NamingService)con.newInstance(context);
         } catch (Exception ex) {
             Log log = context.logManager().getLog(NamingService.class);
             // Blockfile may throw RuntimeException but HostsTxt won't

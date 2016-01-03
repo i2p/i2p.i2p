@@ -7,10 +7,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +79,6 @@ public class Reseeder {
 
               // Disabling everything, use SSL
               //"http://i2p.mooo.com/netDb/" + "," +
-              //"http://193.150.121.66/netDb/" + "," +
               //"http://uk.reseed.i2p2.no/" + "," +
               //"http://netdb.i2p2.no/"; // Only SU3 (v3) support
               "";
@@ -89,14 +86,14 @@ public class Reseeder {
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
               "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
-              "https://netdb.rows.io:444/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
+              //"https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
               "https://i2p.mooo.com/netDb/" + "," +
-              "https://193.150.121.66/netDb/" + "," +
               "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
               "https://us.reseed.i2p2.no:444/" + "," +
               "https://uk.reseed.i2p2.no:444/" + "," +
-              "https://link.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
+              "https://www.torontocrypto.org:8443/" + "," +
+              "https://reseed.i2p.vzaws.com:8443/" + ", " + // Only SU3 (v3) support
+              "https://user.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
               "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
@@ -153,7 +150,7 @@ public class Reseeder {
      *  @throws IllegalArgumentException if it doesn't end with zip or su3
      *  @since 0.9.19
      */
-    void requestReseed(URL url) throws IllegalArgumentException {
+    void requestReseed(URI url) throws IllegalArgumentException {
         ReseedRunner reseedRunner = new ReseedRunner(url);
         // set to daemon so it doesn't hang a shutdown
         Thread reseed = new I2PAppThread(reseedRunner, "Reseed", true);
@@ -207,7 +204,7 @@ public class Reseeder {
             if (fetched <= 0)
                 throw new IOException("No seeds extracted");
             _checker.setStatus(
-                _("Reseeding: got router info from file ({0} successful, {1} errors).", fetched, errors));
+                _t("Reseeding: got router info from file ({0} successful, {1} errors).", fetched, errors));
             System.err.println("Reseed got " + fetched + " router infos from file with " + errors + " errors");
             _context.router().eventLog().addEvent(EventLog.RESEED, fetched + " from file");
             return fetched;
@@ -239,7 +236,7 @@ public class Reseeder {
         /** bytes per sec for each su3 downloaded */
         private final List<Long> _bandwidths;
         private static final int MAX_DATE_SETS = 2;
-        private final URL _url;
+        private final URI _url;
 
         /**
          *  Start a reseed from the default URL list
@@ -256,7 +253,7 @@ public class Reseeder {
          *  @throws IllegalArgumentException if it doesn't end with zip or su3
          *  @since 0.9.19
          */
-        public ReseedRunner(URL url) throws IllegalArgumentException {
+        public ReseedRunner(URI url) throws IllegalArgumentException {
             String lc = url.getPath().toLowerCase(Locale.US);
             if (!(lc.endsWith(".zip") || lc.endsWith(".su3")))
                 throw new IllegalArgumentException("Reseed URL must end with .zip or .su3");
@@ -279,7 +276,7 @@ public class Reseeder {
         private void run2() {
             _isRunning = true;
             _checker.setError("");
-            _checker.setStatus(_("Reseeding"));
+            _checker.setStatus(_t("Reseeding"));
             if (_context.getBooleanProperty(PROP_PROXY_ENABLE)) {
                 _proxyHost = _context.getProperty(PROP_PROXY_HOST);
                 _proxyPort = _context.getProperty(PROP_PROXY_PORT, -1);
@@ -311,9 +308,9 @@ public class Reseeder {
                                        "and if nothing helps, read the FAQ about reseeding manually.");
                 } // else < 0, no valid URLs
                 String old = _checker.getError();
-                _checker.setError(_("Reseed failed.") + ' '  +
-                                  _("See {0} for help.",
-                                    "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>") +
+                _checker.setError(_t("Reseed failed.") + ' '  +
+                                  _t("See {0} for help.",
+                                    "<a target=\"_top\" href=\"/configreseed\">" + _t("reseed configuration page") + "</a>") +
                                   "<br>" + old);
             }
             _isRunning = false;
@@ -412,7 +409,7 @@ public class Reseeder {
         * @return count of routerinfos successfully fetched, or -1 if no valid URLs
         */
         private int reseed(boolean echoStatus) {
-            List<URL> URLList = new ArrayList<URL>();
+            List<URI> URLList = new ArrayList<URI>();
             String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
@@ -429,29 +426,29 @@ public class Reseeder {
                     if (!u.endsWith("/"))
                         u = u + '/';
                     try {
-                        URLList.add(new URL(u));
-                    } catch (MalformedURLException mue) {}
+                        URLList.add(new URI(u));
+                    } catch (URISyntaxException mue) {}
                 }
                 Collections.shuffle(URLList, _context.random());
                 if (!SSLDisable && !SSLRequired) {
                     // put the non-SSL at the end of the SSL
-                    List<URL> URLList2 = new ArrayList<URL>();
+                    List<URI> URLList2 = new ArrayList<URI>();
                     tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
                     while (tok.hasMoreTokens()) {
                         String u = tok.nextToken().trim();
                         if (!u.endsWith("/"))
                             u = u + '/';
                         try {
-                            URLList2.add(new URL(u));
-                        } catch (MalformedURLException mue) {}
+                            URLList2.add(new URI(u));
+                        } catch (URISyntaxException mue) {}
                     }
                     Collections.shuffle(URLList2, _context.random());
                     URLList.addAll(URLList2);
                 }
             } else {
                 // custom list given
-                List<URL> SSLList = new ArrayList<URL>();
-                List<URL> nonSSLList = new ArrayList<URL>();
+                List<URI> SSLList = new ArrayList<URI>();
+                List<URI> nonSSLList = new ArrayList<URI>();
                 StringTokenizer tok = new StringTokenizer(URLs, " ,");
                 while (tok.hasMoreTokens()) {
                     // format tokens
@@ -461,12 +458,12 @@ public class Reseeder {
                     // check if ssl or not then add to respective list
                     if (u.startsWith("https")) {
                         try {
-                            SSLList.add(new URL(u));
-                        } catch (MalformedURLException mue) {}
+                            SSLList.add(new URI(u));
+                        } catch (URISyntaxException mue) {}
                     } else {
                         try {
-                            nonSSLList.add(new URL(u));
-                        } catch (MalformedURLException mue) {}
+                            nonSSLList.add(new URI(u));
+                        } catch (URISyntaxException mue) {}
                     }
                 }
                 // shuffle lists
@@ -482,8 +479,8 @@ public class Reseeder {
             }
             if (!isSNISupported()) {
                 try {
-                    URLList.remove(new URL("https://netdb.i2p2.no/"));
-                } catch (MalformedURLException mue) {}
+                    URLList.remove(new URI("https://netdb.i2p2.no/"));
+                } catch (URISyntaxException mue) {}
             }
             if (URLList.isEmpty()) {
                 System.out.println("No valid reseed URLs");
@@ -501,19 +498,19 @@ public class Reseeder {
         * @param echoStatus apparently always false
         * @return count of routerinfos successfully fetched
         */
-        private int reseed(List<URL> URLList, boolean echoStatus) {
+        private int reseed(List<URI> URLList, boolean echoStatus) {
             int total = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
                 if (_context.router().gracefulShutdownInProgress()) {
                     System.out.println("Reseed aborted, shutdown in progress");
                     return total;
                 }
-                URL url = URLList.get(i);
+                URI url = URLList.get(i);
                 int dl = 0;
                 if (ENABLE_SU3) {
                     try {
-                        dl = reseedSU3(new URL(url.toString() + SU3_FILENAME), echoStatus);
-                    } catch (MalformedURLException mue) {}
+                        dl = reseedSU3(new URI(url.toString() + SU3_FILENAME), echoStatus);
+                    } catch (URISyntaxException mue) {}
                 }
                 if (ENABLE_NON_SU3) {
                     if (dl <= 0)
@@ -557,11 +554,11 @@ public class Reseeder {
          * @param echoStatus apparently always false
          * @return count of routerinfos successfully fetched
          **/
-        private int reseedOne(URL seedURL, boolean echoStatus) {
+        private int reseedOne(URI seedURL, boolean echoStatus) {
             try {
                 // Don't use context clock as we may be adjusting the time
                 final long timeLimit = System.currentTimeMillis() + MAX_TIME_PER_HOST;
-                _checker.setStatus(_("Reseeding: fetching seed URL."));
+                _checker.setStatus(_t("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 byte contentRaw[] = readURL(seedURL);
                 if (contentRaw == null) {
@@ -570,7 +567,7 @@ public class Reseeder {
                     System.err.println("Reseed got no router infos from " + seedURL);
                     return 0;
                 }
-                String content = new String(contentRaw);
+                String content = DataHelper.getUTF8(contentRaw);
                 // This isn't really URLs, but Base64 hashes
                 // but they may include % encoding
                 Set<String> urls = new HashSet<String>(1024);
@@ -618,7 +615,7 @@ public class Reseeder {
                      iter.hasNext() && fetched < 200 && System.currentTimeMillis() < timeLimit; ) {
                     try {
                         _checker.setStatus(
-                            _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
+                            _t("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
                         if (!fetchSeed(seedURL.toString(), iter.next()))
                             continue;
@@ -628,7 +625,7 @@ public class Reseeder {
                             if (fetched % 60 == 0)
                                 System.out.println();
                         }
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Failed fetch", e);
                         errors++;
@@ -659,7 +656,7 @@ public class Reseeder {
          *  @return count of routerinfos successfully fetched
          *  @since 0.9.14
          **/
-        public int reseedSU3(URL seedURL, boolean echoStatus) {
+        public int reseedSU3(URI seedURL, boolean echoStatus) {
             return reseedSU3OrZip(seedURL, true, echoStatus);
         }
 
@@ -673,7 +670,7 @@ public class Reseeder {
          *  @return count of routerinfos successfully fetched
          *  @since 0.9.19
          **/
-        public int reseedZip(URL seedURL, boolean echoStatus) {
+        public int reseedZip(URI seedURL, boolean echoStatus) {
             return reseedSU3OrZip(seedURL, false, echoStatus);
         }
 
@@ -687,12 +684,12 @@ public class Reseeder {
          *  @return count of routerinfos successfully fetched
          *  @since 0.9.19
          **/
-        private int reseedSU3OrZip(URL seedURL, boolean isSU3, boolean echoStatus) {
+        private int reseedSU3OrZip(URI seedURL, boolean isSU3, boolean echoStatus) {
             int fetched = 0;
             int errors = 0;
             File contentRaw = null;
             try {
-                _checker.setStatus(_("Reseeding: fetching seed URL."));
+                _checker.setStatus(_t("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 // don't use context time, as we may be step-changing it
                 // from the server header
@@ -728,7 +725,7 @@ public class Reseeder {
                     contentRaw.delete();
             }
             _checker.setStatus(
-                _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
+                _t("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
             System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
             return fetched;
         }
@@ -869,7 +866,7 @@ public class Reseeder {
             if (ourHash != null && DataHelper.eq(hash, ourHash.getData()))
                 return false;
 
-            URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + ROUTERINFO_PREFIX + peer + ROUTERINFO_SUFFIX);
+            URI url = new URI(seedURL + (seedURL.endsWith("/") ? "" : "/") + ROUTERINFO_PREFIX + peer + ROUTERINFO_SUFFIX);
 
             byte data[] = readURL(url);
             if (data == null || data.length <= 0)
@@ -878,7 +875,7 @@ public class Reseeder {
         }
 
         /** @return null on error */
-        private byte[] readURL(URL url) throws IOException {
+        private byte[] readURL(URI url) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
             EepGet get;
             boolean ssl = url.toString().startsWith("https");
@@ -923,7 +920,7 @@ public class Reseeder {
          *  @return null on error
          *  @since 0.9.14
          */
-        private File fetchURL(URL url) throws IOException {
+        private File fetchURL(URI url) throws IOException {
             File out = new File(_context.getTempDir(), "reseed-" + _context.random().nextInt() + ".tmp");
             EepGet get;
             boolean ssl = url.toString().startsWith("https");
@@ -1000,17 +997,17 @@ public class Reseeder {
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /** translate */
-    private String _(String key) {
+    private String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
     /** translate */
-    private String _(String s, Object o) {
+    private String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 
     /** translate */
-    private String _(String s, Object o, Object o2) {
+    private String _t(String s, Object o, Object o2) {
         return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
     }
 

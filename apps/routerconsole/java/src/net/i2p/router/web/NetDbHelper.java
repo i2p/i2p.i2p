@@ -5,6 +5,8 @@ import net.i2p.data.DataHelper;
 
 public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
+    private String _version;
+    private String _country;
     private int _full;
     private boolean _lease;
     private boolean _debug;
@@ -17,7 +19,8 @@ public class NetDbHelper extends HelperBase {
                                            _x("All Routers"),                   // 3
                                            _x("All Routers with Full Stats"),   // 4
                                            "LeaseSet Debug",                    // 5
-                                           _x("LeaseSets")   };                 // 6
+                                           _x("LeaseSets"),                     // 6
+                                           "Sybil"   };                         // 7
 
     private static final String links[] =
                                           {"",                                  // 0
@@ -26,11 +29,24 @@ public class NetDbHelper extends HelperBase {
                                            "?f=2",                              // 3
                                            "?f=1",                              // 4
                                            "?l=2",                              // 5
-                                           "?l=1" };                            // 6
+                                           "?l=1",                              // 6
+                                           "?f=3" };                            // 7
 
     public void setRouter(String r) {
         if (r != null)
             _routerPrefix = DataHelper.stripHTML(r);  // XSS
+    }
+
+    /** @since 0.9.21 */
+    public void setVersion(String v) {
+        if (v != null)
+            _version = DataHelper.stripHTML(v);  // XSS
+    }
+
+    /** @since 0.9.21 */
+    public void setCountry(String c) {
+        if (c != null)
+            _country = DataHelper.stripHTML(c);  // XSS
     }
 
     public void setFull(String f) {
@@ -59,10 +75,12 @@ public class NetDbHelper extends HelperBase {
         NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
             renderNavBar();
-            if (_routerPrefix != null)
-                renderer.renderRouterInfoHTML(_out, _routerPrefix);
+            if (_routerPrefix != null || _version != null || _country != null)
+                renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
+            else if (_full == 3)
+                (new SybilRenderer(_context)).getNetDbSummary(_out);
             else
                 renderer.renderStatusHTML(_out, _full);
         } catch (IOException ioe) {
@@ -87,6 +105,8 @@ public class NetDbHelper extends HelperBase {
             return 3;
         if (_full == 1)
             return 4;
+        if (_full == 3)
+            return 7;
         return 0;
     }
 
@@ -105,18 +125,18 @@ public class NetDbHelper extends HelperBase {
         for (int i = 0; i < titles.length; i++) {
             if (i == 2 && tab != 2)
                 continue;   // can't nav to lookup
-            if (i == 5 && !_context.getBooleanProperty(PROP_ADVANCED))
+            if ((i == 5 || i == 7) && !_context.getBooleanProperty(PROP_ADVANCED))
                 continue;
             if (i == tab) {
                 // we are there
                 if (span)
                     buf.append("<span class=\"tab2\">");
-                buf.append(_(titles[i]));
+                buf.append(_t(titles[i]));
             } else {
                 // we are not there, make a link
                 if (span)
                     buf.append("<span class=\"tab\">");
-                buf.append("<a href=\"netdb").append(links[i]).append("\">").append(_(titles[i])).append("</a>");
+                buf.append("<a href=\"netdb").append(links[i]).append("\">").append(_t(titles[i])).append("</a>");
             }
             if (span)
                 buf.append(" </span>\n");

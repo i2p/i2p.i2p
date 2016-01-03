@@ -213,7 +213,7 @@ class BuildHandler implements Runnable {
         while (_isRunning && !_manager.isShutdown()) {
             try {
                 handleInboundRequest();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "B0rked in the tunnel handler", e);
             }
         }
@@ -352,7 +352,7 @@ class BuildHandler implements Runnable {
                         default:
                             _context.statManager().addRateData("tunnel.receiveRejectionCritical", 1);
                     }
-                    // penalize peer based on their bitchiness level
+                    // penalize peer based on their reported error level
                     _context.profileManager().tunnelRejected(peer, rtt, howBad);
                     _context.messageHistory().tunnelParticipantRejected(peer, "peer rejected after " + rtt + " with " + howBad + ": " + cfg.toString());
                 }
@@ -629,9 +629,17 @@ class BuildHandler implements Runnable {
         boolean isInGW = req.readIsInboundGateway();
         boolean isOutEnd = req.readIsOutboundEndpoint();
 
+        Hash from = state.fromHash;
+        if (from == null && state.from != null)
+            from = state.from.calculateHash();
+        // warning, from could be null, but it should only
+        // happen if we will be a IBGW and it came from us as a OBEP
+
         if (isInGW && isOutEnd) {
             _context.statManager().addRateData("tunnel.rejectHostile", 1);
             _log.error("Dropping build request, IBGW+OBEP");
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
 
@@ -640,24 +648,24 @@ class BuildHandler implements Runnable {
             _context.statManager().addRateData("tunnel.rejectHostile", 1);
             // We are 2 hops in a row? Drop it without a reply.
             // No way to recognize if we are every other hop, but see below
-            _log.error("Dropping build request, we are the next hop");
+            // old i2pd
+            if (_log.shouldWarn())
+                _log.warn("Dropping build request, we are the next hop");
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
-        // previous test should be sufficient to keep it from getting here but maybe not?
         if (!isInGW) {
-            Hash from = state.fromHash;
-            if (from == null)
-                from = state.from.calculateHash();
-            if (_context.routerHash().equals(from)) {
+            // if from is null, it came via OutboundMessageDistributor.distribute(),
+            // i.e. we were the OBEP, which is fine if we're going to be an IBGW
+            // but if not, something is seriously wrong here.
+            if (from == null || _context.routerHash().equals(from)) {
                 _context.statManager().addRateData("tunnel.rejectHostile", 1);
                 _log.error("Dropping build request, we are the previous hop");
                 return;
             }
         }
         if ((!isOutEnd) && (!isInGW)) {
-            Hash from = state.fromHash;
-            if (from == null)
-                from = state.from.calculateHash();
             // Previous and next hop the same? Don't help somebody be evil. Drop it without a reply.
             // A-B-C-A is not preventable
             if (nextPeer.equals(from)) {
@@ -665,6 +673,7 @@ class BuildHandler implements Runnable {
                 _context.statManager().addRateData("tunnel.rejectHostile", 1);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping build request with the same previous and next hop");
+                _context.commSystem().mayDisconnect(from);
                 return;
             }
         }
@@ -679,12 +688,16 @@ class BuildHandler implements Runnable {
             _context.statManager().addRateData("tunnel.rejectTooOld", 1);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping build request too old... replay attack? " + DataHelper.formatDuration(timeDiff));
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
         if (timeDiff < 0 - MAX_REQUEST_FUTURE) {
             _context.statManager().addRateData("tunnel.rejectFuture", 1);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping build request too far in future " + DataHelper.formatDuration(0 - timeDiff));
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return;
         }
 
@@ -759,9 +772,6 @@ class BuildHandler implements Runnable {
         // This is at the end as it compares to a percentage of created tunnels.
         // We may need another counter above for requests.
         if (response == 0 && !isInGW) {
-            Hash from = state.fromHash;
-            if (from == null)
-                from = state.from.calculateHash();
             if (from != null && _throttler.shouldThrottle(from)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rejecting tunnel (hop throttle), previous hop: " + from);
@@ -782,8 +792,7 @@ class BuildHandler implements Runnable {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Responding to " + state.msg.getUniqueId() + "/" + ourId
                        + " after " + recvDelay + " with " + response 
-                       + " from " + (state.fromHash != null ? state.fromHash : 
-                                     state.from != null ? state.from.calculateHash() : "tunnel"));
+                       + " from " + (from != null ? from : "tunnel"));
 
         HopConfig cfg = null;
         if (response == 0) {
@@ -793,12 +802,11 @@ class BuildHandler implements Runnable {
             cfg.setIVKey(req.readIVKey());
             cfg.setLayerKey(req.readLayerKey());
             if (isInGW) {
-                cfg.setReceiveFrom(null);
+                // default
+                //cfg.setReceiveFrom(null);
             } else {
-                if (state.fromHash != null) {
-                    cfg.setReceiveFrom(state.fromHash);
-                } else if (state.from != null) {
-                    cfg.setReceiveFrom(state.from.calculateHash());
+                if (from != null) {
+                    cfg.setReceiveFrom(from);
                 } else {
                     // b0rk
                     return;
@@ -806,8 +814,9 @@ class BuildHandler implements Runnable {
             }
             cfg.setReceiveTunnelId(DataHelper.toLong(4, ourId));
             if (isOutEnd) {
-                cfg.setSendTo(null);
-                cfg.setSendTunnelId(null);
+                // default
+                //cfg.setSendTo(null);
+                //cfg.setSendTunnelId(null);
             } else {
                 cfg.setSendTo(nextPeer);
                 cfg.setSendTunnelId(DataHelper.toLong(4, nextId));
@@ -834,27 +843,33 @@ class BuildHandler implements Runnable {
                     _log.warn("DUP ID failure " + state.msg.getUniqueId() + "/" + cfg.getReceiveTunnel() + " as " + (isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
             }
         }
+
+        // determination of response is now complete
+
         if (response != 0) {
             _context.statManager().addRateData("tunnel.reject." + response, 1);
-            _context.messageHistory().tunnelRejected(state.fromHash, new TunnelId(ourId), nextPeer, 
+            _context.messageHistory().tunnelRejected(from, new TunnelId(ourId), nextPeer, 
                                                      "rejecting for " + response + ": " +
                                                      state.msg.getUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
                                                      recvDelay + " as " +
                                                      (isOutEnd ? "outbound endpoint" : isInGW ? "inbound gw" : "participant"));
-        }
-
-        // Connection congestion control:
-        // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
-        // just drop it.
-        // 81% = between 75% control measures in Transports and 87% rejection above
-        if (response != 0 &&
-            (! _context.routerHash().equals(nextPeer)) &&
-            (! _context.commSystem().haveOutboundCapacity(81)) &&
-            (! _context.commSystem().isEstablished(nextPeer))) {
-            _context.statManager().addRateData("tunnel.dropConnLimits", 1);
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Not sending rejection due to conn limits");
-            return;
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
+            // Connection congestion control:
+            // If we rejected the request, are near our conn limits, and aren't connected to the next hop,
+            // just drop it.
+            // 81% = between 75% control measures in Transports and 87% rejection above
+            if ((! _context.routerHash().equals(nextPeer)) &&
+                (! _context.commSystem().haveOutboundCapacity(81)) &&
+                (! _context.commSystem().isEstablished(nextPeer))) {
+                _context.statManager().addRateData("tunnel.dropConnLimits", 1);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not sending rejection due to conn limits");
+                return;
+            }
+        } else if (isInGW && from != null) {
+            // we're the start of the tunnel, no use staying connected
+            _context.commSystem().mayDisconnect(from);
         }
 
         EncryptedBuildRecord reply = BuildResponseRecord.create(_context, response, req.readReplyKey(), req.readReplyIV(), state.msg.getUniqueId());
@@ -930,6 +945,11 @@ class BuildHandler implements Runnable {
      *  but could also be the reply where we are the IBEP.
      */
     private class TunnelBuildMessageHandlerJobBuilder implements HandlerJobBuilder {
+
+        /**
+         *  Either from or fromHash may be null, but both should be null only if
+         *  we're to be a IBGW and it came from us as a OBEP.
+         */
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             // need to figure out if this is a reply to an inbound tunnel request (where we are the
             // endpoint, receiving the request at the last hop)
@@ -1056,6 +1076,10 @@ class BuildHandler implements Runnable {
         final Hash fromHash;
         final long recvTime;
 
+        /**
+         *  Either f or h may be null, but both should be null only if
+         *  we're to be a IBGW and it came from us as a OBEP.
+         */
         public BuildMessageState(RouterContext ctx, I2NPMessage m, RouterIdentity f, Hash h) {
             _ctx = ctx;
             msg = (TunnelBuildMessage)m;

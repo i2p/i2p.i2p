@@ -20,8 +20,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.util.I2PAppThread;
 
 /**
  * Listen on TCP port and connect to I2P
@@ -30,12 +32,11 @@ import net.i2p.client.streaming.I2PSocketManager;
  */
 public class TCPlistener implements Runnable {
 
-	private NamedDB info,  database;
-	private Logger _log;
-	public I2PSocketManager socketManager;
-	public I2PServerSocket serverSocket;
-	private ServerSocket listener;
-	private AtomicBoolean lives;
+	private final NamedDB info,  database;
+	private final Logger _log;
+	private final I2PSocketManager socketManager;
+	private final ServerSocket listener;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor
@@ -76,7 +77,7 @@ public class TCPlistener implements Runnable {
 						conn++;
 						// toss the connection to a new thread.
 						TCPtoI2P conn_c = new TCPtoI2P(socketManager, server, info, database, lives);
-						Thread t = new Thread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
+						Thread t = new I2PAppThread(conn_c, Thread.currentThread().getName() + " TCPtoI2P " + conn);
 						t.start();
 						g = false;
 					}

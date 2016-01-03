@@ -5,6 +5,7 @@
 # 
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
+# cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
 # Martin Svensson <digitalmannen@gmail.com>, 2011, 2012
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-17 21:49+0000\n"
-"PO-Revision-Date: 2014-09-17 22:07+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"POT-Creation-Date: 2015-05-14 08:33+0000\n"
+"PO-Revision-Date: 2015-05-14 15:44+0000\n"
+"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -70,7 +71,7 @@ msgstr "Signerad"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:233
 msgid "Key"
-msgstr ""
+msgstr "Nyckel"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:235
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:260
@@ -118,27 +119,27 @@ msgid "Showing {0} of {1}"
 msgstr "Visar {0} av {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:228
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:412
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
 msgid "Add"
 msgstr "Lägg till"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:228
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:240
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
 msgid "Replace"
 msgstr "Ersätt "
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:254
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:239
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:243
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
 msgstr "Värdnamnet {0} finns redan i adressboken, oförändrat."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:256
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:241
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #, java-format
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
@@ -146,63 +147,63 @@ msgid ""
 msgstr "Värdnamnet {0} finns redan i adressboken med en annan destination. Klicka på \"Ersätt\"för att skriva över."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:254
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
 #, java-format
 msgid "Destination added for {0}."
 msgstr "Mål tillagt för {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:271
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:256
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:260
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "Mål ändrat för {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:273
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
 msgid "Warning - host name does not end with \".i2p\""
 msgstr "Varning - värdnamn slutar inte med \".i2p\""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:266
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:270
 msgid "Invalid Base 64 destination."
 msgstr "Ogiltigt Base64 mål."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:272
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:276
 #, java-format
 msgid "Invalid host name \"{0}\"."
 msgstr "Ogiltigt värdnamn  \"{0}\"."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:275
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 msgid "Please enter a host name and destination"
 msgstr "Ange värdnamn och mål"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:312
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:304
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:270
 msgid "Delete Entry"
 msgstr "Ta bort post"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
 msgid "Delete Selected"
 msgstr "Radera Valda"
 
 #. parameter is a host name
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:300
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "Mål {0} raderat."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
@@ -210,12 +211,12 @@ msgstr[0] "1 mål raderat."
 msgstr[1] "{0} mål raderade."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:301
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:305
 msgid "No entries selected to delete."
 msgstr "Inga poster valda för radering."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
 msgid "Address book saved."
 msgstr "Adressbok sparad."
 
@@ -225,8 +226,8 @@ msgstr "FEL: Kunde inte skriva till adressboks filen."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -234,15 +235,15 @@ msgstr "Felaktigt formulär skickat, förmodligen för att du använde \"Bakåt 
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:314
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr "Om problemet kvarstår, bekräfta att du har cookies påslaget i din browser."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:126
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid "Save"
@@ -253,7 +254,7 @@ msgid "Configuration saved."
 msgstr "Inställningar sparade."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Reload"
@@ -263,35 +264,35 @@ msgstr "Ladda om"
 msgid "Configuration reloaded."
 msgstr "Inställningar laddade igen."
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:101
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:104
 #, java-format
 msgid "{0} address book in {1} database"
 msgstr "{0} adressboken i {1} databas"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:253
 msgid "Manually added via SusiDNS"
 msgstr "Manuellt tillagda via SusiDNS"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:263
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:267
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
 msgstr "Kunde inte lägga till målet för {0} till namntjänsten {1}"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:287
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:291
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "Det gick inte att ta bort målet för {0} från namntjänsten {1}"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:140
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr "Prenumerationer sparade, uppdaterar adressbok från prenumerations-källorna nu."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:143
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
 msgid "Subscriptions saved."
 msgstr "Prenumerationer sparade."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions reloaded."
 msgstr "Prenumerationer laddade igen."
 
@@ -411,7 +412,7 @@ msgid "Links"
 msgstr "Länkar"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:404
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
 msgid "Destination"
 msgstr "Mål"
@@ -433,19 +434,23 @@ msgid "details"
 msgstr "detaljer"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:383
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+msgid "Export in hosts.txt format"
+msgstr "Exportera till hosts.txt format"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "This address book is empty."
 msgstr "Denna adressboken är tom."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
 msgid "Add new destination"
 msgstr "Lägg till nytt mål"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:400
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
 msgid "Host Name"
 msgstr "Värdnamn"
@@ -629,7 +634,7 @@ msgstr "Den uppdaterar din hosts.txt fil från distribuerade källor eller \"pre
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
-msgstr ""
+msgstr "I den förvalda konfigurationen, är adressboken endast abonnerad till {0}"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:145
 msgid ""
@@ -641,7 +646,7 @@ msgstr "Att prenumerera på ytterligare siter är enkelt, lägg bara till dem i 
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_top\">the overview</a>."
-msgstr ""
+msgstr "För mer information om namngivning i I2P, se  <a ref=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">överblicken</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:149
 msgid "How does the addressbook application work?"
@@ -706,7 +711,7 @@ msgstr "Dessa URLer hänvisar till publicerade hosts.txt filer."
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
-msgstr ""
+msgstr "Den förvalda prenumerationen är hosts.txt från {0}, som endast uppdateras sällan."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:161
 msgid ""

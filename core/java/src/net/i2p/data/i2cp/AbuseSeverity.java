@@ -45,7 +45,7 @@ public class AbuseSeverity extends DataStructureImpl {
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_severityId < 0) throw new DataFormatException("Invalid abuse severity: " + _severityId);
-        DataHelper.writeLong(out, 1, _severityId);
+        out.write((byte) _severityId);
     }
 
     @Override

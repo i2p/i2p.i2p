@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -21,6 +23,7 @@ public class SAMReader {
     private final SAMClientEventListener _listener;
     private volatile boolean _live;
     private Thread _thread;
+    private static final AtomicInteger _count = new AtomicInteger();
     
     public SAMReader(I2PAppContext context, InputStream samIn, SAMClientEventListener listener) {
         _log = context.logManager().getLog(SAMReader.class);
@@ -32,7 +35,7 @@ public class SAMReader {
         if (_live)
             throw new IllegalStateException();
         _live = true;
-        I2PAppThread t = new I2PAppThread(new Runner(), "SAM reader");
+        I2PAppThread t = new I2PAppThread(new Runner(), "SAM reader " + _count.incrementAndGet());
         t.start();
         _thread = t;
     }
@@ -111,10 +114,7 @@ public class SAMReader {
                     break;
                 }
                 
-                String line = "";
-                try {
-                    line = new String(baos.toByteArray(), "ISO-8859-1");
-                } catch (IOException ioe) {}
+                String line = DataHelper.getUTF8(baos.toByteArray());
                 baos.reset();
                 
                 if (_log.shouldDebug())
@@ -275,7 +275,7 @@ public class SAMReader {
                 String pr = params.getProperty("PROTOCOL");
                 int fromPort = 0;
                 int toPort = 0;
-                int protocol = 18;
+                int protocol = I2PSession.PROTO_DATAGRAM_RAW;
                 try {
                     if (fp != null)
                         fromPort = Integer.parseInt(fp);

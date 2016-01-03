@@ -694,6 +694,18 @@ input.reload {
      min-height: 22px;
 }
 
+input.starttorrent {
+     background: #f3efc7 url('images/start.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.stoptorrent {
+     background: #f3efc7 url('images/stop.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
 select {
      background: #fff;
 /*     background: url('/themes/snark/ubergine/images/graytile.png') !important;*/

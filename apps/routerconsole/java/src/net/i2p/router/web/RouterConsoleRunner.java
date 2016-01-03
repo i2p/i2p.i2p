@@ -26,8 +26,9 @@ import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
-import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
+import net.i2p.router.news.NewsManager;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -298,12 +299,12 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava7) {
-                s = "Java 7 will be required by mid-2015, please upgrade soon";
+                s = "Java 7 will be required by late 2015, please upgrade soon";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 will be required by mid-2015, please upgrade Java soon";
+                s = "Pack200 will be required by late 2015, please upgrade Java soon";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -517,7 +518,7 @@ public class RouterConsoleRunner implements RouterApp {
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                     sslFactory.addExcludeProtocols(I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.toArray(
                                                    new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
-                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.INCLUDE_CIPHERS.toArray(
+                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
                                                       new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
@@ -629,8 +630,9 @@ public class RouterConsoleRunner implements RouterApp {
                 }
             }
             if (error) {
+                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : "7657");
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
-                               "If your console is still accessible at http://127.0.0.1:" + _listenPort + "/,\n" +
+                               "If your console is still accessible at http://127.0.0.1:" + port + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");
@@ -706,6 +708,8 @@ public class RouterConsoleRunner implements RouterApp {
         
             ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
+            NewsManager nm = new NewsManager(_context, _mgr, null);
+            nm.startup();
         
             if (PluginStarter.pluginsEnabled(_context)) {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
@@ -757,6 +761,13 @@ public class RouterConsoleRunner implements RouterApp {
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
+                // export cert, fails silently
+                File dir = new SecureDirectory(_context.getConfigDir(), "certificates");
+                dir.mkdir();
+                dir = new SecureDirectory(dir, "console");
+                dir.mkdir();
+                File certFile = new File(dir, "console.local.crt");
+                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {

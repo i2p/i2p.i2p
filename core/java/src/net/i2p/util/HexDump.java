@@ -13,6 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import net.i2p.data.DataHelper;
+
 /**
  * Hexdump class (well, it's actually a namespace with some functions,
  * but let's stick with java terminology :-).  These methods generate
@@ -25,7 +27,7 @@ public class HexDump {
 
     private static final int FORMAT_OFFSET_PADDING = 8;
     private static final int FORMAT_BYTES_PER_ROW = 16;
-    private static final byte[] HEXCHARS = "0123456789abcdef".getBytes();
+    private static final byte[] HEXCHARS = DataHelper.getASCII("0123456789abcdef");
 
     /**
      * Dump a byte array in a String.
@@ -37,11 +39,10 @@ public class HexDump {
 
         try {
             dump(data, 0, data.length, out);
+            return out.toString("ISO-8859-1");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("no 8859?", e);
         }
-
-        return out.toString();
     }
 
     /**
@@ -56,11 +57,10 @@ public class HexDump {
 
         try {
             dump(data, off, len, out);
+            return out.toString("ISO-8859-1");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("no 8859?", e);
         }
-
-        return out.toString();
     }
 
     /**
@@ -91,9 +91,10 @@ public class HexDump {
             hexoff = Integer.toString(dumpoff, 16);
             hexofflen = hexoff.length();
             for (i = 0; i < FORMAT_OFFSET_PADDING - hexofflen; ++i) {
-                hexoff = "0" + hexoff;
+                out.write('0');
             }
-            out.write((hexoff + " ").getBytes());
+            out.write(DataHelper.getASCII(hexoff));
+            out.write(' ');
 
             // Bytes to be printed in the current line
             nextbytes = (FORMAT_BYTES_PER_ROW < (end - dumpoff) ? FORMAT_BYTES_PER_ROW : (end - dumpoff));
@@ -101,35 +102,48 @@ public class HexDump {
             for (i = 0; i < FORMAT_BYTES_PER_ROW; ++i) {
                 // Put two spaces to separate 8-bytes blocks
                 if ((i % 8) == 0) {
-                    out.write(" ".getBytes());
+                    out.write(' ');
                 }
                 if (i >= nextbytes) {
-                    out.write("   ".getBytes());
+                    out.write(DataHelper.getASCII("   "));
                 } else {
                     val = data[dumpoff + i] & 0xff;
                     out.write(HEXCHARS[val >>> 4]);
                     out.write(HEXCHARS[val & 0xf]);
-                    out.write(" ".getBytes());
+                    out.write(' ');
                 }
             }
 
-            out.write(" |".getBytes());
+            out.write(DataHelper.getASCII(" |"));
 
             for (i = 0; i < FORMAT_BYTES_PER_ROW; ++i) {
                 if (i >= nextbytes) {
-                    out.write(" ".getBytes());
+                    out.write(' ');
                 } else {
                     val = data[i + dumpoff];
                     // Is it a printable character?
                     if ((val > 31) && (val < 127)) {
                         out.write(val);
                     } else {
-                        out.write(".".getBytes());
+                        out.write('.');
                     }
                 }
             }
 
-            out.write("|\n".getBytes());
+            out.write('|');
+            out.write('\n');
         }
     }
+
+    /**
+     *  @since 0.9.21
+     */
+/****
+    public static void main(String[] args) {
+        byte[] b = new byte[9993];
+        RandomSource.getInstance().nextBytes(b);
+        System.out.println(dump(b));
+        System.out.println(dump("test test test abcde xyz !!!".getBytes()));
+    }
+****/
 }

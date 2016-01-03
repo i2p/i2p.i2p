@@ -257,7 +257,7 @@ public class DSAEngine {
                     _log.warn("Took too long to verify the signature (" + diff + "ms)");
             }
             return ok;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             _log.log(Log.CRIT, "Error verifying the signature", e);
             return false;
         }
@@ -285,8 +285,8 @@ public class DSAEngine {
             try {
                 return altSign(data, offset, length, signingKey);
             } catch (GeneralSecurityException gse) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(type + " Sign Fail", gse);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error(type + " Sign Fail", gse);
                 return null;
             }
         }

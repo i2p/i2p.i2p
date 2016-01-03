@@ -29,7 +29,7 @@ public class ByteArrayPool
     public static final int __POOL_SIZE=
         Integer.getInteger("org.mortbay.util.ByteArrayPool.pool_size",8).intValue();
     
-    public static final ThreadLocal __pools=new BAThreadLocal();
+    public static final ThreadLocal<byte[][]> __pools = new BAThreadLocal();
     public static final AtomicInteger __slot = new AtomicInteger();
     
     /* ------------------------------------------------------------ */
@@ -39,7 +39,7 @@ public class ByteArrayPool
      */
     public static byte[] getByteArray(int size)
     {
-        byte[][] pool = (byte[][])__pools.get();
+        byte[][] pool = __pools.get();
         boolean full=true;
         for (int i=pool.length;i-->0;)
         {
@@ -63,7 +63,7 @@ public class ByteArrayPool
     /* ------------------------------------------------------------ */
     public static byte[] getByteArrayAtLeast(int minSize)
     {
-        byte[][] pool = (byte[][])__pools.get();
+        byte[][] pool = __pools.get();
         for (int i=pool.length;i-->0;)
         {
             if (pool[i]!=null && pool[i].length>=minSize)
@@ -84,7 +84,7 @@ public class ByteArrayPool
         if (b==null)
             return;
         
-        byte[][] pool = (byte[][])__pools.get();
+        byte[][] pool = __pools.get();
         for (int i=pool.length;i-->0;)
         {
             if (pool[i]==null)
@@ -103,9 +103,10 @@ public class ByteArrayPool
     
     /* ------------------------------------------------------------ */
     /* ------------------------------------------------------------ */
-    private static final class BAThreadLocal extends ThreadLocal
+    private static final class BAThreadLocal extends ThreadLocal<byte[][]>
     {
-        protected Object initialValue()
+        @Override
+        protected byte[][] initialValue()
             {
                 return new byte[__POOL_SIZE][];
             }

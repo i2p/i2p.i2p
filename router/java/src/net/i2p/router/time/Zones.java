@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.router.transport.GeoIP;
 
 /**
@@ -105,7 +106,7 @@ class Zones {
                 try {
                     if (line.charAt(0) == '#')
                         continue;
-                    String[] s = line.split(",");
+                    String[] s = DataHelper.split(line, ",");
                     String ucContinent = s[1].toUpperCase(Locale.US).trim();
                     String zone = _continentToZone.get(ucContinent);
                     if (zone == null)

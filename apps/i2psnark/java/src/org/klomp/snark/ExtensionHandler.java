@@ -42,7 +42,7 @@ abstract class ExtensionHandler {
    *  @param dht advertise DHT capability
    *  @return bencoded outgoing handshake message
    */
-    public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht) {
+    public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht, boolean uploadOnly) {
         Map<String, Object> handshake = new HashMap<String, Object>();
         Map<String, Integer> m = new HashMap<String, Integer>();
         if (pexAndMetadata) {
@@ -59,6 +59,9 @@ abstract class ExtensionHandler {
         handshake.put("p", Integer.valueOf(TrackerClient.PORT));
         handshake.put("v", "I2PSnark");
         handshake.put("reqq", Integer.valueOf(5));
+        // BEP 21
+        if (uploadOnly)
+            handshake.put("upload_only", Integer.valueOf(1));
         return BEncoder.bencode(handshake);
     }
 
@@ -90,17 +93,20 @@ abstract class ExtensionHandler {
             peer.setHandshakeMap(map);
             Map<String, BEValue> msgmap = map.get("m").getMap();
 
-            if (msgmap.get(TYPE_PEX) != null) {
-                if (log.shouldLog(Log.DEBUG))
-                    log.debug("Peer supports PEX extension: " + peer);
-                // peer state calls peer listener calls sendPEX()
-            }
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Peer " + peer + " supports extensions: " + msgmap.keySet());
 
-            if (msgmap.get(TYPE_DHT) != null) {
-                if (log.shouldLog(Log.DEBUG))
-                    log.debug("Peer supports DHT extension: " + peer);
-                // peer state calls peer listener calls sendDHT()
-            }
+            //if (msgmap.get(TYPE_PEX) != null) {
+            //    if (log.shouldLog(Log.DEBUG))
+            //        log.debug("Peer supports PEX extension: " + peer);
+            //    // peer state calls peer listener calls sendPEX()
+            //}
+
+            //if (msgmap.get(TYPE_DHT) != null) {
+            //    if (log.shouldLog(Log.DEBUG))
+            //        log.debug("Peer supports DHT extension: " + peer);
+            //    // peer state calls peer listener calls sendDHT()
+            //}
 
             MagnetState state = peer.getMagnetState();
 
@@ -204,30 +210,31 @@ abstract class ExtensionHandler {
                 if (log.shouldLog(Log.DEBUG))
                     log.debug("Got request for " + piece + " from: " + peer);
                 byte[] pc;
+                int totalSize;
                 synchronized(state) {
                     pc = state.getChunk(piece);
+                    totalSize = state.getSize();
                 }
-                sendPiece(peer, piece, pc);
+                sendPiece(peer, piece, pc, totalSize);
                 // Do this here because PeerConnectionOut only reports for PIECE messages
                 peer.uploaded(pc.length);
                 listener.uploaded(peer, pc.length);
             } else if (type == TYPE_DATA) {
-                int size = map.get("total_size").getInt();
-                if (log.shouldLog(Log.DEBUG))
-                    log.debug("Got data for " + piece + " length " + size + " from: " + peer);
+                // On close reading of BEP 9, this is the total metadata size.
+                // Prior to 0.9.21, we sent the piece size, so we can't count on it.
+                // just ignore it. The actual length will be verified in saveChunk()
+                //int size = map.get("total_size").getInt();
+                //if (log.shouldLog(Log.DEBUG))
+                //    log.debug("Got data for " + piece + " length " + size + " from: " + peer);
                 boolean done;
                 int chk = -1;
                 synchronized(state) {
                     if (state.isComplete())
                         return;
                     int len = is.available();
-                    if (len != size) {
-                        // probably fatal
-                        if (log.shouldLog(Log.WARN))
-                            log.warn("total_size " + size + " but avail data " + len);
-                    }
                     peer.downloaded(len);
                     listener.downloaded(peer, len);
+                    // this checks the size
                     done = state.saveChunk(piece, bs, bs.length - len, len);
                     if (log.shouldLog(Log.INFO))
                         log.info("Got chunk " + piece + " from " + peer);
@@ -290,11 +297,15 @@ abstract class ExtensionHandler {
         }
     }
 
-    private static void sendPiece(Peer peer, int piece, byte[] data) {
+    private static void sendPiece(Peer peer, int piece, byte[] data, int totalSize) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("msg_type", Integer.valueOf(TYPE_DATA));
         map.put("piece", Integer.valueOf(piece));
-        map.put("total_size", Integer.valueOf(data.length));
+        // BEP 9
+        // "This key has the same semantics as the 'metadata_size' in the extension header"
+        // which apparently means the same value. Fixed in 0.9.21.
+        //map.put("total_size", Integer.valueOf(data.length));
+        map.put("total_size", Integer.valueOf(totalSize));
         byte[] dict = BEncoder.bencode(map);
         byte[] payload = new byte[dict.length + data.length];
         System.arraycopy(dict, 0, payload, 0, dict.length);

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -49,6 +49,9 @@ msgid "Netherlands Antilles"
 msgstr ""
 
 msgid "Angola"
+msgstr ""
+
+msgid "Asia/Pacific Region"
 msgstr ""
 
 msgid "Antarctica"
@@ -102,6 +105,9 @@ msgstr ""
 msgid "Benin"
 msgstr ""
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr ""
 
@@ -109,6 +115,9 @@ msgid "Brunei Darussalam"
 msgstr ""
 
 msgid "Bolivia"
+msgstr ""
+
+msgid "Bonaire"
 msgstr ""
 
 msgid "Brazil"
@@ -138,13 +147,10 @@ msgstr ""
 msgid "Cocos (Keeling) Islands"
 msgstr ""
 
-msgid "The Democratic Republic of the Congo"
+msgid "Congo"
 msgstr ""
 
 msgid "Central African Republic"
-msgstr ""
-
-msgid "Congo"
 msgstr ""
 
 msgid "Switzerland"
@@ -243,7 +249,7 @@ msgstr ""
 msgid "Falkland Islands (Malvinas)"
 msgstr ""
 
-msgid "Federated States of Micronesia"
+msgid "Micronesia"
 msgstr ""
 
 msgid "Faroe Islands"
@@ -345,7 +351,7 @@ msgstr ""
 msgid "Iraq"
 msgstr ""
 
-msgid "Islamic Republic of Iran"
+msgid "Iran"
 msgstr ""
 
 msgid "Iceland"
@@ -384,7 +390,7 @@ msgstr ""
 msgid "Saint Kitts and Nevis"
 msgstr ""
 
-msgid "The Democratic People's Republic of Korea"
+msgid "North Korea"
 msgstr ""
 
 msgid "Republic of Korea"
@@ -429,7 +435,7 @@ msgstr ""
 msgid "Latvia"
 msgstr ""
 
-msgid "Libyan Arab Jamahiriya"
+msgid "Libya"
 msgstr ""
 
 msgid "Morocco"
@@ -438,7 +444,7 @@ msgstr ""
 msgid "Monaco"
 msgstr ""
 
-msgid "Republic of Moldova"
+msgid "Moldova"
 msgstr ""
 
 msgid "Montenegro"
@@ -453,7 +459,7 @@ msgstr ""
 msgid "Marshall Islands"
 msgstr ""
 
-msgid "The Former Yugoslav Republic of Macedonia"
+msgid "Macedonia"
 msgstr ""
 
 msgid "Mali"
@@ -465,7 +471,7 @@ msgstr ""
 msgid "Mongolia"
 msgstr ""
 
-msgid "Macao"
+msgid "Macau"
 msgstr ""
 
 msgid "Northern Mariana Islands"
@@ -645,13 +651,19 @@ msgstr ""
 msgid "Suriname"
 msgstr ""
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr ""
 
 msgid "El Salvador"
 msgstr ""
 
-msgid "Syrian Arab Republic"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
 msgstr ""
 
 msgid "Swaziland"
@@ -702,7 +714,7 @@ msgstr ""
 msgid "Taiwan"
 msgstr ""
 
-msgid "United Republic of Tanzania"
+msgid "Tanzania"
 msgstr ""
 
 msgid "Ukraine"
@@ -723,7 +735,7 @@ msgstr ""
 msgid "Uzbekistan"
 msgstr ""
 
-msgid "Holy See (Vatican City State)"
+msgid "Vatican"
 msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
@@ -735,7 +747,7 @@ msgstr ""
 msgid "Virgin Islands"
 msgstr ""
 
-msgid "Viet Nam"
+msgid "Vietnam"
 msgstr ""
 
 msgid "Vanuatu"

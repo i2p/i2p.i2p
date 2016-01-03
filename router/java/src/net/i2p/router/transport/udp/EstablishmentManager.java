@@ -29,6 +29,7 @@ import net.i2p.router.util.DecayingBloomFilter;
 import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Coordinate the establishment of new sessions - both inbound and outbound.
@@ -126,6 +127,19 @@ class EstablishmentManager {
     /** for the DSM and or netdb store */
     private static final int DATA_MESSAGE_TIMEOUT = 10*1000;
     
+    /**
+     * Java I2P has always parsed the length of the extended options field,
+     * but i2pd hasn't recognized it until this release.
+     * No matter, the options weren't defined until this release anyway.
+     *
+**********************************************************************************************************
+     * FIXME 0.9.23 for testing, change to 0.9.24 for release
+     *
+     */
+    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.23";
+    private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
+
+
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(EstablishmentManager.class);
@@ -356,8 +370,16 @@ class EstablishmentManager {
                         _transport.failed(msg, "Peer has bad key, cannot establish");
                         return;
                     }
+                    boolean allowExtendedOptions = VersionComparator.comp(toRouterInfo.getVersion(),
+                                                                          VERSION_ALLOW_EXTENDED_OPTIONS) >= 0
+                                                   && !_context.getBooleanProperty(PROP_DISABLE_EXT_OPTS);
+                    // w/o ext options, it's always 'requested', no need to set
+                    // don't ask if they are indirect
+                    boolean requestIntroduction = allowExtendedOptions && !isIndirect &&
+                                                  _transport.introducersMaybeRequired();
                     state = new OutboundEstablishState(_context, maybeTo, to,
-                                                       toIdentity,
+                                                       toIdentity, allowExtendedOptions,
+                                                       requestIntroduction,
                                                        sessionKey, addr, _transport.getDHFactory());
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
@@ -477,7 +499,9 @@ class EstablishmentManager {
             // Don't offer to relay to privileged ports.
             // Only offer for an IPv4 session.
             // TODO if already we have their RI, only offer if they need it (no 'C' cap)
-            if (_transport.canIntroduce() && state.getSentPort() >= 1024 &&
+            // if extended options, only if they asked for it
+            if (state.isIntroductionRequested() &&
+                _transport.canIntroduce() && state.getSentPort() >= 1024 &&
                 state.getSentIP().length == 4) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
@@ -746,7 +770,7 @@ class EstablishmentManager {
                                            // so it needs to be caught in InNetMessagePool.
         dsm.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
         dsm.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        _transport.send(dsm, peer);
+        // sent below
 
         // just do this inline
         //_context.simpleTimer2().addEvent(new PublishToNewInbound(peer), 0);
@@ -756,8 +780,14 @@ class EstablishmentManager {
                 // ok, we are fine with them, send them our latest info
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("Publishing to the peer after confirm plus delay (without banlist): " + peer);
-                sendOurInfo(peer, true);
+                // bundle the two messages together for efficiency
+                DatabaseStoreMessage dbsm = getOurInfo();
+                List<I2NPMessage> msgs = new ArrayList<I2NPMessage>(2);
+                msgs.add(dsm);
+                msgs.add(dbsm);
+                _transport.send(msgs, peer);
             } else {
+                _transport.send(dsm, peer);
                 // nuh uh.
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("NOT publishing to the peer after confirm plus delay (WITH banlist): " + (hash != null ? hash.toString() : "unknown"));
@@ -804,12 +834,14 @@ class EstablishmentManager {
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
+        DatabaseStoreMessage dbsm = null;
         if (!state.isFirstMessageOurDSM()) {
-            sendOurInfo(peer, false);
+            dbsm = getOurInfo();
         } else if (_log.shouldLog(Log.INFO)) {
             _log.info("Skipping publish: " + state);
         }
         
+        List<OutNetMessage> msgs = new ArrayList<OutNetMessage>(8);
         OutNetMessage msg;
         while ((msg = state.getNextQueuedMessage()) != null) {
             if (now - Router.CLOCK_FUDGE_FACTOR > msg.getExpiration()) {
@@ -817,21 +849,33 @@ class EstablishmentManager {
                 _transport.failed(msg, "Took too long to establish, but it was established");
             } else {
                 msg.timestamp("session fully established and sent");
-                _transport.send(msg);
+                msgs.add(msg);
             }
         }
+        _transport.send(dbsm, msgs, peer);
         return peer;
     }
     
+/****
     private void sendOurInfo(PeerState peer, boolean isInbound) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Publishing to the peer after confirm: " + 
                       (isInbound ? " inbound con from " + peer : "outbound con to " + peer));
-        
+        DatabaseStoreMessage m = getOurInfo();
+        _transport.send(m, peer);
+    }
+****/
+    
+    /**
+     *  A database store message with our router info
+     *  @return non-null
+     *  @since 0.9.24 split from sendOurInfo()
+     */
+    private DatabaseStoreMessage getOurInfo() {
         DatabaseStoreMessage m = new DatabaseStoreMessage(_context);
         m.setEntry(_context.router().getRouterInfo());
         m.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);
-        _transport.send(m, peer);
+        return m;
     }
     
     /** the relay tag is a 4-byte field in the protocol */
@@ -850,11 +894,20 @@ class EstablishmentManager {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer " + state + " sent us an invalid DH parameter", ippe);
             _inboundStates.remove(state.getRemoteHostId());
+            state.fail();
             return;
         }
-        _transport.send(_builder.buildSessionCreatedPacket(state,
+        UDPPacket pkt = _builder.buildSessionCreatedPacket(state,
                                                            _transport.getExternalPort(state.getSentIP().length == 16),
-                                                           _transport.getIntroKey()));
+                                                           _transport.getIntroKey());
+        if (pkt == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Peer " + state + " sent us an invalid IP?");
+            _inboundStates.remove(state.getRemoteHostId());
+            state.fail();
+            return;
+        }
+        _transport.send(pkt);
         state.createdPacketSent();
     }
 

@@ -14,7 +14,6 @@ import net.i2p.data.Destination;
 public class UDPSink implements Sink {
 
     /**
-     *  @param src ignored
      *  @throws IllegalArgumentException on DatagramSocket IOException
      */
     public UDPSink(InetAddress host, int port) {

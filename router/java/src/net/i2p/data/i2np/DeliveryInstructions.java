@@ -209,7 +209,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     public int readBytes(byte data[], int offset) throws DataFormatException {
         int cur = offset;
-        long flags = DataHelper.fromLong(data, cur, 1);
+        int flags = data[cur] & 0xff;
         cur++;
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read flags: " + flags + " mode: " +  flagMode(flags));
@@ -357,8 +357,8 @@ public class DeliveryInstructions extends DataStructureImpl {
         int offset = 0;
         offset += getAdditionalInfo(rv, offset);
         if (offset != additionalSize)
-            //_log.log(Log.CRIT, "wtf, additionalSize = " + additionalSize + ", offset = " + offset);
-            throw new IllegalStateException("wtf, additionalSize = " + additionalSize + ", offset = " + offset);
+            //_log.log(Log.CRIT, "size mismatch, additionalSize = " + additionalSize + ", offset = " + offset);
+            throw new IllegalStateException("size mismatch, additionalSize = " + additionalSize + ", offset = " + offset);
         return rv;
     }
 
@@ -430,7 +430,7 @@ public class DeliveryInstructions extends DataStructureImpl {
         //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
         //               + " =?= " + flagMode(flags));
         byte additionalInfo[] = getAdditionalInfo();
-        DataHelper.writeLong(out, 1, flags);
+        out.write((byte) flags);
         if (additionalInfo != null) {
             out.write(additionalInfo);
             out.flush();

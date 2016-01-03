@@ -42,6 +42,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.PortMapper;
 import net.i2p.util.SystemVersion;
 
@@ -206,8 +207,8 @@ public class SAMBridge implements Runnable, ClientApp {
      *
      * @param name name of the destination
      * @return null if the name does not exist, or if it is improperly formatted
-     * @deprecated unused
      */
+/****
     public Destination getDestination(String name) {
         synchronized (nameToPrivKeys) {
             String val = nameToPrivKeys.get(name);
@@ -223,6 +224,7 @@ public class SAMBridge implements Runnable, ClientApp {
             }
         }
     }
+****/
     
     /**
      * Retrieve the I2P private keystream for the given name, formatted
@@ -255,59 +257,51 @@ public class SAMBridge implements Runnable, ClientApp {
     
     /**
      * Load up the keys from the persistFilename.
-     * TODO use DataHelper
-     * TODO store in config dir, not base dir
      */
+    @SuppressWarnings("unchecked")
     private void loadKeys() {
         synchronized (nameToPrivKeys) {
             nameToPrivKeys.clear();
-            BufferedReader br = null;
+            File file = new File(persistFilename);
+            // now in config dir but check base dir too...
+            if (!file.exists()) {
+                if (file.isAbsolute())
+                    return;
+                file = new File(I2PAppContext.getGlobalContext().getConfigDir(), persistFilename);
+                if (!file.exists())
+                    return;
+            }
             try {
-                br = new BufferedReader(new InputStreamReader(
-                        new FileInputStream(persistFilename), "UTF-8"));
-                String line = null;
-                while ( (line = br.readLine()) != null) {
-                    int eq = line.indexOf('=');
-                    String name = line.substring(0, eq);
-                    String privKeys = line.substring(eq+1);
-                    nameToPrivKeys.put(name, privKeys);
-                }
+                Properties props = new Properties();
+                DataHelper.loadProps(props, file);
+                // unchecked
+                Map foo = props;
+                nameToPrivKeys.putAll(foo);
                 if (_log.shouldInfo())
-                    _log.info("Loaded " + nameToPrivKeys.size() + " private keys from " + persistFilename);
-            } catch (FileNotFoundException fnfe) {
-                _log.warn("Key file does not exist at " + persistFilename);
+                    _log.info("Loaded " + nameToPrivKeys.size() + " private keys from " + file);
             } catch (IOException ioe) {
-                _log.error("Unable to read the keys from " + persistFilename, ioe);
-            } finally {
-                if (br != null) try { br.close(); } catch (IOException ioe) {}
+                _log.error("Unable to read the keys from " + file, ioe);
             }
         }
     }
     
     /**
      * Store the current keys to disk in the location specified on creation.
-     * TODO use DataHelper
-     * TODO store in config dir, not base dir
      */
     private void storeKeys() {
         synchronized (nameToPrivKeys) {
-            FileOutputStream out = null;
+            File file = new File(persistFilename);
+            // now in config dir but check base dir too...
+            if (!file.exists() && !file.isAbsolute())
+                file = new File(I2PAppContext.getGlobalContext().getConfigDir(), persistFilename);
             try {
-                out = new FileOutputStream(persistFilename);
-                for (Map.Entry<String, String> entry : nameToPrivKeys.entrySet()) {
-                    String name = entry.getKey();
-                    String privKeys = entry.getValue();
-                    out.write(name.getBytes("UTF-8"));
-                    out.write('=');
-                    out.write(privKeys.getBytes("UTF-8"));
-                    out.write('\n');
-                }
+                Properties props = new OrderedProperties();
+                props.putAll(nameToPrivKeys);
+                DataHelper.storeProps(props, file);
                 if (_log.shouldInfo())
-                    _log.info("Saved " + nameToPrivKeys.size() + " private keys to " + persistFilename);
+                    _log.info("Saved " + nameToPrivKeys.size() + " private keys to " + file);
             } catch (IOException ioe) {
-                _log.error("Error writing out the SAM keys to " + persistFilename, ioe);
-            } finally {
-                if (out != null) try { out.close(); } catch (IOException ioe) {}
+                _log.error("Error writing out the SAM keys to " + file, ioe);
             }
         }
     }
@@ -365,7 +359,7 @@ public class SAMBridge implements Runnable, ClientApp {
      * TODO we could have multiple servers on different hosts/ports in the future.
      *
      * @param props non-null instantiate and start server if it doesn't exist
-     * @param return non-null
+     * @return non-null
      * @throws IOException if can't bind to host/port, or if different than existing
      * @since 0.9.24
      */
@@ -715,7 +709,9 @@ public class SAMBridge implements Runnable, ClientApp {
         changeState(RUNNING);
         if (_mgr != null)
             _mgr.register(this);
-        I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_SAM, _listenPort);
+        I2PAppContext.getGlobalContext().portMapper().register(_useSSL ? PortMapper.SVC_SAM_SSL : PortMapper.SVC_SAM,
+                                                               _listenHost != null ? _listenHost : "127.0.0.1",
+                                                               _listenPort);
         try {
             while (acceptConnections) {
                 SocketChannel s = serverSocket.accept();
@@ -781,7 +777,7 @@ public class SAMBridge implements Runnable, ClientApp {
                 if (serverSocket != null)
                     serverSocket.close();
             } catch (IOException e) {}
-            I2PAppContext.getGlobalContext().portMapper().unregister(PortMapper.SVC_SAM);
+            I2PAppContext.getGlobalContext().portMapper().unregister(_useSSL ? PortMapper.SVC_SAM_SSL : PortMapper.SVC_SAM);
             stopHandlers();
             changeState(STOPPED);
         }

@@ -56,11 +56,9 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class KeyGenerator {
-    //private final Log _log;
     private final I2PAppContext _context;
 
     public KeyGenerator(I2PAppContext context) {
-        //_log = context.logManager().getLog(KeyGenerator.class);
         _context = context;
     }
 
@@ -85,7 +83,6 @@ public class KeyGenerator {
     /**
      *  PBE the passphrase with the salt.
      *  Warning - SLOW
-     *  Deprecated - Used by Syndie only.
      */
     public SessionKey generateSessionKey(byte salt[], byte passphrase[]) {
         byte salted[] = new byte[16+passphrase.length];
@@ -122,6 +119,7 @@ public class KeyGenerator {
     /**
      *  @deprecated use getElGamalExponentSize() which allows override in the properties
      */
+    @Deprecated
     public static final int PUBKEY_EXPONENT_SIZE = DEFAULT_USE_LONG_EXPONENT ?
                                                    PUBKEY_EXPONENT_SIZE_FULL :
                                                    PUBKEY_EXPONENT_SIZE_SHORT;
@@ -228,7 +226,7 @@ public class KeyGenerator {
     }
 
     /**
-     *  Generic signature type, supports DSA and ECDSA
+     *  Generic signature type, supports DSA, ECDSA, EdDSA
      *  @since 0.9.9
      */
     public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {
@@ -343,7 +341,7 @@ public class KeyGenerator {
     public static void main(String args[]) {
         try {
              main2(args);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
              e.printStackTrace();
         }
     }
@@ -381,7 +379,7 @@ public class KeyGenerator {
                 try {
                     System.out.println("Testing " + type);
                     testSig(type, runs);
-                } catch (Exception e) {
+                } catch (GeneralSecurityException e) {
                     System.out.println("error testing " + type);
                     e.printStackTrace();
                 }
@@ -417,6 +415,8 @@ public class KeyGenerator {
             RandomSource.getInstance().nextBytes(src);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, privkey);
+            if (sig == null)
+                throw new GeneralSecurityException("signature generation failed");
             long mid = System.nanoTime();
             boolean ok = DSAEngine.getInstance().verifySignature(sig, src, pubkey);
             long end = System.nanoTime();

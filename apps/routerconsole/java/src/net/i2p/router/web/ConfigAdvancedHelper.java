@@ -6,7 +6,6 @@ import java.util.TreeMap;
 import net.i2p.data.DataHelper;
 
 public class ConfigAdvancedHelper extends HelperBase {
-    private final static String CHECKED = " checked=\"checked\" ";
     static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
 
     public String getSettings() {
@@ -34,5 +33,10 @@ public class ConfigAdvancedHelper extends HelperBase {
             (mode == 2 && ff.equals("auto")))
             return CHECKED;
         return "";
+    }
+
+    /** @since 0.9.21 */
+    public boolean isFloodfill() {
+        return _context.netDb().floodfillEnabled();
     }
 }

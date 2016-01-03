@@ -9,6 +9,8 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.security.NoSuchAlgorithmException; 
 
+import net.i2p.data.DataHelper;
+
 /**
  * Class for generation and parsing of <a href="http://www.hashcash.org/">HashCash</a><br>
  * Copyright 2006 Gregory Rubin <a href="mailto:grrubin@gmail.com">grrubin@gmail.com</a><br>
@@ -61,7 +63,7 @@ public class HashCash implements Comparable<HashCash> {
   	    myExtensions = deserializeExtensions(parts[index++]);
   	    
   	    MessageDigest md = MessageDigest.getInstance("SHA1");
-  	    md.update(cash.getBytes());
+  	    md.update(DataHelper.getUTF8(cash));
   	    byte[] tempBytes = md.digest();
   	    int tempValue = numberOfLeadingZeros(tempBytes);
   	    
@@ -190,7 +192,7 @@ public class HashCash implements Comparable<HashCash> {
         serializeExtensions(extensions) + ":";
         result.myToken = generateCash(prefix, value, md);
         md.reset();
-        md.update(result.myToken.getBytes());
+        md.update(DataHelper.getUTF8(result.myToken));
         result.myValue = numberOfLeadingZeros(md.digest());
         break;
       
@@ -294,7 +296,7 @@ public class HashCash implements Comparable<HashCash> {
       counter++;
       temp = prefix + Long.toHexString(counter);
       md.reset();
-      md.update(temp.getBytes());
+      md.update(DataHelper.getUTF8(temp));
       bArray = md.digest();
       tempValue = numberOfLeadingZeros(bArray);
     } while ( tempValue < value);

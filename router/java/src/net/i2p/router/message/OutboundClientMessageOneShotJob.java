@@ -38,9 +38,66 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**
- * Send a client message out a random outbound tunnel and into a random inbound
+ * Send a client message out an outbound tunnel and into an inbound
  * tunnel on the target leaseSet.  This also (sometimes) bundles the sender's leaseSet and
  * a DeliveryStatusMessage (for ACKing any sessionTags used in the garlic).
+ *
+ * <p>
+ * This class is where we make several important decisions about
+ * what to send and what path to send it over. These decisions
+ * will dramatically affect:
+ * <ul>
+ * <li>Local performance and outbound bandwidth usage
+ * <li>Streaming performance and reliability
+ * <li>Overall network performace and connection congestion
+ * </ul>
+ *
+ * <p>
+ * For the outbound message, we build and encrypt a garlic message,
+ * after making the following decisions:
+ * <ul>
+ * <li>Whether to bundle our leaseset
+ * <li>Whether to bundle session tags, and if so, how many
+ * <li>Whether to bundle an encrypted DeliveryStatusMessage to be returned
+ *     to us as an acknowledgement
+ * </ul>
+ *
+ * <p>
+ * Also, we make the following path selection decisions:
+ * <ul>
+ * <li>What outbound client tunnel of ours to use send the message out
+ * <li>What inbound client tunnel of his (i.e. lease, chosen from his leaseset)
+ *     to use to send the message in
+ * <li>If a DeliveryStatusMessage is bundled, What inbound client tunnel of ours
+ *     do we specify to receive it
+ * </ul>
+ *
+ * <p>
+ * Note that the 4th tunnel in the DeliveryStatusMessage's round trip (his outbound tunnel)
+ * is not selected by us, it is chosen by the recipient.
+ *
+ * <p>
+ * If a DeliveryStatusMessage is sent, a listener is registered to wait for its reply.
+ * When a reply is received, or the timeout is reached, this is noted
+ * and will influence subsequent bundling and path selection decisions.
+ *
+ * <p>
+ * Path selection decisions are cached and reused if still valid and if
+ * previous deliveries were apparently successful. This significantly
+ * reduces out-of-order delivery and network connection congestion.
+ * Caching is based on the local/remote destination pair.
+ *
+ * <p>
+ * Bundling decisions, and both messaging and reply expiration times, are generally
+ * set here but may be overridden by the client on a per-message basis.
+ * Within clients, there may be overall settings or per-message settings.
+ * The streaming lib also overrides defaults for some messages.
+ * A datagram-based DHT application may need significantly different
+ * settings than a streaming application. For an application such as
+ * a bittorrent client that sends both types of traffic on the same tunnels,
+ * it is important to tune the settings for efficiency and performance.
+ * The per-session and per-message overrides are set via I2CP.
+ *
  *
  */
 public class OutboundClientMessageOneShotJob extends JobImpl {
@@ -949,15 +1006,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (_outTunnel.getLength() > 0)
                     size = ((size + 1023) / 1024) * 1024; // messages are in ~1KB blocks
                 
-                for (int i = 0; i < _outTunnel.getLength(); i++) {
+                // skip ourselves at first hop
+                for (int i = 1; i < _outTunnel.getLength(); i++) {
                     getContext().profileManager().tunnelTestSucceeded(_outTunnel.getPeer(i), sendTime);
                     getContext().profileManager().tunnelDataPushed(_outTunnel.getPeer(i), sendTime, size);
                 }
                 _outTunnel.incrementVerifiedBytesTransferred(size);
             }
-            if (_inTunnel != null)
-                for (int i = 0; i < _inTunnel.getLength(); i++)
+            if (_inTunnel != null) {
+                // skip ourselves at last hop
+                for (int i = 0; i < _inTunnel.getLength() - 1; i++) {
                     getContext().profileManager().tunnelTestSucceeded(_inTunnel.getPeer(i), sendTime);
+                }
+            }
         }
 
         public void setMessage(I2NPMessage msg) {}

@@ -219,6 +219,7 @@ public class MultiPartRequest
     }
 
     /* ------------------------------------------------------------ */
+    @SuppressWarnings("rawtypes")
     public Hashtable[] getMultipleParams(String name) 
     {
         List<Object> parts = _partMap.getValues(name);

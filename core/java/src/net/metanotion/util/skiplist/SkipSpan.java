@@ -28,9 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+import java.io.Flushable;
+
 //import net.metanotion.io.block.BlockFile;
 
-public class SkipSpan {
+public class SkipSpan implements Flushable {
 	/** This is actually limited by BlockFile.spanSize which is much smaller */
 	public static final int MAX_SIZE = 256;
 

@@ -43,9 +43,11 @@ public class SearchHelper extends HelperBase {
         _query = s;
     }
 
+    private static final String SS = Character.toString(S);
+
     private void buildEngineMap() {
         String config = _context.getProperty(PROP_ENGINES, ENGINES_DEFAULT);
-        String[] args = config.split("" + S);
+        String[] args = DataHelper.split(config, SS);
         for (int i = 0; i < args.length - 1; i += 2) {
             String name = args[i];
             String url = args[i+1];
@@ -71,7 +73,7 @@ public class SearchHelper extends HelperBase {
             }
         }
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<select name=\"engine\" title=\"").append(_("Select search engine")).append("\">");
+        buf.append("<select name=\"engine\" title=\"").append(_t("Select search engine")).append("\">");
         for (String name : _engines.keySet()) {
             buf.append("<option value=\"").append(name).append('\"');
             if (name.equals(dflt))

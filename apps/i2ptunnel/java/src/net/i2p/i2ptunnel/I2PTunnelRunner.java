@@ -326,7 +326,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
 		//   at net.i2p.i2ptunnel.I2PTunnelRunner.run(I2PTunnelRunner.java:167)
             if (_log.shouldLog(Log.WARN))
                 _log.warn("gnu?", ise);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Internal error", e);
         } finally {

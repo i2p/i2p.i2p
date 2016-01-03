@@ -5,17 +5,20 @@
 package net.i2p.client.streaming;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 
 
@@ -34,6 +37,26 @@ public interface I2PSocketManager {
      */
     public I2PSession getSession();
     
+    /**
+     *  @return a new subsession, non-null
+     *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
+     *                          and different signing keys
+     *  @param opts subsession options if any, may be null
+     *  @since 0.9.21
+     */
+    public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException;
+    
+    /**
+     *  @since 0.9.21
+     */
+    public void removeSubsession(I2PSession session);
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.21
+     */
+    public List<I2PSession> getSubsessions();
+
     /**
      * How long should we wait for the client to .accept() a socket before
      * sending back a NACK/Close?  

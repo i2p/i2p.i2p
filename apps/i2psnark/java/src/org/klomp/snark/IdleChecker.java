@@ -120,10 +120,10 @@ class IdleChecker extends SimpleTimer2.TimedEvent {
         Map<String, String> opts = _util.getI2CPOptions();
         String i = opts.get("inbound.quantity");
         if (i == null)
-            i = "3";
+            i = Integer.toString(SnarkManager.DEFAULT_TUNNEL_QUANTITY);
         String o = opts.get("outbound.quantity");
         if (o == null)
-            o = "3";
+            o = Integer.toString(SnarkManager.DEFAULT_TUNNEL_QUANTITY);
         String ib = opts.get("inbound.backupQuantity");
         if (ib == null)
             ib = "0";

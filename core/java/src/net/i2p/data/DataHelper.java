@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
@@ -86,6 +88,7 @@ public class DataHelper {
             "stat_tunnel.buildExploratorySuccess.60m",
             "stat_tunnel.participatingTunnels.60m",
             "stat_uptime",
+            "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
             "a", "s",
@@ -1491,10 +1494,12 @@ public class DataHelper {
             return (ms / (60 * 1000)) + "m";
         } else if (ms < 3 * 24 * 60 * 60 * 1000) {
             return (ms / (60 * 60 * 1000)) + "h";
-        } else if (ms > 1000l * 24l * 60l * 60l * 1000l) {
-            return "n/a";
-        } else {
+        } else if (ms < 3L * 365 * 24 * 60 * 60 * 1000) {
             return (ms / (24 * 60 * 60 * 1000)) + "d";
+        } else if (ms < 1000L * 365 * 24 * 60 * 60 * 1000) {
+            return (ms / (365L * 24 * 60 * 60 * 1000)) + "y";
+        } else {
+            return "n/a";
         }
     }
     
@@ -1537,11 +1542,14 @@ public class DataHelper {
             // hours
             // alternates: hrs, hr., hrs.
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
-        } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
-            return _("n/a");
-        } else {
+        } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
             // days
             t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
+            // years
+            t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
+        } else {
+            return _t("n/a");
         }
         // Replace minus sign to work around
         // bug in Chrome (and IE?), line breaks at the minus sign
@@ -1581,10 +1589,14 @@ public class DataHelper {
             t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
         } else if (ams < 2 * 24 * 60 * 60 * 1000) {
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
-        } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
-            return _("n/a");
-        } else {
+        } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
+            // days
             t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
+            // years
+            t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
+        } else {
+            return _t("n/a");
         }
         if (ms < 0)
             t = t.replace("-", "&minus;");
@@ -1593,7 +1605,7 @@ public class DataHelper {
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
-    private static String _(String key) {
+    private static String _t(String key) {
         return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
@@ -1606,11 +1618,11 @@ public class DataHelper {
      * NOTE: formatDuration2() recommended in most cases for readability
      */
     public static String formatSize(long bytes) {
-        double val = bytes;
+        float val = bytes;
         int scale = 0;
-        while (val >= 1024) {
+        while (val >= 1024.0f) {
             scale++; 
-            val /= 1024;
+            val /= 1024.0f;
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -1684,7 +1696,7 @@ public class DataHelper {
         if (unescaped == null) return null;
         String escaped = unescaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            escaped = escaped.replaceAll(escapeChars[i], escapeCodes[i]);
+            escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
     }
@@ -1699,7 +1711,7 @@ public class DataHelper {
         if (escaped == null) return null;
         String unescaped = escaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            unescaped = unescaped.replaceAll(escapeCodes[i], escapeChars[i]);
+            unescaped = unescaped.replace(escapeCodes[i], escapeChars[i]);
         }
         return unescaped;
     }
@@ -1855,7 +1867,6 @@ public class DataHelper {
      *
      *  @return null if orig is null
      *  @throws RuntimeException
-     *  @deprecated unused
      */
     public static String getUTF8(byte orig[], int offset, int len) {
         if (orig == null) return null;
@@ -1879,5 +1890,39 @@ public class DataHelper {
             rv[i] = (byte)orig.charAt(i);
         }
         return rv;
+    }
+
+    /**
+     *  Same as s.split(regex) but caches the compiled pattern for speed.
+     *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  @param s non-null
+     *  @param regex non-null
+     *  @throws java.util.regex.PatternSyntaxException unchecked
+     *  @since 0.9.24
+     */
+    public static String[] split(String s, String regex) {
+        return split(s, regex, 0);
+    }
+
+    private static final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<String, Pattern>();
+
+    /**
+     *  Same as s.split(regex, limit) but caches the compiled pattern for speed.
+     *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  @param s non-null
+     *  @param regex non-null
+     *  @param limit result threshold
+     *  @throws java.util.regex.PatternSyntaxException unchecked
+     *  @since 0.9.24
+     */
+    public static String[] split(String s, String regex, int limit) {
+        Pattern p = patterns.get(regex);
+        if (p == null) {
+            p = Pattern.compile(regex);
+            patterns.putIfAbsent(regex, p);
+        }
+        return p.split(s, limit);
     }
 }

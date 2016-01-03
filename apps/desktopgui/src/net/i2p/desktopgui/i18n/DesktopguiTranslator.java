@@ -16,11 +16,11 @@ public class DesktopguiTranslator {
         return ctx;
     }
     
-    public static String _(String s) {
+    public static String _t(String s) {
         return Translate.getString(s, getRouterContext(), BUNDLE_NAME);
     }
 
-    public static String _(String s, Object o) {
+    public static String _t(String s, Object o) {
         return Translate.getString(s, o, getRouterContext(), BUNDLE_NAME);
     }
 }

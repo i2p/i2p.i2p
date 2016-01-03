@@ -9,13 +9,13 @@
 # walking <walking@i2pmail.org>, 2011
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
-# YF <yfdyh000@gmail.com>, 2014
+# YF <yfdyh000@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-17 21:49+0000\n"
-"PO-Revision-Date: 2014-10-14 12:02+0000\n"
+"POT-Creation-Date: 2015-07-17 01:13+0000\n"
+"PO-Revision-Date: 2015-06-08 10:13+0000\n"
 "Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgstr "Hashcash"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:229
 msgid "Hidden"
-msgstr "隐藏"
+msgstr "隐身"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:231
 msgid "Signed"
@@ -116,27 +116,27 @@ msgid "Showing {0} of {1}"
 msgstr "显示 {0} 个项目共 {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:228
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:412
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
 msgid "Add"
 msgstr "添加"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:228
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:240
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
 msgid "Replace"
 msgstr "替换"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:254
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:239
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:243
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
 msgstr "主机名{0}已存在于地址簿中，操作取消。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:256
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:241
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #, java-format
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
@@ -144,75 +144,75 @@ msgid ""
 msgstr "主机名{0}已存在于地址簿中，但对应不同的目标密钥，点击“替换”覆盖此记录。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:254
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
 #, java-format
 msgid "Destination added for {0}."
 msgstr "目标密钥已添加为{0}。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:271
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:256
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:260
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "目标已更新为{0}。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:273
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
 msgid "Warning - host name does not end with \".i2p\""
 msgstr "警告 - 主机名未以\".i2p\"结尾。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:266
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:270
 msgid "Invalid Base 64 destination."
 msgstr "无效的Base64目标密钥"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:272
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:276
 #, java-format
 msgid "Invalid host name \"{0}\"."
 msgstr "无效的主机名“{0}”。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:275
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 msgid "Please enter a host name and destination"
 msgstr "请输入主机名称与目标"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:312
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:304
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:270
 msgid "Delete Entry"
 msgstr "删除记录"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
 msgid "Delete Selected"
 msgstr "删除选中项"
 
 #. parameter is a host name
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:300
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "目标 {0} 已删除"
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
 msgstr[0] "{0} 个目标已删除。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:301
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:305
 msgid "No entries selected to delete."
 msgstr "未选择要删除的记录。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
 msgid "Address book saved."
 msgstr "地址簿已保存。"
 
@@ -222,8 +222,8 @@ msgstr "错误:无法写入地址簿文件"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -231,15 +231,15 @@ msgstr "提交数据无效，可能的原因是您使用了浏览器中的“前
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:314
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:159
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr "如果问题持续出现，请检查您的浏览器是否已启用cookie。"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:126
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid "Save"
@@ -250,7 +250,7 @@ msgid "Configuration saved."
 msgstr "配置已保存"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Reload"
@@ -260,35 +260,35 @@ msgstr "刷新"
 msgid "Configuration reloaded."
 msgstr "配置已重新载入"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:101
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:104
 #, java-format
 msgid "{0} address book in {1} database"
 msgstr "{1}数据库中{0}地址簿"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:253
 msgid "Manually added via SusiDNS"
 msgstr "通过 SusiDNS 手工添加。"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:263
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:267
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
 msgstr "域名服务{1}中的目标{0}添加失败。"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:287
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:291
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "域名服务{1}中的目标{0}删除失败。"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr "订阅已保存，正在通过订阅地址更新地址簿。"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:143
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions saved."
 msgstr "订阅已保存。"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions reloaded."
 msgstr "订阅设置已重新载入。"
 
@@ -372,7 +372,7 @@ msgstr "地址簿"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:156
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:141
 msgid "Storage"
-msgstr "储存"
+msgstr "存储"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:174
 msgid "Filter"
@@ -408,7 +408,7 @@ msgid "Links"
 msgstr "链接"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:404
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
 msgid "Destination"
 msgstr "目标"
@@ -430,19 +430,23 @@ msgid "details"
 msgstr "详情"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
 msgid "Cancel"
 msgstr "取消"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:383
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+msgid "Export in hosts.txt format"
+msgstr "导出 hosts.txt 格式"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "This address book is empty."
 msgstr "此地址簿为空。"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
 msgid "Add new destination"
 msgstr "添加新目标"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:400
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
 msgid "Host Name"
 msgstr "主机名称"
@@ -502,11 +506,11 @@ msgstr "更新周期(小时)"
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
-msgstr "您发布的公开地址簿 hosts.txt (请指定为您Web服务器目录中的某个路径以便发布。)"
+msgstr "您公开发布的地址簿 hosts.txt 文件 (请在您的Web服务器目录中选择一个位置以便发布。)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:182
 msgid "Your hosts.txt (don't change)"
-msgstr "您的 host.txt (无需修改)"
+msgstr "您的 hosts.txt (不要修改)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:184
 msgid "Your personal addressbook, these hosts will be published"
@@ -582,7 +586,7 @@ msgstr "ElGamal 2048位"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:226
 msgid "Signing Key"
-msgstr "签名钥匙"
+msgstr "签名密钥"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:232
 msgid "Certificate"
@@ -590,7 +594,7 @@ msgstr "证书"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:238
 msgid "Added Date"
-msgstr "加入日期"
+msgstr "添加时间"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:244
 msgid "Source"
@@ -620,7 +624,7 @@ msgstr "地址簿程序是I2P软件的一部分。"
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
-msgstr "他通过分散的来源或称地址簿“订阅”(概念类似RSS)更新您的地址簿文件 host.txt。"
+msgstr "它定期从分散的来源或称地址簿“订阅”(概念类似RSS)更新您的地址簿文件 hosts.txt。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:143
 #, java-format
@@ -696,14 +700,14 @@ msgstr "地址簿程序定期通过这些链接检查是否有新的I2P匿名网
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:157
 msgid "Those URLs refer to published hosts.txt files."
-msgstr "这些URL指向公开发布的hosts.txt文件。"
+msgstr "这些URL指向公开发布的 hosts.txt 文件。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:159
 #, java-format
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
-msgstr "默认订阅是来自 {0} 的 hosts.txt，这很少更新。"
+msgstr "默认订阅是来自 {0} 的 hosts.txt，它很少更新。"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:161
 msgid ""

@@ -182,7 +182,7 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
         } catch (IllegalStateException ise) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("gnu?", ise);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Internal error", e);
         } finally {

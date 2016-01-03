@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 
 /**
  * Count how often something happens with a particular peer and all peers.
@@ -57,9 +56,7 @@ class ConnThrottler {
         _log = log;
         // for logging
         _fmt = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-        String systemTimeZone = I2PAppContext.getGlobalContext().getProperty("i2p.systemTimeZone");
-        if (systemTimeZone != null)
-            _fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+        _fmt.setTimeZone(SystemVersion.getSystemTimeZone());
         new Cleaner();
     }
 

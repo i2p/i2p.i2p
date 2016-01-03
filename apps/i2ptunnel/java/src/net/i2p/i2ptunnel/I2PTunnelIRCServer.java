@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Base32;
@@ -128,7 +129,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             this.cloakKey = new byte[Hash.HASH_LENGTH];
             tunnel.getContext().random().nextBytes(this.cloakKey);
         } else {
-            this.cloakKey = SHA256Generator.getInstance().calculateHash(passphrase.trim().getBytes()).getData();
+            this.cloakKey = SHA256Generator.getInstance().calculateHash(DataHelper.getUTF8(passphrase.trim())).getData();
         }
         
         // get the fake hostmask to use
@@ -158,7 +159,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 modifiedRegistration = buf.toString();
             }
             Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
-            Thread t = new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(),
+            Thread t = new I2PTunnelRunner(s, socket, slock, null, DataHelper.getUTF8(modifiedRegistration),
                                            null, (I2PTunnelRunner.FailCallback) null);
             // run in the unlimited client pool
             //t.start();
@@ -277,7 +278,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Got line: " + s);
 
-            String field[]=s.split(" ",5);
+            String field[] = DataHelper.split(s, " ", 5);
             String command;
             int idx=0;
 

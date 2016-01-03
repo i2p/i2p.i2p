@@ -31,7 +31,7 @@ public class TunnelDataMessage extends FastI2NPMessageImpl {
     
     public final static int MESSAGE_TYPE = 18;
     public static final int DATA_SIZE = 1024;
-    /** if we can't deliver a tunnel message in 10s, fuck it */
+    /** if we can't deliver a tunnel message in 10s, forget it */
     private static final int EXPIRATION_PERIOD = 10*1000;
     
     private static final ByteCache _cache;

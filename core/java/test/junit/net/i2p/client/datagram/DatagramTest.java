@@ -43,15 +43,15 @@ public class DatagramTest extends TestCase {
         I2PSession session = client.createSession(new ByteArrayInputStream(out.toByteArray()), null);
 
         I2PDatagramMaker dm = new I2PDatagramMaker(session);
-        byte[] dg = dm.makeI2PDatagram("What's the deal with 42?".getBytes());
+        byte[] dg = dm.makeI2PDatagram(DataHelper.getASCII("What's the deal with 42?"));
 
         I2PDatagramDissector dd = new I2PDatagramDissector();
         dd.loadI2PDatagram(dg);
         byte[] x = dd.getPayload();
-        assertTrue(DataHelper.eq(x, "What's the deal with 42?".getBytes()));
+        assertTrue(DataHelper.eq(x, DataHelper.getASCII("What's the deal with 42?")));
 
         x = dd.extractPayload();
-        assertTrue(DataHelper.eq(x, "What's the deal with 42?".getBytes()));
+        assertTrue(DataHelper.eq(x, DataHelper.getASCII("What's the deal with 42?")));
 
         assertEquals(d, dd.getSender());
         assertEquals(d, dd.extractSender());
@@ -67,7 +67,7 @@ public class DatagramTest extends TestCase {
         ByteArrayOutputStream dout = new ByteArrayOutputStream();
         d.writeBytes(dout);
         dsaEng.sign(Hash.FAKE_HASH.toByteArray(), session.getPrivateKey()).writeBytes(dout);
-        dout.write("blah".getBytes());
+        dout.write(DataHelper.getASCII("blah"));
 
         byte[] data = dout.toByteArray();
         I2PDatagramDissector dd = new I2PDatagramDissector();

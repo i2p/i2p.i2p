@@ -257,7 +257,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     getContext().profileManager().dbLookupSuccessful(_target, delay);
                     if (_sentTo != null)
                         getContext().profileManager().dbStoreSuccessful(_sentTo);
-                    getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay, 0);
+                    getContext().statManager().addRateData("netDb.floodfillVerifyOK", delay);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Verify success for " + _key);
                     if (_isRouterInfo)
@@ -290,7 +290,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             // though it is the real problem.
             if (_target != null && !_target.equals(_sentTo))
                 getContext().profileManager().dbLookupFailed(_target);
-            getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay, 0);
+            getContext().statManager().addRateData("netDb.floodfillVerifyFail", delay);
             resend();
         }        
         public void setMessage(I2NPMessage message) { _message = message; }
@@ -328,7 +328,7 @@ class FloodfillVerifyStoreJob extends JobImpl {
             getContext().profileManager().dbLookupFailed(_target);
             //if (_sentTo != null)
             //    getContext().profileManager().dbStoreFailed(_sentTo);
-            getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime, 0);
+            getContext().statManager().addRateData("netDb.floodfillVerifyTimeout", getContext().clock().now() - _sendTime);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Verify timed out for: " + _key);
             if (_ignore.size() < MAX_PEERS_TO_TRY) {

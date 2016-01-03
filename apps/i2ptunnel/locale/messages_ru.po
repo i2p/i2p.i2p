@@ -16,20 +16,21 @@
 # gmind, 2012
 # Nikolay Parukhin <parukhin@gmail.com>, 2014
 # sfix <anon-9b36b2e@lycos.com>, 2013
+# brianhopes <voganc-12@live.ru>, 2015
 # yume, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2015-05-07 07:15+0000\n"
+"Last-Translator: brianhopes <voganc-12@live.ru>\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru_RU\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:361
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:371
@@ -43,6 +44,7 @@ msgid_plural "{0} inbound, {0} outbound tunnels"
 msgstr[0] "{0} входящий, {0} исходящий туннель"
 msgstr[1] "{0} входящих, {0} исходящих туннеля"
 msgstr[2] "{0} входящих, {0} исходящих туннелей"
+msgstr[3] "{0} входящих, {0} исходящих туннелей"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:409
 msgid "lower bandwidth and reliability"
@@ -1074,7 +1076,7 @@ msgstr "Выберите имя и описание для вашего тунн
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr "Здесь может быть что угодно - просто для удобства идентификации тунеля в консоли."
+msgstr "Здесь может быть что угодно - просто для удобства идентификации туннеля в консоли."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:357
 msgid ""

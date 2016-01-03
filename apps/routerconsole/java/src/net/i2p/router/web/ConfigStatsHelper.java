@@ -176,8 +176,8 @@ public class ConfigStatsHelper extends HelperBase {
      */
     private class AlphaComparator implements Comparator<String> {
         public int compare(String lhs, String rhs) {
-            String lname = _(lhs);
-            String rname = _(rhs);
+            String lname = _t(lhs);
+            String rname = _t(rhs);
             return Collator.getInstance().compare(lname, rname);
         }
     }

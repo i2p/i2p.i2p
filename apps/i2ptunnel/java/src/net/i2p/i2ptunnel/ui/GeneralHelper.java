@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -146,11 +147,11 @@ public class GeneralHelper {
         List<String> rv = tcg.clearAllMessages();
         try {
             tcg.saveConfig();
-            rv.add(0, _("Configuration changes saved", context));
+            rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
             Log log = context.logManager().getLog(GeneralHelper.class);
             log.error("Failed to save config file", ioe);
-            rv.add(0, _("Failed to save configuration", context) + ": " + ioe.toString());
+            rv.add(0, _t("Failed to save configuration", context) + ": " + ioe.toString());
         }
         return rv;
     }
@@ -341,7 +342,8 @@ public class GeneralHelper {
                     rv = pkf.getDestination();
                     if (rv != null)
                         return rv;
-                } catch (Exception e) {}
+                } catch (I2PException e) {
+                } catch (IOException e) {}
             }
         }
         return null;
@@ -439,12 +441,12 @@ public class GeneralHelper {
         }
         if (type == null) {
             // same default logic as in TunnelController.setConfig()
-            if ((!TunnelController.isClient(ttype) ||
-                ((TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
-                  TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
-                  TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
-                  TunnelController.TYPE_STD_CLIENT.equals(ttype)) &&
-                 !isShared)))
+            if (!TunnelController.isClient(ttype) ||
+                TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
+                TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
+                TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
+                TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
+                (TunnelController.TYPE_HTTP_CLIENT.equals(ttype) && isShared))
                 type = TunnelController.PREFERRED_SIGTYPE;
             else
                 type = SigType.DSA_SHA1;
@@ -714,7 +716,7 @@ public class GeneralHelper {
         return def;
     }
 
-    protected static String _(String key, I2PAppContext context) {
-        return Messages._(key, context);
+    protected static String _t(String key, I2PAppContext context) {
+        return Messages._t(key, context);
     }
 }

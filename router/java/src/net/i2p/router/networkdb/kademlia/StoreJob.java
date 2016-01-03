@@ -33,6 +33,8 @@ import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
 /**
+ *  Stores through this always request a reply.
+ *
  *  Unused directly - see FloodfillStoreJob
  */
 class StoreJob extends JobImpl {
@@ -291,7 +293,8 @@ class StoreJob extends JobImpl {
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
         }
         msg.setEntry(_state.getData());
-        msg.setMessageExpiration(getContext().clock().now() + _timeoutMs);
+        long now = getContext().clock().now();
+        msg.setMessageExpiration(now + _timeoutMs);
 
         if (router.getIdentity().equals(getContext().router().getRouterInfo().getIdentity())) {
             // don't send it to ourselves
@@ -303,7 +306,7 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send store timeout is " + responseTime);
 
-        sendStore(msg, router, getContext().clock().now() + responseTime);
+        sendStore(msg, router, now + responseTime);
     }
     
     /**
@@ -313,14 +316,14 @@ class StoreJob extends JobImpl {
      */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         if (msg.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
-            getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
+            getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1);
             // if it is an encrypted leaseset...
             if (getContext().keyRing().get(msg.getKey()) != null)
                 sendStoreThroughGarlic(msg, peer, expiration);
             else
                 sendStoreThroughClient(msg, peer, expiration);
         } else {
-            getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
+            getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1);
             sendDirect(msg, peer, expiration);
         }
     }
@@ -555,9 +558,9 @@ class StoreJob extends JobImpl {
      *
      */
     private class SendSuccessJob extends JobImpl implements ReplyJob {
-        private RouterInfo _peer;
-        private TunnelInfo _sendThrough;
-        private int _msgSize;
+        private final RouterInfo _peer;
+        private final TunnelInfo _sendThrough;
+        private final int _msgSize;
         
         public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer) {
             this(enclosingContext, peer, null, 0);
@@ -613,8 +616,8 @@ class StoreJob extends JobImpl {
      *
      */
     private class FailedJob extends JobImpl {
-        private RouterInfo _peer;
-        private long _sendOn;
+        private final RouterInfo _peer;
+        private final long _sendOn;
 
         public FailedJob(RouterContext enclosingContext, RouterInfo peer, long sendOn) {
             super(enclosingContext);
@@ -633,7 +636,7 @@ class StoreJob extends JobImpl {
             _state.replyTimeout(hash);
 
             getContext().profileManager().dbStoreFailed(hash);
-            getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn, 0);
+            getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn);
             
             sendNext();
         }

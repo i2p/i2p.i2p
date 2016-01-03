@@ -81,7 +81,7 @@ public class PublicKeyTest extends StructureTest {
     
     public void testShortRead() throws Exception{
         PublicKey publicKey = new PublicKey();
-        ByteArrayInputStream in = new ByteArrayInputStream("six times nine equals forty-two".getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("six times nine equals forty-two"));
         boolean error = false;
         try{
             publicKey.readBytes(in);

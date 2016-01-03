@@ -67,13 +67,15 @@ abstract class LogWriterBase implements Runnable {
 
     public void run() {
         _write = true;
+        // don't bother on Android
+        final boolean shouldReadConfig = !SystemVersion.isAndroid();
         try {
             while (_write) {
                 flushRecords();
-                if (_write)
+                if (_write && shouldReadConfig)
                     rereadConfig();
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Error writing the log: " + e);
             e.printStackTrace();
         }
@@ -97,8 +99,7 @@ abstract class LogWriterBase implements Runnable {
                         dupCount++;
                     } else {
                         if (dupCount > 0) {
-                            writeRecord(_last.getPriority(), dupMessage(dupCount, _last, false));
-                            _manager.getBuffer().add(dupMessage(dupCount, _last, true));
+                            writeDupMessage(dupCount, _last);
                             dupCount = 0;
                         }
                         writeRecord(rec);
@@ -106,8 +107,7 @@ abstract class LogWriterBase implements Runnable {
                     _last = rec;
                 }
                 if (dupCount > 0) {
-                    writeRecord(_last.getPriority(), dupMessage(dupCount, _last, false));
-                    _manager.getBuffer().add(dupMessage(dupCount, _last, true));
+                    writeDupMessage(dupCount, _last);
                 }
                 flushWriter();
             }
@@ -126,13 +126,29 @@ abstract class LogWriterBase implements Runnable {
     }
 
     /**
+     *  Write a msg with the date stamp of the last duplicate
+     *  @since 0.9.21
+     */
+    private void writeDupMessage(int dupCount, LogRecord lastRecord) {
+        String dmsg = dupMessage(dupCount, lastRecord, false);
+        writeRecord(lastRecord.getPriority(), dmsg);
+        if (_manager.getDisplayOnScreenLevel() <= lastRecord.getPriority() && _manager.displayOnScreen())
+            System.out.print(dmsg);
+        dmsg = dupMessage(dupCount, lastRecord, true);
+        _manager.getBuffer().add(dmsg);
+        if (lastRecord.getPriority() >= Log.CRIT)
+            _manager.getBuffer().addCritical(dmsg);
+    }
+
+    /**
      *  Return a msg with the date stamp of the last duplicate
      *  @since 0.9.3
      */
     private String dupMessage(int dupCount, LogRecord lastRecord, boolean reverse) {
-        String arrows = reverse ? "&darr;&darr;&darr;" : "^^^";
+        String arrows = reverse ? (SystemVersion.isAndroid() ? "vvv" : "&darr;&darr;&darr;") : "^^^";
         return LogRecordFormatter.getWhen(_manager, lastRecord) + ' ' + arrows + ' ' +
-               _(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows + '\n';
+               _t(dupCount, "1 similar message omitted", "{0} similar messages omitted") + ' ' + arrows +
+               LogRecordFormatter.NL;
     }
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
@@ -141,7 +157,7 @@ abstract class LogWriterBase implements Runnable {
      *  gettext
      *  @since 0.9.3
      */
-    private String _(int a, String b, String c) {
+    private String _t(int a, String b, String c) {
         return Translate.getString(a, b, c, _manager.getContext(), BUNDLE_NAME);
     }
 

@@ -29,7 +29,7 @@ class RouterThrottleImpl implements RouterThrottle {
     // TODO reduce
     private static final long JOB_LAG_LIMIT_TUNNEL = 500;
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final int DEFAULT_MAX_TUNNELS = 5000;
+    private static final int DEFAULT_MAX_TUNNELS = 10*1000;
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
     private static final long DEFAULT_REJECT_STARTUP_TIME = 10*60*1000;
     private static final String PROP_REJECT_STARTUP_TIME = "router.rejectStartupTime";
@@ -276,7 +276,7 @@ class RouterThrottleImpl implements RouterThrottle {
         
         // ok, we're not hosed, but can we handle the bandwidth requirements 
         // of another tunnel?
-        rs = _context.statManager().getRate("tunnel.participatingMessageCount");
+        rs = _context.statManager().getRate("tunnel.participatingMessageCountAvgPerTunnel");
         r = null;
         double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
         if (rs != null) {

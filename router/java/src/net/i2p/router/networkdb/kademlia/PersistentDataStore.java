@@ -13,6 +13,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,8 +44,10 @@ import net.i2p.util.SecureFileOutputStream;
  * Write out keys to disk when we get them and periodically read ones we don't know
  * about into memory, with newly read routers are also added to the routing table.
  *
+ * Public only for access to static methods by startup classes
+ *
  */
-class PersistentDataStore extends TransientDataStore {
+public class PersistentDataStore extends TransientDataStore {
     private final File _dbDir;
     private final KademliaNetworkDatabaseFacade _facade;
     private final Writer _writer;
@@ -162,7 +165,7 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     private class RemoveJob extends JobImpl {
-        private Hash _key;
+        private final Hash _key;
         public RemoveJob(Hash key) {
             super(PersistentDataStore.this._context);
             _key = key;
@@ -193,7 +196,7 @@ class PersistentDataStore extends TransientDataStore {
      * we will soon have to implement a scheme for keeping only
      * a subset of all DatabaseEntrys in memory and keeping the rest on disk.
      */
-    private class Writer implements Runnable {
+    private class Writer implements Runnable, Flushable {
         private final Map<Hash, DatabaseEntry>_keys;
         private final Object _waitLock;
         private volatile boolean _quit;
@@ -484,7 +487,7 @@ class PersistentDataStore extends TransientDataStore {
                 // don't overwrite recent netdb RIs with reseed data
                 return fileDate > _knownDate + (60*60*1000);
             } else {
-                // wtf - prevent injection from reseeding
+                // safety measure - prevent injection from reseeding
                 _log.error("Prevented LS overwrite by RI " + _key + " from " + _routerFile);
                 return false;
             }
@@ -540,7 +543,7 @@ class PersistentDataStore extends TransientDataStore {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unable to read the router reference in " + _routerFile.getName(), ioe);
                     corrupt = true;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     // key certificate problems, etc., don't let one bad RI kill the whole thing
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unable to read the router reference in " + _routerFile.getName(), e);
@@ -629,7 +632,25 @@ class PersistentDataStore extends TransientDataStore {
             return ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
         return DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX;
     }
+
+    /**
+     *  The persistent RI file for a hash.
+     *  This is available before the netdb subsystem is running, so we can delete our old RI.
+     *
+     *  @return non-null, should be absolute, does not necessarily exist
+     *  @since 0.9.23
+     */
+    public static File getRouterInfoFile(RouterContext ctx, Hash hash) {
+        String b64 = hash.toBase64();
+        File dir = new File(ctx.getRouterDir(), ctx.getProperty(KademliaNetworkDatabaseFacade.PROP_DB_DIR, KademliaNetworkDatabaseFacade.DEFAULT_DB_DIR));
+        if (ctx.getBooleanProperty(PROP_FLAT))
+            return new File(dir, ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX);
+        return new File(dir, DIR_PREFIX + b64.charAt(0) + File.separatorChar + ROUTERINFO_PREFIX + b64 + ROUTERINFO_SUFFIX);
+    }
     
+    /**
+     *  Package private for installer BundleRouterInfos
+     */
     static Hash getRouterInfoHash(String filename) {
         return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
@@ -645,7 +666,7 @@ class PersistentDataStore extends TransientDataStore {
                 return null;
             Hash h = Hash.create(b);
             return h;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // static
             //_log.warn("Unable to fetch the key from [" + filename + "]", e);
             return null;

@@ -51,7 +51,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class CommandThread extends Thread {
+    private class CommandThread extends I2PAppThread {
         private final boolean consumeOutput;
         private final Object shellCommand;
         private final Result result;
@@ -84,7 +84,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private static class StreamConsumer extends Thread {
+    private static class StreamConsumer extends I2PAppThread {
         private final BufferedReader bufferedReader;
 
         public StreamConsumer(InputStream inputStream) {
@@ -115,7 +115,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private static class StreamReader extends Thread {
+    private static class StreamReader extends I2PAppThread {
         private final BufferedReader bufferedReader;
 
         public StreamReader(InputStream inputStream) {
@@ -149,7 +149,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private static class StreamWriter extends Thread {
+    private static class StreamWriter extends I2PAppThread {
         private final BufferedWriter bufferedWriter;
 
         public StreamWriter(OutputStream outputStream) {
@@ -439,7 +439,7 @@ public class ShellCommand {
                     System.out.println("ShellCommand waiting for \"" + name + '\"');
                 try {
                     process.waitFor();
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
                     if (DEBUG) {
                         System.out.println("ShellCommand exception waiting for \"" + name + '\"');
                         e.printStackTrace();
@@ -457,7 +457,7 @@ public class ShellCommand {
                 if (process.exitValue() > 0)
                     return false;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // probably IOException, file not found from exec()
             if (DEBUG) {
                 System.out.println("ShellCommand execute exception for \"" + name + '\"');

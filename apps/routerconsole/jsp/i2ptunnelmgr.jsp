@@ -52,11 +52,11 @@
 
 <%@include file="summary.jsi" %>
 
-<h1><%=intl._("Hidden Services Manager")%> <span class="newtab"><a href="/i2ptunnel/" target="_blank" title="<%=intl._("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
+<h1><%=intl._t("Hidden Services Manager")%> <span class="newtab"><a href="/i2ptunnel/" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="main">
 <iframe src="/i2ptunnel/" width="100%" height="100%" frameborder="0" border="0" name="i2ptunnelframe" id="i2ptunnelframe" onload="setupFrame()" allowtransparency="true">
-<%=intl._("Your browser does not support iFrames.")%>
-&nbsp;<a href="/i2ptunnel/"><%=intl._("Click here to continue.")%></a>
+<%=intl._t("Your browser does not support iFrames.")%>
+&nbsp;<a href="/i2ptunnel/"><%=intl._t("Click here to continue.")%></a>
 </iframe>
 </div></body></html>
 <%

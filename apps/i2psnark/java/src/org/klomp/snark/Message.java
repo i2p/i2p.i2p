@@ -55,11 +55,13 @@ class Message
   byte type;
 
   // Used for HAVE, REQUEST, PIECE and CANCEL messages.
+  // Also SUGGEST, REJECT, ALLOWED_FAST
   // low byte used for EXTENSION message
   // low two bytes used for PORT message
   int piece;
 
   // Used for REQUEST, PIECE and CANCEL messages.
+  // Also REJECT
   int begin;
   int length;
 
@@ -104,15 +106,18 @@ class Message
     int datalen = 1;
 
     // piece is 4 bytes.
-    if (type == HAVE || type == REQUEST || type == PIECE || type == CANCEL)
+    if (type == HAVE || type == REQUEST || type == PIECE || type == CANCEL ||
+        type == SUGGEST || type == REJECT || type == ALLOWED_FAST)
       datalen += 4;
 
     // begin/offset is 4 bytes
-    if (type == REQUEST || type == PIECE || type == CANCEL)
+    if (type == REQUEST || type == PIECE || type == CANCEL ||
+        type == REJECT)
       datalen += 4;
 
     // length is 4 bytes
-    if (type == REQUEST || type == CANCEL)
+    if (type == REQUEST || type == CANCEL ||
+        type == REJECT)
       datalen += 4;
 
     // msg type is 1 byte
@@ -131,15 +136,18 @@ class Message
     dos.writeByte(type & 0xFF);
 
     // Send additional info (piece number)
-    if (type == HAVE || type == REQUEST || type == PIECE || type == CANCEL)
+    if (type == HAVE || type == REQUEST || type == PIECE || type == CANCEL ||
+        type == SUGGEST || type == REJECT || type == ALLOWED_FAST)
       dos.writeInt(piece);
 
     // Send additional info (begin/offset)
-    if (type == REQUEST || type == PIECE || type == CANCEL)
+    if (type == REQUEST || type == PIECE || type == CANCEL ||
+        type == REJECT)
       dos.writeInt(begin);
 
     // Send additional info (length); for PIECE this is implicit.
-    if (type == REQUEST || type == CANCEL)
+    if (type == REQUEST || type == CANCEL ||
+        type == REJECT)
         dos.writeInt(length);
 
     if (type == EXTENSION)
@@ -173,21 +181,32 @@ class Message
       case UNINTERESTED:
         return "UNINTERESTED";
       case HAVE:
-        return "HAVE(" + piece + ")";
+        return "HAVE(" + piece + ')';
       case BITFIELD:
         return "BITFIELD";
       case REQUEST:
-        return "REQUEST(" + piece + "," + begin + "," + length + ")";
+        return "REQUEST(" + piece + ',' + begin + ',' + length + ')';
       case PIECE:
-        return "PIECE(" + piece + "," + begin + "," + length + ")";
+        return "PIECE(" + piece + ',' + begin + ',' + length + ')';
       case CANCEL:
-        return "CANCEL(" + piece + "," + begin + "," + length + ")";
+        return "CANCEL(" + piece + ',' + begin + ',' + length + ')';
       case PORT:
-        return "PORT(" + piece + ")";
+        return "PORT(" + piece + ')';
       case EXTENSION:
         return "EXTENSION(" + piece + ',' + data.length + ')';
+      // fast extensions below here
+      case SUGGEST:
+        return "SUGGEST(" + piece + ')';
+      case HAVE_ALL:
+        return "HAVE_ALL";
+      case HAVE_NONE:
+        return "HAVE_NONE";
+      case REJECT:
+        return "REJECT(" + piece + ',' + begin + ',' + length + ')';
+      case ALLOWED_FAST:
+        return "ALLOWED_FAST(" + piece + ')';
       default:
-        return "<UNKNOWN>";
+        return "UNKNOWN (" + type + ')';
       }
   }
 }

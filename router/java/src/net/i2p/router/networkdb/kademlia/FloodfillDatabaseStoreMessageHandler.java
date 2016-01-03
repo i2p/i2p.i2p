@@ -28,7 +28,7 @@ public class FloodfillDatabaseStoreMessageHandler implements HandlerJobBuilder {
         _context = context;
         _facade = facade;
         // following are for HFDSMJ
-        context.statManager().createRateStat("netDb.storeHandled", "How many netDb store messages have we handled?", "NetworkDatabase", new long[] { 60*60*1000l });
+        context.statManager().createRateStat("netDb.storeHandled", "How many netDb store messages have we handled?", "NetworkDatabase", new long[] { 60*1000, 60*60*1000l });
         context.statManager().createRateStat("netDb.storeLeaseSetHandled", "How many leaseSet store messages have we handled?", "NetworkDatabase", new long[] { 60*60*1000l });
         context.statManager().createRateStat("netDb.storeRouterInfoHandled", "How many routerInfo store messages have we handled?", "NetworkDatabase", new long[] { 60*60*1000l });
         context.statManager().createRateStat("netDb.storeRecvTime", "How long it takes to handle the local store part of a dbStore?", "NetworkDatabase", new long[] { 60*60*1000l });

@@ -142,7 +142,7 @@ abstract class SAMHandler implements Runnable, Handler {
     public static boolean writeString(String str, SocketChannel out)
     {
     	try {
-            writeBytes(ByteBuffer.wrap(DataHelper.getASCII(str)), out);
+            writeBytes(ByteBuffer.wrap(DataHelper.getUTF8(str)), out);
         } catch (IOException e) {
             //_log.debug("Caught IOException", e);
             return false;

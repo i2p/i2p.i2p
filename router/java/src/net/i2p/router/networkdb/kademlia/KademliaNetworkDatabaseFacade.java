@@ -40,6 +40,7 @@ import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.peermanager.PeerProfile;
@@ -171,6 +172,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         context.statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*60*1000l });
         // following is for RepublishLeaseSetJob
         context.statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for DatabaseStoreMessage
+        context.statManager().createRateStat("netDb.DSMAllZeros", "Store with zero key", "NetworkDatabase", new long[] { 60*60*1000l });
+        // following is for HandleDatabaseLookupMessageJob
+        context.statManager().createRateStat("netDb.DLMAllZeros", "Lookup with zero key", "NetworkDatabase", new long[] { 60*60*1000l });
     }
     
     @Override
@@ -207,7 +212,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void removeFromExploreKeys(Collection<Hash> toRemove) {
         if (!_initialized) return;
         _exploreKeys.removeAll(toRemove);
-        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
 
     public void queueForExploration(Collection<Hash> keys) {
@@ -215,7 +220,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         for (Iterator<Hash> iter = keys.iterator(); iter.hasNext() && _exploreKeys.size() < MAX_EXPLORE_QUEUE; ) {
             _exploreKeys.add(iter.next());
         }
-        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size());
     }
     
     public synchronized void shutdown() {
@@ -270,7 +275,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //_ds = new TransientDataStore();
 //        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
-        _negativeCache = new NegativeLookupCache();
+        _negativeCache = new NegativeLookupCache(_context);
         
         createHandlers();
         
@@ -642,7 +647,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         try {
             store(h, localLeaseSet);
         } catch (IllegalArgumentException iae) {
-            _log.error("wtf, locally published leaseSet is not valid?", iae);
+            _log.error("locally published leaseSet is not valid?", iae);
             throw iae;
         }
         if (!_context.clientManager().shouldPublishLeaseSet(h))
@@ -889,6 +894,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad network: " + routerInfo);
             return "Not in our network";
+        }
+        FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+        if (fkc != null) {
+            boolean validFamily = fkc.verify(routerInfo);
+            if (!validFamily) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad family sig: " + routerInfo.getHash());
+            }
+            // todo store in RI
         }
         return validate(routerInfo);
     }

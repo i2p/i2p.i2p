@@ -150,4 +150,16 @@ public class Frequency {
     private final static long now() {
         return System.currentTimeMillis();
     }
+    
+    /**
+     * Appends the data of this frequency to the specified StringBuilder
+     * @param dest to append data to
+     * @since 0.9.23
+     */
+    synchronized void store(StringBuilder dest) {
+        dest.append("avgInterval:").append(_avgInterval).append(',');
+        dest.append("minAverageInterval").append(_minAverageInterval).append(',');
+        dest.append("lastEvent").append(_lastEvent).append(",");
+        dest.append("count").append(_count);
+    }
 }

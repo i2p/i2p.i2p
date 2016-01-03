@@ -24,6 +24,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -205,6 +206,20 @@ class ConnectionAcceptor implements Runnable
             int level = stop ? Log.WARN : Log.ERROR;
             if (_log.shouldLog(level))
                 _log.log(level, "Error while accepting", ioe);
+            synchronized(this) {
+                if (!stop) {
+                    locked_halt();
+                    thread = null;
+                    stop = true;
+                }
+            }
+          }
+        catch (ConnectException ioe)
+          {
+            // This is presumed to be due to socket closing by I2PSnarkUtil.disconnect(),
+            // which does not currently call our halt(), although it should
+            if (_log.shouldWarn())
+                _log.warn("Error while accepting", ioe);
             synchronized(this) {
                 if (!stop) {
                     locked_halt();

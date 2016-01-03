@@ -2,30 +2,25 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# walking <walking@i2pmail.org>, 2011
-# walking <walking@i2pmail.org>, 2011
 # walking <waling@mail.i2p>, 2013
 # walking <walking@i2pmail.org>, 2011
 # xtoaster <zhazhenzhong@gmail.com>, 2012
-# xtoaster <zhazhenzhong@gmail.com>, 2012
-# xtoaster <zhazhenzhong@gmail.com>, 2012
+# YF <yfdyh000@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2013-07-11 06:43+0000\n"
-"Last-Translator: xtoaster <zhazhenzhong@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/"
-"language/zh_CN/)\n"
-"Language: zh_CN\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 02:58+0000\n"
+"Last-Translator: YF <yfdyh000@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Anonymous Proxy"
@@ -61,6 +56,9 @@ msgstr "荷兰属地"
 msgid "Angola"
 msgstr "安哥拉"
 
+msgid "Asia/Pacific Region"
+msgstr "亚洲/太平洋地区"
+
 msgid "Antarctica"
 msgstr "南极洲"
 
@@ -80,7 +78,7 @@ msgid "Aruba"
 msgstr "阿鲁巴"
 
 msgid "Åland Islands"
-msgstr "Åland Islands"
+msgstr "奥兰群岛"
 
 msgid "Azerbaijan"
 msgstr "阿塞拜疆"
@@ -112,6 +110,9 @@ msgstr "不丹"
 msgid "Benin"
 msgstr "贝宁"
 
+msgid "Saint Barthélemy"
+msgstr "圣巴泰勒米"
+
 msgid "Bermuda"
 msgstr "百慕大"
 
@@ -120,6 +121,9 @@ msgstr "文莱达鲁萨兰"
 
 msgid "Bolivia"
 msgstr "玻利维亚"
+
+msgid "Bonaire"
+msgstr "博内尔"
 
 msgid "Brazil"
 msgstr "巴西"
@@ -148,14 +152,11 @@ msgstr "加拿大"
 msgid "Cocos (Keeling) Islands"
 msgstr "科科斯（基林）群岛"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "民主刚果"
+msgid "Congo"
+msgstr "刚果"
 
 msgid "Central African Republic"
 msgstr "中非"
-
-msgid "Congo"
-msgstr "刚果"
 
 msgid "Switzerland"
 msgstr "瑞士"
@@ -200,7 +201,7 @@ msgid "Cyprus"
 msgstr "塞浦路斯"
 
 msgid "Czech Republic"
-msgstr "捷克"
+msgstr "捷克共和国"
 
 msgid "Germany"
 msgstr "德国"
@@ -215,7 +216,7 @@ msgid "Dominica"
 msgstr "多米尼"
 
 msgid "Dominican Republic"
-msgstr "多米尼加联邦"
+msgstr "多米尼加共和国"
 
 msgid "Algeria"
 msgstr "阿尔及利亚"
@@ -253,7 +254,7 @@ msgstr "斐济"
 msgid "Falkland Islands (Malvinas)"
 msgstr "福克兰群岛"
 
-msgid "Federated States of Micronesia"
+msgid "Micronesia"
 msgstr "密克罗尼西亚"
 
 msgid "Faroe Islands"
@@ -355,7 +356,7 @@ msgstr "英属印度洋地区"
 msgid "Iraq"
 msgstr "伊拉克"
 
-msgid "Islamic Republic of Iran"
+msgid "Iran"
 msgstr "伊朗"
 
 msgid "Iceland"
@@ -394,7 +395,7 @@ msgstr "科摩罗"
 msgid "Saint Kitts and Nevis"
 msgstr "圣克里斯多福与尼维斯"
 
-msgid "The Democratic People's Republic of Korea"
+msgid "North Korea"
 msgstr "朝鲜"
 
 msgid "Republic of Korea"
@@ -439,7 +440,7 @@ msgstr "卢森堡"
 msgid "Latvia"
 msgstr "拉脱维亚"
 
-msgid "Libyan Arab Jamahiriya"
+msgid "Libya"
 msgstr "利比亚"
 
 msgid "Morocco"
@@ -448,7 +449,7 @@ msgstr "摩洛哥"
 msgid "Monaco"
 msgstr "摩纳哥"
 
-msgid "Republic of Moldova"
+msgid "Moldova"
 msgstr "摩尔多瓦"
 
 msgid "Montenegro"
@@ -463,8 +464,8 @@ msgstr "马达加斯加"
 msgid "Marshall Islands"
 msgstr "马绍尔群岛"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "前南斯拉夫之马其顿共和国"
+msgid "Macedonia"
+msgstr "马其顿"
 
 msgid "Mali"
 msgstr "马里"
@@ -475,7 +476,7 @@ msgstr "缅甸"
 msgid "Mongolia"
 msgstr "蒙古"
 
-msgid "Macao"
+msgid "Macau"
 msgstr "澳门"
 
 msgid "Northern Mariana Islands"
@@ -655,13 +656,19 @@ msgstr "索马里"
 msgid "Suriname"
 msgstr "苏里南"
 
+msgid "South Sudan"
+msgstr "南苏丹"
+
 msgid "Sao Tome and Principe"
 msgstr "圣多美与普林西比共和国"
 
 msgid "El Salvador"
 msgstr "萨尔瓦多"
 
-msgid "Syrian Arab Republic"
+msgid "Sint Maarten"
+msgstr "圣马丁岛"
+
+msgid "Syria"
 msgstr "叙利亚"
 
 msgid "Swaziland"
@@ -712,7 +719,7 @@ msgstr "图瓦鲁"
 msgid "Taiwan"
 msgstr "台湾"
 
-msgid "United Republic of Tanzania"
+msgid "Tanzania"
 msgstr "坦桑尼亚"
 
 msgid "Ukraine"
@@ -733,8 +740,8 @@ msgstr "乌拉圭"
 msgid "Uzbekistan"
 msgstr "乌兹别克斯坦"
 
-msgid "Holy See (Vatican City State)"
-msgstr "梵地冈"
+msgid "Vatican"
+msgstr "梵蒂冈"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "圣文森特和格林纳丁斯"
@@ -745,7 +752,7 @@ msgstr "委内瑞拉"
 msgid "Virgin Islands"
 msgstr "维京群岛"
 
-msgid "Viet Nam"
+msgid "Vietnam"
 msgstr "越南"
 
 msgid "Vanuatu"
@@ -771,4 +778,3 @@ msgstr "赞比亚"
 
 msgid "Zimbabwe"
 msgstr "津巴布韦"
-

@@ -4,8 +4,9 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Denis Blank <gribua@gmail.com>, 2011
-# Denis Blank <gribua@gmail.com>, 2012
+# Denis Lysenko <gribua@gmail.com>, 2015
+# Denis Lysenko <gribua@gmail.com>, 2011
+# Denis Lysenko <gribua@gmail.com>, 2012
 # jonny_nut, 2014
 # madjong <madjong@i2pmail.org>, 2014
 # puxud <puxud@alivance.com>, 2014
@@ -13,10 +14,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
+"POT-Creation-Date: 2015-05-14 08:33+0000\n"
+"PO-Revision-Date: 2015-08-07 17:15+0000\n"
+"Last-Translator: Denis Lysenko <gribua@gmail.com>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,7 +37,7 @@ msgstr ""
 #: ../java/build/Proxy.java:129 ../java/build/Proxy.java:140
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:185
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:207
 msgid "Router Console"
 msgstr "Консоль роутера"
 
@@ -50,7 +51,7 @@ msgstr "Консоль роутера"
 #: ../java/build/Proxy.java:152 ../java/build/Proxy.java:165
 #: ../java/build/Proxy.java:174 ../java/build/Proxy.java:186
 msgid "I2P Router Console"
-msgstr "Консоль роутера"
+msgstr "Консоль роутера I2P"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:20
 #: ../java/build/Proxy.java:30 ../java/build/Proxy.java:40
@@ -61,7 +62,7 @@ msgstr "Консоль роутера"
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:142
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:166
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:187
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:193
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
 msgid "Configuration"
 msgstr "Настройки"
 
@@ -74,7 +75,7 @@ msgstr "Настройки"
 #: ../java/build/Proxy.java:132 ../java/build/Proxy.java:143
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:167
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:188
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:193
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
 msgid "Help"
 msgstr "Допомога"
 
@@ -87,7 +88,7 @@ msgstr "Допомога"
 #: ../java/build/Proxy.java:133 ../java/build/Proxy.java:144
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:168
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:189
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:193
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
 msgid "Addressbook"
 msgstr "Адресна книга"
 
@@ -440,15 +441,15 @@ msgid ""
 "tunnel."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:610
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:634
 msgid "This seems to be a bad destination:"
 msgstr "Скоріше всього це поганий адрес призначення:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:611
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:635
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper не може допомогти Вам з місцем призначення як це!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:684
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:709
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -456,79 +457,79 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Для того щоб перейти по локальному посиланню з локальної адресної книги, натисніть ось<a href=\"{0}\">тут</a>. Для переходу по новому addresshelper-посиланню, натисніть будь-ласка <a href=\"{1}\">тут</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1095
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1119
 msgid "Destination lease set not found"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1245
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1271
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1249
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1275
 msgid "Base 32"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1253
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1279
 msgid "Destination"
 msgstr "Адреса призначення"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1259
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1285
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продовжити до {0} без збереження"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1265
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1291
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr ""
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1268
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1294
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1269
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1295
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:156
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:169
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr "Додано через address helper {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:158
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:171
 msgid "Added via address helper"
 msgstr "Додано через address helper"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:175
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:188
 msgid "router"
 msgstr "роутер"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:177
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
 msgid "master"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:179
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
 msgid "private"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:186
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:201
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "Перенаправляємо до {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:213
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr "{0} збережено в {1} адресної книги, перенапрявляємо."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:199
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:214
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr "Не вдалось зберегти {0} в {1} адресної книги, перенаправляємо."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:201
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:216
 msgid "Click here if you are not redirected automatically."
 msgstr "Клацніть тут якщо вас не перенаправило автоматично."

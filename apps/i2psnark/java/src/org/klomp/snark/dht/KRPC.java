@@ -40,6 +40,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.SnarkManager;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.bencode.BDecoder;
@@ -128,8 +129,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
     /** Max number of nodes to return. BEP 5 says 8 */
     private static final int K = 8;
-    /** Max number of peers to return. BEP 5 doesn't say. We'll use the same as I2PSnarkUtil.MAX_CONNECTIONS */
-    private static final int MAX_WANT = 16;
+    /** Max number of peers to return. BEP 5 doesn't say.
+     * We'll use more than I2PSnarkUtil.MAX_CONNECTIONS since lots could be old.
+     */
+    private static final int MAX_WANT = I2PSnarkUtil.MAX_CONNECTIONS * 3 / 2;
 
     /** overloads error codes which start with 201 */
     private static final int REPLY_NONE = 0;
@@ -243,6 +246,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param maxWait how long to wait for each to reply (not total) must be > 0
      *  @param parallel how many outstanding at once (unimplemented, always 1)
      */
+    @SuppressWarnings("unchecked")
     private void explore(NID target, int maxNodes, long maxWait, int parallel) {
         List<NodeInfo> nodes = _knownNodes.findClosest(target, maxNodes);
         if (nodes.isEmpty()) {
@@ -327,6 +331,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param noSeeds true if we do not want seeds in the result
      *  @return possibly empty (never null)
      */
+    @SuppressWarnings("unchecked")
     public Collection<Hash> getPeersAndAnnounce(byte[] ih, int max, long maxWait,
                                                 int annMax, long annMaxWait,
                                                 boolean isSeed, boolean noSeeds) {
@@ -858,6 +863,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param repliable true for all but announce
      *  @return null on error
      */
+    @SuppressWarnings("unchecked")
     private ReplyWaiter sendQuery(NodeInfo nInfo, Map<String, Object> map, boolean repliable) {
         if (nInfo.equals(_myNodeInfo))
             throw new IllegalArgumentException("wtf don't send to ourselves");
@@ -907,6 +913,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      * @param toPort the query port, we will increment here
      *  @return success
      */
+    @SuppressWarnings("unchecked")
     private boolean sendResponse(NodeInfo nInfo, MsgID msgID, Map<String, Object> map) {
         if (nInfo.equals(_myNodeInfo))
             throw new IllegalArgumentException("wtf don't send to ourselves");
@@ -1408,7 +1415,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private List<Hash> receivePeers(NodeInfo nInfo, List<BEValue> peers) throws InvalidBEncodingException {
         if (_log.shouldLog(Log.INFO))
              _log.info("Rcvd peers from: " + nInfo);
-        int max = Math.min(MAX_WANT, peers.size());
+        int max = Math.min(MAX_WANT * 2, peers.size());
         List<Hash> rv = new ArrayList<Hash>(max);
         for (BEValue bev : peers) {
             byte[] b = bev.getBytes();

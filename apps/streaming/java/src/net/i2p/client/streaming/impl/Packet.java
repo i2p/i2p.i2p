@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -67,6 +68,7 @@ import net.i2p.util.Log;
  *
  */
 class Packet {
+    protected final I2PSession _session;
     private long _sendStreamId;
     private long _receiveStreamId;
     private long _sequenceNum;
@@ -167,8 +169,15 @@ class Packet {
      *  Does no initialization.
      *  See readPacket() for inbound packets, and the setters for outbound packets.
      */
-    public Packet() { }
+    public Packet(I2PSession session) {
+        _session = session;
+    }
     
+    /** @since 0.9.21 */
+    public I2PSession getSession() {
+        return _session;
+    }
+
     private boolean _sendStreamIdSet = false;
 
     /** what stream do we send data to the peer on?
@@ -334,10 +343,13 @@ class Packet {
      */
     public Destination getOptionalFrom() { return _optionFrom; }
 
-    public void setOptionalFrom(Destination from) { 
-        setFlag(FLAG_FROM_INCLUDED, from != null);
-        if (from == null) throw new RuntimeException("from is null!?");
-        _optionFrom = from; 
+    /** 
+     * This sets the from field in the packet to the Destination for the session
+     * provided in the constructor.
+     */
+    public void setOptionalFrom() { 
+        setFlag(FLAG_FROM_INCLUDED, true);
+        _optionFrom = _session.getMyDestination();
     }
     
     /** 
@@ -508,10 +520,10 @@ class Packet {
         return cur - offset;
     }
     
-    
     /**
      * how large would this packet be if we wrote it
      * @return How large the current packet would be
+     *
      * @throws IllegalStateException 
      */
     private int writtenSize() {
@@ -546,6 +558,8 @@ class Packet {
         
         return size;
     }
+    
+
     /**
      * Read the packet from the buffer (starting at the offset) and return
      * the number of bytes read.
@@ -571,7 +585,7 @@ class Packet {
         cur += 4;
         setAckThrough(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        int numNacks = (int)DataHelper.fromLong(buffer, cur, 1);
+        int numNacks = buffer[cur] & 0xff;
         cur++;
         if (length < 22 + numNacks*4)
             throw new IllegalArgumentException("Too small with " + numNacks + " nacks: " + length);
@@ -585,7 +599,7 @@ class Packet {
         } else {
             setNacks(null);
         }
-        setResendDelay((int)DataHelper.fromLong(buffer, cur, 1));
+        setResendDelay(buffer[cur] & 0xff);
         cur++;
         setFlags((int)DataHelper.fromLong(buffer, cur, 2));
         cur += 2;
@@ -619,7 +633,7 @@ class Packet {
             try {
                 Destination optionFrom = Destination.create(bais);
                 cur += optionFrom.size();
-                setOptionalFrom(optionFrom);
+                _optionFrom = optionFrom;
             } catch (IOException ioe) {
                 throw new IllegalArgumentException("Bad from field", ioe);
             } catch (DataFormatException dfe) {
@@ -766,7 +780,7 @@ class Packet {
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
-        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG");
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG ").append(_optionSignature.length());
         if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
         if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
     }

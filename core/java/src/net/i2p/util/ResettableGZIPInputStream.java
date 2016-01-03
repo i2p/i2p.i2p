@@ -110,7 +110,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             //if (_lookaheadStream.getEOFReached()) {
             if (inf.finished()) {
                 verifyFooter();
-                inf.reset(); // so it doesn't bitch about missing data...
+                inf.reset(); // so it doesn't complain about missing data...
                 _complete = true;
             }
             return read;
@@ -124,7 +124,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public long getTotalRead() {
         try {
             return inf.getBytesRead(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return 0;
         }
     }
@@ -136,7 +136,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public long getTotalExpanded() { 
         try {
             return inf.getBytesWritten(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return 0;
         }
@@ -149,7 +149,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public long getRemaining() { 
         try {
             return inf.getRemaining(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return 0;
         }
@@ -162,7 +162,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public boolean getFinished() { 
         try {
             return inf.finished(); 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // possible NPE in some implementations
             return true;
         }
@@ -375,40 +375,51 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     
 /******
     public static void main(String args[]) {
-        for (int i = 129; i < 64*1024; i++) {
-            if (!test(i)) return;
+
+        java.util.Random r = new java.util.Random();
+        for (int i = 129; i < 64*1024; i+= 17) {
+            byte[] b = new byte[i];
+            r.nextBytes(b);
+            if (!test(b)) return;
         }
         
-        byte orig[] = "ho ho ho, merry christmas".getBytes();
         try {
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(64);
-            java.util.zip.GZIPOutputStream o = new java.util.zip.GZIPOutputStream(baos);
-            o.write(orig);
-            o.finish();
-            o.flush();
-            o.close();
-            byte compressed[] = baos.toByteArray();
-            
             ResettableGZIPInputStream i = new ResettableGZIPInputStream();
-            i.initialize(new ByteArrayInputStream(compressed));
-            byte readBuf[] = new byte[128];
-            int read = i.read(readBuf);
-            if (read != orig.length)
-                throw new RuntimeException("read=" + read);
-            for (int j = 0; j < read; j++)
-                if (readBuf[j] != orig[j])
-                    throw new RuntimeException("wtf, j=" + j + " readBuf=" + readBuf[j] + " orig=" + orig[j]);
-            boolean ok = (-1 == i.read());
-            if (!ok) throw new RuntimeException("wtf, not EOF after the data?");
+            for (int k = 1; k < 1599; k++) {
+                byte orig[] = new byte[k];
+                r.nextBytes(orig);
+                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(k+100);
+                java.util.zip.GZIPOutputStream o = new java.util.zip.GZIPOutputStream(baos);
+                o.write(orig);
+                o.finish();
+                o.flush();
+                o.close();
+                byte compressed[] = baos.toByteArray();
+            
+                i.initialize(new java.io.ByteArrayInputStream(compressed));
+                byte readBuf[] = new byte[k];
+                int read = DataHelper.read(i, readBuf);
+                if (read != orig.length)
+                    throw new RuntimeException("read=" + read + " expected " + orig.length);
+                for (int j = 0; j < read; j++) {
+                    if (readBuf[j] != orig[j])
+                        throw new RuntimeException("wtf, j=" + j + " readBuf=" + readBuf[j] + " orig=" + orig[j]);
+                }
+                boolean ok = (-1 == i.read());
+                if (!ok) throw new RuntimeException("wtf, not EOF after the data?");
+                //System.out.println("Match ok");
+                // try both closing and not
+                if ((k % 2) != 0)
+                    i.close();
+            }
             System.out.println("Match ok");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    private static boolean test(int size) {
-        byte b[] = new byte[size];
-        new java.util.Random().nextBytes(b);
+    private static boolean test(byte[] b) {
+        int size = b.length;
         try { 
             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(size);
             java.util.zip.GZIPOutputStream o = new java.util.zip.GZIPOutputStream(baos);
@@ -417,7 +428,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             o.flush();
             byte compressed[] = baos.toByteArray();
             
-            ResettableGZIPInputStream in = new ResettableGZIPInputStream(new ByteArrayInputStream(compressed));
+            ResettableGZIPInputStream in = new ResettableGZIPInputStream(new java.io.ByteArrayInputStream(compressed));
             java.io.ByteArrayOutputStream baos2 = new java.io.ByteArrayOutputStream(size);
             byte rbuf[] = new byte[512];
             while (true) {
@@ -433,7 +444,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             if (!net.i2p.data.DataHelper.eq(rv, 0, b, 0, b.length)) {
                 throw new RuntimeException("foo, read=" + rv.length);
             } else {
-                System.out.println("match, w00t @ " + size);
+                //System.out.println("match, w00t @ " + size);
                 return true;
             }
         } catch (Exception e) { 

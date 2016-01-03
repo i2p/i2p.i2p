@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 
 import gnu.getopt.Getopt;
 
@@ -56,10 +57,13 @@ public class SAMStreamSink {
     private final Map<String, Sink> _remotePeers;
     private static I2PSSLSocketFactory _sslSocketFactory;
     
-    private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4, RAWHDR = 5, FORWARD = 6;
-    private static final String USAGE = "Usage: SAMStreamSink [-s] [-m mode] [-v version] [-b samHost] [-p samPort] [-o opt=val] [-u user] [-w password] myDestFile sinkDir\n" +
-                                        "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4; raw-with-headers: 5; stream-forward: 6\n" +
-                                        "       -s: use SSL\n" +
+    private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4, RAWHDR = 5, FORWARD = 6, FORWARDSSL=7;
+    private static final String USAGE = "Usage: SAMStreamSink [-s] [-m mode] [-v version] [-b samHost] [-p samPort]\n" +
+                                        "                     [-o opt=val] [-u user] [-w password] myDestFile sinkDir\n" +
+                                        "       modes: stream: 0; datagram: 1; v1datagram: 2;\n" +
+                                        "              raw: 3; v1raw: 4; raw-with-headers: 5;\n" +
+                                        "              stream-forward: 6; stream-forward-ssl: 7\n" +
+                                        "       -s: use SSL to connect to bridge\n" +
                                         "       multiple -o session options are allowed";
     private static final int V3FORWARDPORT=9998;
     private static final int V3DGPORT=9999;
@@ -73,7 +77,7 @@ public class SAMStreamSink {
         String port = "7656";
         String user = null;
         String password = null;
-        String opts = "";
+        String opts = "inbound.length=0 outbound.length=0";
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -83,7 +87,7 @@ public class SAMStreamSink {
 
             case 'm':
                 mode = Integer.parseInt(g.getOptarg());
-                if (mode < 0 || mode > FORWARD) {
+                if (mode < 0 || mode > FORWARDSSL) {
                     System.err.println(USAGE);
                     return;
                 }
@@ -174,7 +178,7 @@ public class SAMStreamSink {
                 Thread t = new Pinger(out);
                 t.start();
             }
-            if (_isV3 && (mode == STREAM || mode == FORWARD)) {
+            if (_isV3 && (mode == STREAM || mode == FORWARD || mode == FORWARDSSL)) {
                 // test multiple acceptors, only works in 3.2
                 int acceptors = (_isV32 && mode == STREAM) ? 4 : 1;
                 for (int i = 0; i < acceptors; i++) {
@@ -193,7 +197,18 @@ public class SAMStreamSink {
                 }
                 if (mode == FORWARD) {
                     // set up a listening ServerSocket
-                    (new FwdRcvr(isSSL)).start();
+                    (new FwdRcvr(false, null)).start();
+                } else if (mode == FORWARDSSL) {
+                    // set up a listening ServerSocket
+                    String scfile = SSLUtil.DEFAULT_SAMCLIENT_CONFIGFILE;
+                    File file = new File(scfile);
+                    Properties opts = new Properties();
+                    if (file.exists())
+                        DataHelper.loadProps(opts, file);
+                    boolean shouldSave = SSLUtil.verifyKeyStore(opts);
+                    if (shouldSave)
+                        DataHelper.storeProps(opts, file);
+                    (new FwdRcvr(true, opts)).start();
                 }
             } else if (_isV3 && (mode == DG || mode == RAW || mode == RAWHDR)) {
                 // set up a listening DatagramSocket
@@ -208,7 +223,10 @@ public class SAMStreamSink {
     private class DGRcvr extends I2PAppThread {
         private final int _mode;
 
-        public DGRcvr(int mode) { _mode = mode; }
+        public DGRcvr(int mode) {
+            super("SAM DG Rcvr");
+            _mode = mode;
+        }
 
         public void run() {
             byte[] buf = new byte[32768];
@@ -257,18 +275,23 @@ public class SAMStreamSink {
 
     private class FwdRcvr extends I2PAppThread {
         private final boolean _isSSL;
+        // for SSL only
+        private final Properties _opts;
 
-        public FwdRcvr(boolean isSSL) {
-            if (isSSL)
-                throw new UnsupportedOperationException("TODO");
+        public FwdRcvr(boolean isSSL, Properties opts) {
+            super("SAM Fwd Rcvr");
             _isSSL = isSSL;
+            _opts = opts;
         }
 
         public void run() {
             try {
                 ServerSocket ss;
                 if (_isSSL) {
-                    throw new UnsupportedOperationException("TODO");
+                    SSLServerSocketFactory fact = SSLUtil.initializeFactory(_opts);
+                    SSLServerSocket sock = (SSLServerSocket) fact.createServerSocket(V3FORWARDPORT);
+                    I2PSSLSocketFactory.setProtocolsAndCiphers(sock);
+                    ss = sock;
                 } else {
                     ss = new ServerSocket(V3FORWARDPORT);
                 }
@@ -277,10 +300,40 @@ public class SAMStreamSink {
                     Sink sink = new Sink("FAKE", "FAKEFROM");
                     try {
                         InputStream in = s.getInputStream();
+                        boolean gotDest = false;
+                        byte[] dest = new byte[1024];
+                        int dlen = 0;
                         byte[] buf = new byte[32768];
                         int len;
                         while((len = in.read(buf)) >= 0) {
-                            sink.received(buf, 0, len);
+                            if (!gotDest) {
+                                // eat the dest line
+                                for (int i = 0; i < len; i++) {
+                                    byte b = buf[i];
+                                    if (b == (byte) '\n') {
+                                        gotDest = true;
+                                        if (_log.shouldInfo()) {
+                                            try {
+                                                _log.info("Got incoming accept from: \"" + new String(dest, 0, dlen, "ISO-8859-1") + '"');
+                                            } catch (IOException uee) {}
+                                        }
+                                        // feed any remaining to the sink
+                                        i++;
+                                        if (i < len)
+                                            sink.received(buf, i, len - i);
+                                        break;
+                                    } else {
+                                        if (dlen < dest.length) {
+                                            dest[dlen++] = b;
+                                        } else if (dlen == dest.length) {
+                                            dlen++;
+                                            _log.error("first line overflow on accept");
+                                        }
+                                    }
+                                }
+                            } else {
+                                sink.received(buf, 0, len);
+                            }
                         }
                         sink.closed();
                     } catch (IOException ioe) {
@@ -307,7 +360,7 @@ public class SAMStreamSink {
                 try {
                     Thread.sleep(127*1000);
                     synchronized(_out) {
-                        _out.write(DataHelper.getASCII("PING " + System.currentTimeMillis() + '\n'));
+                        _out.write(DataHelper.getUTF8("PING " + System.currentTimeMillis() + '\n'));
                         _out.flush();
                     }
                 } catch (InterruptedException ie) {
@@ -377,7 +430,7 @@ public class SAMStreamSink {
                 _log.info("Got PING " + data + ", sending PONG " + data);
             synchronized (_out) {
                 try {
-                    _out.write(("PONG " + data + '\n').getBytes());
+                    _out.write(("PONG " + data + '\n').getBytes("UTF-8"));
                     _out.flush();
                 } catch (IOException ioe) {
                     _log.error("PONG fail", ioe);
@@ -514,9 +567,9 @@ public class SAMStreamSink {
         synchronized (samOut) {
             try {
                 if (user != null && password != null)
-                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=" + user + " PASSWORD=" + password + '\n').getBytes());
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=" + user + " PASSWORD=" + password + '\n').getBytes("UTF-8"));
                 else
-                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
@@ -534,13 +587,15 @@ public class SAMStreamSink {
                         req = "STREAM ACCEPT SILENT=false TO_PORT=5678 ID=" + _v3ID + "\n";
                     else if (mode == FORWARD)
                         req = "STREAM FORWARD ID=" + _v3ID + " PORT=" + V3FORWARDPORT + '\n';
+                    else if (mode == FORWARDSSL)
+                        req = "STREAM FORWARD ID=" + _v3ID + " PORT=" + V3FORWARDPORT + " SSL=true\n";
                     else
                         throw new IllegalStateException("mode " + mode);
-                    samOut.write(req.getBytes());
+                    samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("STREAM ACCEPT/FORWARD sent");
-                    if (mode == FORWARD) {
+                    if (mode == FORWARD || mode == FORWARDSSL) {
                         // docs were wrong, we do not get a STREAM STATUS if SILENT=true for ACCEPT
                         boolean ok = eventHandler.waitForStreamStatusReply();
                         if (!ok) 
@@ -587,7 +642,7 @@ public class SAMStreamSink {
                     dest = _destFile;
                 }
                 String style;
-                if (mode == STREAM || mode == FORWARD)
+                if (mode == STREAM || mode == FORWARD || mode == FORWARDSSL)
                     style = "STREAM";
                 else if (mode == V1DG)
                     style = "DATAGRAM";
@@ -600,7 +655,7 @@ public class SAMStreamSink {
                 else
                     style = "RAW HEADER=true PORT=" + V3DGPORT;
                 String req = "SESSION CREATE STYLE=" + style + " DESTINATION=" + dest + ' ' + _conOptions + ' ' + sopts + '\n';
-                samOut.write(req.getBytes());
+                samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
@@ -612,7 +667,7 @@ public class SAMStreamSink {
                         _log.debug("Session create reply found: " + ok);
                 }
                 req = "NAMING LOOKUP NAME=ME\n";
-                samOut.write(req.getBytes());
+                samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Naming lookup sent");
@@ -649,7 +704,7 @@ public class SAMStreamSink {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(f);
-            fos.write(dest.getBytes());
+            fos.write(dest.getBytes("UTF-8"));
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("My destination written to " + _destFile);
         } catch (IOException e) {

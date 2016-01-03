@@ -9,12 +9,14 @@ package net.i2p.i2ptunnel.web;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.data.Certificate;
@@ -84,7 +86,7 @@ public class IndexBean {
         String error;
         try {
             tcg = TunnelControllerGroup.getInstance();
-            error = tcg == null ? _("Tunnels are not initialized yet, please reload in two minutes.")
+            error = tcg == null ? _t("Tunnels are not initialized yet, please reload in two minutes.")
                                 : null;
         } catch (IllegalArgumentException iae) {
             tcg = null;
@@ -157,9 +159,9 @@ public class IndexBean {
         // If passwords are turned on, all is assumed good
         if (!_context.getBooleanProperty(PROP_PW_ENABLE) &&
             !haveNonce(_curNonce))
-            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
+            return _t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                    + ' ' +
-                   _("If the problem persists, verify that you have cookies enabled in your browser.");
+                   _t("If the problem persists, verify that you have cookies enabled in your browser.");
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))
@@ -205,7 +207,7 @@ public class IndexBean {
 
     private String reloadConfig() {
         _group.reloadControllers();
-        return _("Configuration reloaded for all tunnels");
+        return _t("Configuration reloaded for all tunnels");
     }
 
     private String start() {
@@ -219,7 +221,7 @@ public class IndexBean {
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
         // FIXME name will be HTML escaped twice
-        return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "...";
+        return _t("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
     private String stop() {
@@ -233,7 +235,7 @@ public class IndexBean {
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
         // FIXME name will be HTML escaped twice
-        return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "...";
+        return _t("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "...";
     }
     
     private String saveChanges() {
@@ -266,7 +268,7 @@ public class IndexBean {
         if (_action != null) {
             try {
                 buf.append(processAction()).append('\n');
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "Error processing " + _action, e);
                 buf.append("Error: ").append(e.toString()).append('\n');
             }
@@ -322,7 +324,7 @@ public class IndexBean {
         if (name != null)
             return DataHelper.escapeHTML(name);
         else
-            return _("New Tunnel");
+            return _t("New Tunnel");
     }
     
     /**
@@ -342,13 +344,13 @@ public class IndexBean {
         if (tun != null && tun.getListenPort() != null) {
             String port = tun.getListenPort();
             if (port.length() == 0)
-                return "<font color=\"red\">" + _("Port not set") + "</font>";
+                return "<font color=\"red\">" + _t("Port not set") + "</font>";
             int iport = Addresses.getPort(port);
             if (iport == 0)
-                return "<font color=\"red\">" + _("Invalid port") + ' ' + port + "</font>";
+                return "<font color=\"red\">" + _t("Invalid port") + ' ' + port + "</font>";
             if (iport < 1024)
                 return "<font color=\"red\">" +
-                       _("Warning - ports less than 1024 are not recommended") +
+                       _t("Warning - ports less than 1024 are not recommended") +
                        ": " + port + "</font>";
             // dup check, O(n**2)
             List<TunnelController> controllers = _group.getControllers();
@@ -357,12 +359,12 @@ public class IndexBean {
                     continue;
                 if (port.equals(controllers.get(i).getListenPort()))
                     return "<font color=\"red\">" +
-                           _("Warning - duplicate port") +
+                           _t("Warning - duplicate port") +
                            ": " + port + "</font>";
             }
             return port;
         }
-        return "<font color=\"red\">" + _("Port not set") + "</font>";
+        return "<font color=\"red\">" + _t("Port not set") + "</font>";
     }
     
     public String getTunnelType(int tunnel) {
@@ -374,18 +376,18 @@ public class IndexBean {
     }
     
     public String getTypeName(String internalType) {
-        if (TunnelController.TYPE_STD_CLIENT.equals(internalType)) return _("Standard client");
-        else if (TunnelController.TYPE_HTTP_CLIENT.equals(internalType)) return _("HTTP/HTTPS client");
-        else if (TunnelController.TYPE_IRC_CLIENT.equals(internalType)) return _("IRC client");
-        else if (TunnelController.TYPE_STD_SERVER.equals(internalType)) return _("Standard server");
-        else if (TunnelController.TYPE_HTTP_SERVER.equals(internalType)) return _("HTTP server");
-        else if (TunnelController.TYPE_SOCKS.equals(internalType)) return _("SOCKS 4/4a/5 proxy");
-        else if (TunnelController.TYPE_SOCKS_IRC.equals(internalType)) return _("SOCKS IRC proxy");
-        else if (TunnelController.TYPE_CONNECT.equals(internalType)) return _("CONNECT/SSL/HTTPS proxy");
-        else if (TunnelController.TYPE_IRC_SERVER.equals(internalType)) return _("IRC server");
-        else if (TunnelController.TYPE_STREAMR_CLIENT.equals(internalType)) return _("Streamr client");
-        else if (TunnelController.TYPE_STREAMR_SERVER.equals(internalType)) return _("Streamr server");
-        else if (TunnelController.TYPE_HTTP_BIDIR_SERVER.equals(internalType)) return _("HTTP bidir");
+        if (TunnelController.TYPE_STD_CLIENT.equals(internalType)) return _t("Standard client");
+        else if (TunnelController.TYPE_HTTP_CLIENT.equals(internalType)) return _t("HTTP/HTTPS client");
+        else if (TunnelController.TYPE_IRC_CLIENT.equals(internalType)) return _t("IRC client");
+        else if (TunnelController.TYPE_STD_SERVER.equals(internalType)) return _t("Standard server");
+        else if (TunnelController.TYPE_HTTP_SERVER.equals(internalType)) return _t("HTTP server");
+        else if (TunnelController.TYPE_SOCKS.equals(internalType)) return _t("SOCKS 4/4a/5 proxy");
+        else if (TunnelController.TYPE_SOCKS_IRC.equals(internalType)) return _t("SOCKS IRC proxy");
+        else if (TunnelController.TYPE_CONNECT.equals(internalType)) return _t("CONNECT/SSL/HTTPS proxy");
+        else if (TunnelController.TYPE_IRC_SERVER.equals(internalType)) return _t("IRC server");
+        else if (TunnelController.TYPE_STREAMR_CLIENT.equals(internalType)) return _t("Streamr client");
+        else if (TunnelController.TYPE_STREAMR_SERVER.equals(internalType)) return _t("Streamr server");
+        else if (TunnelController.TYPE_HTTP_BIDIR_SERVER.equals(internalType)) return _t("HTTP bidir");
         else return internalType;
     }
     
@@ -442,15 +444,15 @@ public class IndexBean {
                 host = tun.getTargetHost();
             String port = tun.getTargetPort();
             if (host == null || host.length() == 0)
-                host = "<font color=\"red\">" + _("Host not set") + "</font>";
+                host = "<font color=\"red\">" + _t("Host not set") + "</font>";
             else if (Addresses.getIP(host) == null)
-                host = "<font color=\"red\">" + _("Invalid address") + ' ' + host + "</font>";
+                host = "<font color=\"red\">" + _t("Invalid address") + ' ' + host + "</font>";
             else if (host.indexOf(':') >= 0)
                 host = '[' + host + ']';
             if (port == null || port.length() == 0)
-                port = "<font color=\"red\">" + _("Port not set") + "</font>";
+                port = "<font color=\"red\">" + _t("Port not set") + "</font>";
             else if (Addresses.getPort(port) == 0)
-                port = "<font color=\"red\">" + _("Invalid port") + ' ' + port + "</font>";
+                port = "<font color=\"red\">" + _t("Invalid port") + ' ' + port + "</font>";
             return host + ':' + port;
        }  else
             return "";
@@ -972,7 +974,9 @@ public class IndexBean {
         PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
         try {
             pkf.createIfAbsent();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return "Create private key file failed: " + e;
+        } catch (IOException e) {
             return "Create private key file failed: " + e;
         }
         switch (_certType) {
@@ -1011,7 +1015,9 @@ public class IndexBean {
         try {
             pkf.write();
             newdest = pkf.getDestination();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return "Modification failed: " + e;
+        } catch (IOException e) {
             return "Modification failed: " + e;
         }
         return "Destination modified - " +
@@ -1074,8 +1080,8 @@ public class IndexBean {
         }
     }
 
-    protected String _(String key) {
-        return Messages._(key, _context);
+    protected String _t(String key) {
+        return Messages._t(key, _context);
     }
 
     /** translate (ngettext)

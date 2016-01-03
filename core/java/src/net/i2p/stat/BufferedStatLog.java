@@ -2,8 +2,9 @@ package net.i2p.stat;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,7 +116,7 @@ public class BufferedStatLog implements StatLog {
             if (_out != null) try { _out.close(); } catch (IOException ioe) {}
             _outFile = filename;
             try {
-                _out = new BufferedWriter(new FileWriter(_outFile, true), 32*1024);
+                _out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(_outFile, true), "UTF-8"), 32*1024);
             } catch (IOException ioe) { ioe.printStackTrace(); }
         }
     }
@@ -144,7 +145,7 @@ public class BufferedStatLog implements StatLog {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("writing " + writeStart +"->"+ writeEnd);
                             writeEvents(writeStart, writeEnd);
-                        } catch (Exception e) {
+                        } catch (RuntimeException e) {
                             _log.error("error writing " + writeStart +"->"+ writeEnd, e);
                         }
                     }

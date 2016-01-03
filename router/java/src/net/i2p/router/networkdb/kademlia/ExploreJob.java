@@ -78,7 +78,7 @@ class ExploreJob extends SearchJob {
      * @param expiration when the search should stop
      * @param peer the peer to send it to
      *
-     * @return a DatabaseLookupMessage or GarlicMessage
+     * @return a DatabaseLookupMessage or GarlicMessage or null on error
      */
     @Override
     protected I2NPMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration, RouterInfo peer) {
@@ -146,6 +146,7 @@ class ExploreJob extends SearchJob {
                               ' ' + sess.key + ' ' + sess.tag);
                 msg.setReplySession(sess.key, sess.tag);
             }
+            // may be null
             outMsg = MessageWrapper.wrap(getContext(), msg, peer);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Encrypted exploratory DLM for " + getState().getTarget() + " to " +

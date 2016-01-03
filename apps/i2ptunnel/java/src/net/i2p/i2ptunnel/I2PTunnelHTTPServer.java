@@ -419,12 +419,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             setEntry(headers, "Connection", "close");
             // we keep the enc sent by the browser before clobbering it, since it may have 
             // been x-i2p-gzip
-            String enc = getEntryOrNull(headers, "Accept-encoding");
-            String altEnc = getEntryOrNull(headers, "X-Accept-encoding");
+            String enc = getEntryOrNull(headers, "Accept-Encoding");
+            String altEnc = getEntryOrNull(headers, "X-Accept-Encoding");
             
             // according to rfc2616 s14.3, this *should* force identity, even if
             // "identity;q=1, *;q=0" didn't.  
-            setEntry(headers, "Accept-encoding", ""); 
+            // as of 0.9.23, the client passes this header through, and we do the same,
+            // so if the server and browser can do the compression/decompression, we don't have to
+            //setEntry(headers, "Accept-Encoding", ""); 
 
             socket.setReadTimeout(readTimeout);
             Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
@@ -432,7 +434,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // instead of i2ptunnelrunner, use something that reads the HTTP 
             // request from the socket, modifies the headers, sends the request to the 
             // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
-            // if it was one of the Accept-encoding: values, and gzip the payload       
+            // if it was one of the Accept-Encoding: values, and gzip the payload       
             boolean allowGZIP = true;
             String val = opts.getProperty("i2ptunnel.gzip");
             if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
@@ -443,7 +445,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             boolean useGZIP = alt || ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
             // Don't pass this on, outproxies should strip so I2P traffic isn't so obvious but they probably don't
             if (alt)
-                headers.remove("X-Accept-encoding");
+                headers.remove("X-Accept-Encoding");
 
             String modifiedHeader = formatHeaders(headers, command);
             if (_log.shouldLog(Log.DEBUG))
@@ -453,7 +455,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (allowGZIP && useGZIP) {
                 t = new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log);
             } else {
-                t = new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(),
+                t = new I2PTunnelRunner(s, socket, slock, null, DataHelper.getUTF8(modifiedHeader),
                                                null, (I2PTunnelRunner.FailCallback) null);
             }
             // run in the unlimited client pool
@@ -535,7 +537,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 
                 if (_log.shouldLog(Log.INFO))
                     _log.info("request headers: " + _headers);
-                serverout.write(_headers.getBytes());
+                serverout.write(DataHelper.getUTF8(_headers));
                 browserin = _browser.getInputStream();
                 // Don't spin off a thread for this except for POSTs
                 // beware interference with Shoutcast, etc.?
@@ -573,7 +575,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 Map<String, List<String>> headers = readHeaders(null, serverin, command,
                     SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
-                compressedOut.write(modifiedHeaders.getBytes());
+                compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
 
                 Sender s = new Sender(compressedOut, serverin, "server: server to browser", _log);
                 if (_log.shouldLog(Log.INFO))
@@ -662,7 +664,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          */
         @Override
         protected String filterResponseLine(String line) {
-            String[] s = line.split(" ", 3);
+            String[] s = DataHelper.split(line, " ", 3);
             if (s.length > 1 &&
                 (s[1].startsWith("3") || s[1].startsWith("5")))
                 _dataExpected = 0;
@@ -671,6 +673,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     
         /**
          *  Don't compress small responses or images.
+         *  Don't compress things that are already compressed.
          *  Compression is inline but decompression on the client side
          *  creates a new thread.
          */
@@ -687,7 +690,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      (!_contentType.equals("application/x-bzip")) &&
                      (!_contentType.equals("application/x-bzip2")) &&
                      (!_contentType.equals("application/x-gzip")) &&
-                     (!_contentType.equals("application/zip"))));
+                     (!_contentType.equals("application/zip")))) &&
+                   (_contentEncoding == null ||
+                    ((!_contentEncoding.equals("gzip")) &&
+                     (!_contentEncoding.equals("compress")) &&
+                     (!_contentEncoding.equals("deflate"))));
         }
 
         @Override
@@ -695,7 +702,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Including x-i2p-gzip as the content encoding in the response");
             if (shouldCompress())
-                out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
+                out.write(DataHelper.getASCII("Content-encoding: x-i2p-gzip\r\n"));
             super.finishHeaders();
         }
 
@@ -735,7 +742,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         public long getTotalRead() { 
             try {
                 return def.getTotalIn();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // j2se 1.4.2_08 on linux is sometimes throwing an NPE in the getTotalIn() implementation
                 return 0; 
             }
@@ -743,7 +750,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         public long getTotalCompressed() { 
             try {
                 return def.getTotalOut();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // j2se 1.4.2_08 on linux is sometimes throwing an NPE in the getTotalOut() implementation
                 return 0;
             }
@@ -817,7 +824,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  @throws BadRequestException on bad headers
      *  @throws IOException on other errors in the underlying stream
      */
-    private static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
+    static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
                                                            String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
@@ -877,9 +884,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
                 String lcName = name.toLowerCase(Locale.US);
                 if ("accept-encoding".equals(lcName))
-                    name = "Accept-encoding";
+                    name = "Accept-Encoding";
                 else if ("x-accept-encoding".equals(lcName))
-                    name = "X-Accept-encoding";
+                    name = "X-Accept-Encoding";
                 else if ("x-forwarded-for".equals(lcName))
                     name = "X-Forwarded-For";
                 else if ("x-forwarded-server".equals(lcName))

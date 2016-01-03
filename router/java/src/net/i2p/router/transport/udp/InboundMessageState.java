@@ -342,7 +342,8 @@ class InboundMessageState implements CDQEntry {
             buf.append(" completely received with ");
             //buf.append(getCompleteSize()).append(" bytes");
             // may display -1 but avoid cascaded exceptions after release
-            buf.append(_completeSize).append(" bytes");
+            buf.append(_completeSize).append(" bytes in ");
+            buf.append(_lastFragment + 1).append(" fragments");
         } else {
             for (int i = 0; i <= _lastFragment; i++) {
                 buf.append(" fragment ").append(i);

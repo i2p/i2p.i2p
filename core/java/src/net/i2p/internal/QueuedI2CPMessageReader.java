@@ -42,7 +42,7 @@ public class QueuedI2CPMessageReader extends I2CPMessageReader {
          * Pumps messages from the incoming message queue to the listener.
          */
         @Override
-        public void run() {
+        protected void run2() {
             while (_stayAlive) {
                 while (_doRun) {
                     // do read

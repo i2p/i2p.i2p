@@ -117,7 +117,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, MESSAGE_TYPE);
+            out.write((byte) MESSAGE_TYPE);
             _sessionId.writeBytes(out);
             _destination.writeBytes(out);
             _payload.writeBytes(out);

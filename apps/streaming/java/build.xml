@@ -39,19 +39,22 @@
     </target>
     <target name="builddeptest">
         <ant dir="../../../core/java" target="jar" />
-        <ant dir="../../../apps/ministreaming/java/" target="jarTest" />
+        <ant dir="../../../apps/ministreaming/java/" target="jar" />
     </target>
     <target name="junit.compileTest" depends="builddeptest, compile">
 
         <echo message="[DEBUG] ant home is ${ant.home}" />
         <echo message="[DEBUG] junit home before override is ${junit.home}" />
         <echo message="[DEBUG] hamcrest home before override is ${hamcrest.home}" />
+        <echo message="[DEBUG] mockito home before override is ${mockito.home}" />
 
         <property name="junit.home" value="${ant.home}/lib" />
         <property name="hamcrest.home" value="${ant.home}/lib" />
+        <property name="mockito.home" value="${ant.home}/lib" />
 
         <echo message="[DEBUG] junit home after override is ${junit.home}" />
         <echo message="[DEBUG] hamcrest home after override is ${hamcrest.home}" />
+        <echo message="[DEBUG] mockito home after override is ${mockito.home}" />
 
         <javac
             srcdir="./test/junit"
@@ -61,10 +64,12 @@
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
-                <pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
+                <pathelement location="${mockito.home}/byte-buddy.jar" />
+                <pathelement location="${mockito.home}/objenesis.jar" />
+                <pathelement location="${mockito.home}/mockito-core.jar" />
             </classpath>
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -85,6 +90,11 @@
                 <include name="**/*.class"/>
                 <!-- exclude Test classes -->
                 <exclude name="**/*Test.class" />
+                <exclude name="**/*TestBase.class" />
+                <exclude name="**/*IT.class" />
+                <exclude name="**/*IT$*.class" />
+                <exclude name="**/StreamingITBase.class" />
+                <exclude name="**/StreamingITBase$*.class" />
                 <!-- exclude anything not in net.i2p.* -->
                 <exclude name="org/cybergarage/**/*.class" />
                 <exclude name="org/freenetproject/**/*.class" />
@@ -105,6 +115,7 @@
 
         <property name="junit.home" value="${ant.home}/lib" />
         <property name="hamcrest.home" value="${ant.home}/lib" />
+        <property name="mockito.home" value="${ant.home}/lib" />
 
         <junit printsummary="withOutAndErr" fork="yes" showoutput="yes" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
@@ -114,13 +125,15 @@
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-all.jar" />
+                <pathelement location="${mockito.home}/byte-buddy.jar" />
+                <pathelement location="${mockito.home}/objenesis.jar" />
+                <pathelement location="${mockito.home}/mockito-core.jar" />
                 <pathelement location="${junit.home}/junit4.jar" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../../core/java/build/i2ptest.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
-                <pathelement location="../../ministreaming/java/build/mstreamingTest.jar" />
                 <pathelement location="../../build/jbigi.jar" />
                 <pathelement location="${with.clover}" />
                 <pathelement location="${with.cobertura}" />
@@ -128,6 +141,7 @@
             <batchtest todir="../../../reports/streaming/junit/">
                 <fileset dir="./test/junit">
                     <include name="**/*Test.java" />
+                    <include name="**/*IT.java" if="runIntegrationTests" />
                 </fileset>
             </batchtest>
             <formatter type="xml"/>

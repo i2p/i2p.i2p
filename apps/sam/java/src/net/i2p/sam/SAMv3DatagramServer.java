@@ -24,6 +24,7 @@ import net.i2p.client.I2PSession;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  *  This is the thread listening on 127.0.0.1:7655 or as specified by
@@ -90,7 +91,7 @@ class SAMv3DatagramServer implements Handler {
 	/** @since 0.9.24 */
 	public int getPort() { return _port; }
 
-	private static class Listener implements Runnable {
+	private class Listener implements Runnable {
 		
 		private final DatagramChannel server;
 		
@@ -98,8 +99,17 @@ class SAMv3DatagramServer implements Handler {
 		{
 			this.server = server ;
 		}
-		public void run()
-		{
+
+		public void run() {
+			I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_SAM_UDP, _host, _port);
+			try {
+				run2();
+			} finally {
+				I2PAppContext.getGlobalContext().portMapper().unregister(PortMapper.SVC_SAM_UDP);
+			}
+		}
+
+		private void run2() {
 			ByteBuffer inBuf = ByteBuffer.allocateDirect(SAMRawSession.RAW_SIZE_MAX+1024);
 			
 			while (!Thread.interrupted())
@@ -135,6 +145,7 @@ class SAMv3DatagramServer implements Handler {
 		public void run() {
 			try {
 				String header = DataHelper.readLine(is).trim();
+				// we cannot use SAMUtils.parseParams() here
 				StringTokenizer tok = new StringTokenizer(header, " ");
 				if (tok.countTokens() < 3) {
 					// This is not a correct message, for sure

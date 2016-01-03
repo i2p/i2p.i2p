@@ -3,7 +3,7 @@ package net.i2p.router.networkdb.reseed;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.data.DataHelper;
@@ -31,6 +31,7 @@ public class ReseedChecker {
     private final AtomicBoolean _inProgress = new AtomicBoolean();
     private volatile String _lastStatus = "";
     private volatile String _lastError = "";
+    private volatile boolean _networkLogged;
 
     public static final int MINIMUM = 50;
     private static final long STATUS_CLEAN_TIME = 20*60*1000;
@@ -79,9 +80,13 @@ public class ReseedChecker {
         File noReseedFileAlt3 = new File(_context.getConfigDir(), "noreseed.i2p");
         if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
             if (!Addresses.isConnected()) {
-                _log.logAlways(Log.WARN, "Cannot reseed, no network connection");
+                if (!_networkLogged) {
+                    _log.logAlways(Log.WARN, "Cannot reseed, no network connection");
+                    _networkLogged = true;
+                }
                 return false;
             }
+            _networkLogged = false;
             if (count <= 1)
                 _log.logAlways(Log.INFO, "Downloading peer router information for a new I2P installation");
             else
@@ -126,7 +131,7 @@ public class ReseedChecker {
      *  @throws IllegalArgumentException if it doesn't end with zip or su3
      *  @since 0.9.19
      */
-    public boolean requestReseed(URL url) throws IllegalArgumentException {
+    public boolean requestReseed(URI url) throws IllegalArgumentException {
         if (_inProgress.compareAndSet(false, true)) {
             Reseeder reseeder = new Reseeder(_context, this);
             try {

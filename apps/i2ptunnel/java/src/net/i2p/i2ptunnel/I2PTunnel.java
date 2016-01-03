@@ -35,7 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -1605,7 +1604,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private void runRun(String args[], Logging l) {
         if (args.length == 1) {
             try {
-                BufferedReader br = new BufferedReader(new FileReader(args[0]));
+                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
                     runCommand(line, l);
@@ -1874,7 +1873,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             try {
                 result.fromByteArray(content);
                 return result;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 if (log.shouldLog(Log.INFO)) 
                     log.info("File is not a binary destination - trying base64");
                 try {

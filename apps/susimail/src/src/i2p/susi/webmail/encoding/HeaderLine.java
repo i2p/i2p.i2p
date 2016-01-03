@@ -66,7 +66,7 @@ public class HeaderLine implements Encoding {
 		boolean quoting = false;
 		boolean quote = false;
 		boolean linebreak = false;
-		String quotedSequence = null;
+		StringBuilder quotedSequence = null;
 		int rest = in.length;
 		int index = 0;
 		while( true ) {
@@ -102,14 +102,15 @@ public class HeaderLine implements Encoding {
 			}
 			if( quote ) {
 				if( ! quoting ) {
-					quotedSequence = "=?utf-8?Q?";
+					quotedSequence = new StringBuilder(64);
+					quotedSequence.append("=?utf-8?Q?");
 					quoting = true;
 				}
-				quotedSequence += HexTable.table[ c < 0 ? 256 + c : c ];
+				quotedSequence.append(HexTable.table[ c < 0 ? 256 + c : c ]);
 			}
 			else {
 				if( quoting ) {
-					quotedSequence += "?=";
+					quotedSequence.append("?=");
 					int sl = quotedSequence.length();
 					if( l + sl > 76 ) {
 						/*
@@ -138,7 +139,7 @@ public class HeaderLine implements Encoding {
 			}
 		}
 		if( quoting ) {
-			quotedSequence += "?=";
+			quotedSequence.append("?=");
 			int sl = quotedSequence.length();
 			if( l + sl > 76 ) {
 				/*
@@ -232,7 +233,9 @@ public class HeaderLine implements Encoding {
 												length -= distance;
 												lastCharWasQuoted = true;
 												continue;
-											} catch (Exception e1) {
+											} catch (IOException e1) {
+												Debug.debug(Debug.ERROR, e1.toString());
+											} catch (RuntimeException e1) {
 												Debug.debug(Debug.ERROR, e1.toString());
 											}
 										}

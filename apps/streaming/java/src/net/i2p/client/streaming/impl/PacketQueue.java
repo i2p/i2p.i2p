@@ -1,5 +1,6 @@
 package net.i2p.client.streaming.impl;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,11 +26,9 @@ import net.i2p.util.SimpleTimer2;
  *<p>
  * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
-class PacketQueue implements SendMessageStatusListener {
+class PacketQueue implements SendMessageStatusListener, Closeable {
     private final I2PAppContext _context;
     private final Log _log;
-    private final I2PSession _session;
-    private final ConnectionManager _connectionManager;
     private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     private final Map<Long, Connection> _messageStatusMap;
     private volatile boolean _dead;
@@ -46,13 +45,11 @@ class PacketQueue implements SendMessageStatusListener {
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
     private static final boolean ENABLE_STATUS_LISTEN = true;
 
-    public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
+    public PacketQueue(I2PAppContext context, SimpleTimer2 timer) {
         _context = context;
-        _session = session;
-        _connectionManager = mgr;
         _log = context.logManager().getLog(PacketQueue.class);
         _messageStatusMap = new ConcurrentHashMap<Long, Connection>(16);
-        new RemoveExpired();
+        new RemoveExpired(timer);
         // all createRateStats in ConnectionManager
     }
 
@@ -101,7 +98,7 @@ class PacketQueue implements SendMessageStatusListener {
             int size = 0;
             long beforeWrite = System.currentTimeMillis();
             if (packet.shouldSign())
-                size = packet.writeSignedPacket(buf, 0, _context, _session.getPrivateKey());
+                size = packet.writeSignedPacket(buf, 0);
             else
                 size = packet.writePacket(buf, 0);
             long writeTime = System.currentTimeMillis() - beforeWrite;
@@ -155,14 +152,15 @@ class PacketQueue implements SendMessageStatusListener {
                     options.setTagThreshold(thresh);
                 }
             }
+            I2PSession session = packet.getSession();
             if (listenForStatus) {
-                long id = _session.sendMessage(packet.getTo(), buf, 0, size,
+                long id = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options, this);
                 _messageStatusMap.put(Long.valueOf(id), packet.getConnection());
                 sent = true;
             } else {
-                sent = _session.sendMessage(packet.getTo(), buf, 0, size,
+                sent = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options);
             }
@@ -199,9 +197,10 @@ class PacketQueue implements SendMessageStatusListener {
             //packet.setTagsSent(tagsSent);
             packet.incrementSends();
             Connection c = packet.getConnection();
-            String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
-            if (_log.shouldDebug())
-                _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+            if (c != null && _log.shouldDebug()) {
+                String suffix = "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO();
+                c.getConnectionManager().getPacketHandler().displayPacket(packet, "SEND", suffix);
+            }
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))
                 packet.logTCPDump();
@@ -329,8 +328,8 @@ class PacketQueue implements SendMessageStatusListener {
      */
     private class RemoveExpired extends SimpleTimer2.TimedEvent {
         
-        public RemoveExpired() {
-             super(_context.simpleTimer2(), REMOVE_EXPIRED_TIME);
+        public RemoveExpired(SimpleTimer2 timer) {
+             super(timer, REMOVE_EXPIRED_TIME);
         }
 
         public void timeReached() {

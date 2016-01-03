@@ -9,6 +9,8 @@ package net.i2p.client;
  *
  */
 
+import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -16,12 +18,13 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.SigningPrivateKey;
 
 /**
  * <p>Define the standard means of sending and receiving messages on the 
  * I2P network by using the I2CP (the client protocol).  This is done over a 
- * bidirectional TCP socket and never sends any private keys.
+ * bidirectional TCP socket.
  *
  * End to end encryption in I2PSession was disabled in release 0.6.
  *
@@ -96,7 +99,7 @@ public interface I2PSession {
      *                 objects that were sent along side the given keyUsed.
      * @return success
      */
-    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
+    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set<SessionTag> tagsSent) throws I2PSessionException;
 
     /**
      * End-to-End Crypto is disabled, tags and keys are ignored.
@@ -104,7 +107,7 @@ public interface I2PSession {
      * @param tagsSent UNUSED, IGNORED.
      * @return success
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent) throws I2PSessionException;
 
     /**
      * End-to-End Crypto is disabled, tags and keys are ignored.
@@ -114,7 +117,7 @@ public interface I2PSession {
      * @return success
      * @since 0.7.1
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire) throws I2PSessionException;
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expire) throws I2PSessionException;
 
     /**
      * See I2PSessionMuxedImpl for proto/port details.
@@ -131,7 +134,7 @@ public interface I2PSession {
      * @return success
      * @since 0.7.1
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent,
                                int proto, int fromPort, int toPort) throws I2PSessionException;
 
     /**
@@ -150,7 +153,7 @@ public interface I2PSession {
      * @return success
      * @since 0.7.1
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expire,
                                int proto, int fromPort, int toPort) throws I2PSessionException;
 
     /**
@@ -169,7 +172,7 @@ public interface I2PSession {
      * @return success
      * @since 0.8.4
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expire,
                                int proto, int fromPort, int toPort, int flags) throws I2PSessionException;
 
     /**
@@ -247,6 +250,26 @@ public interface I2PSession {
      *
      */
     public void destroySession() throws I2PSessionException;
+    
+    /**
+     *  @return a new subsession, non-null
+     *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
+     *                          and different signing keys
+     *  @param opts subsession options if any, may be null
+     *  @since 0.9.21
+     */
+    public I2PSession addSubsession(InputStream privateKeyStream, Properties opts) throws I2PSessionException;
+    
+    /**
+     *  @since 0.9.21
+     */
+    public void removeSubsession(I2PSession session);
+    
+    /**
+     *  @return a list of subsessions, non-null, does not include the primary session
+     *  @since 0.9.21
+     */
+    public List<I2PSession> getSubsessions();
 
     /**
      * Actually connect the session and start receiving/sending messages
@@ -257,7 +280,7 @@ public interface I2PSession {
     /** 
      * Have we closed the session? 
      *
-     * @return true if the session is closed
+     * @return true if the session is closed, OR connect() has not been called yet
      */
     public boolean isClosed();
     

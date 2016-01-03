@@ -43,7 +43,7 @@ class PacketPusher implements Runnable {
                          send(packets.get(i));
                     }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 _log.error("SSU Output Queue Error", e);
             }
         }

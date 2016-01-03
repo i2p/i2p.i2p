@@ -69,7 +69,7 @@ public class SAMStreamSend {
         String port = "7656";
         String user = null;
         String password = null;
-        String opts = "";
+        String opts = "inbound.length=0 outbound.length=0";
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -237,9 +237,10 @@ public class SAMStreamSend {
         synchronized (samOut) {
             try {
                 if (user != null && password != null)
-                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=" + user + " PASSWORD=" + password + '\n').getBytes());
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + " USER=\"" + user.replace("\"", "\\\"") +
+                                  "\" PASSWORD=\"" + password.replace("\"", "\\\"") + "\"\n").getBytes("UTF-8"));
                 else
-                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes());
+                    samOut.write(("HELLO VERSION MIN=1.0 MAX=" + version + '\n').getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Hello sent");
@@ -256,6 +257,8 @@ public class SAMStreamSend {
                     byte[] id = new byte[5];
                     _context.random().nextBytes(id);
                     _v3ID = Base32.encode(id);
+                    if (_isV32)
+                        _v3ID = "xx€€xx" + _v3ID;
                     _conOptions = "ID=" + _v3ID;
                 }
                 String style;
@@ -266,7 +269,7 @@ public class SAMStreamSend {
                 else
                     style = "RAW";
                 String req = "SESSION CREATE STYLE=" + style + " DESTINATION=TRANSIENT " + _conOptions + ' ' + opts + '\n';
-                samOut.write(req.getBytes());
+                samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Session create sent");
@@ -277,7 +280,7 @@ public class SAMStreamSend {
                     _log.debug("Session create reply found: " + ok);
 
                 req = "NAMING LOOKUP NAME=ME\n";
-                samOut.write(req.getBytes());
+                samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Naming lookup sent");
@@ -350,7 +353,7 @@ public class SAMStreamSend {
                 byte dest[] = new byte[1024];
                 int read = DataHelper.read(fin, dest);
 
-                _remoteDestination = new String(dest, 0, read);
+                _remoteDestination = DataHelper.getUTF8(dest, 0, read);
 
                 _context.statManager().createRateStat("send." + _connectionId + ".totalSent", "Data size sent", "swarm", new long[] { 30*1000, 60*1000, 5*60*1000 });
                 _context.statManager().createRateStat("send." + _connectionId + ".started", "When we start", "swarm", new long[] { 5*60*1000 });
@@ -363,7 +366,7 @@ public class SAMStreamSend {
                     if (_isV3)
                         buf.append(" FROM_PORT=1234 TO_PORT=5678");
                     buf.append('\n');
-                    byte[] msg = DataHelper.getASCII(buf.toString());
+                    byte[] msg = DataHelper.getUTF8(buf.toString());
                     synchronized (_samOut) {
                         _samOut.write(msg);
                         _samOut.flush();
@@ -431,7 +434,7 @@ public class SAMStreamSend {
                                     } else {
                                         throw new IOException("unsupported mode " + _mode);
                                     }
-                                    byte msg[] = DataHelper.getASCII(m);
+                                    byte msg[] = DataHelper.getUTF8(m);
                                     _samOut.write(msg);
                                 }
                                 _samOut.write(data, 0, read);
@@ -440,16 +443,16 @@ public class SAMStreamSend {
                         } else {
                             // real datagrams
                             ByteArrayOutputStream baos = new ByteArrayOutputStream(read + 1024);
-                            baos.write(DataHelper.getASCII("3.0 "));
-                            baos.write(DataHelper.getASCII(_v3ID));
+                            baos.write(DataHelper.getUTF8("3.0 "));
+                            baos.write(DataHelper.getUTF8(_v3ID));
                             baos.write((byte) ' ');
-                            baos.write(DataHelper.getASCII(_remoteDestination));
+                            baos.write(DataHelper.getUTF8(_remoteDestination));
                             if (_isV32) {
                                 // only set TO_PORT to test session setting of FROM_PORT
                                 if (_mode == RAW)
-                                    baos.write(DataHelper.getASCII(" PROTOCOL=123 TO_PORT=5678"));
+                                    baos.write(DataHelper.getUTF8(" PROTOCOL=123 TO_PORT=5678"));
                                 else
-                                    baos.write(DataHelper.getASCII(" TO_PORT=5678"));
+                                    baos.write(DataHelper.getUTF8(" TO_PORT=5678"));
                             }
                             baos.write((byte) '\n');
                             baos.write(data, 0, read);
@@ -476,12 +479,13 @@ public class SAMStreamSend {
                         _log.info("Error closing", ioe);
                     }
                 } else {
-                    byte msg[] = ("STREAM CLOSE ID=" + _connectionId + "\n").getBytes();
                     try {
+                        byte msg[] = ("STREAM CLOSE ID=" + _connectionId + "\n").getBytes("UTF-8");
                         synchronized (_samOut) {
                             _samOut.write(msg);
                             _samOut.flush();
-                            _samOut.close();
+                            // we can't close this yet, we will lose data
+                            //_samOut.close();
                         }
                     } catch (IOException ioe) {
                         _log.info("Error closing", ioe);
@@ -492,20 +496,18 @@ public class SAMStreamSend {
             }
             
             closed();
+            // stop the reader, since we're only doing this once for testing
+            // you wouldn't do this in a real application
+            // closing the master socket too fast will kill the data socket flushing through
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ie) {}
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Runner exiting");
             if (toSend != _totalSent)
                 _log.error("Only sent " + _totalSent + " of " + toSend + " bytes");
             if (_reader2 != null)
                 _reader2.stopReading();
-            // stop the reader, since we're only doing this once for testing
-            // you wouldn't do this in a real application
-            if (_isV3) {
-                // closing the master socket too fast will kill the data socket flushing through
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException ie) {}
-            }
             _reader.stopReading();
         }
     }

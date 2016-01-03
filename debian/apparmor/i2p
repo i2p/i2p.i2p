@@ -1,14 +1,15 @@
-# Last Modified: Sun Apr 12 22:08:32 2015
+# Last Modified: Sun Dec 06 12:30:32 2015
 # vim:syntax=apparmor et ts=4 sw=4
 
-#include <abstractions/base>
-#include <abstractions/fonts>
-#include <abstractions/nameservice>
-#include <abstractions/ssl_certs>
-#include <abstractions/user-tmp>
+  #include <abstractions/base>
+  #include <abstractions/fonts>
+  #include <abstractions/nameservice>
+  #include <abstractions/ssl_certs>
 
-network inet stream,
-network inet6 stream,
+  network inet stream,
+  network inet dgram,
+  network inet6 stream,
+  network inet6 dgram,
 
   # Needed by Java
   @{PROC}                                                 r,
@@ -16,8 +17,6 @@ network inet6 stream,
   owner @{PROC}/[0-9]*/status                             r,
   @{PROC}/[0-9]*/net/ipv6_route                           r,
   @{PROC}/[0-9]*/net/if_inet6                             r,
-  /dev/random                                             r,
-  /dev/urandom                                            r,
   /sys/devices/system/cpu/                                r,
   /sys/devices/system/cpu/**                              r,
 
@@ -53,15 +52,28 @@ network inet6 stream,
   /usr/share/java/wrapper*.jar                            r,
 
   # 'm' is needed by the I2P-Bote plugin
-  /{,var/}tmp/                                            rwm,
-  owner /{,var/}tmp/**                                    rwklm,
+  /{,lib/live/mount/overlay/}tmp/                         rwm,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
+  owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/** rw,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*           rwk,
+  owner /{,lib/live/mount/overlay/}tmp/wrapper*/**        rw,
+  # Scrypt used by I2P-Bote
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
+  owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwkm,
+  # /graphs in the router console
+  owner /{,lib/live/mount/overlay/}tmp/imageio[0-9]*.tmp  rwk,
 
   # Prevent spamming the logs
   deny /dev/tty                                           rw,
+  deny /{,lib/live/mount/overlay/}var/tmp/                r,
   deny @{PROC}/[0-9]*/fd/                                 r,
   deny /usr/sbin/                                         r,
   deny /var/cache/fontconfig/                             wk,
 
-  # Used by some versions of the Tanuki wrapper, not needed by I2P
+  # Some versions of the Tanuki wrapper package will try to load these jars but
+  # they are  not needed by I2P. The deny rule here will prevent the logs from
+  # being spammed.
   deny /usr/share/java/hamcrest*.jar                      r,
   deny /usr/share/java/junit*.jar                         r,

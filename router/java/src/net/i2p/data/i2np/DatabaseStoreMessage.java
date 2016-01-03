@@ -103,6 +103,13 @@ public class DatabaseStoreMessage extends FastI2NPMessageImpl {
         int curIndex = offset;
         
         _key = Hash.create(data, curIndex);
+        // i2pd bug? Generally followed by corrupt gzipped content.
+        // Fast-fail here to save resources.
+        if (_key.equals(Hash.FAKE_HASH)) {
+            // createRateStat in KNDF
+            _context.statManager().addRateData("netDb.DSMAllZeros", 1);
+            throw new I2NPMessageException("DSM all zeros");
+        }
         curIndex += Hash.HASH_LENGTH;
         
         // as of 0.9.18, ignore other 7 bits of the type byte, in preparation for future options
