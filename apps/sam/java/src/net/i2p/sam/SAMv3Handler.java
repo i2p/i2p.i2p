@@ -23,7 +23,6 @@ import java.net.NoRouteToHostException;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import java.util.HashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -56,13 +55,6 @@ class SAMv3Handler extends SAMv1Handler
 	private long _lastPing;
 	private static final int FIRST_READ_TIMEOUT = 60*1000;
 	private static final int READ_TIMEOUT = 3*60*1000;
-	
-	interface Session {
-		String getNick();
-		void close();
-		boolean sendBytes(String dest, byte[] data, int proto,
-		                  int fromPort, int toPort) throws DataFormatException, I2PSessionException;
-	}
 	
 	/**
 	 * Create a new SAM version 3 handler.  This constructor expects
@@ -103,121 +95,6 @@ class SAMv3Handler extends SAMv1Handler
 	public boolean verifVersion()
 	{
 		return (verMajor == 3);
-	}
-	
-	/**
-	 *  The values in the SessionsDB
-	 */
-	public static class SessionRecord
-	{
-		private final String m_dest ;
-		private final Properties m_props ;
-		private ThreadGroup m_threadgroup ;
-		private final SAMv3Handler m_handler ;
-
-		public SessionRecord( String dest, Properties props, SAMv3Handler handler )
-		{
-			m_dest = dest; 
-			m_props = new Properties() ;
-			m_props.putAll(props);
-			m_handler = handler ;
-		}
-
-		public SessionRecord( SessionRecord in )
-		{
-			m_dest = in.getDest();
-			m_props = in.getProps();
-			m_threadgroup = in.getThreadGroup();
-			m_handler = in.getHandler();
-		}
-
-		public String getDest()
-		{
-			return m_dest;
-		}
-
-		synchronized public Properties getProps()
-		{
-			Properties p = new Properties();
-			p.putAll(m_props);
-			return m_props;
-		}
-
-		public SAMv3Handler getHandler()
-		{
-			return m_handler ;
-		}
-
-		synchronized public ThreadGroup getThreadGroup()
-		{
-			return m_threadgroup ;
-		}
-
-		synchronized public void createThreadGroup(String name)
-		{
-			if (m_threadgroup == null)
-				m_threadgroup = new ThreadGroup(name);
-		}
-	}
-
-	/**
-	 *  basically a HashMap from String to SessionRecord
-	 */
-	public static class SessionsDB
-	{
-		private static final long serialVersionUID = 0x1;
-
-		static class ExistingIdException extends Exception {
-			private static final long serialVersionUID = 0x1;
-		}
-
-		static class ExistingDestException extends Exception {
-			private static final long serialVersionUID = 0x1;
-		}
-		
-		private final HashMap<String, SessionRecord> map;
-
-		public SessionsDB() {
-			map = new HashMap<String, SessionRecord>() ;
-		}
-
-		/** @return success */
-		synchronized public boolean put( String nick, SessionRecord session )
-			throws ExistingIdException, ExistingDestException
-		{
-			if ( map.containsKey(nick) ) {
-				throw new ExistingIdException();
-			}
-			for ( SessionRecord r : map.values() ) {
-				if (r.getDest().equals(session.getDest())) {
-					throw new ExistingDestException();
-				}
-			}
-
-			if ( !map.containsKey(nick) ) {
-				session.createThreadGroup("SAM session "+nick);
-				map.put(nick, session) ;
-				return true ;
-			}
-			else
-				return false ;
-		}
-
-		/** @return true if removed */
-		synchronized public boolean del( String nick )
-		{
-			return map.remove(nick) != null;
-		}
-
-		synchronized public SessionRecord get(String nick)
-		{
-			return map.get(nick);
-		}
-
-		synchronized public boolean containsKey( String nick )
-		{
-			return map.containsKey(nick);
-		}
 	}
 
 	public String getClientIP()

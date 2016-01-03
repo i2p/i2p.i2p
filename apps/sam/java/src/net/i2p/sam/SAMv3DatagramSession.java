@@ -18,7 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress ;
 import java.nio.ByteBuffer;
 
-class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Session, SAMDatagramReceiver {
+class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDatagramReceiver {
 	
 	private final SAMv3Handler handler;
 	private final SAMv3DatagramServer server;
@@ -46,7 +46,7 @@ class SAMv3DatagramSession extends SAMDatagramSession implements SAMv3Handler.Se
 		this.recv = this;  // replacement
 		this.server = dgServer;
 
-		SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+		SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 		if (rec == null)
 			throw new SAMException("Record disappeared for nickname : \""+nick+"\"");
 

@@ -43,7 +43,7 @@ import net.i2p.util.Log;
  * @author mkvore
  */
 
-class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Session
+class SAMv3StreamSession  extends SAMStreamSession implements Session
 {
 
 		private static final int BUFFER_SIZE = 1024 ;
@@ -81,7 +81,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	    	this.nick = login ;
 	    }
 
-	    public static SAMv3Handler.SessionsDB getDB()
+	    public static SessionsDB getDB()
 	    {
 	    	return SAMv3Handler.sSessionsHash ;
 	    }
@@ -135,7 +135,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 
 	        I2PSocket i2ps = socketMgr.connect(d, opts);
 
-	        SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+	        SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 	        
 	        if ( rec==null ) throw new InterruptedIOException() ;
 	        
@@ -193,7 +193,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 			_acceptors.decrementAndGet();
 		}
 
-	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+	    	SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 
 		if ( rec==null || i2ps==null ) throw new InterruptedIOException() ;
 
@@ -223,7 +223,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	     */
 	    public void startForwardingIncoming(Properties props, boolean sendPorts) throws SAMException, InterruptedIOException
 	    {
-	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+	    	SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 	    	boolean verbose = !Boolean.parseBoolean(props.getProperty("SILENT"));
 	        
 	        if ( rec==null ) throw new InterruptedIOException() ;
@@ -450,7 +450,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements SAMv3Handler.Sessi
 	     */
 	    public void stopForwardingIncoming() throws SAMException, InterruptedIOException
 	    {
-	    	SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+	    	SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 	        
 	        if ( rec==null ) throw new InterruptedIOException() ;
 	        

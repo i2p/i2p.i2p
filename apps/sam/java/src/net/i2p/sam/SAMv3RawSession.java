@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  * @author MKVore
  *
  */
-class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SAMRawReceiver {
+class SAMv3RawSession extends SAMRawSession  implements Session, SAMRawReceiver {
 	
 	private final String nick;
 	private final SAMv3Handler handler;
@@ -48,7 +48,7 @@ class SAMv3RawSession extends SAMRawSession  implements SAMv3Handler.Session, SA
 		this.recv = this ;  // replacement
 		this.server = dgServer;
 
-		SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+		SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 		if (rec == null)
 			throw new InterruptedIOException() ;
 		this.handler = rec.getHandler();

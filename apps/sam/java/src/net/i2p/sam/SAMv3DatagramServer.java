@@ -160,7 +160,7 @@ class SAMv3DatagramServer implements Handler {
 				String nick = tok.nextToken();
 				String dest = tok.nextToken();
 
-				SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+				SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 				if (rec!=null) {
 					Properties sprops = rec.getProps();
 					String pr = sprops.getProperty("PROTOCOL");
@@ -206,7 +206,7 @@ class SAMv3DatagramServer implements Handler {
 					// TODO too many allocations and copies. One here and one in Listener above.
 					byte[] data = new byte[is.available()];
 					is.read(data);
-					SAMv3Handler.Session sess = rec.getHandler().getSession();
+					Session sess = rec.getHandler().getSession();
 					if (sess != null)
 						sess.sendBytes(dest, data, proto, fromPort, toPort);
 					else
