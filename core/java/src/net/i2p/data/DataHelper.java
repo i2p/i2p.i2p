@@ -99,6 +99,9 @@ public class DataHelper {
         }
     }
 
+    private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\r\n;]");
+    private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[#\r\n]");
+
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
      *
@@ -509,19 +512,13 @@ public class DataHelper {
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
-                if (name.contains("#") ||
-                    name.contains("=") ||
-                    name.contains("\r") ||
-                    name.contains("\n") ||
-                    name.startsWith(";")) {
+                if (ILLEGAL_KEY.matcher(name).matches()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key: \"" +
                                                            name + "\" = \"" + val + '\"');
                     continue;
                 }
-                if (val.contains("#") ||
-                    val.contains("\r") ||
-                    val.contains("\n")) {
+                if (ILLEGAL_VALUE.matcher(val).matches()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#\\r\\n\") in value: \"" +
                                                            name + "\" = \"" + val + '\"');
