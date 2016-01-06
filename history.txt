@@ -3,10 +3,12 @@
  * Console: Properly register listen hosts with PortMapper
  * DataHelper: Optimize checks in storeProps()
  * I2PTunnel: Fixup console links in error pages if console is
-           on a non-standard host or port, or on https
+   on a non-standard host or port, or on https
  * Jetty: Change default source logging from b64 to b32.
    To change back to b64, add the following to the RequestLogImpl
    section of jetty.xml: <Set name="b64">true</Set>
+ * NetDB: Don't query floodfills if they are too old to
+   support sig types or encrypted replies (ticket #1742)
  * PortMapper: Add method to convert wildcard host to actual host
 
 2015-12-21 zzz
