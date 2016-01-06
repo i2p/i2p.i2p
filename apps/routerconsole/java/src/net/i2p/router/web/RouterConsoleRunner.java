@@ -1,14 +1,17 @@
 package net.i2p.router.web;
 
-import java.util.ArrayList;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -442,6 +445,7 @@ public class RouterConsoleRunner implements RouterApp {
                     System.err.println("Bad routerconsole port " + _listenPort);
             }
             if (lport > 0) {
+                List<String> hosts = new ArrayList<String>(2);
                 StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
@@ -490,13 +494,20 @@ public class RouterConsoleRunner implements RouterApp {
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
+                        hosts.add(host);
                     } catch (Exception ioe) {
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ": " + ioe);
                         System.err.println("You may ignore this warning if the console is still available at http://localhost:" + _listenPort);
                     }
                 }
-                // XXX: what if listenhosts do not include 127.0.0.1? (Should that ever even happen?)
-                _context.portMapper().register(PortMapper.SVC_CONSOLE,lport);
+                if (hosts.isEmpty()) {
+                    _context.portMapper().register(PortMapper.SVC_CONSOLE, lport);
+                } else {
+                    // put IPv4 first
+                    Collections.sort(hosts, new HostComparator());
+                    _context.portMapper().register(PortMapper.SVC_CONSOLE, hosts.get(0), lport);
+                    // note that we could still fail in connector.start() below
+                }
             }
 
             // add SSL listeners
@@ -520,6 +531,7 @@ public class RouterConsoleRunner implements RouterApp {
                                                    new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
                     sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
                                                       new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
+                    List<String> hosts = new ArrayList<String>(2);
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
@@ -561,6 +573,7 @@ public class RouterConsoleRunner implements RouterApp {
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;
+                            hosts.add(host);
                         } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
                             if (SystemVersion.isGNU())
@@ -568,7 +581,14 @@ public class RouterConsoleRunner implements RouterApp {
                             System.err.println("You may ignore this warning if the console is still available at https://localhost:" + sslPort);
                         }
                     }
-                    _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);
+                    if (hosts.isEmpty()) {
+                        _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, sslPort);
+                    } else {
+                        // put IPv4 first
+                        Collections.sort(hosts, new HostComparator());
+                        _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, hosts.get(0), sslPort);
+                        // note that we could still fail in connector.start() below
+                    }
                 } else {
                     System.err.println("Unable to create or access keystore for SSL: " + keyStore.getAbsolutePath());
                 }
@@ -898,6 +918,21 @@ public class RouterConsoleRunner implements RouterApp {
         }
     }
 
+    /**
+     * Put IPv4 first
+     * @since 0.9.24
+     */
+    private static class HostComparator implements Comparator<String>, Serializable {
+         public int compare(String l, String r) {
+             boolean l4 = l.contains(".");
+             boolean r4 = r.contains(".");
+             if (l4 && !r4)
+                 return -1;
+             if (r4 && !l4)
+                 return 1;
+             return l.compareTo(r);
+        }
+    }
     
     /**
      * Just to set the name and set Daemon
