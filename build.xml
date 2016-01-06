@@ -1616,6 +1616,11 @@
         <ant dir="router/java/" target="jarTest" />
         <copy file="core/java/build/i2ptest.jar" todir="build" />
         <copy file="router/java/build/routertest.jar" todir="build" />
+        <!-- broken -->
+      <!--
+        <ant dir="apps/ministreaming/java/" target="junit.compileTest" />
+        <ant dir="apps/streaming/java/" target="junit.compileTest" />
+       -->
     </target>
     <target name="prepTest" depends="prepupdate, buildTest">
         <!-- overwrite i2p.jar and router.jar with the test versions -->
@@ -1793,11 +1798,9 @@
          since preppkg puts too much stuff in pkg-temp -->
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
--->
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
-<!--
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
 -->
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
