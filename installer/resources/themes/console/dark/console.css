@@ -177,7 +177,7 @@ div.routersummary ul {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -7px -5px -8px !important;
+     margin: -5px -7px 5px -8px !important;
      width: 188px !important;
      overflow: hidden;
      font-size: 8pt;

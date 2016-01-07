@@ -1,3 +1,6 @@
+2016-01-07 zzz
+ * Console: Fixed summary bar overflow (ticket #1739)
+
 2016-01-06 zzz
  * Build: Remove big geoip files from release again
  * Console: Properly register listen hosts with PortMapper
