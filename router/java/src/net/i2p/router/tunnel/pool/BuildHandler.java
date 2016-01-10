@@ -47,6 +47,10 @@ import net.i2p.util.Log;
  * it used to be called from the BuildExecutor thread loop.
  *
  * Note that 10 minute tunnel expiration is hardcoded in here.
+ *
+ * There is only one of these objects but there may be multiple
+ * threads running it. Instantiated and started by TunnelPoolManager.
+ *
  */
 class BuildHandler implements Runnable {
     private final RouterContext _context;
@@ -122,6 +126,7 @@ class BuildHandler implements Runnable {
         _context.statManager().createRequiredRateStat("tunnel.rejectHopThrottle", "Reject per-hop limit", "Tunnels", new long[] { 60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.dropReqThrottle", "Drop per-hop limit", "Tunnels", new long[] { 60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.dropLookupThrottle", "Drop next hop lookup", "Tunnels", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropDecryptFail", "Can't find our slot", "Tunnels", new long[] { 60*60*1000 });
 
         _context.statManager().createRequiredRateStat("tunnel.rejectOverloaded", "Delay to process rejected request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.acceptLoad", "Delay to process accepted request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -459,15 +464,20 @@ class BuildHandler implements Runnable {
         // this not only decrypts the current hop's record, but encrypts the other records
         // with the enclosed reply key
         long beforeDecrypt = System.currentTimeMillis();
-        BuildRequestRecord req = _processor.decrypt(_context, state.msg, _context.routerHash(), _context.keyManager().getPrivateKey());
+        BuildRequestRecord req = _processor.decrypt(state.msg, _context.routerHash(), _context.keyManager().getPrivateKey());
         long decryptTime = System.currentTimeMillis() - beforeDecrypt;
         _context.statManager().addRateData("tunnel.decryptRequestTime", decryptTime);
         if (decryptTime > 500 && _log.shouldLog(Log.WARN))
             _log.warn("Took too long to decrypt the request: " + decryptTime + " for message " + state.msg.getUniqueId() + " received " + (timeSinceReceived+decryptTime) + " ago");
         if (req == null) {
             // no records matched, or the decryption failed.  bah
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("The request " + state.msg.getUniqueId() + " could not be decrypted");
+            if (_log.shouldLog(Log.WARN)) {
+                Hash from = state.fromHash;
+                if (from == null && state.from != null)
+                    from = state.from.calculateHash();
+                _log.warn("The request " + state.msg.getUniqueId() + " could not be decrypted from: " + from);
+            }
+            _context.statManager().addRateData("tunnel.dropDecryptFail", 1);
             return -1;
         }
 
@@ -993,7 +1003,7 @@ class BuildHandler implements Runnable {
                             fh = from.calculateHash();
                         if (fh != null && _requestThrottler.shouldThrottle(fh)) {
                             if (_log.shouldLog(Log.WARN))
-                                _log.warn("Dropping tunnel request (from throttle), previous hop: " + from);
+                                _log.warn("Dropping tunnel request (from throttle), previous hop: " + fh);
                             _context.statManager().addRateData("tunnel.dropReqThrottle", 1);
                             accept = false;
                         }

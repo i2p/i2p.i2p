@@ -204,6 +204,7 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.participantLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
         // following is for BuildMessageProcessor
         ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.buildRequestBadReplyKey", "Build requests with bad reply keys", "Tunnels", new long[] { 60*60*1000 });
         // following are for FragmentHandler
         ctx.statManager().createRateStat("tunnel.smallFragments", "How many pad bytes are in small fragments?", 
                                               "Tunnels", RATES);
@@ -603,7 +604,7 @@ public class TunnelDispatcher implements Service {
                            + " messageId " + msg.getUniqueId()
                            + "/" + msg.getMessage().getUniqueId()
                            + " messageType: " + msg.getMessage().getClass().getSimpleName()
-                           + " existing = " + _inboundGateways.size(), new Exception("source"));
+                           + " existing = " + _inboundGateways.size());
         }
         
         //long dispatchTime = _context.clock().now() - before;

@@ -1,3 +1,6 @@
+2016-01-10 zzz
+ * Tunnels: Fix build request Bloom filter (ticket #1746)
+
 2016-01-07 zzz
  * Console: Fixed summary bar overflow (ticket #1739)
 

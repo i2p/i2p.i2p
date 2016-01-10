@@ -61,13 +61,19 @@ public class DecayingBloomFilter {
         _longToEntry = null;
         _longToEntryMask = 0;
         context.addShutdownTask(new Shutdown());
-        _decayEvent = new DecayEvent();
         _keepDecaying = true;
-        _decayEvent.schedule(_durationMs);
+        if (_durationMs == 60*60*1000) {
+            // special mode for BuildMessageProcessor
+            _decayEvent = new DecayHourlyEvent();
+        } else {
+            _decayEvent = new DecayEvent();
+            _decayEvent.schedule(_durationMs);
+        }
     }
 
     /**
      * Create a bloom filter that will decay its entries over time.  
+     * Uses default m of 23, memory usage is 2 MB.
      *
      * @param durationMs entries last for at least this long, but no more than twice this long
      * @param entryBytes how large are the entries to be added?  if this is less than 32 bytes,
@@ -78,7 +84,10 @@ public class DecayingBloomFilter {
         this(context, durationMs, entryBytes, "DBF");
     }
 
-    /** @param name just for logging / debugging / stats */
+    /**
+     * Uses default m of 23, memory usage is 2 MB.
+     * @param name just for logging / debugging / stats
+     */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name) {
         // this is instantiated in four different places, they may have different
         // requirements, but for now use this as a gross method of memory reduction.
@@ -87,6 +96,8 @@ public class DecayingBloomFilter {
     }
 
     /**
+     * Memory usage is 2 * (2**m) bits or 2**(m-2) bytes.
+     *
      * @param m filter size exponent, max is 29
      */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name, int m) {
@@ -123,9 +134,14 @@ public class DecayingBloomFilter {
             _longToEntry = null;
             _longToEntryMask = 0;
         }
-        _decayEvent = new DecayEvent();
         _keepDecaying = true;
-        _decayEvent.schedule(_durationMs);
+        if (_durationMs == 60*60*1000) {
+            // special mode for BuildMessageProcessor
+            _decayEvent = new DecayHourlyEvent();
+        } else {
+            _decayEvent = new DecayEvent();
+            _decayEvent.schedule(_durationMs);
+        }
         if (_log.shouldLog(Log.WARN))
            _log.warn("New DBF " + name + " m = " + m + " k = " + k + " entryBytes = " + entryBytes +
                      " numExtenders = " + numExtenders + " cycle (s) = " + (durationMs / 1000));
@@ -318,15 +334,60 @@ public class DecayingBloomFilter {
     }
     
     private class DecayEvent extends SimpleTimer2.TimedEvent {
+        /**
+         *  Caller MUST schedule.
+         */
         DecayEvent() {
             super(_context.simpleTimer2());
         }
-    	
+
         public void timeReached() {
             if (_keepDecaying) {
                 decay();
                 schedule(_durationMs);
             }
+        }
+    }
+    
+    /**
+     *  Decays at 5 minutes after the top of the hour.
+     *  This ignores leap seconds.
+     *  @since 0.9.24
+     */
+    private class DecayHourlyEvent extends SimpleTimer2.TimedEvent {
+        private static final long HOUR = 60 * 60 * 1000L;
+        private static final long LAG = 5 * 60 * 1000L;
+        private volatile long _currentHour;
+
+        /**
+         *  Schedules itself. Caller MUST NOT schedule.
+         */
+        DecayHourlyEvent() {
+            super(_context.simpleTimer2());
+            schedule(getTimeTillNextHour());
+        }
+
+        public void timeReached() {
+            if (_keepDecaying) {
+                long now = _context.clock().now();
+                long currentHour = now / HOUR;
+                // handle possible clock adjustments
+                if (_currentHour != currentHour) {
+                    decay();
+                    _currentHour = currentHour;
+                }
+                long next = ((1 + currentHour) * HOUR) + LAG;
+                schedule(Math.max(5000, next - now));
+            }
+        }
+
+        /** side effect: sets _currentHour */
+        private long getTimeTillNextHour() {
+            long now = _context.clock().now();
+            long currentHour = now / HOUR;
+            _currentHour = currentHour;
+            long next = ((1 + currentHour) * HOUR) + LAG;
+            return Math.max(5000, next - now);
         }
     }
     
