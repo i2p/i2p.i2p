@@ -1,3 +1,7 @@
+2016-01-13 zzz
+ * BuildHandler: More early-disconnect cases
+ * Family: Add i2p-dev cert
+
 2016-01-10 zzz
  * Tunnels: Fix build request Bloom filter (ticket #1746)
 
