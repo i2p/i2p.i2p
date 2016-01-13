@@ -165,6 +165,9 @@ class IntroductionManager {
      * Also, ping all idle peers that were introducers in the last 2 hours,
      * to keep the connection up, since the netDb can have quite stale information,
      * and we want to keep our introducers valid.
+     *
+     * @param ssuOptions out parameter, options are added
+     * @return number of introducers added
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
         int start = _context.random().nextInt(Integer.MAX_VALUE);
