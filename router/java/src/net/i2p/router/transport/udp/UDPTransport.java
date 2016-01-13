@@ -2502,6 +2502,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void mayDisconnect(final Hash peer) {
         final PeerState ps =  _peersByIdent.get(peer);
         if (ps != null && ps.isInbound() &&
+            ps.getWeRelayToThemAs() <= 0 &&
             ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 2) {
             ps.setMayDisconnect();
         }
