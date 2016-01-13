@@ -451,6 +451,10 @@ class BuildHandler implements Runnable {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(state.msg.getUniqueId() + ": handling request after " + timeSinceReceived);
         
+        Hash from = state.fromHash;
+        if (from == null && state.from != null)
+            from = state.from.calculateHash();
+
         if (timeSinceReceived > (BuildRequestor.REQUEST_TIMEOUT*3)) {
             // don't even bother, since we are so overloaded locally
             _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Overloaded"));
@@ -458,6 +462,8 @@ class BuildHandler implements Runnable {
                 _log.warn("Not even trying to handle/decrypt the request " + state.msg.getUniqueId() 
                            + ", since we received it a long time ago: " + timeSinceReceived);
             _context.statManager().addRateData("tunnel.dropLoadDelay", timeSinceReceived);
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return -1;
         }
         // ok, this is not our own tunnel, so we need to do some heavy lifting
@@ -472,12 +478,11 @@ class BuildHandler implements Runnable {
         if (req == null) {
             // no records matched, or the decryption failed.  bah
             if (_log.shouldLog(Log.WARN)) {
-                Hash from = state.fromHash;
-                if (from == null && state.from != null)
-                    from = state.from.calculateHash();
                 _log.warn("The request " + state.msg.getUniqueId() + " could not be decrypted from: " + from);
             }
             _context.statManager().addRateData("tunnel.dropDecryptFail", 1);
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return -1;
         }
 
@@ -506,6 +511,8 @@ class BuildHandler implements Runnable {
                     _log.warn("Drop next hop lookup, limit " + limit);
                 _context.statManager().addRateData("tunnel.dropLookupThrottle", 1);
             }
+            if (from != null)
+                _context.commSystem().mayDisconnect(from);
             return -1;
         } else {
             long beforeHandle = System.currentTimeMillis();
