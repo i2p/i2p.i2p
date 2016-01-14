@@ -17,9 +17,9 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.CachedIteratorArrayList;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
-import net.i2p.util.CachedIteratorArrayList;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
