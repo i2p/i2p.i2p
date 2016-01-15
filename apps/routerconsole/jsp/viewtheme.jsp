@@ -18,6 +18,8 @@ if (uri.endsWith(".css")) {
   response.setContentType("image/jpeg");
 } else if (uri.endsWith(".ico")) {
   response.setContentType("image/x-icon");
+} else if (uri.endsWith(".svg")) {
+  response.setContentType("image/svg+xml");
 }
 /*
  * User or plugin themes
