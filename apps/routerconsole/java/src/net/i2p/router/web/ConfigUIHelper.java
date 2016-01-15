@@ -99,7 +99,8 @@ public class ConfigUIHelper extends HelperBase {
         { "tr", "tr", _x("Turkish"), null },
         { "uk", "ua", _x("Ukrainian"), null },
         { "vi", "vn", _x("Vietnamese"), null },
-        { "zh", "cn", _x("Chinese"), null }
+        { "zh", "cn", _x("Chinese"), null },
+        { "zh_TW", "tw", _x("Chinese"), "Taiwan" }
     };
 
 
