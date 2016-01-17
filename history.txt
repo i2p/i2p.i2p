@@ -1,3 +1,13 @@
+2016-01-17 zzz
+ * BuildHandler: Disable tunnel removal on next-hop timeout
+ * Console:
+   - Fix mime type for svg in themes directory
+   - Add zh_TW translation
+ * Fortuna: Add getByte() method
+ * i2psnark: add opendocument mime types
+ * i2ptunnel: Remove unused stats
+ * Utils: Move CachedIteratorArrayList from core to router
+
 2016-01-13 zzz
  * BuildHandler: More early-disconnect cases
  * Family: Add i2p-dev cert
