@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Simple event logger for occasional events,
@@ -94,6 +95,8 @@ public class EventLog {
             buf.append(_context.clock().now()).append(' ').append(event);
             if (info != null && info.length() > 0)
                 buf.append(' ').append(info);
+            if (SystemVersion.isWindows())
+                buf.append('\r');
             buf.append('\n');
             out.write(buf.toString().getBytes("UTF-8"));
         } catch (IOException ioe) {
@@ -126,7 +129,7 @@ public class EventLog {
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
-                    String[] s = DataHelper.split(line, " ", 3);
+                    String[] s = DataHelper.split(line.trim(), " ", 3);
                     if (!s[1].equals(event))
                         continue;
                     long time = Long.parseLong(s[0]);
@@ -168,7 +171,7 @@ public class EventLog {
             String line = null;
             while ( (line = br.readLine()) != null) {
                 try {
-                    String[] s = DataHelper.split(line, " ", 2);
+                    String[] s = DataHelper.split(line.trim(), " ", 2);
                     if (s.length < 2)
                         continue;
                     long time = Long.parseLong(s[0]);

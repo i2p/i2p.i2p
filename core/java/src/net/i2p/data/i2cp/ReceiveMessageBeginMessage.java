@@ -86,7 +86,7 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, MESSAGE_TYPE);
+            out.write((byte) MESSAGE_TYPE);
             DataHelper.writeLong(out, 2, _sessionId);
             DataHelper.writeLong(out, 4, _messageId);
         } catch (DataFormatException dfe) {

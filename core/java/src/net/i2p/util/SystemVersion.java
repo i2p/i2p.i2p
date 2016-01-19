@@ -5,6 +5,9 @@ package net.i2p.util;
  */
 
 import java.lang.reflect.Field;
+import java.util.TimeZone;
+
+import net.i2p.I2PAppContext;
 
 /**
  * Methods to find out what system we are running on
@@ -202,4 +205,59 @@ public abstract class SystemVersion {
             maxMemory = 96*1024*1024l;
         return maxMemory;
     }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone() {
+        return getSystemTimeZone(I2PAppContext.getGlobalContext());
+    }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone(I2PAppContext ctx) {
+        String systemTimeZone = ctx.getProperty("i2p.systemTimeZone");
+        if (systemTimeZone != null)
+            return TimeZone.getTimeZone(systemTimeZone);
+        return TimeZone.getDefault();
+    }
+
+    /**
+     *  @since 0.9.24
+     */
+/****
+    public static void main(String[] args) {
+        System.out.println("64 bit   : " + is64Bit());
+        System.out.println("Java 6   : " + isJava6());
+        System.out.println("Java 7   : " + isJava7());
+        System.out.println("Java 8   : " + isJava8());
+        System.out.println("Java 9   : " + isJava9());
+        System.out.println("Android  : " + isAndroid());
+        if (isAndroid())
+            System.out.println("  Version: " + getAndroidVersion());
+        System.out.println("Apache   : " + isApache());
+        System.out.println("ARM      : " + isARM());
+        System.out.println("Mac      : " + isMac());
+        System.out.println("Gentoo   : " + isGentoo());
+        System.out.println("GNU      : " + isGNU());
+        System.out.println("Windows  : " + isWindows());
+        System.out.println("Wrapper  : " + hasWrapper());
+        System.out.println("x86      : " + isX86());
+        System.out.println("Max mem  : " + getMaxMemory());
+
+    }
+****/
 }

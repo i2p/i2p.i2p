@@ -1287,7 +1287,7 @@ installsystemd() {
         cat << EOF >> "$SYSTEMD_SERVICE"
 [Unit]
 Description=$APP_LONG_NAME
-After= local-fs.target network.target
+After= local-fs.target network.target time-sync.target
 
 [Service]
 Type=forking

@@ -12,12 +12,13 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
  *
  */
-public class EchoTest extends StreamingTestBase {
+public class EchoIT extends StreamingITBase {
     private Log _log;
     private I2PSession _client;
     private I2PSession _server;
@@ -25,7 +26,7 @@ public class EchoTest extends StreamingTestBase {
     @Test
     public void test() throws Exception {
         I2PAppContext context = I2PAppContext.getGlobalContext();
-        _log = context.logManager().getLog(ConnectTest.class);
+        _log = context.logManager().getLog(ConnectIT.class);
         _log.debug("creating server session");
         _server = createSession();
         _log.debug("running server");
@@ -116,7 +117,7 @@ public class EchoTest extends StreamingTestBase {
                 InputStream in = socket.getInputStream();
                 OutputStream out = socket.getOutputStream();
                 for (int i = 0; i < 3; i++) {
-                    out.write("blah!".getBytes());
+                    out.write(DataHelper.getASCII("blah!"));
                     _log.debug("client wrote a line");
                     out.flush();
                     _log.debug("client flushed");

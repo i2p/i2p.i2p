@@ -14,13 +14,13 @@ import net.i2p.util.SimpleTimer2;
 public class MessageOutputStreamTest extends TestCase {
     private I2PAppContext _context;
     private SimpleTimer2 _st2;
-    
+
     @Before
     public void setUp() {
         _context = I2PAppContext.getGlobalContext();
         _st2 = _context.simpleTimer2();
     }
-    
+
     @Test
     public void test() throws Exception {
         Receiver receiver = new Receiver();
@@ -39,12 +39,12 @@ public class MessageOutputStreamTest extends TestCase {
         }
         assertTrue(
                 "read does not match (first off = " + firstOff + "): \n"
-                    + Base64.encode(buf) + "\n" 
-                    + Base64.encode(read)
-                ,
-                firstOff < 0);
+                        + Base64.encode(buf) + "\n" 
+                        + Base64.encode(read)
+                        ,
+                        firstOff < 0);
     }
-    
+
     private class Receiver implements MessageOutputStream.DataReceiver {
         private ByteArrayOutputStream _data;
         public Receiver() {
@@ -52,7 +52,7 @@ public class MessageOutputStreamTest extends TestCase {
         }
         public MessageOutputStream.WriteStatus writeData(byte[] buf, int off, int size) {
             _data.write(buf, off, size);
-			return new DummyWriteStatus();
+            return new DummyWriteStatus();
         }
         public boolean writeInProcess() { return false; }
         public byte[] getData() { return _data.toByteArray(); }

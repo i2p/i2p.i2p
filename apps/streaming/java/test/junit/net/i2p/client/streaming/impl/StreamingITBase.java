@@ -12,7 +12,7 @@ import net.i2p.util.Log;
 
 import junit.framework.TestCase;
 
-abstract class StreamingTestBase extends TestCase {
+abstract class StreamingITBase extends TestCase {
 
     // TODO: this may need to start a full router
     

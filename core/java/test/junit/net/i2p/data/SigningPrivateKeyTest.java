@@ -81,7 +81,7 @@ public class SigningPrivateKeyTest extends StructureTest {
     
     public void testShortRead() throws Exception{
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
-        ByteArrayInputStream in = new ByteArrayInputStream("short".getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("short"));
         boolean error = false;
         try{
             signingPrivateKey.readBytes(in);

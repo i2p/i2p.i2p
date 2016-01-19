@@ -64,7 +64,7 @@ public class ConfigClientsHelper extends HelperBase {
         if ((mode == 0 && disabled) ||
             (mode == 1 && (!disabled) && (!ssl)) ||
             (mode == 2 && (!disabled) && ssl))
-            return "checked=\"checked\"";
+            return CHECKED;
         return "";
     }
 
@@ -72,7 +72,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getAuth() {
         boolean enabled =  _context.getBooleanProperty(PROP_AUTH);
         if (enabled)
-            return "checked=\"checked\"";
+            return CHECKED;
         return "";
     }
 
@@ -151,7 +151,7 @@ public class ConfigClientsHelper extends HelperBase {
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        false, RouterConsoleRunner.class.getName().equals(ca.className),
                        // description
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""),
+                       DataHelper.escapeHTML(ca.className + ((ca.args != null) ? " " + ca.args : "")),
                        // edit
                        allowEdit && (""+cur).equals(_edit),
                        // show edit button, show update button
@@ -212,7 +212,7 @@ public class ConfigClientsHelper extends HelperBase {
                 boolean isRunning = WebAppStarter.isWebAppRunning(app);
                 renderForm(buf, app, app, !"addressbook".equals(app),
                            "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app),
-                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
+                           RouterConsoleRunner.ROUTERCONSOLE.equals(app), DataHelper.escapeHTML(app + ".war"),
                            false, false, false, isRunning, false, !isRunning);
             }
         }
@@ -316,31 +316,33 @@ public class ConfigClientsHelper extends HelperBase {
     /**
      *  Misnamed, renders a single line in a table for a single client/webapp/plugin.
      *
-     *  ro trumps edit and showEditButton
+     *  @param name will be escaped here
+     *  @param ro trumps edit and showEditButton
+     *  @param escapedDesc description, must be HTML escaped, except for plugins
      */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
-                            boolean enabled, boolean ro, boolean preventDisable, String desc, boolean edit,
+                            boolean enabled, boolean ro, boolean preventDisable, String escapedDesc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
                             boolean showDeleteButton, boolean showStartButton) {
-        String escapeddesc = DataHelper.escapeHTML(desc);
+        String escapedName = DataHelper.escapeHTML(name);
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
-                link += name + "/";
-            buf.append("<a href=\"").append(link).append("\">").append(_t(name)).append("</a>");
+                link += escapedName + "/";
+            buf.append("<a href=\"").append(link).append("\">").append(_t(escapedName)).append("</a>");
         } else if (edit && !ro) {
-            buf.append("<input type=\"text\" name=\"name").append(index).append("\" value=\"");
+            buf.append("<input type=\"text\" name=\"nofilter_name").append(index).append("\" value=\"");
             if (name.length() > 0)
-                buf.append(_t(name));
+                buf.append(_t(escapedName));
             buf.append("\" >");
         } else {
             if (name.length() > 0)
-                buf.append(_t(name));
+                buf.append(_t(escapedName));
         }
-        buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
+        buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\"");
         if (enabled) {
-            buf.append("checked=\"checked\" ");
+            buf.append(CHECKED);
             if (ro || preventDisable)
                 buf.append("disabled=\"disabled\" ");
         }
@@ -366,17 +368,17 @@ public class ConfigClientsHelper extends HelperBase {
         if (showDeleteButton && (!edit) && !ro) {
             buf.append("<button type=\"submit\" class=\"Xdelete\" name=\"action\" value=\"Delete ").append(index)
                .append("\" onclick=\"if (!confirm('")
-               .append(_t("Are you sure you want to delete {0}?", _t(name)))
+               .append(_t("Are you sure you want to delete {0}?", _t(escapedName)))
                .append("')) { return false; }\">")
                .append(_t("Delete")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         buf.append("</td><td align=\"left\" width=\"50%\">");
         if (edit && !ro) {
-            buf.append("<input type=\"text\" size=\"80\" spellcheck=\"false\" name=\"desc").append(index).append("\" value=\"");
-            buf.append(escapeddesc);
+            buf.append("<input type=\"text\" size=\"80\" spellcheck=\"false\" name=\"nofilter_desc").append(index).append("\" value=\"");
+            buf.append(escapedDesc);
             buf.append("\" >");
         } else {
-            buf.append(desc);
+            buf.append(escapedDesc);
         }
         buf.append("</td></tr>\n");
     }

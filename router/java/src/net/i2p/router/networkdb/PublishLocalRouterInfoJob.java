@@ -82,9 +82,6 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             List<RouterAddress> newAddrs = getContext().commSystem().createAddresses();
             int count = _runCount.incrementAndGet();
             RouterInfo ri = new RouterInfo(oldRI);
-            // this will get overwritten by setOptions() below, must restore it below
-            getContext().router().addCapabilities(ri);
-            String caps = ri.getCapabilities();
             if (_notFirstTime && (count % 4) != 0 && oldAddrs.size() == newAddrs.size()) {
                 // 3 times out of 4, we don't republish if everything is the same...
                 // If something changed, including the cost, then publish,
@@ -116,9 +113,6 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             }
             ri.setPublished(getContext().clock().now());
             Properties stats = getContext().statPublisher().publishStatistics();
-            stats.setProperty(RouterInfo.PROP_NETWORK_ID, String.valueOf(Router.NETWORK_ID));
-            // restore caps generated above
-            stats.setProperty(RouterInfo.PROP_CAPABILITIES, caps);
             ri.setOptions(stats);
             ri.setAddresses(newAddrs);
 

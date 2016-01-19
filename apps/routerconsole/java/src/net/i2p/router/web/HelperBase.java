@@ -12,6 +12,7 @@ public abstract class HelperBase {
     protected Writer _out;
 
     static final String PROP_ADVANCED = "routerconsole.advanced";
+    static final String CHECKED = " checked=\"checked\" ";
 
     /**
      * Configure this bean to query a particular router context
@@ -43,6 +44,19 @@ public abstract class HelperBase {
      */
     public void storeWriter(Writer out) { _out = out; }
 
+    /**
+     *  Is a boolean property set to true?
+     *
+     *  @param prop must default to false
+     *  @return non-null, either "" or " checked=\"checked\" "
+     *  @since 0.9.24 consolidated from various helpers
+     */
+    protected String getChecked(String prop) {
+        if (_context.getBooleanProperty(prop))
+            return CHECKED;
+        return "";
+    }
+
     /** translate a string */
     public String _t(String s) {
         return Messages.getString(s, _context);
@@ -56,7 +70,7 @@ public abstract class HelperBase {
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _t("foo {0} bar", _t("baz"))
+     *    To translate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */

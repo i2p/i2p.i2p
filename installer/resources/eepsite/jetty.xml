@@ -310,6 +310,8 @@
           <Set name="extended">false</Set>
           <Set name="logCookies">false</Set>
           <Set name="LogTimeZone">GMT</Set>
+          <!-- False for b32 logging. True for b64 logging. Default false -->
+          <Set name="b64">false</Set>
         </New>
       </Set>
     </Ref>

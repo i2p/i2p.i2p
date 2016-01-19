@@ -41,8 +41,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.SystemVersion;
 
 /**
  * data structure to hold a single message, mostly used with folder view and sorting
@@ -276,7 +276,7 @@ class Mail {
 		DateFormat localDateFormatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 		DateFormat longLocalDateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
 		// the router sets the JVM time zone to UTC but saves the original here so we can get it
-		TimeZone tz = DataHelper.getSystemTimeZone(I2PAppContext.getGlobalContext());
+		TimeZone tz = SystemVersion.getSystemTimeZone();
 		localDateFormatter.setTimeZone(tz);
 		longLocalDateFormatter.setTimeZone(tz);
 		DateFormat mailDateFormatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH );

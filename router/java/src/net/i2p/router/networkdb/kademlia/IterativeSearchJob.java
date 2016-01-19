@@ -10,6 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -30,6 +31,7 @@ import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.VersionComparator;
 
 /**
  * A traditional Kademlia search that continues to search
@@ -74,7 +76,7 @@ class IterativeSearchJob extends FloodSearchJob {
     
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
-    private static final int TOTAL_SEARCH_LIMIT = 6;
+    private static final int TOTAL_SEARCH_LIMIT = 5;
     /** Max number of peers to query if we are ff */
     private static final int TOTAL_SEARCH_LIMIT_WHEN_FF = 3;
     /** TOTAL_SEARCH_LIMIT * SINGLE_SEARCH_TIME, plus some extra */
@@ -199,10 +201,12 @@ class IterativeSearchJob extends FloodSearchJob {
             }
         }
         final boolean empty;
+        // outside sync to avoid deadlock
+        final Hash us = getContext().routerHash();
         synchronized(this) {
             _toTry.addAll(floodfillPeers);
             // don't ask ourselves or the target
-            _toTry.remove(getContext().routerHash());
+            _toTry.remove(us);
             _toTry.remove(_key);
             empty = _toTry.isEmpty();
         }
@@ -286,6 +290,20 @@ class IterativeSearchJob extends FloodSearchJob {
     private void sendQuery(Hash peer) {
             TunnelManagerFacade tm = getContext().tunnelManager();
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+            if (ri != null) {
+                // Now that most of the netdb is Ed RIs and EC LSs, don't even bother
+                // querying old floodfills that don't know about those sig types.
+                // This is also more recent than the version that supports encrypted replies,
+                // so we won't request unencrypted replies anymore either.
+                String v = ri.getVersion();
+                String since = SigType.EdDSA_SHA512_Ed25519.getSupportedSince();
+                if (VersionComparator.comp(v, since) < 0) {
+                    failed(peer, false);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(getJobId() + ": not sending query to old version " + v + ": " + peer);
+                    return;
+                }
+            }
             TunnelInfo outTunnel;
             TunnelInfo replyTunnel;
             boolean isClientReplyTunnel;
@@ -379,7 +397,9 @@ class IterativeSearchJob extends FloodSearchJob {
                 // if we have the ff RI, garlic encrypt it
                 if (ri != null) {
                     // request encrypted reply
-                    if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
+                    // now covered by version check above, which is more recent
+                    //if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
+                    if (true) {
                         MessageWrapper.OneTimeSession sess;
                         if (isClientReplyTunnel)
                             sess = MessageWrapper.generateSession(getContext(), _fromLocalDest);
@@ -537,16 +557,20 @@ class IterativeSearchJob extends FloodSearchJob {
             unheard = new ArrayList<Hash>(_unheardFrom);
         }
         // blame the unheard-from (others already blamed in failed() above)
-        for (Hash h : unheard)
+        for (Hash h : unheard) {
             getContext().profileManager().dbLookupFailed(h);
+        }
         long time = System.currentTimeMillis() - _created;
         if (_log.shouldLog(Log.INFO)) {
             long timeRemaining = _expiration - getContext().clock().now();
             _log.info(getJobId() + ": ISJ for " + _key + " failed with " + timeRemaining + " remaining after " + time +
                       ", peers queried: " + tries);
         }
-        getContext().statManager().addRateData("netDb.failedTime", time);
-        getContext().statManager().addRateData("netDb.failedRetries", Math.max(0, tries - 1));
+        if (tries > 0) {
+            // don't bias the stats with immediate fails
+            getContext().statManager().addRateData("netDb.failedTime", time);
+            getContext().statManager().addRateData("netDb.failedRetries", tries - 1);
+        }
         for (Job j : _onFailed) {
             getContext().jobQueue().addJob(j);
         }

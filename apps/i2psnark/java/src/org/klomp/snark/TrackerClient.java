@@ -907,6 +907,8 @@ public class TrackerClient implements Runnable {
     if (!"http".equals(url.getScheme()))
         return null;
     String host = url.getHost();
+    if (host == null)
+        return null;
     if (host.endsWith(".i2p"))
         return ConvertToHash.getHash(host);
     if (host.equals("i2p")) {

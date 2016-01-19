@@ -3,9 +3,11 @@ package net.i2p.router.web;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 import org.tanukisoftware.wrapper.WrapperManager;
 import org.tanukisoftware.wrapper.event.WrapperControlEvent;
+import org.tanukisoftware.wrapper.event.WrapperServiceControlEvent;
 import org.tanukisoftware.wrapper.event.WrapperEvent;
 import org.tanukisoftware.wrapper.event.WrapperEventListener;
 
@@ -28,7 +30,9 @@ class WrapperListener {
      */
     public WrapperListener(RouterContext ctx) {
         _listener = new SignalHandler(ctx);
-        long mask = WrapperEventListener.EVENT_FLAG_CONTROL;
+        long mask = SystemVersion.isWindows() ? WrapperEventListener.EVENT_FLAG_SERVICE :
+                                                WrapperEventListener.EVENT_FLAG_CONTROL;
+
         WrapperManager.addWrapperEventListener(_listener, mask);
     }
 
@@ -55,10 +59,37 @@ class WrapperListener {
         }
 
         public void fired(WrapperEvent event) {
-            if (!(event instanceof WrapperControlEvent))
-                return;
-            WrapperControlEvent wce = (WrapperControlEvent) event;
             Log log = _ctxt.logManager().getLog(ConfigServiceHandler.class);
+            if (SystemVersion.isWindows() && (event instanceof WrapperServiceControlEvent)) {
+                WrapperServiceControlEvent wcse = (WrapperServiceControlEvent) event;
+                int code = wcse.getServiceControlCode();
+                switch (code) {
+                  case WrapperManager.SERVICE_CONTROL_CODE_STOP:       // 1
+                  case WrapperManager.SERVICE_CONTROL_CODE_SHUTDOWN:   // 5
+                    log.log(Log.CRIT, "Hard shutdown initiated by Windows service control: " + code);
+                    // JVM will call ShutdownHook if we don't do it ourselves
+                    ConfigServiceHandler.registerWrapperNotifier(_ctxt, Router.EXIT_HARD, false);
+                    _ctxt.router().shutdown(Router.EXIT_HARD);
+                    break;
+
+                  // TODO Power suspend/resume?
+                  // Warning, definitions not available in 3.2.0, use integers
+                  // Tanuki doesn't usually mark things with @since, sadly
+                  // case 35xx // WrapperManager.SERVICE_CONTROL_POWEREVENT_ ...
+                  //  break;
+
+                  default:
+                    if (log.shouldWarn())
+                        log.warn("Unhandled control event code: " + code);
+                    break;
+                }
+                return;
+            } else if (!(event instanceof WrapperControlEvent)) {
+                if (log.shouldWarn())
+                    log.warn("Got unhandled event: " + event);
+                return;
+            }
+            WrapperControlEvent wce = (WrapperControlEvent) event;
             if (log.shouldLog(Log.WARN))
                 log.warn("Got signal: " + wce.getControlEventName());
             int sig = wce.getControlEvent();

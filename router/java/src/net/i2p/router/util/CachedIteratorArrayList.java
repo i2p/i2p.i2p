@@ -1,4 +1,4 @@
-package net.i2p.util;
+package net.i2p.router.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  * ArrayList that uses a single iterator.  Useful to avoid object churn
  * while keeping the conveniences of an iterator.
  * 
- * @since 0.9.4
+ * @since 0.9.4 moved from net.i2p.util in 0.9.24
  * 
  * @author zab
  */

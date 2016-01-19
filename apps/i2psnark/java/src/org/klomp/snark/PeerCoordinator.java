@@ -70,7 +70,7 @@ class PeerCoordinator implements PeerListener
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
-  final static int MAX_UPLOADERS = 6;
+  final static int MAX_UPLOADERS = 8;
   public static final long MAX_INACTIVE = 8*60*1000;
 
   /**
@@ -403,7 +403,7 @@ class PeerCoordinator implements PeerListener
    *  Formerly used to
    *  reduce max if huge pieces to keep from ooming when leeching
    *  but now we don't
-   *  @return usually 16	
+   *  @return usually I2PSnarkUtil.MAX_CONNECTIONS
    */
   private int getMaxConnections() {
     if (metainfo == null)
@@ -604,11 +604,13 @@ class PeerCoordinator implements PeerListener
             bitfield = storage.getBitField();
         else
             bitfield = null;
+        // if we aren't a seed but we don't want any more
+        final boolean partialComplete = wantedBytes == 0 && bitfield != null && !bitfield.complete();
         Runnable r = new Runnable()
           {
             public void run()
             {
-              peer.runConnection(_util, listener, bitfield, magnetState);
+              peer.runConnection(_util, listener, bitfield, magnetState, partialComplete);
             }
           };
         String threadName = "Snark peer " + peer.toString();

@@ -80,7 +80,7 @@ public class Storage implements Closeable
   /** bigger than this will be rejected */
   public static final int MAX_PIECE_SIZE = 16*1024*1024;
   /** The maximum number of pieces in a torrent. */
-  public static final int MAX_PIECES = 10*1024;
+  public static final int MAX_PIECES = 32*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
 
   private static final Map<String, String> _filterNameCache = new ConcurrentHashMap<String, String>();
@@ -166,7 +166,7 @@ public class Storage implements Closeable
     else
         pc_size = DEFAULT_PIECE_SIZE;
     int pcs = (int) ((total - 1)/pc_size) + 1;
-    while (pcs > (MAX_PIECES * 2 / 3) && pc_size < MAX_PIECE_SIZE)
+    while (pcs > (MAX_PIECES / 3) && pc_size < MAX_PIECE_SIZE)
       {
         pc_size *= 2;
         pcs = (int) ((total - 1)/pc_size) +1;

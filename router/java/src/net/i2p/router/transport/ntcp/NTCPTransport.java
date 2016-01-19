@@ -487,6 +487,21 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(final Hash peer) {
+        final NTCPConnection con = _conByIdent.get(peer);
+        if (con != null && con.isEstablished() && con.isInbound() &&
+            con.getMessagesReceived() <= 2 && con.getMessagesSent() <= 1) {
+            con.setMayDisconnect();
+        }
+    }
+
+    /**
      * @return usually the con passed in, but possibly a second connection with the same peer...
      */
     NTCPConnection removeCon(NTCPConnection con) {

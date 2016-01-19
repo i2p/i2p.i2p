@@ -152,7 +152,6 @@ public class TunnelCreatorConfig implements TunnelInfo {
 
     /**
      *  This calls profile manager tunnelDataPushed1m() for each peer
-     *  @return null for exploratory
      */
     public synchronized void incrementVerifiedBytesTransferred(int bytes) { 
         _verifiedBytesTransferred += bytes; 

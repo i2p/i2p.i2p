@@ -155,23 +155,34 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     @Override
-    public boolean isBacklogged(Hash dest) { 
-        return _manager.isBacklogged(dest); 
+    public boolean isBacklogged(Hash peer) { 
+        return _manager.isBacklogged(peer); 
     }
     
     @Override
-    public boolean isEstablished(Hash dest) { 
-        return _manager.isEstablished(dest); 
+    public boolean isEstablished(Hash peer) { 
+        return _manager.isEstablished(peer); 
     }
     
     @Override
-    public boolean wasUnreachable(Hash dest) { 
-        return _manager.wasUnreachable(dest); 
+    public boolean wasUnreachable(Hash peer) { 
+        return _manager.wasUnreachable(peer); 
     }
     
     @Override
-    public byte[] getIP(Hash dest) { 
-        return _manager.getIP(dest); 
+    public byte[] getIP(Hash peer) { 
+        return _manager.getIP(peer); 
+    }
+    
+    /**
+     * Tell the comm system that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(Hash peer) {
+        _manager.mayDisconnect(peer); 
     }
     
     @Override
@@ -196,6 +207,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * @deprecated unused
      */
     @Override
+    @Deprecated
     public void recheckReachability() { _manager.recheckReachability(); }
 
     @Override

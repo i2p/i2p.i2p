@@ -45,6 +45,7 @@ public class RouterTimestamper extends Timestamper {
     private static final int MAX_CONSECUTIVE_FAILS = 10;
     private static final int DEFAULT_TIMEOUT = 10*1000;
     private static final int SHORT_TIMEOUT = 5*1000;
+    private static final long MAX_WAIT_INITIALIZATION = 45*1000;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";
@@ -141,7 +142,7 @@ public class RouterTimestamper extends Timestamper {
         try { 
             synchronized (this) {
                 if (!_initialized)
-                    wait();
+                    wait(MAX_WAIT_INITIALIZATION);
             }
         } catch (InterruptedException ie) {}
     }

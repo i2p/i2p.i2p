@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Khairul Agasta <khairuldroids@gmail.com>, 2014-2015
 msgid ""
@@ -11,11 +11,12 @@ msgstr ""
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
 "PO-Revision-Date: 2015-06-02 04:22+0000\n"
 "Last-Translator: Khairul Agasta <khairuldroids@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/projects/p/I2P/language/id/)\n"
+"Language-Team: Indonesian (http://www.transifex.com/projects/p/I2P/language/"
+"id/)\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. Type: boolean
@@ -30,7 +31,9 @@ msgstr "Apakah router I2P perlu memulai saat boot?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "Router I2P dapat dijalankan sebagai daemon yang memulai secara otomatis ketika komputer anda booting. Ini adalah konfigurasi yang direkomendasikan."
+msgstr ""
+"Router I2P dapat dijalankan sebagai daemon yang memulai secara otomatis "
+"ketika komputer anda booting. Ini adalah konfigurasi yang direkomendasikan."
 
 #. Type: string
 #. Description
@@ -42,11 +45,16 @@ msgstr "I2P pengguna daemon:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "Dengan default, I2P dikonfigurasikan untuk berjalan dibawah akun i2psvc ketika menjalankan sebagai daemon. Untuk menggunakan profil I2P **yang ada** Anda perlu memasukkan nama akun berbeda disini. Sebagai contoh, jika sebelumnya Anda memasang I2P pada /home/user/i2p, maka Anda harus memasukkan 'user' disini."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Dengan default, I2P dikonfigurasikan untuk berjalan dibawah akun i2psvc "
+"ketika menjalankan sebagai daemon. Untuk menggunakan profil I2P **yang ada** "
+"Anda perlu memasukkan nama akun berbeda disini. Sebagai contoh, jika "
+"sebelumnya Anda memasang I2P pada /home/user/i2p, maka Anda harus memasukkan "
+"'user' disini."
 
 #. Type: string
 #. Description
@@ -54,7 +62,9 @@ msgstr "Dengan default, I2P dikonfigurasikan untuk berjalan dibawah akun i2psvc 
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Sangat penting: Jika pengguna selain default 'i2psvc' dimasukkan disini, nama pengguna yang dipilih *HARUS* yang sudah ada."
+msgstr ""
+"Sangat penting: Jika pengguna selain default 'i2psvc' dimasukkan disini, "
+"nama pengguna yang dipilih *HARUS* yang sudah ada."
 
 #. Type: string
 #. Description
@@ -74,7 +84,9 @@ msgstr "Dengan default, I2P hanya akan diizinkan menggunakan RAM hingga 128MB."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Router bandwidth tinggi, seperti halnya router dengan banyak torrent / pengaya yang aktif, Anda mungkin perlu menambahkan value ini."
+msgstr ""
+"Router bandwidth tinggi, seperti halnya router dengan banyak torrent / "
+"pengaya yang aktif, Anda mungkin perlu menambahkan value ini."
 
 #. Type: boolean
 #. Description
@@ -88,4 +100,6 @@ msgstr "Jalankan daemon I2P yang dibatasi dengan AppArmor"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Dengan mengaktifkan opsi ini I2P akan di sandboxkan dengan AppArmor, membatasi file dan direktori mana yang dapat diakses oleh I2P."
+msgstr ""
+"Dengan mengaktifkan opsi ini I2P akan di sandboxkan dengan AppArmor, "
+"membatasi file dan direktori mana yang dapat diakses oleh I2P."

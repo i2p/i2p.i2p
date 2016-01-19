@@ -731,11 +731,17 @@ public class EepGet {
                     // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
                     // This oddly adds a ":" even if no port, but that seems to work.
                     URI url = new URI(_actualURL);
-		    if (_redirectLocation.startsWith("/"))
-                        _actualURL = "http://" + url.getHost() + ":" + url.getPort() + _redirectLocation;
+                    String host = url.getHost();
+                    if (host == null)
+                        throw new MalformedURLException("Redirected to invalid URL");
+                    int port = url.getPort();
+                    if (port < 0)
+                        port = 80;
+                    if (_redirectLocation.startsWith("/"))
+                        _actualURL = "http://" + host + ":" + port + _redirectLocation;
                     else
                         // this blows up completely on a redirect to https://, for example
-                        _actualURL = "http://" + url.getHost() + ":" + url.getPort() + "/" + _redirectLocation;
+                        _actualURL = "http://" + host+ ":" + port + "/" + _redirectLocation;
                 }
             } catch (URISyntaxException use) {
                 IOException ioe = new MalformedURLException("Redirected to invalid URL");
@@ -1232,6 +1238,8 @@ public class EepGet {
                 URI url = new URI(_actualURL);
                 if ("http".equals(url.getScheme())) {
                     String host = url.getHost();
+                    if (host == null)
+                        throw new MalformedURLException("URL is not supported:" + _actualURL);
                     String hostlc = host.toLowerCase(Locale.US);
                     if (hostlc.endsWith(".i2p"))
                         throw new UnknownHostException("I2P addresses must be proxied");
@@ -1512,7 +1520,7 @@ public class EepGet {
         String key = null;
         for (int i = 0; i < data.length; i++) {
             switch (data[i]) {
-                case '\"':
+                case '"':
                     if (isQuoted) {
                         // keys never quoted
                         if (key != null) {

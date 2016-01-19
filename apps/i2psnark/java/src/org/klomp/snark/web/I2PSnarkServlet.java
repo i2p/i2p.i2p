@@ -31,6 +31,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.I2PSnarkUtil;
@@ -2305,13 +2306,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<tr><td>");
         out.write(_t("Inbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 10, 3, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 10, SnarkManager.DEFAULT_TUNNEL_QUANTITY,
+                                options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, 3, options.remove("inbound.length"), "inbound.length", HOP));
         out.write("<tr><td>");
         out.write(_t("Outbound Settings"));
         out.write(":<td>");
-        out.write(renderOptions(1, 10, 3, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
+        out.write(renderOptions(1, 10, SnarkManager.DEFAULT_TUNNEL_QUANTITY,
+                                options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, 3, options.remove("outbound.length"), "outbound.length", HOP));
 
@@ -2800,7 +2803,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 }
                 long dat = meta.getCreationDate();
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
+                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 if (dat > 0) {
                     String date = fmt.format(new Date(dat));
                     buf.append("<tr><td>");

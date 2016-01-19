@@ -155,13 +155,12 @@ public class ConfigServiceHandler extends FormHandler {
 
     /**
      *  Register a handler for signals,
-     *  so we can handle HUP from the wrapper (non-Windows only, wrapper 3.2.0 or higher)
+     *  so we can handle HUP from the wrapper (wrapper 3.2.0 or higher)
      *
      *  @since 0.8.13
      */
     synchronized static void registerSignalHandler(RouterContext ctx) {
-        if (ctx.hasWrapper() && _wrapperListener == null &&
-            !SystemVersion.isWindows()) {
+        if (ctx.hasWrapper() && _wrapperListener == null) {
             String wv = System.getProperty("wrapper.version");
             if (wv != null && VersionComparator.comp(wv, LISTENER_AVAILABLE) >= 0) {
                 try {

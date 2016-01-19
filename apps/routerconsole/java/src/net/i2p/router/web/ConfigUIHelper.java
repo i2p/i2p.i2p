@@ -14,13 +14,13 @@ public class ConfigUIHelper extends HelperBase {
         for (String theme : themes) {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
-                buf.append("checked=\"checked\" ");
+                buf.append(CHECKED);
             buf.append("value=\"").append(theme).append("\">").append(_t(theme)).append("<br>\n");
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
         buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
-            buf.append("checked=\"checked\" ");
+            buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Set theme universally across all apps"))
            .append("<br>\n");
@@ -32,7 +32,7 @@ public class ConfigUIHelper extends HelperBase {
         boolean forceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
         buf.append("<input type=\"checkbox\" name=\"forceMobileConsole\" ");
         if (forceMobileConsole)
-            buf.append("checked=\"checked\" ");
+            buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Force the mobile console to be used"))
            .append("<br>\n");
@@ -99,7 +99,8 @@ public class ConfigUIHelper extends HelperBase {
         { "tr", "tr", _x("Turkish"), null },
         { "uk", "ua", _x("Ukrainian"), null },
         { "vi", "vn", _x("Vietnamese"), null },
-        { "zh", "cn", _x("Chinese"), null }
+        { "zh", "cn", _x("Chinese"), null },
+        { "zh_TW", "tw", _x("Chinese"), "Taiwan" }
     };
 
 
@@ -138,7 +139,7 @@ public class ConfigUIHelper extends HelperBase {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
             String lang = langs[i][0];
             if (lang.equals(current))
-                buf.append("checked=\"checked\" ");
+                buf.append(CHECKED);
             buf.append("value=\"").append(lang).append("\">")
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\"> ");
             int under = lang.indexOf('_');

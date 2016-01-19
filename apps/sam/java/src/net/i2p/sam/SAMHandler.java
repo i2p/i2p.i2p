@@ -35,8 +35,8 @@ abstract class SAMHandler implements Runnable, Handler {
     private final Object socketWLock = new Object(); // Guards writings on socket
     protected final SocketChannel socket;
 
-    protected final int verMajor;
-    protected final int verMinor;
+    public final int verMajor;
+    public final int verMinor;
     
     /** I2CP options configuring the I2CP connection (port, host, numHops, etc) */
     protected final Properties i2cpProps;
@@ -102,7 +102,10 @@ abstract class SAMHandler implements Runnable, Handler {
         }
     }
     
-    static public void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
+    /**
+     *  Caller must synch
+     */
+    private static void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
         while (data.hasRemaining()) out.write(data);           
         out.socket().getOutputStream().flush();
     }
@@ -132,11 +135,14 @@ abstract class SAMHandler implements Runnable, Handler {
         }
     }
 
-    /** @return success */
+    /**
+     * Unsynchronized, use with caution
+     * @return success
+     */
     public static boolean writeString(String str, SocketChannel out)
     {
     	try {
-            writeBytes(ByteBuffer.wrap(DataHelper.getASCII(str)), out);
+            writeBytes(ByteBuffer.wrap(DataHelper.getUTF8(str)), out);
         } catch (IOException e) {
             //_log.debug("Caught IOException", e);
             return false;
@@ -158,6 +164,8 @@ abstract class SAMHandler implements Runnable, Handler {
      * unregister with the bridge.
      */
     public void stopHandling() {
+        if (_log.shouldInfo())
+            _log.info("Stopping: " + this, new Exception("I did it"));
         synchronized (stopLock) {
             stopHandler = true;
         }

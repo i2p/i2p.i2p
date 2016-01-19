@@ -68,7 +68,7 @@ class UDPAddress {
             _introKey = null;
             return;
         }
-        _host = addr.getOption(PROP_HOST);
+        _host = addr.getHost();
         _port = addr.getPort();
         try { 
             String mtu = addr.getOption(PROP_MTU);

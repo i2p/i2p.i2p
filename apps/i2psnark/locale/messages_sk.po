@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:09+0000\n"
-"PO-Revision-Date: 2015-07-17 01:32+0000\n"
+"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"PO-Revision-Date: 2015-11-05 17:17+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Slovak (http://www.transifex.com/projects/p/I2P/language/sk/)\n"
+"Language-Team: Slovak (http://www.transifex.com/otf/I2P/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,222 +24,230 @@ msgid "No more torrents running."
 msgstr ""
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:76
-#: ../java/src/org/klomp/snark/SnarkManager.java:2392
-#: ../java/src/org/klomp/snark/SnarkManager.java:2403
+#: ../java/src/org/klomp/snark/SnarkManager.java:2539
+#: ../java/src/org/klomp/snark/SnarkManager.java:2550
 msgid "I2P tunnel closed."
 msgstr "I2P tunel je zatvorený."
 
 #: ../java/src/org/klomp/snark/MagnetURI.java:42
 #: ../java/src/org/klomp/snark/MagnetURI.java:52
-#: ../java/src/org/klomp/snark/SnarkManager.java:2096
+#: ../java/src/org/klomp/snark/SnarkManager.java:2221
 msgid "Magnet"
 msgstr "Magnet"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:772
+#: ../java/src/org/klomp/snark/SnarkManager.java:791
 #, java-format
 msgid "Total uploaders limit changed to {0}"
 msgstr "Celkový limit uploaderov bol zmenený na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:774
+#: ../java/src/org/klomp/snark/SnarkManager.java:793
 #, java-format
 msgid "Minimum total uploaders limit is {0}"
 msgstr "Minimálny celkový limit uploaderov je {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:786
+#: ../java/src/org/klomp/snark/SnarkManager.java:805
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
 msgstr "Limit nárastu ŠP bol zmenený na {0}KBps"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:788
+#: ../java/src/org/klomp/snark/SnarkManager.java:807
 #, java-format
 msgid "Minimum up bandwidth limit is {0}KBps"
 msgstr "Minimálny limit nárastu šírky pásma je {0}KBps"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:800
+#: ../java/src/org/klomp/snark/SnarkManager.java:819
 #, java-format
 msgid "Startup delay changed to {0}"
 msgstr "Zdržanie pri spustení bolo zmenené na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:811
+#: ../java/src/org/klomp/snark/SnarkManager.java:830
 #, java-format
 msgid "Refresh time changed to {0}"
 msgstr "Čas refreshu bol zmenený na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:813
+#: ../java/src/org/klomp/snark/SnarkManager.java:832
 msgid "Refresh disabled"
 msgstr "Refresh zakázaný"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:829
+#: ../java/src/org/klomp/snark/SnarkManager.java:848
 #, java-format
 msgid "Page size changed to {0}"
 msgstr "Veľkosť stránky bola zmenená na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:838
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:956
+#: ../java/src/org/klomp/snark/SnarkManager.java:857
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:958
 msgid "Data directory must be an absolute path"
 msgstr "Dátový priečinok musí byť absolútna cesta"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:840
+#: ../java/src/org/klomp/snark/SnarkManager.java:859
 msgid "Data directory does not exist"
 msgstr "Dátový priečinok neexistuje"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:842
+#: ../java/src/org/klomp/snark/SnarkManager.java:861
 msgid "Not a directory"
 msgstr "Nie je priečinok"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:844
+#: ../java/src/org/klomp/snark/SnarkManager.java:863
 msgid "Unreadable"
 msgstr "Nečitateľné"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:849
+#: ../java/src/org/klomp/snark/SnarkManager.java:868
 #, java-format
 msgid "Data directory changed to {0}"
 msgstr "Dátový priečinok bol zmenený na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:904
+#: ../java/src/org/klomp/snark/SnarkManager.java:923
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
 msgstr "Zmeny I2CP a tunelov sa prejavia po zastavení všetkých torrentov"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:908
+#: ../java/src/org/klomp/snark/SnarkManager.java:927
 #, java-format
 msgid "I2CP options changed to {0}"
 msgstr "I2CP nastavenia boli zmenené na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:914
+#: ../java/src/org/klomp/snark/SnarkManager.java:933
 msgid "Disconnecting old I2CP destination"
 msgstr "Odpája sa starý I2CP cieľ"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:916
+#: ../java/src/org/klomp/snark/SnarkManager.java:935
 #, java-format
 msgid "I2CP settings changed to {0}"
 msgstr "I2CP nastavenia boli zmenené na {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:921
+#: ../java/src/org/klomp/snark/SnarkManager.java:940
 msgid ""
 "Unable to connect with the new settings, reverting to the old I2CP settings"
 msgstr "Nie je možné sa pripojiť pomocou nových nastavení, vracia sa naspäť k starým I2CP nastaveniam"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:925
+#: ../java/src/org/klomp/snark/SnarkManager.java:944
 msgid "Unable to reconnect with the old settings!"
 msgstr "Nie je možné sa znova pripojiť pomocou starých nastavení!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:927
+#: ../java/src/org/klomp/snark/SnarkManager.java:946
 msgid "Reconnected on the new I2CP destination"
 msgstr "Znova sa pripája k novému I2CP cieľu"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:934
+#: ../java/src/org/klomp/snark/SnarkManager.java:953
 #, java-format
 msgid "I2CP listener restarted for \"{0}\""
 msgstr "I2CP listener bol reštartovaný pre \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:948
+#: ../java/src/org/klomp/snark/SnarkManager.java:967
 msgid "New files will be publicly readable"
 msgstr "Nové súbory budú verejne čitateľné"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:950
+#: ../java/src/org/klomp/snark/SnarkManager.java:969
 msgid "New files will not be publicly readable"
 msgstr "Nové súbory nebudú verejne čitateľné"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:957
+#: ../java/src/org/klomp/snark/SnarkManager.java:976
 msgid "Enabled autostart"
 msgstr "Povolené automatické spustenie"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:959
+#: ../java/src/org/klomp/snark/SnarkManager.java:978
 msgid "Disabled autostart"
 msgstr "Zakázané automatické spustenie"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:965
+#: ../java/src/org/klomp/snark/SnarkManager.java:985
+msgid "Enabled smart sort"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:987
+msgid "Disabled smart sort"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:994
 msgid "Enabled open trackers - torrent restart required to take effect."
 msgstr "Povolené otvorené stopovače - pre prejavenie efektu sa vyžaduje reštart torrentu."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:967
+#: ../java/src/org/klomp/snark/SnarkManager.java:996
 msgid "Disabled open trackers - torrent restart required to take effect."
 msgstr "Zakázané otvorené stopovače - pre prejavenie efektu sa vyžaduje reštart torrentu."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:974
+#: ../java/src/org/klomp/snark/SnarkManager.java:1003
 msgid "Enabled DHT."
 msgstr "Povolené DHT."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:976
+#: ../java/src/org/klomp/snark/SnarkManager.java:1005
 msgid "Disabled DHT."
 msgstr "Zakázané DHT."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:978
+#: ../java/src/org/klomp/snark/SnarkManager.java:1007
 msgid "DHT change requires tunnel shutdown and reopen"
 msgstr "Zmena DHT vyžaduje vypnutie a znovuotvorenie tunela"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:985
+#: ../java/src/org/klomp/snark/SnarkManager.java:1014
 #, java-format
 msgid "{0} theme loaded, return to main i2psnark page to view."
 msgstr "{0} téma bola načítaná, vráťte sa na hlavnú stránku i2psnark pre zobrazenie."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:995
+#: ../java/src/org/klomp/snark/SnarkManager.java:1024
 msgid "Configuration unchanged."
 msgstr "Konfigurácia nebola zmenená."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1027
+#: ../java/src/org/klomp/snark/SnarkManager.java:1056
 msgid "Open Tracker list changed - torrent restart required to take effect."
 msgstr "Zoznam otvorených stopovačov sa zmenil - pre prejavenie efektu sa vyžaduje reštart torrentu."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1037
+#: ../java/src/org/klomp/snark/SnarkManager.java:1066
 msgid "Private tracker list changed - affects newly created torrents only."
 msgstr "Súkromný zoznam stopovačov bol zmenený - to sa bude týkať iba novo vytvorených torrentov."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1083
+#: ../java/src/org/klomp/snark/SnarkManager.java:1112
 #, java-format
 msgid "Unable to save the config to {0}"
 msgstr "Nebolo možné uložiť konfiguráciu do {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1164
+#: ../java/src/org/klomp/snark/SnarkManager.java:1193
 msgid "Connecting to I2P"
 msgstr "Pripája sa k I2P"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1167
+#: ../java/src/org/klomp/snark/SnarkManager.java:1196
 msgid "Error connecting to I2P - check your I2CP settings!"
 msgstr "Chyba pri pripájaní sa k I2P - skontrolujte si vaše I2CP nastavenia!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1176
-#: ../java/src/org/klomp/snark/SnarkManager.java:2133
+#: ../java/src/org/klomp/snark/SnarkManager.java:1205
+#: ../java/src/org/klomp/snark/SnarkManager.java:2270
 #, java-format
 msgid "Error: Could not add the torrent {0}"
 msgstr "Chyba: Nebolo možné pridať torrent {0}"
 
 #. catch this here so we don't try do delete it below
-#: ../java/src/org/klomp/snark/SnarkManager.java:1199
+#: ../java/src/org/klomp/snark/SnarkManager.java:1228
 #, java-format
 msgid "Cannot open \"{0}\""
 msgstr "Nie je možné otvoriť \"{0}\""
 
 #. TODO - if the existing one is a magnet, delete it and add the metainfo
 #. instead?
-#: ../java/src/org/klomp/snark/SnarkManager.java:1218
-#: ../java/src/org/klomp/snark/SnarkManager.java:1352
-#: ../java/src/org/klomp/snark/SnarkManager.java:1440
+#: ../java/src/org/klomp/snark/SnarkManager.java:1247
+#: ../java/src/org/klomp/snark/SnarkManager.java:1388
+#: ../java/src/org/klomp/snark/SnarkManager.java:1476
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:166
 #, java-format
 msgid "Torrent with this info hash is already running: {0}"
 msgstr "Torrent s týmto info hashom je už spustený: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1224
+#: ../java/src/org/klomp/snark/SnarkManager.java:1253
 #, java-format
 msgid "ERROR - No I2P trackers in private torrent \"{0}\""
 msgstr "CHYBA - Žiadne I2P stopovače v súkromnom torrente \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1226
+#: ../java/src/org/klomp/snark/SnarkManager.java:1255
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and"
 " DHT only."
 msgstr "Varovanie - V \"{0}\" nie sú žiadne I2P stopovače, oznámené to bude iba DHT a otvoreným stopovačom I2P."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1229
+#: ../java/src/org/klomp/snark/SnarkManager.java:1258
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will "
 "announce to DHT only."
 msgstr "Varovanie - V \"{0}\" nie sú žiadne I2P stopovače, pričom otvorené stopovače sú zakázané, oznámené to bude iba DHT."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1231
+#: ../java/src/org/klomp/snark/SnarkManager.java:1260
 #, java-format
 msgid ""
 "Warning - No I2P trackers in \"{0}\", and DHT and open trackers are "
@@ -247,34 +255,46 @@ msgid ""
 "torrent."
 msgstr "Varovanie - V \"{0}\" nie sú žiadne I2P stopovače, pričom otvorené stopovače aj DHT sú zakázané, mali by ste otvorené stopovače alebo DHT pred spustením torrentu povoliť."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1257
+#: ../java/src/org/klomp/snark/SnarkManager.java:1286
 #, java-format
 msgid "Torrent in \"{0}\" is invalid"
 msgstr "Torrent v \"{0}\" je neplatný"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1264
+#: ../java/src/org/klomp/snark/SnarkManager.java:1292
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1042
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1069
+#, java-format
+msgid "Torrent file deleted: {0}"
+msgstr "Súbor torrentu bol odstránený: {0}"
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:1295
+#, java-format
+msgid "Torrent file moved from {0} to {1}"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:1299
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:193
 #, java-format
 msgid "ERROR - Out of memory, cannot create torrent from {0}"
 msgstr "CHYBA - Nedostatok pamäte, nie je možné vytvoriť torrent z {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1285
+#: ../java/src/org/klomp/snark/SnarkManager.java:1321
 #, java-format
-msgid "Torrent added and started: \"{0}\""
-msgstr "Torrent bol pridaný a spustený: \"{0}\""
+msgid "Torrent added and started: {0}"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1287
+#: ../java/src/org/klomp/snark/SnarkManager.java:1323
 #, java-format
-msgid "Torrent added: \"{0}\""
-msgstr "Torrent bol pridaný: \"{0}\""
+msgid "Torrent added: {0}"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1363
+#: ../java/src/org/klomp/snark/SnarkManager.java:1399
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:93
 #, java-format
 msgid "Fetching {0}"
 msgstr "Získava sa {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1369
+#: ../java/src/org/klomp/snark/SnarkManager.java:1405
 #, java-format
 msgid ""
 "Open trackers are disabled and we have no DHT peers. Fetch of {0} may not "
@@ -282,130 +302,145 @@ msgid ""
 "DHT."
 msgstr "Otvorené stopovače sú zakázané a my nemáme žiadnych DHT peerov. Získanie {0} nemusí uspieť, pokiaľ nespustíte ďalší torrent, prípadne nepovolíte otvorené stopovače alebo DHT."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1373
+#: ../java/src/org/klomp/snark/SnarkManager.java:1409
 #, java-format
 msgid "Adding {0}"
 msgstr "Pridáva sa {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1406
+#: ../java/src/org/klomp/snark/SnarkManager.java:1442
 #, java-format
 msgid "Download already running: {0}"
 msgstr "Sťahovanie je už spustené: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1451
-#: ../java/src/org/klomp/snark/SnarkManager.java:1477
-#: ../java/src/org/klomp/snark/SnarkManager.java:2052
+#: ../java/src/org/klomp/snark/SnarkManager.java:1487
+#: ../java/src/org/klomp/snark/SnarkManager.java:1513
+#: ../java/src/org/klomp/snark/SnarkManager.java:2151
 #, java-format
 msgid "Failed to copy torrent file to {0}"
 msgstr "Nepodarilo sa skopírovať súbor torrentu do {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1828
+#: ../java/src/org/klomp/snark/SnarkManager.java:1927
 #, java-format
-msgid "Too many files in \"{0}\" ({1}), deleting it!"
-msgstr "Príliš veľa súborov v \"{0}\" ({1}), odstraňuje sa!"
+msgid "Too many files in \"{0}\" ({1})!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1830
+#: ../java/src/org/klomp/snark/SnarkManager.java:1929
 #, java-format
-msgid "Torrent file \"{0}\" cannot end in \".torrent\", deleting it!"
-msgstr "Súbor torrentu \"{0}\" nemôže končiť na \".torrent\", odstraňuje sa!"
+msgid "Torrent file \"{0}\" cannot end in \".torrent\"!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1832
+#: ../java/src/org/klomp/snark/SnarkManager.java:1931
 #, java-format
-msgid "No pieces in \"{0}\",  deleting it!"
-msgstr "V \"{0}\" nie sú žiadne kúsky, odstraňuje sa!"
+msgid "No pieces in \"{0}\"!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1834
+#: ../java/src/org/klomp/snark/SnarkManager.java:1933
 #, java-format
-msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
-msgstr "V \"{0}\" je príliš veľa kúskov, limit je {1}, odstraňuje sa!"
+msgid "Too many pieces in \"{0}\", limit is {1}!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1836
+#: ../java/src/org/klomp/snark/SnarkManager.java:1935
 #, java-format
-msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
-msgstr "Kúsky v \"{0}\" ({1}B) sú príliš veľké, odstraňuje sa."
+msgid "Pieces are too large in \"{0}\" ({1}B)!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1837
+#: ../java/src/org/klomp/snark/SnarkManager.java:1936
 #, java-format
 msgid "Limit is {0}B"
 msgstr "Limit je {0}B"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1839
+#: ../java/src/org/klomp/snark/SnarkManager.java:1938
 #, java-format
-msgid "Torrent \"{0}\" has no data, deleting it!"
-msgstr "Torrent \"{0}\" neobsahuje žiadne dáta, odstraňuje sa!"
+msgid "Torrent \"{0}\" has no data!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1847
+#: ../java/src/org/klomp/snark/SnarkManager.java:1946
 #, java-format
-msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
-msgstr "Torrenty väčšie než {0}B zatiaľ nie sú podporované, odstraňuje sa \"{1}\""
+msgid "Torrents larger than {0}B are not supported yet \"{1}\"!"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1864
+#: ../java/src/org/klomp/snark/SnarkManager.java:1963
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
 msgstr "Chyba: Nebolo možné odstrániť torrent {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1887
-#: ../java/src/org/klomp/snark/SnarkManager.java:1906
+#: ../java/src/org/klomp/snark/SnarkManager.java:1986
+#: ../java/src/org/klomp/snark/SnarkManager.java:2005
 #, java-format
-msgid "Torrent stopped: \"{0}\""
-msgstr "Torrent bol zastavený: \"{0}\""
+msgid "Torrent stopped: {0}"
+msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1926
+#: ../java/src/org/klomp/snark/SnarkManager.java:2025
 #, java-format
 msgid "Torrent removed: \"{0}\""
 msgstr "Torrent bol odstránený: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1934
+#: ../java/src/org/klomp/snark/SnarkManager.java:2033
 #, java-format
 msgid "Adding torrents in {0}"
 msgstr "Pridávajú sa torrenty do {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1966
+#: ../java/src/org/klomp/snark/SnarkManager.java:2067
 #, java-format
 msgid "Up bandwidth limit is {0} KBps"
 msgstr "Limit nárastu šírky pásma je {0} KBps"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1993
+#: ../java/src/org/klomp/snark/SnarkManager.java:2092
 #, java-format
 msgid "Download finished: {0}"
 msgstr "Sťahovanie bolo dokončené: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2048
+#: ../java/src/org/klomp/snark/SnarkManager.java:2147
 #, java-format
 msgid "Metainfo received for {0}"
 msgstr "Metainformácie pre {0} boli doručené"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2049
-#: ../java/src/org/klomp/snark/SnarkManager.java:2280
+#: ../java/src/org/klomp/snark/SnarkManager.java:2148
+#: ../java/src/org/klomp/snark/SnarkManager.java:2431
 #, java-format
 msgid "Starting up torrent {0}"
 msgstr "Spúšťa sa torrent {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2064
+#: ../java/src/org/klomp/snark/SnarkManager.java:2163
 #, java-format
 msgid "Error on torrent {0}"
 msgstr "Chyba na torrente {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2127
+#: ../java/src/org/klomp/snark/SnarkManager.java:2264
 msgid "Unable to connect to I2P!"
 msgstr "Nie je možné sa pripojiť k I2P!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2279
+#: ../java/src/org/klomp/snark/SnarkManager.java:2430
 #: ../java/src/org/klomp/snark/web/FetchAndAdd.java:130
 msgid "Opening the I2P tunnel"
 msgstr "Otvára sa I2P tunel"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2303
+#: ../java/src/org/klomp/snark/SnarkManager.java:2450
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "Otvára sa I2P tunel a spúšťajú sa všetky torrenty."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2366
+#: ../java/src/org/klomp/snark/SnarkManager.java:2513
 msgid "Stopping all torrents and closing the I2P tunnel."
 msgstr "Zastavujú sa všetky torrenty a zatvára sa I2P tunel."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:2385
+#: ../java/src/org/klomp/snark/SnarkManager.java:2532
 msgid "Closing I2P tunnel after notifying trackers."
 msgstr "Po upozornení stopovačov sa zatvára I2P tunel."
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:2594
+#, java-format
+msgid "Finished recheck of torrent {0}, now {1} complete"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:2596
+#, java-format
+msgid "Finished recheck of torrent {0}, unchanged"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:2600
+#, java-format
+msgid "Error checking the torrent {0}"
+msgstr ""
 
 #: ../java/src/org/klomp/snark/TrackerClient.java:245
 #, java-format
@@ -452,178 +487,178 @@ msgstr "Torrent už vo fronte je: {0}"
 msgid "Torrent at {0} was not valid"
 msgstr "Torrent na {0} nebol platný."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:268
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:311
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:322
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1763
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2662
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:270
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:313
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:324
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1778
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2698
 msgid "I2PSnark"
 msgstr "I2PSnark"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:273
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2149
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2422
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:275
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2165
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2446
 msgid "Configuration"
 msgstr "Konfigurácia"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:275
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:277
 msgid "Anonymous BitTorrent Client"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:289
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:291
 msgid "Router is down"
 msgstr "Router nie je spustený"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:306
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:308
 msgid "Torrents"
 msgstr "Torrenty"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:317
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:319
 msgid "Refresh page"
 msgstr "Obnoviť stránku"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:326
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:328
 msgid "Forum"
 msgstr "Fórum"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:341
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:343
 msgid "Click \"Add torrent\" button to fetch torrent"
 msgstr "Kliknite na tlačidlo \"Pridať torrent\" pre získanie torrentu"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:394
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:396
 msgid "clear messages"
 msgstr "zmazať správy"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:449
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2980
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:451
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3072
 msgid "Status"
 msgstr "Stav"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:451
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:493
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:511
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:537
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:568
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:583
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:598
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2953
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2970
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2982
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2994
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:453
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:495
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:513
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:539
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:570
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:585
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:600
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3045
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3062
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3074
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3086
 #, java-format
 msgid "Sort by {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:462
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:464
 msgid "Hide Peers"
 msgstr "Skryť peerov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:468
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:470
 msgid "Show Peers"
 msgstr "Zobraziť peerov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:491
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2648
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2681
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:493
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2684
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2718
 msgid "Torrent"
 msgstr "Torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:493
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2953
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:495
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3045
 msgid "File type"
 msgstr ""
 
 #. Translators: Please keep short or translate as " "
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:509
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:511
 msgid "ETA"
 msgstr "ETA"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:511
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:512
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:513
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:514
 msgid "Estimated time remaining"
 msgstr "Odhadovaný zostávajúci čas"
 
 #. Translators: Please keep short or translate as " "
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:535
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:537
 msgid "RX"
 msgstr "RX"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:537
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:538
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:539
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:540
 msgid "Downloaded"
 msgstr "Stiahnuté"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:537
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2818
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2968
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:539
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2878
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3060
 msgid "Size"
 msgstr "Veľkosť"
 
 #. Translators: Please keep short or translate as " "
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:566
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:568
 msgid "TX"
 msgstr "TX"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:568
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2836
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:570
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2896
 msgid "Upload ratio"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:568
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:569
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:570
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:571
 msgid "Uploaded"
 msgstr "Uploadnuté"
 
 #. Translators: Please keep short or translate as " "
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:581
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:583
 msgid "RX Rate"
 msgstr "RX sadzba"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:583
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:584
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:585
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:586
 msgid "Down Rate"
 msgstr "Dolná sadzba"
 
 #. Translators: Please keep short or translate as " "
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:596
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:598
 msgid "TX Rate"
 msgstr "TX sadzba"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:598
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:599
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:600
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:601
 msgid "Up Rate"
 msgstr "Horná sadzba"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:615
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:617
 msgid "Stop all torrents and the I2P tunnel"
 msgstr "Zastaviť všetky torrenty a I2P tunel"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:617
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:619
 msgid "Stop All"
 msgstr "Zastaviť všetko"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:629
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:631
 msgid "Start all stopped torrents"
 msgstr "Spustiť všetky zastavené torrenty"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:631
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:645
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:633
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:647
 msgid "Start All"
 msgstr "Spustiť všetko"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:643
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:645
 msgid "Start all torrents and the I2P tunnel"
 msgstr "Spustiť všetky torrenty a I2P tunel"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:668
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:670
 msgid "No torrents loaded."
 msgstr "Neboli načítané žiadne torrenty."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:674
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:676
 msgid "Totals"
 msgstr "Súhrny"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:676
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:678
 #, java-format
 msgid "1 torrent"
 msgid_plural "{0} torrents"
@@ -631,7 +666,7 @@ msgstr[0] "1 torrent"
 msgstr[1] "{0} torrenty"
 msgstr[2] "{0} torrentov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:681
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:683
 #, java-format
 msgid "1 connected peer"
 msgid_plural "{0} connected peers"
@@ -639,7 +674,7 @@ msgstr[0] "1 pripojený peer"
 msgstr[1] "{0} pripojení peerovia"
 msgstr[2] "{0} pripojených peerov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:688
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:690
 #, java-format
 msgid "1 DHT peer"
 msgid_plural "{0} DHT peers"
@@ -647,207 +682,202 @@ msgstr[0] "1 DHT peer"
 msgstr[1] "{0} DHT peerovia"
 msgstr[2] "{0} DHT peerov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:695
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:697
 msgid "Dest"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:823
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:825
 msgid "First"
 msgstr "Prvé"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:823
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:825
 msgid "First page"
 msgstr "Prvá stránka"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:833
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:835
 msgid "Prev"
 msgstr "Predchádzajúce"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:833
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:835
 msgid "Previous page"
 msgstr "Predchádzajúca stránka"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:866
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:868
 msgid "Next"
 msgstr "Nasledujúce"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:866
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:868
 msgid "Next page"
 msgstr "Nasledujúca stránka"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:874
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:876
 msgid "Last"
 msgstr "Posledné"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:874
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:876
 msgid "Last page"
 msgstr "Posledná stránka"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:960
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:962
 msgid "Data directory cannot be created"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:970
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1176
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:972
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1185
 #, java-format
 msgid "Cannot add torrent {0} inside another torrent: {1}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:985
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:993
 #, java-format
 msgid "Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\""
 msgstr "Neplatná URL: Musí začínať na \"http://\", \"{0}\" alebo \"{1}\""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1026
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1055
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1034
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1063
 #, java-format
 msgid "Magnet deleted: {0}"
 msgstr "Magnet bol odstránený: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1034
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1061
-#, java-format
-msgid "Torrent file deleted: {0}"
-msgstr "Súbor torrentu bol odstránený: {0}"
-
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1053
 #, java-format
 msgid "Download deleted: {0}"
 msgstr "Sťahovanie odstránené: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1070
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1078
 #, java-format
 msgid "Data file deleted: {0}"
 msgstr "Dátový súbor bol odstránený: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1072
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1081
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1080
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1089
 #, java-format
 msgid "Data file could not be deleted: {0}"
 msgstr "Dátový súbor nemohol byť odstránený: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1097
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1105
 #, java-format
 msgid "Directory could not be deleted: {0}"
 msgstr "Priečinok nemohol byť odstránený: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1104
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1112
 #, java-format
 msgid "Directory deleted: {0}"
 msgstr "Priečinok bol odstránený: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1155
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1164
 #, java-format
 msgid "Cannot add a torrent ending in \".torrent\": {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1160
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1169
 #, java-format
 msgid "Torrent with this name is already running: {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1166
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1175
 #, java-format
 msgid "Cannot add a torrent including an I2P directory: {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1181
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1190
 #, java-format
 msgid "Cannot add torrent {0} including another torrent: {1}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1207
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1216
 msgid "Error - Cannot include alternate trackers without a primary tracker"
 msgstr "Chyba - Nie je možné zahrnúť alternatívne stopovače bez toho primárneho"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1220
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1229
 msgid "Error - Cannot mix private and public trackers in a torrent"
 msgstr "Chyba - Nie je možné zmiešať v torrente súkromné aj verejné stopovače"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1242
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1251
 #, java-format
 msgid "Torrent created for \"{0}\""
 msgstr "Pre \"{0}\" bol vytvorený torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1244
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1253
 #, java-format
 msgid ""
 "Many I2P trackers require you to register new torrents before seeding - "
 "please do so before starting \"{0}\""
 msgstr "Mnoho I2P stopovačov od vás vyžaduje registrovať pred seedovaním nové torrenty - prosím urobte tak pred spustením \"{0}\""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1246
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1255
 #, java-format
 msgid "Error creating a torrent for \"{0}\""
 msgstr "Chyba pri vytváraní torrentu pre \"{0}\""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1250
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1259
 #, java-format
 msgid "Cannot create a torrent for the nonexistent data: {0}"
 msgstr "Nie je možné vytvoriť torrent pre neexistujúce dáta: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1253
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1262
 msgid "Error creating torrent - you must enter a file or directory"
 msgstr "Chyba pri vytváraní torrentu - musíte zadať súbor alebo priečinok"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1284
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2406
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1293
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2430
 msgid "Delete selected"
 msgstr "Zvolená možnosť odstrániť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1284
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2408
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1293
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2432
 msgid "Save tracker configuration"
 msgstr "Uložiť konfiguráciu stopovača"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1301
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1310
 msgid "Removed"
 msgstr "Odstránené"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1333
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2405
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2407
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1342
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2429
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2431
 msgid "Add tracker"
 msgstr "Pridať stopovač"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1356
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1359
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1365
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1368
 msgid "Enter valid tracker name and URLs"
 msgstr "Zadajte platný názov a URL stopovača"
 
 #. "<input type=\"reset\" class=\"cancel\"
 #. value=\"").append(_t("Cancel")).append("\">\n" +
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1361
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2410
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1370
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2434
 msgid "Restore defaults"
 msgstr "Obnoviť predvolené nastavenia"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1364
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1373
 msgid "Restored default trackers"
 msgstr "Obnoviť predvolené stopovače"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1472
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1473
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1485
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1486
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2949
 msgid "Checking"
 msgstr "Kontroluje sa"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1475
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1476
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1489
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1490
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2956
 msgid "Allocating"
 msgstr "Alokuje sa"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1490
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1499
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1505
 msgid "Tracker Error"
 msgstr "Chyba stopovača"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1492
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1522
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1527
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1538
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1543
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1549
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1554
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1507
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1537
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1542
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1553
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1558
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1564
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1569
 #, java-format
 msgid "1 peer"
 msgid_plural "{0} peers"
@@ -855,366 +885,377 @@ msgstr[0] "1 peer"
 msgstr[1] "{0} peerovia"
 msgstr[2] "{0} peerov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1502
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1503
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1517
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1518
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2954
 msgid "Starting"
 msgstr "Spúšťa sa"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1511
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1526
 msgid "Seeding"
 msgstr "Seeduje sa"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1515
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1529
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1530
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2831
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3047
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1544
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1545
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2891
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3139
 msgid "Complete"
 msgstr "Dokončené"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1534
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1535
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1540
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1541
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1549
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1550
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1555
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1556
 msgid "OK"
 msgstr "OK"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1545
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1546
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1551
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1552
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1560
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1561
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1566
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1567
 msgid "Stalled"
 msgstr "Zablokované"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1556
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1557
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1560
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1561
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1571
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1572
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1575
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1576
 msgid "No Peers"
 msgstr "Žiadni peerovia"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1563
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1564
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1578
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1579
 msgid "Stopped"
 msgstr "Zastavené"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1593
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1608
 msgid "Torrent details"
 msgstr "Detaily torrentu"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1628
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1643
 msgid "View files"
 msgstr "Zobraziť súbory"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1630
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1645
 msgid "Open file"
 msgstr "Otvoriť súbor"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1682
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1697
 msgid "Stop the torrent"
 msgstr "Zastaviť torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1684
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1699
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2961
 msgid "Stop"
 msgstr "Zastaviť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1697
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1712
 msgid "Start the torrent"
 msgstr "Spustiť torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1699
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1714
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2963
 msgid "Start"
 msgstr "Spustiť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1712
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1727
 msgid "Remove the torrent from the active list, deleting the .torrent file"
 msgstr "Odstrániť torrent zo zoznamu aktívnych zmazaním .torrent súboru."
 
 #. Can't figure out how to escape double quotes inside the onclick string.
 #. Single quotes in translate strings with parameters must be doubled.
 #. Then the remaining single quote must be escaped
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1717
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1732
 #, java-format
 msgid ""
 "Are you sure you want to delete the file \\''{0}\\'' (downloaded data will "
 "not be deleted) ?"
 msgstr "Ste si istý, že chcete odstrániť súbor \\\"{0}\\\"\n(stiahnuté dáta nebudú odstránené) ?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1721
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1736
 msgid "Remove"
 msgstr "Odstrániť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1734
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1749
 msgid "Delete the .torrent file and the associated data file(s)"
 msgstr "Odstrániť .torrent súbor a aj príslušný dátový súbor(y)"
 
 #. Can't figure out how to escape double quotes inside the onclick string.
 #. Single quotes in translate strings with parameters must be doubled.
 #. Then the remaining single quote must be escaped
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1739
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1754
 #, java-format
 msgid ""
 "Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded "
 "data?"
 msgstr "Ste si istý, že chcete odstrániť torrent \\\"{0}\\\" a s ním aj všetky stiahnuté dáta?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1743
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2364
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1758
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2388
 msgid "Delete"
 msgstr "Zmazať"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1779
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1794
 msgid "Unknown"
 msgstr "Neznáme"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1791
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1806
 msgid "Seed"
 msgstr "Seed"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1814
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1829
 msgid "Uninteresting (The peer has no pieces we need)"
 msgstr "Nezaujímavý (Peer nemá žiadne kúsky, ktoré potrebujeme)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1816
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1831
 msgid "Choked (The peer is not allowing us to request pieces)"
 msgstr "Zapchaný (Peer nám neumožňuje žiadať o kúsky)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1836
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1851
 msgid "Uninterested (We have no pieces the peer needs)"
 msgstr "Nezaujímajúci sa (Nemáme žiadne kúsky, ktoré peer potrebuje)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1838
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1853
 msgid "Choking (We are not allowing the peer to request pieces)"
 msgstr "Zapchaný (Neumožňujeme peerovi žiadať o kúsky)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1954
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1969
 #, java-format
 msgid "Details at {0} tracker"
 msgstr "Detaily sú v {0} stopovači"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1971
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1986
 msgid "Info"
 msgstr "Informácie"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2044
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2059
 msgid "Add Torrent"
 msgstr "Pridať torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2047
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2062
 msgid "From URL"
 msgstr "Z URL"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2050
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2065
 msgid ""
 "Enter the torrent file download URL (I2P only), magnet link, maggot link, or"
 " info hash"
 msgstr "Zadajte URL (iba I2P) pre stiahnutie torrentu, magnetový alebo maggotový link, prípadne info hash"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2055
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2070
 msgid "Add torrent"
 msgstr "Pridať torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2059
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2074
 msgid "Data dir"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2062
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2077
 #, java-format
 msgid "Enter the directory to save the data in (default {0})"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2066
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2081
 #, java-format
 msgid "You can also copy .torrent files to: {0}."
 msgstr "Môžete tiež skopírovať .torrent súbory do: {0}."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2068
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2083
 msgid "Removing a .torrent will cause it to stop."
 msgstr "Odstránenie .torrent spôsobí jeho zastavenie."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2081
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2096
 msgid "Create Torrent"
 msgstr "Vytvoriť torrent"
 
 #. out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\"
 #. value=\"" + newFile + "\" /><br>\n");
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2084
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2099
 msgid "Data to seed"
 msgstr "Dáta na seedovanie"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2088
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2103
 #, java-format
 msgid "File or directory to seed (full path or within the directory {0} )"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2091
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2337
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2106
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2361
 msgid "Trackers"
 msgstr "Stopovače"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2093
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2108
 msgid "Primary"
 msgstr "Primárne"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2095
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2110
 msgid "Alternates"
 msgstr "Alternatívne"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2098
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2113
 msgid "Create torrent"
 msgstr "Vytvoriť torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2116
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2131
 msgid "none"
 msgstr "žiadne"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2153
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2169
 msgid "Data directory"
 msgstr "Dátový priečinok"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2158
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2174
 msgid "Files readable by all"
 msgstr "Súbory čitateľné všetkými"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2162
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2178
 msgid "If checked, other users may access the downloaded files"
 msgstr "Ak je zaškrtnuté, ostatní užívatelia budú môcť pristupovať k stiahnutým súborom"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2166
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2182
 msgid "Auto start torrents"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2170
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2186
 msgid "If checked, automatically start torrents that are added"
 msgstr "Ak je zaškrtnuté, automaticky sa spustia pridané torrenty"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2174
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2190
+msgid "Smart torrent sorting"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2194
+msgid "If checked, ignore words such as 'the' when sorting"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2198
 msgid "Theme"
 msgstr "Téma"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2188
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2212
 msgid "Refresh time"
 msgstr "Čas refreshu"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2201
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2225
 msgid "Never"
 msgstr "Nikdy"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2207
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2231
 msgid "Startup delay"
 msgstr "Zdržanie pri spustení"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2209
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2233
 msgid "minutes"
 msgstr "minúty"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2213
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2237
 msgid "Page size"
 msgstr "Veľkosť stránky"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2215
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2239
 msgid "torrents"
 msgstr "torrentov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2239
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2263
 msgid "Total uploader limit"
 msgstr "Celkový limit uploaderov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2242
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2266
 msgid "peers"
 msgstr "peerovia"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2246
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2270
 msgid "Up bandwidth limit"
 msgstr "Limit nárastu šírky pásma"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2249
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2273
 msgid "Half available bandwidth recommended."
 msgstr "Odporúča sa polovica dostupnej šírky pásma."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2251
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2275
 msgid "View or change router bandwidth"
 msgstr "Zobraziť alebo zmeniť šírku pásma routra"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2255
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2279
 msgid "Use open trackers also"
 msgstr "Použiť aj otvorené stopovače"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2259
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2283
 msgid ""
 "If checked, announce torrents to open trackers as well as the tracker listed"
 " in the torrent file"
 msgstr "Ak je zaškrtnuté, otvorené stopovače tak isto ako aj stopovače vypísané v súbore torrentu sa oboznámia so všetkými torrentmi"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2263
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2287
 msgid "Enable DHT"
 msgstr "Povoliť DHT"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2267
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2291
 msgid "If checked, use DHT"
 msgstr "Ak je zaškrtnuté, použije sa DHT"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2283
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2307
 msgid "Inbound Settings"
 msgstr "Nastavenia prichádzajúcich dát"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2289
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2313
 msgid "Outbound Settings"
 msgstr "Nastavenia odchádzajúcich dát"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2297
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2321
 msgid "I2CP host"
 msgstr "I2CP host"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2302
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2326
 msgid "I2CP port"
 msgstr "I2CP port"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2317
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2341
 msgid "I2CP options"
 msgstr "I2CP nastavenia"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2322
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2346
 msgid "Save configuration"
 msgstr "Uložiť konfiguráciu"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2342
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2953
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2366
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3045
 msgid "Name"
 msgstr "Názov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2344
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2368
 msgid "Website URL"
 msgstr "URL webovej stránky"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2346
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2370
 msgid "Standard"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2348
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3080
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2372
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3172
 msgid "Open"
 msgstr "Otvoriť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2350
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2374
 msgid "Private"
 msgstr "Súkromné"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2352
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2376
 msgid "Announce URL"
 msgstr "Oznámiť URL"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2396
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2420
 msgid "Add"
 msgstr "Pridať"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2439
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2463
 #, java-format
 msgid "Invalid magnet URL {0}"
 msgstr "Neplatná magnetová URL {0}"
 
 #. * dummies for translation
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2447
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2471
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
@@ -1222,7 +1263,7 @@ msgstr[0] "1 hop"
 msgstr[1] "{0} hopy"
 msgstr[2] "{0} hopov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2448
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2472
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
@@ -1230,119 +1271,135 @@ msgstr[0] "1 tunel"
 msgstr[1] "{0} tunely"
 msgstr[2] "{0} tunelov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2691
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2728
 msgid "Torrent file"
 msgstr "Súbor torrentu"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2699
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2736
 msgid "Data location"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2708
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2745
 msgid "Info hash"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2727
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2764
 msgid "Primary Tracker"
 msgstr "Primárny stopovač"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2736
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2773
 msgid "Tracker List"
 msgstr "Zoznam stopovačov"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2761
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2798
 msgid "Comment"
 msgstr "Komentár"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2771
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2812
 msgid "Created"
 msgstr "Vytvorené"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2782
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2823
 msgid "Created By"
 msgstr "Vytvorené užívateľom"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2794
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2833
+msgid "Added"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2842
+msgid "Completed"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2854
 msgid "Magnet link"
 msgstr "Magnetový link"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2807
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2867
 msgid "Private torrent"
 msgstr "Súkromný torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2827
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2887
 msgid "Completion"
 msgstr "Dokončenie"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2856
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2982
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2916
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3074
 msgid "Remaining"
 msgstr "Zostávajúce"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2866
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2926
 msgid "Files"
 msgstr "Súbory"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2873
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2933
 msgid "Pieces"
 msgstr "Kúsky"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2879
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2939
 msgid "Piece size"
 msgstr "Veľkosť kúsku"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2933
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2952
+msgid "Refresh page for results"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2964
+msgid "Force Recheck"
+msgstr ""
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3025
 msgid "Directory"
 msgstr "Priečinok"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2992
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3084
 msgid "Priority"
 msgstr "Priorita"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3004
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3096
 msgid "Up to higher level directory"
 msgstr "Hore do priečinka vyššej úrovne"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3038
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3130
 msgid "Torrent not found?"
 msgstr "Torrent nenájdený?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3044
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3136
 msgid "File not found in torrent?"
 msgstr "Súbor nenájdený v torrente?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3057
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3149
 msgid "complete"
 msgstr "dokončiť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3058
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3150
 msgid "remaining"
 msgstr "zostávajúcich"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3104
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3196
 msgid "High"
 msgstr "Vysoká"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3109
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3201
 msgid "Normal"
 msgstr "Normálna"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3114
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3206
 msgid "Skip"
 msgstr "Preskočiť"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3124
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3216
 msgid "Set all high"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3126
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3218
 msgid "Set all normal"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3128
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3220
 msgid "Skip all"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3129
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3221
 msgid "Save priorities"
 msgstr "Uložiť priority"

@@ -43,7 +43,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
-        _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
+        _context.statManager().addRateData("netDb.lookupsReceived", 1);
 
         DatabaseLookupMessage dlm = (DatabaseLookupMessage)receivedMessage;
         if (!_facade.shouldThrottleLookup(dlm.getFrom(), dlm.getReplyTunnel())) {

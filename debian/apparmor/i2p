@@ -1,4 +1,4 @@
-# Last Modified: Thu May 21 18:30:32 2015
+# Last Modified: Sun Dec 06 12:30:32 2015
 # vim:syntax=apparmor et ts=4 sw=4
 
   #include <abstractions/base>
@@ -61,7 +61,9 @@
   owner /{,lib/live/mount/overlay/}tmp/scrypt*            rwk,
   owner /{,lib/live/mount/overlay/}tmp/scrypt*/**         rw,
   owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/        rwm,
-  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwklm,
+  owner /{,lib/live/mount/overlay/}tmp/i2p-daemon/**      rwkm,
+  # /graphs in the router console
+  owner /{,lib/live/mount/overlay/}tmp/imageio[0-9]*.tmp  rwk,
 
   # Prevent spamming the logs
   deny /dev/tty                                           rw,

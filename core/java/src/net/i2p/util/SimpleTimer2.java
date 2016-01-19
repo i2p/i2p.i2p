@@ -295,7 +295,7 @@ public class SimpleTimer2 {
             if (timeoutMs <= 0) {
                 // streaming timers do call with timeoutMs == 0
                 if (timeoutMs < 0 && _log.shouldLog(Log.WARN))
-                    _log.warn("Timeout <= 0: " + this + " timeout = " + timeoutMs + " state: " + _state);
+                    _log.warn("Sched. timeout < 0: " + this + " timeout = " + timeoutMs + " state: " + _state);
                 timeoutMs = 1; // otherwise we may execute before _future is updated, which is fine
                                // except it triggers 'early execution' warning logging
             }
@@ -337,6 +337,11 @@ public class SimpleTimer2 {
          *                        two timeouts, else use the later
          */
         public synchronized void reschedule(long timeoutMs, boolean useEarliestTime) {
+            if (timeoutMs <= 0) {
+                if (timeoutMs < 0 && _log.shouldWarn())
+                    _log.warn("Resched. timeout < 0: " + this + " timeout = " + timeoutMs + " state: " + _state);
+                timeoutMs = 1;
+            }
             final long now = System.currentTimeMillis();
             long oldTimeout;
             boolean scheduled = _state == TimedEventState.SCHEDULED;
@@ -349,6 +354,12 @@ public class SimpleTimer2 {
             if ((oldTimeout - _fuzz > timeoutMs && useEarliestTime) ||
                 (oldTimeout + _fuzz < timeoutMs && !useEarliestTime)||
                 (!scheduled)) {
+                if (scheduled && oldTimeout <= 5) {
+                    // don't reschedule to avoid race
+                    if (_log.shouldWarn())
+                        _log.warn("not rescheduling to " + timeoutMs + ", about to execute " + this + " in " + oldTimeout);
+                    return;
+                }
                 if (scheduled && (now + timeoutMs) < _nextRun) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Re-scheduling: " + this + " timeout = " + timeoutMs + " old timeout was " + oldTimeout + " state: " + _state);
@@ -382,10 +393,14 @@ public class SimpleTimer2 {
                 _cancelAfterRun = true;
                 return true;
               case SCHEDULED:
-                boolean cancelled = _future.cancel(false);
+                // There's probably a race here, where it's cancelled after it's running
+                // The result (if rescheduled) is a dup on the queue, see tickets 1694, 1705
+                // Mitigated by close-to-execution check in reschedule()
+                boolean cancelled = _future.cancel(true);
                 if (cancelled)
                     _state = TimedEventState.CANCELLED;
-                else {} // log something as this could be serious, we remain RUNNING otherwise
+                else
+                    _log.error("could not cancel " + this + " to run in " + (_nextRun - System.currentTimeMillis()), new Exception());
                 return cancelled;
             }
             return false;
@@ -407,6 +422,10 @@ public class SimpleTimer2 {
             long before = System.currentTimeMillis();
             long delay = 0;
             synchronized(this) {
+                if (Thread.currentThread().isInterrupted()) {
+                    _log.warn("I was interrupted in run, state "+_state+" event "+this);
+                    return;
+                }
                 if (_rescheduleAfterRun)
                     throw new IllegalStateException(this + " rescheduleAfterRun cannot be true here");
                 

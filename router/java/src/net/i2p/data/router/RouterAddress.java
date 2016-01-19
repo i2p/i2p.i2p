@@ -288,7 +288,7 @@ public class RouterAddress extends DataStructureImpl {
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_transportStyle == null)
             throw new DataFormatException("uninitialized");
-        DataHelper.writeLong(out, 1, _cost);
+        out.write((byte) _cost);
         DataHelper.writeLong(out, 8, _expiration);
         DataHelper.writeString(out, _transportStyle);
         DataHelper.writeProperties(out, _options);

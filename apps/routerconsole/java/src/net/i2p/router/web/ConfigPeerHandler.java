@@ -42,12 +42,12 @@ public class ConfigPeerHandler extends FormHandler {
                 PeerProfile prof = _context.profileOrganizer().getProfile(h);
                 if (prof != null) {
                     try {
-                        prof.setSpeedBonus(Long.parseLong(_speed));
+                        prof.setSpeedBonus(Integer.parseInt(_speed));
                     } catch (NumberFormatException nfe) {
                         addFormError(_t("Bad speed value"));
                     }
                     try {
-                        prof.setCapacityBonus(Long.parseLong(_capacity));
+                        prof.setCapacityBonus(Integer.parseInt(_capacity));
                     } catch (NumberFormatException nfe) {
                         addFormError(_t("Bad capacity value"));
                     }

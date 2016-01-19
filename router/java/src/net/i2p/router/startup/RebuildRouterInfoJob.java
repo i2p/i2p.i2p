@@ -118,10 +118,8 @@ class RebuildRouterInfoJob extends JobImpl {
             
             try {
                 info.setAddresses(getContext().commSystem().createAddresses());
-                Properties stats = getContext().statPublisher().publishStatistics();
-                stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
+                Properties stats = getContext().statPublisher().publishStatistics(info.getHash());
                 info.setOptions(stats);
-                getContext().router().addCapabilities(info);
                 // info.setPeers(new HashSet()); // this would have the trusted peers
                 info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 

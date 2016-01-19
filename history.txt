@@ -1,5 +1,252 @@
+2016-01-17 zzz
+ * BuildHandler: Disable tunnel removal on next-hop timeout
+ * Console:
+   - Fix mime type for svg in themes directory
+   - Add zh_TW translation
+ * Fortuna: Add getByte() method
+ * i2psnark: add opendocument mime types
+ * i2ptunnel: Remove unused stats
+ * Utils: Move CachedIteratorArrayList from core to router
+
+2016-01-13 zzz
+ * BuildHandler: More early-disconnect cases
+ * Family: Add i2p-dev cert
+
+2016-01-10 zzz
+ * Tunnels: Fix build request Bloom filter (ticket #1746)
+
+2016-01-07 zzz
+ * Console: Fixed summary bar overflow (ticket #1739)
+
+2016-01-06 zzz
+ * Build: Remove big geoip files from release again
+ * Console: Properly register listen hosts with PortMapper
+ * DataHelper: Optimize checks in storeProps()
+ * I2PTunnel: Fixup console links in error pages if console is
+   on a non-standard host or port, or on https
+ * Jetty: Change default source logging from b64 to b32.
+   To change back to b64, add the following to the RequestLogImpl
+   section of jetty.xml: <Set name="b64">true</Set>
+ * NetDB: Don't query floodfills if they are too old to
+   support sig types or encrypted replies (ticket #1742)
+ * PortMapper: Add method to convert wildcard host to actual host
+
+2015-12-21 zzz
+ * SSU: Hand all messages pending after establishment to the
+   outbound queue at once, for efficiency.
+   Don't sort outbound messages by size, keep priority order instead.
+
+2015-12-20 zzz
+ * BuildHandler: Additional fixes (ticket #1738)
+ * CertUtil: Add methods to export private keys
+ * Console: Sybil tool enhancementsrivate keys
+ * Transports:
+   - Disconnect faster when first message is a
+     tunnel build request which we reject
+   - Display SSU sent/received messages, not packets,
+     on /peers to be consistent with NTCP
+
+2015-12-18 zzz
+ * BuildHandler: Fix NPE (ticket #1738)
+
+2015-12-16 zzz
+ * Profiles:
+   - Don't use same family in a tunnel
+   - Reduce IPv6 mask from 8 to 6
+
+2015-12-13 zzz
+ * Data: Optimize router info writes, disable caching
+
+2015-12-12 zzz
+ * Router:
+   - Add family public key to router info (ticket #1510)
+   - More deadlock prevention (ticket #1722)
+
+2015-12-11 zzz
+ * Logs: Windows line ending fixes
+ * Router:
+   - Fix family verification, partially hook into netdb store()
+   - Limit wait for NTP to 45 seconds (ticket #1725)
+   - Increase lookup cache max sizes,
+     reduce max lookup depth, and increase non-floodfill profile bonus
+     to attempt to reduce load on floodfills
+   - Don't let context clock shifts affect calculated uptime
+ * Transport: More deadlock prevention (ticket #1722)
+ * SSU: Fix outbound IPv6 errors on Windows without a real v6 address
+   when explict host is set. Validate addresses before confirming that
+   we have an IPv6 address. Possibly related to ticket #1538.
+ * Wrapper: Listen for Windows Service shutdown events to stop router
+
+2015-12-10 zzz
+ * Router:
+   - Change addCapabilities() to getCapabilities()
+   - Add netdb family sign/verify utility (ticket #1510)
+ * RouterInfo:
+   - Remove addCapability() and delCapability()
+ * StatPublisher:
+   - Remove Service interface, not required
+   - Consolidate getCapabilities() and network ID here
+   - Add family signatures
+
+2015-12-08 str4d
+ * Core: Fill in basic datastructure length tests
+ * Ministreaming: Add unit tests
+ * Streaming:
+   - Add more unit tests
+   - Separate out integration tests
+
+2015-12-08 zzz
+ * Crypto: Consolidate certificate import methods
+
+2015-12-06 zzz
+ * Console: Don't force profile creation when loading floodfill tab
+ * Installer: Add wrapper deadlock detection to default wrapper.config
+ * NetDb: Stub out a "family" indicator (ticket #1510)
+ * Profiles: More changes to reduce memory usage
+ * Startup: Increase rekey probability
+ * Sybil tool: Tweaks and enhancements
+
+2015-12-04 zzz
+ * Console: Fix NPE on /profiles
+ * Profiles:
+   - Fix first heard about to be earliest, undeprecate
+   - Fixup first heard about at profile readin
+   - Persist good/bad lookup/store DBHistory stats added in 0.7.8
+   - Remove unused DBHistory methods and fields to save memory
+   - Change bonus longs to ints to save memory
+   - Extend profile expiration time from 3 days to 15
+   - Consolidate getLong()
+   - Synch fixes
+ * Sybil tool: Tweaks and enhancements
+
+2015-12-03 zzz
+ * Console: Add experimental Sybil analysis tool
+ * NetDb: Fix deadlock (ticket #1722)
+
+2015-12-01 zzz
+ * i2psnark:
+   - Consolidate default tunnel length definition
+   - Increase max peers and uploaders per torrent
+   - Increase default max total uploaders
+   - Increase max peers sent and returned in DHT
+* SAM:
+   - Don't map keys to upper case in parser, corrupts I2CP options
+   - Register SSL and UDP ports with PortMapper
+* SSU: Allow IP and port in relay request if it matches the source
+* Transport: Interrupt DH refiller thread when pool is empty,
+  to speed refilling and reduce pumper stalls
+
+2015-11-30 zzz
+ * SAM:
+   - Timeout for first command after HELLO
+   - Send error message if no NAME key in LOOKUP
+   - Destination caching enhancements
+   - Client: Add SSL forward support, handle header line in forwarded stream
+
+2015-11-29 zzz
+ * i2ptunnel:
+   - Change preferred sig type to Ed
+   - Set permissions on backup tunnel keys file
+
+2015-11-28 zzz
+ * i2psnark:
+   - Fix NPE caused by URL-to-URI conversion in -2 (ticket #1715)
+   - Increase max pieces to 32K
+   - BEP 21 support (upload_only)
+ * SAM:
+   - Fix parser to allow spaces in quoted values (tickets #1325, #1488)
+   - Handle UTF-8 in ReadLine (ticket #1488)
+   - 3.2 complete (ticket #1574)
+
+2015-11-27 zzz
+ * SAM:
+   - Use DataHelper to load/store sam.keys
+   - Move sam.keys to config dir (ticket #677)
+
+2015-11-27 zzz
+Prop from i2p.i2p.zzz.sam:
+ * PasswordManager: new methods for use by SAM
+ * SAM:
+   - Use getopt for SAM args processing
+   - Change default host from 0.0.0.0 to 127.0.0.1
+   - Add SSL support with -s option (ticket #1106)
+   - Add -c configfile option, default sam.config
+   - Add protocol and port notification (ticket #1323)
+   - Add authorization options in HELLO (ticket #1106)
+   - Add AUTH commands: ENABLE, DISABLE, ADD, REMOVE
+   - Add PING, PONG commands (tickets #1572, #1573)
+   - Add QUIT, STOP, EXIT commands
+   - Add SSL option for STREAM FORWARD
+   - Move DatagramServer from SAMv3Handler to its own file
+   - Make DatagramServer a Handler, register with bridge
+   - Use ReadLine with timeout for SAMHandlerFactory
+   - Support parallel STREAM ACCEPTs
+   - Add HEADER option for RAW forwarding
+   - Better exception handling
+   - Extensive enhancements to Java client for testing
+   - Bump version to 3.2 (ticket #1574)
+ * Streaming: Fix recognition of PoisonPacket in ConnectionHandler
+
+2015-11-22 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Build:
+   - More release checks
+   - Add systray dependency tracking to build
+   - Remove commons-logging classes from commons-logging.jar (ticket #1679)
+ * Lint:
+   - Replace URL with URI where possible
+   - Don't use DataHelper.fromLong() for 1-byte reads, for efficiency
+   - Don't catch Exception, catch RuntimeException or checked exception.
+ * i2psnark:
+   - Minor details page reformatting
+   - Add skipped length on details page
+ * NewsManager: Make it a ClientApp, not a RouterApp
+ * Profiles: Don't allow creation of our own profile
+ * Router: Revert JobTiming being a clock shift listener, not needed
+ * SSU:
+   - Support extended options
+   - Add support for requesting a relay tag via
+     Session Request extended options (ticket #1465)
+ * Tunnels:
+   - Locking fixes
+   - Don't set stats in our own profile
+   - Minor optimizations
+ * Utils:
+   - Centralize time zone code in DataHelper
+   - Add caching string split()
+
+2015-11-21 zzz
+  * Console: Fix escaping of plugin description on /configclients (ticket #1711)
+
+* 2015-11-19 0.9.23 released
+
+2015-11-19 str4d
+  * build.xml: Stop building SUD and SU2 update files in "ant release" (ticket #1709)
+
+2015-11-15 kytv
+ * Updates to geoip.txt and geoipv6.dat.gz based on Maxmind GeoLite Country
+   database from 2015-11-03.
+ * Translation updates
+
+2015-11-13 zab
+ * Interrupt() when cancelling scheduled tasks (tickets #1694, #1705)
+
+2015-11-13 zzz
+ * Console: Fix lifetime participating bandwidth display (ticket #1706)
+
+2015-11-12 zzz
+ * Console /configclients:
+   = Fix filtering and escaping
+   - Fix autostart setting on new client, was inverted
+
+2015-11-11 zzz
+ * i2psnark:
+   - Change log level to hide socket closed error at tunnel shutdown (ticket #1687)
+   - Increase max pieces
+ * Timers: State fix 4th try (tickets #1694, #1705)
+
 2015-11-05 zzz
- * I2CP: Fix additional connections getting rejected during tunnel open (ticket #1650)
+ * I2CP: Fix additional connections getting rejected during tunnel open (tickets #1650, #1698)
  * Streaming: Split blacklist into one for EC and one for Ed
 
 2015-11-04 zzz

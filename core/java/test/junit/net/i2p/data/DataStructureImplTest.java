@@ -60,7 +60,7 @@ public class DataStructureImplTest extends TestCase{
     public void testErrors() throws Exception{
         boolean error = false;
         try{
-            _struct.fromByteArray("water is poison".getBytes());
+            _struct.fromByteArray(DataHelper.getASCII("water is poison"));
         }catch(DataFormatException dfe){
             error = true;
         }

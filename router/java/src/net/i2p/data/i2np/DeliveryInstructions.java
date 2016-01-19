@@ -430,7 +430,7 @@ public class DeliveryInstructions extends DataStructureImpl {
         //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
         //               + " =?= " + flagMode(flags));
         byte additionalInfo[] = getAdditionalInfo();
-        DataHelper.writeLong(out, 1, flags);
+        out.write((byte) flags);
         if (additionalInfo != null) {
             out.write(additionalInfo);
             out.flush();

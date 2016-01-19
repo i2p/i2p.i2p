@@ -19,6 +19,7 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 
@@ -66,10 +67,10 @@ public class I2PSessionTest extends TestCase implements I2PSessionListener{
         _s.add("c");
         _s.add("d");
         
-        session.sendMessage(d, "a".getBytes());
-        session.sendMessage(d, "b".getBytes());
-        session.sendMessage(d, "c".getBytes());
-        session.sendMessage(d, "d".getBytes());
+        session.sendMessage(d, DataHelper.getASCII("a"));
+        session.sendMessage(d, DataHelper.getASCII("b"));
+        session.sendMessage(d, DataHelper.getASCII("c"));
+        session.sendMessage(d, DataHelper.getASCII("d"));
         
         for(int i = 0; (i < 20)&&(!_s.isEmpty()); i++){
             Thread.sleep(1000);

@@ -123,7 +123,7 @@ public class LoadClientAppsJob extends JobImpl {
             for (int i = 0; i < data.length; i++) {
                 switch (data[i]) {
                     case '\'':
-                    case '\"':
+                    case '"':
                         if (isQuoted) {
                             String str = buf.toString().trim();
                             if (str.length() > 0)

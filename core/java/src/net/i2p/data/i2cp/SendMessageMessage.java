@@ -139,7 +139,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, getType());
+            out.write((byte) getType());
             _sessionId.writeBytes(out);
             _destination.writeBytes(out);
             _payload.writeBytes(out);

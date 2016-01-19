@@ -172,14 +172,31 @@ class OutboundMessageFragments {
     }
 
     /**
-     * short circuit the OutNetMessage, letting us send the establish
-     * complete message reliably
+     *  Short circuit the OutNetMessage, letting us send the establish
+     *  complete message reliably.
+     *  If you have multiple messages, use the list variant,
+     *  so the messages may be bundled efficiently.
      */
-    public void add(OutboundMessageState state) {
-        PeerState peer = state.getPeer();
+    public void add(OutboundMessageState state, PeerState peer) {
         if (peer == null)
             throw new RuntimeException("null peer for " + state);
         peer.add(state);
+        add(peer);
+        //_context.statManager().addRateData("udp.outboundActiveCount", active, 0);
+    }
+
+    /**
+     *  Short circuit the OutNetMessage, letting us send multiple messages
+     *  reliably and efficiently.
+     *  @since 0.9.24
+     */
+    public void add(List<OutboundMessageState> states, PeerState peer) {
+        if (peer == null)
+            throw new RuntimeException("null peer");
+        int sz = states.size();
+        for (int i = 0; i < sz; i++) {
+            peer.add(states.get(i));
+        }
         add(peer);
         //_context.statManager().addRateData("udp.outboundActiveCount", active, 0);
     }
@@ -400,8 +417,10 @@ class OutboundMessageFragments {
         int fragmentsToSend = toSend.size();
         // sort by size, biggest first
         // don't bother unless more than one state (fragments are already sorted within a state)
-        if (fragmentsToSend > 1 && states.size() > 1)
-            Collections.sort(toSend, new FragmentComparator());
+        // This puts the DeliveryStatusMessage after the DatabaseStoreMessage, don't do it for now.
+        // It also undoes the ordering of the priority queue in PeerState.
+        //if (fragmentsToSend > 1 && states.size() > 1)
+        //    Collections.sort(toSend, new FragmentComparator());
 
         List<Fragment> sendNext = new ArrayList<Fragment>(Math.min(toSend.size(), 4));
         List<UDPPacket> rv = new ArrayList<UDPPacket>(toSend.size());
@@ -490,6 +509,7 @@ class OutboundMessageFragments {
      *  Biggest first
      *  @since 0.9.16
      */
+/****
     private static class FragmentComparator implements Comparator<Fragment>, Serializable {
 
         public int compare(Fragment l, Fragment r) {
@@ -497,7 +517,9 @@ class OutboundMessageFragments {
             return r.state.fragmentSize(r.num) - l.state.fragmentSize(l.num);
         }
     }
+****/
 
+    /** throttle */
     public interface ActiveThrottle {
         public void choke(Hash peer);
         public void unchoke(Hash peer);

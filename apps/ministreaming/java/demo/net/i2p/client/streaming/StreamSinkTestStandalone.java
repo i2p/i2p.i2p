@@ -1,10 +1,8 @@
-package net.i2p.client.streaming.impl;
+package net.i2p.client.streaming;
 
-import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.StreamSinkClient;
 import net.i2p.client.streaming.StreamSinkSend;
 import net.i2p.client.streaming.StreamSinkServer;
-import net.i2p.client.streaming.impl.I2PSocketManagerFull;
 /**
  * Usage: StreamSinkTest [(old|new) [#hops [#kb]]]
  */
@@ -26,30 +24,23 @@ public class StreamSinkTestStandalone {
   /* */
     
     public static void main(String args[]) {
-        boolean old = false;
         int hops = 0;
         int kb = 32*1024;
         if (args.length > 0) {
-            if ("old".equals(args[0]))
-                old = true;
-        } 
-        if (args.length > 1) {
             try { 
-                hops = Integer.parseInt(args[1]); 
+                hops = Integer.parseInt(args[0]); 
             } catch (NumberFormatException nfe) {
                 hops = 0;
             }
         }
-        if (args.length > 2) {
+        if (args.length > 1) {
             try {
-                kb = Integer.parseInt(args[2]);
+                kb = Integer.parseInt(args[1]);
             } catch (NumberFormatException nfe) {
                 kb = 32*1024;
             }
         }
         
-        if (!old)
-            System.setProperty(I2PSocketManagerFactory.PROP_MANAGER, I2PSocketManagerFull.class.getName());
         System.setProperty("tunnels.depthInbound", ""+hops);
         
         new Thread(new Runnable() { 

@@ -109,7 +109,7 @@ class OutboundEstablishState {
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
      *  @param remotePeer must have supported sig type
-     *  @param allowExtenededOptions are we allowed to send extended options to Bob?
+     *  @param allowExtendedOptions are we allowed to send extended options to Bob?
      *  @param needIntroduction should we ask Bob to be an introducer for us?
                ignored unless allowExtendedOptions is true
      *  @param introKey Bob's introduction key, as published in the netdb

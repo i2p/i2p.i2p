@@ -98,6 +98,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
 
     /**
      * Returns the raw payload data, excluding the signature, to be signed by sign().
+     *
+     * Most callers should use writeBytes() or toByteArray() instead.
+     *
      * FIXME RouterInfo throws DFE and LeaseSet returns null
      * @return null on error ???????????????????????
      */
@@ -120,13 +123,6 @@ public abstract class DatabaseEntry extends DataStructureImpl {
             _routingKeyGenMod = mod;
         }
         return _currentRoutingKey;
-    }
-
-    /**
-     * @deprecated unused
-     */
-    public void setRoutingKey(Hash key) {
-        _currentRoutingKey = key;
     }
 
     /**

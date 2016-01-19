@@ -407,35 +407,48 @@ public class TransportManager implements TransportEventListener {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability() { 
         for (Transport t : _transports.values())
             t.recheckReachability();
     }
 
-    public boolean isBacklogged(Hash dest) {
+    public boolean isBacklogged(Hash peer) {
         for (Transport t : _transports.values()) {
-            if (t.isBacklogged(dest))
+            if (t.isBacklogged(peer))
                 return true;
         }
         return false;
     }    
     
-    public boolean isEstablished(Hash dest) {
+    public boolean isEstablished(Hash peer) {
         for (Transport t : _transports.values()) {
-            if (t.isEstablished(dest))
+            if (t.isEstablished(peer))
                 return true;
         }
         return false;
     }    
     
     /**
+     * Tell the transports that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    public void mayDisconnect(Hash peer) {
+        for (Transport t : _transports.values()) {
+             t.mayDisconnect(peer);
+        }
+    }
+    
+    /**
      * Was the peer UNreachable (outbound only) on any transport,
      * based on the last time we tried it for each transport?
      * This is NOT reset if the peer contacts us.
      */
-    public boolean wasUnreachable(Hash dest) {
+    public boolean wasUnreachable(Hash peer) {
         for (Transport t : _transports.values()) {
-            if (!t.wasUnreachable(dest))
+            if (!t.wasUnreachable(peer))
                 return false;
         }
         return true;
@@ -452,8 +465,8 @@ public class TransportManager implements TransportEventListener {
      *
      * @return IPv4 or IPv6 or null
      */
-    public byte[] getIP(Hash dest) {
-        return TransportImpl.getIP(dest);
+    public byte[] getIP(Hash peer) {
+        return TransportImpl.getIP(peer);
     }    
     
     /**
@@ -745,8 +758,8 @@ public class TransportManager implements TransportEventListener {
                    //"<b id=\"def.dev\">").append(_t("Dev")).append("</b>: ").append(_t("The standard deviation of the round trip time in milliseconds")).append("<br>\n" +
                    "<b id=\"def.rto\">RTO</b>: ").append(_t("The retransmit timeout in milliseconds")).append("<br>\n" +
                    "<b id=\"def.mtu\">MTU</b>: ").append(_t("Current maximum send packet size / estimated maximum receive packet size (bytes)")).append("<br>\n" +
-                   "<b id=\"def.send\">").append(_t("TX")).append("</b>: ").append(_t("The total number of packets sent to the peer")).append("<br>\n" +
-                   "<b id=\"def.recv\">").append(_t("RX")).append("</b>: ").append(_t("The total number of packets received from the peer")).append("<br>\n" +
+                   "<b id=\"def.send\">").append(_t("TX")).append("</b>: ").append(_t("The total number of messages sent to the peer")).append("<br>\n" +
+                   "<b id=\"def.recv\">").append(_t("RX")).append("</b>: ").append(_t("The total number of messages received from the peer")).append("<br>\n" +
                    "<b id=\"def.resent\">").append(_t("Dup TX")).append("</b>: ").append(_t("The total number of packets retransmitted to the peer")).append("<br>\n" +
                    "<b id=\"def.dupRecv\">").append(_t("Dup RX")).append("</b>: ").append(_t("The total number of duplicate packets received from the peer")).append("</p>" +
                    "</div>\n");

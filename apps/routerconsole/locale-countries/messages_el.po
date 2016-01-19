@@ -5,16 +5,17 @@
 # 
 # Translators:
 # Alex <hestia@riseup.net>, 2012
+# LaScapigliata <ditri2000@hotmail.com>, 2015
 # Alex <hestia@riseup.net>, 2012
 # lixtetrax <lixtetrax@grhack.net>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:08+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Greek (http://www.transifex.com/projects/p/I2P/language/el/)\n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2015-11-05 23:37+0000\n"
+"Last-Translator: LaScapigliata <ditri2000@hotmail.com>\n"
+"Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -193,7 +194,7 @@ msgid "Curaçao"
 msgstr ""
 
 msgid "Christmas Island"
-msgstr "Νησιά των Χριστουγέννων"
+msgstr "Νήσος των Χριστουγέννων"
 
 msgid "Cyprus"
 msgstr "Κύπρος"
@@ -217,7 +218,7 @@ msgid "Dominican Republic"
 msgstr "Δομινικανή Δημοκρατία"
 
 msgid "Algeria"
-msgstr "Αλγερια"
+msgstr "Αλγερία"
 
 msgid "Ecuador"
 msgstr "Ισημερινός"
@@ -328,7 +329,7 @@ msgid "Croatia"
 msgstr "Κροατία"
 
 msgid "Haiti"
-msgstr "Αιτή"
+msgstr "Αϊτή"
 
 msgid "Hungary"
 msgstr "Ουγγαρία"
@@ -355,7 +356,7 @@ msgid "Iraq"
 msgstr "Ιράκ"
 
 msgid "Iran"
-msgstr ""
+msgstr "Ιράν"
 
 msgid "Iceland"
 msgstr "Ισλανδία"
@@ -394,7 +395,7 @@ msgid "Saint Kitts and Nevis"
 msgstr "Αγιος Κιτς και Νεβί"
 
 msgid "North Korea"
-msgstr ""
+msgstr "Βόρεια Κορέα"
 
 msgid "Republic of Korea"
 msgstr "Δημοκρατία της Κορέας"
@@ -448,7 +449,7 @@ msgid "Monaco"
 msgstr "Μονακό"
 
 msgid "Moldova"
-msgstr ""
+msgstr "Μολδαβία"
 
 msgid "Montenegro"
 msgstr "Μαυροβούνιο"
@@ -475,7 +476,7 @@ msgid "Mongolia"
 msgstr "Μογγολία"
 
 msgid "Macau"
-msgstr ""
+msgstr "Μακάο"
 
 msgid "Northern Mariana Islands"
 msgstr "Northern Mariana Islands"

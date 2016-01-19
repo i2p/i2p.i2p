@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -89,6 +88,7 @@ public class DataHelper {
             "stat_tunnel.buildExploratorySuccess.60m",
             "stat_tunnel.participatingTunnels.60m",
             "stat_uptime",
+            "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
             "a", "s",
@@ -98,6 +98,9 @@ public class DataHelper {
             _propertiesKeyCache.put(keys[i], keys[i]);
         }
     }
+
+    private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\r\n;]");
+    private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[#\r\n]");
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -509,19 +512,13 @@ public class DataHelper {
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
-                if (name.contains("#") ||
-                    name.contains("=") ||
-                    name.contains("\r") ||
-                    name.contains("\n") ||
-                    name.startsWith(";")) {
+                if (ILLEGAL_KEY.matcher(name).matches()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key: \"" +
                                                            name + "\" = \"" + val + '\"');
                     continue;
                 }
-                if (val.contains("#") ||
-                    val.contains("\r") ||
-                    val.contains("\n")) {
+                if (ILLEGAL_VALUE.matcher(val).matches()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#\\r\\n\") in value: \"" +
                                                            name + "\" = \"" + val + '\"');
@@ -1924,21 +1921,5 @@ public class DataHelper {
             patterns.putIfAbsent(regex, p);
         }
         return p.split(s, limit);
-    }
-
-    /**
-     *  The system's time zone, which is probably different from the
-     *  JVM time zone, because Router changes the JVM default to GMT.
-     *  It saves the old default in the context properties where we can get it.
-     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
-     *
-     *  @return non-null
-     *  @since 0.9.24
-     */
-    public static TimeZone getSystemTimeZone(I2PAppContext ctx) {
-        String systemTimeZone = ctx.getProperty("i2p.systemTimeZone");
-        if (systemTimeZone != null)
-            return TimeZone.getTimeZone(systemTimeZone);
-        return TimeZone.getDefault();
     }
 }

@@ -17,10 +17,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-06 20:09+0000\n"
+"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"PO-Revision-Date: 2015-11-15 12:23+0000\n"
 "Last-Translator: brianhopes <voganc-12@live.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -460,39 +460,39 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Для перехода по ссылке из локальной адресной книги, нажмите <a href=\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a href=\"{1}\">здесь</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1119
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1121
 msgid "Destination lease set not found"
 msgstr "LeaseSet для адреса назначения не найден"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1271
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1273
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1275
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1277
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1279
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1281
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1285
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1287
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продолжить переход к {0} без сохранения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1291
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "Сохранить {0} в адресную книгу маршрутизатора и перейти к сайту"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1294
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1296
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr "Сохранить {0} в основную адресную книгу и перейти к сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1295
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1297
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "Сохранить {0} в приватную адресную книгу и перейти к сайту"

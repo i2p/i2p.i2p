@@ -31,6 +31,7 @@ import net.i2p.data.router.RouterPrivateKeyFile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.networkdb.kademlia.PersistentDataStore;
 import net.i2p.util.Log;
 
@@ -98,7 +99,13 @@ class LoadRouterInfoJob extends JobImpl {
                     throw new DataFormatException("Our RouterInfo has a bad signature");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
-                _us = info;
+                // don't reuse if family name changed
+                if (DataHelper.eq(info.getOption(FamilyKeyCrypto.OPT_NAME),
+                                  getContext().getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME))) {
+                    _us = info;
+                } else {
+                    _log.logAlways(Log.WARN, "NetDb family name changed");
+                }
             }
             
             if (keys2Exist || keysExist) {
@@ -114,9 +121,9 @@ class LoadRouterInfoJob extends JobImpl {
                 boolean sigTypeChanged = stype != cstype;
                 if (sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) {
                     // Not explicitly configured, and default has changed
-                    // Give a 15% chance of rekeying for each restart
+                    // Give a 25% chance of rekeying for each restart
                     // TODO reduce to ~3 (i.e. increase probability) in future release
-                    if (getContext().random().nextInt(7) > 0) {
+                    if (getContext().random().nextInt(4) > 0) {
                         sigTypeChanged = false;
                         if (_log.shouldWarn())
                             _log.warn("Deferring RI rekey from " + stype + " to " + cstype);

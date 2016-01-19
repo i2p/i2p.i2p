@@ -277,6 +277,7 @@ public class SummaryBarRenderer {
            .append(_t("show"))
            .append("</a></td></tr>\n" +
 
+                   "</table><table>" + // fix for some rows with a big left side and some with a big right side
                    "<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
@@ -287,6 +288,7 @@ public class SummaryBarRenderer {
            .append(_helper.getVersion())
            .append("</td></tr>\n" +
 
+                   "</table><table>" + // fix for some rows with a big left side and some with a big right side
                    "<tr title=\"")
            .append(_t("How long we've been running for this session"))
            .append("\">" +
@@ -633,7 +635,7 @@ public class SummaryBarRenderer {
                 buf.append("<ul>\n");
                 DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
+                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 int i = 0;
                 final int max = 2;
                 for (NewsEntry entry : entries) {

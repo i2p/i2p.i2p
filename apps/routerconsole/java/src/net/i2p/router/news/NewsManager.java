@@ -19,6 +19,7 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.TranslateReader;
 
 import org.cybergarage.xml.Node;
@@ -233,7 +234,7 @@ public class NewsManager implements ClientApp {
                     //  Doesn't work if the date has a : in it, but SHORT hopefully does not
                     DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                     // the router sets the JVM time zone to UTC but saves the original here so we can get it
-                    fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
+                    fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                     try {
                         Date date = fmt.parse(newsContent.substring(0, colon));
                         entry.updated = date.getTime();

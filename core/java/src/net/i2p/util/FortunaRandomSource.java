@@ -184,6 +184,17 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
     }
 
     /**
+     * Not part of java.util.SecureRandom, but added for efficiency, since Fortuna supports it.
+     *
+     * @since 0.9.24
+     */
+    public byte nextByte() { 
+        synchronized(_fortuna) {
+            return _fortuna.nextByte();
+        }
+    }
+
+    /**
      * Implementation from sun's java.util.Random javadocs 
      */
     @Override

@@ -47,7 +47,9 @@ class ProfileOrganizerRenderer {
         int standard = 0;
         for (Hash peer : peers) {
             if (_organizer.getUs().equals(peer)) continue;
-            PeerProfile prof = _organizer.getProfile(peer);
+            PeerProfile prof = _organizer.getProfileNonblocking(peer);
+            if (prof == null)
+                continue;
             if (mode == 2) {
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
                 if (info != null && info.getCapabilities().indexOf("f") >= 0)
@@ -364,6 +366,9 @@ class ProfileOrganizerRenderer {
     private String formatInterval(long now, long then) {
         if (then <= 0)
             return _t(NA);
+        // avoid 0 or negative
+        if (now <= then)
+            return DataHelper.formatDuration2(1);
         return DataHelper.formatDuration2(now - then);
     }
 

@@ -10,6 +10,7 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.data.DataHelper;
 import net.i2p.router.news.NewsEntry;
 import net.i2p.router.news.NewsManager;
+import net.i2p.util.SystemVersion;
 
 
 /**
@@ -55,7 +56,7 @@ public class NewsFeedHelper extends HelperBase {
         if (!entries.isEmpty()) {
             DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
             // the router sets the JVM time zone to UTC but saves the original here so we can get it
-            fmt.setTimeZone(DataHelper.getSystemTimeZone(ctx));
+            fmt.setTimeZone(SystemVersion.getSystemTimeZone(ctx));
             int i = 0;
             for (NewsEntry entry : entries) {
                 if (i++ < start)

@@ -296,7 +296,14 @@ class ConnectionHandler {
 
         public PoisonPacket() {
             super(null);
-            setOptionalDelay(POISON_MAX_DELAY_REQUEST);
+        }
+
+        @Override
+        public int getOptionalDelay() { return POISON_MAX_DELAY_REQUEST; }
+
+        @Override
+        public String toString() {
+            return "POISON";
         }
     }
 }

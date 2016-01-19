@@ -78,8 +78,11 @@ public class RouterInfo extends DatabaseEntry {
     private volatile boolean _hashCodeInitialized;
     /** should we cache the byte and string versions _byteified ? **/
     private boolean _shouldCache;
-    /** maybe we should check if we are floodfill? */
-    private static final boolean CACHE_ALL = SystemVersion.getMaxMemory() > 128*1024*1024l;
+    /**
+     * Maybe we should check if we are floodfill?
+     * If we do bring this back, don't do on ARM or Android
+     */
+    private static final boolean CACHE_ALL = false; // SystemVersion.getMaxMemory() > 128*1024*1024l;
 
     public static final String PROP_NETWORK_ID = "netId";
     public static final String PROP_CAPABILITIES = "caps";
@@ -308,11 +311,30 @@ public class RouterInfo extends DatabaseEntry {
      */
     protected byte[] getBytes() throws DataFormatException {
         if (_byteified != null) return _byteified;
-        if (_identity == null) throw new DataFormatException("Router identity isn't set?!");
-
-        //long before = Clock.getInstance().now();
         ByteArrayOutputStream out = new ByteArrayOutputStream(2*1024);
         try {
+            writeDataBytes(out);
+        } catch (IOException ioe) {
+            throw new DataFormatException("IO Error getting bytes", ioe);
+        }
+        byte data[] = out.toByteArray();
+        if (CACHE_ALL || _shouldCache)
+            _byteified = data;
+        return data;
+    }
+
+    /** 
+     * Write out the raw payload of the routerInfo, excluding the signature.  This
+     * caches the data in memory if possible.
+     *
+     * @throws DataFormatException if the data is somehow b0rked (missing props, etc)
+     * @throws IOException
+     * @since 0.9.24
+     */
+    private void writeDataBytes(OutputStream out) throws DataFormatException, IOException {
+        if (_identity == null) throw new DataFormatException("Missing identity");
+        if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
+
             _identity.writeBytes(out);
             // avoid thrashing objects
             //DataHelper.writeDate(out, new Date(_published));
@@ -320,9 +342,9 @@ public class RouterInfo extends DatabaseEntry {
             int sz = _addresses.size();
             if (sz <= 0 || isHidden()) {
                 // Do not send IP address to peers in hidden mode
-                DataHelper.writeLong(out, 1, 0);
+                out.write((byte) 0);
             } else {
-                DataHelper.writeLong(out, 1, sz);
+                out.write((byte) sz);
                 for (RouterAddress addr : _addresses) {
                     addr.writeBytes(out);
                 }
@@ -332,7 +354,7 @@ public class RouterInfo extends DatabaseEntry {
             //         method of trusted links, which isn't implemented in the router
             //         at the moment, and may not be later.
             int psz = _peers == null ? 0 : _peers.size();
-            DataHelper.writeLong(out, 1, psz);
+            out.write((byte) psz);
             if (psz > 0) {
                 Collection<Hash> peers = _peers;
                 if (psz > 1)
@@ -345,17 +367,6 @@ public class RouterInfo extends DatabaseEntry {
                 }
             }
             DataHelper.writeProperties(out, _options);
-        } catch (IOException ioe) {
-            throw new DataFormatException("IO Error getting bytes", ioe);
-        }
-        byte data[] = out.toByteArray();
-        //if (_log.shouldLog(Log.DEBUG)) {
-        //    long after = Clock.getInstance().now();
-        //    _log.debug("getBytes()  took " + (after - before) + "ms");
-        //}
-        if (CACHE_ALL || _shouldCache)
-            _byteified = data;
-        return data;
     }
 
     /**
@@ -435,44 +446,6 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
-     * Warning, must be called AFTER setOptions().
-     *
-     * @throws IllegalStateException if RouterInfo is already signed
-     */
-    public void addCapability(char cap) {
-        if (_signature != null)
-            throw new IllegalStateException();
-
-            String caps = _options.getProperty(PROP_CAPABILITIES);
-            if (caps == null)
-                _options.setProperty(PROP_CAPABILITIES, String.valueOf(cap));
-            else if (caps.indexOf(cap) == -1)
-                _options.setProperty(PROP_CAPABILITIES, caps + cap);
-    }
-
-    /**
-     * @throws IllegalStateException if RouterInfo is already signed
-     * @deprecated unused
-     */
-    public void delCapability(char cap) {
-        if (_signature != null)
-            throw new IllegalStateException();
-
-            String caps = _options.getProperty(PROP_CAPABILITIES);
-            int idx;
-            if (caps == null) {
-                return;
-            } else if ((idx = caps.indexOf(cap)) == -1) {
-                return;
-	    } else {
-                StringBuilder buf = new StringBuilder(caps);
-		while ( (idx = buf.indexOf(""+cap)) != -1)
-                    buf.deleteCharAt(idx);
-                _options.setProperty(PROP_CAPABILITIES, buf.toString());
-            }
-    }
-
-    /**
      * Determine whether the router was published recently (within the given age milliseconds).
      * The age should be large enough to take into consideration any clock fudge factor, so
      * values such as 1 or 2 hours are probably reasonable.
@@ -525,16 +498,11 @@ public class RouterInfo extends DatabaseEntry {
 
         if (!_isValid) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(RouterInfo.class);
-            byte data[] = null;
-            try {
-                data = getBytes();
-            } catch (DataFormatException dfe) {
-                log.error("Error validating", dfe);
-                return;
+            if (log.shouldWarn()) {
+                log.warn("Sig verify fail: " + toString(), new Exception("from"));
+            } else {
+                log.error("RI Sig verify fail: " + _identity.getHash());
             }
-            log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
-                           + (log.shouldLog(Log.WARN) ? ("]\n" + toString()) : ""),
-                           new Exception("Signature failed"));
         }
     }
     
@@ -631,18 +599,9 @@ public class RouterInfo extends DatabaseEntry {
      *  This does NOT validate the signature
      */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if (_identity == null) throw new DataFormatException("Missing identity");
-        if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
         if (_signature == null) throw new DataFormatException("Signature is null");
-        //if (!isValid())
-        //    throw new DataFormatException("Data is not valid");
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
-        baos.write(getBytes());
-        _signature.writeBytes(baos);
-
-        byte data[] = baos.toByteArray();
-        //_log.debug("Writing routerInfo [len=" + data.length + "]: " + toString());
-        out.write(data);
+        writeDataBytes(out);
+        _signature.writeBytes(out);
     }
     
     @Override

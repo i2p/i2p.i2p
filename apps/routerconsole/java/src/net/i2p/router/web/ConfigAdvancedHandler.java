@@ -55,7 +55,7 @@ public class ConfigAdvancedHandler extends FormHandler {
         if (_config != null) {
             Properties props = new Properties();
             try {
-                DataHelper.loadProps(props, new ByteArrayInputStream(_config.getBytes()));
+                DataHelper.loadProps(props, new ByteArrayInputStream(DataHelper.getUTF8(_config)));
             } catch (IOException ioe) {
                 _log.error("Config error", ioe);
                 addFormError(ioe.toString());

@@ -1,4 +1,4 @@
-package net.i2p.util;
+package net.i2p.router.util;
 
 import static org.junit.Assert.*;
 

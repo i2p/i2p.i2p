@@ -82,7 +82,7 @@ public class SigningPublicKeyTest extends StructureTest {
     
     public void testShortRead() throws Exception{
         SigningPublicKey publicKey = new SigningPublicKey();
-        ByteArrayInputStream in = new ByteArrayInputStream("six times nine equals forty-two".getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("six times nine equals forty-two"));
         boolean error = false;
         try{
             publicKey.readBytes(in);

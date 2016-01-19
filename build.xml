@@ -1616,6 +1616,11 @@
         <ant dir="router/java/" target="jarTest" />
         <copy file="core/java/build/i2ptest.jar" todir="build" />
         <copy file="router/java/build/routertest.jar" todir="build" />
+        <!-- broken -->
+      <!--
+        <ant dir="apps/ministreaming/java/" target="junit.compileTest" />
+        <ant dir="apps/streaming/java/" target="junit.compileTest" />
+       -->
     </target>
     <target name="prepTest" depends="prepupdate, buildTest">
         <!-- overwrite i2p.jar and router.jar with the test versions -->
@@ -1626,6 +1631,7 @@
     <target name="junit.test" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="junit.test" />
         <ant dir="router/java/" target="junit.test" />
+        <ant dir="apps/ministreaming/java/" target="junit.test" />
         <ant dir="apps/streaming/java/" target="junit.test" />
     </target>
     <target name="scalatest.test" depends="buildProperties, jbigi" >
@@ -1637,6 +1643,7 @@
         <!-- both junit and scala -->
         <ant dir="core/java/" target="test" />
         <ant dir="router/java/" target="test" />
+        <ant dir="apps/ministreaming/java/" target="test" />
         <ant dir="apps/streaming/java/" target="test" />
     </target>
     <target name="scalatest.report" depends="buildProperties" >
@@ -1646,22 +1653,26 @@
     <target name="junit.report" depends="buildProperties" >
         <ant dir="core/java/" target="junit.report" />
         <ant dir="router/java/" target="junit.report" />
+        <ant dir="apps/ministreaming/java/" target="junit.report" />
         <ant dir="apps/streaming/java/" target="junit.report" />
     </target>
     <target name="clover.report" depends="buildProperties" if="with.clover">
         <ant dir="core/java/" target="clover.report" />
         <ant dir="router/java/" target="clover.report" />
+        <ant dir="apps/ministreaming/java" target="clover.report" />
         <ant dir="apps/streaming/java" target="clover.report" />
     </target>
     <target name="cobertura.report" depends="buildProperties" if="with.cobertura">
         <ant dir="core/java/" target="cobertura.report" />
         <ant dir="router/java/" target="cobertura.report" />
+        <ant dir="apps/ministreaming/java" target="cobertura.report" />
         <ant dir="apps/streaming/java" target="cobertura.report" />
     </target>
     <target name="test.report" depends="junit.report, scalatest.report, clover.report, cobertura.report"/>
     <target name="fulltest" depends="buildProperties, jbigi" >
         <ant dir="core/java/" target="fulltest" />
         <ant dir="router/java/" target="fulltest" />
+        <ant dir="apps/ministreaming/java" target="fulltest" />
         <ant dir="apps/streaming/java" target="fulltest" />
     </target>
     <target name="jenkins.cobertura.report" depends="cobertura.report">
@@ -1677,6 +1688,11 @@
             match='filename="net' replace='filename="router/java/src/net'/>
         <replaceregexp byline="true" file="reports/router/cobertura/coverage.xml"
             match="&lt;source&gt;./src" replace="&lt;source&gt;router/java/src"/>
+
+        <replaceregexp byline="true" file="reports/ministreaming/cobertura/coverage.xml"
+            match='filename="net' replace='filename="apps/ministreaming/java/src/net'/>
+        <replaceregexp byline="true" file="reports/ministreaming/cobertura/coverage.xml"
+            match="&lt;source&gt;./src" replace="&lt;source&gt;apps/ministreaming/java/src"/>
 
         <replaceregexp byline="true" file="reports/streaming/cobertura/coverage.xml"
             match='filename="net' replace='filename="apps/streaming/java/src/net'/>
@@ -1782,24 +1798,18 @@
          since preppkg puts too much stuff in pkg-temp -->
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
--->
     <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyAndGeoIPRepack, updater200WithJettyAndGeoIP, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
-<!--
-    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
 -->
+    <target name="release" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, delete-j6-update, installer-nowindows, delete-nonwindows, installer-windows">
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
         <copy file="i2pinstall_${full.version}_windows.exe" tofile="i2pinstall_${release.number}_windows.exe" />
+        <!-- remove these, we don't build them anymore -->
         <delete file="i2pupdate.sud" />
         <delete file="i2pupdate.su2" />
-        <!-- make this a lot easier by putting release.privkey=/path/to/privkey in override.properties -->
+        <!-- make this a lot easier by putting release.privkey.su3=/path/to/su3keystore.ks in override.properties -->
 
-        <!-- now build and verify the packed sud from the packed zip -->
-        <sudsign infile="i2pupdate.zip" outfile="i2pupdate.sud" />
-
-        <!-- now build and verify the packed su2 from the packed zip -->
-        <sudsign infile="i2pupdate200.zip" outfile="i2pupdate.su2" />
         <!-- now build and verify the packed su3 from the packed zip -->
         <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${release.number}" />
         <!-- this will use the monotonerc file in the current workspace -->
@@ -1837,9 +1847,7 @@
 
         <chmod perm="444" type="file">
             <fileset dir="${basedir}">
-                <include name="i2pupdate.su2" />
                 <include name="i2pupdate.su3" />
-                <include name="i2pupdate.sud" />
             </fileset>
         </chmod>
         <echo message="File sizes:" />
@@ -1849,9 +1857,7 @@
             <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
-            <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.su3" />
-            <arg value="i2pupdate.sud" />
             <arg value="i2pinstall_${release.number}_windows.exe.sig" />
             <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
@@ -1862,14 +1868,8 @@
         <sha256sum file="i2pinstall_${release.number}.jar" />
         <sha256sum file="i2psource_${release.number}.tar.bz2" />
         <sha256sum file="i2pupdate_${release.number}.zip" />
-        <sha256sum file="i2pupdate.su2" />
         <sha256sum file="i2pupdate.su3" />
-        <sha256sum file="i2pupdate.sud" />
         <!-- make torrent files -->
-        <copy file="i2pupdate.sud" tofile="i2pupdate-${release.number}.sud" />
-        <mktorrent file="i2pupdate-${release.number}.sud" />
-        <copy file="i2pupdate.su2" tofile="i2pupdate-${release.number}.su2" />
-        <mktorrent file="i2pupdate-${release.number}.su2" />
         <copy file="i2pupdate.su3" tofile="i2pupdate-${release.number}.su3" />
         <mktorrent file="i2pupdate-${release.number}.su3" />
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />

@@ -455,7 +455,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (allowGZIP && useGZIP) {
                 t = new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log);
             } else {
-                t = new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(),
+                t = new I2PTunnelRunner(s, socket, slock, null, DataHelper.getUTF8(modifiedHeader),
                                                null, (I2PTunnelRunner.FailCallback) null);
             }
             // run in the unlimited client pool
@@ -537,7 +537,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 
                 if (_log.shouldLog(Log.INFO))
                     _log.info("request headers: " + _headers);
-                serverout.write(_headers.getBytes());
+                serverout.write(DataHelper.getUTF8(_headers));
                 browserin = _browser.getInputStream();
                 // Don't spin off a thread for this except for POSTs
                 // beware interference with Shoutcast, etc.?
@@ -575,7 +575,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 Map<String, List<String>> headers = readHeaders(null, serverin, command,
                     SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
-                compressedOut.write(modifiedHeaders.getBytes());
+                compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
 
                 Sender s = new Sender(compressedOut, serverin, "server: server to browser", _log);
                 if (_log.shouldLog(Log.INFO))
@@ -702,7 +702,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Including x-i2p-gzip as the content encoding in the response");
             if (shouldCompress())
-                out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
+                out.write(DataHelper.getASCII("Content-encoding: x-i2p-gzip\r\n"));
             super.finishHeaders();
         }
 

@@ -5,6 +5,7 @@ Prerequisites to build from source:
 	Apache Ant 1.7.0 or higher
 	The xgettext, msgfmt, and msgmerge tools installed
 	  from the GNU gettext package http://www.gnu.org/software/gettext/
+	Build environment must use a UTF-8 locale.
 
 To build:
 	On x86 systems do:

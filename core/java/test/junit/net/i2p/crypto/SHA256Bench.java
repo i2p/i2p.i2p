@@ -29,11 +29,12 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 
 public class SHA256Bench {
 	public static void main(String args[]) {
-		Hash asdfs = SHA256Generator.getInstance().calculateHash("qwerty".getBytes());
+		Hash asdfs = SHA256Generator.getInstance().calculateHash(DataHelper.getASCII("qwerty"));
 			
 		int times = 100;
 		long shorttime = 0;
@@ -56,17 +57,17 @@ public class SHA256Bench {
 		long minLong1 = 0;
 		long maxLong1 = 0;
         
-		byte[] smess = new String("abc").getBytes();
+		byte[] smess = DataHelper.getASCII(new String("abc"));
 		StringBuilder buf = new StringBuilder();
 		for (int x = 0; x < 10*1024; x++) {
 			buf.append("a");
 		}
-		byte[] mmess = buf.toString().getBytes(); // new String("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq").getBytes();
+		byte[] mmess = DataHelper.getASCII(buf.toString()); // new String("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq").getBytes();
 		buf = new StringBuilder();
 		for (int x = 0; x < 1000000; x++) {
 			buf.append("a");
 		}
-		byte[] lmess = buf.toString().getBytes();
+		byte[] lmess = DataHelper.getASCII(buf.toString());
         
 		// warm up the engines
 		SHA256Generator.getInstance().calculateHash(smess);

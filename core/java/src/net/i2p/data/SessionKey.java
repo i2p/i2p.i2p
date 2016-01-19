@@ -11,7 +11,9 @@ package net.i2p.data;
 
 /**
  * Defines the SessionKey as defined by the I2P data structure spec.
- * A session key is 32byte Integer. 
+ * A session key is a 32 byte Integer. 
+ *
+ * To create one with random data, use I2PAppContext.keyGenerator().generateSessionKey().
  *
  * @author jrandom
  */
@@ -19,6 +21,7 @@ public class SessionKey extends SimpleDataStructure {
     private Object _preparedKey;
 
     public final static int KEYSIZE_BYTES = 32;
+    /** A key with all zeroes in the data */
     public static final SessionKey INVALID_KEY = new SessionKey(new byte[KEYSIZE_BYTES]);
 
     public SessionKey() {

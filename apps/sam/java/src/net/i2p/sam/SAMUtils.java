@@ -11,9 +11,9 @@ package net.i2p.sam;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -82,6 +82,7 @@ class SAMUtils {
      *
      * @return True if the destination is valid, false otherwise
      */
+/****
     public static boolean checkDestination(String dest) {
         try {
             Destination d = new Destination();
@@ -92,6 +93,7 @@ class SAMUtils {
             return false;
         }
     }
+****/
 
     /**
      * Check whether a base64-encoded {dest,privkey,signingprivkey} is valid
@@ -105,8 +107,7 @@ class SAMUtils {
             return false;
     	ByteArrayInputStream destKeyStream = new ByteArrayInputStream(b);
     	try {
-    		Destination d = new Destination();
-    		d.readBytes(destKeyStream);
+    		Destination d = Destination.create(destKeyStream);
     		new PrivateKey().readBytes(destKeyStream);
     		SigningPrivateKey spk = new SigningPrivateKey(d.getSigningPublicKey().getType());
     		spk.readBytes(destKeyStream);
@@ -159,95 +160,186 @@ class SAMUtils {
     	return d;
     }
 
+    public static final String COMMAND = "\"\"COMMAND\"\"";
+    public static final String OPCODE = "\"\"OPCODE\"\"";
+
     /**
-     * Parse SAM parameters, and put them into a Propetries object
+     *  Parse SAM parameters, and put them into a Propetries object
      *
-     * @param tok A StringTokenizer pointing to the SAM parameters
+     *  Modified from EepGet.
+     *  COMMAND and OPCODE are mapped to upper case; keys, values, and ping data are not.
+     *  Double quotes around values are stripped.
      *
-     * @throws SAMException if the data was formatted incorrectly
-     * @return Properties with the parsed SAM params, never null
+     *  Possible input:
+     *<pre>
+     *  COMMAND
+     *  COMMAND OPCODE
+     *  COMMAND OPCODE [key=val]...
+     *  COMMAND OPCODE [key=" val with spaces "]...
+     *  PING
+     *  PONG
+     *  PING any   thing goes
+     *  PONG any   thing   goes
+     *
+     *  Escaping is allowed with a backslash, e.g. \"
+     *  No spaces before or after '=' allowed
+     *  Keys may not be quoted
+     *  COMMAND, OPCODE, and keys may not have '=' or whitespace unless escaped
+     *  Duplicate keys not allowed
+     *</pre>
+     *
+     *  A key without a value is not allowed by the spec, but is
+     *  returned with the value "true".
+     *
+     *  COMMAND is returned as the value of the key ""COMMAND"".
+     *  OPCODE, or the remainder of the PING/PONG line if any, is returned as the value of the key ""OPCODE"".
+     *
+     *  @param args non-null
+     *  @throws SAMException on some errors but not all
+     *  @return non-null, may be empty. Does not throw on missing COMMAND or OPCODE; caller must check.
      */
-    public static Properties parseParams(StringTokenizer tok) throws SAMException {
-        int ntoks = tok.countTokens();
-        Properties props = new Properties();
-        
-        StringBuilder value = new StringBuilder();
-        for (int i = 0; i < ntoks; ++i) {
-            String token = tok.nextToken();
+    public static Properties parseParams(String args) throws SAMException {
+        final Properties rv = new Properties();
+        final StringBuilder buf = new StringBuilder(32);
+        final int length = args.length();
+        boolean isQuoted = false;
+        String key = null;
+        // We go one past the end to force a fake trailing space
+        // to make things easier, so we don't need cleanup at the end
+        for (int i = 0; i <= length; i++) {
+            char c = (i < length) ? args.charAt(i) : ' ';
+            switch (c) {
+                case '"':
+                    if (isQuoted) {
+                        // keys never quoted
+                        if (key != null) {
+                            if (rv.setProperty(key, buf.length() > 0 ? buf.toString() : "true") != null)
+                                throw new SAMException("Duplicate parameter " + key);
+                            key = null;
+                        }
+                        buf.setLength(0);
+                    }
+                    isQuoted = !isQuoted;
+                    break;
 
-            int pos = token.indexOf("=");
-            if (pos <= 0) {
-                //_log.debug("Error in params format");
-                if (pos == 0) {
-                    throw new SAMException("No param specified [" + token + "]");
-                } else {
-                    throw new SAMException("Bad formatting for param [" + token + "]");
-                }
-            }
-            
-            String param = token.substring(0, pos);
-            value.append(token.substring(pos+1));
-            if (value.length() == 0)
-                throw new SAMException("Empty value for param " + param);
-            
-            // FIXME: The following code does not take into account that there
-            // may have been multiple subsequent space chars in the input that
-            // StringTokenizer treates as one.
-            if (value.charAt(0) == '"') {
-                while ( (i < ntoks) && (value.lastIndexOf("\"") <= 0) ) {
-                    value.append(' ').append(tok.nextToken());
-                    i++;
-                }
-            }
+                case '\r':
+                case '\n':
+                    break;
 
-            props.setProperty(param, value.toString());
-            value.setLength(0);
+                case ' ':
+                case '\b':
+                case '\f':
+                case '\t':
+                    // whitespace - if we're in a quoted section, keep this as part of the quote,
+                    // otherwise use it as a delim
+                    if (isQuoted) {
+                        buf.append(c);
+                    } else {
+                        if (key != null) {
+                            if (rv.setProperty(key, buf.length() > 0 ? buf.toString() : "true") != null)
+                                throw new SAMException("Duplicate parameter " + key);
+                            key = null;
+                        } else if (buf.length() > 0) {
+                            // key without value
+                            String k = buf.toString();
+                            if (rv.isEmpty()) {
+                                k =  k.toUpperCase(Locale.US);
+                                rv.setProperty(COMMAND, k);
+                                if (k.equals("PING") || k.equals("PONG")) {
+                                    // eat the rest of the line
+                                    if (i + 1 < args.length()) {
+                                        String pingData = args.substring(i + 1);
+                                        rv.setProperty(OPCODE, pingData);
+                                    }
+                                    // this will force an end of the loop
+                                    i = length + 1;
+                                }
+                            } else if (rv.size() == 1) {
+                                rv.setProperty(OPCODE, k.toUpperCase(Locale.US));
+                            } else {
+                                if (rv.setProperty(k, "true") != null)
+                                    throw new SAMException("Duplicate parameter " + k);
+                            }
+                        }
+                        buf.setLength(0);
+                    }
+                    break;
+
+                case '=':
+                    if (isQuoted) {
+                        buf.append(c);
+                    } else if (key != null) {
+                        // '=' in a value
+                        buf.append(c);
+                    } else {
+                        if (buf.length() == 0)
+                            throw new SAMException("Empty parameter name");
+                        key = buf.toString();
+                        buf.setLength(0);
+                    }
+                    break;
+
+                case '\\':
+                    if (++i >= length)
+                        throw new SAMException("Unterminated escape");
+                    c = args.charAt(i);
+                    // fall through...
+
+                default:
+                    buf.append(c);
+                    break;
+            }
         }
-
-        //if (_log.shouldLog(Log.DEBUG)) {
-        //    _log.debug("Parsed properties: " + dumpProperties(props));
-        //}
-
-        return props;
+        // nothing needed here, as we forced a trailing space in the loop
+        // unterminated quoted content will be lost
+        if (isQuoted)
+            throw new SAMException("Unterminated quote");
+        return rv;
     }
 
-    /* Dump a Properties object in an human-readable form */
-/****
-    private static String dumpProperties(Properties props) {
-        StringBuilder builder = new StringBuilder();
-        String key, val;
-        boolean firstIter = true;
-        
-        for (Map.Entry<Object, Object> entry : props.entrySet()) {
-            key = (String) entry.getKey();
-            val = (String) entry.getValue();
-            
-            if (!firstIter) {
-                builder.append(";");
-            } else {
-                firstIter = false;
-            }
-            builder.append(" \"" + key + "\" -> \"" + val + "\"");
-        }
-        
-        return builder.toString();
-    }
-****/
-    
 /****
     public static void main(String args[]) {
         try {
             test("a=b c=d e=\"f g h\"");
             test("a=\"b c d\" e=\"f g h\" i=\"j\"");
             test("a=\"b c d\" e=f i=\"j\"");
+            if (args.length == 0) {
+                System.out.println("Usage: CommandParser file || CommandParser text to parse");
+                return;
+            }
+            if (args.length > 1 || !(new java.io.File(args[0])).exists()) {
+                StringBuilder buf = new StringBuilder(128);
+                for (int i = 0; i < args.length; i++) {
+                    if (i != 0)
+                        buf.append(' ');
+                    buf.append(args[i]);
+                }
+                test(buf.toString());
+            } else {
+                java.io.InputStream in = new java.io.FileInputStream(args[0]);
+                String line;
+                while ((line = net.i2p.data.DataHelper.readLine(in)) != null) {
+                    try {
+                        test(line);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     private static void test(String props) throws Exception {
-        StringTokenizer tok = new StringTokenizer(props);
-        Properties p = parseParams(tok);
-        System.out.println(p);
+        System.out.println("Testing: " + props);
+        Properties m = parseParams(props);
+        System.out.println("Found " + m.size() + " keys");
+        for (Map.Entry e : m.entrySet()) {
+            System.out.println(e.getKey() + "=[" + e.getValue() + ']');
+        }
+        System.out.println("-------------");
     }
 ****/
 }
+

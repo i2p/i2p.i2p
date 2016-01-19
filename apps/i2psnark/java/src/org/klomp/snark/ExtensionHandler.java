@@ -42,7 +42,7 @@ abstract class ExtensionHandler {
    *  @param dht advertise DHT capability
    *  @return bencoded outgoing handshake message
    */
-    public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht) {
+    public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht, boolean uploadOnly) {
         Map<String, Object> handshake = new HashMap<String, Object>();
         Map<String, Integer> m = new HashMap<String, Integer>();
         if (pexAndMetadata) {
@@ -59,6 +59,9 @@ abstract class ExtensionHandler {
         handshake.put("p", Integer.valueOf(TrackerClient.PORT));
         handshake.put("v", "I2PSnark");
         handshake.put("reqq", Integer.valueOf(5));
+        // BEP 21
+        if (uploadOnly)
+            handshake.put("upload_only", Integer.valueOf(1));
         return BEncoder.bencode(handshake);
     }
 

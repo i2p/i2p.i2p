@@ -43,6 +43,7 @@ import net.i2p.util.PortMapper;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
@@ -589,7 +590,7 @@ class NewsFetcher extends UpdateRunner {
                 return;
             DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
             // the router sets the JVM time zone to UTC but saves the original here so we can get it
-            fmt.setTimeZone(DataHelper.getSystemTimeZone(_context));
+            fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
             for (NewsEntry e : entries) {
                 if (e.title == null || e.content == null)
                     continue;

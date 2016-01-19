@@ -331,6 +331,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             String fixedHost = _context.getProperty(PROP_EXTERNAL_HOST);
             if (fixedHost != null && fixedHost.length() > 0) {
                 try {
+                    // TODO getAllByName(), bind to each
                     String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
                     if (Addresses.getAddresses().contains(testAddr))
                         bindTo = testAddr;
@@ -733,8 +734,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
         if (ip == null)
             return;
+        // this is essentially isValid(ip), but we can't use that because
+        // _haveIPv6Address is not set yet
+        if (!(isPubliclyRoutable(ip) || allowLocal())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
+            return;
+        }
         if (source == SOURCE_INTERFACE && ip.length == 16) {
-            // must be set before isValid() call
+            // NOW we can set it, it's a valid v6 address
+            // (we don't want to set this for Teredo, 6to4, ...)
             _haveIPv6Address = true;
         }
         if (explicitAddressSpecified())
@@ -742,11 +751,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
         if (!sources.contains(source.toConfigString()))
             return;
-        if (!isValid(ip)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
-            return;
-        }
         if (!isAlive()) {
             if (source == SOURCE_INTERFACE || source == SOURCE_UPNP) {
                 try {
@@ -1824,14 +1828,74 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
-     *  "injected" message from the EstablishmentManager
+     *  "injected" message from the EstablishmentManager.
+     *  If you have multiple messages, use the list variant,
+     *  so the messages may be bundled efficiently.
+     *
+     *  @param peer all messages MUST be going to this peer
      */
     void send(I2NPMessage msg, PeerState peer) {
         try {
             OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Injecting a data message to a new peer: " + peer);
-            _fragments.add(state);
+            _fragments.add(state, peer);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
+    }
+
+    /**
+     *  "injected" message from the EstablishmentManager,
+     *  plus pending messages to send,
+     *  so the messages may be bundled efficiently.
+     *  Called at end of outbound establishment.
+     *
+     *  @param msg may be null if nothing to inject
+     *  @param msgs non-null, may be empty
+     *  @param peer all messages MUST be going to this peer
+     *  @since 0.9.24
+     */
+    void send(I2NPMessage msg, List<OutNetMessage> msgs, PeerState peer) {
+        try {
+            int sz = msgs.size();
+            List<OutboundMessageState> states = new ArrayList<OutboundMessageState>(sz + 1);
+            if (msg != null) {
+                OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
+                states.add(state);
+            }
+            for (int i = 0; i < sz; i++) {
+                OutboundMessageState state = new OutboundMessageState(_context, msgs.get(i), peer);
+                states.add(state);
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting " + states.size() + " data messages to a new peer: " + peer);
+            _fragments.add(states, peer);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
+    }
+
+    /**
+     *  "injected" messages from the EstablishmentManager.
+     *  Called at end of inbound establishment.
+     *
+     *  @param peer all messages MUST be going to this peer
+     *  @since 0.9.24
+     */
+    void send(List<I2NPMessage> msgs, PeerState peer) {
+        try {
+            int sz = msgs.size();
+            List<OutboundMessageState> states = new ArrayList<OutboundMessageState>(sz);
+            for (int i = 0; i < sz; i++) {
+                OutboundMessageState state = new OutboundMessageState(_context, msgs.get(i), peer);
+                states.add(state);
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting " + sz + " data messages to a new peer: " + peer);
+            _fragments.add(states, peer);
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Shouldnt happen", new Exception("I did it"));
@@ -2428,6 +2492,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return peer != null && peer.isBacklogged();
     }
 
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(final Hash peer) {
+        final PeerState ps =  _peersByIdent.get(peer);
+        if (ps != null && ps.isInbound() &&
+            ps.getWeRelayToThemAs() <= 0 &&
+            ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 2) {
+            ps.setMayDisconnect();
+        }
+    }
+
     public boolean allowConnection() {
             return _peersByIdent.size() < getMaxConnections();
     }
@@ -2674,8 +2754,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //buf.append(peer.getMTUDecreases());
             buf.append("</td>");
         
-            long sent = peer.getPacketsTransmitted();
-            long recv = peer.getPacketsReceived();
+            long sent = peer.getMessagesSent();
+            long recv = peer.getMessagesReceived();
             
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(sent);
@@ -2816,6 +2896,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final long LONG_LOOP_TIME = 25*1000;
         private static final long EXPIRE_INCREMENT = 15*1000;
         private static final long EXPIRE_DECREMENT = 45*1000;
+        private static final long MAY_DISCON_TIMEOUT = 10*1000;
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
@@ -2825,7 +2906,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity(33)) {
+            boolean haveCap = haveCapacity(33);
+            if (haveCap) {
                 long inc;
                 // don't adjust too quickly if we are looping fast
                 if (_lastLoopShort)
@@ -2844,6 +2926,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long now = _context.clock().now();
             long shortInactivityCutoff = now - _expireTimeout;
             long longInactivityCutoff = now - EXPIRE_TIMEOUT;
+            final long mayDisconCutoff = now - MAY_DISCON_TIMEOUT;
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
             boolean shouldPingFirewall = _reachabilityStatus != Status.OK;
@@ -2858,10 +2941,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     PeerState peer = iter.next();
                     long inactivityCutoff;
                     // if we offered to introduce them, or we used them as introducer in last 2 hours
-                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff)
+                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff) {
                         inactivityCutoff = longInactivityCutoff;
-                    else
+                    } else if (!haveCap && peer.getMayDisconnect() &&
+                               peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 2) {
+                        inactivityCutoff = mayDisconCutoff;
+                    } else {
                         inactivityCutoff = shortInactivityCutoff;
+                    }
                     if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
                         _expireBuffer.add(peer);
                         iter.remove();

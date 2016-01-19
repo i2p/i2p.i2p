@@ -15,14 +15,16 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -48,6 +50,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
     protected final long _id;
     private static final AtomicLong __id = new AtomicLong();
+    private static final int FIRST_READ_TIMEOUT = 60*1000;
     
     /**
      * Create a new SAM version 1 handler.  This constructor expects
@@ -97,14 +100,15 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         String domain = null;
         String opcode = null;
         boolean canContinue = false;
-        StringTokenizer tok;
         Properties props;
+        final StringBuilder buf = new StringBuilder(128);
 
         this.thread.setName("SAMv1Handler " + _id);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SAM handling started");
 
         try {
+            boolean gotFirstLine = false;
             while (true) {
                 if (shouldStop()) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -121,43 +125,39 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 	_log.info("Connection closed by client");
                 	break;
                 }
-                java.io.InputStream is = clientSocketChannel.socket().getInputStream();
-                if (is == null) {
-                	_log.info("Connection closed by client");
-                	break;
-                }
-                msg = DataHelper.readLine(is);
-                if (msg == null) {
-                    _log.info("Connection closed by client (line read : null)");
+                buf.setLength(0);
+                // first time, set a timeout
+                try {
+                    Socket sock = clientSocketChannel.socket();
+                    ReadLine.readLine(sock, buf, gotFirstLine ? 0 : FIRST_READ_TIMEOUT);
+                    sock.setSoTimeout(0);
+                } catch (SocketTimeoutException ste) {
+                    writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
                     break;
                 }
-                msg = msg.trim();
+                msg = buf.toString();
 
                 if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug("New message received: [" + msg + "]");
+                    _log.debug("New message received: [" + msg + ']');
                 }
-
-                if(msg.equals("")) {
+                props = SAMUtils.parseParams(msg);
+                domain = (String) props.remove(SAMUtils.COMMAND);
+                if (domain == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Ignoring newline");
                     continue;
                 }
-
-                tok = new StringTokenizer(msg, " ");
-                if (tok.countTokens() < 2) {
-                    // This is not a correct message, for sure
+                opcode = (String) props.remove(SAMUtils.OPCODE);
+                if (opcode == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Error in message format");
                     break;
                 }
-                domain = tok.nextToken();
-                opcode = tok.nextToken();
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("Parsing (domain: \"" + domain
                                + "\"; opcode: \"" + opcode + "\")");
                 }
-                props = SAMUtils.parseParams(tok);
-
+                gotFirstLine = true;
                 if (domain.equals("STREAM")) {
                     canContinue = execStreamMessage(opcode, props);
                 } else if (domain.equals("DATAGRAM")) {
@@ -186,7 +186,9 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         } catch (IOException e) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Caught IOException for message [" + msg + "]", e);
-        } catch (Exception e) {
+        } catch (SAMException e) {
+            _log.error("Unexpected exception for message [" + msg + "]", e);
+        } catch (RuntimeException e) {
             _log.error("Unexpected exception for message [" + msg + "]", e);
         } finally {
             if (_log.shouldLog(Log.DEBUG))
@@ -367,16 +369,11 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     /* Parse and execute a NAMING message */
   protected boolean execNamingMessage(String opcode, Properties props) {
         if (opcode.equals("LOOKUP")) {
-            if (props.isEmpty()) {
-                _log.debug("No parameters specified in NAMING LOOKUP message");
-                return false;
-            }
-            
             String name = props.getProperty("NAME");
             if (name == null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Name to resolve not specified in NAMING message");
-                return false;
+                return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=\"\" MESSAGE=\"Must specify NAME\"\n");
             }
 
             Destination dest = null ;
@@ -438,25 +435,44 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             }
 
             int size;
-            {
-                String strsize = props.getProperty("SIZE");
-                if (strsize == null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Size not specified in DATAGRAM SEND message");
-                    return false;
-                }
+            String strsize = props.getProperty("SIZE");
+            if (strsize == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Size not specified in DATAGRAM SEND message");
+                return false;
+            }
+            try {
+                size = Integer.parseInt(strsize);
+            } catch (NumberFormatException e) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid DATAGRAM SEND size specified: " + strsize);
+                return false;
+            }
+            if (!checkDatagramSize(size)) {
+                if (_log.shouldLog(Log.WARN))
+                     _log.warn("Specified size (" + size
+                           + ") is out of protocol limits");
+                return false;
+            }
+            int proto = I2PSession.PROTO_DATAGRAM;
+            int fromPort = I2PSession.PORT_UNSPECIFIED;
+            int toPort = I2PSession.PORT_UNSPECIFIED;
+            String s = props.getProperty("FROM_PORT");
+            if (s != null) {
                 try {
-                    size = Integer.parseInt(strsize);
+                    fromPort = Integer.parseInt(s);
                 } catch (NumberFormatException e) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Invalid DATAGRAM SEND size specified: " + strsize);
-                    return false;
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid DATAGRAM SEND port specified: " + s);
                 }
-                if (!checkDatagramSize(size)) {
-                    if (_log.shouldLog(Log.DEBUG))
-                         _log.debug("Specified size (" + size
-                               + ") is out of protocol limits");
-                    return false;
+            }
+            s = props.getProperty("TO_PORT");
+            if (s != null) {
+                try {
+                    toPort = Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND port specified: " + s);
                 }
             }
 
@@ -466,7 +482,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 in.readFully(data);
 
-                if (!getDatagramSession().sendBytes(dest, data)) {
+                if (!getDatagramSession().sendBytes(dest, data, proto, fromPort, toPort)) {
                     _log.error("DATAGRAM SEND failed");
                     // a message send failure is no reason to drop the SAM session
                     // for raw and repliable datagrams, just carry on our merry way
@@ -523,25 +539,53 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             }
 
             int size;
-            {
-                String strsize = props.getProperty("SIZE");
-                if (strsize == null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Size not specified in RAW SEND message");
-                    return false;
-                }
+            String strsize = props.getProperty("SIZE");
+            if (strsize == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Size not specified in RAW SEND message");
+                return false;
+            }
+            try {
+                size = Integer.parseInt(strsize);
+            } catch (NumberFormatException e) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid RAW SEND size specified: " + strsize);
+                return false;
+            }
+            if (!checkSize(size)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Specified size (" + size
+                           + ") is out of protocol limits");
+                return false;
+            }
+            int proto = I2PSession.PROTO_DATAGRAM_RAW;
+            int fromPort = I2PSession.PORT_UNSPECIFIED;
+            int toPort = I2PSession.PORT_UNSPECIFIED;
+            String s = props.getProperty("PROTOCOL");
+            if (s != null) {
                 try {
-                    size = Integer.parseInt(strsize);
+                    proto = Integer.parseInt(s);
                 } catch (NumberFormatException e) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Invalid RAW SEND size specified: " + strsize);
-                    return false;
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND protocol specified: " + s);
                 }
-                if (!checkSize(size)) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Specified size (" + size
-                               + ") is out of protocol limits");
-                    return false;
+            }
+            s = props.getProperty("FROM_PORT");
+            if (s != null) {
+                try {
+                    fromPort = Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND port specified: " + s);
+                }
+            }
+            s = props.getProperty("TO_PORT");
+            if (s != null) {
+                try {
+                    toPort = Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Invalid RAW SEND port specified: " + s);
                 }
             }
 
@@ -551,7 +595,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 in.readFully(data);
 
-                if (!getRawSession().sendBytes(dest, data)) {
+                if (!getRawSession().sendBytes(dest, data, proto, fromPort, toPort)) {
                     _log.error("RAW SEND failed");
                     // a message send failure is no reason to drop the SAM session
                     // for raw and repliable datagrams, just carry on our merry way
@@ -796,16 +840,21 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
     
     // SAMRawReceiver implementation
-    public void receiveRawBytes(byte data[]) throws IOException {
+    public void receiveRawBytes(byte data[], int proto, int fromPort, int toPort) throws IOException {
         if (getRawSession() == null) {
             _log.error("BUG! Received raw bytes, but session is null!");
             return;
         }
 
-        ByteArrayOutputStream msg = new ByteArrayOutputStream();
+        ByteArrayOutputStream msg = new ByteArrayOutputStream(64 + data.length);
 
-        String msgText = "RAW RECEIVED SIZE=" + data.length + "\n";
+        String msgText = "RAW RECEIVED SIZE=" + data.length;
         msg.write(DataHelper.getASCII(msgText));
+        if ((verMajor == 3 && verMinor >= 2) || verMajor > 3) {
+            msgText = " PROTOCOL=" + proto + " FROM_PORT=" + fromPort + " TO_PORT=" + toPort;
+            msg.write(DataHelper.getASCII(msgText));
+        }
+        msg.write((byte) '\n');
         msg.write(data);
         
         if (_log.shouldLog(Log.DEBUG))
@@ -832,17 +881,23 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     }
 
     // SAMDatagramReceiver implementation
-    public void receiveDatagramBytes(Destination sender, byte data[]) throws IOException {
+    public void receiveDatagramBytes(Destination sender, byte data[], int proto,
+                                     int fromPort, int toPort) throws IOException {
         if (getDatagramSession() == null) {
             _log.error("BUG! Received datagram bytes, but session is null!");
             return;
         }
 
-        ByteArrayOutputStream msg = new ByteArrayOutputStream();
+        ByteArrayOutputStream msg = new ByteArrayOutputStream(100 + data.length);
 
         String msgText = "DATAGRAM RECEIVED DESTINATION=" + sender.toBase64()
-                         + " SIZE=" + data.length + "\n";
+                         + " SIZE=" + data.length;
         msg.write(DataHelper.getASCII(msgText));
+        if ((verMajor == 3 && verMinor >= 2) || verMajor > 3) {
+            msgText = " FROM_PORT=" + fromPort + " TO_PORT=" + toPort;
+            msg.write(DataHelper.getASCII(msgText));
+        }
+        msg.write((byte) '\n');
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending to client: " + msgText);

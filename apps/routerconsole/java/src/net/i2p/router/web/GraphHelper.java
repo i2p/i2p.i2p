@@ -358,8 +358,8 @@ public class GraphHelper extends FormHandler {
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
             _out.write(_t("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
-            _out.write(_t("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"checked\" ") + "> ");
-            _out.write(_t("or")+ " " +_t("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"checked\" " : "") + "><br>\n");
+            _out.write(_t("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + "> ");
+            _out.write(_t("or")+ " " +_t("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + "><br>\n");
             _out.write(_t("Image sizes") + ": " + _t("width") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
                        + "\"> " + _t("pixels") + ", " + _t("height") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\"> " + _t("pixels") + "<br>\n");
@@ -382,7 +382,7 @@ public class GraphHelper extends FormHandler {
                        " <input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             if (persistent)
-                _out.write(" checked=\"checked\"");
+                _out.write(HelperBase.CHECKED);
             _out.write(">" +
                        "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
