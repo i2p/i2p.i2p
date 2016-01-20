@@ -32,6 +32,7 @@ import net.i2p.util.Log;
 public class StatisticsManager {
     private final Log _log;
     private final RouterContext _context;
+    private final String _networkID;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
     private static final String PROP_CONTACT_NAME = "netdb.contact";
@@ -46,6 +47,7 @@ public class StatisticsManager {
         _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
         _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
         _log = context.logManager().getLog(StatisticsManager.class);
+        _networkID = Integer.toString(context.router().getNetworkID());
     }
         
     /**
@@ -72,7 +74,7 @@ public class StatisticsManager {
         // scheduled for removal, never used
         if (CoreVersion.VERSION.equals("0.9.23"))
             stats.setProperty("coreVersion", CoreVersion.VERSION);
-        stats.setProperty(RouterInfo.PROP_NETWORK_ID, Integer.toString(Router.NETWORK_ID));
+        stats.setProperty(RouterInfo.PROP_NETWORK_ID, _networkID);
         stats.setProperty(RouterInfo.PROP_CAPABILITIES, _context.router().getCapabilities());
 
         // No longer expose, to make build tracking more expensive

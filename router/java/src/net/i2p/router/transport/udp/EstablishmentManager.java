@@ -42,6 +42,7 @@ class EstablishmentManager {
     private final Log _log;
     private final UDPTransport _transport;
     private final PacketBuilder _builder;
+    private final int _networkID;
 
     /** map of RemoteHostId to InboundEstablishState */
     private final ConcurrentHashMap<RemoteHostId, InboundEstablishState> _inboundStates;
@@ -143,6 +144,7 @@ class EstablishmentManager {
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(EstablishmentManager.class);
+        _networkID = ctx.router().getNetworkID();
         _transport = transport;
         _builder = new PacketBuilder(ctx, transport);
         _inboundStates = new ConcurrentHashMap<RemoteHostId, InboundEstablishState>();
@@ -252,7 +254,7 @@ class EstablishmentManager {
         }
         RouterIdentity toIdentity = toRouterInfo.getIdentity();
         Hash toHash = toIdentity.calculateHash();
-        if (toRouterInfo.getNetworkId() != Router.NETWORK_ID) {
+        if (toRouterInfo.getNetworkId() != _networkID) {
             _context.banlist().banlistRouter(toHash);
             _transport.markUnreachable(toHash);
             _transport.failed(msg, "Remote peer is on the wrong network, cannot establish");
@@ -765,7 +767,7 @@ class EstablishmentManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Completing to the peer after IB confirm: " + peer);
         DeliveryStatusMessage dsm = new DeliveryStatusMessage(_context);
-        dsm.setArrival(Router.NETWORK_ID); // overloaded, sure, but future versions can check this
+        dsm.setArrival(_networkID); // overloaded, sure, but future versions can check this
                                            // This causes huge values in the inNetPool.droppedDeliveryStatusDelay stat
                                            // so it needs to be caught in InNetMessagePool.
         dsm.setMessageExpiration(_context.clock().now() + DATA_MESSAGE_TIMEOUT);

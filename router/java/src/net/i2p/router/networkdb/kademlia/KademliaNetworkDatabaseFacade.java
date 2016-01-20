@@ -70,6 +70,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final ReseedChecker _reseedChecker;
     private volatile long _lastRIPublishTime;
     private NegativeLookupCache _negativeCache;
+    protected final int _networkID;
 
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
@@ -156,6 +157,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(getClass());
+        _networkID = context.router().getNetworkID();
         _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap<Hash, RepublishLeaseSetJob>(8);
         _activeRequests = new HashMap<Hash, SearchJob>(8);
@@ -889,7 +891,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature";
         }
-        if (routerInfo.getNetworkId() != Router.NETWORK_ID){
+        if (routerInfo.getNetworkId() != _networkID){
             _context.banlist().banlistRouter(key, "Not in our network");
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad network: " + routerInfo);
