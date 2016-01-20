@@ -1,3 +1,6 @@
+2016-01-20 zzz
+ * SusiDNS: Replace image (ticket #1301)
+
 2016-01-17 zzz
  * BuildHandler: Disable tunnel removal on next-hop timeout
  * Console:
@@ -39,7 +42,7 @@
 2015-12-20 zzz
  * BuildHandler: Additional fixes (ticket #1738)
  * CertUtil: Add methods to export private keys
- * Console: Sybil tool enhancementsrivate keys
+ * Console: Sybil tool enhancements
  * Transports:
    - Disconnect faster when first message is a
      tunnel build request which we reject
