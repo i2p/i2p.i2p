@@ -14,6 +14,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 
 import net.i2p.I2PAppContext;
@@ -560,6 +561,103 @@ public class KeyStoreUtil {
     }
 
     /** 
+     *  Export the private key and certificate chain (if any) out of a keystore.
+     *  Does NOT close the stream. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @since 0.9.25
+     */
+    public static void exportPrivateKey(File ks, String ksPW, String alias, String keyPW,
+                                        OutputStream out)
+                              throws GeneralSecurityException, IOException {
+        InputStream fis = null;
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            fis = new FileInputStream(ks);
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            keyStore.load(fis, pwchars);
+            char[] keypwchars = keyPW.toCharArray();
+            PrivateKey pk = (PrivateKey) keyStore.getKey(alias, keypwchars);
+            if (pk == null)
+                throw new GeneralSecurityException("private key not found: " + alias);
+            Certificate[] certs = keyStore.getCertificateChain(alias);
+            CertUtil.exportPrivateKey(pk, certs, out);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Import the private key and certificate chain to a keystore.
+     *  Keystore will be created if it does not exist.
+     *  Private key MUST be first in the stream.
+     *  Closes the stream. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key. If null, will be taken from the Subject CN
+     *               of the first certificate in the chain.
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return the alias as specified or extracted
+     *  @since 0.9.25
+     */
+    public static String importPrivateKey(File ks, String ksPW, String alias, String keyPW,
+                                          InputStream in)
+                              throws GeneralSecurityException, IOException {
+        OutputStream fos = null;
+        try {
+            KeyStore keyStore = createKeyStore(ks, ksPW);
+            PrivateKey pk = CertUtil.loadPrivateKey(in);
+            List<X509Certificate> certs = CertUtil.loadCerts(in);
+            if (alias == null) {
+                alias = CertUtil.getSubjectValue(certs.get(0), "CN");
+                if (alias == null)
+                    throw new GeneralSecurityException("no alias specified and no Subject CN in cert");
+                if (alias.endsWith(".family.i2p.net") && alias.length() > ".family.i2p.net".length())
+                    alias = alias.substring(0, ".family.i2p.net".length());
+            }
+            keyStore.setKeyEntry(alias, pk, keyPW.toCharArray(), certs.toArray(new Certificate[certs.size()]));
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            fos = new SecureFileOutputStream(ks);
+            keyStore.store(fos, pwchars);
+            return alias;
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            try { in.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Import the private key and certificate chain to a keystore.
+     *  Keystore will be created if it does not exist.
+     *  Private key MUST be first in the stream.
+     *  Closes the stream. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key, non-null.
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @since 0.9.25
+     */
+    public static void storePrivateKey(File ks, String ksPW, String alias, String keyPW,
+                                       PrivateKey pk, List<X509Certificate> certs)
+                              throws GeneralSecurityException, IOException {
+        OutputStream fos = null;
+        try {
+            KeyStore keyStore = createKeyStore(ks, ksPW);
+            keyStore.setKeyEntry(alias, pk, keyPW.toCharArray(), certs.toArray(new Certificate[certs.size()]));
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            fos = new SecureFileOutputStream(ks);
+            keyStore.store(fos, pwchars);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
      *  Get a cert out of a keystore
      *
      *  @param ks path to the keystore
@@ -644,8 +742,16 @@ public class KeyStoreUtil {
      */
 /****
     public static void main(String[] args) {
-        File ksf = (args.length > 0) ? new File(args[0]) : null;
         try {
+            if (args.length > 0 && "import".equals(args[0])) {
+                testImport(args);
+                return;
+            }
+            if (args.length > 0 && "export".equals(args[0])) {
+                testExport(args);
+                return;
+            }
+            File ksf = (args.length > 0) ? new File(args[0]) : null;
             if (ksf != null && !ksf.exists()) {
                 createKeyStore(ksf, DEFAULT_KEYSTORE_PASSWORD);
                 System.out.println("Created empty keystore " + ksf);
@@ -674,5 +780,22 @@ public class KeyStoreUtil {
             e.printStackTrace();
         }
     }
+
+    private static void testImport(String[] args) throws Exception {
+        File ksf = new File(args[1]);
+        InputStream in = new FileInputStream(args[2]);
+        String alias = args[2];
+        String pw = args[3];
+        importPrivateKey(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, pw, in);
+    }
+
+
+    private static void testExport(String[] args) throws Exception {
+        File ksf = new File(args[1]);
+        String alias = args[2];
+        String pw = args[3];
+        exportPrivateKey(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, pw, System.out);
+    }
+
 ****/
 }

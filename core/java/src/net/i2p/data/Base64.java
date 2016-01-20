@@ -104,6 +104,17 @@ public class Base64 {
         return safeDecode(s, false);
     }
 
+    /**
+     *  Decodes data from Base64 notation using the I2P alphabet.
+     *
+     *  @param useStandardAlphabet Warning, must be false for I2P compatibility
+     *  @return the decoded data, null on error
+     *  @since 0.9.25
+     */
+    public static byte[] decode(String s, boolean useStandardAlphabet) {
+        return safeDecode(s, useStandardAlphabet);
+    }
+
     /** Maximum line length (76) of Base64 output. */
     private final static int MAX_LINE_LENGTH = 76;
 
