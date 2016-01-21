@@ -3,6 +3,7 @@ package net.i2p.crypto.eddsa;
 import java.security.PublicKey;
 
 import net.i2p.crypto.eddsa.math.GroupElement;
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAParameterSpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
@@ -35,9 +36,61 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
         return "X.509";
     }
 
+    /**
+     *  This follows the spec at
+     *  ref: https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
+     *  which matches the docs from
+     *  java.security.spec.X509EncodedKeySpec
+     *  quote:
+     *<pre>
+     * The SubjectPublicKeyInfo syntax is defined in the X.509 standard as follows:
+     *  SubjectPublicKeyInfo ::= SEQUENCE {
+     *    algorithm AlgorithmIdentifier,
+     *    subjectPublicKey BIT STRING }
+     *</pre>
+     *
+     *<pre>
+     *  AlgorithmIdentifier ::= SEQUENCE
+     *  {
+     *    algorithm           OBJECT IDENTIFIER,
+     *    parameters          ANY OPTIONAL
+     *  }
+     *</pre>
+     *
+     *  @return 47 bytes for Ed25519, null for other curves
+     *  @since implemented in 0.9.25
+     */
     public byte[] getEncoded() {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO no equals() implemented in spec, but it's essentially a singleton
+        if (!edDsaSpec.equals(EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)))
+            return null;
+        int totlen = 15 + Abyte.length;
+        byte[] rv = new byte[totlen];
+        int idx = 0;
+        // sequence
+        rv[idx++] = 0x30;
+        rv[idx++] = (byte) (13 + Abyte.length);
+        // Algorithm Identifier
+        // sequence
+        rv[idx++] = 0x30;
+        rv[idx++] = 8;
+        // OID 1.3.101.100
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/bb540809%28v=vs.85%29.aspx
+        rv[idx++] = 0x06;
+        rv[idx++] = 3;
+        rv[idx++] = (1 * 40) + 3;
+        rv[idx++] = 101;
+        rv[idx++] = 100;
+        // params
+        rv[idx++] = 0x0a;
+        rv[idx++] = 1;
+        rv[idx++] = 1; // Ed25519
+        // the key
+        rv[idx++] = 0x03; // bit string
+        rv[idx++] = (byte) (1 + Abyte.length);
+        rv[idx++] = 0; // number of trailing unused bits
+        System.arraycopy(Abyte, 0, rv, idx, Abyte.length);
+        return rv;
     }
 
     public EdDSAParameterSpec getParams() {
