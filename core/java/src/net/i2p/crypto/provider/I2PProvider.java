@@ -41,5 +41,14 @@ public final class I2PProvider extends Provider {
         put("KeyFactory.EdDSA", "net.i2p.crypto.eddsa.KeyFactory");
         put("KeyPairGenerator.EdDSA", "net.i2p.crypto.eddsa.KeyPairGenerator");
         put("Signature.SHA512withEdDSA", "net.i2p.crypto.eddsa.EdDSAEngine");
+        // Didn't find much documentation on these at all,
+        // see http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/HowToImplAProvider.html
+        // section "Mapping from OID to name"
+        // Without these, keytool fails with:
+        // keytool error: java.security.NoSuchAlgorithmException: unrecognized algorithm name: SHA512withEdDSA
+        put("Alg.Alias.KeyPairGenerator.1.3.101.100", "EdDSA");
+        put("Alg.Alias.KeyPairGenerator.OID.1.3.101.100", "EdDSA");
+        put("Alg.Alias.Signature.1.3.101.100", "SHA512withEdDSA");
+        put("Alg.Alias.Signature.OID.1.3.101.100", "SHA512withEdDSA");
     }
 }
