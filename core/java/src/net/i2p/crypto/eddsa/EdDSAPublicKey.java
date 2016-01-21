@@ -1,6 +1,8 @@
 package net.i2p.crypto.eddsa;
 
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 
 import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
@@ -26,6 +28,14 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
         this.Aneg = spec.getNegativeA();
         this.Abyte = this.A.toByteArray();
         this.edDsaSpec = spec.getParams();
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    public EdDSAPublicKey(X509EncodedKeySpec spec) throws InvalidKeySpecException {
+        this(new EdDSAPublicKeySpec(decode(spec.getEncoded()),
+                                    EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)));
     }
 
     public String getAlgorithm() {
@@ -91,6 +101,40 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
         rv[idx++] = 0; // number of trailing unused bits
         System.arraycopy(Abyte, 0, rv, idx, Abyte.length);
         return rv;
+    }
+
+    /**
+     *  This is really dumb for now.
+     *  See getEncoded().
+     *
+     *  @return 32 bytes for Ed25519, throws for other curves
+     *  @since 0.9.25
+     */
+    private static byte[] decode(byte[] d) throws InvalidKeySpecException {
+        try {
+            int idx = 0;
+            if (d[idx++] != 0x30 ||
+                d[idx++] != 45 ||
+                d[idx++] != 0x30 ||
+                d[idx++] != 8 ||
+                d[idx++] != 0x06 ||
+                d[idx++] != 1 ||
+                d[idx++] != (1 * 40) + 3 ||
+                d[idx++] != 101 ||
+                d[idx++] != 100 ||
+                d[idx++] != 0x0a ||
+                d[idx++] != 1 ||
+                d[idx++] != 1 ||
+                d[idx++] != 0x03 ||
+                d[idx++] != 32 ||
+                d[idx++] != 0)
+            throw new InvalidKeySpecException("unsupported key spec");
+            byte[] rv = new byte[32];
+            System.arraycopy(d, idx, rv, 0, 32);
+            return rv;
+        } catch (IndexOutOfBoundsException ioobe) {
+            throw new InvalidKeySpecException(ioobe);
+        }
     }
 
     public EdDSAParameterSpec getParams() {

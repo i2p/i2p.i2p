@@ -1,6 +1,8 @@
 package net.i2p.crypto.eddsa;
 
 import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
@@ -30,6 +32,14 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
         this.A = spec.getA();
         this.Abyte = this.A.toByteArray();
         this.edDsaSpec = spec.getParams();
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    public EdDSAPrivateKey(PKCS8EncodedKeySpec spec) throws InvalidKeySpecException {
+        this(new EdDSAPrivateKeySpec(decode(spec.getEncoded()),
+                                     EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)));
     }
 
     public String getAlgorithm() {
@@ -109,6 +119,32 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
         rv[idx++] = (byte) seed.length;
         System.arraycopy(seed, 0, rv, idx, seed.length);
         return rv;
+    }
+
+    /**
+     *  This is really dumb for now.
+     *  See getEncoded().
+     *
+     *  @return 32 bytes for Ed25519, throws for other curves
+     *  @since 0.9.25
+     */
+    private static byte[] decode(byte[] d) throws InvalidKeySpecException {
+        try {
+            int idx = 0;
+            if (d[idx++] != 0x30 ||
+                d[idx++] != 37 ||
+                d[idx++] != 0x0a ||
+                d[idx++] != 1 ||
+                d[idx++] != 1 ||
+                d[idx++] != 0x04 ||
+                d[idx++] != 32)
+            throw new InvalidKeySpecException("unsupported key spec");
+            byte[] rv = new byte[32];
+            System.arraycopy(d, idx, rv, 0, 32);
+            return rv;
+        } catch (IndexOutOfBoundsException ioobe) {
+            throw new InvalidKeySpecException(ioobe);
+        }
     }
 
     public EdDSAParameterSpec getParams() {
