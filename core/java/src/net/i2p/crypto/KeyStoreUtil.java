@@ -9,15 +9,18 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Base32;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
@@ -38,6 +41,14 @@ public class KeyStoreUtil {
     private static final String DEFAULT_KEY_ALGORITHM = "RSA";
     private static final int DEFAULT_KEY_SIZE = 2048;
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
+
+    static {
+        try {
+            Security.addProvider(new I2PProvider());
+        } catch (SecurityException se) {
+            System.out.println("WARN: Could not install I2P provider: " + se);
+        }
+    }
 
     /**
      *  No reports of some of these in a Java keystore but just to be safe...
@@ -465,20 +476,28 @@ public class KeyStoreUtil {
             }
         }
         String keytool = (new File(System.getProperty("java.home"), "bin/keytool")).getAbsolutePath();
-        String[] args = new String[] {
-                   keytool,
-                   "-genkey",            // -genkeypair preferred in newer keytools, but this works with more
-                   "-storetype", KeyStore.getDefaultType(),
-                   "-keystore", ks.getAbsolutePath(),
-                   "-storepass", ksPW,
-                   "-alias", alias,
-                   "-dname", "CN=" + cname + ",OU=" + ou + ",O=I2P Anonymous Network,L=XX,ST=XX,C=XX",
-                   "-validity", Integer.toString(validDays),  // 10 years
-                   "-keyalg", keyAlg,
-                   "-sigalg", getSigAlg(keySize, keyAlg),
-                   "-keysize", Integer.toString(keySize),
-                   "-keypass", keyPW
-        };
+        List<String> a = new ArrayList<String>(32);
+        a.add(keytool);
+        a.add("-genkey");    // -genkeypair preferred in newer keytools, but this works with more
+        a.add("-storetype"); a.add(KeyStore.getDefaultType());
+        a.add("-keystore");  a.add(ks.getAbsolutePath());
+        a.add("-storepass"); a.add(ksPW);
+        a.add("-alias");     a.add(alias);
+        a.add("-dname");     a.add("CN=" + cname + ",OU=" + ou + ",O=I2P Anonymous Network,L=XX,ST=XX,C=XX");
+        a.add("-validity");  a.add(Integer.toString(validDays));  // 10 years
+        a.add("-keyalg");    a.add(keyAlg);
+        a.add("-sigalg");    a.add(getSigAlg(keySize, keyAlg));
+        a.add("-keysize");   a.add(Integer.toString(keySize));
+        a.add("-keypass");   a.add(keyPW);
+        if (keyAlg.equals("Ed") || keyAlg.equals("EdDSA")) {
+            File f = I2PAppContext.getGlobalContext().getBaseDir();
+            f = new File(f, "lib");
+            f = new File(f, "i2p.jar");
+            // providerpath is not in the man page; see keytool -genkey -help
+            a.add("-providerpath");  a.add(f.getAbsolutePath());
+            a.add("-providerclass"); a.add("net.i2p.crypto.provider.I2PProvider");
+        }
+        String[] args = a.toArray(new String[a.size()]);
         // TODO pipe key password to process; requires ShellCommand enhancements
         boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 240);
         if (success) {
@@ -515,6 +534,8 @@ public class KeyStoreUtil {
     private static String getSigAlg(int size, String keyalg) {
         if (keyalg.equals("EC"))
             keyalg = "ECDSA";
+        else if (keyalg.equals("Ed"))
+            keyalg = "EdDSA";
         String hash;
         if (keyalg.equals("ECDSA")) {
             if (size <= 256)
@@ -523,6 +544,8 @@ public class KeyStoreUtil {
                 hash = "SHA384";
             else
                 hash = "SHA512";
+        } else if (keyalg.equals("EdDSA")) {
+            hash = "SHA512";
         } else {
             if (size <= 1024)
                 hash = "SHA1";
@@ -739,6 +762,9 @@ public class KeyStoreUtil {
      *   Usage: KeyStoreUtil (loads from system keystore)
      *          KeyStoreUtil foo.ks (loads from system keystore, and from foo.ks keystore if exists, else creates empty)
      *          KeyStoreUtil certDir (loads from system keystore and all certs in certDir if exists)
+     *          KeyStoreUtil import file.ks file.key alias keypw (imxports private key from file to keystore)
+     *          KeyStoreUtil export file.ks alias keypw (exports private key from keystore)
+     *          KeyStoreUtil keygen file.ks alias keypw (create keypair in keystore)
      */
 /****
     public static void main(String[] args) {
@@ -749,6 +775,10 @@ public class KeyStoreUtil {
             }
             if (args.length > 0 && "export".equals(args[0])) {
                 testExport(args);
+                return;
+            }
+            if (args.length > 0 && "keygen".equals(args[0])) {
+                testKeygen(args);
                 return;
             }
             File ksf = (args.length > 0) ? new File(args[0]) : null;
@@ -784,8 +814,8 @@ public class KeyStoreUtil {
     private static void testImport(String[] args) throws Exception {
         File ksf = new File(args[1]);
         InputStream in = new FileInputStream(args[2]);
-        String alias = args[2];
-        String pw = args[3];
+        String alias = args[3];
+        String pw = args[4];
         importPrivateKey(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, pw, in);
     }
 
@@ -797,5 +827,13 @@ public class KeyStoreUtil {
         exportPrivateKey(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, pw, System.out);
     }
 
+    private static void testKeygen(String[] args) throws Exception {
+        File ksf = new File(args[1]);
+        String alias = args[2];
+        String pw = args[3];
+        boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, "test cname", "test ou",
+                                DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
+        System.out.println("genkey ok? " + ok);
+    }
 ****/
 }
