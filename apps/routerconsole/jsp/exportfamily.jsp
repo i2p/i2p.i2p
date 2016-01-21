@@ -12,7 +12,7 @@ try {
         response.setDateHeader("Expires", 0);
         response.addHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
         response.addHeader("Pragma", "no-cache");
-        String name = "family-" + family + ".crt";
+        String name = "family-" + family + "-secret.crt";
         response.setContentType("application/x-x509-ca-cert; name=\"" + name + '"');
         response.addHeader("Content-Disposition", "attachment; filename=\"" + name + '"');
         java.io.File ks = new java.io.File(ctx.getConfigDir(), "keystore");

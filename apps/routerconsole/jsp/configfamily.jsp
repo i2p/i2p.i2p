@@ -44,7 +44,8 @@
 <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <h3><%=intl._t("Join Router Family")%></h3>
-<p><%=intl._t("Select private key file")%> :
+<p><%=intl._t("Import the secret family key that you exported from an existing router in the family.")%>
+<p><%=intl._t("Select secret key file")%> :
 <input name="file" type="file" value="" />
 </p>
 <div class="formaction">
@@ -60,7 +61,7 @@
 <div class="configure">
 <form action="/exportfamily" method="GET">
 <h3><%=intl._t("Export Family Key")%></h3>
-<p><%=intl._t("Create a family key certificate to be imported into other routers you control.")%>
+<p><%=intl._t("Export the secret family key to be imported into other routers you control.")%>
 </p>
 <div class="formaction">
 <input type="submit" name="action" class="go" value="<%=intl._t("Export Family Key")%>" />
