@@ -479,6 +479,7 @@ public class KeyStoreUtil {
         List<String> a = new ArrayList<String>(32);
         a.add(keytool);
         a.add("-genkey");    // -genkeypair preferred in newer keytools, but this works with more
+        //a.add("-v");         // verbose, gives you a stack trace on exception
         a.add("-storetype"); a.add(KeyStore.getDefaultType());
         a.add("-keystore");  a.add(ks.getAbsolutePath());
         a.add("-storepass"); a.add(ksPW);
@@ -765,6 +766,7 @@ public class KeyStoreUtil {
      *          KeyStoreUtil import file.ks file.key alias keypw (imxports private key from file to keystore)
      *          KeyStoreUtil export file.ks alias keypw (exports private key from keystore)
      *          KeyStoreUtil keygen file.ks alias keypw (create keypair in keystore)
+     *          KeyStoreUtil keygen2 file.ks alias keypw (create keypair using I2PProvider)
      */
 /****
     public static void main(String[] args) {
@@ -779,6 +781,10 @@ public class KeyStoreUtil {
             }
             if (args.length > 0 && "keygen".equals(args[0])) {
                 testKeygen(args);
+                return;
+            }
+            if (args.length > 0 && "keygen2".equals(args[0])) {
+                testKeygen2(args);
                 return;
             }
             File ksf = (args.length > 0) ? new File(args[0]) : null;
@@ -834,6 +840,27 @@ public class KeyStoreUtil {
         boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, "test cname", "test ou",
                                 DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
         System.out.println("genkey ok? " + ok);
+    }
+
+    private static void testKeygen2(String[] args) throws Exception {
+        // keygen test using the I2PProvider
+        SigType type = SigType.EdDSA_SHA512_Ed25519;
+        java.security.KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
+        kpg.initialize(type.getParams());
+        java.security.KeyPair kp = kpg.generateKeyPair();
+        java.security.PublicKey jpub = kp.getPublic();
+        java.security.PrivateKey jpriv = kp.getPrivate();
+
+        System.out.println("Encoded private key:");
+        System.out.println(net.i2p.util.HexDump.dump(jpriv.getEncoded()));
+        System.out.println("Encoded public key:");
+        System.out.println(net.i2p.util.HexDump.dump(jpub.getEncoded()));
+
+        java.security.Signature jsig = java.security.Signature.getInstance("SHA512withEdDSA");
+        jsig.initSign(jpriv);
+        jsig.update(new byte[111]);
+        net.i2p.data.Signature sig = SigUtil.fromJavaSig(jsig.sign(), type);
+        System.out.println("Signature test: " + sig);
     }
 ****/
 }

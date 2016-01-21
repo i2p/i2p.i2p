@@ -118,7 +118,7 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
                 d[idx++] != 0x30 ||
                 d[idx++] != 8 ||
                 d[idx++] != 0x06 ||
-                d[idx++] != 1 ||
+                d[idx++] != 3 ||
                 d[idx++] != (1 * 40) + 3 ||
                 d[idx++] != 101 ||
                 d[idx++] != 100 ||

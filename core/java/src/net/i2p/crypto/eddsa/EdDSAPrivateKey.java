@@ -53,7 +53,7 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
     /**
      *  This follows the spec at
      *  https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
-     *  NOT the docs from
+     *  AND the docs from
      *  java.security.spec.PKCS8EncodedKeySpec
      *  quote:
      *<pre>
@@ -77,39 +77,43 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
      *  }
      *</pre>
      *
-     *  @return 39 bytes for Ed25519, null for other curves
+     *  Note that the private key encoding is not fully specified in the Josefsson draft,
+     *  and the example is wrong, as it's lacking Version and AlgorithmIdentifier.
+     *  But sun.security.pkcs.PKCS8Key expects them so we must include them for keytool to work.
+     *
+     *  @return 49 bytes for Ed25519, null for other curves
      *  @since implemented in 0.9.25
      */
     public byte[] getEncoded() {
         // TODO no equals() implemented in spec, but it's essentially a singleton
         if (!edDsaSpec.equals(EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)))
             return null;
-        int totlen = 7 + seed.length;
+        int totlen = 17 + seed.length;
         byte[] rv = new byte[totlen];
         int idx = 0;
         // sequence
         rv[idx++] = 0x30;
-        rv[idx++] = (byte) (5 + seed.length);
+        rv[idx++] = (byte) (15 + seed.length);
 
         // version
         // not in the Josefsson example
-        //rv[idx++] = 0x02;
-        //rv[idx++] = 1;
-        //rv[idx++] = 0;
+        rv[idx++] = 0x02;
+        rv[idx++] = 1;
+        rv[idx++] = 0;
 
         // Algorithm Identifier
         // sequence
         // not in the Josefsson example
-        //rv[idx++] = 0x30;
-        //rv[idx++] = (byte) (10 + seed.length);
+        rv[idx++] = 0x30;
+        rv[idx++] = 8;
         // OID 1.3.101.100
         // https://msdn.microsoft.com/en-us/library/windows/desktop/bb540809%28v=vs.85%29.aspx
         // not in the Josefsson example
-        //rv[idx++] = 0x06;
-        //rv[idx++] = 3;
-        //rv[idx++] = (1 * 40) + 3;
-        //rv[idx++] = 101;
-        //rv[idx++] = 100;
+        rv[idx++] = 0x06;
+        rv[idx++] = 3;
+        rv[idx++] = (1 * 40) + 3;
+        rv[idx++] = 101;
+        rv[idx++] = 100;
         // params
         rv[idx++] = 0x0a;
         rv[idx++] = 1;
@@ -132,7 +136,17 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
         try {
             int idx = 0;
             if (d[idx++] != 0x30 ||
-                d[idx++] != 37 ||
+                d[idx++] != 47 ||
+                d[idx++] != 0x02 ||
+                d[idx++] != 1 ||
+                d[idx++] != 0 ||
+                d[idx++] != 0x30 ||
+                d[idx++] != 8 ||
+                d[idx++] != 0x06 ||
+                d[idx++] != 3 ||
+                d[idx++] != (1 * 40) + 3 ||
+                d[idx++] != 101 ||
+                d[idx++] != 100 ||
                 d[idx++] != 0x0a ||
                 d[idx++] != 1 ||
                 d[idx++] != 1 ||
