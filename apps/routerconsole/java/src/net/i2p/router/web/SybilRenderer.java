@@ -769,7 +769,8 @@ class SybilRenderer {
             if (!full) {
                 buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>]");
             }
-            buf.append("</th></tr><tr><td>\n");
+            buf.append("</th><th><img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
+            buf.append("</th></tr><tr><td colspan=\"2\">\n");
             if (us != null) {
                 BigInteger dist = HashDistance.getDistance(us, info.getHash());
                 distance = biLog2(dist);
