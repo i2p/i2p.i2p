@@ -17,7 +17,7 @@
     </target>
 
     <!-- only used if not set by a higher build.xml -->
-    <property name="javac.compilerargs" value="" />
+    <property name="javac.compilerargs7" value="" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -25,12 +25,12 @@
         <javac srcdir="./core/src/main/java" debug="true" deprecation="on" source="1.7" target="1.7"
                includeAntRuntime="false"
                destdir="./build/obj" >
-            <compilerarg line="${javac.compilerargs}" />
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
         <javac srcdir="./javase/src/main/java" debug="true" deprecation="on" source="1.7" target="1.7"
                includeAntRuntime="false"
                destdir="./build/obj" classpath="./build/obj" >
-            <compilerarg line="${javac.compilerargs}" />
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>
 
@@ -43,7 +43,7 @@
             includeAntRuntime="false"
             destdir="./buildTest/obj"
             classpath="./build/zxing.jar" >
-            <compilerarg line="${javac.compilerargs}" />
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>
 

@@ -186,6 +186,17 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
+   Imagegen:
+     Identicon:
+       Copyright (c) 2007-2014 Don Park <donpark@docuverse.com>
+       See licenses/LICENSE-Identicon.txt
+     RandomArt:
+       Copyright (c) 2000, 2001 Markus Friedl.  All rights reserved.
+       Copyright (c) 2008 Alexander von Gernler.  All rights reserved.
+       See licenses/LICENSE-BSD.txt
+     Zxing:
+       See licenses/LICENSE-Apache2.0.txt
+
    Jetty 8.1.17.v20150415:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
