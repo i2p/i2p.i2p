@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="identicon">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <!-- run from top level build.xml to get dependencies built -->
+    </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../../build"
+            srcdir="./core/src/main/java" 
+            destdir="./build/obj" >
+        </depend>
+    </target>
+
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+
+    <target name="compile" depends="depend">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./core/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+               includeAntRuntime="false"
+               destdir="./build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="compileTest" depends="jar">
+	<mkdir dir="./buildTest" />
+	<mkdir dir="./buildTest/obj" />
+        <javac
+            srcdir="./test/junit"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+            includeAntRuntime="false"
+            destdir="./buildTest/obj"
+            classpath="./build/identicon.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="jarTest" depends="jar, compileTest">
+        <jar destfile="./build/identiconTest.jar" basedir="./buildTest/obj" includes="**/*.class" update="true" />
+    </target>
+
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/identicon.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/identicon.jar" >
+            <srcfiles dir= "." includes="build/obj/**/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+    
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./core/src/main/java" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="identicon library" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+	<delete dir="./buildTest" />
+    </target>
+    <target name="cleandep" depends="clean">
+    </target>
+    <target name="distclean" depends="clean">
+    </target>
+</project>

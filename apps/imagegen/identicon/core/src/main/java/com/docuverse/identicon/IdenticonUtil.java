@@ -3,9 +3,6 @@ package com.docuverse.identicon;
 import java.net.InetAddress;
 import java.security.MessageDigest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Utility methods useful for implementing identicon functionality. Methods are
  * class methods for convenience.
@@ -19,8 +16,6 @@ import org.apache.commons.logging.LogFactory;
  * @author don
  */
 public class IdenticonUtil {
-	private static final Log log = LogFactory.getLog(IdenticonUtil.class);
-
 	private static final int DEFAULT_IDENTICON_SIZE = 16;
 
 	private static final int MINIMUM_IDENTICON_SIZE = 15;
@@ -134,7 +129,7 @@ public class IdenticonUtil {
 						.getByName(remoteAddr));
 			}
 		} catch (Exception e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		return code;
 	}
@@ -151,7 +146,7 @@ public class IdenticonUtil {
 					size = MAXIMUM_IDENTICON_SIZE;
 			}
 		} catch (Exception e) {
-			log.error(e);
+			e.printStackTrace();
 		}
 		return size;
 	}
