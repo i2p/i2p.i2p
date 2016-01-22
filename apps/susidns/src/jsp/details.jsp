@@ -30,7 +30,6 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -142,9 +141,14 @@
 </p>
 </form>
 </div>
+<div><table><tr><td>
+<img src="/imagegen/id?s=320&amp;c=<%=addr.getB64().replace("=", "%3d")%>" width="320" height="320">
+</td><td>
+<img src="/imagegen/qr?s=320&amp;c=http%3a%2f%2f<%=addr.getName()%>%2f%3fi2paddresshelper%3d<%=addr.getDestination()%>">
+</td></tr></table></div>
 <%
-        }
-    }
+        }  // addr == null
+    }  // detail == null
 %>
 <div id="footer">
 <hr>
