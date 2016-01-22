@@ -201,7 +201,8 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         } catch (InterruptedException ie) {}
 
         // why urandom?  because /dev/random blocks
-        ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
+        if (!SystemVersion.isWindows())
+            ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
         File localFile = new File(_context.getConfigDir(), SEEDFILE);
         ok = seedFromFile(localFile, buf) || ok;
