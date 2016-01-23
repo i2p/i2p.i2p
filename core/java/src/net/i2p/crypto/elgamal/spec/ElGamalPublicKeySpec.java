@@ -10,7 +10,7 @@ import java.math.BigInteger;
 public class ElGamalPublicKeySpec
     extends ElGamalKeySpec
 {
-    private BigInteger  y;
+    private final BigInteger y;
 
     public ElGamalPublicKeySpec(
         BigInteger              y,

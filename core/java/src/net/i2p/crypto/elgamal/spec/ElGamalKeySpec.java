@@ -5,7 +5,7 @@ import java.security.spec.KeySpec;
 public class ElGamalKeySpec
     implements KeySpec
 {
-    private ElGamalParameterSpec  spec;
+    private final ElGamalParameterSpec  spec;
 
     public ElGamalKeySpec(
         ElGamalParameterSpec  spec)

@@ -16,7 +16,7 @@ import net.i2p.crypto.elgamal.spec.ElGamalPublicKeySpec;
 public class ElGamalPublicKeyImpl
     implements ElGamalPublicKey, DHPublicKey
 {
-    static final long serialVersionUID = 8712728417091216948L;
+    private static final long serialVersionUID = 8712728417091216948L;
         
     private BigInteger              y;
     private ElGamalParameterSpec    elSpec;

@@ -16,11 +16,10 @@ import net.i2p.crypto.elgamal.spec.ElGamalPrivateKeySpec;
 public class ElGamalPrivateKeyImpl
     implements ElGamalPrivateKey, DHPrivateKey
 {
-    static final long serialVersionUID = 4819350091141529678L;
+    private static final long serialVersionUID = 4819350091141529678L;
         
-    BigInteger      x;
-
-    ElGamalParameterSpec   elSpec;
+    private BigInteger x;
+    private ElGamalParameterSpec elSpec;
 
     protected ElGamalPrivateKeyImpl()
     {
