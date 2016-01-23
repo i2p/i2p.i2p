@@ -80,6 +80,11 @@ public class CryptoConstants {
     public static final DSAParameterSpec DSA_SHA1_SPEC = new DSAParameterSpec(dsap, dsaq, dsag);
 
     /**
+     *  @since 0.9.25
+     */
+    public static final ElGamalParameterSpec I2P_ELGAMAL_2048_SPEC = new ElGamalParameterSpec(elgp, elgg);
+
+    /**
      *  This will be org.bouncycastle.jce.spec.ElgamalParameterSpec
      *  if BC is available, otherwise it
      *  will be net.i2p.crypto.ElgamalParameterSpec
@@ -99,11 +104,11 @@ public class CryptoConstants {
             } catch (Exception e) {
                 //System.out.println("BC ElG spec failed");
                 //e.printStackTrace();
-                spec = new ElGamalParameterSpec(elgp, elgg);
+                spec = I2P_ELGAMAL_2048_SPEC;
             }
         } else {
             //System.out.println("BC not available");
-            spec = new ElGamalParameterSpec(elgp, elgg);
+            spec = I2P_ELGAMAL_2048_SPEC;
         }
         ELGAMAL_2048_SPEC = spec;
     }

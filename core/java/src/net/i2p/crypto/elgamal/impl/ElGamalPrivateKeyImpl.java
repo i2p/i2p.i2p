@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.spec.DHParameterSpec;
@@ -25,32 +26,48 @@ public class ElGamalPrivateKeyImpl
     {
     }
 
-    ElGamalPrivateKeyImpl(
+    public ElGamalPrivateKeyImpl(
         ElGamalPrivateKey    key)
     {
         this.x = key.getX();
         this.elSpec = key.getParameters();
     }
 
-    ElGamalPrivateKeyImpl(
+    public ElGamalPrivateKeyImpl(
         DHPrivateKey    key)
     {
         this.x = key.getX();
         this.elSpec = new ElGamalParameterSpec(key.getParams().getP(), key.getParams().getG());
     }
     
-    ElGamalPrivateKeyImpl(
+    public ElGamalPrivateKeyImpl(
         ElGamalPrivateKeySpec    spec)
     {
         this.x = spec.getX();
         this.elSpec = new ElGamalParameterSpec(spec.getParams().getP(), spec.getParams().getG());
     }
 
-    ElGamalPrivateKeyImpl(
+    public ElGamalPrivateKeyImpl(
         DHPrivateKeySpec    spec)
     {
         this.x = spec.getX();
         this.elSpec = new ElGamalParameterSpec(spec.getP(), spec.getG());
+    }
+    
+    public ElGamalPrivateKeyImpl(
+        BigInteger x,
+        ElGamalParameterSpec elSpec)
+    {
+        this.x = x;
+        this.elSpec = elSpec;
+    }
+
+    public ElGamalPrivateKeyImpl(
+        PKCS8EncodedKeySpec spec)
+    {
+        throw new UnsupportedOperationException("todo");
+        //this.x = spec.getX();
+        //this.elSpec = new ElGamalParameterSpec(spec.getP(), spec.getG());
     }
     
     public String getAlgorithm()
