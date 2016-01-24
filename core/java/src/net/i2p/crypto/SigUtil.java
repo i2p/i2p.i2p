@@ -141,7 +141,7 @@ public final class SigUtil {
                 throw new IllegalArgumentException("Unknown RSA type");
             return fromJavaKey(k, type);
         }
-        throw new IllegalArgumentException("Unknown type");
+        throw new IllegalArgumentException("Unknown type: " + pk.getClass());
     }
 
     /**
@@ -161,7 +161,7 @@ public final class SigUtil {
             case RSA:
                 return fromJavaKey((RSAPublicKey) pk, type);
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unknown type: " + type);
         }
     }
 
@@ -209,7 +209,7 @@ public final class SigUtil {
                 throw new IllegalArgumentException("Unknown RSA type");
             return fromJavaKey(k, type);
         }
-        throw new IllegalArgumentException("Unknown type");
+        throw new IllegalArgumentException("Unknown type: " + pk.getClass());
     }
 
     /**
@@ -229,7 +229,7 @@ public final class SigUtil {
             case RSA:
                 return fromJavaKey((RSAPrivateKey) pk, type);
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unknown type: " + type);
         }
     }
 
@@ -661,7 +661,7 @@ public final class SigUtil {
      *
      *  r and s are always non-negative.
      *
-     *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for this before you
+     *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for this before you
      *  add a SigType with bigger signatures.
      *
      *  @param sig length must be even
@@ -669,33 +669,39 @@ public final class SigUtil {
      *  @since 0.9.25, split out from sigBytesToASN1(byte[])
      */
     public static byte[] sigBytesToASN1(BigInteger r, BigInteger s) {
+        int extra = 4;
         byte[] rb = r.toByteArray();
-        if (rb.length > 127)
-            throw new IllegalArgumentException("FIXME R length > 127");
+        if (rb.length > 127) {
+            extra++;
+            if (rb.length > 255)
+                extra++;
+        }
         byte[] sb = s.toByteArray();
-        if (sb.length > 127)
-            throw new IllegalArgumentException("FIXME S length > 127");
-        int seqlen = rb.length + sb.length + 4;
-        if (seqlen > 255)
-            throw new IllegalArgumentException("FIXME seq length > 255");
+        if (sb.length > 127) {
+            extra++;
+            if (sb.length > 255)
+                extra++;
+        }
+        int seqlen = rb.length + sb.length + extra;
         int totlen = seqlen + 2;
-        if (seqlen > 127)
+        if (seqlen > 127) {
             totlen++;
+            if (seqlen > 255)
+                totlen++;
+        }
         byte[] rv = new byte[totlen];
         int idx = 0;
 
         rv[idx++] = 0x30;
-        if (seqlen > 127)
-            rv[idx++] =(byte) 0x81;
-        rv[idx++] = (byte) seqlen;
+        idx = intToASN1(rv, idx, seqlen);
 
         rv[idx++] = 0x02;
-        rv[idx++] = (byte) rb.length;
+        idx = intToASN1(rv, idx, rb.length);
         System.arraycopy(rb, 0, rv, idx, rb.length);
         idx += rb.length;
 
         rv[idx++] = 0x02;
-        rv[idx++] = (byte) sb.length;
+        idx = intToASN1(rv, idx, sb.length);
         System.arraycopy(sb, 0, rv, idx, sb.length);
 
         //System.out.println("post TO asn1\n" + net.i2p.util.HexDump.dump(rv));
@@ -703,8 +709,31 @@ public final class SigUtil {
     }
 
     /**
+     *  Output an length or integer value in ASN.1
+     *  Does NOT output the tag e.g. 0x02 / 0x30
+     *
+     *  @param val 0-65535
+     *  @return the new index
+     *  @since 0.9.25
+     */
+    private static int intToASN1(byte[] d, int idx, int val) {
+        if (val < 0 || val > 65535)
+            throw new IllegalArgumentException("fixme length " + val);
+        if (val > 127) {
+            if (val > 255) {
+                d[idx++] = (byte) 0x82;
+                d[idx++] = (byte) (val >> 8);
+            } else {
+                d[idx++] = (byte) 0x81;
+            }
+        }
+        d[idx++] = (byte) val;
+        return idx;
+    }
+
+    /**
      *  See above.
-     *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for bigger than that.
+     *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for bigger than that.
      *
      *  @param len must be even, twice the nominal length of each BigInteger
      *  @return len bytes, call split() on the result to get two BigIntegers
@@ -724,8 +753,17 @@ public final class SigUtil {
         byte[] rv = new byte[len];
         int sublen = len / 2;
         int rlen = asn[++idx];
-        if ((rlen & 0x80) != 0)
-            throw new SignatureException("FIXME R length > 127");
+        if ((rlen & 0x80) != 0) {
+            if ((rlen & 0xff) == 0x81) { 
+                rlen = asn[++idx] & 0xff;
+            } else if ((rlen & 0xff) == 0x82) {
+                rlen = asn[++idx] & 0xff;
+                rlen <<= 8;
+                rlen |= asn[++idx] & 0xff;
+            } else {
+                throw new SignatureException("FIXME R length > 65535");
+            }
+        }
         if ((asn[++idx] & 0x80) != 0)
             throw new SignatureException("R is negative");
         if (rlen > sublen + 1)
@@ -735,27 +773,36 @@ public final class SigUtil {
         else
             System.arraycopy(asn, idx, rv, sublen - rlen, rlen);
         idx += rlen;
-        int slenloc = idx + 1;
+
         if (asn[idx] != 0x02)
             throw new SignatureException("asn[s] = " + (asn[idx] & 0xff));
-        int slen = asn[slenloc];
-        if ((slen & 0x80) != 0)
-            throw new SignatureException("FIXME S length > 127");
-        if ((asn[slenloc + 1] & 0x80) != 0)
+        int slen = asn[++idx];
+        if ((slen & 0x80) != 0) {
+            if ((slen & 0xff) == 0x81) { 
+                slen = asn[++idx] & 0xff;
+            } else if ((slen & 0xff) == 0x82) {
+                slen = asn[++idx] & 0xff;
+                slen <<= 8;
+                slen |= asn[++idx] & 0xff;
+            } else {
+                throw new SignatureException("FIXME S length > 65535");
+            }
+        }
+        if ((asn[++idx] & 0x80) != 0)
             throw new SignatureException("S is negative");
         if (slen > sublen + 1)
             throw new SignatureException("S too big " + slen);
         if (slen == sublen + 1)
-            System.arraycopy(asn, slenloc + 2, rv, sublen, sublen);
+            System.arraycopy(asn, idx + 1, rv, sublen, sublen);
         else
-            System.arraycopy(asn, slenloc + 1, rv, len - slen, slen);
+            System.arraycopy(asn, idx, rv, len - slen, slen);
         //System.out.println("post from asn1\n" + net.i2p.util.HexDump.dump(rv));
         return rv;
     }
 
     /**
      *  See above.
-     *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for bigger than that.
+     *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for bigger than that.
      *
      *  @param len nominal length of each BigInteger
      *  @return two BigIntegers
