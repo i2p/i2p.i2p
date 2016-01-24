@@ -44,7 +44,7 @@ import net.i2p.util.NativeBigInteger;
  * See also: ECConstants, RSAConstants
  *
  */
-public class CryptoConstants {
+public final class CryptoConstants {
     public static final BigInteger dsap = new NativeBigInteger(
                                                                "9c05b2aa960d9b97b8931963c9cc9e8c3026e9b8ed92fad0a69cc886d5bf8015fcadae31"
                                                              + "a0ad18fab3f01b00a358de237655c4964afaa2b337e96ad316b9fb1cc564b5aec5b69a9f"

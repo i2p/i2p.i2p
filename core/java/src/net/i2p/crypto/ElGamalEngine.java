@@ -52,7 +52,7 @@ import net.i2p.util.SimpleByteCache;
  * @author thecrypto, jrandom
  */
 
-public class ElGamalEngine {
+public final class ElGamalEngine {
     private final Log _log;
     private final I2PAppContext _context;
     private final YKGenerator _ykgen;

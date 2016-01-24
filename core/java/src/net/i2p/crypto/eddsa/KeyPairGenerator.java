@@ -21,7 +21,7 @@ import net.i2p.util.RandomSource;
  *
  *  @since 0.9.15
  */
-public class KeyPairGenerator extends KeyPairGeneratorSpi {
+public final class KeyPairGenerator extends KeyPairGeneratorSpi {
     private static final int DEFAULT_STRENGTH = 256;
     private EdDSAParameterSpec edParams;
     private SecureRandom random;

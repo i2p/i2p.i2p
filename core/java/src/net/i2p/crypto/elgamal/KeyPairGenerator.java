@@ -27,7 +27,7 @@ import net.i2p.util.RandomSource;
  *
  * @since 0.9.25
  */
-public class KeyPairGenerator extends KeyPairGeneratorSpi {
+public final class KeyPairGenerator extends KeyPairGeneratorSpi {
     // always long, don't use short key
     private static final int DEFAULT_STRENGTH = 2048;
     private ElGamalParameterSpec elgParams;

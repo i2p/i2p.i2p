@@ -41,7 +41,7 @@ import net.i2p.util.SystemVersion;
  *
  *  @since 0.9.9
  */
-public class CertUtil {
+public final class CertUtil {
         
     private static final int LINE_LENGTH = 64;
 

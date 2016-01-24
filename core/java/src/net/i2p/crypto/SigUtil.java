@@ -50,7 +50,7 @@ import net.i2p.util.NativeBigInteger;
  *
  * @since 0.9.9, public since 0.9.12
  */
-public class SigUtil {
+public final class SigUtil {
 
     private static final Map<SigningPublicKey, ECPublicKey> _ECPubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
     private static final Map<SigningPrivateKey, ECPrivateKey> _ECPrivkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);

@@ -55,7 +55,7 @@ import net.i2p.util.RandomSource;
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
  */
-public class KeyGenerator {
+public final class KeyGenerator {
     private final I2PAppContext _context;
 
     public KeyGenerator(I2PAppContext context) {

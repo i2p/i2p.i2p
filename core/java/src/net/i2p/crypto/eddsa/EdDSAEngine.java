@@ -20,7 +20,7 @@ import net.i2p.crypto.eddsa.math.ScalarOps;
  * @author str4d
  *
  */
-public class EdDSAEngine extends Signature {
+public final class EdDSAEngine extends Signature {
     private MessageDigest digest;
     private final ByteArrayOutputStream baos;
     private EdDSAKey key;

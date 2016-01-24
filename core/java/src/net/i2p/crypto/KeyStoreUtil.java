@@ -33,7 +33,7 @@ import net.i2p.util.SystemVersion;
  *
  *  @since 0.9.9
  */
-public class KeyStoreUtil {
+public final class KeyStoreUtil {
         
     public static boolean _blacklistLogged;
 

@@ -20,7 +20,7 @@ import net.i2p.util.NativeBigInteger;
  *
  * @since 0.9.9
  */
-class ECConstants {
+final class ECConstants {
 
     private static final boolean DEBUG = false;
 

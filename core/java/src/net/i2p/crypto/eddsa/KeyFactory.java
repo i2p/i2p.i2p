@@ -18,7 +18,7 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
  * @author str4d
  *
  */
-public class KeyFactory extends KeyFactorySpi {
+public final class KeyFactory extends KeyFactorySpi {
 
     /**
      *  As of 0.9.25, supports PKCS8EncodedKeySpec

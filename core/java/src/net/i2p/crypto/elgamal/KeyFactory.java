@@ -25,7 +25,7 @@ import net.i2p.crypto.elgamal.spec.ElGamalPublicKeySpec;
  *
  * @since 0.9.25
  */
-public class KeyFactory extends KeyFactorySpi {
+public final class KeyFactory extends KeyFactorySpi {
 
     /**
      *  Supports PKCS8EncodedKeySpec

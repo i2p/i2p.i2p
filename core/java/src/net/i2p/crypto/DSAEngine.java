@@ -72,7 +72,7 @@ import net.i2p.util.NativeBigInteger;
  *
  *  EdDSA support added in 0.9.15
  */
-public class DSAEngine {
+public final class DSAEngine {
     private final Log _log;
     private final I2PAppContext _context;
 
