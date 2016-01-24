@@ -60,23 +60,15 @@ public class KeyFactory extends KeyFactorySpi {
             throws InvalidKeySpecException {
         if (keySpec.isAssignableFrom(ElGamalPublicKeySpec.class) && key instanceof ElGamalPublicKey) {
             ElGamalPublicKey k = (ElGamalPublicKey) key;
-            // key.getParams() is a DHParameterSpec
-            DHParameterSpec dhp = k.getParams();
-            if (dhp != null) {
-                if (dhp.getP().equals(I2P_ELGAMAL_2048_SPEC.getP()) &&
-                    dhp.getG().equals(I2P_ELGAMAL_2048_SPEC.getG()))
-                    return (T) new ElGamalPrivateKeySpec(k.getY(), I2P_ELGAMAL_2048_SPEC);
-                return (T) new ElGamalPrivateKeySpec(k.getY(), new ElGamalParameterSpec(dhp.getP(), dhp.getG()));
+            ElGamalParameterSpec egp = k.getParameters();
+            if (egp != null) {
+                return (T) new ElGamalPrivateKeySpec(k.getY(), egp);
             }
         } else if (keySpec.isAssignableFrom(ElGamalPrivateKeySpec.class) && key instanceof ElGamalPrivateKey) {
             ElGamalPrivateKey k = (ElGamalPrivateKey) key;
-            // key.getParams() is a DHParameterSpec
-            DHParameterSpec dhp = k.getParams();
-            if (dhp != null) {
-                if (dhp.getP().equals(I2P_ELGAMAL_2048_SPEC.getP()) &&
-                    dhp.getG().equals(I2P_ELGAMAL_2048_SPEC.getG()))
-                    return (T) new ElGamalPrivateKeySpec(k.getX(), I2P_ELGAMAL_2048_SPEC);
-                return (T) new ElGamalPrivateKeySpec(k.getX(), new ElGamalParameterSpec(dhp.getP(), dhp.getG()));
+            ElGamalParameterSpec egp = k.getParameters();
+            if (egp != null) {
+                return (T) new ElGamalPrivateKeySpec(k.getX(), egp);
             }
         }
         throw new InvalidKeySpecException("not implemented yet " + key + " " + keySpec);

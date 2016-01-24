@@ -549,9 +549,13 @@ public class SigUtil {
 
     /**
      *  Split a byte array into two BigIntegers
+     *  @param b length must be even
      *  @return array of two BigIntegers
+     *  @since 0.9.9
      */
-    private static BigInteger[] split(byte[] b) {
+    private static NativeBigInteger[] split(byte[] b) {
+        if ((b.length & 0x01) != 0)
+            throw new IllegalArgumentException("length must be even");
         int sublen = b.length / 2;
         byte[] bx = new byte[sublen];
         byte[] by = new byte[sublen];
@@ -565,9 +569,12 @@ public class SigUtil {
     /**
      *  Combine two BigIntegers of nominal length = len / 2
      *  @return array of exactly len bytes
+     *  @since 0.9.9
      */
     private static byte[] combine(BigInteger x, BigInteger y, int len)
                               throws InvalidKeyException {
+        if ((len & 0x01) != 0)
+            throw new InvalidKeyException("length must be even");
         int sublen = len / 2;
         byte[] b = new byte[len];
         byte[] bx = rectify(x, sublen);
@@ -609,7 +616,8 @@ public class SigUtil {
 
     /**
      *  http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html
-     *  Signature Format	ASN.1 sequence of two INTEGER values: r and s, in that order:
+     *<pre>
+     *  Signature Format: ASN.1 sequence of two INTEGER values: r and s, in that order:
      *                                SEQUENCE ::= { r INTEGER, s INTEGER }
      *
      *  http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
@@ -619,6 +627,7 @@ public class SigUtil {
      *  02 -- tag indicating INTEGER
      *  xx - length in octets
      *  xxxxxx - value
+     *</pre>
      *
      *  Convert to BigInteger and back so we have the minimum length representation, as required.
      *  r and s are always non-negative.
@@ -626,22 +635,43 @@ public class SigUtil {
      *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for this before you
      *  add a SigType with bigger signatures.
      *
+     *  @param sig length must be even
      *  @throws IllegalArgumentException if too big
      *  @since 0.8.7, moved to SigUtil in 0.9.9
      */
     private static byte[] sigBytesToASN1(byte[] sig) {
-        //System.out.println("pre TO asn1\n" + net.i2p.util.HexDump.dump(sig));
-        int len = sig.length;
-        int sublen = len / 2;
-        byte[] tmp = new byte[sublen];
+        BigInteger[] rs = split(sig);
+        return sigBytesToASN1(rs[0], rs[1]);
+    }
 
-        System.arraycopy(sig, 0, tmp, 0, sublen);
-        BigInteger r = new BigInteger(1, tmp);
+    /**
+     *  http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html
+     *<pre>
+     *  Signature Format: ASN.1 sequence of two INTEGER values: r and s, in that order:
+     *                                SEQUENCE ::= { r INTEGER, s INTEGER }
+     *
+     *  http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
+     *  30 -- tag indicating SEQUENCE
+     *  xx - length in octets
+     *
+     *  02 -- tag indicating INTEGER
+     *  xx - length in octets
+     *  xxxxxx - value
+     *</pre>
+     *
+     *  r and s are always non-negative.
+     *
+     *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for this before you
+     *  add a SigType with bigger signatures.
+     *
+     *  @param sig length must be even
+     *  @throws IllegalArgumentException if too big
+     *  @since 0.9.25, split out from sigBytesToASN1(byte[])
+     */
+    public static byte[] sigBytesToASN1(BigInteger r, BigInteger s) {
         byte[] rb = r.toByteArray();
         if (rb.length > 127)
             throw new IllegalArgumentException("FIXME R length > 127");
-        System.arraycopy(sig, sublen, tmp, 0, sublen);
-        BigInteger s = new BigInteger(1, tmp);
         byte[] sb = s.toByteArray();
         if (sb.length > 127)
             throw new IllegalArgumentException("FIXME S length > 127");
@@ -676,7 +706,8 @@ public class SigUtil {
      *  See above.
      *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for bigger than that.
      *
-     *  @return len bytes
+     *  @param len must be even, twice the nominal length of each BigInteger
+     *  @return len bytes, call split() on the result to get two BigIntegers
      *  @since 0.8.7, moved to SigUtil in 0.9.9
      */
     private static byte[] aSN1ToSigBytes(byte[] asn, int len)
@@ -720,6 +751,20 @@ public class SigUtil {
             System.arraycopy(asn, slenloc + 1, rv, len - slen, slen);
         //System.out.println("post from asn1\n" + net.i2p.util.HexDump.dump(rv));
         return rv;
+    }
+
+    /**
+     *  See above.
+     *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for bigger than that.
+     *
+     *  @param len nominal length of each BigInteger
+     *  @return two BigIntegers
+     *  @since 0.9.25
+     */
+    public static NativeBigInteger[] aSN1ToBigInteger(byte[] asn, int len)
+                              throws SignatureException {
+        byte[] sig = aSN1ToSigBytes(asn, len * 2);
+        return split(sig);
     }
 
     public static void clearCaches() {
