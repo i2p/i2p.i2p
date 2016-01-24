@@ -716,7 +716,7 @@ public final class SigUtil {
      *  @return the new index
      *  @since 0.9.25
      */
-    private static int intToASN1(byte[] d, int idx, int val) {
+    public static int intToASN1(byte[] d, int idx, int val) {
         if (val < 0 || val > 65535)
             throw new IllegalArgumentException("fixme length " + val);
         if (val > 127) {

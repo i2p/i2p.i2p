@@ -10,7 +10,9 @@ import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPrivateKeySpec;
 
+import static net.i2p.crypto.SigUtil.intToASN1;
 import net.i2p.crypto.elgamal.ElGamalPrivateKey;
+import static net.i2p.crypto.elgamal.impl.ElGamalPublicKeyImpl.spaceFor;
 import net.i2p.crypto.elgamal.spec.ElGamalParameterSpec;
 import net.i2p.crypto.elgamal.spec.ElGamalPrivateKeySpec;
 
@@ -93,7 +95,62 @@ public class ElGamalPrivateKeyImpl
      */
     public byte[] getEncoded()
     {
-        return null;
+        byte[] pb = elSpec.getP().toByteArray();
+        byte[] gb = elSpec.getG().toByteArray();
+        byte[] xb = x.toByteArray();
+        int seq3len = 2 + spaceFor(pb.length) + spaceFor(gb.length);
+        int seq2len = 8 + 1 + spaceFor(seq3len);
+        int seq1len = 1 + 3 + spaceFor(seq2len) + 1 + spaceFor(xb.length);
+        int totlen = 1 + spaceFor(seq1len);
+        byte[] rv = new byte[totlen];
+        int idx = 0;
+        // sequence 1
+        rv[idx++] = 0x30;
+        idx = intToASN1(rv, idx, seq1len);
+
+        // version
+        rv[idx++] = 0x02;
+        rv[idx++] = 1;
+        rv[idx++] = 0;
+
+        // Algorithm Identifier
+        // sequence 2
+        rv[idx++] = 0x30;
+        idx = intToASN1(rv, idx, seq2len);
+        // OID: 1.3.14.7.2.1.1
+        rv[idx++] = 0x06;
+        rv[idx++] = 6;
+        rv[idx++] = (1 * 40) + 3;
+        rv[idx++] = 14;
+        rv[idx++] = 7;
+        rv[idx++] = 2;
+        rv[idx++] = 1;
+        rv[idx++] = 1;
+
+        // params
+        // sequence 3
+        rv[idx++] = 0x30;
+        idx = intToASN1(rv, idx, seq3len);
+        // P
+        // integer
+        rv[idx++] = 0x02;
+        idx = intToASN1(rv, idx, pb.length);
+        System.arraycopy(pb, 0, rv, idx, pb.length);
+        idx += pb.length;
+        // G
+        // integer
+        rv[idx++] = 0x02;
+        idx = intToASN1(rv, idx, gb.length);
+        System.arraycopy(gb, 0, rv, idx, gb.length);
+        idx += gb.length;
+
+        // the key
+        // octet string
+        rv[idx++] = 0x04;
+        idx = intToASN1(rv, idx, xb.length);
+        // BC puts an integer in the bit string, we're not going to do that
+        System.arraycopy(xb, 0, rv, idx, xb.length);
+        return rv;
     }
 
     public ElGamalParameterSpec getParameters()
