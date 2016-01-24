@@ -31,13 +31,24 @@ public final class I2PProvider extends Provider {
 
     private void setup() {
         // TODO: Implement SPIs for existing code
+        // However -
+        // quote
+        // http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/HowToImplAProvider.html
+        //
+        // If your provider is supplying encryption algorithms through the
+        // Cipher, KeyAgreement, KeyGenerator, Mac, or SecretKeyFactory classes,
+        // you will need to sign your JAR file so that the JCA can authenticate the code at runtime.
+        // If you are NOT providing an implementation of this type you can skip this step.
+        //
         //put("Cipher.AES", "net.i2p.crypto.provider.CipherSpi$aesCBC");
         //put("Cipher.ElGamal", "net.i2p.crypto.provider.CipherSpi$elGamal");
         //put("Mac.HmacMD5-I2P", "net.i2p.crypto.provider.MacSpi");
+
         put("MessageDigest.SHA-1", "net.i2p.crypto.SHA1");
         //put("Signature.SHA1withDSA", "net.i2p.crypto.provider.SignatureSpi");
 
         // EdDSA
+        // OID: 1.3.101.100
         put("KeyFactory.EdDSA", "net.i2p.crypto.eddsa.KeyFactory");
         put("KeyPairGenerator.EdDSA", "net.i2p.crypto.eddsa.KeyPairGenerator");
         put("Signature.SHA512withEdDSA", "net.i2p.crypto.eddsa.EdDSAEngine");
@@ -50,5 +61,21 @@ public final class I2PProvider extends Provider {
         put("Alg.Alias.KeyPairGenerator.OID.1.3.101.100", "EdDSA");
         put("Alg.Alias.Signature.1.3.101.100", "SHA512withEdDSA");
         put("Alg.Alias.Signature.OID.1.3.101.100", "SHA512withEdDSA");
+        // TODO Ed25519ph
+        // OID: 1.3.101.101
+
+        // ElGamal
+        // OID: 1.3.14.7.2.1.1
+        put("KeyFactory.DH", "net.i2p.crypto.elgamal.KeyFactory");
+        put("KeyFactory.DiffieHellman", "net.i2p.crypto.elgamal.KeyFactory");
+        put("KeyFactory.ElGamal", "net.i2p.crypto.elgamal.KeyFactory");
+        put("KeyPairGenerator.DH", "net.i2p.crypto.elgamal.KeyPairGenerator");
+        put("KeyPairGenerator.DiffieHellman", "net.i2p.crypto.elgamal.KeyPairGenerator");
+        put("KeyPairGenerator.ElGamal", "net.i2p.crypto.elgamal.KeyPairGenerator");
+        put("Signature.SHA256withElGamal", "net.i2p.crypto.elgamal.ElGamalSigEngine");
+        put("Alg.Alias.KeyPairGenerator.1.3.14.7.2.1.1", "ElGamal");
+        put("Alg.Alias.KeyPairGenerator.OID.1.3.14.7.2.1.1", "ElGamal");
+        put("Alg.Alias.Signature.1.3.14.7.2.1.1", "SHA256withElGamal");
+        put("Alg.Alias.Signature.OID.1.3.14.7.2.1.1", "SHA256withElGamal");
     }
 }
