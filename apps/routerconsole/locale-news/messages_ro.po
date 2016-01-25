@@ -4,16 +4,17 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# polearnik <polearnik@mail.ru>, 2013
-# polearnik <polearnik@mail.ru>, 2013
+# pol polearnik <polearnik@mail.ru>, 2013
+# pol polearnik <polearnik@mail.ru>, 2013
+# titus <titus0818@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-02-23 16:51+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/ro/)\n"
+"PO-Revision-Date: 2015-11-20 16:44+0000\n"
+"Last-Translator: titus <titus0818@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -63,4 +64,4 @@ msgstr "Odată ce aveți destinație  \"clientii comuni\", listată in stânga p
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr ""
+msgstr "Indicați clientul IRC la {0}localhost:6668{1} și salutați-ne la {2}#i2p{3}."

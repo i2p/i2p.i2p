@@ -7,18 +7,19 @@
 # Bad Cluster <badcluster@i2pmail.org>, 2012
 # Leelium <bovas85@gmail.com>, 2012
 #   <colomboi2p@ymail.com>, 2012
-# Giuseppe Pignataro <anubisteam01@gmail.com>, 2014
+# Giuseppe Pignataro <rogepix@gmail.com>, 2014
 # mkkid <jokjok@hotmail.it>, 2011
 # spawned76 <fswitch20@hotmail.com>, 2012
+# Tristano Ajmone <tajmone@gmail.com>, 2015
 # Jacopo Tumminello <tummarellox@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/I2P/language/it/)\n"
+"POT-Creation-Date: 2016-01-17 17:08+0000\n"
+"PO-Revision-Date: 2015-12-27 22:54+0000\n"
+"Last-Translator: Tristano Ajmone <tajmone@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -38,7 +39,7 @@ msgstr ""
 #: ../java/build/Proxy.java:129 ../java/build/Proxy.java:140
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:185
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:209
 msgid "Router Console"
 msgstr "Console del router"
 
@@ -63,7 +64,7 @@ msgstr "Console del router"
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:142
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:166
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:187
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:193
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Configuration"
 msgstr "Configurazione"
 
@@ -76,7 +77,7 @@ msgstr "Configurazione"
 #: ../java/build/Proxy.java:132 ../java/build/Proxy.java:143
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:167
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:188
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:193
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Help"
 msgstr "Aiuto"
 
@@ -89,7 +90,7 @@ msgstr "Aiuto"
 #: ../java/build/Proxy.java:133 ../java/build/Proxy.java:144
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:168
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:189
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:193
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Addressbook"
 msgstr "Rubrica"
 
@@ -110,7 +111,7 @@ msgstr ""
 #: ../java/build/Proxy.java:14
 msgid ""
 "If you save it to your address book, you will not see this message again."
-msgstr ""
+msgstr "Se lo salvi nella tua rubrica, non ti verrà più mostrato questo messaggio"
 
 #: ../java/build/Proxy.java:15
 msgid ""
@@ -178,7 +179,7 @@ msgstr ""
 #: ../java/build/Proxy.java:68 ../java/build/Proxy.java:74
 #: ../java/build/Proxy.java:95 ../java/build/Proxy.java:101
 msgid "Website Unreachable"
-msgstr ""
+msgstr "Sito web irraggiungibile"
 
 #: ../java/build/Proxy.java:52
 msgid "The website was not reachable, because its lease set was not found."
@@ -215,7 +216,7 @@ msgstr ""
 msgid ""
 "The proxy could be temporarily unavailable, too busy, or it has blocked your"
 " access."
-msgstr ""
+msgstr "Il proxy potrebbe essere momentaneamente non disponibile, troppo occupato, oppure ti ha bloccato l'accesso."
 
 #: ../java/build/Proxy.java:65 ../java/build/Proxy.java:147
 #: ../java/build/Proxy.java:181 ../java/build/Proxy.java:193
@@ -241,7 +242,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:76 ../java/build/Proxy.java:149
 msgid "Could not connect to the following destination:"
-msgstr ""
+msgstr "Non è stato possibile connettersi alla seguente destinazione:"
 
 #: ../java/build/Proxy.java:77
 msgid "Error: Request Denied"
@@ -259,7 +260,7 @@ msgstr "Il tuo browse non supporta gli iFrames."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr ""
+msgstr "Non utilizzare il proxy per accedere alla console del router, al localhost, o a destinazioni della LAN locale."
 
 #: ../java/build/Proxy.java:86 ../java/build/Proxy.java:92
 msgid "Warning: No Outproxy Configured"
@@ -269,21 +270,21 @@ msgstr "Attenzione: Nessun Proxy di uscita configurato"
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
-msgstr ""
+msgstr "La tua era una richiesta per un sito esterno a I2P, ma non hai configurato alcun HTTP outproxy."
 
 #: ../java/build/Proxy.java:94
 msgid "Please configure an outproxy in I2PTunnel."
-msgstr ""
+msgstr "Si prega di configurare un outproxy in I2PTunnel."
 
 #: ../java/build/Proxy.java:102
 msgid "The website was not reachable."
-msgstr ""
+msgstr "Il sito web non era raggiungibile."
 
 #: ../java/build/Proxy.java:103
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr ""
+msgstr "Il sito web non è in linea, vi è una congestione della rete, oppure il tuo router non è ancora ben integrato con i peer."
 
 #: ../java/build/Proxy.java:106 ../java/build/Proxy.java:112
 msgid "Warning: Invalid Destination"
@@ -293,7 +294,7 @@ msgstr "Destinazione locale"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr ""
+msgstr "La destinazione del sito web specificata non era valida, o altrimenti irraggiungibile."
 
 #: ../java/build/Proxy.java:114
 msgid ""
@@ -333,7 +334,7 @@ msgstr ""
 
 #: ../java/build/Proxy.java:139 ../java/build/Proxy.java:145
 msgid "Outproxy Unreachable"
-msgstr ""
+msgstr "Outproxy Irraggiungibile "
 
 #: ../java/build/Proxy.java:146
 msgid ""
@@ -343,11 +344,11 @@ msgstr ""
 
 #: ../java/build/Proxy.java:150
 msgid "Website Unknown"
-msgstr ""
+msgstr "Sito web sconosciuto"
 
 #: ../java/build/Proxy.java:156
 msgid "Website Not Found in Addressbook"
-msgstr ""
+msgstr "Sito web non trovato nella Rubrica"
 
 #: ../java/build/Proxy.java:157
 msgid "The website was not found in your router's addressbook."
@@ -392,7 +393,7 @@ msgstr ""
 #: ../java/build/Proxy.java:172 ../java/build/Proxy.java:178
 #: ../java/build/Proxy.java:184 ../java/build/Proxy.java:190
 msgid "Outproxy Not Found"
-msgstr ""
+msgstr "Outproxy non trovato"
 
 #: ../java/build/Proxy.java:179
 msgid ""
@@ -442,15 +443,15 @@ msgid ""
 "tunnel."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:610
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:634
 msgid "This seems to be a bad destination:"
 msgstr "Questa non sembra essere una buona destinazione:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:611
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:635
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "i2paddresshelper non ti può aiutare con una destinazione del genere!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:684
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:709
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -458,79 +459,79 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Per visitare la destinazione nel tuo database host, cliccare <a href=\"{0}\">qui</a>. \nPer visitare la destinazione addresshelper in conflitto, cliccare <a href=\"{1}\">qui</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1095
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1121
 msgid "Destination lease set not found"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1245
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1273
 msgid "Host"
 msgstr "Host"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1249
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1277
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1253
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1281
 msgid "Destination"
 msgstr "Destinazione"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1259
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1287
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Continua a {0} senza salvare"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1265
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr ""
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1268
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1296
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1269
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1297
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:156
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:171
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr "Aggiunto con address helper {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:158
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:173
 msgid "Added via address helper"
 msgstr "Aggiunto con address helper"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:175
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
 msgid "router"
 msgstr "router"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:177
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
 msgid "master"
-msgstr ""
+msgstr "master"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:179
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:194
 msgid "private"
 msgstr "privato"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:186
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "Redirezionamento a {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:198
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:215
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr "{0} salvato sulla rubrica {1}, in redirezionamento."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:199
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:216
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr "Salvataggio di {0} sulla rubrica {1} fallito, in redirezionamento."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:201
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:218
 msgid "Click here if you are not redirected automatically."
 msgstr "Clicca qui se non sei redirezionato automaticamente."

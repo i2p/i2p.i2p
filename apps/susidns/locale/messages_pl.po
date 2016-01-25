@@ -5,17 +5,18 @@
 # 
 # Translators:
 # PolishAnon <b790979@klzlk.com>, 2011, 2012
-# seb, 2014-2015
+# sebx, 2014-2015
 # Smert i2p <Smert@safe-mail.net>, 2013
+# Verdulo :-) <cybertomek@openmailbox.org>, 2016
 # Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:13+0000\n"
-"PO-Revision-Date: 2015-06-09 20:53+0000\n"
-"Last-Translator: seb\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
+"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"PO-Revision-Date: 2016-01-24 01:12+0000\n"
+"Last-Translator: Verdulo :-) <cybertomek@openmailbox.org>\n"
+"Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -123,7 +124,7 @@ msgstr "Wyświetlono {0} z {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:432
 msgid "Add"
 msgstr "Dodaj"
 
@@ -131,7 +132,7 @@ msgstr "Dodaj"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:430
 msgid "Replace"
 msgstr "Zastąp"
 
@@ -193,7 +194,7 @@ msgstr "Usuń wpis"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:354
 msgid "Delete Selected"
 msgstr "Usuń zaznaczone"
 
@@ -407,54 +408,54 @@ msgstr "wyczyść filtr"
 msgid "Search"
 msgstr "Szukaj"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:249
 msgid "Name"
 msgstr "Nazwa"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:251
 msgid "Links"
 msgstr "Linki"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:253
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:424
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
 msgid "Destination"
 msgstr "Miejsce przeznaczenia"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:288
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:289
 msgid "Mark for deletion"
 msgstr "Zaznacz do usunięcia"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:308
 msgid "Base 32 address"
 msgstr "Adres Base 32"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
 msgid "More information on this entry"
 msgstr "Więcej informacji na temat tego wpisu"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:315
 msgid "details"
 msgstr "szczegóły"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:352
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:428
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:379
 msgid "Export in hosts.txt format"
 msgstr "Eksportuj w formacie hosts.txt"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:403
 msgid "This address book is empty."
 msgstr "Ta książka adresowa jest pusta."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:418
 msgid "Add new destination"
 msgstr "Dodaj nowe miejsce przeznaczenia"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:420
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
 msgid "Host Name"
 msgstr "Nazwa hosta"
@@ -644,7 +645,7 @@ msgstr "W domyślnej konfiguracji, książka adresowa jest subskrybowana tylko d
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a> file."
-msgstr "Zapisywanie się do innych witryn jest proste, wystarczy dodać je do pliku &lt;a href=\"subscriptions.jsp\"&gt;subskrypcje&lt;/a&gt;."
+msgstr "Zapisywanie się do innych witryn jest proste, wystarczy dodać je do pliku <a href=\"subscriptions\">subskrypcje</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:147
 msgid ""

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:13+0000\n"
-"PO-Revision-Date: 2015-08-05 15:31+0000\n"
+"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"PO-Revision-Date: 2015-11-19 05:12+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
@@ -112,7 +112,7 @@ msgstr "{0} / {1} görüntüleniyor"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:432
 msgid "Add"
 msgstr "Ekleyin"
 
@@ -120,7 +120,7 @@ msgstr "Ekleyin"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:430
 msgid "Replace"
 msgstr "Değiştirin"
 
@@ -182,7 +182,7 @@ msgstr "Kaydı Silin"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:354
 msgid "Delete Selected"
 msgstr "Seçileri Silin"
 
@@ -394,54 +394,54 @@ msgstr "süzgeci temizleyin"
 msgid "Search"
 msgstr "Arayın"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:249
 msgid "Name"
 msgstr "Ad"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:251
 msgid "Links"
 msgstr "Bağlantılar"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:253
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:424
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
 msgid "Destination"
 msgstr "Hedef"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:288
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:289
 msgid "Mark for deletion"
 msgstr "Silmek üzere işaretleyin"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:308
 msgid "Base 32 address"
 msgstr "Base 32 adresi"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
 msgid "More information on this entry"
 msgstr "Kayıtla ilgili diğer bilgiler"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:315
 msgid "details"
 msgstr "ayrıntılar"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:352
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:428
 msgid "Cancel"
 msgstr "İptal"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:379
 msgid "Export in hosts.txt format"
 msgstr "hosts.txt biçiminde verin"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:403
 msgid "This address book is empty."
 msgstr "Bu adres defteri boş."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:418
 msgid "Add new destination"
 msgstr "Yeni hedef ekleyin"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:420
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
 msgid "Host Name"
 msgstr "Sunucu Adı"

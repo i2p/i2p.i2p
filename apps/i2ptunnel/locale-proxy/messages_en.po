@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"POT-Creation-Date: 2016-01-17 17:08+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -31,7 +31,7 @@ msgstr ""
 #: ../java/build/Proxy.java:129 ../java/build/Proxy.java:140
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:185
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:207
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:209
 msgid "Router Console"
 msgstr ""
 
@@ -56,7 +56,7 @@ msgstr ""
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:142
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:166
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:187
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Configuration"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 #: ../java/build/Proxy.java:132 ../java/build/Proxy.java:143
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:167
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:188
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Help"
 msgstr ""
 
@@ -82,7 +82,7 @@ msgstr ""
 #: ../java/build/Proxy.java:133 ../java/build/Proxy.java:144
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:168
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:189
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Addressbook"
 msgstr ""
 
@@ -486,42 +486,42 @@ msgstr ""
 msgid "Save {0} to private address book and continue to website"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:169
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:171
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:171
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:173
 msgid "Added via address helper"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:188
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
 msgid "router"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
 msgid "master"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:194
 msgid "private"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:201
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
 #, java-format
 msgid "Redirecting to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:213
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:215
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:214
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:216
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:216
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:218
 msgid "Click here if you are not redirected automatically."
 msgstr ""
