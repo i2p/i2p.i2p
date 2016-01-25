@@ -94,7 +94,7 @@ public class Reseeder {
               "https://www.torontocrypto.org:8443/" + "," +
               "https://reseed.i2p.vzaws.com:8443/" + ", " + // Only SU3 (v3) support
               "https://user.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
+              "https://download.xxlspeed.com/"; // Only HTTPS and SU3 (v3) support
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
 
