@@ -451,8 +451,8 @@ public class TunnelDispatcher implements Service {
     public void remove(TunnelCreatorConfig cfg) {
         if (cfg.isInbound()) {
             TunnelId recvId = cfg.getConfig(cfg.getLength()-1).getReceiveTunnel();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing our own inbound " + cfg);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("removing our own inbound " + cfg);
             TunnelParticipant participant = _participants.remove(recvId);
             if (participant == null) {
                 _inboundGateways.remove(recvId);
@@ -470,8 +470,8 @@ public class TunnelDispatcher implements Service {
                 }
             }
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing our own outbound " + cfg);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("removing our own outbound " + cfg);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
             TunnelGateway gw = _outboundGateways.remove(outId);
             if (gw != null) {
@@ -498,8 +498,8 @@ public class TunnelDispatcher implements Service {
         
         boolean removed = (null != _participatingConfig.remove(recvId));
         if (removed) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing " + cfg /* , new Exception() */ );
+            if (_log.shouldLog(Log.INFO))
+                _log.info("removing " + cfg /* , new Exception() */ );
         } else {
             // this is normal, this can get called twice
             if (_log.shouldLog(Log.DEBUG))
