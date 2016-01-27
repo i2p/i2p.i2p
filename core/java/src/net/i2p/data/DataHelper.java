@@ -1324,8 +1324,9 @@ public class DataHelper {
      *
      * @param hash null OK
      * @return null on EOF
-     * @deprecated use MessageDigest version
+     * @deprecated use MessageDigest version to be removed in 0.9.27
      */
+    @Deprecated
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
         StringBuilder buf = new StringBuilder(128);
         boolean ok = readLine(in, buf, hash);
@@ -1380,7 +1381,7 @@ public class DataHelper {
      *
      * @return true if the line was read, false if eof was reached on an empty line
      *              (returns true for non-empty last line without a newline)
-     * @deprecated use StringBuilder / MessageDigest version
+     * @deprecated use StringBuilder / MessageDigest version, to be removed in 0.9.27
      */
     @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
@@ -1420,8 +1421,9 @@ public class DataHelper {
      * @param hash null OK
      * @return true if the line was read, false if eof was reached on an empty line
      *              (returns true for non-empty last line without a newline)
-     * @deprecated use MessageDigest version
+     * @deprecated use MessageDigest version, to be removed in 0.9.27
      */
+    @Deprecated
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
         int c = -1;
         int i = 0;
@@ -1463,8 +1465,9 @@ public class DataHelper {
     
     /**
      *  update the hash along the way
-     *  @deprecated use MessageDigest version
+     *  @deprecated use MessageDigest version, to be removed in 0.9.27
      */
+    @Deprecated
     public static void write(OutputStream out, byte data[], Sha256Standalone hash) throws IOException {
         hash.update(data);
         out.write(data);
