@@ -170,7 +170,7 @@
   - In the i2p.newsxml branch, edit magnet links, release dates and release
     number in data/releases.json, and check in
 
-2. Add update torrents to tracker2.postman.i2p and start seeding (su2 and su3)
+2. Add i2pupdate-0.9.xx.su3 torrent to tracker2.postman.i2p and start seeding
 
 3. Notify the following people:
   - All in-network update hosts
