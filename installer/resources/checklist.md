@@ -51,6 +51,7 @@
     release.signer.su3=xxx@mail.i2p
     build.built-by=xxx
     javac.compilerargs=-bootclasspath /usr/lib/jvm/java-6-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-6-openjdk-amd64/jre/lib/jce.jar
+    javac.compilerargs7=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
     ```
 
 5. Copy latest trust list _MTN/monotonerc from website or some other workspace
