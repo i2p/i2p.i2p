@@ -208,10 +208,10 @@ public final class KeyGenerator {
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         BigInteger x = null;
 
-        // make sure the random key is less than the DSA q
+        // make sure the random key is less than the DSA q and greater than zero
         do {
             x = new NativeBigInteger(160, _context.random());
-        } while (x.compareTo(CryptoConstants.dsaq) >= 0);
+        } while (x.compareTo(CryptoConstants.dsaq) >= 0 || x.equals(BigInteger.ZERO));
 
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         keys[0] = new SigningPublicKey();
