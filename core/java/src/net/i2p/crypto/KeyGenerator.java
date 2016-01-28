@@ -34,6 +34,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -57,6 +58,10 @@ import net.i2p.util.RandomSource;
  */
 public final class KeyGenerator {
     private final I2PAppContext _context;
+
+    static {
+        I2PProvider.addProvider();
+    }
 
     public KeyGenerator(I2PAppContext context) {
         _context = context;

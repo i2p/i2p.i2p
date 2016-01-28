@@ -3,6 +3,7 @@ package net.i2p.crypto.provider;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
+import java.security.Security;
 
 /**
  *  @since 0.9.15
@@ -11,6 +12,7 @@ public final class I2PProvider extends Provider {
     public static final String PROVIDER_NAME = "I2P";
     private static final String INFO = "I2P Security Provider v0.1, implementing" +
             "several algorithms used by I2P.";
+    private static boolean _installed;
 
     /**
      * Construct a new provider.  This should only be required when
@@ -77,5 +79,34 @@ public final class I2PProvider extends Provider {
         put("Alg.Alias.KeyPairGenerator.OID.1.3.14.7.2.1.1", "ElGamal");
         put("Alg.Alias.Signature.1.3.14.7.2.1.1", "SHA256withElGamal");
         put("Alg.Alias.Signature.OID.1.3.14.7.2.1.1", "SHA256withElGamal");
+    }
+
+    /**
+     *  Install the I2PProvider.
+     *  Harmless to call multiple times.
+     *  @since 0.9.25
+     */
+    public static void addProvider() {
+        synchronized(I2PProvider.class) {
+            if (!_installed) {
+                try {
+                    Provider us = new I2PProvider();
+                    // put ours ahead of BC, if installed, because our ElGamal
+                    // implementation may not be fully compatible with BC
+                    Provider[] provs = Security.getProviders();
+                    for (int i = 0; i < provs.length; i++) {
+                        if (provs[i].getName().equals("BC")) {
+                            Security.insertProviderAt(us, i);
+                            _installed = true;
+                            return;
+                        }
+                    }
+                    Security.addProvider(us);
+                    _installed = true;
+                } catch (SecurityException se) {
+                    System.out.println("WARN: Could not install I2P provider: " + se);
+                }
+            }
+        }
     }
 }

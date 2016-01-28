@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -43,11 +42,7 @@ public final class KeyStoreUtil {
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
 
     static {
-        try {
-            Security.addProvider(new I2PProvider());
-        } catch (SecurityException se) {
-            System.out.println("WARN: Could not install I2P provider: " + se);
-        }
+        I2PProvider.addProvider();
     }
 
     /**
@@ -490,7 +485,7 @@ public final class KeyStoreUtil {
         a.add("-sigalg");    a.add(getSigAlg(keySize, keyAlg));
         a.add("-keysize");   a.add(Integer.toString(keySize));
         a.add("-keypass");   a.add(keyPW);
-        if (keyAlg.equals("Ed") || keyAlg.equals("EdDSA")) {
+        if (keyAlg.equals("Ed") || keyAlg.equals("EdDSA") || keyAlg.equals("ElGamal")) {
             File f = I2PAppContext.getGlobalContext().getBaseDir();
             f = new File(f, "lib");
             f = new File(f, "i2p.jar");
@@ -838,13 +833,15 @@ public final class KeyStoreUtil {
         String alias = args[2];
         String pw = args[3];
         boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, "test cname", "test ou",
-                                DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
+                                //DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
+                                DEFAULT_KEY_VALID_DAYS, "ElGamal", 2048, pw);
         System.out.println("genkey ok? " + ok);
     }
 
     private static void testKeygen2(String[] args) throws Exception {
         // keygen test using the I2PProvider
-        SigType type = SigType.EdDSA_SHA512_Ed25519;
+        //SigType type = SigType.EdDSA_SHA512_Ed25519;
+        SigType type = SigType.ElGamal_SHA256_MODP2048;
         java.security.KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
         kpg.initialize(type.getParams());
         java.security.KeyPair kp = kpg.generateKeyPair();
@@ -856,10 +853,20 @@ public final class KeyStoreUtil {
         System.out.println("Encoded public key:");
         System.out.println(net.i2p.util.HexDump.dump(jpub.getEncoded()));
 
-        java.security.Signature jsig = java.security.Signature.getInstance("SHA512withEdDSA");
+        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         jsig.initSign(jpriv);
-        jsig.update(new byte[111]);
-        net.i2p.data.Signature sig = SigUtil.fromJavaSig(jsig.sign(), type);
+        byte[] data = new byte[111];
+        net.i2p.util.RandomSource.getInstance().nextBytes(data);
+        jsig.update(data);
+        byte[] bsig = jsig.sign();
+        System.out.println("Encoded signature:");
+        System.out.println(net.i2p.util.HexDump.dump(bsig));
+        jsig.initVerify(jpub);
+        jsig.update(data);
+        boolean ok = jsig.verify(bsig);
+        System.out.println("verify passed? " + ok);
+
+        net.i2p.data.Signature sig = SigUtil.fromJavaSig(bsig, type);
         System.out.println("Signature test: " + sig);
     }
 ****/
