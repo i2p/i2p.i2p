@@ -577,7 +577,7 @@ Debian wrapper.config to try to prevent confusion.
  "true."
 --- a/installer/resources/locale/po/messages_pt_BR.po
 +++ b/installer/resources/locale/po/messages_pt_BR.po
-@@ -190,15 +190,15 @@
+@@ -189,13 +189,13 @@
  msgstr "Solicitar um despejo de thread se está sendo executado."
  
  #: ../i2prouter:1864
@@ -592,11 +592,9 @@ Debian wrapper.config to try to prevent confusion.
  
  #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite i2prouter e ponha ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
- msgstr ""
- "De qualquer forma, se quiser mesmo executar o roteador como root, edite "
--"i2prouter e ponha ALLOW_ROOT=true."
-+"/etc/default/i2p e ponha ALLOW_ROOT=true."
++msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite /etc/default/i2p e ponha ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_pl.po
 +++ b/installer/resources/locale/po/messages_pl.po
 @@ -191,13 +191,13 @@
