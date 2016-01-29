@@ -60,4 +60,6 @@ public abstract class FieldElement implements Serializable {
     public abstract FieldElement invert();
 
     public abstract FieldElement pow22523();
+
+    // Note: concrete subclasses must implement hashCode() and equals()
 }

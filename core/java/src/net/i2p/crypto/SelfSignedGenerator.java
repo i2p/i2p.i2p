@@ -153,6 +153,12 @@ public final class SelfSignedGenerator {
             throw new GeneralSecurityException("cert error", iae);
         }
 
+        // some simple tests
+        PublicKey cpub = cert.getPublicKey();
+        cert.verify(cpub);
+        if (!cpub.equals(jpub))
+            throw new GeneralSecurityException("pubkey mismatch");
+
         Object[] rv = { jpub, jpriv, cert };
         return rv;
     }

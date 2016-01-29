@@ -3,6 +3,7 @@ package net.i2p.crypto.eddsa;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 
 import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
@@ -152,8 +153,9 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
                 d[idx++] != 1 ||
                 d[idx++] != 1 ||
                 d[idx++] != 0x04 ||
-                d[idx++] != 32)
-            throw new InvalidKeySpecException("unsupported key spec");
+                d[idx++] != 32) {
+                throw new InvalidKeySpecException("unsupported key spec");
+            }
             byte[] rv = new byte[32];
             System.arraycopy(d, idx, rv, 0, 32);
             return rv;
@@ -184,5 +186,27 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
 
     public byte[] getAbyte() {
         return Abyte;
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(seed);
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof EdDSAPrivateKey))
+            return false;
+        EdDSAPrivateKey pk = (EdDSAPrivateKey) o;
+        return Arrays.equals(seed, pk.getSeed()) &&
+               edDsaSpec.equals(pk.getParams());
     }
 }

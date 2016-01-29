@@ -31,7 +31,7 @@ public final class KeyFactory extends KeyFactorySpi {
         if (keySpec instanceof PKCS8EncodedKeySpec) {
             return new EdDSAPrivateKey((PKCS8EncodedKeySpec) keySpec);
         }
-        throw new InvalidKeySpecException("key spec not recognised");
+        throw new InvalidKeySpecException("key spec not recognised: " + keySpec.getClass());
     }
 
     /**
@@ -45,7 +45,7 @@ public final class KeyFactory extends KeyFactorySpi {
         if (keySpec instanceof X509EncodedKeySpec) {
             return new EdDSAPublicKey((X509EncodedKeySpec) keySpec);
         }
-        throw new InvalidKeySpecException("key spec not recognised");
+        throw new InvalidKeySpecException("key spec not recognised: " + keySpec.getClass());
     }
 
     @SuppressWarnings("unchecked")

@@ -50,19 +50,22 @@ public final class I2PProvider extends Provider {
         //put("Signature.SHA1withDSA", "net.i2p.crypto.provider.SignatureSpi");
 
         // EdDSA
-        // OID: 1.3.101.100
+        // Key OID: 1.3.101.100; Sig OID: 1.3.101.101
         put("KeyFactory.EdDSA", "net.i2p.crypto.eddsa.KeyFactory");
         put("KeyPairGenerator.EdDSA", "net.i2p.crypto.eddsa.KeyPairGenerator");
         put("Signature.SHA512withEdDSA", "net.i2p.crypto.eddsa.EdDSAEngine");
         // Didn't find much documentation on these at all,
         // see http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/HowToImplAProvider.html
         // section "Mapping from OID to name"
+        // without these, Certificate.verify() fails
+        put("Alg.Alias.KeyFactory.1.3.101.100", "EdDSA");
+        put("Alg.Alias.KeyFactory.OID.1.3.101.100", "EdDSA");
         // Without these, keytool fails with:
         // keytool error: java.security.NoSuchAlgorithmException: unrecognized algorithm name: SHA512withEdDSA
         put("Alg.Alias.KeyPairGenerator.1.3.101.100", "EdDSA");
         put("Alg.Alias.KeyPairGenerator.OID.1.3.101.100", "EdDSA");
-        put("Alg.Alias.Signature.1.3.101.100", "SHA512withEdDSA");
-        put("Alg.Alias.Signature.OID.1.3.101.100", "SHA512withEdDSA");
+        put("Alg.Alias.Signature.1.3.101.101", "SHA512withEdDSA");
+        put("Alg.Alias.Signature.OID.1.3.101.101", "SHA512withEdDSA");
         // TODO Ed25519ph
         // OID: 1.3.101.101
 
@@ -75,6 +78,8 @@ public final class I2PProvider extends Provider {
         put("KeyPairGenerator.DiffieHellman", "net.i2p.crypto.elgamal.KeyPairGenerator");
         put("KeyPairGenerator.ElGamal", "net.i2p.crypto.elgamal.KeyPairGenerator");
         put("Signature.SHA256withElGamal", "net.i2p.crypto.elgamal.ElGamalSigEngine");
+        put("Alg.Alias.KeyFactory.1.3.14.7.2.1.1", "ElGamal");
+        put("Alg.Alias.KeyFactory.OID.1.3.14.7.2.1.1", "ElGamal");
         put("Alg.Alias.KeyPairGenerator.1.3.14.7.2.1.1", "ElGamal");
         put("Alg.Alias.KeyPairGenerator.OID.1.3.14.7.2.1.1", "ElGamal");
         put("Alg.Alias.Signature.1.3.14.7.2.1.1", "SHA256withElGamal");

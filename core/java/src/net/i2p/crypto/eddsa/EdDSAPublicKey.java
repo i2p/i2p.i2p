@@ -3,6 +3,7 @@ package net.i2p.crypto.eddsa;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 import net.i2p.crypto.eddsa.math.GroupElement;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
@@ -126,9 +127,10 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
                 d[idx++] != 1 ||
                 d[idx++] != 1 ||
                 d[idx++] != 0x03 ||
-                d[idx++] != 32 ||
-                d[idx++] != 0)
-            throw new InvalidKeySpecException("unsupported key spec");
+                d[idx++] != 33 ||
+                d[idx++] != 0) {
+                throw new InvalidKeySpecException("unsupported key spec");
+            }
             byte[] rv = new byte[32];
             System.arraycopy(d, idx, rv, 0, 32);
             return rv;
@@ -151,5 +153,27 @@ public class EdDSAPublicKey implements EdDSAKey, PublicKey {
 
     public byte[] getAbyte() {
         return Abyte;
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(Abyte);
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof EdDSAPublicKey))
+            return false;
+        EdDSAPublicKey pk = (EdDSAPublicKey) o;
+        return Arrays.equals(Abyte, pk.getAbyte()) &&
+               edDsaSpec.equals(pk.getParams());
     }
 }
