@@ -87,7 +87,6 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
      *  @since implemented in 0.9.25
      */
     public byte[] getEncoded() {
-        // TODO no equals() implemented in spec, but it's essentially a singleton
         if (!edDsaSpec.equals(EdDSANamedCurveTable.getByName(EdDSANamedCurveTable.CURVE_ED25519_SHA512)))
             return null;
         int totlen = 17 + seed.length;

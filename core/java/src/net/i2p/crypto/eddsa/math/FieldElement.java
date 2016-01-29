@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 /**
  *
+ * Note: concrete subclasses must implement hashCode() and equals()
+ *
  * @since 0.9.15
  *
  */
