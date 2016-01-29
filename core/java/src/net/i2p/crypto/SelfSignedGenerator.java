@@ -57,15 +57,6 @@ public final class SelfSignedGenerator {
     private static final String OID_OU = "2.5.4.11";
     // Subject Key Identifier
     private static final String OID_SKI = "2.5.29.14";
-    //private static final String OID_RSA_4096_PUB = "1.2.840.113549.1.1.1";
-    // TODO put these in SigType
-    private static final String OID_DSA_1024_SIG = "1.2.840.10040.4.3";
-    private static final String OID_ECDSA_P256_SIG = "1.2.840.10045.4.3.2";
-    private static final String OID_ECDSA_P384_SIG = "1.2.840.10045.4.3.3";
-    private static final String OID_ECDSA_P521_SIG = "1.2.840.10045.4.3.4";
-    private static final String OID_RSA_2048_SIG = "1.2.840.113549.1.1.11";
-    private static final String OID_RSA_3072_SIG = "1.2.840.113549.1.1.12";
-    private static final String OID_RSA_4096_SIG = "1.2.840.113549.1.1.13";
 
     private static final Map<String, String> OIDS;
     static {
@@ -92,29 +83,16 @@ public final class SelfSignedGenerator {
         PublicKey jpub = SigUtil.toJavaKey(pub);
         PrivateKey jpriv = SigUtil.toJavaKey(priv);
 
-        // TODO just put the oid in the sigtype
         String oid;
         switch (type) {
             case DSA_SHA1:
-                oid = OID_DSA_1024_SIG;
-                break;
             case ECDSA_SHA256_P256:
-                oid = OID_ECDSA_P256_SIG;
-                break;
             case ECDSA_SHA384_P384:
-                oid = OID_ECDSA_P384_SIG;
-                break;
             case ECDSA_SHA512_P521:
-                oid = OID_ECDSA_P521_SIG;
-                break;
             case RSA_SHA256_2048:
-                oid = OID_RSA_2048_SIG;
-                break;
             case RSA_SHA384_3072:
-                oid = OID_RSA_3072_SIG;
-                break;
             case RSA_SHA512_4096:
-                oid = OID_RSA_4096_SIG;
+                oid = type.getOID();
                 break;
             default:
                 throw new GeneralSecurityException("Unsupported: " + type);
