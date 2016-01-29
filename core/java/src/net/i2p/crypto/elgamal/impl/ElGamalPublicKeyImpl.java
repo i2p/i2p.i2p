@@ -82,10 +82,10 @@ public class ElGamalPublicKeyImpl
         byte[] pb = elSpec.getP().toByteArray();
         byte[] gb = elSpec.getG().toByteArray();
         byte[] yb = y.toByteArray();
-        int seq3len = 2 + spaceFor(pb.length) + spaceFor(gb.length);
-        int seq2len = 8 + 1 + spaceFor(seq3len);
-        int seq1len = 1 + spaceFor(seq2len) + 1 + spaceFor(yb.length + 1);
-        int totlen = 1 + spaceFor(seq1len);
+        int seq3len = spaceFor(pb.length) + spaceFor(gb.length);
+        int seq2len = 8 + spaceFor(seq3len);
+        int seq1len = spaceFor(seq2len) + spaceFor(yb.length + 1);
+        int totlen = spaceFor(seq1len);
         byte[] rv = new byte[totlen];
         int idx = 0;
         // sequence 1
@@ -133,6 +133,10 @@ public class ElGamalPublicKeyImpl
         return rv;
     }
 
+    /**
+     *  @param val the length of the value, 65535 max
+     *  @return the length of the TLV
+     */
     static int spaceFor(int val) {
         int rv;
         if (val > 255)
@@ -141,7 +145,7 @@ public class ElGamalPublicKeyImpl
             rv = 2;
         else
             rv = 1;
-        return rv + val;
+        return 1 + rv + val;
     }
 
     public ElGamalParameterSpec getParameters()

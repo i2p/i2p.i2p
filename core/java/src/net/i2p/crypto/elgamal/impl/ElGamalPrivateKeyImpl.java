@@ -98,10 +98,10 @@ public class ElGamalPrivateKeyImpl
         byte[] pb = elSpec.getP().toByteArray();
         byte[] gb = elSpec.getG().toByteArray();
         byte[] xb = x.toByteArray();
-        int seq3len = 2 + spaceFor(pb.length) + spaceFor(gb.length);
-        int seq2len = 8 + 1 + spaceFor(seq3len);
-        int seq1len = 1 + 3 + spaceFor(seq2len) + 1 + spaceFor(xb.length);
-        int totlen = 1 + spaceFor(seq1len);
+        int seq3len = spaceFor(pb.length) + spaceFor(gb.length);
+        int seq2len = 8 + spaceFor(seq3len);
+        int seq1len = 3 + spaceFor(seq2len) + spaceFor(xb.length);
+        int totlen = spaceFor(seq1len);
         byte[] rv = new byte[totlen];
         int idx = 0;
         // sequence 1
