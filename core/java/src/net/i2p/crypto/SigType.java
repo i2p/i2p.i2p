@@ -55,9 +55,17 @@ public enum SigType {
      *  @since 0.9.15
      */
     EdDSA_SHA512_Ed25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA",
-                                                                            // this is the OID of the key, not the sig, probably wrong
-                         EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.100", "0.9.17");
+                         EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.101", "0.9.17"),
 
+    /**
+     *  Prehash version (double hashing, for offline use such as su3, not for use on the network)
+     *  Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes
+     *  @since 0.9.25
+     */
+    EdDSA_SHA512_Ed25519ph(8, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "NonewithEdDSA",
+                           EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.101", "0.9.25"),
+
+    ;
 
     // TESTING....................
 
@@ -285,6 +293,8 @@ public enum SigType {
             // handle mixed-case enum
             if (uc.equals("EDDSA_SHA512_ED25519"))
                 return EdDSA_SHA512_Ed25519;
+            if (uc.equals("EDDSA_SHA512_ED25519PH"))
+                return EdDSA_SHA512_Ed25519ph;
             return valueOf(uc);
         } catch (IllegalArgumentException iae) {
             try {
