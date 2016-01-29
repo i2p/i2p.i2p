@@ -33,6 +33,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.HexDump;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SystemVersion;
 
@@ -48,6 +49,8 @@ import net.i2p.util.SystemVersion;
  *  @since 0.9.25
  */
 public final class SelfSignedGenerator {
+
+    private static final boolean DEBUG = false;
 
     private static final String OID_CN = "2.5.4.3";
     private static final String OID_C = "2.5.4.6";
@@ -92,6 +95,7 @@ public final class SelfSignedGenerator {
             case RSA_SHA256_2048:
             case RSA_SHA384_3072:
             case RSA_SHA512_4096:
+            case EdDSA_SHA512_Ed25519:
                 oid = type.getOID();
                 break;
             default:
@@ -121,21 +125,23 @@ public final class SelfSignedGenerator {
         idx += tbs.length;
 
         // sig algo
-        System.out.println("Sig OID");
-        System.out.println(net.i2p.util.HexDump.dump(sigoid));
         System.arraycopy(sigoid, 0, cb, idx, sigoid.length);
         idx += sigoid.length;
 
         // sig (bit string)
-        System.out.println("Signature");
-        System.out.println(net.i2p.util.HexDump.dump(sigbytes));
         cb[idx++] = 0x03;
         idx = intToASN1(cb, idx, sigbytes.length + 1);
         cb[idx++] = 0;
         System.arraycopy(sigbytes, 0, cb, idx, sigbytes.length);
 
-        System.out.println("Whole cert");
-        System.out.println(net.i2p.util.HexDump.dump(cb));
+        if (DEBUG) {
+            System.out.println("Sig OID");
+            System.out.println(HexDump.dump(sigoid));
+            System.out.println("Signature");
+            System.out.println(HexDump.dump(sigbytes));
+            System.out.println("Whole cert");
+            System.out.println(HexDump.dump(cb));
+        }
         ByteArrayInputStream bais = new ByteArrayInputStream(cb);
 
         X509Certificate cert;
@@ -180,39 +186,41 @@ public final class SelfSignedGenerator {
         int idx = 0;
         rv[idx++] = 0x30;
         idx = intToASN1(rv, idx, len);
-        System.out.println(net.i2p.util.HexDump.dump(version));
         System.arraycopy(version, 0, rv, idx, version.length);
         idx += version.length;
-        System.out.println("serial");
-        System.out.println(net.i2p.util.HexDump.dump(serial));
         System.arraycopy(serial, 0, rv, idx, serial.length);
         idx += serial.length;
-        System.out.println("oid");
-        System.out.println(net.i2p.util.HexDump.dump(sigoid));
         System.arraycopy(sigoid, 0, rv, idx, sigoid.length);
         idx += sigoid.length;
-        System.out.println("issuer");
-        System.out.println(net.i2p.util.HexDump.dump(issuer));
         System.arraycopy(issuer, 0, rv, idx, issuer.length);
         idx += issuer.length;
-        System.out.println("valid");
-        System.out.println(net.i2p.util.HexDump.dump(validity));
         System.arraycopy(validity, 0, rv, idx, validity.length);
         idx += validity.length;
-        System.out.println("subject");
-        System.out.println(net.i2p.util.HexDump.dump(subject));
         System.arraycopy(subject, 0, rv, idx, subject.length);
         idx += subject.length;
-        System.out.println("pub");
-        System.out.println(net.i2p.util.HexDump.dump(pubbytes));
         System.arraycopy(pubbytes, 0, rv, idx, pubbytes.length);
         idx += pubbytes.length;
-        System.out.println("extensions");
-        System.out.println(net.i2p.util.HexDump.dump(extbytes));
         System.arraycopy(extbytes, 0, rv, idx, extbytes.length);
 
-        System.out.println("TBS cert");
-        System.out.println(net.i2p.util.HexDump.dump(rv));
+        if (DEBUG) {
+            System.out.println(HexDump.dump(version));
+            System.out.println("serial");
+            System.out.println(HexDump.dump(serial));
+            System.out.println("oid");
+            System.out.println(HexDump.dump(sigoid));
+            System.out.println("issuer");
+            System.out.println(HexDump.dump(issuer));
+            System.out.println("valid");
+            System.out.println(HexDump.dump(validity));
+            System.out.println("subject");
+            System.out.println(HexDump.dump(subject));
+            System.out.println("pub");
+            System.out.println(HexDump.dump(pubbytes));
+            System.out.println("extensions");
+            System.out.println(HexDump.dump(extbytes));
+            System.out.println("TBS cert");
+            System.out.println(HexDump.dump(rv));
+        }
         return rv;
     }
 
@@ -363,6 +371,7 @@ public final class SelfSignedGenerator {
             test("test4", SigType.RSA_SHA256_2048);
             test("test5", SigType.RSA_SHA384_3072);
             test("test6", SigType.RSA_SHA512_4096);
+            test("test7", SigType.EdDSA_SHA512_Ed25519);
         } catch (Exception e) {
             e.printStackTrace();
         }
