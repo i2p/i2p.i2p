@@ -77,8 +77,9 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
      *  }
      *</pre>
      *
-     *  Note that the private key encoding is not fully specified in the Josefsson draft,
-     *  and the example is wrong, as it's lacking Version and AlgorithmIdentifier.
+     *  Note that the private key encoding is not fully specified in the Josefsson draft version 04,
+     *  and the example could be wrong, as it's lacking Version and AlgorithmIdentifier.
+     *  This will hopefully be clarified in the next draft.
      *  But sun.security.pkcs.PKCS8Key expects them so we must include them for keytool to work.
      *
      *  @return 49 bytes for Ed25519, null for other curves
