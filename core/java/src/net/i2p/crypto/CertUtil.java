@@ -15,7 +15,9 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CRLException;
 import java.security.cert.X509Certificate;
+import java.security.cert.X509CRL;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.KeySpec;
 import java.util.ArrayList;
@@ -327,4 +329,72 @@ public final class CertUtil {
             try { in.close(); } catch (IOException foo) {}
         }
     }
+
+    /**
+     *  Write a CRL to a file in base64 format.
+     *
+     *  @return success
+     *  @since 0.9.25
+     */
+    public static boolean saveCRL(X509CRL crl, File file) {
+        OutputStream os = null;
+        try {
+           os = new SecureFileOutputStream(file);
+           exportCRL(crl, os);
+           return true;
+        } catch (CRLException ce) {
+            error("Error writing X509 CRL " + file.getAbsolutePath(), ce);
+           return false;
+        } catch (IOException ioe) {
+            error("Error writing X509 CRL " + file.getAbsolutePath(), ioe);
+           return false;
+        } finally {
+            try { if (os != null) os.close(); } catch (IOException foo) {}
+        }
+    }
+
+    /**
+     *  Writes a CRL in base64 format.
+     *  Does NOT close the stream. Throws on all errors.
+     *
+     *  @throws CRLException if the crl does not support encoding
+     *  @since 0.9.25
+     */
+    private static void exportCRL(X509CRL crl, OutputStream out)
+                                                throws IOException, CRLException {
+        byte[] buf = crl.getEncoded();
+        if (buf == null)
+            throw new CRLException("encoding unsupported for this CRL");
+        PrintWriter wr = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+        wr.println("-----BEGIN X509 CRL-----");
+        String b64 = Base64.encode(buf, true);     // true = use standard alphabet
+        for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
+            wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
+        }
+        wr.println("-----END X509 CRL-----");
+        wr.flush();
+        if (wr.checkError())
+            throw new IOException("Failed write to " + out);
+    }
+
+/****
+    public static final void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: [loadcert | loadcrl | loadprivatekey] file");
+            System.exit(1);
+        }
+        try {
+            File f = new File(args[1]);
+            if (args[0].equals("loadcert")) {
+                loadCert(f);
+            } else if (args[0].equals("loadcrl")) {
+            } else {
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+****/
 }
