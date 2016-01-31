@@ -103,16 +103,7 @@ public final class CertUtil {
                                                 throws IOException, CertificateEncodingException {
         // Get the encoded form which is suitable for exporting
         byte[] buf = cert.getEncoded();
-        PrintWriter wr = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-        wr.println("-----BEGIN CERTIFICATE-----");
-        String b64 = Base64.encode(buf, true);     // true = use standard alphabet
-        for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
-            wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
-        }
-        wr.println("-----END CERTIFICATE-----");
-        wr.flush();
-        if (wr.checkError())
-            throw new IOException("Failed write to " + out);
+        writePEM(buf, "CERTIFICATE", out);
     }
 
     /**
@@ -131,13 +122,27 @@ public final class CertUtil {
         byte[] buf = pk.getEncoded();
         if (buf == null)
             throw new InvalidKeyException("encoding unsupported for this key");
+        writePEM(buf, "PRIVATE KEY", out);
+    }
+
+    /**
+     *  Modified from:
+     *  http://www.exampledepot.com/egs/java.security.cert/ExportCert.html
+     *
+     *  Writes data in base64 format.
+     *  Does NOT close the stream. Throws on all errors.
+     *
+     *  @since 0.9.25 consolidated from other methods
+     */
+    private static void writePEM(byte[] buf, String what, OutputStream out)
+                                                throws IOException {
         PrintWriter wr = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-        wr.println("-----BEGIN PRIVATE KEY-----");
+        wr.println("-----BEGIN " + what + "-----");
         String b64 = Base64.encode(buf, true);     // true = use standard alphabet
         for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
             wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
         }
-        wr.println("-----END PRIVATE KEY-----");
+        wr.println("-----END " + what + "-----");
         wr.flush();
         if (wr.checkError())
             throw new IOException("Failed write to " + out);
@@ -363,18 +368,7 @@ public final class CertUtil {
     private static void exportCRL(X509CRL crl, OutputStream out)
                                                 throws IOException, CRLException {
         byte[] buf = crl.getEncoded();
-        if (buf == null)
-            throw new CRLException("encoding unsupported for this CRL");
-        PrintWriter wr = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-        wr.println("-----BEGIN X509 CRL-----");
-        String b64 = Base64.encode(buf, true);     // true = use standard alphabet
-        for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
-            wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
-        }
-        wr.println("-----END X509 CRL-----");
-        wr.flush();
-        if (wr.checkError())
-            throw new IOException("Failed write to " + out);
+        writePEM(buf, "X509 CRL", out);
     }
 
 /****
