@@ -1,3 +1,16 @@
+2016-02-01 zzz
+Prop from i2p.i2p.zzz.imagegen:
+ * Console:
+   - New imagegen webapp, including servlets for identicons, QR codes,
+     and random art. Bundles a small part of zxing, most of identicon,
+     and a rewrite of randomart from gnutls.
+   - Add identicons to sybil page.
+ * i2ptunnel: Add identicons to i2ptunnel address helper conflict page.
+     Clean up text on the conflict page for readability.
+ * SusiDNS:
+   - Display QR and identicon images on details page
+   - Fix title whitespace
+
 * 2016-01-27 0.9.24 released
 
 2016-01-27 zzz
