@@ -69,10 +69,8 @@ public class QRServlet extends HttpServlet {
 		String codeParam = request.getParameter(PARAM_IDENTICON_CODE_SHORT);
 		boolean codeSpecified = codeParam != null && codeParam.length() > 0;
 		if (!codeSpecified) {
-			// TODO 404
-			codeParam="http://stats.i2p/?i2paddresshelper=Okd5sN9hFWx-sr0HH8EFaxkeIMi6PC5eGTcjM1KB7uQ0ffCUJ2nVKzcsKZFHQc7pLONjOs2LmG5H-2SheVH504EfLZnoB7vxoamhOMENnDABkIRGGoRisc5AcJXQ759LraLRdiGSR0WTHQ0O1TU0hAz7vAv3SOaDp9OwNDr9u902qFzzTKjUTG5vMTayjTkLo2kOwi6NVchDeEj9M7mjj5ySgySbD48QpzBgcqw1R27oIoHQmjgbtbmV2sBL-2Tpyh3lRe1Vip0-K0Sf4D-Zv78MzSh8ibdxNcZACmZiVODpgMj2ejWJHxAEz41RsfBpazPV0d38Mfg4wzaS95R5hBBo6SdAM4h5vcZ5ESRiheLxJbW0vBpLRd4mNvtKOrcEtyCvtvsP3FpA-6IKVswyZpHgr3wn6ndDHiVCiLAQZws4MsIUE1nkfxKpKtAnFZtPrrB8eh7QO9CkH2JBhj7bG0ED6mV5~X5iqi52UpsZ8gnjZTgyG5pOF8RcFrk86kHxAAAA";
-			//response.setStatus(403);
-			//return;
+			response.setStatus(403);
+			return;
 		}
 
 		String sizeParam = request.getParameter(PARAM_IDENTICON_SIZE_SHORT);

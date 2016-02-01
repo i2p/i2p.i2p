@@ -24,6 +24,7 @@ public class RandomArtServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -3507466186902317988L;
 	private static final String PARAM_IDENTICON_CODE_SHORT = "c";
+	private static final String PARAM_IDENTICON_MODE_SHORT = "m";
 	private static final long DEFAULT_IDENTICON_EXPIRES_IN_MILLIS = 24 * 60 * 60 * 1000;
 	private int version = 1;
 	private long identiconExpiresInMillis = DEFAULT_IDENTICON_EXPIRES_IN_MILLIS;
@@ -34,8 +35,12 @@ public class RandomArtServlet extends HttpServlet {
 
 		String codeParam = request.getParameter(PARAM_IDENTICON_CODE_SHORT);
 		boolean codeSpecified = codeParam != null && codeParam.length() > 0;
-		if (!codeSpecified)
-			codeParam="stats.i2p";
+		if (!codeSpecified) {
+			response.setStatus(403);
+			return;
+                }
+		String modeParam = request.getParameter(PARAM_IDENTICON_MODE_SHORT);
+		boolean html = modeParam == null || modeParam.startsWith("h");
 		String identiconETag = IdenticonUtil.getIdenticonETag(codeParam.hashCode(), 0,
 				version);
 		String requestETag = request.getHeader("If-None-Match");
@@ -47,13 +52,13 @@ public class RandomArtServlet extends HttpServlet {
 			if (h == null) {
 				response.setStatus(403);
 			} else {
-				boolean html = true;
 				StringBuilder buf = new StringBuilder(512);
 				if (html) {
 					response.setContentType("text/html");
 					buf.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"></head><body>");
 				} else {
 					response.setContentType("text/plain");
+					response.setCharacterEncoding("UTF-8");
 				}
 				buf.append(RandomArt.gnutls_key_fingerprint_randomart(h.getData(), "SHA", 256, "", true, html));
 				if (html)
