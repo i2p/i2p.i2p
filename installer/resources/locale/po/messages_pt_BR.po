@@ -2,7 +2,7 @@
 # Copyright (C) 2012 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # testsubject67 <deborinha97@hotmail.com>, 2014
 # blueboy, 2013
@@ -13,14 +13,13 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:16+0000\n"
-"PO-Revision-Date: 2015-05-07 03:44+0000\n"
+"PO-Revision-Date: 2015-12-23 00:12+0000\n"
 "Last-Translator: blueboy\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/I2P/"
-"language/pt_BR/)\n"
-"Language: pt_BR\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../i2prouter:221
@@ -175,7 +174,7 @@ msgstr "Reinicialize apenas se já estiver sendo executado."
 
 #: ../i2prouter:1848
 msgid "Query the current status."
-msgstr "Duvide do status atual."
+msgstr "Consulte o status atual."
 
 #: ../i2prouter:1849
 msgid "Install to start automatically when system boots."
@@ -199,6 +198,4 @@ msgstr "Executar o roteador I2P como usuário root *não* é recomendado."
 
 #: ../i2prouter:1872
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
-msgstr ""
-"De qualquer forma, se quiser mesmo executar o roteador como root, edite "
-"i2prouter e ponha ALLOW_ROOT=true."
+msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite i2prouter e ponha ALLOW_ROOT=true."

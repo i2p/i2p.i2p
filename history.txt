@@ -1,3 +1,9 @@
+* 2016-01-27 0.9.24 released
+
+2016-01-27 zzz
+ * SocksHeader: Fix arraycopy argument order
+ * SSU: Fix minimum version for extended options
+
 2016-01-20 zzz
  * SusiDNS: Replace image (ticket #1301)
 

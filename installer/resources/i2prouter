@@ -556,7 +556,7 @@ setup_openbsd() {
     set +e
 }
 
-if [ "$DIST_OS"="openbsd" -a ! -f "$WRAPPER_CMD" ]; then
+if [ "$DIST_OS" = "openbsd" -a ! -f "$WRAPPER_CMD" ]; then
     # We handle it here because Tanuki doesn't ship OpenBSD binaries.
     # We don't either, but they are (finally!) in OpenBSD itself.
     setup_openbsd

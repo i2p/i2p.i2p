@@ -132,11 +132,8 @@ class EstablishmentManager {
      * but i2pd hasn't recognized it until this release.
      * No matter, the options weren't defined until this release anyway.
      *
-**********************************************************************************************************
-     * FIXME 0.9.23 for testing, change to 0.9.24 for release
-     *
      */
-    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.23";
+    private static final String VERSION_ALLOW_EXTENDED_OPTIONS = "0.9.24";
     private static final String PROP_DISABLE_EXT_OPTS = "i2np.udp.disableExtendedOptions";
 
 

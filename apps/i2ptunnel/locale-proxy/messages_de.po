@@ -20,10 +20,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-02 01:19+0000\n"
+"POT-Creation-Date: 2016-01-17 17:08+0000\n"
+"PO-Revision-Date: 2015-12-17 16:34+0000\n"
 "Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/I2P/language/de/)\n"
+"Language-Team: German (http://www.transifex.com/otf/I2P/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -43,7 +43,7 @@ msgstr "Information: Neuer Hostname"
 #: ../java/build/Proxy.java:129 ../java/build/Proxy.java:140
 #: ../java/build/Proxy.java:151 ../java/build/Proxy.java:164
 #: ../java/build/Proxy.java:173 ../java/build/Proxy.java:185
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:207
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:209
 msgid "Router Console"
 msgstr "Routerkonsole"
 
@@ -68,7 +68,7 @@ msgstr "I2P Routerkonsole"
 #: ../java/build/Proxy.java:131 ../java/build/Proxy.java:142
 #: ../java/build/Proxy.java:153 ../java/build/Proxy.java:166
 #: ../java/build/Proxy.java:175 ../java/build/Proxy.java:187
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Configuration"
 msgstr "Einstellungen"
 
@@ -81,7 +81,7 @@ msgstr "Einstellungen"
 #: ../java/build/Proxy.java:132 ../java/build/Proxy.java:143
 #: ../java/build/Proxy.java:154 ../java/build/Proxy.java:167
 #: ../java/build/Proxy.java:176 ../java/build/Proxy.java:188
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Help"
 msgstr "Hilfe"
 
@@ -94,7 +94,7 @@ msgstr "Hilfe"
 #: ../java/build/Proxy.java:133 ../java/build/Proxy.java:144
 #: ../java/build/Proxy.java:155 ../java/build/Proxy.java:168
 #: ../java/build/Proxy.java:177 ../java/build/Proxy.java:189
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:208
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:210
 msgid "Addressbook"
 msgstr "Adressbuch"
 
@@ -463,79 +463,79 @@ msgid ""
 "click <a href=\"{1}\">here</a>."
 msgstr "Um das Ziel in Ihrer Host-Datenbank zu besuchen, klicken Sie <a href=\"{0}\">hier</a>, und um das Ziel aus der kollidierenden Adresshelfer-Anfrage zu besuchen, <a href=\"{1}\">hier</a>!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1119
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1121
 msgid "Destination lease set not found"
 msgstr "Leaseset des Servers nicht gefunden."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1271
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1273
 msgid "Host"
 msgstr "Host"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1275
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1277
 msgid "Base 32"
 msgstr "Base 32"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1279
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1281
 msgid "Destination"
 msgstr "Ziel"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1285
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1287
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Weiter zu {0}, ohne zu speichern"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1291
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
 #, java-format
 msgid "Save {0} to router address book and continue to website"
 msgstr "Speichern Sie {0} in das I2P Router Adressbuch und besuchen sie diese Webseite."
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1294
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1296
 #, java-format
 msgid "Save {0} to master address book and continue to website"
 msgstr "Speichern Sie {0} ins I2P Master Adressbuch und besuchen Sie diese Webseite."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1295
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1297
 #, java-format
 msgid "Save {0} to private address book and continue to website"
 msgstr "Speichern Sie {0} in das private I2P Adressbuch und besuchen Sie diese Webseite."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:169
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:171
 #, java-format
 msgid "Added via address helper from {0}"
 msgstr "Hinzugefüg über den Adressenhelfer von {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:171
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:173
 msgid "Added via address helper"
 msgstr "Durch Adresshelfer hinzugefügt"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:188
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
 msgid "router"
 msgstr "Router"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:190
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
 msgid "master"
 msgstr "Master"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:192
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:194
 msgid "private"
 msgstr "Privat"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:201
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:203
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "Weiterleitung zu {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:213
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:215
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr "{0} wurde ins {1} Adressbuch geschrieben.  Du wirst nun weitergeleitet."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:214
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:216
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr "Konnte {0} nicht im {1} Adressbuch speichern. Du wirst nun weitergeleitet."
 
-#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:216
+#: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:218
 msgid "Click here if you are not redirected automatically."
 msgstr "Klick hier, wenn du nicht automatisch weitergeleitet wirst!"
