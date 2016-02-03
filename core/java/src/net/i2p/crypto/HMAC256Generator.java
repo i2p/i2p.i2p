@@ -21,7 +21,7 @@ import org.bouncycastle.oldcrypto.macs.I2PHMac;
  *
  * Deprecated, used only by Syndie.
  */
-public class HMAC256Generator extends HMACGenerator {
+public final class HMAC256Generator extends HMACGenerator {
 
     /**
      *  @param context unused

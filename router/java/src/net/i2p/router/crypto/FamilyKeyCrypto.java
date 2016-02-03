@@ -47,12 +47,13 @@ public class FamilyKeyCrypto {
     private final SigningPrivateKey _privkey;
     private final SigningPublicKey _pubkey;
 
-    private static final String PROP_KEYSTORE_PASSWORD = "netdb.family.keystorePassword";
+    public static final String PROP_KEYSTORE_PASSWORD = "netdb.family.keystorePassword";
     public static final String PROP_FAMILY_NAME = "netdb.family.name";
-    private static final String PROP_KEY_PASSWORD = "netdb.family.keyPassword";
-    private static final String CERT_SUFFIX = ".crt";
-    private static final String KEYSTORE_PREFIX = "family-";
-    private static final String KEYSTORE_SUFFIX = ".ks";
+    public static final String PROP_KEY_PASSWORD = "netdb.family.keyPassword";
+    public static final String CERT_SUFFIX = ".crt";
+    public static final String KEYSTORE_PREFIX = "family-";
+    public static final String KEYSTORE_SUFFIX = ".ks";
+    public static final String CN_SUFFIX = ".family.i2p.net";
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
     // Note that we can't use RSA here, as the b64 sig would exceed the 255 char limit for a Mapping
     // Note that we can't use EdDSA here, as keystore doesn't know how, and encoding/decoding is unimplemented
@@ -289,7 +290,7 @@ public class FamilyKeyCrypto {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
         // and one for the cname
-        String cname = _fname + ".family.i2p.net";
+        String cname = _fname + CN_SUFFIX;
 
         boolean success = KeyStoreUtil.createKeys(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, _fname, cname, "family",
                                                   DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM,

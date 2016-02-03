@@ -32,20 +32,20 @@ public enum SigType {
      *  Pubkey 128 bytes; privkey 20 bytes; hash 20 bytes; sig 40 bytes
      *  @since 0.9.8
      */
-    DSA_SHA1(0, 128, 20, 20, 40, SigAlgo.DSA, "SHA-1", "SHA1withDSA", CryptoConstants.DSA_SHA1_SPEC, "0"),
+    DSA_SHA1(0, 128, 20, 20, 40, SigAlgo.DSA, "SHA-1", "SHA1withDSA", CryptoConstants.DSA_SHA1_SPEC, "1.2.840.10040.4.3", "0"),
     /**  Pubkey 64 bytes; privkey 32 bytes; hash 32 bytes; sig 64 bytes */
-    ECDSA_SHA256_P256(1, 64, 32, 32, 64, SigAlgo.EC, "SHA-256", "SHA256withECDSA", ECConstants.P256_SPEC, "0.9.12"),
+    ECDSA_SHA256_P256(1, 64, 32, 32, 64, SigAlgo.EC, "SHA-256", "SHA256withECDSA", ECConstants.P256_SPEC, "1.2.840.10045.4.3.2", "0.9.12"),
     /**  Pubkey 96 bytes; privkey 48 bytes; hash 48 bytes; sig 96 bytes */
-    ECDSA_SHA384_P384(2, 96, 48, 48, 96, SigAlgo.EC, "SHA-384", "SHA384withECDSA", ECConstants.P384_SPEC, "0.9.12"),
+    ECDSA_SHA384_P384(2, 96, 48, 48, 96, SigAlgo.EC, "SHA-384", "SHA384withECDSA", ECConstants.P384_SPEC, "1.2.840.10045.4.3.3", "0.9.12"),
     /**  Pubkey 132 bytes; privkey 66 bytes; hash 64 bytes; sig 132 bytes */
-    ECDSA_SHA512_P521(3, 132, 66, 64, 132, SigAlgo.EC, "SHA-512", "SHA512withECDSA", ECConstants.P521_SPEC, "0.9.12"),
+    ECDSA_SHA512_P521(3, 132, 66, 64, 132, SigAlgo.EC, "SHA-512", "SHA512withECDSA", ECConstants.P521_SPEC, "1.2.840.10045.4.3.4", "0.9.12"),
 
     /**  Pubkey 256 bytes; privkey 512 bytes; hash 32 bytes; sig 256 bytes */
-    RSA_SHA256_2048(4, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC, "0.9.12"),
+    RSA_SHA256_2048(4, 256, 512, 32, 256, SigAlgo.RSA, "SHA-256", "SHA256withRSA", RSAConstants.F4_2048_SPEC, "1.2.840.113549.1.1.11", "0.9.12"),
     /**  Pubkey 384 bytes; privkey 768 bytes; hash 48 bytes; sig 384 bytes */
-    RSA_SHA384_3072(5, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC, "0.9.12"),
+    RSA_SHA384_3072(5, 384, 768, 48, 384, SigAlgo.RSA, "SHA-384", "SHA384withRSA", RSAConstants.F4_3072_SPEC, "1.2.840.113549.1.1.12", "0.9.12"),
     /**  Pubkey 512 bytes; privkey 1024 bytes; hash 64 bytes; sig 512 bytes */
-    RSA_SHA512_4096(6, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC, "0.9.12"),
+    RSA_SHA512_4096(6, 512, 1024, 64, 512, SigAlgo.RSA, "SHA-512", "SHA512withRSA", RSAConstants.F4_4096_SPEC, "1.2.840.113549.1.1.13", "0.9.12"),
 
     /**
      *  Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes
@@ -55,8 +55,17 @@ public enum SigType {
      *  @since 0.9.15
      */
     EdDSA_SHA512_Ed25519(7, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "SHA512withEdDSA",
-                         EdDSANamedCurveTable.getByName("ed25519-sha-512"), "0.9.17");
+                         EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.101", "0.9.17"),
 
+    /**
+     *  Prehash version (double hashing, for offline use such as su3, not for use on the network)
+     *  Pubkey 32 bytes; privkey 32 bytes; hash 64 bytes; sig 64 bytes
+     *  @since 0.9.25
+     */
+    EdDSA_SHA512_Ed25519ph(8, 32, 32, 64, 64, SigAlgo.EdDSA, "SHA-512", "NonewithEdDSA",
+                           EdDSANamedCurveTable.getByName("ed25519-sha-512"), "1.3.101.101", "0.9.25"),
+
+    ;
 
     // TESTING....................
 
@@ -99,12 +108,12 @@ public enum SigType {
 
     private final int code, pubkeyLen, privkeyLen, hashLen, sigLen;
     private final SigAlgo base;
-    private final String digestName, algoName, since;
+    private final String digestName, algoName, oid, since;
     private final AlgorithmParameterSpec params;
     private final boolean isAvail;
 
     SigType(int cod, int pubLen, int privLen, int hLen, int sLen, SigAlgo baseAlgo,
-            String mdName, String aName, AlgorithmParameterSpec pSpec, String supportedSince) {
+            String mdName, String aName, AlgorithmParameterSpec pSpec, String oid, String supportedSince) {
         code = cod;
         pubkeyLen = pubLen;
         privkeyLen = privLen;
@@ -114,6 +123,7 @@ public enum SigType {
         digestName = mdName;
         algoName = aName;
         params = pSpec;
+        this.oid = oid;
         since = supportedSince;
         isAvail = x_isAvailable();
     }
@@ -181,6 +191,15 @@ public enum SigType {
      */
     public String getSupportedSince() {
         return since;
+    }
+
+    /**
+     *  The OID for the signature.
+     *
+     *  @since 0.9.25
+     */
+    public String getOID() {
+        return oid;
     }
 
     /**
@@ -274,6 +293,8 @@ public enum SigType {
             // handle mixed-case enum
             if (uc.equals("EDDSA_SHA512_ED25519"))
                 return EdDSA_SHA512_Ed25519;
+            if (uc.equals("EDDSA_SHA512_ED25519PH"))
+                return EdDSA_SHA512_Ed25519ph;
             return valueOf(uc);
         } catch (IllegalArgumentException iae) {
             try {

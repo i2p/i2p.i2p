@@ -51,6 +51,7 @@
     release.signer.su3=xxx@mail.i2p
     build.built-by=xxx
     javac.compilerargs=-bootclasspath /usr/lib/jvm/java-6-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-6-openjdk-amd64/jre/lib/jce.jar
+    javac.compilerargs7=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
     ```
 
 5. Copy latest trust list _MTN/monotonerc from website or some other workspace
@@ -169,7 +170,7 @@
   - In the i2p.newsxml branch, edit magnet links, release dates and release
     number in data/releases.json, and check in
 
-2. Add update torrents to tracker2.postman.i2p and start seeding (su2 and su3)
+2. Add i2pupdate-0.9.xx.su3 torrent to tracker2.postman.i2p and start seeding
 
 3. Notify the following people:
   - All in-network update hosts

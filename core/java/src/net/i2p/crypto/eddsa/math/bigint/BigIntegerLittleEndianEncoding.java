@@ -15,7 +15,7 @@ public class BigIntegerLittleEndianEncoding extends Encoding implements Serializ
     private BigInteger mask;
 
     @Override
-    public void setField(Field f) {
+    public synchronized void setField(Field f) {
         super.setField(f);
         mask = BigInteger.ONE.shiftLeft(f.getb()-1).subtract(BigInteger.ONE);
     }

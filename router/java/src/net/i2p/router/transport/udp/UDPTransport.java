@@ -87,6 +87,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private int _mtu;
     private int _mtu_ipv6;
     private boolean _mismatchLogged;
+    private final int _networkID;
 
     /**
      *  Do we have a public IPv6 address?
@@ -218,6 +219,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
+        _networkID = ctx.router().getNetworkID();
         _dhFactory = dh;
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new ConcurrentHashMap<Hash, PeerState>(128);
@@ -1289,7 +1291,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (entry == null)
                 return;
             if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
-                ((RouterInfo) entry).getNetworkId() != Router.NETWORK_ID) {
+                ((RouterInfo) entry).getNetworkId() != _networkID) {
                 // this is pre-0.6.1.10, so it isn't going to happen any more
 
                 /*

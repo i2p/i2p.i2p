@@ -13,10 +13,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Base32;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
@@ -29,7 +32,7 @@ import net.i2p.util.SystemVersion;
  *
  *  @since 0.9.9
  */
-public class KeyStoreUtil {
+public final class KeyStoreUtil {
         
     public static boolean _blacklistLogged;
 
@@ -37,6 +40,10 @@ public class KeyStoreUtil {
     private static final String DEFAULT_KEY_ALGORITHM = "RSA";
     private static final int DEFAULT_KEY_SIZE = 2048;
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
+
+    static {
+        I2PProvider.addProvider();
+    }
 
     /**
      *  No reports of some of these in a Java keystore but just to be safe...
@@ -464,20 +471,29 @@ public class KeyStoreUtil {
             }
         }
         String keytool = (new File(System.getProperty("java.home"), "bin/keytool")).getAbsolutePath();
-        String[] args = new String[] {
-                   keytool,
-                   "-genkey",            // -genkeypair preferred in newer keytools, but this works with more
-                   "-storetype", KeyStore.getDefaultType(),
-                   "-keystore", ks.getAbsolutePath(),
-                   "-storepass", ksPW,
-                   "-alias", alias,
-                   "-dname", "CN=" + cname + ",OU=" + ou + ",O=I2P Anonymous Network,L=XX,ST=XX,C=XX",
-                   "-validity", Integer.toString(validDays),  // 10 years
-                   "-keyalg", keyAlg,
-                   "-sigalg", getSigAlg(keySize, keyAlg),
-                   "-keysize", Integer.toString(keySize),
-                   "-keypass", keyPW
-        };
+        List<String> a = new ArrayList<String>(32);
+        a.add(keytool);
+        a.add("-genkey");    // -genkeypair preferred in newer keytools, but this works with more
+        //a.add("-v");         // verbose, gives you a stack trace on exception
+        a.add("-storetype"); a.add(KeyStore.getDefaultType());
+        a.add("-keystore");  a.add(ks.getAbsolutePath());
+        a.add("-storepass"); a.add(ksPW);
+        a.add("-alias");     a.add(alias);
+        a.add("-dname");     a.add("CN=" + cname + ",OU=" + ou + ",O=I2P Anonymous Network,L=XX,ST=XX,C=XX");
+        a.add("-validity");  a.add(Integer.toString(validDays));  // 10 years
+        a.add("-keyalg");    a.add(keyAlg);
+        a.add("-sigalg");    a.add(getSigAlg(keySize, keyAlg));
+        a.add("-keysize");   a.add(Integer.toString(keySize));
+        a.add("-keypass");   a.add(keyPW);
+        if (keyAlg.equals("Ed") || keyAlg.equals("EdDSA") || keyAlg.equals("ElGamal")) {
+            File f = I2PAppContext.getGlobalContext().getBaseDir();
+            f = new File(f, "lib");
+            f = new File(f, "i2p.jar");
+            // providerpath is not in the man page; see keytool -genkey -help
+            a.add("-providerpath");  a.add(f.getAbsolutePath());
+            a.add("-providerclass"); a.add("net.i2p.crypto.provider.I2PProvider");
+        }
+        String[] args = a.toArray(new String[a.size()]);
         // TODO pipe key password to process; requires ShellCommand enhancements
         boolean success = (new ShellCommand()).executeSilentAndWaitTimed(args, 240);
         if (success) {
@@ -514,6 +530,8 @@ public class KeyStoreUtil {
     private static String getSigAlg(int size, String keyalg) {
         if (keyalg.equals("EC"))
             keyalg = "ECDSA";
+        else if (keyalg.equals("Ed"))
+            keyalg = "EdDSA";
         String hash;
         if (keyalg.equals("ECDSA")) {
             if (size <= 256)
@@ -522,6 +540,8 @@ public class KeyStoreUtil {
                 hash = "SHA384";
             else
                 hash = "SHA512";
+        } else if (keyalg.equals("EdDSA")) {
+            hash = "SHA512";
         } else {
             if (size <= 1024)
                 hash = "SHA1";
@@ -556,6 +576,103 @@ public class KeyStoreUtil {
             return (PrivateKey) keyStore.getKey(alias, keypwchars);
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Export the private key and certificate chain (if any) out of a keystore.
+     *  Does NOT close the stream. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @since 0.9.25
+     */
+    public static void exportPrivateKey(File ks, String ksPW, String alias, String keyPW,
+                                        OutputStream out)
+                              throws GeneralSecurityException, IOException {
+        InputStream fis = null;
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            fis = new FileInputStream(ks);
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            keyStore.load(fis, pwchars);
+            char[] keypwchars = keyPW.toCharArray();
+            PrivateKey pk = (PrivateKey) keyStore.getKey(alias, keypwchars);
+            if (pk == null)
+                throw new GeneralSecurityException("private key not found: " + alias);
+            Certificate[] certs = keyStore.getCertificateChain(alias);
+            CertUtil.exportPrivateKey(pk, certs, out);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Import the private key and certificate chain to a keystore.
+     *  Keystore will be created if it does not exist.
+     *  Private key MUST be first in the stream.
+     *  Closes the stream. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key. If null, will be taken from the Subject CN
+     *               of the first certificate in the chain.
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return the alias as specified or extracted
+     *  @since 0.9.25
+     */
+    public static String importPrivateKey(File ks, String ksPW, String alias, String keyPW,
+                                          InputStream in)
+                              throws GeneralSecurityException, IOException {
+        OutputStream fos = null;
+        try {
+            KeyStore keyStore = createKeyStore(ks, ksPW);
+            PrivateKey pk = CertUtil.loadPrivateKey(in);
+            List<X509Certificate> certs = CertUtil.loadCerts(in);
+            if (alias == null) {
+                alias = CertUtil.getSubjectValue(certs.get(0), "CN");
+                if (alias == null)
+                    throw new GeneralSecurityException("no alias specified and no Subject CN in cert");
+                if (alias.endsWith(".family.i2p.net") && alias.length() > ".family.i2p.net".length())
+                    alias = alias.substring(0, ".family.i2p.net".length());
+            }
+            keyStore.setKeyEntry(alias, pk, keyPW.toCharArray(), certs.toArray(new Certificate[certs.size()]));
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            fos = new SecureFileOutputStream(ks);
+            keyStore.store(fos, pwchars);
+            return alias;
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            try { in.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /** 
+     *  Import the private key and certificate chain to a keystore.
+     *  Keystore will be created if it does not exist.
+     *  Private key MUST be first in the stream.
+     *  Closes the stream. Throws on all errors.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password, may be null
+     *  @param alias the name of the key, non-null.
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @since 0.9.25
+     */
+    public static void storePrivateKey(File ks, String ksPW, String alias, String keyPW,
+                                       PrivateKey pk, List<X509Certificate> certs)
+                              throws GeneralSecurityException, IOException {
+        OutputStream fos = null;
+        try {
+            KeyStore keyStore = createKeyStore(ks, ksPW);
+            keyStore.setKeyEntry(alias, pk, keyPW.toCharArray(), certs.toArray(new Certificate[certs.size()]));
+            char[] pwchars = ksPW != null ? ksPW.toCharArray() : null;
+            fos = new SecureFileOutputStream(ks);
+            keyStore.store(fos, pwchars);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -641,11 +758,31 @@ public class KeyStoreUtil {
      *   Usage: KeyStoreUtil (loads from system keystore)
      *          KeyStoreUtil foo.ks (loads from system keystore, and from foo.ks keystore if exists, else creates empty)
      *          KeyStoreUtil certDir (loads from system keystore and all certs in certDir if exists)
+     *          KeyStoreUtil import file.ks file.key alias keypw (imxports private key from file to keystore)
+     *          KeyStoreUtil export file.ks alias keypw (exports private key from keystore)
+     *          KeyStoreUtil keygen file.ks alias keypw (create keypair in keystore)
+     *          KeyStoreUtil keygen2 file.ks alias keypw (create keypair using I2PProvider)
      */
 /****
     public static void main(String[] args) {
-        File ksf = (args.length > 0) ? new File(args[0]) : null;
         try {
+            if (args.length > 0 && "import".equals(args[0])) {
+                testImport(args);
+                return;
+            }
+            if (args.length > 0 && "export".equals(args[0])) {
+                testExport(args);
+                return;
+            }
+            if (args.length > 0 && "keygen".equals(args[0])) {
+                testKeygen(args);
+                return;
+            }
+            if (args.length > 0 && "keygen2".equals(args[0])) {
+                testKeygen2(args);
+                return;
+            }
+            File ksf = (args.length > 0) ? new File(args[0]) : null;
             if (ksf != null && !ksf.exists()) {
                 createKeyStore(ksf, DEFAULT_KEYSTORE_PASSWORD);
                 System.out.println("Created empty keystore " + ksf);
@@ -673,6 +810,64 @@ public class KeyStoreUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void testImport(String[] args) throws Exception {
+        File ksf = new File(args[1]);
+        InputStream in = new FileInputStream(args[2]);
+        String alias = args[3];
+        String pw = args[4];
+        importPrivateKey(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, pw, in);
+    }
+
+
+    private static void testExport(String[] args) throws Exception {
+        File ksf = new File(args[1]);
+        String alias = args[2];
+        String pw = args[3];
+        exportPrivateKey(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, pw, System.out);
+    }
+
+    private static void testKeygen(String[] args) throws Exception {
+        File ksf = new File(args[1]);
+        String alias = args[2];
+        String pw = args[3];
+        boolean ok = createKeys(ksf, DEFAULT_KEYSTORE_PASSWORD, alias, "test cname", "test ou",
+                                //DEFAULT_KEY_VALID_DAYS, "EdDSA", 256, pw);
+                                DEFAULT_KEY_VALID_DAYS, "ElGamal", 2048, pw);
+        System.out.println("genkey ok? " + ok);
+    }
+
+    private static void testKeygen2(String[] args) throws Exception {
+        // keygen test using the I2PProvider
+        //SigType type = SigType.EdDSA_SHA512_Ed25519;
+        SigType type = SigType.ElGamal_SHA256_MODP2048;
+        java.security.KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
+        kpg.initialize(type.getParams());
+        java.security.KeyPair kp = kpg.generateKeyPair();
+        java.security.PublicKey jpub = kp.getPublic();
+        java.security.PrivateKey jpriv = kp.getPrivate();
+
+        System.out.println("Encoded private key:");
+        System.out.println(net.i2p.util.HexDump.dump(jpriv.getEncoded()));
+        System.out.println("Encoded public key:");
+        System.out.println(net.i2p.util.HexDump.dump(jpub.getEncoded()));
+
+        java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+        jsig.initSign(jpriv);
+        byte[] data = new byte[111];
+        net.i2p.util.RandomSource.getInstance().nextBytes(data);
+        jsig.update(data);
+        byte[] bsig = jsig.sign();
+        System.out.println("Encoded signature:");
+        System.out.println(net.i2p.util.HexDump.dump(bsig));
+        jsig.initVerify(jpub);
+        jsig.update(data);
+        boolean ok = jsig.verify(bsig);
+        System.out.println("verify passed? " + ok);
+
+        net.i2p.data.Signature sig = SigUtil.fromJavaSig(bsig, type);
+        System.out.println("Signature test: " + sig);
     }
 ****/
 }

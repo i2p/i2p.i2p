@@ -64,7 +64,9 @@ package gnu.crypto.hash;
  * See SHA256Generator for more information.
  *
  * @version $Revision: 1.2 $
+ * @deprecated to be removed in 0.9.27
  */
+@Deprecated
 public class Sha256Standalone extends BaseHashStandalone {
    // Constants and variables
    // -------------------------------------------------------------------------

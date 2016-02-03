@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAParameterSpec;
 
+import net.i2p.crypto.elgamal.spec.ElGamalParameterSpec;
 import net.i2p.util.NativeBigInteger;
 
 /**
@@ -43,7 +44,7 @@ import net.i2p.util.NativeBigInteger;
  * See also: ECConstants, RSAConstants
  *
  */
-public class CryptoConstants {
+public final class CryptoConstants {
     public static final BigInteger dsap = new NativeBigInteger(
                                                                "9c05b2aa960d9b97b8931963c9cc9e8c3026e9b8ed92fad0a69cc886d5bf8015fcadae31"
                                                              + "a0ad18fab3f01b00a358de237655c4964afaa2b337e96ad316b9fb1cc564b5aec5b69a9f"
@@ -79,6 +80,11 @@ public class CryptoConstants {
     public static final DSAParameterSpec DSA_SHA1_SPEC = new DSAParameterSpec(dsap, dsaq, dsag);
 
     /**
+     *  @since 0.9.25
+     */
+    public static final ElGamalParameterSpec I2P_ELGAMAL_2048_SPEC = new ElGamalParameterSpec(elgp, elgg);
+
+    /**
      *  This will be org.bouncycastle.jce.spec.ElgamalParameterSpec
      *  if BC is available, otherwise it
      *  will be net.i2p.crypto.ElgamalParameterSpec
@@ -98,11 +104,11 @@ public class CryptoConstants {
             } catch (Exception e) {
                 //System.out.println("BC ElG spec failed");
                 //e.printStackTrace();
-                spec = new ElGamalParameterSpec(elgp, elgg);
+                spec = I2P_ELGAMAL_2048_SPEC;
             }
         } else {
             //System.out.println("BC not available");
-            spec = new ElGamalParameterSpec(elgp, elgg);
+            spec = I2P_ELGAMAL_2048_SPEC;
         }
         ELGAMAL_2048_SPEC = spec;
     }

@@ -1,7 +1,5 @@
 package net.i2p.crypto;
 
-import gnu.crypto.hash.Sha256Standalone;
-
 import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,24 +12,12 @@ import net.i2p.data.Hash;
  * Defines a wrapper for SHA-256 operation.
  * 
  * As of release 0.8.7, uses java.security.MessageDigest by default.
- * If that is unavailable, it uses
+ * As of release 0.9.25, uses only MessageDigest.
  * GNU-Crypto {@link gnu.crypto.hash.Sha256Standalone}
+ * is deprecated.
  */
 public final class SHA256Generator {
     private final LinkedBlockingQueue<MessageDigest> _digests;
-
-    private static final boolean _useGnu;
-
-    static {
-        boolean useGnu = false;
-        try {
-            MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            useGnu = true;
-            System.out.println("INFO: Using GNU SHA-256");
-        }
-        _useGnu = useGnu;
-    }
 
     /**
      *  @param context unused
@@ -96,45 +82,14 @@ public final class SHA256Generator {
     }
     
     /**
-     *  Return a new MessageDigest from the system libs unless unavailable
-     *  in this JVM, in that case return a wrapped GNU Sha256Standalone
+     *  Return a new MessageDigest from the system libs.
      *  @since 0.8.7, public since 0.8.8 for FortunaStandalone
      */
     public static MessageDigest getDigestInstance() {
-        if (!_useGnu) {
-            try {
-                return MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {}
-        }
-        return new GnuMessageDigest();
-    }
-
-    /**
-     *  Wrapper to make Sha256Standalone a MessageDigest
-     *  @since 0.8.7
-     */
-    private static class GnuMessageDigest extends MessageDigest {
-        private final Sha256Standalone _gnu;
-
-        protected GnuMessageDigest() {
-            super("SHA-256");
-            _gnu = new Sha256Standalone();
-        }
-
-        protected byte[] engineDigest() {
-            return _gnu.digest();
-        }
-
-        protected void engineReset() {
-            _gnu.reset();
-        }
-
-        protected void engineUpdate(byte input) {
-            _gnu.update(input);
-        }
-
-        protected void engineUpdate(byte[] input, int offset, int len) {
-            _gnu.update(input, offset, len);
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 

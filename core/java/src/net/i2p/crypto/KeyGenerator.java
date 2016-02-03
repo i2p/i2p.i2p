@@ -34,6 +34,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -55,8 +56,12 @@ import net.i2p.util.RandomSource;
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
  */
-public class KeyGenerator {
+public final class KeyGenerator {
     private final I2PAppContext _context;
+
+    static {
+        I2PProvider.addProvider();
+    }
 
     public KeyGenerator(I2PAppContext context) {
         _context = context;
@@ -208,10 +213,10 @@ public class KeyGenerator {
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         BigInteger x = null;
 
-        // make sure the random key is less than the DSA q
+        // make sure the random key is less than the DSA q and greater than zero
         do {
             x = new NativeBigInteger(160, _context.random());
-        } while (x.compareTo(CryptoConstants.dsaq) >= 0);
+        } while (x.compareTo(CryptoConstants.dsaq) >= 0 || x.equals(BigInteger.ZERO));
 
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         keys[0] = new SigningPublicKey();

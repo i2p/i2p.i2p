@@ -471,10 +471,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     portNum = "7654";
                 String msg;
                 if (getTunnel().getContext().isRouterContext())
+                    msg = "Unable to build tunnels for the client";
+                else
                     msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the client";
-                else
-                    msg = "Unable to build tunnels for the client";
                 if (++retries < MAX_RETRIES) {
                     if (log != null)
                         log.log(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");

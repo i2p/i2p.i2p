@@ -36,7 +36,7 @@ import net.i2p.util.SystemVersion;
  *
  * @author jrandom, thecrypto
  */
-public class CryptixAESEngine extends AESEngine {
+public final class CryptixAESEngine extends AESEngine {
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;

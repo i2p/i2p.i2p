@@ -9,12 +9,21 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CRLException;
 import java.security.cert.X509Certificate;
+import java.security.cert.X509CRL;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.KeySpec;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 
 import javax.naming.InvalidNameException;
@@ -24,6 +33,7 @@ import javax.security.auth.x500.X500Principal;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
@@ -33,7 +43,7 @@ import net.i2p.util.SystemVersion;
  *
  *  @since 0.9.9
  */
-public class CertUtil {
+public final class CertUtil {
         
     private static final int LINE_LENGTH = 64;
 
@@ -93,16 +103,7 @@ public class CertUtil {
                                                 throws IOException, CertificateEncodingException {
         // Get the encoded form which is suitable for exporting
         byte[] buf = cert.getEncoded();
-        PrintWriter wr = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-        wr.println("-----BEGIN CERTIFICATE-----");
-        String b64 = Base64.encode(buf, true);     // true = use standard alphabet
-        for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
-            wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
-        }
-        wr.println("-----END CERTIFICATE-----");
-        wr.flush();
-        if (wr.checkError())
-            throw new IOException("Failed write to " + out);
+        writePEM(buf, "CERTIFICATE", out);
     }
 
     /**
@@ -121,13 +122,27 @@ public class CertUtil {
         byte[] buf = pk.getEncoded();
         if (buf == null)
             throw new InvalidKeyException("encoding unsupported for this key");
+        writePEM(buf, "PRIVATE KEY", out);
+    }
+
+    /**
+     *  Modified from:
+     *  http://www.exampledepot.com/egs/java.security.cert/ExportCert.html
+     *
+     *  Writes data in base64 format.
+     *  Does NOT close the stream. Throws on all errors.
+     *
+     *  @since 0.9.25 consolidated from other methods
+     */
+    private static void writePEM(byte[] buf, String what, OutputStream out)
+                                                throws IOException {
         PrintWriter wr = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-        wr.println("-----BEGIN PRIVATE KEY-----");
+        wr.println("-----BEGIN " + what + "-----");
         String b64 = Base64.encode(buf, true);     // true = use standard alphabet
         for (int i = 0; i < b64.length(); i += LINE_LENGTH) {
             wr.println(b64.substring(i, Math.min(i + LINE_LENGTH, b64.length())));
         }
-        wr.println("-----END PRIVATE KEY-----");
+        wr.println("-----END " + what + "-----");
         wr.flush();
         if (wr.checkError())
             throw new IOException("Failed write to " + out);
@@ -235,4 +250,145 @@ public class CertUtil {
             try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
     }
+
+    /**
+     *  Get a single Private Key from an input stream.
+     *  Does NOT close the stream.
+     *
+     *  @return non-null, non-empty, throws on all errors including certificate invalid
+     *  @since 0.9.25
+     */
+    public static PrivateKey loadPrivateKey(InputStream in) throws IOException, GeneralSecurityException {
+        try {
+            String line;
+            while ((line = DataHelper.readLine(in)) != null) {
+                if (line.startsWith("---") && line.contains("BEGIN") && line.contains("PRIVATE"))
+                    break;
+            }
+            if (line == null)
+                throw new IOException("no private key found");
+            StringBuilder buf = new StringBuilder(128);
+            while ((line = DataHelper.readLine(in)) != null) {
+                if (line.startsWith("---"))
+                    break;
+                buf.append(line.trim());
+            }
+            if (buf.length() <= 0)
+                throw new IOException("no private key found");
+            byte[] data = Base64.decode(buf.toString(), true);
+            if (data == null)
+                throw new CertificateEncodingException("bad base64 cert");
+            PrivateKey rv = null;
+            // try all the types
+            for (SigAlgo algo : EnumSet.allOf(SigAlgo.class)) {
+                try {
+                    KeySpec ks = new PKCS8EncodedKeySpec(data);
+                    String alg = algo.getName();
+                    KeyFactory kf = KeyFactory.getInstance(alg);
+                    rv = kf.generatePrivate(ks);
+                    break;
+                } catch (GeneralSecurityException gse) {
+                    //gse.printStackTrace();
+                }
+            }
+            if (rv == null)
+                throw new InvalidKeyException("unsupported key type");
+            return rv;
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            // Exception in thread "main" java.lang.IllegalArgumentException: Input byte array has wrong 4-byte ending unit
+            // at java.util.Base64$Decoder.decode0(Base64.java:704)
+            throw new GeneralSecurityException("key error", iae);
+        }
+    }
+
+    /**
+     *  Get one or more certificates from an input stream.
+     *  Throws if any certificate is invalid (e.g. expired).
+     *  Does NOT close the stream.
+     *
+     *  @return non-null, non-empty, throws on all errors including certificate invalid
+     *  @since 0.9.25
+     */
+    public static List<X509Certificate> loadCerts(InputStream in) throws IOException, GeneralSecurityException {
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            Collection<? extends Certificate> certs = cf.generateCertificates(in);
+            List<X509Certificate> rv = new ArrayList<X509Certificate>(certs.size());
+            for (Certificate cert : certs) {
+                if (!(cert instanceof X509Certificate))
+                    throw new GeneralSecurityException("not a X.509 cert");
+                X509Certificate xcert = (X509Certificate) cert;
+                xcert.checkValidity();
+                rv.add(xcert);
+            }
+            if (rv.isEmpty())
+                throw new IOException("no certs found");
+            return rv;
+        } catch (IllegalArgumentException iae) {
+            // java 1.8.0_40-b10, openSUSE
+            // Exception in thread "main" java.lang.IllegalArgumentException: Input byte array has wrong 4-byte ending unit
+            // at java.util.Base64$Decoder.decode0(Base64.java:704)
+            throw new GeneralSecurityException("cert error", iae);
+        } finally {
+            try { in.close(); } catch (IOException foo) {}
+        }
+    }
+
+    /**
+     *  Write a CRL to a file in base64 format.
+     *
+     *  @return success
+     *  @since 0.9.25
+     */
+    public static boolean saveCRL(X509CRL crl, File file) {
+        OutputStream os = null;
+        try {
+           os = new SecureFileOutputStream(file);
+           exportCRL(crl, os);
+           return true;
+        } catch (CRLException ce) {
+            error("Error writing X509 CRL " + file.getAbsolutePath(), ce);
+           return false;
+        } catch (IOException ioe) {
+            error("Error writing X509 CRL " + file.getAbsolutePath(), ioe);
+           return false;
+        } finally {
+            try { if (os != null) os.close(); } catch (IOException foo) {}
+        }
+    }
+
+    /**
+     *  Writes a CRL in base64 format.
+     *  Does NOT close the stream. Throws on all errors.
+     *
+     *  @throws CRLException if the crl does not support encoding
+     *  @since 0.9.25
+     */
+    private static void exportCRL(X509CRL crl, OutputStream out)
+                                                throws IOException, CRLException {
+        byte[] buf = crl.getEncoded();
+        writePEM(buf, "X509 CRL", out);
+    }
+
+/****
+    public static final void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: [loadcert | loadcrl | loadprivatekey] file");
+            System.exit(1);
+        }
+        try {
+            File f = new File(args[1]);
+            if (args[0].equals("loadcert")) {
+                loadCert(f);
+            } else if (args[0].equals("loadcrl")) {
+            } else {
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+****/
 }

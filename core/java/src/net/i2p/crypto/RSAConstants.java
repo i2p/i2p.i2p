@@ -10,7 +10,7 @@ import net.i2p.util.NativeBigInteger;
  *
  * @since 0.9.9
  */
-class RSAConstants {
+final class RSAConstants {
 
     /**
      *  Generate a spec

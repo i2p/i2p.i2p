@@ -883,6 +883,11 @@
                     <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
                 </condition>
             </fail>
+            <fail message="javac.compilerargs7 must contain a -bootclasspath option in override.properties">
+                <condition>
+                    <not><contains string="${javac.compilerargs7}" substring="-bootclasspath"/></not>
+                </condition>
+            </fail>
             <fail message="build.built-by must be set in override.properties">
                 <condition>
                     <equals arg1="${build.built-by}" arg2="unknown"/>
