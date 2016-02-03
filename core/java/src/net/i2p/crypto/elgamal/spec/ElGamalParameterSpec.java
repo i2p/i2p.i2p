@@ -8,7 +8,7 @@ import java.security.spec.AlgorithmParameterSpec;
  *  This can't actually be passed to the BC provider, we would have to
  *  use reflection to create a "real" org.bouncycasle.jce.spec.ElGamalParameterSpec.
  *
- *  @since 0.9.18
+ *  @since 0.9.18, moved from net.i2p.crypto in 0.9.25
  */
 public class ElGamalParameterSpec implements AlgorithmParameterSpec {
     private final BigInteger p;
@@ -42,5 +42,33 @@ public class ElGamalParameterSpec implements AlgorithmParameterSpec {
      */
     public BigInteger getG() {
         return g;
+    }
+
+    /**
+     * @since 0.9.25
+     */
+    @Override
+    public int hashCode() {
+        return p.hashCode() ^ g.hashCode();
+    }
+
+    /**
+     * @since 0.9.25
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        BigInteger op, og;
+        if (obj instanceof ElGamalParameterSpec) {
+            ElGamalParameterSpec egps = (ElGamalParameterSpec) obj;
+            op = egps.getP();
+            og = egps.getG();
+        //} else if (obj.getClass().getName().equals("org.bouncycastle.jce.spec.ElGamalParameterSpec")) {
+            //reflection... no...
+        } else {
+            return false;
+        }
+        return p.equals(op) && g.equals(og);
     }
 }

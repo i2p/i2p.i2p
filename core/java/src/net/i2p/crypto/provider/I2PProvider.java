@@ -64,6 +64,10 @@ public final class I2PProvider extends Provider {
         // keytool error: java.security.NoSuchAlgorithmException: unrecognized algorithm name: SHA512withEdDSA
         put("Alg.Alias.KeyPairGenerator.1.3.101.100", "EdDSA");
         put("Alg.Alias.KeyPairGenerator.OID.1.3.101.100", "EdDSA");
+        // with this setting, keytool keygen doesn't work
+        // java.security.cert.CertificateException: Signature algorithm mismatch
+        // it must match the key setting (1.3.101.100) to work
+        // but this works fine with programmatic cert generation
         put("Alg.Alias.Signature.1.3.101.101", "SHA512withEdDSA");
         put("Alg.Alias.Signature.OID.1.3.101.101", "SHA512withEdDSA");
         // TODO Ed25519ph
