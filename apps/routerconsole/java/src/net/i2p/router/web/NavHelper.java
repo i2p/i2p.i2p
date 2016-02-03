@@ -41,7 +41,12 @@ public class NavHelper {
         _icons.remove(name);
     }
     
-
+    /**
+     *  Retrieve binary icon for a plugin
+     *  @param name plugin name
+     *  @return null if not found
+     *  @since 0.9.25
+     */
     public static byte[] getBinary(String name){
         if(name != null)
             return _binary.get(name);
@@ -49,7 +54,11 @@ public class NavHelper {
             return null;
     }
 
-
+    /**
+     *  Store binary icon for a plugin
+     *  @param name plugin name
+     *  @since 0.9.25
+     */
     public static void setBinary(String name, byte[] arr){
         _binary.put(name, arr);
     }

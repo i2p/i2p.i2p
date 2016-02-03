@@ -354,19 +354,17 @@ public class PluginStarter implements Runnable {
             }
         }
 
-
-    //handle console icons for plugins without web-resources through prop icon-code
-    String fullprop = props.getProperty("icon-code");
-    if(fullprop != null && fullprop.length() > 1){
-        byte[] decoded = Base64.decode(fullprop);
-        if(decoded != null) {
-            NavHelper.setBinary(appName, decoded);
-            iconfile = "/Plugins/pluginicon?plugin=" + appName;
-        } else {
-            iconfile = "/themes/console/images/plugin.png";
+        //handle console icons for plugins without web-resources through prop icon-code
+        String fullprop = props.getProperty("icon-code");
+        if(fullprop != null && fullprop.length() > 1){
+            byte[] decoded = Base64.decode(fullprop);
+            if(decoded != null) {
+                NavHelper.setBinary(appName, decoded);
+                iconfile = "/Plugins/pluginicon?plugin=" + appName;
+            } else {
+                iconfile = "/themes/console/images/plugin.png";
+            }
         }
-    }
-
 
         // load and start things in clients.config
         File clientConfig = new File(pluginDir, "clients.config");

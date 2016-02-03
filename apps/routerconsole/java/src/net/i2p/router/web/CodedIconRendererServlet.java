@@ -1,9 +1,10 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.File;
 import java.util.Arrays;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -11,25 +12,27 @@ import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.util.FileUtil;
  
 
- /**
-  *
-  * @author cacapo
-  */
-
+/**
+ * Serve plugin icons, at /Plugins/pluginicon?plugin=foo
+ *
+ * @author cacapo
+ * @since 0.9.25
+ */
 public class CodedIconRendererServlet extends HttpServlet {
  
-    public static final long serialVersionUID = 16851750L;
+    private static final long serialVersionUID = 16851750L;
     
-    String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
-    String file = "docs" + java.io.File.separatorChar + "themes" + java.io.File.separatorChar + "console" +  java.io.File.separatorChar + "images" + java.io.File.separatorChar + "plugin.png";
-       
+    private static final String base = I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
+    private static final String file = "docs" + File.separatorChar + "themes" + File.separatorChar + "console" +  File.separatorChar + "images" + File.separatorChar + "plugin.png";
 
 
      @Override
-
      protected void service(HttpServletRequest srq, HttpServletResponse srs) throws ServletException, IOException {
          byte[] data;
          String name = srq.getParameter("plugin");
@@ -38,7 +41,7 @@ public class CodedIconRendererServlet extends HttpServlet {
          //set as many headers as are common to any outcome
          
          srs.setContentType("image/png");
-         srs.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + 86400000l);
+         srs.setDateHeader("Expires", I2PAppContext.getGlobalContext().clock().now() + 86400000l);
          srs.setHeader("Cache-Control", "public, max-age=86400");
          OutputStream os = srs.getOutputStream();
          
@@ -55,14 +58,14 @@ public class CodedIconRendererServlet extends HttpServlet {
                      os.flush();
                      os.close();
                  }catch(IOException e){
-                     net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error writing binary image data for plugin", e);
+                     I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error writing binary image data for plugin", e);
                  }
              } else {
                  srs.sendError(304, "Not Modified");
              }
          } else {
              //Binary data is not present but must be substituted by file on disk
-             File pfile = new java.io.File(base, file);
+             File pfile = new File(base, file);
              srs.setHeader("Content-Length", Long.toString(pfile.length()));
              try{
                  long lastmod = pfile.lastModified();
@@ -72,15 +75,15 @@ public class CodedIconRendererServlet extends HttpServlet {
                          srs.sendError(304, "Not Modified");
                      } else {
                          srs.setDateHeader("Last-Modified", lastmod);
-                         net.i2p.util.FileUtil.readFile(file, base, os); 
+                         FileUtil.readFile(file, base, os); 
                      }
                      
                  }
-             } catch(java.io.IOException e) {
+             } catch(IOException e) {
                  if (!srs.isCommitted()) {
                      srs.sendError(403, e.toString());
                  } else {
-                     net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error serving plugin.png", e);
+                     I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error serving plugin.png", e);
                      throw e;
                  }
              }
