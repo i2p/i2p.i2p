@@ -12,6 +12,13 @@ import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 
 /**
  * An EdDSA private key.
+ *<p>
+ * Warning: Private key encoding is not fully specified in the
+ * current IETF draft. This implementation uses PKCS#8 encoding,
+ * and is subject to change. See getEncoded().
+ *</p><p>
+ * Ref: https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
+ *</p>
  *
  * @since 0.9.15
  * @author str4d
@@ -52,9 +59,7 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
     }
 
     /**
-     *  This follows the spec at
-     *  https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
-     *  AND the docs from
+     *  This follows the docs from
      *  java.security.spec.PKCS8EncodedKeySpec
      *  quote:
      *<pre>
@@ -77,6 +82,8 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
      *    parameters          ANY OPTIONAL
      *  }
      *</pre>
+     *
+     *  Ref: https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
      *
      *  Note that the private key encoding is not fully specified in the Josefsson draft version 04,
      *  and the example could be wrong, as it's lacking Version and AlgorithmIdentifier.

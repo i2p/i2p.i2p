@@ -515,15 +515,20 @@ public final class DSAEngine {
         if (type == SigType.DSA_SHA1)
             return altVerifySigSHA1(signature, data, offset, len, verifyingKey);
 
-        java.security.Signature jsig;
-        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new EdDSAEngine(type.getDigestInstance());
-        else
-            jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PublicKey pubKey = SigUtil.toJavaKey(verifyingKey);
-        jsig.initVerify(pubKey);
-        jsig.update(data, offset, len);
-        boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
+        byte[] sigbytes = SigUtil.toJavaSig(signature);
+        boolean rv;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
+            // take advantage of one-shot mode
+            EdDSAEngine jsig = new EdDSAEngine(type.getDigestInstance());
+            jsig.initVerify(pubKey);
+            rv = jsig.verifyOneShot(data, offset, len, sigbytes);
+        } else {
+            java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+            jsig.initVerify(pubKey);
+            jsig.update(data, offset, len);
+            rv = jsig.verify(sigbytes);
+        }
         return rv;
     }
 
@@ -563,15 +568,21 @@ public final class DSAEngine {
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
-        String algo = getRawAlgo(type);
-        java.security.Signature jsig;
-        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
-        else
-            jsig = java.security.Signature.getInstance(algo);
-        jsig.initVerify(pubKey);
-        jsig.update(hash.getData());
-        boolean rv = jsig.verify(SigUtil.toJavaSig(signature));
+        byte[] sigbytes = SigUtil.toJavaSig(signature);
+        boolean rv;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
+            // take advantage of one-shot mode
+            // Ignore algo, EdDSAKey includes a hash specification.
+            EdDSAEngine jsig = new EdDSAEngine();
+            jsig.initVerify(pubKey);
+            rv = jsig.verifyOneShot(hash.getData(), sigbytes);
+        } else {
+            String algo = getRawAlgo(type);
+            java.security.Signature jsig = java.security.Signature.getInstance(algo);
+            jsig.initVerify(pubKey);
+            jsig.update(hash.getData());
+            rv = jsig.verify(sigbytes);
+        }
         return rv;
     }
 
@@ -606,15 +617,20 @@ public final class DSAEngine {
         if (type == SigType.DSA_SHA1)
             return altSignSHA1(data, offset, len, privateKey);
 
-        java.security.Signature jsig;
-        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new EdDSAEngine(type.getDigestInstance());
-        else
-            jsig = java.security.Signature.getInstance(type.getAlgorithmName());
         PrivateKey privKey = SigUtil.toJavaKey(privateKey);
-        jsig.initSign(privKey, _context.random());
-        jsig.update(data, offset, len);
-        return SigUtil.fromJavaSig(jsig.sign(), type);
+        byte[] sigbytes;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
+            // take advantage of one-shot mode
+            EdDSAEngine jsig = new EdDSAEngine(type.getDigestInstance());
+            jsig.initSign(privKey);
+            sigbytes = jsig.signOneShot(data, offset, len);
+        } else {
+            java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+            jsig.initSign(privKey, _context.random());
+            jsig.update(data, offset, len);
+            sigbytes = jsig.sign();
+        }
+        return SigUtil.fromJavaSig(sigbytes, type);
     }
 
     /**
@@ -649,14 +665,20 @@ public final class DSAEngine {
         if (type.getHashLen() != hashlen)
             throw new IllegalArgumentException("type mismatch hash=" + hash.getClass() + " key=" + type);
 
-        java.security.Signature jsig;
-        if (type.getBaseAlgorithm() == SigAlgo.EdDSA)
-            jsig = new EdDSAEngine(); // Ignore algo, EdDSAKey includes a hash specification.
-        else
-            jsig = java.security.Signature.getInstance(algo);
-        jsig.initSign(privKey, _context.random());
-        jsig.update(hash.getData());
-        return SigUtil.fromJavaSig(jsig.sign(), type);
+        byte[] sigbytes;
+        if (type.getBaseAlgorithm() == SigAlgo.EdDSA) {
+            // take advantage of one-shot mode
+            // Ignore algo, EdDSAKey includes a hash specification.
+            EdDSAEngine jsig = new EdDSAEngine();
+            jsig.initSign(privKey);
+            sigbytes = jsig.signOneShot(hash.getData());
+        } else {
+            java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+            jsig.initSign(privKey, _context.random());
+            jsig.update(hash.getData());
+            sigbytes = jsig.sign();
+        }
+        return SigUtil.fromJavaSig(sigbytes, type);
     }
 
     /**

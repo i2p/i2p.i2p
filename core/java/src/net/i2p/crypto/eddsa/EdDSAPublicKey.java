@@ -12,6 +12,12 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
 
 /**
  * An EdDSA public key.
+ *<p>
+ * Warning: Public key encoding is is based on the
+ * current IETF draft, and is subject to change. See getEncoded().
+ *</p><p>
+ * Ref: https://tools.ietf.org/html/draft-josefsson-pkix-eddsa-04
+ *</p>
  *
  * @since 0.9.15
  * @author str4d

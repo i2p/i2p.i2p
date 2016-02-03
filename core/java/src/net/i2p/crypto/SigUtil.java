@@ -664,7 +664,6 @@ public final class SigUtil {
      *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for this before you
      *  add a SigType with bigger signatures.
      *
-     *  @param sig length must be even
      *  @throws IllegalArgumentException if too big
      *  @since 0.9.25, split out from sigBytesToASN1(byte[])
      */
