@@ -2,15 +2,14 @@
 JCPUID
 ======
 
-Linux -> Windows cross-compilation
-----------------------------------
-Install ming-w64 (on debian or whichever package that provides i686-w64-mingw32 and x86_64_w64_mingw32).
+Windows
+-------
+Install MS Visual Studio (comminity edition 2015 was last used).
+Import a project from the msvc files. And build a binary.
 
-To build the 32-bit binaries run something like this:
-    CC=i686-w64-mingw32-gcc TARGET=windows BITS=32 ./build.sh
-
-To build the 64-bit binaries run something like this:
-    CC=x86_64-w64-mingw32-gcc TARGET=windows BITS=64 ./build.sh
+Cross-compilation using mingw has been attempted with version 4.6.3 and 5.2.1 of mingw,
+but the resulting binaries have not been able to execute on 32-bit windows machines.
+64-bit machines work fine though.
 
 FreeBSD
 -------
