@@ -58,17 +58,17 @@ public class ConfigFamilyHandler extends FormHandler {
                     family = family.substring(0, family.length() - FamilyKeyCrypto.CN_SUFFIX.length());
                 // store to keystore
                 File ks = new SecureDirectory(_context.getConfigDir(), "keystore");
-                if (!ks.exists());
+                if (!ks.exists())
                     ks.mkdirs();
                 ks = new File(ks, FamilyKeyCrypto.KEYSTORE_PREFIX + family + FamilyKeyCrypto.KEYSTORE_SUFFIX);
                 String keypw = KeyStoreUtil.randomString();
                 KeyStoreUtil.storePrivateKey(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, family, keypw, pk, certs);
                 // store certificate
                 File cf = new SecureDirectory(_context.getConfigDir(), "certificates");
-                if (!cf.exists());
+                if (!cf.exists())
                     cf.mkdirs();
                 cf = new SecureDirectory(cf, "family");
-                if (!ks.exists());
+                if (!ks.exists())
                     ks.mkdirs();
                 cf = new File(cf, family + FamilyKeyCrypto.CERT_SUFFIX);
                 // ignore failure

@@ -1,9 +1,57 @@
+2016-02-03 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Build: More checks in release target
+ * Console:
+   - New /configfamily for export/import and setup (ticket #1510)
+   - Custom icons for non-webapp plugins (ticket #1550)
+   - Add secure.thethinhat.i2p to console home page and hosts.txt
+ * Crypto:
+   - Implement EdDSA key encoding and decoding (ticket #1723, github issue #13)
+   - Fix I2P crypto provider and add it
+   - Specify I2P provider in keytool arguments when necessary
+   - Add EdDSA key generator support to provider
+   - Synch fix in EdDSA (github issue #10)
+   - Add hashCode() and equals() everywhere it was missing in EdDSA
+   - Put unknown class name in EdDSA exceptions
+   - Implement one-shot methods in EdDSA so we don't copy
+     the data if all the data is available (ticket #1750)
+   - Fix API violation if EdDSA signing object is reused (ticket #1750)
+   - Add ElGamal classes, from Bouncy Castle 1.53, for provider
+   - Implement Java ElGamal keys built on the BC classes
+   - Add KeyFactory and KeyPairGenerator for ElGamal
+   - Add ElGamal signature implementation, to be reviewed
+   - KeyGenerator: Check that dsax is greater than zero
+   - SHA256Generator: Don't fall back to Sha256Standalone,
+     SHA-256 support must now be in the JRE.
+     Deprecate all uses of Sha256Standalone, schedule for removal.
+     This will require a new Syndie release.
+   - New utils to support private key import/export
+   - Add support for CRL generation and export
+   - Consolidate PEM encoding
+   - Improve ASN.1 signature encoding/decoding utilities
+   - New selfsigned key and cert generator,
+     to be hooked in to KeyStoreUtil to replace keytool.
+   - Add EdDSA_SHA512_Ed25519ph sig type
+   - Add OIDs to sig types
+ * I2PTunnel: Fix exception message choice that was backwards
+   for router/non-router context
+ * Jetty: Add gzip filter to eepsite Jetty (new installs only)
+ * Random: Don't bother trying to seed from /dev/urandom on Windows
+ * Router: Make network ID configurable
+
+2016-02-01 zzz
+ * Imagegen:
+   - Return 403 if no code specified in QR or RA
+   - Mode parameter for html or text in RA
+   - Set RA text-mode character encoding
+   - Fix up test page
+
 2016-02-01 zzz
 Prop from i2p.i2p.zzz.imagegen:
  * Console:
    - New imagegen webapp, including servlets for identicons, QR codes,
      and random art. Bundles a small part of zxing, most of identicon,
-     and a rewrite of randomart from gnutls.
+     and a rewrite of randomart from gnutls (ticket #1652)
    - Add identicons to sybil page.
  * i2ptunnel: Add identicons to i2ptunnel address helper conflict page.
      Clean up text on the conflict page for readability.
@@ -151,12 +199,12 @@ Prop from i2p.i2p.zzz.imagegen:
    - Increase max peers and uploaders per torrent
    - Increase default max total uploaders
    - Increase max peers sent and returned in DHT
-* SAM:
+ * SAM:
    - Don't map keys to upper case in parser, corrupts I2CP options
    - Register SSL and UDP ports with PortMapper
-* SSU: Allow IP and port in relay request if it matches the source
-* Transport: Interrupt DH refiller thread when pool is empty,
-  to speed refilling and reduce pumper stalls
+ * SSU: Allow IP and port in relay request if it matches the source
+ * Transport: Interrupt DH refiller thread when pool is empty,
+   to speed refilling and reduce pumper stalls
 
 2015-11-30 zzz
  * SAM:
