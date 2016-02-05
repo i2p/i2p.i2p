@@ -39,7 +39,7 @@ class SAMRawSession extends SAMMessageSession {
      * @throws DataFormatException
      * @throws I2PSessionException 
      */
-    public SAMRawSession(String dest, Properties props,
+    protected SAMRawSession(String dest, Properties props,
                          SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
         super(dest, props);
 
@@ -60,6 +60,18 @@ class SAMRawSession extends SAMMessageSession {
                          SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
         super(destStream, props);
 
+        this.recv = recv;
+    }
+
+    /**
+     * Create a new SAM RAW session on an existing I2P session.
+     *
+     * @since 0.9.25
+     */
+    protected SAMRawSession(I2PSession sess, int listenProtocol, int listenPort,
+                            SAMRawReceiver recv) throws IOException, 
+                              DataFormatException, I2PSessionException {
+        super(sess, listenProtocol, listenPort);
         this.recv = recv;
     }
 

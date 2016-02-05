@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -47,7 +48,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-class SAMStreamSession {
+class SAMStreamSession implements SAMMessageSess {
 
     protected final Log _log;
 
@@ -68,6 +69,8 @@ class SAMStreamSession {
 
     // Can we create outgoing connections?
     protected final boolean canCreate;
+    private final int listenProtocol;
+    private final int listenPort;
 
     /** 
      * should we flush every time we get a STREAM SEND, or leave that up to
@@ -105,8 +108,8 @@ class SAMStreamSession {
      * @throws DataFormatException
      * @throws SAMException 
      */
-    public SAMStreamSession(InputStream destStream, String dir,
-                            Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
+    protected SAMStreamSession(InputStream destStream, String dir,
+                               Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
         this.recv = recv;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
 
@@ -170,8 +173,15 @@ class SAMStreamSession {
 
         forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
         
+        if (Boolean.parseBoolean(props.getProperty("i2p.streaming.enforceProtocol")))
+            listenProtocol = I2PSession.PROTO_STREAMING;
+        else
+            listenProtocol = I2PSession.PROTO_ANY;
+        listenPort = I2PSession.PORT_ANY;
+
 
         if (startAcceptor) {
+            // FIXME don't start threads in constructors
             server = new SAMStreamSessionServer();
             Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
 
@@ -179,6 +189,48 @@ class SAMStreamSession {
         } else {
             server = null;
         }
+    }
+
+    /**
+     * Create a new SAM STREAM session on an existing socket manager.
+     * v3 only.
+     *
+     * @param props Properties to setup the I2P session
+     * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws SAMException 
+     * @since 0.9.25
+     */
+    protected SAMStreamSession(I2PSocketManager mgr, Properties props, SAMStreamReceiver recv, int listenport)
+                               throws IOException, DataFormatException, SAMException {
+        this.recv = recv;
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("SAM STREAM session instantiated");
+        canCreate = true;
+        Properties allprops = (Properties) System.getProperties().clone();
+        allprops.putAll(props);
+        socketMgr = mgr;
+        socketMgr.addDisconnectListener(new DisconnectListener());
+        forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
+        listenProtocol = I2PSession.PROTO_STREAMING;
+        listenPort = listenport;
+        server = null;
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public int getListenProtocol() {
+        return listenProtocol;
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public int getListenPort() {
+        return listenPort;
     }
     
     protected class DisconnectListener implements I2PSocketManager.DisconnectListener {
@@ -302,6 +354,15 @@ class SAMStreamSession {
         removeSocketHandler(id);
 
         return true;
+    }
+
+    /**
+     *  Unsupported
+     *  @throws DataFormatException always
+     *  @since 0.9.25 moved from subclass SAMv3StreamSession to implement SAMMessageSess
+     */
+    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws DataFormatException {
+    	throw new DataFormatException(null);
     }
 
     /** 

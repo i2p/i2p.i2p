@@ -45,7 +45,7 @@ class SAMDatagramSession extends SAMMessageSession {
      * @throws DataFormatException
      * @throws I2PSessionException 
      */
-    public SAMDatagramSession(String dest, Properties props,
+    protected SAMDatagramSession(String dest, Properties props,
                               SAMDatagramReceiver recv) throws IOException, 
                               DataFormatException, I2PSessionException {
         super(dest, props);
@@ -68,6 +68,20 @@ class SAMDatagramSession extends SAMMessageSession {
                               SAMDatagramReceiver recv) throws IOException, 
                               DataFormatException, I2PSessionException {
         super(destStream, props);
+
+        this.recv = recv;
+        dgramMaker = new I2PDatagramMaker(getI2PSession());
+    }
+
+    /**
+     * Create a new SAM DATAGRAM session on an existing I2P session.
+     *
+     * @since 0.9.25
+     */
+    protected SAMDatagramSession(I2PSession sess, int listenPort,
+                              SAMDatagramReceiver recv) throws IOException, 
+                              DataFormatException, I2PSessionException {
+        super(sess, I2PSession.PROTO_DATAGRAM, listenPort);
 
         this.recv = recv;
         dgramMaker = new I2PDatagramMaker(getI2PSession());

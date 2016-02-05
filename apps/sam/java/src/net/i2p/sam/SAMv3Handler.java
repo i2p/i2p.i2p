@@ -48,6 +48,7 @@ class SAMv3Handler extends SAMv1Handler
 {
 	
 	private Session session;
+        // TODO remove singleton, hang off SAMBridge like dgserver
 	public static final SessionsDB sSessionsHash = new SessionsDB();
 	private volatile boolean stolenSocket;
 	private volatile boolean streamForwardingSocket;
@@ -369,8 +370,15 @@ class SAMv3Handler extends SAMv1Handler
 	protected boolean execSessionMessage(String opcode, Properties props) {
 
 		String dest = "BUG!";
-		String nick =  null ;
 		boolean ok = false ;
+
+		String nick = (String) props.remove("ID");
+		if (nick == null)
+			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"ID not specified\"\n");
+
+		String style = (String) props.remove("STYLE");
+		if (style == null && !opcode.equals("REMOVE"))
+			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
 
 		try{
 			if (opcode.equals("CREATE")) {
@@ -418,22 +426,6 @@ class SAMv3Handler extends SAMv1Handler
 						return writeString("SESSION STATUS RESULT=INVALID_KEY\n");
 				}
 
-
-				nick = (String) props.remove("ID");
-				if (nick == null) {
-					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("SESSION ID parameter not specified");
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"ID not specified\"\n");
-				}
-
-
-				String style = (String) props.remove("STYLE");
-				if (style == null) {
-					if (_log.shouldLog(Log.DEBUG))
-						_log.debug("SESSION STYLE parameter not specified");
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
-				}
-
 				// Unconditionally override what the client may have set
 				// (iMule sets BestEffort) as None is more efficient
 				// and the client has no way to access delivery notifications
@@ -472,6 +464,13 @@ class SAMv3Handler extends SAMv1Handler
 					SAMv3StreamSession v3 = newSAMStreamSession(nick);
 					streamSession = v3;
 					this.session = v3;
+				} else if (style.equals("MASTER")) {
+					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
+					MasterSession v3 = new MasterSession(nick, dgs, this, allProps);
+					streamSession = v3;
+					datagramSession = v3;
+                                        rawSession = v3;
+					this.session = v3;
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");
@@ -480,6 +479,22 @@ class SAMv3Handler extends SAMv1Handler
 				ok = true ;
 				return writeString("SESSION STATUS RESULT=OK DESTINATION="
 						+ dest + "\n");
+			} else if (opcode.equals("ADD") || opcode.equals("REMOVE")) {
+                                // prevent trouble in finally block
+				ok = true;
+				if (streamSession != null || datagramSession != null || rawSession != null)
+					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Not a MASTER session\"\n");
+				MasterSession msess = (MasterSession) session;
+				String msg;
+				if (opcode.equals("ADD")) {
+					msg = msess.add(nick, style, props);
+				} else {
+					msg = msess.remove(nick, props);
+				}
+				if (msg == null)
+					return writeString("SESSION STATUS RESULT=OK MESSAGE=\"" + opcode + ' ' + nick + "\"\n");
+				else
+					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + msg + "\"\n");
 			} else {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("Unrecognized SESSION message opcode: \""

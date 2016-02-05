@@ -6,17 +6,18 @@
 package net.i2p.sam;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress ;
+import java.nio.ByteBuffer;
 import java.util.Properties;
 
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress ;
-import java.nio.ByteBuffer;
 
 class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDatagramReceiver {
 	
@@ -53,21 +54,28 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 		this.handler = rec.getHandler();
 		
 		Properties props = rec.getProps();
-		String portStr = props.getProperty("PORT");
-		if (portStr == null) {
-			if (_log.shouldDebug())
-				_log.debug("receiver port not specified. Current socket will be used.");
-			this.clientAddress = null;
-		} else {
-			int port = Integer.parseInt(portStr);
-			String host = props.getProperty("HOST");
-			if (host == null) {    		
-				host = rec.getHandler().getClientIP();
-				if (_log.shouldDebug())
-					_log.debug("no host specified. Taken from the client socket : " + host+':'+port);
-			}
-			this.clientAddress = new InetSocketAddress(host, port);
-		}
+		clientAddress = SAMv3RawSession.getSocketAddress(props, handler);
+	}
+
+	/**
+	 *   Build a Datagram Session on an existing i2p session
+	 *   registered with the given nickname
+	 *   
+	 * @param nick nickname of the session
+	 * @throws IOException
+	 * @throws DataFormatException
+	 * @throws I2PSessionException
+	 * @since 0.9.25
+	 */
+	public SAMv3DatagramSession(String nick, Properties props, SAMv3Handler handler, I2PSession isess,
+	                            int listenPort, SAMv3DatagramServer dgServer) 
+			throws IOException, DataFormatException, I2PSessionException {
+		super(isess, listenPort, null);  // to be replaced by this
+		this.nick = nick ;
+		this.recv = this ;  // replacement
+		this.server = dgServer;
+		this.handler = handler;
+		clientAddress = SAMv3RawSession.getSocketAddress(props, handler);
 	}
 
 	public void receiveDatagramBytes(Destination sender, byte[] data, int proto,

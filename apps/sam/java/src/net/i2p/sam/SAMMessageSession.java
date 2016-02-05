@@ -33,11 +33,13 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-abstract class SAMMessageSession implements Closeable {
+abstract class SAMMessageSession implements SAMMessageSess {
 
     protected final Log _log;
     private final I2PSession session;
     private final SAMMessageSessionHandler handler;
+    private final int listenProtocol;
+    private final int listenPort;
 
     /**
      * Initialize a new SAM message-based session.
@@ -68,6 +70,33 @@ abstract class SAMMessageSession implements Closeable {
 
         handler = new SAMMessageSessionHandler(destStream, props);
         session = handler.getSession();
+        listenProtocol = I2PSession.PROTO_ANY;
+        listenPort = I2PSession.PORT_ANY;
+        // FIXME don't start threads in constructors
+        Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
+        t.start();
+    }
+
+    /**
+     * Initialize a new SAM message-based session using an existing I2PSession.
+     *
+     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
+     * @param props Properties to setup the I2P session
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws I2PSessionException 
+     * @since 0.9.25
+     */
+    protected SAMMessageSession(I2PSession sess, int listenProtocol, int listenPort)
+                            throws IOException, DataFormatException, I2PSessionException {
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Initializing SAM message-based session");
+
+        session = sess;
+        handler = new SAMMessageSessionHandler(session);
+        this.listenProtocol = listenProtocol;
+        this.listenPort = listenPort;
         // FIXME don't start threads in constructors
         Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
         t.start();
@@ -80,6 +109,20 @@ abstract class SAMMessageSession implements Closeable {
      */
     public Destination getDestination() {
         return session.getMyDestination();
+    }
+
+    /**
+     * @since 0.9.25
+     */
+    public int getListenProtocol() {
+        return listenProtocol;
+    }
+
+    /**
+     * @since 0.9.25
+     */
+    public int getListenPort() {
+        return listenPort;
     }
 
     /**
@@ -188,7 +231,7 @@ abstract class SAMMessageSession implements Closeable {
      *
      * @author human
      */
-    class SAMMessageSessionHandler implements Runnable, I2PSessionMuxedListener {
+    private class SAMMessageSessionHandler implements Runnable, I2PSessionMuxedListener {
 
         private final I2PSession _session;
         private final Object runningLock = new Object();
@@ -198,8 +241,8 @@ abstract class SAMMessageSession implements Closeable {
          * Create a new SAM message-based session handler
          *
          * @param destStream Input stream containing the destination keys
-	 * @param props Properties to setup the I2P session
-	 * @throws I2PSessionException 
+         * @param props Properties to setup the I2P session
+         * @throws I2PSessionException 
          */
         public SAMMessageSessionHandler(InputStream destStream, Properties props) throws I2PSessionException {
             if (_log.shouldLog(Log.DEBUG))
@@ -218,7 +261,17 @@ abstract class SAMMessageSession implements Closeable {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("I2P session connected");
 
-            _session.addMuxedSessionListener(this, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
+            _session.addMuxedSessionListener(this, listenProtocol, listenPort);
+        }
+                
+        /**
+         * Create a new SAM message-based session handler on an existing I2PSession
+         *
+         * @since 0.9.25
+         */
+        public SAMMessageSessionHandler(I2PSession sess) throws I2PSessionException {
+            _session = sess;
+            _session.addMuxedSessionListener(this, listenProtocol, listenPort);
         }
 
         /**
@@ -257,7 +310,7 @@ abstract class SAMMessageSession implements Closeable {
                 _log.debug("Shutting down SAM message-based session handler");
             
             shutDown();
-            session.removeListener(I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
+            session.removeListener(listenProtocol, listenPort);
             
             try {
                 if (_log.shouldLog(Log.DEBUG))

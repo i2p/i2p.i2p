@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLException;
@@ -30,6 +31,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -46,13 +48,16 @@ import net.i2p.util.Log;
 class SAMv3StreamSession  extends SAMStreamSession implements Session
 {
 
-		private static final int BUFFER_SIZE = 1024 ;
+		private static final int BUFFER_SIZE = 1024;
+		private static final int MAX_ACCEPT_QUEUE = 64;
 		
 		private final Object socketServerLock = new Object();
 		/** this is ONLY set for FORWARD, not for ACCEPT */
 		private I2PServerSocket socketServer;
 		/** this is the count of active ACCEPT sockets */
 		private final AtomicInteger _acceptors = new AtomicInteger();
+		/** for subsession only, null otherwise */
+		private final LinkedBlockingQueue<I2PSocket> _acceptQueue;
 
 		private static I2PSSLSocketFactory _sslSocketFactory;
 	
@@ -79,6 +84,55 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
                       getDB().get(login).getProps(),
                       getDB().get(login).getHandler());
 	    	this.nick = login ;
+		_acceptQueue = null;
+	    }
+
+	    /**
+	     *   Build a Datagram Session on an existing I2P session
+	     *   registered with the given nickname
+	     *   
+	     * @param nick nickname of the session
+	     * @throws IOException
+	     * @throws DataFormatException
+	     * @throws I2PSessionException
+	     * @since 0.9.25
+	     */
+	    public SAMv3StreamSession(String login, Properties props, SAMv3Handler handler, I2PSocketManager mgr,
+	                                int listenPort) throws IOException, DataFormatException, SAMException {
+		super(mgr, props, handler, listenPort);
+		this.nick = login ;
+		_acceptQueue = new LinkedBlockingQueue<I2PSocket>(MAX_ACCEPT_QUEUE);
+	    }
+
+	    /**
+	     * Put a socket on the accept queue.
+	     * Only for subsession, throws IllegalStateException otherwise.
+	     *   
+	     * @return success, false if full
+	     * @since 0.9.25
+	     */
+	    public boolean queueSocket(I2PSocket sock) {
+		if (_acceptQueue == null)
+		    throw new IllegalStateException();
+		return _acceptQueue.offer(sock);
+	    }
+
+	    /**
+	     * Take a socket from the accept queue.
+	     * Only for subsession, throws IllegalStateException otherwise.
+	     *   
+	     * @since 0.9.25
+	     */
+	    private I2PSocket acceptSocket() throws ConnectException {
+		if (_acceptQueue == null)
+		    throw new IllegalStateException();
+		try {
+			return _acceptQueue.take();
+		} catch (InterruptedException ie) {
+			ConnectException ce = new ConnectException("interrupted");
+			ce.initCause(ie);
+			throw ce;
+		}
 	    }
 
 	    public static SessionsDB getDB()
@@ -185,10 +239,13 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 			}
 		}
 
-		I2PSocket i2ps;
+		I2PSocket i2ps = null;
 		_acceptors.incrementAndGet();
 		try {
-			i2ps = socketMgr.getServerSocket().accept();
+			if (_acceptQueue != null)
+				i2ps = acceptSocket();
+			else
+				i2ps = socketMgr.getServerSocket().accept();
 		} finally {
 			_acceptors.decrementAndGet();
 		}
@@ -257,25 +314,23 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	    		this.socketServer = this.socketMgr.getServerSocket();
 	    	}
 	    	
-	    	SocketForwarder forwarder = new SocketForwarder(host, port, isSSL, this, verbose, sendPorts);
+	    	SocketForwarder forwarder = new SocketForwarder(host, port, isSSL, verbose, sendPorts);
 	    	(new I2PAppThread(rec.getThreadGroup(), forwarder, "SAMV3StreamForwarder")).start();
 	    }
 	    
 	    /**
 	     *  Forward sockets from I2P to the host/port provided
 	     */
-	    private static class SocketForwarder implements Runnable
+	    private class SocketForwarder implements Runnable
 	    {
 	    	private final String host;
 	    	private final int port;
-	    	private final SAMv3StreamSession session;
 	    	private final boolean isSSL, verbose, sendPorts;
 	    	
 	    	SocketForwarder(String host, int port, boolean isSSL,
-		                SAMv3StreamSession session, boolean verbose, boolean sendPorts) {
+		                boolean verbose, boolean sendPorts) {
 	    		this.host = host ;
 	    		this.port = port ;
-	    		this.session = session ;
 	    		this.verbose = verbose ;
 	    		this.sendPorts = sendPorts;
 			this.isSSL = isSSL;
@@ -283,12 +338,15 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	    	
 	    	public void run()
 	    	{
-	    		while (session.getSocketServer()!=null) {
+	    		while (getSocketServer() != null) {
 	    			
 	    			// wait and accept a connection from I2P side
 	    			I2PSocket i2ps;
 	    			try {
-	    				i2ps = session.getSocketServer().accept();
+					if (_acceptQueue != null)
+						i2ps = acceptSocket();
+					else
+		    				i2ps = getSocketServer().accept();
 	    				if (i2ps == null)
 		    				continue;
 				} catch (SocketTimeoutException ste) {
@@ -437,7 +495,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 		}
 	    }
 	    
-	    private I2PServerSocket getSocketServer()
+	    protected I2PServerSocket getSocketServer()
 	    {
 	    	synchronized ( this.socketServerLock ) {
 	    		return this.socketServer ;
@@ -478,14 +536,5 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	    @Override
 	    public void close() {
 	        socketMgr.destroySocketManager();
-	    }
-
-	    /**
-	     *  Unsupported
-	     *  @throws DataFormatException always
-	     */
-	    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws DataFormatException
-	    {
-	    	throw new DataFormatException(null);
 	    }
 }
