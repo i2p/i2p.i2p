@@ -34,6 +34,8 @@ class SAMv3RawSession extends SAMRawSession implements Session, SAMRawReceiver {
 	 *   Build a Raw Datagram Session according to information
 	 *   registered with the given nickname
 	 *   
+	 * Caller MUST call start().
+	 *
 	 * @param nick nickname of the session
 	 * @throws IOException
 	 * @throws DataFormatException
@@ -62,6 +64,8 @@ class SAMv3RawSession extends SAMRawSession implements Session, SAMRawReceiver {
 	 *   Build a Raw Session on an existing i2p session
 	 *   registered with the given nickname
 	 *   
+	 * Caller MUST call start().
+	 *
 	 * @param nick nickname of the session
 	 * @throws IOException
 	 * @throws DataFormatException

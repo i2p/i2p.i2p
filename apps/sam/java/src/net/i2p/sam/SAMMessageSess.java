@@ -16,6 +16,12 @@ import net.i2p.data.Destination;
 interface SAMMessageSess extends Closeable {
 
     /**
+     * Start a SAM message-based session.
+     * MUST be called after constructor.
+     */
+    public void start();
+
+    /**
      * Close a SAM message-based session.
      */
     public void close();

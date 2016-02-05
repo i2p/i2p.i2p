@@ -84,6 +84,8 @@ class SAMStreamSession implements SAMMessageSess {
     /**
      * Create a new SAM STREAM session.
      *
+     * Caller MUST call start().
+     *
      * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
      * @param props Properties to setup the I2P session
@@ -181,11 +183,7 @@ class SAMStreamSession implements SAMMessageSess {
 
 
         if (startAcceptor) {
-            // FIXME don't start threads in constructors
             server = new SAMStreamSessionServer();
-            Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
-
-            t.start();
         } else {
             server = null;
         }
@@ -217,6 +215,16 @@ class SAMStreamSession implements SAMMessageSess {
         listenProtocol = I2PSession.PROTO_STREAMING;
         listenPort = listenport;
         server = null;
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public void start() {
+        if (server != null) {
+            Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
+            t.start();
+        }
     }
 
     /*

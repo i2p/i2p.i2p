@@ -71,6 +71,8 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	     * Create a new SAM STREAM session, according to information
 	     * registered with the given nickname
 	     *
+	     * Caller MUST call start().
+	     *
 	     * @param login The nickname
 	     * @throws IOException
 	     * @throws DataFormatException
@@ -88,9 +90,11 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	    }
 
 	    /**
-	     *   Build a Datagram Session on an existing I2P session
+	     *   Build a Stream Session on an existing I2P session
 	     *   registered with the given nickname
 	     *   
+	     * Caller MUST call start().
+	     *
 	     * @param nick nickname of the session
 	     * @throws IOException
 	     * @throws DataFormatException

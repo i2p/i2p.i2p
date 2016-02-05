@@ -455,15 +455,18 @@ class SAMv3Handler extends SAMv1Handler
 					SAMv3RawSession v3 = new SAMv3RawSession(nick, dgs);
                                         rawSession = v3;
 					this.session = v3;
+					v3.start();
 				} else if (style.equals("DATAGRAM")) {
 					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
 					SAMv3DatagramSession v3 = new SAMv3DatagramSession(nick, dgs);
 					datagramSession = v3;
 					this.session = v3;
+					v3.start();
 				} else if (style.equals("STREAM")) {
 					SAMv3StreamSession v3 = newSAMStreamSession(nick);
 					streamSession = v3;
 					this.session = v3;
+					v3.start();
 				} else if (style.equals("MASTER")) {
 					SAMv3DatagramServer dgs = bridge.getV3DatagramServer(props);
 					MasterSession v3 = new MasterSession(nick, dgs, this, allProps);
@@ -471,6 +474,7 @@ class SAMv3Handler extends SAMv1Handler
 					datagramSession = v3;
                                         rawSession = v3;
 					this.session = v3;
+					v3.start();
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");

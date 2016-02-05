@@ -274,8 +274,10 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
 
                 if (style.equals("RAW")) {
                     rawSession = new SAMRawSession(destKeystream, props, this);
+                    rawSession.start();
                 } else if (style.equals("DATAGRAM")) {
                     datagramSession = new SAMDatagramSession(destKeystream, props,this);
+                    datagramSession.start();
                 } else if (style.equals("STREAM")) {
                     String dir = (String) props.remove("DIRECTION");
                     if (dir == null) {
@@ -290,6 +292,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     }
                 
                     streamSession = newSAMStreamSession(destKeystream, dir,props);
+                    streamSession.start();
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");

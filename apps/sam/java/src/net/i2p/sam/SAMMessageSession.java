@@ -72,9 +72,6 @@ abstract class SAMMessageSession implements SAMMessageSess {
         session = handler.getSession();
         listenProtocol = I2PSession.PROTO_ANY;
         listenPort = I2PSession.PORT_ANY;
-        // FIXME don't start threads in constructors
-        Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
-        t.start();
     }
 
     /**
@@ -97,7 +94,12 @@ abstract class SAMMessageSession implements SAMMessageSess {
         handler = new SAMMessageSessionHandler(session);
         this.listenProtocol = listenProtocol;
         this.listenPort = listenPort;
-        // FIXME don't start threads in constructors
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public void start() {
         Thread t = new I2PAppThread(handler, "SAMMessageSessionHandler");
         t.start();
     }

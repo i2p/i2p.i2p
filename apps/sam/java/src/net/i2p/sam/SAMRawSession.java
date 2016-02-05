@@ -49,6 +49,8 @@ class SAMRawSession extends SAMMessageSession {
     /**
      * Create a new SAM RAW session.
      *
+     * Caller MUST call start().
+     *
      * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
      * @param props Properties to setup the I2P session
      * @param recv Object that will receive incoming data

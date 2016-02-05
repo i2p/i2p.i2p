@@ -22,6 +22,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -39,11 +40,14 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	private final SAMv3Handler handler;
 	private final SAMv3DatagramServer dgs;
 	private final Map<String, SAMMessageSess> sessions;
+	private final StreamAcceptor streamAcceptor;
 
 	/**
 	 * Build a Session according to information
-	 * registered with the given nickname
-	 *   
+	 * registered with the given nickname.
+	 *
+	 * Caller MUST call start().
+	 * 
 	 * @param nick nickname of the session
 	 * @throws IOException
 	 * @throws DataFormatException
@@ -63,6 +67,16 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 		// if we get a RAW session added with 0/0, it will replace this,
 		// and we won't add this back if removed.
 		isess.addMuxedSessionListener(this, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
+		streamAcceptor = new StreamAcceptor();
+	}
+
+	/**
+	 *  Overridden to start the acceptor.
+	 */
+	@Override
+	public void start() {
+		Thread t = new I2PAppThread(streamAcceptor, "SAMMasterAcceptor");
+		t.start();
 	}
 
 	/**
@@ -147,6 +161,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 		}
 		// listeners etc
 
+		sess.start();
 		// all ok
 		return null;
 	}
@@ -236,10 +251,12 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 
 	/**
 	 * Close the master session
+	 * Overridden to stop the acceptor.
 	 */
 	@Override
 	public void close() {
 		// close sessions?
+		streamAcceptor.stopRunning();
 		super.close();
 	}
         
@@ -290,11 +307,17 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 
 	private class StreamAcceptor implements Runnable {
 		
+		private volatile boolean stop;
+
 		public StreamAcceptor() {
 		}
 		
+		public void stopRunning() {
+			stop = true;
+		}
+
 		public void run() {
-			while (getSocketServer()!=null) {
+			while (!stop && getSocketServer() != null) {
 				
 				// wait and accept a connection from I2P side
 				I2PSocket i2ps;
@@ -353,6 +376,8 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 						_log.warn("No subsession found for incoming streaming connection on port " + port);
 				}
 			}
+			if (_log.shouldWarn())
+				_log.warn("Stream acceptor stopped");
 		}
 	}
 }

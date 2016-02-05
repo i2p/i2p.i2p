@@ -35,6 +35,7 @@ class SAMDatagramSession extends SAMMessageSession {
 
     private final I2PDatagramMaker dgramMaker;
     private final I2PDatagramDissector dgramDissector = new I2PDatagramDissector();
+
     /**
      * Create a new SAM DATAGRAM session.
      *
@@ -56,6 +57,8 @@ class SAMDatagramSession extends SAMMessageSession {
 
     /**
      * Create a new SAM DATAGRAM session.
+     *
+     * Caller MUST call start().
      *
      * @param destStream Input stream containing the destination keys
      * @param props Properties to setup the I2P session
