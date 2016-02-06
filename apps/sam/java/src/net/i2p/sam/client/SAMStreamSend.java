@@ -56,18 +56,20 @@ public class SAMStreamSend {
     
     private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4;
     private static final int MASTER=8;
-    private static final String USAGE = "Usage: SAMStreamSend [-s] [-x] [-m mode] [-v version] [-b samHost] [-p samPort] [-o opt=val] [-u user] [-w password] peerDestFile dataDir\n" +
+    private static final String USAGE = "Usage: SAMStreamSend [-s] [-x] [-m mode] [-v version] [-b samHost] [-p samPort]\n" +
+                                        "                     [-o opt=val] [-u user] [-w password] peerDestFile dataDir\n" +
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
+                                        "              default is stream\n" +
                                         "       -s: use SSL\n" +
                                         "       -x: use master session (forces -v 3.3)\n" +
                                         "       multiple -o session options are allowed";
 
     public static void main(String args[]) {
-        Getopt g = new Getopt("SAM", args, "sxb:m:o:p:u:v:w:");
+        Getopt g = new Getopt("SAM", args, "sxhb:m:o:p:u:v:w:");
         boolean isSSL = false;
         boolean isMaster = false;
         int mode = STREAM;
-        String version = "1.0";
+        String version = "3.3";
         String host = "127.0.0.1";
         String port = "7656";
         String user = null;
@@ -292,10 +294,12 @@ public class SAMStreamSend {
                     style = "STREAM";
                 else if (mode == DG || mode == V1DG)
                     style = "DATAGRAM";
-                else
+                else   // RAW or V1RAW
                     style = "RAW";
 
                 if (masterMode) {
+                    if (mode == V1DG || mode == V1RAW)
+                        throw new IllegalArgumentException("v1 dg/raw incompatible with master session");
                     String req = "SESSION CREATE DESTINATION=TRANSIENT STYLE=MASTER ID=masterSend " + opts + '\n';
                     samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
@@ -306,6 +310,9 @@ public class SAMStreamSend {
                         throw new IOException("SESSION CREATE STYLE=MASTER failed");
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION CREATE STYLE=MASTER reply found: " + ok);
+                    // PORT required even if we aren't listening for this test
+                    if (mode != STREAM)
+                        opts += " PORT=9999";
                 }
                 String req = "SESSION " + command + " STYLE=" + style + ' ' + _conOptions + ' ' + opts + '\n';
                 samOut.write(req.getBytes("UTF-8"));

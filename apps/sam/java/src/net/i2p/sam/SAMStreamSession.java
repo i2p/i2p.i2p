@@ -364,11 +364,11 @@ class SAMStreamSession implements SAMMessageSess {
 
     /**
      *  Unsupported
-     *  @throws DataFormatException always
+     *  @throws I2PSessionException always
      *  @since 0.9.25 moved from subclass SAMv3StreamSession to implement SAMMessageSess
      */
-    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws DataFormatException {
-    	throw new DataFormatException(null);
+    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws I2PSessionException {
+    	throw new I2PSessionException("Unsupported in stream or master session");
     }
 
     /** 

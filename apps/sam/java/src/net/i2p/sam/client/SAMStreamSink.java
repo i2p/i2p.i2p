@@ -64,6 +64,7 @@ public class SAMStreamSink {
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2;\n" +
                                         "              raw: 3; v1raw: 4; raw-with-headers: 5;\n" +
                                         "              stream-forward: 6; stream-forward-ssl: 7\n" +
+                                        "              default is stream\n" +
                                         "       -s: use SSL to connect to bridge\n" +
                                         "       -x: use master session (forces -v 3.3)\n" +
                                         "       multiple -o session options are allowed";
@@ -71,11 +72,11 @@ public class SAMStreamSink {
     private static final int V3DGPORT=9999;
 
     public static void main(String args[]) {
-        Getopt g = new Getopt("SAM", args, "sxb:m:p:u:v:w:");
+        Getopt g = new Getopt("SAM", args, "sxhb:m:p:u:v:w:");
         boolean isSSL = false;
         boolean isMaster = false;
         int mode = STREAM;
-        String version = "1.0";
+        String version = "3.3";
         String host = "127.0.0.1";
         String port = "7656";
         String user = null;
@@ -682,6 +683,8 @@ public class SAMStreamSink {
                     style = "RAW HEADER=true PORT=" + V3DGPORT;
 
                 if (masterMode) {
+                    if (mode == V1DG || mode == V1RAW)
+                        throw new IllegalArgumentException("v1 dg/raw incompatible with master session");
                     String req = "SESSION CREATE DESTINATION=" + dest + " STYLE=MASTER ID=masterSink " + sopts + '\n';
                     samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
