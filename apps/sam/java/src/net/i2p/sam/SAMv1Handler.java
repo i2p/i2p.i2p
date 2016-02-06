@@ -51,6 +51,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
     protected final long _id;
     private static final AtomicLong __id = new AtomicLong();
     private static final int FIRST_READ_TIMEOUT = 60*1000;
+    protected static final String SESSION_ERROR = "SESSION STATUS RESULT=I2P_ERROR";
     
     /**
      * Create a new SAM version 1 handler.  This constructor expects
@@ -132,7 +133,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     ReadLine.readLine(sock, buf, gotFirstLine ? 0 : FIRST_READ_TIMEOUT);
                     sock.setSoTimeout(0);
                 } catch (SocketTimeoutException ste) {
-                    writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
+                    writeString(SESSION_ERROR, "command timeout, bye");
                     break;
                 }
                 msg = buf.toString();
@@ -222,19 +223,19 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                     || (streamSession != null)) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Trying to create a session, but one still exists");
-                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
+                    return writeString(SESSION_ERROR, "Session already exists");
                 }
                 if (props.isEmpty()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("No parameters specified in SESSION CREATE message");
-                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
+                    return writeString(SESSION_ERROR, "No parameters for SESSION CREATE");
                 }
                 
                 dest = (String) props.remove("DESTINATION");
                 if (dest == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION DESTINATION parameter not specified");
-                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"DESTINATION not specified\"\n");
+                    return writeString(SESSION_ERROR, "DESTINATION not specified");
                 }
                 
                 String destKeystream = null;
@@ -264,7 +265,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 if (style == null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION STYLE parameter not specified");
-                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
+                    return writeString(SESSION_ERROR, "No SESSION STYLE specified");
                 }
                 
 		// Unconditionally override what the client may have set
@@ -288,7 +289,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                                && !dir.equals("BOTH")) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Unknown DIRECTION parameter value: [" + dir + "]");
-                        return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown DIRECTION parameter\"\n");
+                        return writeString(SESSION_ERROR, "Unknown DIRECTION parameter");
                     }
                 
                     streamSession = newSAMStreamSession(destKeystream, dir,props);
@@ -296,7 +297,7 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");
-                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized SESSION STYLE\"\n");
+                    return writeString(SESSION_ERROR, "Unrecognized SESSION STYLE");
                 }
                 return writeString("SESSION STATUS RESULT=OK DESTINATION="
                                    + dest + "\n");
@@ -304,22 +305,22 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Unrecognized SESSION message opcode: \""
                            + opcode + "\"");
-                return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized opcode\"\n");
+                return writeString(SESSION_ERROR, "Unrecognized opcode");
             }
         } catch (DataFormatException e) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Invalid destination specified");
-            return writeString("SESSION STATUS RESULT=INVALID_KEY DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+            return writeString("SESSION STATUS RESULT=INVALID_KEY", e.getMessage());
         } catch (I2PSessionException e) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("I2P error when instantiating session", e);
-            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+            return writeString(SESSION_ERROR, e.getMessage());
         } catch (SAMException e) {
             _log.error("Unexpected SAM error", e);
-            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+            return writeString(SESSION_ERROR, e.getMessage());
         } catch (IOException e) {
             _log.error("Unexpected IOException", e);
-            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+            return writeString(SESSION_ERROR, e.getMessage());
         }
     }
 
@@ -1011,6 +1012,18 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             rv = "";
         }
         return rv;
+    }
+
+    /**
+     * Write a string and message, escaping the message.
+     * Writes s + createMessageString(msg) + \n
+     *
+     * @param s The string, non-null
+     * @param s The message may be null
+     * @since 0.9.25
+     */
+    protected boolean writeString(String s, String msg) {
+        return writeString(s + createMessageString(msg) + '\n');
     }
   
     public void receiveStreamBytes(int id, ByteBuffer data) throws IOException {

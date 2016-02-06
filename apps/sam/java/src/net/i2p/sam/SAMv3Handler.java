@@ -56,6 +56,7 @@ class SAMv3Handler extends SAMv1Handler
 	private long _lastPing;
 	private static final int FIRST_READ_TIMEOUT = 60*1000;
 	private static final int READ_TIMEOUT = 3*60*1000;
+	private static final String AUTH_ERROR = "AUTH STATUS RESULT=I2P_ERROR";
 	
 	/**
 	 * Create a new SAM version 3 handler.  This constructor expects
@@ -196,7 +197,7 @@ class SAMv3Handler extends SAMv1Handler
 								if (now - _lastPing >= READ_TIMEOUT) {
 									if (_log.shouldWarn())
 										_log.warn("Failed to respond to PING");
-									writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
+									writeString(SESSION_ERROR, "PONG timeout");
 									break;
 								}
 							} else {
@@ -211,13 +212,13 @@ class SAMv3Handler extends SAMv1Handler
 								if (now - _lastPing >= 2*READ_TIMEOUT) {
 									if (_log.shouldWarn())
 										_log.warn("Failed to respond to PING");
-									writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"PONG timeout\"\n");
+									writeString(SESSION_ERROR, "PONG timeout");
 									break;
 								}
 							} else if (_lastPing < 0) {
 								if (_log.shouldWarn())
 									_log.warn("2nd timeout");
-								writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
+								writeString(SESSION_ERROR, "command timeout, bye");
 								break;
 							} else {
 								// don't clear buffer, don't send ping,
@@ -238,7 +239,7 @@ class SAMv3Handler extends SAMv1Handler
 						ReadLine.readLine(socket, buf, gotFirstLine ? 0 : FIRST_READ_TIMEOUT);
 						socket.setSoTimeout(0);
 					} catch (SocketTimeoutException ste) {
-						writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"command timeout, bye\"\n");
+						writeString(SESSION_ERROR, "command timeout, bye");
 						break;
 					}
 					line = buf.toString();
@@ -275,7 +276,7 @@ class SAMv3Handler extends SAMv1Handler
 
 				if (opcode == null) {
 					// This is not a correct message, for sure
-					if (writeString(domain + " STATUS RESULT=I2P_ERROR MESSAGE=\"command not specified\"\n"))
+					if (writeString(domain + " STATUS RESULT=I2P_ERROR", "command not specified"))
 						continue;
 					else
 						break;
@@ -398,11 +399,11 @@ class SAMv3Handler extends SAMv1Handler
 
 		String nick = (String) props.remove("ID");
 		if (nick == null)
-			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"ID not specified\"\n");
+			return writeString(SESSION_ERROR, "ID not specified");
 
 		String style = (String) props.remove("STYLE");
 		if (style == null && !opcode.equals("REMOVE"))
-			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
+			return writeString(SESSION_ERROR, "No SESSION STYLE specified");
 
 		try{
 			if (opcode.equals("CREATE")) {
@@ -410,19 +411,19 @@ class SAMv3Handler extends SAMv1Handler
 						|| (this.getStreamSession() != null)) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Trying to create a session, but one still exists");
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
+					return writeString(SESSION_ERROR, "Session already exists");
 				}
 				if (props.isEmpty()) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("No parameters specified in SESSION CREATE message");
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
+					return writeString(SESSION_ERROR, "No parameters for SESSION CREATE");
 				}
 
 				dest = (String) props.remove("DESTINATION");
 				if (dest == null) {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("SESSION DESTINATION parameter not specified");
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"DESTINATION not specified\"\n");
+					return writeString(SESSION_ERROR, "DESTINATION not specified");
 				}
 
 				if (dest.equals("TRANSIENT")) {
@@ -433,8 +434,8 @@ class SAMv3Handler extends SAMv1Handler
 					if (sigTypeStr != null) {
 						sigType = SigType.parseSigType(sigTypeStr);
 						if (sigType == null) {
-							return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"SIGNATURE_TYPE "
-							                   + sigTypeStr + " unsupported\"\n");
+							return writeString(SESSION_ERROR, "SIGNATURE_TYPE "
+							                   + sigTypeStr + " unsupported");
 						}
 					} else {
 						sigType = SigType.DSA_SHA1;
@@ -511,7 +512,7 @@ class SAMv3Handler extends SAMv1Handler
 				} else {
 					if (_log.shouldLog(Log.DEBUG))
 						_log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized SESSION STYLE\"\n");
+					return writeString(SESSION_ERROR, "Unrecognized SESSION STYLE");
 				}
 				ok = true ;
 				return writeString("SESSION STATUS RESULT=OK DESTINATION="
@@ -520,7 +521,7 @@ class SAMv3Handler extends SAMv1Handler
                                 // prevent trouble in finally block
 				ok = true;
 				if (streamSession == null || datagramSession == null || rawSession == null)
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Not a MASTER session\"\n");
+					return writeString(SESSION_ERROR, "Not a MASTER session");
 				MasterSession msess = (MasterSession) session;
 				String msg;
 				if (opcode.equals("ADD")) {
@@ -529,30 +530,30 @@ class SAMv3Handler extends SAMv1Handler
 					msg = msess.remove(nick, props);
 				}
 				if (msg == null)
-					return writeString("SESSION STATUS RESULT=OK MESSAGE=\"" + opcode + ' ' + nick + "\"\n");
+					return writeString("SESSION STATUS RESULT=OK", opcode + ' ' + nick);
 				else
-					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + msg + "\"\n");
+					return writeString(SESSION_ERROR, msg);
 			} else {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("Unrecognized SESSION message opcode: \""
 						+ opcode + "\"");
-				return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized opcode\"\n");
+				return writeString(SESSION_ERROR, "Unrecognized opcode");
 			}
 		} catch (DataFormatException e) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("Invalid destination specified");
-			return writeString("SESSION STATUS RESULT=INVALID_KEY DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString("SESSION STATUS RESULT=INVALID_KEY", e.getMessage());
 		} catch (I2PSessionException e) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("I2P error when instantiating session", e);
-			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString(SESSION_ERROR, e.getMessage());
 		} catch (SAMException e) {
 			if (_log.shouldLog(Log.INFO))
 				_log.info("Funny SAM error", e);
-			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString(SESSION_ERROR, e.getMessage());
 		} catch (IOException e) {
 			_log.error("Unexpected IOException", e);
-			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString(SESSION_ERROR, e.getMessage());
 		} finally {
 			// unregister the session if it has not been created
 			if ( !ok && nick!=null ) {
@@ -796,29 +797,29 @@ class SAMv3Handler extends SAMv1Handler
 			String user = props.getProperty("USER");
 			String pw = props.getProperty("PASSWORD");
 			if (user == null || pw == null)
-				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"USER and PASSWORD required\"\n");
+				return writeString(AUTH_ERROR, "USER and PASSWORD required");
 			String prop = SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX;
 			if (i2cpProps.containsKey(prop))
-				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"user " + user + " already exists\"\n");
+				return writeString(AUTH_ERROR, "user " + user + " already exists");
 			PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
 			String shash = pm.createHash(pw);
 			i2cpProps.setProperty(prop, shash);
 		} else if (opcode.equals("REMOVE")) {
 			String user = props.getProperty("USER");
 			if (user == null)
-				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"USER required\"\n");
+				return writeString(AUTH_ERROR, "USER required");
 			String prop = SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX;
 			if (!i2cpProps.containsKey(prop))
-				return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"user " + user + " not found\"\n");
+				return writeString(AUTH_ERROR, "user " + user + " not found");
 			i2cpProps.remove(prop);
 		} else {
-			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown AUTH command\"\n");
+			return writeString(AUTH_ERROR, "Unknown AUTH command");
 		}
 		try {
 			bridge.saveConfig();
 			return writeString("AUTH STATUS RESULT=OK\n");
 		} catch (IOException ioe) {
-			return writeString("AUTH STATUS RESULT=I2P_ERROR MESSAGE=\"Config save failed: " + ioe + "\"\n");
+			return writeString(AUTH_ERROR, "Config save failed: " + ioe);
 		}
 	}
 

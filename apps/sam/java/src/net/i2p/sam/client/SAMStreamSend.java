@@ -296,7 +296,7 @@ public class SAMStreamSend {
                     style = "RAW";
 
                 if (masterMode) {
-                    String req = "SESSION CREATE DESTINATION=TRANSIENT STYLE=MASTER ID=master " + opts + '\n';
+                    String req = "SESSION CREATE DESTINATION=TRANSIENT STYLE=MASTER ID=masterSend " + opts + '\n';
                     samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
                     if (_log.shouldLog(Log.DEBUG))

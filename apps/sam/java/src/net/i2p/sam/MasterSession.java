@@ -18,6 +18,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionMuxedListener;
+import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -327,13 +328,15 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 		}
 
 		public void run() {
-			while (!stop && getSocketServer() != null) {
-				
+			if (_log.shouldWarn())
+				_log.warn("Stream acceptor started");
+			final I2PServerSocket i2pss = socketMgr.getServerSocket();
+			while (!stop) {
 				// wait and accept a connection from I2P side
 				I2PSocket i2ps;
 				try {
-					i2ps = getSocketServer().accept();
-					if (i2ps == null)
+					i2ps = i2pss.accept();
+					if (i2ps == null)  // never null as of 0.9.17
 						continue;
 				} catch (SocketTimeoutException ste) {
 					continue;
