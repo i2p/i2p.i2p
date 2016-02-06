@@ -727,6 +727,14 @@ public class SAMStreamSink {
                     samOut.write(req.getBytes("UTF-8"));
                     req = "SESSION ADD STYLE=RAW PORT=9994 FROM_PORT=94 LISTEN_PROTOCOL=222 ID=raw94\n";
                     samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION REMOVE ID=stream99\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION REMOVE ID=raw95\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION REMOVE ID=notfound\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION REMOVE ID=masterSink\n"; // shouldn't remove ourselves
+                    samOut.write(req.getBytes("UTF-8"));
                     samOut.flush();
                 }
                 req = "NAMING LOOKUP NAME=ME\n";

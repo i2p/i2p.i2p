@@ -234,6 +234,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
     private class SAMMessageSessionHandler implements Runnable, I2PSessionMuxedListener {
 
         private final I2PSession _session;
+        private final boolean _isOwnSession;
         private final Object runningLock = new Object();
         private volatile boolean stillRunning = true;
                 
@@ -253,6 +254,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
                 props.setProperty("inbound.nickname", "SAM UDP Client");
                 props.setProperty("outbound.nickname", "SAM UDP Client");
             }
+            _isOwnSession = true;
             _session = client.createSession(destStream, props);
 
             if (_log.shouldLog(Log.DEBUG))
@@ -270,6 +272,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
          * @since 0.9.25
          */
         public SAMMessageSessionHandler(I2PSession sess) throws I2PSessionException {
+            _isOwnSession = false;
             _session = sess;
             _session.addMuxedSessionListener(this, listenProtocol, listenPort);
         }
@@ -312,14 +315,16 @@ abstract class SAMMessageSession implements SAMMessageSess {
             shutDown();
             session.removeListener(listenProtocol, listenPort);
             
-            try {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Destroying I2P session...");
-                session.destroySession();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("I2P session destroyed");
-            } catch (I2PSessionException e) {
-                    _log.error("Error destroying I2P session", e);
+            if (_isOwnSession) {
+                try {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Destroying I2P session...");
+                    session.destroySession();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("I2P session destroyed");
+                } catch (I2PSessionException e) {
+                        _log.error("Error destroying I2P session", e);
+                }
             }
         }
         

@@ -536,9 +536,11 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 
 	    /**
 	     * Close the stream session
+	     * TODO Why do we override?
 	     */
 	    @Override
 	    public void close() {
-	        socketMgr.destroySocketManager();
+		if (_isOwnSession)
+			socketMgr.destroySocketManager();
 	    }
 }

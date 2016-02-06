@@ -329,6 +329,16 @@ public class SAMStreamSend {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("SESSION " + command + " reply found: " + ok);
 
+                if (masterMode) {
+                    // do a bunch more
+                    req = "SESSION ADD STYLE=STREAM FROM_PORT=99 ID=stream99\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=STREAM FROM_PORT=98 ID=stream98\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION REMOVE ID=stream99\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    samOut.flush();
+                }
                 req = "NAMING LOOKUP NAME=ME\n";
                 samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();

@@ -186,11 +186,14 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 *  @return null for success, or error message
 	 */
 	public synchronized String remove(String nick, Properties props) {
-		boolean ok = SAMv3Handler.sSessionsHash.del(nick);
+		boolean ok;
 		SAMMessageSess sess = sessions.remove(nick);
 		if (sess != null) {
+			ok = SAMv3Handler.sSessionsHash.del(nick);
 			sess.close();
 			// TODO if 0/0, add back this as listener?
+			if (_log.shouldWarn())
+				_log.warn("removed " + sess + " proto " + sess.getListenProtocol() + " port " + sess.getListenPort());
 		} else {
 			ok = false;
 		}

@@ -68,6 +68,7 @@ class SAMStreamSession implements SAMMessageSess {
     protected final boolean canCreate;
     private final int listenProtocol;
     private final int listenPort;
+    protected final boolean _isOwnSession;
 
     /** 
      * should we flush every time we get a STREAM SEND, or leave that up to
@@ -158,6 +159,7 @@ class SAMStreamSession implements SAMMessageSess {
             allprops.setProperty("outbound.nickname", "SAM TCP Client");
         }
 
+        _isOwnSession = true;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Creating I2PSocketManager...");
         try {
@@ -207,6 +209,7 @@ class SAMStreamSession implements SAMMessageSess {
         canCreate = true;
         Properties allprops = (Properties) System.getProperties().clone();
         allprops.putAll(props);
+        _isOwnSession = false;
         socketMgr = mgr;
         socketMgr.addDisconnectListener(new DisconnectListener());
         forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
@@ -342,7 +345,8 @@ class SAMStreamSession implements SAMMessageSess {
         }
         removeAllSocketHandlers();
         recv.stopStreamReceiving();
-        socketMgr.destroySocketManager();
+        if (_isOwnSession)
+            socketMgr.destroySocketManager();
     }
 
     /**
