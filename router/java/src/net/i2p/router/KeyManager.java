@@ -65,6 +65,7 @@ public class KeyManager {
      *
      *  @deprecated we never read keys in anymore
      */
+    @Deprecated
     public void startup() {
         // run inline so keys are loaded immediately
         (new SynchronizeKeysJob()).runJob();

@@ -254,6 +254,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      *  Expensive (iterates through all tunnels of all pools) and unnecessary.
      *  @deprecated unused
      */
+    @Deprecated
     public TunnelInfo getTunnelInfo(TunnelId id) {
         TunnelInfo info = null;
         for (TunnelPool pool : _clientInboundPools.values()) {
@@ -646,6 +647,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
     
     /** @deprecated moved to routerconsole */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
     }
 

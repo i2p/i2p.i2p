@@ -159,6 +159,7 @@ public interface Transport {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability();
 
     public boolean isBacklogged(Hash peer);

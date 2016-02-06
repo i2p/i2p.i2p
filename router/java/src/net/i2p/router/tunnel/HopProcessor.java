@@ -34,6 +34,7 @@ class HopProcessor {
     /**
      *  @deprecated used only by unit tests
      */
+    @Deprecated
     HopProcessor(I2PAppContext ctx, HopConfig config) {
         this(ctx, config, createValidator());
     }
@@ -48,6 +49,7 @@ class HopProcessor {
     /**
      *  @deprecated used only by unit test constructor
      */
+    @Deprecated
     private static IVValidator createValidator() { 
         // yeah, we'll use an O(1) validator later (e.g. bloom filter)
         return new HashSetIVValidator();

@@ -86,30 +86,35 @@ public class JobQueue {
     private long _lagWarning = DEFAULT_LAG_WARNING;
     private final static long DEFAULT_LAG_WARNING = 5*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_LAG_WARNING = "router.jobLagWarning";
     
     /** if a job is this lagged, the router is hosed, so spit out a warning (dont shut it down) */
     private long _lagFatal = DEFAULT_LAG_FATAL;
     private final static long DEFAULT_LAG_FATAL = 30*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_LAG_FATAL = "router.jobLagFatal";
     
     /** if a job takes this long to run, spit out a warning, but keep going */
     private long _runWarning = DEFAULT_RUN_WARNING;
     private final static long DEFAULT_RUN_WARNING = 5*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_RUN_WARNING = "router.jobRunWarning";
     
     /** if a job takes this long to run, the router is hosed, so spit out a warning (dont shut it down) */
     private long _runFatal = DEFAULT_RUN_FATAL;
     private final static long DEFAULT_RUN_FATAL = 30*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_RUN_FATAL = "router.jobRunFatal";
     
     /** don't enforce fatal limits until the router has been up for this long */
     private long _warmupTime = DEFAULT_WARMUP_TIME;
     private final static long DEFAULT_WARMUP_TIME = 10*60*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_WARMUP_TIME = "router.jobWarmupTime";
     
     /** max ready and waiting jobs before we start dropping 'em */
@@ -118,6 +123,7 @@ public class JobQueue {
     private final static long MIN_LAG_TO_DROP = 500;
 
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
 
     /** 
@@ -249,6 +255,7 @@ public class JobQueue {
      *
      * @deprecated unused
      */
+    @Deprecated
     public boolean isJobActive(Job job) {
         synchronized (_jobLock) {
             if (_readyJobs.contains(job) || _timedJobs.contains(job))
@@ -263,6 +270,7 @@ public class JobQueue {
     /**
      *  @deprecated contention - see JobTiming.setStartAfter() comments
      */
+    @Deprecated
     public void timingUpdated() {
         synchronized (_jobLock) {
             _jobLock.notifyAll();
@@ -346,6 +354,7 @@ public class JobQueue {
     }
 
     /** @deprecated do you really want to do this? */
+    @Deprecated
     public void restart() {
         synchronized (_jobLock) {
             _timedJobs.clear();
@@ -787,6 +796,7 @@ public class JobQueue {
     }
 
     /** @deprecated moved to router console */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
     }
 }

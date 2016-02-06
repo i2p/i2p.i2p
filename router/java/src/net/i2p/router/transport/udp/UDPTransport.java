@@ -127,6 +127,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** now unused, we pick a random port
      *  @deprecated unused
      */
+    @Deprecated
     public static final int DEFAULT_INTERNAL_PORT = 8887;
 
     /** define this to explicitly set an external IP address */
@@ -3102,6 +3103,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @deprecated unused
      */
     @Override
+    @Deprecated
     public void recheckReachability() {
         // FIXME locking if we do this again
         //_testEvent.runTest();

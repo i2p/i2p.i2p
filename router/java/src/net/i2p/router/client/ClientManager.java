@@ -565,6 +565,7 @@ class ClientManager {
     }
     
     /** @deprecated unused */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
 /******
         StringBuilder buf = new StringBuilder(8*1024);

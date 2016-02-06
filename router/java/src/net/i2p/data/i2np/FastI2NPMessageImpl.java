@@ -53,6 +53,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  @deprecated unused
      *  @throws UnsupportedOperationException
      */
+    @Deprecated
     @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();
@@ -62,6 +63,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  @deprecated unused
      *  @throws UnsupportedOperationException
      */
+    @Deprecated
     @Override
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         throw new UnsupportedOperationException();
@@ -118,6 +120,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  @deprecated unused
      *  @throws UnsupportedOperationException
      */
+    @Deprecated
     @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();

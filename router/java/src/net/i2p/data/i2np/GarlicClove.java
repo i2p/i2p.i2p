@@ -60,6 +60,7 @@ public class GarlicClove extends DataStructureImpl {
      *  @deprecated unused, use byte array method to avoid copying
      *  @throws UnsupportedOperationException always
      */
+    @Deprecated
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();
 /****
@@ -119,6 +120,7 @@ public class GarlicClove extends DataStructureImpl {
      *  @deprecated unused, use byte array method to avoid copying
      *  @throws UnsupportedOperationException always
      */
+    @Deprecated
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();
 /****

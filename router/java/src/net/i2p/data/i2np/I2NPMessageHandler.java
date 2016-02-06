@@ -46,6 +46,7 @@ public class I2NPMessageHandler {
      * @throws I2NPMessageException if there is a problem handling the particular
      *          message - if it is an unknown type or has improper formatting, etc.
      */
+    @Deprecated
     public I2NPMessage readMessage(InputStream in) throws IOException, I2NPMessageException {
         if (_messageBuffer == null) _messageBuffer = new byte[38*1024]; // more than necessary
         try {

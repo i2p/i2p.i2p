@@ -330,6 +330,7 @@ public class RouterClock extends Clock {
      *  @since 0.7.12
      *  @deprecated for debugging only
      */
+    @Deprecated
     public long getDeltaOffset() {
         return _desiredOffset - _offset;
     }

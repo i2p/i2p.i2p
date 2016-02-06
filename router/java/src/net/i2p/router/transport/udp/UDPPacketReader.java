@@ -849,6 +849,7 @@ class UDPPacketReader {
         }
         
         /** @deprecated unused */
+        @Deprecated
         public int readAliceIPSize() {
             int offset = readBodyOffset();
             offset += _message[offset] & 0xff;
@@ -856,6 +857,7 @@ class UDPPacketReader {
             return _message[offset] & 0xff;
         }
         /** @deprecated unused */
+        @Deprecated
         public void readAliceIP(byte target[], int targetOffset) {
             int offset = readBodyOffset();
             offset += _message[offset] & 0xff;
@@ -865,6 +867,7 @@ class UDPPacketReader {
             System.arraycopy(_message, offset, target, targetOffset, sz);
         }
         /** @deprecated unused */
+        @Deprecated
         public int readAlicePort() {
             int offset = readBodyOffset();
             offset += _message[offset] & 0xff;

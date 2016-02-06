@@ -29,6 +29,7 @@ class GetBidsJob extends JobImpl {
     /**
      *  @deprecated unused, see static getBids()
      */
+    @Deprecated
     public GetBidsJob(RouterContext ctx, TransportManager tmgr, OutNetMessage msg) {
         super(ctx);
         _log = ctx.logManager().getLog(GetBidsJob.class);

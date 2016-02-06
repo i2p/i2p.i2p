@@ -221,6 +221,7 @@ public class RouterInfo extends DatabaseEntry {
      *
      * @deprecated Implemented here but unused elsewhere
      */
+    @Deprecated
     public Set<Hash> getPeers() {
         if (_peers == null)
             return Collections.emptySet();
@@ -234,6 +235,7 @@ public class RouterInfo extends DatabaseEntry {
      * @deprecated Implemented here but unused elsewhere
      * @throws IllegalStateException if RouterInfo is already signed
      */
+    @Deprecated
     public void setPeers(Set<Hash> peers) {
         if (_signature != null)
             throw new IllegalStateException();
@@ -255,6 +257,7 @@ public class RouterInfo extends DatabaseEntry {
      * @deprecated use getOptionsMap()
      * @return sorted, non-null, NOT a copy, do not modify!!!
      */
+    @Deprecated
     public Properties getOptions() {
         return _options;
     }

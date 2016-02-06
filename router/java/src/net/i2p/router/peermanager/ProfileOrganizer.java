@@ -240,6 +240,7 @@ public class ProfileOrganizer {
     public int countFastPeers() { return count(_fastPeers); }
     public int countHighCapacityPeers() { return count(_highCapacityPeers); }
     /** @deprecated use ProfileManager.getPeersByCapability('f').size() */
+    @Deprecated
     public int countWellIntegratedPeers() { return count(_wellIntegratedPeers); }
     public int countNotFailingPeers() { return count(_notFailingPeers); }
     public int countFailingPeers() { return count(_failingPeers); }
@@ -492,6 +493,7 @@ public class ProfileOrganizer {
      *
      * @deprecated unused
      */
+    @Deprecated
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
     }
@@ -503,6 +505,7 @@ public class ProfileOrganizer {
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      * @deprecated unused
      */
+    @Deprecated
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {

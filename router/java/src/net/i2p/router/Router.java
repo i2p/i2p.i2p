@@ -450,12 +450,14 @@ public class Router implements RouterClock.ClockShiftListener {
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
 
     /** @deprecated unused */
+    @Deprecated
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
     /** @return absolute path */
     public String getConfigFilename() { return _configFilename; }
 
     /** @deprecated unused */
+    @Deprecated
     public void setConfigFilename(String filename) { _configFilename = filename; }
     
     public String getConfigSetting(String name) { 
@@ -469,6 +471,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.13
      *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
+    @Deprecated
     public void setConfigSetting(String name, String value) { 
             _config.put(name, value); 
     }
@@ -480,6 +483,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.13
      *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
+    @Deprecated
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
             // remove the backing default also
@@ -937,6 +941,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
     /** @deprecated unused */
+    @Deprecated
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
     /**

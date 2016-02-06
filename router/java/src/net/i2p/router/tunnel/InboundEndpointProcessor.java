@@ -24,6 +24,7 @@ class InboundEndpointProcessor {
     /**
      *  @deprecated used only by unit tests
      */
+    @Deprecated
     InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         this(ctx, cfg, DummyValidator.getInstance());
     }

@@ -450,6 +450,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      * @deprecated unused and rather drastic
      */
     @Override
+    @Deprecated
     public void failTags(PublicKey target) {
         removeSession(target);
     }

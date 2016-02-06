@@ -77,6 +77,7 @@ public class MessageHistory {
     public boolean getDoLog() { return _doLog; }
     
     /** @deprecated unused */
+    @Deprecated
     void setPauseFlushes(boolean doPause) { _doPause = doPause; }
     String getFilename() { return _historyFile; }
     
