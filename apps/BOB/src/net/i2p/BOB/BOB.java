@@ -143,6 +143,7 @@ public class BOB implements Runnable, ClientApp {
 	 * Stop BOB gracefully
 	 * @deprecated unused
 	 */
+	@Deprecated
 	public synchronized static void stop() {
 		if (_bob != null)
 			_bob.shutdown(null);

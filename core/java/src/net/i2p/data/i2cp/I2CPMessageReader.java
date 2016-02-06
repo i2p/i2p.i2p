@@ -71,6 +71,7 @@ public class I2CPMessageReader {
      * Have the already started reader pause its reading indefinitely
      * @deprecated unused
      */
+    @Deprecated
     public void pauseReading() {
         _reader.pauseRunner();
     }
@@ -79,6 +80,7 @@ public class I2CPMessageReader {
      * Resume reading after a pause
      * @deprecated unused
      */
+    @Deprecated
     public void resumeReading() {
         _reader.resumeRunner();
     }

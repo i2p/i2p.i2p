@@ -35,6 +35,7 @@ public class Frequency {
      * when did the last event occur?
      * @deprecated unused
      */
+    @Deprecated
     public synchronized long getLastEvent() {
             return _lastEvent;
     }
@@ -53,6 +54,7 @@ public class Frequency {
      * @return milliseconds; returns period + 1 if no events in previous period
      * @deprecated unused
      */
+    @Deprecated
     public synchronized double getMinAverageInterval() {
             return _minAverageInterval;
     }

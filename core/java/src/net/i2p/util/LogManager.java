@@ -210,6 +210,7 @@ public class LogManager implements Flushable {
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }
         
     /** @deprecated unused */
+    @Deprecated
     public void setDisplayOnScreen(boolean yes) {
         _displayOnScreen = yes;
     }
@@ -223,6 +224,7 @@ public class LogManager implements Flushable {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public void setDisplayOnScreenLevel(int level) {
         _onScreenLimit = level;
     }
@@ -232,6 +234,7 @@ public class LogManager implements Flushable {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public void setConsoleBufferSize(int numRecords) {
         _consoleBufferSize = numRecords;
     }

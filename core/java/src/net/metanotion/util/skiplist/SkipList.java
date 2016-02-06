@@ -139,6 +139,7 @@ public class SkipList implements Flushable {
 	 * dumps all the skip levels
 	 * @deprecated goes to System.out
 	 */
+	@Deprecated
 	public void printSL() {
 		System.out.println("List size " + size);
 		System.out.println(stack.printAll());

@@ -35,6 +35,7 @@ import net.i2p.data.Destination;
  * @deprecated use HostsTxtNamingService.put()
  * @since 0.7.9
  */
+@Deprecated
 public class EepGetAndAddNamingService extends EepGetNamingService {
 
     /** default hosts.txt filename */

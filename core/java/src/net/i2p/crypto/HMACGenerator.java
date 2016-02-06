@@ -58,6 +58,7 @@ public class HMACGenerator {
      * @return the first 16 bytes contain the HMAC, the last 16 bytes are zero
      * @deprecated unused (not even by Syndie)
      */
+    @Deprecated
     public Hash calculate(SessionKey key, byte data[]) {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");

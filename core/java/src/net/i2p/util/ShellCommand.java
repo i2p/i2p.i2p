@@ -190,6 +190,7 @@ public class ShellCommand {
      * 
      * @param shellCommand The command for the shell to execute.
      */
+    @Deprecated
     public void execute(String shellCommand) {
         execute(shellCommand, NO_CONSUME_OUTPUT, NO_WAIT_FOR_EXIT_STATUS);
     }
@@ -211,6 +212,7 @@ public class ShellCommand {
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
      */
+    @Deprecated
     public boolean executeAndWait(String shellCommand) {
         return execute(shellCommand, NO_CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
     }
@@ -236,6 +238,7 @@ public class ShellCommand {
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
      */
+    @Deprecated
     public boolean executeAndWaitTimed(String shellCommand, int seconds) {
         Result result = new Result();
         Thread commandThread = new CommandThread(shellCommand, NO_CONSUME_OUTPUT, result);
@@ -263,6 +266,7 @@ public class ShellCommand {
      * @param  shellCommand The command for the shell to execute.
      * @throws IOException
      */
+    @Deprecated
     public void executeSilent(String shellCommand) throws IOException {
         Runtime.getRuntime().exec(shellCommand, null);
     }
@@ -365,16 +369,19 @@ public class ShellCommand {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public InputStream getErrorStream() {
         return _errorStream;
     }
 
     /** @deprecated unused */
+    @Deprecated
     public InputStream getInputStream() {
         return _inputStream;
     }
 
     /** @deprecated unused */
+    @Deprecated
     public OutputStream getOutputStream() {
         return _outputStream;
     }

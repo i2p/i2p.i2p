@@ -22,6 +22,7 @@ public class SimpleTimer {
      *  If you have a context, use context.simpleTimer() instead
      *  @deprecated use SimpleTimer2
      */
+	@Deprecated
     public static SimpleTimer getInstance() {
         return I2PAppContext.getGlobalContext().simpleTimer();
     }
@@ -41,6 +42,7 @@ public class SimpleTimer {
      *  Others should use context.simpleTimer() instead
      *  @deprecated use SimpleTimer2
      */
+    @Deprecated
     public SimpleTimer(I2PAppContext context) {
         this(context, "SimpleTimer");
     }
@@ -50,6 +52,7 @@ public class SimpleTimer {
      *  Others should use context.simpleTimer() instead
      *  @deprecated use SimpleTimer2
      */
+    @Deprecated
     private SimpleTimer(I2PAppContext context, String name) {
         runn = new SimpleStore(true);
         _log = context.logManager().getLog(SimpleTimer.class);

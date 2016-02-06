@@ -744,6 +744,7 @@ public class I2PAppContext {
     }
 
     /** @deprecated used only by syndie */
+    @Deprecated
     public HMAC256Generator hmac256() {
         if (!_hmac256Initialized)
             initializeHMAC256();
@@ -751,6 +752,7 @@ public class I2PAppContext {
     }
 
     /** @deprecated used only by syndie */
+    @Deprecated
     private void initializeHMAC256() {
         synchronized (_lock10) {
             if (_hmac256 == null) {
@@ -941,6 +943,7 @@ public class I2PAppContext {
      * @since 0.9 to replace static instance in the class
      * @deprecated in 0.9.20, use simpleTimer2()
      */
+    @Deprecated
     @SuppressWarnings("deprecation")
     public SimpleScheduler simpleScheduler() {
         if (!_simpleSchedulerInitialized)
@@ -951,6 +954,7 @@ public class I2PAppContext {
     /**
      * @deprecated in 0.9.20
      */
+    @Deprecated
     private void initializeSimpleScheduler() {
         synchronized (_lock18) {
             if (_simpleScheduler == null)
@@ -964,6 +968,7 @@ public class I2PAppContext {
      * @since 0.9 to replace static instance in the class
      * @deprecated use SimpleTimer2
      */
+    @Deprecated
     public SimpleTimer simpleTimer() {
         if (!_simpleTimerInitialized)
             initializeSimpleTimer();
@@ -973,6 +978,7 @@ public class I2PAppContext {
     /**
      * @deprecated use SimpleTimer2
      */
+    @Deprecated
     private void initializeSimpleTimer() {
         synchronized (_lock19) {
             if (_simpleTimer == null)

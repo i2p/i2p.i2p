@@ -70,6 +70,7 @@ implements Mac
      *  Standard HMAC, size == digest size.
      *  @deprecated Use javax.crypto.Mac
      */
+    @Deprecated
     public I2PHMac(MessageDigest digest) {
         this(digest, digest.getDigestLength()); 
     }

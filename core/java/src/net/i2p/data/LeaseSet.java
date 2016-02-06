@@ -141,6 +141,7 @@ public class LeaseSet extends DatabaseEntry {
      *  The revocation key.
      *  @deprecated unused
      */
+    @Deprecated
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
@@ -262,6 +263,7 @@ public class LeaseSet extends DatabaseEntry {
      * @deprecated revocation unused
      * @return true only if the signature matches
      */
+    @Deprecated
     public boolean verifySignature(SigningPublicKey signingKey) {
         if (super.verifySignature())
             return true;
