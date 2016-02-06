@@ -149,6 +149,7 @@ public class ConfigNetHelper extends HelperBase {
      *  This isn't updated for the new statuses, but it's commented out in the jsp.
      *  @deprecated unused, to be fixed if needed
      */
+    @Deprecated
     public String getRequireIntroductionsChecked() {
         Status status = _context.commSystem().getStatus();
         switch (status) {

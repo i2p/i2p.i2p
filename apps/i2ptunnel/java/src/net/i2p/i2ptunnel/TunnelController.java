@@ -752,6 +752,7 @@ public class TunnelController implements Logging {
      *  @return one big string of "key=val key=val ..."
      *  @deprecated why would you want this? Use getClientOptionProps() instead
      */
+    @Deprecated
     public String getClientOptions() {
         StringBuilder opts = new StringBuilder(64);
         for (Map.Entry<Object, Object> e : _config.entrySet()) {
@@ -869,6 +870,7 @@ public class TunnelController implements Logging {
      *  A text description of the tunnel.
      *  @deprecated unused
      */
+    @Deprecated
     public void getSummary(StringBuilder buf) {
         String type = getType();
         buf.append(type);

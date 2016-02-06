@@ -93,6 +93,7 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
      *
      * @deprecated unused
      */
+    @Deprecated
     public boolean isFinished() {
         return finished;
     }
@@ -104,6 +105,7 @@ public class I2PTunnelOutproxyRunner extends I2PAppThread {
      * @return date (ms since the epoch), or -1 if no data has been transferred yet
      * @deprecated unused
      */
+    @Deprecated
     public long getLastActivityOn() {
         return lastActivityOn;
     }

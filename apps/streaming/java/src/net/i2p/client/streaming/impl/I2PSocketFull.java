@@ -96,6 +96,7 @@ class I2PSocketFull implements I2PSocket {
      *  @return null always
      *  @since 0.8.9
      */
+    @Deprecated
     public synchronized SelectableChannel getChannel() {
         return null;
     }

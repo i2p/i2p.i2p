@@ -48,9 +48,10 @@ class SummaryRenderer {
      * DOM level 3 load and store support.  Perhaps we can bundle that, or
      * specify who can get it from where, etc.
      *
-     * @deprecated unsed
+     * @deprecated unused
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         throw new UnsupportedOperationException();
 /*****
