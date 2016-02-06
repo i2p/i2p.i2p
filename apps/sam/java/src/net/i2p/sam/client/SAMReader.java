@@ -137,6 +137,10 @@ public class SAMReader {
                     if ( (eq > 0) && (eq < pair.length() - 1) ) {
                         String name = pair.substring(0, eq);
                         String val = pair.substring(eq+1);
+                        if (val.length() <= 0) {
+                            _log.error("Empty value for " + name);
+                            continue;
+                        }
                         while ( (val.charAt(0) == '\"') && (val.length() > 0) )
                             val = val.substring(1);
                         while ( (val.length() > 0) && (val.charAt(val.length()-1) == '\"') )

@@ -702,8 +702,7 @@ public class SAMStreamSink {
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("SESSION " + command + " sent");
-                if (mode == STREAM) {
-                    // why only waiting in stream mode?
+                //if (mode == STREAM) {
                     boolean ok;
                     if (masterMode)
                         ok = eventHandler.waitForSessionAddReply();
@@ -713,6 +712,22 @@ public class SAMStreamSink {
                         throw new IOException("SESSION " + command + " failed");
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("SESSION " + command + " reply found: " + ok);
+                //}
+                if (masterMode) {
+                    // do a bunch more
+                    req = "SESSION ADD STYLE=STREAM FROM_PORT=99 ID=stream99\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=STREAM FROM_PORT=98 ID=stream98\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=DATAGRAM PORT=9997 LISTEN_PORT=97 ID=dg97\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=DATAGRAM PORT=9996 FROM_PORT=96 ID=dg96\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=RAW PORT=9995 LISTEN_PORT=95 ID=raw95\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=RAW PORT=9994 FROM_PORT=94 LISTEN_PROTOCOL=222 ID=raw94\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    samOut.flush();
                 }
                 req = "NAMING LOOKUP NAME=ME\n";
                 samOut.write(req.getBytes("UTF-8"));

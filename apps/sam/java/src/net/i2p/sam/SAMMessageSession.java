@@ -67,11 +67,10 @@ abstract class SAMMessageSession implements SAMMessageSess {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Initializing SAM message-based session");
-
-        handler = new SAMMessageSessionHandler(destStream, props);
-        session = handler.getSession();
         listenProtocol = I2PSession.PROTO_ANY;
         listenPort = I2PSession.PORT_ANY;
+        handler = new SAMMessageSessionHandler(destStream, props);
+        session = handler.getSession();
     }
 
     /**
@@ -89,11 +88,10 @@ abstract class SAMMessageSession implements SAMMessageSess {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Initializing SAM message-based session");
-
-        session = sess;
-        handler = new SAMMessageSessionHandler(session);
         this.listenProtocol = listenProtocol;
         this.listenPort = listenPort;
+        session = sess;
+        handler = new SAMMessageSessionHandler(session);
     }
 
     /*

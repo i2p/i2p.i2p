@@ -314,10 +314,13 @@ class SAMv3Handler extends SAMv1Handler
 		} catch (IOException e) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("Caught IOException in handler", e);
+			writeString(SESSION_ERROR, e.getMessage());
 		} catch (SAMException e) {
 			_log.error("Unexpected exception for message [" + msg + ']', e);
+			writeString(SESSION_ERROR, e.getMessage());
 		} catch (RuntimeException e) {
 			_log.error("Unexpected exception for message [" + msg + ']', e);
+			writeString(SESSION_ERROR, e.getMessage());
 		} finally {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("Stopping handler");
@@ -467,8 +470,6 @@ class SAMv3Handler extends SAMv1Handler
 					// SAMStreamSession constructor.
 					allProps.setProperty("i2p.streaming.enforceProtocol", "true");
 					allProps.setProperty("i2cp.dontPublishLeaseSet", "false");
-					allProps.setProperty("FROM_PORT", Integer.toString(I2PSession.PORT_UNSPECIFIED));
-					allProps.setProperty("TO_PORT", Integer.toString(I2PSession.PORT_UNSPECIFIED));
 				}
 
 				try {
@@ -530,9 +531,9 @@ class SAMv3Handler extends SAMv1Handler
 					msg = msess.remove(nick, props);
 				}
 				if (msg == null)
-					return writeString("SESSION STATUS RESULT=OK", opcode + ' ' + nick);
+					return writeString("SESSION STATUS RESULT=OK ID=\"" + nick + '"', opcode + ' ' + nick);
 				else
-					return writeString(SESSION_ERROR, msg);
+					return writeString(SESSION_ERROR + " ID=\"" + nick + '"', msg);
 			} else {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("Unrecognized SESSION message opcode: \""
@@ -581,10 +582,9 @@ class SAMv3Handler extends SAMv1Handler
 
 		if ( session != null )
 		{
-			_log.error ( "STREAM message received, but this session is a master session" );
-			
+			_log.error("v3 control socket cannot be used for STREAM");
 			try {
-				notifyStreamResult(true, "I2P_ERROR", "master session cannot be used for streams");
+				notifyStreamResult(true, "I2P_ERROR", "v3 control socket cannot be used for STREAM");
 			} catch (IOException e) {}
 			return false;
 		}

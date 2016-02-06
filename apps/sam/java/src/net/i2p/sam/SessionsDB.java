@@ -32,8 +32,7 @@ class SessionsDB {
 		map = new HashMap<String, SessionRecord>() ;
 	}
 
-	/** @return success */
-	synchronized public boolean put( String nick, SessionRecord session )
+	public synchronized void put(String nick, SessionRecord session)
 		throws ExistingIdException, ExistingDestException
 	{
 		if ( map.containsKey(nick) ) {
@@ -44,14 +43,19 @@ class SessionsDB {
 				throw new ExistingDestException();
 			}
 		}
+		session.createThreadGroup("SAM session "+nick);
+		map.put(nick, session) ;
+	}
 
-		if ( !map.containsKey(nick) ) {
-			session.createThreadGroup("SAM session "+nick);
-			map.put(nick, session) ;
-			return true ;
+	/** @since 0.9.25 */
+	public synchronized void putDupDestOK(String nick, SessionRecord session)
+		throws ExistingIdException
+	{
+		if (map.containsKey(nick)) {
+			throw new ExistingIdException();
 		}
-		else
-			return false ;
+		session.createThreadGroup("SAM session "+nick);
+		map.put(nick, session) ;
 	}
 
 	/** @return true if removed */

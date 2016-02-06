@@ -42,6 +42,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	private final SAMv3DatagramServer dgs;
 	private final Map<String, SAMMessageSess> sessions;
 	private final StreamAcceptor streamAcceptor;
+	private static final String[] INVALID_OPTS = { "PORT", "HOST", "FROM_PORT", "TO_PORT", "PROTOCOL" };
 
 	/**
 	 * Build a Session according to information
@@ -57,6 +58,11 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	public MasterSession(String nick, SAMv3DatagramServer dgServer, SAMv3Handler handler, Properties props) 
 			throws IOException, DataFormatException, SAMException {
 		super(nick);
+		for (int i = 0; i < INVALID_OPTS.length; i++) {
+			String p = INVALID_OPTS[i];
+			if (props.containsKey(p))
+				throw new SAMException("MASTER session options may not contain " + p);
+		}
 		dgs = dgServer;
 		sessions = new ConcurrentHashMap<String, SAMMessageSess>(4);
 		this.handler = handler;
@@ -162,15 +168,13 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 
 		rec = new SessionRecord(getDestination().toBase64(), props, subhandler);
 		try {
-			if (!SAMv3Handler.sSessionsHash.put(nick, rec))
-				return "Duplicate ID " + nick;
+			SAMv3Handler.sSessionsHash.putDupDestOK(nick, rec);
 			sessions.put(nick, sess);
 		} catch (SessionsDB.ExistingIdException e) {
-			return e.toString();
-		} catch (SessionsDB.ExistingDestException e) {
-			// fixme need new db method for dup dests
+			return "Duplicate ID " + nick;
 		}
-		// listeners etc
+		if (_log.shouldWarn())
+			_log.warn("added " + style + " proto " + listenProtocol + " port " + listenPort);
 
 		sess.start();
 		// all ok
