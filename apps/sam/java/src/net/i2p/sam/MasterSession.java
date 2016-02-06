@@ -56,10 +56,6 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	public MasterSession(String nick, SAMv3DatagramServer dgServer, SAMv3Handler handler, Properties props) 
 			throws IOException, DataFormatException, SAMException {
 		super(nick);
-		props.setProperty("net.i2p.streaming.enforceProtocol", "true");
-                props.setProperty("i2cp.dontPublishLeaseSet", "false");
-		props.setProperty("FROM_PORT", Integer.toString(I2PSession.PORT_UNSPECIFIED));
-		props.setProperty("TO_PORT", Integer.toString(I2PSession.PORT_UNSPECIFIED));
 		dgs = dgServer;
 		sessions = new ConcurrentHashMap<String, SAMMessageSess>(4);
 		this.handler = handler;
@@ -84,6 +80,8 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 *  @return null for success, or error message
 	 */
 	public synchronized String add(String nick, String style, Properties props) {
+		if (props.containsKey("DESTINATION"))
+			return "SESSION ADD may not contain DESTINATION";
 		SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 		if (rec != null || sessions.containsKey(nick))
 			return "Duplicate ID " + nick;
@@ -103,9 +101,11 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 		}
 		int listenProtocol;
 		SAMMessageSess sess;
-		// temp
+		SAMv3Handler subhandler;
 		try {
 			I2PSession isess = socketMgr.getSession();
+			subhandler = new SAMv3Handler(handler.getClientSocket(), handler.verMajor,
+			                              handler.verMinor, handler.getBridge());
 			if (style.equals("RAW")) {
 				if (!props.containsKey("PORT"))
 					return "RAW subsession must specify PORT";
@@ -124,21 +124,32 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 						return "Bad LISTEN_PROTOCOL " + spr;
 					}
 				}
-				sess = new SAMv3RawSession(nick, props, handler, isess, listenProtocol, listenPort, dgs);
+				SAMv3RawSession ssess = new SAMv3RawSession(nick, props, handler, isess, listenProtocol, listenPort, dgs);
+				subhandler.setSession(ssess);
+				sess = ssess;
 			} else if (style.equals("DATAGRAM")) {
 				if (!props.containsKey("PORT"))
 					return "DATAGRAM subsession must specify PORT";
 				listenProtocol = I2PSession.PROTO_DATAGRAM;
-				sess = new SAMv3DatagramSession(nick, props, handler, isess, listenPort, dgs);
+				SAMv3DatagramSession ssess = new SAMv3DatagramSession(nick, props, handler, isess, listenPort, dgs);
+				subhandler.setSession(ssess);
+				sess = ssess;
 			} else if (style.equals("STREAM")) {
 				listenProtocol = I2PSession.PROTO_STREAMING;
 				// FIXME need something that hangs off an existing dest
-				sess = new SAMv3StreamSession(nick, props, handler, socketMgr, listenPort);
+				SAMv3StreamSession ssess = new SAMv3StreamSession(nick, props, handler, socketMgr, listenPort);
+				subhandler.setSession(ssess);
+				sess = ssess;
 			} else {
 				return "Unrecognized SESSION STYLE " + style;
 			}
-		} catch (Exception e) {
-			// temp
+		} catch (IOException e) {
+			return e.toString();
+		} catch (DataFormatException e) {
+			return e.toString();
+		} catch (SAMException e) {
+			return e.toString();
+		} catch (I2PSessionException e) {
 			return e.toString();
 		}
 
@@ -148,8 +159,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 				return "Duplicate protocol " + listenProtocol + " and port " + listenPort;
 		}
 
-		// add to session db and our map
-		rec = new SessionRecord(getDestination().toBase64(), props, handler);
+		rec = new SessionRecord(getDestination().toBase64(), props, subhandler);
 		try {
 			if (!SAMv3Handler.sSessionsHash.put(nick, rec))
 				return "Duplicate ID " + nick;

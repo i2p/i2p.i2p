@@ -133,7 +133,31 @@ class SAMv3Handler extends SAMv1Handler
 	Session getSession() {
 		return session;
 	}
-	
+
+	/**
+	 *  For subsessions created by MasterSession
+	 *  @since 0.9.25
+	 */
+	void setSession(SAMv3RawSession sess) {
+		rawSession = sess; session = sess;
+	}
+
+	/**
+	 *  For subsessions created by MasterSession
+	 *  @since 0.9.25
+	 */
+	void setSession(SAMv3DatagramSession sess) {
+		datagramSession = sess; session = sess;
+	}	
+
+	/**
+	 *  For subsessions created by MasterSession
+	 *  @since 0.9.25
+	 */
+	void setSession(SAMv3StreamSession sess) {
+		streamSession = sess; session = sess;
+	}	
+
 	@Override
 	public void handle() {
 		String msg = null;
@@ -435,7 +459,16 @@ class SAMv3Handler extends SAMv1Handler
 				Properties allProps = new Properties();
 				allProps.putAll(i2cpProps);
 				allProps.putAll(props);
-				
+
+				if (style.equals("MASTER")) {
+					// We must put these here, as SessionRecord.getProps() makes a copy,
+					// and the socket manager is instantiated in the
+					// SAMStreamSession constructor.
+					allProps.setProperty("i2p.streaming.enforceProtocol", "true");
+					allProps.setProperty("i2cp.dontPublishLeaseSet", "false");
+					allProps.setProperty("FROM_PORT", Integer.toString(I2PSession.PORT_UNSPECIFIED));
+					allProps.setProperty("TO_PORT", Integer.toString(I2PSession.PORT_UNSPECIFIED));
+				}
 
 				try {
 					sSessionsHash.put( nick, new SessionRecord(dest, allProps, this) ) ;
@@ -486,7 +519,7 @@ class SAMv3Handler extends SAMv1Handler
 			} else if (opcode.equals("ADD") || opcode.equals("REMOVE")) {
                                 // prevent trouble in finally block
 				ok = true;
-				if (streamSession != null || datagramSession != null || rawSession != null)
+				if (streamSession == null || datagramSession == null || rawSession == null)
 					return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Not a MASTER session\"\n");
 				MasterSession msess = (MasterSession) session;
 				String msg;
@@ -512,14 +545,14 @@ class SAMv3Handler extends SAMv1Handler
 		} catch (I2PSessionException e) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("I2P error when instantiating session", e);
-			return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n");
 		} catch (SAMException e) {
 			if (_log.shouldLog(Log.INFO))
 				_log.info("Funny SAM error", e);
-			return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n");
 		} catch (IOException e) {
 			_log.error("Unexpected IOException", e);
-			return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
+			return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n");
 		} finally {
 			// unregister the session if it has not been created
 			if ( !ok && nick!=null ) {
@@ -566,23 +599,21 @@ class SAMv3Handler extends SAMv1Handler
 		}
 
 		rec = sSessionsHash.get(nick);
-
 		if ( rec==null ) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("STREAM SESSION ID does not exist");
 			try {
-				notifyStreamResult(true, "INVALID_ID", "STREAM SESSION ID does not exist");
+				notifyStreamResult(true, "INVALID_ID", "STREAM SESSION ID " + nick + " does not exist");
 			} catch (IOException e) {}
 			return false ;
 		}
 		
 		streamSession = rec.getHandler().streamSession ;
-		
 		if (streamSession==null) {
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug("specified ID is not a stream session");
 			try {
-				notifyStreamResult(true, "I2P_ERROR",  "specified ID is not a STREAM session");
+				notifyStreamResult(true, "I2P_ERROR",  "specified ID " + nick + " is not a STREAM session");
 			} catch (IOException e) {}
 			return false ;
 		}
@@ -638,19 +669,19 @@ class SAMv3Handler extends SAMv1Handler
 			} catch (DataFormatException e) {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("Invalid destination in STREAM CONNECT message");
-				notifyStreamResult ( verbose, "INVALID_KEY", null );
+				notifyStreamResult ( verbose, "INVALID_KEY", e.getMessage());
 			} catch (ConnectException e) {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("STREAM CONNECT failed", e);
-				notifyStreamResult ( verbose, "CONNECTION_REFUSED", null );
+				notifyStreamResult ( verbose, "CONNECTION_REFUSED", e.getMessage());
 			} catch (NoRouteToHostException e) {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("STREAM CONNECT failed", e);
-				notifyStreamResult ( verbose, "CANT_REACH_PEER", null );
+				notifyStreamResult ( verbose, "CANT_REACH_PEER", e.getMessage());
 			} catch (InterruptedIOException e) {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("STREAM CONNECT failed", e);
-				notifyStreamResult ( verbose, "TIMEOUT", null );
+				notifyStreamResult ( verbose, "TIMEOUT", e.getMessage());
 			} catch (I2PException e) {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("STREAM CONNECT failed", e);
@@ -702,7 +733,7 @@ class SAMv3Handler extends SAMv1Handler
 			} catch (SAMException e) {
 				if (_log.shouldLog(Log.DEBUG))
 					_log.debug("STREAM ACCEPT failed", e);
-				notifyStreamResult ( verbose, "ALREADY_ACCEPTING", null );
+				notifyStreamResult ( verbose, "ALREADY_ACCEPTING", e.getMessage());
 			}
 		} catch (IOException e) {
 		}
@@ -710,6 +741,11 @@ class SAMv3Handler extends SAMv1Handler
 	}
 	
 
+	/**
+	 * @param verbose if false, does nothing
+	 * @param result non-null
+	 * @param message may be null
+	 */
 	public void notifyStreamResult(boolean verbose, String result, String message) throws IOException {
 		if (!verbose) return ;
 		String msgString = createMessageString(message);

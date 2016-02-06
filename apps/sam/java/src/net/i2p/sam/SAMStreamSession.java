@@ -29,6 +29,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -51,13 +52,9 @@ import net.i2p.util.Log;
 class SAMStreamSession implements SAMMessageSess {
 
     protected final Log _log;
-
     protected final static int SOCKET_HANDLER_BUF_SIZE = 32768;
-
     protected final SAMStreamReceiver recv;
-
     protected final SAMStreamSessionServer server;
-
     protected final I2PSocketManager socketMgr;
 
     /** stream id (Long) to SAMStreamSessionSocketReader */
@@ -163,12 +160,13 @@ class SAMStreamSession implements SAMMessageSess {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Creating I2PSocketManager...");
-        socketMgr = I2PSocketManagerFactory.createManager(destStream,
-                                                          i2cpHost,
-                                                          i2cpPort, 
-                                                          allprops);
-        if (socketMgr == null) {
-            throw new SAMException("Error creating I2PSocketManager");
+        try {
+            // we do it this way so we get exceptions
+            socketMgr = I2PSocketManagerFactory.createDisconnectedManager(destStream,
+                                                            i2cpHost, i2cpPort, allprops);
+            socketMgr.getSession().connect();
+        } catch (I2PSessionException ise) {
+            throw new SAMException("Error creating I2PSocketManager: " + ise.getMessage(), ise);
         }
         
         socketMgr.addDisconnectListener(new DisconnectListener());

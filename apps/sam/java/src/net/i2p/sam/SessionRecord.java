@@ -42,6 +42,10 @@ class SessionRecord {
 		return m_dest;
 	}
 
+	/**
+	 * Warning - returns a copy.
+	 * @return a copy
+	 */
 	synchronized public Properties getProps()
 	{
 		Properties p = new Properties();
