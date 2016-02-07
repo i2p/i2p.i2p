@@ -168,10 +168,15 @@ class SAMv3DatagramServer implements Handler {
 					String fp = sprops.getProperty("FROM_PORT");
 					String tp = sprops.getProperty("TO_PORT");
 					// 3.3 props
-					String st = sprops.getProperty("SEND_TAGS");
-					String tt = sprops.getProperty("TAG_THRESHOLD");
-					String ex = sprops.getProperty("EXPIRES");
-					String sl = sprops.getProperty("SEND_LEASESET");
+					// If this is a straight DATAGRAM or RAW session, we
+					// don't need to send these, the router already got them in
+					// the options, but if a subsession, we must, so just
+					// do it all the time.
+					String st = sprops.getProperty("crypto.tagsToSend");
+					String tt = sprops.getProperty("crypto.lowTagThreshold");
+					String sl = sprops.getProperty("shouldBundleReplyInfo");
+					String exms = sprops.getProperty("clientMessageTimeout");  // ms
+					String exs = null;                                         // seconds
 					while (tok.hasMoreTokens()) {
 						String t = tok.nextToken();
 						// 3.2 props
@@ -187,7 +192,7 @@ class SAMv3DatagramServer implements Handler {
 						else if (t.startsWith("TAG_THRESHOLD="))
 							tt = t.substring("TAG_THRESHOLD=".length());
 						else if (t.startsWith("EXPIRES="))
-							ex = t.substring("EXPIRES=".length());
+							exs = t.substring("EXPIRES=".length());
 						else if (t.startsWith("SEND_LEASESET="))
 							sl = t.substring("SEND_LEASESET=".length());
 					}
@@ -199,7 +204,7 @@ class SAMv3DatagramServer implements Handler {
 					// 3.3 props
 					int sendTags = 0;
 					int tagThreshold = 0;
-					int expires = 0;
+					int expires = 0; // seconds
 					boolean sendLeaseSet = true;
 					try {
 						// 3.2 props
@@ -214,8 +219,10 @@ class SAMv3DatagramServer implements Handler {
 							sendTags = Integer.parseInt(st);
 						if (tt != null)
 							tagThreshold = Integer.parseInt(tt);
-						if (ex != null)
-							expires = Integer.parseInt(ex);
+						if (exs != null)
+							expires = Integer.parseInt(exs);
+						else if (exms != null)
+							expires = Integer.parseInt(exms) / 1000;
 						if (sl != null)
 							sendLeaseSet = Boolean.parseBoolean(sl);
 					} catch (NumberFormatException nfe) {
