@@ -46,6 +46,17 @@ interface SAMMessageSess extends Closeable {
     public boolean sendBytes(String dest, byte[] data, int proto,
                              int fromPort, int toPort) throws DataFormatException, I2PSessionException;
 
+    /**
+     * Send bytes through a SAM message-based session.
+     *
+     * @since 0.9.25
+     */
+    public boolean sendBytes(String dest, byte[] data, int proto,
+                             int fromPort, int toPort,
+                             boolean sendLeaseSet, int sendTags,
+                             int tagThreshold, int expiration)
+                                  throws DataFormatException, I2PSessionException;
+
     public int getListenProtocol();
 
     public int getListenPort();

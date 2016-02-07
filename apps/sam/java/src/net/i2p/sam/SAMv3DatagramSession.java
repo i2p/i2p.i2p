@@ -74,7 +74,7 @@ class SAMv3DatagramSession extends SAMDatagramSession implements Session, SAMDat
 	public SAMv3DatagramSession(String nick, Properties props, SAMv3Handler handler, I2PSession isess,
 	                            int listenPort, SAMv3DatagramServer dgServer) 
 			throws IOException, DataFormatException, I2PSessionException {
-		super(isess, listenPort, null);  // to be replaced by this
+		super(isess, props, listenPort, null);  // to be replaced by this
 		this.nick = nick ;
 		this.recv = this ;  // replacement
 		this.server = dgServer;

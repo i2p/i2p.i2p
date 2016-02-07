@@ -37,6 +37,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
 
     protected final Log _log;
     private final I2PSession session;
+    protected final boolean _isOwnSession;
     private final SAMMessageSessionHandler handler;
     private final int listenProtocol;
     private final int listenPort;
@@ -69,6 +70,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
             _log.debug("Initializing SAM message-based session");
         listenProtocol = I2PSession.PROTO_ANY;
         listenPort = I2PSession.PORT_ANY;
+        _isOwnSession = true;
         handler = new SAMMessageSessionHandler(destStream, props);
         session = handler.getSession();
     }
@@ -90,6 +92,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
             _log.debug("Initializing SAM message-based session");
         this.listenProtocol = listenProtocol;
         this.listenPort = listenPort;
+        _isOwnSession = false;
         session = sess;
         handler = new SAMMessageSessionHandler(session);
     }
@@ -165,14 +168,19 @@ abstract class SAMMessageSession implements SAMMessageSess {
     }
 
     /**
-     * Actually send bytes through the SAM message-based session I2PSession.
-     * TODO unused, umimplemented in the sessions and handlers
+     * Actually send bytes through the SAM message-based session I2PSession,
+     * using per-message extended options.
+     * For efficiency, use the method without all the extra options if they are all defaults.
      *
      * @param dest Destination
      * @param data Bytes to be sent
      * @param proto I2CP protocol
      * @param fromPort I2CP from port
      * @param toPort I2CP to port
+     * @param sendLeaseSet true is the usual setting and the I2CP default
+     * @param sendTags 0 to leave as default
+     * @param tagThreshold 0 to leave as default
+     * @param expiration SECONDS from now, NOT absolute time, 0 to leave as default
      *
      * @return True if the data was sent, false otherwise
      * @throws DataFormatException on unknown / bad dest
@@ -182,7 +190,7 @@ abstract class SAMMessageSession implements SAMMessageSess {
     protected boolean sendBytesThroughMessageSession(String dest, byte[] data,
                                         int proto, int fromPort, int toPort,
                                         boolean sendLeaseSet, int sendTags,
-                                        int tagThreshold, long expires)
+                                        int tagThreshold, int expiration)
                                         throws DataFormatException, I2PSessionException {
 	Destination d = SAMUtils.getDest(dest);
 
@@ -190,10 +198,14 @@ abstract class SAMMessageSession implements SAMMessageSess {
 	    _log.debug("Sending " + data.length + " bytes to " + dest);
 	}
 	SendMessageOptions opts = new SendMessageOptions();
-	opts.setSendLeaseSet(sendLeaseSet);
-	opts.setTagsToSend(sendTags);
-	opts.setTagThreshold(tagThreshold);
-	opts.setDate(expires);
+	if (!sendLeaseSet)
+	    opts.setSendLeaseSet(false);
+	if (sendTags > 0)
+	    opts.setTagsToSend(sendTags);
+	if (tagThreshold > 0)
+	    opts.setTagThreshold(tagThreshold);
+	if (expiration > 0)
+	    opts.setDate(I2PAppContext.getGlobalContext().clock().now() + (expiration * 1000));
 
 	return session.sendMessage(d, data, 0, data.length, proto, fromPort, toPort, opts);
     }
@@ -234,7 +246,6 @@ abstract class SAMMessageSession implements SAMMessageSess {
     private class SAMMessageSessionHandler implements Runnable, I2PSessionMuxedListener {
 
         private final I2PSession _session;
-        private final boolean _isOwnSession;
         private final Object runningLock = new Object();
         private volatile boolean stillRunning = true;
                 
@@ -254,7 +265,6 @@ abstract class SAMMessageSession implements SAMMessageSess {
                 props.setProperty("inbound.nickname", "SAM UDP Client");
                 props.setProperty("outbound.nickname", "SAM UDP Client");
             }
-            _isOwnSession = true;
             _session = client.createSession(destStream, props);
 
             if (_log.shouldLog(Log.DEBUG))
@@ -272,7 +282,6 @@ abstract class SAMMessageSession implements SAMMessageSess {
          * @since 0.9.25
          */
         public SAMMessageSessionHandler(I2PSession sess) throws I2PSessionException {
-            _isOwnSession = false;
             _session = sess;
             _session.addMuxedSessionListener(this, listenProtocol, listenPort);
         }

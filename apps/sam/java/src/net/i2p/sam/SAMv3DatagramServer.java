@@ -163,54 +163,79 @@ class SAMv3DatagramServer implements Handler {
 				SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 				if (rec!=null) {
 					Properties sprops = rec.getProps();
+					// 3.2 props
 					String pr = sprops.getProperty("PROTOCOL");
 					String fp = sprops.getProperty("FROM_PORT");
 					String tp = sprops.getProperty("TO_PORT");
+					// 3.3 props
+					String st = sprops.getProperty("SEND_TAGS");
+					String tt = sprops.getProperty("TAG_THRESHOLD");
+					String ex = sprops.getProperty("EXPIRES");
+					String sl = sprops.getProperty("SEND_LEASESET");
 					while (tok.hasMoreTokens()) {
 						String t = tok.nextToken();
+						// 3.2 props
 						if (t.startsWith("PROTOCOL="))
 							pr = t.substring("PROTOCOL=".length());
 						else if (t.startsWith("FROM_PORT="))
 							fp = t.substring("FROM_PORT=".length());
 						else if (t.startsWith("TO_PORT="))
 							tp = t.substring("TO_PORT=".length());
+						// 3.3 props
+						else if (t.startsWith("SEND_TAGS="))
+							st = t.substring("SEND_TAGS=".length());
+						else if (t.startsWith("TAG_THRESHOLD="))
+							tt = t.substring("TAG_THRESHOLD=".length());
+						else if (t.startsWith("EXPIRES="))
+							ex = t.substring("EXPIRES=".length());
+						else if (t.startsWith("SEND_LEASESET="))
+							sl = t.substring("SEND_LEASESET=".length());
 					}
 
+					// 3.2 props
 					int proto = I2PSession.PROTO_UNSPECIFIED;
 					int fromPort = I2PSession.PORT_UNSPECIFIED;
 					int toPort = I2PSession.PORT_UNSPECIFIED;
-					if (pr != null) {
-						try {
+					// 3.3 props
+					int sendTags = 0;
+					int tagThreshold = 0;
+					int expires = 0;
+					boolean sendLeaseSet = true;
+					try {
+						// 3.2 props
+						if (pr != null)
 							proto = Integer.parseInt(pr);
-						} catch (NumberFormatException nfe) {
-							warn("Bad datagram header received");
-							return;
-						}
-					}
-					if (fp != null) {
-						try {
+						if (fp != null)
 							fromPort = Integer.parseInt(fp);
-						} catch (NumberFormatException nfe) {
-							warn("Bad datagram header received");
-							return;
-						}
-					}
-					if (tp != null) {
-						try {
+						if (tp != null)
 							toPort = Integer.parseInt(tp);
-						} catch (NumberFormatException nfe) {
-							warn("Bad datagram header received");
-							return;
-						}
+						// 3.3 props
+						if (st != null)
+							sendTags = Integer.parseInt(st);
+						if (tt != null)
+							tagThreshold = Integer.parseInt(tt);
+						if (ex != null)
+							expires = Integer.parseInt(ex);
+						if (sl != null)
+							sendLeaseSet = Boolean.parseBoolean(sl);
+					} catch (NumberFormatException nfe) {
+						warn("Bad datagram header received");
+						return;
 					}
 					// TODO too many allocations and copies. One here and one in Listener above.
 					byte[] data = new byte[is.available()];
 					is.read(data);
 					Session sess = rec.getHandler().getSession();
-					if (sess != null)
-						sess.sendBytes(dest, data, proto, fromPort, toPort);
-					else
+					if (sess != null) {
+						if (sendTags > 0 || tagThreshold > 0 || expires > 0 || !sendLeaseSet) {
+							sess.sendBytes(dest, data, proto, fromPort, toPort,
+							               sendLeaseSet, sendTags, tagThreshold, expires);
+						} else {
+							sess.sendBytes(dest, data, proto, fromPort, toPort);
+						}
+					} else {
 						warn("Dropping datagram, no session for " + nick);
+					}
 				} else {
 					warn("Dropping datagram, no session for " + nick);
 				}

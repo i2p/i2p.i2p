@@ -42,7 +42,6 @@ class SAMRawSession extends SAMMessageSession {
     protected SAMRawSession(String dest, Properties props,
                          SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
         super(dest, props);
-
         this.recv = recv;
     }
 
@@ -61,16 +60,16 @@ class SAMRawSession extends SAMMessageSession {
     public SAMRawSession(InputStream destStream, Properties props,
                          SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
         super(destStream, props);
-
         this.recv = recv;
     }
 
     /**
      * Create a new SAM RAW session on an existing I2P session.
      *
+     * @param props unused for now
      * @since 0.9.25
      */
-    protected SAMRawSession(I2PSession sess, int listenProtocol, int listenPort,
+    protected SAMRawSession(I2PSession sess, Properties props, int listenProtocol, int listenPort,
                             SAMRawReceiver recv) throws IOException, 
                               DataFormatException, I2PSessionException {
         super(sess, listenProtocol, listenPort);
@@ -94,6 +93,24 @@ class SAMRawSession extends SAMMessageSession {
         if (proto == I2PSession.PROTO_UNSPECIFIED)
             proto = I2PSession.PROTO_DATAGRAM_RAW;
         return sendBytesThroughMessageSession(dest, data, proto, fromPort, toPort);
+    }
+
+    /**
+     * Send bytes through a SAM RAW session.
+     *
+     * @since 0.9.25
+     */
+    public boolean sendBytes(String dest, byte[] data, int proto,
+                             int fromPort, int toPort,
+                             boolean sendLeaseSet, int sendTags,
+                             int tagThreshold, int expiration)
+                                 throws DataFormatException, I2PSessionException {
+        if (data.length > RAW_SIZE_MAX)
+            throw new DataFormatException("Data size limit exceeded (" + data.length + ")");
+        if (proto == I2PSession.PROTO_UNSPECIFIED)
+            proto = I2PSession.PROTO_DATAGRAM_RAW;
+        return sendBytesThroughMessageSession(dest, data, proto, fromPort, toPort,
+                                              sendLeaseSet, sendTags,tagThreshold, expiration);
     }
 
     protected void messageReceived(byte[] msg, int proto, int fromPort, int toPort) {

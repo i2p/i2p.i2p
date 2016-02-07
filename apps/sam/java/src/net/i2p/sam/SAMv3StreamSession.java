@@ -131,6 +131,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 		if (_acceptQueue == null)
 		    throw new IllegalStateException();
 		try {
+			// TODO there's no CoDel or expiration in this queue
 			return _acceptQueue.take();
 		} catch (InterruptedException ie) {
 			ConnectException ce = new ConnectException("interrupted");

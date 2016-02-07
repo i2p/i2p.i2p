@@ -75,7 +75,7 @@ class SAMv3RawSession extends SAMRawSession implements Session, SAMRawReceiver {
 	public SAMv3RawSession(String nick, Properties props, SAMv3Handler handler, I2PSession isess,
 	                       int listenProtocol, int listenPort, SAMv3DatagramServer dgServer) 
 			throws IOException, DataFormatException, I2PSessionException {
-		super(isess, listenProtocol, listenPort, null);  // to be replace by this
+		super(isess, props, listenProtocol, listenPort, null);  // to be replaced by this
 		this.nick = nick ;
 		this.recv = this ;  // replacement
 		this.server = dgServer;

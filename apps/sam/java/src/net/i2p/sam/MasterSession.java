@@ -42,7 +42,8 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	private final SAMv3DatagramServer dgs;
 	private final Map<String, SAMMessageSess> sessions;
 	private final StreamAcceptor streamAcceptor;
-	private static final String[] INVALID_OPTS = { "PORT", "HOST", "FROM_PORT", "TO_PORT", "PROTOCOL" };
+	private static final String[] INVALID_OPTS = { "PORT", "HOST", "FROM_PORT", "TO_PORT",
+	                                               "PROTOCOL", "LISTEN_PORT", "LISTEN_PROTOCOL" };
 
 	/**
 	 * Build a Session according to information

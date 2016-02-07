@@ -372,7 +372,19 @@ class SAMStreamSession implements SAMMessageSess {
      *  @since 0.9.25 moved from subclass SAMv3StreamSession to implement SAMMessageSess
      */
     public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws I2PSessionException {
-    	throw new I2PSessionException("Unsupported in STREAM or MASTER session");
+        throw new I2PSessionException("Unsupported in STREAM or MASTER session");
+    }
+
+    /**
+     *  Unsupported
+     *  @throws I2PSessionException always
+     *  @since 0.9.25
+     */
+    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp,
+                             boolean sendLeaseSet, int sendTags,
+                             int tagThreshold, int expiration)
+                                 throws I2PSessionException {
+        throw new I2PSessionException("Unsupported in STREAM or MASTER session");
     }
 
     /** 
