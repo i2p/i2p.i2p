@@ -910,6 +910,8 @@ public class DoCMDS implements Runnable {
 
 								} else if (Command.equals(C_getnick)) {
 									// Get the NamedDB to work with...
+									boolean nsfail = false;
+
 									try {
 										database.getReadLock();
 									} catch (Exception ex) {
@@ -920,6 +922,7 @@ public class DoCMDS implements Runnable {
 										ns = true;
 									} catch (RuntimeException b) {
 										try {
+											nsfail = true;
 											nns(out);
 										} catch (Exception ex) {
 											try {
@@ -932,7 +935,7 @@ public class DoCMDS implements Runnable {
 									}
 
 									database.releaseReadLock();
-									if (ns) {
+									if (ns && !nsfail) {
 										try {
 											rlock();
 										} catch (Exception e) {
