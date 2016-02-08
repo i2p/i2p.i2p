@@ -513,6 +513,7 @@ public class SAMStreamSend {
                                     baos.write(DataHelper.getUTF8(" PROTOCOL=123 TO_PORT=5678"));
                                 else
                                     baos.write(DataHelper.getUTF8(" TO_PORT=5678"));
+                                baos.write(DataHelper.getUTF8(" SEND_TAGS=19 TAG_THRESHOLD=13 EXPIRES=33 SEND_LEASESET=true"));
                             }
                             baos.write((byte) '\n');
                             baos.write(data, 0, read);

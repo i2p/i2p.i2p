@@ -137,6 +137,7 @@ class SAMv3DatagramServer implements Handler {
 
 	private static class MessageDispatcher implements Runnable {
 		private final ByteArrayInputStream is;
+		private static final int MAX_LINE_LENGTH = 2*1024;
 	
 		public MessageDispatcher(byte[] buf) {
 			this.is = new ByteArrayInputStream(buf) ;
@@ -144,8 +145,21 @@ class SAMv3DatagramServer implements Handler {
 	
 		public void run() {
 			try {
-				String header = DataHelper.readLine(is).trim();
+				// not UTF-8
+				//String header = DataHelper.readLine(is).trim();
 				// we cannot use SAMUtils.parseParams() here
+				final UTF8Reader reader = new UTF8Reader(is);
+				final StringBuilder buf = new StringBuilder(MAX_LINE_LENGTH);
+				int c;
+				int i = 0;
+				while ((c = reader.read()) != -1) {
+					if (++i > MAX_LINE_LENGTH)
+						throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
+					if (c == '\n')
+						break;
+					buf.append((char)c);
+				}
+				String header = buf.toString();
 				StringTokenizer tok = new StringTokenizer(header, " ");
 				if (tok.countTokens() < 3) {
 					// This is not a correct message, for sure
