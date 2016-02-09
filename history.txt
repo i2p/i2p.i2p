@@ -1,3 +1,6 @@
+2016-02-09 zzz
+ * Crypto: Fix raw (su3) signing, broken in test2 prop (-2)
+
 2016-02-08 zzz
  * BOB: Fix invalid output after getnick (ticket #1204)
  * SAM v3.3:

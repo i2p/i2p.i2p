@@ -673,7 +673,7 @@ public final class DSAEngine {
             jsig.initSign(privKey);
             sigbytes = jsig.signOneShot(hash.getData());
         } else {
-            java.security.Signature jsig = java.security.Signature.getInstance(type.getAlgorithmName());
+            java.security.Signature jsig = java.security.Signature.getInstance(algo);
             jsig.initSign(privKey, _context.random());
             jsig.update(hash.getData());
             sigbytes = jsig.sign();
