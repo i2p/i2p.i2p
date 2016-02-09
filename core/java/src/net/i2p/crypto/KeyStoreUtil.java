@@ -9,12 +9,16 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.security.cert.X509CRL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -430,6 +434,9 @@ public final class KeyStoreUtil {
     /**
      *  Create a keypair and store it in the keystore at ks, creating it if necessary.
      *
+     *  For new code, the createKeys() with the SigType argument is recommended over this one,
+     *  as it throws exceptions, and returns the certificate and CRL.
+     *
      *  Warning, may take a long time.
      *
      *  @param ks path to the keystore
@@ -446,6 +453,137 @@ public final class KeyStoreUtil {
      *  @since 0.8.3, consolidated from RouterConsoleRunner and SSLClientListenerRunner in 0.9.9
      */
     public static boolean createKeys(File ks, String ksPW, String alias, String cname, String ou,
+                                     int validDays, String keyAlg, int keySize, String keyPW) {
+        boolean useKeytool = I2PAppContext.getGlobalContext().getBooleanProperty("crypto.useExternalKeytool");
+        if (useKeytool) {
+            return createKeysCLI(ks, ksPW, alias, cname, ou, validDays, keyAlg, keySize, keyPW);
+        } else {
+            try {
+                createKeysAndCRL(ks, ksPW, alias, cname, ou, validDays, keyAlg, keySize, keyPW);
+                return true;
+            } catch (GeneralSecurityException gse) {
+                error("Create keys error", gse);
+                return false;
+            } catch (IOException ioe) {
+                error("Create keys error", ioe);
+                return false;
+            }
+        }
+    }
+
+    /**
+     *  New way - Native Java, does not call out to keytool.
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *
+     *  This returns the public key, private key, certificate, and CRL in an array.
+     *  All of these are Java classes. Keys may be converted to I2P classes with SigUtil.
+     *  The private key and selfsigned cert are stored in the keystore.
+     *  The public key may be derived from the private key with KeyGenerator.getSigningPublicKey().
+     *  The public key certificate may be stored separately with
+     *  CertUtil.saveCert() if desired.
+     *  The CRL is not stored by this method, store it with
+     *  CertUtil.saveCRL() or CertUtil.exportCRL() if desired.
+     *
+     *  Throws on all errors.
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password
+     *  @param alias the name of the key
+     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param ou e.g. console
+     *  @param validDays e.g. 3652 (10 years)
+     *  @param keyAlg e.g. DSA , RSA, EC
+     *  @param keySize e.g. 1024
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return all you need:
+     *      rv[0] is a Java PublicKey
+     *      rv[1] is a Java PrivateKey
+     *      rv[2] is a Java X509Certificate
+     *      rv[3] is a Java X509CRL
+     *  @since 0.9.25
+     */
+    public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, String ou,
+                                            int validDays, String keyAlg, int keySize, String keyPW)
+                                                throws GeneralSecurityException, IOException {
+        String algoName = getSigAlg(keySize, keyAlg);
+        SigType type = null;
+        for (SigType t : EnumSet.allOf(SigType.class)) {
+            if (t.getAlgorithmName().equals(algoName)) {
+                type = t;
+                break;
+            }
+        }
+        if (type == null)
+            throw new GeneralSecurityException("Unsupported algorithm/size: " + keyAlg + '/' + keySize);
+        return createKeysAndCRL(ks, ksPW, alias, cname, ou, validDays, type, keyPW);
+    }
+
+    /**
+     *  New way - Native Java, does not call out to keytool.
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *
+     *  This returns the public key, private key, certificate, and CRL in an array.
+     *  All of these are Java classes. Keys may be converted to I2P classes with SigUtil.
+     *  The private key and selfsigned cert are stored in the keystore.
+     *  The public key may be derived from the private key with KeyGenerator.getSigningPublicKey().
+     *  The public key certificate may be stored separately with
+     *  CertUtil.saveCert() if desired.
+     *  The CRL is not stored by this method, store it with
+     *  CertUtil.saveCRL() or CertUtil.exportCRL() if desired.
+     *
+     *  Throws on all errors.
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password
+     *  @param alias the name of the key
+     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param ou e.g. console
+     *  @param validDays e.g. 3652 (10 years)
+     *  @param keyAlg e.g. DSA , RSA, EC
+     *  @param keySize e.g. 1024
+     *  @param keyPW the key password, must be at least 6 characters
+     *  @return all you need:
+     *      rv[0] is a Java PublicKey
+     *      rv[1] is a Java PrivateKey
+     *      rv[2] is a Java X509Certificate
+     *      rv[3] is a Java X509CRL
+     *  @since 0.9.25
+     */
+    public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, String ou,
+                                            int validDays, SigType type, String keyPW)
+                                                throws GeneralSecurityException, IOException {
+        Object[] rv = SelfSignedGenerator.generate(cname, ou, "XX", "I2P Anonymous Network", "XX", "XX", validDays, type);
+        PublicKey jpub = (PublicKey) rv[0];
+        PrivateKey jpriv = (PrivateKey) rv[1];
+        X509Certificate cert = (X509Certificate) rv[2];
+        X509CRL crl = (X509CRL) rv[3];
+        List<X509Certificate> certs = Collections.singletonList(cert);
+        storePrivateKey(ks, ksPW, alias, keyPW, jpriv, certs);
+        return rv;
+    }
+
+    /**
+     *  OLD way - keytool
+     *  Create a keypair and store it in the keystore at ks, creating it if necessary.
+     *
+     *  Warning, may take a long time.
+     *
+     *  @param ks path to the keystore
+     *  @param ksPW the keystore password
+     *  @param alias the name of the key
+     *  @param cname e.g. randomstuff.console.i2p.net
+     *  @param ou e.g. console
+     *  @param validDays e.g. 3652 (10 years)
+     *  @param keyAlg e.g. DSA , RSA, EC
+     *  @param keySize e.g. 1024
+     *  @param keyPW the key password, must be at least 6 characters
+     *
+     *  @return success
+     *  @since 0.8.3, consolidated from RouterConsoleRunner and SSLClientListenerRunner in 0.9.9
+     */
+    private static boolean createKeysCLI(File ks, String ksPW, String alias, String cname, String ou,
                                      int validDays, String keyAlg, int keySize, String keyPW) {
         if (ks.exists()) {
             try {

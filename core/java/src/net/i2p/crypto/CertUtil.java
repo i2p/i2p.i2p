@@ -97,9 +97,9 @@ public final class CertUtil {
      *  Writes a certificate in base64 format.
      *  Does NOT close the stream. Throws on all errors.
      *
-     *  @since 0.9.24, pulled out of saveCert()
+     *  @since 0.9.24, pulled out of saveCert(), public since 0.9.25
      */
-    private static void exportCert(Certificate cert, OutputStream out)
+    public static void exportCert(Certificate cert, OutputStream out)
                                                 throws IOException, CertificateEncodingException {
         // Get the encoded form which is suitable for exporting
         byte[] buf = cert.getEncoded();
@@ -365,7 +365,7 @@ public final class CertUtil {
      *  @throws CRLException if the crl does not support encoding
      *  @since 0.9.25
      */
-    private static void exportCRL(X509CRL crl, OutputStream out)
+    public static void exportCRL(X509CRL crl, OutputStream out)
                                                 throws IOException, CRLException {
         byte[] buf = crl.getEncoded();
         writePEM(buf, "X509 CRL", out);

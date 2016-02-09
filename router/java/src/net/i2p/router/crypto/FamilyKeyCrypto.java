@@ -8,6 +8,8 @@ import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.security.cert.X509CRL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +53,7 @@ public class FamilyKeyCrypto {
     public static final String PROP_FAMILY_NAME = "netdb.family.name";
     public static final String PROP_KEY_PASSWORD = "netdb.family.keyPassword";
     public static final String CERT_SUFFIX = ".crt";
+    public static final String CRL_SUFFIX = ".crl";
     public static final String KEYSTORE_PREFIX = "family-";
     public static final String KEYSTORE_SUFFIX = ".ks";
     public static final String CN_SUFFIX = ".family.i2p.net";
@@ -61,6 +64,7 @@ public class FamilyKeyCrypto {
     private static final int DEFAULT_KEY_SIZE = SigType.ECDSA_SHA256_P256.isAvailable() ? 256 : 1024;
     private static final String KS_DIR = "keystore";
     private static final String CERT_DIR = "certificates/family";
+    private static final String CRL_DIR = "crls";
     public static final String OPT_NAME = "family";
     public static final String OPT_SIG = "family.sig";
     public static final String OPT_KEY = "family.key";
@@ -270,11 +274,12 @@ public class FamilyKeyCrypto {
                 throw new GeneralSecurityException(s);
             }
         }
-        createKeyStore(ks);
 
-        // Now read it back out of the new keystore and save it in ascii form
-        // where the clients can get to it.
-        exportCert(ks);
+        try {
+            createKeyStore(ks);
+        } catch (IOException ioe) {
+            throw new GeneralSecurityException("Failed to create NetDb family keystore", ioe);
+        }
     }
 
 
@@ -286,26 +291,22 @@ public class FamilyKeyCrypto {
      *
      * @throws GeneralSecurityException on all errors
      */
-    private void createKeyStore(File ks) throws GeneralSecurityException {
+    private void createKeyStore(File ks) throws GeneralSecurityException, IOException {
         // make a random 48 character password (30 * 8 / 5)
         String keyPassword = KeyStoreUtil.randomString();
         // and one for the cname
         String cname = _fname + CN_SUFFIX;
 
-        boolean success = KeyStoreUtil.createKeys(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, _fname, cname, "family",
+        Object[] rv = KeyStoreUtil.createKeysAndCRL(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, _fname, cname, "family",
                                                   DEFAULT_KEY_VALID_DAYS, DEFAULT_KEY_ALGORITHM,
                                                   DEFAULT_KEY_SIZE, keyPassword);
-        if (success) {
-            success = ks.exists();
-            if (success) {
+
                 Map<String, String> changes = new HashMap<String, String>();
                 changes.put(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
                 changes.put(PROP_KEY_PASSWORD, keyPassword);
                 changes.put(PROP_FAMILY_NAME, _fname);
                 _context.router().saveConfig(changes, null);
-            }
-        }
-        if (success) {
+
             _log.logAlways(Log.INFO, "Created new private key for netdb family \"" + _fname +
                            "\" in keystore: " + ks.getAbsolutePath() + "\n" +
                            "Copy the keystore to the other routers in the family,\n" +
@@ -314,27 +315,22 @@ public class FamilyKeyCrypto {
                            PROP_KEYSTORE_PASSWORD + '=' + KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD + '\n' +
                            PROP_KEY_PASSWORD + '=' + keyPassword);
 
-        } else {
-            String s = "Failed to create NetDb family keystore.\n" +
-                       "This is for the Sun/Oracle keytool, others may be incompatible.\n" +
-                       "If you create the keystore manually, you must add " + PROP_KEYSTORE_PASSWORD + " and " + PROP_KEY_PASSWORD +
-                       " to " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath();
-            _log.error(s);
-            throw new GeneralSecurityException(s);
-        }
+        X509Certificate cert = (X509Certificate) rv[2];
+        exportCert(cert);
+        X509CRL crl = (X509CRL) rv[3];
+        exportCRL(ks.getParentFile(), crl);
     }
 
     /** 
-     * Pull the cert back OUT of the keystore and save it as ascii
+     * Save the public key certificate
      * so the clients can get to it.
      */
-    private void exportCert(File ks) {
+    private void exportCert(X509Certificate cert) {
         File sdir = new SecureDirectory(_context.getConfigDir(), CERT_DIR);
         if (sdir.exists() || sdir.mkdirs()) {
-            String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
             String name = _fname.replace("@", "_at_") + CERT_SUFFIX;
             File out = new File(sdir, name);
-            boolean success = KeyStoreUtil.exportCert(ks, ksPass, _fname, out);
+            boolean success = CertUtil.saveCert(cert, out);
             if (success) {
                 _log.logAlways(Log.INFO, "Created new public key certificate for netdb family \"" + _fname +
                            "\" in file: " + out.getAbsolutePath() + "\n" +
@@ -342,10 +338,34 @@ public class FamilyKeyCrypto {
                            "Copy the certificate to the directory $I2P/" + CERT_DIR + " for each of the other routers in the family.\n" +
                            "Give this certificate to an I2P developer for inclusion in the next I2P release.");
             } else {
-                _log.error("Error getting SSL cert to save as ASCII");
+                _log.error("Error saving family key certificate");
             }
         } else {
-            _log.error("Error saving ASCII SSL keys");
+            _log.error("Error saving family key certificate");
+        }
+    }
+
+    /** 
+     * Save the CRL just in case.
+     * @param ksdir parent of directory to save in
+     * @since 0.9.25
+     */
+    private void exportCRL(File ksdir, X509CRL crl) {
+        File sdir = new SecureDirectory(ksdir, CRL_DIR);
+        if (sdir.exists() || sdir.mkdirs()) {
+            String name = KEYSTORE_PREFIX + _fname.replace("@", "_at_") + '-' + System.currentTimeMillis() + CRL_SUFFIX;
+            File out = new File(sdir, name);
+            boolean success = CertUtil.saveCRL(crl, out);
+            if (success) {
+                _log.logAlways(Log.INFO, "Created certificate revocation list (CRL) for netdb family \"" + _fname +
+                           "\" in file: " + out.getAbsolutePath() + "\n" +
+                           "Back up the keystore and CRL files and keep them secure.\n" +
+                           "If your private key is ever compromised, give the CRL to an I2P developer for publication.");
+            } else {
+                _log.error("Error saving family key CRL");
+            }
+        } else {
+            _log.error("Error saving family key CRL");
         }
     }
 
