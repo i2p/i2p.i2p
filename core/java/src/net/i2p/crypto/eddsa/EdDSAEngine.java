@@ -426,7 +426,7 @@ public final class EdDSAEngine extends Signature {
     @Override
     protected void engineSetParameter(AlgorithmParameterSpec spec) throws InvalidAlgorithmParameterException {
         if (spec.equals(ONE_SHOT_MODE)) {
-            if (oneShotBytes != null || baos != null && baos.size() > 0)
+            if (oneShotBytes != null || (baos != null && baos.size() > 0))
                 throw new InvalidAlgorithmParameterException("update() already called");
             oneShotMode = true;
         } else {
