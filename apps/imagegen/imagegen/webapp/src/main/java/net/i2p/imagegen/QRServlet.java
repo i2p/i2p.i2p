@@ -1,8 +1,34 @@
 package net.i2p.imagegen;
 
+/* contains code adapted from jrobin: */
+/*******************************************************************************
+ * Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
+ * Copyright (c) 2011 The OpenNMS Group, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *******************************************************************************/
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,6 +45,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import net.i2p.util.SystemVersion;
+
 /**
  * This servlet generates QR code images.
  * 
@@ -32,9 +60,15 @@ public class QRServlet extends HttpServlet {
 	private static final String INIT_PARAM_CACHE_PROVIDER = "cacheProvider";
 	private static final String PARAM_IDENTICON_SIZE_SHORT = "s";
 	private static final String PARAM_IDENTICON_CODE_SHORT = "c";
+	private static final String PARAM_IDENTICON_TEXT_SHORT = "t";
 	private static final String IDENTICON_IMAGE_FORMAT = "PNG";
 	private static final String IDENTICON_IMAGE_MIMETYPE = "image/png";
 	private static final long DEFAULT_IDENTICON_EXPIRES_IN_MILLIS = 24 * 60 * 60 * 1000;
+        // TODO the fonts all look terrible. See also the rendering hints below, nothing helps
+	private static final String DEFAULT_FONT_NAME = SystemVersion.isWindows() ?
+	                                                "Lucida Sans Typewriter" : Font.SANS_SERIF;	
+	private static final Font DEFAULT_LARGE_FONT = new Font(DEFAULT_FONT_NAME, Font.BOLD, 16);
+
 	private int version = 1;
 	private IdenticonCache cache;
 	private long identiconExpiresInMillis = DEFAULT_IDENTICON_EXPIRES_IN_MILLIS;
@@ -110,7 +144,33 @@ public class QRServlet extends HttpServlet {
 				} catch (WriterException we) {
 					throw new IOException("encode failed", we);
 				}
-				MatrixToImageWriter.writeToStream(matrix, IDENTICON_IMAGE_FORMAT, byteOut);
+				String text = request.getParameter(PARAM_IDENTICON_TEXT_SHORT);
+				if (text != null) {
+					BufferedImage bi = MatrixToImageWriter.toBufferedImage(matrix);
+					Graphics2D g = bi.createGraphics();
+					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+					g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+					g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
+					g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+					g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+					Font font = DEFAULT_LARGE_FONT;
+					g.setFont(font);
+					// doesn't work
+					Color color = Color.RED;
+					g.setColor(color);
+					int width = bi.getWidth();
+					int height = bi.getHeight();
+					double swidth = font.getStringBounds(text, 0, text.length(),
+					                                     g.getFontRenderContext()).getBounds().getWidth();
+					int x = (width - (int) swidth) / 2;
+					int y = height - 10;
+					g.drawString(text, x, y);
+					if (!ImageIO.write(bi, IDENTICON_IMAGE_FORMAT, byteOut))
+						throw new IOException("ImageIO.write() fail");
+				} else {
+					MatrixToImageWriter.writeToStream(matrix, IDENTICON_IMAGE_FORMAT, byteOut);
+				}
 				imageBytes = byteOut.toByteArray();
 				if (cache != null)
 					cache.add(identiconETag, imageBytes);
