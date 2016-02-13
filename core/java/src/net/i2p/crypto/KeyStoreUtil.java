@@ -541,8 +541,6 @@ public final class KeyStoreUtil {
      *  @param cname e.g. randomstuff.console.i2p.net
      *  @param ou e.g. console
      *  @param validDays e.g. 3652 (10 years)
-     *  @param keyAlg e.g. DSA , RSA, EC
-     *  @param keySize e.g. 1024
      *  @param keyPW the key password, must be at least 6 characters
      *  @return all you need:
      *      rv[0] is a Java PublicKey

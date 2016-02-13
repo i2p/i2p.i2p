@@ -946,7 +946,6 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
      * Writes s + createMessageString(msg) + \n
      *
      * @param s The string, non-null
-     * @param s The message may be null
      * @since 0.9.25
      */
     protected boolean writeString(String s, String msg) {

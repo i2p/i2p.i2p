@@ -54,7 +54,7 @@ public class QRServlet extends HttpServlet {
 		String cacheProvider = cfg.getInitParameter(INIT_PARAM_CACHE_PROVIDER);
 		if (cacheProvider != null) {
 			try {
-				Class cacheClass = Class.forName(cacheProvider);
+				Class<?> cacheClass = Class.forName(cacheProvider);
 				this.cache = (IdenticonCache) cacheClass.newInstance();
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -95,7 +95,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	     *   
 	     * Caller MUST call start().
 	     *
-	     * @param nick nickname of the session
+	     * @param login nickname of the session
 	     * @throws IOException
 	     * @throws DataFormatException
 	     * @throws I2PSessionException

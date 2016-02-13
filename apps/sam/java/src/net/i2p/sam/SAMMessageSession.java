@@ -78,8 +78,6 @@ abstract class SAMMessageSession implements SAMMessageSess {
     /**
      * Initialize a new SAM message-based session using an existing I2PSession.
      *
-     * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
-     * @param props Properties to setup the I2P session
      * @throws IOException
      * @throws DataFormatException
      * @throws I2PSessionException 

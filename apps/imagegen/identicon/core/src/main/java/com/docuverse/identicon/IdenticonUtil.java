@@ -7,7 +7,7 @@ import java.security.MessageDigest;
  * Utility methods useful for implementing identicon functionality. Methods are
  * class methods for convenience.
  * <p>
- * Key method of interest is {@link getIdenticonCode} which converts IP address
+ * Key method of interest is {@link #getIdenticonCode} which converts IP address
  * into identicon code.<br>
  * <strong>IMPORTANT</strong>: <code>inetSalt</code> value must be set to
  * reasonably long random string prior to invoking this method.
@@ -49,7 +49,7 @@ public class IdenticonUtil {
 	/**
 	 * Returns current inetSalt value.
 	 * 
-	 * @return
+	 * @return the value
 	 */
 	public static String getInetSalt() {
 		return inetSalt;
@@ -117,7 +117,7 @@ public class IdenticonUtil {
 	 *            will be used to determine the value.
 	 * @param remoteAddr
 	 *            HTTP requester's IP address. Optional if code was specified.
-	 * @return
+	 * @return the code
 	 */
 	public static int getIdenticonCode(String codeParam, String remoteAddr) {
 		int code = 0;
