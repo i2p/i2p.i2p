@@ -405,11 +405,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label><%=intl._t("Blacklist")%></label>
                 <input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
-            <div id="hostField" class="rowItem">
+            <div id="accessListField" class="rowItem">
                 <label for="accessList" accesskey="s">
                     <%=intl._t("Access List")%>:
                 </label>
-                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <textarea rows="2" style="height: 8em;" cols="60" name="accessList" title="Access List" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>               
             </div>
                  
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
@@ -424,6 +424,35 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         <%=intl._t("Enable")%>:
                     </label>
                     <input value="1" type="checkbox" id="startOnLoad" name="rejectInproxy" title="Deny inproxy access when enabled"<%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+              </div>
+            <div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._t("Block Accesses containing Referers")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._t("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="rejectReferer" title="Deny accesseses with referers (probably from inproxies)"<%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+              </div>
+            <div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._t("Block these User-Agents")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._t("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="rejectUserAgents" title="Deny User-Agents matching these strings (probably from inproxies)"<%=(editBean.isRejectUserAgents(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+                <div id="optionsHostField" class="rowItem">
+                    <input type="text" id="userAgents" name="userAgents" size="20" title="comma separated, e.g. Mozilla,Opera (case-sensitive)" value="<%=editBean.getUserAgents(curTunnel)%>" class="freetext" />                
                 </div>
               </div>
             <% } // httpserver

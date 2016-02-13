@@ -255,6 +255,11 @@ public class EditBean extends IndexBean {
         return _helper.getMultihome(tunnel);
     }
 
+    /** @since 0.9.25 */
+    public String getUserAgents(int tunnel) {
+        return _helper.getUserAgents(tunnel);
+    }
+    
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
         return _helper.getProxyAuth(tunnel) != "false";

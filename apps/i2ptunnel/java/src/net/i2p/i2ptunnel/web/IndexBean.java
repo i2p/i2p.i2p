@@ -679,6 +679,31 @@ public class IndexBean {
         return _helper.getRejectInproxy(tunnel);
     }
 
+    /** @since 0.9.25 */
+    public void setRejectReferer(String moo) {
+        _config.setRejectReferer(true);
+    }
+
+    /** @since 0.9.25 */
+    public boolean isRejectReferer(int tunnel) {
+        return _helper.getRejectReferer(tunnel);
+    }
+
+    /** @since 0.9.25 */
+    public void setRejectUserAgents(String moo) {
+        _config.setRejectUserAgents(true);
+    }
+
+    /** @since 0.9.25 */
+    public boolean isRejectUserAgents(int tunnel) {
+        return _helper.getRejectUserAgents(tunnel);
+    }
+
+    /** @since 0.9.25 */
+    public void setUserAgents(String agents) {
+        _config.setUserAgents(agents);
+    }
+
     /** @since 0.9.13 */
     public void setUniqueLocal(String moo) {
         _config.setUniqueLocal(true);

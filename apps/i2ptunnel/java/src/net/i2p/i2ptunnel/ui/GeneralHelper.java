@@ -630,6 +630,21 @@ public class GeneralHelper {
         return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
     }
 
+    /** @since 0.9.25 */
+    public boolean getRejectReferer(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_REFERER);
+    }
+
+    /** @since 0.9.25 */
+    public boolean getRejectUserAgents(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_USER_AGENTS);
+    }
+
+    /** @since 0.9.25 */
+    public String getUserAgents(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_USER_AGENTS, "");
+    }
+
     public boolean getUniqueLocal(int tunnel) {
         return getBooleanProperty(tunnel, I2PTunnelServer.PROP_UNIQUE_LOCAL);
     }

@@ -241,7 +241,7 @@ class ConnectionManager {
                 if (why != null) {
                     if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                         _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
-                           (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().calculateHash().toBase64()));
+                           (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().toBase32()));
                     reject = true;
                 } else { 
                     assignReceiveStreamId(con);
