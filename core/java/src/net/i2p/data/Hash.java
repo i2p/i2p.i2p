@@ -106,6 +106,17 @@ public class Hash extends SimpleDataStructure {
     }
 
     /**
+     *  For convenience.
+     *  @return "{52 chars}.b32.i2p" or null if data not set.
+     *  @since 0.9.25
+     */
+    public String toBase32() {
+        if (_data == null)
+            return null;
+        return Base32.encode(_data) + ".b32.i2p";
+    }
+
+    /**
      *  @since 0.9.17
      */
     public static void clearCache() {
