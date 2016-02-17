@@ -458,6 +458,7 @@ class SAMv3Handler extends SAMv1Handler
 				// (iMule sets BestEffort) as None is more efficient
 				// and the client has no way to access delivery notifications
 				i2cpProps.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
+				i2cpProps.setProperty("i2cp.fastReceive", "true");
 
 				// Record the session in the database sSessionsHash
 				Properties allProps = new Properties();

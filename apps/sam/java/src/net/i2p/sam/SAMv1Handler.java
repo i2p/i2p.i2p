@@ -453,8 +453,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
             
             String dest = props.getProperty("DESTINATION");
             if (dest == null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Destination not specified in SEND message");
+                if (_log.shouldWarn())
+                    _log.warn("Destination not specified in SEND message");
                 return false;
             }
 
@@ -522,27 +522,27 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 in.readFully(data);
 
                 SAMMessageSess sess = isRaw ? rawSession : datagramSession;
-                if (sess.sendBytes(dest, data, proto, fromPort, toPort)) {
-                    _log.error("SEND failed");
+                if (!sess.sendBytes(dest, data, proto, fromPort, toPort)) {
+                    if (_log.shouldWarn())
+                        _log.warn((isRaw ? "SEND RAW to " : "SEND DATAGRAM to ") + dest + " size " + size +
+                                  " failed");
                     // a message send failure is no reason to drop the SAM session
                     // for raw and repliable datagrams, just carry on our merry way
-                    return true;
                 }
-
                 return true;
             } catch (EOFException e) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Too few bytes with SEND message (expected: "
-                           + size);
+                if (_log.shouldWarn())
+                    _log.warn("Too few bytes with SEND message (expected: "
+                           + size, e);
                 return false;
             } catch (IOException e) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Caught IOException while parsing SEND message",
+                if (_log.shouldWarn())
+                    _log.warn("Caught IOException while parsing SEND message",
                            e);
                 return false;
             } catch (DataFormatException e) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Invalid key specified with SEND message",
+                if (_log.shouldWarn())
+                    _log.warn("Invalid key specified with SEND message",
                            e);
                 return false;
             } catch (I2PSessionException e) {
@@ -550,8 +550,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 return false;
             }
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Unrecognized message opcode: \""
+            if (_log.shouldWarn())
+                _log.warn("Unrecognized message opcode: \""
                        + opcode + "\"");
             return false;
         }
@@ -571,8 +571,8 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
         } else if (opcode.equals("CLOSE")) {
             return execStreamClose(props);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Unrecognized STREAM message opcode: \""
+            if (_log.shouldWarn())
+                _log.warn("Unrecognized STREAM message opcode: \""
                        + opcode + "\"");
             return false;
         }
