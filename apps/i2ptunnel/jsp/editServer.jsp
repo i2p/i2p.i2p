@@ -398,12 +398,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
             </div>
             <div id="portField" class="rowItem">
-                <label><%=intl._t("Disable")%></label>
-                <input value="0" type="radio" id="startOnLoad" name="accessMode" title="Allow all clients"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <label><%=intl._t("Whitelist")%></label>
-                <input value="1" type="radio" id="startOnLoad" name="accessMode" title="Allow listed clients only"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <label><%=intl._t("Blacklist")%></label>
-                <input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <% /* can't use <label> here */ %>
+                <p><input value="0" type="radio" id="startOnLoad" name="accessMode" title="Allow all clients"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <b><%=intl._t("Disable")%></b></p>
+                <p><input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <b><%=intl._t("Blacklist")%></b></p>
+                <p><input value="1" type="radio" id="startOnLoad" name="accessMode" title="Allow listed clients only"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <b><%=intl._t("Whitelist")%></b></p>
             </div>
             <div id="accessListField" class="rowItem">
                 <label for="accessList" accesskey="s">
