@@ -33,6 +33,8 @@ public class RandomArtServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
+		if (request.getCharacterEncoding() == null)
+			request.setCharacterEncoding("UTF-8");
 		String codeParam = request.getParameter(PARAM_IDENTICON_CODE_SHORT);
 		boolean codeSpecified = codeParam != null && codeParam.length() > 0;
 		if (!codeSpecified) {
