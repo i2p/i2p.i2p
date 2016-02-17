@@ -678,7 +678,8 @@ class BuildHandler implements Runnable {
             // but if not, something is seriously wrong here.
             if (from == null || _context.routerHash().equals(from)) {
                 _context.statManager().addRateData("tunnel.rejectHostile", 1);
-                _log.error("Dropping build request, we are the previous hop: " + req);
+                if (_log.shouldWarn())
+                    _log.warn("Dropping build request, we are the previous hop: " + req);
                 return;
             }
         }
