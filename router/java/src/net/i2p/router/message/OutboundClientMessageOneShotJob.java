@@ -373,7 +373,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _lease = _cache.leaseCache.get(_hashPair);
             if (_lease != null) {
                 // if outbound tunnel length == 0 && lease.firsthop.isBacklogged() don't use it ??
-                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
+                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR / 4)) {
                     // see if the current leaseSet contains the old lease, so that if the dest removes
                     // it (due to failure for example) we won't continue to use it.
                     for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
@@ -397,14 +397,21 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
         // get the possible leases
         List<Lease> leases = new ArrayList<Lease>(_leaseSet.getLeaseCount());
+        // first try to get ones that really haven't expired
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
             Lease lease = _leaseSet.getLease(i);
-            if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": getNextLease() - expired lease! - " + lease + " for " + _toString);
-                continue;
-            } else {
+            if (!lease.isExpired(Router.CLOCK_FUDGE_FACTOR / 4))
                 leases.add(lease);
+        }
+
+        if (leases.isEmpty()) {
+            // TODO if _lease != null, fire off
+            // a lookup ? KNDF will keep giving us the current ls until CLOCK_FUDGE_FACTOR
+            // try again with a fudge factor
+            for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
+                Lease lease = _leaseSet.getLease(i);
+                if (!lease.isExpired(Router.CLOCK_FUDGE_FACTOR))
+                    leases.add(lease);
             }
         }
         
