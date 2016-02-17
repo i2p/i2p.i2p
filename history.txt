@@ -1,3 +1,9 @@
+2016-02-17 zzz
+ * i2psnark: Increase max files per torrent to 2000
+ * I2PTunnel: Improve layout of blacklist radio buttons
+ * Router: Switch to new lease sooner before expiration
+ * SAM: Don't log an error on datagram send success
+
 2016-02-13 zzz
  * I2PTunnel:
    - Add options to block by referer and user-agent
