@@ -222,10 +222,12 @@ public class ConfigNetHelper extends HelperBase {
             buf.append(addr);
             buf.append("<br>");
         }
-        buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                   "<input type=\"checkbox\" class=\"optbox\" name=\"addrnew\"");
-        buf.append(CHECKED);
-        buf.append("><input name =\"udpHost1\" type=\"text\" size=\"16\" />" +
+        buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        if (!addrs.isEmpty()) {
+            buf.append(_t("Add host name or IP"))
+               .append(": ");
+        }
+        buf.append("<input name=\"udpHost1\" type=\"text\" size=\"16\" >" +
                    "</div>");
         return buf.toString();
     }

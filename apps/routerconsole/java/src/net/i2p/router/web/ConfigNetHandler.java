@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
 import net.i2p.router.transport.TransportManager;
@@ -164,6 +165,9 @@ public class ConfigNetHandler extends FormHandler {
             String oldUdp = _context.getProperty(UDPTransport.PROP_SOURCES,
                                                  _context.router().isHidden() ? "hidden" : UDPTransport.DEFAULT_SOURCES);
             String oldUHost = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, "");
+            // force change to fixed if user enters a host name/IP
+            if (_udpHost1 != null && _udpHost1.length() > 0)
+                _udpAutoIP = "fixed";
             if (_udpAutoIP != null) {
                 String uhost = "";
                 if (_udpAutoIP.equals("fixed")) {
@@ -173,18 +177,17 @@ public class ConfigNetHandler extends FormHandler {
                     for (Object o : _settings.keySet()) {
                         String k = (String) o;
                         if (k.startsWith("addr_")) {
-                            String v = k.substring(5);
+                            String v = DataHelper.stripHTML(k.substring(5));
                             if (v.length() > 0)
                                 addrs.add(v);
                         }
                     }
-                    if (getJettyString("addrnew") != null) {
-                        if (_udpHost1 != null && _udpHost1.length() > 0) {
-                            if (verifyAddress(_udpHost1)) {
-                                addrs.add(_udpHost1);
-                            } else {
-                                error = true;
-                            }
+                    if (_udpHost1 != null && _udpHost1.length() > 0) {
+                        if (verifyAddress(_udpHost1)) {
+                            addrs.add(_udpHost1);
+                        } else {
+                            // verifyAddress() outputs form error
+                            error = true;
                         }
                     }
                     int tot = addrs.size();
