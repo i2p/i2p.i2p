@@ -15,6 +15,9 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertStore;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509CRL;
@@ -23,8 +26,10 @@ import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
@@ -45,6 +50,8 @@ import net.i2p.util.SystemVersion;
  */
 public final class CertUtil {
         
+    private static final String CERT_DIR = "certificates";
+    private static final String REVOCATION_DIR = "revocations";
     private static final int LINE_LENGTH = 64;
 
     /**
@@ -371,10 +378,123 @@ public final class CertUtil {
         writePEM(buf, "X509 CRL", out);
     }
 
+    /**
+     *  Is the certificate revoked?
+     *
+     *  @since 0.9.25
+     */
+    public static boolean isRevoked(I2PAppContext ctx, Certificate cert) {
+        CertStore store = loadCRLs(ctx);
+        return isRevoked(store, cert);
+    }
+
+    /**
+     *  Is the certificate revoked?
+     *
+     *  @since 0.9.25
+     */
+    public static boolean isRevoked(CertStore store, Certificate cert) {
+        try {
+            for (CRL crl : store.getCRLs(null)) {
+                if (crl.isRevoked(cert))
+                    return true;
+            }
+        } catch (GeneralSecurityException gse) {}
+        return false;
+    }
+
+    /**
+     *  Load CRLs from standard locations.
+     *
+     *  @return non-null, possibly empty
+     *  @since 0.9.25
+     */
+    public static CertStore loadCRLs(I2PAppContext ctx) {
+        Set<X509CRL> crls = new HashSet<X509CRL>(8);
+        File dir = new File(ctx.getBaseDir(), CERT_DIR);
+        dir = new File(dir, REVOCATION_DIR);
+        loadCRLs(crls, dir);
+        boolean diff = true;
+        try {
+            diff = !ctx.getBaseDir().getCanonicalPath().equals(ctx.getConfigDir().getCanonicalPath());
+        } catch (IOException ioe) {}
+        if (diff) {
+            File dir2 = new File(ctx.getConfigDir(), CERT_DIR);
+            dir2 = new File(dir2, REVOCATION_DIR);
+            loadCRLs(crls, dir2);
+        }
+        CollectionCertStoreParameters ccsp = new CollectionCertStoreParameters(crls);
+        try {
+            CertStore store = CertStore.getInstance("Collection", ccsp);
+            return store;
+        } catch (GeneralSecurityException gse) {
+            // shouldn't happen
+            error("CertStore", gse);
+            throw new UnsupportedOperationException(gse);
+        }
+    }
+
+    /**
+     *  Load CRLs from the directory into the set.
+     *
+     *  @since 0.9.25
+     */
+    private static void loadCRLs(Set<X509CRL> crls, File dir) {
+        if (dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    File f = files[i];
+                    if (!f.isFile())
+                        continue;
+                    if (f.getName().endsWith(".crl")) {
+                        try {
+                            X509CRL crl = loadCRL(f);
+                            crls.add(crl);
+                        } catch (IOException ioe) {
+                            error("Cannot load CRL from " + f, ioe);
+                        } catch (GeneralSecurityException crle) {
+                            error("Cannot load CRL from " + f, crle);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *  Load a CRL.
+     *
+     *  @return non-null, possibly empty
+     *  @since 0.9.25
+     */
+    private static X509CRL loadCRL(File file) throws IOException, GeneralSecurityException {
+        InputStream in = null;
+        try {
+            in = new FileInputStream(file);
+            return loadCRL(in);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /**
+     *  Load a CRL. Does NOT Close the stream.
+     *
+     *  @return non-null
+     *  @since 0.9.25
+     */
+    private static X509CRL loadCRL(InputStream in) throws GeneralSecurityException {
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        return (X509CRL) cf.generateCRL(in);
+    }
+
+
+
 /****
     public static final void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Usage: [loadcert | loadcrl | loadprivatekey] file");
+            System.out.println("Usage: [loadcert | loadcrl | loadcrldir | loadcrldirs | isrevoked | loadprivatekey] file");
             System.exit(1);
         }
         try {
@@ -382,7 +502,21 @@ public final class CertUtil {
             if (args[0].equals("loadcert")) {
                 loadCert(f);
             } else if (args[0].equals("loadcrl")) {
+                loadCRL(f);
+            } else if (args[0].equals("loadcrldir")) {
+                Set<X509CRL> crls = new HashSet<X509CRL>(8);
+                loadCRLs(crls, f);
+                System.out.println("Found " + crls.size() + " CRLs");
+            } else if (args[0].equals("loadcrldirs")) {
+                CertStore store = loadCRLs(I2PAppContext.getGlobalContext());
+                Collection<? extends CRL> crls = store.getCRLs(null);
+                System.out.println("Found " + crls.size() + " CRLs");
+            } else if (args[0].equals("isrevoked")) {
+                Certificate cert = loadCert(f);
+                boolean rv = isRevoked(I2PAppContext.getGlobalContext(), cert);
+                System.out.println("Revoked? " + rv);
             } else {
+                System.out.println("Usage: [loadcert | loadcrl | loadprivatekey] file");
             }
 
         } catch (Exception e) {
