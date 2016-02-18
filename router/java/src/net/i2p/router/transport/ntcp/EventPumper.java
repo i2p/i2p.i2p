@@ -273,9 +273,12 @@ class EventPumper implements Runnable {
                                 }
                                 
                                 final long expire;
-                                if (!haveCap && con.getMayDisconnect() &&
+                                if ((!haveCap || !con.isInbound()) &&
+                                    con.getMayDisconnect() &&
                                     con.getMessagesReceived() <= 2 && con.getMessagesSent() <= 1) {
                                     expire = MAY_DISCON_TIMEOUT;
+                                    if (_log.shouldInfo())
+                                        _log.info("Possible early disconnect for " + con);
                                 } else {
                                     expire = _expireIdleWriteTime;
                                 }

@@ -773,7 +773,10 @@ class PeerState {
         return _remoteIP.length == 16;
     }
 
+    /** the last time we used them as an introducer, or 0 */
     public long getIntroducerTime() { return _lastIntroducerTime; }
+
+    /** set the last time we used them as an introducer to now */
     public void setIntroducerTime() { _lastIntroducerTime = _context.clock().now(); }
     
     /** 

@@ -86,7 +86,8 @@ public class PublishLocalRouterInfoJob extends JobImpl {
                 // 3 times out of 4, we don't republish if everything is the same...
                 // If something changed, including the cost, then publish,
                 // otherwise don't.
-                boolean different = !oldRI.getCapabilities().equals(ri.getCapabilities());
+                String newcaps = getContext().router().getCapabilities();
+                boolean different = !oldRI.getCapabilities().equals(newcaps);
                 if (!different) {
                     Comparator<RouterAddress> comp = new AddrComparator();
                     Collections.sort(oldAddrs, comp);
@@ -107,7 +108,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
                 }
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Republishing early because addresses or costs or caps have changed -" +
-                              " oldCaps: " + oldRI.getCapabilities() + " newCaps: " + ri.getCapabilities() +
+                              " oldCaps: " + oldRI.getCapabilities() + " newCaps: " + newcaps +
                               " old:\n" +
                               oldAddrs + "\nnew:\n" + newAddrs);
             }

@@ -2504,8 +2504,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     @Override
     public void mayDisconnect(final Hash peer) {
         final PeerState ps =  _peersByIdent.get(peer);
-        if (ps != null && ps.isInbound() &&
+        if (ps != null &&
             ps.getWeRelayToThemAs() <= 0 &&
+            (ps.getTheyRelayToUsAs() <= 0 || ps.getIntroducerTime() < _context.clock().now() - 2*60*60*1000) &&
             ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 2) {
             ps.setMayDisconnect();
         }
@@ -2935,7 +2936,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             boolean shouldPingFirewall = _reachabilityStatus != Status.OK;
             int currentListenPort = getListenPort(false);
             boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
-            boolean shortLoop = shouldPingFirewall;
+            boolean shortLoop = shouldPingFirewall || !haveCap || _context.netDb().floodfillEnabled();
             _lastLoopShort = shortLoop;
             _expireBuffer.clear();
             _runCount++;
@@ -2946,8 +2947,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     // if we offered to introduce them, or we used them as introducer in last 2 hours
                     if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff) {
                         inactivityCutoff = longInactivityCutoff;
-                    } else if (!haveCap && peer.getMayDisconnect() &&
+                    } else if ((!haveCap || !peer.isInbound()) &&
+                               peer.getMayDisconnect() &&
                                peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 2) {
+                        if (_log.shouldInfo())
+                            _log.info("Possible early disconnect for: " + peer);
                         inactivityCutoff = mayDisconCutoff;
                     } else {
                         inactivityCutoff = shortInactivityCutoff;
