@@ -1,3 +1,17 @@
+2016-02-19 zzz
+ * Clock: Add sanity checks to detect invalid system clock
+
+2016-02-18 zzz
+ * Console: Clean up display and form handling
+   for specifying a fixed host name or IP on /confignet
+ * Crypto: Add utilities for loading CRLs from disk;
+   check for revocation when reading in certificates
+ * Transport:
+   - Implement mayDisconnect() for outbound connections also,
+     use when publishing RI directly to floodfill
+   - Run SSU idle disconnect check faster if floodfill or near connection limit
+ * NetDB: Fix bug publishing router info too often
+
 2016-02-17 zzz
  * i2psnark: Increase max files per torrent to 2000
  * I2PTunnel: Improve layout of blacklist radio buttons
