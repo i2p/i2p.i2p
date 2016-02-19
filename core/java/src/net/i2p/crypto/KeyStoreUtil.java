@@ -13,6 +13,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertStore;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509CRL;
 import java.util.ArrayList;
@@ -332,6 +333,8 @@ public final class KeyStoreUtil {
      *  Load all X509 Certs from a directory and add them to the
      *  trusted set of certificates in the key store
      *
+     *  This DOES check for revocation.
+     *
      *  @return number successfully added
      *  @since 0.8.2, moved from SSLEepGet in 0.9.9
      */
@@ -341,6 +344,7 @@ public final class KeyStoreUtil {
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {
+                CertStore cs = CertUtil.loadCRLs();
                 for (int i = 0; i < files.length; i++) {
                     File f = files[i];
                     if (!f.isFile())
@@ -354,7 +358,7 @@ public final class KeyStoreUtil {
                         alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12") ||
                         alias.endsWith(".cer"))
                         alias = alias.substring(0, alias.length() - 4);
-                    boolean success = addCert(f, alias, ks);
+                    boolean success = addCert(f, alias, ks, cs);
                     if (success)
                         added++;
                 }
@@ -367,10 +371,26 @@ public final class KeyStoreUtil {
      *  Load an X509 Cert from a file and add it to the
      *  trusted set of certificates in the key store
      *
+     *  This does NOT check for revocation.
+     *
      *  @return success
      *  @since 0.8.2, moved from SSLEepGet in 0.9.9
      */
     public static boolean addCert(File file, String alias, KeyStore ks) {
+        return addCert(file, alias, ks, null);
+    }
+
+    /**
+     *  Load an X509 Cert from a file and add it to the
+     *  trusted set of certificates in the key store
+     *
+     *  This DOES check for revocation, IF cs is non-null.
+     *
+     *  @param cs may be null; if non-null, check for revocation
+     *  @return success
+     *  @since 0.9.25
+     */
+    public static boolean addCert(File file, String alias, KeyStore ks, CertStore cs) {
         try {
             X509Certificate cert = CertUtil.loadCert(file);
             info("Read X509 Certificate from " + file.getAbsolutePath() +
@@ -378,6 +398,10 @@ public final class KeyStoreUtil {
                           " Serial: " + cert.getSerialNumber().toString(16) +
                           "; Valid From: " + cert.getNotBefore() +
                           " To: " + cert.getNotAfter());
+            if (cs != null && CertUtil.isRevoked(cs, cert)) {
+                error("Certificate is revoked: " + file, new Exception());
+                return false;
+            }
             ks.setCertificateEntry(alias, cert);
             info("Now trusting X509 Certificate, Issuer: " + cert.getIssuerX500Principal());
         } catch (CertificateExpiredException cee) {

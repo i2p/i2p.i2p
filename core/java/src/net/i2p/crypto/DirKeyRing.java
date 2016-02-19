@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CRLException;
 import java.security.cert.X509Certificate;
 
 import net.i2p.util.SystemVersion;
@@ -34,6 +35,8 @@ class DirKeyRing implements KeyRing {
      *  Cert must be in the file (escaped keyName).crt,
      *  and have a CN == keyName.
      *
+     *  This DOES do a revocation check.
+     *
      *  CN check unsupported on Android.
      *
      *  @return null if file doesn't exist, throws on all other errors
@@ -50,6 +53,8 @@ class DirKeyRing implements KeyRing {
         if (!kd.exists())
             return null;
         X509Certificate cert = CertUtil.loadCert(kd);
+        if (CertUtil.isRevoked(cert))
+            throw new CRLException("Certificate is revoked");
         if (!SystemVersion.isAndroid()) {
             // getSubjectValue() unsupported on Android.
             // Any cert problems will be caught in non-Android testing.

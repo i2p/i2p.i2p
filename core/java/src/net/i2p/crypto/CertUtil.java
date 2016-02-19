@@ -226,16 +226,23 @@ public final class CertUtil {
      *  Get the Java public key from a X.509 certificate file.
      *  Throws if the certificate is invalid (e.g. expired).
      *
+     *  This DOES check for revocation.
+     *
      *  @return non-null, throws on all errors including certificate invalid
      *  @since 0.9.24 moved from SU3File private method
      */
     public static PublicKey loadKey(File kd) throws IOException, GeneralSecurityException {
-        return loadCert(kd).getPublicKey();
+        X509Certificate cert = loadCert(kd);
+        if (isRevoked(cert))
+            throw new CRLException("Certificate is revoked");
+        return cert.getPublicKey();
     }
 
     /**
      *  Get the certificate from a X.509 certificate file.
      *  Throws if the certificate is invalid (e.g. expired).
+     *
+     *  This does NOT check for revocation.
      *
      *  @return non-null, throws on all errors including certificate invalid
      *  @since 0.9.24 adapted from SU3File private method
@@ -314,6 +321,8 @@ public final class CertUtil {
      *  Throws if any certificate is invalid (e.g. expired).
      *  Does NOT close the stream.
      *
+     *  This does NOT check for revocation.
+     *
      *  @return non-null, non-empty, throws on all errors including certificate invalid
      *  @since 0.9.25
      */
@@ -380,6 +389,19 @@ public final class CertUtil {
 
     /**
      *  Is the certificate revoked?
+     *  This loads the CRLs from disk.
+     *  For efficiency, call loadCRLs() and then pass to isRevoked().
+     *
+     *  @since 0.9.25
+     */
+    public static boolean isRevoked(Certificate cert) {
+        return isRevoked(I2PAppContext.getGlobalContext(), cert);
+    }
+
+    /**
+     *  Is the certificate revoked?
+     *  This loads the CRLs from disk.
+     *  For efficiency, call loadCRLs() and then pass to isRevoked().
      *
      *  @since 0.9.25
      */
@@ -409,6 +431,16 @@ public final class CertUtil {
      *  @return non-null, possibly empty
      *  @since 0.9.25
      */
+    public static CertStore loadCRLs() {
+        return loadCRLs(I2PAppContext.getGlobalContext());
+    }
+
+    /**
+     *  Load CRLs from standard locations.
+     *
+     *  @return non-null, possibly empty
+     *  @since 0.9.25
+     */
     public static CertStore loadCRLs(I2PAppContext ctx) {
         Set<X509CRL> crls = new HashSet<X509CRL>(8);
         File dir = new File(ctx.getBaseDir(), CERT_DIR);
@@ -423,6 +455,7 @@ public final class CertUtil {
             dir2 = new File(dir2, REVOCATION_DIR);
             loadCRLs(crls, dir2);
         }
+        //System.out.println("Loaded " + crls.size() + " CRLs");
         CollectionCertStoreParameters ccsp = new CollectionCertStoreParameters(crls);
         try {
             CertStore store = CertStore.getInstance("Collection", ccsp);
