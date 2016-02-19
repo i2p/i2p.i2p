@@ -38,8 +38,8 @@ import net.i2p.util.Log;
  * Simple extension to the I2PTunnelServer that filters the HTTP
  * headers sent from the client to the server, replacing the Host
  * header with whatever this instance has been configured with, and
- * if the browser set Accept-encoding: x-i2p-gzip, gzip the http 
- * message body and set Content-encoding: x-i2p-gzip.
+ * if the browser set Accept-Encoding: x-i2p-gzip, gzip the http 
+ * message body and set Content-Encoding: x-i2p-gzip.
  *
  */
 public class I2PTunnelHTTPServer extends I2PTunnelServer {
@@ -481,7 +481,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             long afterSocket = getTunnel().getContext().clock().now();
             // instead of i2ptunnelrunner, use something that reads the HTTP 
             // request from the socket, modifies the headers, sends the request to the 
-            // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
+            // server, reads the response headers, rewriting to include Content-Encoding: x-i2p-gzip
             // if it was one of the Accept-Encoding: values, and gzip the payload       
             boolean allowGZIP = true;
             String val = opts.getProperty("i2ptunnel.gzip");
@@ -750,7 +750,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Including x-i2p-gzip as the content encoding in the response");
             if (shouldCompress())
-                out.write(DataHelper.getASCII("Content-encoding: x-i2p-gzip\r\n"));
+                out.write(DataHelper.getASCII("Content-Encoding: x-i2p-gzip\r\n"));
             super.finishHeaders();
         }
 

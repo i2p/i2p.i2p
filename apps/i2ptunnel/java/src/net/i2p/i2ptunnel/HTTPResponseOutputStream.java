@@ -26,8 +26,8 @@ import net.i2p.util.Log;
  * Simple stream for delivering an HTTP response to
  * the client, trivially filtered to make sure "Connection: close"
  * is always in the response.  Perhaps add transparent handling of the
- * Content-encoding: x-i2p-gzip, adjusting the headers to say Content-encoding: identity?
- * Content-encoding: gzip is trivial as well, but Transfer-encoding: chunked makes it
+ * Content-Encoding: x-i2p-gzip, adjusting the headers to say Content-Encoding: identity?
+ * Content-Encoding: gzip is trivial as well, but Transfer-Encoding: chunked makes it
  * more work than is worthwhile at the moment.
  *
  */
