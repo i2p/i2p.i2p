@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -20,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.provider.I2PProvider;
@@ -51,66 +54,85 @@ public final class KeyStoreUtil {
     }
 
     /**
+     *  SHA1 hashes
+     *
      *  No reports of some of these in a Java keystore but just to be safe...
      *  CNNIC ones are in Ubuntu keystore.
+     *
+     *  In comments below are the serial numer, CN, and OU
      */
-    private static final BigInteger[] BLACKLIST_SERIAL = new BigInteger[] {
+    private static final String[] BLACKLIST_SHA1 = new String[] {
         // CNNIC https://googleonlinesecurity.blogspot.com/2015/03/maintaining-digital-certificate-security.html
-        new BigInteger("49:33:00:01".replace(":", ""), 16),
+        //new BigInteger("49:33:00:01".replace(":", ""), 16),
+        //"CNNIC ROOT",
+        //null,
+        "8b:af:4c:9b:1d:f0:2a:92:f7:da:12:8e:b9:1b:ac:f4:98:60:4b:6f",
+
         // CNNIC EV root https://bugzilla.mozilla.org/show_bug.cgi?id=607208
-        new BigInteger("48:9f:00:01".replace(":", ""), 16),
+        //new BigInteger("48:9f:00:01".replace(":", ""), 16),
+        //"China Internet Network Information Center EV Certificates Root",
+        //null,
+        "4f:99:aa:93:fb:2b:d1:37:26:a1:99:4a:ce:7f:f0:05:f2:93:5d:1e",
+
         // Superfish http://blog.erratasec.com/2015/02/extracting-superfish-certificate.html
-        new BigInteger("d2:fc:13:87:a9:44:dc:e7".replace(":", ""), 16),
+        //new BigInteger("d2:fc:13:87:a9:44:dc:e7".replace(":", ""), 16),
+        //"Superfish, Inc.",
+        //null,
+        "c8:64:48:48:69:d4:1d:2b:0d:32:31:9c:5a:62:f9:31:5a:af:2c:bd",
+
         // eDellRoot https://www.reddit.com/r/technology/comments/3twmfv/dell_ships_laptops_with_rogue_root_ca_exactly/
-        new BigInteger("6b:c5:7b:95:18:93:aa:97:4b:62:4a:c0:88:fc:3b:b6".replace(":", ""), 16),
+        //new BigInteger("6b:c5:7b:95:18:93:aa:97:4b:62:4a:c0:88:fc:3b:b6".replace(":", ""), 16),
+        //"eDellRoot",
+        //null,
+        "98:a0:4e:41:63:35:77:90:c4:a7:9e:6d:71:3f:f0:af:51:fe:69:27",
+
         // DSDTestProvider https://blog.hboeck.de/archives/876-Superfish-2.0-Dangerous-Certificate-on-Dell-Laptops-breaks-encrypted-HTTPS-Connections.html
         // serial number is actually negative; hex string as reported by certtool below
         //new BigInteger("a4:4c:38:47:f8:ee:71:80:43:4d:b1:80:b9:a7:e9:62".replace(":", ""), 16)
-        new BigInteger("-5b:b3:c7:b8:07:11:8e:7f:bc:b2:4e:7f:46:58:16:9e".replace(":", ""), 16),
+        //new BigInteger("-5b:b3:c7:b8:07:11:8e:7f:bc:b2:4e:7f:46:58:16:9e".replace(":", ""), 16),
+        //"DSDTestProvider",
+        //null,
+        "02:c2:d9:31:06:2d:7b:1d:c2:a5:c7:f5:f0:68:50:64:08:1f:b2:21",
+
         // Verisign G1 Roots
         // https://googleonlinesecurity.blogspot.com/2015/12/proactive-measures-in-digital.html
         // https://knowledge.symantec.com/support/ssl-certificates-support/index?page=content&id=ALERT1941
         // SHA-1
-        new BigInteger("3c:91:31:cb:1f:f6:d0:1b:0e:9a:b8:d0:44:bf:12:be".replace(":", ""), 16),
+        //new BigInteger("3c:91:31:cb:1f:f6:d0:1b:0e:9a:b8:d0:44:bf:12:be".replace(":", ""), 16),
+        //null,
+        //"Class 3 Public Primary Certification Authority",
+        "a1:db:63:93:91:6f:17:e4:18:55:09:40:04:15:c7:02:40:b0:ae:6b",
+
         // MD2
-        new BigInteger("70:ba:e4:1d:10:d9:29:34:b6:38:ca:7b:03:cc:ba:bf".replace(":", ""), 16),
+        //new BigInteger("70:ba:e4:1d:10:d9:29:34:b6:38:ca:7b:03:cc:ba:bf".replace(":", ""), 16),
+        //null,
+        //"Class 3 Public Primary Certification Authority",
+        "74:2c:31:92:e6:07:e4:24:eb:45:49:54:2b:e1:bb:c5:3e:61:74:e2",
+
         // Comodo SHA1 https://cabforum.org/pipermail/public/2015-December/006500.html
         // https://bugzilla.mozilla.org/show_bug.cgi?id=1208461
-        new BigInteger("44:be:0c:8b:50:00:21:b4:11:d3:2a:68:06:a9:ad:69".replace(":", ""), 16)
+        //new BigInteger("44:be:0c:8b:50:00:21:b4:11:d3:2a:68:06:a9:ad:69".replace(":", ""), 16)
+	//"UTN - DATACorp SGC"
+        //null
+        "58:11:9f:0e:12:82:87:ea:50:fd:d9:87:45:6f:4f:78:dc:fa:d6:d4"
     };
 
-    /**
-     *  Corresponding issuer CN for the serial number.
-     *  Must be same number of entries as BLACKLIST_SERIAL.
-     *  Either CN or OU must be non-null
-     */
-    private static final String[] BLACKLIST_ISSUER_CN = new String[] {
-        "CNNIC ROOT",
-        "China Internet Network Information Center EV Certificates Root",
-        "Superfish, Inc.",
-        "eDellRoot",
-        "DSDTestProvider",
-        null,
-        null,
-	"UTN - DATACorp SGC"
-    };
+    private static final Set<SHA1Hash> _blacklist = new HashSet<SHA1Hash>(16);
 
-    /**
-     *  Corresponding issuer OU for the serial number.
-     *  Must be same number of entries as BLACKLIST_SERIAL.
-     *  Either CN or OU must be non-null
-     */
-    private static final String[] BLACKLIST_ISSUER_OU = new String[] {
-        null,
-        null,
-        null,
-        null,
-        null,
-        "Class 3 Public Primary Certification Authority",
-        "Class 3 Public Primary Certification Authority",
-        null
-    };
-
+    static {
+        for (int i = 0; i < BLACKLIST_SHA1.length; i++) {
+            String s = BLACKLIST_SHA1[i].replace(":", "");
+            BigInteger bi = new BigInteger(s, 16);
+            byte[] b = bi.toByteArray();
+            if (b.length == 21) {
+                byte[] b2 = new byte[20];
+                System.arraycopy(b, 1, b2, 0, 20);
+                b = b2;
+            }
+            SHA1Hash h = new SHA1Hash(b);
+            _blacklist.add(h);
+        }
+    }
 
     /**
      *  Create a new KeyStore object, and load it from ksFile if it is
@@ -261,64 +283,57 @@ public final class KeyStoreUtil {
 
     /**
      *  Remove all blacklisted X509 Certs in a key store.
-     *  Match by serial number and issuer CN, which should uniquely identify a cert,
-     *  if the CN is present. Should be faster than fingerprints.
      *
      *  @return number successfully removed
      *  @since 0.9.24
      */
     private static int removeBlacklistedCerts(KeyStore ks) {
-        // This matches on the CN or OU in the issuer,
-        // and we can't do that on Android.
-        // Alternative is sha1hash(cert.getEncoded()) but that would be slower,
-        // unless the blacklist gets a little longer.
         if (SystemVersion.isAndroid())
             return 0;
         int count = 0;
         try {
+            MessageDigest md = SHA1.getInstance();
             for(Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
                 if (ks.isCertificateEntry(alias)) {
                     Certificate c = ks.getCertificate(alias);
                     if (c != null && (c instanceof X509Certificate)) {
-                        X509Certificate xc = (X509Certificate) c;
-                        BigInteger serial = xc.getSerialNumber();
+                        //X509Certificate xc = (X509Certificate) c;
+                        //BigInteger serial = xc.getSerialNumber();
                         // debug:
                         //String xname = CertUtil.getIssuerValue(xc, "CN");
                         //info("Found \"" + xname + "\" s/n: " + serial.toString(16));
                         //if (xname == null)
                         //    info("name is null, full issuer: " + xc.getIssuerX500Principal().getName());
-                        for (int i = 0; i < BLACKLIST_SERIAL.length; i++) {
-                            if (BLACKLIST_SERIAL[i].equals(serial)) {
-                                if (BLACKLIST_ISSUER_CN[i] != null) {
-                                    String name = CertUtil.getIssuerValue(xc, "CN");
-                                    if (BLACKLIST_ISSUER_CN[i].equals(name)) {
-                                        ks.deleteEntry(alias);
-                                        count++;
-                                        if (!_blacklistLogged) {
-                                            // should this be a logAlways?
-                                            warn("Ignoring blacklisted certificate \"" + alias +
-                                                 "\" CN: \"" + name +
-                                                 "\" s/n: " + serial.toString(16), null);
-                                        }
-                                        break;
-                                    }
-                                }
-                                if (BLACKLIST_ISSUER_OU[i] != null) {
-                                    String name = CertUtil.getIssuerValue(xc, "OU");
-                                    if (BLACKLIST_ISSUER_OU[i].equals(name)) {
-                                        ks.deleteEntry(alias);
-                                        count++;
-                                        if (!_blacklistLogged) {
-                                            // should this be a logAlways?
-                                            warn("Ignoring blacklisted certificate \"" + alias +
-                                                 "\" OU: \"" + name +
-                                                 "\" s/n: " + serial.toString(16), null);
-                                        }
-                                        break;
-                                    }
+                        byte[] enc = c.getEncoded();
+                        if (enc != null) {
+                            byte[] h = md.digest(enc);
+                            //StringBuilder buf = new StringBuilder(60);
+                            //String hex = DataHelper.toString(h);
+                            //for (int i = 0; i < hex.length(); i += 2) {
+                            //    buf.append(hex.charAt(i));
+                            //    buf.append(hex.charAt(i+1));
+                            //    if (i < hex.length() - 2)
+                            //        buf.append(':');
+                            //}
+                            //info("hex is: " + buf);
+                            if (_blacklist.contains(new SHA1Hash(h))) {
+                                ks.deleteEntry(alias);
+                                count++;
+                                if (!_blacklistLogged) {
+                                    // should this be a logAlways?
+                                    X509Certificate xc = (X509Certificate) c;
+                                    BigInteger serial = xc.getSerialNumber();
+                                    String cn = CertUtil.getIssuerValue(xc, "CN");
+                                    String ou = CertUtil.getIssuerValue(xc, "OU");
+                                    warn("Ignoring blacklisted certificate \"" + alias +
+                                         "\" CN: \"" + cn +
+                                         "\" OU: \"" + ou +
+                                         "\" s/n: " + serial.toString(16), null);
                                 }
                             }
+                        } else {
+                            info("null encoding!!!");
                         }
                     }
                 }
@@ -1000,8 +1015,8 @@ public final class KeyStoreUtil {
 
     private static void testKeygen2(String[] args) throws Exception {
         // keygen test using the I2PProvider
-        //SigType type = SigType.EdDSA_SHA512_Ed25519;
-        SigType type = SigType.ElGamal_SHA256_MODP2048;
+        SigType type = SigType.EdDSA_SHA512_Ed25519;
+        //SigType type = SigType.ElGamal_SHA256_MODP2048;
         java.security.KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance(type.getBaseAlgorithm().getName());
         kpg.initialize(type.getParams());
         java.security.KeyPair kp = kpg.generateKeyPair();
