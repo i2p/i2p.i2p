@@ -21,8 +21,8 @@
 <%@include file="formhandler.jsi" %>
 
 <p><%=intl._t("Routers in the same family share a family key.")%>
-<%=intl._t("To start a new family, enter a family name.")%>
 <%=intl._t("To join an existing family, import the private key you exported from a router in the family.")%>
+<%=intl._t("To start a new family, enter a family name.")%>
 </p>
 
 <%
@@ -30,26 +30,26 @@
    if (family.length() <= 0) {
        // no family yet
 %>
-<div class="configure"><form action="" method="POST">
-<input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<h3><%=intl._t("Create Router Family")%></h3>
-<p><%=intl._t("Family Name")%> :
-<input name="family" type="text" size="30" value="" />
-</p>
-<div class="formaction">
-<input type="submit" name="action" class="accept" value="<%=intl._t("Create Router Family")%>" />
-</div></form></div>
-
 <div class="configure">
 <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<h3><%=intl._t("Join Router Family")%></h3>
+<h3><%=intl._t("Join Existing Router Family")%></h3>
 <p><%=intl._t("Import the secret family key that you exported from an existing router in the family.")%>
 <p><%=intl._t("Select secret key file")%> :
 <input name="file" type="file" value="" />
 </p>
 <div class="formaction">
-<input type="submit" name="action" class="download" value="<%=intl._t("Join Router Family")%>" />
+<input type="submit" name="action" class="download" value="<%=intl._t("Join Existing Router Family")%>" />
+</div></form></div>
+
+<div class="configure"><form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<h3><%=intl._t("Create New Router Family")%></h3>
+<p><%=intl._t("Family Name")%> :
+<input name="family" type="text" size="30" value="" />
+</p>
+<div class="formaction">
+<input type="submit" name="action" class="accept" value="<%=intl._t("Create New Router Family")%>" />
 </div></form></div>
 <%
    } else {
