@@ -24,7 +24,7 @@ import net.i2p.router.Banlist;
 /**
  *  Moved from Banlist.java
  */
-public class BanlistRenderer {
+class BanlistRenderer {
     private final RouterContext _context;
 
     public BanlistRenderer(RouterContext context) {

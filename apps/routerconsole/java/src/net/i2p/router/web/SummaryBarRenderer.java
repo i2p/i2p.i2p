@@ -23,7 +23,7 @@ import net.i2p.util.SystemVersion;
  *  Refactored from summarynoframe.jsp to save ~100KB
  *
  */
-public class SummaryBarRenderer {
+class SummaryBarRenderer {
 
     static final String ALL_SECTIONS[] =
         {"HelpAndFAQ", "I2PServices", "I2PInternals", "General", "ShortGeneral", "NetworkReachability",
