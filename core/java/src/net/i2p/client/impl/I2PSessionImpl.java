@@ -679,7 +679,16 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
         } catch (UnknownHostException uhe) {
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
-            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
+            // Generate the best error message as this will be logged
+            String msg;
+            if (_context.isRouterContext())
+                msg = "Failed to build tunnels";
+            else if (SystemVersion.isAndroid() &&
+                    Boolean.parseBoolean(_options.getProperty(PROP_DOMAIN_SOCKET)))
+                msg = "Failed to bind to the router and build tunnels";
+            else
+                msg = "Cannot connect to the router on " + _hostname + ':' + _portNum + " and build tunnels";
+            throw new I2PSessionException(getPrefix() + msg, ioe);
         } finally {
             if (success) {
                 changeState(State.OPEN);
