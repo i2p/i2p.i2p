@@ -1,3 +1,11 @@
+2016-02-22 zzz
+ * Console: Improve news CSS (ticket #1710)
+ * Crypto: Blacklist certificates by SHA1 hash, not by serial/CN/OU
+ * I2CP: Improve client error message when internal router connection fails 
+ * Graphs: Increase font size
+ * Transports: Increase default max inbound bandwidth,
+   increase minimum in/out bandwidths
+
 2016-02-19 zzz
  * Clock: Add sanity checks to detect invalid system clock
 
