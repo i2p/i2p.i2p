@@ -97,7 +97,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
             if (howLongAgo > MAX_TIME_TO_REBUILD) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Client " + dest.calculateHash().toBase64().substring(0,6)
-                               + " has a leaseSet that expired " + DataHelper.formatDuration(howLongAgo));
+                               + " has a leaseSet that expired " + DataHelper.formatDuration(howLongAgo) + " ago");
                 lively = false;
             }
         }
