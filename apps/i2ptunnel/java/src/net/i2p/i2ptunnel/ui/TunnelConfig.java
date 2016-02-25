@@ -560,6 +560,13 @@ public class TunnelConfig {
             }
         }
 
+        // override bundle setting set above
+        if (!TunnelController.isClient(_type) &&
+            !TunnelController.TYPE_HTTP_SERVER.equals(_type) &&
+            !TunnelController.TYPE_STREAMR_SERVER.equals(_type)) {
+            config.setProperty(TunnelController.OPT_BUNDLE_REPLY, "true");
+        }
+
         // generic proxy stuff
         if (TunnelController.TYPE_HTTP_CLIENT.equals(_type) || TunnelController.TYPE_CONNECT.equals(_type) || 
             TunnelController.TYPE_SOCKS.equals(_type) ||TunnelController.TYPE_SOCKS_IRC.equals(_type)) {
