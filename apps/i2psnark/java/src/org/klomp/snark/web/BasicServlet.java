@@ -378,7 +378,7 @@ class BasicServlet extends HttpServlet
     {   
         if (content.getContentType()!=null && response.getContentType()==null)
             response.setContentType(content.getContentType());
-        
+        response.setHeader("X-Content-Type-Options", "nosniff");
         long lml = content.getLastModified();
         if (lml > 0)
             response.setDateHeader("Last-Modified",lml);
@@ -394,7 +394,6 @@ class BasicServlet extends HttpServlet
         long ct = content.getCacheTime();
         if (ct>=0)
             response.setHeader("Cache-Control", "public, max-age=" + ct);
-
     }
 
     /* ------------------------------------------------------------ */

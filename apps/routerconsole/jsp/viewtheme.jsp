@@ -21,6 +21,7 @@ if (uri.endsWith(".css")) {
 } else if (uri.endsWith(".svg")) {
   response.setContentType("image/svg+xml");
 }
+response.setHeader("X-Content-Type-Options", "nosniff");
 /*
  * User or plugin themes
  * If the request is for /themes/console/foo/bar/baz,

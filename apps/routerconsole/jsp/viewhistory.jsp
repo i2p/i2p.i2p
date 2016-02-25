@@ -7,6 +7,7 @@
  * Do not tag this file for translation.
  */
 response.setContentType("text/plain");
+response.setHeader("X-Content-Type-Options", "nosniff");
 String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
 try {
     net.i2p.util.FileUtil.readFile("history.txt", base, response.getOutputStream());

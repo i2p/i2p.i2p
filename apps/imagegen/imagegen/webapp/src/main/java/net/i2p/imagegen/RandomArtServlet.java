@@ -62,6 +62,7 @@ public class RandomArtServlet extends HttpServlet {
 					response.setContentType("text/plain");
 					response.setCharacterEncoding("UTF-8");
 				}
+				response.setHeader("X-Content-Type-Options", "nosniff");
 				buf.append(RandomArt.gnutls_key_fingerprint_randomart(h.getData(), "SHA", 256, "", true, html));
 				if (html)
 					buf.append("</body></html>");

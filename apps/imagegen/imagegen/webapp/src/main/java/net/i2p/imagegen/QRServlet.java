@@ -191,6 +191,7 @@ public class QRServlet extends HttpServlet {
 
 			// return image bytes to requester
 			response.setContentType(IDENTICON_IMAGE_MIMETYPE);
+			response.setHeader("X-Content-Type-Options", "nosniff");
 			response.setContentLength(imageBytes.length);
 			response.getOutputStream().write(imageBytes);
 		}

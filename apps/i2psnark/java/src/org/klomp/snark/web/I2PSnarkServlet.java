@@ -379,6 +379,7 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
+        resp.setHeader("X-Content-Type-Options", "nosniff");
     }
 
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
