@@ -354,6 +354,7 @@ public class CPUID {
         System.out.println("CPU has SSE4.1: " + c.hasSSE41());
         System.out.println("CPU has SSE4.2: " + c.hasSSE42());
         System.out.println("CPU has SSE4A:  " + c.hasSSE4A());
+        System.out.println("CPU has AES-NI: " + c.hasAES());
         System.out.println("CPU has AVX:    " + c.hasAVX());
         System.out.println("CPU has AVX2:   " + c.hasAVX2());
         System.out.println("CPU has AVX512: " + c.hasAVX512());
