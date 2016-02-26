@@ -226,26 +226,49 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <%=intl._t("Local destination")%>(<span class="accessKey">L</span>):
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
-         <% String b64 = editBean.getDestinationBase64(curTunnel);
-            if (!"".equals(b64)) {
-                String name = editBean.getSpoofedHost(curTunnel);
-                if (name == null || name.equals(""))
-                    name = editBean.getTunnelName(curTunnel);
-                if (!"".equals(name)) { %>
-                    <a href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>    
-         <%     }
-            } %>
             </div>
 
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+                   String sig = editBean.getNameSignature(curTunnel);
+                   if (sig.length() > 0) {
           %><div id="sigField" class="rowItem">
                 <label for="signature">
                     <%=intl._t("Hostname Signature")%>
                 </label>
-                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=editBean.getNameSignature(curTunnel)%>" wrap="off" class="freetext" />                
+                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=sig%>" wrap="off" class="freetext" />                
             </div>
-            <% } %>
+         <%
+                   }  // sig
+               }  // type
 
+            String b64 = editBean.getDestinationBase64(curTunnel);
+            if (!"".equals(b64)) {
+         %>
+            <div id="destinationField" class="rowItem">
+        <%
+                b64 = b64.replace("=", "%3d");
+                String name = editBean.getSpoofedHost(curTunnel);
+                if (name == null || name.equals(""))
+                    name = editBean.getTunnelName(curTunnel);
+                if (name != null && !name.equals("") && !name.contains(" ") && name.endsWith(".i2p")) {
+         %>
+              <label>
+              <a class="control" title="<%=intl._t("Generate QR code")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=b64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
+              </label>
+              <a class="control" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>    
+        <%
+                } else {
+          %>
+              <label> </label>
+              <span class="comment"><%=intl._t("Set name with .i2p suffix to enable QR code generation")%></span>
+        <%
+                }  // name
+         %>
+            </div>
+        <%
+            }  // b64
+
+         %>
             <div class="footer">
             </div>
         </div>

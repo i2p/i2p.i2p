@@ -8,6 +8,7 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -79,7 +80,10 @@ public class EditBean extends IndexBean {
             return "";
         String keyFile = tun.getPrivKeyFile();
         if (keyFile != null && keyFile.trim().length() > 0) {
-            PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
+            File f = new File(keyFile);
+            if (!f.isAbsolute())
+                f = new File(_context.getConfigDir(), keyFile);
+            PrivateKeyFile pkf = new PrivateKeyFile(f);
             try {
                 Destination d = pkf.getDestination();
                 if (d == null)
@@ -87,8 +91,9 @@ public class EditBean extends IndexBean {
                 SigningPrivateKey privKey = pkf.getSigningPrivKey();
                 if (privKey == null)
                     return "";
-                //System.err.println("Signing " + spoof + " with " + Base64.encode(privKey.getData()));
                 Signature sig = _context.dsa().sign(spoof.getBytes("UTF-8"), privKey);
+                if (sig == null)
+                    return "";
                 return Base64.encode(sig.getData());
             } catch (I2PException e) {
             } catch (IOException e) {}
