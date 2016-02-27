@@ -267,13 +267,21 @@ public class GeneralHelper {
     public String getPrivateKeyFile(int tunnel) {
         return getPrivateKeyFile(_group, tunnel);
     }
-    public static String getPrivateKeyFile(TunnelControllerGroup tcg, int tunnel) {
+
+    public String getPrivateKeyFile(TunnelControllerGroup tcg, int tunnel) {
         TunnelController tun = getController(tcg, tunnel);
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
         if (tunnel < 0)
             tunnel = tcg == null ? 999 : tcg.getControllers().size();
-        return "i2ptunnel" + tunnel + "-privKeys.dat";
+        String rv = "i2ptunnel" + tunnel + "-privKeys.dat";
+        // Don't default to a file that already exists,
+        // which could happen after other tunnels are deleted.
+        int i = 0;
+        while ((new File(_context.getConfigDir(), rv)).exists()) {
+            rv = "i2ptunnel" + tunnel + '.' + (++i) + "-privKeys.dat";
+        }
+        return rv;
     }
 
     public String getClientInterface(int tunnel) {

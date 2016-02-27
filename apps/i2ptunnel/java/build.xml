@@ -235,6 +235,7 @@
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="build/i2ptunnel.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp" />
+            <srcfiles dir= "build/obj" includes="**/ui/*.class **/web/*.class" />
         </uptodate>
         <condition property="shouldListChanges2" >
             <and>
