@@ -108,7 +108,6 @@ public class EdDSAEngineTest {
 
     @Test
     public void testVerifyResetsForReuse() throws Exception {
-        //Signature sgr = Signature.getInstance("EdDSA", "I2P");
         Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
 
         EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(TEST_PK,
@@ -123,5 +122,93 @@ public class EdDSAEngineTest {
         // Second usage
         sgr.update(TEST_MSG);
         assertThat("Second verify failed", sgr.verify(TEST_MSG_SIG), is(true));
+    }
+
+    @Test
+    public void testSignOneShotMode() throws Exception {
+        Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+        EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+
+        EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(TEST_SEED, spec);
+        PrivateKey sKey = new EdDSAPrivateKey(privKey);
+        sgr.initSign(sKey);
+        sgr.setParameter(EdDSAEngine.ONE_SHOT_MODE);
+
+        sgr.update(TEST_MSG);
+
+        assertThat("One-shot mode sign failed", sgr.sign(), is(equalTo(TEST_MSG_SIG)));
+    }
+
+    @Test
+    public void testVerifyOneShotMode() throws Exception {
+        Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+
+        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(TEST_PK,
+                EdDSANamedCurveTable.getByName("ed25519-sha-512"));
+        PublicKey vKey = new EdDSAPublicKey(pubKey);
+        sgr.initVerify(vKey);
+        sgr.setParameter(EdDSAEngine.ONE_SHOT_MODE);
+
+        sgr.update(TEST_MSG);
+
+        assertThat("One-shot mode verify failed", sgr.verify(TEST_MSG_SIG), is(true));
+    }
+
+    @Test
+    public void testSignOneShotModeMultipleUpdates() throws Exception {
+        Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+        EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+
+        EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(TEST_SEED, spec);
+        PrivateKey sKey = new EdDSAPrivateKey(privKey);
+        sgr.initSign(sKey);
+        sgr.setParameter(EdDSAEngine.ONE_SHOT_MODE);
+
+        sgr.update(TEST_MSG);
+
+        exception.expect(SignatureException.class);
+        exception.expectMessage("update() already called");
+        sgr.update(TEST_MSG);
+    }
+
+    @Test
+    public void testVerifyOneShotModeMultipleUpdates() throws Exception {
+        Signature sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+
+        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(TEST_PK,
+                EdDSANamedCurveTable.getByName("ed25519-sha-512"));
+        PublicKey vKey = new EdDSAPublicKey(pubKey);
+        sgr.initVerify(vKey);
+        sgr.setParameter(EdDSAEngine.ONE_SHOT_MODE);
+
+        sgr.update(TEST_MSG);
+
+        exception.expect(SignatureException.class);
+        exception.expectMessage("update() already called");
+        sgr.update(TEST_MSG);
+    }
+
+    @Test
+    public void testSignOneShot() throws Exception {
+        EdDSAEngine sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+        EdDSAParameterSpec spec = EdDSANamedCurveTable.getByName("ed25519-sha-512");
+
+        EdDSAPrivateKeySpec privKey = new EdDSAPrivateKeySpec(TEST_SEED, spec);
+        PrivateKey sKey = new EdDSAPrivateKey(privKey);
+        sgr.initSign(sKey);
+
+        assertThat("signOneShot() failed", sgr.signOneShot(TEST_MSG), is(equalTo(TEST_MSG_SIG)));
+    }
+
+    @Test
+    public void testVerifyOneShot() throws Exception {
+        EdDSAEngine sgr = new EdDSAEngine(MessageDigest.getInstance("SHA-512"));
+
+        EdDSAPublicKeySpec pubKey = new EdDSAPublicKeySpec(TEST_PK,
+                EdDSANamedCurveTable.getByName("ed25519-sha-512"));
+        PublicKey vKey = new EdDSAPublicKey(pubKey);
+        sgr.initVerify(vKey);
+
+        assertThat("verifyOneShot() failed", sgr.verifyOneShot(TEST_MSG, TEST_MSG_SIG), is(true));
     }
 }
