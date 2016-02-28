@@ -33,7 +33,7 @@ import net.i2p.crypto.eddsa.math.ScalarOps;
  *Option 1:
  *</p><ol>
  *<li>Call initSign() or initVerify() as usual.
- *</li><li>Call setParameter(ONE_SHOT_MOE)
+ *</li><li>Call setParameter(ONE_SHOT_MODE)
  *</li><li>Call update(byte[]) or update(byte[], int, int) exactly once
  *</li><li>Call sign() or verify() as usual.
  *</li><li>If doing additional one-shot signs or verifies with this object, you must
