@@ -52,6 +52,16 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract LeaseSet lookupLeaseSetLocally(Hash key);
     public abstract void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs);
     public abstract RouterInfo lookupRouterInfoLocally(Hash key);
+    
+    /**
+     *  Unconditionally lookup using the client's tunnels.
+     *  No success or failed jobs, no local lookup, no checks.
+     *  Use this to refresh a leaseset before expiration.
+     *
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @since 0.9.25
+     */
+    public abstract void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest);
 
     /**
      *  Lookup using the client's tunnels

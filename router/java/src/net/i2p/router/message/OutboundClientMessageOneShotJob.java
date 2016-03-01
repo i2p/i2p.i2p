@@ -281,6 +281,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             //getContext().statManager().addRateData("client.leaseSetFoundLocally", 1);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
+
+            if (!_leaseSet.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
+                // If it's about to expire, refetch in the background, we'll
+                // probably need it again. This will prevent stalls later.
+                // We don't know if the other end is actually publishing his LS, so this could be a waste of time.
+                // When we move to LS2, we will have a bit that tells us if it is published.
+                if (_log.shouldWarn()) {
+                    long exp = now - _leaseSet.getLatestLeaseDate();
+                    _log.warn(getJobId() + ": leaseSet expired " + DataHelper.formatDuration(exp) + " ago, firing search: " + _leaseSet.getHash().toBase32());
+                }
+                getContext().netDb().lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
+            }
+
             success.runJob();
         } else {
             _leaseSetLookupBegin = getContext().clock().now();

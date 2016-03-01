@@ -1500,7 +1500,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long sinceSelected = _context.clock().now() - _introducersSelectedOn;
             if (valid >= PUBLIC_RELAY_COUNT) {
                 // try to shift 'em around every 10 minutes or so
-                if (sinceSelected > 10*60*1000) {
+                if (sinceSelected > 17*60*1000) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Our introducers are valid, but haven't changed in " + DataHelper.formatDuration(sinceSelected) + ", so lets rechoose");
                     return true;

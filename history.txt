@@ -1,3 +1,12 @@
+2016-03-01 zzz
+ * i2psnark: Fix handling of HAVE messages received before metainfo
+ * i2ptunnel: Don't default to a private key file that exists (ticket #1628)
+ * NetDb:
+   - Search for new leaseset before expiration;
+   - Reduce expiration for router infos with introducers
+   - Add missing reseed cert
+ * SSU: Switch introducers less often
+
 2016-02-26 zzz
  * Console:
    - Add X-Content-Type-Options header everywhere (ticket #1763)
@@ -8,6 +17,8 @@
    - Add QR code generation
  * Router: Log full path to wrapper.log when dumping threads
  * Transports: Increase connection limits for class N and higher
+ * Utils: Add main classes to i2p.jar and router.jar
+   for simple command line access to utilities
 
 2016-02-22 zzz
  * Console: Improve news CSS (ticket #1710)

@@ -133,6 +133,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final static long ROUTER_INFO_EXPIRATION_MIN = 90*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 75*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_INTRODUCED = 45*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
 
@@ -493,7 +494,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     /**
      *  Lookup using exploratory tunnels.
-     *  Use lookupDestination() if you don't need the LS or need it validated.
+     *  Use lookupDestination() if you don't need the LS or don't need it validated.
      */
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         lookupLeaseSet(key, onFindJob, onFailedLookupJob, timeoutMs, null);
@@ -501,7 +502,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     /**
      *  Lookup using the client's tunnels
-     *  Use lookupDestination() if you don't need the LS or need it validated.
+     *  Use lookupDestination() if you don't need the LS or don't need it validated.
      *
      *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      *  @since 0.9.10
@@ -511,26 +512,39 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_initialized) return;
         LeaseSet ls = lookupLeaseSetLocally(key);
         if (ls != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("leaseSet found locally, firing " + onFindJob);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("leaseSet found locally, firing " + onFindJob);
             if (onFindJob != null)
                 _context.jobQueue().addJob(onFindJob);
         } else if (isNegativeCached(key)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Negative cached, not searching: " + key);
+                _log.warn("Negative cached, not searching LS: " + key);
             if (onFailedLookupJob != null)
                 _context.jobQueue().addJob(onFailedLookupJob);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("leaseSet not found locally, running search");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("leaseSet not found locally, running search");
             search(key, onFindJob, onFailedLookupJob, timeoutMs, true, fromLocalDest);
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("after lookupLeaseSet");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("after lookupLeaseSet");
     }
     
     /**
-     *  Use lookupDestination() if you don't need the LS or need it validated.
+     *  Unconditionally lookup using the client's tunnels.
+     *  No success or failed jobs, no local lookup, no checks.
+     *  Use this to refresh a leaseset before expiration.
+     *
+     *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
+     *  @since 0.9.25
+     */
+    public void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest) {
+        if (!_initialized) return;
+        search(key, null, null, 20*1000, true, fromLocalDest);
+    }
+
+    /**
+     *  Use lookupDestination() if you don't need the LS or don't need it validated.
      */
     public LeaseSet lookupLeaseSetLocally(Hash key) {
         if (!_initialized) return null;
@@ -571,6 +585,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         Destination d = lookupDestinationLocally(key);
         if (d != null) {
             _context.jobQueue().addJob(onFinishedJob);
+        } else if (isNegativeCached(key)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Negative cached, not searching dest: " + key);
         } else {
             search(key, onFinishedJob, onFinishedJob, timeoutMs, true, fromLocalDest);
         }
@@ -605,6 +622,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else if (_context.banlist().isBanlistedForever(key)) {
             if (onFailedLookupJob != null)
                 _context.jobQueue().addJob(onFailedLookupJob);
+        } else if (isNegativeCached(key)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Negative cached, not searching RI: " + key);
         } else {
             search(key, onFindJob, onFailedLookupJob, timeoutMs, false);
         }
@@ -957,25 +977,28 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                           + new Date(routerInfo.getPublished()) + "]", new Exception());
             return "Peer published " + DataHelper.formatDuration(age) + " in the future?!";
         }
+        if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_INTRODUCED)) {
+            if (routerInfo.getAddresses().isEmpty())
+                return "Old peer with no addresses";
+            // This should cover the introducers case below too
+            // And even better, catches the case where the router is unreachable but knows no introducers
+            if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                return "Old peer and thinks it is unreachable";
+            // FIXME check all SSU addresses, not just first
+            RouterAddress ra = routerInfo.getTargetAddress("SSU");
+            if (ra != null) {
+                // Introducers change often, introducee will ping introducer for 2 hours
+                if (ra.getOption("ihost0") != null)
+                    return "Old peer with SSU Introducers";
+            }
+        }
         if (upLongEnough && (routerInfo.getPublished() < now - 2*24*60*60*1000l) ) {
             long age = _context.clock().now() - routerInfo.getPublished();
             return "Peer published " + DataHelper.formatDuration(age) + " ago";
         }
         if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
-            if (routerInfo.getAddresses().isEmpty())
-                return "Peer published > 75m ago with no addresses";
-            // This should cover the introducers case below too
-            // And even better, catches the case where the router is unreachable but knows no introducers
-            if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
-                return "Peer published > 75m ago and thinks it is unreachable";
-            RouterAddress ra = routerInfo.getTargetAddress("SSU");
-            if (ra != null) {
-                // Introducers change often, introducee will ping introducer for 2 hours
-                if (ra.getOption("ihost0") != null)
-                    return "Peer published > 75m ago with SSU Introducers";
-                if (routerInfo.getTargetAddress("NTCP") == null)
-                    return "Peer published > 75m ago, SSU only without introducers";
-            }
+            if (routerInfo.getTargetAddress("NTCP") == null)
+                return "Peer published > 75m ago, SSU only without introducers";
         }
         return null;
     }
