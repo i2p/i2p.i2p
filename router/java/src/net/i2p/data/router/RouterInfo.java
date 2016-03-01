@@ -187,7 +187,7 @@ public class RouterInfo extends DatabaseEntry {
      * @return unmodifiable view, non-null
      */
     public Collection<RouterAddress> getAddresses() {
-            return Collections.unmodifiableCollection(_addresses);
+            return Collections.unmodifiableList(_addresses);
     }
 
     /**

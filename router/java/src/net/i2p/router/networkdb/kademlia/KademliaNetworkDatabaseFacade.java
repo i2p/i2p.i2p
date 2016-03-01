@@ -984,9 +984,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // And even better, catches the case where the router is unreachable but knows no introducers
             if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
                 return "Old peer and thinks it is unreachable";
-            // FIXME check all SSU addresses, not just first
-            RouterAddress ra = routerInfo.getTargetAddress("SSU");
-            if (ra != null) {
+            // Just check all the addresses, faster than getting just the SSU ones
+            for (RouterAddress ra : routerInfo.getAddresses()) {
                 // Introducers change often, introducee will ping introducer for 2 hours
                 if (ra.getOption("ihost0") != null)
                     return "Old peer with SSU Introducers";
