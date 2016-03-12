@@ -36,11 +36,11 @@ fi
 
 if [ $BITS -eq 32 ]; then
   export ABI=32
-  export CFLAGS="-m32"
+  export CFLAGS="-m32 -mtune=i686 -march=i686"
   export LDFLAGS="-m32"
 elif [ $BITS -eq 64 ]; then
   export ABI=64
-  export CFLAGS="-m64"
+  export CFLAGS="-m64 -mtune=generic"
   export LDFLAGS="-m64"
 else
   printf "\aBITS value \"$BITS\" not valid, please select 32 or 64\n\a" >&2
@@ -83,7 +83,7 @@ case $TARGET in
     Darwin*)
         JAVA_HOME=$(/usr/libexec/java_home)
         CFLAGS="${CFLAGS} -fPIC -Wall -arch x86_64 -arch i386"
-        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/"
+        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/dawrin/"
         LDFLAGS="${LDFLAGS} -dynamiclib -framework JavaVM"
         LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
     Linux*|OpenBSD*|NetBSD*|*FreeBSD*|SunOS*)
@@ -118,6 +118,9 @@ echo "CC_PREFIX:$CC_PREFIX"
 echo "TARGET:$TARGET"
 echo "HOST:$HOST"
 echo "ARCH:$ARCH"
+echo "CFLAGS:$CFLAGS"
+echo "LDFLAGS:$LDFLAGS"
+echo ""
 
 echo "Compiling C code..."
 rm -f ${LIBFILE}
