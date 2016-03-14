@@ -1,3 +1,10 @@
+2016-03-14 zzz
+ * Console: Replace pastethis with zerobin
+ * Peer selection: Don't truncate data used for random slice
+ * Router: Fix corner cases maintaining local leasesets (ticket #1768)
+ * Susimail: Fix NPE
+ * UPnP: Fix NPE in HTML output on /peers (ticket #1779)
+
 2016-03-01 zzz
  * i2psnark: Fix handling of HAVE messages received before metainfo
  * i2ptunnel: Don't default to a private key file that exists (ticket #1628)
