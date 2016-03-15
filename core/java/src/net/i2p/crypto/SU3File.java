@@ -628,7 +628,7 @@ public class SU3File {
         System.err.println("Usage: SU3File keygen       [-t type|code] [-p keystorepw] [-r crlFile.crl] publicKeyFile.crt keystore.ks you@mail.i2p\n" +
                            "       SU3File sign         [-t type|code] [-c type|code] [-f type|code] [-p keystorepw] inputFile.zip signedFile.su3 keystore.ks version you@mail.i2p\n" +
                            "       SU3File bulksign     [-t type|code] [-c type|code] [-p keystorepw] directory keystore.ks version you@mail.i2p\n" +
-                           "                            (signs all .zip and .xml files in the directory)\n" +
+                           "                            (signs all .zip, .xml, and .xml.gz files in the directory)\n" +
                            "       SU3File showversion  signedFile.su3\n" +
                            "       SU3File verifysig    [-k file.crt] signedFile.su3  ## -k use this pubkey cert for verification\n" +
                            "       SU3File extract      [-x] [-k file.crt] signedFile.su3 outFile   ## -x don't check sig");
@@ -762,7 +762,8 @@ public class SU3File {
         int success = 0;
         for (File in : files) {
             String inputFile = in.getPath();
-            if (!inputFile.endsWith(".zip") && !inputFile.endsWith(".xml"))
+            if (!inputFile.endsWith(".zip") && !inputFile.endsWith(".xml") &&
+                !inputFile.endsWith(".xml.gz"))
                 continue;
             String signedFile = inputFile.substring(0, inputFile.length() - 4) + ".su3";
             boolean rv = signCLI(stype, ctype, null, inputFile, signedFile,
