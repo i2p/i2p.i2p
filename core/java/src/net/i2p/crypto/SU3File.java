@@ -725,7 +725,7 @@ public class SU3File {
     }
 
     /**
-     *  Zip only
+     *  Zip, xml, and xml.gz only
      *  @return success
      *  @since 0.9.9
      */
@@ -762,11 +762,22 @@ public class SU3File {
         int success = 0;
         for (File in : files) {
             String inputFile = in.getPath();
-            if (!inputFile.endsWith(".zip") && !inputFile.endsWith(".xml") &&
-                !inputFile.endsWith(".xml.gz"))
+            int len;
+            String ftype;
+            if (inputFile.endsWith(".zip")) {
+                len = 4;
+                ftype = "ZIP";
+            } else if (inputFile.endsWith(".xml")) {
+                len = 4;
+                ftype = "XML";
+            } else if (inputFile.endsWith(".xml.gz")) {
+                len = 7;
+                ftype = "XML_GZ";
+            } else {
                 continue;
-            String signedFile = inputFile.substring(0, inputFile.length() - 4) + ".su3";
-            boolean rv = signCLI(stype, ctype, null, inputFile, signedFile,
+            }
+            String signedFile = inputFile.substring(0, inputFile.length() - len) + ".su3";
+            boolean rv = signCLI(stype, ctype, ftype, inputFile, signedFile,
                                  privateKeyFile, version, signerName, keypw, kspass);
             if (!rv)
                 return false;
