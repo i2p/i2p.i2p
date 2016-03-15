@@ -87,8 +87,8 @@ public class ConfigUpdateHandler extends FormHandler {
     //"http://meeh.i2p/i2pupdate/i2pupdate.su2\r\n" +
     "http://stats.i2p/i2p/i2pupdate.su2\r\n" +
     // "http://www.i2p2.i2p/_static/i2pupdate.su2\r\n" +
-    "http://update.dg.i2p/files/i2pupdate.su2\r\n" +
-    "http://update.killyourtv.i2p/i2pupdate.su2\r\n" ;
+    "http://update.dg.i2p/files/i2pupdate.su2";
+    //"http://update.killyourtv.i2p/i2pupdate.su2\r\n" ;
     // "http://update.postman.i2p/i2pupdate.su2" ;
 
     private static final String NO_PACK200_URLS =
@@ -97,8 +97,8 @@ public class ConfigUpdateHandler extends FormHandler {
     //"http://meeh.i2p/i2pupdate/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
     // "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
-    "http://update.dg.i2p/files/i2pupdate.sud\r\n" +
-    "http://update.killyourtv.i2p/i2pupdate.sud\r\n" ;
+    "http://update.dg.i2p/files/i2pupdate.sud";
+    //"http://update.killyourtv.i2p/i2pupdate.sud\r\n" ;
     // "http://update.postman.i2p/i2pupdate.sud" ;
 
     /**
@@ -131,8 +131,8 @@ public class ConfigUpdateHandler extends FormHandler {
     //"http://meeh.i2p/i2pupdate/i2pupdate.su3\r\n" +
     "http://stats.i2p/i2p/i2pupdate.su3\r\n" +
     // "http://www.i2p2.i2p/_static/i2pupdate.su3\r\n" +
-    "http://update.dg.i2p/files/i2pupdate.su3\r\n" +
-    "http://update.killyourtv.i2p/i2pupdate.su3\r\n" ;
+    "http://update.dg.i2p/files/i2pupdate.su3";
+    //"http://update.killyourtv.i2p/i2pupdate.su3\r\n" ;
     // "http://update.postman.i2p/i2pupdate.su3" ;
 
     /**
