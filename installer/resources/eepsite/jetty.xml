@@ -272,6 +272,14 @@
       </Call>
     </Ref>
 
+    <!-- ===================== -->
+    <!-- DefaultHandler config -->
+    <!-- http://stackoverflow.com/questions/4202275/how-to-prevent-jetty-from-showing-context-related-information -->
+    <!-- ===================== -->
+    <Ref id="DefaultHandler">
+      <Set name="showContexts">false</Set>
+    </Ref>
+
     <!-- =========================================================== -->
     <!-- Configure Authentication Realms                             -->
     <!-- Realms may be configured for the entire server here, or     -->
