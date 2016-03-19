@@ -71,9 +71,8 @@ public class StatisticsManager {
     public Properties publishStatistics(Hash h) { 
         Properties stats = new Properties();
         stats.setProperty("router.version", RouterVersion.VERSION);
-        // scheduled for removal, never used
-        if (CoreVersion.VERSION.equals("0.9.23"))
-            stats.setProperty("coreVersion", CoreVersion.VERSION);
+        // never used
+        //stats.setProperty("coreVersion", CoreVersion.VERSION);
         stats.setProperty(RouterInfo.PROP_NETWORK_ID, _networkID);
         stats.setProperty(RouterInfo.PROP_CAPABILITIES, _context.router().getCapabilities());
 
@@ -168,9 +167,7 @@ public class StatisticsManager {
         }
 
         // So that we will still get build requests - not required since 0.7.9 2010-01-12
-        // scheduled for removal
-        if (CoreVersion.VERSION.equals("0.9.23"))
-            stats.setProperty("stat_uptime", "90m");
+        //stats.setProperty("stat_uptime", "90m");
         if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
             int ri = _context.router().getUptime() > 30*60*1000 ?
                      _context.netDb().getKnownRouters() :

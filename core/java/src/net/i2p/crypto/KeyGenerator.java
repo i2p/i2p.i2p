@@ -15,6 +15,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.ProviderException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -416,19 +417,30 @@ public final class KeyGenerator {
         else
             System.out.println(type + " private-to-public test FAILED");
         //System.out.println("privkey " + keys[1]);
+          MessageDigest md = type.getDigestInstance();
         for (int i = 0; i < runs; i++) {
             RandomSource.getInstance().nextBytes(src);
+              md.update(src);
+              byte[] sha = md.digest();
+              SimpleDataStructure hash = type.getHashInstance();
+              hash.setData(sha);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, privkey);
+            Signature sig2 = DSAEngine.getInstance().sign(hash, privkey);
             if (sig == null)
                 throw new GeneralSecurityException("signature generation failed");
+            if (sig2 == null)
+                throw new GeneralSecurityException("signature generation (H) failed");
             long mid = System.nanoTime();
             boolean ok = DSAEngine.getInstance().verifySignature(sig, src, pubkey);
+            boolean ok2 = DSAEngine.getInstance().verifySignature(sig2, hash, pubkey);
             long end = System.nanoTime();
             stime += mid - start;
             vtime += end - mid;
             if (!ok)
                 throw new GeneralSecurityException(type + " V(S(data)) fail");
+            if (!ok2)
+                throw new GeneralSecurityException(type + " V(S(H(data))) fail");
         }
         stime /= 1000*1000;
         vtime /= 1000*1000;
