@@ -15,10 +15,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-15 12:43+0000\n"
+"POT-Creation-Date: 2015-11-05 17:12+0000\n"
+"PO-Revision-Date: 2015-10-04 14:17+0000\n"
 "Last-Translator: Maxym Mykhalchuk\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -130,7 +130,7 @@ msgstr "Показаны {0} из {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:432
 msgid "Add"
 msgstr "Добавить"
 
@@ -138,7 +138,7 @@ msgstr "Добавить"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:430
 msgid "Replace"
 msgstr "Заменить"
 
@@ -200,7 +200,7 @@ msgstr "Удалить"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:354
 msgid "Delete Selected"
 msgstr "Удалить выделенное"
 
@@ -239,7 +239,7 @@ msgstr "ОШИБКА: Не удалось сохранить файл адрес
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -248,14 +248,14 @@ msgstr "Форма не принята, скорее всего это прои�
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:159
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr "Если проблема сохраняется, проверьте, что в Вашем браузере разрешены cookies"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid "Save"
@@ -266,7 +266,7 @@ msgid "Configuration saved."
 msgstr "Настройки сохранены."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Reload"
@@ -295,16 +295,16 @@ msgstr "Не удалось добавить адрес назначения д�
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "Не удалось удалить адрес назначения для {0} из сервиса именования {1}"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:140
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr "Подписки сохранены, запущена загрузка подписок и обновление адресной книги."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions saved."
 msgstr "Подписки сохранены."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions reloaded."
 msgstr "Подписки перезагружены."
 
@@ -415,54 +415,54 @@ msgstr "сбросить фильтр"
 msgid "Search"
 msgstr "Поиск"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:249
 msgid "Name"
 msgstr "Имя"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:251
 msgid "Links"
 msgstr "Ссылки"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:253
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:424
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:288
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:289
 msgid "Mark for deletion"
 msgstr "Пометить для удаления"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:308
 msgid "Base 32 address"
 msgstr "Base 32 адрес"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
 msgid "More information on this entry"
 msgstr "Больше информации об этом пункте"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:315
 msgid "details"
 msgstr "детали"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:352
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:428
 msgid "Cancel"
 msgstr "Отмена"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:379
 msgid "Export in hosts.txt format"
 msgstr "Экспортировать в формате hosts.txt"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:403
 msgid "This address book is empty."
 msgstr "Эта адресная книга пуста."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:418
 msgid "Add new destination"
 msgstr "Добавить новый адрес"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:420
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
 msgid "Host Name"
 msgstr "Имя хоста"

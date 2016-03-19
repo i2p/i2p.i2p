@@ -6,20 +6,21 @@
 # Translators:
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
-# Роман Азаренко <transifex@basicxp.ru>, 2013
+# Foster Snowhill, 2013
+# brianhopes <voganc-12@live.ru>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-03 18:29+0000\n"
-"PO-Revision-Date: 2013-12-04 11:46+0000\n"
-"Last-Translator: Bergitte <alvina_alexandrova@mail.ru>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
+"POT-Creation-Date: 2014-01-09 19:27+0000\n"
+"PO-Revision-Date: 2015-11-01 08:19+0000\n"
+"Last-Translator: brianhopes <voganc-12@live.ru>\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru_RU\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:23
 msgid "Start I2P"
@@ -39,7 +40,7 @@ msgstr "Запустить браузер I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:50
 msgid "Configure desktopgui"
-msgstr "Настроить desktopgui"
+msgstr "Настроить рабочий стол"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Restart I2P"
@@ -49,10 +50,10 @@ msgstr "Перезапустить I2P"
 msgid "Stop I2P"
 msgstr "Остановить I2P"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:43
 msgid "Tray icon configuration"
 msgstr "Конфигурация значка в области уведомлений"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:46
 msgid "Should tray icon be enabled?"
 msgstr "Отображать ли значок в области уведомлений?"
