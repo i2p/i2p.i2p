@@ -293,6 +293,7 @@ public class RouterConsoleRunner implements RouterApp {
     private void checkJavaVersion() {
         boolean noJava7 = !SystemVersion.isJava7();
         boolean noPack200 = !FileUtil.isPack200Supported();
+        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
         if (noJava7 || noPack200) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
@@ -302,12 +303,17 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava7) {
-                s = "Java 7 will be required by late 2015, please upgrade soon";
+                s = "Java 7 is now required, please upgrade";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 will be required by late 2015, please upgrade Java soon";
+                s = "Pack200 is required for automatic updates, please upgrade Java";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+            if (openARM) {
+                s = "OpenJDK is not recommended for ARM. Use Oracle Java 8";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }

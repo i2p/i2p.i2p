@@ -26,6 +26,7 @@ public abstract class SystemVersion {
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
+    private static final boolean _isOpenJDK;
     private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
 
@@ -53,6 +54,8 @@ public abstract class SystemVersion {
         _isApache = vendor.startsWith("Apache");
         _isGNU = vendor.startsWith("GNU Classpath") ||               // JamVM
                  vendor.startsWith("Free Software Foundation");      // gij
+        String runtime = System.getProperty("java.runtime.name");
+        _isOpenJDK = runtime != null && runtime.contains("OpenJDK");
 
         int sdk = 0;
         if (_isAndroid) {
@@ -108,6 +111,13 @@ public abstract class SystemVersion {
      */
     public static boolean isGentoo() {
         return _isGentoo;
+    }
+
+    /**
+     *  @since 0.9.26
+     */
+    public static boolean isOpenJDK() {
+        return _isOpenJDK;
     }
 
     /**
@@ -238,7 +248,6 @@ public abstract class SystemVersion {
     /**
      *  @since 0.9.24
      */
-/****
     public static void main(String[] args) {
         System.out.println("64 bit   : " + is64Bit());
         System.out.println("Java 6   : " + isJava6());
@@ -253,11 +262,11 @@ public abstract class SystemVersion {
         System.out.println("Mac      : " + isMac());
         System.out.println("Gentoo   : " + isGentoo());
         System.out.println("GNU      : " + isGNU());
+        System.out.println("OpenJDK  : " + isOpenJDK());
         System.out.println("Windows  : " + isWindows());
         System.out.println("Wrapper  : " + hasWrapper());
         System.out.println("x86      : " + isX86());
         System.out.println("Max mem  : " + getMaxMemory());
 
     }
-****/
 }
