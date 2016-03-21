@@ -1,3 +1,5 @@
+* 2016-03-22 0.9.25 released
+
 2016-03-14 zzz
  * Console: Replace pastethis with zerobin
  * Peer selection: Don't truncate data used for random slice
