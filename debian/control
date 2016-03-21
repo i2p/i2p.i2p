@@ -18,8 +18,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,libcommons-logging-java
  ,hardening-wrapper
  ,po-debconf
-# Uncomment the next line for Debian unstable or Ubuntu Saucy (and newer)
-# ,dh-systemd
+ ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -27,6 +26,7 @@ Section: net
 Priority: optional
 Depends: ${java:Depends}, ${shlibs:Depends},
  adduser,
+ debconf,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
  lsb-base,
@@ -77,6 +77,7 @@ Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
 Suggests: tor
+ ,apparmor
  ,i2p-messenger
  ,i2phex
  ,i2p-tahoe-lafs

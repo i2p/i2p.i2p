@@ -1,3 +1,9 @@
+i2p (0.9.24-1) unstable; urgency=medium
+
+  * New upstream version 0.9.24
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 30 Jan 2016 12:08:27 +0000
+
 i2p (0.9.23-2) unstable; urgency=medium
 
   * Backport of two fixes from after the release of 0.9.23

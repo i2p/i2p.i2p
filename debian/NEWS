@@ -4,8 +4,8 @@ i2p (0.8.6-5) stable; urgency=low
   Instead the file /etc/i2p/wrapper.config is used with the changes that used to
   be in wrapper.service have been moved to the initscript. If you have changed
   the amount of memory set aside for I2P, you'll need to make that change to
-  /etc/i2p/wrapper.config.
-
+  /etc/i2p/wrapper.config. 
+ 
   The I2P router is now split into four different packages: i2p, i2p-doc,
   i2p-router, and libjbigi.
 
