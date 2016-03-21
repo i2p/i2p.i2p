@@ -497,8 +497,16 @@ class BuildHandler implements Runnable {
             // limit concurrent next-hop lookups to prevent job queue overload attacks
             int numTunnels = _context.tunnelManager().getParticipatingCount();
             int limit = Math.max(MIN_LOOKUP_LIMIT, Math.min(MAX_LOOKUP_LIMIT, numTunnels * PERCENT_LOOKUP_LIMIT / 100));
-            int current = _currentLookups.incrementAndGet();
+            int current;
+            // leaky counter, since it isn't reliable
+            if (_context.random().nextInt(16) > 0)
+                current = _currentLookups.incrementAndGet();
+            else
+                current = 1;
             if (current <= limit) {
+                // don't let it go negative
+                if (current <= 0)
+                    _currentLookups.set(1);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Request " + req
                                + " handled, lookup next peer " + nextPeer
@@ -510,9 +518,9 @@ class BuildHandler implements Runnable {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Drop next hop lookup, limit " + limit + ": " + req);
                 _context.statManager().addRateData("tunnel.dropLookupThrottle", 1);
+                if (from != null)
+                    _context.commSystem().mayDisconnect(from);
             }
-            if (from != null)
-                _context.commSystem().mayDisconnect(from);
             return -1;
         } else {
             long beforeHandle = System.currentTimeMillis();
