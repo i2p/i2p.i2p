@@ -106,6 +106,8 @@ Public domain except as listed below:
 
 Installer:
    Launch4j 3.0.1:
+   (Launch4j is only included in the upstream source package and Windows binaries.
+    Not applicable for non-Windows binaries or Debian/Launchpad packages.)
    Copyright (c) 2004, 2008 Grzegorz Kowal
    See licenses/LICENSE-Launch4j.txt (in binary packages)
    See installer/lib/launch4j/LICENSE.txt (in source packages)
