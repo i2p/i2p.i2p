@@ -48,6 +48,7 @@ override_dh_auto_clean:
 	rm -rf $(CURDIR)/core/c/jcpuid/lib/
 	rm -f $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	rm -rf $(CURDIR)/debian/python-i2p
+	rm -f $(CURDIR)/override.properties
 	debconf-updatepo
 
 override_dh_auto_build:
@@ -71,6 +72,11 @@ ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 else
 	@echo "Already found deb in version, not doing anything"
 endif
+	# build options
+	@/bin/echo -e "javac.version=1.7" > $(CURDIR)/override.properties
+	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
+	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
+	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper

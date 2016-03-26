@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
  ,debconf
- ,default-jdk | openjdk-7-jdk
+ ,openjdk-7-jdk
  ,dh-apparmor
  ,gettext
  ,libgmp-dev (>= 2:5.0.5)
