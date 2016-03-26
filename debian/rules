@@ -47,7 +47,6 @@ override_dh_auto_clean:
 	find $(CURDIR)/core \( -name '*\.so' -o -name '*\.o' \) -exec rm -f {} \;
 	rm -rf $(CURDIR)/core/c/jcpuid/lib/
 	rm -f $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
-	rm -f $(CURDIR)/installer/lib/launch4j/lib/commons-logging.jar
 	rm -rf $(CURDIR)/debian/python-i2p
 	debconf-updatepo
 
@@ -62,8 +61,6 @@ binary-indep: build-indep
 build-indep:
 	dh_prep
 	mkdir -p $(CURDIR)/installer/lib/wrapper/all
-	mkdir -p $(CURDIR)/installer/lib/launch4j/lib/
-	ln -sf /usr/share/java/commons-logging.jar $(CURDIR)/installer/lib/launch4j/lib/commons-logging.jar
 	ln -sf /usr/share/java/wrapper.jar $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	if [ ! -e $(CURDIR)/debian/routerversion.java.bak ]; then \
 		cp $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak; \

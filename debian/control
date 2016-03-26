@@ -14,7 +14,6 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,gettext
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
- ,libcommons-logging-java
  ,hardening-wrapper
  ,po-debconf
  ,dh-systemd
