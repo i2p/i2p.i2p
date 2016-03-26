@@ -1,0 +1,31 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Mon, 30 Jul 2012 17:56:40 +0000
+Subject: remove launch4j
+
+---
+ build.xml | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/build.xml b/build.xml
+index 9544491..ce106bf 100644
+--- a/build.xml
++++ b/build.xml
+@@ -1206,18 +1206,7 @@
+         <copy todir="pkg-temp/licenses/" >
+           <fileset dir="licenses/" />
+         </copy>
+-        <!--
+-              The license in launch4j/ is a BSD license for launch4j
+-              The license in launch4j/head is a MIT license for the code that is actually wrapped around the jars
+-              So we include the MIT one in our binary package
+-         -->
+-        <copy file="installer/lib/launch4j/head/LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Launch4j.txt" />
+         <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
+-        <!--  Not sure if these are used or should be included -->
+-        <copy file="installer/lib/launch4j/lib/foxtrot.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Foxtrot.txt" />
+-        <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
+-        <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
+-        <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
+         <copy file="apps/imagegen/identicon/README.md" tofile="pkg-temp/licenses/LICENSE-Identicon.txt" />
+     </target>
+ 

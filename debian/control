@@ -13,8 +13,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,dh-apparmor
  ,gettext
  ,libgmp-dev (>= 2:5.0.5)
-# uncomment the next line for official builds
-# ,libservice-wrapper-java
+ ,libservice-wrapper-java
  ,libcommons-logging-java
  ,hardening-wrapper
  ,po-debconf
