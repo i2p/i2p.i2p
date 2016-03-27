@@ -70,7 +70,9 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless, libecj-java
+ openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless,
+ libecj-java,
+ geoip-database
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu

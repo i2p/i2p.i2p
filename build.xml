@@ -699,7 +699,7 @@
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.oldcrypto:org.bouncycastle.oldcrypto.*:gnu.crypto.*:gnu.getopt:gnu.gettext:com.nettgryppa.security:net.metanotion:net.metanotion.*:org.apache.http.conn.ssl:org.apache.http.conn.util:org.apache.http.util" />
             <group title="Streaming Library" packages="net.i2p.client.streaming:net.i2p.client.streaming.impl" />
-            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:net.i2p.data.router:org.cybergarage:org.cybergarage.*:org.freenetproject:org.xlattice.crypto.filters:com.maxmind.geoip" />
             <group title="Router Console" packages="net.i2p.router.web:net.i2p.router.update:net.i2p.router.news" />
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
@@ -1478,10 +1478,13 @@
         <copy file="build/jbigi.jar" todir="pkg-temp/lib/" />
     </target>
 
-    <!-- GeoIP files and flag icons -->
+    <!-- GeoIP files -->
     <target name="prepgeoupdate">
-        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
-        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
+        <copy todir="pkg-temp/geoip/" >
+            <!-- We use a fileset here so it doesn't fail if the files don't exist.
+                 As of 0.9.26, the files are not included in Debian/Ubuntu builds. -->
+            <fileset dir="installer/resources" includes="geoip.txt geoipv6.dat.gz" />
+        </copy>
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
@@ -1986,6 +1989,8 @@
                 <include name="**/**" />
                 <exclude name="debian/**"/>
                 <exclude name="**/*.sh"/>
+                <exclude name="installer/resources/geoip.txt"/>
+                <exclude name="installer/resources/geoipv6.dat.gz"/>
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
                 <exclude name="debian/**" />
