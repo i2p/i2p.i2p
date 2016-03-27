@@ -67,7 +67,7 @@
             <echo message="The following command will install all of the dependencies for you:" />
             <echo message=" " />
             <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential \" />
-            <echo message="                   quilt libcommons-logging-java dh-apparmor dh-systemd" />
+            <echo message="                   quilt libcommons-logging-java dh-apparmor dh-systemd libservice-wrapper-java" />
             <echo message=" " />
             <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
             <echo message="to patch the source and build the packages." />
