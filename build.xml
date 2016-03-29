@@ -1985,6 +1985,7 @@
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}">
                 <include name="**/**" />
                 <exclude name="debian/**"/>
+                <exclude name="debian-alt/**"/>
                 <exclude name="**/*.sh"/>
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">

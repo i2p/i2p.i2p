@@ -28,6 +28,7 @@ cp -f ${tarball} "$tarball.bkp"
 echo "Filtering tarball contents..."
 bzcat "$tarball" | tar --wildcards --delete '*/installer/lib/*' \
                         --delete '*/Slackware/*' \
+                        --delete '*/debian-alt/*' \
                         --delete '*/debian/*' > "$tdir/${fname}"
 
 echo "Compressing filtered tarball..."
