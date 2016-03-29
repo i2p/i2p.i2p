@@ -950,10 +950,12 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
+        <ant dir="apps/imagegen/" target="distclean" />
         <delete dir="core/c/jbigi/bin" />
         <delete dir="core/c/jbigi/lib" />
         <delete dir="core/c/jcpuid/lib" />
         <ant dir="installer/resources/locale" target="distclean" />
+        <ant dir="installer/tools/java" target="distclean" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
@@ -1003,6 +1005,7 @@
         <ant dir="apps/susimail/" target="distclean" />
         <ant dir="apps/susidns/src/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
+        <ant dir="apps/imagegen/" target="distclean" />
     </target>
 
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
