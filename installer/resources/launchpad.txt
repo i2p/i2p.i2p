@@ -45,7 +45,8 @@ Generate files to upload
   * series MUST be trusty
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
-    (or add -k keyid argument to debuild)
+    (or add -k keyid argument to debuild, which you must do
+     if you want to sign with a subkey)
     run gpg -K to list your private keys
 - edit debian/control to uncomment libservice-wrapper-java line
 - ant debian-tarball

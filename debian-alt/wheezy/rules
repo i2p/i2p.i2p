@@ -36,7 +36,7 @@ export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{prin
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
-	dh $@ --with systemd,quilt
+	dh $@ --with systemd
 
 clean: createcopyright
 
@@ -47,8 +47,8 @@ override_dh_auto_clean:
 	find $(CURDIR)/core \( -name '*\.so' -o -name '*\.o' \) -exec rm -f {} \;
 	rm -rf $(CURDIR)/core/c/jcpuid/lib/
 	rm -f $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
+	rm -f $(CURDIR)/installer/lib/launch4j/lib/commons-logging.jar
 	rm -rf $(CURDIR)/debian/python-i2p
-	rm -f $(CURDIR)/override.properties
 	debconf-updatepo
 
 override_dh_auto_build:
@@ -62,6 +62,8 @@ binary-indep: build-indep
 build-indep:
 	dh_prep
 	mkdir -p $(CURDIR)/installer/lib/wrapper/all
+	mkdir -p $(CURDIR)/installer/lib/launch4j/lib/
+	ln -sf /usr/share/java/commons-logging.jar $(CURDIR)/installer/lib/launch4j/lib/commons-logging.jar
 	ln -sf /usr/share/java/wrapper.jar $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	if [ ! -e $(CURDIR)/debian/routerversion.java.bak ]; then \
 		cp $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak; \
@@ -72,13 +74,7 @@ ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 else
 	@echo "Already found deb in version, not doing anything"
 endif
-	# build options
-	@/bin/echo -e "javac.version=1.7" > $(CURDIR)/override.properties
-	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
-	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
-	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
-	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
-	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
+	TZ=UTC LANG=C.UTF-8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
 

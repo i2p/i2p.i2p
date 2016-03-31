@@ -28,6 +28,7 @@ cp -f ${tarball} "$tarball.bkp"
 echo "Filtering tarball contents..."
 bzcat "$tarball" | tar --wildcards --delete '*/installer/lib/*' \
                         --delete '*/Slackware/*' \
+                        --delete '*/debian-alt/*' \
                         --delete '*/installer/resources/geoip.txt' \
                         --delete '*/installer/resources/geoipv6.dat.gz' \
                         --delete '*/debian/*' > "$tdir/${fname}"
