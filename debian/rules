@@ -76,6 +76,7 @@ endif
 	@/bin/echo -e "javac.version=1.7" > $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
+	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config

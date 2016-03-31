@@ -1479,17 +1479,19 @@
     </target>
 
     <!-- GeoIP files -->
-    <target name="prepgeoupdate">
-        <copy todir="pkg-temp/geoip/" >
-            <!-- We use a fileset here so it doesn't fail if the files don't exist.
-                 As of 0.9.26, the files are not included in Debian/Ubuntu builds. -->
-            <fileset dir="installer/resources" includes="geoip.txt geoipv6.dat.gz" />
-        </copy>
+    <target name="prepgeoupdate" depends="prepgeoupdate-unlesspkg" >
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/continents.txt" todir="pkg-temp/geoip/" />
       <!--
         <copy file="installer/resources/public-suffix-list.txt" todir="pkg-temp/geoip/" />
        -->
+    </target>
+
+    <!-- GeoIP files, set withGeoIPDatabase=true in override.properties to prevent -->
+    <!-- As of 0.9.26, the files are not included in Debian/Ubuntu builds. -->
+    <target name="prepgeoupdate-unlesspkg" unless="${with-geoip-database}" >
+        <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
+        <copy file="installer/resources/geoipv6.dat.gz" todir="pkg-temp/geoip/" />
     </target>
 
     <!-- All jetty jars required for update.
