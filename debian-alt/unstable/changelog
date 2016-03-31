@@ -1,3 +1,9 @@
+i2p (0.9.25-1) unstable; urgency=medium
+
+  * New upstream version 0.9.25
+
+ -- zzz on i2p <zzz@i2pmail.org>  Tue, 29 Mar 2016 18:12:12 +0000
+
 i2p (0.9.24-1) unstable; urgency=medium
 
   * New upstream version 0.9.24

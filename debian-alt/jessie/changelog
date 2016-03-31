@@ -1,8 +1,8 @@
-i2p (0.9.24-1~deb8u+1) stable; urgency=medium
+i2p (0.9.25-1~deb8u+1) stable; urgency=medium
 
   * Backport to Jessie
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 30 Jan 2016 13:36:20 +0000
+ -- zzz on i2p <zzz@i2pmail.org>  Tue, 29 Mar 2016 18:12:12 +0000
 
 i2p (0.9.24-1) unstable; urgency=medium
 
@@ -51,12 +51,6 @@ i2p (0.9.23-1) unstable; urgency=medium
     - Update GeoIP data (new installs and PPA only)
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 19 Nov 2015 12:41:36 +0000
-
-i2p (0.9.22-1~deb8u+1) stable; urgency=medium
-
-  * Backport to Jessie
-
- -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 13 Sep 2015 11:58:19 +0000
 
 i2p (0.9.22-1) unstable; urgency=medium
 

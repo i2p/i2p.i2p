@@ -1,8 +1,14 @@
-i2p (0.9.23-2~precise+1) precise; urgency=medium
+i2p (0.9.25-1~precise+1) precise; urgency=medium
 
   * Backport to Precise
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 06 Dec 2015 17:26:47 +0000
+ -- zzz on i2p <zzz@i2pmail.org>  Thu, 31 Mar 2016 18:12:12 +0000
+
+i2p (0.9.24-1) unstable; urgency=medium
+
+  * New upstream version 0.9.24
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 30 Jan 2016 12:08:27 +0000
 
 i2p (0.9.23-2) unstable; urgency=medium
 
