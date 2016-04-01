@@ -258,6 +258,8 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
@@ -282,6 +284,8 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="build/i2ptunnel.jar" />

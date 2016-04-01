@@ -18,6 +18,8 @@
                 <pathelement location="../../../core/java/build/obj" />
                 <pathelement location="../../ministreaming/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
             </classpath>
         </depend>
     </target>
@@ -37,9 +39,15 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
-            includeAntRuntime="false"
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" >
+            includeAntRuntime="false" >
             <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+            </classpath>
         </javac>
     </target>
 

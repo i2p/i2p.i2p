@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
+    <!-- This copies jars, with some modifications and renaming,
+         from the jetty-distribution directory to the jettylib directory.
+         This is disabled if the property with-libjetty8-java=true.
+
+         This copies jars, with some modifications and renaming,
+         from the apache-tomcat-deployer and apache-tomcat directories to the jettylib directory.
+         This is disabled if the property with-libservlet2.5-java=true.
+
+         This also builds the small helper jar jetty-i2p.jar from
+         the source in the java/ directory.
+     -->
+
     <property name="jetty.ver" value="8.1.17.v20150415" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
     <property name="jetty.sha1" value="ce7bcd1bdcdac4cf130467f6d55155b9e1517e71" />
@@ -22,16 +34,24 @@
       - updating to a new Jetty version by changing ${jetty.ver} and ${jetty.sha1} above.
      -->
 
-    <target name="ensureJettylib" >
-        <available property="jetty.zip.extracted" file="${jetty.base}" type="dir" />
+    <!-- verify everything we need is in jettylib/ -->
+    <target name="ensureJettylib" depends="ensureJettylib1, copyJettylib" />
+
+    <target name="ensureJettylib1" >
+        <condition property="jetty.zip.extracted" >
+            <or>
+                <istrue value="${with-libjetty8-java}" />
+                <available file="${jetty.base}" type="dir" />
+            </or>
+        </condition>
         <condition property="jetty.zip.available" >
             <or>
                 <istrue value="${jetty.zip.extracted}" />
                 <available file="${jetty.filename}" type="file" />
             </or>
         </condition>
-        <ant target="copyJettylib" />
     </target>
+
   <!--
     <target name="ensureJettylib" depends="extractJettylib" />
    -->
@@ -62,6 +82,7 @@
 
     <condition property="verified.already" >
         <or>
+            <istrue value="${with-libjetty8-java}" />
             <istrue value="${jetty.zip.extracted}" />
             <and>
                 <available file="${jetty.filename}" />
@@ -94,8 +115,15 @@
         <unzip src="${jetty.filename}" dest="." />
     </target>
 
-    <target name="copyJettylib" depends="extractJettylib" >
+    <target name="mkJettylibdir" >
         <mkdir dir="jettylib" />
+    </target>
+
+    <!-- Jetty and tomcat files -->
+    <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib" />
+
+    <!-- Jetty files only -->
+    <target name="copyJettylib1" depends="extractJettylib" unless="${with-libjetty8-java}" >
       <!-- We copy everything to names without the version numbers so we
            can update them later. Where there was something similar in Jetty 5/6,
            we use the same names so they will overwrite the Jetty 5/6 jar on upgrade.
@@ -157,7 +185,6 @@
             <zipfileset excludes="META-INF/LICENSE.txt META-INF/NOTICE.txt" src="../../installer/lib/launch4j/lib/commons-logging.jar" />
         </jar>
       -->
-        <ant target="copyTomcatLib" />
     </target>
 
     <!-- Tomcat util jar.
@@ -169,7 +196,7 @@
          Apparently this is only required for precompilation of jsps, so this is put in
          with the JspC compiler jasper-runtime.jar below.
      -->
-    <target name="buildTomcatUtilJar" >
+    <target name="buildTomcatUtilJar" unless="${with-libservlet2.5-java}" >
         <!-- take only what we need from the tomcat-coyote jar -->
         <jar destfile="${tomcat2.lib.small}/tomcat-coyote-util.jar" >
             <zipfileset src="${tomcat2.lib}/tomcat-coyote.jar"
@@ -192,14 +219,19 @@
          If we go to Tomcat 7:
          tomcat-api.jar + tomcat-util.jar: Add to javax.servlet.jar (as of Tomcat 7 / Jetty 8)
      -->
-    <target name="copyTomcatLib" >
-        <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
-            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
-            <zipfileset src="${tomcat2.lib.small}/tomcat-coyote-util.jar" />
-        </jar>
+    <target name="copyTomcatLib" depends="mkJettylibdir, copyTomcatLib1, copyTomcatLib2, copyTomcatLib3" />
+
+    <target name="copyTomcatLib1" unless="${with-libservlet2.5-java}" >
         <jar destfile="jettylib/commons-el.jar" duplicate="preserve" filesetmanifest="merge" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
+        </jar>
+    </target>
+
+    <target name="copyTomcatLib2" unless="${with-libtomcat6-java}" >
+        <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
+            <zipfileset src="${tomcat2.lib.small}/tomcat-coyote-util.jar" />
         </jar>
 <!--
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
@@ -215,6 +247,9 @@
         <jar destfile="jettylib/commons-logging.jar" update="true" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-juli.jar" />
         </jar>
+    </target>
+
+    <target name="copyTomcatLib3" unless="${with-libtomcat7-java}" >
         <jar destfile="jettylib/jasper-compiler.jar" >
             <manifest>
                 <attribute name="Note" value="Intentionally empty" />
