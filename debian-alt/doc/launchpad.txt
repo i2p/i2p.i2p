@@ -32,7 +32,7 @@ Prep
   sudo apt-get install devscripts dput dh_systemd
 
 - check out clean copy of release:
-  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar
+  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-0.9.xx
 
 Generate files to upload
 ------------------------
@@ -45,21 +45,21 @@ Generate files to upload
   * series MUST be trusty
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
-    (or add -k keyid argument to debuild, which you must do
+    (or add -kkeyid argument to debuild, which you must do
      if you want to sign with a subkey)
     run gpg -K to list your private keys
 - edit debian/control to uncomment libservice-wrapper-java line
-- ant debian-tarball
+- ant debian-release-tarball
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
-  and a tarball ../i2p_0.9.XX-0-xxxxxxxx.orig.tar.bz2
-- mv ../i2p_0.9.XX-0-xxxxxxxx.orig.tar.bz2 ../i2p_0.9.XX.orig.tar.bz2
+  and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
 - cd ../i2p-0.9.XX-0-xxxxxxxx/
 - Build the *1ubuntu1* files:
   If you have NOT done a successful dput for this release yet:
-    debuild -S -sa
+    debuild -S -sa -kkeyid
   otherwise, if just fixing up the control files, patches, etc:
-    debuild -S -sd
+    debuild -S -sd -kkeyid
+  (note: no space allowed in -kkeyid)
 - If patches fail, you must fix them up, either manually or with quilt
   (quilt instructions go here)
 
@@ -126,3 +126,43 @@ Release
 Then copy trusty, vivid, wily, and xenial from your PPA to the i2p-maintainers PPA
   (select "copy existing binaries")
   Copy trusty first and wait for it to be published in i2p-maintainers or the others will fail.
+
+
+Creating milestone, release, and uploading files
+----------------------------------------------
+
+You must first create a milestone, then create a release
+and attach it to the milestone.
+Go to https://launchpad.net/i2p/trunk
+Down at bottom, click 'create milestone'
+    Name: 0.9.xx (NOT i2p 0.9.xx)
+    Code name: empty
+    Date targeted: Actual release date
+    Tags: empty
+    Summary: empty
+Click 'register milestone'
+Now you are back on https://launchpad.net/i2p/trunk
+At your milestone, 'release now'
+    Date released: Actual release date
+    Release notes: empty
+    Changelog: empty
+Click 'create release'
+Now you on the page for that milestone
+Click 'add download file'
+For each of the four files
+    i2psource_0.9.xx.tar.bz2
+      Description: I2P 0.9.xx Source Code
+      Sig: i2psource_0.9.xx.tar.bz2.sig
+      File Content Type: Code Release Tarball
+    i2pinstall_0.9.xx_windows.exe
+      Description: I2P 0.9.xx Installer for Windows
+      Sig: i2pinstall_0.9.xx_windows.exe.sig
+      File Content Type: Installer File
+    i2pinstall_0.9.xx.jar
+      Description: I2P 0.9.xx Installer (Linux / OSX / FreeBSD / Solaris)
+      Sig: i2pinstall_0.9.xx.jar.sig
+      File Content Type: Installer File
+    i2pupdate_0.9.xx.zip
+      Description: I2P 0.9.xx Update
+      Sig: i2pupdate_0.9.xx.zip.sig
+      File Content Type: Installer File
