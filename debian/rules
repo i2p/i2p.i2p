@@ -84,6 +84,7 @@ endif
 	# ubuntu: only in wily
 	# debian: in wheezy jessie stretch sid
 	@/bin/echo -e "with-libjetty8-java=true" >> $(CURDIR)/override.properties
+	mkdir -p $(CURDIR)/apps/jetty/jettylib
 	ln -sf /usr/share/java/jetty8-continuation.jar $(CURDIR)/apps/jetty/jettylib/jetty-continuation.jar
 	ln -sf /usr/share/java/jetty8-deploy.jar $(CURDIR)/apps/jetty/jettylib/jetty-deploy.jar
 	ln -sf /usr/share/java/jetty8-http.jar $(CURDIR)/apps/jetty/jettylib/jetty-http.jar
@@ -98,17 +99,20 @@ endif
 	ln -sf /usr/share/java/jetty8-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
 	ln -sf /usr/share/java/jetty8-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
 	ln -sf /usr/share/java/jetty8-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
+	# following two are from libservlet3.0-java which is a dependency of libjetty8-java
+	ln -sf /usr/share/java/servlet-api-3.0.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
+	ln -sf /usr/share/java/jsp-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
 
 	# ubuntu: only in wily
 	# debian: in wheezy jessie stretch sid
+	#mkdir -p $(CURDIR)/apps/jetty/jettylib
 	#@/bin/echo -e "with-libservlet2.5-java=true" >> $(CURDIR)/override.properties
 	#ln -sf /usr/share/java/el-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
-	#ln -sf /usr/share/java/jsp-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
-	#ln -sf /usr/share/java/servlet-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
 
 	# ubuntu: only in precise trusty vivid
 	# debian: only in wheezy
 	#@/bin/echo -e "with-libtomcat6-java=true" >> $(CURDIR)/override.properties
+	#mkdir -p $(CURDIR)/apps/jetty/jettylib
 	#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
 	#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
 	#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
@@ -116,6 +120,7 @@ endif
 
 	# debian and ubuntu: everywhere
 	#@/bin/echo -e "with-libtomcat7-java=true" >> $(CURDIR)/override.properties
+	#mkdir -p $(CURDIR)/apps/jetty/jettylib
 	#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
 	#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
 	#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar

@@ -1143,7 +1143,7 @@
     </target>
 
     <!-- see targets below for conditional copying -->
-    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty-unlesspkg, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
         <delete>
@@ -1201,9 +1201,13 @@
         </copy>
     </target>
 
+    <target name="copyjetty" depends="copyjetty-unlesspkg" >
+        <copy file="build/jetty-i2p.jar" todir="pkg-temp/libs/" />
+    </target>
+
     <target name="copyjetty-unlesspkg" unless="${with-libjetty8-java}" >
         <copy todir="pkg-temp/lib" >
-            <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" />
+            <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" excludes="jetty-i2p.jar" />
         </copy>
     </target>
 
@@ -1996,8 +2000,6 @@
         <delete dir="../i2p-${Extended.Version}" />
         <exec executable="mtn" failonerror="true">
             <arg value="co" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
             <!-- w: is the revision of the current workspace -->
             <arg value="-r" />
             <arg value="w:" />
@@ -2010,11 +2012,13 @@
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+          <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/standard.jar" />
+           -->
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2025,11 +2029,13 @@
                 <exclude name="**/*.sh"/>
                 <exclude name="installer/resources/geoip.txt"/>
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
+                <exclude name="apps/jetty/jetty-distribution-*/**"/>
+          <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
                 <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
-                <exclude name="apps/jetty/jetty-distribution-*/**"/>
                 <exclude name="apps/susidns/src/WEB-INF/lib/jstl.jar" />
                 <exclude name="apps/susidns/src/WEB-INF/lib/standard.jar" />
+           -->
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
@@ -2054,8 +2060,6 @@
         <delete dir="../i2p-${Extended.Version}" />
         <exec executable="mtn" failonerror="true">
             <arg value="co" />
-            <arg value="-b" />
-            <arg value="i2p.i2p" />
             <!-- w: is the revision of the current workspace -->
             <arg value="-r" />
             <arg value="w:" />
@@ -2068,11 +2072,13 @@
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+          <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/standard.jar" />
+           -->
             <!-- anything added above, add in debian-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2083,11 +2089,13 @@
                 <exclude name="**/*.sh"/>
                 <exclude name="installer/resources/geoip.txt"/>
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
+                <exclude name="apps/jetty/jetty-distribution-*/**"/>
+          <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
                 <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
-                <exclude name="apps/jetty/jetty-distribution-*/**"/>
                 <exclude name="apps/susidns/src/WEB-INF/lib/jstl.jar" />
                 <exclude name="apps/susidns/src/WEB-INF/lib/standard.jar" />
+           -->
                 <!-- anything added above, add in debian-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}" filemode="755">
