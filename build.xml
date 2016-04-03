@@ -1202,7 +1202,7 @@
     </target>
 
     <target name="copyjetty" depends="copyjetty-unlesspkg" >
-        <copy file="build/jetty-i2p.jar" todir="pkg-temp/libs/" />
+        <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="copyjetty-unlesspkg" unless="${with-libjetty8-java}" >
