@@ -24,6 +24,7 @@ pkg-temp/lib/desktopgui.jar usr/share/i2p/lib
 pkg-temp/lib/i2p.jar usr/share/i2p/lib
 pkg-temp/lib/i2psnark.jar usr/share/i2p/lib
 pkg-temp/lib/i2ptunnel.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-i2p.jar usr/share/i2p/lib
 pkg-temp/lib/jrobin.jar usr/share/i2p/lib
 pkg-temp/lib/mstreaming.jar usr/share/i2p/lib
 pkg-temp/lib/routerconsole.jar usr/share/i2p/lib
@@ -40,7 +41,6 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-continuation.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-deploy.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-http.jar usr/share/i2p/lib
-#pkg-temp/lib/jetty-i2p.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-io.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-security.jar usr/share/i2p/lib
