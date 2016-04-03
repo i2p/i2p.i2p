@@ -77,6 +77,64 @@ endif
 	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
+
+	# debian and ubuntu: everywhere
+	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
+
+	# ubuntu: only in wily
+	# debian: in wheezy jessie stretch sid
+	@/bin/echo -e "with-libjetty8-java=true" >> $(CURDIR)/override.properties
+	mkdir -p $(CURDIR)/apps/jetty/jettylib
+	ln -sf /usr/share/java/jetty8-continuation.jar $(CURDIR)/apps/jetty/jettylib/jetty-continuation.jar
+	ln -sf /usr/share/java/jetty8-deploy.jar $(CURDIR)/apps/jetty/jettylib/jetty-deploy.jar
+	ln -sf /usr/share/java/jetty8-http.jar $(CURDIR)/apps/jetty/jettylib/jetty-http.jar
+	ln -sf /usr/share/java/jetty8-io.jar $(CURDIR)/apps/jetty/jettylib/jetty-io.jar
+	ln -sf /usr/share/java/jetty8-rewrite.jar $(CURDIR)/apps/jetty/jettylib/jetty-rewrite-handler.jar
+	ln -sf /usr/share/java/jetty8-security.jar $(CURDIR)/apps/jetty/jettylib/jetty-security.jar
+	ln -sf /usr/share/java/jetty8-servlet.jar $(CURDIR)/apps/jetty/jettylib/jetty-servlet.jar
+	ln -sf /usr/share/java/jetty8-servlets.jar $(CURDIR)/apps/jetty/jettylib/jetty-servlets.jar
+	ln -sf /usr/share/java/jetty8-start.jar $(CURDIR)/apps/jetty/jettylib/jetty-start.jar
+	ln -sf /usr/share/java/jetty8-util.jar $(CURDIR)/apps/jetty/jettylib/jetty-util.jar
+	ln -sf /usr/share/java/jetty8-webapp.jar $(CURDIR)/apps/jetty/jettylib/jetty-webapp.jar
+	ln -sf /usr/share/java/jetty8-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
+	ln -sf /usr/share/java/jetty8-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
+	ln -sf /usr/share/java/jetty8-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
+	# following two are from libservlet3.0-java which is a dependency of libjetty8-java
+	ln -sf /usr/share/java/servlet-api-3.0.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
+	ln -sf /usr/share/java/jsp-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
+
+	# ubuntu: only in wily
+	# debian: in wheezy jessie stretch sid
+	#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	#@/bin/echo -e "with-libservlet2.5-java=true" >> $(CURDIR)/override.properties
+	#ln -sf /usr/share/java/el-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+
+	# ubuntu: only in precise trusty vivid
+	# debian: only in wheezy
+	#@/bin/echo -e "with-libtomcat6-java=true" >> $(CURDIR)/override.properties
+	#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
+	#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+
+	# debian and ubuntu: everywhere
+	#@/bin/echo -e "with-libtomcat7-java=true" >> $(CURDIR)/override.properties
+	#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
+	#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+
+	# ubuntu: only in wily
+	# debian: in wheezy jessie stretch sid
+	#@/bin/echo -e "with-libjakarta-taglibs-standard-java=true" >> $(CURDIR)/override.properties
+	#ln -sf /usr/share/java/standard.jar $(CURDIR)/apps/susidns/src/WEB-INF/lib/standard.jar
+
+	# debian and ubuntu: everywhere
+	#@/bin/echo -e "with-libjstl1.1-java=true" >> $(CURDIR)/override.properties
+	#ln -sf /usr/share/java/jstl1.1.jar $(CURDIR)/apps/susidns/src/WEB-INF/lib/jstl.jar
+
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper

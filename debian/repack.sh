@@ -29,6 +29,13 @@ echo "Filtering tarball contents..."
 bzcat "$tarball" | tar --wildcards --delete '*/installer/lib/*' \
                         --delete '*/Slackware/*' \
                         --delete '*/debian-alt/*' \
+                        --delete '*/installer/resources/geoip.txt' \
+                        --delete '*/installer/resources/geoipv6.dat.gz' \
+                        --delete '*/apps/jetty/apache-tomcat/*' \
+                        --delete '*/apps/jetty/apache-tomcat-deployer/*' \
+                        --delete '*/apps/jetty/jetty-distribution-*/*' \
+                        --delete '*/apps/susidns/src/WEB-INF/lib/jstl.jar' \
+                        --delete '*/apps/susidns/src/WEB-INF/lib/standard.jar' \
                         --delete '*/debian/*' > "$tdir/${fname}"
 
 echo "Compressing filtered tarball..."

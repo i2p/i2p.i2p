@@ -10,6 +10,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant-optional
  ,debconf
  ,openjdk-7-jdk
+ ,libjetty8-java, libservlet3.0-java
  ,dh-apparmor
  ,gettext
  ,libgmp-dev (>= 2:5.0.5)
@@ -70,7 +71,10 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless, libecj-java
+ openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless,
+ libecj-java,
+ geoip-database,
+ libjetty8-java, libservlet3.0-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
