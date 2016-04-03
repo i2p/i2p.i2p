@@ -53,7 +53,6 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 #pkg-temp/lib/org.mortbay.jetty.jar usr/share/i2p/lib
 #pkg-temp/lib/org.mortbay.jmx.jar usr/share/i2p/lib
 # following two are from libservlet3.0-java which is a dependency of libjetty8-java
-#pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 #pkg-temp/lib/javax.servlet.jar usr/share/i2p/lib
 
 
@@ -69,6 +68,7 @@ pkg-temp/lib/commons-el.jar usr/share/i2p/lib
 # todo: see if libtomcat7-java will work
 # legacy name, contains only tomcat-juli, not commons-logging
 pkg-temp/lib/commons-logging.jar usr/share/i2p/lib
+pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 
 
 # uncomment if not building with libjakarta-taglibs-standard-java
