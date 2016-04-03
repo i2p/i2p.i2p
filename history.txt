@@ -1,3 +1,14 @@
+2016-04-03 zzz
+ * Debian builds:
+   - Add build options to depend on various packages
+   - Depend on geoip-database and libjetty8-java by default
+   - Add debian-alt directory with configurations for alternate series
+   - Prep for depending on additional packages
+   - Improvements in ant debian build targets
+ * Transport:
+   - Add library to read standard Maxmind geoip database format
+   - Use system Maxmind geoip files if available
+
 * 2016-03-22 0.9.25 released
 
 2016-03-14 zzz
