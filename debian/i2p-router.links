@@ -7,7 +7,7 @@ usr/share/java/eclipse-ecj.jar /usr/share/i2p/lib/eclipse-ecj.jar
 
 
 # comment out if not building with libjetty8-java
-# ubuntu: only in wily
+# ubuntu: in trusty vivid wily xenial
 # debian: in wheezy jessie stretch sid
 usr/share/java/jetty8-continuation.jar usr/share/i2p/lib/jetty-continuation.jar
 usr/share/java/jetty8-deploy.jar usr/share/i2p/lib/jetty-deploy.jar
@@ -50,13 +50,7 @@ usr/share/java/jsp-api-2.2.jar usr/share/i2p/lib/jsp-api.jar
 #usr/share/java/tomcat-coyote.jar usr/share/i2p/lib/tomcat-coyote.jar
 
 
-# comment out if not building with libjakarta-taglibs-standard-java
-# ubuntu: only in wily
-# debian: in wheezy jessie stretch sid
-#usr/share/java/standard.jar usr/share/i2p/lib/standard.jar
-
-
-# comment out if not building with libjstl1.1-java
-# ubuntu: in precise trusty vivid wily xenial
-# debian: in wheezy jessie stretch sid
-#usr/share/java/jstl1.1.jar usr/share/i2p/lib/jstl.jar
+# comment out if not building with glassfish-javaee
+# ubuntu and debian: everywhere
+usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/jstl.jar
+usr/share/java/glassfish-appserv-jstl.jar usr/share/i2p/lib/standard.jar

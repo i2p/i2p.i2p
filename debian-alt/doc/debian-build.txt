@@ -64,3 +64,9 @@ reprepro includedeb unstable libjbigi-jni_0.9.xx-1_amd64.deb
 # if you already got the source from launchpad
 # with reprepro update, skip this?
 reprepro includedsc unstable i2p_0.9.XX-1.dsc
+
+
+# To copy precise to wheezy if you build precise on launchpad
+# and then did a reprepro update:
+# Note that syntax is reprepro copysrc TO FROM package!
+reprepro copysrc wheezy precise i2p

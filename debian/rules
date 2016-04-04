@@ -72,17 +72,17 @@ ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 else
 	@echo "Already found deb in version, not doing anything"
 endif
-	# build options
+	@# build options
 	@/bin/echo -e "javac.version=1.7" > $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
 
-	# debian and ubuntu: everywhere
+	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
 
-	# ubuntu: only in wily
-	# debian: in wheezy jessie stretch sid
+	@# ubuntu: not in precise
+	@# debian: in wheezy jessie stretch sid
 	@/bin/echo -e "with-libjetty8-java=true" >> $(CURDIR)/override.properties
 	mkdir -p $(CURDIR)/apps/jetty/jettylib
 	ln -sf /usr/share/java/jetty8-continuation.jar $(CURDIR)/apps/jetty/jettylib/jetty-continuation.jar
@@ -99,41 +99,37 @@ endif
 	ln -sf /usr/share/java/jetty8-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
 	ln -sf /usr/share/java/jetty8-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
 	ln -sf /usr/share/java/jetty8-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
-	# following two are from libservlet3.0-java which is a dependency of libjetty8-java
+	@# following two are from libservlet3.0-java which is a dependency of libjetty8-java
 	ln -sf /usr/share/java/servlet-api-3.0.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
 	ln -sf /usr/share/java/jsp-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
 
-	# ubuntu: only in wily
-	# debian: in wheezy jessie stretch sid
-	#mkdir -p $(CURDIR)/apps/jetty/jettylib
-	#@/bin/echo -e "with-libservlet2.5-java=true" >> $(CURDIR)/override.properties
-	#ln -sf /usr/share/java/el-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+	@# ubuntu: only in wily
+	@# debian: in wheezy jessie stretch sid
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#@/bin/echo -e "with-libservlet2.5-java=true" >> $(CURDIR)/override.properties
+	@#ln -sf /usr/share/java/el-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
 
-	# ubuntu: only in precise trusty vivid
-	# debian: only in wheezy
-	#@/bin/echo -e "with-libtomcat6-java=true" >> $(CURDIR)/override.properties
-	#mkdir -p $(CURDIR)/apps/jetty/jettylib
-	#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
-	#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
-	#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
-	#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+	@# ubuntu: only in precise trusty vivid
+	@# debian: only in wheezy
+	@#@/bin/echo -e "with-libtomcat6-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
+	@#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	@#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	@#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
 
-	# debian and ubuntu: everywhere
-	#@/bin/echo -e "with-libtomcat7-java=true" >> $(CURDIR)/override.properties
-	#mkdir -p $(CURDIR)/apps/jetty/jettylib
-	#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
-	#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
-	#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
-	#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+	@# debian and ubuntu: everywhere
+	@#@/bin/echo -e "with-libtomcat7-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-compiler.jar
+	@#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	@#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	@#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
 
-	# ubuntu: only in wily
-	# debian: in wheezy jessie stretch sid
-	#@/bin/echo -e "with-libjakarta-taglibs-standard-java=true" >> $(CURDIR)/override.properties
-	#ln -sf /usr/share/java/standard.jar $(CURDIR)/apps/susidns/src/WEB-INF/lib/standard.jar
-
-	# debian and ubuntu: everywhere
-	#@/bin/echo -e "with-libjstl1.1-java=true" >> $(CURDIR)/override.properties
-	#ln -sf /usr/share/java/jstl1.1.jar $(CURDIR)/apps/susidns/src/WEB-INF/lib/jstl.jar
+	@# debian and ubuntu: everywhere
+	@/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
+	ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/WEB-INF/lib/jstl.jar
+	ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/WEB-INF/lib/standard.jar
 
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config

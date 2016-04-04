@@ -36,7 +36,7 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 
 
 # uncomment if not building with libjetty8-java
-# ubuntu: only in wily
+# ubuntu: in trusty vivid wily xenial
 # debian: in wheezy jessie stretch sid
 #pkg-temp/lib/jetty-continuation.jar usr/share/i2p/lib
 #pkg-temp/lib/jetty-deploy.jar usr/share/i2p/lib
@@ -71,13 +71,7 @@ pkg-temp/lib/commons-logging.jar usr/share/i2p/lib
 pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 
 
-# uncomment if not building with libjakarta-taglibs-standard-java
-# ubuntu: only in wily
-# debian: in wheezy jessie stretch sid
-pkg-temp/lib/jstl.jar usr/share/i2p/lib
-
-
-# uncomment if not building with libjstl1.1-java
-# ubuntu: in precise trusty vivid wily xenial
-# debian: in wheezy jessie stretch sid
-pkg-temp/lib/standard.jar usr/share/i2p/lib
+# uncomment if not building with glassfish-javaee
+# ubuntu and debian: everywhere
+#pkg-temp/lib/jstl.jar usr/share/i2p/lib
+#pkg-temp/lib/standard.jar usr/share/i2p/lib
