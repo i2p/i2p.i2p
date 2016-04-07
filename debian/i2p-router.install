@@ -56,22 +56,18 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 #pkg-temp/lib/javax.servlet.jar usr/share/i2p/lib
 
 
-# uncomment if not building with libservlet2.5-java
-# ubuntu: only in wily
-# debian: in wheezy jessie stretch sid
+# uncomment if not building with either libtomcat6-java or libtomcat7-java
 pkg-temp/lib/commons-el.jar usr/share/i2p/lib
-
-
-# uncomment if not building with libtomcat6-java
-# ubuntu: only in precise trusty vivid
-# debian: only in wheezy
-# todo: see if libtomcat7-java will work
 # legacy name, contains only tomcat-juli, not commons-logging
 pkg-temp/lib/commons-logging.jar usr/share/i2p/lib
 pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 
 
-# uncomment if not building with glassfish-javaee
+# uncomment if not building with either glassfish-javaee or libjakarta-taglibs-standard-java
 # ubuntu and debian: everywhere
 #pkg-temp/lib/jstl.jar usr/share/i2p/lib
+
+
+# uncomment if not building with either glassfish-javaee or libjstl1.1-java
+# ubuntu and debian: everywhere
 #pkg-temp/lib/standard.jar usr/share/i2p/lib

@@ -4,7 +4,7 @@ Section: net
 Standards-Version: 3.9.6
 Priority: optional
 Bugs: mailto:zzz@i2pmail.org
-Homepage: https://geti2p.net
+Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
@@ -45,7 +45,7 @@ Architecture: any
 Section: java
 Priority: optional
 Depends: ${shlibs:Depends}, i2p-router
-Homepage: http://www.i2p2.de/jbigi
+Homepage: https://geti2p.net/
 Description: Java Big Integer library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .

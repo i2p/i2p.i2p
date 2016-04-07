@@ -222,6 +222,16 @@
     <target name="copyTomcatLib" depends="mkJettylibdir, copyTomcatLib1, copyTomcatLib2, copyTomcatLib3" />
 
     <target name="copyTomcatLib1" unless="${with-libservlet2.5-java}" >
+        <condition property="with-libtomcat-java" >
+            <or>
+                <istrue value="${with-libtomcat6-java}" />
+                <istrue value="${with-libtomcat7-java}" />
+            </or>
+        </condition>
+    </target>
+
+
+    <target name="copyTomcatLib2" unless="${with-libtomcat-java}" >
         <!-- EL libs.
              Tomcat 6 has EL 2.1.
              Tomcat 7 / libservlet3.0 has EL 2.2.
@@ -232,9 +242,7 @@
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
         </jar>
-    </target>
 
-    <target name="copyTomcatLib2" unless="${with-libtomcat6-java}" >
         <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
             <zipfileset src="${tomcat2.lib.small}/tomcat-coyote-util.jar" />
@@ -255,7 +263,7 @@
         </jar>
     </target>
 
-    <target name="copyTomcatLib3" unless="${with-libtomcat7-java}" >
+    <target name="copyTomcatLib3" unless="${with-libtomcat-java}" >
         <jar destfile="jettylib/jasper-compiler.jar" >
             <manifest>
                 <attribute name="Note" value="Intentionally empty" />

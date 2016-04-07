@@ -523,8 +523,8 @@
 
     <!-- Custom target to collect the jars that I2P-Bote needs to compile, so it can compile from source. -->
     <target name="jarBote" depends="buildRouter, buildStreaming, buildJetty" >
-        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="build/" />
-        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="build/" />
+        <copy file="apps/susidns/src/lib/jstl.jar" todir="build/" />
+        <copy file="apps/susidns/src/lib/standard.jar" todir="build/" />
     </target>
 
     <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available">
@@ -1215,18 +1215,21 @@
         </copy>
     </target>
 
-    <target name="copytomcat-unlesspkg" unless="${with-libservlet2.5-java}" >
+    <!-- todo handle alt package too -->
+    <target name="copytomcat-unlesspkg" unless="${with-libtomcat7-java}" >
         <copy todir="pkg-temp/lib" >
             <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar" />
         </copy>
     </target>
 
+    <!-- todo handle alt package too -->
     <target name="copyjstl-unlesspkg" unless="${with-glassfish-javaee}" >
-        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
     </target>
 
+    <!-- todo handle alt package too -->
     <target name="copystandard-unlesspkg" unless="${with-glassfish-javaee}" >
-        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/lib/standard.jar" todir="pkg-temp/lib/" />
     </target>
 
     <!-- does NOT include launch4j licenses for Windows builds -->
@@ -1459,8 +1462,8 @@
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
         <!-- as of 0.7.12; someday, we can remove these from the updater -->
-        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
@@ -1825,7 +1828,7 @@
             <arg value="-output"/>
             <arg value="i2p.fba"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->
@@ -2014,11 +2017,16 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <!-- libjetty8-java -->
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/jstl.jar" />
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/standard.jar" />
+            <!-- libjstl1.1-java or glassfish-javaee -->
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
+            <!-- libjakarta-taglibs-standard-java or glassfish-javaee -->
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <!-- libtomcat6-java or libtomcat7-java -->
           <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
@@ -2034,8 +2042,8 @@
                 <exclude name="installer/resources/geoip.txt"/>
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
-                <exclude name="apps/susidns/src/WEB-INF/lib/jstl.jar" />
-                <exclude name="apps/susidns/src/WEB-INF/lib/standard.jar" />
+                <exclude name="apps/susidns/src/lib/jstl.jar" />
+                <exclude name="apps/susidns/src/lib/standard.jar" />
           <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
                 <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
@@ -2077,8 +2085,8 @@
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/jstl.jar" />
-            <file name="../i2p-${Extended.Version}/apps/susidns/src/WEB-INF/lib/standard.jar" />
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
           <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
@@ -2094,8 +2102,8 @@
                 <exclude name="installer/resources/geoip.txt"/>
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
-                <exclude name="apps/susidns/src/WEB-INF/lib/jstl.jar" />
-                <exclude name="apps/susidns/src/WEB-INF/lib/standard.jar" />
+                <exclude name="apps/susidns/src/lib/jstl.jar" />
+                <exclude name="apps/susidns/src/lib/standard.jar" />
           <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
                 <exclude name="apps/jetty/apache-tomcat-deployer/**"/>

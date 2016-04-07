@@ -1,3 +1,12 @@
+2016-04-07 zzz
+ * Debian builds:
+   - Prep for depending on tomcat packages
+   - Minor fixes
+
+2016-04-04 zzz
+ * Debian builds:
+   - Depend on glassfish-javaee for JSTL 1.2 by default
+
 2016-04-03 zzz
  * Debian builds:
    - Add build options to depend on various packages
