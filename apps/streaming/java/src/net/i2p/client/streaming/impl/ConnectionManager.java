@@ -395,12 +395,14 @@ class ConnectionManager {
      * Build a new connection to the given peer.  This blocks if there is no
      * connection delay, otherwise it returns immediately.
      *
-     * @param peer Destination to contact
+     * @param peer Destination to contact, non-null
      * @param opts Connection's options
      * @param session generally the session from the constructor, but could be a subsession
      * @return new connection, or null if we have exceeded our limit
      */
     public Connection connect(Destination peer, ConnectionOptions opts, I2PSession session) {
+        if (peer == null)
+            throw new NullPointerException();
         Connection con = null;
         long expiration = _context.clock().now();
         long tmout = opts.getConnectTimeout();

@@ -825,16 +825,23 @@ class Connection {
     public void schedule(SimpleTimer.TimedEvent event, long msToWait) {
         _timer.addEvent(event, msToWait);
     }
-    
-    private boolean _remotePeerSet = false;
+
     /** who are we talking with
-     * @return peer Destination
+     * @return peer Destination or null if unset
      */
-    public Destination getRemotePeer() { return _remotePeer; }
+    public synchronized Destination getRemotePeer() { return _remotePeer; }
+
+    /**
+     *  @param peer non-null
+     */
     public void setRemotePeer(Destination peer) { 
-        if (_remotePeerSet) throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
-        _remotePeerSet = true;
-        _remotePeer = peer; 
+        if (peer == null)
+            throw new NullPointerException();
+        synchronized(this) {
+            if (_remotePeer != null)
+                throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
+            _remotePeer = peer; 
+        }
         // now that we know who the other end is, get the rtt etc. from the cache
         _connectionManager.updateOptsFromShare(this);
     }
@@ -1220,7 +1227,7 @@ class Connection {
             buf.append(" from ");
         else
             buf.append(" to ");
-        if (_remotePeerSet)
+        if (_remotePeer != null)
             buf.append(_remotePeer.calculateHash().toBase64().substring(0,4));
         else
             buf.append("unknown");

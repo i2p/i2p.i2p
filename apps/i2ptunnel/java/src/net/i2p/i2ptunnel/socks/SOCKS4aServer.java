@@ -22,6 +22,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
@@ -212,14 +213,22 @@ public class SOCKS4aServer extends SOCKSServer {
         try {
             if (connHostName.toLowerCase(Locale.US).endsWith(".i2p") ||
                 connHostName.toLowerCase(Locale.US).endsWith(".onion")) {
-                _log.debug("connecting to " + connHostName + "...");
-                // Let's not due a new Dest for every request, huh?
+                // Let's not do a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
+                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(connHostName);
+                if (dest == null) {
+                    try {
+                        sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
+                    } catch (IOException ioe) {}
+                    throw new SOCKSException("Host not found");
+                }
+                if (_log.shouldDebug())
+                    _log.debug("connecting to " + connHostName + "...");
                 Properties overrides = new Properties();
                 I2PSocketOptions sktOpts = t.buildOptions(overrides);
                 sktOpts.setPort(connPort);
-                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName), sktOpts);
+                destSock = t.createI2PSocket(dest, sktOpts);
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);
@@ -249,10 +258,18 @@ public class SOCKS4aServer extends SOCKSServer {
                 }
                 int p = I2PAppContext.getGlobalContext().random().nextInt(proxies.size());
                 String proxy = proxies.get(p);
-                _log.debug("connecting to port " + connPort + " proxy " + proxy + " for " + connHostName + "...");
+                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(proxy);
+                if (dest == null) {
+                    try {
+                        sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
+                    } catch (IOException ioe) {}
+                    throw new SOCKSException("Outproxy not found");
+                }
+                if (_log.shouldDebug())
+                    _log.debug("connecting to port " + connPort + " proxy " + proxy + " for " + connHostName + "...");
                 // this isn't going to work, these need to be socks outproxies so we need
                 // to do a socks session to them?
-                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(proxy));
+                destSock = t.createI2PSocket(dest);
             }
             confirmConnection();
             _log.debug("connection confirmed - exchanging data...");

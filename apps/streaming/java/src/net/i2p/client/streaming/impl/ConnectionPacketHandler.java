@@ -479,7 +479,13 @@ class ConnectionPacketHandler {
             if (con.getSendStreamId() <= 0) {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     con.setSendStreamId(packet.getReceiveStreamId());
-                    con.setRemotePeer(packet.getOptionalFrom());
+                    Destination dest = packet.getOptionalFrom();
+                    if (dest == null) {
+                        if (_log.shouldWarn())
+                            _log.warn("SYN Packet without FROM");
+                        return false;
+                    }
+                    con.setRemotePeer(dest);
                     return true;
                 } else {
                     // neither RST nor SYN and we dont have the stream id yet?

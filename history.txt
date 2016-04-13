@@ -1,3 +1,6 @@
+2016-04-13 zzz
+ * SOCKS: Fix NPE on lookup failure in SOCKS 4a
+
 2016-04-07 zzz
  * Debian builds:
    - Prep for depending on tomcat packages
