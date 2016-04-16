@@ -68,15 +68,14 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
         if (next != null)
             return true;
         try {
-            String inputLine = input.readLine();
-            while (inputLine != null) {
+            String inputLine;
+            while ((inputLine = input.readLine()) != null) {
                 inputLine = ConfigParser.stripComments(inputLine);
                 String[] splitLine = DataHelper.split(inputLine, "=");
                 if (splitLine.length == 2) {
                     next = new ConfigEntry(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
                     return true;
                 }
-                inputLine = input.readLine();
             }
         } catch (IOException ioe) {}
         try { input.close(); } catch (IOException ioe) {}

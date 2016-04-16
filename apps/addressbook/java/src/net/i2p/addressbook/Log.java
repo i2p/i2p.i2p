@@ -36,7 +36,7 @@ import java.util.Date;
  */
 class Log {
 
-    private File file;
+    private final File file;
 
     /**
      * Construct a Log instance that writes to the File file.

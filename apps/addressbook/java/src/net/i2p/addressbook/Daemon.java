@@ -23,9 +23,9 @@ package net.i2p.addressbook;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -130,11 +130,12 @@ public class Daemon {
             // yes, the EepGet fetch() is done in next()
             long start = System.currentTimeMillis();
             AddressBook sub = iter.next();
-            long end = System.currentTimeMillis();
             // SubscriptionIterator puts in a dummy AddressBook with no location if no fetch is done
-            if (DEBUG && log != null && sub.getLocation() != null)
+            if (DEBUG && log != null && sub.getLocation() != null) {
+                long end = System.currentTimeMillis();
                 log.append("Fetch of " + sub.getLocation() + " took " + (end - start));
-            start = end;
+                start = end;
+            }
             int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
             for (Iterator<Map.Entry<String, String>> eIter = sub.iterator(); eIter.hasNext(); ) {
                 Map.Entry<String, String> entry = eIter.next();
@@ -254,7 +255,7 @@ public class Daemon {
         }
         delay *= 60 * 60 * 1000;
         
-        List<String> defaultSubs = new LinkedList<String>();
+        List<String> defaultSubs = new ArrayList<String>(4);
         // defaultSubs.add("http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/hosts.txt");
         defaultSubs.add(DEFAULT_SUB);
         

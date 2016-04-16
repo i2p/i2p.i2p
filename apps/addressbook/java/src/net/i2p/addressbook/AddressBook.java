@@ -38,10 +38,12 @@ import net.i2p.util.SecureFile;
  * destinations. AddressBooks can be created from local and remote files, merged
  * together, and written out to local files.
  * 
+ * Methods are NOT thread-safe.
+ * 
  * @author Ragnarok
  *  
  */
-class AddressBook {
+class AddressBook implements Iterable<Map.Entry<String, String>> {
 
     private final String location;
     /** either addresses or subFile will be non-null, but not both */
@@ -107,7 +109,7 @@ class AddressBook {
         new File("addressbook.tmp").delete();
     }
 */
-    static final long MAX_SUB_SIZE = 3 * 1024 * 1024l; //about 5,000 hosts
+    static final long MAX_SUB_SIZE = 5 * 1024 * 1024l; //about 8,000 hosts
 
     /**
      * Construct an AddressBook from the Subscription subscription. If the

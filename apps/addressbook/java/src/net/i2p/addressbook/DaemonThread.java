@@ -35,7 +35,7 @@ import net.i2p.util.I2PAppThread;
  */
 public class DaemonThread extends I2PAppThread implements NamingServiceUpdater {
 
-    private String[] args;
+    private final String[] args;
 
     /**
      * Construct a DaemonThread with the command line arguments args.

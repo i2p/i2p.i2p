@@ -37,9 +37,9 @@ import net.i2p.util.PortMapper;
  */
 class SubscriptionIterator implements Iterator<AddressBook> {
 
-    private Iterator<Subscription> subIterator;
-    private String proxyHost;
-    private int proxyPort;
+    private final Iterator<Subscription> subIterator;
+    private final String proxyHost;
+    private final int proxyPort;
     private final long delay;
 
     /**

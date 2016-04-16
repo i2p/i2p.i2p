@@ -23,8 +23,8 @@ package net.i2p.addressbook;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,19 +34,15 @@ import java.util.Map;
  * @author Ragnarok
  *  
  */
-class SubscriptionList {
+class SubscriptionList implements Iterable<AddressBook> {
 
-    private List<Subscription> subscriptions;
-
-    private File etagsFile;
-
-    private File lastModifiedFile;
-    private File lastFetchedFile;
+    private final List<Subscription> subscriptions;
+    private final File etagsFile;
+    private final File lastModifiedFile;
+    private final File lastFetchedFile;
     private final long delay;
-    
-    private String proxyHost;
-    
-    private int proxyPort;
+    private final String proxyHost;
+    private final int proxyPort;
 
     /**
      * Construct a SubscriptionList using the urls from locationsFile and, if
@@ -69,7 +65,7 @@ class SubscriptionList {
     public SubscriptionList(File locationsFile, File etagsFile,
             File lastModifiedFile, File lastFetchedFile, long delay, List<String> defaultSubs, String proxyHost, 
             int proxyPort) {
-        this.subscriptions = new LinkedList<Subscription>();
+        this.subscriptions = new ArrayList<Subscription>(4);
         this.etagsFile = etagsFile;
         this.lastModifiedFile = lastModifiedFile;
         this.lastFetchedFile = lastFetchedFile;
