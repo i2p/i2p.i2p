@@ -68,6 +68,10 @@ class BuildExecutor implements Runnable {
         //_context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildReplySlow", "Build reply late, but not too late", "Tunnels", new long[] { 10*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildClientExpireIB", "", "Tunnels", new long[] { 60*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildClientExpireOB", "", "Tunnels", new long[] { 60*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildExploratoryExpireIB", "", "Tunnels", new long[] { 60*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildExploratoryExpireOB", "", "Tunnels", new long[] { 60*60*1000 });
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
@@ -184,7 +188,7 @@ class BuildExecutor implements Runnable {
                     String bwTier = "Unknown";
                     if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized
                     // Record that a peer of the given tier expired
-                    _context.statManager().addRateData("tunnel.tierExpire" + bwTier, 1, 0);
+                    _context.statManager().addRateData("tunnel.tierExpire" + bwTier, 1);
                     didNotReply(cfg.getReplyMessageId(), peer);
                     // Blame everybody since we don't know whose fault it is.
                     // (it could be our exploratory tunnel's fault too...)
@@ -194,10 +198,19 @@ class BuildExecutor implements Runnable {
                 TunnelPool pool = cfg.getTunnelPool();
                 if (pool != null)
                     pool.buildComplete(cfg);
-                if (cfg.getDestination() == null)
-                    _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1, 0);
-                else
-                    _context.statManager().addRateData("tunnel.buildClientExpire", 1, 0);
+                if (cfg.getDestination() == null) {
+                    _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1);
+                    //if (cfg.isInbound())
+                    //    _context.statManager().addRateData("tunnel.buildExploratoryExpireIB", 1);
+                    //else
+                    //    _context.statManager().addRateData("tunnel.buildExploratoryExpireOB", 1);
+                } else {
+                    _context.statManager().addRateData("tunnel.buildClientExpire", 1);
+                    //if (cfg.isInbound())
+                    //    _context.statManager().addRateData("tunnel.buildClientExpireIB", 1);
+                    //else
+                    //    _context.statManager().addRateData("tunnel.buildClientExpireOB", 1);
+                }
             }
         }
         
