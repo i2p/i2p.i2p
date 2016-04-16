@@ -93,7 +93,9 @@ class ConfigParser {
             String inputLine;
             while ((inputLine = input.readLine()) != null) {
                 inputLine = stripComments(inputLine);
-                String[] splitLine = DataHelper.split(inputLine, "=");
+                if (inputLine.length() == 0)
+                    continue;
+                String[] splitLine = DataHelper.split(inputLine, "=", 2);
                 if (splitLine.length == 2) {
                     result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
                 }

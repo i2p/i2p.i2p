@@ -74,7 +74,9 @@ class Log {
      * 
      * @return The File that the log is writing to.
      */
+/****
     public File getFile() {
         return this.file;
     }
+****/
 }

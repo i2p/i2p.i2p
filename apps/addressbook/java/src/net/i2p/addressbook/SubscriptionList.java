@@ -24,6 +24,7 @@ package net.i2p.addressbook;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,17 +81,17 @@ class SubscriptionList implements Iterable<AddressBook> {
         try {
             etags = ConfigParser.parse(etagsFile);
         } catch (IOException exp) {
-            etags = new HashMap<String, String>();
+            etags = Collections.<String, String>emptyMap();
         }
         try {
             lastModified = ConfigParser.parse(lastModifiedFile);
         } catch (IOException exp) {
-            lastModified = new HashMap<String, String>();
+            lastModified = Collections.<String, String>emptyMap();
         }
         try {
             lastFetched = ConfigParser.parse(lastFetchedFile);
         } catch (IOException exp) {
-            lastFetched = new HashMap<String, String>();
+            lastFetched = Collections.<String, String>emptyMap();
         }
         for (String location : locations) {
             this.subscriptions.add(new Subscription(location, etags.get(location),
@@ -117,9 +118,10 @@ class SubscriptionList implements Iterable<AddressBook> {
      * won't be read back correctly; the '=' should be escaped.
      */
     public void write() {
-        Map<String, String> etags = new HashMap<String, String>();
-        Map<String, String>  lastModified = new HashMap<String, String>();
-        Map<String, String>  lastFetched = new HashMap<String, String>();
+        int sz = subscriptions.size();
+        Map<String, String> etags = new HashMap<String, String>(sz);
+        Map<String, String> lastModified = new HashMap<String, String>(sz);
+        Map<String, String> lastFetched = new HashMap<String, String>(sz);
         for (Subscription sub : this.subscriptions) {
             if (sub.getEtag() != null) {
                 etags.put(sub.getLocation(), sub.getEtag());
@@ -127,13 +129,16 @@ class SubscriptionList implements Iterable<AddressBook> {
             if (sub.getLastModified() != null) {
                 lastModified.put(sub.getLocation(), sub.getLastModified());
             }
-            lastFetched.put(sub.getLocation(), "" + sub.getLastFetched());
+            lastFetched.put(sub.getLocation(), Long.toString(sub.getLastFetched()));
         }
         try {
             ConfigParser.write(etags, this.etagsFile);
+        } catch (IOException exp) {}
+        try {
             ConfigParser.write(lastModified, this.lastModifiedFile);
+        } catch (IOException exp) {}
+        try {
             ConfigParser.write(lastFetched, this.lastFetchedFile);
-        } catch (IOException exp) {
-        }
+        } catch (IOException exp) {}
     }
 }

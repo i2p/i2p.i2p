@@ -71,7 +71,9 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
             String inputLine;
             while ((inputLine = input.readLine()) != null) {
                 inputLine = ConfigParser.stripComments(inputLine);
-                String[] splitLine = DataHelper.split(inputLine, "=");
+                if (inputLine.length() == 0)
+                    continue;
+                String[] splitLine = DataHelper.split(inputLine, "=", 2);
                 if (splitLine.length == 2) {
                     next = new ConfigEntry(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
                     return true;
