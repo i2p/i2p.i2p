@@ -407,6 +407,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     /**
      * The client asked for a message, so we send it to them.  
      *
+     * This is only when not in fast receive mode.
+     * In the default fast receive mode, data is sent in MessageReceivedJob.
      */
     private void handleReceiveBegin(ReceiveMessageBeginMessage message) {
         if (_runner.isDead()) return;
@@ -427,8 +429,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error delivering the payload", ime);
+            String emsg = "Error sending data to client " + _runner.getDestHash();
+            if (_log.shouldWarn())
+                _log.warn(emsg, ime);
+            else
+                _log.logAlways(Log.WARN, emsg);
             _runner.removePayload(new MessageId(message.getMessageId()));
         }
     }
