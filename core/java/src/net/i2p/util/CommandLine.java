@@ -37,7 +37,7 @@ public class CommandLine {
         "net.i2p.util.PartialEepGet",
         "net.i2p.util.ShellCommand",
         "net.i2p.util.SSLEepGet",
-        //"net.i2p.util.SystemVersion",
+        "net.i2p.util.SystemVersion",
         "net.i2p.util.TranslateReader",
         "net.i2p.util.ZipFileComment"
     });
