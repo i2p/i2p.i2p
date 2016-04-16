@@ -365,6 +365,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     /** @since 0.9.14 */
     public static final String PROP_INTERNAL_SSL = "i2ptunnel.httpclient.allowInternalSSL";
 
+    /**
+     *
+     *  Note: This does not handle RFC 2616 header line splitting,
+     *  which is obsoleted in RFC 7230.
+     */
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
 
