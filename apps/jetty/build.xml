@@ -50,6 +50,16 @@
                 <available file="${jetty.filename}" type="file" />
             </or>
         </condition>
+        <condition property="verified.already" >
+            <or>
+                <istrue value="${with-libjetty8-java}" />
+                <istrue value="${jetty.zip.extracted}" />
+                <and>
+                    <available file="${jetty.filename}" />
+                    <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+                </and>
+            </or>
+        </condition>
     </target>
 
   <!--
@@ -79,17 +89,6 @@
         </fail>
         <get src="${jetty.url}" verbose="true" dest="${jetty.filename}" />
     </target>
-
-    <condition property="verified.already" >
-        <or>
-            <istrue value="${with-libjetty8-java}" />
-            <istrue value="${jetty.zip.extracted}" />
-            <and>
-                <available file="${jetty.filename}" />
-                <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
-            </and>
-        </or>
-    </condition>
 
     <target name="verifyJettylib" depends="fetchJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
