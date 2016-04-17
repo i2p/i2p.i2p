@@ -74,10 +74,14 @@ public class PrivateKeyFile {
         String stype = null;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
+            case 'c':
+                stype = g.getOptarg();
+                break;
+
             case 't':
                 stype = g.getOptarg();
                 // fall thru...
@@ -117,9 +121,21 @@ public class PrivateKeyFile {
 
         try {
             File f = new File(filearg);
+            boolean exists = f.exists();
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
-            Destination d = pkf.createIfAbsent();
-            System.out.println("Original Destination:");
+            Destination d;
+            if (stype != null) {
+                SigType type = SigType.parseSigType(stype);
+                if (type == null)
+                    throw new IllegalArgumentException("Signature type " + stype + " is not supported");
+                d = pkf.createIfAbsent(type);
+            } else {
+                d = pkf.createIfAbsent();
+            }
+            if (exists)
+                System.out.println("Original Destination:");
+            else
+                System.out.println("Created Destination:");
             System.out.println(pkf);
             verifySignature(d);
             switch (mode) {
@@ -185,12 +201,12 @@ public class PrivateKeyFile {
     }
 
     private static void usage() {
-        System.err.println("Usage: PrivateKeyFile filename (generates if nonexistent, then prints)\n" +
+        System.err.println("Usage: PrivateKeyFile [-c sigtype] filename (generates if nonexistent, then prints)\n" +
                            "       PrivateKeyFile -h filename (generates if nonexistent, adds hashcash cert)\n" +
                            "       PrivateKeyFile -h -e effort filename (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
                            "       PrivateKeyFile -n filename (changes to null cert)\n" +
                            "       PrivateKeyFile -s filename signwithdestfile (generates if nonexistent, adds cert signed by 2nd dest)\n" +
-                           "       PrivateKeyFile -t sigtype filename (changes to KeyCertificate of the given sig type\n" +
+                           "       PrivateKeyFile -t sigtype filename (changes to KeyCertificate of the given sig type)\n" +
                            "       PrivateKeyFile -u filename (changes to unknown cert)\n" +
                            "       PrivateKeyFile -x filename (changes to hidden cert)\n");
     }
@@ -257,16 +273,31 @@ public class PrivateKeyFile {
         this.signingPrivKey = spk;
     }
     
-    /** Also reads in the file to get the privKey and signingPrivKey, 
+    /**
+     *  Create with the default signature type if nonexistent.
+     *
+     *  Also reads in the file to get the privKey and signingPrivKey, 
      *  which aren't available from I2PClient.
      */
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
+        return createIfAbsent(I2PClient.DEFAULT_SIGTYPE);
+    }
+    
+    /**
+     *  Create with the specified signature type if nonexistent.
+     *
+     *  Also reads in the file to get the privKey and signingPrivKey, 
+     *  which aren't available from I2PClient.
+     *
+     *  @since 0.9.26
+     */
+    public Destination createIfAbsent(SigType type) throws I2PException, IOException, DataFormatException {
         if(!this.file.exists()) {
             OutputStream out = null;
             try {
                 out = new SecureFileOutputStream(this.file);
                 if (this.client != null)
-                    this.client.createDestination(out);
+                    this.client.createDestination(out, type);
                 else
                     write();
             } finally {
