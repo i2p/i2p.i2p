@@ -36,6 +36,7 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SystemVersion;
 
@@ -53,6 +54,12 @@ public class Daemon {
     private static final String DEFAULT_SUB = "http://i2p-projekt.i2p/hosts.txt";
     /** @since 0.9.12 */
     static final String OLD_DEFAULT_SUB = "http://www.i2p2.i2p/hosts.txt";
+    /** Any properties we receive from the subscription, we store to the
+     *  addressbook with this prefix, so it knows it's part of the signature.
+     *  This is also chosen so that it can't be spoofed.
+     */
+    private static final String RCVD_PROP_PREFIX = "=";
+    private static final boolean MUST_VALIDATE = false;
     
     /**
      * Update the router and published address books using remote data from the
@@ -137,8 +144,8 @@ public class Daemon {
                 start = end;
             }
             int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
-            for (Iterator<Map.Entry<String, String>> eIter = sub.iterator(); eIter.hasNext(); ) {
-                Map.Entry<String, String> entry = eIter.next();
+            for (Iterator<Map.Entry<String, HostTxtEntry>> eIter = sub.iterator(); eIter.hasNext(); ) {
+                Map.Entry<String, HostTxtEntry> entry = eIter.next();
                 String key = entry.getKey();
                 boolean isKnown;
                 Destination oldDest = null;
@@ -157,9 +164,26 @@ public class Daemon {
                 try {
                     if (!isKnown) {
                         if (AddressBook.isValidKey(key)) {
-                            Destination dest = new Destination(entry.getValue());
-                            Properties props = new Properties();
+                            HostTxtEntry he = entry.getValue();
+                            Destination dest = new Destination(he.getDest());
+                            Properties props = new OrderedProperties();
                             props.setProperty("s", sub.getLocation());
+                            if (he.hasValidSig()) {
+                                props.setProperty("v", "true");
+                            } else if (MUST_VALIDATE) {
+                                // TODO
+                                //if (log != null)
+                                //    log.append("Bad signature for new key " + key);
+                                continue;
+                            }
+                            Properties hprops = he.getProps();
+                            if (hprops != null) {
+                                // merge in all the received properties
+                                for (Map.Entry<Object, Object> e : hprops.entrySet()) {
+                                    // Add prefix to indicate received property
+                                    props.setProperty(RCVD_PROP_PREFIX + e.getKey(), (String) e.getValue());
+                                }
+                            }
                             boolean success = router.put(key, dest, props);
                             if (log != null) {
                                 if (success)
@@ -172,7 +196,7 @@ public class Daemon {
                             if (published != null) {
                                 if (publishedNS == null)
                                     publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
-                                success = publishedNS.putIfAbsent(key, dest);
+                                success = publishedNS.putIfAbsent(key, dest, props);
                                 if (log != null && !success) {
                                     try {
                                         log.append("Save to published address book " + published.getCanonicalPath() + " failed for new key " + key);
@@ -237,16 +261,12 @@ public class Daemon {
         File published = null;
         boolean should_publish = Boolean.parseBoolean(settings.get("should_publish"));
         if (should_publish) 
-            published = new File(home, settings
-                .get("published_addressbook"));
-        File subscriptionFile = new File(home, settings
-                .get("subscriptions"));
+            published = new File(home, settings.get("published_addressbook"));
+        File subscriptionFile = new File(home, settings.get("subscriptions"));
         File logFile = new File(home, settings.get("log"));
         File etagsFile = new File(home, settings.get("etags"));
-        File lastModifiedFile = new File(home, settings
-                .get("last_modified"));
-        File lastFetchedFile = new File(home, settings
-                .get("last_fetched"));
+        File lastModifiedFile = new File(home, settings.get("last_modified"));
+        File lastFetchedFile = new File(home, settings.get("last_fetched"));
         long delay;
         try {
             delay = Long.parseLong(settings.get("update_delay"));
@@ -260,8 +280,9 @@ public class Daemon {
         defaultSubs.add(DEFAULT_SUB);
         
         SubscriptionList subscriptions = new SubscriptionList(subscriptionFile,
-                etagsFile, lastModifiedFile, lastFetchedFile, delay, defaultSubs, settings
-                .get("proxy_host"), Integer.parseInt(settings.get("proxy_port")));
+                                                              etagsFile, lastModifiedFile, lastFetchedFile,
+                                                              delay, defaultSubs, settings.get("proxy_host"),
+                                                              Integer.parseInt(settings.get("proxy_port")));
         Log log = SystemVersion.isAndroid() ? null : new Log(logFile);
 
         // If false, add hosts via naming service; if true, write hosts.txt file directly

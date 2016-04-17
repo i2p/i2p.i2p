@@ -1,3 +1,18 @@
+2016-04-17 zzz
+ * Addressbook:
+   - Several cleanups and refactoring
+   - Add initial support for signatures in subscriptions
+   - Fix main-class in addressbook.jar
+   - Fix corrupted manifest in addressbook.jar
+ * Build: Fix broken build from scratch in jetty build.xml
+ * Console:
+   - Add JSTL version to /logs
+   - Update version warnings
+   - Add OpenJDK check for ARM
+ * PrivateKeyFile: Add method to specify sig type on creation
+ * SingleFileNamingService: Store signature properties on write
+ * TunnelId: Add max value check
+
 2016-04-13 zzz
  * SOCKS: Fix NPE on lookup failure in SOCKS 4a
 

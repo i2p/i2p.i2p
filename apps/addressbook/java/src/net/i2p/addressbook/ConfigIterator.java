@@ -42,9 +42,12 @@ import net.i2p.data.DataHelper;
  *  Callers should iterate all the way through or call close()
  *  to ensure the underlying stream is closed.
  *
+ *  Warning - misnamed - this is not used for config files.
+ *  It is only used for subscriptions.
+ *
  *  @since 0.8.7
  */
-class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
+class ConfigIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Closeable {
 
     private BufferedReader input;
     private ConfigEntry next;
@@ -70,14 +73,11 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
         try {
             String inputLine;
             while ((inputLine = input.readLine()) != null) {
-                inputLine = ConfigParser.stripComments(inputLine);
-                if (inputLine.length() == 0)
+                HostTxtEntry he = HostTxtParser.parse(inputLine);
+                if (he == null)
                     continue;
-                String[] splitLine = DataHelper.split(inputLine, "=", 2);
-                if (splitLine.length == 2) {
-                    next = new ConfigEntry(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
-                    return true;
-                }
+                next = new ConfigEntry(he.getName(), he);
+                return true;
             }
         } catch (IOException ioe) {}
         try { input.close(); } catch (IOException ioe) {}
@@ -86,10 +86,10 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
         return false;
     }
 
-    public Map.Entry<String, String> next() {
+    public Map.Entry<String, HostTxtEntry> next() {
         if (!hasNext())
             throw new NoSuchElementException();
-        Map.Entry<String, String> rv = next;
+        Map.Entry<String, HostTxtEntry> rv = next;
         next = null;
         return rv;
     }
@@ -112,11 +112,11 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
     /**
      *  The object returned by the iterator.
      */
-    private static class ConfigEntry implements Map.Entry<String, String> {
+    private static class ConfigEntry implements Map.Entry<String, HostTxtEntry> {
         private final String key;
-        private final String value;
+        private final HostTxtEntry value;
 
-        public ConfigEntry(String k, String v) {
+        public ConfigEntry(String k, HostTxtEntry v) {
             key = k;
             value = v;
         }
@@ -125,11 +125,11 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>>, Closeable {
             return key;
         }
 
-        public String getValue() {
+        public HostTxtEntry getValue() {
             return value;
         }
 
-        public String setValue(String v) {
+        public HostTxtEntry setValue(HostTxtEntry v) {
             throw new UnsupportedOperationException();
         }
 
