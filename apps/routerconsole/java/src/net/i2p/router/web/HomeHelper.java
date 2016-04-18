@@ -213,7 +213,7 @@ public class HomeHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table class=\"homelinkedit\"><tr><th>")
            .append(_t("Remove"))
-           .append("</th><th colspan=\"2\">")
+           .append("</th><th></th><th>")
            .append(_t("Name"))
            .append("</th><th>")
            .append(_t("URL"))
