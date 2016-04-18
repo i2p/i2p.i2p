@@ -26,7 +26,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             cur++;
         }
 
-        buf.append("<table>\n");
+        buf.append("<table id=\"tunnelconfig\">\n");
         TunnelPoolSettings exploratoryIn = _context.tunnelManager().getInboundSettings();
         TunnelPoolSettings exploratoryOut = _context.tunnelManager().getOutboundSettings();
         
@@ -69,7 +69,7 @@ public class ConfigTunnelsHelper extends HelperBase {
 
         boolean advanced = isAdvanced();
 
-        buf.append("<tr><th colspan=\"3\"><a name=\"").append(prefix).append("\">");
+        buf.append("<tr><th colspan=\"3\" class=\"th_title\"><a name=\"").append(prefix).append("\">");
         buf.append(name).append("</a></th></tr>\n");
         if (in.getLength() <= 0 ||
             in.getLength() + in.getLengthVariance() <= 0 ||

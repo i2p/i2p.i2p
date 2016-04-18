@@ -17,6 +17,6 @@
 <jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% conhelper.storeWriter(out); %>
  <h1>I2P Router &raquo; Old Console</h1>
-<div class="main" id="main">
+<div class="main" id="main"><p id="oldconsole">
  <jsp:getProperty name="conhelper" property="console" />
-</div></body></html>
+</p></div></body></html>

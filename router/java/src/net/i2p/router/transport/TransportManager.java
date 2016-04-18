@@ -683,7 +683,7 @@ public class TransportManager implements TransportEventListener {
      */
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         if (_context.getBooleanProperty(PROP_ADVANCED)) {
-            out.write("<p><b>");
+            out.write("<p id=\"upnpstatus\"><b>");
             out.write(_t("Status"));
             out.write(": ");
             out.write(_t(getReachabilityStatus().toStatusString()));
@@ -702,7 +702,7 @@ public class TransportManager implements TransportEventListener {
         }
 
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h3>").append(_t("Router Transport Addresses")).append("</h3><pre>\n");
+        buf.append("<h3 id=\"transports\">").append(_t("Router Transport Addresses")).append("</h3><pre id=\"transports\">\n");
         for (Transport t : _transports.values()) {
             if (t.hasCurrentAddress()) {
                 for (RouterAddress ra : t.getCurrentAddresses()) {
@@ -721,7 +721,7 @@ public class TransportManager implements TransportEventListener {
         } else if (_upnpManager != null) {
             out.write(_upnpManager.renderStatusHTML());
         } else {
-            out.write("<h3><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n");
+            out.write("<h3 id=\"upnpstatus\"><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n");
         }
         out.write("</p>\n");
         out.flush();

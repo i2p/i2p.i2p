@@ -99,7 +99,7 @@ public class EventLogHelper extends FormHandler {
         // So just use the "shared/console nonce".
         String nonce = CSSHelper.getNonce();
         try {
-            _out.write("<br><h3>" + _t("Display Events") + "</h3>");
+            _out.write("<br><h3 id=\"displayevents\">" + _t("Display Events") + "</h3>");
             _out.write("<form action=\"events\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
@@ -175,7 +175,7 @@ public class EventLogHelper extends FormHandler {
             return _t("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
         }
         StringBuilder buf = new StringBuilder(2048);
-        buf.append("<table><tr><th>");
+        buf.append("<table id=\"eventlog\"><tr><th>");
         buf.append(_t("Time"));
         buf.append("</th><th>");
         if (isAll) {

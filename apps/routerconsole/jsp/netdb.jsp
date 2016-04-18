@@ -11,8 +11,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Network Database")%></h1>
-<div class="main" id="main">
- <div class="wideload">
+<div class="main" id="netdb">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />
  <jsp:setProperty name="netdbHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%
@@ -26,4 +25,4 @@
  <jsp:setProperty name="netdbHelper" property="version" value="<%=request.getParameter(\"v\")%>" />
  <jsp:setProperty name="netdbHelper" property="country" value="<%=request.getParameter(\"c\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
-</div></div></body></html>
+</div></body></html>

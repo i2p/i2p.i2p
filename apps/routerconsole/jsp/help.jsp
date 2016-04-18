@@ -14,7 +14,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P Router Help &amp; Support</h1>
-<div class="main" id="main"><p>
+<div class="main" id="help"><p>
 
 <%@include file="help.jsi" %>
 <%@include file="help-legal.jsi" %>

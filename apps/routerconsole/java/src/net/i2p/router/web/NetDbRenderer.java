@@ -124,7 +124,7 @@ class NetDbRenderer {
     public void renderLeaseSetHTML(Writer out, boolean debug) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         if (debug)
-            buf.append("<p>Debug mode - Sorted by hash distance, closest first</p>\n");
+            buf.append("<p id=\"debugmode\">Debug mode - Sorted by hash distance, closest first</p>\n");
         Hash ourRKey;
         Set<LeaseSet> leases;
         DecimalFormat fmt;
@@ -338,14 +338,14 @@ class NetDbRenderer {
      if (!showStats) {
 
         // the summary table
-        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
+        buf.append("<table id=\"netdboverview\" border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
            .append(_t("Network Database Router Statistics"))
            .append("</th></tr><tr><td style=\"vertical-align: top;\">");
         // versions table
         List<String> versionList = new ArrayList<String>(versions.objects());
         if (!versionList.isEmpty()) {
             Collections.sort(versionList, Collections.reverseOrder(new VersionComparator()));
-            buf.append("<table>\n");
+            buf.append("<table id=\"netdbversions\">\n");
             buf.append("<tr><th>" + _t("Version") + "</th><th>" + _t("Count") + "</th></tr>\n");
             for (String routerVersion : versionList) {
                 int num = versions.count(routerVersion);
@@ -364,7 +364,7 @@ class NetDbRenderer {
         start = end;
             
         // transports table
-        buf.append("<table>\n");
+        buf.append("<table id=\"netdbtransports\">\n");
         buf.append("<tr><th align=\"left\">" + _t("Transports") + "</th><th>" + _t("Count") + "</th></tr>\n");
         for (int i = 0; i < TNAMES.length; i++) {
             int num = transportCount[i];
@@ -386,7 +386,7 @@ class NetDbRenderer {
         List<String> countryList = new ArrayList<String>(countries.objects());
         if (!countryList.isEmpty()) {
             Collections.sort(countryList, new CountryComparator());
-            buf.append("<table>\n");
+            buf.append("<table id=\"netdbcountrylist\">\n");
             buf.append("<tr><th align=\"left\">" + _t("Country") + "</th><th>" + _t("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);

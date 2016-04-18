@@ -120,7 +120,7 @@ public class JobQueueHelper extends HelperBase {
         List<String> names = new ArrayList<String>(counter.objects());
         if (names.size() < 4)
             return;
-        buf.append("<table style=\"width: 30%; margin-left: 100px;\">\n" +
+        buf.append("<table id=\"schedjobs\" style=\"width: 30%; margin-left: 100px;\">\n" +
                    "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Queued")).append("<th>");
         Collections.sort(names, new JobCountComparator(counter));
         for (String name : names) {
@@ -137,7 +137,7 @@ public class JobQueueHelper extends HelperBase {
      *  @since 0.8.9
      */
     private void getJobStats(StringBuilder buf) { 
-        buf.append("<table>\n" +
+        buf.append("<table id=\"jobstats\">\n" +
                    "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Runs")).append("</th>" +
                    "<th>").append(_t("Dropped")).append("</th>" +
                    "<th>").append(_t("Time")).append("</th><th><i>").append(_t("Avg")).append("</i></th><th><i>")

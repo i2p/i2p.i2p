@@ -78,13 +78,14 @@ class ProfileOrganizerRenderer {
       if (mode < 2) {
 
         //buf.append("<h2>").append(_t("Peer Profiles")).append("</h2>\n<p>");
+        buf.append("<p id=\"profiles_overview\" class=\"infohelp\">");
         buf.append(ngettext("Showing 1 recent profile.", "Showing {0} recent profiles.", order.size())).append('\n');
         if (older > 0)
             buf.append(ngettext("Hiding 1 older profile.", "Hiding {0} older profiles.", older)).append('\n');
         if (standard > 0)
             buf.append("<a href=\"/profiles?f=1\">").append(ngettext("Hiding 1 standard profile.", "Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
-                   buf.append("<table>");
+                   buf.append("<table id=\"profiles\">");
                    buf.append("<tr>");
                    buf.append("<th>").append(_t("Peer")).append("</th>");
                    buf.append("<th>").append(_t("Groups (Caps)")).append("</th>");
@@ -197,7 +198,7 @@ class ProfileOrganizerRenderer {
 
         //buf.append("<h2><a name=\"flood\"></a>").append(_t("Floodfill and Integrated Peers"))
         //   .append(" (").append(integratedPeers.size()).append(")</h2>\n");
-        buf.append("<table>");
+        buf.append("<div class=\"widescroll\"><table id=\"floodfills\">");
         buf.append("<tr>");
         buf.append("<th class=\"smallhead\">").append(_t("Peer")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("Caps")).append("</th>");
@@ -250,7 +251,7 @@ class ProfileOrganizerRenderer {
             }
             buf.append("</tr>\n");
         }
-        buf.append("</table>");
+        buf.append("</table></div>");
 
       ////
       //// don't bother reindenting

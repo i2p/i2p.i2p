@@ -15,6 +15,6 @@
 <% oldhelper.storeWriter(out); %>
 <jsp:setProperty name="oldhelper" property="full" value="<%=request.getParameter(\"f\")%>" />
  <h1><%=intl._t("I2P Router Statistics")%></h1>
-<div class="main" id="main">
+<div class="main" id="stats">
  <jsp:getProperty name="oldhelper" property="stats" />
-<hr></div></body></html>
+</div></body></html>

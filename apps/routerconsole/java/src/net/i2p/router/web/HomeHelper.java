@@ -211,7 +211,7 @@ public class HomeHelper extends HelperBase {
 
     private String renderConfig(Collection<App> apps) {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table><tr><th>")
+        buf.append("<table class=\"homelinkedit\"><tr><th>")
            .append(_t("Remove"))
            .append("</th><th colspan=\"2\">")
            .append(_t("Name"))
@@ -238,7 +238,7 @@ public class HomeHelper extends HelperBase {
                 buf.append(url);
             buf.append("</a></td></tr>\n");
         }
-        buf.append("<tr><td colspan=\"2\" align=\"center\"><b>")
+        buf.append("<tr id=\"addnew\"><td colspan=\"2\" align=\"center\"><b>")
            .append(_t("Add")).append(":</b>" +
                    "</td><td align=\"left\"><input type=\"text\" name=\"nofilter_name\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"nofilter_url\"></td></tr>");

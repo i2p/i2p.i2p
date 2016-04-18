@@ -69,12 +69,12 @@ public class StatsGenerator {
         for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
             String group = entry.getKey();
             Set<String> stats = entry.getValue();
-            buf.append("<h3><a name=\"");
+            buf.append("<h3 class=\"stats\"><a name=\"");
             buf.append(group);
             buf.append("\">");
             buf.append(_t(group));
             buf.append("</a></h3>");
-            buf.append("<ul>");
+            buf.append("<ul class=\"statlist\">");
             out.write(buf.toString());
             buf.setLength(0);
             for (String stat : stats) {

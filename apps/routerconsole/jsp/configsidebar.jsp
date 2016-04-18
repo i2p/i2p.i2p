@@ -38,12 +38,12 @@ input.default {
  <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >
 </form>
 
-<h3><%=intl._t("Customize Summary Bar")%></h3>
+<h3 class="tabletitle"><%=intl._t("Customize Summary Bar")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
  <jsp:getProperty name="summaryhelper" property="configTable" />
- <div class="formaction">
+ <div class="formaction" id="sidebardefaults">
   <input type="submit" class="reload" name="action" value="<%=intl._t("Restore full default")%>" >
   <input type="submit" class="reload" name="action" value="<%=intl._t("Restore minimal default")%>" >
  </div>

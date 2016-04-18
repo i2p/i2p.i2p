@@ -127,7 +127,7 @@
  <%=intl._t("UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports.")%>
    <%=intl._t("UPnP support is beta, and may not work for any number of reasons")%>:
 </p>
-<ul>
+<ul id="upnphelp">
 <li class="tidylist"><%=intl._t("No UPnP-compatible device present")%>
 <li class="tidylist"><%=intl._t("UPnP disabled on the device")%>
 <li class="tidylist"><%=intl._t("Software firewall interference with UPnP")%>
@@ -148,7 +148,7 @@
  <%=intl._t("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>
  <%=intl._t("If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem.")%>
 </p>
- <ul>
+ <ul id="reachability">
 <li class="tidylist"><b><%=intl._t("OK")%></b> - 
      <%=intl._t("Your UDP port does not appear to be firewalled.")%>
 <li class="tidylist"><b><%=intl._t("Firewalled")%></b> - 

@@ -9,6 +9,7 @@ public class ConfigUIHelper extends HelperBase {
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);
+        buf.append("<div id=\"availablethemes\">");
         String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         Set<String> themes = themeSet();
         for (String theme : themes) {
@@ -18,6 +19,7 @@ public class ConfigUIHelper extends HelperBase {
             buf.append("value=\"").append(theme).append("\">").append(_t(theme)).append("<br>\n");
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
+        buf.append("</div><div id=\"themeoptions\">");
         buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
             buf.append(CHECKED);
@@ -35,7 +37,7 @@ public class ConfigUIHelper extends HelperBase {
             buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Force the mobile console to be used"))
-           .append("<br>\n");
+           .append("</div>\n");
         return buf.toString();
     }
 
@@ -164,7 +166,7 @@ public class ConfigUIHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(512);
         ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
         Map<String, String> userpw = mgr.getMD5(RouterConsoleRunner.PROP_CONSOLE_PW);
-        buf.append("<table>");
+        buf.append("<table id=\"consolepass\">");
         if (userpw.isEmpty()) {
             buf.append("<tr><td colspan=\"3\">");
             buf.append(_t("Add a user and password to enable."));
