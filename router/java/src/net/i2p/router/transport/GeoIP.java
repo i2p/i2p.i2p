@@ -70,7 +70,7 @@ public class GeoIP {
     public static final String PROP_DEBIAN_GEOIPV6 = "geoip.v6.dat";
     private static final String DEBIAN_GEOIP_FILE = "/usr/share/GeoIP/GeoIP.dat";
     private static final String DEBIAN_GEOIPV6_FILE = "/usr/share/GeoIP/GeoIPv6.dat";
-    private static final boolean ENABLE_DEBIAN = !SystemVersion.isWindows();
+    private static final boolean ENABLE_DEBIAN = !(SystemVersion.isWindows() || SystemVersion.isAndroid());
     /** maxmind API */
     private static final String UNKNOWN_COUNTRY_CODE = "--";
 
