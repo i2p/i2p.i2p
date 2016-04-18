@@ -20,16 +20,19 @@
 
  <jsp:useBean class="net.i2p.router.web.ConfigNetHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
-<div class="configure">
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>">
  <input type="hidden" name="action" value="blah" >
  <input type="hidden" name="ratesOnly" value="1" >
- <h3><%=intl._t("Bandwidth limiter")%></h3><p>
+
+ <h3 id="bwlimiter" class="tabletitle"><%=intl._t("Bandwidth limiter")%></h3>
+ <table id="bandwidthconfig" class="configtable">
+ <tr><td class="infohelp" colspan="2">
+ <!-- TODO: move to css -->
  <img src="/themes/console/images/itoopie_xsm.png" alt="">
  <b><%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b>
- </p>
-   <div class="wideload"><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" >
+ </td></tr>
+   <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" >
           <%=intl._t("KBps In")%>
         </td><td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)</td>
 <% /********
@@ -55,8 +58,9 @@
     </tr><tr>
         <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> <%=intl._t("Share")%></td>
         <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
-</td></tr></table></div>
-<p><% int share = nethelper.getShareBandwidth();
+</td></tr>
+<tr><td class="infohelp" colspan="2">
+<% int share = nethelper.getShareBandwidth();
     if (share < 12) {
         out.print("<b>");
         out.print(intl._t("NOTE"));
@@ -73,11 +77,14 @@
 
         out.print(intl._t("The higher the share bandwidth the more you improve your anonymity and help the network."));
     }
- %></p>
-<p><a href="confignet"><%=intl._t("Advanced network configuration page")%></a></p><hr>
-<div class="formaction">
+ %></td></tr>
+  <tr><td colspan="2">
+   <a href="confignet"><%=intl._t("Advanced network configuration page")%></a>
+  </td></tr>
+  <tr><td class="optionsave" colspan="2">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" class="accept" name="save" value="<%=intl._t("Save changes")%>" >
-</div>
+  </td></tr>
+ </table>
 </form>
-</div></div></body></html>
+</div></body></html>

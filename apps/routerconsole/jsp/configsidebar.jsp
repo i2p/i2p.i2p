@@ -29,14 +29,22 @@ input.default {
 <jsp:useBean class="net.i2p.router.web.SummaryHelper" id="summaryhelper" scope="request" />
 <jsp:setProperty name="summaryhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
-<h3><%=intl._t("Refresh Interval")%></h3>
+<h3 class="tabletitle"><%=intl._t("Refresh Interval")%></h3>
+<table class="configtable">
+ <tr>
 <form action="" method="POST">
+  <td>
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="0">
  <input type="text" name="refreshInterval" value="<jsp:getProperty name="intl" property="refresh" />" >
  <%=intl._t("seconds")%>
+  </td>
+  <td class="optionsave">
  <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >
+  </td>
 </form>
+ </tr>
+</table>
 
 <h3 class="tabletitle"><%=intl._t("Customize Summary Bar")%></h3>
 <form action="" method="POST">

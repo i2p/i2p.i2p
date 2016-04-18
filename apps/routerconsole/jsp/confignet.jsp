@@ -19,18 +19,39 @@
 
  <jsp:useBean class="net.i2p.router.web.ConfigNetHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
-<div class="configure">
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
- <h3><%=intl._t("IP and Transport Configuration")%></h3><p>
+ <h3 id="iptransport" class="tabletitle"><%=intl._t("IP and Transport Configuration")%></h3>
+ <table id="netconfig" class="configtable">
+ <tr>
+  <td class="infohelp">
+ <!-- TODO replace static img with css background -->
  <img src="/themes/console/images/itoopie_xsm.png" alt="">
  <b><%=intl._t("The default settings will work for most people.")%>
  <a href="#chelp"><%=intl._t("There is help below.")%></a></b>
- </p><p><b><%=intl._t("UPnP Configuration")%>:</b><br>
+ <%=intl._t("Changing these settings will restart your router.")%>
+  </td>
+ </tr>
+ <tr>
+  <td class="infowarn">
+   <b><%=intl._t("Do not reveal your port numbers to anyone as they can be used to discover your ip address.")%></b>
+  </td>
+ </tr>
+ <tr>
+  <th id="upnpconfig"><%=intl._t("UPnP Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
     <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> >
     <%=intl._t("Enable UPnP to open firewall ports")%> - <a href="peers#upnp"><%=intl._t("UPnP status")%></a>
- </p><p><b><%=intl._t("IP Configuration")%>:</b><br>
+  </td>
+ </tr>
+ <tr>
+  <th id="ipconfig"><%=intl._t("IP Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
  <%=intl._t("Externally reachable hostname or IP address")%>:<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> >
     <%=intl._t("Use all auto-detect methods")%><br>
@@ -43,19 +64,34 @@
     <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> >
     <%=intl._t("Hidden mode - do not publish IP")%> <i><%=intl._t("(prevents participating traffic)")%></i><br>
     <input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> >
-    <%=intl._t("Specify hostname or IP")%>:<br>
+    <%=intl._t("Specify hostname or IP")%>:
     <%=nethelper.getAddressSelector() %>
- </p><p>
- <%=intl._t("Action when IP changes")%>:<br>
+  </td>
+ </tr>
+ <tr>
+  <th id="ipchange"><%=intl._t("Action when IP changes")%></th>
+ </tr>
+ <tr>
+  <td>
     <input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >
     <%=intl._t("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
     (<i><%=intl._t("Experimental")%></i>)
- </p><p>
- <%=intl._t("IPv4 Configuration")%>:<br>
+  </td>
+ </tr>
+ <tr>
+  <th id="ipv4config"><%=intl._t("IPv4 Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
     <input type="checkbox" class="optbox" name="IPv4Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv4FirewalledChecked" /> >
     <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%>
- </p><p>
- <%=intl._t("IPv6 Configuration")%>:<br>
+  </td>
+ </tr>
+ <tr>
+  <th id="ipv6config"><%=intl._t("IPv6 Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
     <input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
     <%=intl._t("Disable IPv6")%><br>
     <input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >
@@ -66,12 +102,20 @@
     <%=intl._t("Prefer IPv6 over IPv4")%><br>
     <input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
     <%=intl._t("Use IPv6 only (disable IPv4)")%>
-    (<i><%=intl._t("Experimental")%></i>)<br>
- </p><p><b><%=intl._t("UDP Configuration:")%></b><br>
+    (<i><%=intl._t("Experimental")%></i>)
+  </td>
+ </tr>
+ <tr>
+  <th id="udpconfig"><%=intl._t("UDP Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
  <%=intl._t("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" ><br>
  <input type="checkbox" class="optbox" name="disableUDP" value="disabled" <%=nethelper.getUdpDisabledChecked() %> >
- <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that blocks outbound UDP)")%></i><br>
+ <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that blocks outbound UDP)")%></i>
+  </td>
+ </tr>
 <% /********
 <!-- let's keep this simple...
 <input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
@@ -81,8 +125,11 @@
  Current External UDP address: <i><jsp:getProperty name="nethelper" property="udpAddress" /></i><br>
 -->
 *********/ %>
- </p><p>
- <b><%=intl._t("TCP Configuration")%>:</b><br>
+ <tr>
+  <th id="tcpconfig"><%=intl._t("TCP Configuration")%></th>
+ </tr>
+ <tr>
+  <td>
  <%=intl._t("Externally reachable hostname or IP address")%>:<br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> >
     <%=intl._t("Use auto-detected IP address")%>
@@ -96,20 +143,33 @@
     <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> >
     <%=intl._t("Disable inbound (Firewalled)")%><br>
     <input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> >
-    <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i><br>
- </p><p>
- <%=intl._t("Externally reachable TCP port")%>:<br>
+    <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i>
+  </td>
+ </tr>
+ <tr>
+  <th id="externaltcp"><%=intl._t("Externally reachable TCP port")%></th>
+ </tr>
+ <tr>
+  <td>
     <input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> >
     <%=intl._t("Use the same port configured for UDP")%>
     <i>(<%=intl._t("currently")%> <jsp:getProperty name="nethelper" property="udpPort" />)</i><br>
     <input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> >
     <%=intl._t("Specify Port")%>:
-    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" ><br>
- </p><p><b><%=intl._t("Notes")%>: <%=intl._t("a) Do not reveal your port numbers to anyone!   b) Changing these settings will restart your router.")%></b></p>
-<hr><div class="formaction">
+    <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" >
+  </td>
+ </tr>
+ <tr>
+  <td class="optionsave">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" class="accept" name="save" value="<%=intl._t("Save changes")%>" >
-</div><h3><a name="chelp"><%=intl._t("Configuration Help")%>:</a></h3><div align="justify"><p>
+  </td>
+ </tr>
+</table>
+
+<h3><a name="chelp"><%=intl._t("Configuration Help")%></a></h3>
+<div id="confighelp">
+ <p>
  <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
  </p><p>
  <%=intl._t("If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you.")%>
@@ -143,7 +203,10 @@
     <%=intl._t("If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially.")%>
     <%=intl._t("When in doubt, leave the settings at the defaults.")%>
 </p>
-<h3><a name="help"><%=intl._t("Reachability Help")%>:</a></h3><p>
+</div>
+<h3><a name="help"><%=intl._t("Reachability Help")%></a></h3>
+<div id="reach_help">
+<p>
  <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
  <%=intl._t("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>
  <%=intl._t("If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem.")%>
@@ -199,7 +262,8 @@
 <li class="tidylist"><b><%=intl._t("ERR - Client Manager I2CP Error - check logs")%></b> -
      <%=intl._t("This is usually due to a port 7654 conflict. Check the logs to verify.")%> 
      <%=intl._t("Do you have another I2P instance running? Stop the conflicting program and restart I2P.")%>
- </ul><hr>
+ </ul>
+</div>
 <% /********
       <!--
  <b>Dynamic Router Keys: </b>
@@ -221,4 +285,4 @@
  <br>
 -->
 *********/ %>
-</div></form></div></div></body></html>
+</form></div></body></html>
