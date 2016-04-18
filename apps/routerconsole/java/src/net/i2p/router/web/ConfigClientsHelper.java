@@ -290,15 +290,17 @@ public class ConfigClientsHelper extends HelperBase {
                 }
                 s = stripHTML(appProps, "websiteURL");
                 if (s != null) {
-                    desc.append("<tr><td>")
-                        .append("<a href=\"").append(s).append("\">").append(_t("Website")).append("</a><td>&nbsp;");
+                    desc.append("<tr><td><b>")
+                        .append(_t("Website")).append("</b></td><td><a href=\"")
+                        .append(s).append("\">").append(s).append("</a>");
                 }
                 String updateURL = stripHTML(appProps, "updateURL.su3");
                 if (updateURL == null)
                     updateURL = stripHTML(appProps, "updateURL");
                 if (updateURL != null) {
-                    desc.append("<tr><td>")
-                        .append("<a href=\"").append(updateURL).append("\">").append(_t("Update link")).append("</a><td>&nbsp;");
+                    desc.append("<tr><td><b>")
+                        .append(_t("Update link")).append("</b></td><td><a href=\"")
+                        .append(updateURL).append("\">").append(updateURL).append("</a>");
                 }
                 desc.append("</table>");
                 boolean isRunning = PluginStarter.isPluginRunning(app, _context);
