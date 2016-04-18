@@ -42,25 +42,25 @@ import net.i2p.data.DataHelper;
  *  Callers should iterate all the way through or call close()
  *  to ensure the underlying stream is closed.
  *
- *  Warning - misnamed - this is not used for config files.
+ *  This is not used for config files.
  *  It is only used for subscriptions.
  *
- *  @since 0.8.7
+ *  @since 0.8.7, renamed from ConfigIterator in 0.9.26
  */
-class ConfigIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Closeable {
+class HostTxtIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Closeable {
 
     private BufferedReader input;
-    private ConfigEntry next;
+    private MapEntry next;
 
     /**
      *  A dummy iterator in which hasNext() is always false.
      */
-    public ConfigIterator() {}
+    public HostTxtIterator() {}
 
     /**
      *  An iterator over the key/value pairs in the file.
      */
-    public ConfigIterator(File file) throws IOException {
+    public HostTxtIterator(File file) throws IOException {
             FileInputStream fileStream = new FileInputStream(file);
             input = new BufferedReader(new InputStreamReader(fileStream, "UTF-8"));
     }
@@ -76,7 +76,7 @@ class ConfigIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Close
                 HostTxtEntry he = HostTxtParser.parse(inputLine);
                 if (he == null)
                     continue;
-                next = new ConfigEntry(he.getName(), he);
+                next = new MapEntry(he.getName(), he);
                 return true;
             }
         } catch (IOException ioe) {}
@@ -112,11 +112,11 @@ class ConfigIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Close
     /**
      *  The object returned by the iterator.
      */
-    private static class ConfigEntry implements Map.Entry<String, HostTxtEntry> {
+    private static class MapEntry implements Map.Entry<String, HostTxtEntry> {
         private final String key;
         private final HostTxtEntry value;
 
-        public ConfigEntry(String k, HostTxtEntry v) {
+        public MapEntry(String k, HostTxtEntry v) {
             key = k;
             value = v;
         }

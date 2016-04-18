@@ -184,9 +184,9 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
     public Iterator<Map.Entry<String, HostTxtEntry>> iterator() {
         if (this.subFile != null) {
             try {
-                return new ConfigIterator(this.subFile);
+                return new HostTxtIterator(this.subFile);
             } catch (IOException ioe) {
-                return new ConfigIterator();
+                return new HostTxtIterator();
             }
         }
         return this.addresses.entrySet().iterator();
