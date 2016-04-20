@@ -243,6 +243,7 @@
             </java>
         </sequential>
     </macrodef>
+
     <target name="dist" depends="pkg, javadoc" />
     <target name="dist200" depends="pkg200, javadoc" />
     <target name="build" depends="build2">
@@ -883,7 +884,8 @@
         </fail>
     </target>
 
-    <target name="-pre-release">
+    <target name="-pre-sign">
+            <!-- if you're distributing su3 files to others, at a minimum you should set these -->
             <fail message="javac.compilerargs must contain a -bootclasspath option in override.properties">
                 <condition>
                     <not><contains string="${javac.compilerargs}" substring="-bootclasspath"/></not>
@@ -904,6 +906,9 @@
                     <not><equals arg1="${require.gettext}" arg2="true"/></not>
                 </condition>
             </fail>
+    </target>
+
+    <target name="-pre-release" depends="-pre-sign">
             <echo message="================================================================" />
             <echo message="Did you update these files?" />
             <exec executable="ls" failonerror="true">
@@ -1377,11 +1382,11 @@
         <su3sign infile="i2pupdate200.zip" sigtype="ROUTER" outfile="i2pupdate.su3" su3.ver="${full.version}" />
     </target>
 
-    <target name="signed-updater200" depends="updater200, -sign-update" />
-    <target name="signed-updater200WithJetty" depends="updater200WithJetty, -sign-update" />
-    <target name="signed-updater200WithJettyAndGeoIP" depends="updater200WithJettyAndGeoIP, -sign-update" />
-    <target name="signed-updater200WithJavadoc" depends="updater200WithJavadoc, -sign-update" />
-    <target name="signed-updater200WithJavadocAndJetty" depends="updater200WithJavadocAndJetty, -sign-update" />
+    <target name="signed-updater200" depends="-pre-sign, updater200, -sign-update" />
+    <target name="signed-updater200WithJetty" depends="-pre-sign, updater200WithJetty, -sign-update" />
+    <target name="signed-updater200WithJettyAndGeoIP" depends="-pre-sign, updater200WithJettyAndGeoIP, -sign-update" />
+    <target name="signed-updater200WithJavadoc" depends="-pre-sign, updater200WithJavadoc, -sign-update" />
+    <target name="signed-updater200WithJavadocAndJetty" depends="-pre-sign, updater200WithJavadocAndJetty, -sign-update" />
 
     <target name="zipit" depends="getReleaseNumber">
         <!--
