@@ -229,7 +229,7 @@ public class BSkipLevels extends SkipLevels {
 			return;
 		}
 		if (bf.log.shouldLog(Log.DEBUG))
-			bf.log.debug("Killing " + this + ' ' + print(), new Exception());
+			bf.log.debug("Killing " + this + ' ' + print() /* , new Exception() */ );
 		isKilled = true;
 		bsl.levelHash.remove(Integer.valueOf(levelPage));
 		bf.freePage(levelPage);

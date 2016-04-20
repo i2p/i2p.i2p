@@ -32,8 +32,10 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import net.metanotion.io.RAIFile;
@@ -431,8 +433,14 @@ public class BlockFile implements Closeable {
 	}
 
 	/**
+	 *  Open a skiplist if it exists.
+	 *  Returns null if the skiplist does not exist.
+	 *  Empty skiplists are not preserved after close.
+	 *
 	 *  If the file is writable, this runs an integrity check and repair
 	 *  on first open.
+	 *
+	 *  @return null if not found
 	 */
 	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {
 		// added I2P
@@ -454,6 +462,12 @@ public class BlockFile implements Closeable {
 		return bsl;
 	}
 
+	/**
+	 *  Create and open a new skiplist if it does not exist.
+	 *  Throws IOException if it already exists.
+	 *
+	 *  @throws IOException if already exists or other errors
+	 */
 	public BSkipList makeIndex(String name, Serializer key, Serializer val) throws IOException {
 		if(metaIndex.get(name) != null) { throw new IOException("Index already exists"); }
 		int page = allocPage();
@@ -464,15 +478,27 @@ public class BlockFile implements Closeable {
 		return bsl;
 	}
 
+	/**
+	 *  Delete a skiplist if it exists.
+	 *  Must be open. Throws IOException if exists but is closed.
+	 *  Broken before 0.9.26.
+	 *
+	 *  @throws IOException if it is closed.
+	 */
 	public void delIndex(String name) throws IOException {
-		Integer page = (Integer) metaIndex.remove(name);
-		if (page == null) { return; }
-		Serializer nb = new IdentityBytes();
-		BSkipList bsl = new BSkipList(spanSize, this, page.intValue(), nb, nb, true);
+		if (metaIndex.get(name) == null)
+                    return;
+		BSkipList bsl = openIndices.get(name);
+		if (bsl == null)
+			throw new IOException("Cannot delete closed skiplist, open it first: " + name);
 		bsl.delete();
+		openIndices.remove(name);
+		metaIndex.remove(name);
 	}
 
 	/**
+	 *  Close a skiplist if it is open.
+	 *
 	 *  Added I2P
 	 */
 	public void closeIndex(String name) {
@@ -482,8 +508,66 @@ public class BlockFile implements Closeable {
 	}
 
 	/**
+	 *  Reformat a skiplist with new Serializers if it exists.
+	 *  The skiplist must be closed.
+	 *  Throws IOException if the skiplist is open.
+	 *  The skiplist will remain closed after completion.
+	 *
+	 *  @throws IOException if it is open or on errors
+	 *  @since 0.9.26
+	 */
+	public void reformatIndex(String name, Serializer oldKey, Serializer oldVal,
+	                          Serializer newKey, Serializer newVal) throws IOException {
+		if (openIndices.containsKey(name))
+			throw new IOException("Cannot reformat open skiplist " + name);
+		BSkipList old = getIndex(name, oldKey, oldVal);
+		if (old == null)
+			return;
+		long start = System.currentTimeMillis();
+		String tmpName = "---tmp---" + name + "---tmp---";
+		BSkipList tmp = makeIndex(tmpName, newKey, newVal);
+
+		// It could be much more efficient to do this at the
+		// SkipSpan layer but that's way too hard.
+		final int loop = 32;
+		List<Comparable> keys = new ArrayList<Comparable>(loop);
+		List<Object> vals = new ArrayList<Object>(loop);
+		while (true) {
+			SkipIterator iter = old.iterator();
+			for (int i = 0; iter.hasNext() && i < loop; i++) {
+				keys.add(iter.nextKey());
+				vals.add(iter.next());
+			}
+			// save state, as deleting corrupts the iterator
+			boolean done = !iter.hasNext();
+			for (int i = 0; i < keys.size(); i++) {
+				tmp.put(keys.get(i), vals.get(i));
+			}
+			for (int i = keys.size() - 1; i >= 0; i--) {
+				old.remove(keys.get(i));
+			}
+			if (done)
+				break;
+			keys.clear();
+			vals.clear();
+		}
+
+		delIndex(name);
+		closeIndex(name);
+		closeIndex(tmpName);
+		Integer page = (Integer) metaIndex.get(tmpName);
+		metaIndex.put(name, page);
+		metaIndex.remove(tmpName);
+		if (log.shouldWarn())
+			log.warn("reformatted list: " + name + " in " +
+			         (System.currentTimeMillis() - start) + "ms");
+	}
+
+	/**
+	 *  Closes all open skiplists and then the blockfile itself.
+	 *
 	 *  Note (I2P)
-         *  Does NOT close the RAF / RAI.
+	 *  Does NOT close the RAF / RAI.
 	 */
 	public void close() throws IOException {
 		// added I2P

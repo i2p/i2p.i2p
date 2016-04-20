@@ -151,7 +151,6 @@ public class BSkipList extends SkipList implements Closeable {
 			curLevel.killInstance();
 			curLevel = nextLevel;
 		}
-		stack.killInstance();
 
 		SkipSpan curSpan = first;
 		while(curSpan != null) {
