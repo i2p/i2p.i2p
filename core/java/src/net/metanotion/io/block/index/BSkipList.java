@@ -104,7 +104,8 @@ public class BSkipList<K extends Comparable<? super K>, V> extends SkipList<K, V
 		if (bf.file.canWrite() &&
 		    (levelCount != levelHash.size() || spans != spanHash.size() || size != total)) {
 			if (bf.log.shouldLog(Log.WARN))
-				bf.log.warn("On-disk counts were " + levelCount + " / " + spans + " / " +  size + ", correcting");
+				bf.log.warn("On-disk counts were " + levelCount + " levels / " + spans +
+				            " spans / " +  size + " entries, correcting to " + total + " entries");
 			size = total;
 			flush();
 		}

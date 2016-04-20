@@ -1,3 +1,16 @@
+2016-04-20 zzz
+ * Addressbook:
+   - Add sign/verify methods for inner signature
+   - Add preliminary handling of incoming actions
+ * Blockfile:
+   - Add generics
+   - Add method to change serialization schema for a skiplist
+   - Fix delIndex() method
+ * BlockfileNamingService:
+   - New database version 4, for multiple destinations per hostname
+   - Disallow database version higher than supported
+ * NamingService: Add new API methods for multiple Destinations per hostname
+
 2016-04-17 zzz
  * Addressbook:
    - Several cleanups and refactoring

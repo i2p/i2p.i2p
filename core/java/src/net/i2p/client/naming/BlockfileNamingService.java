@@ -121,6 +121,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String REVERSE_SKIPLIST = "%%__REVERSE__%%";
     private static final String PROP_INFO = "info";
     private static final String PROP_VERSION = "version";
+    private static final String PROP_LISTVERSION = "listversion";
     private static final String PROP_LISTS = "lists";
     private static final String PROP_CREATED = "created";
     private static final String PROP_UPGRADED = "upgraded";
@@ -406,12 +407,29 @@ public class BlockfileNamingService extends DummyNamingService {
             // version 3 -> version 4
             // support multiple destinations per hostname
             if (VersionComparator.comp(_version, "4") < 0) {
+                SkipList<String, Properties> hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+                if (hdr == null)
+                    throw new IOException("No db header");
+                Properties info = hdr.get(PROP_INFO);
+                if (info == null)
+                    throw new IOException("No header info");
                 for (String list : _lists) { 
                     try {
-                        if (_log.shouldWarn())
-                            _log.warn("Upgrading " + list + " from database version 3 to 4");
-                        _bf.reformatIndex(list, _stringSerializer, _destSerializerV1,
-                                          _stringSerializer, _destSerializerV4);
+                        // so that we can handle an aborted upgrade,
+                        // we keep track of the version of each list
+                        String vprop = PROP_LISTVERSION + '_' + list;
+                        String listVersion = info.getProperty(vprop);
+                        if (listVersion == null || VersionComparator.comp(listVersion, "4") < 0) {
+                            if (_log.shouldWarn())
+                                _log.warn("Upgrading " + list + " from database version 3 to 4");
+                            _bf.reformatIndex(list, _stringSerializer, _destSerializerV1,
+                                              _stringSerializer, _destSerializerV4);
+                            info.setProperty(vprop, "4");
+                            hdr.put(PROP_INFO, info);
+                        } else {
+                            if (_log.shouldWarn())
+                                _log.warn("Partial upgrade, " + list + " already at version " + listVersion);
+                        }
                     } catch (IOException ioe) {
                         _log.error("Failed upgrade of list " + list + " to version 4", ioe);
                     }
@@ -1537,7 +1555,6 @@ public class BlockfileNamingService extends DummyNamingService {
             ctxProps.setProperty(PROP_FORCE, "true");
         I2PAppContext ctx = new I2PAppContext(ctxProps);
         BlockfileNamingService bns = new BlockfileNamingService(ctx);
-/****
         Properties sprops = new Properties();
         String lname = "privatehosts.txt";
         sprops.setProperty("list", lname);
@@ -1549,6 +1566,7 @@ public class BlockfileNamingService extends DummyNamingService {
         sprops.setProperty("list", lname);
         System.out.println("List " + lname + " contains " + bns.size(sprops));
 
+/****
         List<String> names = null;
         Properties props = new Properties();
         try {

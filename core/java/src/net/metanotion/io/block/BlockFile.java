@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.metanotion.io.RAIFile;
@@ -526,7 +527,12 @@ public class BlockFile implements Closeable {
 			return;
 		long start = System.currentTimeMillis();
 		String tmpName = "---tmp---" + name + "---tmp---";
-		BSkipList<K, V> tmp = makeIndex(tmpName, newKey, newVal);
+		BSkipList<K, V> tmp = getIndex(tmpName, newKey, newVal);
+		if (tmp != null) {
+			log.logAlways(Log.WARN, "Continuing on aborted reformat of list " + name);
+		} else {
+			tmp = makeIndex(tmpName, newKey, newVal);
+		}
 
 		// It could be much more efficient to do this at the
 		// SkipSpan layer but that's way too hard.
@@ -536,8 +542,12 @@ public class BlockFile implements Closeable {
 		while (true) {
 			SkipIterator<K, V> iter = old.iterator();
 			for (int i = 0; iter.hasNext() && i < loop; i++) {
-				keys.add(iter.nextKey());
-				vals.add(iter.next());
+				try {
+					keys.add(iter.nextKey());
+					vals.add(iter.next());
+				} catch (NoSuchElementException nsee) {
+					throw new IOException("Unable to reformat corrupt list " + name, nsee);
+				}
 			}
 			// save state, as deleting corrupts the iterator
 			boolean done = !iter.hasNext();
