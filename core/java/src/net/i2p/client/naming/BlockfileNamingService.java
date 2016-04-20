@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -104,6 +105,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private volatile boolean _isClosed;
     private final boolean _readOnly;
     private String _version = "0";
+    private volatile boolean _isVersion4;
     private boolean _needsUpgrade;
 
     private static final Serializer<Properties> _infoSerializer = new PropertiesSerializer();
@@ -221,6 +223,7 @@ public class BlockfileNamingService extends DummyNamingService {
         long start = _context.clock().now();
         _version = VERSION;
         _destSerializer = _destSerializerV4;
+        _isVersion4 = true;
         try {
             BlockFile rv = new BlockFile(f, true);
             SkipList<String, Properties> hdr = rv.makeIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
@@ -321,8 +324,10 @@ public class BlockfileNamingService extends DummyNamingService {
                                       " but this implementation only supports versions 1-" + VERSION +
                                       " Did you downgrade I2P??");
             _version = version;
-            if (VersionComparator.comp(version, "4") >= 0)
+            if (VersionComparator.comp(version, "4") >= 0) {
                 _destSerializer = _destSerializerV4;
+                _isVersion4 = true;
+            }
             _needsUpgrade = needsUpgrade(bf);
             if (_needsUpgrade) {
                 if (_log.shouldLog(Log.WARN))
@@ -442,6 +447,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     }
                 }
                 _destSerializer = _destSerializerV4;
+                _isVersion4 = true;
                 setVersion("4");
             }
 
@@ -478,6 +484,7 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     /**
+     *  For either v1 or v4.
      *  Caller must synchronize
      *  @return entry or null, or throws ioe
      */
@@ -541,7 +548,9 @@ public class BlockfileNamingService extends DummyNamingService {
 ****/
 
     /**
+     *  Single dest version.
      *  Caller must synchronize
+     *
      *  @param props may be null
      *  @throws RuntimeException
      */
@@ -549,6 +558,25 @@ public class BlockfileNamingService extends DummyNamingService {
         DestEntry de = new DestEntry();
         de.dest = dest;
         de.props = props;
+        sl.put(key, de);
+    }
+
+    /**
+     *  Multiple dests version.
+     *  DB MUST be version 4.
+     *  Caller must synchronize
+     *
+     *  @param propsList may be null, or entries may be null
+     *  @throws RuntimeException
+     *  @since 0.9.26
+     */
+    private static void addEntry(SkipList<String, DestEntry> sl, String key, List<Destination> dests, List<Properties> propsList) {
+        DestEntry de = new DestEntry();
+        de.destList = dests;
+        de.dest = dests.get(0);
+        de.propsList = propsList;
+        if (propsList != null)
+            de.props = propsList.get(0);
         sl.put(key, de);
     }
 
@@ -727,7 +755,9 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     /*
-     * @param options If non-null and contains the key "list", lookup in
+     * Single dest version.
+     *
+     * @param lookupOptions If non-null and contains the key "list", lookup in
      *                that list only, otherwise all lists
      */
     private Destination lookup2(String hostname, Properties lookupOptions, Properties storedOptions) {
@@ -783,6 +813,75 @@ public class BlockfileNamingService extends DummyNamingService {
         return d;
     }
 
+    /*
+     * Multiple dests version.
+     * DB MUST be version 4.
+     *
+     * @param lookupOptions If non-null and contains the key "list", lookup in
+     *                that list only, otherwise all lists
+     * @since 0.9.26
+     */
+    private List<Destination> lookupAll2(String hostname, Properties lookupOptions, List<Properties> storedOptions) {
+        // only use cache for b32
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+            Destination d = super.lookup(hostname, null, null);
+            if (d != null) {
+                if (storedOptions != null)
+                    storedOptions.add(null);
+                return Collections.singletonList(d);
+            }
+            // Base32 failed?
+            return null;
+        }
+        String key = hostname.toLowerCase(Locale.US);
+        synchronized(_negativeCache) {
+            if (_negativeCache.get(key) != null)
+                return null;
+        }
+        String listname = null;
+        if (lookupOptions != null)
+            listname = lookupOptions.getProperty("list");
+
+        List<Destination> rv = null;
+        synchronized(_bf) {
+            if (_isClosed)
+                return null;
+            for (String list : _lists) { 
+                if (listname != null && !list.equals(listname))
+                    continue;
+                try {
+                    DestEntry de = getEntry(list, key);
+                    if (de != null) {
+                        int sz = de.destList.size();
+                        // if any are invalid, assume they all are
+                        boolean invalid = false;
+                        for (int i = 0; i < sz; i++) {
+                            if (!validate(key, de, listname))
+                                invalid = true;
+                        }
+                        if (invalid)
+                            continue;
+                        rv = de.destList;
+                        if (storedOptions != null)
+                            storedOptions.addAll(de.propsList);
+                        break;
+                    }
+                } catch (IOException ioe) {
+                    break;
+                }
+            }
+            deleteInvalid();
+        }
+        if (rv != null) {
+            putCache(hostname, rv.get(0));
+        } else {
+            synchronized(_negativeCache) {
+                _negativeCache.put(key, DUMMY);
+            }
+        }
+        return rv;
+    }
+
     /**
      * @param options If non-null and contains the key "list", add to that list
      *                (default "hosts.txt")
@@ -805,6 +904,12 @@ public class BlockfileNamingService extends DummyNamingService {
         return put(hostname, d, options, true);
     }
 
+    /**
+     * Single dest version
+     * This does not prevent adding b32. Caller must check.
+     *
+     * @param checkExisting if true, fail if entry already exists
+     */
     private boolean put(String hostname, Destination d, Properties options, boolean checkExisting) {
         if (_readOnly) {
             _log.error("Add entry failed, read-only hosts database");
@@ -846,6 +951,82 @@ public class BlockfileNamingService extends DummyNamingService {
                         nsl.entryChanged(this, hostname, d, options);
                     else
                         nsl.entryAdded(this, hostname, d, options);
+                }
+                return true;
+            } catch (IOException ioe) {
+                _log.error("DB add error", ioe);
+                return false;
+            } catch (RuntimeException re) {
+                _log.error("DB add error", re);
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Multiple dests version.
+     * DB MUST be version 4.
+     * This does not prevent adding b32. Caller must check.
+     *
+     * @param propsList may be null, or entries may be null
+     * @param checkExisting if true, fail if entry already exists
+     * @since 0.9.26
+     */
+    private boolean put(String hostname, List<Destination> dests, List<Properties> propsList, boolean checkExisting) {
+        int sz = dests.size();
+        if (sz <= 0)
+            throw new IllegalArgumentException();
+        if (sz == 1)
+            return put(hostname, dests.get(0), propsList != null ? propsList.get(0) : null, checkExisting);
+        if (_readOnly) {
+            _log.error("Add entry failed, read-only hosts database");
+            return false;
+        }
+        String key = hostname.toLowerCase(Locale.US);
+        synchronized(_negativeCache) {
+            _negativeCache.remove(key);
+        }
+        String listname = FALLBACK_LIST;
+        String date = Long.toString(_context.clock().now());
+        List<Properties> outProps = new ArrayList<Properties>(propsList.size());
+        for (Properties options : propsList) {
+            Properties props = new Properties();
+            props.setProperty(PROP_ADDED, date);
+            if (options != null) {
+                props.putAll(options);
+                String list = options.getProperty("list");
+                if (list != null) {
+                    listname = list;
+                    props.remove("list");
+                }
+            }
+            outProps.add(props);
+        }
+        synchronized(_bf) {
+            if (_isClosed)
+                return false;
+            try {
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null)
+                    sl = _bf.makeIndex(listname, _stringSerializer, _destSerializer);
+                boolean changed =  (checkExisting || !_listeners.isEmpty()) && sl.get(key) != null;
+                if (changed && checkExisting)
+                        return false;
+                addEntry(sl, key, dests, outProps);
+                if (changed) {
+                    removeCache(hostname);
+                    // removeReverseEntry(key, oldDest) ???
+                }
+                for (int i = 0; i < dests.size(); i++) {
+                    Destination d = dests.get(i);
+                    Properties options = propsList.get(i);
+                    addReverseEntry(key, d);
+                    for (NamingServiceListener nsl : _listeners) { 
+                        if (changed)
+                            nsl.entryChanged(this, hostname, d, options);
+                        else
+                            nsl.entryAdded(this, hostname, d, options);
+                    }
                 }
                 return true;
             } catch (IOException ioe) {
@@ -1243,6 +1424,128 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     ////////// End NamingService API
+
+    //// Begin new API for multiple Destinations
+
+    /**
+     *  Return all of the entries found in the first list found, or in the list
+     *  specified in lookupOptions. Does not aggregate all destinations found
+     *  in all lists.
+     *
+     *  If storedOptions is non-null, it must be a List that supports null entries.
+     *  If the returned value (the List of Destinations) is non-null,
+     *  the same number of Properties objects will be added to storedOptions.
+     *  If no properties were found for a given Destination, the corresponding
+     *  entry in the storedOptions list will be null.
+     *
+     *  @param lookupOptions input parameter, NamingService-specific, may be null
+     *  @param storedOptions output parameter, NamingService-specific, any stored properties will be added if non-null
+     *  @return non-empty List of Destinations, or null if nothing found
+     *  @since 0.9.26
+     */
+    @Override
+    public List<Destination> lookupAll(String hostname, Properties lookupOptions, List<Properties> storedOptions) {
+        if (!_isVersion4)
+            return super.lookupAll(hostname, lookupOptions, storedOptions);
+        List<Destination> rv = lookupAll2(hostname, lookupOptions, storedOptions);
+        if (rv == null) {
+            // if hostname starts with "www.", strip and try again
+            // but not for www.i2p
+            hostname = hostname.toLowerCase(Locale.US);
+            if (hostname.startsWith("www.") && hostname.length() > 7) {
+                hostname = hostname.substring(4);
+                rv = lookupAll2(hostname, lookupOptions, storedOptions);
+            }
+        }
+        // we sort the destinations in addDestionation(),
+        // which is a lot easier than sorting them here
+        return rv;
+    }
+
+    /**
+     *  Add a Destination to an existing hostname's entry in the addressbook.
+     *
+     *  This does not prevent adding b32. Caller must check.
+     *
+     *  @param options NamingService-specific, may be null
+     *  @return success
+     *  @since 0.9.26
+     */
+    @Override
+    public boolean addDestination(String hostname, Destination d, Properties options) {
+        if (!_isVersion4)
+            return putIfAbsent(hostname, d, options);
+        List<Properties> storedOptions = new ArrayList<Properties>(4);
+        synchronized(_bf) {
+            // We use lookupAll2(), not lookupAll(), because if hostname starts with www.,
+            // we do not want to read in from the
+            // non-www hostname and then copy it to a new www hostname.
+            List<Destination> dests = lookupAll2(hostname, options, storedOptions);
+            if (dests == null)
+                return put(hostname, d, options, false);
+            if (dests.contains(d))
+                return false;
+            List<Destination> newDests = new ArrayList<Destination>(dests.size() + 1);
+            newDests.addAll(dests);
+            // TODO better sort by sigtype preference.
+            // For now, non-DSA at the front, DSA at the end
+            SigType type = d.getSigningPublicKey().getType();
+            if (type != SigType.DSA_SHA1 && type.isAvailable()) {
+                dests.add(0, d);
+                storedOptions.add(0, options);
+            } else {
+                dests.add(d);
+                storedOptions.add(options);
+            }
+            return put(hostname, newDests, storedOptions, false);
+        }
+    }
+
+    /**
+     *  Remove a hostname's entry only if it contains the Destination d.
+     *  If the NamingService supports multiple Destinations per hostname,
+     *  and this is the only Destination, removes the entire entry.
+     *  If aditional Destinations remain, it only removes the
+     *  specified Destination from the entry.
+     *
+     *  @param options NamingService-specific, may be null
+     *  @return true if entry containing d was successfully removed.
+     *  @since 0.9.26
+     */
+    @Override
+    public boolean remove(String hostname, Destination d, Properties options) {
+        if (!_isVersion4) {
+            // super does a get-test-remove, so lock around that
+            synchronized(_bf) {
+                return super.remove(hostname, d, options);
+            }
+        }
+        List<Properties> storedOptions = new ArrayList<Properties>(4);
+        synchronized(_bf) {
+            List<Destination> dests = lookupAll(hostname, options, storedOptions);
+            if (dests == null)
+                return false;
+            for (int i = 0; i < dests.size(); i++) {
+                Destination dd = dests.get(i);
+                if (dd.equals(d)) {
+                    // Found it. Remove and return.
+                    if (dests.size() == 1)
+                        return remove(hostname, options);
+                    List<Destination> newDests = new ArrayList<Destination>(dests.size() - 1);
+                    for (int j = 0; j < dests.size(); j++) {
+                        if (j != i)
+                            newDests.add(dests.get(j));
+                    }
+                    storedOptions.remove(i);
+                    removeReverseEntry(hostname, d);
+                    return put(hostname, newDests, storedOptions, false);
+                }
+            }
+        }
+        return false;
+    }
+
+    //// End new API for multiple Destinations
 
     /**
      *  Continuously validate anything we read in.
