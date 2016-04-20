@@ -73,6 +73,7 @@ public class BSkipLevels<K extends Comparable<? super K>, V> extends SkipLevels<
 	 *  after the constructor, unless it's a new empty
 	 *  level and init() was previously called.
 	 */
+	@SuppressWarnings("unchecked")
 	public BSkipLevels(BlockFile bf, int levelPage, BSkipList<K, V> bsl) throws IOException {
 		this.levelPage = levelPage;
 		this.bf = bf;
@@ -378,6 +379,7 @@ public class BSkipLevels<K extends Comparable<? super K>, V> extends SkipLevels<
 	 *  This needs work.
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean blvlck(boolean fix, int width, SkipLevels<K, V>[] prevLevels) {
 		bf.log.warn("    Skip level at width " + width);
 		bf.log.warn("        levels " + this.levels.length);

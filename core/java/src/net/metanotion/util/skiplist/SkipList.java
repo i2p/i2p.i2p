@@ -95,6 +95,7 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable {
 		return max;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void put(K key, V val)	{
 		if(key == null) { throw new NullPointerException(); }
 		if(val == null) { throw new NullPointerException(); }
@@ -116,6 +117,7 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object remove(K key) {
 		if(key == null) { throw new NullPointerException(); }
 		Object[] res = stack.remove(stack.levels.length - 1, key, this);

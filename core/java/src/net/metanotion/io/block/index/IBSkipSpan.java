@@ -59,6 +59,7 @@ public class IBSkipSpan<K extends Comparable<? super K>, V> extends BSkipSpan<K,
 	private K firstKey;
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public SkipSpan<K, V> newInstance(SkipList<K, V> sl) {
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("Splitting page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);

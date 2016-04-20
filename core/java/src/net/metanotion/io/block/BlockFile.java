@@ -442,6 +442,7 @@ public class BlockFile implements Closeable {
 	 *
 	 *  @return null if not found
 	 */
+	@SuppressWarnings("unchecked")
 	public <K extends Comparable<? super K>, V> BSkipList<K, V> getIndex(String name, Serializer<K> key, Serializer<V> val) throws IOException {
 		// added I2P
 		BSkipList<K, V> bsl = (BSkipList<K, V>) openIndices.get(name);

@@ -50,6 +50,7 @@ public class SkipSpan<K extends Comparable<? super K>, V> implements Flushable {
 	/*
 	 *  @throws IllegalArgumentException if size too big or too small
 	 */
+	@SuppressWarnings("unchecked")
 	public SkipSpan(int size) {
 		if(size < 1 || size > MAX_SIZE)
 			throw new IllegalArgumentException("Invalid span size " + size);

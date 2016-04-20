@@ -287,6 +287,7 @@ public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V
 	 * Load the whole span's keys and values into memory
 	 * @param flushOnError set to false if you are going to flush anyway
 	 */
+	@SuppressWarnings("unchecked")
 	protected void loadData(boolean flushOnError) throws IOException {
 		if (isKilled)
 			throw new IOException("Already killed!! " + this);

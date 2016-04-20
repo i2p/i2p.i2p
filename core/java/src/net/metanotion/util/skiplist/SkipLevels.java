@@ -62,6 +62,7 @@ public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable
 	/*
 	 *  @throws IllegalArgumentException if size too big or too small
 	 */
+	@SuppressWarnings("unchecked")
 	public SkipLevels(int size, SkipSpan<K, V> span) {
 		if(size < 1 || size > MAX_SIZE)
 			throw new IllegalArgumentException("Invalid Level Skip size");
@@ -129,6 +130,7 @@ public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable
 	 *                and the deleted SkipLevels is taller than this SkipLevels.
 	 *          rv is null if no object was removed.
 	 */
+	@SuppressWarnings("unchecked")
 	public Object[] remove(int start, K key, SkipList<K, V> sl) {
 		Object[] res = null;
 		SkipLevels<K, V> slvls = null;
