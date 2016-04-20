@@ -35,6 +35,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 import net.metanotion.io.RAIFile;
@@ -407,6 +408,12 @@ public class BlockfileNamingService extends DummyNamingService {
             // version 3 -> version 4
             // support multiple destinations per hostname
             if (VersionComparator.comp(_version, "4") < 0) {
+                // Upgrade of 4K entry DB on RPi 2 is over 2 1/2 minutes, disable for now
+                if (SystemVersion.isAndroid() || SystemVersion.isARM()) {
+                    if (_log.shouldWarn())
+                        _log.warn("Deferring upgrade to version 4 on Android/ARM");
+                    return true;
+                }
                 SkipList<String, Properties> hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
                 if (hdr == null)
                     throw new IOException("No db header");
