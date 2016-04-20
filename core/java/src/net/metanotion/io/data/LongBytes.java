@@ -30,10 +30,10 @@ package net.metanotion.io.data;
 
 import net.metanotion.io.Serializer;
 
-public class LongBytes implements Serializer {
-	public byte[] getBytes(Object o) {
+public class LongBytes implements Serializer<Long> {
+	public byte[] getBytes(Long o) {
 		byte[] b = new byte[8];
-		long v = ((Long) o).longValue();
+		long v = o.longValue();
  		b[0] = (byte)(0xff & (v >> 56));
 		b[1] = (byte)(0xff & (v >> 48));
  		b[2] = (byte)(0xff & (v >> 40));
@@ -45,7 +45,7 @@ public class LongBytes implements Serializer {
  		return b;
 	}
 
-	public Object construct(byte[] b) {
+	public Long construct(byte[] b) {
 		long v =(((long)(b[0] & 0xff) << 56) |
 				 ((long)(b[1] & 0xff) << 48) |
 				 ((long)(b[2] & 0xff) << 40) |

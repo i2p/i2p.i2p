@@ -30,7 +30,7 @@ package net.metanotion.io.data;
 
 import net.metanotion.io.Serializer;
 
-public class NullBytes implements Serializer {
+public class NullBytes implements Serializer<Object> {
 	public byte[] getBytes(Object o) { return null; }
 	public Object construct(byte[] b) { return null; }
 }

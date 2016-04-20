@@ -41,9 +41,9 @@ import net.metanotion.util.skiplist.SkipSpan;
 	If the caller does not iterate all the way through, the last span
 	will remain in memory.
 */
-public class IBSkipIterator extends SkipIterator {
+public class IBSkipIterator<K extends Comparable<? super K>, V> extends SkipIterator<K, V> {
 
-	public IBSkipIterator(SkipSpan ss, int index) {
+	public IBSkipIterator(SkipSpan<K, V> ss, int index) {
 		super(ss, index);
 	}
 
@@ -53,8 +53,8 @@ public class IBSkipIterator extends SkipIterator {
 	 * @throws RuntimeException on IOE
 	 */
 	@Override
-	public Object next() {
-		Object o;
+	public V next() {
+		V o;
 		if(index < ss.nKeys) {
 			if (ss.vals == null) {
 				try {
@@ -90,7 +90,7 @@ public class IBSkipIterator extends SkipIterator {
 	 * @throws RuntimeException on IOE
 	 */
 	@Override
-	public Comparable nextKey() {
+	public K nextKey() {
 		if(index < ss.nKeys) {
 			if (ss.keys == null) {
 				try {
@@ -110,7 +110,7 @@ public class IBSkipIterator extends SkipIterator {
 	 * @throws RuntimeException on IOE
 	 */
 	@Override
-	public Object previous() {
+	public V previous() {
 		if(index > 0) {
 			index--;
 		} else if(ss.prev != null) {

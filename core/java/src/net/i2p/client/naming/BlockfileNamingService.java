@@ -105,13 +105,13 @@ public class BlockfileNamingService extends DummyNamingService {
     private String _version = "0";
     private boolean _needsUpgrade;
 
-    private static final Serializer _infoSerializer = new PropertiesSerializer();
-    private static final Serializer _stringSerializer = new UTF8StringBytes();
-    private static final Serializer _destSerializerV1 = new DestEntrySerializer();
-    private static final Serializer _destSerializerV4 = new DestEntrySerializerV4();
+    private static final Serializer<Properties> _infoSerializer = new PropertiesSerializer();
+    private static final Serializer<String> _stringSerializer = new UTF8StringBytes();
+    private static final Serializer<DestEntry> _destSerializerV1 = new DestEntrySerializer();
+    private static final Serializer<DestEntry> _destSerializerV4 = new DestEntrySerializerV4();
     // upgrade(), initExisting(), and initNew() will change this to _destSerializerV4
-    private volatile Serializer _destSerializer = _destSerializerV1;
-    private static final Serializer _hashIndexSerializer = new IntBytes();
+    private volatile Serializer<DestEntry> _destSerializer = _destSerializerV1;
+    private static final Serializer<Integer> _hashIndexSerializer = new IntBytes();
 
     private static final String HOSTS_DB = "hostsdb.blockfile";
     private static final String FALLBACK_LIST = "hosts.txt";
@@ -1402,14 +1402,13 @@ public class BlockfileNamingService extends DummyNamingService {
      *  but if we threw a RuntimeException we would prevent access to entries later in
      *  the SkipSpan.
      */
-    private static class DestEntrySerializer implements Serializer {
+    private static class DestEntrySerializer implements Serializer<DestEntry> {
 
         /**
          *  A format error on the properties is non-fatal (only the properties are lost)
          *  A format error on the destination is fatal
          */
-        public byte[] getBytes(Object o) {
-            DestEntry de = (DestEntry) o;
+        public byte[] getBytes(DestEntry de) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             try {
                 try {
@@ -1429,7 +1428,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
 
         /** returns null on error */
-        public Object construct(byte[] b) {
+        public DestEntry construct(byte[] b) {
             DestEntry rv = new DestEntry();
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             try {
@@ -1452,10 +1451,9 @@ public class BlockfileNamingService extends DummyNamingService {
      *  For multiple destinations per hostname
      *  @since 0.9.26
      */
-    private static class DestEntrySerializerV4 implements Serializer {
+    private static class DestEntrySerializerV4 implements Serializer<DestEntry> {
 
-        public byte[] getBytes(Object o) {
-            DestEntry de = (DestEntry) o;
+        public byte[] getBytes(DestEntry de) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             int sz = de.destList != null ? de.destList.size() : 1;
             try {
@@ -1487,7 +1485,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
 
         /** returns null on error */
-        public Object construct(byte[] b) {
+        public DestEntry construct(byte[] b) {
             DestEntry rv = new DestEntry();
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             try {

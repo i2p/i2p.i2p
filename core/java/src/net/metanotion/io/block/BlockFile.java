@@ -96,7 +96,7 @@ public class BlockFile implements Closeable {
 	/** I2P was the file locked when we opened it? */
 	private final boolean _wasMounted;
 
-	private final BSkipList metaIndex;
+	private final BSkipList<String, Integer> metaIndex;
 	private boolean _isClosed;
 	/** cached list of free pages, only valid if freListStart > 0 */
 	private FreeListBlock flb;
@@ -322,7 +322,7 @@ public class BlockFile implements Closeable {
 		if (rai.canWrite())
 			mount();
 
-		metaIndex = new BSkipList(spanSize, this, METAINDEX_PAGE, new StringBytes(), new IntBytes());
+		metaIndex = new BSkipList<String, Integer>(spanSize, this, METAINDEX_PAGE, new StringBytes(), new IntBytes());
 	}
 
 	/**
@@ -442,15 +442,15 @@ public class BlockFile implements Closeable {
 	 *
 	 *  @return null if not found
 	 */
-	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {
+	public <K extends Comparable<? super K>, V> BSkipList<K, V> getIndex(String name, Serializer<K> key, Serializer<V> val) throws IOException {
 		// added I2P
-		BSkipList bsl = openIndices.get(name);
+		BSkipList<K, V> bsl = (BSkipList<K, V>) openIndices.get(name);
 		if (bsl != null)
 			return bsl;
 
-		Integer page = (Integer) metaIndex.get(name);
+		Integer page = metaIndex.get(name);
 		if (page == null) { return null; }
-		bsl = new BSkipList(spanSize, this, page.intValue(), key, val, true);
+		bsl = new BSkipList<K, V>(spanSize, this, page.intValue(), key, val, true);
 		if (file.canWrite()) {
 			log.info("Checking skiplist " + name + " in blockfile " + file);
 			if (bsl.bslck(true, false))
@@ -468,12 +468,12 @@ public class BlockFile implements Closeable {
 	 *
 	 *  @throws IOException if already exists or other errors
 	 */
-	public BSkipList makeIndex(String name, Serializer key, Serializer val) throws IOException {
+	public <K extends Comparable<? super K>, V> BSkipList<K, V> makeIndex(String name, Serializer<K> key, Serializer<V> val) throws IOException {
 		if(metaIndex.get(name) != null) { throw new IOException("Index already exists"); }
 		int page = allocPage();
 		metaIndex.put(name, Integer.valueOf(page));
 		BSkipList.init(this, page, spanSize);
-		BSkipList bsl = new BSkipList(spanSize, this, page, key, val, true);
+		BSkipList<K, V> bsl = new BSkipList<K, V>(spanSize, this, page, key, val, true);
 		openIndices.put(name, bsl);
 		return bsl;
 	}
@@ -516,24 +516,24 @@ public class BlockFile implements Closeable {
 	 *  @throws IOException if it is open or on errors
 	 *  @since 0.9.26
 	 */
-	public void reformatIndex(String name, Serializer oldKey, Serializer oldVal,
-	                          Serializer newKey, Serializer newVal) throws IOException {
+	public <K extends Comparable<? super K>, V> void reformatIndex(String name, Serializer<K> oldKey, Serializer<V> oldVal,
+	                          Serializer<K> newKey, Serializer<V> newVal) throws IOException {
 		if (openIndices.containsKey(name))
 			throw new IOException("Cannot reformat open skiplist " + name);
-		BSkipList old = getIndex(name, oldKey, oldVal);
+		BSkipList<K, V> old = getIndex(name, oldKey, oldVal);
 		if (old == null)
 			return;
 		long start = System.currentTimeMillis();
 		String tmpName = "---tmp---" + name + "---tmp---";
-		BSkipList tmp = makeIndex(tmpName, newKey, newVal);
+		BSkipList<K, V> tmp = makeIndex(tmpName, newKey, newVal);
 
 		// It could be much more efficient to do this at the
 		// SkipSpan layer but that's way too hard.
 		final int loop = 32;
-		List<Comparable> keys = new ArrayList<Comparable>(loop);
-		List<Object> vals = new ArrayList<Object>(loop);
+		List<K> keys = new ArrayList<K>(loop);
+		List<V> vals = new ArrayList<V>(loop);
 		while (true) {
-			SkipIterator iter = old.iterator();
+			SkipIterator<K, V> iter = old.iterator();
 			for (int i = 0; iter.hasNext() && i < loop; i++) {
 				keys.add(iter.nextKey());
 				vals.add(iter.next());
@@ -555,7 +555,7 @@ public class BlockFile implements Closeable {
 		delIndex(name);
 		closeIndex(name);
 		closeIndex(tmpName);
-		Integer page = (Integer) metaIndex.get(tmpName);
+		Integer page = metaIndex.get(tmpName);
 		metaIndex.put(name, page);
 		metaIndex.remove(tmpName);
 		if (log.shouldWarn())
@@ -623,9 +623,15 @@ public class BlockFile implements Closeable {
 			try {
 				// This uses IdentityBytes, so the value class won't be right, but at least
 				// it won't fail the out-of-order check
-				Serializer keyser = slname.equals("%%__REVERSE__%%") ? new IntBytes() : new UTF8StringBytes();
-				BSkipList bsl = getIndex(slname, keyser, new IdentityBytes());
-				if (bsl == null) {
+				boolean fail;
+				if (slname.equals("%%__REVERSE__%%")) {
+					Serializer<Integer> keyser = new IntBytes();
+					fail = getIndex(slname, keyser, new IdentityBytes()) == null;
+				} else {
+					Serializer<String> keyser = new UTF8StringBytes();
+					fail = getIndex(slname, keyser, new IdentityBytes()) == null;
+				}
+				if (fail) {
 					log.error("Can't find list? " + slname);
 					continue;
 				}

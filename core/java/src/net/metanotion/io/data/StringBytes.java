@@ -32,14 +32,14 @@ import java.io.UnsupportedEncodingException;
 
 import net.metanotion.io.Serializer;
 
-public class StringBytes implements Serializer {
-	public byte[] getBytes(Object o) {
+public class StringBytes implements Serializer<String> {
+	public byte[] getBytes(String o) {
 		try {
-			return ((String) o).getBytes("US-ASCII");
+			return o.getBytes("US-ASCII");
 		} catch (UnsupportedEncodingException uee) { throw new Error("Unsupported Encoding"); }
 	}
 
-	public Object construct(byte[] b) {
+	public String construct(byte[] b) {
 		try {
 			return new String(b, "US-ASCII");
 		} catch (UnsupportedEncodingException uee) { throw new Error("Unsupported Encoding"); }
