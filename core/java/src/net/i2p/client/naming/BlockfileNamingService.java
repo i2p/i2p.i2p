@@ -221,7 +221,7 @@ public class BlockfileNamingService extends DummyNamingService {
         _destSerializer = _destSerializerV4;
         try {
             BlockFile rv = new BlockFile(f, true);
-            SkipList hdr = rv.makeIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+            SkipList<String, Properties> hdr = rv.makeIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
             Properties info = new Properties();
             info.setProperty(PROP_VERSION, VERSION);
             info.setProperty(PROP_CREATED, Long.toString(_context.clock().now()));
@@ -293,10 +293,10 @@ public class BlockfileNamingService extends DummyNamingService {
         try {
             BlockFile bf = new BlockFile(raf, false);
             // TODO all in one skiplist or separate?
-            SkipList hdr = bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+            SkipList<String, Properties> hdr = bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
             if (hdr == null)
                 throw new IOException("No db header");
-            Properties info = (Properties) hdr.get(PROP_INFO);
+            Properties info = hdr.get(PROP_INFO);
             if (info == null)
                 throw new IOException("No header info");
 
@@ -379,7 +379,7 @@ public class BlockfileNamingService extends DummyNamingService {
             // version 1 -> version 2
             // Add reverse skiplist
             if (VersionComparator.comp(_version, "2") < 0) {
-                SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+                SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
                 if (rev == null) {
                     rev = _bf.makeIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
                     if (_log.shouldLog(Log.WARN))
@@ -438,10 +438,10 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @since 0.9.26 pulled out of upgrade()
      */
     private void setVersion(String version) throws IOException {
-        SkipList hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+        SkipList<String, Properties> hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
         if (hdr == null)
             throw new IOException("No db header");
-        Properties info = (Properties) hdr.get(PROP_INFO);
+        Properties info = hdr.get(PROP_INFO);
         if (info == null)
             throw new IOException("No header info");
         info.setProperty(PROP_VERSION, version);
@@ -458,10 +458,10 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     private DestEntry getEntry(String listname, String key) throws IOException {
         try {
-            SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+            SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
             if (sl == null)
                 return null;
-            DestEntry rv = (DestEntry) sl.get(key);
+            DestEntry rv = sl.get(key);
             return rv;
         } catch (IOException ioe) {
             _log.error("DB Lookup error", ioe);
@@ -480,7 +480,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private void addEntry(BlockFile bf, String listname, String key, Destination dest, String source) throws IOException {
         try {
             // catch IOE and delete index??
-            SkipList sl = bf.getIndex(listname, _stringSerializer, _destSerializer);
+            SkipList<String, DestEntry> sl = bf.getIndex(listname, _stringSerializer, _destSerializer);
             if (sl == null) {
                 //_log.info("Making new skiplist " + listname);
                 sl = bf.makeIndex(listname, _stringSerializer, _destSerializer);
@@ -520,7 +520,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @param props may be null
      *  @throws RuntimeException
      */
-    private static void addEntry(SkipList sl, String key, Destination dest, Properties props) {
+    private static void addEntry(SkipList<String, DestEntry> sl, String key, Destination dest, Properties props) {
         DestEntry de = new DestEntry();
         de.dest = dest;
         de.props = props;
@@ -540,7 +540,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @return removed object or null
      *  @throws RuntimeException
      */
-    private static Object removeEntry(SkipList sl, String key) {
+    private static Object removeEntry(SkipList<String, ?> sl, String key) {
         return sl.remove(key);
     }
 
@@ -567,12 +567,12 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     private String getReverseEntry(Hash hash) {
         try {
-            SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
                 return null;
             Integer idx = getReverseKey(hash);
             //_log.info("Get reverse " + idx + ' ' + hash);
-            Properties props = (Properties) rev.get(idx);
+            Properties props = rev.get(idx);
             if (props == null)
                 return null;
             for (Object okey : props.keySet()) {
@@ -614,11 +614,11 @@ public class BlockfileNamingService extends DummyNamingService {
     private static void addReverseEntry(BlockFile bf, String key, Destination dest, Log log) {
         //log.info("Add reverse " + key);
         try {
-            SkipList rev = bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            SkipList<Integer, Properties> rev = bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
                 return;
             Integer idx = getReverseKey(dest);
-            Properties props = (Properties) rev.get(idx);
+            Properties props = rev.get(idx);
             if (props != null) {
                 if (props.getProperty(key) != null)
                     return;
@@ -642,11 +642,11 @@ public class BlockfileNamingService extends DummyNamingService {
     private void removeReverseEntry(String key, Destination dest) {
         //_log.info("Remove reverse " + key);
         try {
-            SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
                 return;
             Integer idx = getReverseKey(dest);
-            Properties props = (Properties) rev.get(idx);
+            Properties props = rev.get(idx);
             if (props == null || props.remove(key) == null)
                 return;
             if (props.isEmpty())
@@ -804,7 +804,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return false;
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     sl = _bf.makeIndex(listname, _stringSerializer, _destSerializer);
                 boolean changed =  (checkExisting || !_listeners.isEmpty()) && sl.get(key) != null;
@@ -855,7 +855,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return false;
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     return false;
                 Object removed = removeEntry(sl, key);
@@ -932,13 +932,13 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return Collections.emptyMap();
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.emptyMap();
                 }
-                SkipIterator iter;
+                SkipIterator<String, DestEntry> iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
@@ -949,7 +949,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
-                    String key = (String) iter.nextKey();
+                    String key = iter.nextKey();
                     if (startsWith != null) {
                         if (startsWith.equals("[0-9]")) {
                             if (key.charAt(0) > '9')
@@ -958,7 +958,7 @@ public class BlockfileNamingService extends DummyNamingService {
                             break;
                         }
                     }
-                    DestEntry de = (DestEntry) iter.next();
+                    DestEntry de = iter.next();
                     if (!validate(key, de, listname))
                         continue;
                     if (search != null && key.indexOf(search) < 0)
@@ -1026,13 +1026,13 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return Collections.emptyMap();
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.emptyMap();
                 }
-                SkipIterator iter;
+                SkipIterator<String, DestEntry> iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
@@ -1043,7 +1043,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
-                    String key = (String) iter.nextKey();
+                    String key = iter.nextKey();
                     if (startsWith != null) {
                         if (startsWith.equals("[0-9]")) {
                             if (key.charAt(0) > '9')
@@ -1052,7 +1052,7 @@ public class BlockfileNamingService extends DummyNamingService {
                             break;
                         }
                     }
-                    DestEntry de = (DestEntry) iter.next();
+                    DestEntry de = iter.next();
                     if (!validate(key, de, listname))
                         continue;
                     if (search != null && key.indexOf(search) < 0)
@@ -1120,13 +1120,13 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return Collections.emptySet();
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.emptySet();
                 }
-                SkipIterator iter;
+                SkipIterator<String, DestEntry> iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
@@ -1136,7 +1136,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
-                    String key = (String) iter.nextKey();
+                    String key = iter.nextKey();
                     if (startsWith != null) {
                         if (startsWith.equals("[0-9]")) {
                             if (key.charAt(0) > '9')
@@ -1199,7 +1199,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return 0;
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     return 0;
                 return sl.size();
@@ -1253,7 +1253,7 @@ public class BlockfileNamingService extends DummyNamingService {
             String key = ie.key;
             String list = ie.list;
             try {
-                SkipList sl = _bf.getIndex(list, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(list, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     _log.error("No list found to remove corrupt \"" + key + "\" from database " + list);
                     continue;
@@ -1346,12 +1346,11 @@ public class BlockfileNamingService extends DummyNamingService {
      *  but if we threw a RuntimeException we would prevent access to entries later in
      *  the SkipSpan.
      */
-    private static class PropertiesSerializer implements Serializer {
+    private static class PropertiesSerializer implements Serializer<Properties> {
         /**
          *  A format error on the properties is non-fatal (returns an empty properties)
          */
-        public byte[] getBytes(Object o) {
-            Properties p = (Properties) o;
+        public byte[] getBytes(Properties p) {
             try {
                 return DataHelper.toProperties(p);
             } catch (DataFormatException dfe) {
@@ -1362,7 +1361,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
 
         /** returns null on error */
-        public Object construct(byte[] b) {
+        public Properties construct(byte[] b) {
             Properties rv = new Properties();
             try {
                 DataHelper.fromProperties(b, 0, rv);
