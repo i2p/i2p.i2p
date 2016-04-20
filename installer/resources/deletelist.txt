@@ -97,3 +97,6 @@ certificates/ssl/ieb9oopo.mooo.com2.crt
 certificates/ssl/netdb.i2p2.no2.crt
 certificates/ssl/i2p.mooo.com2.crt
 certificates/ssl/ieb9oopo.mooo.com.crt
+# vanished
+certificates/news/killyourtv_at_mail.i2p.crt
+certificates/router/killyourtv_at_mail.i2p.crt
