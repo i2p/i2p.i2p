@@ -540,7 +540,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @return removed object or null
      *  @throws RuntimeException
      */
-    private static Object removeEntry(SkipList<String, ?> sl, String key) {
+    private static <V> V removeEntry(SkipList<String, V> sl, String key) {
         return sl.remove(key);
     }
 
@@ -858,12 +858,12 @@ public class BlockfileNamingService extends DummyNamingService {
                 SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     return false;
-                Object removed = removeEntry(sl, key);
+                DestEntry removed = removeEntry(sl, key);
                 boolean rv = removed != null;
                 if (rv) {
                     removeCache(hostname);
                     try {
-                        removeReverseEntry(key, ((DestEntry)removed).dest);
+                        removeReverseEntry(key, removed.dest);
                     } catch (ClassCastException cce) {
                         _log.error("DB reverse remove error", cce);
                     }
