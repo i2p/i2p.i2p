@@ -206,6 +206,7 @@ public class BSkipList<K extends Comparable<? super K>, V> extends SkipList<K, V
 		return new IBSkipIterator<K, V>(first, 0);
 	}
 
+/****
 	@Override
 	public SkipIterator<K, V> min() {
 		return iterator();
@@ -218,6 +219,7 @@ public class BSkipList<K extends Comparable<? super K>, V> extends SkipList<K, V
 		SkipSpan<K, V> ss = stack.getEnd();
 		return new IBSkipIterator<K, V>(ss, ss.nKeys - 1);
 	}
+****/
 
 	@Override
 	public SkipIterator<K, V> find(K key) {

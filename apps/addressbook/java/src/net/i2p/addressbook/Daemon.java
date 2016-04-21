@@ -254,10 +254,10 @@ public class Daemon {
                                     }
                                     String poldname = hprops.getProperty(HostTxtEntry.PROP_OLDNAME);
                                     if (poldname != null) {
-                                        Destination pod = router.lookup(poldname);
+                                        List<Destination> pod = router.lookupAll(poldname);
                                         if (pod == null) {
                                             // we didn't have the old one, so we'll add the new one
-                                        } else if (pod.equals(dest)) {
+                                        } else if (pod.contains(dest)) {
                                             // checks out, so we'll add the new one
                                         } else {
                                             // mismatch, disallow
@@ -297,10 +297,10 @@ public class Daemon {
                                             continue;
                                         }
                                         Destination pod = new Destination(polddest);
-                                        Destination pod2 = router.lookup(poldname);
+                                        List<Destination> pod2 = router.lookupAll(poldname);
                                         if (pod2 == null) {
                                             // we didn't have the old name
-                                        } else if (pod.equals(pod2)) {
+                                        } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
                                                 if (log != null)
@@ -330,6 +330,8 @@ public class Daemon {
                                     }
                                 } else if (action.equals(HostTxtEntry.ACTION_CHANGEDEST)) {
                                     // change destination on an existing entry
+                                    // This removes all previous destinations under that hostname,
+                                    // is this what we want?
                                     String polddest = hprops.getProperty(HostTxtEntry.PROP_OLDDEST);
                                     if (polddest != null) {
                                         Destination pod = new Destination(polddest);
@@ -369,20 +371,22 @@ public class Daemon {
                                     }
                                 } else if (action.equals(HostTxtEntry.ACTION_CHANGENAME)) {
                                     // Delete old name, replace with new
+                                    // This removes all previous destinations under that hostname,
+                                    // is this what we want?
                                     if (isKnown) {
                                         old++;
                                         continue;
                                     }
                                     String poldname = hprops.getProperty(HostTxtEntry.PROP_OLDNAME);
                                     if (poldname != null) {
-                                        Destination pod = router.lookup(poldname);
+                                        List<Destination> pod = router.lookupAll(poldname);
                                         if (pod == null) {
                                             // we didn't have the old name
-                                        } else if (pod.equals(dest)) {
+                                        } else if (pod.contains(dest)) {
                                             // checks out, so we'll delete it
                                             if (knownNames != null)
                                                 knownNames.remove(poldname);
-                                            boolean success = router.remove(poldname);
+                                            boolean success = router.remove(poldname, dest);
                                             if (success)
                                                 deleted++;
                                             if (log != null) {
@@ -399,7 +403,7 @@ public class Daemon {
                                             if (published != null) {
                                                 if (publishedNS == null)
                                                     publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
-                                                success = publishedNS.remove(poldname);
+                                                success = publishedNS.remove(poldname, dest);
                                                 if (log != null && !success)
                                                     log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + poldname);
                                             }
@@ -431,11 +435,11 @@ public class Daemon {
                                     String poldname = hprops.getProperty(HostTxtEntry.PROP_NAME);
                                     if (polddest != null && poldname != null) {
                                         Destination pod = new Destination(polddest);
-                                        Destination pod2 = router.lookup(poldname);
-                                        if (pod.equals(pod2)) {
-                                            if (knownNames != null)
+                                        List<Destination> pod2 = router.lookupAll(poldname);
+                                        if (pod2 != null && pod2.contains(pod)) {
+                                            if (knownNames != null && pod2.size() == 1)
                                                 knownNames.remove(poldname);
-                                            boolean success = router.remove(poldname);
+                                            boolean success = router.remove(poldname, pod);
                                             if (success)
                                                 deleted++;
                                             if (log != null) {
@@ -452,7 +456,7 @@ public class Daemon {
                                             if (published != null) {
                                                 if (publishedNS == null)
                                                     publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
-                                                success = publishedNS.remove(poldname);
+                                                success = publishedNS.remove(poldname, pod);
                                                 if (log != null && !success)
                                                     log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + poldname);
                                             }
@@ -485,11 +489,11 @@ public class Daemon {
                                         Destination pod = new Destination(polddest);
                                         String poldname = hprops.getProperty(HostTxtEntry.PROP_NAME);
                                         if (poldname != null) {
-                                            Destination pod2 = router.lookup(poldname);
-                                            if (pod.equals(pod2)) {
+                                            List<Destination> pod2 = router.lookupAll(poldname);
+                                            if (pod2 != null && pod2.contains(pod)) {
                                                 if (knownNames != null)
                                                     knownNames.remove(poldname);
-                                                boolean success = router.remove(poldname);
+                                                boolean success = router.remove(poldname, pod);
                                                 if (success)
                                                     deleted++;
                                                 if (log != null) {
@@ -506,7 +510,7 @@ public class Daemon {
                                                 if (published != null) {
                                                     if (publishedNS == null)
                                                         publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
-                                                    success = publishedNS.remove(poldname);
+                                                    success = publishedNS.remove(poldname, pod);
                                                     if (log != null && !success)
                                                         log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + poldname);
                                                 }
@@ -530,12 +534,12 @@ public class Daemon {
                                                 break;
                                             rev2 = rev;
                                             // forward check in case hash collision or something
-                                            Destination fwd = router.lookup(rev);
-                                            if (!pod.equals(fwd))
+                                            List<Destination> fwd = router.lookupAll(rev);
+                                            if (!fwd.contains(pod))
                                                 break;  // can't go around again, fail
                                             if (knownNames != null)
                                                 knownNames.remove(rev);
-                                            boolean success = router.remove(rev);
+                                            boolean success = router.remove(rev, pod);
                                             if (success)
                                                 deleted++;
                                             if (log != null) {
@@ -552,7 +556,7 @@ public class Daemon {
                                             if (published != null) {
                                                 if (publishedNS == null)
                                                     publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
-                                                success = publishedNS.remove(rev);
+                                                success = publishedNS.remove(rev, pod);
                                                 if (log != null && !success)
                                                     log.append("Remove from published address book " + published.getAbsolutePath() + " failed for " + rev);
                                             }

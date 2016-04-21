@@ -217,7 +217,10 @@ class HostTxtParser {
         for (HostTxtEntry e : map.values()) {
             System.out.println("Host: " + e.getName() +
                                "\nDest: " + e.getDest() +
-                               "\nValid? " + e.hasValidSig());
+                               "\nAction: " + (e.getProps() != null ? e.getProps().getProperty("action") : "(none)") +
+                               "\nValid Inner? " + e.hasValidInnerSig() +
+                               "\nValid? " + e.hasValidSig() +
+                               '\n');
         }
     }
 

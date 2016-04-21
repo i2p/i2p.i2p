@@ -35,7 +35,7 @@ import net.i2p.util.RandomSource;
 
 //import net.metanotion.io.block.BlockFile;
 
-public class SkipList<K extends Comparable<? super K>, V> implements Flushable {
+public class SkipList<K extends Comparable<? super K>, V> implements Flushable, Iterable<V> {
 	/** the probability of each next higher level */
 	protected static final int P = 2;
 	private static final int MIN_SLOTS = 4;
@@ -151,6 +151,7 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable {
 	 * dumps all the data
 	 * @deprecated goes to System.out
 	 */
+	@Deprecated
 	public void print() {
 		System.out.println("List size " + size);
 		System.out.println(first.print());
@@ -163,12 +164,14 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable {
 
 	public SkipIterator<K, V> iterator() { return new SkipIterator<K, V>(first, 0); }
 
+/****
 	public SkipIterator<K, V> min() { return new SkipIterator<K, V>(first, 0); }
 
 	public SkipIterator<K, V> max() {
 		SkipSpan<K, V> ss = stack.getEnd();
 		return new SkipIterator<K, V>(ss, ss.nKeys - 1);
 	}
+****/
 
 	/** @return an iterator where nextKey() is the first one greater than or equal to 'key' */
 	public SkipIterator<K, V> find(K key) {
@@ -177,7 +180,6 @@ public class SkipList<K extends Comparable<? super K>, V> implements Flushable {
 		if(search[0] < 0) { search[0] = -1 * (search[0] + 1); }
 		return new SkipIterator<K, V>(ss, search[0]);
 	}
-
 
 	// Levels adjusted to guarantee O(log n) search
 	// This is expensive proportional to the number of spans.
