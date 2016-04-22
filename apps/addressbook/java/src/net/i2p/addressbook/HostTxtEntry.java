@@ -19,6 +19,7 @@ import net.i2p.util.OrderedProperties;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import net.i2p.data.Base32;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SigningPrivateKey;
@@ -398,12 +399,31 @@ class HostTxtEntry {
         props.setProperty(sigprop, s.toBase64());
     }
 
+    /**
+     *  Usage: HostTxtEntry [-i] [-x] [hostname.i2p] [key=val]...
+     */
     public static void main(String[] args) throws Exception {
-        int astart = 0;
-        if (args.length > 0 && args[0].equals("-i"))
-            astart++;
+        boolean inner = false;
+        boolean remove = false;
+        if (args.length > 0 && args[0].equals("-i")) {
+            inner = true;
+            args = Arrays.copyOfRange(args, 1, args.length);
+        }
+        if (args.length > 0 && args[0].equals("-x")) {
+            remove = true;
+            args = Arrays.copyOfRange(args, 1, args.length);
+        }
+        String host;
+        if (args.length > 0 && args[0].endsWith(".i2p")) {
+            host = args[0];
+            args = Arrays.copyOfRange(args, 1, args.length);
+        } else {
+            byte[] rand = new byte[5];
+            RandomSource.getInstance().nextBytes(rand);
+            host = Base32.encode(rand) + ".i2p";
+        }
         OrderedProperties props = new OrderedProperties();
-        for (int i = astart; i < args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             int eq = args[i].indexOf("=");
             props.setProperty(args[i].substring(0, eq), args[i].substring(eq + 1));
         }
@@ -412,28 +432,25 @@ class HostTxtEntry {
         File f = new File("tmp-eepPriv.dat");
         PrivateKeyFile pkf = new PrivateKeyFile(f);
         pkf.createIfAbsent(SigType.EdDSA_SHA512_Ed25519);
-        f.delete();
+        //f.delete();
         PrivateKeyFile pkf2;
-        if (astart != 0) {
+        if (inner) {
             // inner
             File f2 = new File("tmp-eepPriv2.dat");
             pkf2 = new PrivateKeyFile(f2);
             pkf2.createIfAbsent(SigType.DSA_SHA1);
-            f2.delete();
+            //f2.delete();
             props.setProperty(PROP_OLDDEST, pkf2.getDestination().toBase64());
         } else {
             pkf2 = null;
         }
-        byte[] rand = new byte[5];
-        RandomSource.getInstance().nextBytes(rand);
-        String host = Base32.encode(rand) + ".i2p";
         HostTxtEntry he = new HostTxtEntry(host, pkf.getDestination().toBase64(), props);
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
         //out.write("Before signing:\n");
         //he.write(out);
         //out.flush();
         SigningPrivateKey priv = pkf.getSigningPrivKey();
-        if (astart != 0) {
+        if (inner) {
             SigningPrivateKey priv2 = pkf2.getSigningPrivKey();
             he.signInner(priv2);
             //out.write("After signing inner:\n");
@@ -443,7 +460,7 @@ class HostTxtEntry {
         //out.write("After signing:\n");
         he.write(out);
         out.flush();
-        if (astart > 0 && !he.hasValidInnerSig())
+        if (inner && !he.hasValidInnerSig())
             throw new IllegalStateException("Inner fail 1");
         if (!he.hasValidSig())
             throw new IllegalStateException("Outer fail 1");
@@ -455,25 +472,27 @@ class HostTxtEntry {
         String line = sw.toString();
         line = line.substring(line.indexOf(PROPS_SEPARATOR) + 2);
         HostTxtEntry he2 = new HostTxtEntry(host, pkf.getDestination().toBase64(), line);
-        if (astart > 0 && !he2.hasValidInnerSig())
+        if (inner && !he2.hasValidInnerSig())
             throw new IllegalStateException("Inner fail 2");
         if (!he2.hasValidSig())
             throw new IllegalStateException("Outer fail 2");
 
         // 'remove' tests (corrupts earlier sigs)
-        he.getProps().remove(PROP_SIG);
-        he.signRemove(priv);
-        //out.write("Remove entry:\n");
-        sw = new StringWriter(1024);
-        buf = new BufferedWriter(sw);
-        he.writeRemove(buf);
-        buf.flush();
-        out.write(sw.toString());
-        out.flush();
-        line = sw.toString().substring(2).trim();
-        HostTxtEntry he3 = new HostTxtEntry(line);
-        if (!he3.hasValidRemoveSig())
-            throw new IllegalStateException("Remove verify fail");
+        if (remove) {
+            he.getProps().remove(PROP_SIG);
+            he.signRemove(priv);
+            //out.write("Remove entry:\n");
+            sw = new StringWriter(1024);
+            buf = new BufferedWriter(sw);
+            he.writeRemove(buf);
+            buf.flush();
+            out.write(sw.toString());
+            out.flush();
+            line = sw.toString().substring(2).trim();
+            HostTxtEntry he3 = new HostTxtEntry(line);
+            if (!he3.hasValidRemoveSig())
+                throw new IllegalStateException("Remove verify fail");
+        }
 
         //out.write("Test passed\n");
         //out.flush();

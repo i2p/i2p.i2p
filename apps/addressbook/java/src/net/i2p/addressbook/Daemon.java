@@ -202,40 +202,50 @@ public class Daemon {
                                     String polddest = hprops.getProperty(HostTxtEntry.PROP_OLDDEST);
                                     if (polddest != null) {
                                         Destination pod = new Destination(polddest);
-                                        // fill in oldDest for .txt naming service
-                                        if (isKnown && isTextFile)
-                                            oldDest = router.lookup(key);
-                                        if (pod.equals(dest)) {
-                                            // invalid
-                                            if (log != null)
-                                                log.append("Action: " + action + " failed because" +
-                                                           " identical old and new destinations for " + key +
-                                                           " from " + addressbook.getLocation());
-                                            invalid++;
-                                            continue;
-                                        } else if (!isKnown) {
+                                        List<Destination> pod2 = router.lookupAll(key);
+                                        if (pod2 == null) {
                                             // we didn't know it before, so we'll add it
-                                        } else if (dest.equals(oldDest)) {
+                                            // TODO check inner sig anyway?
+                                        } else if (pod2.contains(dest)) {
                                             // we knew it before, with the same dest
                                             old++;
                                             continue;
-                                        } else if (pod.equals(oldDest)) {
+                                        } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
                                                 if (log != null)
                                                     log.append("Action: " + action + " failed because" +
                                                                " inner signature for key " + key +
                                                                " failed" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                                 invalid++;
                                                 continue;
                                             }
                                             // TODO Requires NamingService support
                                             // if (isTextFile), do we replace or not? check sigType.isAvailable()
-                                            // router.addAltDest(dest)
-                                            if (log != null)
-                                                log.append("Action: " + action + " unimplemented" +
-                                                           " from " + addressbook.getLocation());
+                                            boolean success = router.addDestination(key, dest, props);
+                                            if (log != null) {
+                                                if (success)
+                                                    log.append("Additional address for " + key +
+                                                               " added to address book. From: " + addressbook.getLocation());
+                                                else
+                                                    log.append("Failed to add additional address for " + key +
+                                                               " From: " + addressbook.getLocation());
+                                            }
+                                            // now update the published addressbook
+                                            // ditto
+                                            if (published != null) {
+                                                if (publishedNS == null)
+                                                    publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                                success = publishedNS.addDestination(key, dest, props);
+                                                if (log != null && !success)
+                                                    log.append("Add to published address book " + published.getAbsolutePath() + " failed for " + key);
+                                            }
+                                            nnew++;
+                                            continue;
+                                        } else {
+                                            // mismatch, disallow
+                                            logMismatch(log, action, key, pod2, he.getDest(), addressbook);
                                             invalid++;
                                             continue;
                                         }
@@ -261,18 +271,14 @@ public class Daemon {
                                             // checks out, so we'll add the new one
                                         } else {
                                             // mismatch, disallow
-                                            if (log != null)
-                                                log.append("Action: " + action + " failed because" +
-                                                           " destination for old name " + poldname +
-                                                           " does not match" +
-                                                           " from " + addressbook.getLocation());
+                                            logMismatch(log, action, key, pod, he.getDest(), addressbook);
                                             invalid++;
                                             continue;
                                         }
                                     } else {
                                         if (log != null)
                                             log.append("Action: " + action + " failed, missing required parameters" +
-                                                       " from " + addressbook.getLocation());
+                                                       ". From: " + addressbook.getLocation());
                                         invalid++;
                                         continue;
                                     }
@@ -292,7 +298,7 @@ public class Daemon {
                                                 log.append("Action: " + action + " failed because" +
                                                            " old name " + poldname +
                                                            " is invalid" +
-                                                           " from " + addressbook.getLocation());
+                                                           ". From: " + addressbook.getLocation());
                                             invalid++;
                                             continue;
                                         }
@@ -300,6 +306,7 @@ public class Daemon {
                                         List<Destination> pod2 = router.lookupAll(poldname);
                                         if (pod2 == null) {
                                             // we didn't have the old name
+                                            // TODO check inner sig anyway?
                                         } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
@@ -307,24 +314,20 @@ public class Daemon {
                                                     log.append("Action: " + action + " failed because" +
                                                                " inner signature for old name " + poldname +
                                                                " failed" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                                 invalid++;
                                                 continue;
                                             }
                                         } else {
                                             // mismatch, disallow
-                                            if (log != null)
-                                                log.append("Action: " + action + " failed because" +
-                                                           " destination for old name " + poldname +
-                                                           " does not match provided" +
-                                                           " from " + addressbook.getLocation());
+                                            logMismatch(log, action, key, pod2, polddest, addressbook);
                                             invalid++;
                                             continue;
                                         }
                                     } else {
                                         if (log != null)
                                             log.append("Action: " + action + " failed, missing required parameters" +
-                                                       " from " + addressbook.getLocation());
+                                                       ". From: " + addressbook.getLocation());
                                         invalid++;
                                         continue;
                                     }
@@ -335,37 +338,44 @@ public class Daemon {
                                     String polddest = hprops.getProperty(HostTxtEntry.PROP_OLDDEST);
                                     if (polddest != null) {
                                         Destination pod = new Destination(polddest);
-                                        // fill in oldDest for .txt naming service
-                                        if (isKnown && isTextFile)
-                                            oldDest = router.lookup(key);
-                                        if (!isKnown) {
+                                        List<Destination> pod2 = router.lookupAll(key);
+                                        if (pod2 == null) {
                                             // we didn't have the old name
-                                        } else if (pod.equals(oldDest)) {
+                                            // TODO check inner sig anyway?
+                                        } else if (pod2.contains(dest)) {
+                                            // we already have the new dest
+                                            old++;
+                                            continue;
+                                        } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
                                                 if (log != null)
                                                     log.append("Action: " + action + " failed because" +
                                                                " inner signature for key " + key +
                                                                " failed" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                                 invalid++;
                                                 continue;
+                                            }
+                                            if (log != null) {
+                                                if (pod2.size() == 1)
+                                                    log.append("Changing destination for " + key +
+                                                               ". From: " + addressbook.getLocation());
+                                                else
+                                                    log.append("Replacing " + pod2.size() + " destinations for " + key +
+                                                               ". From: " + addressbook.getLocation());
                                             }
                                             // TODO set flag to do non-putifabsent for published below
                                         } else {
                                             // mismatch, disallow
-                                            if (log != null)
-                                                log.append("Action: " + action + " failed because" +
-                                                           " destination for key " + key +
-                                                           " does not match provided" +
-                                                           " from " + addressbook.getLocation());
+                                            logMismatch(log, action, key, pod2, polddest, addressbook);
                                             invalid++;
                                             continue;
                                         }
                                     } else {
                                         if (log != null)
                                             log.append("Action: " + action + " failed, missing required parameters" +
-                                                       " from " + addressbook.getLocation());
+                                                       ". From: " + addressbook.getLocation());
                                         invalid++;
                                         continue;
                                     }
@@ -393,11 +403,11 @@ public class Daemon {
                                                 if (success)
                                                     log.append("Removed: " + poldname +
                                                                " to be replaced with " + key +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                                 else
                                                     log.append("Remove failed for: " + poldname +
                                                                " to be replaced with " + key +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                             }
                                             // now update the published addressbook
                                             if (published != null) {
@@ -409,18 +419,13 @@ public class Daemon {
                                             }
                                         } else {
                                             // mismatch, disallow
-                                            if (log != null)
-                                                log.append("Action: " + action + " failed because" +
-                                                           " destination for old name " + poldname +
-                                                           " does not match new name " + key +
-                                                           " from " + addressbook.getLocation());
-                                            invalid++;
+                                            logMismatch(log, action, key, pod, he.getDest(), addressbook);
                                             continue;
                                         }
                                     } else {
                                         if (log != null)
                                             log.append("Action: " + action + " failed, missing required parameters" +
-                                                       " from " + addressbook.getLocation());
+                                                       ". From: " + addressbook.getLocation());
                                         invalid++;
                                         continue;
                                     }
@@ -446,11 +451,11 @@ public class Daemon {
                                                 if (success)
                                                     log.append("Removed: " + poldname +
                                                                " as requested" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                                 else
                                                     log.append("Remove failed for: " + poldname +
                                                                " as requested" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                             }
                                             // now update the published addressbook
                                             if (published != null) {
@@ -462,17 +467,13 @@ public class Daemon {
                                             }
                                         } else if (pod2 != null) {
                                             // mismatch, disallow
-                                            if (log != null)
-                                                log.append("Action: " + action + " failed because" +
-                                                           " destination for " + poldname +
-                                                           " does not match" +
-                                                           " from " + addressbook.getLocation());
+                                            logMismatch(log, action, key, pod2, polddest, addressbook);
                                             invalid++;
                                         }
                                     } else {
                                         if (log != null)
                                             log.append("Action: " + action + " failed, missing required parameters" +
-                                                       " from " + addressbook.getLocation());
+                                                       ". From: " + addressbook.getLocation());
                                         invalid++;
                                     }
                                     continue;
@@ -500,11 +501,11 @@ public class Daemon {
                                                     if (success)
                                                         log.append("Removed: " + poldname +
                                                                    " as requested" +
-                                                                   " from " + addressbook.getLocation());
+                                                                   ". From: " + addressbook.getLocation());
                                                     else
                                                         log.append("Remove failed for: " + poldname +
                                                                    " as requested" +
-                                                                   " from " + addressbook.getLocation());
+                                                                   ". From: " + addressbook.getLocation());
                                                 }
                                                 // now update the published addressbook
                                                 if (published != null) {
@@ -516,11 +517,7 @@ public class Daemon {
                                                 }
                                             } else if (pod2 != null) {
                                                 // mismatch, disallow
-                                                if (log != null)
-                                                    log.append("Action: " + action + " failed because" +
-                                                               " destination for " + poldname +
-                                                               " does not match" +
-                                                               " from " + addressbook.getLocation());
+                                                logMismatch(log, action, key, pod2, polddest, addressbook);
                                                 invalid++;
                                             }
                                         }
@@ -546,11 +543,11 @@ public class Daemon {
                                                 if (success)
                                                     log.append("Removed: " + rev +
                                                                " as requested" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                                 else
                                                     log.append("Remove failed for: " + rev +
                                                                " as requested" +
-                                                               " from " + addressbook.getLocation());
+                                                               ". From: " + addressbook.getLocation());
                                             }
                                             // now update the published addressbook
                                             if (published != null) {
@@ -564,7 +561,7 @@ public class Daemon {
                                     } else {
                                         if (log != null)
                                             log.append("Action: " + action + " failed, missing required parameters" +
-                                                       " from " + addressbook.getLocation());
+                                                       ". From: " + addressbook.getLocation());
                                         invalid++;
                                     }
                                     continue;
@@ -575,7 +572,7 @@ public class Daemon {
                                 } else {
                                     if (log != null)
                                         log.append("Action: " + action + " unrecognized" +
-                                                   " from " + addressbook.getLocation());
+                                                   ". From: " + addressbook.getLocation());
                                     invalid++;
                                     continue;
                                 }
@@ -602,7 +599,7 @@ public class Daemon {
                                 knownNames.add(key);
                             nnew++;
                         } else if (log != null) {
-                            log.append("Bad hostname " + key + " from "
+                            log.append("Bad hostname " + key + ". From: "
                                    + addressbook.getLocation());
                             invalid++;
                         }        
@@ -612,7 +609,7 @@ public class Daemon {
                         if (isTextFile)
                             oldDest = router.lookup(key);
                         if (oldDest != null && !oldDest.toBase64().equals(entry.getValue())) {
-                            log.append("Conflict for " + key + " from "
+                            log.append("Conflict for " + key + ". From: "
                                        + addressbook.getLocation()
                                        + ". Destination in remote address book is "
                                        + entry.getValue());
@@ -643,6 +640,25 @@ public class Daemon {
             addressbook.delete();
         }  // subscriptions
         subscriptions.write();
+    }
+
+    private static void logMismatch(Log log, String action, String name, List<Destination> dests,
+                                    String olddest, AddressBook addressbook) {
+        if (log != null) {
+            StringBuilder buf = new StringBuilder(16);
+            final int sz = dests.size();
+            for (int i = 0; i < sz; i++) {
+                buf.append(dests.get(i).toBase64().substring(0, 6));
+                if (i != sz - 1)
+                    buf.append(", ");
+            }
+            log.append("Action: " + action + " failed because" +
+                       " destinations for " + name +
+                       " (" + buf + ')' +
+                       " do not include" +
+                       " (" + olddest.substring(0, 6) + ')' +
+                       ". From: " + addressbook.getLocation());
+        }
     }
 
     /**

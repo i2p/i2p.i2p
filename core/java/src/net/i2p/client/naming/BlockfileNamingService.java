@@ -10,6 +10,7 @@ package net.i2p.client.naming;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -135,6 +136,7 @@ public class BlockfileNamingService extends DummyNamingService {
     
     private static final String DUMMY = "";
     private static final int NEGATIVE_CACHE_SIZE = 32;
+    private static final int MAX_VALUE_LENGTH = 4096;
 
     /**
      *  Opens the database at hostsdb.blockfile or creates a new
@@ -852,18 +854,17 @@ public class BlockfileNamingService extends DummyNamingService {
                 try {
                     DestEntry de = getEntry(list, key);
                     if (de != null) {
-                        int sz = de.destList.size();
-                        // if any are invalid, assume they all are
-                        boolean invalid = false;
-                        for (int i = 0; i < sz; i++) {
-                            if (!validate(key, de, listname))
-                                invalid = true;
-                        }
-                        if (invalid)
+                        if (!validate(key, de, listname))
                             continue;
-                        rv = de.destList;
-                        if (storedOptions != null)
-                            storedOptions.addAll(de.propsList);
+                        if (de.destList != null) {
+                            rv = de.destList;
+                            if (storedOptions != null)
+                                storedOptions.addAll(de.propsList);
+                        } else {
+                            rv = Collections.singletonList(de.dest);
+                            if (storedOptions != null)
+                                storedOptions.add(de.props);
+                        }
                         break;
                     }
                 } catch (IOException ioe) {
@@ -1491,10 +1492,10 @@ public class BlockfileNamingService extends DummyNamingService {
             // For now, non-DSA at the front, DSA at the end
             SigType type = d.getSigningPublicKey().getType();
             if (type != SigType.DSA_SHA1 && type.isAvailable()) {
-                dests.add(0, d);
+                newDests.add(0, d);
                 storedOptions.add(0, options);
             } else {
-                dests.add(d);
+                newDests.add(d);
                 storedOptions.add(options);
             }
             return put(hostname, newDests, storedOptions, false);
@@ -1562,6 +1563,12 @@ public class BlockfileNamingService extends DummyNamingService {
                      de != null &&
                      de.dest != null &&
                      de.dest.getPublicKey() != null;
+        if (_isVersion4 && rv && de.destList != null) {
+            // additional checks for multi-dest
+            rv = de.propsList != null &&
+                 de.destList.size() == de.propsList.size() &&
+                 !de.destList.contains(null);
+        }
         if ((!rv) && (!_readOnly))
             _invalid.add(new InvalidEntry(key, listname));
         return rv;
@@ -1706,13 +1713,26 @@ public class BlockfileNamingService extends DummyNamingService {
      *  and is serialized in that order.
      */
     private static class DestEntry {
-        /** may be null */
+        /** May be null.
+         *  If more than one dest, contains the first props.
+         */
         public Properties props;
-        /** may not be null */
+
+        /** May not be null.
+         *  If more than one dest, contains the first dest.
+         */
         public Destination dest;
-        /** may be null - v4 only - same size as destList - may contain null entries */
+
+        /** May be null - v4 only - same size as destList - may contain null entries
+         *  Only non-null if more than one dest.
+         *  First entry always equal to props.
+         */
         public List<Properties> propsList;
-        /** may be null - v4 only - same size as propsList */
+
+        /** May be null - v4 only - same size as propsList
+         *  Only non-null if more than one dest.
+         *  First entry always equal to dest.
+         */
         public List<Destination> destList;
 
         @Override
@@ -1796,7 +1816,7 @@ public class BlockfileNamingService extends DummyNamingService {
                         d = de.destList.get(i);
                     }
                     try {
-                        DataHelper.writeProperties(baos, p, true, false);
+                        writeProperties(baos, p);
                     } catch (DataFormatException dfe) {
                         logError("DB Write Fail - properties too big?", dfe);
                         baos.write(new byte[2]);
@@ -1819,7 +1839,7 @@ public class BlockfileNamingService extends DummyNamingService {
                 int sz = bais.read() & 0xff;
                 if (sz <= 0)
                     throw new DataFormatException("bad dest count " + sz);
-                rv.props = DataHelper.readProperties(bais);
+                rv.props = readProperties(bais);
                 rv.dest = Destination.create(bais);
                 if (sz > 1) {
                     rv.propsList = new ArrayList<Properties>(sz);
@@ -1827,7 +1847,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     rv.propsList.add(rv.props);
                     rv.destList.add(rv.dest);
                     for (int i = 1; i < sz; i++) {
-                        rv.propsList.add(DataHelper.readProperties(bais));
+                        rv.propsList.add(readProperties(bais));
                         rv.destList.add(Destination.create(bais));
                     }
                 }
@@ -1840,6 +1860,132 @@ public class BlockfileNamingService extends DummyNamingService {
             }
             return rv;
         }
+    }
+
+    /**
+     * Same as DataHelper.writeProperties, UTF-8, unsorted,
+     * except that values may up to 4K bytes.
+     *
+     * @param props source may be null
+     * @throws DataFormatException if any key string is over 255 bytes long,
+     *                             if any value string is over 4096 bytes long, or if the total length
+     *                             (not including the two length bytes) is greater than 65535 bytes.
+     * @since 0.9.26
+     */
+    private static void writeProperties(ByteArrayOutputStream rawStream, Properties p) 
+            throws DataFormatException, IOException {
+        if (p != null && !p.isEmpty()) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 32);
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
+                String key = (String) entry.getKey();
+                String val = (String) entry.getValue();
+                DataHelper.writeStringUTF8(baos, key);
+                baos.write('=');
+                writeLongStringUTF8(baos, val);
+                baos.write(';');
+            }
+            if (baos.size() > 65535)
+                throw new DataFormatException("Properties too big (65535 max): " + baos.size());
+            byte propBytes[] = baos.toByteArray();
+            DataHelper.writeLong(rawStream, 2, propBytes.length);
+            rawStream.write(propBytes);
+        } else {
+            DataHelper.writeLong(rawStream, 2, 0);
+        }
+    }
+
+    /**
+     * Same as DataHelper.readProperties, UTF-8, unsorted,
+     * except that values may up to 4K bytes.
+     *
+     * Throws DataFormatException on duplicate key
+     *
+     * @param rawStream stream to read the mapping from
+     * @throws DataFormatException if the format is invalid
+     * @throws IOException if there is a problem reading the data
+     * @return a Properties
+     * @since 0.9.26
+     */
+    public static Properties readProperties(ByteArrayInputStream in) 
+        throws DataFormatException, IOException {
+        Properties props = new Properties();
+        int size = (int) DataHelper.readLong(in, 2);
+        // this doesn't prevent reading past the end on corruption
+        int ignore = in.available() - size;
+        while (in.available() > ignore) {
+            String key = DataHelper.readString(in);
+            int b = in.read();
+            if (b != '=')
+                throw new DataFormatException("Bad key " + b);
+            String val = readLongString(in);
+            b = in.read();
+            if (b != ';')
+                throw new DataFormatException("Bad value");
+            Object old = props.put(key, val);
+            if (old != null)
+                throw new DataFormatException("Duplicate key " + key);
+        }
+        return props;
+    }
+
+    /**
+     * Same as DataHelper.writeStringUTF8, except that
+     * strings up to 4K bytes are allowed.
+     * Format is: one-byte length + data, or 0xff + two-byte length + data
+     *
+     * @param out stream to write string
+     * @param string to write out: null strings are valid, but strings of excess length will
+     *               cause a DataFormatException to be thrown
+     * @throws DataFormatException if the string is not valid
+     * @throws IOException if there is an IO error writing the string
+     */
+    private static void writeLongStringUTF8(ByteArrayOutputStream out, String string) 
+        throws DataFormatException, IOException {
+        if (string == null) {
+            out.write(0);
+        } else {
+            byte[] raw = string.getBytes("UTF-8");
+            int len = raw.length;
+            if (len >= 255) {
+                if (len > MAX_VALUE_LENGTH)
+                    throw new DataFormatException(MAX_VALUE_LENGTH + " max, but this is "
+                                              + len + " [" + string + "]");
+                out.write(0xff);
+                DataHelper.writeLong(out, 2, len);
+            } else {
+                out.write(len);
+            }
+            out.write(raw);
+        }
+    }
+
+    /**
+     * Same as DataHelper.readString, except that
+     * strings up to 4K bytes are allowed.
+     * Format is: one-byte length + data, or 0xff + two-byte length + data
+     *
+     * @param in stream to read from
+     * @throws DataFormatException if the stream doesn't contain a validly formatted string
+     * @throws EOFException if there aren't enough bytes to read the string
+     * @throws IOException if there is an IO error reading the string
+     * @return UTF-8 string
+     */
+    private static String readLongString(ByteArrayInputStream in) throws DataFormatException, IOException {
+        int size = in.read();
+        if (size < 0)
+            throw new EOFException("EOF reading string");
+        if (size == 0xff) {
+            size = (int) DataHelper.readLong(in, 2);
+            if (size > MAX_VALUE_LENGTH)
+                throw new DataFormatException(MAX_VALUE_LENGTH + " max, but this is " + size);
+        }
+        if (size == 0)
+            return "";
+        byte raw[] = new byte[size];
+        int read = DataHelper.read(in, raw);
+        if (read != size)
+            throw new EOFException("EOF reading string");
+        return new String(raw, "UTF-8");
     }
 
     /**
