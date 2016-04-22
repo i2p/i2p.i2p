@@ -101,6 +101,24 @@ class SubscriptionList implements Iterable<AddressBook> {
     }
     
     /**
+     * Testing only.
+     * 
+     * @param hoststxt path to a local file used as the test 'subscription' input
+     * @since 0.9.26
+     */
+    public SubscriptionList(String hoststxt) {
+        File dummy = new File("/dev/null");
+        this.etagsFile = dummy;
+        this.lastModifiedFile = dummy;
+        this.lastFetchedFile = dummy;
+        this.delay = 0;
+        this.proxyHost = "127.0.0.1";
+        this.proxyPort = 4444;
+        Subscription sub = new Subscription("file:" + hoststxt, null, null, null);
+        this.subscriptions = Collections.singletonList(sub);
+    }
+    
+    /**
      * Return an iterator over the AddressBooks represented by the Subscriptions
      * in this SubscriptionList.
      * 

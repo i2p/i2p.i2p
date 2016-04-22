@@ -71,9 +71,16 @@ class HostTxtEntry {
      * @throws IllegalArgumentException on dup key in sprops and other errors
      */
     public HostTxtEntry(String name, String dest, String sprops) throws IllegalArgumentException {
-        this.name = name;
-        this.dest = dest;
-        this.props = parseProps(sprops);
+        this(name, dest, parseProps(sprops));
+    }
+
+    /**
+     * A 'remove' entry. Name and Dest will be null.
+     * @param sprops line part after the #!, non-null
+     * @throws IllegalArgumentException on dup key in sprops and other errors
+     */
+    public HostTxtEntry(String sprops) throws IllegalArgumentException {
+        this(null, null, parseProps(sprops));
     }
 
     /**
@@ -132,19 +139,19 @@ class HostTxtEntry {
     }
 
     /**
-     * Write as a "remove" line #!olddest=dest#oldname=name#k1=v1#k2=v2...]
+     * Write as a "remove" line #!dest=dest#name=name#k1=v1#sig=sig...]
      * Includes newline.
      * Must have been constructed with non-null properties.
      */
     public void writeRemove(BufferedWriter out) throws IOException {
         if (props == null)
             throw new IllegalStateException();
-        props.setProperty(PROP_OLDNAME, name);
-        props.setProperty(PROP_OLDDEST, dest);
+        props.setProperty(PROP_NAME, name);
+        props.setProperty(PROP_DEST, dest);
         writeProps(out, false, false);
         out.newLine();
-        props.remove(PROP_OLDNAME);
-        props.remove(PROP_OLDDEST);
+        props.remove(PROP_NAME);
+        props.remove(PROP_DEST);
     }
 
     /**
@@ -265,6 +272,50 @@ class HostTxtEntry {
         return rv;
     }
 
+    /**
+     * Verify with the "dest" property's public key using the "sig" property
+     */
+    public boolean hasValidRemoveSig() {
+        if (props == null)
+            return false;
+        boolean rv = false;
+        // don't cache result
+        if (true) {
+            StringWriter buf = new StringWriter(1024);
+            String sig = props.getProperty(PROP_SIG);
+            String olddest = props.getProperty(PROP_DEST);
+            if (sig == null || olddest == null)
+                return false;
+            try {
+                writeProps(buf, true, true);
+            } catch (IOException ioe) {
+                // won't happen
+                return false;
+            }
+            byte[] sdata = Base64.decode(sig);
+            if (sdata == null)
+                return false;
+            Destination d;
+            try {
+                d = new Destination(olddest);
+            } catch (DataFormatException dfe) {
+                return false;
+            }
+            SigningPublicKey spk = d.getSigningPublicKey();
+            SigType type = spk.getType();
+            if (type == null)
+                return false;
+            Signature s;
+            try {
+                s = new Signature(type, sdata);
+            } catch (IllegalArgumentException iae) {
+                return false;
+            }
+            rv = DSAEngine.getInstance().verifySignature(s, DataHelper.getUTF8(buf.toString()), spk);
+        }
+        return rv;
+    }
+
     @Override
     public int hashCode() {
         return dest.hashCode();
@@ -297,6 +348,30 @@ class HostTxtEntry {
      */
     private void signInner(SigningPrivateKey spk) {
         signIt(spk, PROP_OLDSIG);
+    }
+
+    /**
+     * Sign as a "remove" line #!dest=dest#name=name#k1=v1#sig=sig...]
+     */
+    public void signRemove(SigningPrivateKey spk) {
+        if (props == null)
+            throw new IllegalStateException();
+        if (props.containsKey(PROP_SIG))
+            throw new IllegalStateException();
+        props.setProperty(PROP_NAME, name);
+        props.setProperty(PROP_DEST, dest);
+        StringWriter buf = new StringWriter(1024);
+        try {
+            writeProps(buf, false, false);
+        } catch (IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        props.remove(PROP_NAME);
+        props.remove(PROP_DEST);
+        Signature s = DSAEngine.getInstance().sign(DataHelper.getUTF8(buf.toString()), spk);
+        if (s == null)
+            throw new IllegalArgumentException("sig failed");
+        props.setProperty(PROP_SIG, s.toBase64());
     }
 
     /**
@@ -384,6 +459,22 @@ class HostTxtEntry {
             throw new IllegalStateException("Inner fail 2");
         if (!he2.hasValidSig())
             throw new IllegalStateException("Outer fail 2");
+
+        // 'remove' tests (corrupts earlier sigs)
+        he.getProps().remove(PROP_SIG);
+        he.signRemove(priv);
+        //out.write("Remove entry:\n");
+        sw = new StringWriter(1024);
+        buf = new BufferedWriter(sw);
+        he.writeRemove(buf);
+        buf.flush();
+        out.write(sw.toString());
+        out.flush();
+        line = sw.toString().substring(2).trim();
+        HostTxtEntry he3 = new HostTxtEntry(line);
+        if (!he3.hasValidRemoveSig())
+            throw new IllegalStateException("Remove verify fail");
+
         //out.write("Test passed\n");
         //out.flush();
     }

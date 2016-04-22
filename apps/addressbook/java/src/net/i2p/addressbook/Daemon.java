@@ -737,7 +737,24 @@ public class Daemon {
      *            others are ignored.
      */
     public static void main(String[] args) {
-        _instance.run(args);
+        if (args != null && args.length > 0 && args[0].equals("test"))
+            _instance.test(args);
+        else
+            _instance.run(args);
+    }
+
+    /** @since 0.9.26 */
+    private static void test(String[] args) {
+        Properties ctxProps = new Properties();
+        String PROP_FORCE = "i2p.naming.blockfile.writeInAppContext";
+        ctxProps.setProperty(PROP_FORCE, "true");
+        I2PAppContext ctx = new I2PAppContext(ctxProps);
+        NamingService ns = getNamingService("hosts.txt");
+        File published = new File("test-published.txt");
+        Log log = new Log(new File("test-log.txt"));
+        SubscriptionList subscriptions = new SubscriptionList("test-sub.txt");
+        update(ns, published, subscriptions, log);
+        ctx.logManager().flush();
     }
     
     public void run(String[] args) {

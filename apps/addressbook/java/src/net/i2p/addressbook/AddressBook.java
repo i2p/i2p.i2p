@@ -178,6 +178,18 @@ class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
     }
 
     /**
+     * Test only.
+     * 
+     * @param testsubfile path to a file containing the simulated fetch of a subscription
+     * @since 0.9.26
+     */
+    public AddressBook(String testsubfile) {
+        this.location = testsubfile;
+        this.addresses = null;
+        this.subFile = new File(testsubfile);
+    }
+
+    /**
      * Return an iterator over the addresses in the AddressBook.
      * @since 0.8.7
      */
