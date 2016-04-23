@@ -119,6 +119,9 @@
 <td><%=intl._t("Added Date")%></td>
 <td><%=addr.getAdded()%></td>
 </tr><tr class="list${book.trClass}">
+<td><%=intl._t("Validated")%></td>
+<td><%=addr.isValidated() ? intl._t("yes") : intl._t("no")%></td>
+</tr><tr class="list${book.trClass}">
 <td><%=intl._t("Source")%></td>
 <td><%=addr.getSource()%></td>
 </tr><tr class="list${book.trClass}">

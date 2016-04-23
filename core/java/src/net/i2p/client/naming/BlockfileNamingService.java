@@ -132,7 +132,9 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String VERSION = "4";
 
     private static final String PROP_ADDED = "a";
+    private static final String PROP_MODDED = "m";
     private static final String PROP_SOURCE = "s";
+    private static final String PROP_VALIDATED = "v";
     
     private static final String DUMMY = "";
     private static final int NEGATIVE_CACHE_SIZE = 32;

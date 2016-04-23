@@ -373,6 +373,7 @@ public class Daemon {
                                                                ". From: " + addressbook.getLocation());
                                             }
                                             allowExistingKeyInPublished = true;
+                                            props.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
                                         } else {
                                             // mismatch, disallow
                                             logMismatch(log, action, key, pod2, polddest, addressbook);
@@ -447,6 +448,7 @@ public class Daemon {
                                 } else if (action.equals(HostTxtEntry.ACTION_UPDATE)) {
                                     if (isKnown) {
                                         allowExistingKeyInPublished = true;
+                                        props.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
                                     }
                                 } else {
                                     if (log != null)
