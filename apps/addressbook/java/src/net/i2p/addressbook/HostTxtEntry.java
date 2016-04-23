@@ -132,27 +132,34 @@ class HostTxtEntry {
      * Includes newline.
      */
     public void write(BufferedWriter out) throws IOException {
-        out.write(name);
-        out.write(KV_SEPARATOR);
-        out.write(dest);
+        if (name != null && dest != null) {
+            out.write(name);
+            out.write(KV_SEPARATOR);
+            out.write(dest);
+        }
         writeProps(out, false, false);
         out.newLine();
     }
 
     /**
      * Write as a "remove" line #!dest=dest#name=name#k1=v1#sig=sig...]
+     * This works whether constructed with name and dest, or just properties.
      * Includes newline.
      * Must have been constructed with non-null properties.
      */
     public void writeRemove(BufferedWriter out) throws IOException {
         if (props == null)
             throw new IllegalStateException();
-        props.setProperty(PROP_NAME, name);
-        props.setProperty(PROP_DEST, dest);
+        if (name != null && dest != null) {
+            props.setProperty(PROP_NAME, name);
+            props.setProperty(PROP_DEST, dest);
+        }
         writeProps(out, false, false);
         out.newLine();
-        props.remove(PROP_NAME);
-        props.remove(PROP_DEST);
+        if (name != null && dest != null) {
+            props.remove(PROP_NAME);
+            props.remove(PROP_DEST);
+        }
     }
 
     /**
@@ -185,7 +192,7 @@ class HostTxtEntry {
      * Verify with the dest public key using the "sig" property
      */
     public boolean hasValidSig() {
-        if (props == null)
+        if (props == null || name == null || dest == null)
             return false;
         if (!isValidated) {
             isValidated = true;
@@ -230,7 +237,7 @@ class HostTxtEntry {
      * Verify with the "olddest" property's public key using the "oldsig" property
      */
     public boolean hasValidInnerSig() {
-        if (props == null)
+        if (props == null || name == null || dest == null)
             return false;
         boolean rv = false;
         // don't cache result
@@ -450,35 +457,35 @@ class HostTxtEntry {
         //he.write(out);
         //out.flush();
         SigningPrivateKey priv = pkf.getSigningPrivKey();
-        if (inner) {
-            SigningPrivateKey priv2 = pkf2.getSigningPrivKey();
-            he.signInner(priv2);
-            //out.write("After signing inner:\n");
-            //he.write(out);
-        }
-        he.sign(priv);
-        //out.write("After signing:\n");
-        he.write(out);
-        out.flush();
-        if (inner && !he.hasValidInnerSig())
-            throw new IllegalStateException("Inner fail 1");
-        if (!he.hasValidSig())
-            throw new IllegalStateException("Outer fail 1");
-        // now create 2nd, read in
         StringWriter sw = new StringWriter(1024);
         BufferedWriter buf = new BufferedWriter(sw);
-        he.write(buf);
-        buf.flush();
-        String line = sw.toString();
-        line = line.substring(line.indexOf(PROPS_SEPARATOR) + 2);
-        HostTxtEntry he2 = new HostTxtEntry(host, pkf.getDestination().toBase64(), line);
-        if (inner && !he2.hasValidInnerSig())
-            throw new IllegalStateException("Inner fail 2");
-        if (!he2.hasValidSig())
-            throw new IllegalStateException("Outer fail 2");
-
-        // 'remove' tests (corrupts earlier sigs)
-        if (remove) {
+        if (!remove) {
+            if (inner) {
+                SigningPrivateKey priv2 = pkf2.getSigningPrivKey();
+                he.signInner(priv2);
+                //out.write("After signing inner:\n");
+                //he.write(out);
+            }
+            he.sign(priv);
+            //out.write("After signing:\n");
+            he.write(out);
+            out.flush();
+            if (inner && !he.hasValidInnerSig())
+                throw new IllegalStateException("Inner fail 1");
+            if (!he.hasValidSig())
+                throw new IllegalStateException("Outer fail 1");
+            // now create 2nd, read in
+            he.write(buf);
+            buf.flush();
+            String line = sw.toString();
+            line = line.substring(line.indexOf(PROPS_SEPARATOR) + 2);
+            HostTxtEntry he2 = new HostTxtEntry(host, pkf.getDestination().toBase64(), line);
+            if (inner && !he2.hasValidInnerSig())
+                throw new IllegalStateException("Inner fail 2");
+            if (!he2.hasValidSig())
+                throw new IllegalStateException("Outer fail 2");
+        } else {
+            // 'remove' tests (corrupts earlier sigs)
             he.getProps().remove(PROP_SIG);
             he.signRemove(priv);
             //out.write("Remove entry:\n");
@@ -488,7 +495,7 @@ class HostTxtEntry {
             buf.flush();
             out.write(sw.toString());
             out.flush();
-            line = sw.toString().substring(2).trim();
+            String line = sw.toString().substring(2).trim();
             HostTxtEntry he3 = new HostTxtEntry(line);
             if (!he3.hasValidRemoveSig())
                 throw new IllegalStateException("Remove verify fail");

@@ -137,6 +137,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String DUMMY = "";
     private static final int NEGATIVE_CACHE_SIZE = 32;
     private static final int MAX_VALUE_LENGTH = 4096;
+    private static final int MAX_DESTS_PER_HOST = 8;
 
     /**
      *  Opens the database at hostsdb.blockfile or creates a new
@@ -1486,6 +1487,8 @@ public class BlockfileNamingService extends DummyNamingService {
                 return put(hostname, d, options, false);
             if (dests.contains(d))
                 return false;
+            if (dests.size() >= MAX_DESTS_PER_HOST)
+                return false;
             List<Destination> newDests = new ArrayList<Destination>(dests.size() + 1);
             newDests.addAll(dests);
             // TODO better sort by sigtype preference.
@@ -1523,7 +1526,10 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         List<Properties> storedOptions = new ArrayList<Properties>(4);
         synchronized(_bf) {
-            List<Destination> dests = lookupAll(hostname, options, storedOptions);
+            // We use lookupAll2(), not lookupAll(), because if hostname starts with www.,
+            // we do not want to read in from the
+            // non-www hostname and then copy it to a new www hostname.
+            List<Destination> dests = lookupAll2(hostname, options, storedOptions);
             if (dests == null)
                 return false;
             for (int i = 0; i < dests.size(); i++) {

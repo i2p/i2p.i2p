@@ -73,7 +73,7 @@ class HostTxtIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Clos
         try {
             String inputLine;
             while ((inputLine = input.readLine()) != null) {
-                HostTxtEntry he = HostTxtParser.parse(inputLine);
+                HostTxtEntry he = HostTxtParser.parse(inputLine, true);
                 if (he == null)
                     continue;
                 next = new MapEntry(he.getName(), he);
@@ -86,6 +86,11 @@ class HostTxtIterator implements Iterator<Map.Entry<String, HostTxtEntry>>, Clos
         return false;
     }
 
+    /**
+     *  'remove' entries will be returned with a null key,
+     *  and the value will contain a null name, null dest,
+     *  and non-null props.
+     */
     public Map.Entry<String, HostTxtEntry> next() {
         if (!hasNext())
             throw new NoSuchElementException();
