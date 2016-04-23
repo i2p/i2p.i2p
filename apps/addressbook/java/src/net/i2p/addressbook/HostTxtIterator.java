@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.data.DataHelper;
 
 /**

@@ -1,4 +1,4 @@
-package net.i2p.addressbook;
+package net.i2p.client.naming;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -13,25 +13,27 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.OrderedProperties;
 // for testing only
 import java.io.File;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 import net.i2p.data.Base32;
 import net.i2p.data.PrivateKeyFile;
-import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.RandomSource;
 
 
 /**
  * A hostname, b64 destination, and optional properties.
+ * Includes methods to sign and verify the entry.
+ * Used by addressbook to parse subscription data,
+ * and by i2ptunnel to generate signed metadata.
  * 
  * @since 0.9.26
  */
-class HostTxtEntry {
+public class HostTxtEntry {
 
     private final String name;
     private final String dest;
@@ -344,7 +346,6 @@ class HostTxtEntry {
 
     /**
      * Sign and set the "sig" property
-     * for testing only
      */
     private void sign(SigningPrivateKey spk) {
         signIt(spk, PROP_SIG);
@@ -352,7 +353,6 @@ class HostTxtEntry {
 
     /**
      * Sign and set the "oldsig" property
-     * for testing only
      */
     private void signInner(SigningPrivateKey spk) {
         signIt(spk, PROP_OLDSIG);
@@ -383,7 +383,6 @@ class HostTxtEntry {
     }
 
     /**
-     * for testing only
      * @param sigprop The signature property to set
      */
     private void signIt(SigningPrivateKey spk, String sigprop) {

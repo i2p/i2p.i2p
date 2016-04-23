@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.util.EepGet;
 import net.i2p.util.SecureFile;
 

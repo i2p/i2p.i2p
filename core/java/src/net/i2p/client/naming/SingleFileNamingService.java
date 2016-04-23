@@ -59,10 +59,6 @@ public class SingleFileNamingService extends NamingService {
     private long _lastWrite;
     private volatile boolean _isClosed;
 
-    private static final String RCVD_PROP_PREFIX = "=";
-    private static final String PROPS_SEPARATOR = "#!";
-    private static final char PROP_SEPARATOR = '#';
-
     public SingleFileNamingService(I2PAppContext context, String filename) {
         super(context);
         File file = new File(filename);
@@ -267,7 +263,7 @@ public class SingleFileNamingService extends NamingService {
     }
 
     /** 
-     *  Write the subscription options part of the line (after the #!).
+     *  Write the subscription options part of the line (including the #!).
      *  Only options starting with '=' (if any) are written (with the '=' stripped).
      *  Does not write a newline.
      *
@@ -278,15 +274,15 @@ public class SingleFileNamingService extends NamingService {
         boolean started = false;
         for (Map.Entry<Object, Object> e : options.entrySet()) {
             String k = (String) e.getKey();
-            if (!k.startsWith(RCVD_PROP_PREFIX))
+            if (!k.startsWith("="))
                 continue;
             k = k.substring(1);
             String v = (String) e.getValue();
             if (started) {
-                out.write(PROP_SEPARATOR);
+                out.write(HostTxtEntry.PROP_SEPARATOR);
             } else {
                 started = true;
-                out.write(PROPS_SEPARATOR);
+                out.write(HostTxtEntry.PROPS_SEPARATOR);
             }
             out.write(k);
             out.write('=');

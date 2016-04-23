@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.util.PortMapper;
 
 /**

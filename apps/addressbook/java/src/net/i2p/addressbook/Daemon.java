@@ -32,6 +32,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.client.naming.NamingService;
 import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.data.DataFormatException;
