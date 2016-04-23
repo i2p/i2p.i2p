@@ -76,11 +76,12 @@
         %><p>No host specified</p><%
     } else {
         detail = net.i2p.data.DataHelper.stripHTML(detail);
-        i2p.susi.dns.AddressBean addr = book.getLookup();
-        if (addr == null) {
+        java.util.List<i2p.susi.dns.AddressBean> addrs = book.getLookupAll();
+        if (addrs == null) {
             %><p>Not found: <%=detail%></p><%
         } else {
-            String b32 = addr.getB32();
+            for (i2p.susi.dns.AddressBean addr : addrs) {
+                String b32 = addr.getB32();
 %>
 <jsp:setProperty name="book" property="trClass"	value="0" />
 <table class="book" cellspacing="0" cellpadding="5">
@@ -146,13 +147,17 @@
 <img src="/imagegen/id?s=320&amp;c=<%=addr.getB64().replace("=", "%3d")%>" width="320" height="320">
 </td><td>
 <img src="/imagegen/qr?s=320&amp;t=<%=addr.getName()%>&amp;c=http%3a%2f%2f<%=addr.getName()%>%2f%3fi2paddresshelper%3d<%=addr.getDestination()%>">
-</td></tr></table></div>
+</td></tr></table>
+<hr>
 <%
-        }  // addr == null
+            }  // foreach addr
+%>
+</div>
+<%
+        }  // addrs == null
     }  // detail == null
 %>
 <div id="footer">
-<hr>
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
 </div>
