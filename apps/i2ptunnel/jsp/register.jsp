@@ -1,4 +1,4 @@
-<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean,net.i2p.client.naming.HostTxtEntry,net.i2p.data.SigningPrivateKey,net.i2p.util.OrderedProperties"
+<%@page contentType="text/html" import="java.io.InputStream,net.i2p.i2ptunnel.web.EditBean,net.i2p.servlet.RequestWrapper,net.i2p.client.I2PSessionException,net.i2p.client.naming.HostTxtEntry,net.i2p.data.PrivateKeyFile,net.i2p.data.SigningPrivateKey,net.i2p.util.OrderedProperties"
 %><%@page trimDirectiveWhitespaces="true"
 %><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -8,7 +8,9 @@
 %>
 <jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
-<% String tun = request.getParameter("tunnel");
+<%
+   RequestWrapper wrequest = new RequestWrapper(request);
+   String tun = wrequest.getParameter("tunnel");
    int curTunnel = -1;
    if (tun != null) {
      try {
@@ -43,8 +45,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
   if (editBean.isInitialized()) {
 
 %>
-    <form method="post" action="authenticate">
-
+    <form method="post" enctype="multipart/form-data" action="register" accept-charset="UTF-8">
         <div id="tunnelEditPanel" class="panel">
             <div class="header">
 <%
@@ -73,26 +74,23 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
     if (!"new".equals(tunnelType)) {      
 %>
+  <span class="comment">
+    <%=intl._t("Please be sure to select, copy, and paste the entire contents of the appropriate authentication data into the form of your favorite registration site")%>
+  </span>
             <div class="separator">
                 <hr />
             </div>
-
             <div id="nameField" class="rowItem">
                 <label for="name" accesskey="N">
-                    <%=intl._t("Name")%>(<span class="accessKey">N</span>):
+                    <%=intl._t("Name")%>
                 </label>
                 <span class="text"><%=editBean.getTunnelName(curTunnel)%></span>
             </div>
-            <div id="typeField" class="rowItem">
-                <label><%=intl._t("Type")%>:</label>
-                <span class="text"><%=tunnelTypeName%></span>
-            </div>
-                 
 <%            
       if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
           %><div id="websiteField" class="rowItem">
                 <label for="spoofedHost" accesskey="W">
-                    <%=intl._t("Website name")%>(<span class="accessKey">W</span>):
+                    <%=intl._t("Website name")%>
                 </label>
                 <span class="text"><%=editBean.getSpoofedHost(curTunnel)%></span>    
             </div>
@@ -101,7 +99,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 %>
             <div id="destinationField" class="rowItem">
                 <label for="localDestination" accesskey="L">
-                    <%=intl._t("Local destination")%>(<span class="accessKey">L</span>):
+                    <%=intl._t("Local destination")%>
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
             </div>
@@ -126,15 +124,16 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                OrderedProperties props = new OrderedProperties();
                HostTxtEntry he = new HostTxtEntry(name, b64, props);
                he.sign(spk);
-          %><div id="destinationField" class="rowItem">
-                <label><%=intl._t("Authentication Strings")%>:</label>
-                <span class="text"><%=intl._t("Select and copy the entire contents of the appropriate box")%></span>
-            </div>
-            <div id="sigField" class="rowItem">
+          %><div id="sigField" class="rowItem">
                 <label for="signature">
                     <%=intl._t("Authentication for adding host")%>
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+            </div>
+        </div>
+        <div id="tunnelAdvancedNetworking" class="panel">
+            <div class="header">
+                <h4><%=intl._t("Advanced authentication strings")%></h4>
             </div>
 <%
                props.remove(HostTxtEntry.PROP_SIG);
@@ -145,16 +144,157 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <%=intl._t("Authentication for removing host")%>
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeRemove(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will remove the entry for {0}", name)%></span>
             </div>
+            <div class="separator">
+                <hr />
+            </div>
+<%
+               String oldname = wrequest.getParameter("oldname");
+               String olddestfile = wrequest.getFilename("olddestfile");
+               SigningPrivateKey spk2 = null;
+               String olddest = null;
+               if (olddestfile != null) {
+                   InputStream destIn = wrequest.getInputStream("olddestfile");
+                   if (destIn.available() > 0) {
+                       try {
+                           PrivateKeyFile pkf2 = new PrivateKeyFile(destIn);
+                           String oldb64 = pkf2.getDestination().toBase64();
+                           if (!b64.equals(oldb64)) {
+                               // disallow dup
+                               olddest = b64;
+                               spk2 = pkf2.getSigningPrivKey();
+                           }
+                       } catch (I2PSessionException ise) {
+                           throw new IllegalStateException("Unable to open private key file " + olddestfile, ise);
+                       }
+                   }
+               }
+               props.remove(HostTxtEntry.PROP_SIG);
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Authentication for changing name")%>
+                </label>
+<%
+               if (oldname != null && oldname.length() > 0 && !oldname.equals(name)) {
+                   props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_CHANGENAME);
+                   props.setProperty(HostTxtEntry.PROP_OLDNAME, oldname);
+                   he.sign(spk);
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will change the name from {0} to {1}, using the same destination", oldname, name)%></span>
+<%
+               } else {
+                %><span class="comment"><%=intl._t("This tunnel must be configured with the new host name.")%></span>
+                  <span class="comment"><%=intl._t("Enter old host name below.")%></span>
+<%
+               }
+          %></div>
+            <div class="separator">
+                <hr />
+            </div>
+<%
+               props.remove(HostTxtEntry.PROP_SIG);
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Authentication for adding alias")%>
+                </label>
+<%
+               if (oldname != null && oldname.length() > 0 && !oldname.equals(name)) {
+                   props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_ADDNAME);
+                   props.setProperty(HostTxtEntry.PROP_OLDNAME, oldname);
+                   he.sign(spk);
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will add an alias {0} for {1}, using the same destination", name, oldname)%></span>
+<%
+               } else {
+                %><span class="comment"><%=intl._t("This tunnel must be configured with the new host name.")%></span>
+                  <span class="comment"><%=intl._t("Enter old host name below.")%></span>
+<%
+               }
+          %></div>
+            <div class="separator">
+                <hr />
+            </div>
+<%
+               props.remove(HostTxtEntry.PROP_SIG);
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Authentication for changing destination")%>
+                </label>
+<%
+               if (spk2 != null) {
+                   props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_CHANGEDEST);
+                   props.setProperty(HostTxtEntry.PROP_OLDDEST, olddest);
+                   he.signInner(spk2);
+                   he.sign(spk);
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will change the destination for {0}", name)%></span>
+<%
+               } else {
+                %><span class="comment"><%=intl._t("This tunnel must be configured with the new destination.")%></span>
+                  <span class="comment"><%=intl._t("Enter old destination below.")%></span>
+<%
+               }
+          %></div>
+            <div class="separator">
+                <hr />
+            </div>
+<%
+               props.remove(HostTxtEntry.PROP_SIG);
+               props.remove(HostTxtEntry.PROP_OLDSIG);
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Authentication for adding alternate destination")%>
+                </label>
+<%
+               if (spk2 != null) {
+                   props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_ADDDEST);
+                   props.setProperty(HostTxtEntry.PROP_OLDDEST, olddest);
+                   he.signInner(spk2);
+                   he.sign(spk);
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will add an alternate destination for {0}", name)%></span>
+<%
+               } else {
+                %><span class="comment"><%=intl._t("This tunnel must be configured with the new destination.")%></span>
+                  <span class="comment"><%=intl._t("Enter old destination below.")%></span>
+<%
+               }
+          %></div>
+            <div class="separator">
+                <hr />
+            </div>
+<%
+               props.remove(HostTxtEntry.PROP_SIG);
+               props.remove(HostTxtEntry.PROP_OLDSIG);
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Authentication for adding subdomain")%>
+                </label>
+<%
+               if (oldname != null && oldname.length() > 0 && !oldname.equals(name) && spk2 != null) {
+                   props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_ADDSUBDOMAIN);
+                   props.setProperty(HostTxtEntry.PROP_OLDNAME, oldname);
+                   props.setProperty(HostTxtEntry.PROP_OLDDEST, olddest);
+                   he.signInner(spk2);
+                   he.sign(spk);
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will add a subdomain {0} of {1}, with a different destination", name, oldname)%></span>
+<%
+               } else {
+                %><span class="comment"><%=intl._t("This tunnel must be configured with the new subdomain and destination.")%></span>
+                  <span class="comment"><%=intl._t("Enter higher-level domain and destination below.")%></span>
+<%
+               }
+          %></div>
 
-
-            <div class="footer">
+          <div class="footer">
             </div>
 <%
           }  // spk != null
        }  // valid b64 and name
     }  // !"new".equals(tunnelType)
-    if (!valid) {
+    if (!valid && curTunnel >= 0) {
         %><a href="edit?tunnel=<%=curTunnel%>"><%=intl._t("Go back and edit the tunnel")%></a><%
     }
 %>
@@ -162,15 +302,36 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
 
 <%
-    if (false && valid) {
+    if (valid) {
 %>
         <div id="globalOperationsPanel" class="panel">
-            <div class="header"></div>
+            <div class="header">
+                <h4><%=intl._t("Specify old name and destination")%></h4>
+            </div>
+  <span class="comment">
+    <%=intl._t("This is only required for advanced authentication.")%>
+    <%=intl._t("See above for required items.")%>
+  </span>
+<%
+               String oldname = wrequest.getParameter("oldname");
+               if (oldname == null) oldname = "";
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Old Host Name")%>
+                </label>
+                <input type="text" size="30" maxlength="50" name="oldname" id="name" title="Old Host Name" value="<%=oldname%>" class="freetext" />               
+            </div> 
+            <div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._t("Private Key File for old Destination")%>
+                </label>
+                <input type="file" size="50%" name="olddestfile" id="name" value="" />               
+            </div> 
             <div class="footer">
                 <div class="toolbox">
                     <input type="hidden" value="true" name="removeConfirm" />
                     <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._t("Cancel")%></button>
-                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="authenticate" title="Generate Authentication"><%=intl._t("Generate")%>(<span class="accessKey">S</span>)</button>
+                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="authenticate" title="Generate Authentication"><%=intl._t("Generate")%></button>
                 </div>
             </div> 
         </div>

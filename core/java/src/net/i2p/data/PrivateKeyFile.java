@@ -274,6 +274,18 @@ public class PrivateKeyFile {
     }
     
     /**
+     *  Can't be used for writing
+     *  @since 0.9.26
+     */
+    public PrivateKeyFile(InputStream in) throws I2PSessionException {
+        this("/dev/null");
+        I2PSession s = this.client.createSession(in, new Properties());
+        this.dest = s.getMyDestination();
+        this.privKey = s.getDecryptionKey();
+        this.signingPrivKey = s.getPrivateKey();
+    }
+    
+    /**
      *  Create with the default signature type if nonexistent.
      *
      *  Also reads in the file to get the privKey and signingPrivKey, 

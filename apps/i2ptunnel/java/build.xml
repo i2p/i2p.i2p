@@ -270,6 +270,8 @@
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- required for multipart form handling in register.jsp -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
@@ -299,6 +301,8 @@
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- required for multipart form handling in register.jsp -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
         </javac>
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />
