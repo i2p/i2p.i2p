@@ -71,6 +71,7 @@ public class EditBean extends IndexBean {
         return _helper.getPrivateKeyFile(tunnel);
     }
     
+/****
     public String getNameSignature(int tunnel) {
         String spoof = getSpoofedHost(tunnel);
         if (spoof.length() <= 0)
@@ -99,6 +100,26 @@ public class EditBean extends IndexBean {
             } catch (IOException e) {}
         }
         return "";
+    }
+****/
+    
+    /**
+     *  @since 0.9.26
+     *  @return key or null
+     */
+    public SigningPrivateKey getSigningPrivateKey(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun == null)
+            return null;
+        String keyFile = tun.getPrivKeyFile();
+        if (keyFile != null && keyFile.trim().length() > 0) {
+            File f = new File(keyFile);
+            if (!f.isAbsolute())
+                f = new File(_context.getConfigDir(), keyFile);
+            PrivateKeyFile pkf = new PrivateKeyFile(f);
+            return pkf.getSigningPrivKey();
+        }
+        return null;
     }
     
     public boolean startAutomatically(int tunnel) {

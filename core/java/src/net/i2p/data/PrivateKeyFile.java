@@ -455,11 +455,29 @@ public class PrivateKeyFile {
         return c;
     }
     
+    /**
+     *  @return null on error or if not initialized
+     */
     public PrivateKey getPrivKey() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return null;
+        }
         return this.privKey;
     }
 
+    /**
+     *  @return null on error or if not initialized
+     */
     public SigningPrivateKey getSigningPrivKey() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return null;
+        }
         return this.signingPrivKey;
     }
     

@@ -139,7 +139,7 @@ public class HostTxtEntry {
             out.write(KV_SEPARATOR);
             out.write(dest);
         }
-        writeProps(out, false, false);
+        writeProps(out);
         out.newLine();
     }
 
@@ -149,19 +149,36 @@ public class HostTxtEntry {
      * Includes newline.
      * Must have been constructed with non-null properties.
      */
-    public void writeRemove(BufferedWriter out) throws IOException {
+    public void writeRemoveLine(BufferedWriter out) throws IOException {
+        writeRemove(out);
+        out.newLine();
+    }
+
+    /**
+     * Write as a "remove" line #!dest=dest#name=name#k1=v1#sig=sig...]
+     * This works whether constructed with name and dest, or just properties.
+     * Does not include newline.
+     * Must have been constructed with non-null properties.
+     */
+    public void writeRemove(Writer out) throws IOException {
         if (props == null)
             throw new IllegalStateException();
         if (name != null && dest != null) {
             props.setProperty(PROP_NAME, name);
             props.setProperty(PROP_DEST, dest);
         }
-        writeProps(out, false, false);
-        out.newLine();
+        writeProps(out);
         if (name != null && dest != null) {
             props.remove(PROP_NAME);
             props.remove(PROP_DEST);
         }
+    }
+
+    /**
+     * Write the props part (if any) only, without newline
+     */
+    public void writeProps(Writer out) throws IOException {
+        writeProps(out, false, false);
     }
 
     /**
@@ -346,20 +363,23 @@ public class HostTxtEntry {
 
     /**
      * Sign and set the "sig" property
+     * Must have been constructed with non-null properties.
      */
-    private void sign(SigningPrivateKey spk) {
+    public void sign(SigningPrivateKey spk) {
         signIt(spk, PROP_SIG);
     }
 
     /**
      * Sign and set the "oldsig" property
+     * Must have been constructed with non-null properties.
      */
-    private void signInner(SigningPrivateKey spk) {
+    public void signInner(SigningPrivateKey spk) {
         signIt(spk, PROP_OLDSIG);
     }
 
     /**
      * Sign as a "remove" line #!dest=dest#name=name#k1=v1#sig=sig...]
+     * Must have been constructed with non-null properties.
      */
     public void signRemove(SigningPrivateKey spk) {
         if (props == null)
@@ -370,7 +390,7 @@ public class HostTxtEntry {
         props.setProperty(PROP_DEST, dest);
         StringWriter buf = new StringWriter(1024);
         try {
-            writeProps(buf, false, false);
+            writeProps(buf);
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }
@@ -395,7 +415,7 @@ public class HostTxtEntry {
         buf.append(KV_SEPARATOR);
         buf.append(dest);
         try {
-            writeProps(buf, false, false);
+            writeProps(buf);
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }
@@ -490,7 +510,7 @@ public class HostTxtEntry {
             //out.write("Remove entry:\n");
             sw = new StringWriter(1024);
             buf = new BufferedWriter(sw);
-            he.writeRemove(buf);
+            he.writeRemoveLine(buf);
             buf.flush();
             out.write(sw.toString());
             out.flush();

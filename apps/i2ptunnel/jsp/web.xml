@@ -32,6 +32,11 @@
         <url-pattern>/wizard</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.register_jsp</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+
     <!-- this webapp doesn't actually use sessions or cookies -->
     <session-config>
         <session-timeout>
