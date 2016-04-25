@@ -620,10 +620,10 @@ public class BlockfileNamingService extends DummyNamingService {
      *  Returns null without exception on error (logs only).
      *  Returns without logging if no reverse skiplist (version 1).
      *
-     *  @return the first one found if more than one
-     *  @since 0.8.9
+     *  @return all found if more than one
+     *  @since 0.9.26 from getReverseEntry() 0.8.9
      */
-    private String getReverseEntry(Hash hash) {
+    private List<String> getReverseEntries(Hash hash) {
         try {
             SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
@@ -633,13 +633,21 @@ public class BlockfileNamingService extends DummyNamingService {
             Properties props = rev.get(idx);
             if (props == null)
                 return null;
-            for (Object okey : props.keySet()) {
-                String key = (String) okey;
+            List<String> rv = new ArrayList<String>(props.size());
+            for (String key : props.stringPropertyNames()) {
                 // now do the forward lookup to verify (using the cache)
-                Destination d = lookup(key);
-                if (d != null && d.calculateHash().equals(hash))
-                    return key;
+                List<Destination> ld = lookupAll(key);
+                if (ld != null) {
+                    for (Destination d : ld) {
+                        if (d.calculateHash().equals(hash)) {
+                            rv.add(key);
+                            break;
+                        }
+                    }
+                }
             }
+            if (!rv.isEmpty())
+                return rv;
         } catch (IOException ioe) {
             _log.error("DB get reverse error", ioe);
         } catch (RuntimeException e) {
@@ -1385,10 +1393,33 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     @Override
     public String reverseLookup(Hash h) {
+        List<String> ls;
         synchronized(_bf) {
             if (_isClosed)
                 return null;
-            return getReverseEntry(h);
+            ls = getReverseEntries(h);
+        }
+        return (ls != null) ? ls.get(0) : null;
+    }
+
+    /**
+     * @param options ignored
+     * @since 0.9.26
+     */
+    @Override
+    public List<String> reverseLookupAll(Destination d, Properties options) {
+        return reverseLookupAll(d.calculateHash());
+    }
+
+    /**
+     * @since 0.9.26
+     */
+    @Override
+    public List<String> reverseLookupAll(Hash h) {
+        synchronized(_bf) {
+            if (_isClosed)
+                return null;
+            return getReverseEntries(h);
         }
     }
 

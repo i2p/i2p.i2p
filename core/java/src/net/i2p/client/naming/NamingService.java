@@ -691,6 +691,51 @@ public abstract class NamingService {
         return remove(hostname, options);
     }
 
+    /**
+     * Reverse lookup a hash.
+     * This implementation returns the result from reverseLookup, or null.
+     * Subclasses implementing reverse lookups should override.
+     *
+     * @param h non-null
+     * @return a non-empty list of host names for this hash, or <code>null</code>
+     * if none is known. It is safe for subclasses to always return
+     * <code>null</code> if no reverse lookup is possible.
+     * @since 0.9.26
+     */
+    public List<String> reverseLookupAll(Hash h) {
+        String s = reverseLookup(h);
+        return (s != null) ? Collections.singletonList(s) : null;
+    }
+
+    /**
+     * Reverse lookup a destination
+     * This implementation returns reverseLookupAll(dest, null).
+     *
+     * @param dest non-null
+     * @return a non-empty list of host names for this Destination, or <code>null</code>
+     * if none is known. It is safe for subclasses to always return
+     * <code>null</code> if no reverse lookup is possible.
+     * @since 0.9.26
+     */
+    public List<String> reverseLookupAll(Destination dest) {
+        return reverseLookupAll(dest, null);
+    }
+
+    /**
+     *  Same as reverseLookupAll(dest) but with options
+     *  This implementation returns the result from reverseLookup, or null.
+     *  Subclasses implementing reverse lookups should override.
+     *
+     *  @param d non-null
+     *  @param options NamingService-specific, can be null
+     *  @return a non-empty list of host names for this Destination, or <code>null</code>
+     *  @since 0.9.26
+     */
+    public List<String> reverseLookupAll(Destination d, Properties options) {
+        String s = reverseLookup(d, options);
+        return (s != null) ? Collections.singletonList(s) : null;
+    }
+
     //// End new API for multiple Destinations
 
     /**

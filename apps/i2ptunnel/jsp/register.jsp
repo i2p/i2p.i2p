@@ -128,7 +128,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="signature">
                     <%=intl._t("Authentication for adding host")%>
                 </label>
-                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>               
             </div>
         </div>
         <div id="tunnelAdvancedNetworking" class="panel">
@@ -180,7 +180,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                    props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_CHANGENAME);
                    props.setProperty(HostTxtEntry.PROP_OLDNAME, oldname);
                    he.sign(spk);
-                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>               
                 <span class="comment"><%=intl._t("This will change the name from {0} to {1}, using the same destination", oldname, name)%></span>
 <%
                } else {
@@ -203,7 +203,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                    props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_ADDNAME);
                    props.setProperty(HostTxtEntry.PROP_OLDNAME, oldname);
                    he.sign(spk);
-                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>               
                 <span class="comment"><%=intl._t("This will add an alias {0} for {1}, using the same destination", name, oldname)%></span>
 <%
                } else {
@@ -227,7 +227,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                    props.setProperty(HostTxtEntry.PROP_OLDDEST, olddest);
                    he.signInner(spk2);
                    he.sign(spk);
-                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>               
                 <span class="comment"><%=intl._t("This will change the destination for {0}", name)%></span>
 <%
                } else {
@@ -252,7 +252,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                    props.setProperty(HostTxtEntry.PROP_OLDDEST, olddest);
                    he.signInner(spk2);
                    he.sign(spk);
-                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>               
                 <span class="comment"><%=intl._t("This will add an alternate destination for {0}", name)%></span>
 <%
                } else {
@@ -278,7 +278,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                    props.setProperty(HostTxtEntry.PROP_OLDDEST, olddest);
                    he.signInner(spk2);
                    he.sign(spk);
-                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeProps(out); %></textarea>               
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>               
                 <span class="comment"><%=intl._t("This will add a subdomain {0} of {1}, with a different destination", name, oldname)%></span>
 <%
                } else {

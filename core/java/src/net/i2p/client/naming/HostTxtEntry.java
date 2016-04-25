@@ -134,13 +134,21 @@ public class HostTxtEntry {
      * Includes newline.
      */
     public void write(BufferedWriter out) throws IOException {
+        write((Writer) out);
+        out.newLine();
+    }
+
+    /**
+     * Write as a standard line name=dest[#!k1=v1#k2=v2...]
+     * Does not include newline.
+     */
+    public void write(Writer out) throws IOException {
         if (name != null && dest != null) {
             out.write(name);
             out.write(KV_SEPARATOR);
             out.write(dest);
         }
         writeProps(out);
-        out.newLine();
     }
 
     /**
