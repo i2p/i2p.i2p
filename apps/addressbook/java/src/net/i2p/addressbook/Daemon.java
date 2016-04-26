@@ -212,7 +212,12 @@ public class Daemon {
                                         List<Destination> pod2 = router.lookupAll(key);
                                         if (pod2 == null) {
                                             // we didn't know it before, so we'll add it
-                                            // TODO check inner sig anyway?
+                                            // check inner sig anyway
+                                            if (!he.hasValidInnerSig()) {
+                                                logInner(log, action, key, addressbook);
+                                                invalid++;
+                                                continue;
+                                            }
                                         } else if (pod2.contains(dest)) {
                                             // we knew it before, with the same dest
                                             old++;
@@ -220,11 +225,7 @@ public class Daemon {
                                         } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
-                                                if (log != null)
-                                                    log.append("Action: " + action + " failed because" +
-                                                               " inner signature for key " + key +
-                                                               " failed" +
-                                                               ". From: " + addressbook.getLocation());
+                                                logInner(log, action, key, addressbook);
                                                 invalid++;
                                                 continue;
                                             }
@@ -258,8 +259,7 @@ public class Daemon {
                                             continue;
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters");
+                                        logMissing(log, action, key, addressbook);
                                         invalid++;
                                         continue;
                                     }
@@ -284,9 +284,7 @@ public class Daemon {
                                             continue;
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters" +
-                                                       ". From: " + addressbook.getLocation());
+                                        logMissing(log, action, key, addressbook);
                                         invalid++;
                                         continue;
                                     }
@@ -314,15 +312,16 @@ public class Daemon {
                                         List<Destination> pod2 = router.lookupAll(poldname);
                                         if (pod2 == null) {
                                             // we didn't have the old name
-                                            // TODO check inner sig anyway?
+                                            // check inner sig anyway
+                                            if (!he.hasValidInnerSig()) {
+                                                logInner(log, action, key, addressbook);
+                                                invalid++;
+                                                continue;
+                                            }
                                         } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
-                                                if (log != null)
-                                                    log.append("Action: " + action + " failed because" +
-                                                               " inner signature for old name " + poldname +
-                                                               " failed" +
-                                                               ". From: " + addressbook.getLocation());
+                                                logInner(log, action, key, addressbook);
                                                 invalid++;
                                                 continue;
                                             }
@@ -333,9 +332,7 @@ public class Daemon {
                                             continue;
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters" +
-                                                       ". From: " + addressbook.getLocation());
+                                        logMissing(log, action, key, addressbook);
                                         invalid++;
                                         continue;
                                     }
@@ -349,7 +346,12 @@ public class Daemon {
                                         List<Destination> pod2 = router.lookupAll(key);
                                         if (pod2 == null) {
                                             // we didn't have the old name
-                                            // TODO check inner sig anyway?
+                                            // check inner sig anyway
+                                            if (!he.hasValidInnerSig()) {
+                                                logInner(log, action, key, addressbook);
+                                                invalid++;
+                                                continue;
+                                            }
                                         } else if (pod2.contains(dest)) {
                                             // we already have the new dest
                                             old++;
@@ -357,11 +359,7 @@ public class Daemon {
                                         } else if (pod2.contains(pod)) {
                                             // checks out, so verify the inner sig
                                             if (!he.hasValidInnerSig()) {
-                                                if (log != null)
-                                                    log.append("Action: " + action + " failed because" +
-                                                               " inner signature for key " + key +
-                                                               " failed" +
-                                                               ". From: " + addressbook.getLocation());
+                                                logInner(log, action, key, addressbook);
                                                 invalid++;
                                                 continue;
                                             }
@@ -382,9 +380,7 @@ public class Daemon {
                                             continue;
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters" +
-                                                       ". From: " + addressbook.getLocation());
+                                        logMissing(log, action, key, addressbook);
                                         invalid++;
                                         continue;
                                     }
@@ -432,9 +428,7 @@ public class Daemon {
                                             continue;
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters" +
-                                                       ". From: " + addressbook.getLocation());
+                                        logMissing(log, action, key, addressbook);
                                         invalid++;
                                         continue;
                                     }
@@ -527,9 +521,7 @@ public class Daemon {
                                             old++;
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters" +
-                                                       ". From: " + addressbook.getLocation());
+                                        logMissing(log, action, "delete", addressbook);
                                         invalid++;
                                     }
                                 } else if (action.equals(HostTxtEntry.ACTION_REMOVEALL)) {
@@ -603,9 +595,7 @@ public class Daemon {
                                             }
                                         }
                                     } else {
-                                        if (log != null)
-                                            log.append("Action: " + action + " failed, missing required parameters" +
-                                                       ". From: " + addressbook.getLocation());
+                                        logMissing(log, action, "delete", addressbook);
                                         invalid++;
                                     }
                                 } else {
@@ -666,6 +656,26 @@ public class Daemon {
         subscriptions.write();
     }
 
+    /** @since 0.9.26 */
+    private static void logInner(Log log, String action, String name, AddressBook addressbook) {
+        if (log != null) {
+            log.append("Action: " + action + " failed because" +
+                       " inner signature for key " + name +
+                       " failed" +
+                       ". From: " + addressbook.getLocation());
+        }
+    }
+
+    /** @since 0.9.26 */
+    private static void logMissing(Log log, String action, String name, AddressBook addressbook) {
+        if (log != null) {
+            log.append("Action: " + action + " for " + name +
+                       " failed, missing required parameters" +
+                       ". From: " + addressbook.getLocation());
+        }
+    }
+
+    /** @since 0.9.26 */
     private static void logMismatch(Log log, String action, String name, List<Destination> dests,
                                     String olddest, AddressBook addressbook) {
         if (log != null) {

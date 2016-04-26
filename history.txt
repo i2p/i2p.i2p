@@ -1,3 +1,26 @@
+2016-04-26 zzz
+ * Addressbook:
+   - Finish implementation of signed actions
+   - Move HostTxtEntry to net.i2p.client.naming for use by i2ptunnel
+   - Add tests for Daemon to read local subscription file
+   - Store last-modified date
+   - Logging cleanups and consolidation
+ * Blockfile: Remove unused code and classes
+ * BlockfileNamingService:
+   - Implementation and fixes for new API methods
+   - Add support for long property values, backward compatbile, no version bump
+ * DataHelper: Properties methods cleanup
+ * i2ptunnel:
+   - New page for registration authentication
+   - Remove old, unused hostname signature generation
+ * NamingService: Add new API methods for reverseLookupAll()
+ * PrivateKeyFile:
+   - Add InputStream constructor for i2ptunnel
+   - Ensure initialization before returning private keys
+ * SusiDNS:
+   - Display signature validation on details page
+   - Add support for multiple dests per hostname
+
 2016-04-20 zzz
  * Addressbook:
    - Add sign/verify methods for inner signature
