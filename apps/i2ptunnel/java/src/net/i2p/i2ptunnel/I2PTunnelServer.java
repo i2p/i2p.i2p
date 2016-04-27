@@ -243,7 +243,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 String portNum = getTunnel().port;
                 if (portNum == null)
                     portNum = "7654";
-                String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
+                String msg;
+                if (getTunnel().getContext().isRouterContext())
+                    msg = "Unable to build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
+                else
+                    msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
                 if (++retries < MAX_RETRIES) {
                     msg += ", retrying in " + (RETRY_DELAY / 1000) + " seconds";
