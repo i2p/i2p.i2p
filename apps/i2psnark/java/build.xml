@@ -70,7 +70,7 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/web/* **/messages_*.class">
             <manifest>
-                <attribute name="Main-Class" value="org.klomp.snark.Snark" />
+                <attribute name="Main-Class" value="org.klomp.snark.CommandLine" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
