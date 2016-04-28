@@ -30,8 +30,10 @@ import net.i2p.util.Log;
  * It is not the handler for garlic messages received down a tunnel,
  * as InNetMessagePool short circuits tunnel messages,
  * and those garlic messages are handled in InboundMessageDistributor.
+ *
+ * Public for JobQueue as these jobs may be dropped.
  */
-class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
+public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
     private final Log _log;
     private final GarlicMessage _message;
     //private RouterIdentity _from;

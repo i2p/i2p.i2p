@@ -36,12 +36,12 @@ import net.i2p.util.Log;
  *
  * @author mkvore
  */
-
 class SAMv2StreamSession extends SAMStreamSession
 {
-
 		/**
 		 * Create a new SAM STREAM session.
+		 *
+		 * Caller MUST call start().
 		 *
 		 * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
 		 * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
@@ -59,6 +59,8 @@ class SAMv2StreamSession extends SAMStreamSession
 
 		/**
 		 * Create a new SAM STREAM session.
+		 *
+		 * Caller MUST call start().
 		 *
 		 * @param destStream Input stream containing the destination and private keys (same format as PrivateKeyFile)
 		 * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH")
@@ -86,7 +88,6 @@ class SAMv2StreamSession extends SAMStreamSession
 		 *                                      receive-only session
 		 * @return true if the communication with the SAM client is ok
 		 */
-
 		@Override
 		public boolean connect ( int id, String dest, Properties props )
 		throws DataFormatException, SAMInvalidDirectionException
@@ -105,56 +106,39 @@ class SAMv2StreamSession extends SAMStreamSession
 				return false ;
 			}
 
-			Destination d = new Destination();
-
-			d.fromBase64 ( dest );
-
+			Destination d = SAMUtils.getDest(dest);
 			I2PSocketOptions opts = socketMgr.buildOptions ( props );
-
 			if ( props.getProperty ( I2PSocketOptions.PROP_CONNECT_TIMEOUT ) == null )
 				opts.setConnectTimeout ( 60 * 1000 );
 
 			if (_log.shouldLog(Log.DEBUG))
 				_log.debug ( "Connecting new I2PSocket..." );
 
-
 			// non-blocking connection (SAMv2)
-
-			StreamConnector connector ;
-
-			connector = new StreamConnector ( id, d, opts );
-			
+			StreamConnector connector = new StreamConnector ( id, d, opts );
 			I2PAppThread connectThread = new I2PAppThread ( connector, "StreamConnector" + id ) ;
-
 			connectThread.start() ;
-
 			return true ;
 		}
 
-
-
-
 		/**
-				* SAM STREAM socket connecter, running in its own thread.  
-				*
-				* @author mkvore
-		*/
-
+		 * SAM STREAM socket connecter, running in its own thread.  
+		 *
+		 * @author mkvore
+		 */
 		private class StreamConnector implements Runnable
 		{
-
 				private final int id;
 				private final Destination      dest ;
 				private final I2PSocketOptions opts ;
 
 				/**
-						* Create a new SAM STREAM session socket reader
-						*
-						* @param id   Unique id assigned to the handler
-						* @param dest Destination to reach
-						* @param opts Socket options (I2PSocketOptions)
+				 * Create a new SAM STREAM session socket reader
+				 *
+				 * @param id   Unique id assigned to the handler
+				 * @param dest Destination to reach
+				 * @param opts Socket options (I2PSocketOptions)
 				*/
-
 
 				public StreamConnector ( int id, Destination dest, I2PSocketOptions opts )// throws IOException
 				{
@@ -165,7 +149,6 @@ class SAMv2StreamSession extends SAMStreamSession
 					this.opts = opts ;
 					this.dest = dest ;
 				}
-
 
 				public void run()
 				{
@@ -226,18 +209,15 @@ class SAMv2StreamSession extends SAMStreamSession
 				}
 		}
 
-
-
 		/**
-				* Lets us push data through the stream without blocking, (even after exceeding
-				* the I2PSocket's buffer)
+		 * Lets us push data through the stream without blocking, (even after exceeding
+		 * the I2PSocket's buffer)
 		 * 
 		 * @param s I2PSocket
 		 * @param id Socket ID
 		 * @return v2StreamSender
 		 * @throws IOException 
 		 */
-
 		@Override
 		protected StreamSender newStreamSender ( I2PSocket s, int id ) throws IOException
 		{
@@ -252,7 +232,6 @@ class SAMv2StreamSession extends SAMStreamSession
 		}
 
 		private class V2StreamSender extends StreamSender
-
 		{
 				private final List<ByteArray> _data;
 				private int _dataSize;
@@ -271,12 +250,12 @@ class SAMv2StreamSession extends SAMStreamSession
 				}
 
 				/**
-						* Send bytes through the SAM STREAM session socket sender
-						*
+				 * Send bytes through the SAM STREAM session socket sender
+				 *
 				 * @param in Data stream of data to send
 				 * @param size Count of bytes to send
 				 * @throws IOException if the client didnt provide enough data
-				*/
+				 */
 				@Override
 				public void sendBytes ( InputStream in, int size ) throws IOException
 				{
@@ -318,9 +297,9 @@ class SAMv2StreamSession extends SAMStreamSession
 				}
 
 				/**
-						* Stop a SAM STREAM session socket sender thread immediately
-						*
-				*/
+				 * Stop a SAM STREAM session socket sender thread immediately
+				 *
+				 */
 				@Override
 				public void stopRunning()
 				{
@@ -353,9 +332,9 @@ class SAMv2StreamSession extends SAMStreamSession
 				}
 
 				/**
-						* Stop a SAM STREAM session socket sender gracefully: stop the
-						* sender thread once all pending data has been sent.
-				*/
+				 * Stop a SAM STREAM session socket sender gracefully: stop the
+				 * sender thread once all pending data has been sent.
+				 */
 				@Override
 				public void shutDownGracefully()
 				{
@@ -442,8 +421,6 @@ class SAMv2StreamSession extends SAMStreamSession
 				}
 		}
 
-
-
 		/**
 		 * Send bytes through a SAM STREAM session.
 		 *
@@ -470,30 +447,24 @@ class SAMv2StreamSession extends SAMStreamSession
 			return true;
 		}
 
-
 		/**
-				* SAM STREAM socket reader, running in its own thread.  It forwards
-				* forward data to/from an I2P socket.
-				*
-				* @author human
+		 * SAM STREAM socket reader, running in its own thread.  It forwards
+		 * forward data to/from an I2P socket.
+		 *
+		 * @author human
 		*/
-
-		
-
 		public class SAMv2StreamSessionSocketReader extends SAMv1StreamSessionSocketReader
 		{
-
 				protected boolean nolimit       ;
 				protected long    limit         ;
 				protected long    totalReceived ;
 
-
 				/**
-						* Create a new SAM STREAM session socket reader
-						*
-						* @param s Socket to be handled
-						* @param id Unique id assigned to the handler
-				*/
+				 * Create a new SAM STREAM session socket reader
+				 *
+				 * @param s Socket to be handled
+				 * @param id Unique id assigned to the handler
+				 */
 				public SAMv2StreamSessionSocketReader ( I2PSocket s, int id ) throws IOException
 				{
 					super ( s, id );
@@ -592,7 +563,4 @@ class SAMv2StreamSession extends SAMStreamSession
 						_log.debug ( "Shutting down SAM STREAM session socket handler " + id );
 				}
 		}
-
-
-
 }

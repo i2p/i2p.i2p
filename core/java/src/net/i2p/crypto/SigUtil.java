@@ -18,6 +18,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAPrivateKeySpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
@@ -49,7 +50,7 @@ import net.i2p.util.NativeBigInteger;
  *
  * @since 0.9.9, public since 0.9.12
  */
-public class SigUtil {
+public final class SigUtil {
 
     private static final Map<SigningPublicKey, ECPublicKey> _ECPubkeyCache = new LHMCache<SigningPublicKey, ECPublicKey>(64);
     private static final Map<SigningPrivateKey, ECPrivateKey> _ECPrivkeyCache = new LHMCache<SigningPrivateKey, ECPrivateKey>(16);
@@ -97,6 +98,55 @@ public class SigUtil {
     }
 
     /**
+     *  Use if SigType is unknown.
+     *  For efficiency, use fromJavakey(pk, type) if type is known.
+     *
+     *  @param pk JAVA key!
+     *  @throws IllegalArgumentException on unknown type
+     *  @since 0.9.18
+     */
+    public static SigningPublicKey fromJavaKey(PublicKey pk)
+                              throws GeneralSecurityException {
+        if (pk instanceof DSAPublicKey) {
+            return fromJavaKey((DSAPublicKey) pk);
+        }
+        if (pk instanceof ECPublicKey) {
+            ECPublicKey k = (ECPublicKey) pk;
+            AlgorithmParameterSpec spec = k.getParams();
+            SigType type;
+            if (spec.equals(SigType.ECDSA_SHA256_P256.getParams()))
+                type = SigType.ECDSA_SHA256_P256;
+            else if (spec.equals(SigType.ECDSA_SHA384_P384.getParams()))
+                type = SigType.ECDSA_SHA384_P384;
+            else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
+                type = SigType.ECDSA_SHA512_P521;
+            else
+                throw new IllegalArgumentException("Unknown EC type");
+            return fromJavaKey(k, type);
+        }
+        if (pk instanceof EdDSAPublicKey) {
+            return fromJavaKey((EdDSAPublicKey) pk, SigType.EdDSA_SHA512_Ed25519);
+        }
+        if (pk instanceof RSAPublicKey) {
+            RSAPublicKey k = (RSAPublicKey) pk;
+            int sz = k.getModulus().bitLength();
+            SigType type;
+            if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA256_2048.getParams()).getKeysize())
+                type = SigType.RSA_SHA256_2048;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA384_3072.getParams()).getKeysize())
+                type = SigType.RSA_SHA384_3072;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA512_4096.getParams()).getKeysize())
+                type = SigType.RSA_SHA512_4096;
+            else
+                throw new IllegalArgumentException("Unknown RSA type");
+            return fromJavaKey(k, type);
+        }
+        throw new IllegalArgumentException("Unknown type: " + pk.getClass());
+    }
+
+    /**
+     *  Use if SigType is known.
+     *
      *  @param pk JAVA key!
      */
     public static SigningPublicKey fromJavaKey(PublicKey pk, SigType type)
@@ -111,11 +161,60 @@ public class SigUtil {
             case RSA:
                 return fromJavaKey((RSAPublicKey) pk, type);
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unknown type: " + type);
         }
     }
 
     /**
+     *  Use if SigType is unknown.
+     *  For efficiency, use fromJavakey(pk, type) if type is known.
+     *
+     *  @param pk JAVA key!
+     *  @throws IllegalArgumentException on unknown type
+     *  @since 0.9.18
+     */
+    public static SigningPrivateKey fromJavaKey(PrivateKey pk)
+                              throws GeneralSecurityException {
+        if (pk instanceof DSAPrivateKey) {
+            return fromJavaKey((DSAPrivateKey) pk);
+        }
+        if (pk instanceof ECPrivateKey) {
+            ECPrivateKey k = (ECPrivateKey) pk;
+            AlgorithmParameterSpec spec = k.getParams();
+            SigType type;
+            if (spec.equals(SigType.ECDSA_SHA256_P256.getParams()))
+                type = SigType.ECDSA_SHA256_P256;
+            else if (spec.equals(SigType.ECDSA_SHA384_P384.getParams()))
+                type = SigType.ECDSA_SHA384_P384;
+            else if (spec.equals(SigType.ECDSA_SHA512_P521.getParams()))
+                type = SigType.ECDSA_SHA512_P521;
+            else
+                throw new IllegalArgumentException("Unknown EC type");
+            return fromJavaKey(k, type);
+        }
+        if (pk instanceof EdDSAPrivateKey) {
+            return fromJavaKey((EdDSAPrivateKey) pk, SigType.EdDSA_SHA512_Ed25519);
+        }
+        if (pk instanceof RSAPrivateKey) {
+            RSAPrivateKey k = (RSAPrivateKey) pk;
+            int sz = k.getModulus().bitLength();
+            SigType type;
+            if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA256_2048.getParams()).getKeysize())
+                type = SigType.RSA_SHA256_2048;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA384_3072.getParams()).getKeysize())
+                type = SigType.RSA_SHA384_3072;
+            else if (sz <= ((RSAKeyGenParameterSpec) SigType.RSA_SHA512_4096.getParams()).getKeysize())
+                type = SigType.RSA_SHA512_4096;
+            else
+                throw new IllegalArgumentException("Unknown RSA type");
+            return fromJavaKey(k, type);
+        }
+        throw new IllegalArgumentException("Unknown type: " + pk.getClass());
+    }
+
+    /**
+     *  Use if SigType is known.
+     *
      *  @param pk JAVA key!
      */
     public static SigningPrivateKey fromJavaKey(PrivateKey pk, SigType type)
@@ -130,7 +229,7 @@ public class SigUtil {
             case RSA:
                 return fromJavaKey((RSAPrivateKey) pk, type);
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unknown type: " + type);
         }
     }
 
@@ -450,9 +549,13 @@ public class SigUtil {
 
     /**
      *  Split a byte array into two BigIntegers
+     *  @param b length must be even
      *  @return array of two BigIntegers
+     *  @since 0.9.9
      */
-    private static BigInteger[] split(byte[] b) {
+    private static NativeBigInteger[] split(byte[] b) {
+        if ((b.length & 0x01) != 0)
+            throw new IllegalArgumentException("length must be even");
         int sublen = b.length / 2;
         byte[] bx = new byte[sublen];
         byte[] by = new byte[sublen];
@@ -466,9 +569,12 @@ public class SigUtil {
     /**
      *  Combine two BigIntegers of nominal length = len / 2
      *  @return array of exactly len bytes
+     *  @since 0.9.9
      */
     private static byte[] combine(BigInteger x, BigInteger y, int len)
                               throws InvalidKeyException {
+        if ((len & 0x01) != 0)
+            throw new InvalidKeyException("length must be even");
         int sublen = len / 2;
         byte[] b = new byte[len];
         byte[] bx = rectify(x, sublen);
@@ -510,7 +616,8 @@ public class SigUtil {
 
     /**
      *  http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html
-     *  Signature Format	ASN.1 sequence of two INTEGER values: r and s, in that order:
+     *<pre>
+     *  Signature Format: ASN.1 sequence of two INTEGER values: r and s, in that order:
      *                                SEQUENCE ::= { r INTEGER, s INTEGER }
      *
      *  http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
@@ -520,6 +627,7 @@ public class SigUtil {
      *  02 -- tag indicating INTEGER
      *  xx - length in octets
      *  xxxxxx - value
+     *</pre>
      *
      *  Convert to BigInteger and back so we have the minimum length representation, as required.
      *  r and s are always non-negative.
@@ -527,46 +635,72 @@ public class SigUtil {
      *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for this before you
      *  add a SigType with bigger signatures.
      *
+     *  @param sig length must be even
      *  @throws IllegalArgumentException if too big
      *  @since 0.8.7, moved to SigUtil in 0.9.9
      */
     private static byte[] sigBytesToASN1(byte[] sig) {
-        //System.out.println("pre TO asn1\n" + net.i2p.util.HexDump.dump(sig));
-        int len = sig.length;
-        int sublen = len / 2;
-        byte[] tmp = new byte[sublen];
+        BigInteger[] rs = split(sig);
+        return sigBytesToASN1(rs[0], rs[1]);
+    }
 
-        System.arraycopy(sig, 0, tmp, 0, sublen);
-        BigInteger r = new BigInteger(1, tmp);
+    /**
+     *  http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html
+     *<pre>
+     *  Signature Format: ASN.1 sequence of two INTEGER values: r and s, in that order:
+     *                                SEQUENCE ::= { r INTEGER, s INTEGER }
+     *
+     *  http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
+     *  30 -- tag indicating SEQUENCE
+     *  xx - length in octets
+     *
+     *  02 -- tag indicating INTEGER
+     *  xx - length in octets
+     *  xxxxxx - value
+     *</pre>
+     *
+     *  r and s are always non-negative.
+     *
+     *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for this before you
+     *  add a SigType with bigger signatures.
+     *
+     *  @throws IllegalArgumentException if too big
+     *  @since 0.9.25, split out from sigBytesToASN1(byte[])
+     */
+    public static byte[] sigBytesToASN1(BigInteger r, BigInteger s) {
+        int extra = 4;
         byte[] rb = r.toByteArray();
-        if (rb.length > 127)
-            throw new IllegalArgumentException("FIXME R length > 127");
-        System.arraycopy(sig, sublen, tmp, 0, sublen);
-        BigInteger s = new BigInteger(1, tmp);
+        if (rb.length > 127) {
+            extra++;
+            if (rb.length > 255)
+                extra++;
+        }
         byte[] sb = s.toByteArray();
-        if (sb.length > 127)
-            throw new IllegalArgumentException("FIXME S length > 127");
-        int seqlen = rb.length + sb.length + 4;
-        if (seqlen > 255)
-            throw new IllegalArgumentException("FIXME seq length > 255");
+        if (sb.length > 127) {
+            extra++;
+            if (sb.length > 255)
+                extra++;
+        }
+        int seqlen = rb.length + sb.length + extra;
         int totlen = seqlen + 2;
-        if (seqlen > 127)
+        if (seqlen > 127) {
             totlen++;
+            if (seqlen > 255)
+                totlen++;
+        }
         byte[] rv = new byte[totlen];
         int idx = 0;
 
         rv[idx++] = 0x30;
-        if (seqlen > 127)
-            rv[idx++] =(byte) 0x81;
-        rv[idx++] = (byte) seqlen;
+        idx = intToASN1(rv, idx, seqlen);
 
         rv[idx++] = 0x02;
-        rv[idx++] = (byte) rb.length;
+        idx = intToASN1(rv, idx, rb.length);
         System.arraycopy(rb, 0, rv, idx, rb.length);
         idx += rb.length;
 
         rv[idx++] = 0x02;
-        rv[idx++] = (byte) sb.length;
+        idx = intToASN1(rv, idx, sb.length);
         System.arraycopy(sb, 0, rv, idx, sb.length);
 
         //System.out.println("post TO asn1\n" + net.i2p.util.HexDump.dump(rv));
@@ -574,10 +708,34 @@ public class SigUtil {
     }
 
     /**
-     *  See above.
-     *  Only supports sigs up to about 252 bytes. See code to fix BER encoding for bigger than that.
+     *  Output an length or integer value in ASN.1
+     *  Does NOT output the tag e.g. 0x02 / 0x30
      *
-     *  @return len bytes
+     *  @param val 0-65535
+     *  @return the new index
+     *  @since 0.9.25
+     */
+    public static int intToASN1(byte[] d, int idx, int val) {
+        if (val < 0 || val > 65535)
+            throw new IllegalArgumentException("fixme length " + val);
+        if (val > 127) {
+            if (val > 255) {
+                d[idx++] = (byte) 0x82;
+                d[idx++] = (byte) (val >> 8);
+            } else {
+                d[idx++] = (byte) 0x81;
+            }
+        }
+        d[idx++] = (byte) val;
+        return idx;
+    }
+
+    /**
+     *  See above.
+     *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for bigger than that.
+     *
+     *  @param len must be even, twice the nominal length of each BigInteger
+     *  @return len bytes, call split() on the result to get two BigIntegers
      *  @since 0.8.7, moved to SigUtil in 0.9.9
      */
     private static byte[] aSN1ToSigBytes(byte[] asn, int len)
@@ -594,8 +752,17 @@ public class SigUtil {
         byte[] rv = new byte[len];
         int sublen = len / 2;
         int rlen = asn[++idx];
-        if ((rlen & 0x80) != 0)
-            throw new SignatureException("FIXME R length > 127");
+        if ((rlen & 0x80) != 0) {
+            if ((rlen & 0xff) == 0x81) { 
+                rlen = asn[++idx] & 0xff;
+            } else if ((rlen & 0xff) == 0x82) {
+                rlen = asn[++idx] & 0xff;
+                rlen <<= 8;
+                rlen |= asn[++idx] & 0xff;
+            } else {
+                throw new SignatureException("FIXME R length > 65535");
+            }
+        }
         if ((asn[++idx] & 0x80) != 0)
             throw new SignatureException("R is negative");
         if (rlen > sublen + 1)
@@ -605,22 +772,45 @@ public class SigUtil {
         else
             System.arraycopy(asn, idx, rv, sublen - rlen, rlen);
         idx += rlen;
-        int slenloc = idx + 1;
+
         if (asn[idx] != 0x02)
             throw new SignatureException("asn[s] = " + (asn[idx] & 0xff));
-        int slen = asn[slenloc];
-        if ((slen & 0x80) != 0)
-            throw new SignatureException("FIXME S length > 127");
-        if ((asn[slenloc + 1] & 0x80) != 0)
+        int slen = asn[++idx];
+        if ((slen & 0x80) != 0) {
+            if ((slen & 0xff) == 0x81) { 
+                slen = asn[++idx] & 0xff;
+            } else if ((slen & 0xff) == 0x82) {
+                slen = asn[++idx] & 0xff;
+                slen <<= 8;
+                slen |= asn[++idx] & 0xff;
+            } else {
+                throw new SignatureException("FIXME S length > 65535");
+            }
+        }
+        if ((asn[++idx] & 0x80) != 0)
             throw new SignatureException("S is negative");
         if (slen > sublen + 1)
             throw new SignatureException("S too big " + slen);
         if (slen == sublen + 1)
-            System.arraycopy(asn, slenloc + 2, rv, sublen, sublen);
+            System.arraycopy(asn, idx + 1, rv, sublen, sublen);
         else
-            System.arraycopy(asn, slenloc + 1, rv, len - slen, slen);
+            System.arraycopy(asn, idx, rv, len - slen, slen);
         //System.out.println("post from asn1\n" + net.i2p.util.HexDump.dump(rv));
         return rv;
+    }
+
+    /**
+     *  See above.
+     *  Only supports sigs up to about 65530 bytes. See code to fix BER encoding for bigger than that.
+     *
+     *  @param len nominal length of each BigInteger
+     *  @return two BigIntegers
+     *  @since 0.9.25
+     */
+    public static NativeBigInteger[] aSN1ToBigInteger(byte[] asn, int len)
+                              throws SignatureException {
+        byte[] sig = aSN1ToSigBytes(asn, len * 2);
+        return split(sig);
     }
 
     public static void clearCaches() {

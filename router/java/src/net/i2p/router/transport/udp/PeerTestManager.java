@@ -12,7 +12,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SessionKey;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.router.transport.TransportUtil;
@@ -207,7 +207,7 @@ class PeerTestManager {
         test.incrementPacketsRelayed();
         sendTestToBob();
         
-        _context.simpleScheduler().addEvent(new ContinueTest(test.getNonce()), RESEND_TIMEOUT);
+        _context.simpleTimer2().addEvent(new ContinueTest(test.getNonce()), RESEND_TIMEOUT);
     }
     
     private class ContinueTest implements SimpleTimer.TimedEvent {
@@ -246,7 +246,7 @@ class PeerTestManager {
                         sendTestToCharlie();
                     }
                     // retx at 4, 10, 17, 25 elapsed time
-                    _context.simpleScheduler().addEvent(ContinueTest.this, RESEND_TIMEOUT + (sent*1000));
+                    _context.simpleTimer2().addEvent(ContinueTest.this, RESEND_TIMEOUT + (sent*1000));
                 }
             }
         }
@@ -345,8 +345,8 @@ class PeerTestManager {
                 if (test.getAlicePortFromCharlie() > 0)
                     testComplete(false);
             } catch (UnknownHostException uhe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to get our IP (length " + ipSize +
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to get our IP (length " + ipSize +
                                ") from bob's reply: " + from + ", " + testInfo, uhe);
                 _context.statManager().addRateData("udp.testBadIP", 1);
             }
@@ -364,7 +364,7 @@ class PeerTestManager {
                 // why are we doing this instead of calling testComplete() ?
                 _currentTestComplete = true;
                 _context.statManager().addRateData("udp.statusKnownCharlie", 1);
-                honorStatus(CommSystemFacade.STATUS_UNKNOWN);
+                honorStatus(Status.UNKNOWN);
                 _currentTest = null;
                 return;
             }
@@ -433,7 +433,6 @@ class PeerTestManager {
      */
     private void testComplete(boolean forgetTest) {
         _currentTestComplete = true;
-        short status = -1;
         PeerTestState test = _currentTest;
 
         // Don't do this or we won't call honorStatus()
@@ -443,25 +442,26 @@ class PeerTestManager {
         //    return;
         // }
 
+        Status status;
         if (test.getAlicePortFromCharlie() > 0) {
             // we received a second message from charlie
             if ( (test.getAlicePort() == test.getAlicePortFromCharlie()) &&
                  (test.getAliceIP() != null) && (test.getAliceIPFromCharlie() != null) &&
                  (test.getAliceIP().equals(test.getAliceIPFromCharlie())) ) {
-                status = CommSystemFacade.STATUS_OK;
+                status = Status.IPV4_OK_IPV6_UNKNOWN;
             } else {
-                status = CommSystemFacade.STATUS_DIFFERENT;
+                status = Status.IPV4_SNAT_IPV6_UNKNOWN;
             }
         } else if (test.getReceiveCharlieTime() > 0) {
             // we received only one message from charlie
-            status = CommSystemFacade.STATUS_UNKNOWN;
+            status = Status.UNKNOWN;
         } else if (test.getReceiveBobTime() > 0) {
             // we received a message from bob but no messages from charlie
-            status = CommSystemFacade.STATUS_REJECT_UNSOLICITED;
+            status = Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
         } else {
             // we never received anything from bob - he is either down, 
             // ignoring us, or unable to get a Charlie to respond
-            status = CommSystemFacade.STATUS_UNKNOWN;
+            status = Status.UNKNOWN;
         }
         
         if (_log.shouldLog(Log.INFO))
@@ -477,7 +477,7 @@ class PeerTestManager {
      * necessary).
      *
      */
-    private void honorStatus(short status) {
+    private void honorStatus(Status status) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Test results: status = " + status);
         _transport.setReachabilityStatus(status);
@@ -702,7 +702,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
             UDPPacket packet = _packetBuilder.buildPeerTestToBob(bobIP, from.getPort(), aliceIP, alicePort,
@@ -805,7 +805,7 @@ class PeerTestManager {
             
             if (isNew) {
                 _activeTests.put(Long.valueOf(nonce), state);
-                _context.simpleScheduler().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
+                _context.simpleTimer2().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
             UDPPacket packet = _packetBuilder.buildPeerTestToCharlie(aliceIP, from.getPort(), aliceIntroKey, nonce, 

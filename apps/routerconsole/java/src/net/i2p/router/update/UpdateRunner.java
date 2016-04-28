@@ -16,6 +16,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.PartialEepGet;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.VersionComparator;
 
@@ -45,8 +46,6 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     protected final ByteArrayOutputStream _baos;
     protected URI _currentURI;
     private final String _currentVersion;
-
-    private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
     protected static final long CONNECT_TIMEOUT = 55*1000;
     protected static final long INACTIVITY_TIMEOUT = 5*60*1000;
@@ -150,6 +149,16 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
             if (shouldProxy) {
                 proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
                 proxyPort = ConfigUpdateHandler.proxyPort(_context);
+                if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+                    proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+                    _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+                    String msg = _t("HTTP client proxy tunnel must be running");
+                    if (_log.shouldWarn())
+                        _log.warn(msg);
+                    updateStatus("<b>" + msg + "</b>");
+                    _mgr.notifyTaskFailed(this, msg, null);
+                    return;
+                }
             } else {
                 // TODO, wrong method, fail
                 proxyHost = null;
@@ -170,9 +179,10 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
 
         if (_urls.isEmpty()) {
             // not likely, don't bother translating
-            updateStatus("<b>Update source list is empty, cannot download update</b>");
-            _log.error("Update source list is empty - cannot download update");
-            _mgr.notifyTaskFailed(this, "", null);
+            String msg = "Update source list is empty, cannot download update";
+            updateStatus("<b>" + msg + "</b>");
+            _log.error(msg);
+            _mgr.notifyTaskFailed(this, msg, null);
             return;
         }
 
@@ -189,7 +199,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
                 continue;
             }
 
-            updateStatus("<b>" + _("Updating from {0}", linkify(updateURL)) + "</b>");
+            updateStatus("<b>" + _t("Updating from {0}", linkify(updateURL)) + "</b>");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Selected update URL: " + updateURL);
 
@@ -249,7 +259,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_isPartial)
             return;
         long d = currentWrite + bytesTransferred;
-        String status = "<b>" + _("Updating") + "</b>";
+        String status = "<b>" + _t("Updating") + "</b>";
         _mgr.notifyProgress(this, status, d, d + bytesRemaining);
     }
 
@@ -262,7 +272,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
             if (newer) {
                 _newVersion = newVersion;
             } else {
-                updateStatus("<b>" + _("No new version found at {0}", linkify(url)) + "</b>");
+                updateStatus("<b>" + _t("No new version found at {0}", linkify(url)) + "</b>");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Found old version \"" + newVersion + "\" at " + url);
             }
@@ -285,7 +295,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_log.shouldLog(Log.WARN))
             _log.warn("Update from " + url + " did not download completely (" +
                            bytesRemaining + " remaining after " + currentAttempt + " tries)");
-        updateStatus("<b>" + _("Transfer failed from {0}", linkify(url)) + "</b>");
+        updateStatus("<b>" + _t("Transfer failed from {0}", linkify(url)) + "</b>");
         _mgr.notifyAttemptFailed(this, url, null);
         // update() will call notifyTaskFailed() after last URL
     }
@@ -303,15 +313,15 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     }
 
     /** translate a string */
-    protected String _(String s) {
-        return _mgr._(s);
+    protected String _t(String s) {
+        return _mgr._t(s);
     }
 
     /**
      *  translate a string with a parameter
      */
-    protected String _(String s, Object o) {
-        return _mgr._(s, o);
+    protected String _t(String s, Object o) {
+        return _mgr._t(s, o);
     }
 
     @Override

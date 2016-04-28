@@ -45,6 +45,16 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.21
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId;
+    }
+
     public void setSessionId(SessionId id) {
         _sessionId = id;
     }
@@ -64,6 +74,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     }
 
     /** @deprecated unused - presumably he meant remove? */
+    @Deprecated
     public void remoteEndpoint(int endpoint) {
         if ((endpoint >= 0) && (endpoint < _endpoints.size())) _endpoints.remove(endpoint);
     }

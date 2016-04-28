@@ -28,6 +28,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
 
 /**
@@ -47,6 +48,7 @@ class SearchJob extends JobImpl {
     private final long _expiration;
     private final long _timeoutMs;
     private final boolean _keepStats;
+    private final boolean _isLease;
     private Job _pendingRequeueJob;
     private final PeerSelector _peerSelector;
     private final List<Search> _deferredSearches;
@@ -88,10 +90,11 @@ class SearchJob extends JobImpl {
      * Create a new search for the routingKey specified
      * 
      */
-    public SearchJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, Job onSuccess, Job onFailure, long timeoutMs, boolean keepStats, boolean isLease) {
+    public SearchJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key,
+                     Job onSuccess, Job onFailure, long timeoutMs, boolean keepStats, boolean isLease) {
         super(context);
         if ( (key == null) || (key.getData() == null) ) 
-            throw new IllegalArgumentException("Search for null key?  wtf");
+            throw new IllegalArgumentException("Search for null key?");
         _log = getContext().logManager().getLog(getClass());
         _facade = facade;
         _state = new SearchState(getContext(), key);
@@ -99,13 +102,14 @@ class SearchJob extends JobImpl {
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
         _keepStats = keepStats;
+        _isLease = isLease;
         _deferredSearches = new ArrayList<Search>(0);
         _peerSelector = facade.getPeerSelector();
         _startedOn = -1;
         _expiration = getContext().clock().now() + timeoutMs;
-        getContext().statManager().addRateData("netDb.searchCount", 1, 0);
+        getContext().statManager().addRateData("netDb.searchCount", 1);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
+            _log.debug("Search (" + getClass().getName() + " for " + key, new Exception("Search enqueued by"));
     }
 
     public void runJob() {
@@ -348,6 +352,7 @@ class SearchJob extends JobImpl {
         else
             requeuePending(REQUEUE_DELAY);
     }
+
     private void requeuePending(long ms) {
         if (_pendingRequeueJob == null)
             _pendingRequeueJob = new RequeuePending(getContext());
@@ -390,17 +395,24 @@ class SearchJob extends JobImpl {
             return;
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + ": Send search to " + router.getIdentity().getHash().toBase64()
-                          + " for " + _state.getTarget().toBase64() 
+                _log.info(getJobId() + ": Send search to " + router.getIdentity().getHash()
+                          + " for " + _state.getTarget()
                           + " w/ timeout " + getPerPeerTimeoutMs(router.getIdentity().calculateHash()));
         }
 
-        getContext().statManager().addRateData("netDb.searchMessageCount", 1, 0);
+        getContext().statManager().addRateData("netDb.searchMessageCount", 1);
 
-        //if (_isLease || true) // always send searches out tunnels
+        // To minimize connection congestion, send RI lokups through exploratory tunnels if not connected.
+        // To minimize crypto overhead and response latency, send RI lookups directly if connected.
+        // But not too likely since we don't explore when we're floodfill.
+        // Always send LS lookups thru expl tunnels.
+        // But this is never used for LSes...
+
+        if (_isLease ||
+             !getContext().commSystem().isEstablished(router.getIdentity().calculateHash()))
             sendLeaseSearch(router);
-        //else
-        //    sendRouterSearch(router);
+        else
+            sendRouterSearch(router);
     }
     
     
@@ -413,7 +425,7 @@ class SearchJob extends JobImpl {
         Hash to = router.getIdentity().getHash();
         TunnelInfo inTunnel = getContext().tunnelManager().selectInboundExploratoryTunnel(to);
         if (inTunnel == null) {
-            _log.warn("No tunnels to get search replies through!  wtf!");
+            _log.warn("No tunnels to get search replies through!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
@@ -424,7 +436,7 @@ class SearchJob extends JobImpl {
         
         //RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
         //if (inGateway == null) {
-        //    _log.error("We can't find the gateway to our inbound tunnel?! wtf");
+        //    _log.error("We can't find the gateway to our inbound tunnel?!");
         //    getContext().jobQueue().addJob(new FailedJob(getContext(), router));
         //    return;
         //}
@@ -433,10 +445,14 @@ class SearchJob extends JobImpl {
         long expiration = getContext().clock().now() + timeout;
 
         I2NPMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration, router);	
-	
+        if (msg == null) {
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+            return;
+        }
+
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel == null) {
-            _log.warn("No tunnels to send search out through!  wtf!");
+            _log.warn("No tunnels to send search out through! Impossible?");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }        
@@ -461,27 +477,31 @@ class SearchJob extends JobImpl {
     }
     
     /** we're searching for a router, so we can just send direct */
-/******* always send through the lease
     protected void sendRouterSearch(RouterInfo router) {
         int timeout = _facade.getPeerTimeout(router.getIdentity().getHash());
         long expiration = getContext().clock().now() + timeout;
 
-        DatabaseLookupMessage msg = buildMessage(expiration);
+        // use the 4-arg one so we pick up the override in ExploreJob
+        //I2NPMessage msg = buildMessage(expiration);
+        I2NPMessage msg = buildMessage(null, router.getIdentity().getHash(), expiration, router);	
+        if (msg == null) {
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+            return;
+        }
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Sending router search to " + router.getIdentity().getHash().toBase64() 
-                      + " for " + msg.getSearchKey().toBase64() + " w/ replies to us [" 
-                      + msg.getFrom().toBase64() + "]");
+            _log.debug(getJobId() + ": Sending router search directly to " + router.getIdentity().getHash()
+                      + " for " + _state.getTarget());
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
-                                                          reply, new FailedJob(getContext(), router), sel, timeout, SEARCH_PRIORITY);
+                                                          reply, new FailedJob(getContext(), router), sel, timeout,
+                                                          OutNetMessage.PRIORITY_EXPLORATORY);
         if (FloodfillNetworkDatabaseFacade.isFloodfill(router))
             _floodfillSearchesOutstanding++;
         j.runJob();
         //getContext().jobQueue().addJob(j);
     }
-**********/
     
 
     /**
@@ -495,6 +515,8 @@ class SearchJob extends JobImpl {
      * @return a DatabaseLookupMessage
      */
     protected I2NPMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration, RouterInfo peer) {
+        throw new UnsupportedOperationException("see ExploreJob");
+/*******
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
         //msg.setFrom(replyGateway.getIdentity().getHash());
@@ -503,6 +525,7 @@ class SearchJob extends JobImpl {
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         return msg;
+*********/
     }
     
     /**
@@ -522,6 +545,7 @@ class SearchJob extends JobImpl {
     }
 *********/
     
+    /** found a reply */
     void replyFound(DatabaseSearchReplyMessage message, Hash peer) {
         long duration = _state.replyFound(peer);
         // this processing can take a while, so split 'er up
@@ -569,13 +593,13 @@ class SearchJob extends JobImpl {
             _state.replyTimeout(_peer);
             if (_penalizePeer) { 
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Penalizing peer for timeout on search: " + _peer.toBase64() + " after " + (getContext().clock().now() - _sentOn));
+                    _log.info("Penalizing peer for timeout on search: " + _peer + " after " + (getContext().clock().now() - _sentOn));
                 getContext().profileManager().dbLookupFailed(_peer);
             } else {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("NOT (!!) Penalizing peer for timeout on search: " + _peer.toBase64());
+                    _log.error("NOT (!!) Penalizing peer for timeout on search: " + _peer);
             }
-            getContext().statManager().addRateData("netDb.failedPeers", 1, 0);
+            getContext().statManager().addRateData("netDb.failedPeers", 1);
             searchNext();
         }
         public String getName() { return "Kademlia Search Failed"; }
@@ -593,7 +617,7 @@ class SearchJob extends JobImpl {
 	
         if (_keepStats) {
             long time = getContext().clock().now() - _state.getWhenStarted();
-            getContext().statManager().addRateData("netDb.successTime", time, 0);
+            getContext().statManager().addRateData("netDb.successTime", time);
             getContext().statManager().addRateData("netDb.successPeers", _state.getAttempted().size(), time);
         }
         if (_onSuccess != null)
@@ -682,7 +706,7 @@ class SearchJob extends JobImpl {
     protected void fail() {
         if (isLocal()) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": why did we fail if the target is local?: " + _state.getTarget().toBase64(), new Exception("failure cause"));
+                _log.error(getJobId() + ": why did we fail if the target is local?: " + _state.getTarget(), new Exception("failure cause"));
             succeed();
             return;
         }
@@ -697,7 +721,7 @@ class SearchJob extends JobImpl {
         getContext().statManager().addRateData("netDb.failedAttemptedPeers", attempted, time);
         
         if (_keepStats) {
-            getContext().statManager().addRateData("netDb.failedTime", time, 0);
+            getContext().statManager().addRateData("netDb.failedTime", time);
             //_facade.fail(_state.getTarget());
         }
         if (_onFailure != null)
@@ -757,10 +781,10 @@ class SearchJob extends JobImpl {
     }
     
     private static class Search {
-        private Job _onFind;
-        private Job _onFail;
-        private long _expiration;
-        private boolean _isLease;
+        private final Job _onFind;
+        private final Job _onFail;
+        private final long _expiration;
+        private final boolean _isLease;
         
         public Search(Job onFind, Job onFail, long expiration, boolean isLease) {
             _onFind = onFind;
@@ -782,6 +806,7 @@ class SearchJob extends JobImpl {
     }
     
     boolean wasAttempted(Hash peer) { return _state.wasAttempted(peer); }
+
     long timeoutMs() { return _timeoutMs; }
 
     /** @return true if peer was new */
@@ -795,5 +820,6 @@ class SearchJob extends JobImpl {
         }
         return rv;
     }
+
     void decrementOutstandingFloodfillSearches() { _floodfillSearchesOutstanding--; }
 }

@@ -59,7 +59,7 @@ public class CSSHelper extends HelperBase {
         // Protected with nonce in css.jsi
         if (lang != null && lang.length() >= 2 && lang.length() <= 6 &&
             lang.replaceAll("[a-zA-Z_]", "").length() == 0) {
-            Map m = new HashMap(2);
+            Map<String, String> m = new HashMap<String, String>(2);
             int under = lang.indexOf('_');
             if (under < 0) {
                 m.put(Messages.PROP_LANG, lang.toLowerCase(Locale.US));
@@ -107,7 +107,7 @@ public class CSSHelper extends HelperBase {
             if (Integer.parseInt(r) < MIN_REFRESH)
                 r = "" + MIN_REFRESH;
             _context.router().saveConfig(PROP_REFRESH, r);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
         }
     }
 
@@ -117,7 +117,7 @@ public class CSSHelper extends HelperBase {
         try {
             if (Integer.parseInt(r) < MIN_REFRESH)
                 r = "" + MIN_REFRESH;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             r = "" + MIN_REFRESH;
         }
         return r;
@@ -146,9 +146,9 @@ public class CSSHelper extends HelperBase {
     public String title(String s) {
          StringBuilder buf = new StringBuilder(128);
          buf.append("<title>")
-            .append(_("I2P Router Console"))
+            .append(_t("I2P Router Console"))
             .append(" - ")
-            .append(_(s))
+            .append(_t(s))
             .append("</title>");
          return buf.toString();
     }

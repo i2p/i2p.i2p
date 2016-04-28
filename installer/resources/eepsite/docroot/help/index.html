@@ -1,6 +1,6 @@
 <html>
  <head>
-  <title>I2P Anonymous Webserver | Welcome to your eepsite</title>
+  <title>I2P Hidden Service Website</title>
   <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -8,7 +8,7 @@
  <body>
 <div class="fairylights">
 <div class="main">
- <h1>I2P Anonymous Webserver</h1>
+ <h1>I2P Hidden Service Website</h1>
 <div class="langbar">
 <!-- Some of these languages listed here are yet to be translated -->
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
@@ -24,66 +24,65 @@
 </div>
 <h2>Quick Guide to Anonymous Webserving on I2P</h2>
 
- <p>This is your eepsite, your own anonymous I2P webserver - simply edit the files under <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)  
+ <p>This is your own anonymous I2P webserver ("eepsite") - simply edit the files under <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)  
  and they'll be reachable by others once you follow the instructions below.
- In I2P, eepsites are addressed using a 'key', which is represented as a really long Base64 string.
+ In I2P, hidden services are addressed using a 'key', which is represented as a really long Base64 string.
  (The 'key' is somewhat analogous to an IP address, and
- is shown on the eepsite's I2PTunnel
+ is shown on the hidden service
  <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">configuration page</a>).
- The instructions below detail how to assign a name like "mysite.i2p" to your key and start up your eepsite.</p>
- <p>You can reach your eepsite locally via 
+ The instructions below detail how to assign a name like "mysite.i2p" to your key and start up your website.</p>
+ <p>You can reach your site locally via 
  <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.
 </p>
 
- <h2>How to set up and announce your eepsite</h2>
- Your eepsite is stopped by default.
+ <h2>How to set up and announce your hidden service website</h2>
+ Your website is stopped by default.
  After you start it, it will be difficult for other people to find because it
  doesn't have a name and they don't have your really long Base64 key.
  You could just tell people that really long key, but thankfully I2P has an address book
- and several easy ways to tell people about your eepsite. Here's detailed instructions.
+ and several easy ways to tell people about your website. Here's detailed instructions.
  <ul>
- <li>Pick a name for your eepsite (<i>something</i>.i2p). Use all lower-case.
+ <li>Pick a name for your website (<i>something</i>.i2p). Use all lower-case.
      You may wish to check first in your own router's address book
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">here</a>,
      or the file <code>i2p/hosts.txt</code> to see if your name is already taken.
-     Enter the new name for your eepsite on the
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
+     Enter the new name for your website on the
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">hidden service configuration page</a>
      where it says "Website name". This will replace the default "mysite.i2p".
-     Also, check the "Auto Start" box. Your eepsite will now start every time you start your router.
+     Also, check the "Auto Start" box. Your website will now start every time you start your router.
      Be sure to click "Save".</li>
- <li>Click the start button for your eepsite on the
+ <li>Click the start button for your website on the
      <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">main i2ptunnel configuration page</a>.
-     You should now see "eepsite" listed under "Local Destinations" on the left side of the
+     You should now see it listed under "Hidden Services and Clients" on the left side of the
      <a href="http://127.0.0.1:7657/index.jsp">I2P Router Console</a>.
-     Your eepsite is now running.</li>
+     Your website is now running.</li>
  <li>Highlight the entire "Local destination" key on the
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">hidden service configuration page</a>.
      and copy it for
-     later pasting. Make sure you get the whole thing - it's over 500 characters and it must end in "AAAA".</li>
+     later pasting. Make sure you get the whole thing - it's over 500 characters.</li>
  <li>Enter the name and paste in the destination key into your
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">master address book</a>.
      Click "Add" to add the destination to your address book.</li>
- <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
+ <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should
  be right back here. Hopefully it worked.</li>
- <li>Before you tell the world about your new eepsite, you should add some content.
+ <li>Before you tell the world about your new website, you should add some content.
  Go to <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!</li>
 </ul>
 <h2>Register your own .I2P Domain</h2><ul>
- <li>Now it's time to add your eepsite to an I2P address book hosted by a site
+ <li>Now it's time to add your website to an I2P address book hosted by a site
      such as <a href="http://stats.i2p/">stats.i2p</a> or <a href="http://no.i2p/">no.i2p</a>.
      That is, you must enter
-     your eepsite name and key into a web interface on one or more of these sites.
+     your website name and key into a web interface on one or more of these sites.
      Here is <a href="http://stats.i2p/i2p/addkey.html">the key entry form at stats.i2p</a>.
      Again, your key is the entire "Local destination" key on the
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
-     Be sure you get the whole thing, ending with "AAAA".
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">hidden service configuration page</a>.
+     Be sure you get the whole thing.
      Don't forget to click "add a key".
      Check to see if it reports the key was added.
      Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply typing <i>something</i>.i2p into their browser.</li>
 </ul><h2>Adding Addressbook Subscriptions</h2><ul>
  <li>Speaking of address book updates, this would be a good time to add some more addressbooks
      to your own <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">subscription list</a>. Go to your subscriptions configuration page and add a couple of these for an automatically updated list of new hosts:<ul>
-     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
      <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
      <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li>
      <li><a href="http://no.i2p/export/alive-hosts.txt">http://no.i2p/export/alive-hosts.txt</a></li></ul>
@@ -94,7 +93,7 @@
      or <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p</code>
      into your browser.
      Once it's working, then you can tell others to use it.</li>
- <li>Some people check eepsite lists such as
+ <li>Some people check website lists such as
  <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> or <a href="http://perv.i2p">perv.i2p</a> for new eepsites, so you may start getting a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:
      <ul>
      <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>

@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# helloks <kqwe1859@gmail.com>, 2014
+# Choi Yeon-Ung <kqwe1859@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2014-01-27 12:28+0000\n"
-"Last-Translator: helloks <kqwe1859@gmail.com>\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-05-15 16:18+0000\n"
+"Last-Translator: Choi Yeon-Ung <kqwe1859@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/I2P/language/"
 "ko/)\n"
 "Language: ko\n"
@@ -85,3 +85,19 @@ msgid ""
 msgstr ""
 "높은 대역폭의 라우터, 또는 활성화된 torrent / 플러그인을 많이 사용하는 라우터"
 "의 경우, 이 값을 증가시켜야 할 수 있습니다."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "I2P 데몬은 AppArmor 안에서 실행"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""
+"이 옵션을 활성화 시 I2P는 AppArmor에 의해 샌드박싱되고, I2P가 어떤 파일과 폴"
+"더를 접근할 지 제한됩니다."

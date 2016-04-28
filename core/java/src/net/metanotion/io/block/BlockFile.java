@@ -28,11 +28,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io.block;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.metanotion.io.RAIFile;
@@ -64,7 +68,7 @@ import net.i2p.util.Log;
  * Pages are 1 KB and are numbered starting from 1.
  * e.g. the Metaindex skiplist is at offset 1024 bytes
  */
-public class BlockFile {
+public class BlockFile implements Closeable {
 	public static final int PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
 	public final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
@@ -93,7 +97,7 @@ public class BlockFile {
 	/** I2P was the file locked when we opened it? */
 	private final boolean _wasMounted;
 
-	private final BSkipList metaIndex;
+	private final BSkipList<String, Integer> metaIndex;
 	private boolean _isClosed;
 	/** cached list of free pages, only valid if freListStart > 0 */
 	private FreeListBlock flb;
@@ -146,7 +150,7 @@ public class BlockFile {
 			bf.bfck(true);
 			bf.close();
 			raif.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -319,7 +323,7 @@ public class BlockFile {
 		if (rai.canWrite())
 			mount();
 
-		metaIndex = new BSkipList(spanSize, this, METAINDEX_PAGE, new StringBytes(), new IntBytes());
+		metaIndex = new BSkipList<String, Integer>(spanSize, this, METAINDEX_PAGE, new StringBytes(), new IntBytes());
 	}
 
 	/**
@@ -430,18 +434,25 @@ public class BlockFile {
 	}
 
 	/**
+	 *  Open a skiplist if it exists.
+	 *  Returns null if the skiplist does not exist.
+	 *  Empty skiplists are not preserved after close.
+	 *
 	 *  If the file is writable, this runs an integrity check and repair
 	 *  on first open.
+	 *
+	 *  @return null if not found
 	 */
-	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {
+	@SuppressWarnings("unchecked")
+	public <K extends Comparable<? super K>, V> BSkipList<K, V> getIndex(String name, Serializer<K> key, Serializer<V> val) throws IOException {
 		// added I2P
-		BSkipList bsl = openIndices.get(name);
+		BSkipList<K, V> bsl = (BSkipList<K, V>) openIndices.get(name);
 		if (bsl != null)
 			return bsl;
 
-		Integer page = (Integer) metaIndex.get(name);
+		Integer page = metaIndex.get(name);
 		if (page == null) { return null; }
-		bsl = new BSkipList(spanSize, this, page.intValue(), key, val, true);
+		bsl = new BSkipList<K, V>(spanSize, this, page.intValue(), key, val, true);
 		if (file.canWrite()) {
 			log.info("Checking skiplist " + name + " in blockfile " + file);
 			if (bsl.bslck(true, false))
@@ -453,25 +464,43 @@ public class BlockFile {
 		return bsl;
 	}
 
-	public BSkipList makeIndex(String name, Serializer key, Serializer val) throws IOException {
+	/**
+	 *  Create and open a new skiplist if it does not exist.
+	 *  Throws IOException if it already exists.
+	 *
+	 *  @throws IOException if already exists or other errors
+	 */
+	public <K extends Comparable<? super K>, V> BSkipList<K, V> makeIndex(String name, Serializer<K> key, Serializer<V> val) throws IOException {
 		if(metaIndex.get(name) != null) { throw new IOException("Index already exists"); }
 		int page = allocPage();
 		metaIndex.put(name, Integer.valueOf(page));
 		BSkipList.init(this, page, spanSize);
-		BSkipList bsl = new BSkipList(spanSize, this, page, key, val, true);
+		BSkipList<K, V> bsl = new BSkipList<K, V>(spanSize, this, page, key, val, true);
 		openIndices.put(name, bsl);
 		return bsl;
 	}
 
+	/**
+	 *  Delete a skiplist if it exists.
+	 *  Must be open. Throws IOException if exists but is closed.
+	 *  Broken before 0.9.26.
+	 *
+	 *  @throws IOException if it is closed.
+	 */
 	public void delIndex(String name) throws IOException {
-		Integer page = (Integer) metaIndex.remove(name);
-		if (page == null) { return; }
-		Serializer nb = new IdentityBytes();
-		BSkipList bsl = new BSkipList(spanSize, this, page.intValue(), nb, nb, true);
+		if (metaIndex.get(name) == null)
+                    return;
+		BSkipList bsl = openIndices.get(name);
+		if (bsl == null)
+			throw new IOException("Cannot delete closed skiplist, open it first: " + name);
 		bsl.delete();
+		openIndices.remove(name);
+		metaIndex.remove(name);
 	}
 
 	/**
+	 *  Close a skiplist if it is open.
+	 *
 	 *  Added I2P
 	 */
 	public void closeIndex(String name) {
@@ -481,8 +510,75 @@ public class BlockFile {
 	}
 
 	/**
+	 *  Reformat a skiplist with new Serializers if it exists.
+	 *  The skiplist must be closed.
+	 *  Throws IOException if the skiplist is open.
+	 *  The skiplist will remain closed after completion.
+	 *
+	 *  @throws IOException if it is open or on errors
+	 *  @since 0.9.26
+	 */
+	public <K extends Comparable<? super K>, V> void reformatIndex(String name, Serializer<K> oldKey, Serializer<V> oldVal,
+	                          Serializer<K> newKey, Serializer<V> newVal) throws IOException {
+		if (openIndices.containsKey(name))
+			throw new IOException("Cannot reformat open skiplist " + name);
+		BSkipList<K, V> old = getIndex(name, oldKey, oldVal);
+		if (old == null)
+			return;
+		long start = System.currentTimeMillis();
+		String tmpName = "---tmp---" + name + "---tmp---";
+		BSkipList<K, V> tmp = getIndex(tmpName, newKey, newVal);
+		if (tmp != null) {
+			log.logAlways(Log.WARN, "Continuing on aborted reformat of list " + name);
+		} else {
+			tmp = makeIndex(tmpName, newKey, newVal);
+		}
+
+		// It could be much more efficient to do this at the
+		// SkipSpan layer but that's way too hard.
+		final int loop = 32;
+		List<K> keys = new ArrayList<K>(loop);
+		List<V> vals = new ArrayList<V>(loop);
+		while (true) {
+			SkipIterator<K, V> iter = old.iterator();
+			for (int i = 0; iter.hasNext() && i < loop; i++) {
+				try {
+					keys.add(iter.nextKey());
+					vals.add(iter.next());
+				} catch (NoSuchElementException nsee) {
+					throw new IOException("Unable to reformat corrupt list " + name, nsee);
+				}
+			}
+			// save state, as deleting corrupts the iterator
+			boolean done = !iter.hasNext();
+			for (int i = 0; i < keys.size(); i++) {
+				tmp.put(keys.get(i), vals.get(i));
+			}
+			for (int i = keys.size() - 1; i >= 0; i--) {
+				old.remove(keys.get(i));
+			}
+			if (done)
+				break;
+			keys.clear();
+			vals.clear();
+		}
+
+		delIndex(name);
+		closeIndex(name);
+		closeIndex(tmpName);
+		Integer page = metaIndex.get(tmpName);
+		metaIndex.put(name, page);
+		metaIndex.remove(tmpName);
+		if (log.shouldWarn())
+			log.warn("reformatted list: " + name + " in " +
+			         (System.currentTimeMillis() - start) + "ms");
+	}
+
+	/**
+	 *  Closes all open skiplists and then the blockfile itself.
+	 *
 	 *  Note (I2P)
-         *  Does NOT close the RAF / RAI.
+	 *  Does NOT close the RAF / RAI.
 	 */
 	public void close() throws IOException {
 		// added I2P
@@ -538,9 +634,15 @@ public class BlockFile {
 			try {
 				// This uses IdentityBytes, so the value class won't be right, but at least
 				// it won't fail the out-of-order check
-				Serializer keyser = slname.equals("%%__REVERSE__%%") ? new IntBytes() : new UTF8StringBytes();
-				BSkipList bsl = getIndex(slname, keyser, new IdentityBytes());
-				if (bsl == null) {
+				boolean fail;
+				if (slname.equals("%%__REVERSE__%%")) {
+					Serializer<Integer> keyser = new IntBytes();
+					fail = getIndex(slname, keyser, new IdentityBytes()) == null;
+				} else {
+					Serializer<String> keyser = new UTF8StringBytes();
+					fail = getIndex(slname, keyser, new IdentityBytes()) == null;
+				}
+				if (fail) {
 					log.error("Can't find list? " + slname);
 					continue;
 				}

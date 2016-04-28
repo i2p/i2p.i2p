@@ -15,6 +15,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.BuildRequestRecord;
 import net.i2p.data.i2np.BuildResponseRecord;
+import net.i2p.data.i2np.EncryptedBuildRecord;
 import net.i2p.data.i2np.TunnelBuildMessage;
 import net.i2p.data.i2np.TunnelBuildReplyMessage;
 import net.i2p.util.Log;
@@ -74,7 +75,7 @@ public class BuildMessageTestStandalone extends TestCase {
         for (int i = 0; i < cfg.getLength(); i++) {
             // this not only decrypts the current hop's record, but encrypts the other records
             // with the reply key
-            BuildRequestRecord req = proc.decrypt(ctx, msg, _peers[i], _privKeys[i]);
+            BuildRequestRecord req = proc.decrypt(msg, _peers[i], _privKeys[i]);
             // If false, no records matched the _peers[i], or the decryption failed
             assertTrue("foo @ " + i, req != null);
             long ourId = req.readReceiveTunnelId();
@@ -87,11 +88,11 @@ public class BuildMessageTestStandalone extends TestCase {
             long now = (ctx.clock().now() / (60l*60l*1000l)) * (60*60*1000);
             int ourSlot = -1;
 
-            byte reply[] = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), -1);
+            EncryptedBuildRecord reply = BuildResponseRecord.create(ctx, 0, req.readReplyKey(), req.readReplyIV(), -1);
             for (int j = 0; j < TunnelBuildMessage.MAX_RECORD_COUNT; j++) {
                 if (msg.getRecord(j) == null) {
                     ourSlot = j;
-                    msg.setRecord(j, new ByteArray(reply));
+                    msg.setRecord(j, reply);
                     break;
                 }
             }
@@ -173,7 +174,7 @@ public class BuildMessageTestStandalone extends TestCase {
             hop.setReplyKey(ctx.keyGenerator().generateSessionKey());
             byte iv[] = new byte[BuildRequestRecord.IV_SIZE];
             Arrays.fill(iv, (byte)i); // consistent for repeatability
-            hop.setReplyIV(new ByteArray(iv));
+            hop.setReplyIV(iv);
             hop.setReceiveTunnelId(new TunnelId(i+1));
         }
         return cfg;

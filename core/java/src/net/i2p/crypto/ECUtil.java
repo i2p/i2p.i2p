@@ -19,7 +19,7 @@ import net.i2p.util.NativeBigInteger;
  *
  *  @since 0.9.16
  */
-class ECUtil {
+final class ECUtil {
 
     private static final BigInteger TWO = new BigInteger("2");
     private static final BigInteger THREE = new BigInteger("3");

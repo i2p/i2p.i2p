@@ -62,7 +62,7 @@ public class Peer implements Comparable<Peer>
 
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
-  PeerState state;
+  volatile PeerState state;
 
   /** shared across all peers on this torrent */
   MagnetState magnetState;
@@ -79,15 +79,15 @@ public class Peer implements Comparable<Peer>
   private long uploaded_old[] = {-1,-1,-1};
   private long downloaded_old[] = {-1,-1,-1};
 
-  //  bytes per bt spec:                 0011223344556677
-  static final long OPTION_EXTENSION = 0x0000000000100000l;
-  static final long OPTION_FAST      = 0x0000000000000004l;
-  static final long OPTION_DHT       = 0x0000000000000001l;
+  //  bytes per bt spec:                         0011223344556677
+  private static final long OPTION_EXTENSION = 0x0000000000100000l;
+  private static final long OPTION_FAST      = 0x0000000000000004l;
+  //private static final long OPTION_DHT       = 0x0000000000000001l;
   /** we use a different bit since the compact format is different */
 /* no, let's use an extension message
   static final long OPTION_I2P_DHT   = 0x0000000040000000l;
 */
-  static final long OPTION_AZMP      = 0x1000000000000000l;
+  //private static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
   /**
@@ -194,6 +194,7 @@ public class Peer implements Comparable<Peer>
    * Compares the PeerIDs.
    * @deprecated unused?
    */
+  @Deprecated
   public int compareTo(Peer p)
   {
     int rv = peerID.compareTo(p.peerID);
@@ -217,9 +218,11 @@ public class Peer implements Comparable<Peer>
    *
    * If the given BitField is non-null it is send to the peer as first
    * message.
+   *
+   * @param uploadOnly if we are complete with skipped files, i.e. a partial seed
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield, MagnetState mState)
-  {
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield,
+                            MagnetState mState, boolean uploadOnly) {
     if (state != null)
       throw new IllegalStateException("Peer already started");
 
@@ -275,16 +278,8 @@ public class Peer implements Comparable<Peer>
             int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht));
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly));
         }
-
-        // Old DHT PORT message
-        //if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
-        //    if (_log.shouldLog(Log.DEBUG))
-        //        _log.debug("Peer supports DHT, sending PORT message");
-        //    int port = util.getDHT().getPort();
-        //    out.sendPort(port);
-        //}
 
         // Send our bitmap
         if (bitfield != null)
@@ -297,7 +292,7 @@ public class Peer implements Comparable<Peer>
   
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Start running the reader with " + toString());
-        // Use this thread for running the incomming connection.
+        // Use this thread for running the incoming connection.
         // The outgoing connection creates its own Thread.
         out.startup();
         Thread.currentThread().setName("Snark reader from " + peerID);
@@ -338,6 +333,9 @@ public class Peer implements Comparable<Peer>
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
     // Handshake write - options
     long myOptions = OPTION_EXTENSION;
+    // we can't handle HAVE_ALL or HAVE_NONE if we don't know the number of pieces
+    if (metainfo != null)
+        myOptions |= OPTION_FAST;
     // FIXME get util here somehow
     //if (util.getDHT() != null)
     //    myOptions |= OPTION_I2P_DHT;
@@ -385,15 +383,15 @@ public class Peer implements Comparable<Peer>
     if (options != 0) {
         // send them something in runConnection() above
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ": " + toString());
+            _log.debug("Peer supports options 0x" + Long.toHexString(options) + ": " + toString());
     }
 
     return bs;
   }
 
-  /** @since 0.8.4 */
-  public long getOptions() {
-      return options;
+  /** @since 0.9.21 */
+  public boolean supportsFast() {
+      return (options & OPTION_FAST) != 0;
   }
 
   /** @since 0.8.4 */
@@ -534,6 +532,7 @@ public class Peer implements Comparable<Peer>
    * @deprecated deadlocks
    * @since 0.8.1
    */
+  @Deprecated
   boolean isRequesting(int p) {
     PeerState s = state;
     return s != null && s.isRequesting(p);
@@ -566,6 +565,7 @@ public class Peer implements Comparable<Peer>
    * us then we start downloading from it. Has no effect when not connected.
    * @deprecated unused
    */
+  @Deprecated
   public void setInteresting(boolean interest)
   {
     PeerState s = state;

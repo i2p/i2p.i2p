@@ -6,8 +6,11 @@ import java.net.SocketTimeoutException;
 import net.i2p.I2PException;
 
 /**
- * Defines how to listen for streaming peer connections
- *
+ *  Streaming server socket returned by {@link I2PSocketManager#getServerSocket()}.
+ *  Defines how to listen for streaming peer connections.
+ *<p>
+ *  Note that this is not a standard Java {@link java.net.ServerSocket},
+ *  if you need one of those, use {@link I2PSocketManager#getStandardServerSocket()} instead.
  */
 public interface I2PServerSocket {
     /**
@@ -39,6 +42,7 @@ public interface I2PServerSocket {
      *  @return null always
      *  @since 0.8.11
      */
+    @Deprecated
     public AcceptingChannel getChannel();
 
     /**

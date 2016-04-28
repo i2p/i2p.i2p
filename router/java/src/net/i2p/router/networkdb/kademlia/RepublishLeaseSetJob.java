@@ -53,7 +53,7 @@ public class RepublishLeaseSetJob extends JobImpl {
                     } else {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Publishing " + ls);
-                        getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1, 0);
+                        getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1);
                         _facade.sendStore(_dest, ls, null, new OnRepublishFailure(getContext(), this), REPUBLISH_LEASESET_TIMEOUT, null);
                         _lastPublished = getContext().clock().now();
                         //getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
@@ -105,7 +105,7 @@ public class RepublishLeaseSetJob extends JobImpl {
 
     /** requeue */
     private static class OnRepublishFailure extends JobImpl {
-        private RepublishLeaseSetJob _job;
+        private final RepublishLeaseSetJob _job;
         public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
             super(ctx); 
             _job = job;

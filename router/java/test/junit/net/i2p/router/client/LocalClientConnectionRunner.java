@@ -8,6 +8,8 @@ import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.I2CPMessageReader;
+import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.RequestVariableLeaseSetMessage;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
@@ -40,9 +42,9 @@ class LocalClientConnectionRunner extends ClientConnectionRunner {
      *  don't instantiate a RequestLeaseSetJob
      */
     @Override
-    void requestLeaseSet(LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
+    void requestLeaseSet(Hash h, LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
         RequestVariableLeaseSetMessage msg = new RequestVariableLeaseSetMessage();
-        msg.setSessionId(getSessionId());
+        msg.setSessionId(getSessionId(h));
         for (int i = 0; i < set.getLeaseCount(); i++) {
             Lease lease = set.getLease(i);
             msg.addEndpoint(lease);
@@ -51,6 +53,27 @@ class LocalClientConnectionRunner extends ClientConnectionRunner {
             doSend(msg);
         } catch (I2CPMessageException ime) {
             ime.printStackTrace();
+        }
+    }
+
+    /**
+     *  No job queue, so super NPEs
+     */
+    @Override
+    void updateMessageDeliveryStatus(Destination dest, MessageId id, long messageNonce, int status) {
+        if (messageNonce <= 0)
+            return;
+        MessageStatusMessage msg = new MessageStatusMessage();
+        msg.setMessageId(id.getMessageId());
+        msg.setSessionId(getSessionId(dest.calculateHash()).getSessionId());
+        // has to be >= 0, it is initialized to -1
+        msg.setNonce(messageNonce);
+        msg.setSize(0);
+        msg.setStatus(status);
+        try {
+            doSend(msg);
+        } catch (I2CPMessageException ime) {
+            _log.warn("Error updating the status for " + id, ime);
         }
     }
 

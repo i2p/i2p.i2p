@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# plazmism <gomidori@live.jp>, 2014
+# a1678991 <nfgantanku@yahoo.co.jp>, 2015
+# タカハシ <gomidori@live.jp>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2014-01-31 12:06+0000\n"
-"Last-Translator: plazmism <gomidori@live.jp>\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-04-01 09:06+0000\n"
+"Last-Translator: a1678991 <nfgantanku@yahoo.co.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/I2P/language/"
 "ja/)\n"
 "Language: ja\n"
@@ -87,3 +88,17 @@ msgid ""
 msgstr ""
 "高い帯域幅のルーター、またたくさんのアクティブな torrent / プラグインがある"
 "ルーターも、この値を増やす必要がある場合があります。"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "AppArmorの中でI2Pデーモンを実行"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""

@@ -8,6 +8,7 @@ import java.util.Set;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import static net.i2p.router.peermanager.ProfileOrganizer.Slice.*;
 
 /**
  * Pick peers randomly out of the fast pool, and put them into tunnels
@@ -65,7 +66,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 } else {
                     firstHopExclude = exclude;
                 }
-                ctx.profileOrganizer().selectFastPeers(1, firstHopExclude, matches, settings.getRandomKey(), length == 2 ? 2 : 4);
+                ctx.profileOrganizer().selectFastPeers(1, firstHopExclude, matches, settings.getRandomKey(), length == 2 ? SLICE_0_1 : SLICE_0);
                 matches.remove(ctx.routerHash());
                 exclude.addAll(matches);
                 rv.addAll(matches);
@@ -73,7 +74,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                 if (length > 2) {
                     // middle hop(s)
                     // group 2 or 3
-                    ctx.profileOrganizer().selectFastPeers(length - 2, exclude, matches, settings.getRandomKey(), 3);
+                    ctx.profileOrganizer().selectFastPeers(length - 2, exclude, matches, settings.getRandomKey(), SLICE_2_3);
                     matches.remove(ctx.routerHash());
                     if (matches.size() > 1) {
                         // order the middle peers for tunnels >= 4 hops
@@ -96,7 +97,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
                     if (moreExclude != null)
                         exclude.addAll(moreExclude);
                 }
-                ctx.profileOrganizer().selectFastPeers(1, exclude, matches, settings.getRandomKey(), length == 2 ? 3 : 5);
+                ctx.profileOrganizer().selectFastPeers(1, exclude, matches, settings.getRandomKey(), length == 2 ? SLICE_2_3 : SLICE_1);
                 matches.remove(ctx.routerHash());
                 rv.addAll(matches);
             }

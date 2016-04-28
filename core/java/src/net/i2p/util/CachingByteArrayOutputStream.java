@@ -13,6 +13,7 @@ import net.i2p.data.ByteArray;
  * 
  * @deprecated unused
  */
+@Deprecated
 public class CachingByteArrayOutputStream extends ByteArrayOutputStream {
     private ByteCache _cache;
     private ByteArray _buf;

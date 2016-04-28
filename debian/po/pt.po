@@ -1,17 +1,18 @@
-# Portuguese debconf translation
-# Copyright (C) 2013 The I2P Project
-# This file is distributed under the same license as the i2p package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
+# wtfisthis <low_fps11@yahoo.com>, 2015
 # wtfisthis <low_fps11@yahoo.com>, 2013
-# rafaelbf, 2013
+# Rafael Ferrari, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2013-06-17 21:11+0000\n"
-"Last-Translator: rafaelbf\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-03-31 20:53+0000\n"
+"Last-Translator: wtfisthis <low_fps11@yahoo.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/"
 "pt/)\n"
 "Language: pt\n"
@@ -87,3 +88,19 @@ msgid ""
 msgstr ""
 "Roteadores I2P com internet rápida, e também com muitos torrents e plugins "
 "ativos, podem precisar aumentar este valor."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "Correr daemon I2p confinado com o AppArmor"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""
+"Com esta opção ativada  o I2P Vai correr em sandbox com AppArmor, retingindo "
+"que ficheiros  e diretórios são acessíveis pelo I2P "

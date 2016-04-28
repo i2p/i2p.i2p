@@ -54,7 +54,7 @@ class PluginUpdateHandler implements Checker, Updater {
         }
 
         if (oldVersion == null || updateSources == null) {
-            //updateStatus("<b>" + _("Cannot check, plugin {0} is not installed", appName) + "</b>");
+            //updateStatus("<b>" + _t("Cannot check, plugin {0} is not installed", appName) + "</b>");
             return null;
         }
 
@@ -67,7 +67,8 @@ class PluginUpdateHandler implements Checker, Updater {
     public UpdateTask update(UpdateType type, UpdateMethod method, List<URI> updateSources,
                                String appName, String newVersion, long maxTime) {
         if (type != UpdateType.PLUGIN ||
-            method != UpdateMethod.HTTP || updateSources.isEmpty())
+            (method != UpdateMethod.HTTP && method != UpdateMethod.FILE) ||
+            updateSources.isEmpty())
             return null;
         Properties props = PluginStarter.pluginProperties(_context, appName);
         String oldVersion = props.getProperty("version");
@@ -78,7 +79,7 @@ class PluginUpdateHandler implements Checker, Updater {
 
         UpdateRunner update = new PluginUpdateRunner(_context, _mgr, updateSources, appName, oldVersion);
         // set status before thread to ensure UI feedback
-        _mgr.notifyProgress(update, "<b>" + _mgr._("Updating") + "</b>");
+        _mgr.notifyProgress(update, "<b>" + _mgr._t("Updating") + "</b>");
         return update;
     }
 }

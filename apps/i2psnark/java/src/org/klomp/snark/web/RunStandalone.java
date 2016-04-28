@@ -10,6 +10,7 @@ import net.i2p.util.FileUtil;
 /**
  *  @deprecated does not work
  */
+@Deprecated
 public class RunStandalone {
 /****
     static {

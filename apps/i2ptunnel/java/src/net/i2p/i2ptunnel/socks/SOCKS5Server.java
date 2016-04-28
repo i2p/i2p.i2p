@@ -24,6 +24,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnel;
@@ -226,7 +227,7 @@ public class SOCKS5Server extends SOCKSServer {
                 }
                 byte addr[] = new byte[addrLen];
                 in.readFully(addr);
-                connHostName = new String(addr);
+                connHostName = DataHelper.getUTF8(addr);
             }
             _log.debug("DOMAINNAME address type in request: " + connHostName);
             break;
@@ -362,8 +363,7 @@ public class SOCKS5Server extends SOCKSServer {
 
         try {
             if (connHostName.toLowerCase(Locale.US).endsWith(".i2p")) {
-                _log.debug("connecting to " + connHostName + "...");
-                // Let's not due a new Dest for every request, huh?
+                // Let's not do a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
                 Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(connHostName);
@@ -373,10 +373,12 @@ public class SOCKS5Server extends SOCKSServer {
                     } catch (IOException ioe) {}
                     throw new SOCKSException("Host not found");
                 }
+                if (_log.shouldDebug())
+                    _log.debug("connecting to " + connHostName + "...");
                 Properties overrides = new Properties();
                 I2PSocketOptions sktOpts = t.buildOptions(overrides);
                 sktOpts.setPort(connPort);
-                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName), sktOpts);
+                destSock = t.createI2PSocket(dest, sktOpts);
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);
@@ -467,7 +469,7 @@ public class SOCKS5Server extends SOCKSServer {
         Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(proxy);
         if (dest == null)
             throw new SOCKSException("Outproxy not found");
-        I2PSocket destSock = tun.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(proxy), proxyOpts);
+        I2PSocket destSock = tun.createI2PSocket(dest, proxyOpts);
         DataOutputStream out = null;
         DataInputStream in = null;
         try {

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,8 @@ import org.tanukisoftware.wrapper.WrapperManager;
 public class LogsHelper extends HelperBase {
 
     private static final String LOCATION_AVAILABLE = "3.3.7";
-    
+    private static final String _jstlVersion = jstlVersion();
+
     /** @since 0.8.12 */
     public String getJettyVersion() {
         return Server.getVersion();
@@ -42,11 +44,38 @@ public class LogsHelper extends HelperBase {
     }
 
     /**
+     * @return non-null, "n/a" on failure
+     * @since 0.9.26
+     */
+    public String getJstlVersion() {
+        return _jstlVersion;
+    }
+
+    /**
+     * @return non-null, "n/a" on failure
+     * @since 0.9.26
+     */
+    private static String jstlVersion() {
+        String rv = "n/a";
+        try {
+            Class<?> cls = Class.forName("org.apache.taglibs.standard.Version", true, ClassLoader.getSystemClassLoader());
+            Method getVersion = cls.getMethod("getVersion");
+            // returns "standard-taglib 1.2.0"
+            Object version = getVersion.invoke(null, (Object[]) null);
+            rv = (String) version;
+            //int sp = rv.indexOf(' ');
+            //if (sp >= 0 && rv.length() > sp + 1)
+            //    rv = rv.substring(sp + 1);
+        } catch (Exception e) {}
+        return rv;
+    }
+
+    /**
      *  Does not call logManager.flush(); call getCriticalLogs() first to flush
      */
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
-        return "<p>" + _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b></p>" + str;
+        return "<p>" + _t("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b></p>" + str;
     }
     
     /**
@@ -97,10 +126,10 @@ public class LogsHelper extends HelperBase {
             str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
         }
         if (str == null) {
-            return "<p>" + _("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
+            return "<p>" + _t("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
         } else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            return "<p>" + _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p><pre>" + str + "</pre>";
+            return "<p>" + _t("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p><pre>" + str + "</pre>";
         }
     }
     
@@ -115,7 +144,7 @@ public class LogsHelper extends HelperBase {
     /** formats in reverse order */
     private String formatMessages(List<String> msgs) {
         if (msgs.isEmpty())
-            return "<p><i>" + _("No log messages") + "</i></p>";
+            return "<p><i>" + _t("No log messages") + "</i></p>";
         boolean colorize = _context.getBooleanPropertyDefaultTrue("routerconsole.logs.color");
         StringBuilder buf = new StringBuilder(16*1024); 
         buf.append("<ul>");
@@ -138,13 +167,13 @@ public class LogsHelper extends HelperBase {
                 // Homeland Security Advisory System
                 // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
                 // but pink instead of yellow for WARN
-                if (msg.contains(_("CRIT")))
+                if (msg.contains(_t("CRIT")))
                     color = "#cc0000";
-                else if (msg.contains(_("ERROR")))
+                else if (msg.contains(_t("ERROR")))
                     color = "#ff3300";
-                else if (msg.contains(_("WARN")))
+                else if (msg.contains(_t("WARN")))
                     color = "#ff00cc";
-                else if (msg.contains(_("INFO")))
+                else if (msg.contains(_t("INFO")))
                     color = "#000099";
                 else
                     color = "#006600";

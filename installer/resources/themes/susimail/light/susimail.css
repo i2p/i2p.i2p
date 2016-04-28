@@ -274,6 +274,12 @@ input.configure {
      min-height: 22px;
 }
 
+input.saveas {
+     background: #ddf url('/susimail/icons/drive_edit.png') no-repeat 4px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
 input[type=file], input.new_upload {
      background: #ddf url('/themes/console/images/add.png') no-repeat 4px center;
      padding: 2px 3px 2px 24px;

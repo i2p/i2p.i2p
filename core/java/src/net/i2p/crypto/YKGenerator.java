@@ -35,7 +35,7 @@ import net.i2p.util.SystemVersion;
  *
  * @author jrandom
  */
-class YKGenerator {
+final class YKGenerator {
     //private final static Log _log = new Log(YKGenerator.class);
     private final int MIN_NUM_BUILDERS;
     private final int MAX_NUM_BUILDERS;
@@ -91,7 +91,7 @@ class YKGenerator {
             return;
         _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
                                        "YK Precalc", true);
-        _precalcThread.setPriority(Thread.MIN_PRIORITY);
+        _precalcThread.setPriority(Thread.NORM_PRIORITY - 2);
         _isRunning = true;
         _precalcThread.start();
     }

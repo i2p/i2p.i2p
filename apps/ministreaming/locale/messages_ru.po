@@ -4,88 +4,93 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Maxym Mykhalchuk, 2015
 # yume, 2014
 # Тимофей <nefelim4ag@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-23 17:55+0000\n"
-"PO-Revision-Date: 2014-06-26 19:53+0000\n"
-"Last-Translator: yume\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-05-15 14:49+0000\n"
+"Last-Translator: Maxym Mykhalchuk\n"
 "Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru_RU\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:58
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
 msgstr "Время ожидания для сообщения истекло"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:61
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
 msgstr "Ошибка доставки до локального адресата"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:64
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:97
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
 msgid "Local router failure"
 msgstr "Ошибка локального маршрутизатора"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:67
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
 msgid "Local network failure"
 msgstr "Локальная ошибка сети"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:70
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
 msgid "Session closed"
 msgstr "Сессия завершена"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:73
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
 msgid "Invalid message"
 msgstr "Неправильное сообщение"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:76
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
 msgid "Invalid message options"
 msgstr "Неправильные параметры сообщения"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:79
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
 msgid "Buffer overflow"
 msgstr "Переполнение буфера"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:82
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
 msgid "Message expired"
 msgstr "Истек срок действия сообщения"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:85
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
-msgstr ""
+msgstr "Локальный LeaseSet недействителен"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:88
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
 msgstr "Нет локальных туннелей"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:91
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
 msgid "Unsupported encryption options"
 msgstr "Не поддерживаемые настройки шифрования"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:94
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
 msgid "Invalid destination"
 msgstr "Недопустимый адрес назначения"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:100
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
-msgstr ""
+msgstr "Время ожидания истекло для LeaseSet с адресом назначения"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:103
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "LeaseSet для адреса назначения не найден"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:106
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"
 msgstr "Адрес локального отправителя отключен"
 
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
+msgid "Connection was reset"
+msgstr "Соединение сброшено"
+
 #. Translate this one here, can't do it later
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:113
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
 msgid "Failure code"
 msgstr "Код ошибки"

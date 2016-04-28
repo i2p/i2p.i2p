@@ -11,7 +11,7 @@ import net.i2p.util.Log;
 
 /**
  *  Priority Blocking Queue using methods in the entries,
- *  as definied in PQEntry, to store priority and sequence number,
+ *  as defined in PQEntry, to store priority and sequence number,
  *  ensuring FIFO order within a priority.
  *
  *  Input: add(), offer(), and put() are overridden to add a sequence number.
@@ -49,6 +49,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
      *  Returns false if full
      *  @deprecated use offer(o)
      */
+    @Deprecated
     @Override
     public boolean add(E o) {
         timestamp(o);
@@ -79,6 +80,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
      *  @param unit ignored
      *  @deprecated use offer(o)
      */
+    @Deprecated
     @Override
     public boolean offer(E o, long timeout, TimeUnit unit) {
         timestamp(o);
@@ -94,6 +96,7 @@ public class PriBlockingQueue<E extends PQEntry> extends PriorityBlockingQueue<E
      *  Non blocking. Does not add if full.
      *  @deprecated use offer(o)
      */
+    @Deprecated
     @Override
     public void put(E o) {
         timestamp(o);

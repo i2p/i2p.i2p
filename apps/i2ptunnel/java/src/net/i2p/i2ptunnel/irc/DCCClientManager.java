@@ -109,6 +109,7 @@ public class DCCClientManager extends EventReceiver {
             I2PTunnelDCCClient cTunnel = new I2PTunnelDCCClient(b32, localPort, port, l, sockMgr,
                                                                 _dispatch, _tunnel, ++_id);
             cTunnel.attachEventDispatcher(this);
+            cTunnel.startRunning();
             int lport = cTunnel.getLocalPort();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Opened client tunnel at port " + lport +

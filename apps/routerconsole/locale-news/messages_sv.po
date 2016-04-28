@@ -4,6 +4,8 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Anders Nilsson <locally@devode.se>, 2015
+# cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2013
 # WinterFairy <winterfairy@riseup.net>, 2014
@@ -13,9 +15,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-02-23 16:51+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/language/sv_SE/)\n"
+"PO-Revision-Date: 2015-11-08 21:30+0000\n"
+"Last-Translator: Anders Nilsson <locally@devode.se>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,14 +25,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Grattis för din I2P installation!"
+msgstr "Grattis till din I2P-installation!"
 
 msgid "Welcome to I2P!"
 msgstr "Välkommen till I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "{0}Ha tålamod{1} medan I2P startar upp och letar upp peers."
+msgstr "Vänligen {0}ha tålamod{1} medan I2P startar och letar upp noder."
 
 #, java-format
 msgid ""
@@ -65,4 +67,4 @@ msgstr "När du har fått en \"delade klienter\" destination listad till vänste
 msgid ""
 "Point your IRC client to {0}localhost:6668{1} and say hi to us on "
 "{2}#i2p{3}."
-msgstr ""
+msgstr "Peka din IRC klient till {0}localhost:6668{1} och säg hej till oss på {2}#i2p{3}."

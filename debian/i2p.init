@@ -43,32 +43,19 @@ I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.pidfile=$JVMPIDFILE \
  wrapper.daemonize=TRUE"
 
-[ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
-[ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
+. /lib/lsb/init-functions
+. /lib/init/vars.sh
 
 
 for ENV_FILE in /etc/environment /etc/default/locale; do
-[ -r "$ENV_FILE" ] || continue
-[ -s "$ENV_FILE" ] || continue
+    [ -r "$ENV_FILE" ] || continue
+    [ -s "$ENV_FILE" ] || continue
 
- for var in LANG LANGUAGE LC_ALL LC_CTYPE; do
-     value=`egrep "^${var}=" "$ENV_FILE" | tail -n1 | cut -d= -f2`
-     [ -n "$value" ] && eval export $var=$value
+    for var in LANG LANGUAGE LC_ALL LC_CTYPE; do
+        value=`egrep "^${var}=" "$ENV_FILE" | tail -n1 | cut -d= -f2`
+        [ -n "$value" ] && eval export $var=$value
 
-# This is commented out for Ubuntu: Ubuntu still creates
-# /etc/environment in the most recent release
-# (currently 'Precise').
-#
-# TODO Add logic to automatically handle this
-#
-# Commented for Ubuntu since PPA packages 0.9-1$DISTRO1.
-# Packages for Debian systems will have this stanza uncommented.
-#
-#     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
-#         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
-#     fi
-
- done
+    done
 done
 
 # read config file
@@ -79,11 +66,20 @@ if [ -z "$RUN_DAEMON" ]; then
     exit 1
 fi
 
+case "$CONFINE_WITH_APPARMOR" in
+    [NnFf]*)
+        USE_AA="no"
+        ;;
+    *)
+        USE_AA="yes"
+        ;;
+esac
+
 case "$RUN_DAEMON" in
-        [NnFf]*)
-                log_action_msg "$DESC daemon disabled in /etc/default/$NAME".
-                exit 0
-                ;;
+    [NnFf]*)
+        log_action_msg "$DESC daemon disabled in /etc/default/$NAME".
+        exit 0
+        ;;
 esac
 
 # We need the wrapper. If it's not found, abort.
@@ -95,6 +91,7 @@ esac
 
 do_start()
 {
+    [ ! -z $ULIMIT ] && ulimit -n $ULIMIT
     start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null 2>&1 \
         || return 1
     [ -d $RUN ] || mkdir $RUN > /dev/null 2>&1
@@ -111,8 +108,29 @@ do_start()
     fi
     chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP $RUN > /dev/null 2>&1
     chown -f -R $I2PUSER:i2psvc /var/log/$NAME > /dev/null 2>&1
-    TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON -n $NICE -- \
-        $I2P_ARGS || return 2
+    if [ "$USE_AA" = "yes" ] && \
+       [ -x /usr/sbin/aa-status ] && \
+       [ -x /usr/sbin/aa-exec ] && \
+       [ -e /etc/apparmor.d/system_i2p ] && \
+       /usr/sbin/aa-status --enabled ; then
+            AA="--startas /usr/sbin/aa-exec"
+            AA_ARGS="--profile=system_i2p -- $DAEMON"
+    else
+            AA=""
+            AA_ARGS=""
+    fi
+
+    TZ=UTC start-stop-daemon --start --quiet --chuid $I2PUSER --pidfile $PIDFILE $AA --exec $DAEMON --nicelevel $NICE -- \
+        $AA_ARGS $I2P_ARGS || return 2
+
+    # FIXME Temporary hack
+    # Files from /usr/share/i2p should have been copied, if need be, well before the 15 seconds are up.
+    if [ ! -f /var/lib/i2p/i2p-config/.perms ] && [ $I2PUSER = "i2psvc" ]; then
+        sleep 15
+        find /var/lib/i2p/ -type d -exec chmod 770 {} \;
+        find /var/lib/i2p/ -type f -exec chmod 660 {} \;
+        touch /var/lib/i2p/i2p-config/.perms
+    fi
 }
 
 do_stop()
@@ -124,7 +142,8 @@ do_stop()
     start-stop-daemon --stop --quiet --oknodo --retry=0/60/KILL/20 --exec $DAEMON
 
     rm -rf "$I2PTEMP" > /dev/null 2>&1
-    [ -d "$RUN" ] && rmdir --ignore-fail-on-non-empty "$RUN" > /dev/null 2>&1
+    [ -d "$RUN" ] && rm -f "$RUN/*" > /dev/null 2>&1
+    [ -d "$RUN" ] && rmdir "$RUN" > /dev/null 2>&1
 }
 
 do_dump()

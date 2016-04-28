@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
@@ -54,8 +56,6 @@ import net.i2p.util.Translate;
  * @author jrandom
  */
 public class DataHelper {
-    private static final byte[] EQUAL_BYTES = getUTF8("=");
-    private static final byte[] SEMICOLON_BYTES = getUTF8(";");
 
     /**
      *  Map of String to itself to cache common
@@ -86,6 +86,7 @@ public class DataHelper {
             "stat_tunnel.buildExploratorySuccess.60m",
             "stat_tunnel.participatingTunnels.60m",
             "stat_uptime",
+            "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
             "a", "s",
@@ -95,6 +96,9 @@ public class DataHelper {
             _propertiesKeyCache.put(keys[i], keys[i]);
         }
     }
+
+    private static final Pattern ILLEGAL_KEY =  Pattern.compile("[#=\r\n;]");
+    private static final Pattern ILLEGAL_VALUE =  Pattern.compile("[#\r\n]");
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -108,6 +112,9 @@ public class DataHelper {
      * for the value. Finally after that comes the literal UTF-8 character ';'. This key=value;
      * is repeated until there are no more bytes (not characters!) left as defined by the
      * first two byte integer.
+     *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
      * @param rawStream stream to read the mapping from
      * @throws DataFormatException if the format is invalid
      * @throws IOException if there is a problem reading the data
@@ -122,7 +129,14 @@ public class DataHelper {
 
     /**
      *  Ditto, load into an existing properties
+     *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
      *  @param props the Properties to load into
+     *  @param rawStream stream to read the mapping from
+     *  @throws DataFormatException if the format is invalid
+     *  @throws IOException if there is a problem reading the data
+     *  @return the parameter props
      *  @since 0.8.13
      */
     public static Properties readProperties(InputStream rawStream, Properties props) 
@@ -132,23 +146,21 @@ public class DataHelper {
         int read = read(rawStream, data);
         if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-        byte eqBuf[] = new byte[EQUAL_BYTES.length];
-        byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key = readString(in);
             String cached = _propertiesKeyCache.get(key);
             if (cached != null)
                 key = cached;
-            read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
+            int b = in.read();
+            if (b != '=')
                 throw new DataFormatException("Bad key");
-            }
             String val = readString(in);
-            read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
+            b = in.read();
+            if (b != ';')
                 throw new DataFormatException("Bad value");
-            }
-            props.put(key, val);
+            Object old = props.put(key, val);
+            if (old != null)
+                throw new DataFormatException("Duplicate key " + key);
         }
         return props;
     }
@@ -160,11 +172,13 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @param rawStream stream to write to
-     * @param props properties to write out
-     * @throws DataFormatException if there is not enough valid data to write out
+     * @param props properties to write out, may be null
+     * @throws DataFormatException if there is not enough valid data to write out,
+     *                             or a length limit is exceeded
      * @throws IOException if there is an IO error writing out the data
      */
     public static void writeProperties(OutputStream rawStream, Properties props) 
@@ -178,7 +192,8 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -187,6 +202,7 @@ public class DataHelper {
      * Use utf8 = false for RouterAddress (fast, non UTF-8)
      * Use utf8 = true for SessionConfig (slow, UTF-8)
      * @param props source may be null
+     * @throws DataFormatException if a length limit is exceeded
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
@@ -200,6 +216,8 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -215,7 +233,7 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8, boolean sort) 
             throws DataFormatException, IOException {
-        if (props != null) {
+        if (props != null && !props.isEmpty()) {
             Properties p;
             if (sort) {
                 p = new OrderedProperties();
@@ -231,12 +249,12 @@ public class DataHelper {
                     writeStringUTF8(baos, key);
                 else
                     writeString(baos, key);
-                baos.write(EQUAL_BYTES);
+                baos.write('=');
                 if (utf8)
                     writeStringUTF8(baos, val);
                 else
                     writeString(baos, val);
-                baos.write(SEMICOLON_BYTES);
+                baos.write(';');
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
@@ -257,6 +275,8 @@ public class DataHelper {
      * Strings will be UTF-8 encoded in the byte array.
      * Warning - confusing method name, Properties is the source.
      *
+     * Properties from the defaults table of props (if any) are not written out by this method.
+     *
      * @deprecated unused
      *
      * @param target returned array as specified in data structure spec
@@ -275,9 +295,9 @@ public class DataHelper {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 writeStringUTF8(baos, key);
-                baos.write(EQUAL_BYTES);
+                baos.write('=');
                 writeStringUTF8(baos, val);
-                baos.write(SEMICOLON_BYTES);
+                baos.write(';');
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
@@ -299,6 +319,8 @@ public class DataHelper {
      * Warning - confusing method name, Properties is the target.
      * Strings must be UTF-8 encoded in the byte array.
      *
+     *  As of 0.9.18, throws DataFormatException on duplicate key
+     *
      * @param source source
      * @param target returned Properties
      * @return new offset
@@ -307,8 +329,6 @@ public class DataHelper {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
         ByteArrayInputStream in = new ByteArrayInputStream(source, offset, size);
-        byte eqBuf[] = new byte[EQUAL_BYTES.length];
-        byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key;
             try {
@@ -316,24 +336,24 @@ public class DataHelper {
                 String cached = _propertiesKeyCache.get(key);
                 if (cached != null)
                     key = cached;
-                int read = read(in, eqBuf);
-                if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
+                int b = in.read();
+                if (b != '=')
                     throw new DataFormatException("Bad key");
-                }
             } catch (IOException ioe) {
                 throw new DataFormatException("Bad key", ioe);
             }
             String val;
             try {
                 val = readString(in);
-                int read = read(in, semiBuf);
-                if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
+                int b = in.read();
+                if (b != ';')
                     throw new DataFormatException("Bad value");
-                }
             } catch (IOException ioe) {
                 throw new DataFormatException("Bad value", ioe);
             }
-            target.put(key, val);
+            Object old= target.put(key, val);
+            if (old != null)
+                throw new DataFormatException("Duplicate key " + key);
         }
         return offset + size;
     }
@@ -347,6 +367,8 @@ public class DataHelper {
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
      * Warning - confusing method name, Properties is the source.
+     *
+     * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @throws DataFormatException if key, value, or total is too long
      */
@@ -398,6 +420,9 @@ public class DataHelper {
      * - '=' is the only key-termination character (not ':' or whitespace)
      *
      * As of 0.9.10, an empty value is allowed.
+     *
+     * As in Java Properties, duplicate keys are allowed, last one wins.
+     *
      */
     public static void loadProps(Properties props, File file) throws IOException {
         loadProps(props, file, false);
@@ -458,6 +483,8 @@ public class DataHelper {
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
      * As of 0.8.1, file will be mode 600.
      *
+     * Properties from the defaults table of props (if any) are not written out by this method.
+     *
      * Leading or trailing whitespace in values is not checked but
      * will be trimmed by loadProps()
      *
@@ -475,19 +502,13 @@ public class DataHelper {
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String name = (String) entry.getKey();
                 String val = (String) entry.getValue();
-                if (name.contains("#") ||
-                    name.contains("=") ||
-                    name.contains("\r") ||
-                    name.contains("\n") ||
-                    name.startsWith(";")) {
+                if (ILLEGAL_KEY.matcher(name).matches()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#;=\\r\\n\") in key: \"" +
                                                            name + "\" = \"" + val + '\"');
                     continue;
                 }
-                if (val.contains("#") ||
-                    val.contains("\r") ||
-                    val.contains("\n")) {
+                if (ILLEGAL_VALUE.matcher(val).matches()) {
                     if (iae == null)
                         iae = new IllegalArgumentException("Invalid character (one of \"#\\r\\n\") in value: \"" +
                                                            name + "\" = \"" + val + '\"');
@@ -498,6 +519,11 @@ public class DataHelper {
             out.flush();
             fos.getFD().sync();
             out.close();
+            if (out.checkError()) {
+                out = null;
+                tmpFile.delete();
+                throw new IOException("Failed to write properties to " + tmpFile);
+            }
             out = null;
             if (!FileUtil.rename(tmpFile, file))
                 throw new IOException("Failed rename from " + tmpFile + " to " + file);
@@ -661,17 +687,21 @@ public class DataHelper {
     }
     
     /**
+     * Big endian.
+     *
      * @param numBytes 1-8
      * @param value non-negative
+     * @return an array of length numBytes
      */
     public static byte[] toLong(int numBytes, long value) throws IllegalArgumentException {
-        if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         byte val[] = new byte[numBytes];
         toLong(val, 0, numBytes, value);
         return val;
     }
     
     /**
+     * Big endian.
+     *
      * @param numBytes 1-8
      * @param value non-negative
      */
@@ -693,6 +723,7 @@ public class DataHelper {
      * @since 0.8.12
      */
     public static void toLongLE(byte target[], int offset, int numBytes, long value) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         int limit = offset + numBytes;
         for (int i = offset; i < limit; i++) {
@@ -702,6 +733,8 @@ public class DataHelper {
     }
     
     /**
+     * Big endian.
+     *
      * @param src if null returns 0
      * @param numBytes 1-8
      * @return non-negative
@@ -709,6 +742,7 @@ public class DataHelper {
      * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
      */
     public static long fromLong(byte src[], int offset, int numBytes) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         if ( (src == null) || (src.length == 0) )
             return 0;
         
@@ -733,6 +767,7 @@ public class DataHelper {
      * @since 0.8.12
      */
     public static long fromLongLE(byte src[], int offset, int numBytes) {
+        if (numBytes <= 0 || numBytes > 8) throw new IllegalArgumentException("Invalid number of bytes");
         long rv = 0;
         for (int i = offset + numBytes - 1; i >= offset; i--) {
             rv <<= 8;
@@ -865,8 +900,9 @@ public class DataHelper {
      *               cause a DataFormatException to be thrown
      * @throws DataFormatException if the string is not valid
      * @throws IOException if there is an IO error writing the string
+     * @since public since 0.9.26
      */
-    private static void writeStringUTF8(OutputStream out, String string) 
+    public static void writeStringUTF8(OutputStream out, String string) 
         throws DataFormatException, IOException {
         if (string == null) {
             out.write((byte) 0);
@@ -891,6 +927,7 @@ public class DataHelper {
      * @return boolean value, or null
      * @deprecated unused
      */
+    @Deprecated
     public static Boolean readBoolean(InputStream in) throws DataFormatException, IOException {
         int val = in.read();
         switch (val) {
@@ -1279,8 +1316,9 @@ public class DataHelper {
      *
      * @param hash null OK
      * @return null on EOF
-     * @deprecated use MessageDigest version
+     * @deprecated use MessageDigest version to be removed in 0.9.27
      */
+    @Deprecated
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
         StringBuilder buf = new StringBuilder(128);
         boolean ok = readLine(in, buf, hash);
@@ -1335,7 +1373,7 @@ public class DataHelper {
      *
      * @return true if the line was read, false if eof was reached on an empty line
      *              (returns true for non-empty last line without a newline)
-     * @deprecated use StringBuilder / MessageDigest version
+     * @deprecated use StringBuilder / MessageDigest version, to be removed in 0.9.27
      */
     @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
@@ -1375,8 +1413,9 @@ public class DataHelper {
      * @param hash null OK
      * @return true if the line was read, false if eof was reached on an empty line
      *              (returns true for non-empty last line without a newline)
-     * @deprecated use MessageDigest version
+     * @deprecated use MessageDigest version, to be removed in 0.9.27
      */
+    @Deprecated
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
         int c = -1;
         int i = 0;
@@ -1418,8 +1457,9 @@ public class DataHelper {
     
     /**
      *  update the hash along the way
-     *  @deprecated use MessageDigest version
+     *  @deprecated use MessageDigest version, to be removed in 0.9.27
      */
+    @Deprecated
     public static void write(OutputStream out, byte data[], Sha256Standalone hash) throws IOException {
         hash.update(data);
         out.write(data);
@@ -1446,10 +1486,12 @@ public class DataHelper {
             return (ms / (60 * 1000)) + "m";
         } else if (ms < 3 * 24 * 60 * 60 * 1000) {
             return (ms / (60 * 60 * 1000)) + "h";
-        } else if (ms > 1000l * 24l * 60l * 60l * 1000l) {
-            return "n/a";
-        } else {
+        } else if (ms < 3L * 365 * 24 * 60 * 60 * 1000) {
             return (ms / (24 * 60 * 60 * 1000)) + "d";
+        } else if (ms < 1000L * 365 * 24 * 60 * 60 * 1000) {
+            return (ms / (365L * 24 * 60 * 60 * 1000)) + "y";
+        } else {
+            return "n/a";
         }
     }
     
@@ -1466,11 +1508,11 @@ public class DataHelper {
      * @since 0.8.2
      */
     public static String formatDuration2(long ms) {
+        if (ms == 0)
+            return "0";
         String t;
         long ams = ms >= 0 ? ms : 0 - ms;
-        if (ms == 0) {
-            return "0";
-        } else if (ams < 3 * 1000) {
+        if (ams < 3 * 1000) {
             // NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
             // spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
             // a lot of tables.
@@ -1492,11 +1534,14 @@ public class DataHelper {
             // hours
             // alternates: hrs, hr., hrs.
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
-        } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
-            return _("n/a");
-        } else {
+        } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
             // days
             t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
+            // years
+            t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
+        } else {
+            return _t("n/a");
         }
         // Replace minus sign to work around
         // bug in Chrome (and IE?), line breaks at the minus sign
@@ -1510,9 +1555,49 @@ public class DataHelper {
         return t.replace(" ", "&nbsp;");
     }
     
+    /**
+     * Like formatDuration2(long) but with microsec and nanosec also.
+     *
+     * @since 0.9.19
+     */
+    public static String formatDuration2(double ms) {
+        if (ms == 0d)
+            return "0";
+        String t;
+        double adms = ms >= 0 ? ms : 0 - ms;
+        long lms = (long) ms;
+        long ams = lms >= 0 ? lms : 0 - lms;
+        if (adms < 0.000000001d) {
+            return "0";
+        } else if (adms < 0.001d) {
+            t = ngettext("1 ns", "{0,number,###} ns", (int) Math.round(ms * 1000000d));
+        } else if (adms < 1.0d) {
+            t = ngettext("1 μs", "{0,number,###} μs", (int) Math.round(ms * 1000d));
+        } else if (ams < 3 * 1000) {
+            t = ngettext("1 ms", "{0,number,####} ms", (int) Math.round(ms));
+        } else if (ams < 2 * 60 * 1000) {
+            t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
+        } else if (ams < 120 * 60 * 1000) {
+            t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
+        } else if (ams < 2 * 24 * 60 * 60 * 1000) {
+            t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
+        } else if (ams < 3L * 365 * 24 * 60 * 60 * 1000) {
+            // days
+            t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        } else if (ams < 1000L * 365 * 24 * 60 * 60 * 1000) {
+            // years
+            t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
+        } else {
+            return _t("n/a");
+        }
+        if (ms < 0)
+            t = t.replace("-", "&minus;");
+        return t.replace(" ", "&nbsp;");
+    }
+    
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
-    private static String _(String key) {
+    private static String _t(String key) {
         return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
@@ -1525,11 +1610,11 @@ public class DataHelper {
      * NOTE: formatDuration2() recommended in most cases for readability
      */
     public static String formatSize(long bytes) {
-        double val = bytes;
+        float val = bytes;
         int scale = 0;
-        while (val >= 1024) {
+        while (val >= 1024.0f) {
             scale++; 
-            val /= 1024;
+            val /= 1024.0f;
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -1603,7 +1688,7 @@ public class DataHelper {
         if (unescaped == null) return null;
         String escaped = unescaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            escaped = escaped.replaceAll(escapeChars[i], escapeCodes[i]);
+            escaped = escaped.replace(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
     }
@@ -1618,7 +1703,7 @@ public class DataHelper {
         if (escaped == null) return null;
         String unescaped = escaped;
         for (int i = 0; i < escapeChars.length; i++) {
-            unescaped = unescaped.replaceAll(escapeCodes[i], escapeChars[i]);
+            unescaped = unescaped.replace(escapeCodes[i], escapeChars[i]);
         }
         return unescaped;
     }
@@ -1774,7 +1859,6 @@ public class DataHelper {
      *
      *  @return null if orig is null
      *  @throws RuntimeException
-     *  @deprecated unused
      */
     public static String getUTF8(byte orig[], int offset, int len) {
         if (orig == null) return null;
@@ -1798,5 +1882,39 @@ public class DataHelper {
             rv[i] = (byte)orig.charAt(i);
         }
         return rv;
+    }
+
+    /**
+     *  Same as s.split(regex) but caches the compiled pattern for speed.
+     *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  @param s non-null
+     *  @param regex non-null
+     *  @throws java.util.regex.PatternSyntaxException unchecked
+     *  @since 0.9.24
+     */
+    public static String[] split(String s, String regex) {
+        return split(s, regex, 0);
+    }
+
+    private static final ConcurrentHashMap<String, Pattern> patterns = new ConcurrentHashMap<String, Pattern>();
+
+    /**
+     *  Same as s.split(regex, limit) but caches the compiled pattern for speed.
+     *  This saves about 10 microseconds (Bulldozer) on subsequent invocations.
+     *
+     *  @param s non-null
+     *  @param regex non-null
+     *  @param limit result threshold
+     *  @throws java.util.regex.PatternSyntaxException unchecked
+     *  @since 0.9.24
+     */
+    public static String[] split(String s, String regex, int limit) {
+        Pattern p = patterns.get(regex);
+        if (p == null) {
+            p = Pattern.compile(regex);
+            patterns.putIfAbsent(regex, p);
+        }
+        return p.split(s, limit);
     }
 }

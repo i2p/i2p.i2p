@@ -17,6 +17,7 @@ import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.crypto.TransientSessionKeyManager;
 import net.i2p.router.dummy.*;
+import net.i2p.router.message.GarlicMessageParser;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
@@ -27,7 +28,6 @@ import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
-import net.i2p.update.UpdateManager;
 import net.i2p.util.KeyRing;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 import net.i2p.util.SystemVersion;
@@ -63,11 +63,11 @@ public class RouterContext extends I2PAppContext {
     private Banlist _banlist;
     private Blocklist _blocklist;
     private MessageValidator _messageValidator;
-    private UpdateManager _updateManager;
     //private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
     private RouterAppManager _appManager;
     private RouterKeyGenerator _routingKeyGenerator;
+    private GarlicMessageParser _garlicMessageParser;
     private final Set<Runnable> _finalShutdownTasks;
     // split up big lock on this to avoid deadlocks
     private volatile boolean _initialized;
@@ -120,7 +120,8 @@ public class RouterContext extends I2PAppContext {
             // or about 2 seconds per buffer - so about 200x faster
             // to fill than to drain - so we don't need too many
             long maxMemory = SystemVersion.getMaxMemory();
-            long buffs = Math.min(16, Math.max(2, maxMemory / (14 * 1024 * 1024)));
+            long maxBuffs = (SystemVersion.isAndroid() || SystemVersion.isARM()) ? 4 : 8;
+            long buffs = Math.min(maxBuffs, Math.max(2, maxMemory / (21 * 1024 * 1024)));
             envProps.setProperty("prng.buffers", "" + buffs);
         }
         return envProps;
@@ -135,6 +136,7 @@ public class RouterContext extends I2PAppContext {
      * @since 0.8.4
      * @deprecated Use Router.saveConfig()
      */
+    @Deprecated
     public void setProperty(String propName, String value) {
     		_overrideProps.setProperty(propName, value);
     }
@@ -179,8 +181,10 @@ public class RouterContext extends I2PAppContext {
             _clientManagerFacade = new DummyClientManagerFacade(this);
             // internal client manager is null
         }
+        _garlicMessageParser = new GarlicMessageParser(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
+        _jobQueue.startup();
         _inNetMessagePool = new InNetMessagePool(this);
         _outNetMessagePool = new OutNetMessagePool(this);
         _messageHistory = new MessageHistory(this);
@@ -259,6 +263,9 @@ public class RouterContext extends I2PAppContext {
     /**
      *  Convenience method for getting the router hash.
      *  Equivalent to context.router().getRouterInfo().getIdentity().getHash()
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      *  @return may be null if called very early
      */
     public Hash routerHash() {
@@ -482,8 +489,11 @@ public class RouterContext extends I2PAppContext {
     @Override
     protected void initializeClock() {
         synchronized (_lock1) {
-            if (_clock == null)
-                _clock = new RouterClock(this);
+            if (_clock == null) {
+                RouterClock rc = new RouterClock(this);
+                rc.start();
+                _clock = rc;
+            }
             _clockInitialized = true;
         }
     }
@@ -616,5 +626,15 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterKeyGenerator routerKeyGenerator() {
         return _routingKeyGenerator;
+    }
+
+    /**
+     * Since we only need one.
+     *
+     * @return non-null after initAll()
+     * @since 0.9.20
+     */
+    public GarlicMessageParser garlicMessageParser() {
+        return _garlicMessageParser;
     }
 }

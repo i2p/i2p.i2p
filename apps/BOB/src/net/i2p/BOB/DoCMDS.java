@@ -25,12 +25,13 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
-//import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-//import net.i2p.i2ptunnel.I2PTunnel;
+import net.i2p.util.I2PAppThread;
+
 // needed only for debugging.
 // import java.util.logging.Level;
 // import java.util.logging.Logger;
@@ -909,6 +910,8 @@ public class DoCMDS implements Runnable {
 
 								} else if (Command.equals(C_getnick)) {
 									// Get the NamedDB to work with...
+									boolean nsfail = false;
+
 									try {
 										database.getReadLock();
 									} catch (Exception ex) {
@@ -919,6 +922,7 @@ public class DoCMDS implements Runnable {
 										ns = true;
 									} catch (RuntimeException b) {
 										try {
+											nsfail = true;
 											nns(out);
 										} catch (Exception ex) {
 											try {
@@ -931,7 +935,7 @@ public class DoCMDS implements Runnable {
 									}
 
 									database.releaseReadLock();
-									if (ns) {
+									if (ns && !nsfail) {
 										try {
 											rlock();
 										} catch (Exception e) {
@@ -1307,7 +1311,7 @@ public class DoCMDS implements Runnable {
 														// wait
 													}
 													tunnel = new MUXlisten(lock, database, nickinfo, _log);
-													Thread t = new Thread(tunnel);
+													Thread t = new I2PAppThread(tunnel);
 													t.start();
 													// try {
 													//	Thread.sleep(1000 * 10); // Slow down the startup.

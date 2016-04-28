@@ -16,7 +16,18 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Performance Graphs")%></h1>
+<%
+    // needs to be after the summary bar is rendered, so
+    // that the restart button is processed
+    String stat = request.getParameter("stat");
+    if (stat == null) {
+        // probably because restart or shutdown was clicked
+        response.setStatus(302);
+        response.setHeader("Location", "/graphs");
+        return;
+    }
+%>
+<h1><%=intl._t("I2P Performance Graphs")%></h1>
 <div class="main" id="main">
  <div class="graphspanel">
  <div class="widepanel">

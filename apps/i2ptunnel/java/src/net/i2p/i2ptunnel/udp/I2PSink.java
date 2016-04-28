@@ -32,7 +32,10 @@ public class I2PSink implements Sink {
         }
     }
     
-    /** @param src ignored */
+    /**
+     *  @param src ignored
+     *  @throws RuntimeException if session is closed
+     */
     public synchronized void send(Destination src, byte[] data) {
         //System.out.print("w");
         // create payload
@@ -49,9 +52,8 @@ public class I2PSink implements Sink {
             this.sess.sendMessage(this.dest, payload,
                                   (this.raw ? I2PSession.PROTO_DATAGRAM_RAW : I2PSession.PROTO_DATAGRAM),
                                   I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
-        } catch(I2PSessionException exc) {
-            // TODO: handle better
-            exc.printStackTrace();
+        } catch (I2PSessionException ise) {
+            throw new RuntimeException("failed to send data", ise);
         }
     }
     

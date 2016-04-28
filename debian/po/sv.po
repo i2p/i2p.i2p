@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
+# cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # Martin Svensson <digitalmannen@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2013-09-22 05:00+0000\n"
-"Last-Translator: hottuna <i2p@robertfoss.se>\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-04-24 21:35+0000\n"
+"Last-Translator: cacapo <handelsehorisont@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/projects/p/I2P/"
 "language/sv_SE/)\n"
 "Language: sv_SE\n"
@@ -87,3 +88,19 @@ msgid ""
 msgstr ""
 "För routrar med hög bandbredd eller routrar med hög aktivitet kan detta "
 "behöva ökas"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "Kör I2Pdaemon begränsad av AppArmor"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""
+"Med det här valet aktiverat kommer I2P att köras i sandlåda med AppArmor, "
+"som begränsar vilka filer och mappar som kan kommas åt av I2P."

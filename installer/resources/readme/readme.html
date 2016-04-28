@@ -7,7 +7,7 @@
 <h3>Services on I2P</h3>
 <ul class="links">
 
-<li class="tidylist"><b>Invisible Internet &amp; Public Web Browsing</b><br>On I2P you can access anonymous websites (eepsites) and other services (e.g. ssh over I2P, IRC, Jabber etc.) in addition to being able to host your own services. You can also access the normal web anonymously via I2P's built-in web proxy (outproxy). <a href="https://geti2p.net/en/about/browser-config" target="_blank">Configure your browser</a> to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then browse to an eepsite or a normal, unencrypted <code>http://</code> address. If you wish to disable or change outproxy access to the normal internet, remove or modify the outproxy entry for <code>false.i2p</code> under the <i>Outproxies</i> option in the <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy  Tunnel Editor</a>. In the "Sites of Interest" section <a href="#eepsites">below</a>, we list a few of the sites hosted on I2P.</li>
+<li class="tidylist"><b>Invisible Internet &amp; Public Web Browsing</b><br>On I2P you can access hidden service websites ("eepsites") and other services (e.g. ssh over I2P, IRC, Jabber etc.) in addition to being able to host your own services. You can also access the normal web anonymously via I2P's built-in web proxy (outproxy). <a href="https://geti2p.net/en/about/browser-config" target="_blank">Configure your browser</a> to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then browse to a hidden service website or a normal, unencrypted <code>http://</code> address. If you wish to disable or change outproxy access to the normal internet, remove or modify the outproxy entry for <code>false.i2p</code> under the <i>Outproxies</i> option in the <a href="/i2ptunnel/edit?tunnel=0" target="_blank">I2P HTTP Proxy  Tunnel Editor</a>. In the "Sites of Interest" section <a href="#eepsites">below</a>, we list a few of the sites hosted on I2P.</li>
 
 <li class="tidylist"><b>Anonymous E-Mail</b><br>Postman's I2P-based mail system can be accessed either via <a href="/webmail">I2P's built-in mail client</a>
   (susimail) or using any mail client that supports smtp and pop3.
@@ -35,18 +35,18 @@
 <h3>Anonymous Encrypted Web Hosting on I2P</h3>
 <ul class="links">
 
-<li class="tidylist"><b>Ready to Roll!</b><br>I2P comes with a built-in, ready-to-go web server for hosting your own anonymous website (eepsite) on the I2P network: a <a href="http://jetty.mortbay.org/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. To host your own content,
+<li class="tidylist"><b>Ready to Roll!</b><br>I2P comes with a built-in, ready-to-go web server for hosting your own hidden service website ("eepsite") on the I2P network: a <a href="http://jetty.mortbay.org/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. To host your own content,
   simply place your files in the <code>eepsite/docroot/</code> directory (or place 
   any standard JSP/Servlet .war files under <code>eepsite/webapps</code>, 
   or standard CGI scripts under <code>eepsite/cgi-bin</code>) and they'll show 
   up. You can also run any alternative web server platform over I2P and replace the built-in server, or run it on another tunnel.</li>
 <li class="tidylist"><b>Start Your Tunnel</b><br>  
   After starting up, your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>,  
-  your eepsite will be visible (but not discoverable) to others. Detailed instructions for starting 
-  your eepsite, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li></ul>
+  your website will be visible (but not discoverable) to others. Detailed instructions for starting 
+  your website, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li></ul>
     
 <a name="eepsites"></a>    
-    <h3>I2P-Hosted Sites of Interest</h3>
+    <h3>I2P-Hidden Services of Interest</h3>
     <ul class="links">
       <li class="tidylist"><b>Invisible Internet Project (I2P) Official Website</b><br><a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: Secure and
         anonymous connections to <a href="https://geti2p.net/en/" target="_blank">geti2p.net</a>. If you want to know more about how I2P works or how you can participate, this is your first port of call!</li>
@@ -57,10 +57,10 @@
         archive  with  source code (where permissible), information about I2P, including a <a href="http://echelon.i2p/I2Pguide/index.html" target="_blank">beginner's guide</a> and pre-release developer builds of I2P for the adventurous to try.</li>
         <li class="tidylist"><b>Ugha's Wiki</b><br><a href="http://ugha.i2p/" target="_blank">ugha.i2p</a>: An open wiki that anyone can edit with plenty of information  about I2P, help for beginners, additional links into the network, and more.</li>
         <li class="tidylist"><b>The Planet (on I2P)</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: An RSS aggregator site that takes news and events from around I2P and publishes them all in one place. A good site to visit to see the community at work!</li>
-        <li class="tidylist"><b>Eepsite Search Engine</b><br><a href="http://eepsites.i2p/" target="_blank">eepsites.i2p</a>: An 
-        anonymously-hosted eepsite search engine.</li>
+        <li class="tidylist"><b>Website Search Engine</b><br><a href="http://eepsites.i2p/" target="_blank">eepsites.i2p</a>: An 
+        anonymously-hosted hidden service search engine.</li>
       <li class="tidylist"><b>I2P Network Health</b><br><a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: Check out various aspects of network performance with this I2P network monitoring site run by zzz.</li> 
-      <li class="tidylist"><b>Discover I2P</b><br>There are many more eepsites - just follow the links from the ones you see, 
+      <li class="tidylist"><b>Discover I2P</b><br>There are many more hidden services - just follow the links from the ones you see, 
       bookmark your favourites, and visit them often!<br></li>     
     </ul>
 
@@ -80,7 +80,7 @@
    </li>
   
 <li class="tidylist"><b>Check Your Proxy Setttings</b><br>If 
-  you cannot see any eepsites at all (not even <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), 
+  you cannot see any websites at all (not even <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>), 
   make sure your browser's proxy is set to access http traffic (<i>not</i> https, <i>not</i> socks) via <code>127.0.0.1 port 4444</code>. If you need some help, there's <a href="https://geti2p.net/en/about/browser-config" target="_blank">a guide</a> to configuring your browser for I2P use.
   </li>
 

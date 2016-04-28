@@ -35,6 +35,7 @@ public class Frequency {
      * when did the last event occur?
      * @deprecated unused
      */
+    @Deprecated
     public synchronized long getLastEvent() {
             return _lastEvent;
     }
@@ -53,6 +54,7 @@ public class Frequency {
      * @return milliseconds; returns period + 1 if no events in previous period
      * @deprecated unused
      */
+    @Deprecated
     public synchronized double getMinAverageInterval() {
             return _minAverageInterval;
     }
@@ -149,5 +151,17 @@ public class Frequency {
 
     private final static long now() {
         return System.currentTimeMillis();
+    }
+    
+    /**
+     * Appends the data of this frequency to the specified StringBuilder
+     * @param dest to append data to
+     * @since 0.9.23
+     */
+    synchronized void store(StringBuilder dest) {
+        dest.append("avgInterval:").append(_avgInterval).append(',');
+        dest.append("minAverageInterval").append(_minAverageInterval).append(',');
+        dest.append("lastEvent").append(_lastEvent).append(",");
+        dest.append("count").append(_count);
     }
 }

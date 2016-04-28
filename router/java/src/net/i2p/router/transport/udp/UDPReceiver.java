@@ -52,6 +52,7 @@ class UDPReceiver {
         //_context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receiveHolePunch", "How often we receive a NAT hole punch", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.ignorePacketFromDroplist", "Packet lifetime for those dropped on the drop list", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.receiveFailsafe", "limiter stuck?", "udp", new long[] { 24*60*60*1000L });
     }
     
     /**
@@ -127,7 +128,7 @@ class UDPReceiver {
             long delay = ARTIFICIAL_DELAY_BASE + _context.random().nextInt(ARTIFICIAL_DELAY);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Delay packet " + packet + " for " + delay);
-            SimpleScheduler.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
+            SimpleTimer2.getInstance().addEvent(new ArtificiallyDelayedReceive(packet), delay);
             return -1;
         }
 **********/
@@ -265,8 +266,16 @@ class UDPReceiver {
                         //_context.bandwidthLimiter().requestInbound(req, size, "UDP receiver");
                         FIFOBandwidthLimiter.Request req =
                               _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
-                        while (req.getPendingRequested() > 0)
+                        // failsafe, don't wait forever
+                        int waitCount = 0;
+                        while (req.getPendingRequested() > 0 && waitCount++ < 5) {
                             req.waitForNextAllocation();
+                        }
+                        if (waitCount >= 5) {
+                            // tell FBL we didn't receive it, but receive it anyway
+                            req.abort();
+                            _context.statManager().addRateData("udp.receiveFailsafe", 1);
+                        }
                         
                         receive(packet);
                         //_context.statManager().addRateData("udp.receivePacketSize", size);

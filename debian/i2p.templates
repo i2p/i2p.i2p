@@ -33,3 +33,10 @@ _Description: Memory that can be allocated to I2P:
  .
  High bandwidth routers, as well as routers with a lot of active torrents / plugins, may
  need to have this value increased.
+
+Template: i2p/aa
+Type: boolean
+Default: true
+_Description: Should the I2P daemon be confined with AppArmor?
+ With this option enabled I2P will be sandboxed with AppArmor, restricting which files and
+ directories may be accessed by I2P.

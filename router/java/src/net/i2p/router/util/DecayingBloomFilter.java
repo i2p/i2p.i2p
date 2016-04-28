@@ -61,13 +61,19 @@ public class DecayingBloomFilter {
         _longToEntry = null;
         _longToEntryMask = 0;
         context.addShutdownTask(new Shutdown());
-        _decayEvent = new DecayEvent();
         _keepDecaying = true;
-        _decayEvent.schedule(_durationMs);
+        if (_durationMs == 60*60*1000) {
+            // special mode for BuildMessageProcessor
+            _decayEvent = new DecayHourlyEvent();
+        } else {
+            _decayEvent = new DecayEvent();
+            _decayEvent.schedule(_durationMs);
+        }
     }
 
     /**
      * Create a bloom filter that will decay its entries over time.  
+     * Uses default m of 23, memory usage is 2 MB.
      *
      * @param durationMs entries last for at least this long, but no more than twice this long
      * @param entryBytes how large are the entries to be added?  if this is less than 32 bytes,
@@ -78,7 +84,10 @@ public class DecayingBloomFilter {
         this(context, durationMs, entryBytes, "DBF");
     }
 
-    /** @param name just for logging / debugging / stats */
+    /**
+     * Uses default m of 23, memory usage is 2 MB.
+     * @param name just for logging / debugging / stats
+     */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name) {
         // this is instantiated in four different places, they may have different
         // requirements, but for now use this as a gross method of memory reduction.
@@ -86,16 +95,26 @@ public class DecayingBloomFilter {
         this(context, durationMs, entryBytes, name, context.getProperty("router.decayingBloomFilterM", DEFAULT_M));
     }
 
-    /** @param m filter size exponent */
+    /**
+     * Memory usage is 2 * (2**m) bits or 2**(m-2) bytes.
+     *
+     * @param m filter size exponent, max is 29
+     */
     public DecayingBloomFilter(I2PAppContext context, int durationMs, int entryBytes, String name, int m) {
         _context = context;
         _log = context.logManager().getLog(DecayingBloomFilter.class);
         _entryBytes = entryBytes;
         _name = name;
         int k = DEFAULT_K;
-        // max is (23,11) or (26,10); see KeySelector for details
-        if (m > DEFAULT_M)
+        // max is (23,11) or (26,10) or (29,9); see KeySelector for details
+        if (m > DEFAULT_M) {
             k--;
+            if (m > 26) {
+                k--;
+                if (m > 29)
+                    throw new IllegalArgumentException("Max m is 29");
+            }
+        }
         _current = new BloomSHA1(m, k);
         _previous = new BloomSHA1(m, k);
         _durationMs = durationMs;
@@ -115,9 +134,14 @@ public class DecayingBloomFilter {
             _longToEntry = null;
             _longToEntryMask = 0;
         }
-        _decayEvent = new DecayEvent();
         _keepDecaying = true;
-        _decayEvent.schedule(_durationMs);
+        if (_durationMs == 60*60*1000) {
+            // special mode for BuildMessageProcessor
+            _decayEvent = new DecayHourlyEvent();
+        } else {
+            _decayEvent = new DecayEvent();
+            _decayEvent.schedule(_durationMs);
+        }
         if (_log.shouldLog(Log.WARN))
            _log.warn("New DBF " + name + " m = " + m + " k = " + k + " entryBytes = " + entryBytes +
                      " numExtenders = " + numExtenders + " cycle (s) = " + (durationMs / 1000));
@@ -310,15 +334,60 @@ public class DecayingBloomFilter {
     }
     
     private class DecayEvent extends SimpleTimer2.TimedEvent {
+        /**
+         *  Caller MUST schedule.
+         */
         DecayEvent() {
             super(_context.simpleTimer2());
         }
-    	
+
         public void timeReached() {
             if (_keepDecaying) {
                 decay();
                 schedule(_durationMs);
             }
+        }
+    }
+    
+    /**
+     *  Decays at 5 minutes after the top of the hour.
+     *  This ignores leap seconds.
+     *  @since 0.9.24
+     */
+    private class DecayHourlyEvent extends SimpleTimer2.TimedEvent {
+        private static final long HOUR = 60 * 60 * 1000L;
+        private static final long LAG = 5 * 60 * 1000L;
+        private volatile long _currentHour;
+
+        /**
+         *  Schedules itself. Caller MUST NOT schedule.
+         */
+        DecayHourlyEvent() {
+            super(_context.simpleTimer2());
+            schedule(getTimeTillNextHour());
+        }
+
+        public void timeReached() {
+            if (_keepDecaying) {
+                long now = _context.clock().now();
+                long currentHour = now / HOUR;
+                // handle possible clock adjustments
+                if (_currentHour != currentHour) {
+                    decay();
+                    _currentHour = currentHour;
+                }
+                long next = ((1 + currentHour) * HOUR) + LAG;
+                schedule(Math.max(5000, next - now));
+            }
+        }
+
+        /** side effect: sets _currentHour */
+        private long getTimeTillNextHour() {
+            long now = _context.clock().now();
+            long currentHour = now / HOUR;
+            _currentHour = currentHour;
+            long next = ((1 + currentHour) * HOUR) + LAG;
+            return Math.max(5000, next - now);
         }
     }
     
@@ -372,6 +441,12 @@ public class DecayingBloomFilter {
      *
      *  Following stats for m=25, k=10:
      *  1792 2.4E-6; 4096 0.14%; 5120 0.6%; 6144 1.7%; 8192 6.8%; 10240 15%
+     *
+     *  Following stats for m=26, k=10:
+     *  4096 7.3E-6; 5120 4.5E-5; 6144 1.8E-4; 8192 0.14%; 10240 0.6%, 12288 1.7%
+     *
+     *  Following stats for m=27, k=9:
+     *  8192 1.1E-5; 10240 5.6E-5; 12288 2.0E-4; 14336 5.8E-4; 16384 0.14%
      *</pre>
      */
 /*****
@@ -400,16 +475,23 @@ public class DecayingBloomFilter {
     }
 
     private static void testByLong(int kbps, int m, int numRuns) {
+        System.out.println("Starting 8 byte test");
         int messages = 60 * 10 * kbps;
-        Random r = new Random();
+        java.util.Random r = new java.util.Random();
         DecayingBloomFilter filter = new DecayingBloomFilter(I2PAppContext.getGlobalContext(), 600*1000, 8, "test", m);
         int falsePositives = 0;
         long totalTime = 0;
         double fpr = 0d;
         for (int j = 0; j < numRuns; j++) {
+            // screen out birthday paradoxes (waste of time and space?)
+            java.util.Set<Long> longs = new java.util.HashSet<Long>(messages);
             long start = System.currentTimeMillis();
             for (int i = 0; i < messages; i++) {
-                if (filter.add(r.nextLong())) {
+                long rand;
+                do {
+                    rand = r.nextLong();
+                } while (!longs.add(Long.valueOf(rand)));
+                if (filter.add(rand)) {
                     falsePositives++;
                     //System.out.println("False positive " + falsePositives + " (testByLong j=" + j + " i=" + i + ")");
                 }
@@ -422,13 +504,14 @@ public class DecayingBloomFilter {
         System.out.println("False postive rate should be " + fpr);
         System.out.println("After " + numRuns + " runs pushing " + messages + " entries in "
                            + DataHelper.formatDuration(totalTime/numRuns) + " per run, there were "
-                           + falsePositives + " false positives");
-
+                           + falsePositives + " false positives (" +
+                           (((double) falsePositives) / messages) + ')');
     }
 
     private static void testByBytes(int kbps, int m, int numRuns) {
+        System.out.println("Starting 16 byte test");
         byte iv[][] = new byte[60*10*kbps][16];
-        Random r = new Random();
+        java.util.Random r = new java.util.Random();
         for (int i = 0; i < iv.length; i++)
             r.nextBytes(iv[i]);
 
@@ -452,7 +535,8 @@ public class DecayingBloomFilter {
         System.out.println("False postive rate should be " + fpr);
         System.out.println("After " + numRuns + " runs pushing " + iv.length + " entries in "
                            + DataHelper.formatDuration(totalTime/numRuns) + " per run, there were "
-                           + falsePositives + " false positives");
+                           + falsePositives + " false positives (" +
+                           (((double) falsePositives) / iv.length) + ')');
         //System.out.println("inserted: " + bloom.size() + " with " + bloom.capacity() 
         //                   + " (" + bloom.falsePositives()*100.0d + "% false positive)");
     }

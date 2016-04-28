@@ -20,6 +20,7 @@ import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
@@ -30,6 +31,8 @@ import net.i2p.data.router.RouterPrivateKeyFile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.crypto.FamilyKeyCrypto;
+import net.i2p.router.networkdb.kademlia.PersistentDataStore;
 import net.i2p.util.Log;
 
 /**
@@ -83,7 +86,7 @@ class LoadRouterInfoJob extends JobImpl {
         try {
             // if we have a routerinfo but no keys, things go bad in a hurry:
             // CRIT   ...rkdb.PublishLocalRouterInfoJob: Internal error - signing private key not known?  rescheduling publish for 30s
-            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known?  wtf
+            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known? Impossible?
             // CRIT   ...sport.udp.EstablishmentManager: Error in the establisher java.lang.NullPointerException
             // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
             // so pretend the RI isn't there if there is no keyfile
@@ -96,7 +99,13 @@ class LoadRouterInfoJob extends JobImpl {
                     throw new DataFormatException("Our RouterInfo has a bad signature");
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
-                _us = info;
+                // don't reuse if family name changed
+                if (DataHelper.eq(info.getOption(FamilyKeyCrypto.OPT_NAME),
+                                  getContext().getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME))) {
+                    _us = info;
+                } else {
+                    _log.logAlways(Log.WARN, "NetDb family name changed");
+                }
             }
             
             if (keys2Exist || keysExist) {
@@ -110,11 +119,30 @@ class LoadRouterInfoJob extends JobImpl {
                 // check if the sigtype config changed
                 SigType cstype = CreateRouterInfoJob.getSigTypeConfig(getContext());
                 boolean sigTypeChanged = stype != cstype;
+                if (sigTypeChanged && getContext().getProperty(CreateRouterInfoJob.PROP_ROUTER_SIGTYPE) == null) {
+                    // Not explicitly configured, and default has changed
+                    // Give a 25% chance of rekeying for each restart
+                    // TODO reduce to ~3 (i.e. increase probability) in future release
+                    if (getContext().random().nextInt(4) > 0) {
+                        sigTypeChanged = false;
+                        if (_log.shouldWarn())
+                            _log.warn("Deferring RI rekey from " + stype + " to " + cstype);
+                    }
+                }
 
                 if (sigTypeChanged || shouldRebuild(privkey)) {
+                    if (_us != null) {
+                        Hash h = _us.getIdentity().getHash();
+                        _log.logAlways(Log.WARN, "Deleting old router identity " + h.toBase64());
+                        // the netdb hasn't started yet, but we want to delete the RI
+                        File f = PersistentDataStore.getRouterInfoFile(getContext(), h);
+                        f.delete();
+                        // the banlist can be called at any time
+                        getContext().banlist().banlistRouterForever(h, "Our previous identity");
+                        _us = null;
+                    }
                     if (sigTypeChanged)
                         _log.logAlways(Log.WARN, "Rebuilding RouterInfo with new signature type " + cstype);
-                    _us = null;
                     // windows... close before deleting
                     if (fis1 != null) {
                         try { fis1.close(); } catch (IOException ioe) {}

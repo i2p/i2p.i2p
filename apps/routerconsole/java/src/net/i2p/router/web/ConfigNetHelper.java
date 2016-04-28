@@ -2,11 +2,12 @@ package net.i2p.router.web;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.router.RouterAddress;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.Router;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.TransportUtil;
@@ -24,7 +25,6 @@ public class ConfigNetHelper extends HelperBase {
     final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
-    private final static String CHECKED = " checked=\"checked\" ";
 
     public String getUdphostname() {
         return _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, ""); 
@@ -42,10 +42,10 @@ public class ConfigNetHelper extends HelperBase {
     public String getUdpIP() {
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return _("unknown");
+            return _t("unknown");
         String rv = addr.getHost();
         if (rv == null)
-            return _("unknown");
+            return _t("unknown");
         return rv;
     }
 
@@ -57,10 +57,10 @@ public class ConfigNetHelper extends HelperBase {
       /****
         RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
         if (addr == null)
-            return _("unknown");
+            return _t("unknown");
         UDPAddress ua = new UDPAddress(addr);
         if (ua.getPort() <= 0)
-            return _("unknown");
+            return _t("unknown");
         return "" + ua.getPort();
       ****/
         // Since we can't get to UDPTransport.getRequestedPort() from here, just use
@@ -77,19 +77,17 @@ public class ConfigNetHelper extends HelperBase {
         return _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, "unset");
     }
 
-    /** @param prop must default to false */
-    public String getChecked(String prop) {
-        if (_context.getBooleanProperty(prop))
-            return CHECKED;
-        return "";
-    }
-
     public String getDynamicKeysChecked() {
         return getChecked(Router.PROP_DYNAMIC_KEYS);
     }
 
     public String getLaptopChecked() {
         return getChecked(UDPTransport.PROP_LAPTOP_MODE);
+    }
+
+    /** @since 0.9.20 */
+    public String getIPv4FirewalledChecked() {
+        return getChecked(TransportUtil.PROP_IPV4_FIREWALLED);
     }
 
     public String getTcpAutoPortChecked(int mode) {
@@ -147,14 +145,19 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
+    /**
+     *  This isn't updated for the new statuses, but it's commented out in the jsp.
+     *  @deprecated unused, to be fixed if needed
+     */
+    @Deprecated
     public String getRequireIntroductionsChecked() {
-        short status = _context.commSystem().getReachabilityStatus();
+        Status status = _context.commSystem().getStatus();
         switch (status) {
-            case CommSystemFacade.STATUS_OK:
-            case CommSystemFacade.STATUS_UNKNOWN:
+            case OK:
+            case UNKNOWN:
                 return getChecked(UDPTransport.PROP_FORCE_INTRODUCERS);
-            case CommSystemFacade.STATUS_DIFFERENT:
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+            case DIFFERENT:
+            case REJECT_UNSOLICITED:
             default:
                 return CHECKED;
         }
@@ -185,13 +188,19 @@ public class ConfigNetHelper extends HelperBase {
     /** @since IPv6 */
     public String getAddressSelector() {
         Set<String> addrs = getAddresses();
+        // isPubliclyRoutable() rejects some IPv6 addresses that getAddresses() allows
+        for (Iterator<String> iter = addrs.iterator(); iter.hasNext(); ) {
+            byte[] ip = Addresses.getIP(iter.next());
+            if (ip == null || !TransportUtil.isPubliclyRoutable(ip, true))
+                iter.remove();
+        }
         Set<String> configs;
         String cs = getUdphostname();
         if (cs.length() <= 0) {
             configs = Collections.emptySet();
         } else {
             configs = new HashSet<String>(4);
-            String[] ca = cs.split("[,; \r\n\t]");
+            String[] ca = DataHelper.split(cs, "[,; \r\n\t]");
             for (int i = 0; i < ca.length; i++) {
                 String c = ca[i];
                 if (c.length() > 0) {
@@ -213,10 +222,12 @@ public class ConfigNetHelper extends HelperBase {
             buf.append(addr);
             buf.append("<br>");
         }
-        buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                   "<input type=\"checkbox\" class=\"optbox\" name=\"addrnew\"");
-        buf.append(CHECKED);
-        buf.append("><input name =\"udpHost1\" type=\"text\" size=\"16\" />" +
+        buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        if (!addrs.isEmpty()) {
+            buf.append(_t("Add host name or IP"))
+               .append(": ");
+        }
+        buf.append("<input name=\"udpHost1\" type=\"text\" size=\"16\" >" +
                    "</div>");
         return buf.toString();
     }
@@ -237,8 +248,8 @@ public class ConfigNetHelper extends HelperBase {
         return kbytesToBits(getShareBandwidth());
     }
     private String kbytesToBits(int kbytes) {
-        return DataHelper.formatSize(kbytes * (8 * 1024L)) + ' ' + _("bits per second") +
-               ' ' + _("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * (1024L * 60 * 60 * 24 * 31)));
+        return DataHelper.formatSize(kbytes * (8 * 1024L)) + ' ' + _t("bits per second") +
+               ' ' + _t("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * (1024L * 60 * 60 * 24 * 31)));
     }
     public String getInboundBurstRate() {
         return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
@@ -318,6 +329,10 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public static final int DEFAULT_SHARE_KBPS = 12;
+
+    /**
+     *  @return in KBytes per second
+     */
     public int getShareBandwidth() {
         int irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();
         int orateKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();

@@ -18,7 +18,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Event Log")%></h1>
+<h1><%=intl._t("I2P Event Log")%></h1>
 <div class="main" id="main">
  <div class="eventspanel">
  <div class="widepanel">

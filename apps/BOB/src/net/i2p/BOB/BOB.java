@@ -38,7 +38,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import net.i2p.client.I2PClient;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer2;
 
 /**
@@ -144,6 +143,7 @@ public class BOB implements Runnable, ClientApp {
 	 * Stop BOB gracefully
 	 * @deprecated unused
 	 */
+	@Deprecated
 	public synchronized static void stop() {
 		if (_bob != null)
 			_bob.shutdown(null);
@@ -214,9 +214,7 @@ public class BOB implements Runnable, ClientApp {
 		// Re-reading the config file in each thread is pretty damn stupid.
 		String configLocation = System.getProperty(PROP_CONFIG_LOCATION, "bob.config");
 		// This is here just to ensure there is no interference with our threadgroups.
-		SimpleScheduler Y1 = SimpleScheduler.getInstance();
 		SimpleTimer2 Y2 = SimpleTimer2.getInstance();
-		i = Y1.hashCode();
 		i = Y2.hashCode();
 		{
 			File cfg = new File(configLocation);
@@ -250,11 +248,11 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey("inbound.length")) {
-			props.setProperty("inbound.length", "1");
+			props.setProperty("inbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("outbound.length")) {
-			props.setProperty("outbound.length", "1");
+			props.setProperty("outbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("inbound.lengthVariance")) {
@@ -341,7 +339,7 @@ public class BOB implements Runnable, ClientApp {
 
 				if (g) {
 					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
-					Thread t = new Thread(conn_c);
+					Thread t = new I2PAppThread(conn_c);
 					t.setName("BOB.DoCMDS " + i);
 					t.start();
 					i++;

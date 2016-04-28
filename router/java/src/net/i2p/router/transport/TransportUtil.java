@@ -23,6 +23,7 @@ public abstract class TransportUtil {
 
     public static final String NTCP_IPV6_CONFIG = "i2np.ntcp.ipv6";
     public static final String SSU_IPV6_CONFIG = "i2np.udp.ipv6";
+    public static final String PROP_IPV4_FIREWALLED = "i2np.ipv4.firewalled";
 
     public enum IPv6Config {
         /** IPv6 disabled */
@@ -84,12 +85,20 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  @param transportStyle ignored
+     *  @since 0.9.20
+     */
+    public static boolean isIPv4Firewalled(RouterContext ctx, String transportStyle) {
+        return ctx.getBooleanProperty(PROP_IPV4_FIREWALLED);
+    }
+
+    /**
      *  Addresses without a host (i.e. w/introducers)
      *  are assumed to be IPv4
      */
     public static boolean isIPv6(RouterAddress addr) {
         // do this the fast way, without calling getIP() to parse the host string
-        String host = addr.getOption(RouterAddress.PROP_HOST);
+        String host = addr.getHost();
         return host != null && host.contains(":");
     }
 
@@ -102,6 +111,8 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  Ref: RFC 5735
+     *
      *  @param addr non-null
      *  @since IPv6
      */
@@ -110,22 +121,41 @@ public abstract class TransportUtil {
             if (!allowIPv4)
                 return false;
             int a0 = addr[0] & 0xFF;
-            if (a0 == 127) return false;
-            if (a0 == 10) return false;
-            int a1 = addr[1] & 0xFF;
-            if (a0 == 172 && a1 >= 16 && a1 <= 31) return false;
-            if (a0 == 192 && a1 == 168) return false;
-            if (a0 >= 224) return false; // no multicast
+            // please keep sorted by IP
             if (a0 == 0) return false;
-            if (a0 == 169 && a1 == 254) return false;
+            if (a0 == 10) return false;
             // 5/8 allocated to RIPE (30 November 2010)
             //if ((addr[0]&0xFF) == 5) return false;  // Hamachi
             // Hamachi moved to 25/8 Nov. 2012
             // Assigned to UK Ministry of Defence
             // http://blog.logmein.com/products/changes-to-hamachi-on-november-19th
             if (a0 == 25) return false;
+            if (a0 == 127) return false;
+            int a1 = addr[1] & 0xFF;
             // Carrier Grade NAT RFC 6598
             if (a0 == 100 && a1 >= 64 && a1 <= 127) return false;
+            // DHCP autoconfig RFC 3927
+            if (a0 == 169 && a1 == 254) return false;
+            if (a0 == 172 && a1 >= 16 && a1 <= 31) return false;
+            if (a0 == 192) {
+                if (a1 == 168) return false;
+                if (a1 == 0) {
+                    int a2 = addr[2] & 0xFF;
+                    // protocol assignment, documentation
+                    // 192.0.0.2 seen in the wild, RFC 6333 "Dual-Stack Lite Broadband Deployments Following IPv4 Exhaustion"
+                    if (a2 == 0 || a2 == 2) return false;
+                }
+                // 6to4 anycast
+                if (a1 == 88 && (addr[2] & 0xff) == 99) return false;
+            }
+            if (a0 == 198) {
+                // tests
+                if (a1 == 18 || a1 == 19) return false;
+                if (a1 == 51 && (addr[2] & 0xff) == 100) return false;
+            }
+            // test
+            if (a0 == 203 && a1 == 0 && (addr[2] & 0xff) == 113) return false;
+            if (a0 >= 224) return false; // no multicast
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             if (allowIPv6) {
@@ -173,11 +203,22 @@ public abstract class TransportUtil {
     /**
      *  Is this a valid port for us or a remote router?
      *
+     *  ref: http://i2p-projekt.i2p/en/docs/ports
+     *
      *  @since 0.9.17 moved from logic in individual transports
      */
     public static boolean isValidPort(int port) {
+        // update log message in UDPEndpoint if you update this list
         return port >= 1024 &&
                port <= 65535 &&
-               port != 1900;    // UPnP SSDP
+               port != 1900 &&  // UPnP SSDP
+               port != 2827 &&  // BOB
+               port != 4444 &&  // HTTP
+               port != 4445 &&  // HTTPS
+               port != 6668 &&  // IRC
+               (!(port >= 7650 && port <= 7664)) && // standard I2P range
+               port != 8998 &&  // mtn
+               port != 31000 && // Wrapper
+               port != 32000;   // Wrapper
     }
 }

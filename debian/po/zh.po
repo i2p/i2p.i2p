@@ -1,16 +1,17 @@
-# Chinese debconf translation
-# Copyright (C) 2013 The I2P Project
-# This file is distributed under the same license as the i2p package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
 # walking <waling@mail.i2p>, 2013
+# YF <yfdyh000@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2013-07-11 06:58+0000\n"
-"Last-Translator: xtoaster <zhazhenzhong@gmail.com>\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-06-07 16:29+0000\n"
+"Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/I2P/"
 "language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -48,8 +49,8 @@ msgid ""
 "account name here. For example, if your previous I2P installation is at /"
 "home/user/i2p, you may enter 'user' here."
 msgstr ""
-"I2P后台服务默认以i2psvc账户运行。要使用*已有*的I2P配置文件，您可以输入不同的"
-"账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入'user'。"
+"I2P后台服务默认以 i2psvc 账户运行。要使用*已有*的I2P配置文件，您可以输入不同"
+"的账户名。例如，如果您之前的I2P安装在 /home/user/i2p，此处可输入 'user'。"
 
 #. Type: string
 #. Description
@@ -57,19 +58,19 @@ msgstr ""
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "重要：如果您输入默认'i2psvc'以外的账户，此账户务必已经存在。"
+msgstr "重要：如果您输入默认的 'i2psvc' 以外的账户，此账户必须已经存在。"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr "I2P 可用最大内存："
+msgstr "I2P 最多可占用内存："
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "I2P 默认最大内存128M。"
+msgstr "默认情况下，I2P 最多只允许使用 128MB 系统内存。"
 
 #. Type: string
 #. Description
@@ -78,3 +79,17 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr "高带宽路由节点及BT下载很多的节点，建议考虑放宽此限制。"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "在 AppArmor 的限制下运行 I2P 守护进程"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr "此选项将启用被 AppArmor 沙盒化的 I2P，限制 I2P 可访问的文件和目录。"

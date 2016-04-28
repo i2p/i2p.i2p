@@ -89,10 +89,10 @@ public class TunnelHistory {
         _lifetimeRejected.incrementAndGet();
         if (severity >= TUNNEL_REJECT_CRIT) {
             _lastRejectedCritical = _context.clock().now();
-            _rejectRate.addData(1, 1);
+            _rejectRate.addData(1);
         } else if (severity >= TUNNEL_REJECT_BANDWIDTH) {
             _lastRejectedBandwidth = _context.clock().now();
-            _rejectRate.addData(1, 1);
+            _rejectRate.addData(1);
         } else if (severity >= TUNNEL_REJECT_TRANSIENT_OVERLOAD) {
             _lastRejectedTransient = _context.clock().now();
             // dont increment the reject rate in this case
@@ -108,7 +108,7 @@ public class TunnelHistory {
      */
     public void incrementFailed(int pct) {
         _lifetimeFailed.incrementAndGet();
-        _failRate.addData(pct, 1);
+        _failRate.addData(pct);
         _lastFailed = _context.clock().now();
     }
     
@@ -151,7 +151,7 @@ public class TunnelHistory {
         add(buf, "lifetimeAgreedTo", _lifetimeAgreedTo.get(), "How many tunnels has the peer ever agreed to participate in?");
         add(buf, "lifetimeFailed", _lifetimeFailed.get(), "How many tunnels has the peer ever agreed to participate in that failed prematurely?");
         add(buf, "lifetimeRejected", _lifetimeRejected.get(), "How many tunnels has the peer ever refused to participate in?");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString().getBytes("UTF-8"));
         _rejectRate.store(out, "tunnelHistory.rejectRate");
         _failRate.store(out, "tunnelHistory.failRate");
     }
@@ -190,14 +190,6 @@ public class TunnelHistory {
     }
     
     private final static long getLong(Properties props, String key) {
-        String val = props.getProperty(key);
-        if (val != null) {
-            try {
-                return Long.parseLong(val);
-            } catch (NumberFormatException nfe) {
-                return 0;
-            }
-        }
-        return 0;
+        return ProfilePersistenceHelper.getLong(props, key);
     }
 }

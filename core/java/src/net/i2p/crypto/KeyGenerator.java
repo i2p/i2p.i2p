@@ -26,11 +26,15 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -52,12 +56,14 @@ import net.i2p.util.RandomSource;
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
  */
-public class KeyGenerator {
-    //private final Log _log;
+public final class KeyGenerator {
     private final I2PAppContext _context;
 
+    static {
+        I2PProvider.addProvider();
+    }
+
     public KeyGenerator(I2PAppContext context) {
-        //_log = context.logManager().getLog(KeyGenerator.class);
         _context = context;
     }
 
@@ -82,7 +88,6 @@ public class KeyGenerator {
     /**
      *  PBE the passphrase with the salt.
      *  Warning - SLOW
-     *  Deprecated - Used by Syndie only.
      */
     public SessionKey generateSessionKey(byte salt[], byte passphrase[]) {
         byte salted[] = new byte[16+passphrase.length];
@@ -119,6 +124,7 @@ public class KeyGenerator {
     /**
      *  @deprecated use getElGamalExponentSize() which allows override in the properties
      */
+    @Deprecated
     public static final int PUBKEY_EXPONENT_SIZE = DEFAULT_USE_LONG_EXPONENT ?
                                                    PUBKEY_EXPONENT_SIZE_FULL :
                                                    PUBKEY_EXPONENT_SIZE_SHORT;
@@ -207,10 +213,10 @@ public class KeyGenerator {
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         BigInteger x = null;
 
-        // make sure the random key is less than the DSA q
+        // make sure the random key is less than the DSA q and greater than zero
         do {
             x = new NativeBigInteger(160, _context.random());
-        } while (x.compareTo(CryptoConstants.dsaq) >= 0);
+        } while (x.compareTo(CryptoConstants.dsaq) >= 0 || x.equals(BigInteger.ZERO));
 
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         keys[0] = new SigningPublicKey();
@@ -225,7 +231,7 @@ public class KeyGenerator {
     }
 
     /**
-     *  Generic signature type, supports DSA and ECDSA
+     *  Generic signature type, supports DSA, ECDSA, EdDSA
      *  @since 0.9.9
      */
     public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {
@@ -334,27 +340,51 @@ public class KeyGenerator {
         }
     }
 
+    /**
+     *  Usage: KeyGenerator [sigtype...]
+     */
     public static void main(String args[]) {
         try {
              main2(args);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
              e.printStackTrace();
         }
     }
 
-    public static void main2(String args[]) {
+    /**
+     *  Usage: KeyGenerator [sigtype...]
+     */
+    private static void main2(String args[]) {
         RandomSource.getInstance().nextBoolean();
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         int runs = 200; // warmup
+        Collection<SigType> toTest;
+        if (args.length > 0) {
+            toTest = new ArrayList<SigType>();
+            for (int i = 0; i < args.length; i++) {
+                SigType type = SigType.parseSigType(args[i]);
+                if (type != null)
+                    toTest.add(type);
+                else
+                    System.out.println("Unknown type: " + args[i]);
+            }
+            if (toTest.isEmpty()) {
+                System.out.println("No types to test");
+                return;
+            }
+        } else {
+            toTest = Arrays.asList(SigType.values());
+        }
         for (int j = 0; j < 2; j++) {
-            for (SigType type : SigType.values()) {
+            for (SigType type : toTest) {
                 if (!type.isAvailable()) {
                     System.out.println("Skipping unavailable: " + type);
+                    continue;
                 }
                 try {
                     System.out.println("Testing " + type);
                     testSig(type, runs);
-                } catch (Exception e) {
+                } catch (GeneralSecurityException e) {
                     System.out.println("error testing " + type);
                     e.printStackTrace();
                 }
@@ -390,6 +420,8 @@ public class KeyGenerator {
             RandomSource.getInstance().nextBytes(src);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, privkey);
+            if (sig == null)
+                throw new GeneralSecurityException("signature generation failed");
             long mid = System.nanoTime();
             boolean ok = DSAEngine.getInstance().verifySignature(sig, src, pubkey);
             long end = System.nanoTime();

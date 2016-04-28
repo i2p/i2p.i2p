@@ -1,11 +1,17 @@
 package net.i2p.crypto.eddsa.math;
 
+import java.io.Serializable;
+
 /**
+ *
+ * Note: concrete subclasses must implement hashCode() and equals()
  *
  * @since 0.9.15
  *
  */
-public abstract class FieldElement {
+public abstract class FieldElement implements Serializable {
+    private static final long serialVersionUID = 1239527465875676L;
+
     protected final Field f;
 
     public FieldElement(Field f) {
@@ -56,4 +62,6 @@ public abstract class FieldElement {
     public abstract FieldElement invert();
 
     public abstract FieldElement pow22523();
+
+    // Note: concrete subclasses must implement hashCode() and equals()
 }

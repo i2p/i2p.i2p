@@ -1,5 +1,7 @@
 package net.i2p.client.naming;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,8 +41,8 @@ public class MetaNamingService extends DummyNamingService {
         while (tok.hasMoreTokens()) {
             try {
                 Class<?> cls = Class.forName(tok.nextToken());
-                Constructor<?> con = cls.getConstructor(new Class[] { I2PAppContext.class });
-                addNamingService((NamingService)con.newInstance(new Object[] { context }), false);
+                Constructor<?> con = cls.getConstructor(I2PAppContext.class);
+                addNamingService((NamingService)con.newInstance(), false);
             } catch (Exception ex) {
             }
         }
@@ -181,6 +183,19 @@ public class MetaNamingService extends DummyNamingService {
 
     /**
      *  All services aggregated
+     *  @since 0.9.20
+     */
+    @Override
+    public Map<String, String> getBase64Entries(Properties options) {
+        Map<String, String> rv = new HashMap<String, String>();
+        for (NamingService ns : _services) { 
+             rv.putAll(ns.getBase64Entries(options));
+        }
+        return rv;
+    }
+
+    /**
+     *  All services aggregated
      */
     @Override
     public Set<String> getNames(Properties options) {
@@ -189,6 +204,17 @@ public class MetaNamingService extends DummyNamingService {
              rv.addAll(ns.getNames(options));
         }
         return rv;
+    }
+
+    /**
+     *  All services aggregated.
+     *  Duplicates not removed (for efficiency)
+     *  @since 0.9.20
+     */
+    public void export(Writer out, Properties options) throws IOException {
+        for (NamingService ns : _services) { 
+             export(out, options);
+        }
     }
 
     /**

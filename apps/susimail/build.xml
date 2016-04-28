@@ -24,6 +24,12 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../core/java/build/obj" />
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../jetty/jettylib/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="../jetty/jettylib/tomcat-api.jar" />
+                <pathelement location="../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
         </depend>
     </target>
@@ -37,8 +43,13 @@
             destdir="./src/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
-                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../jetty/jettylib/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="../jetty/jettylib/tomcat-api.jar" />
+                <pathelement location="../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
         </javac>
     </target>

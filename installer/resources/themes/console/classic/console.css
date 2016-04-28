@@ -227,7 +227,7 @@ div.routersummary ul {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 0px -5px 0px;
+     margin: -5px 0px 5px 0px;
      width: 193px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -995,7 +995,7 @@ p img:first-child {
      margin: 5px 5px 0 5px;
      color: #001;
      font-size: 7pt;
-     width: 310px;
+     width: 330px;
      text-align: right;
      float: right;
      valign: middle;

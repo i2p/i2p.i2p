@@ -2,13 +2,16 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.List;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
+import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.util.EventLog;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -30,9 +33,10 @@ class FloodfillMonitorJob extends JobImpl {
     private static final int REQUEUE_DELAY = 60*60*1000;
     private static final long MIN_UPTIME = 2*60*60*1000;
     private static final long MIN_CHANGE_DELAY = 6*60*60*1000;
+
     private static final int MIN_FF = 5000;
     private static final int MAX_FF = 999999;
-    private static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
+    static final String PROP_FLOODFILL_PARTICIPANT = "router.floodfillParticipant";
     
     public FloodfillMonitorJob(RouterContext context, FloodfillNetworkDatabaseFacade facade) {
         super(context);
@@ -47,26 +51,39 @@ class FloodfillMonitorJob extends JobImpl {
         boolean ff = shouldBeFloodfill();
         _facade.setFloodfillEnabled(ff);
         if (ff != wasFF) {
-			if(ff) {
-				getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
-			} else {
-				getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
-			}
-            getContext().router().rebuildRouterInfo();
+            if (ff) {
+                getContext().router().eventLog().addEvent(EventLog.BECAME_FLOODFILL);
+            } else {
+                getContext().router().eventLog().addEvent(EventLog.NOT_FLOODFILL);
+            }
+            getContext().router().rebuildRouterInfo(true);
+            Job routerInfoFlood = new FloodfillRouterInfoFloodJob(getContext(), _facade);
+            if(getContext().router().getUptime() < 5*60*1000) {
+                // Needed to prevent race if router.floodfillParticipant=true (not auto)
+                routerInfoFlood.getTiming().setStartAfter(getContext().clock().now() + 5*60*1000);
+                getContext().jobQueue().addJob(routerInfoFlood);
+                if(_log.shouldLog(Log.DEBUG)) {
+                    _log.logAlways(Log.DEBUG, "Deferring our FloodfillRouterInfoFloodJob run because of low uptime.");
+                }
+            } else {
+                routerInfoFlood.runJob();
+                if(_log.shouldLog(Log.DEBUG)) {
+                    _log.logAlways(Log.DEBUG, "Running FloodfillRouterInfoFloodJob");
+                }
+            }
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Should we be floodfill? " + ff);
         int delay = (REQUEUE_DELAY / 2) + getContext().random().nextInt(REQUEUE_DELAY);
         // there's a lot of eligible non-floodfills, keep them from all jumping in at once
-        // To do: somehow assess the size of the network to make this adaptive?
+        // TODO: somehow assess the size of the network to make this adaptive?
         if (!ff)
             delay *= 4; // this was 7, reduced for moar FFs --zab
         requeue(delay);
     }
 
     private boolean shouldBeFloodfill() {
-        // Only if not shutting down...
-        if (getContext().getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null)
+        if (!SigType.ECDSA_SHA256_P256.isAvailable())
             return false;
 
         // Hidden trumps netDb.floodfillParticipant=true
@@ -81,8 +98,15 @@ class FloodfillMonitorJob extends JobImpl {
 
         // auto from here down
 
+        // Only if not shutting down...
+        if (getContext().router().gracefulShutdownInProgress())
+            return false;
+
         // ARM ElG decrypt is too slow
-        if (SystemVersion.isARM())
+        if (SystemVersion.isARM() || SystemVersion.isAndroid())
+            return false;
+
+        if (getContext().getBooleanProperty(UDPTransport.PROP_LAPTOP_MODE))
             return false;
 
         if (getContext().commSystem().isInBadCountry())
@@ -100,8 +124,10 @@ class FloodfillMonitorJob extends JobImpl {
         if (ri == null)
             return false;
         char bw = ri.getBandwidthTier().charAt(0);
-        // Only if class N or O...
-        if (bw < Router.CAPABILITY_BW128 || bw > Router.CAPABILITY_BW256)
+        // Only if class M, N, O, P, X
+        if (bw != Router.CAPABILITY_BW64 &&
+            bw != Router.CAPABILITY_BW128 && bw != Router.CAPABILITY_BW256 &&
+            bw != Router.CAPABILITY_BW512 && bw != Router.CAPABILITY_BW_UNLIMITED)
             return false;
 
         // This list will not include ourselves...
@@ -145,12 +171,17 @@ class FloodfillMonitorJob extends JobImpl {
             ffcount++;
         int good = ffcount - failcount;
         boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf("R") >= 0;
-        // Use the same job lag test as in RouterThrottleImpl
-        happy = happy && getContext().jobQueue().getMaxLag() < 2*1000;
+        // TODO - limit may still be too high
+        // For reference, the avg lifetime job lag on my Pi is 6.
+        // Should we consider avg. dropped ff jobs?
+        RateStat lagStat = getContext().statManager().getRate("jobQueue.jobLag");
+        RateStat queueStat = getContext().statManager().getRate("router.tunnelBacklog");
+        happy = happy && lagStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 25;
+        happy = happy && queueStat.getRate(60*60*1000L).getAvgOrLifetimeAvg() < 5;
         // Only if we're pretty well integrated...
-        happy = happy && _facade.getKnownRouters() >= 200;
+        happy = happy && _facade.getKnownRouters() >= 400;
         happy = happy && getContext().commSystem().countActivePeers() >= 50;
-        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 35;
+        happy = happy && getContext().tunnelManager().getParticipatingCount() >= 25;
         happy = happy && Math.abs(getContext().clock().getOffset()) < 10*1000;
         // We need an address and no introducers
         if (happy) {

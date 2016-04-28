@@ -1,11 +1,9 @@
-This is an I2P port of snark [http://klomp.org/snark], a GPL'ed bittorrent client
+This is i2psnark, an I2P port of snark http://klomp.org/snark/ , a GPLv2 bittorrent client.
+It contains significant enhancements including a web UI and support for
+multitorrent, magnet, PEX and DHT.
 
-The build in tracker has been removed for simplicity.
+i2psnark is packaged as a webapp running in the router console.
 
-Example usage:
-  java -jar lib/i2psnark.jar myFile.torrent
-
-or, a more verbose setting:
-  java -jar lib/i2psnark.jar --eepproxy 127.0.0.1 4444 \
-       --i2cp 127.0.0.1 7654 "inbound.length=2 outbound.length=2" \
-       --debug 6 myFile.torrent
+See http://i2p-projekt.i2p/en/docs/applications/bittorrent
+or https://geti2p.net/en/docs/applications/bittorrent
+for the specification of the protocols for bittorrent over I2P.

@@ -80,6 +80,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected I2PTunnelTask task;
     protected boolean bidir;
     private ThreadPoolExecutor _executor;
+    protected volatile ThreadPoolExecutor _clientExecutor;
     private final Map<Integer, InetSocketAddress> _socketMap = new ConcurrentHashMap<Integer, InetSocketAddress>(4);
 
     /** unused? port should always be specified */
@@ -242,7 +243,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 String portNum = getTunnel().port;
                 if (portNum == null)
                     portNum = "7654";
-                String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
+                String msg;
+                if (getTunnel().getContext().isRouterContext())
+                    msg = "Unable to build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
+                else
+                    msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
                 if (++retries < MAX_RETRIES) {
                     msg += ", retrying in " + (RETRY_DELAY / 1000) + " seconds";
@@ -470,6 +475,16 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (_usePool) {
             _executor = new CustomThreadPoolExecutor(getHandlerCount(), "ServerHandler pool " + remoteHost + ':' + remotePort);
         }
+        TunnelControllerGroup tcg = TunnelControllerGroup.getInstance();
+        if (tcg != null) {
+            _clientExecutor = tcg.getClientExecutor();
+        } else {
+            // Fallback in case TCG.getInstance() is null, never instantiated
+            // and we were not started by TCG.
+            // Maybe a plugin loaded before TCG? Should be rare.
+            // Never shut down.
+            _clientExecutor = new TunnelControllerGroup.CustomThreadPoolExecutor();
+        }
         while (open) {
             try {
                 I2PServerSocket ci2pss = i2pss;
@@ -506,7 +521,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 break;
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // streaming borkage
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Uncaught exception accepting", e);
@@ -559,10 +574,25 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
 
         public void run() {
-            blockingHandle(_i2ps);   
+            try {
+                blockingHandle(_i2ps);   
+            } catch (Throwable t) {
+                _log.error("Uncaught error in i2ptunnel server", t);
+            }
         }
     }
     
+    /**
+     *  This is run in a thread from a limited-size thread pool via Handler.run(),
+     *  except for a standard server (this class, no extension, as determined in getUsePool()),
+     *  it is run directly in the acceptor thread (see run()).
+     *
+     *  In either case, this method and any overrides must spawn a thread and return quickly.
+     *  If blocking while reading the headers (as in HTTP and IRC), the thread pool
+     *  may be exhausted.
+     *
+     *  See PROP_USE_POOL, DEFAULT_USE_POOL, PROP_HANDLER_COUNT, DEFAULT_HANDLER_COUNT
+     */
     protected void blockingHandle(I2PSocket socket) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Incoming connection to '" + toString() + "' port " + socket.getLocalPort() +
@@ -577,7 +607,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             afterSocket = getTunnel().getContext().clock().now();
             Thread t = new I2PTunnelRunner(s, socket, slock, null, null,
                                            null, (I2PTunnelRunner.FailCallback) null);
-            t.start();
+            // run in the unlimited client pool
+            //t.start();
+            _clientExecutor.execute(t);
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;

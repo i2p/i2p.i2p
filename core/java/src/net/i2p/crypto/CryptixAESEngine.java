@@ -36,36 +36,14 @@ import net.i2p.util.SystemVersion;
  *
  * @author jrandom, thecrypto
  */
-public class CryptixAESEngine extends AESEngine {
+public final class CryptixAESEngine extends AESEngine {
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
-    private final static boolean USE_FAKE_CRYPTO = false;
     // keys are now cached in the SessionKey objects
     //private CryptixAESKeyCache _cache;
     
     /** see test results below */
     private static final int MIN_SYSTEM_AES_LENGTH = 704;
-    private static final boolean USE_SYSTEM_AES;
-    static {
-        boolean systemOK = false;
-        if (hasAESNI()) {
-            try {
-                systemOK = Cipher.getMaxAllowedKeyLength("AES") >= 256;
-            } catch (GeneralSecurityException gse) {
-                // a NoSuchAlgorithmException
-            } catch (NoSuchMethodError nsme) {
-                // JamVM, gij
-                try {
-                    Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-                    SecretKeySpec key = new SecretKeySpec(new byte[32], "AES");
-                    cipher.init(Cipher.ENCRYPT_MODE, key);
-                    systemOK = true;
-                } catch (GeneralSecurityException gse) {
-                }
-            }
-        }
-        USE_SYSTEM_AES = systemOK;
-        //System.out.println("Using system AES? " + systemOK);
-    }
+    private static final boolean USE_SYSTEM_AES = hasAESNI() && CryptoCheck.isUnlimited();
 
     /**
      *  Do we have AES-NI support in the processor and JVM?
@@ -124,12 +102,6 @@ public class CryptixAESEngine extends AESEngine {
         if (length % 16 != 0) 
             throw new IllegalArgumentException("Only lengths mod 16 are supported here");
 
-        if (USE_FAKE_CRYPTO) {
-            _log.warn("AES Crypto disabled!  Using trivial XOR");
-            System.arraycopy(payload, payloadIndex, out, outIndex, length);
-            return;
-        }
-
         if (USE_SYSTEM_AES && length >= MIN_SYSTEM_AES_LENGTH) {
             try {
                 SecretKeySpec key = new SecretKeySpec(sessionKey.getData(), "AES");
@@ -176,12 +148,6 @@ public class CryptixAESEngine extends AESEngine {
         else if (out.length - outIndex < length)
             throw new IllegalArgumentException("out is too small (out.length=" + out.length 
                                                + " outIndex=" + outIndex + " length=" + length);
-
-        if (USE_FAKE_CRYPTO) {
-            _log.warn("AES Crypto disabled!  Using trivial XOR");
-            System.arraycopy(payload, payloadIndex, out, outIndex, length);
-            return ;
-        }
 
         if (USE_SYSTEM_AES && length >= MIN_SYSTEM_AES_LENGTH) {
             try {

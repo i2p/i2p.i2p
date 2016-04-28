@@ -38,6 +38,16 @@ public class SendMessageMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.21
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId;
+    }
+
     public void setSessionId(SessionId id) {
         _sessionId = id;
     }
@@ -74,7 +84,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
 
     @Override
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
-        if (true) throw new IllegalStateException("wtf, do not run me");
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -129,7 +139,7 @@ public class SendMessageMessage extends I2CPMessageImpl {
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, getType());
+            out.write((byte) getType());
             _sessionId.writeBytes(out);
             _destination.writeBytes(out);
             _payload.writeBytes(out);

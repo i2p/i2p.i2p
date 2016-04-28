@@ -47,8 +47,8 @@ public class IrcInboundFilter implements Runnable {
             in = new BufferedReader(new InputStreamReader(remote.getInputStream(), "ISO-8859-1"));
             output=local.getOutputStream();
         } catch (IOException e) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("IrcInboundFilter: no streams",e);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("IrcInboundFilter: no streams",e);
             return;
         }
         if (_log.shouldLog(Log.DEBUG))

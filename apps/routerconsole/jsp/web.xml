@@ -14,6 +14,18 @@
     </filter-mapping>
 
     <!-- precompiled servlets -->
+
+    <servlet>
+      <servlet-name>net.i2p.router.web.CodedIconRendererServlet</servlet-name>
+      <servlet-class>net.i2p.router.web.CodedIconRendererServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+      <servlet-name>net.i2p.router.web.CodedIconRendererServlet</servlet-name>
+      <url-pattern>/Plugins/*</url-pattern>
+    </servlet-mapping>
+
+
     
     <!-- yeah, i'm lazy, using a jsp instead of a servlet.. -->
     <servlet-mapping> 
@@ -35,6 +47,9 @@
         <session-timeout>
             30
         </session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
     </session-config>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

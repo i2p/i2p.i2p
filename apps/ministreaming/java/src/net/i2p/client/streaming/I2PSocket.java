@@ -9,9 +9,10 @@ import java.nio.channels.SelectableChannel;
 import net.i2p.data.Destination;
 
 /**
- * Minimalistic adapter between the socket api and I2PTunnel's way.
- * Note that this interface is a "subinterface" of the interface
- * defined in the "official" streaming api.
+ *  Streaming socket returned by {@link I2PSocketManager#connect(Destination)}.
+ *<p>
+ *  Note that this is not a standard Java {@link java.net.Socket},
+ *  if you need one of those, use {@link I2PSocketManager#connectToSocket(Destination)} instead.
  */
 public interface I2PSocket extends Closeable {
     /**
@@ -27,6 +28,12 @@ public interface I2PSocket extends Closeable {
     /**
      *  As of 0.9.9 will throw an IOE if socket is closed.
      *  Prior to that would return null instead of throwing IOE.
+     *<p>
+     *  Note that operations on the returned stream may return an
+     *  {@link IOException} whose <i>cause</i> as returned by
+     *  {@link IOException#getCause()} is an {@link I2PSocketException}.
+     *  If so, the client may retrieve a status code via
+     *  {@link I2PSocketException#getStatus()} to provide specific feedback to the user.
      *
      * @return an InputStream to read from the socket. Non-null since 0.9.9.
      * @throws IOException on failure
@@ -36,6 +43,12 @@ public interface I2PSocket extends Closeable {
     /**
      *  As of 0.9.9 will throw an IOE if socket is closed.
      *  Prior to that would return null instead of throwing IOE.
+     *<p>
+     *  Note that operations on the returned stream may return an
+     *  {@link IOException} whose <i>cause</i> as returned by
+     *  {@link IOException#getCause()} is an {@link I2PSocketException}.
+     *  If so, the client may retrieve a status code via
+     *  {@link I2PSocketException#getStatus()} to provide specific feedback to the user.
      *
      * @return an OutputStream to write into the socket. Non-null since 0.9.9.
      * @throws IOException on failure
@@ -49,6 +62,7 @@ public interface I2PSocket extends Closeable {
      *  @return null always
      *  @since 0.8.9
      */
+    @Deprecated
     public SelectableChannel getChannel() throws IOException;
 
     /** 

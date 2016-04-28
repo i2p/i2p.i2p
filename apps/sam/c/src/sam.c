@@ -1173,9 +1173,6 @@ samerr_t sam_winsock_cleanup()
  */
 samerr_t sam_winsock_startup()
 {
-	/*
-	 * Is Windows retarded or what?
-	 */
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	int rc;
@@ -1292,7 +1289,7 @@ const char *sam_winsock_strerror(int code)
 			return "This is a nonrecoverable error";
 		case WSANO_DATA:
 			return "Valid name, no data record of requested type";
-		/* None of this shit compiles under Mingw - who knows why...
+		/* None of this compiles under Mingw - who knows why...
 		case WSA_INVALID_HANDLE:
 			return "Specified event object handle is invalid";
 		case WSA_INVALID_PARAMETER:

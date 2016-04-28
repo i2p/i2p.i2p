@@ -37,11 +37,15 @@ public class OrderedProperties extends Properties {
 
     @Override
     public Set<Object> keySet() {
+        if (size() <= 1)
+            return super.keySet();
         return Collections.unmodifiableSortedSet(new TreeSet<Object>(super.keySet()));
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
+        if (size() <= 1)
+            return super.entrySet();
         TreeSet<Map.Entry<Object, Object>> rv = new TreeSet<Map.Entry<Object, Object>>(new EntryComparator());
         rv.addAll(super.entrySet());
         return Collections.unmodifiableSortedSet(rv);

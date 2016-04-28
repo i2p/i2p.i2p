@@ -2,24 +2,25 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# Alex  <hestia@riseup.net>, 2012.
-#   <hestia@riseup.net>, 2012.
-#   <lixtetrax@grhack.net>, 2012.
+# Alex <hestia@riseup.net>, 2012
+# LaScapigliata <ditri2000@hotmail.com>, 2015
+# Alex <hestia@riseup.net>, 2012
+# lixtetrax <lixtetrax@grhack.net>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2012-08-06 06:39+0000\n"
-"Last-Translator: Alex <hestia@riseup.net>\n"
-"Language-Team: Greek (http://www.transifex.com/projects/p/I2P/language/el/)\n"
-"Language: el\n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2015-11-05 23:37+0000\n"
+"Last-Translator: LaScapigliata <ditri2000@hotmail.com>\n"
+"Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Anonymous Proxy"
 msgstr "Ανώνυμος Proxy"
@@ -53,6 +54,9 @@ msgstr "Ολλανδικές Αντίλλες"
 
 msgid "Angola"
 msgstr "Ανγκόλα"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "Ανταρκτική"
@@ -105,6 +109,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "Βερμούδες"
 
@@ -113,6 +120,9 @@ msgstr "Brunei Darussalam"
 
 msgid "Bolivia"
 msgstr "Βολιβία"
+
+msgid "Bonaire"
+msgstr ""
 
 msgid "Brazil"
 msgstr "Βραζιλία"
@@ -141,14 +151,11 @@ msgstr "Καναδάς"
 msgid "Cocos (Keeling) Islands"
 msgstr "Νησιά Cocos (Keeling)"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Δημοκρατία του Κονγκό"
+msgid "Congo"
+msgstr "Κογκό"
 
 msgid "Central African Republic"
 msgstr "Δημοκρατία της Κεντρικής Αφρικής"
-
-msgid "Congo"
-msgstr "Κογκό"
 
 msgid "Switzerland"
 msgstr "Ελβετία"
@@ -187,7 +194,7 @@ msgid "Curaçao"
 msgstr ""
 
 msgid "Christmas Island"
-msgstr "Νησιά των Χριστουγέννων"
+msgstr "Νήσος των Χριστουγέννων"
 
 msgid "Cyprus"
 msgstr "Κύπρος"
@@ -211,7 +218,7 @@ msgid "Dominican Republic"
 msgstr "Δομινικανή Δημοκρατία"
 
 msgid "Algeria"
-msgstr "Αλγερια"
+msgstr "Αλγερία"
 
 msgid "Ecuador"
 msgstr "Ισημερινός"
@@ -246,8 +253,8 @@ msgstr "Νήσοι Φίτζι"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Νησιά Μαλβίδων"
 
-msgid "Federated States of Micronesia"
-msgstr "Ομοσπονδία Μικρονησίας"
+msgid "Micronesia"
+msgstr ""
 
 msgid "Faroe Islands"
 msgstr "Faroe Islands"
@@ -322,7 +329,7 @@ msgid "Croatia"
 msgstr "Κροατία"
 
 msgid "Haiti"
-msgstr "Αιτή"
+msgstr "Αϊτή"
 
 msgid "Hungary"
 msgstr "Ουγγαρία"
@@ -348,8 +355,8 @@ msgstr "Βρεταννικές Περιοχές Ινδικού Ωκεανού"
 msgid "Iraq"
 msgstr "Ιράκ"
 
-msgid "Islamic Republic of Iran"
-msgstr "Ισλαμική Δημοκρατία του Ιράν"
+msgid "Iran"
+msgstr "Ιράν"
 
 msgid "Iceland"
 msgstr "Ισλανδία"
@@ -387,8 +394,8 @@ msgstr "Κομόρος"
 msgid "Saint Kitts and Nevis"
 msgstr "Αγιος Κιτς και Νεβί"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Λαϊκή Δημοκρατία της Κορέας"
+msgid "North Korea"
+msgstr "Βόρεια Κορέα"
 
 msgid "Republic of Korea"
 msgstr "Δημοκρατία της Κορέας"
@@ -432,8 +439,8 @@ msgstr "Λουξεμβούργο"
 msgid "Latvia"
 msgstr "Λιθουανία"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Libyan Arab Jamahiriya"
+msgid "Libya"
+msgstr ""
 
 msgid "Morocco"
 msgstr "Μαρόκο"
@@ -441,8 +448,8 @@ msgstr "Μαρόκο"
 msgid "Monaco"
 msgstr "Μονακό"
 
-msgid "Republic of Moldova"
-msgstr "Δημοκρατία της Μολδαβίας"
+msgid "Moldova"
+msgstr "Μολδαβία"
 
 msgid "Montenegro"
 msgstr "Μαυροβούνιο"
@@ -456,8 +463,8 @@ msgstr "Μαγαδασκάρη"
 msgid "Marshall Islands"
 msgstr "Νησιά Μάρσαλ"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Γιουγκοσλαβική Δημοκρατια της Μακεδονίας"
+msgid "Macedonia"
+msgstr ""
 
 msgid "Mali"
 msgstr "Μάλι"
@@ -468,7 +475,7 @@ msgstr "Μιανμάρ"
 msgid "Mongolia"
 msgstr "Μογγολία"
 
-msgid "Macao"
+msgid "Macau"
 msgstr "Μακάο"
 
 msgid "Northern Mariana Islands"
@@ -648,14 +655,20 @@ msgstr "Σομαλία"
 msgid "Suriname"
 msgstr "Suriname"
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome και Principe"
 
 msgid "El Salvador"
 msgstr "Ελ Σαλβαδόρ"
 
-msgid "Syrian Arab Republic"
-msgstr "Συρία"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr ""
 
 msgid "Swaziland"
 msgstr "Σουαζιλάνδη"
@@ -705,8 +718,8 @@ msgstr "Τούβαλου"
 msgid "Taiwan"
 msgstr "Ταϊβάν"
 
-msgid "United Republic of Tanzania"
-msgstr "Τανζανία"
+msgid "Tanzania"
+msgstr ""
 
 msgid "Ukraine"
 msgstr "Ουκρανία"
@@ -726,8 +739,8 @@ msgstr "Ουρουγουάη"
 msgid "Uzbekistan"
 msgstr "Ουζμπεκιστάν"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Holy See (Vatican City State)"
+msgid "Vatican"
+msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Saint Vincent and the Grenadines"
@@ -738,8 +751,8 @@ msgstr "Βενεζουέλα"
 msgid "Virgin Islands"
 msgstr "Παρθένοι Νήσοι"
 
-msgid "Viet Nam"
-msgstr "Βιετνάμ"
+msgid "Vietnam"
+msgstr ""
 
 msgid "Vanuatu"
 msgstr "Vanuatu"
@@ -764,4 +777,3 @@ msgstr "Ζάμπια"
 
 msgid "Zimbabwe"
 msgstr "Ζιμπάμπουε"
-

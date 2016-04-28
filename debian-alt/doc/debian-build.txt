@@ -1,0 +1,72 @@
+To build a release:
+
+Make sure workspace revision matches what you want to release.
+
+# Make the source tarball
+# only if you didn't already do it for launchpad!
+# Otherwise make sure the i2p-0.9.xx.orig.tar.bz2 file is
+# in the dir above the source directory, and skip to next step
+ant debian-release-tarball
+
+# Following instructions (and filenames) are for unstable.
+# Repeat for each target.
+
+# Go to the source directory created by ant debian-release-tarball
+# Fix up the changelog
+cd i2p_0.9.xx-x-xxxxxxxx/
+ant debchange
+vi debian/changelog
+   change i2p_0.9.xx-x-xxxxxxxx-1 to i2p_0.9.xx-1
+   change UNRELEASED to unstable
+   change comment to "New upstream version 0.9.xx"
+   fix your name and email
+# fix up the control and rules files as necessary
+# fix up the patches/ files as necessary
+
+# build the binary packages:
+ant debian-binary
+This will make the following files in .:
+  i2p-doc_0.9.xx-1_all.deb
+  i2p-router_0.9.xx-1_all.deb
+  i2p_0.9.xx-1_all.deb
+  libjbigi-jni_0.9.xx-1_amd64.deb
+Note that you won't have a libjbigi-jni_0.9.xx-1_i386.deb file,
+or one for any other architecture. Oh well.
+
+# build the source package, which will be in ..
+# do gpg --list-keys to find your subkey id
+debuild -S -sa -kYOURSUBKEYID
+  (note: no space allowed in -kkeyid)
+This will make the following files in ..:
+  i2p_0.9.XX-1.dsc            (the GPG signature)
+  i2p_0.9.XX-1.debian.tar.xz  (basically the debian/ directory tarball)
+  i2p_0.9.XX-1_source.changes (the changelog text file)
+# now do the same for jessie and wheezy and precise
+
+# scp the following files to the reprepro server:
+  i2p_0.9.XX-1.dsc            (the GPG signature)
+  i2p_0.9.XX-1.tar.xz  (basically the debian/ directory tarball)
+  i2p_0.9.XX-1_source.changes (the changelog text file)
+  i2p_0.9.XX.orig.tar.bz2            (the source tarball)
+  i2p-doc_0.9.xx-1_all.deb           (docs)
+  i2p-router_0.9.xx-1_all.deb        (binary)
+  i2p_0.9.xx-1_all.deb               (top-level package)
+  libjbigi-jni_0.9.xx-1_amd64.deb    (binary)
+
+
+ssh to reprepro server
+sudo su kytv (he owns the reprepro directories)
+
+reprepro includedeb unstable i2p-doc_0.9.xx-1_all.deb
+reprepro includedeb unstable i2p-router_0.9.xx-1_all.deb
+reprepro includedeb unstable i2p_0.9.xx-1_all.deb
+reprepro includedeb unstable libjbigi-jni_0.9.xx-1_amd64.deb
+# if you already got the source from launchpad
+# with reprepro update, skip this?
+reprepro includedsc unstable i2p_0.9.XX-1.dsc
+
+
+# To copy precise to wheezy if you build precise on launchpad
+# and then did a reprepro update:
+# Note that syntax is reprepro copysrc TO FROM package!
+reprepro copysrc wheezy precise i2p

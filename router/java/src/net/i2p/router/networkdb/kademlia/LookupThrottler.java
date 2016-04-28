@@ -3,8 +3,8 @@ package net.i2p.router.networkdb.kademlia;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.util.ObjectCounter;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Count how often we have recently received a lookup request with
@@ -21,11 +21,11 @@ class LookupThrottler {
     private static final TunnelId DUMMY_ID = new TunnelId();
     /** this seems like plenty */
     private static final int MAX_LOOKUPS = 30;
-    private static final long CLEAN_TIME = 60*1000;
+    private static final long CLEAN_TIME = 2*60*1000;
 
     LookupThrottler() {
         this.counter = new ObjectCounter<ReplyTunnel>();
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
+        SimpleTimer2.getInstance().addPeriodicEvent(new Cleaner(), CLEAN_TIME);
     }
 
     /**
@@ -45,8 +45,8 @@ class LookupThrottler {
 
     /** yes, we could have a two-level lookup, or just do h.tostring() + id.tostring() */
     private static class ReplyTunnel {
-        public Hash h;
-        public TunnelId id;
+        public final Hash h;
+        public final TunnelId id;
 
         ReplyTunnel(Hash h, TunnelId id) {
             this.h = h;

@@ -5,11 +5,26 @@
     <target name="builddep">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../../build"
+            srcdir="./src:./test/junit"
+            destdir="./build/obj" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="lib/systray4j.jar" />
+            </classpath>
+        </depend>
+    </target>
 
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.6" />
 
-    <target name="compile">
+    <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac

@@ -27,25 +27,22 @@ import net.i2p.util.Log;
 public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
     private HashMap<String, List<String>> proxies = null;  // port# + "" or "default" -> hostname list
-    protected Destination outProxyDest = null;
 
     //public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest) {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);
     //}
 
-    /** @param pkf private key file name or null for transient key */
+    /**
+     *  As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     *  or open the local socket. You MUST call startRunning() for that.
+     *
+     *  @param pkf private key file name or null for transient key
+     */
     public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
         super(localPort, ownDest, l, notifyThis, "SOCKS Proxy on " + tunnel.listenHost + ':' + localPort, tunnel, pkf);
 
-        if (waitEventValue("openBaseClientResult").equals("error")) {
-            notifyEvent("openSOCKSTunnelResult", "error");
-            return;
-        }
-
         setName("SOCKS Proxy on " + tunnel.listenHost + ':' + localPort);
         parseOptions();
-        startRunning();
-
         notifyEvent("openSOCKSTunnelResult", "ok");
     }
 
@@ -56,7 +53,9 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             Thread t = new I2PTunnelRunner(clientSock, destSock, sockLock, null, null, mySockets,
                                            (I2PTunnelRunner.FailCallback) null);
-            t.start();
+            // we are called from an unlimited thread pool, so run inline
+            //t.start();
+            t.run();
         } catch (SOCKSException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error from SOCKS connection", e);

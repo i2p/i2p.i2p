@@ -158,13 +158,7 @@ public class RouterPasswordManager extends PasswordManager {
         String pfx = realm;
         if (user != null && user.length() > 0)
             pfx += '.' + user;
-        byte[] salt = new byte[SALT_LENGTH];
-        _context.random().nextBytes(salt);
-        byte[] pwHash = _context.keyGenerator().generateSessionKey(salt, DataHelper.getUTF8(pw)).getData();
-        byte[] shashBytes = new byte[SHASH_LENGTH];
-        System.arraycopy(salt, 0, shashBytes, 0, SALT_LENGTH);
-        System.arraycopy(pwHash, 0, shashBytes, SALT_LENGTH, SessionKey.KEYSIZE_BYTES);
-        String shash = Base64.encode(shashBytes);
+        String shash = createHash(pw);
         Map<String, String> toAdd = Collections.singletonMap(pfx + PROP_SHASH, shash);
         List<String> toDel = new ArrayList<String>(4);
         toDel.add(pfx + PROP_PW);

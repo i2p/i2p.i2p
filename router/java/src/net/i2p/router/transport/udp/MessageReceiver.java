@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
@@ -218,18 +219,49 @@ class MessageReceiver {
             return m;
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Message invalid: " + state, ime);
-                _log.warn("DUMP:\n" + HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
-                _log.warn("RAW:\n" + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
+                ByteArray ba;
+                if (state.getFragmentCount() > 1)
+                    ba = buf;
+                else
+                    ba = state.getFragments()[0];
+                byte[] data = ba.getData();
+                _log.warn("Message invalid: " + state +
+                          " PeerState: " + _transport.getPeerState(state.getFrom()) +
+                          "\nDUMP:\n" + HexDump.dump(data, 0, state.getCompleteSize()) +
+                          "\nRAW:\n" + Base64.encode(data, 0, state.getCompleteSize()),
+                          ime);
+            }
+            if (state.getFragments()[0].getData()[0] == DatabaseStoreMessage.MESSAGE_TYPE) {
+                PeerState ps = _transport.getPeerState(state.getFrom());
+                if (ps != null && ps.getRemotePort() == 65520) {
+                    // distinct port of buggy router
+                    _transport.sendDestroy(ps);
+                    _transport.dropPeer(ps, true, "Corrupt DSM");
+                    _context.banlist().banlistRouterForever(state.getFrom(),
+                                                            _x("Sent corrupt DSM"));
+                }
             }
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "error: " + ime.toString() + ": " + state.toString());
             return null;
-        } catch (Exception e) {
-            _log.log(Log.CRIT, "Error dealing with a message: " + state, e);
+        } catch (RuntimeException e) {
+            // e.g. AIOOBE
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error handling a message: " + state, e);
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "error: " + e.toString() + ": " + state.toString());
             return null;
         } finally {
             state.releaseResources();
         }
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     *  @since 0.9.20
+     */
+    private static final String _x(String s) {
+        return s;
     }
 }

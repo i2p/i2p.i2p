@@ -61,9 +61,6 @@ public class SSDPSearchSocketList extends Vector<SSDPSearchSocket>
 		this.multicastIPv6 = multicastIPv6;
 	}
 
-	
-	
-
 	////////////////////////////////////////////////
 	//	Methods
 	////////////////////////////////////////////////

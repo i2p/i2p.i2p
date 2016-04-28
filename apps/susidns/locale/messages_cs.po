@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-17 21:49+0000\n"
-"PO-Revision-Date: 2014-10-13 16:12+0000\n"
-"Last-Translator: A5h8d0wf0x <littleslyfoxie28@gmail.com>\n"
+"POT-Creation-Date: 2015-05-14 08:33+0000\n"
+"PO-Revision-Date: 2015-05-14 08:34+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/I2P/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,27 +120,27 @@ msgid "Showing {0} of {1}"
 msgstr "Zobrazuji {0} z {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:228
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:412
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
 msgid "Add"
 msgstr "Přídat"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:228
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:240
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:410
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
 msgid "Replace"
 msgstr "Nahradit"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:254
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:239
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:243
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:256
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:241
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #, java-format
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
@@ -148,63 +148,63 @@ msgid ""
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:254
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
 #, java-format
 msgid "Destination added for {0}."
 msgstr "Přídán cíl pro {0}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:271
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:256
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:260
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "Cíl pro {0} změněn."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:273
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
 msgid "Warning - host name does not end with \".i2p\""
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:266
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:270
 msgid "Invalid Base 64 destination."
 msgstr "Neplatný cíl ve formátu Base 64."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:272
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:276
 #, java-format
 msgid "Invalid host name \"{0}\"."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:275
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
 msgid "Please enter a host name and destination"
 msgstr "Prosím vložte jméno hostitele a cíl."
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:312
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:304
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:270
 msgid "Delete Entry"
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
 msgid "Delete Selected"
 msgstr "Zvoleno smazání"
 
 #. parameter is a host name
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:300
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "Cíl {0} byl smazán."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
@@ -213,12 +213,12 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:301
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:305
 msgid "No entries selected to delete."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
 msgid "Address book saved."
 msgstr ""
 
@@ -228,8 +228,8 @@ msgstr "Chyba: nepodařilo se zapsat do souboru knihy kontaktů. Zkontrolujte p�
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -237,15 +237,15 @@ msgstr "Neplatný formulář. Pravděpodobně jste klikli na tlačítko \"Zpět\
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:314
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr ""
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:126
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
 msgid "Save"
@@ -256,7 +256,7 @@ msgid "Configuration saved."
 msgstr "Nastavení uloženo."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
 msgid "Reload"
@@ -266,35 +266,35 @@ msgstr "Načíst znovu"
 msgid "Configuration reloaded."
 msgstr "Konfigurace znovu načtena."
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:101
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:104
 #, java-format
 msgid "{0} address book in {1} database"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:253
 msgid "Manually added via SusiDNS"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:263
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:267
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:287
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:291
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:140
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:143
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
 msgid "Subscriptions saved."
 msgstr ""
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions reloaded."
 msgstr ""
 
@@ -414,7 +414,7 @@ msgid "Links"
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:404
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
 msgid "Destination"
 msgstr "Cíl"
@@ -436,19 +436,23 @@ msgid "details"
 msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:408
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:383
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+msgid "Export in hosts.txt format"
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "This address book is empty."
 msgstr ""
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:398
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
 msgid "Add new destination"
 msgstr "Přidat nový cíl"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:400
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
 msgid "Host Name"
 msgstr ""

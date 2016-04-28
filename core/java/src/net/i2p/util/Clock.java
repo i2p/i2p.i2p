@@ -1,9 +1,11 @@
 package net.i2p.util;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
+import net.i2p.time.BuildTime;
 import net.i2p.time.Timestamper;
 
 /**
@@ -19,6 +21,7 @@ import net.i2p.time.Timestamper;
  */
 public class Clock implements Timestamper.UpdateListener {
     protected final I2PAppContext _context;
+    protected final boolean _isSystemClockBad;
     protected long _startedOn;
     protected boolean _statCreated;
     protected volatile long _offset;
@@ -28,7 +31,28 @@ public class Clock implements Timestamper.UpdateListener {
     public Clock(I2PAppContext context) {
         _context = context;
         _listeners = new CopyOnWriteArraySet<ClockUpdateListener>();
-        _startedOn = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+        long min = BuildTime.getEarliestTime();
+        long max = BuildTime.getLatestTime();
+        // If the system clock is obviously bad, set our offset so our time is something "close"
+        // We do not call setOffset() here as it sets _alreadyChanged.
+        // Don't use Log here.
+        if (now < min) {
+            // positive offset
+            _offset = min - now;
+            System.out.println("ERROR: System clock is invalid: " + new Date(now));
+            now = min;
+            _isSystemClockBad = true;
+        } else if (now > max) {
+            // negative offset
+            _offset = max - now;
+            System.out.println("ERROR: System clock is invalid: " + new Date(now));
+            now = max;
+            _isSystemClockBad = true;
+        } else {
+            _isSystemClockBad = false;
+        }
+        _startedOn = now;
     }
 
     public static Clock getInstance() {
@@ -63,6 +87,7 @@ public class Clock implements Timestamper.UpdateListener {
     /**
      * Specify how far away from the "correct" time the computer is - a positive
      * value means that the system time is slow, while a negative value means the system time is fast.
+     *
      * Warning - overridden in RouterClock
      *
      * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
@@ -70,22 +95,28 @@ public class Clock implements Timestamper.UpdateListener {
     public synchronized void setOffset(long offsetMs, boolean force) {
         long delta = offsetMs - _offset;
         if (!force) {
-            if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
-                getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
+            if (!_isSystemClockBad && (offsetMs > MAX_OFFSET || offsetMs < 0 - MAX_OFFSET)) {
+                Log log = getLog();
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
                 return;
             }
             
             // only allow substantial modifications before the first 10 minutes
             if (_alreadyChanged && (System.currentTimeMillis() - _startedOn > 10 * 60 * 1000)) {
                 if ( (delta > MAX_LIVE_OFFSET) || (delta < 0 - MAX_LIVE_OFFSET) ) {
-                    getLog().log(Log.CRIT, "The clock has already been updated, but you want to change it by "
+                    Log log = getLog();
+                    if (log.shouldLog(Log.WARN))
+                        log.warn("The clock has already been updated, but you want to change it by "
                                            + delta + " to " + offsetMs + "?  Did something break?");
                     return;
                 }
             }
             
             if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {
-                getLog().debug("Not changing offset since it is only " + delta + "ms");
+                Log log = getLog();
+                if (log.shouldLog(Log.DEBUG))
+                    log.debug("Not changing offset since it is only " + delta + "ms");
                 _alreadyChanged = true;
                 return;
             }
@@ -102,7 +133,9 @@ public class Clock implements Timestamper.UpdateListener {
             }
             _context.statManager().addRateData("clock.skew", delta, 0);
         } else {
-            getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            Log log = getLog();
+            if (log.shouldLog(Log.INFO))
+                log.info("Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
         }
         _alreadyChanged = true;
         _offset = offsetMs;
@@ -120,17 +153,27 @@ public class Clock implements Timestamper.UpdateListener {
     
     
     public void setNow(long realTime) {
+        if (realTime < BuildTime.getEarliestTime() || realTime > BuildTime.getLatestTime()) {
+            Log log = getLog();
+            String msg = "Invalid time received: " + new Date(realTime);
+            if (log.shouldWarn())
+                log.warn(msg, new Exception());
+            else
+                log.logAlways(Log.WARN, msg);
+            return;
+        }
         long diff = realTime - System.currentTimeMillis();
         setOffset(diff);
     }
 
     /**
+     *  Warning - overridden in RouterClock
+     *
      *  @param stratum ignored
      *  @since 0.7.12
      */
     public void setNow(long realTime, int stratum) {
-        long diff = realTime - System.currentTimeMillis();
-        setOffset(diff);
+        setNow(realTime);
     }
 
     /**

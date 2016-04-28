@@ -164,7 +164,7 @@ class FragmentHandler {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
             _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
-            // java.lang.IllegalStateException: wtf, don't get the completed size when we're not complete - null fragment i=0 of 1
+            // java.lang.IllegalStateException: don't get the completed size when we're not complete - null fragment i=0 of 1
             // at net.i2p.router.tunnel.FragmentedMessage.getCompleteSize(FragmentedMessage.java:194)
             // at net.i2p.router.tunnel.FragmentedMessage.toByteArray(FragmentedMessage.java:223)
             // at net.i2p.router.tunnel.FragmentHandler.receiveComplete(FragmentHandler.java:380)
@@ -340,7 +340,7 @@ class FragmentHandler {
             offset += 4;
         }
         if (extended) {
-            int extendedSize = (int)DataHelper.fromLong(preprocessed, offset, 1);
+            int extendedSize = preprocessed[offset] & 0xff;
             offset++;
             offset += extendedSize; // we don't interpret these yet, but skip them for now
         }

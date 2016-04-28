@@ -1,7 +1,6 @@
 package net.i2p.router.transport.udp;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -9,8 +8,6 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +30,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -42,8 +40,9 @@ import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportUtil;
 import static net.i2p.router.transport.TransportUtil.IPv6Config.*;
-import static net.i2p.router.transport.udp.PeerTestState.Role.*;
 import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
+import static net.i2p.router.transport.udp.PeerTestState.Role.*;
+import static net.i2p.router.transport.udp.Sorters.*;
 import net.i2p.router.util.EventLog;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Addresses;
@@ -79,7 +78,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final ExpirePeerEvent _expireEvent;
     private final PeerTestEvent _testEvent;
     private final PacketBuilder _destroyBuilder;
-    private short _reachabilityStatus;
+    private Status _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
     private int _reachabilityStatusUnchanged;
     private long _introducersSelectedOn;
@@ -87,12 +86,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final DHSessionKeyBuilder.Factory _dhFactory;
     private int _mtu;
     private int _mtu_ipv6;
+    private boolean _mismatchLogged;
+    private final int _networkID;
 
     /**
      *  Do we have a public IPv6 address?
      *  TODO periodically update via CSFI.NetMonitor?
      */
     private boolean _haveIPv6Address;
+    private long _lastInboundIPv6;
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
@@ -113,6 +115,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private Hash _lastFrom;
     private byte[] _lastOurIP;
     private int _lastOurPort;
+    /** since we don't publish our IP/port if introduced anymore, we need
+        to store it somewhere. */
+    private RouterAddress _currentOurV4Address;
+    private RouterAddress _currentOurV6Address;
 
     private static final int DROPLIST_PERIOD = 10*60*1000;
     public static final String STYLE = "SSU";
@@ -121,6 +127,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** now unused, we pick a random port
      *  @deprecated unused
      */
+    @Deprecated
     public static final int DEFAULT_INTERNAL_PORT = 8887;
 
     /** define this to explicitly set an external IP address */
@@ -163,7 +170,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_BIND_INTERFACE = "i2np.udp.bindInterface";
     /** override the "large" (max) MTU, default is PeerState.LARGE_MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
+    private static final String PROP_ADVANCED = "routerconsole.advanced";
         
+    private static final String CAP_TESTING = "" + UDPAddress.CAPACITY_TESTING;
+    private static final String CAP_TESTING_INTRO = "" + UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER;
+
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
     
@@ -209,6 +220,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
+        _networkID = ctx.router().getNetworkID();
         _dhFactory = dh;
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new ConcurrentHashMap<Hash, PeerState>(128);
@@ -240,7 +252,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireTimeout = EXPIRE_TIMEOUT;
         _expireEvent = new ExpirePeerEvent();
         _testEvent = new PeerTestEvent();
-        _reachabilityStatus = CommSystemFacade.STATUS_UNKNOWN;
+        _reachabilityStatus = Status.UNKNOWN;
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
@@ -252,10 +264,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", RATES);
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", RATES);
         _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", RATES);
-        _context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", RATES);
+        //_context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", RATES);
         _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", RATES);
         _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", RATES);
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", RATES);
@@ -265,7 +277,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //_context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
         //_context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
 
-        _context.simpleScheduler().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
+        _context.simpleTimer2().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
     /**
@@ -322,6 +334,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             String fixedHost = _context.getProperty(PROP_EXTERNAL_HOST);
             if (fixedHost != null && fixedHost.length() > 0) {
                 try {
+                    // TODO getAllByName(), bind to each
                     String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
                     if (Addresses.getAddresses().contains(testAddr))
                         bindTo = testAddr;
@@ -331,7 +344,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         List<InetAddress> bindToAddrs = new ArrayList<InetAddress>(4);
         if (bindTo != null) {
-            String[] bta = bindTo.split("[,; \r\n\t]");
+            String[] bta = DataHelper.split(bindTo, "[,; \r\n\t]");
             for (int i = 0; i < bta.length; i++) {
                 String bt = bta[i];
                 if (bt.length() <= 0)
@@ -425,7 +438,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         if (_endpoints.isEmpty()) {
             _log.log(Log.CRIT, "Unable to open UDP port");
-            setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+            setReachabilityStatus(Status.HOSED);
             return;
         }
         if (newPort > 0 &&
@@ -450,6 +463,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         //if (SHOULD_FLOOD_PEERS)
         //    _flooder.startup();
         _expireEvent.setIsAlive(true);
+        _reachabilityStatus = Status.UNKNOWN;
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
         _testEvent.reschedule(10*1000); // lets requeue it for Real Soon
 
@@ -458,8 +472,40 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // TransportManager.startListening() calls router.rebuildRouterInfo()
         if (newPort > 0 && bindToAddrs.isEmpty()) {
             for (InetAddress ia : getSavedLocalAddresses()) {
+                // Discovered or configured addresses are presumed good at the start.
+                // when externalAddressReceived() was called with SOURCE_INTERFACE,
+                // isAlive() was false, so setReachabilityStatus() was not called
+                // TODO should we set both to unknown and wait for an inbound v6 conn,
+                // since there's no v6 testing?
+                if (ia.getAddress().length == 16) {
+                    // FIXME we need to check and time out after an hour of no inbound ipv6,
+                    // change to firewalled maybe? but we don't have any test to restore
+                    // a v6 address after it's removed.
+                    _lastInboundIPv6 = _context.clock().now();
+                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                } else {
+                    if (!isIPv4Firewalled())
+                        setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                }
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
+        } else if (newPort > 0 && !bindToAddrs.isEmpty()) {
+            for (InetAddress ia : bindToAddrs) {
+                if (ia.getAddress().length == 16) {
+                    _lastInboundIPv6 = _context.clock().now();
+                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                } else {
+                    if (!isIPv4Firewalled())
+                        setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+                }
+                rebuildExternalAddress(ia.getHostAddress(), newPort, false);
+            }
+        }
+        if (isIPv4Firewalled()) {
+            if (_lastInboundIPv6 > 0)
+                setReachabilityStatus(Status.IPV4_FIREWALLED_IPV6_UNKNOWN);
+            else
+                setReachabilityStatus(Status.REJECT_UNSOLICITED);
         }
         rebuildExternalAddress(false);
     }
@@ -491,6 +537,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager.reset();
         UDPPacket.clearCache();
         UDPAddress.clearCache();
+        _lastInboundIPv6 = 0;
     }
 
     /**
@@ -503,7 +550,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.log(Log.CRIT, "UDP port failure: " + endpoint);
             if (_endpoints.isEmpty()) {
                 _log.log(Log.CRIT, "No more UDP sockets open");
-                setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+                setReachabilityStatus(Status.HOSED);
                 // TODO restart?
             }
             rebuildExternalAddress();
@@ -656,9 +703,20 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private static final int ALLOW_IP_CHANGE_INTERVAL = 2*60*1000;
     
-    void inboundConnectionReceived() { 
-        // use OS clock since its an ordering thing, not a time thing
-        _lastInboundReceivedOn = System.currentTimeMillis(); 
+    void inboundConnectionReceived(boolean isIPv6) {
+        if (isIPv6) {
+            // FIXME we need to check and time out after an hour of no inbound ipv6,
+            // change to firewalled maybe? but we don't have any test to restore
+            // a v6 address after it's removed.
+            _lastInboundIPv6 = _context.clock().now();
+            if (_currentOurV6Address != null)
+                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+        } else {
+            // Introduced connections are still inbound, this is not evidence
+            // that we are not firewalled.
+            // use OS clock since its an ordering thing, not a time thing
+            _lastInboundReceivedOn = System.currentTimeMillis(); 
+        }
     }
     
     // temp prevent multiples
@@ -679,8 +737,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn("Received address: " + Addresses.toString(ip, port) + " from: " + source);
         if (ip == null)
             return;
+        // this is essentially isValid(ip), but we can't use that because
+        // _haveIPv6Address is not set yet
+        if (!(isPubliclyRoutable(ip) || allowLocal())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
+            return;
+        }
         if (source == SOURCE_INTERFACE && ip.length == 16) {
-            // must be set before isValid() call
+            // NOW we can set it, it's a valid v6 address
+            // (we don't want to set this for Teredo, 6to4, ...)
             _haveIPv6Address = true;
         }
         if (explicitAddressSpecified())
@@ -688,11 +754,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String sources = _context.getProperty(PROP_SOURCES, DEFAULT_SOURCES);
         if (!sources.contains(source.toConfigString()))
             return;
-        if (!isValid(ip)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid address: " + Addresses.toString(ip, port) + " from: " + source);
-            return;
-        }
         if (!isAlive()) {
             if (source == SOURCE_INTERFACE || source == SOURCE_UPNP) {
                 try {
@@ -719,8 +780,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean changed = changeAddress(ip, port);
         // Assume if we have an interface with a public IP that we aren't firewalled.
         // If this is wrong, the peer test will figure it out and change the status.
-        if (changed && ip.length == 4 && source == SOURCE_INTERFACE)
-            setReachabilityStatus(CommSystemFacade.STATUS_OK);
+        if (changed && source == SOURCE_INTERFACE) {
+            if (ip.length == 4) {
+                if (!isIPv4Firewalled())
+                    setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+            } else if (ip.length == 16) {
+                // TODO should we set both to unknown and wait for an inbound v6 conn,
+                // since there's no v6 testing?
+                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+            }
+        }
     }
 
     /**
@@ -737,8 +806,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             else
                 _log.warn("UPnP has failed to open the SSU port: " + port + " reason: " + reason);
         }
-        if (success && ip != null && getExternalIP() != null)
-            setReachabilityStatus(CommSystemFacade.STATUS_OK);
+        if (success && ip != null && getExternalIP() != null) {
+            if (!isIPv4Firewalled())
+                setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
+        }
     }
 
     /**
@@ -758,8 +829,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @param ourPort >= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
-        if (ourIP.length != 4)
-            return;
         boolean isValid = isValid(ourIP) &&
                           TransportUtil.isValidPort(ourPort);
         boolean explicitSpecified = explicitAddressSpecified();
@@ -768,6 +837,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.info("External address received: " + Addresses.toString(ourIP, ourPort) + " from " 
                       + from + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
                       + ", receivedInboundRecent? " + inboundRecent + " status " + _reachabilityStatus);
+        if (ourIP.length != 4) {
+            return;
+        }
         
         if (explicitSpecified) 
             return;
@@ -784,7 +856,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //_context.banlist().banlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
         }
-        RouterAddress addr = getCurrentAddress(false);
+
+        RouterAddress addr = getCurrentExternalAddress(false);
         if (inboundRecent && addr != null && addr.getPort() > 0 && addr.getHost() != null) {
             // use OS clock since its an ordering thing, not a time thing
             // Note that this fails us if we switch from one IP to a second, then back to the first,
@@ -835,7 +908,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean fireTest = false;
 
         boolean isIPv6 = ourIP.length == 16;
-        RouterAddress current = getCurrentAddress(isIPv6);
+        RouterAddress current = getCurrentExternalAddress(isIPv6);
         byte[] externalListenHost = current != null ? current.getIP() : null;
         int externalListenPort = current != null ? current.getPort() : getRequestedPort(isIPv6);
 
@@ -927,6 +1000,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // save PROP_EXTERNAL_PORT
                 _context.router().saveConfig(changes, null);
             }
+            // deadlock thru here ticket #1699
             _context.router().rebuildRouterInfo();
         }
         _testEvent.forceRunImmediately();
@@ -974,8 +1048,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         String prop = _context.getProperty(PROP_FIXED_PORT);
         if (prop != null)
             return Boolean.parseBoolean(prop);
-        int status = getReachabilityStatus();
-        return status != CommSystemFacade.STATUS_REJECT_UNSOLICITED;
+        Status status = getReachabilityStatus();
+        return status != Status.REJECT_UNSOLICITED &&
+               status != Status.IPV4_FIREWALLED_IPV6_OK &&
+               status != Status.IPV4_FIREWALLED_IPV6_UNKNOWN;
     }
 
     /** 
@@ -1017,6 +1093,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since 0.9.3
      */
     void changePeerPort(PeerState peer, int newPort) {
+        // this happens a lot
         int oldPort;
         synchronized (_addDropLock) {
             oldPort = peer.getRemotePort();
@@ -1026,8 +1103,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _peersByRemoteHost.put(peer.getRemoteHostId(), peer);
             }
         }
-        if (_log.shouldLog(Log.WARN) && oldPort != newPort)
-            _log.warn("Changed port from " + oldPort + " to " + newPort + " for " + peer);
+        if (_log.shouldInfo() && oldPort != newPort)
+            _log.info("Changed port from " + oldPort + " to " + newPort + " for " + peer);
     }
 
     /**
@@ -1113,8 +1190,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (remotePeer != null) {
             oldPeer = _peersByIdent.put(remotePeer, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Peer already connected (PBID): old=" + oldPeer + " new=" + peer);
+                // this happens a lot
+                if (_log.shouldInfo())
+                    _log.info("Peer already connected (PBID): old=" + oldPeer + " new=" + peer);
                 // transfer over the old state/inbound message fragments/etc
                 peer.loadFrom(oldPeer);
                 oldEstablishedOn = oldPeer.getKeyEstablishedTime();
@@ -1129,8 +1207,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RemoteHostId oldID = oldPeer.getRemoteHostId();
             if (!remoteId.equals(oldID)) {
                 // leak fix, remove old address
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(remotePeer + " changed address FROM " + oldID + " TO " + remoteId);
+                if (_log.shouldInfo())
+                    _log.info(remotePeer + " changed address FROM " + oldID + " TO " + remoteId);
                 PeerState oldPeer2 = _peersByRemoteHost.remove(oldID);
                 // different ones in the two maps? shouldn't happen
                 if (oldPeer2 != oldPeer && oldPeer2 != null) {
@@ -1160,10 +1238,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _expireEvent.remove(oldPeer2);
         }
 
-        if (_log.shouldLog(Log.WARN) && _peersByIdent.size() != _peersByRemoteHost.size())
+        if (_log.shouldLog(Log.WARN) && !_mismatchLogged && _peersByIdent.size() != _peersByRemoteHost.size()) {
+            _mismatchLogged = true;
             _log.warn("Size Mismatch after add: " + peer
                        + " byIDsz = " + _peersByIdent.size()
                        + " byHostsz = " + _peersByRemoteHost.size());
+        }
         
         _activeThrottle.unchoke(peer.getRemotePeer());
         markReachable(peer.getRemotePeer(), peer.isInbound());
@@ -1181,7 +1261,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         synchronized(_rebuildLock) {
             rebuildIfNecessary();
-            if (getReachabilityStatus() != CommSystemFacade.STATUS_OK &&
+            Status status = getReachabilityStatus();
+            if (status != Status.OK &&
+                status != Status.IPV4_OK_IPV6_UNKNOWN &&
+                status != Status.IPV4_OK_IPV6_FIREWALLED &&
+                status != Status.IPV4_DISABLED_IPV6_OK &&
+                status != Status.IPV4_DISABLED_IPV6_UNKNOWN &&
+                status != Status.IPV4_DISABLED_IPV6_FIREWALLED &&
+                status != Status.DISCONNECTED &&
                 _reachabilityStatusUnchanged < 7) {
                 _testEvent.forceRunSoon();
             }
@@ -1205,7 +1292,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (entry == null)
                 return;
             if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
-                ((RouterInfo) entry).getNetworkId() != Router.NETWORK_ID) {
+                ((RouterInfo) entry).getNetworkId() != _networkID) {
                 // this is pre-0.6.1.10, so it isn't going to happen any more
 
                 /*
@@ -1229,11 +1316,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     RemoteHostId remote = peer.getRemoteHostId();
                     _dropList.add(remote);
                     _context.statManager().addRateData("udp.dropPeerDroplist", 1);
-                    _context.simpleScheduler().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
+                    _context.simpleTimer2().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
-                _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getOption("router.version"));
+                _context.banlist().banlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getVersion());
                 //_context.banlist().banlistRouter(peerHash, "Part of the wrong network", STYLE);
+                if (peer != null)
+                    sendDestroy(peer);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping the peer " + peerHash + " because they are in the wrong net: " + entry);
@@ -1267,12 +1356,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     boolean isInDropList(RemoteHostId peer) { return _dropList.contains(peer); }
     
+    /**
+     *  This does not send a session destroy, caller must do that if desired.
+     *
+     *  @param shouldBanlist doesn't really, only sets unreachable
+     */
     void dropPeer(Hash peer, boolean shouldBanlist, String why) {
         PeerState state = getPeerState(peer);
         if (state != null)
             dropPeer(state, shouldBanlist, why);
     }
 
+    /**
+     *  This does not send a session destroy, caller must do that if desired.
+     *
+     *  @param shouldBanlist doesn't really, only sets unreachable
+     */
     void dropPeer(PeerState peer, boolean shouldBanlist, String why) {
         if (_log.shouldLog(Log.INFO)) {
             long now = _context.clock().now();
@@ -1326,6 +1425,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         rebuildIfNecessary();
     }
 
+    /**
+     *  This does not send a session destroy, caller must do that if desired.
+     *
+     *  @param shouldBanlist doesn't really, only sets unreachable
+     */
     private void locked_dropPeer(PeerState peer, boolean shouldBanlist, String why) {
         peer.dropOutbound();
         peer.expireInboundMessages();
@@ -1396,7 +1500,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long sinceSelected = _context.clock().now() - _introducersSelectedOn;
             if (valid >= PUBLIC_RELAY_COUNT) {
                 // try to shift 'em around every 10 minutes or so
-                if (sinceSelected > 10*60*1000) {
+                if (sinceSelected > 17*60*1000) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Our introducers are valid, but haven't changed in " + DataHelper.formatDuration(sinceSelected) + ", so lets rechoose");
                     return true;
@@ -1486,7 +1590,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      *  @since 0.8.9
      */
-    private void sendDestroy(PeerState peer) {
+    void sendDestroy(PeerState peer) {
         // peer must be fully established
         if (peer.getCurrentCipherKey() == null)
             return;
@@ -1514,8 +1618,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // max of 1000 pps
         int toSleep = Math.max(8, (1000 / burstps));
         int count = 0;
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Sending destroy to : " + howMany + " peers");
+        if (_log.shouldInfo())
+            _log.info("Sending destroy to : " + howMany + " peers");
         for (PeerState peer : _peersByIdent.values()) {
             sendDestroy(peer);
             // 1000 per second * 48 bytes = 400 KBps
@@ -1554,7 +1658,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return _cachedBid[FAST_BID];
         } else {
             // If we don't have a port, all is lost
-            if ( _reachabilityStatus == CommSystemFacade.STATUS_HOSED) {
+            if ( _reachabilityStatus == Status.HOSED) {
                 markUnreachable(to);
                 return null;
             }
@@ -1578,8 +1682,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (us != null) {
                 RouterIdentity id = us.getIdentity();
                 if (id.getSigType() != SigType.DSA_SHA1) {
-                    String v = toAddress.getOption("router.version");
-                    if (v != null && VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
+                    String v = toAddress.getVersion();
+                    if (VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0) {
                         markUnreachable(to);
                         return null;
                     }
@@ -1661,7 +1765,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // in the IntroductionManager a chance to work.
     public static final int EXPIRE_TIMEOUT = 20*60*1000;
     private static final int MAX_IDLE_TIME = EXPIRE_TIMEOUT;
-    public static final int MIN_EXPIRE_TIMEOUT = 270*1000;  // 4 1/2 minutes
+    public static final int MIN_EXPIRE_TIMEOUT = 165*1000;
     
     public String getStyle() { return STYLE; }
 
@@ -1727,14 +1831,74 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /**
-     *  "injected" message from the EstablishmentManager
+     *  "injected" message from the EstablishmentManager.
+     *  If you have multiple messages, use the list variant,
+     *  so the messages may be bundled efficiently.
+     *
+     *  @param peer all messages MUST be going to this peer
      */
     void send(I2NPMessage msg, PeerState peer) {
         try {
             OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Injecting a data message to a new peer: " + peer);
-            _fragments.add(state);
+            _fragments.add(state, peer);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
+    }
+
+    /**
+     *  "injected" message from the EstablishmentManager,
+     *  plus pending messages to send,
+     *  so the messages may be bundled efficiently.
+     *  Called at end of outbound establishment.
+     *
+     *  @param msg may be null if nothing to inject
+     *  @param msgs non-null, may be empty
+     *  @param peer all messages MUST be going to this peer
+     *  @since 0.9.24
+     */
+    void send(I2NPMessage msg, List<OutNetMessage> msgs, PeerState peer) {
+        try {
+            int sz = msgs.size();
+            List<OutboundMessageState> states = new ArrayList<OutboundMessageState>(sz + 1);
+            if (msg != null) {
+                OutboundMessageState state = new OutboundMessageState(_context, msg, peer);
+                states.add(state);
+            }
+            for (int i = 0; i < sz; i++) {
+                OutboundMessageState state = new OutboundMessageState(_context, msgs.get(i), peer);
+                states.add(state);
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting " + states.size() + " data messages to a new peer: " + peer);
+            _fragments.add(states, peer);
+        } catch (IllegalArgumentException iae) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Shouldnt happen", new Exception("I did it"));
+        }
+    }
+
+    /**
+     *  "injected" messages from the EstablishmentManager.
+     *  Called at end of inbound establishment.
+     *
+     *  @param peer all messages MUST be going to this peer
+     *  @since 0.9.24
+     */
+    void send(List<I2NPMessage> msgs, PeerState peer) {
+        try {
+            int sz = msgs.size();
+            List<OutboundMessageState> states = new ArrayList<OutboundMessageState>(sz);
+            for (int i = 0; i < sz; i++) {
+                OutboundMessageState state = new OutboundMessageState(_context, msgs.get(i), peer);
+                states.add(state);
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Injecting " + sz + " data messages to a new peer: " + peer);
+            _fragments.add(states, peer);
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Shouldnt happen", new Exception("I did it"));
@@ -1799,7 +1963,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (explicitAddressSpecified()) {
             host = _context.getProperty(PROP_EXTERNAL_HOST);
             if (host != null) {
-                String[] hosts = host.split("[,; \r\n\t]");
+                String[] hosts = DataHelper.split(host, "[,; \r\n\t]");
                 RouterAddress rv = null;
                 for (int i = 0; i < hosts.length; i++) {
                     String h = hosts[i];
@@ -1810,9 +1974,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return rv;
             }
         } else {
-            RouterAddress cur = getCurrentAddress(false);
-            if (cur != null)
-                host = cur.getHost();
+            if (!introducersRequired()) {
+                RouterAddress cur = getCurrentExternalAddress(false);
+                if (cur != null)
+                    host = cur.getHost();
+            }
         }
         return rebuildExternalAddress(host, port, allowRebuildRouterInfo);
     }
@@ -1838,6 +2004,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /**
      *  Update our IPv4 or IPv6 address and optionally tell the router to rebuild and republish the router info.
+     *  FIXME no way to remove an IPv6 address
      *
      *  @param host new validated IPv4 or IPv6 or DNS hostname or null
      *  @param port new validated port or 0/-1
@@ -1869,12 +2036,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         } else {
             directIncluded = false;
         }
-        
+
         boolean introducersIncluded = false;
         if (introducersRequired) {
-            // FIXME intro manager doesn't sort introducers, so
-            // deepEquals() below can fail even with same introducers.
-            // Only a problem when we have very very few peers to pick from.
+            // intro manager now sorts introducers, so
+            // deepEquals() below will not fail even with same introducers.
+            // Was only a problem when we had very very few peers to pick from.
             int found = _introManager.pickInbound(options, PUBLIC_RELAY_COUNT);
             if (found > 0) {
                 if (_log.shouldLog(Log.INFO))
@@ -1891,9 +2058,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         // if we have explicit external addresses, they had better be reachable
         if (introducersRequired)
-            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
+            options.setProperty(UDPAddress.PROP_CAPACITY, CAP_TESTING);
         else
-            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
+            options.setProperty(UDPAddress.PROP_CAPACITY, CAP_TESTING_INTRO);
 
         // MTU since 0.9.2
         int mtu;
@@ -1936,15 +2103,32 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RouterAddress current = getCurrentAddress(isIPv6);
             boolean wantsRebuild = !addr.deepEquals(current);
 
+            // save the external address, even if we didn't publish it
+            if (port > 0 && host != null) {
+                RouterAddress local;
+                if (directIncluded) {
+                    local = addr;
+                } else {
+                    OrderedProperties localOpts = new OrderedProperties(); 
+                    localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
+                    localOpts.setProperty(UDPAddress.PROP_HOST, host);
+                    local = new RouterAddress(STYLE, localOpts, cost);
+                }
+                replaceCurrentExternalAddress(local, isIPv6);
+            }
+
             if (wantsRebuild) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Address rebuilt: " + addr);
+                    _log.info("Address rebuilt: " + addr, new Exception());
                 replaceAddress(addr);
+                // warning, this calls back into us with allowRebuildRouterInfo = false,
+                // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
                 if (allowRebuildRouterInfo)
                     _context.router().rebuildRouterInfo();
             } else {
                 addr = null;
             }
+        
             if (!isIPv6)
                 _needsRebuild = false;
             return addr;
@@ -1953,7 +2137,55 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.warn("Wanted to rebuild my SSU address, but couldn't specify either the direct or indirect info (needs introducers? " 
                            + introducersRequired + ")", new Exception("source"));
             _needsRebuild = true;
+            // save the external address, even if we didn't publish it
+            if (port > 0 && host != null) {
+                OrderedProperties localOpts = new OrderedProperties(); 
+                localOpts.setProperty(UDPAddress.PROP_PORT, String.valueOf(port));
+                localOpts.setProperty(UDPAddress.PROP_HOST, host);
+                RouterAddress local = new RouterAddress(STYLE, localOpts, DEFAULT_COST);
+                replaceCurrentExternalAddress(local, isIPv6);
+            }
+            if (hasCurrentAddress()) {
+                // We must remove current address, otherwise the user will see
+                // "firewalled with inbound NTCP enabled" warning in console.
+                // Remove the IPv4 address only
+                removeAddress(false);
+                // warning, this calls back into us with allowRebuildRouterInfo = false,
+                // via CSFI.createAddresses->TM.getAddresses()->updateAddress()->REA
+                if (allowRebuildRouterInfo)
+                    _context.router().rebuildRouterInfo();
+            }
             return null;
+        }
+    }
+
+    /**
+     *  Simple storage of IP and port, since
+     *  we don't put them in the real, published RouterAddress anymore
+     *  if we are firewalled.
+     *
+     *  Caller must sync on _rebuildLock
+     *
+     *  @since 0.9.18
+     */
+    private void replaceCurrentExternalAddress(RouterAddress ra, boolean isIPv6) {
+        if (isIPv6)
+            _currentOurV6Address = ra;
+        else
+            _currentOurV4Address = ra;
+    }
+
+    /**
+     *  Simple fetch of stored IP and port, since
+     *  we don't put them in the real, published RouterAddress anymore
+     *  if we are firewalled.
+     *
+     *  @since 0.9.18
+     */
+    private RouterAddress getCurrentExternalAddress(boolean isIPv6) {
+        // deadlock thru here ticket #1699
+        synchronized (_rebuildLock) {
+            return isIPv6 ? _currentOurV6Address : _currentOurV4Address;
         }
     }
 
@@ -1966,6 +2198,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     protected void replaceAddress(RouterAddress address) {
         super.replaceAddress(address);
         _context.commSystem().notifyReplaceAddress(address);
+    }
+
+    /**
+     *  Remove then tell NTCP that we changed.
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    protected void removeAddress(RouterAddress address) {
+        super.removeAddress(address);
+        _context.commSystem().notifyRemoveAddress(address);
+    }
+
+    /**
+     *  Remove then tell NTCP that we changed.
+     *
+     *  @since 0.9.20
+     */
+    @Override
+    protected void removeAddress(boolean ipv6) {
+        super.removeAddress(ipv6);
+        if (ipv6)
+            _lastInboundIPv6 = 0;
+        _context.commSystem().notifyRemoveAddress(ipv6);
     }
 
     /**
@@ -2018,13 +2274,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return true;
         }
         *******************/
-        short status = getReachabilityStatus();
+        Status status = getReachabilityStatus();
         switch (status) {
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-            case CommSystemFacade.STATUS_DIFFERENT:
+            case REJECT_UNSOLICITED:
+            case DIFFERENT:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Require introducers, because our status is " + status);
                 return true;
+
             default:
                 if (!allowDirectUDP()) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -2032,6 +2291,30 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     return true;
                 }
                 return false;
+        }
+    }
+    
+    /**
+     *  MIGHT we require introducers?
+     *  This is like introducersRequired, but if we aren't sure, this returns true.
+     *  Used only by EstablishmentManager.
+     *
+     *  @since 0.9.24
+     */
+    boolean introducersMaybeRequired() {
+        Status status = getReachabilityStatus();
+        switch (status) {
+            case REJECT_UNSOLICITED:
+            case DIFFERENT:
+            case IPV4_FIREWALLED_IPV6_OK:
+            case IPV4_FIREWALLED_IPV6_UNKNOWN:
+            case IPV4_UNKNOWN_IPV6_OK:
+            case IPV4_UNKNOWN_IPV6_FIREWALLED:
+            case UNKNOWN:
+                return true;
+
+            default:
+                return !allowDirectUDP();
         }
     }
     
@@ -2075,7 +2358,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     void failed(OutboundMessageState msg, boolean allowPeerFailure) {
         if (msg == null) return;
-        int consecutive = 0;
         OutNetMessage m = msg.getMessage();
         if ( allowPeerFailure && (msg.getPeer() != null) && 
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
@@ -2087,7 +2369,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //                + " lastReceived: " + recvDelay
             //                + " lastSentFully: " + sendDelay
             //                + " expired? " + msg.isExpired());
-            consecutive = msg.getPeer().incrementConsecutiveFailedSends();
+            int consecutive = msg.getPeer().incrementConsecutiveFailedSends();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Consecutive failure #" + consecutive 
                           + " on " + msg.toString()
@@ -2096,6 +2378,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // ok, a few conseutive failures, but we /are/ getting through to them
             } else {
                 _context.statManager().addRateData("udp.dropPeerConsecutiveFailures", consecutive, msg.getPeer().getInactivityTime());
+                sendDestroy(msg.getPeer());
                 dropPeer(msg.getPeer(), false, "too many failures");
             }
             //if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
@@ -2170,28 +2453,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             super.afterSend(m, true);
     }
 
-    @Override
     public int countPeers() {
             return _peersByIdent.size();
     }
 
-    @Override
     public int countActivePeers() {
-        long now = _context.clock().now();
+        long old = _context.clock().now() - 5*60*1000;
         int active = 0;
         for (PeerState peer : _peersByIdent.values()) {
-                if (now-peer.getLastReceiveTime() <= 5*60*1000)
-                    active++;
+            // PeerState initializes times at construction,
+            // so check message count also
+            if ((peer.getMessagesReceived() > 0 && peer.getLastReceiveTime() >= old) ||
+                (peer.getMessagesSent() > 0 && peer.getLastSendTime() >= old)) {
+                active++;
             }
+        }
         return active;
     }
     
-    @Override
     public int countActiveSendPeers() {
-        long now = _context.clock().now();
+        long old = _context.clock().now() - 60*1000;
         int active = 0;
         for (PeerState peer : _peersByIdent.values()) {
-                if (now-peer.getLastSendFullyTime() <= 1*60*1000)
+                if (peer.getLastSendFullyTime() >= old)
                     active++;
             }
         return active;
@@ -2211,6 +2495,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return peer != null && peer.isBacklogged();
     }
 
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(final Hash peer) {
+        final PeerState ps =  _peersByIdent.get(peer);
+        if (ps != null &&
+            ps.getWeRelayToThemAs() <= 0 &&
+            (ps.getTheyRelayToUsAs() <= 0 || ps.getIntroducerTime() < _context.clock().now() - 2*60*60*1000) &&
+            ps.getMessagesReceived() <= 2 && ps.getMessagesSent() <= 2) {
+            ps.setMayDisconnect();
+        }
+    }
+
     public boolean allowConnection() {
             return _peersByIdent.size() < getMaxConnections();
     }
@@ -2218,6 +2519,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      * Return our peer clock skews on this transport.
      * Vector composed of Long, each element representing a peer skew in seconds.
+     * A positive number means our clock is ahead of theirs.
      */
     @Override
     public Vector<Long> getClockSkews() {
@@ -2254,295 +2556,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     DHSessionKeyBuilder.Factory getDHFactory() {
         return _dhFactory;
     }
-
-    private static final int FLAG_ALPHA = 0;
-    private static final int FLAG_IDLE_IN = 1;
-    private static final int FLAG_IDLE_OUT = 2;
-    private static final int FLAG_RATE_IN = 3;
-    private static final int FLAG_RATE_OUT = 4;
-    private static final int FLAG_SKEW = 5;
-    private static final int FLAG_CWND= 6;
-    private static final int FLAG_SSTHRESH = 7;
-    private static final int FLAG_RTT = 8;
-    //private static final int FLAG_DEV = 9;
-    private static final int FLAG_RTO = 10;
-    private static final int FLAG_MTU = 11;
-    private static final int FLAG_SEND = 12;
-    private static final int FLAG_RECV = 13;
-    private static final int FLAG_RESEND = 14;
-    private static final int FLAG_DUP = 15;
-    private static final int FLAG_UPTIME = 16;
-    private static final int FLAG_DEBUG = 99;
-    
-    private static Comparator<PeerState> getComparator(int sortFlags) {
-        Comparator<PeerState> rv;
-        switch (Math.abs(sortFlags)) {
-            case FLAG_IDLE_IN:
-                rv = new IdleInComparator();
-                break;
-            case FLAG_IDLE_OUT:
-                rv = new IdleOutComparator();
-                break;
-            case FLAG_RATE_IN:
-                rv = new RateInComparator();
-                break;
-            case FLAG_RATE_OUT:
-                rv = new RateOutComparator();
-                break;
-            case FLAG_UPTIME:
-                rv = new UptimeComparator();
-                break;
-            case FLAG_SKEW:
-                rv = new SkewComparator();
-                break;
-            case FLAG_CWND:
-                rv = new CwndComparator();
-                break;
-            case FLAG_SSTHRESH:
-                rv = new SsthreshComparator();
-                break;
-            case FLAG_RTT:
-                rv = new RTTComparator();
-                break;
-            //case FLAG_DEV:
-            //    rv = new DevComparator();
-            //    break;
-            case FLAG_RTO:
-                rv = new RTOComparator();
-                break;
-            case FLAG_MTU:
-                rv = new MTUComparator();
-                break;
-            case FLAG_SEND:
-                rv = new SendCountComparator();
-                break;
-            case FLAG_RECV:
-                rv = new RecvCountComparator();
-                break;
-            case FLAG_RESEND:
-                rv = new ResendComparator();
-                break;
-            case FLAG_DUP:
-                rv = new DupComparator();
-                break;
-            case FLAG_ALPHA:
-            default:
-                rv = new AlphaComparator();
-                break;
-        }
-        if (sortFlags < 0)
-            rv = Collections.reverseOrder(rv);
-        return rv;
-    }
-
-    private static class AlphaComparator extends PeerComparator {
-    }
-
-    private static class IdleInComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = r.getLastReceiveTime() - l.getLastReceiveTime();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class IdleOutComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = r.getLastSendTime() - l.getLastSendTime();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class RateInComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getReceiveBps() - r.getReceiveBps();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
-    private static class RateOutComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getSendBps() - r.getSendBps();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
-    private static class UptimeComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = r.getKeyEstablishedTime() - l.getKeyEstablishedTime();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class SkewComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = Math.abs(l.getClockSkew()) - Math.abs(r.getClockSkew());
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class CwndComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getSendWindowBytes() - r.getSendWindowBytes();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
-    private static class SsthreshComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getSlowStartThreshold() - r.getSlowStartThreshold();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
-    private static class RTTComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getRTT() - r.getRTT();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
- /***
-    private static class DevComparator extends PeerComparator {
-        private static final DevComparator _instance = new DevComparator();
-        public static final DevComparator instance() { return _instance; }
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = l.getRTTDeviation() - r.getRTTDeviation();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-  ****/
-
-    /** */
-    private static class RTOComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getRTO() - r.getRTO();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
-    private static class MTUComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            int rv = l.getMTU() - r.getMTU();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return rv;
-        }
-    }
-
-    private static class SendCountComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsTransmitted() - r.getPacketsTransmitted();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class RecvCountComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsReceived() - r.getPacketsReceived();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class ResendComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsRetransmitted() - r.getPacketsRetransmitted();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-
-    private static class DupComparator extends PeerComparator {
-        @Override
-        public int compare(PeerState l, PeerState r) {
-            long rv = l.getPacketsReceivedDuplicate() - r.getPacketsReceivedDuplicate();
-            if (rv == 0) // fallback on alpha
-                return super.compare(l, r);
-            else
-                return (int)rv;
-        }
-    }
-    
-    private static class PeerComparator implements Comparator<PeerState>, Serializable {
-        public int compare(PeerState l, PeerState r) {
-            return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
-        }
-    }
-
-    private static void appendSortLinks(StringBuilder buf, String urlBase, int sortFlags, String descr, int ascending) {
-        if (ascending == FLAG_ALPHA) {  // 0
-            buf.append(" <a href=\"").append(urlBase).append("?sort=0" +
-                       "#udpcon\" title=\"").append(descr).append("\"><img src=\"/themes/console/images/inbound.png\" alt=\"V\"></a>");
-        } else if (sortFlags == ascending) {
-            buf.append(" <a href=\"").append(urlBase).append("?sort=").append(0-ascending);
-            buf.append("#udpcon\" title=\"").append(descr).append("\"><img src=\"/themes/console/images/inbound.png\" alt=\"V\"></a>" +
-                       "<b><img src=\"/themes/console/images/outbound.png\" alt=\"^\"></b>");
-        } else if (sortFlags == 0 - ascending) {
-            buf.append(" <b><img src=\"/themes/console/images/inbound.png\" alt=\"V\"></b><a href=\"").append(urlBase).append("?sort=").append(ascending);
-            buf.append("#udpcon\" title=\"").append(descr).append("\"><img src=\"/themes/console/images/outbound.png\" alt=\"^\"></a>");
-        } else {
-            buf.append(" <a href=\"").append(urlBase).append("?sort=").append(0-ascending);
-            buf.append("#udpcon\" title=\"").append(descr).append("\"><img src=\"/themes/console/images/inbound.png\" alt=\"V\"></a>" +
-                       "<a href=\"").append(urlBase).append("?sort=").append(ascending);
-            buf.append("#udpcon\" title=\"").append(descr).append("\"><img src=\"/themes/console/images/outbound.png\" alt=\"^\"></a>");
-        }
-    }
     
     @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
@@ -2563,55 +2576,58 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         int numPeers = 0;
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3 id=\"udpcon\">").append(_("UDP connections")).append(": ").append(peers.size());
-        buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
-        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
+        buf.append("<h3 id=\"udpcon\">").append(_t("UDP connections")).append(": ").append(peers.size());
+        buf.append(". ").append(_t("Limit")).append(": ").append(getMaxConnections());
+        buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
+        if (_context.getBooleanProperty(PROP_ADVANCED)) {
+            buf.append(". ").append(_t("Status")).append(": ").append(_t(_reachabilityStatus.toStatusString()));
+        }
         buf.append(".</h3>\n");
         buf.append("<table>\n");
-        buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_("Peer")).append("</a><br>");
+        buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_t("Peer")).append("</a><br>");
         if (sortFlags != FLAG_ALPHA)
-            appendSortLinks(buf, urlBase, sortFlags, _("Sort by peer hash"), FLAG_ALPHA);
+            appendSortLinks(buf, urlBase, sortFlags, _t("Sort by peer hash"), FLAG_ALPHA);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dir\" title=\"")
-           .append(_("Direction/Introduction")).append("\">").append(_("Dir"))
-           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.ipv6\">").append(_("IPv6"))
-           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">").append(_("Idle")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by idle inbound"), FLAG_IDLE_IN);
+           .append(_t("Direction/Introduction")).append("\">").append(_t("Dir"))
+           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.ipv6\">").append(_t("IPv6"))
+           .append("</a></th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">").append(_t("Idle")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle inbound"), FLAG_IDLE_IN);
         buf.append(" / ");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by idle outbound"), FLAG_IDLE_OUT);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle outbound"), FLAG_IDLE_OUT);
         buf.append("</th>");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rate\">").append(_("In/Out")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by inbound rate"), FLAG_RATE_IN);
+        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rate\">").append(_t("In/Out")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by inbound rate"), FLAG_RATE_IN);
         buf.append(" / ");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by outbound rate"), FLAG_RATE_OUT);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by outbound rate"), FLAG_RATE_OUT);
         buf.append("</th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.up\">").append(_("Up")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by connection uptime"), FLAG_UPTIME);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.skew\">").append(_("Skew")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by clock skew"), FLAG_SKEW);
+        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.up\">").append(_t("Up")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by connection uptime"), FLAG_UPTIME);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.skew\">").append(_t("Skew")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by clock skew"), FLAG_SKEW);
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.cwnd\">CWND</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by congestion window"), FLAG_CWND);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by congestion window"), FLAG_CWND);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.ssthresh\">SST</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by slow start threshold"), FLAG_SSTHRESH);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by slow start threshold"), FLAG_SSTHRESH);
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rtt\">RTT</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time"), FLAG_RTT);
-        //buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_("Dev")).append("</a><br>");
-        //appendSortLinks(buf, urlBase, sortFlags, _("Sort by round trip time deviation"), FLAG_DEV);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by round trip time"), FLAG_RTT);
+        //buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_t("Dev")).append("</a><br>");
+        //appendSortLinks(buf, urlBase, sortFlags, _t("Sort by round trip time deviation"), FLAG_DEV);
         buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.rto\">RTO</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by retransmission timeout"), FLAG_RTO);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by retransmission timeout"), FLAG_RTO);
         buf.append("</th>\n");
         buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.mtu\">MTU</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by outbound maximum transmit unit"), FLAG_MTU);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.send\">").append(_("TX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets sent"), FLAG_SEND);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.recv\">").append(_("RX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets received"), FLAG_RECV);
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by outbound maximum transmit unit"), FLAG_MTU);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.send\">").append(_t("TX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets sent"), FLAG_SEND);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.recv\">").append(_t("RX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets received"), FLAG_RECV);
         buf.append("</th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.resent\">").append(_("Dup TX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets retransmitted"), FLAG_RESEND);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dupRecv\">").append(_("Dup RX")).append("</a><br>");
-        appendSortLinks(buf, urlBase, sortFlags, _("Sort by packets received more than once"), FLAG_DUP);
+        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.resent\">").append(_t("Dup TX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets retransmitted"), FLAG_RESEND);
+        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dupRecv\">").append(_t("Dup RX")).append("</a><br>");
+        appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets received more than once"), FLAG_DUP);
         buf.append("</th></tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -2627,17 +2643,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td><td class=\"cells\" nowrap align=\"left\">");
             if (peer.isInbound())
-                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_("Inbound")).append("\">");
+                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound")).append("\">");
             else
-                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\">");
+                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\">");
             if (peer.getWeRelayToThemAs() > 0)
-                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/outbound.png\" height=\"8\" width=\"12\" alt=\"^\" title=\"").append(_("We offered to introduce them")).append("\">");
+                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/outbound.png\" height=\"8\" width=\"12\" alt=\"^\" title=\"").append(_t("We offered to introduce them")).append("\">");
             if (peer.getTheyRelayToUsAs() > 0)
-                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/inbound.png\" height=\"8\" width=\"12\" alt=\"V\" title=\"").append(_("They offered to introduce us")).append("\">");
+                buf.append("&nbsp;&nbsp;<img src=\"/themes/console/images/inbound.png\" height=\"8\" width=\"12\" alt=\"V\" title=\"").append(_t("They offered to introduce us")).append("\">");
             
             boolean appended = false;
             if (_activeThrottle.isChoked(peer.getRemotePeer())) {
-                buf.append("<br><i>").append(_("Choked")).append("</i>");
+                buf.append("<br><i>").append(_t("Choked")).append("</i>");
                 appended = true;
             }
             int cfs = peer.getConsecutiveFailedSends();
@@ -2645,15 +2661,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if (!appended) buf.append("<br>");
                 buf.append(" <i>");
                 if (cfs == 1)
-                    buf.append(_("1 fail"));
+                    buf.append(_t("1 fail"));
                 else
-                    buf.append(_("{0} fails", cfs));
+                    buf.append(_t("{0} fails", cfs));
                 buf.append("</i>");
                 appended = true;
             }
             if (_context.banlist().isBanlisted(peer.getRemotePeer(), STYLE)) {
                 if (!appended) buf.append("<br>");
-                buf.append(" <i>").append(_("Banned")).append("</i>");
+                buf.append(" <i>").append(_t("Banned")).append("</i>");
                 appended = true;
             }
             //byte[] ip = getIP(peer.getRemotePeer());
@@ -2712,7 +2728,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(THINSP).append(peer.getConcurrentSendWindow());
             buf.append(THINSP).append(peer.getConsecutiveSendRejections());
             if (peer.isBacklogged())
-                buf.append(' ').append(_("backlogged"));
+                buf.append(' ').append(_t("backlogged"));
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
@@ -2742,8 +2758,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //buf.append(peer.getMTUDecreases());
             buf.append("</td>");
         
-            long sent = peer.getPacketsTransmitted();
-            long recv = peer.getPacketsReceived();
+            long sent = peer.getMessagesSent();
+            long recv = peer.getMessagesReceived();
             
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(sent);
@@ -2884,6 +2900,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private static final long LONG_LOOP_TIME = 25*1000;
         private static final long EXPIRE_INCREMENT = 15*1000;
         private static final long EXPIRE_DECREMENT = 45*1000;
+        private static final long MAY_DISCON_TIMEOUT = 10*1000;
 
         public ExpirePeerEvent() {
             super(_context.simpleTimer2());
@@ -2893,7 +2910,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-            if (haveCapacity(33)) {
+            boolean haveCap = haveCapacity(33);
+            if (haveCap) {
                 long inc;
                 // don't adjust too quickly if we are looping fast
                 if (_lastLoopShort)
@@ -2912,12 +2930,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long now = _context.clock().now();
             long shortInactivityCutoff = now - _expireTimeout;
             long longInactivityCutoff = now - EXPIRE_TIMEOUT;
+            final long mayDisconCutoff = now - MAY_DISCON_TIMEOUT;
             long pingCutoff = now - (2 * 60*60*1000);
             long pingFirewallCutoff = now - PING_FIREWALL_CUTOFF;
-            boolean shouldPingFirewall = _reachabilityStatus != CommSystemFacade.STATUS_OK;
+            boolean shouldPingFirewall = _reachabilityStatus != Status.OK;
             int currentListenPort = getListenPort(false);
             boolean pingOneOnly = shouldPingFirewall && getExternalPort(false) == currentListenPort;
-            boolean shortLoop = shouldPingFirewall;
+            boolean shortLoop = shouldPingFirewall || !haveCap || _context.netDb().floodfillEnabled();
             _lastLoopShort = shortLoop;
             _expireBuffer.clear();
             _runCount++;
@@ -2926,10 +2945,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     PeerState peer = iter.next();
                     long inactivityCutoff;
                     // if we offered to introduce them, or we used them as introducer in last 2 hours
-                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff)
+                    if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff) {
                         inactivityCutoff = longInactivityCutoff;
-                    else
+                    } else if ((!haveCap || !peer.isInbound()) &&
+                               peer.getMayDisconnect() &&
+                               peer.getMessagesReceived() <= 2 && peer.getMessagesSent() <= 2) {
+                        if (_log.shouldInfo())
+                            _log.info("Possible early disconnect for: " + peer);
+                        inactivityCutoff = mayDisconCutoff;
+                    } else {
                         inactivityCutoff = shortInactivityCutoff;
+                    }
                     if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
                         _expireBuffer.add(peer);
                         iter.remove();
@@ -2991,62 +3017,60 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    void setReachabilityStatus(short status) { 
+    void setReachabilityStatus(Status status) { 
         synchronized (_rebuildLock) {
             locked_setReachabilityStatus(status);
         }
     }
 
-    private void locked_setReachabilityStatus(short status) { 
-        short old = _reachabilityStatus;
-        long now = _context.clock().now();
-        switch (status) {
-            case CommSystemFacade.STATUS_OK:
-                // TODO if OK but internal port != external port, should we have
-                // a different status state? ...as we don't know if the TCP
-                // port will be mapped the same way or not...
-                // Right now, we assume it is and hope for the best for TCP.
-                _context.statManager().addRateData("udp.statusOK", 1);
-                _reachabilityStatus = status; 
-                _reachabilityStatusLastUpdated = now;
-                break;
-            case CommSystemFacade.STATUS_DIFFERENT:
-                _context.statManager().addRateData("udp.statusDifferent", 1);
-                _reachabilityStatus = status; 
-                _reachabilityStatusLastUpdated = now;
-                break;
-            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                _context.statManager().addRateData("udp.statusReject", 1);
-// if old != unsolicited && now - lastUpdated > STATUS_GRACE_PERIOD)
-//
-                // fall through...
-            case CommSystemFacade.STATUS_DISCONNECTED:
-            case CommSystemFacade.STATUS_HOSED:
-                _reachabilityStatus = status; 
-                _reachabilityStatusLastUpdated = now;
-                break;
-            case CommSystemFacade.STATUS_UNKNOWN:
-            default:
-                _context.statManager().addRateData("udp.statusUnknown", 1);
-                //if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
-                //    _testEvent.forceRun();
-                //    SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
-                //} else {
-                //    _reachabilityStatus = status;
-                //    _reachabilityStatusLastUpdated = now;
-                //}
-                break;
-        }
+    private void locked_setReachabilityStatus(Status newStatus) { 
+        Status old = _reachabilityStatus;
+        // merge new status into old
+        Status status = Status.merge(old, newStatus);
         _testEvent.setLastTested();
-        if (status != CommSystemFacade.STATUS_UNKNOWN) {
-            if (status != old)
-                _reachabilityStatusUnchanged = 0;
-            else
-                _reachabilityStatusUnchanged++;
+        // now modify if we are IPv6 only
+        TransportUtil.IPv6Config config = getIPv6Config();
+        if (config == IPV6_ONLY) {
+            if (status == Status.IPV4_UNKNOWN_IPV6_OK)
+                status = Status.IPV4_DISABLED_IPV6_OK;
+            else if (status == Status.IPV4_UNKNOWN_IPV6_FIREWALLED)
+                status = Status.IPV4_DISABLED_IPV6_FIREWALLED;
+            else if (status == Status.UNKNOWN)
+                status = Status.IPV4_DISABLED_IPV6_UNKNOWN;
         }
-        if ( (status != old) && (status != CommSystemFacade.STATUS_UNKNOWN) ) {
+        if (status != Status.UNKNOWN) {
+            // now modify if we have no IPv6 address
+            if (_currentOurV6Address == null) {
+                if (status == Status.IPV4_OK_IPV6_UNKNOWN)
+                    status = Status.OK;
+                else if (status == Status.IPV4_FIREWALLED_IPV6_UNKNOWN)
+                    status = Status.REJECT_UNSOLICITED;
+                else if (status == Status.IPV4_SNAT_IPV6_UNKNOWN)
+                    status = Status.DIFFERENT;
+                // prevent firewalled -> OK -> firewalled+OK
+                else if (status == Status.IPV4_FIREWALLED_IPV6_OK)
+                    status = Status.REJECT_UNSOLICITED;
+                else if (status == Status.IPV4_SNAT_IPV6_OK)
+                    status = Status.DIFFERENT;
+            }
+
+            if (status != old) {
+                _reachabilityStatusUnchanged = 0;
+                long now = _context.clock().now();
+                _reachabilityStatusLastUpdated = now;
+                _reachabilityStatus = status;
+            } else {
+                _reachabilityStatusUnchanged++;
+            }
+        }
+        if (status != old) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Old status: " + old + " New status: " + status + " from: ", new Exception("traceback"));
+                _log.warn("Old status: " + old + " New status: " + status +
+                          " Caused by update: " + newStatus +
+                          " from: ", new Exception("traceback"));
+            if (old != Status.UNKNOWN)
+                _context.router().eventLog().addEvent(EventLog.REACHABILITY,
+                   "from " + _t(old.toStatusString()) + " to " +  _t(status.toStatusString()));
             // Always rebuild when the status changes, even if our address hasn't changed,
             // as rebuildExternalAddress() calls replaceAddress() which calls CSFI.notifyReplaceAddress()
             // which will start up NTCP inbound when we transition to OK.
@@ -3054,26 +3078,28 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 rebuildExternalAddress();
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Status unchanged: " + _reachabilityStatus + " (" + _reachabilityStatusUnchanged + " consecutive times), last updated " +
+                _log.info("Status unchanged: " + _reachabilityStatus +
+                          " after update: " + newStatus +
+                          " (unchanged " + _reachabilityStatusUnchanged + " consecutive times), last updated " +
                           DataHelper.formatDuration(_context.clock().now() - _reachabilityStatusLastUpdated) + " ago");
         }
     }
 
     private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";
 
-    @Override
-    public short getReachabilityStatus() { 
+    /**
+     * Previously returned short, now enum as of 0.9.20
+     */
+    public Status getReachabilityStatus() { 
         String override = _context.getProperty(PROP_REACHABILITY_STATUS_OVERRIDE);
-        if (override == null)
-            return _reachabilityStatus;
-            
-        if ("ok".equals(override))
-            return CommSystemFacade.STATUS_OK;
-        else if ("err-reject".equals(override))
-            return CommSystemFacade.STATUS_REJECT_UNSOLICITED;
-        else if ("err-different".equals(override))
-            return CommSystemFacade.STATUS_DIFFERENT;
-        
+        if (override != null) {
+            if ("ok".equals(override))
+                return Status.OK;
+            else if ("err-reject".equals(override))
+                return Status.REJECT_UNSOLICITED;
+            else if ("err-different".equals(override))
+                return Status.DIFFERENT;
+        }
         return _reachabilityStatus; 
     }
 
@@ -3081,6 +3107,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * @deprecated unused
      */
     @Override
+    @Deprecated
     public void recheckReachability() {
         // FIXME locking if we do this again
         //_testEvent.runTest();
@@ -3109,7 +3136,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             PeerState peer = iter.next();
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
-            // enforce IPv4 connection for BOB
+            // enforce IPv4 connection if we are ALICE looking for a BOB
             byte[] ip = peer.getRemoteIP();
             if (peerRole == BOB && ip.length != 4)
                 continue;
@@ -3134,7 +3161,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private boolean shouldTest() {
-        return ! _context.router().isHidden();
+        return ! (_context.router().isHidden() ||
+                  isIPv4Firewalled());
         //String val = _context.getProperty(PROP_SHOULD_TEST);
         //return ( (val != null) && ("true".equals(val)) );
     }
@@ -3172,12 +3200,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.info("Running periodic test with bob = " + bob);
                 _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
                 setLastTested();
-                _forceRun = false;
-                return;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to run a periodic test, as there are no peers with the capacity required");
             }
-            
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to run a periodic test, as there are no peers with the capacity required");
             _forceRun = false;
         }
         
@@ -3186,6 +3212,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  @since 0.9.13
          */
         public synchronized void forceRunSoon() {
+            if (isIPv4Firewalled())
+                return;
             _forceRun = true;
             reschedule(MIN_TEST_FREQUENCY);
         }
@@ -3196,6 +3224,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  @since 0.9.13
          */
         public synchronized void forceRunImmediately() {
+            if (isIPv4Firewalled())
+                return;
             _lastTested.set(0);
             _forceRun = true;
             reschedule(5*1000);

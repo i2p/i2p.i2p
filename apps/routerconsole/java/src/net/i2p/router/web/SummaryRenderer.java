@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -48,9 +49,10 @@ class SummaryRenderer {
      * DOM level 3 load and store support.  Perhaps we can bundle that, or
      * specify who can get it from where, etc.
      *
-     * @deprecated unsed
+     * @deprecated unused
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         throw new UnsupportedOperationException();
 /*****
@@ -109,7 +111,8 @@ class SummaryRenderer {
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
                        boolean hideTitle, boolean showEvents, int periodCount,
                        int endp, boolean showCredit, SummaryListener lsnr2, String titleOverride) throws IOException {
-        long end = _listener.now() - 75*1000;
+        // prevent NaNs if we are skewed ahead of system time
+        long end = Math.min(_listener.now(), System.currentTimeMillis()) - 75*1000;
         long period = _listener.getRate().getPeriod();
         if (endp > 0)
             end -= period * endp;
@@ -120,6 +123,20 @@ class SummaryRenderer {
         ImageOutputStream ios = null;
         try {
             RrdGraphDef def = new RrdGraphDef();
+            // improve text legibility
+            String lang = Messages.getLanguage(_context);
+            Font small = def.getSmallFont();
+            Font large = def.getLargeFont();
+            if ("ar".equals(lang) || "jp".equals(lang) || ("zh".equals(lang) && !IS_WIN)) {
+                small = small.deriveFont(small.getSize2D() + 2.0f);
+                large = large.deriveFont(Font.PLAIN, large.getSize2D() + 3.0f);
+            } else {
+                small = small.deriveFont(small.getSize2D() + 1.0f);
+                large = large.deriveFont(large.getSize2D() + 1.0f);
+            }
+            def.setSmallFont(small);
+            def.setLargeFont(large);
+
             def.setTimeSpan(start/1000, end/1000);
             def.setMinValue(0d);
             String name = _listener.getRate().getRateStat().getName();
@@ -138,9 +155,9 @@ class SummaryRenderer {
                 else
                     p = DataHelper.formatDuration2(period).replace("&nbsp;", " ");
                 if (showEvents)
-                    title = name + ' ' + _("events in {0}", p);
+                    title = name + ' ' + _t("events in {0}", p);
                 else
-                    title = name + ' ' + _("averaged for {0}", p);
+                    title = name + ' ' + _t("averaged for {0}", p);
                 def.setTitle(title);
             }
             String path = _listener.getData().getPath();
@@ -150,7 +167,7 @@ class SummaryRenderer {
             if (showEvents) {
                 // include the average event count on the plot
                 plotName = dsNames[1];
-                descr = _("Events per period");
+                descr = _t("Events per period");
             } else {
                 // include the average value
                 plotName = dsNames[0];
@@ -158,12 +175,12 @@ class SummaryRenderer {
                 // (there are over 500 of them)
                 // but the descriptions for the default graphs are tagged in
                 // Strings.java
-                descr = _(_listener.getRate().getRateStat().getDescription());
+                descr = _t(_listener.getRate().getRateStat().getDescription());
             }
 
             //long started = ((RouterContext)_context).router().getWhenStarted();
             //if (started > start && started < end)
-            //    def.vrule(started / 1000, RESTART_BAR_COLOR, _("Restart"), 4.0f);
+            //    def.vrule(started / 1000, RESTART_BAR_COLOR, _t("Restart"), 4.0f);
 
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
             if (descr.length() > 0) {
@@ -172,22 +189,22 @@ class SummaryRenderer {
                 def.area(plotName, Color.BLUE);
             }
             if (!hideLegend) {
-                def.gprint(plotName, SummaryListener.CF, _("avg") + ": %.2f %s");
-                def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");
-                def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
+                def.gprint(plotName, SummaryListener.CF, _t("avg") + ": %.2f %s");
+                def.gprint(plotName, "MAX", ' ' + _t("max") + ": %.2f %S");
+                def.gprint(plotName, "LAST", ' ' + _t("now") + ": %.2f %S\\r");
             }
             String plotName2 = null;
             if (lsnr2 != null) {
                 String dsNames2[] = lsnr2.getData().getDsNames();
                 plotName2 = dsNames2[0];
                 String path2 = lsnr2.getData().getPath();
-                String descr2 = _(lsnr2.getRate().getRateStat().getDescription());
+                String descr2 = _t(lsnr2.getRate().getRateStat().getDescription());
                 def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendName());
                 def.line(plotName2, Color.RED, descr2 + "\\r", 3);
                 if (!hideLegend) {
-                    def.gprint(plotName2, SummaryListener.CF, _("avg") + ": %.2f %s");
-                    def.gprint(plotName2, "MAX", ' ' + _("max") + ": %.2f %S");
-                    def.gprint(plotName2, "LAST", ' ' + _("now") + ": %.2f %S\\r");
+                    def.gprint(plotName2, SummaryListener.CF, _t("avg") + ": %.2f %s");
+                    def.gprint(plotName2, "MAX", ' ' + _t("max") + ": %.2f %S");
+                    def.gprint(plotName2, "LAST", ' ' + _t("now") + ": %.2f %S\\r");
                 }
             }
             if (!hideLegend) {
@@ -197,7 +214,7 @@ class SummaryRenderer {
                 for (Map.Entry<Long, String> event : events.entrySet()) {
                     long started = event.getKey().longValue();
                     if (started > start && started < end) {
-                        String legend = _("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\r";
+                        String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\r";
                         def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 4.0f);
                     }
                 }
@@ -270,7 +287,7 @@ class SummaryRenderer {
     private static final boolean IS_WIN = SystemVersion.isWindows();
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         // the RRD font doesn't have zh chars, at least on my system
         // Works on 1.5.9 except on windows
         if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
@@ -281,7 +298,7 @@ class SummaryRenderer {
     /**
      *  translate a string with a parameter
      */
-    private String _(String s, String o) {
+    private String _t(String s, String o) {
         // the RRD font doesn't have zh chars, at least on my system
         // Works on 1.5.9 except on windows
         if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))

@@ -61,6 +61,12 @@ public class Node
 		setName(ns, name);
 	}
 
+	public Node(Node otherNode) 
+	{
+		this();
+		set(otherNode);
+	}
+	
 	////////////////////////////////////////////////
 	//	parent node
 	////////////////////////////////////////////////
@@ -189,6 +195,11 @@ public class Node
 		return removeAttribute(getAttribute(name));
 	}
 
+	public void removeAllAttributes()
+	{
+		attrList.clear();
+	}
+	
 	public boolean hasAttributes()
 	{
 		if (0 < getNAttributes())
@@ -239,6 +250,56 @@ public class Node
 		setAttribute("xmlns:" + ns, value);
 	}
 		
+	////////////////////////////////////////////////
+	//	set
+	////////////////////////////////////////////////
+	
+	public boolean set(Node otherNode) {
+		if (otherNode == null)
+			return false;
+		
+		setName(otherNode.getName());		
+		setValue(otherNode.getValue());
+
+		removeAllAttributes();
+		int nOtherAttributes = otherNode.getNAttributes();
+		for (int n=0; n<nOtherAttributes; n++) {
+			Attribute otherAttr = otherNode.getAttribute(n);
+			Attribute thisAttr = new Attribute(otherAttr);
+			addAttribute(thisAttr);
+		}
+		
+		removeAllNodes();
+		int nOtherChildNodes = otherNode.getNNodes();
+		for (int n=0; n<nOtherChildNodes; n++) {
+			Node otherChildNode = otherNode.getNode(n);
+			Node thisChildNode = new Node();
+			thisChildNode.set(otherChildNode);
+			addNode(thisChildNode);
+		}
+		
+		return true;
+	}
+	
+	////////////////////////////////////////////////
+	//	equals
+	////////////////////////////////////////////////
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o)
+	        return true;
+		if (o == null)
+			return false;
+		if (!(o instanceof Node))
+			return false;
+
+		Node otherNode = (Node) o;
+		String thisNodeString = toString();
+		String otherNodeString = otherNode.toString();
+		
+		return thisNodeString.equals(otherNodeString);
+	}
+	
 	////////////////////////////////////////////////
 	//	Child node
 	////////////////////////////////////////////////
@@ -309,15 +370,29 @@ public class Node
 	//	Element (Child Node)
 	////////////////////////////////////////////////
 
-	public void setNode(String name, String value) {
+	public boolean hasNode(String name) {
 		Node node = getNode(name);
 		if (node != null) {
-			node.setValue(value);
+			return true;
+		}
+		return false;
+	}
+	
+	public void setNode(String name) {
+		if (hasNode(name)) {
 			return;
 		}
-		node = new Node(name);
-		node.setValue(value);
+		Node node = new Node(name);
 		addNode(node);
+	}
+	
+	public void setNode(String name, String value) {
+		Node node = getNode(name);
+		if (node == null) {
+			node = new Node(name);
+			addNode(node);
+		}
+		node.setValue(value);
 	}
 
 	public String getNodeValue(String name) {

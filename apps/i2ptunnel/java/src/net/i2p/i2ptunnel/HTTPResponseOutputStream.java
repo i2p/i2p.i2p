@@ -10,19 +10,14 @@ package net.i2p.i2ptunnel;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.Locale;
-import java.util.concurrent.RejectedExecutionException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
-import net.i2p.util.BigPipedInputStream;
+import net.i2p.data.DataHelper;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
-import net.i2p.util.ReusableGZIPInputStream;
 
 /**
  * This does the transparent gzip decompression on the client side.
@@ -31,8 +26,8 @@ import net.i2p.util.ReusableGZIPInputStream;
  * Simple stream for delivering an HTTP response to
  * the client, trivially filtered to make sure "Connection: close"
  * is always in the response.  Perhaps add transparent handling of the
- * Content-encoding: x-i2p-gzip, adjusting the headers to say Content-encoding: identity?
- * Content-encoding: gzip is trivial as well, but Transfer-encoding: chunked makes it
+ * Content-Encoding: x-i2p-gzip, adjusting the headers to say Content-Encoding: identity?
+ * Content-Encoding: gzip is trivial as well, but Transfer-Encoding: chunked makes it
  * more work than is worthwhile at the moment.
  *
  */
@@ -44,7 +39,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private final byte _buf1[];
     protected boolean _gzip;
     protected long _dataExpected;
+    /** lower-case, trimmed */
     protected String _contentType;
+    /** lower-case, trimmed */
+    protected String _contentEncoding;
 
     private static final int CACHE_SIZE = 8*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
@@ -151,10 +149,12 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         for (int i = 0; i < _headerBuffer.getValid(); i++) {
             if (isNL(_headerBuffer.getData()[i])) {
                 if (lastEnd == -1) {
-                    responseLine = new String(_headerBuffer.getData(), 0, i+1); // includes NL
+                    responseLine = DataHelper.getUTF8(_headerBuffer.getData(), 0, i+1); // includes NL
                     responseLine = filterResponseLine(responseLine);
                     responseLine = (responseLine.trim() + "\r\n");
-                    out.write(responseLine.getBytes());
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Response: " + responseLine.trim());
+                    out.write(DataHelper.getUTF8(responseLine));
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
                         if (_headerBuffer.getData()[j] == ':') {
@@ -162,22 +162,22 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             int valLen = i-(j+1);
                             if ( (keyLen <= 0) || (valLen < 0) )
                                 throw new IOException("Invalid header @ " + j);
-                            String key = new String(_headerBuffer.getData(), lastEnd+1, keyLen);
-                            String val = null;
+                            String key = DataHelper.getUTF8(_headerBuffer.getData(), lastEnd+1, keyLen);
+                            String val;
                             if (valLen == 0)
                                 val = "";
                             else
-                                val = new String(_headerBuffer.getData(), j+2, valLen).trim();
+                                val = DataHelper.getUTF8(_headerBuffer.getData(), j+2, valLen).trim();
                             
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Response header [" + key + "] = [" + val + "]");
                             
                             String lcKey = key.toLowerCase(Locale.US);
                             if ("connection".equals(lcKey)) {
-                                out.write("Connection: close\r\n".getBytes());
+                                out.write(DataHelper.getASCII("Connection: close\r\n"));
                                 connectionSent = true;
                             } else if ("proxy-connection".equals(lcKey)) {
-                                out.write("Proxy-Connection: close\r\n".getBytes());
+                                out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));
                                 proxyConnectionSent = true;
                             } else if ("content-encoding".equals(lcKey) && "x-i2p-gzip".equals(val.toLowerCase(Locale.US))) {
                                 _gzip = true;
@@ -192,20 +192,24 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                     } catch (NumberFormatException nfe) {}
                                 } else if ("content-type".equals(lcKey)) {
                                     // save for compress decision on server side
-                                    _contentType = val;
+                                    _contentType = val.toLowerCase(Locale.US);
+                                } else if ("content-encoding".equals(lcKey)) {
+                                    // save for compress decision on server side
+                                    _contentEncoding = val.toLowerCase(Locale.US);
                                 } else if ("set-cookie".equals(lcKey)) {
                                     String lcVal = val.toLowerCase(Locale.US);
                                     if (lcVal.contains("domain=b32.i2p") ||
-                                        lcVal.contains("domain=.b32.i2p")) {
-                                        // Strip privacy-damaging "supercookie" for b32.i2p
-                                        // Let's presume the user agent ignores a cookie for "i2p"
+                                        lcVal.contains("domain=.b32.i2p") ||
+                                        lcVal.contains("domain=i2p") ||
+                                        lcVal.contains("domain=.i2p")) {
+                                        // Strip privacy-damaging "supercookies" for i2p and b32.i2p
                                         // See RFC 6265 and http://publicsuffix.org/
                                         if (_log.shouldLog(Log.INFO))
                                             _log.info("Stripping \"" + key + ": " + val + "\" from response ");
                                         break;
                                     }
                                 }
-                                out.write((key.trim() + ": " + val.trim() + "\r\n").getBytes());
+                                out.write(DataHelper.getUTF8(key.trim() + ": " + val + "\r\n"));
                             }
                             break;
                         }
@@ -216,9 +220,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
         
         if (!connectionSent)
-            out.write("Connection: close\r\n".getBytes());
+            out.write(DataHelper.getASCII("Connection: close\r\n"));
         if (!proxyConnectionSent)
-            out.write("Proxy-Connection: close\r\n".getBytes());
+            out.write(DataHelper.getASCII("Proxy-Connection: close\r\n"));
             
         finishHeaders();
 
@@ -239,88 +243,24 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected boolean shouldCompress() { return _gzip; }
     
     protected void finishHeaders() throws IOException {
-        out.write("\r\n".getBytes()); // end of the headers
+        out.write(DataHelper.getASCII("\r\n")); // end of the headers
     }
     
     @Override
     public void close() throws IOException {
-        out.close();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Closing " + out + " threaded?? " + shouldCompress(), new Exception("I did it"));
+        synchronized(this) {
+            // synch with changing out field below
+            super.close();
+        }
     }
     
     protected void beginProcessing() throws IOException {
         //out.flush();
-        PipedInputStream pi = BigPipedInputStream.getInstance();
-        PipedOutputStream po = new PipedOutputStream(pi);
-        // Run in the client thread pool, as there should be an unused thread
-        // there after the accept().
-        // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
-        try {
-            I2PTunnelClientBase.getClientExecutor().execute(new Pusher(pi, out));
-        } catch (RejectedExecutionException ree) {
-            // shouldn't happen
-            throw ree;
-        }
-        out = po;
-    }
-    
-    private class Pusher implements Runnable {
-        private final InputStream _inRaw;
-        private final OutputStream _out;
-
-        public Pusher(InputStream in, OutputStream out) {
-            _inRaw = in;
-            _out = out;
-        }
-
-        public void run() {
-            ReusableGZIPInputStream _in = ReusableGZIPInputStream.acquire();
-            long written = 0;
-            ByteArray ba = null;
-            try {
-                // blocking
-                _in.initialize(_inRaw);
-                ba = _cache.acquire();
-                byte buf[] = ba.getData();
-                int read = -1;
-                while ( (read = _in.read(buf)) != -1) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Read " + read + " and writing it to the browser/streams");
-                    _out.write(buf, 0, read);
-                    _out.flush();
-                    written += read;
-                }
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Decompressed: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded());
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded(), ioe);
-            } catch (OutOfMemoryError oom) {
-                _log.error("OOM in HTTP Decompressor", oom);
-            } finally {
-                if (_log.shouldLog(Log.INFO) && (_in != null))
-                    _log.info("After decompression, written=" + written + 
-                                " read=" + _in.getTotalRead() 
-                                + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
-                                + ", finished=" + _in.getFinished());
-                if (ba != null)
-                    _cache.release(ba);
-                if (_out != null) try { 
-                    _out.close(); 
-                } catch (IOException ioe) {}
-            }
-
-            if (_in != null) {
-                double compressed = _in.getTotalRead();
-                double expanded = _in.getTotalExpanded();
-                ReusableGZIPInputStream.release(_in);
-                if (compressed > 0 && expanded > 0) {
-                    // only update the stats if we did something
-                    double ratio = compressed/expanded;
-                    _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), 0);
-                    _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed, 0);
-                    _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, 0);
-                }
-            }
+        OutputStream po = new GunzipOutputStream(out);
+        synchronized(this) {
+            out = po;
         }
     }
 

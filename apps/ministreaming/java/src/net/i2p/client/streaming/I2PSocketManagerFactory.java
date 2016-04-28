@@ -20,7 +20,15 @@ import net.i2p.util.Log;
 /**
  * Simplify the creation of I2PSession and transient I2P Destination objects if 
  * necessary to create a socket manager.  This class is most likely how classes
- * will begin their use of the socket library
+ * will begin their use of the socket library.
+ *
+ * For new applications, createDisconnectedManager() is the preferred method.
+ * It is non-blocking and throws on all errors.
+ * All createManager() methods are blocking and return null on error.
+ *
+ * Note that for all methods, host and port arguments are ignored if in RouterContext;
+ * it will connect internally to the router in the JVM.
+ * You cannot connect out from a router JVM to another router.
  *
  */
 public class I2PSocketManagerFactory {
@@ -29,6 +37,7 @@ public class I2PSocketManagerFactory {
      *  Ignored since 0.9.12, cannot be changed via properties.
      *  @deprecated
      */
+    @Deprecated
     public static final String PROP_MANAGER = "i2p.streaming.manager";
 
     /**
@@ -41,6 +50,7 @@ public class I2PSocketManagerFactory {
      * I2CP router on the local machine on the default port (7654).
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      * 
      * @return the newly created socket manager, or null if there were errors
      */
@@ -53,6 +63,7 @@ public class I2PSocketManagerFactory {
      * I2CP router on the local machine on the default port (7654).
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      * 
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, or null if there were errors
@@ -66,9 +77,10 @@ public class I2PSocketManagerFactory {
      * I2CP router on the specified host and port.
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      * 
-     * @param host I2CP host null to use default
-     * @param port I2CP port <= 0 to use default
+     * @param host I2CP host null to use default, ignored if in router context
+     * @param port I2CP port <= 0 to use default, ignored if in router context
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String host, int port) {
@@ -80,9 +92,10 @@ public class I2PSocketManagerFactory {
      * I2CP router on the given machine reachable through the given port.
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      *
-     * @param i2cpHost I2CP host null to use default
-     * @param i2cpPort I2CP port <= 0 to use default
+     * @param i2cpHost I2CP host null to use default, ignored if in router context
+     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, or null if there were errors
      */
@@ -107,6 +120,7 @@ public class I2PSocketManagerFactory {
      * stream and connected to the default I2CP host and port.
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           or null for a transient destination. Caller must close.
@@ -121,6 +135,7 @@ public class I2PSocketManagerFactory {
      * stream and connected to the default I2CP host and port.
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           or null for a transient destination. Caller must close.
@@ -137,11 +152,12 @@ public class I2PSocketManagerFactory {
      * port.
      * 
      * Blocks for a long time while the router builds tunnels.
+     * The nonblocking createDisconnectedManager() is preferred.
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           or null for a transient destination. Caller must close.
-     * @param i2cpHost I2CP host null to use default
-     * @param i2cpPort I2CP port <= 0 to use default
+     * @param i2cpHost I2CP host null to use default, ignored if in router context
+     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, or null if there were errors
      */
@@ -167,8 +183,8 @@ public class I2PSocketManagerFactory {
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           or null for a transient destination. Caller must close.
-     * @param i2cpHost I2CP host null to use default
-     * @param i2cpPort I2CP port <= 0 to use default
+     * @param i2cpHost I2CP host null to use default, ignored if in router context
+     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, non-null (throws on error)
      * @since 0.9.8
@@ -180,7 +196,9 @@ public class I2PSocketManagerFactory {
             ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
             try {
                 client.createDestination(keyStream, getSigType(opts));
-            } catch (Exception e) {
+            } catch (I2PException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (IOException e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
             myPrivateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
@@ -197,8 +215,8 @@ public class I2PSocketManagerFactory {
      *
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           non-null. Caller must close.
-     * @param i2cpHost I2CP host null to use default
-     * @param i2cpPort I2CP port <= 0 to use default
+     * @param i2cpHost I2CP host null to use default, ignored if in router context
+     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @param connect true to connect (blocking)
      * @return the newly created socket manager, non-null (throws on error)
@@ -212,11 +230,11 @@ public class I2PSocketManagerFactory {
         Properties syscopy = (Properties) System.getProperties().clone();
         for (Map.Entry<Object, Object> e : syscopy.entrySet()) {
             String name = (String) e.getKey();
-            if (!opts.containsKey(name))
+            if (opts.getProperty(name) == null)
                 opts.setProperty(name, (String) e.getValue());
         }
         // as of 0.8.1 (I2CP default is BestEffort)
-        if (!opts.containsKey(I2PClient.PROP_RELIABILITY))
+        if (opts.getProperty(I2PClient.PROP_RELIABILITY) == null)
             opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
 
         if (i2cpHost != null)
@@ -241,9 +259,9 @@ public class I2PSocketManagerFactory {
             Class<?> cls = Class.forName(classname);
             if (!I2PSocketManager.class.isAssignableFrom(cls))
                 throw new IllegalArgumentException(classname + " is not an I2PSocketManager");
-            Constructor<I2PSocketManager> con = (Constructor<I2PSocketManager>)
-                  cls.getConstructor(new Class[] {I2PAppContext.class, I2PSession.class, Properties.class, String.class});
-            I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
+            Constructor<?> con =
+                  cls.getConstructor(I2PAppContext.class, I2PSession.class, Properties.class, String.class);
+            I2PSocketManager mgr = (I2PSocketManager) con.newInstance(new Object[] {context, session, opts, name});
             return mgr;
         } catch (Throwable t) {
             getLog().log(Log.CRIT, "Error loading " + classname, t);

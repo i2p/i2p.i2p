@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.router.RouterInfo;
-import net.i2p.router.CommSystemFacade;
+import net.i2p.router.CommSystemFacade.Status;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.stat.Rate;
@@ -43,7 +43,7 @@ class BuildExecutor implements Runnable {
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
     private volatile boolean _isRunning;
     private boolean _repoll;
-    private static final int MAX_CONCURRENT_BUILDS = 10;
+    private static final int MAX_CONCURRENT_BUILDS = 13;
     /** accept replies up to a minute after we gave up on them */
     private static final long GRACE_PERIOD = 60*1000;
 
@@ -68,6 +68,10 @@ class BuildExecutor implements Runnable {
         //_context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildReplySlow", "Build reply late, but not too late", "Tunnels", new long[] { 10*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildClientExpireIB", "", "Tunnels", new long[] { 60*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildClientExpireOB", "", "Tunnels", new long[] { 60*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildExploratoryExpireIB", "", "Tunnels", new long[] { 60*60*1000 });
+        //ctx.statManager().createRateStat("tunnel.buildExploratoryExpireOB", "", "Tunnels", new long[] { 60*60*1000 });
 
         // Get stat manager, get recognized bandwidth tiers
         StatManager statMgr = _context.statManager();
@@ -106,7 +110,7 @@ class BuildExecutor implements Runnable {
     }
 
     private int allowed() {
-        if (_context.commSystem().getReachabilityStatus() == CommSystemFacade.STATUS_DISCONNECTED)
+        if (_context.commSystem().getStatus() == Status.DISCONNECTED)
             return 0;
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
@@ -129,8 +133,10 @@ class BuildExecutor implements Runnable {
                 }
             }
         }
-        if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
-        else if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
+        if (allowed < 2)
+            allowed = 2; // Never choke below 2 builds (but congestion may)
+        else if (allowed > MAX_CONCURRENT_BUILDS)
+             allowed = MAX_CONCURRENT_BUILDS;
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
 
         // expire any REALLY old requests
@@ -182,7 +188,7 @@ class BuildExecutor implements Runnable {
                     String bwTier = "Unknown";
                     if (ri != null) bwTier = ri.getBandwidthTier(); // Returns "Unknown" if none recognized
                     // Record that a peer of the given tier expired
-                    _context.statManager().addRateData("tunnel.tierExpire" + bwTier, 1, 0);
+                    _context.statManager().addRateData("tunnel.tierExpire" + bwTier, 1);
                     didNotReply(cfg.getReplyMessageId(), peer);
                     // Blame everybody since we don't know whose fault it is.
                     // (it could be our exploratory tunnel's fault too...)
@@ -192,10 +198,19 @@ class BuildExecutor implements Runnable {
                 TunnelPool pool = cfg.getTunnelPool();
                 if (pool != null)
                     pool.buildComplete(cfg);
-                if (cfg.getDestination() == null)
-                    _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1, 0);
-                else
-                    _context.statManager().addRateData("tunnel.buildClientExpire", 1, 0);
+                if (cfg.getDestination() == null) {
+                    _context.statManager().addRateData("tunnel.buildExploratoryExpire", 1);
+                    //if (cfg.isInbound())
+                    //    _context.statManager().addRateData("tunnel.buildExploratoryExpireIB", 1);
+                    //else
+                    //    _context.statManager().addRateData("tunnel.buildExploratoryExpireOB", 1);
+                } else {
+                    _context.statManager().addRateData("tunnel.buildClientExpire", 1);
+                    //if (cfg.isInbound())
+                    //    _context.statManager().addRateData("tunnel.buildClientExpireIB", 1);
+                    //else
+                    //    _context.statManager().addRateData("tunnel.buildClientExpireOB", 1);
+                }
             }
         }
         

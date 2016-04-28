@@ -32,7 +32,9 @@ public class I2PTunnelHTTPBidirServer extends I2PTunnelHTTPServer {
         bidir = true;
 
         /* start the httpclient */
-        task = new I2PTunnelHTTPBidirProxy(localPort, l, sockMgr, getTunnel(), getEventDispatcher(), __serverId);
+        I2PTunnelClientBase client = new I2PTunnelHTTPBidirProxy(localPort, l, sockMgr, getTunnel(), getEventDispatcher(), __serverId);
+        client.startRunning();
+        task = client;
         sockMgr.setName("Server"); // TO-DO: Need to change this to "Bidir"!
         getTunnel().addSession(sockMgr.getSession());
         l.log("Ready!");

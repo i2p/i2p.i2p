@@ -73,12 +73,12 @@ class ExploreJob extends SearchJob {
      * and PeerSelector doesn't include the floodfill peers,
      * so we add the ff peers ourselves and then use the regular PeerSelector.
      *
-     * @param replyTunnelId tunnel to receive replies through
-     * @param replyGateway gateway for the reply tunnel
+     * @param replyTunnelId tunnel to receive replies through, or our router hash if replyGateway is null
+     * @param replyGateway gateway for the reply tunnel, if null, we are sending direct, do not encrypt
      * @param expiration when the search should stop
      * @param peer the peer to send it to
      *
-     * @return a DatabaseLookupMessage or GarlicMessage
+     * @return a DatabaseLookupMessage or GarlicMessage or null on error
      */
     @Override
     protected I2NPMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration, RouterInfo peer) {
@@ -89,7 +89,8 @@ class ExploreJob extends SearchJob {
         //msg.setDontIncludePeers(getState().getClosestAttempted(MAX_CLOSEST));
         Set<Hash> dontIncludePeers = getState().getClosestAttempted(MAX_CLOSEST);
         msg.setMessageExpiration(expiration);
-        msg.setReplyTunnel(replyTunnelId);
+        if (replyTunnelId != null)
+            msg.setReplyTunnel(replyTunnelId);
         
         int available = MAX_CLOSEST - dontIncludePeers.size();
         if (available > 0) {
@@ -134,7 +135,8 @@ class ExploreJob extends SearchJob {
 
         // Now encrypt if we can
         I2NPMessage outMsg;
-        if (getContext().getProperty(IterativeSearchJob.PROP_ENCRYPT_RI, IterativeSearchJob.DEFAULT_ENCRYPT_RI)) {
+        if (replyTunnelId != null &&
+            getContext().getProperty(IterativeSearchJob.PROP_ENCRYPT_RI, IterativeSearchJob.DEFAULT_ENCRYPT_RI)) {
             // request encrypted reply?
             if (DatabaseLookupMessage.supportsEncryptedReplies(peer)) {
                 MessageWrapper.OneTimeSession sess;
@@ -144,6 +146,7 @@ class ExploreJob extends SearchJob {
                               ' ' + sess.key + ' ' + sess.tag);
                 msg.setReplySession(sess.key, sess.tag);
             }
+            // may be null
             outMsg = MessageWrapper.wrap(getContext(), msg, peer);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Encrypted exploratory DLM for " + getState().getTarget() + " to " +

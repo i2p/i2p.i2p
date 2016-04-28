@@ -66,8 +66,10 @@ public class PrecomputationTestVectors {
         BufferedReader file = null;
         int row = 0;
         try {
-            file = new BufferedReader(new InputStreamReader(
-                    PrecomputationTestVectors.class.getResourceAsStream(fileName)));
+            InputStream is = PrecomputationTestVectors.class.getResourceAsStream(fileName);
+            if (is == null)
+                throw new IOException("Resource not found: " + fileName);
+            file = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = file.readLine()) != null) {
                 if (line.equals(" },")) {

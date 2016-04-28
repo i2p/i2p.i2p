@@ -184,6 +184,26 @@ public class Log {
     public boolean shouldLog(int priority) {
         return priority >= _minPriority;
     }
+
+    /** @since 0.9.20 */
+    public boolean shouldDebug() {
+        return shouldLog(DEBUG);
+    }
+
+    /** @since 0.9.20 */
+    public boolean shouldInfo() {
+        return shouldLog(INFO);
+    }
+
+    /** @since 0.9.20 */
+    public boolean shouldWarn() {
+        return shouldLog(WARN);
+    }
+
+    /** @since 0.9.20 */
+    public boolean shouldError() {
+        return shouldLog(ERROR);
+    }
     
     /**
      * logs a loop when closing a resource with level INFO

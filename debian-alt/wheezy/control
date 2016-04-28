@@ -1,0 +1,101 @@
+Source: i2p
+Maintainer: Kill Your TV <killyourtv@i2pmail.org>
+Section: net
+Standards-Version: 3.9.6
+Priority: optional
+Bugs: mailto:killyourtv@i2pmail.org
+Homepage: https://geti2p.net
+Build-Depends: debhelper (>= 7.0.50~)
+ ,ant (>= 1.8)
+ ,ant-optional
+ ,debconf
+ ,default-jdk | openjdk-7-jdk | openjdk-6-jdk
+ ,gettext
+ ,dh-apparmor
+ ,libgmp3-dev
+ ,libservice-wrapper-java
+ ,libcommons-logging-java
+ ,po-debconf
+ ,dh-systemd
+
+Package: i2p
+Architecture: all
+Section: net
+Priority: optional
+Depends: ${java:Depends}, ${shlibs:Depends},
+ adduser,
+ debconf,
+ i2p-router (>= 0.8.6-5),
+ libjbigi-jni,
+ lsb-base,
+ service-wrapper
+Description: Load-balanced unspoofable packet switching network
+ I2P is an anonymizing network, offering a simple layer that identity-sensitive
+ applications can use to securely communicate. All data is wrapped with several
+ layers of encryption, and the network is both distributed and dynamic, with no
+ trusted parties.
+ .
+ This package depends on the router, jbigi, the java service wrapper, and
+ includes support to run I2P as a daemon.
+
+Package: libjbigi-jni
+Architecture: any
+Section: java
+Priority: optional
+Depends: ${shlibs:Depends}, i2p-router
+Homepage: http://www.i2p2.de/jbigi
+Description: Java Big Integer library
+ This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
+ .
+ libjbigi is a math library that is part of the I2P installation.  Use of this
+ library greatly enhances the efficiency of cryptographic algorithms, such as
+ the ones used by I2P. You can expect to see a 5-7x speed improvement on certain
+ tasks, such as elGamal encryption/decryption.
+
+Package: i2p-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Suggests: i2p, default-jdk-doc
+Description: Documentation for I2P
+ I2P is an anonymizing network, offering a simple layer that identity-sensitive
+ applications can use to securely communicate. All data is wrapped with several
+ layers of encryption, and the network is both distributed and dynamic, with no
+ trusted parties.
+ .
+ This package contains the Javadoc files.
+
+Package: i2p-router
+Architecture: all
+Section: net
+Priority: optional
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
+ openjdk-8-jre-headless | openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless | java6-runtime-headless, libecj-java
+Replaces: i2p ( << 0.8.6-5)
+Breaks: i2p (<< 0.8.6-5)
+Recommends: libjbigi-jni, ttf-dejavu
+Suggests: tor
+ ,apparmor
+ ,i2p-messenger
+ ,i2phex
+ ,i2p-tahoe-lafs
+ ,imule
+ ,irc-client
+ ,itoopie
+ ,mail-client
+ ,mail-reader
+ ,news-reader
+ ,polipo
+ ,privoxy
+ ,robert
+ ,syndie
+ ,www-browser
+ ,xul-ext-torbutton
+Description: Load-balanced unspoofable packet switching network
+ I2P is an anonymizing network, offering a simple layer that identity-sensitive
+ applications can use to securely communicate. All data is wrapped with several
+ layers of encryption, and the network is both distributed and dynamic, with no
+ trusted parties.
+ .
+ TrueType fonts (such as those provided in the package ttf-dejavu) are required
+ in order to generate graphs.

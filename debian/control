@@ -1,24 +1,24 @@
 Source: i2p
-Maintainer: Kill Your TV <killyourtv@i2pmail.org>
+Maintainer: zzz <zzz@i2pmail.org>
 Section: net
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 Priority: optional
-Bugs: mailto:killyourtv@i2pmail.org
-Homepage: https://geti2p.net
+Bugs: mailto:zzz@i2pmail.org
+Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
  ,debconf
- ,default-jdk | openjdk-7-jdk | openjdk-6-jdk
+ ,openjdk-7-jdk
+ ,libjetty8-java, libservlet3.0-java
+ ,glassfish-javaee
+ ,dh-apparmor
  ,gettext
- ,libgmp3-dev
-# uncomment the next line for official builds
-# ,libservice-wrapper-java
- ,libcommons-logging-java
+ ,libgmp-dev (>= 2:5.0.5)
+ ,libservice-wrapper-java
  ,hardening-wrapper
  ,po-debconf
-# Uncomment the next line for Debian unstable or Ubuntu Saucy (and newer)
-# ,dh-systemd
+ ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -26,6 +26,7 @@ Section: net
 Priority: optional
 Depends: ${java:Depends}, ${shlibs:Depends},
  adduser,
+ debconf,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
  lsb-base,
@@ -44,7 +45,7 @@ Architecture: any
 Section: java
 Priority: optional
 Depends: ${shlibs:Depends}, i2p-router
-Homepage: http://www.i2p2.de/jbigi
+Homepage: https://geti2p.net/
 Description: Java Big Integer library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .
@@ -71,11 +72,16 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless | java7-runtime-headless | java6-runtime-headless, libecj-java
+ openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless,
+ libecj-java,
+ geoip-database,
+ libjetty8-java, libservlet3.0-java,
+ glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
 Suggests: tor
+ ,apparmor
  ,i2p-messenger
  ,i2phex
  ,i2p-tahoe-lafs
@@ -86,7 +92,7 @@ Suggests: tor
  ,mail-reader
  ,news-reader
  ,polipo
- ,privox
+ ,privoxy
  ,robert
  ,syndie
  ,www-browser

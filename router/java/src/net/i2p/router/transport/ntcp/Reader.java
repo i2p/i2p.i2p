@@ -98,8 +98,10 @@ class Reader {
                         if (keepReading) {
                             // keep on reading the same one
                         } else {
-                            _liveReads.remove(con);
-                            con = null;
+                            if (con != null) {
+                                _liveReads.remove(con);
+                                con = null;
+                            }
                             if (_pendingConnections.isEmpty()) {
                                 _pendingConnections.wait();
                             } else {
@@ -116,6 +118,10 @@ class Reader {
                         _log.debug("begin read for " + con);
                     try {
                         processRead(con);
+                    } catch (IllegalStateException ise) {
+                        // FailedEstablishState.receive() (race - see below)
+                        if (_log.shouldWarn())
+                            _log.warn("Error in the ntcp reader", ise);
                     } catch (RuntimeException re) {
                         _log.log(Log.CRIT, "Error in the ntcp reader", re);
                     }
@@ -153,6 +159,7 @@ class Reader {
                 EventPumper.releaseBuf(buf);
                 break;
             }
+            // FIXME call est.isCorrupt() before also? throws ISE here... see above
             est.receive(buf);
             EventPumper.releaseBuf(buf);
             if (est.isCorrupt()) {

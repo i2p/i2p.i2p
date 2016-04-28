@@ -220,7 +220,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
                 getContext().profileManager().dbLookupFailed(h);
         }
         _facade.complete(_key);
-        getContext().statManager().addRateData("netDb.failedTime", time, 0);
+        getContext().statManager().addRateData("netDb.failedTime", time);
         for (Job j : _onFailed) {
             getContext().jobQueue().addJob(j);
         }
@@ -251,7 +251,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
             }
         }
         _facade.complete(_key);
-        getContext().statManager().addRateData("netDb.successTime", time, 0);
+        getContext().statManager().addRateData("netDb.successTime", time);
         for (Job j : _onFind) {
             getContext().jobQueue().addJob(j);
         }

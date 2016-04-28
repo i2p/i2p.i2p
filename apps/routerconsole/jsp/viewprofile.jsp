@@ -10,7 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("Peer Profile")%></h1>
+<h1><%=intl._t("Peer Profile")%></h1>
 <div class="main" id="main"><div class="wideload">
 <%
     String peerB64 = request.getParameter("peer");
@@ -24,7 +24,7 @@
 <jsp:setProperty name="stathelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="stathelper" property="peer" value="<%=peerB64%>" />
 <% stathelper.storeWriter(out); %>
-<h2><%=intl._("Profile for peer {0}", peerB64)%></h2>
+<h2><%=intl._t("Profile for peer {0}", peerB64)%></h2>
 <pre>
 <jsp:getProperty name="stathelper" property="profile" />
 </pre>

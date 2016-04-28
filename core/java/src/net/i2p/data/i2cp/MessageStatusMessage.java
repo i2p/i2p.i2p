@@ -193,6 +193,16 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         return _sessionId;
     }
 
+    /**
+     * Return the SessionId for this message.
+     *
+     * @since 0.9.21
+     */
+    @Override
+    public SessionId sessionId() {
+        return _sessionId >= 0 ? new SessionId(_sessionId) : null;
+    }
+
     /** @param id 0-65535 */
     public void setSessionId(long id) {
         _sessionId = (int) id;
@@ -275,6 +285,12 @@ public class MessageStatusMessage extends I2CPMessageImpl {
             return "GUARANTEED SUCCESS ";
         case STATUS_SEND_SUCCESS_LOCAL:
             return "LOCAL SUCCESS      ";
+        case STATUS_SEND_BEST_EFFORT_FAILURE:
+            return "PROBABLE FAILURE   ";
+        case STATUS_SEND_FAILURE_NO_TUNNELS:
+            return "NO LOCAL TUNNELS   ";
+        case STATUS_SEND_FAILURE_NO_LEASESET:
+            return "LEASESET NOT FOUND ";
         default:
             return "SEND FAILURE CODE: " + status;
         }
@@ -308,10 +324,10 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         
         try {
             DataHelper.writeLong(out, 4, len);
-            DataHelper.writeLong(out, 1, getType());
+            out.write((byte) MESSAGE_TYPE);
             DataHelper.writeLong(out, 2, _sessionId);
             DataHelper.writeLong(out, 4, _messageId);
-            DataHelper.writeLong(out, 1, _status);
+            out.write((byte) _status);
             DataHelper.writeLong(out, 4, _size);
             DataHelper.writeLong(out, 4, _nonce);
         } catch (DataFormatException dfe) {

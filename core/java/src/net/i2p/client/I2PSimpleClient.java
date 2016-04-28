@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.impl.I2PSimpleSession;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
@@ -26,6 +27,7 @@ public class I2PSimpleClient implements I2PClient {
      *  @deprecated Don't do this
      *  @throws UnsupportedOperationException always
      */
+    @Deprecated
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -35,6 +37,7 @@ public class I2PSimpleClient implements I2PClient {
      *  @throws UnsupportedOperationException always
      *  @since 0.9.12
      */
+    @Deprecated
     public Destination createDestination(OutputStream destKeyStream, SigType type) throws I2PException, IOException {
         throw new UnsupportedOperationException();
     }
@@ -43,6 +46,7 @@ public class I2PSimpleClient implements I2PClient {
      *  @deprecated Don't do this
      *  @throws UnsupportedOperationException always
      */
+    @Deprecated
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         throw new UnsupportedOperationException();
     }

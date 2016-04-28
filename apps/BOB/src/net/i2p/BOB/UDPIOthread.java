@@ -34,15 +34,18 @@ import net.i2p.util.Log;
  *  The skeletal frame is here, just needs to be finished.
  *
  * @author sponge
+ * @deprecated incomplete, unused
  */
+@Deprecated
 public class UDPIOthread implements I2PSessionListener, Runnable {
 
-	private NamedDB info;
-	private Log _log;
-	private Socket socket;
+	private final NamedDB info;
+	private final Log _log;
+	private final Socket socket;
 	private DataInputStream in;
 	private DataOutputStream out;
-	private I2PSession _session;
+	private final I2PSession _session;
+	// FIXME never set
 	private Destination _peerDestination;
 	private boolean up;
 
@@ -58,7 +61,6 @@ public class UDPIOthread implements I2PSessionListener, Runnable {
 		this._log = _log;
 		this.socket = socket;
 		this._session = _session;
-
 	}
 
 	/**

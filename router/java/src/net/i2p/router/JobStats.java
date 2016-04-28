@@ -12,10 +12,11 @@ import net.i2p.data.DataHelper;
 public class JobStats {
     private final String _job;
     private final AtomicLong _numRuns = new AtomicLong();
-    private volatile long _totalTime;
+    private final AtomicLong _numDropped = new AtomicLong();
+    private final AtomicLong _totalTime = new AtomicLong();
     private volatile long _maxTime;
     private volatile long _minTime;
-    private volatile long _totalPendingTime;
+    private final AtomicLong _totalPendingTime = new AtomicLong();
     private volatile long _maxPendingTime;
     private volatile long _minPendingTime;
     
@@ -29,43 +30,55 @@ public class JobStats {
     
     public void jobRan(long runTime, long lag) {
         _numRuns.incrementAndGet();
-        _totalTime += runTime;
+        _totalTime.addAndGet(runTime);
         if ( (_maxTime < 0) || (runTime > _maxTime) )
             _maxTime = runTime;
         if ( (_minTime < 0) || (runTime < _minTime) )
             _minTime = runTime;
-        _totalPendingTime += lag;
+        _totalPendingTime.addAndGet(lag);
         if ( (_maxPendingTime < 0) || (lag > _maxPendingTime) )
             _maxPendingTime = lag;
         if ( (_minPendingTime < 0) || (lag < _minPendingTime) )
             _minPendingTime = lag;
     }
     
+    /** @since 0.9.19 */
+    public void jobDropped() {
+        _numDropped.incrementAndGet();
+    }
+
+    /** @since 0.9.19 */
+    public long getDropped() { return _numDropped.get(); }
+
     public String getName() { return _job; }
     public long getRuns() { return _numRuns.get(); }
-    public long getTotalTime() { return _totalTime; }
+    public long getTotalTime() { return _totalTime.get(); }
     public long getMaxTime() { return _maxTime; }
     public long getMinTime() { return _minTime; }
-    public long getAvgTime() { 
+
+    public double getAvgTime() { 
         long numRuns = _numRuns.get();
         if (numRuns > 0) 
-            return _totalTime / numRuns; 
+            return _totalTime.get() / (double) numRuns; 
         else 
             return 0; 
     }
-    public long getTotalPendingTime() { return _totalPendingTime; }
+    public long getTotalPendingTime() { return _totalPendingTime.get(); }
     public long getMaxPendingTime() { return _maxPendingTime; }
     public long getMinPendingTime() { return _minPendingTime; }
-    public long getAvgPendingTime() { 
+
+    public double getAvgPendingTime() { 
         long numRuns = _numRuns.get();
         if (numRuns > 0) 
-            return _totalPendingTime / numRuns; 
+            return _totalPendingTime.get() / (double) numRuns; 
         else 
             return 0; 
     }
     
+/****
     @Override
     public int hashCode() { return _job.hashCode(); }
+
     @Override
     public boolean equals(Object obj) {
         if ( (obj != null) && (obj instanceof JobStats) ) {
@@ -90,4 +103,5 @@ public class JobStats {
         buf.append(getMaxPendingTime()).append("ms/").append(getMinPendingTime()).append("ms avg/max/min)");
         return buf.toString();
     }
+****/
 }

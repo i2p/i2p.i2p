@@ -58,7 +58,7 @@ class IterativeLookupJob extends JobImpl {
                         continue;
                     }
                     if (peer.equals(from)) {
-                        // wtf
+                        // unusual
                         invalidPeers++;
                         continue;
                     }

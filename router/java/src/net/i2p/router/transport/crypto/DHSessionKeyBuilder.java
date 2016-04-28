@@ -62,9 +62,9 @@ public class DHSessionKeyBuilder {
     private final static String PROP_DH_PRECALC_MIN = "crypto.dh.precalc.min";
     private final static String PROP_DH_PRECALC_MAX = "crypto.dh.precalc.max";
     private final static String PROP_DH_PRECALC_DELAY = "crypto.dh.precalc.delay";
-    private final static int DEFAULT_DH_PRECALC_MIN = 15;
-    private final static int DEFAULT_DH_PRECALC_MAX = 40;
-    private final static int DEFAULT_DH_PRECALC_DELAY = 200;
+    private final static int DEFAULT_DH_PRECALC_MIN = 20;
+    private final static int DEFAULT_DH_PRECALC_MAX = 60;
+    private final static int DEFAULT_DH_PRECALC_DELAY = 25;
 
     /**
      * Create a new public/private value pair for the DH exchange.
@@ -429,6 +429,12 @@ public class DHSessionKeyBuilder {
         public void returnUnused(DHSessionKeyBuilder builder);
     }
 
+    /**
+     *  Try to keep DH pairs at the ready.
+     *  It's important to do this in a separate thread, because if we run out,
+     *  the pairs are generated in the NTCP Pumper thread,
+     *  and it can fall behind.
+     */
     public static class PrecalcRunner extends I2PThread implements Factory {
         private final I2PAppContext _context;
         private final Log _log;
@@ -438,8 +444,8 @@ public class DHSessionKeyBuilder {
         private final LinkedBlockingQueue<DHSessionKeyBuilder> _builders;
         private volatile boolean _isRunning;
 
-        /** check every 30 seconds whether we have less than the minimum */
-        private long _checkDelay = 30 * 1000;
+        /** check periodically whether we have less than the minimum */
+        private long _checkDelay = 10 * 1000;
 
         public PrecalcRunner(I2PAppContext ctx) {
             super("DH Precalc");
@@ -464,7 +470,8 @@ public class DHSessionKeyBuilder {
                 _log.debug("DH Precalc (minimum: " + _minSize + " max: " + _maxSize + ", delay: "
                            + _calcDelay + ")");
             _builders = new LinkedBlockingQueue<DHSessionKeyBuilder>(_maxSize);
-            setPriority(Thread.MIN_PRIORITY);
+            if (!SystemVersion.isWindows())
+                setPriority(Thread.NORM_PRIORITY - 1);
         }
         
         /**
@@ -498,9 +505,10 @@ public class DHSessionKeyBuilder {
                             break;
                         long curCalc = System.currentTimeMillis() - curStart;
                         // for some relief...
-                        try {
-                            Thread.sleep(_calcDelay + (curCalc * 3));
-                        } catch (InterruptedException ie) { // nop
+                        if (!interrupted()) {
+                            try {
+                                Thread.sleep(Math.min(200, Math.max(10, _calcDelay + (curCalc * 3))));
+                            } catch (InterruptedException ie) {}
                         }
                     }
                 }
@@ -534,6 +542,8 @@ public class DHSessionKeyBuilder {
                 if (_log.shouldLog(Log.INFO)) _log.info("No more builders, creating one now");
                 _context.statManager().addRateData("crypto.DHEmpty", 1);
                 builder = precalc();
+                // stop sleeping, wake up, make some more
+                this.interrupt();
             }
             return builder;
         }

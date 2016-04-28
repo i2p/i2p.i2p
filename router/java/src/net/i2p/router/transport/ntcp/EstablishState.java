@@ -81,10 +81,19 @@ class EstablishState {
     // alice receives (and bob sends)
     private final byte _Y[];
     private final byte _e_hXY_tsB[];
-    /** Bob's Timestamp in seconds */
+    /** Bob's timestamp in seconds, this is in message #2, *before* _tsA */
     private transient long _tsB;
-    /** Alice's Timestamp in seconds */
+    /** Alice's timestamp in seconds, this is in message #3, *after* _tsB
+     *  Only saved for outbound. For inbound, see verifyInbound().
+     */
     private transient long _tsA;
+    /**
+     *  OUR clock minus HIS clock, in seconds
+     *
+     *  Inbound: tsB - tsA - rtt/2
+     *  Outbound: tsA - tsB - rtt/2
+     */
+    private transient long _peerSkew;
     private transient byte _e_bobSig[];
 
     /** previously received encrypted block (or the IV) */
@@ -312,7 +321,8 @@ class EstablishState {
                     System.arraycopy(_Y, 0, xy, XY_SIZE, XY_SIZE);
                     byte[] hxy = SimpleByteCache.acquire(HXY_SIZE);
                     _context.sha().calculateHash(xy, 0, XY_SIZE + XY_SIZE, hxy, 0);
-                    _tsB = (_context.clock().now() + 500) / 1000l; // our (Bob's) timestamp in seconds
+                    // our (Bob's) timestamp in seconds
+                    _tsB = (_context.clock().now() + 500) / 1000l;
                     byte toEncrypt[] = new byte[HXY_TSB_PAD_SIZE];  // 48
                     System.arraycopy(hxy, 0, toEncrypt, 0, HXY_SIZE);
                     byte tsB[] = DataHelper.toLong(4, _tsB);
@@ -471,7 +481,9 @@ class EstablishState {
      *  is synchronized, should be OK. See isComplete()
      */
     private void receiveOutbound(ByteBuffer src) {
+
         // recv Y+E(H(X+Y)+tsB, sk, Y[239:255])
+        // Read in Y, which is the first part of message #2
         while (_state == State.OB_SENT_X && src.hasRemaining()) {
             byte c = src.get();
             _Y[_received++] = c;
@@ -491,6 +503,8 @@ class EstablishState {
             }
         }
 
+        // Read in Y, which is the first part of message #2
+        // Read in the rest of message #2
         while (_state == State.OB_GOT_Y && src.hasRemaining()) {
             int i = _received-XY_SIZE;
             _received++;
@@ -517,18 +531,25 @@ class EstablishState {
                 }
                 SimpleByteCache.release(h);
                 changeState(State.OB_GOT_HXY);
-                _tsB = DataHelper.fromLong(hXY_tsB, HXY_SIZE, 4); // their (Bob's) timestamp in seconds
-                _tsA = (_context.clock().now() + 500) / 1000; // our (Alice's) timestamp in seconds
+                // their (Bob's) timestamp in seconds
+                _tsB = DataHelper.fromLong(hXY_tsB, HXY_SIZE, 4);
+                long now = _context.clock().now();
+                // rtt from sending #1 to receiving #2
+                long rtt = now - _con.getCreated();
+                // our (Alice's) timestamp in seconds
+                _tsA = (now + 500) / 1000;
+                _peerSkew = (now - (_tsB * 1000) - (rtt / 2) + 500) / 1000; 
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(prefix()+"h(X+Y) is correct, tsA-tsB=" + (_tsA-_tsB));
+                    _log.debug(prefix()+"h(X+Y) is correct, skew = " + _peerSkew);
 
                 // the skew is not authenticated yet, but it is certainly fatal to
                 // the establishment, so fail hard if appropriate
-                long diff = 1000*Math.abs(_tsA-_tsB);
+                long diff = 1000*Math.abs(_peerSkew);
                 if (!_context.clock().getUpdatedSuccessfully()) {
                     // Adjust the clock one time in desperation
-                    _context.clock().setOffset(1000 * (_tsB - _tsA), true);
-                    _tsA = _tsB;
+                    // We are Alice, he is Bob, adjust to match Bob
+                    _context.clock().setOffset(1000 * (0 - _peerSkew), true);
+                    _peerSkew = 0;
                     if (diff != 0)
                         _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
@@ -538,7 +559,7 @@ class EstablishState {
                     _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
                                                        _con.getRemotePeer().calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
-                    _transport.setLastBadSkew(_tsA- _tsB);
+                    _transport.setLastBadSkew(_peerSkew);
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
@@ -593,6 +614,8 @@ class EstablishState {
                 _transport.getPumper().wantsWrite(_con, _prevEncrypted);
             }
         }
+
+        // Read in message #4
         if (_state == State.OB_SENT_RI && src.hasRemaining()) {
             // we are receiving their confirmation
 
@@ -656,7 +679,8 @@ class EstablishState {
                         byte nextWriteIV[] = _curEncrypted; // reuse buf
                         System.arraycopy(_prevEncrypted, _prevEncrypted.length-AES_SIZE, nextWriteIV, 0, AES_SIZE);
                         // this does not copy the nextWriteIV, do not release to cache
-                        _con.finishOutboundEstablishment(_dh.getSessionKey(), (_tsA-_tsB), nextWriteIV, _e_bobSig); // skew in seconds
+                        // We are Alice, he is Bob, clock skew is Bob - Alice
+                        _con.finishOutboundEstablishment(_dh.getSessionKey(), _peerSkew, nextWriteIV, _e_bobSig); // skew in seconds
                         releaseBufs(true);
                         // if socket gets closed this will be null - prevent NPE
                         InetAddress ia = _con.getChannel().socket().getInetAddress();
@@ -783,7 +807,15 @@ class EstablishState {
         byte b[] = _sz_aliceIdent_tsA_padding_aliceSig.toByteArray();
         try {
             int sz = _aliceIdentSize;
+            // her timestamp from message #3
             long tsA = DataHelper.fromLong(b, 2+sz, 4);
+            // _tsB is when we sent message #2
+            // Adjust backward by RTT/2
+            long now = _context.clock().now();
+            // rtt from sending #2 to receiving #3
+            long rtt = now - _con.getCreated();
+            _peerSkew = (now - (tsA * 1000) - (rtt / 2) + 500) / 1000; 
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream(768);
             baos.write(_X);
             baos.write(_Y);
@@ -827,12 +859,13 @@ class EstablishState {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix() + "verification successful for " + _con);
 
-                long diff = 1000*Math.abs(tsA-_tsB);
+                long diff = 1000*Math.abs(_peerSkew);
                 if (!_context.clock().getUpdatedSuccessfully()) {
                     // Adjust the clock one time in desperation
                     // This isn't very likely, outbound will do it first
-                    _context.clock().setOffset(1000 * (_tsB - tsA), true);
-                    tsA = _tsB;
+                    // We are Bob, she is Alice, adjust to match Alice
+                    _context.clock().setOffset(1000 * (0 - _peerSkew), true);
+                    _peerSkew = 0;
                     if (diff != 0)
                         _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
@@ -842,21 +875,22 @@ class EstablishState {
                     _context.banlist().banlistRouter(DataHelper.formatDuration(diff),
                                                        _aliceIdent.calculateHash(),
                                                        _x("Excessive clock skew: {0}"));
-                    _transport.setLastBadSkew(tsA- _tsB);
+                    _transport.setLastBadSkew(_peerSkew);
                     fail("Clocks too skewed (" + diff + " ms)", null, true);
                     return;
                 } else if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug(prefix()+"Clock skew: " + diff + " ms");
                 }
 
-                sendInboundConfirm(_aliceIdent, tsA);
                 _con.setRemotePeer(_aliceIdent);
+                sendInboundConfirm(_aliceIdent, tsA);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"e_bobSig is " + _e_bobSig.length + " bytes long");
                 byte iv[] = _curEncrypted;  // reuse buf
                 System.arraycopy(_e_bobSig, _e_bobSig.length-AES_SIZE, iv, 0, AES_SIZE);
                 // this does not copy the IV, do not release to cache
-                _con.finishInboundEstablishment(_dh.getSessionKey(), (tsA-_tsB), iv, _prevEncrypted); // skew in seconds
+                // We are Bob, she is Alice, clock skew is Alice-Bob
+                _con.finishInboundEstablishment(_dh.getSessionKey(), _peerSkew, iv, _prevEncrypted); // skew in seconds
                 releaseBufs(true);
                 if (_log.shouldLog(Log.INFO))
                     _log.info(prefix()+"Verified remote peer as " + _aliceIdent.calculateHash());
@@ -1090,7 +1124,7 @@ class EstablishState {
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
 
-        @Override public String toString() { return "VerifiedEstablishState";}
+        @Override public String toString() { return "VerifiedEstablishState: ";}
     }
 
     /**
@@ -1108,7 +1142,7 @@ class EstablishState {
             log.warn("prepareOutbound() on verified state, doing nothing!");
         }
 
-        @Override public String toString() { return "FailedEstablishState";}
+        @Override public String toString() { return "FailedEstablishState: ";}
     }
 
     /** @deprecated unused */

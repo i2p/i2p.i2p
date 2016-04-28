@@ -9,6 +9,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Receive new connection attempts
@@ -23,6 +24,7 @@ class ConnectionHandler {
     private final Log _log;
     private final ConnectionManager _manager;
     private final LinkedBlockingQueue<Packet> _synQueue;
+    private final SimpleTimer2 _timer;
     private volatile boolean _active;
     private int _acceptTimeout;
     
@@ -37,19 +39,20 @@ class ConnectionHandler {
     private static final int MAX_QUEUE_SIZE = 64;
     
     /** Creates a new instance of ConnectionHandler */
-    public ConnectionHandler(I2PAppContext context, ConnectionManager mgr) {
+    public ConnectionHandler(I2PAppContext context, ConnectionManager mgr, SimpleTimer2 timer) {
         _context = context;
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
+        _timer = timer;
         _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     
     public synchronized void setActive(boolean active) { 
         // FIXME active=false this only kills for one thread in accept()
-        // if they are more, they won't ket a poison packet.
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("setActive(" + active + ") called");
+        // if there are more, they won't get a poison packet.
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("setActive(" + active + ") called, previously " + _active, new Exception("I did it"));
         // if starting, clear any old poison
         // if stopping, the accept() loop will clear any pending sockets
         if (active && !_active)
@@ -96,7 +99,7 @@ class ConnectionHandler {
         // also check if expiration of the head is long past for overload detection with peek() ?
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
-            _context.simpleScheduler().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+            _timer.addEvent(new TimeoutSyn(packet), _acceptTimeout);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Dropping new SYN request, as the queue is full");
@@ -243,13 +246,14 @@ class ConnectionHandler {
                 _log.warn("Received a spoofed SYN packet: they said they were " + packet.getOptionalFrom());
             return;
         }
-        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom());
+        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom(), packet.getSession());
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setAckThrough(packet.getSequenceNum());
         reply.setSendStreamId(packet.getReceiveStreamId());
         reply.setReceiveStreamId(0);
-        reply.setOptionalFrom(_manager.getSession().getMyDestination());
+        // TODO remove this someday, as of 0.9.20 we do not require it
+        reply.setOptionalFrom();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);
         // this just sends the packet - no retries or whatnot
@@ -291,7 +295,15 @@ class ConnectionHandler {
         public static final int POISON_MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
 
         public PoisonPacket() {
-            setOptionalDelay(POISON_MAX_DELAY_REQUEST);
+            super(null);
+        }
+
+        @Override
+        public int getOptionalDelay() { return POISON_MAX_DELAY_REQUEST; }
+
+        @Override
+        public String toString() {
+            return "POISON";
         }
     }
 }

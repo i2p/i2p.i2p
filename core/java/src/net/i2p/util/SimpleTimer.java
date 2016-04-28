@@ -14,7 +14,7 @@ import net.i2p.I2PAppContext;
  * they b0rk the timer).
  *
  * WARNING - Deprecated.
- * This is an inefficient mess. Use SimpleScheduler or SimpleTimer2 if possible.
+ * This is an inefficient mess. Use  SimpleTimer2 if possible.
  */
 public class SimpleTimer {
 
@@ -22,6 +22,7 @@ public class SimpleTimer {
      *  If you have a context, use context.simpleTimer() instead
      *  @deprecated use SimpleTimer2
      */
+	@Deprecated
     public static SimpleTimer getInstance() {
         return I2PAppContext.getGlobalContext().simpleTimer();
     }
@@ -41,6 +42,7 @@ public class SimpleTimer {
      *  Others should use context.simpleTimer() instead
      *  @deprecated use SimpleTimer2
      */
+    @Deprecated
     public SimpleTimer(I2PAppContext context) {
         this(context, "SimpleTimer");
     }
@@ -50,6 +52,7 @@ public class SimpleTimer {
      *  Others should use context.simpleTimer() instead
      *  @deprecated use SimpleTimer2
      */
+    @Deprecated
     private SimpleTimer(I2PAppContext context, String name) {
         runn = new SimpleStore(true);
         _log = context.logManager().getLog(SimpleTimer.class);

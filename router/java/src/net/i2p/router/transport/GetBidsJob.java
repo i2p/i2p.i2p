@@ -29,6 +29,7 @@ class GetBidsJob extends JobImpl {
     /**
      *  @deprecated unused, see static getBids()
      */
+    @Deprecated
     public GetBidsJob(RouterContext ctx, TransportManager tmgr, OutNetMessage msg) {
         super(ctx);
         _log = ctx.logManager().getLog(GetBidsJob.class);
@@ -58,7 +59,7 @@ class GetBidsJob extends JobImpl {
         Hash us = context.routerHash();
         if (to.equals(us)) {
             if (log.shouldLog(Log.ERROR))
-                log.error("wtf, send a message to ourselves?  nuh uh. msg = " + msg);
+                log.error("send a message to ourselves?  nuh uh. msg = " + msg);
             context.statManager().addRateData("transport.bidFailSelf", msg.getLifetime());
             fail(context, msg);
             return;

@@ -1,14 +1,17 @@
 package net.i2p.router.web;
 
-import java.util.ArrayList;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +29,9 @@ import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
-import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
+import net.i2p.router.news.NewsManager;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -288,8 +292,10 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.17 */
     private void checkJavaVersion() {
         boolean noJava7 = !SystemVersion.isJava7();
-        boolean noPack200 = !FileUtil.isPack200Supported();
-        if (noJava7 || noPack200) {
+        boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
+                            !FileUtil.isPack200Supported();
+        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
+        if (noJava7 || noPack200 || openARM) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -298,12 +304,17 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava7) {
-                s = "Java 7 will be required by mid-2015, please upgrade soon";
+                s = "Java 7 is now required, please upgrade";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 will be required by mid-2015, please upgrade Java soon";
+                s = "Pack200 is required for plugins and automatic updates, please upgrade Java";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+            if (openARM) {
+                s = "OpenJDK is not recommended for ARM. Use Oracle Java 8";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -441,6 +452,7 @@ public class RouterConsoleRunner implements RouterApp {
                     System.err.println("Bad routerconsole port " + _listenPort);
             }
             if (lport > 0) {
+                List<String> hosts = new ArrayList<String>(2);
                 StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
@@ -489,13 +501,20 @@ public class RouterConsoleRunner implements RouterApp {
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
+                        hosts.add(host);
                     } catch (Exception ioe) {
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ": " + ioe);
                         System.err.println("You may ignore this warning if the console is still available at http://localhost:" + _listenPort);
                     }
                 }
-                // XXX: what if listenhosts do not include 127.0.0.1? (Should that ever even happen?)
-                _context.portMapper().register(PortMapper.SVC_CONSOLE,lport);
+                if (hosts.isEmpty()) {
+                    _context.portMapper().register(PortMapper.SVC_CONSOLE, lport);
+                } else {
+                    // put IPv4 first
+                    Collections.sort(hosts, new HostComparator());
+                    _context.portMapper().register(PortMapper.SVC_CONSOLE, hosts.get(0), lport);
+                    // note that we could still fail in connector.start() below
+                }
             }
 
             // add SSL listeners
@@ -517,8 +536,9 @@ public class RouterConsoleRunner implements RouterApp {
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                     sslFactory.addExcludeProtocols(I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.toArray(
                                                    new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
-                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.INCLUDE_CIPHERS.toArray(
+                    sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
                                                       new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
+                    List<String> hosts = new ArrayList<String>(2);
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
@@ -560,6 +580,7 @@ public class RouterConsoleRunner implements RouterApp {
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;
+                            hosts.add(host);
                         } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
                             if (SystemVersion.isGNU())
@@ -567,7 +588,14 @@ public class RouterConsoleRunner implements RouterApp {
                             System.err.println("You may ignore this warning if the console is still available at https://localhost:" + sslPort);
                         }
                     }
-                    _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);
+                    if (hosts.isEmpty()) {
+                        _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, sslPort);
+                    } else {
+                        // put IPv4 first
+                        Collections.sort(hosts, new HostComparator());
+                        _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, hosts.get(0), sslPort);
+                        // note that we could still fail in connector.start() below
+                    }
                 } else {
                     System.err.println("Unable to create or access keystore for SSL: " + keyStore.getAbsolutePath());
                 }
@@ -629,8 +657,9 @@ public class RouterConsoleRunner implements RouterApp {
                 }
             }
             if (error) {
+                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : "7657");
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
-                               "If your console is still accessible at http://127.0.0.1:" + _listenPort + "/,\n" +
+                               "If your console is still accessible at http://127.0.0.1:" + port + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");
@@ -706,6 +735,8 @@ public class RouterConsoleRunner implements RouterApp {
         
             ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
+            NewsManager nm = new NewsManager(_context, _mgr, null);
+            nm.startup();
         
             if (PluginStarter.pluginsEnabled(_context)) {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
@@ -757,6 +788,13 @@ public class RouterConsoleRunner implements RouterApp {
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
+                // export cert, fails silently
+                File dir = new SecureDirectory(_context.getConfigDir(), "certificates");
+                dir.mkdir();
+                dir = new SecureDirectory(dir, "console");
+                dir.mkdir();
+                File certFile = new File(dir, "console.local.crt");
+                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {
@@ -887,6 +925,21 @@ public class RouterConsoleRunner implements RouterApp {
         }
     }
 
+    /**
+     * Put IPv4 first
+     * @since 0.9.24
+     */
+    private static class HostComparator implements Comparator<String>, Serializable {
+         public int compare(String l, String r) {
+             boolean l4 = l.contains(".");
+             boolean r4 = r.contains(".");
+             if (l4 && !r4)
+                 return -1;
+             if (r4 && !l4)
+                 return 1;
+             return l.compareTo(r);
+        }
+    }
     
     /**
      * Just to set the name and set Daemon

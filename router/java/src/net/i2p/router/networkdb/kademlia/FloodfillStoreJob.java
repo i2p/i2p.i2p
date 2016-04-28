@@ -20,6 +20,8 @@ import net.i2p.util.Log;
 /**
  *  This extends StoreJob to fire off a FloodfillVerifyStoreJob after success.
  *
+ *  Stores through this class always request a reply.
+ *
  */
 class FloodfillStoreJob extends StoreJob {    
     private final FloodfillNetworkDatabaseFacade _facade;

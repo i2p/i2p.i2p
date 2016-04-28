@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -12,7 +13,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
-import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 
@@ -68,17 +68,18 @@ import net.i2p.util.Log;
  *
  */
 class Packet {
+    protected final I2PSession _session;
     private long _sendStreamId;
     private long _receiveStreamId;
     private long _sequenceNum;
     private long _ackThrough;
-    private long _nacks[];
+    protected long _nacks[];
     private int _resendDelay;
     private int _flags;
     private ByteArray _payload;
     // the next four are set only if the flags say so
-    private Signature _optionSignature;
-    private Destination _optionFrom;
+    protected Signature _optionSignature;
+    protected Destination _optionFrom;
     private int _optionDelay;
     private int _optionMaxSize;
     private int _localPort;
@@ -168,8 +169,15 @@ class Packet {
      *  Does no initialization.
      *  See readPacket() for inbound packets, and the setters for outbound packets.
      */
-    public Packet() { }
+    public Packet(I2PSession session) {
+        _session = session;
+    }
     
+    /** @since 0.9.21 */
+    public I2PSession getSession() {
+        return _session;
+    }
+
     private boolean _sendStreamIdSet = false;
 
     /** what stream do we send data to the peer on?
@@ -335,10 +343,13 @@ class Packet {
      */
     public Destination getOptionalFrom() { return _optionFrom; }
 
-    public void setOptionalFrom(Destination from) { 
-        setFlag(FLAG_FROM_INCLUDED, from != null);
-        if (from == null) throw new RuntimeException("from is null!?");
-        _optionFrom = from; 
+    /** 
+     * This sets the from field in the packet to the Destination for the session
+     * provided in the constructor.
+     */
+    public void setOptionalFrom() { 
+        setFlag(FLAG_FROM_INCLUDED, true);
+        _optionFrom = _session.getMyDestination();
     }
     
     /** 
@@ -420,7 +431,7 @@ class Packet {
      * @param fakeSigLen if 0, include the real signature in _optionSignature;
      *                   if nonzero, leave space for that many bytes
      */
-    private int writePacket(byte buffer[], int offset, int fakeSigLen) throws IllegalStateException {
+    protected int writePacket(byte buffer[], int offset, int fakeSigLen) throws IllegalStateException {
         int cur = offset;
         DataHelper.toLong(buffer, cur, 4, (_sendStreamId >= 0 ? _sendStreamId : STREAM_ID_UNKNOWN));
         cur += 4;
@@ -509,10 +520,10 @@ class Packet {
         return cur - offset;
     }
     
-    
     /**
      * how large would this packet be if we wrote it
      * @return How large the current packet would be
+     *
      * @throws IllegalStateException 
      */
     private int writtenSize() {
@@ -547,6 +558,8 @@ class Packet {
         
         return size;
     }
+    
+
     /**
      * Read the packet from the buffer (starting at the offset) and return
      * the number of bytes read.
@@ -572,7 +585,7 @@ class Packet {
         cur += 4;
         setAckThrough(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        int numNacks = (int)DataHelper.fromLong(buffer, cur, 1);
+        int numNacks = buffer[cur] & 0xff;
         cur++;
         if (length < 22 + numNacks*4)
             throw new IllegalArgumentException("Too small with " + numNacks + " nacks: " + length);
@@ -586,7 +599,7 @@ class Packet {
         } else {
             setNacks(null);
         }
-        setResendDelay((int)DataHelper.fromLong(buffer, cur, 1));
+        setResendDelay(buffer[cur] & 0xff);
         cur++;
         setFlags((int)DataHelper.fromLong(buffer, cur, 2));
         cur += 2;
@@ -620,7 +633,7 @@ class Packet {
             try {
                 Destination optionFrom = Destination.create(bais);
                 cur += optionFrom.size();
-                setOptionalFrom(optionFrom);
+                _optionFrom = optionFrom;
             } catch (IOException ioe) {
                 throw new IllegalArgumentException("Bad from field", ioe);
             } catch (DataFormatException dfe) {
@@ -720,45 +733,6 @@ class Packet {
         }
         return ok;
     }
-
-    /**
-     * Sign and write the packet to the buffer (starting at the offset) and return
-     * the number of bytes written.
-     *
-     * @param buffer data to be written
-     * @param offset starting point in the buffer
-     * @param ctx Application Context
-     * @param key signing key
-     * @return Count of bytes written
-     * @throws IllegalStateException if there is data missing or otherwise b0rked
-     */
-    public int writeSignedPacket(byte buffer[], int offset, I2PAppContext ctx, SigningPrivateKey key) throws IllegalStateException {
-        setFlag(FLAG_SIGNATURE_INCLUDED);
-        int size = writePacket(buffer, offset, key.getType().getSigLen());
-        _optionSignature = ctx.dsa().sign(buffer, offset, size, key);
-        //if (false) {
-        //    Log l = ctx.logManager().getLog(Packet.class);
-        //    l.error("Signing: " + toString());
-        //    l.error(Base64.encode(buffer, 0, size));
-        //    l.error("Signature: " + Base64.encode(_optionSignature.getData()));
-        //}
-        // jump into the signed data and inject the signature where we 
-        // previously placed a bunch of zeroes
-        int signatureOffset = offset 
-                              + 4 // sendStreamId
-                              + 4 // receiveStreamId
-                              + 4 // sequenceNum
-                              + 4 // ackThrough
-                              + (_nacks != null ? 4*_nacks.length + 1 : 1)
-                              + 1 // resendDelay
-                              + 2 // flags
-                              + 2 // optionSize
-                              + (isFlagSet(FLAG_DELAY_REQUESTED) ? 2 : 0)
-                              + (isFlagSet(FLAG_FROM_INCLUDED) ? _optionFrom.size() : 0)
-                              + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
-        System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, _optionSignature.length());
-        return size;
-    }
     
     @Override
     public String toString() {
@@ -806,7 +780,7 @@ class Packet {
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
-        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG");
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG ").append(_optionSignature.length());
         if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
         if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
     }

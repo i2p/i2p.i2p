@@ -6,6 +6,7 @@ package net.i2p.i2ptunnel.irc;
 import java.net.Socket;
 import java.io.IOException;
 
+import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
@@ -37,6 +38,9 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
     public static final String CONNECT_STOP_EVENT = "connectionStopped";
 
     /**
+     * As of 0.9.20 this is fast, and does NOT connect the manager to the router,
+     * or open the local socket. You MUST call startRunning() for that.
+     *
      * @param dest the target, presumably b32
      * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -51,8 +55,6 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         _expires = tunnel.getContext().clock().now() + INBOUND_EXPIRE;
 
         setName("DCC send -> " + dest + ':' + remotePort);
-
-        startRunning();
     }
 
     /**
@@ -76,8 +78,17 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         try {
             i2ps = createI2PSocket(dest, opts);
             Thread t = new Runner(s, i2ps);
-            t.start();
-        } catch (Exception ex) {
+            // we are called from an unlimited thread pool, so run inline
+            //t.start();
+            t.run();
+        } catch (IOException ex) {
+            _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
+            closeSocket(s);
+            if (i2ps != null) {
+                try { i2ps.close(); } catch (IOException ioe) {}
+            }
+            notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
+        } catch (I2PException ex) {
             _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
             closeSocket(s);
             if (i2ps != null) {

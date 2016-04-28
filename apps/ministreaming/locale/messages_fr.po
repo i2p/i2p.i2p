@@ -4,13 +4,13 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Towinet, 2014
+# Towinet, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-23 17:55+0000\n"
-"PO-Revision-Date: 2014-06-26 19:02+0000\n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2015-04-01 04:22+0000\n"
 "Last-Translator: Towinet\n"
 "Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -19,72 +19,76 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:58
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
 msgstr "Échéance de message"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:61
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
 msgstr "Échec de livraison vers la destination locale"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:64
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:97
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
 msgid "Local router failure"
 msgstr "Échec de routeur local"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:67
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
 msgid "Local network failure"
 msgstr "Échec de réseau local"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:70
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
 msgid "Session closed"
 msgstr "Session fermée"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:73
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
 msgid "Invalid message"
 msgstr "Message invalide"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:76
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
 msgid "Invalid message options"
 msgstr "Options de message invalide"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:79
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
 msgid "Buffer overflow"
 msgstr "Débordement de buffer"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:82
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
 msgid "Message expired"
 msgstr "Message expiré"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:85
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
 msgstr "Jeu de bail local invalide"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:88
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
 msgstr "Pas de tunnels locaux"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:91
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
 msgid "Unsupported encryption options"
 msgstr "Options de chiffrement non supportées"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:94
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
 msgid "Invalid destination"
 msgstr "Destination invalide"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:100
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
 msgstr "Jeu de bail de la destination expiré"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:103
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
 msgstr "Jeu de bail de la destination non trouvé"
 
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:106
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"
 msgstr "Arrêt de la destination locale"
 
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
+msgid "Connection was reset"
+msgstr "La connexion a été réinitialisée"
+
 #. Translate this one here, can't do it later
-#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:113
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
 msgid "Failure code"
 msgstr "Code d'échec"

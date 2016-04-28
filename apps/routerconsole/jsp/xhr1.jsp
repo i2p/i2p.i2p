@@ -8,6 +8,7 @@
    if (request.getParameter("i2p.contextId") != null) {
        session.setAttribute("i2p.contextId", request.getParameter("i2p.contextId"));
    }
+   response.setHeader("X-Content-Type-Options", "nosniff");
 %>
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
 <jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

@@ -15,7 +15,9 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -74,6 +77,8 @@ public class SingleFileNamingService extends NamingService {
     }
 
     /** 
+     *  Will strip a "www." prefix and retry if lookup fails
+     *
      *  @param hostname case-sensitive; caller should convert to lower case
      *  @param lookupOptions ignored
      *  @param storedOptions ignored
@@ -82,9 +87,11 @@ public class SingleFileNamingService extends NamingService {
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
         try {
             String key = getKey(hostname);
+            if (key == null && hostname.startsWith("www.") && hostname.length() > 7)
+                key = getKey(hostname.substring(4));
             if (key != null)
                 return lookupBase64(key);
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))
@@ -116,7 +123,7 @@ public class SingleFileNamingService extends NamingService {
                     return line.substring(0, split);
             }
             return null;
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))
@@ -158,7 +165,8 @@ public class SingleFileNamingService extends NamingService {
 
     /** 
      *  @param hostname case-sensitive; caller should convert to lower case
-     *  @param options ignored
+     *  @param options if non-null, any prefixed with '=' will be appended
+     *                 in subscription format
      */
     @Override
     public boolean put(String hostname, Destination d, Properties options) {
@@ -189,6 +197,9 @@ public class SingleFileNamingService extends NamingService {
             out.write(hostname);
             out.write('=');
             out.write(d.toBase64());
+            // subscription options
+            if (options != null)
+                writeOptions(options, out);
             out.newLine();
             out.close();
             boolean success = FileUtil.rename(tmp, _file);
@@ -208,11 +219,12 @@ public class SingleFileNamingService extends NamingService {
 
     /** 
      *  @param hostname case-sensitive; caller should convert to lower case
-     *  @param options ignored
+     *  @param options if non-null, any prefixed with '=' will be appended
+     *                 in subscription format
      */
     @Override
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
-        OutputStream out = null;
+        BufferedWriter out = null;
         if (!getWriteLock())
             return false;
         try {
@@ -229,11 +241,14 @@ public class SingleFileNamingService extends NamingService {
                 }
                 // else new file
             }
-            out = new SecureFileOutputStream(_file, true);
+            out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(_file, true), "UTF-8"));
             // FIXME fails if previous last line didn't have a trailing \n
-            out.write(hostname.getBytes("UTF-8"));
+            out.write(hostname);
             out.write('=');
-            out.write(d.toBase64().getBytes());
+            out.write(d.toBase64());
+            // subscription options
+            if (options != null)
+                writeOptions(options, out);
             out.write('\n');
             out.close();
             for (NamingServiceListener nsl : _listeners) { 
@@ -245,6 +260,34 @@ public class SingleFileNamingService extends NamingService {
             _log.error("Error adding " + hostname, ioe);
             return false;
         } finally { releaseWriteLock(); }
+    }
+
+    /** 
+     *  Write the subscription options part of the line (including the #!).
+     *  Only options starting with '=' (if any) are written (with the '=' stripped).
+     *  Does not write a newline.
+     *
+     *  @param options non-null
+     *  @since 0.9.26
+     */
+    private static void writeOptions(Properties options, Writer out) throws IOException {
+        boolean started = false;
+        for (Map.Entry<Object, Object> e : options.entrySet()) {
+            String k = (String) e.getKey();
+            if (!k.startsWith("="))
+                continue;
+            k = k.substring(1);
+            String v = (String) e.getValue();
+            if (started) {
+                out.write(HostTxtEntry.PROP_SEPARATOR);
+            } else {
+                started = true;
+                out.write(HostTxtEntry.PROPS_SEPARATOR);
+            }
+            out.write(k);
+            out.write('=');
+            out.write(v);
+        }
     }
 
     /** 
@@ -358,6 +401,103 @@ public class SingleFileNamingService extends NamingService {
         } catch (IOException ioe) {
             _log.error("getEntries error", ioe);
             return Collections.emptyMap();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
+        }
+    }
+
+    /**
+     *  Overridden since we store base64 natively.
+     *
+     *  @param options As follows:
+     *                 Key "search": return only those matching substring
+     *                 Key "startsWith": return only those starting with
+     *                                   ("[0-9]" allowed)
+     *  @return all mappings (matching the options if non-null)
+     *          or empty Map if none.
+     *          Returned Map is not sorted.
+     *  @since 0.9.20
+     */
+    public Map<String, String> getBase64Entries(Properties options) {
+        if (!_file.exists())
+            return Collections.emptyMap();
+        String searchOpt = null;
+        String startsWith = null;
+        if (options != null) {
+            searchOpt = options.getProperty("search");
+            startsWith = options.getProperty("startsWith");
+        }
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            Map<String, String> rv = new HashMap<String, String>();
+            while ( (line = in.readLine()) != null) {
+                if (line.length() <= 0)
+                    continue;
+                if (startsWith != null) {
+                    if (startsWith.equals("[0-9]")) {
+                        if (line.charAt(0) < '0' || line.charAt(0) > '9')
+                            continue;
+                    } else if (!line.startsWith(startsWith)) {
+                        continue;
+                    }
+                }
+                if (line.startsWith("#"))
+                    continue;
+                if (line.indexOf('#') > 0)  // trim off any end of line comment
+                    line = line.substring(0, line.indexOf('#')).trim();
+                int split = line.indexOf('=');
+                if (split <= 0)
+                    continue;
+                String key = line.substring(0, split);
+                if (searchOpt != null && key.indexOf(searchOpt) < 0)
+                    continue;
+                String b64 = line.substring(split+1);   //.trim() ??????????????
+                if (b64.length() < 387)
+                    continue;
+                rv.put(key, b64);
+            }
+            if (searchOpt == null && startsWith == null) {
+                _lastWrite = _file.lastModified();
+                _size = rv.size();
+            }
+            return rv;
+        } catch (IOException ioe) {
+            _log.error("getEntries error", ioe);
+            return Collections.emptyMap();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
+        }
+    }
+
+    /**
+     *  Overridden for efficiency.
+     *  Output is not sorted.
+     *
+     *  @param options ignored
+     *  @since 0.9.20
+     */
+    public void export(Writer out, Properties options) throws IOException {
+        out.write("# Address book: ");
+        out.write(getName());
+        final String nl = System.getProperty("line.separator", "\n");
+        out.write(nl);
+        out.write("# Exported: ");
+        out.write((new Date()).toString());
+        out.write(nl);
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                out.write(line);
+                out.write(nl);
+            }
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();

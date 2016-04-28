@@ -30,7 +30,6 @@ public class GarlicMessageReceiver {
     private final Log _log;
     private final CloveReceiver _receiver;
     private final Hash _clientDestination;
-    private final GarlicMessageParser _parser;
    
     public interface CloveReceiver {
         public void handleClove(DeliveryInstructions instructions, I2NPMessage data);
@@ -50,15 +49,14 @@ public class GarlicMessageReceiver {
         _context = context;
         _log = context.logManager().getLog(GarlicMessageReceiver.class);
         _clientDestination = clientDestination;
-        _parser = new GarlicMessageParser(context);
         _receiver = receiver;
         //_log.error("New GMR dest = " + clientDestination);
         // all createRateStat in OCMOSJ.init()
     }
     
     public void receive(GarlicMessage message) {
-        PrivateKey decryptionKey = null;
-        SessionKeyManager skm = null;
+        PrivateKey decryptionKey;
+        SessionKeyManager skm;
         if (_clientDestination != null) {
             LeaseSetKeys keys = _context.keyManager().getKeys(_clientDestination);
             skm = _context.clientManager().getClientSessionKeyManager(_clientDestination);
@@ -74,7 +72,7 @@ public class GarlicMessageReceiver {
             skm = _context.sessionKeyManager();
         }
         
-        CloveSet set = _parser.getGarlicCloves(message, decryptionKey, skm);
+        CloveSet set = _context.garlicMessageParser().getGarlicCloves(message, decryptionKey, skm);
         if (set != null) {
             for (int i = 0; i < set.getCloveCount(); i++) {
                 GarlicClove clove = set.getClove(i);
@@ -109,7 +107,8 @@ public class GarlicMessageReceiver {
     private boolean isValid(GarlicClove clove) {
         String invalidReason = _context.messageValidator().validateMessage(clove.getCloveId(), 
                                                                           clove.getExpiration().getTime());
-        if (invalidReason != null) {
+        boolean rv = invalidReason == null;
+        if (!rv) {
             String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Clove is NOT valid: id=" + clove.getCloveId() 
@@ -121,6 +120,6 @@ public class GarlicMessageReceiver {
                                                              clove.getData().getClass().getSimpleName(), 
                                                              "Clove is not valid (expiration " + howLongAgo + " ago)");
         }
-        return (invalidReason == null);
+        return rv;
     }
 }

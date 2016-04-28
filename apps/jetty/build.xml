@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.ver" value="8.1.16.v20140903" />
+    <!-- This copies jars, with some modifications and renaming,
+         from the jetty-distribution directory to the jettylib directory.
+         This is disabled if the property with-libjetty8-java=true.
+
+         This copies jars, with some modifications and renaming,
+         from the apache-tomcat-deployer and apache-tomcat directories to the jettylib directory.
+         This is disabled if the property with-libservlet2.5-java=true.
+
+         This also builds the small helper jar jetty-i2p.jar from
+         the source in the java/ directory.
+     -->
+
+    <property name="jetty.ver" value="8.1.17.v20150415" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="5440b33a722d82b746b9ce50168bfce3c22af349" />
+    <property name="jetty.sha1" value="ce7bcd1bdcdac4cf130467f6d55155b9e1517e71" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.6" />
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
-    <property name="tomcat.ver" value="6.0.41" />
+    <property name="tomcat.ver" value="6.0.44" />
     <property name="tomcat2.lib" value="apache-tomcat-${tomcat.ver}/lib" />
     <property name="tomcat2.lib.small" value="apache-tomcat/lib" />
 
@@ -22,16 +34,34 @@
       - updating to a new Jetty version by changing ${jetty.ver} and ${jetty.sha1} above.
      -->
 
-    <target name="ensureJettylib" >
-        <available property="jetty.zip.extracted" file="${jetty.base}" type="dir" />
+    <!-- verify everything we need is in jettylib/ -->
+    <target name="ensureJettylib" depends="ensureJettylib1, copyJettylib" />
+
+    <target name="ensureJettylib1" >
+        <condition property="jetty.zip.extracted" >
+            <or>
+                <istrue value="${with-libjetty8-java}" />
+                <available file="${jetty.base}" type="dir" />
+            </or>
+        </condition>
         <condition property="jetty.zip.available" >
             <or>
                 <istrue value="${jetty.zip.extracted}" />
                 <available file="${jetty.filename}" type="file" />
             </or>
         </condition>
-        <ant target="copyJettylib" />
+        <condition property="verified.already" >
+            <or>
+                <istrue value="${with-libjetty8-java}" />
+                <istrue value="${jetty.zip.extracted}" />
+                <and>
+                    <available file="${jetty.filename}" />
+                    <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
+                </and>
+            </or>
+        </condition>
     </target>
+
   <!--
     <target name="ensureJettylib" depends="extractJettylib" />
    -->
@@ -60,16 +90,6 @@
         <get src="${jetty.url}" verbose="true" dest="${jetty.filename}" />
     </target>
 
-    <condition property="verified.already" >
-        <or>
-            <istrue value="${jetty.zip.extracted}" />
-            <and>
-                <available file="${jetty.filename}" />
-                <uptodate property="foo.bar.baz" srcfile="${jetty.filename}" targetfile="${verified.filename}" />
-            </and>
-        </or>
-    </condition>
-
     <target name="verifyJettylib" depends="fetchJettylib" unless="verified.already" >
         <condition property="jetty.zip.verified" >
                 <checksum file="${jetty.filename}" algorithm="SHA" property="${jetty.sha1}" />
@@ -94,8 +114,15 @@
         <unzip src="${jetty.filename}" dest="." />
     </target>
 
-    <target name="copyJettylib" depends="extractJettylib" >
+    <target name="mkJettylibdir" >
         <mkdir dir="jettylib" />
+    </target>
+
+    <!-- Jetty and tomcat files -->
+    <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib" />
+
+    <!-- Jetty files only -->
+    <target name="copyJettylib1" depends="extractJettylib" unless="${with-libjetty8-java}" >
       <!-- We copy everything to names without the version numbers so we
            can update them later. Where there was something similar in Jetty 5/6,
            we use the same names so they will overwrite the Jetty 5/6 jar on upgrade.
@@ -149,10 +176,14 @@
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over,
              needed for old plugins and things. We add tomcat-juli below.
           -->
+      <!--
+        * Removed in 0.9.24, see ticket #1679
+        * Jetty now uses tomcat-juli (added below to commons-logging.jar), not commons-logging proper,
+        * and no known plugins use it either.
         <jar destfile="jettylib/commons-logging.jar" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="META-INF/LICENSE.txt META-INF/NOTICE.txt" src="../../installer/lib/launch4j/lib/commons-logging.jar" />
         </jar>
-        <ant target="copyTomcatLib" />
+      -->
     </target>
 
     <!-- Tomcat util jar.
@@ -164,7 +195,7 @@
          Apparently this is only required for precompilation of jsps, so this is put in
          with the JspC compiler jasper-runtime.jar below.
      -->
-    <target name="buildTomcatUtilJar" >
+    <target name="buildTomcatUtilJar" unless="${with-libservlet2.5-java}" >
         <!-- take only what we need from the tomcat-coyote jar -->
         <jar destfile="${tomcat2.lib.small}/tomcat-coyote-util.jar" >
             <zipfileset src="${tomcat2.lib}/tomcat-coyote.jar"
@@ -187,14 +218,33 @@
          If we go to Tomcat 7:
          tomcat-api.jar + tomcat-util.jar: Add to javax.servlet.jar (as of Tomcat 7 / Jetty 8)
      -->
-    <target name="copyTomcatLib" >
-        <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
-            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
-            <zipfileset src="${tomcat2.lib.small}/tomcat-coyote-util.jar" />
-        </jar>
+    <target name="copyTomcatLib" depends="mkJettylibdir, copyTomcatLib1, copyTomcatLib2, copyTomcatLib3" />
+
+    <target name="copyTomcatLib1" unless="${with-libservlet2.5-java}" >
+        <condition property="with-libtomcat-java" >
+            <or>
+                <istrue value="${with-libtomcat6-java}" />
+                <istrue value="${with-libtomcat7-java}" />
+            </or>
+        </condition>
+    </target>
+
+
+    <target name="copyTomcatLib2" unless="${with-libtomcat-java}" >
+        <!-- EL libs.
+             Tomcat 6 has EL 2.1.
+             Tomcat 7 / libservlet3.0 has EL 2.2.
+             According to http://stackoverflow.com/questions/7202686/differences-between-el-2-1-and-2-2
+             2.2 is backwards-compatible with 2.1.
+         -->
         <jar destfile="jettylib/commons-el.jar" duplicate="preserve" filesetmanifest="merge" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
+        </jar>
+
+        <jar destfile="jettylib/jasper-runtime.jar" filesetmanifest="merge" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
+            <zipfileset src="${tomcat2.lib.small}/tomcat-coyote-util.jar" />
         </jar>
 <!--
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
@@ -210,6 +260,9 @@
         <jar destfile="jettylib/commons-logging.jar" update="true" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-juli.jar" />
         </jar>
+    </target>
+
+    <target name="copyTomcatLib3" unless="${with-libtomcat-java}" >
         <jar destfile="jettylib/jasper-compiler.jar" >
             <manifest>
                 <attribute name="Note" value="Intentionally empty" />
@@ -277,8 +330,6 @@
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <!-- old jetty 5 classes blow up the build if you forgot to do distclean -->
-        <delete dir="build/obj/org" />
         <copy todir="build/obj" file="resources/log4j.properties" />
         <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" >
             <manifest>

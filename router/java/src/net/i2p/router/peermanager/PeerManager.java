@@ -61,6 +61,8 @@ class PeerManager {
         Router.CAPABILITY_BW64 +
         Router.CAPABILITY_BW128 +
         Router.CAPABILITY_BW256 +
+        Router.CAPABILITY_BW512 +
+        Router.CAPABILITY_BW_UNLIMITED +
         Router.CAPABILITY_REACHABLE +
         Router.CAPABILITY_UNREACHABLE;
 
@@ -80,7 +82,7 @@ class PeerManager {
             _peersByCapability.put(Character.valueOf(Character.toLowerCase(TRACKED_CAPS.charAt(i))), new ConcurrentHashSet<Hash>());
         loadProfilesInBackground();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        //SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
+        //SimpleTimer2.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
         //new Reorg();
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
@@ -163,7 +165,7 @@ class PeerManager {
      *  @since 0.8.8
      */
     private void loadProfilesInBackground() {
-        (new Thread(new ProfileLoader())).start();
+        (new I2PThread(new ProfileLoader())).start();
     }
 
     /**
@@ -191,7 +193,8 @@ class PeerManager {
     }
     
     /**
-     * Find some peers that meet the criteria and we have the netDb info for locally
+     * Find some peers that meet the criteria and we have the netDb info for locally.
+     * Returned list will not include ourselves.
      *
      * Only used by PeerTestJob (PURPOSE_TEST)
      */

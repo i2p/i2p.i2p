@@ -43,6 +43,15 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
     
     private ReusableGZIPInputStream() { super(); }
     
+    /**
+     *  Clear the cache.
+     *  @since 0.9.21
+     */
+    public static void clearCache() {
+        if (_available != null)
+            _available.clear();
+    }
+
 /*******
     public static void main(String args[]) {
         for (int i = 0; i < 2; i++)

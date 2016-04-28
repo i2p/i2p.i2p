@@ -104,6 +104,17 @@ public class Base64 {
         return safeDecode(s, false);
     }
 
+    /**
+     *  Decodes data from Base64 notation using the I2P alphabet.
+     *
+     *  @param useStandardAlphabet Warning, must be false for I2P compatibility
+     *  @return the decoded data, null on error
+     *  @since 0.9.25
+     */
+    public static byte[] decode(String s, boolean useStandardAlphabet) {
+        return safeDecode(s, useStandardAlphabet);
+    }
+
     /** Maximum line length (76) of Base64 output. */
     private final static int MAX_LINE_LENGTH = 76;
 
@@ -246,8 +257,8 @@ public class Base64 {
     }
 
     private static byte[] read(InputStream in) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
-        byte buf[] = new byte[4096];
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+        byte buf[] = new byte[1024];
         while (true) {
             int read = in.read(buf);
             if (read < 0) break;
@@ -263,7 +274,7 @@ public class Base64 {
     }
 
     private static void decode(InputStream in, OutputStream out) throws IOException {
-        byte decoded[] = decode(new String(read(in)));
+        byte decoded[] = decode(DataHelper.getUTF8(read(in)));
         if (decoded == null)
             throw new IOException("Invalid base 64 string");
         out.write(decoded);
@@ -726,7 +737,7 @@ public class Base64 {
      * As of 0.9.14, whitespace will cause an error.
      * Prior to that, it was ignored.
      *
-     * @param s the strind to decode
+     * @param s the string to decode
      * @return The data as a string, or null on error
      * @since 1.4
      */

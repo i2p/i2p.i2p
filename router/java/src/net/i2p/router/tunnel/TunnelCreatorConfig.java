@@ -30,16 +30,32 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private long _replyMessageId;
     private final boolean _isInbound;
     private int _messagesProcessed;
-    private volatile long _verifiedBytesTransferred;
+    private long _verifiedBytesTransferred;
     private boolean _failed;
     private int _failures;
     private boolean _reused;
     private int _priority;
+    //private static final int THROUGHPUT_COUNT = 3;
+    // Fastest 1 minute throughput, in bytes per minute, ordered with fastest first.
+    //private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
+    private long _peakThroughputCurrentTotal;
+    private long _peakThroughputLastCoallesce = System.currentTimeMillis();
+    // Make configurable? - but can't easily get to pool options from here
+    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
+    private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss", Locale.UK);
     
+    /** 
+     * For exploratory only (null destination)
+     * @param length 1 minimum (0 hop is length 1)
+     */
     public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
         this(ctx, length, isInbound, null);
     }
 
+    /** 
+     * @param length 1 minimum (0 hop is length 1)
+     * @param destination null for exploratory
+     */
     public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
         _context = ctx;
         if (length <= 0)
@@ -131,10 +147,13 @@ public class TunnelCreatorConfig implements TunnelInfo {
     public void setReplyMessageId(long id) { _replyMessageId = id; }
     
     /** take note of a message being pumped through this tunnel */
-    public void incrementProcessedMessages() { _messagesProcessed++; }
-    public int getProcessedMessagesCount() { return _messagesProcessed; }
+    public synchronized void incrementProcessedMessages() { _messagesProcessed++; }
+    public synchronized int getProcessedMessagesCount() { return _messagesProcessed; }
 
-    public void incrementVerifiedBytesTransferred(int bytes) { 
+    /**
+     *  This calls profile manager tunnelDataPushed1m() for each peer
+     */
+    public synchronized void incrementVerifiedBytesTransferred(int bytes) { 
         _verifiedBytesTransferred += bytes; 
         _peakThroughputCurrentTotal += bytes;
         long now = System.currentTimeMillis();
@@ -144,38 +163,34 @@ public class TunnelCreatorConfig implements TunnelInfo {
             double normalized = tot * 60d*1000d / timeSince;
             _peakThroughputLastCoallesce = now;
             _peakThroughputCurrentTotal = 0;
-            if (_context != null)
-                for (int i = 0; i < _peers.length; i++)
+            if (_context != null) {
+                // skip ourselves
+                int start = _isInbound ? 0 : 1;
+                int end = _isInbound ? _peers.length - 1 : _peers.length;
+                for (int i = start; i < end; i++) {
                     _context.profileManager().tunnelDataPushed1m(_peers[i], (int)normalized);
+                }
+            }
         }
     }
 
-    public long getVerifiedBytesTransferred() { return _verifiedBytesTransferred; }
+    public synchronized long getVerifiedBytesTransferred() { return _verifiedBytesTransferred; }
 
-    private static final int THROUGHPUT_COUNT = 3;
-    /** 
-     * fastest 1 minute throughput, in bytes per minute, ordered with fastest
-     * first.
-     */
-    private final double _peakThroughput[] = new double[THROUGHPUT_COUNT];
-    private volatile long _peakThroughputCurrentTotal;
-    private volatile long _peakThroughputLastCoallesce = System.currentTimeMillis();
-    public double getPeakThroughputKBps() { 
+/**** unused
+    public synchronized double getPeakThroughputKBps() { 
         double rv = 0;
         for (int i = 0; i < THROUGHPUT_COUNT; i++)
             rv += _peakThroughput[i];
         rv /= (60d*1024d*THROUGHPUT_COUNT);
         return rv;
     }
-    public void setPeakThroughputKBps(double kBps) {
+
+    public synchronized void setPeakThroughputKBps(double kBps) {
         _peakThroughput[0] = kBps*60*1024;
         //for (int i = 0; i < THROUGHPUT_COUNT; i++)
         //    _peakThroughput[i] = kBps*60;
     }
-    
-    
-    // Make configurable? - but can't easily get to pool options from here
-    private static final int MAX_CONSECUTIVE_TEST_FAILURES = 3;
+****/
     
     /**
      * The tunnel failed a test, so (maybe) stop using it
@@ -264,11 +279,10 @@ public class TunnelCreatorConfig implements TunnelInfo {
         return buf.toString();
     }
     
-    private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss", Locale.UK);
-
     private String getExpirationString() {
         return format(_expiration);
     }
+
     static String format(long date) {
         Date d = new Date(date);
         synchronized (_fmt) {

@@ -11,12 +11,12 @@ package net.i2p.apps.systray;
 
 import java.awt.Frame;
 import java.io.File;
+import java.io.IOException;
 
 import net.i2p.I2PAppContext;
-import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
-
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;
@@ -37,7 +37,6 @@ public class SysTray implements SysTrayMenuListener {
     private static SysTray        _instance;
     private static String         _portString;
     private static boolean        _showIcon;
-    private static UrlLauncher    _urlLauncher    = new UrlLauncher();
     private static final boolean _is64 = SystemVersion.is64Bit();
 
     static {
@@ -67,7 +66,7 @@ public class SysTray implements SysTrayMenuListener {
     private SysTray() {
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
-        SimpleScheduler.getInstance().addPeriodicEvent(new RefreshDisplayEvent(), REFRESH_DISPLAY_FREQUENCY);
+        SimpleTimer2.getInstance().addPeriodicEvent(new RefreshDisplayEvent(), REFRESH_DISPLAY_FREQUENCY);
     }
     
     private static final long REFRESH_DISPLAY_FREQUENCY = 30*1000;
@@ -84,19 +83,20 @@ public class SysTray implements SysTrayMenuListener {
     private static void openRouterConsole(String url) {
 
         String browser = null;
+        UrlLauncher urlLauncher = new UrlLauncher();
 
         if (_browserString == null || _browserString.equals("default")) {
             try {
-                if (_urlLauncher.openUrl(url))
+                if (urlLauncher.openUrl(url))
                     return;
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 // Fall through.
             }
         } else {
             try {
-                if (_urlLauncher.openUrl(url, _browserString))
+                if (urlLauncher.openUrl(url, _browserString))
                     return;
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 // Fall through.
             }
         }

@@ -141,6 +141,7 @@ public class LeaseSet extends DatabaseEntry {
      *  The revocation key.
      *  @deprecated unused
      */
+    @Deprecated
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
@@ -262,6 +263,7 @@ public class LeaseSet extends DatabaseEntry {
      * @deprecated revocation unused
      * @return true only if the signature matches
      */
+    @Deprecated
     public boolean verifySignature(SigningPublicKey signingKey) {
         if (super.verifySignature())
             return true;
@@ -418,10 +420,10 @@ public class LeaseSet extends DatabaseEntry {
             encryp(key);
         } catch (DataFormatException dfe) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
-            log.error("Error encrypting lease: " + _destination.calculateHash());
+            log.error("Error encrypting lease: " + _destination.calculateHash(), dfe);
         } catch (IOException ioe) {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
-            log.error("Error encrypting lease: " + _destination.calculateHash());
+            log.error("Error encrypting lease: " + _destination.calculateHash(), ioe);
         }
     }
 
@@ -520,7 +522,11 @@ public class LeaseSet extends DatabaseEntry {
     private synchronized boolean isEncrypted() {
         if (_decrypted)
            return true;
-        if (_checked || _destination == null)
+        // If the encryption key is not set yet, it can't have been encrypted yet.
+        // Router-side I2CP sets the destination (but not the encryption key)
+        // on an unsigned LS which is pending signature (and possibly encryption)
+        // by the client, and we don't want to attempt 'decryption' on it.
+        if (_checked || _encryptionKey == null || _destination == null)
            return false;
         SessionKey key = I2PAppContext.getGlobalContext().keyRing().get(_destination.calculateHash());
         if (key != null) {
@@ -529,10 +535,10 @@ public class LeaseSet extends DatabaseEntry {
                 _decrypted = true;
             } catch (DataFormatException dfe) {
                 Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
-                log.error("Error decrypting lease: " + _destination.calculateHash() + dfe);
+                log.error("Error decrypting lease: " + _destination.calculateHash(), dfe);
             } catch (IOException ioe) {
                 Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
-                log.error("Error decrypting lease: " + _destination.calculateHash() + ioe);
+                log.error("Error decrypting lease: " + _destination.calculateHash(), ioe);
             }
         }
         _checked = true;

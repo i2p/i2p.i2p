@@ -6,6 +6,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.router.OutNetMessage;
@@ -30,7 +31,7 @@ class NTCPSendFinisher {
     private final I2PAppContext _context;
     private final NTCPTransport _transport;
     private final Log _log;
-    private static int _count;
+    private static final AtomicInteger _count = new AtomicInteger();
     private ThreadPoolExecutor _executor;
     private static final int THREADS;
     static {
@@ -46,7 +47,6 @@ class NTCPSendFinisher {
     }
     
     public synchronized void start() {
-        _count = 0;
         _executor = new CustomThreadPoolExecutor(THREADS);
     }
 
@@ -68,7 +68,7 @@ class NTCPSendFinisher {
     private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
         public CustomThreadPoolExecutor(int num) {
              // use unbounded queue, so maximumPoolSize and keepAliveTime have no effect
-             super(num, num, 1000, TimeUnit.MILLISECONDS,
+             super(MIN_THREADS, num, 10*1000, TimeUnit.MILLISECONDS,
                    new LinkedBlockingQueue<Runnable>(), new CustomThreadFactory());
         }
     }
@@ -76,7 +76,7 @@ class NTCPSendFinisher {
     private static class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName("NTCPSendFinisher " + (++_count) + '/' + THREADS);
+            rv.setName("NTCPSendFinisher " + _count.incrementAndGet() + '/' + THREADS);
             rv.setDaemon(true);
             return rv;
         }
@@ -100,7 +100,7 @@ class NTCPSendFinisher {
                 // appx 0.1 ms
                 //_context.statManager().addRateData("ntcp.sendFinishTime", _context.clock().now() - _queued, 0);
             } catch (Throwable t) {
-                _log.log(Log.CRIT, " wtf, afterSend borked", t);
+                _log.log(Log.CRIT, " afterSend broken?", t);
             }
         }
     }

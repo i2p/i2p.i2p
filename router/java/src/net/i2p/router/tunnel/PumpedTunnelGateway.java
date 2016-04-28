@@ -58,11 +58,13 @@ class PumpedTunnelGateway extends TunnelGateway {
      * @param receiver this receives the encrypted message and forwards it off 
      *                 to the first hop
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor,
                                Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
         super(context, preprocessor, sender, receiver);
         if (getClass() == PumpedTunnelGateway.class) {
             // Unbounded priority queue for outbound
+            // fixme lint PendingGatewayMessage is not a CDPQEntry
             _prequeue = new CoDelPriorityBlockingQueue(context, "OBGW", INITIAL_OB_QUEUE);
             _nextHop = receiver.getSendTo();
             _isInbound = false;

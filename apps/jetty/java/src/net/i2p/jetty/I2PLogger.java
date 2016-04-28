@@ -31,12 +31,12 @@ public class I2PLogger implements Logger
 {    
     private final Log _log;
     
-    StringBuilder _buffer = new StringBuilder();
+    private final StringBuilder _buffer = new StringBuilder();
     
-    static {
+    //static {
         // So people don't wonder where the logs went
-        System.out.println("INFO: Jetty " + Server.getVersion() + " logging to I2P logs using class " + Server.class.getName());
-    }
+        //System.out.println("INFO: Jetty " + Server.getVersion() + " logging to I2P logs using class " + Server.class.getName());
+    //}
 
     public I2PLogger()
     {
@@ -102,7 +102,7 @@ public class I2PLogger implements Logger
         if (arg0 == null && arg1 == null) {
             _log.warn(msg);
         } else if (arg0 != null && arg1 == null && arg0 instanceof Throwable) {
-            _log.error(msg, (Throwable) arg0);
+            warn(msg, (Throwable) arg0);
         } else if (_log.shouldLog(Log.WARN)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
@@ -113,11 +113,16 @@ public class I2PLogger implements Logger
     
     public void warn(String msg, Throwable th)
     {
-        // This doesn't cover ClassNotFoundException, etc.
-        //if (th instanceof RuntimeException || th instanceof Error)
-            _log.error(msg, th);
-        //else
-        //    _log.warn(msg,th);
+        // some of these are serious, some aren't
+        // no way to get it right
+        if (th != null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(msg, th);
+            else
+                _log.logAlways(Log.WARN, msg + ": " + th);
+        } else {
+            _log.logAlways(Log.WARN, msg);
+        }
     }
     
     private void format(String msg, Object arg0, Object arg1)

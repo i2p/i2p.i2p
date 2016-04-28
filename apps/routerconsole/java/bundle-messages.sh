@@ -25,31 +25,33 @@ then
 fi
 
 # on windows, one must specify the path of commnad find
-# since windows has its own retarded version of find.
+# since windows has its own version of find.
 if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-# set LG2 to the language you need in envrionment varibales to enable this
+# set LG2 to the language you need in environment variables to enable this
 
 
 # list specific files in core/ and router/ here, so we don't scan the whole tree
 ROUTERFILES="\
    ../../../core/java/src/net/i2p/data/DataHelper.java \
-   ../../../core/java/src/net/i2p/util/LogWriter.java \
-   ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
-   ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
-   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
-   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
-   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
    ../../../router/java/src/net/i2p/router/Blocklist.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
+   ../../../router/java/src/net/i2p/router/CommSystemFacade.java \
+   ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
    ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java \
+   ../../../router/java/src/net/i2p/router/tasks/CoalesceStatsEvent.java \
    ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java \
+   ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
+   ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
+   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
+   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java \
+   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
    ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java \
    ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
-   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java"
+   ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
+   ../../../core/java/src/net/i2p/util/LogWriter.java \
+"
 
 # add ../java/ so the refs will work in the po file
 JPATHS="../java/src ../jsp/WEB-INF ../java/strings $ROUTERFILES"
@@ -82,19 +84,19 @@ do
 	 	echo "Updating the $i file from the tags..."
 		# extract strings from java and jsp files, and update messages.po files
 		# translate calls must be one of the forms:
-		# _("foo")
+		# _t("foo")
 		# _x("foo")
-		# intl._("foo")
+		# intl._t("foo")
 		# intl.title("foo")
-		# handler._("foo")
-		# formhandler._("foo")
+		# handler._t("foo")
+		# formhandler._t("foo")
 		# net.i2p.router.web.Messages.getString("foo")
 		# In a jsp, you must use a helper or handler that has the context set.
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
+	                 --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title \
 	                 --keyword=handler._ --keyword=formhandler._ \
 	                 --keyword=net.i2p.router.web.Messages.getString \
 		         -o ${i}t

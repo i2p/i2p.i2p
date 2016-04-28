@@ -51,7 +51,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class CommandThread extends Thread {
+    private class CommandThread extends I2PAppThread {
         private final boolean consumeOutput;
         private final Object shellCommand;
         private final Result result;
@@ -84,7 +84,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private static class StreamConsumer extends Thread {
+    private static class StreamConsumer extends I2PAppThread {
         private final BufferedReader bufferedReader;
 
         public StreamConsumer(InputStream inputStream) {
@@ -115,7 +115,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private static class StreamReader extends Thread {
+    private static class StreamReader extends I2PAppThread {
         private final BufferedReader bufferedReader;
 
         public StreamReader(InputStream inputStream) {
@@ -149,7 +149,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private static class StreamWriter extends Thread {
+    private static class StreamWriter extends I2PAppThread {
         private final BufferedWriter bufferedWriter;
 
         public StreamWriter(OutputStream outputStream) {
@@ -190,6 +190,7 @@ public class ShellCommand {
      * 
      * @param shellCommand The command for the shell to execute.
      */
+    @Deprecated
     public void execute(String shellCommand) {
         execute(shellCommand, NO_CONSUME_OUTPUT, NO_WAIT_FOR_EXIT_STATUS);
     }
@@ -211,6 +212,7 @@ public class ShellCommand {
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
      */
+    @Deprecated
     public boolean executeAndWait(String shellCommand) {
         return execute(shellCommand, NO_CONSUME_OUTPUT, WAIT_FOR_EXIT_STATUS);
     }
@@ -236,6 +238,7 @@ public class ShellCommand {
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
      */
+    @Deprecated
     public boolean executeAndWaitTimed(String shellCommand, int seconds) {
         Result result = new Result();
         Thread commandThread = new CommandThread(shellCommand, NO_CONSUME_OUTPUT, result);
@@ -263,6 +266,7 @@ public class ShellCommand {
      * @param  shellCommand The command for the shell to execute.
      * @throws IOException
      */
+    @Deprecated
     public void executeSilent(String shellCommand) throws IOException {
         Runtime.getRuntime().exec(shellCommand, null);
     }
@@ -365,16 +369,19 @@ public class ShellCommand {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public InputStream getErrorStream() {
         return _errorStream;
     }
 
     /** @deprecated unused */
+    @Deprecated
     public InputStream getInputStream() {
         return _inputStream;
     }
 
     /** @deprecated unused */
+    @Deprecated
     public OutputStream getOutputStream() {
         return _outputStream;
     }
@@ -439,7 +446,7 @@ public class ShellCommand {
                     System.out.println("ShellCommand waiting for \"" + name + '\"');
                 try {
                     process.waitFor();
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
                     if (DEBUG) {
                         System.out.println("ShellCommand exception waiting for \"" + name + '\"');
                         e.printStackTrace();
@@ -457,7 +464,7 @@ public class ShellCommand {
                 if (process.exitValue() > 0)
                     return false;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // probably IOException, file not found from exec()
             if (DEBUG) {
                 System.out.println("ShellCommand execute exception for \"" + name + '\"');

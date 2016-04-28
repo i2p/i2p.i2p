@@ -53,7 +53,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     {
         // http://en.wikipedia.org/wiki/Cpuid
         // http://web.archive.org/web/20110307080258/http://www.intel.com/Assets/PDF/appnote/241618.pdf
-        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf
+        // http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-manual-325462.pdf
     	// #include "llvm/Support/Host.h", http://llvm.org/docs/doxygen/html/Host_8cpp_source.html
         String modelString = null;
         int family = CPUID.getCPUFamily();
@@ -471,12 +471,10 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             break;
 
             case 7: {
-                // Flags TODO
                 modelString = "Intel Itanium model " + model;
             }
             break;
 
-            // 15 + 0
             case 15: {
                 isPentiumCompatible = true;
                 isPentiumMMXCompatible = true;
@@ -507,9 +505,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             }
             break;
 
-            // 15 + 1
             case 16: {
-                // Flags TODO
                 modelString = "Intel Itanium II model " + model;
             }
         }

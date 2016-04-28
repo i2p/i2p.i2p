@@ -50,7 +50,7 @@ class MessageOutputStream extends OutputStream {
      *  Since this is less than i2ptunnel's i2p.streaming.connectDelay default of 1000,
      *  we only wait 250 at the start. Guess that's ok, 1000 is too long anyway.
      */
-    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 250;
+    private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 175;
 
 /****
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
@@ -233,7 +233,7 @@ class MessageOutputStream extends OutputStream {
             // no need to be overly worried about duplicates - it would just 
             // push it further out
             if (!_enqueued) {
-                // Maybe we could just use schedule() here - or even SimpleScheduler - not sure...
+                // Maybe we could just use schedule() here - or even SimpleTimer2 - not sure...
                 // To be safe, use forceReschedule() so we don't get lots of duplicates
                 // We've seen the queue blow up before, maybe it was this before the rewrite...
                 // So perhaps it IS wise to be "overly worried" ...

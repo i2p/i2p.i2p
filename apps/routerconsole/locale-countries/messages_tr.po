@@ -2,31 +2,30 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
-# Erkin <erkinbatu@gmail.com>, 2013
-# Kaya Zeren <kayazeren@gmail.com>, 2013
-# TR_anslator <kqzwypgi@sharklasers.com>, 2013
+# Erkin Batu Altunbaş <erkinbatu@gmail.com>, 2013
+# Kaya Zeren <kayazeren@gmail.com>, 2013,2015
+# Trans Lator <kqzwypgi@sharklasers.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:34+0000\n"
-"PO-Revision-Date: 2013-08-09 07:53+0000\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-08-05 13:48+0000\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>\n"
-"Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/I2P/"
-"language/tr_TR/)\n"
-"Language: tr_TR\n"
+"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: tr_TR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Anonymous Proxy"
-msgstr ""
+msgstr "Anonim Vekil Sunucu"
 
 msgid "Satellite Provider"
-msgstr ""
+msgstr "Uydu Hizmeti Sağlayıcısı"
 
 msgid "Andorra"
 msgstr "Andorra"
@@ -50,10 +49,13 @@ msgid "Armenia"
 msgstr "Ermenistan"
 
 msgid "Netherlands Antilles"
-msgstr "Felemenk Antilleri"
+msgstr "Hollanda Antilleri"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr "Asya/Pasifik Bölgesi"
 
 msgid "Antarctica"
 msgstr "Antarktika"
@@ -74,7 +76,7 @@ msgid "Aruba"
 msgstr "Aruba"
 
 msgid "Åland Islands"
-msgstr ""
+msgstr "Åland Adaları"
 
 msgid "Azerbaijan"
 msgstr "Azerbaycan"
@@ -106,6 +108,9 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benin"
 
+msgid "Saint Barthélemy"
+msgstr "Aziz Bartelemi"
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
@@ -114,6 +119,9 @@ msgstr "Brunei Darüsselam"
 
 msgid "Bolivia"
 msgstr "Bolivya"
+
+msgid "Bonaire"
+msgstr "Bonaire"
 
 msgid "Brazil"
 msgstr "Brezilya"
@@ -140,16 +148,13 @@ msgid "Canada"
 msgstr "Kanada"
 
 msgid "Cocos (Keeling) Islands"
-msgstr ""
-
-msgid "The Democratic Republic of the Congo"
-msgstr "Kongo Demokratik Cumhuriyeti"
-
-msgid "Central African Republic"
-msgstr "Orta Afrika Cumhuriyeti"
+msgstr "Cocos (Keeling) Adaları"
 
 msgid "Congo"
 msgstr "Kongo"
+
+msgid "Central African Republic"
+msgstr "Orta Afrika Cumhuriyeti"
 
 msgid "Switzerland"
 msgstr "İsviçre"
@@ -176,7 +181,7 @@ msgid "Costa Rica"
 msgstr "Kosta Rika"
 
 msgid "Serbia and Montenegro"
-msgstr ""
+msgstr "Sırbistan - Karadağ"
 
 msgid "Cuba"
 msgstr "Küba"
@@ -185,10 +190,10 @@ msgid "Cape Verde"
 msgstr "Yeşil Burun Adaları"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Curaçao"
 
 msgid "Christmas Island"
-msgstr ""
+msgstr "Christmas Adaları"
 
 msgid "Cyprus"
 msgstr "Kıbrıs"
@@ -224,7 +229,7 @@ msgid "Egypt"
 msgstr "Mısır"
 
 msgid "Western Sahara"
-msgstr ""
+msgstr "Batı Sahra"
 
 msgid "Eritrea"
 msgstr "Eritre"
@@ -236,7 +241,7 @@ msgid "Ethiopia"
 msgstr "Etiyopya"
 
 msgid "European Union"
-msgstr ""
+msgstr "Avrupa Birliği"
 
 msgid "Finland"
 msgstr "Finlandiya"
@@ -247,8 +252,8 @@ msgstr "Fiji"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Falkland Adaları (Malvinalar)"
 
-msgid "Federated States of Micronesia"
-msgstr "Mikronezya Federe Devletleri"
+msgid "Micronesia"
+msgstr "Mikronezya"
 
 msgid "Faroe Islands"
 msgstr "Faroe Adaları"
@@ -272,7 +277,7 @@ msgid "French Guiana"
 msgstr "Fransız Guyanası"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guerney"
 
 msgid "Ghana"
 msgstr "Gana"
@@ -290,7 +295,7 @@ msgid "Guinea"
 msgstr "Gine"
 
 msgid "Guadeloupe"
-msgstr "Guadlup"
+msgstr "Guadalup"
 
 msgid "Equatorial Guinea"
 msgstr "Ekvator Ginesi"
@@ -338,7 +343,7 @@ msgid "Israel"
 msgstr "İsrail"
 
 msgid "Isle of Man"
-msgstr ""
+msgstr "Isle of Man Adası"
 
 msgid "India"
 msgstr "Hindistan"
@@ -349,8 +354,8 @@ msgstr "İngiliz Hint Okyanus Bölgesi"
 msgid "Iraq"
 msgstr "Irak"
 
-msgid "Islamic Republic of Iran"
-msgstr "İslami İran Cumhuriyeti"
+msgid "Iran"
+msgstr "İran"
 
 msgid "Iceland"
 msgstr "İzlanda"
@@ -359,7 +364,7 @@ msgid "Italy"
 msgstr "İtalya"
 
 msgid "Jersey"
-msgstr ""
+msgstr "Cersey"
 
 msgid "Jamaica"
 msgstr "Jamaika"
@@ -388,8 +393,8 @@ msgstr "Komorolar"
 msgid "Saint Kitts and Nevis"
 msgstr "Aziz Kitts ve Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr ""
+msgid "North Korea"
+msgstr "Kuzey Kore"
 
 msgid "Republic of Korea"
 msgstr "Kore Cumhuriyeti"
@@ -433,8 +438,8 @@ msgstr "Lüksemburg"
 msgid "Latvia"
 msgstr "Letonya"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Libya Arap Cumhuriyeti"
+msgid "Libya"
+msgstr "Libya"
 
 msgid "Morocco"
 msgstr "Fas"
@@ -442,14 +447,14 @@ msgstr "Fas"
 msgid "Monaco"
 msgstr "Monako"
 
-msgid "Republic of Moldova"
-msgstr "Moldova Cumhuriyeti"
+msgid "Moldova"
+msgstr "Moldova"
 
 msgid "Montenegro"
-msgstr ""
+msgstr "Karadağ"
 
 msgid "Saint Martin"
-msgstr ""
+msgstr "Aziz Martin"
 
 msgid "Madagascar"
 msgstr "Madagaskar"
@@ -457,8 +462,8 @@ msgstr "Madagaskar"
 msgid "Marshall Islands"
 msgstr "Marşal Adaları"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Makedonya Eski Yugoslav Cumhuriyeti"
+msgid "Macedonia"
+msgstr "Makedonya"
 
 msgid "Mali"
 msgstr "Mali"
@@ -469,8 +474,8 @@ msgstr "Myanmar"
 msgid "Mongolia"
 msgstr "Moğolistan"
 
-msgid "Macao"
-msgstr "Makao"
+msgid "Macau"
+msgstr "Makau"
 
 msgid "Northern Mariana Islands"
 msgstr "Kuzey Mariyana Adaları"
@@ -482,7 +487,7 @@ msgid "Mauritania"
 msgstr "Moritanya"
 
 msgid "Montserrat"
-msgstr "Montserrat"
+msgstr "Monserat"
 
 msgid "Malta"
 msgstr "Malta"
@@ -524,7 +529,7 @@ msgid "Nicaragua"
 msgstr "Nikaragua"
 
 msgid "Netherlands"
-msgstr "Felemenk"
+msgstr "Hollanda"
 
 msgid "Norway"
 msgstr "Norveç"
@@ -569,7 +574,7 @@ msgid "Saint Pierre and Miquelon"
 msgstr "Aziz Piyer ve Mikelon"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "Pitcairn Adaları"
 
 msgid "Puerto Rico"
 msgstr "Porto Riko"
@@ -590,7 +595,7 @@ msgid "Qatar"
 msgstr "Katar"
 
 msgid "Réunion"
-msgstr ""
+msgstr "Réunion"
 
 msgid "Romania"
 msgstr "Romanya"
@@ -623,13 +628,13 @@ msgid "Singapore"
 msgstr "Singapur"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "Aziz Helena"
 
 msgid "Slovenia"
 msgstr "Slovenya"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Svalbard ve Jan Mayen"
 
 msgid "Slovakia"
 msgstr "Slovakya"
@@ -649,14 +654,20 @@ msgstr "Somali"
 msgid "Suriname"
 msgstr "Surinam"
 
+msgid "South Sudan"
+msgstr "Güney Sudan"
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome ve Principe"
 
 msgid "El Salvador"
 msgstr "El Salvador"
 
-msgid "Syrian Arab Republic"
-msgstr "Suriye Arap Cumhuriyeti"
+msgid "Sint Maarten"
+msgstr "Aziz Marten"
+
+msgid "Syria"
+msgstr "Suriye"
 
 msgid "Swaziland"
 msgstr "Svaziland"
@@ -668,7 +679,7 @@ msgid "Chad"
 msgstr "Çad"
 
 msgid "French Southern Territories"
-msgstr "Fransız Güney Bölgeleri"
+msgstr "Güney Fransa Bölgeleri"
 
 msgid "Togo"
 msgstr "Togo"
@@ -706,8 +717,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Tayva"
 
-msgid "United Republic of Tanzania"
-msgstr "Tanzanya Birleşik Cumhuriyeti"
+msgid "Tanzania"
+msgstr "Tanzanya"
 
 msgid "Ukraine"
 msgstr "Ukrayna"
@@ -727,8 +738,8 @@ msgstr "Uruguay"
 msgid "Uzbekistan"
 msgstr "Özbekistan"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Kutsal Makam (Vatikan Şehir Devleti)"
+msgid "Vatican"
+msgstr "Vatikan"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Aziz Vincent ve Granadinler"
@@ -739,7 +750,7 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Virgin Adaları"
 
-msgid "Viet Nam"
+msgid "Vietnam"
 msgstr "Vietnam"
 
 msgid "Vanuatu"
@@ -765,4 +776,3 @@ msgstr "Zambiya"
 
 msgid "Zimbabwe"
 msgstr "Zimbabve"
-

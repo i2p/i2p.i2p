@@ -16,7 +16,7 @@ public class Messages {
     }
 
     /** lang in routerconsole.lang property, else current locale */
-    public String _(String key) {
+    public String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 

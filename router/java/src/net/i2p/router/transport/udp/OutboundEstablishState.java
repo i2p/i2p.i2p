@@ -56,6 +56,8 @@ class OutboundEstablishState {
     private RemoteHostId _remoteHostId;
     private final RemoteHostId _claimedAddress;
     private final RouterIdentity _remotePeer;
+    private final boolean _allowExtendedOptions;
+    private final boolean _needIntroduction;
     private final SessionKey _introKey;
     private final Queue<OutNetMessage> _queuedMessages;
     private OutboundState _currentState;
@@ -107,12 +109,17 @@ class OutboundEstablishState {
      *  @param claimedAddress an IP/port based RemoteHostId, or null if unknown
      *  @param remoteHostId non-null, == claimedAddress if direct, or a hash-based one if indirect
      *  @param remotePeer must have supported sig type
+     *  @param allowExtendedOptions are we allowed to send extended options to Bob?
+     *  @param needIntroduction should we ask Bob to be an introducer for us?
+               ignored unless allowExtendedOptions is true
      *  @param introKey Bob's introduction key, as published in the netdb
      *  @param addr non-null
      */
     public OutboundEstablishState(RouterContext ctx, RemoteHostId claimedAddress,
                                   RemoteHostId remoteHostId,
-                                  RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr,
+                                  RouterIdentity remotePeer, boolean allowExtendedOptions,
+                                  boolean needIntroduction,
+                                  SessionKey introKey, UDPAddress addr,
                                   DHSessionKeyBuilder.Factory dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
@@ -125,6 +132,8 @@ class OutboundEstablishState {
         }
         _claimedAddress = claimedAddress;
         _remoteHostId = remoteHostId;
+        _allowExtendedOptions = allowExtendedOptions;
+        _needIntroduction = needIntroduction;
         _remotePeer = remotePeer;
         _introKey = introKey;
         _queuedMessages = new LinkedBlockingQueue<OutNetMessage>();
@@ -157,6 +166,19 @@ class OutboundEstablishState {
 
     /** @return -1 if unset */
     public long getIntroNonce() { return _introductionNonce; }
+
+    /**
+     *  Are we allowed to send extended options to this peer?
+     *  @since 0.9.24
+     */
+    public boolean isExtendedOptionsAllowed() { return _allowExtendedOptions; }
+
+    /**
+     *  Should we ask this peer to be an introducer for us?
+     *  Ignored unless allowExtendedOptions is true
+     *  @since 0.9.24
+     */
+    public boolean needIntroduction() { return _needIntroduction; }
     
     /**
      *  Queue a message to be sent after the session is established.

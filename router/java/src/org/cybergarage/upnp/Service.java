@@ -121,7 +121,7 @@ public class Service
 	////////////////////////////////////////////////
 	public static final String SCPD_ROOTNODE="scpd";
 	public static final String SCPD_ROOTNODE_NS="urn:schemas-upnp-org:service-1-0"; 
-	
+
 	public static final String SPEC_VERSION="specVersion";
 	public static final String MAJOR="major";
 	public static final String MAJOR_VALUE="1";
@@ -142,8 +142,8 @@ public class Service
 		sp.addNode(m);
 		
 		//Node scpd = new Node(SCPD_ROOTNODE,SCPD_ROOTNODE_NS); wrong!
-		Node scpd = new Node(SCPD_ROOTNODE); 					// better (twa)
-		scpd.addAttribute("xmlns",SCPD_ROOTNODE_NS); 			// better (twa)
+		Node scpd = new Node(SCPD_ROOTNODE);
+		scpd.addAttribute("xmlns",SCPD_ROOTNODE_NS);
 		scpd.addNode(sp);
 		getServiceData().setSCPDNode(scpd);
 	}
@@ -241,6 +241,31 @@ public class Service
 		return getServiceNode().getNodeValue(SERVICE_ID);
 	}
 
+	////////////////////////////////////////////////
+	//	configID
+	////////////////////////////////////////////////
+
+	private final static String CONFIG_ID = "configId";
+	
+	public void updateConfigId()
+	{
+		Node scpdNode = getSCPDNode();
+		if (scpdNode == null)
+			return;
+		
+		String scpdXml = scpdNode.toString();
+		int configId = UPnP.caluculateConfigId(scpdXml);
+		scpdNode.setAttribute(CONFIG_ID, configId);
+	}
+
+	public int getConfigId()
+	{
+		Node scpdNode = getSCPDNode();
+		if (scpdNode == null)
+			return 0;
+		return scpdNode.getAttributeIntegerValue(CONFIG_ID);
+	}
+	
 	////////////////////////////////////////////////
 	//	isURL
 	////////////////////////////////////////////////
@@ -340,6 +365,7 @@ public class Service
 		catch (ParserException e) {
 			throw new InvalidDescriptionException(e);
 		}
+		
 		return true;
 	}
 
@@ -349,8 +375,10 @@ public class Service
 		Node scpdNode = parser.parse(file);
 		if (scpdNode == null)
 			return false;
+		
 		ServiceData data = getServiceData();
 		data.setSCPDNode(scpdNode);
+
 		return true;
 	}
 
@@ -363,20 +391,22 @@ public class Service
 		Node scpdNode = parser.parse(input);
 		if (scpdNode == null)
 			return false;
+		
 		ServiceData data = getServiceData();
 		data.setSCPDNode(scpdNode);
+		
 		return true;
 	}
 	
 	
     public void setDescriptionURL(String value)
     {
-            getServiceData().setDescriptionURL(value);
+    	getServiceData().setDescriptionURL(value);
     }
 
     public String getDescriptionURL()
     {
-            return getServiceData().getDescriptionURL();
+    	return getServiceData().getDescriptionURL();
     }
 	
 	
@@ -406,6 +436,9 @@ public class Service
 		
 		String scpdURLStr = getSCPDURL();
 
+/****
+ * I2P - no, dont attempt to load local file
+ *
 		// Thanks for Robin V. (Sep 18, 2010)
 		String rootDevPath = rootDev.getDescriptionFilePath();
 		if(rootDevPath!=null) {
@@ -425,6 +458,7 @@ public class Service
 				}
 			}
 		}
+****/
 
 		try {
 			URL scpdUrl = new URL(rootDev.getAbsoluteURL(scpdURLStr));
@@ -434,8 +468,14 @@ public class Service
 				return scpdNode;
 			}
 		}
-		catch (Exception e) {}
+		catch (Exception e) {
+			// I2P
+			Debug.warning(e);
+		}
 		
+/****
+ * I2P - no, dont attempt to load local file
+ *
 		String newScpdURLStr = rootDev.getDescriptionFilePath() + HTTP.toRelativeURL(scpdURLStr);
 		try {
 			scpdNode = getSCPDNode(new File(newScpdURLStr));
@@ -444,6 +484,7 @@ public class Service
 		catch (Exception e) {
 			Debug.warning(e);
 		}
+****/
 		
 		return null;
 	}

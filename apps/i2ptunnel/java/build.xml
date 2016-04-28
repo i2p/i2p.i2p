@@ -62,7 +62,7 @@
     <target name="jar" depends="builddep, compile, bundle-proxy, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
-        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/EditBean.class **/IndexBean.class" >
+        <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class" excludes="**/ui/*.class **/EditBean.class **/IndexBean.class" >
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
@@ -73,7 +73,7 @@
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
             </manifest>
         </jar>
-        <jar destfile="./build/temp-beans.jar" basedir="./build/obj" includes="**/EditBean.class **/IndexBean.class" />
+        <jar destfile="./build/temp-beans.jar" basedir="./build/obj" includes="**/ui/*.class **/EditBean.class **/IndexBean.class" />
     </target>
 
     <target name="jarUpToDate">
@@ -84,6 +84,36 @@
             <and>
                 <not>
                     <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+
+    <!-- Separate jar for general UI classes -->
+    <target name="uiJar" depends="jar, uiJarUpToDate, listChangedFiles" unless="uiJar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.j.tr" value="" />
+        <jar destfile="./build/i2ptunnel-ui.jar" basedir="./build/obj" includes="**/ui/*.class" >
+            <manifest>
+                <attribute name="Class-Path" value="i2p.jar mstreaming.jar i2ptunnel.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="uiJarUpToDate">
+        <uptodate property="uiJar.uptodate" targetfile="build/i2ptunnel-ui.jar" >
+            <srcfiles dir= "build/obj" includes="**/ui/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="uiJar.uptodate" />
                 </not>
                 <isset property="mtn.available" />
             </and>
@@ -185,6 +215,9 @@
     <target name="war" depends="precompilejsp, bundle, warUpToDate, listChangedFiles2" unless="war.uptodate" > 
         <!-- set if unset -->
         <property name="workspace.changes.w.tr" value="" />
+    	<copy todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/ui">
+    		<fileset dir="build/obj/net/i2p/i2ptunnel/ui" />
+    	</copy>
         <copy file="build/obj/net/i2p/i2ptunnel/web/EditBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
         <copy file="build/obj/net/i2p/i2ptunnel/web/IndexBean.class" todir="../jsp/WEB-INF/classes/net/i2p/i2ptunnel/web" />
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
@@ -202,6 +235,7 @@
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="build/i2ptunnel.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp" />
+            <srcfiles dir= "build/obj" includes="**/ui/*.class **/web/*.class" />
         </uptodate>
         <condition property="shouldListChanges2" >
             <and>
@@ -224,12 +258,20 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
+                <!-- jasper-el.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jasper-el.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- required for multipart form handling in register.jsp -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
@@ -248,11 +290,19 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
+                <!-- jasper-el.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jasper-el.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- required for multipart form handling in register.jsp -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
         </javac>
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />

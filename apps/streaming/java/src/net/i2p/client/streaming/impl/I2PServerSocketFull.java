@@ -45,6 +45,7 @@ class I2PServerSocketFull implements I2PServerSocket {
      *  @return null always
      *  @since 0.8.11
      */
+    @Deprecated
     public synchronized AcceptingChannel getChannel() {
         return null;
     }

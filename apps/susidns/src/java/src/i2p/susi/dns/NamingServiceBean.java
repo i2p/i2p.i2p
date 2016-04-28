@@ -21,12 +21,17 @@
 
 package i2p.susi.dns;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
 
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
@@ -98,7 +103,7 @@ public class NamingServiceBean extends AddressbookBean
 		if (isDirect())
 			return super.getDisplayName();
 		loadConfig();
-		return _("{0} address book in {1} database", getFileName(), getNamingService().getName());
+		return _t("{0} address book in {1} database", getFileName(), getNamingService().getName());
 	}
 
 	/** depth-first search */
@@ -196,12 +201,13 @@ public class NamingServiceBean extends AddressbookBean
 				}
 			}
 			AddressBean array[] = list.toArray(new AddressBean[list.size()]);
-			Arrays.sort( array, sorter );
+			if (!(results instanceof SortedMap))
+			    Arrays.sort( array, sorter );
 			entries = array;
 
 			message = generateLoadMessage();
 		}
-		catch (Exception e) {
+		catch (RuntimeException e) {
 			warn(e);
 		}
 		if( message.length() > 0 )
@@ -225,7 +231,7 @@ public class NamingServiceBean extends AddressbookBean
                         if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
 			    (serial != null && serial.equals(lastSerial))) {
 				boolean changed = false;
-				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
+				if (action.equals(_t("Add")) || action.equals(_t("Replace"))) {
 					if(hostname != null && destination != null) {
 						try {
 							// throws IAE with translated message
@@ -236,9 +242,9 @@ public class NamingServiceBean extends AddressbookBean
 							Properties outProperties= new Properties();
 							Destination oldDest = getNamingService().lookup(host, nsOptions, outProperties);
 							if (oldDest != null && destination.equals(oldDest.toBase64())) {
-								message = _("Host name {0} is already in address book, unchanged.", displayHost);
-							} else if (oldDest != null && !action.equals(_("Replace"))) {
-								message = _("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
+								message = _t("Host name {0} is already in address book, unchanged.", displayHost);
+							} else if (oldDest != null && !action.equals(_t("Replace"))) {
+								message = _t("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
 								try {
 									Destination dest = new Destination(destination);
@@ -246,37 +252,37 @@ public class NamingServiceBean extends AddressbookBean
 										nsOptions.putAll(outProperties);
 							                        nsOptions.setProperty("m", Long.toString(_context.clock().now()));
 									}
-						                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
+						                        nsOptions.setProperty("s", _t("Manually added via SusiDNS"));
 									boolean success = getNamingService().put(host, dest, nsOptions);
 									if (success) {
 										changed = true;
 										if (oldDest == null)
-											message = _("Destination added for {0}.", displayHost);
+											message = _t("Destination added for {0}.", displayHost);
 										else
-											message = _("Destination changed for {0}.", displayHost);
+											message = _t("Destination changed for {0}.", displayHost);
 										if (!host.endsWith(".i2p"))
-											message += "<br>" + _("Warning - host name does not end with \".i2p\"");
+											message += "<br>" + _t("Warning - host name does not end with \".i2p\"");
 										// clear form
 										hostname = null;
 										destination = null;
 									} else {
-										message = _("Failed to add Destination for {0} to naming service {1}", displayHost, getNamingService().getName()) + "<br>";
+										message = _t("Failed to add Destination for {0} to naming service {1}", displayHost, getNamingService().getName()) + "<br>";
 									}
 								} catch (DataFormatException dfe) {
-									message = _("Invalid Base 64 destination.");
+									message = _t("Invalid Base 64 destination.");
 								}
 							}
 						} catch (IllegalArgumentException iae) {
 							message = iae.getMessage();
 							if (message == null)
-								message = _("Invalid host name \"{0}\".", hostname);
+								message = _t("Invalid host name \"{0}\".", hostname);
 						}
 					} else {
-						message = _("Please enter a host name and destination");
+						message = _t("Please enter a host name and destination");
 					}
 					// clear search when adding
 					search = null;
-				} else if (action.equals(_("Delete Selected")) || action.equals(_("Delete Entry"))) {
+				} else if (action.equals(_t("Delete Selected")) || action.equals(_t("Delete Entry"))) {
 					String name = null;
 					int deleted = 0;
 					for (String n : deletionMarks) {
@@ -284,7 +290,7 @@ public class NamingServiceBean extends AddressbookBean
 						String uni = AddressBean.toUnicode(n);
 						String displayHost = uni.equals(n) ? n :  uni + " (" + n + ')';
 						if (!success) {
-							message += _("Failed to delete Destination for {0} from naming service {1}", displayHost, getNamingService().getName()) + "<br>";
+							message += _t("Failed to delete Destination for {0} from naming service {1}", displayHost, getNamingService().getName()) + "<br>";
 						} else if (deleted++ == 0) {
 							changed = true;
 							name = displayHost;
@@ -293,25 +299,25 @@ public class NamingServiceBean extends AddressbookBean
 					if( changed ) {
 						if (deleted == 1)
 							// parameter is a host name
-							message += _("Destination {0} deleted.", name);
+							message += _t("Destination {0} deleted.", name);
 						else
 							// parameter will always be >= 2
 							message = ngettext("1 destination deleted.", "{0} destinations deleted.", deleted);
 					} else {
-						message = _("No entries selected to delete.");
+						message = _t("No entries selected to delete.");
 					}
 					// clear search when deleting
-					if (action.equals(_("Delete Entry")))
+					if (action.equals(_t("Delete Entry")))
 						search = null;
 				}
 				if( changed ) {
-					message += "<br>" + _("Address book saved.");
+					message += "<br>" + _t("Address book saved.");
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+				message = _t("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
                                           + ' ' +
-                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
+                                          _t("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		
@@ -350,5 +356,50 @@ public class NamingServiceBean extends AddressbookBean
 		AddressBean rv = new AddressBean(this.detail, dest.toBase64());
 		rv.setProperties(outProps);
 		return rv;
+	}
+
+	/**
+	 *  @since 0.9.26
+	 */
+	public List<AddressBean> getLookupAll() {
+		if (this.detail == null)
+			return null;
+		if (isDirect()) {
+			// won't work for the published addressbook
+			AddressBean ab = getLookup();
+			if (ab != null)
+				return Collections.singletonList(ab);
+			return null;
+		}
+		Properties nsOptions = new Properties();
+		List<Properties> propsList = new ArrayList<Properties>(4);
+		nsOptions.setProperty("list", getFileName());
+		List<Destination> dests = getNamingService().lookupAll(this.detail, nsOptions, propsList);
+		if (dests == null)
+			return null;
+		List<AddressBean> rv = new ArrayList<AddressBean>(dests.size());
+		for (int i = 0; i < dests.size(); i++) {
+			AddressBean ab = new AddressBean(this.detail, dests.get(i).toBase64());
+			ab.setProperties(propsList.get(i));
+			rv.add(ab);
+		}
+		return rv;
+	}
+
+	/**
+	 *  @since 0.9.20
+	 */
+	public void export(Writer out) throws IOException {
+		Properties searchProps = new Properties();
+		// only blockfile needs this
+		searchProps.setProperty("list", getFileName());
+		if (filter != null) {
+			String startsAt = filter.equals("0-9") ? "[0-9]" : filter;
+			searchProps.setProperty("startsWith", startsAt);
+		}
+		if (search != null && search.length() > 0)
+			searchProps.setProperty("search", search.toLowerCase(Locale.US));
+		getNamingService().export(out, searchProps);
+		// No post-filtering for hosts.txt naming services. It is what it is.
 	}
 }

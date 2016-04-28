@@ -10,6 +10,7 @@ import net.i2p.router.web.ConfigUpdateHandler;
 import static net.i2p.update.UpdateType.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
     
 /**
@@ -30,13 +31,23 @@ class UnsignedUpdateRunner extends UpdateRunner {
         /** Get the file */
         @Override
         protected void update() {
-            String zipURL = _currentURI.toString();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Starting unsigned update URL: " + zipURL);
             // always proxy for now
             //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+            if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
+                proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
+                _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
+                String msg = _t("HTTP client proxy tunnel must be running");
+                if (_log.shouldWarn())
+                    _log.warn(msg);
+                updateStatus("<b>" + msg + "</b>");
+                _mgr.notifyTaskFailed(this, msg, null);
+                return;
+            }
+            String zipURL = _currentURI.toString();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Starting unsigned update URL: " + zipURL);
             try {
                 // 40 retries!!
                 _get = new EepGet(_context, proxyHost, proxyPort, 40, _updateFile, zipURL, false);

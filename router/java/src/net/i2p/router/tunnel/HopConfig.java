@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel;
 
-import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -20,13 +19,14 @@ public class HopConfig {
     private SessionKey _layerKey;
     private SessionKey _ivKey;
     private SessionKey _replyKey;
-    private ByteArray _replyIV;
+    private byte[] _replyIV;
     private long _creation;
     private long _expiration;
     //private Map _options;
 
     // these 4 were longs, let's save some space
     // 2 billion * 1KB / 10 minutes = 3 GBps in a single tunnel
+    // we use synchronization instead of an AtomicInteger here to save space
     private int _messagesProcessed;
     private int _oldMessagesProcessed;
     //private int _messagesSent;
@@ -51,12 +51,14 @@ public class HopConfig {
     public void setReceiveTunnelId(byte id[]) { _receiveTunnelId = id; }
     public void setReceiveTunnelId(TunnelId id) { _receiveTunnelId = DataHelper.toLong(4, id.getTunnelId()); }
     
-    /** what is the previous peer in the tunnel (if any)? */
+    /** what is the previous peer in the tunnel (null if gateway) */
     public Hash getReceiveFrom() { return _receiveFrom; }
     public void setReceiveFrom(Hash from) { _receiveFrom = from; }
     
-    /** what is the next tunnel ID we are sending to? */
+    /** what is the next tunnel ID we are sending to? (null if endpoint) */
     public byte[] getSendTunnelId() { return _sendTunnelId; }
+
+    /** what is the next tunnel we are sending to? (null if endpoint) */
     public TunnelId getSendTunnel() { 
         if (_sendTunnel == null)
             _sendTunnel = getTunnel(_sendTunnelId); 
@@ -71,7 +73,7 @@ public class HopConfig {
             return new TunnelId(DataHelper.fromLong(id, 0, id.length));
     }
     
-    /** what is the next peer in the tunnel (if any)? */
+    /** what is the next peer in the tunnel (null if endpoint) */
     public Hash getSendTo() { return _sendTo; }
     public void setSendTo(Hash to) { _sendTo = to; }
     
@@ -87,9 +89,23 @@ public class HopConfig {
     public SessionKey getReplyKey() { return _replyKey; }
     public void setReplyKey(SessionKey key) { _replyKey = key; }
     
-    /** iv used to encrypt the reply sent for the new tunnel creation crypto */
-    public ByteArray getReplyIV() { return _replyIV; }
-    public void setReplyIV(ByteArray iv) { _replyIV = iv; }
+    /**
+     *  IV used to encrypt the reply sent for the new tunnel creation crypto
+     *
+     *  @return 16 bytes
+     */
+    public byte[] getReplyIV() { return _replyIV; }
+
+    /**
+     *  IV used to encrypt the reply sent for the new tunnel creation crypto
+     *
+     *  @throws IllegalArgumentException if not 16 bytes
+     */
+    public void setReplyIV(byte[] iv) {
+        if (iv.length != REPLY_IV_LENGTH)
+            throw new IllegalArgumentException();
+        _replyIV = iv;
+    }
     
     /** when does this tunnel expire (in ms since the epoch)? */
     public long getExpiration() { return _expiration; }
@@ -112,12 +128,29 @@ public class HopConfig {
     /**
      *  Take note of a message being pumped through this tunnel.
      *  "processed" is for incoming and "sent" is for outgoing (could be dropped in between)
+     *  We use synchronization instead of an AtomicInteger here to save space.
      */
-    public void incrementProcessedMessages() { _messagesProcessed++; }
+    public synchronized void incrementProcessedMessages() { _messagesProcessed++; }
 
-    public int getProcessedMessagesCount() { return _messagesProcessed; }
+    public synchronized int getProcessedMessagesCount() { return _messagesProcessed; }
 
-    public int getRecentMessagesCount() {
+    /**
+     *  This returns the number of processed messages since
+     *  the last time getAndResetRecentMessagesCount() was called.
+     *  As of 0.9.23, does NOT reset the count, see getAndResetRecentMessagesCount().
+     */
+    public synchronized int getRecentMessagesCount() {
+        return _messagesProcessed - _oldMessagesProcessed;
+    }
+
+    /**
+     *  This returns the number of processed messages since the last time this was called,
+     *  and resets the count. It should only be called by code that updates the router stats.
+     *  See TunnelDispatcher.updateParticipatingStats().
+     *
+     *  @since 0.9.23
+     */
+    synchronized int getAndResetRecentMessagesCount() {
         int rv = _messagesProcessed - _oldMessagesProcessed;
         _oldMessagesProcessed = _messagesProcessed;
         return rv;
@@ -156,8 +189,9 @@ public class HopConfig {
         }
         
         buf.append(" exp. ").append(TunnelCreatorConfig.format(_expiration));
-        if (_messagesProcessed > 0)
-            buf.append(" used ").append(_messagesProcessed).append("KB");
+        int messagesProcessed = getProcessedMessagesCount();
+        if (messagesProcessed > 0)
+            buf.append(" used ").append(messagesProcessed).append("KB");
         return buf.toString();
     }
 }

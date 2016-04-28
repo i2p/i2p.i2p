@@ -47,6 +47,7 @@ class PacketHandler {
     private static final int MAX_NUM_HANDLERS = 1;
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
+    private static final long MAX_SKEW = 90*24*60*60*1000L;
     
     private enum AuthType { NONE, INTRO, BOBINTRO, SESSION }
 
@@ -87,6 +88,7 @@ class PacketHandler {
         _context.statManager().createRateStat("udp.droppedInvalidEstablish.new", "How old the packet we dropped due to invalidity (even though we do not have any active establishment with the peer) was", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.droppedInvalidInboundEstablish", "How old the packet we dropped due to invalidity (inbound establishment, bad key) was", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.droppedInvalidSkew", "How skewed the packet we dropped due to invalidity (valid except bad skew) was", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.destroyedInvalidSkew", "Destroyed session due to bad skew", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.packetDequeueTime", "How long it takes the UDPReader to pull a packet off the inbound packet queue (when its slow)", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.packetVerifyTime", "How long it takes the PacketHandler to verify a data packet after dequeueing (period is dequeue time)", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.packetVerifyTimeSlow", "How long it takes the PacketHandler to verify a data packet after dequeueing when its slow (period is dequeue time)", "udp", UDPTransport.RATES);
@@ -213,7 +215,7 @@ class PacketHandler {
                     _state = 5;
                     handlePacket(_reader, packet);
                     _state = 6;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     _state = 7;
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Crazy error handling a packet: " + packet, e);
@@ -356,7 +358,7 @@ class PacketHandler {
                         } else {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP " + packet);
-                            _context.statManager().addRateData("udp.droppedInvalidReestablish", packet.getLifetime(), packet.getExpiration());
+                            _context.statManager().addRateData("udp.droppedInvalidReestablish", packet.getLifetime());
                         }
                         return;
                     }
@@ -454,7 +456,7 @@ class PacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot validate rcvd pkt (path) wasCached? " + alreadyFailed + ": " + packet);
 
-                _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime());
                 switch (peerType) {
                     case INBOUND_FALLBACK:
                         _context.statManager().addRateData("udp.droppedInvalidEstablish.inbound", packet.getLifetime(), packet.getTimeSinceReceived());
@@ -531,7 +533,7 @@ class PacketHandler {
                 _state = 34;
                 receivePacket(reader, packet, INBOUND_FALLBACK);
             } else {
-                _context.statManager().addRateData("udp.droppedInvalidInboundEstablish", packet.getLifetime(), packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidInboundEstablish", packet.getLifetime());
             }
         }
 
@@ -609,35 +611,82 @@ class PacketHandler {
             _state = 44;
             long recvOn = packet.getBegin();
             long sendOn = reader.readTimestamp() * 1000;
+            // Positive when we are ahead of them
             long skew = recvOn - sendOn;
+            int type = reader.readPayloadType();
+            // if it's a bad type, the whole packet is probably corrupt
+            boolean typeOK = type <= UDPPacket.MAX_PAYLOAD_TYPE;
+            boolean skewOK = skew < MAX_SKEW && skew > (0 - MAX_SKEW) && typeOK;
 
             // update skew whether or not we will be dropping the packet for excessive skew
             if (state != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
-                if (auth == AuthType.SESSION)
+                if (auth == AuthType.SESSION && typeOK && (skewOK || state.getMessagesReceived() <= 0))
                     state.adjustClockSkew(skew);
             }
-            _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
+            _context.statManager().addRateData("udp.receivePacketSkew", skew);
 
-            if (!_context.clock().getUpdatedSuccessfully()) {
+            if (skewOK && !_context.clock().getUpdatedSuccessfully()) {
                 // adjust the clock one time in desperation
                 // this doesn't seem to work for big skews, we never get anything back,
                 // so we have to wait for NTCP to do it
                 _context.clock().setOffset(0 - skew, true);
-                if (skew != 0)
+                if (skew != 0) {
                     _log.logAlways(Log.WARN, "NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
+                    skew = 0;
+                }
             }
 
             if (skew > GRACE_PERIOD) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Packet too far in the past: " + new Date(sendOn) + ": " + packet);
-                _context.statManager().addRateData("udp.droppedInvalidSkew", skew, packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidSkew", skew);
+                if (state != null && skew > 4 * GRACE_PERIOD && state.getPacketsReceived() <= 0) {
+                    _transport.sendDestroy(state);
+                    _transport.dropPeer(state, true, "Clock skew");
+                    if (state.getRemotePort() == 65520) {
+                        // distinct port of buggy router
+                        _context.banlist().banlistRouterForever(state.getRemotePeer(),
+                                                                _x("Excessive clock skew: {0}"),
+                                                                DataHelper.formatDuration(skew));
+                    } else {
+                        _context.banlist().banlistRouter(DataHelper.formatDuration(skew),
+                                                         state.getRemotePeer(),
+                                                         _x("Excessive clock skew: {0}"));
+                    }
+                    _context.statManager().addRateData("udp.destroyedInvalidSkew", skew);
+                    if (_log.shouldWarn())
+                        _log.warn("Dropped conn, packet too far in the past: " + new Date(sendOn) + ": " + packet +
+                                  " PeerState: " + state);
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("Packet too far in the past: " + new Date(sendOn) + ": " + packet +
+                                  " PeerState: " + state);
+                }
                 return;
             } else if (skew < 0 - GRACE_PERIOD) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Packet too far in the future: " + new Date(sendOn) + ": " + packet);
-                _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew, packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew);
+                if (state != null && skew < 0 - (4 * GRACE_PERIOD) && state.getPacketsReceived() <= 0) {
+                    _transport.sendDestroy(state);
+                    _transport.dropPeer(state, true, "Clock skew");
+                    if (state.getRemotePort() == 65520) {
+                        // distinct port of buggy router
+                        _context.banlist().banlistRouterForever(state.getRemotePeer(),
+                                                                _x("Excessive clock skew: {0}"),
+                                                                DataHelper.formatDuration(0 - skew));
+                    } else {
+                        _context.banlist().banlistRouter(DataHelper.formatDuration(0 - skew),
+                                                         state.getRemotePeer(),
+                                                         _x("Excessive clock skew: {0}"));
+                    }
+                    _context.statManager().addRateData("udp.destroyedInvalidSkew", 0-skew);
+                    if (_log.shouldWarn())
+                        _log.warn("Dropped conn, packet too far in the future: " + new Date(sendOn) + ": " + packet +
+                                  " PeerState: " + state);
+                } else {
+                    if (_log.shouldWarn())
+                        _log.warn("Packet too far in the future: " + new Date(sendOn) + ": " + packet +
+                                  " PeerState: " + state);
+                }
                 return;
             }
 
@@ -648,7 +697,6 @@ class PacketHandler {
             RemoteHostId from = packet.getRemoteHost();
             _state = 46;
             
-            int type = reader.readPayloadType();
             switch (type) {
                 case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                     _state = 47;
@@ -785,9 +833,20 @@ class PacketHandler {
                     _state = 52;
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Dropping type " + type + " auth " + auth + ": " + packet);
-                    _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime(), packet.getExpiration());
+                    _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime());
                     return;
             }
         }
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     *  @since 0.9.20
+     */
+    private static final String _x(String s) {
+        return s;
     }
 }

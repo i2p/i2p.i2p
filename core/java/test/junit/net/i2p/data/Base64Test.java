@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 public class Base64Test extends TestCase{
     public void testBase64(){
         String orig = "you smell";
-        String encoded = Base64.encode(orig.getBytes());
+        String encoded = Base64.encode(DataHelper.getASCII(orig));
         byte decoded[] = Base64.decode(encoded);
         String transformed = new String(decoded);
         assertTrue(orig.equals(transformed));

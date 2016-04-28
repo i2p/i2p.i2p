@@ -9,6 +9,8 @@ package net.i2p.client;
  *
  */
 
+import net.i2p.client.impl.I2PClientImpl;
+
 /**
  * Provide a means of hooking into an appropriate I2PClient implementation
  *

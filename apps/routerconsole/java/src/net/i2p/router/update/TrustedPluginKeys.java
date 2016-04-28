@@ -43,7 +43,7 @@ class TrustedPluginKeys {
      *  @return map of B64 DSA keys to signer names
      */
     public static Map<String, String> getKeys() {
-        Map<String, String> rv = new HashMap(KEYS.length / 2);
+        Map<String, String> rv = new HashMap<String, String>(KEYS.length / 2);
         for (int i = 0; i < KEYS.length; i += 2) {
             rv.put(KEYS[i+1], KEYS[i]);
         }

@@ -113,8 +113,12 @@ class UDPEndpoint implements SocketListener {
     private DatagramSocket getSocket() {
         DatagramSocket socket = null;
         int port = _listenPort;
-        if (port > 0 && !TransportUtil.isValidPort(port))
-            _log.error("Specified UDP port is " + port + ", ports lower than 1024 not recommended");
+        if (port > 0 && !TransportUtil.isValidPort(port)) {
+            _log.error("Specified UDP port " + port + " is not valid, selecting a new port");
+            // See isValidPort() for list
+            _log.error("Invalid ports are: 0-1023, 1900, 2827, 4444, 4445, 6668, 7650-7664, 8998, 31000, 32000, 65536+");
+            port = -1;
+        }
 
         for (int i = 0; i < MAX_PORT_RETRIES; i++) {
              if (port <= 0) {

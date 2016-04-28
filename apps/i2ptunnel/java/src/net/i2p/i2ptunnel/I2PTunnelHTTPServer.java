@@ -4,6 +4,7 @@
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,7 @@ import javax.net.ssl.SSLException;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -35,8 +38,8 @@ import net.i2p.util.Log;
  * Simple extension to the I2PTunnelServer that filters the HTTP
  * headers sent from the client to the server, replacing the Host
  * header with whatever this instance has been configured with, and
- * if the browser set Accept-encoding: x-i2p-gzip, gzip the http 
- * message body and set Content-encoding: x-i2p-gzip.
+ * if the browser set Accept-Encoding: x-i2p-gzip, gzip the http 
+ * message body and set Content-Encoding: x-i2p-gzip.
  *
  */
 public class I2PTunnelHTTPServer extends I2PTunnelServer {
@@ -48,6 +51,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public static final String OPT_POST_MAX = "maxPosts";
     public static final String OPT_POST_TOTAL_MAX = "maxTotalPosts";
     public static final String OPT_REJECT_INPROXY = "rejectInproxy";
+    public static final String OPT_REJECT_REFERER = "rejectReferer";
+    public static final String OPT_REJECT_USER_AGENTS = "rejectUserAgents";
+    public static final String OPT_USER_AGENTS = "userAgentRejectList";
     public static final int DEFAULT_POST_WINDOW = 5*60;
     public static final int DEFAULT_POST_BAN_TIME = 30*60;
     public static final int DEFAULT_POST_TOTAL_BAN_TIME = 10*60;
@@ -62,15 +68,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER, DEST64_HEADER, DEST32_HEADER};
     private static final String SERVER_HEADER = "Server";
     private static final String X_POWERED_BY_HEADER = "X-Powered-By";
-    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER};
+    private static final String X_RUNTIME_HEADER = "X-Runtime"; // Rails
+    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER };
+    /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
+    /** total timeout for the request and all the headers */
     private static final long TOTAL_HEADER_TIMEOUT = 2 * HEADER_TIMEOUT;
     private static final long START_INTERVAL = (60 * 1000) * 3;
+    private static final int MAX_LINE_LENGTH = 8*1024;
+    /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
+    private static final int MAX_HEADERS = 60;
+    /** Includes request, just to prevent OOM DOS @since 0.9.20 */
+    private static final int MAX_TOTAL_HEADER_SIZE = 32*1024;
+    
     private long _startedOn = 0L;
     private ConnThrottler _postThrottler;
 
-    private final static byte[] ERR_UNAVAILABLE =
-        ("HTTP/1.1 503 Service Unavailable\r\n"+
+    private final static String ERR_UNAVAILABLE =
+         "HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -78,12 +93,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "\r\n"+
          "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
-         "<p>This I2P eepsite is unavailable. It may be down or undergoing maintenance.</p>\n" +
-         "</body></html>")
-         .getBytes();
+         "<p>This I2P website is unavailable. It may be down or undergoing maintenance.</p>\n" +
+         "</body></html>";
 
-    private final static byte[] ERR_DENIED =
-        ("HTTP/1.1 403 Denied\r\n"+
+    private final static String ERR_DENIED =
+         "HTTP/1.1 403 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -92,11 +106,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
          "<p>Denied due to excessive requests. Please try again later.</p>\n" +
-         "</body></html>")
-         .getBytes();
+         "</body></html>";
 
-    private final static byte[] ERR_INPROXY =
-        ("HTTP/1.1 403 Denied\r\n"+
+    private final static String ERR_INPROXY =
+         "HTTP/1.1 403 Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -105,8 +118,64 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<html><head><title>403 Denied</title></head>\n"+
          "<body><h2>403 Denied</h2>\n" +
          "<p>Inproxy access denied. You must run <a href=\"https://geti2p.net/\">I2P</a> to access this site.</p>\n" +
-         "</body></html>")
-         .getBytes();
+         "</body></html>";
+
+    private final static String ERR_SSL =
+         "HTTP/1.1 503 Service Unavailable\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>503 Service Unavailable</title></head>\n"+
+         "<body><h2>503 Service Unavailable</h2>\n" +
+         "<p>This I2P website is not configured for SSL.</p>\n" +
+         "</body></html>";
+
+    private final static String ERR_REQUEST_URI_TOO_LONG =
+         "HTTP/1.1 414 Request URI too long\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>414 Request URI Too Long</title></head>\n"+
+         "<body><h2>414 Request URI too long</h2>\n" +
+         "</body></html>";
+
+    private final static String ERR_HEADERS_TOO_LARGE =
+         "HTTP/1.1 431 Request header fields too large\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>431 Request Header Fields Too Large</title></head>\n"+
+         "<body><h2>431 Request header fields too large</h2>\n" +
+         "</body></html>";
+
+    private final static String ERR_REQUEST_TIMEOUT =
+         "HTTP/1.1 408 Request timeout\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>408 Request Timeout</title></head>\n"+
+         "<body><h2>408 Request timeout</h2>\n" +
+         "</body></html>";
+
+    private final static String ERR_BAD_REQUEST =
+         "HTTP/1.1 400 Bad Request\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>400 Bad Request</title></head>\n"+
+         "<body><h2>400 Bad request</h2>\n" +
+         "</body></html>";
+
 
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
@@ -126,7 +195,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private void setupI2PTunnelHTTPServer(String spoofHost) {
         _spoofHost = (spoofHost != null && spoofHost.trim().length() > 0) ? spoofHost.trim() : null;
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
-        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000 });
     }
 
     @Override
@@ -203,16 +271,88 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
+            if (socket.getLocalPort() == 443) {
+                if (getTunnel().getClientOptions().getProperty("targetForPort.443") == null) {
+                    try {
+                        socket.getOutputStream().write(ERR_SSL.getBytes("UTF-8"));
+                    } catch (IOException ioe) {
+                    } finally {
+                        try {
+                            socket.close();
+                        } catch (IOException ioe) {}
+                    }
+                    return;
+                }
+                Socket s = getSocket(socket.getPeerDestination().calculateHash(), 443);
+                Runnable t = new I2PTunnelRunner(s, socket, slock, null, null,
+                                                 null, (I2PTunnelRunner.FailCallback) null);
+                _clientExecutor.execute(t);
+                return;
+            }
+
             long afterAccept = getTunnel().getContext().clock().now();
+
             // The headers _should_ be in the first packet, but
             // may not be, depending on the client-side options
-            socket.setReadTimeout(HEADER_TIMEOUT);
-
-            InputStream in = socket.getInputStream();
 
             StringBuilder command = new StringBuilder(128);
-            Map<String, List<String>> headers = readHeaders(in, command,
-                CLIENT_SKIPHEADERS, getTunnel().getContext());
+            Map<String, List<String>> headers;
+            try {
+                // catch specific exceptions thrown, to return a good
+                // error to the client
+                headers = readHeaders(socket, null, command,
+                                      CLIENT_SKIPHEADERS, getTunnel().getContext());
+            } catch (SocketTimeoutException ste) {
+                try {
+                    socket.getOutputStream().write(ERR_REQUEST_TIMEOUT.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", ste);
+                return;
+            } catch (EOFException eofe) {
+                try {
+                    socket.getOutputStream().write(ERR_BAD_REQUEST.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", eofe);
+                return;
+            } catch (LineTooLongException ltle) {
+                try {
+                    socket.getOutputStream().write(ERR_HEADERS_TOO_LARGE.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", ltle);
+                return;
+            } catch (RequestTooLongException rtle) {
+                try {
+                    socket.getOutputStream().write(ERR_REQUEST_URI_TOO_LONG.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", rtle);
+                return;
+            } catch (BadRequestException bre) {
+                try {
+                    socket.getOutputStream().write(ERR_BAD_REQUEST.getBytes("UTF-8"));
+                } catch (IOException ioe) {
+                } finally {
+                     try { socket.close(); } catch (IOException ioe) {}
+                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error while receiving the new HTTP request", bre);
+                return;
+            }
             long afterHeaders = getTunnel().getContext().clock().now();
 
             Properties opts = getTunnel().getClientOptions();
@@ -220,12 +360,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 (headers.containsKey("X-Forwarded-For") ||
                  headers.containsKey("X-Forwarded-Server") ||
                  headers.containsKey("X-Forwarded-Host"))) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Refusing inproxy access: " + peerHash.toBase64());
+                if (_log.shouldLog(Log.WARN)) {
+                    StringBuilder buf = new StringBuilder();
+                    buf.append("Refusing inproxy access: ").append(Base32.encode(peerHash.getData())).append(".b32.i2p");
+                    List<String> h = headers.get("X-Forwarded-For");
+                    if (h != null)
+                        buf.append(" from: ").append(h.get(0));
+                    h = headers.get("X-Forwarded-Server");
+                    if (h != null)
+                        buf.append(" via: ").append(h.get(0));
+                    h = headers.get("X-Forwarded-Host");
+                    if (h != null)
+                        buf.append(" for: ").append(h.get(0));
+                    _log.warn(buf.toString());
+                }
                 try {
                     // Send a 403, so the user doesn't get an HTTP Proxy error message
                     // and blame his router or the network.
-                    socket.getOutputStream().write(ERR_INPROXY);
+                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
                 } catch (IOException ioe) {}
                 try {
                     socket.close();
@@ -233,16 +385,59 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return;
             }
 
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_REFERER)) &&
+                headers.containsKey("Referer")) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Refusing access from: " +
+                              Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                              " with Referer: " + headers.get("Referer").get(0));
+                try {
+                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                } catch (IOException ioe) {}
+                try {
+                    socket.close();
+                } catch (IOException ioe) {}
+                return;
+            }
+
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_USER_AGENTS)) &&
+                headers.containsKey("User-Agent")) {
+                String ua = headers.get("User-Agent").get(0);
+                if (!ua.startsWith("MYOB")) {
+                    String blockAgents = opts.getProperty(OPT_USER_AGENTS);
+                    if (blockAgents != null) {
+                        String[] agents = DataHelper.split(blockAgents, ",");
+                        for (int i = 0; i < agents.length; i++) {
+                            String ag = agents[i].trim();
+                            if (ag.length() > 0 && ua.contains(ag)) {
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("Refusing access from: " +
+                                              Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                              " with User-Agent: " + ua);
+                                try {
+                                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                                } catch (IOException ioe) {}
+                                try {
+                                    socket.close();
+                                } catch (IOException ioe) {}
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (_postThrottler != null &&
                 command.length() >= 5 &&
                 command.substring(0, 5).toUpperCase(Locale.US).equals("POST ")) {
                 if (_postThrottler.shouldThrottle(peerHash)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Refusing POST since peer is throttled: " + peerHash.toBase64());
+                        _log.warn("Refusing POST since peer is throttled: " +
+                                  Base32.encode(peerHash.getData()) + ".b32.i2p");
                     try {
                         // Send a 403, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
-                        socket.getOutputStream().write(ERR_DENIED);
+                        socket.getOutputStream().write(ERR_DENIED.getBytes("UTF-8"));
                     } catch (IOException ioe) {}
                     try {
                         socket.close();
@@ -272,20 +467,22 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             setEntry(headers, "Connection", "close");
             // we keep the enc sent by the browser before clobbering it, since it may have 
             // been x-i2p-gzip
-            String enc = getEntryOrNull(headers, "Accept-encoding");
-            String altEnc = getEntryOrNull(headers, "X-Accept-encoding");
+            String enc = getEntryOrNull(headers, "Accept-Encoding");
+            String altEnc = getEntryOrNull(headers, "X-Accept-Encoding");
             
             // according to rfc2616 s14.3, this *should* force identity, even if
             // "identity;q=1, *;q=0" didn't.  
-            setEntry(headers, "Accept-encoding", ""); 
+            // as of 0.9.23, the client passes this header through, and we do the same,
+            // so if the server and browser can do the compression/decompression, we don't have to
+            //setEntry(headers, "Accept-Encoding", ""); 
 
             socket.setReadTimeout(readTimeout);
             Socket s = getSocket(socket.getPeerDestination().calculateHash(), socket.getLocalPort());
             long afterSocket = getTunnel().getContext().clock().now();
             // instead of i2ptunnelrunner, use something that reads the HTTP 
             // request from the socket, modifies the headers, sends the request to the 
-            // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
-            // if it was one of the Accept-encoding: values, and gzip the payload       
+            // server, reads the response headers, rewriting to include Content-Encoding: x-i2p-gzip
+            // if it was one of the Accept-Encoding: values, and gzip the payload       
             boolean allowGZIP = true;
             String val = opts.getProperty("i2ptunnel.gzip");
             if ( (val != null) && (!Boolean.parseBoolean(val)) ) 
@@ -296,26 +493,26 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             boolean useGZIP = alt || ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
             // Don't pass this on, outproxies should strip so I2P traffic isn't so obvious but they probably don't
             if (alt)
-                headers.remove("X-Accept-encoding");
+                headers.remove("X-Accept-Encoding");
 
             String modifiedHeader = formatHeaders(headers, command);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Modified header: [" + modifiedHeader + "]");
             
+            Runnable t;
             if (allowGZIP && useGZIP) {
-                I2PAppThread req = new I2PAppThread(
-                    new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log),
-                        Thread.currentThread().getName()+".hc");
-                req.start();
+                t = new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log);
             } else {
-                Thread t = new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(),
+                t = new I2PTunnelRunner(s, socket, slock, null, DataHelper.getUTF8(modifiedHeader),
                                                null, (I2PTunnelRunner.FailCallback) null);
-                t.start();
             }
+            // run in the unlimited client pool
+            //t.start();
+            _clientExecutor.execute(t);
 
             long afterHandle = getTunnel().getContext().clock().now();
             long timeToHandle = afterHandle - afterAccept;
-            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
+            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle);
             if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
                           " [" + timeToHandle +
@@ -327,7 +524,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
-                socket.getOutputStream().write(ERR_UNAVAILABLE);
+                socket.getOutputStream().write(ERR_UNAVAILABLE.getBytes("UTF-8"));
             } catch (IOException ioe) {}
             try {
                 socket.close();
@@ -341,14 +538,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 socket.close();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error while receiving the new HTTP request", ex);
+                _log.warn("Error while receiving the new HTTP request from: " + Base32.encode(peerHash.getData()) + ".b32.i2p", ex);
         } catch (OutOfMemoryError oom) {
             // Often actually a file handle limit problem so we can safely send a response
             // java.lang.OutOfMemoryError: unable to create new native thread
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
                 // and blame his router or the network.
-                socket.getOutputStream().write(ERR_UNAVAILABLE);
+                socket.getOutputStream().write(ERR_UNAVAILABLE.getBytes("UTF-8"));
             } catch (IOException ioe) {}
             try {
                 socket.close();
@@ -388,7 +585,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 
                 if (_log.shouldLog(Log.INFO))
                     _log.info("request headers: " + _headers);
-                serverout.write(_headers.getBytes());
+                serverout.write(DataHelper.getUTF8(_headers));
                 browserin = _browser.getInputStream();
                 // Don't spin off a thread for this except for POSTs
                 // beware interference with Shoutcast, etc.?
@@ -423,10 +620,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
                 //Change headers to protect server identity
                 StringBuilder command = new StringBuilder(128);
-                Map<String, List<String>> headers = readHeaders(serverin, command,
+                Map<String, List<String>> headers = readHeaders(null, serverin, command,
                     SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
-                compressedOut.write(modifiedHeaders.getBytes());
+                compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
 
                 Sender s = new Sender(compressedOut, serverin, "server: server to browser", _log);
                 if (_log.shouldLog(Log.INFO))
@@ -439,7 +636,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 try {
                     if (browserout == null)
                         browserout = _browser.getOutputStream();
-                    browserout.write(ERR_UNAVAILABLE);
+                    browserout.write(ERR_UNAVAILABLE.getBytes("UTF-8"));
                 } catch (IOException ioe) {}
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
@@ -515,7 +712,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          */
         @Override
         protected String filterResponseLine(String line) {
-            String[] s = line.split(" ", 3);
+            String[] s = DataHelper.split(line, " ", 3);
             if (s.length > 1 &&
                 (s[1].startsWith("3") || s[1].startsWith("5")))
                 _dataExpected = 0;
@@ -524,6 +721,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     
         /**
          *  Don't compress small responses or images.
+         *  Don't compress things that are already compressed.
          *  Compression is inline but decompression on the client side
          *  creates a new thread.
          */
@@ -540,7 +738,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                      (!_contentType.equals("application/x-bzip")) &&
                      (!_contentType.equals("application/x-bzip2")) &&
                      (!_contentType.equals("application/x-gzip")) &&
-                     (!_contentType.equals("application/zip"))));
+                     (!_contentType.equals("application/zip")))) &&
+                   (_contentEncoding == null ||
+                    ((!_contentEncoding.equals("gzip")) &&
+                     (!_contentEncoding.equals("compress")) &&
+                     (!_contentEncoding.equals("deflate"))));
         }
 
         @Override
@@ -548,7 +750,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Including x-i2p-gzip as the content encoding in the response");
             if (shouldCompress())
-                out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
+                out.write(DataHelper.getASCII("Content-Encoding: x-i2p-gzip\r\n"));
             super.finishHeaders();
         }
 
@@ -588,7 +790,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         public long getTotalRead() { 
             try {
                 return def.getTotalIn();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // j2se 1.4.2_08 on linux is sometimes throwing an NPE in the getTotalIn() implementation
                 return 0; 
             }
@@ -596,7 +798,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         public long getTotalCompressed() { 
             try {
                 return def.getTotalOut();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // j2se 1.4.2_08 on linux is sometimes throwing an NPE in the getTotalOut() implementation
                 return 0;
             }
@@ -618,9 +820,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         buf.append("\r\n");
         return buf.toString();
     }
-    
-    /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
-    private static final int MAX_HEADERS = 60;
     
     /**
      * Add an entry to the multimap.
@@ -659,49 +858,75 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     	}
     }
 
-    protected static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command,
+    /**
+     *  From I2P to server: socket non-null, in null.
+     *  From server to I2P: socket null, in non-null.
+     *
+     *  Note: This does not handle RFC 2616 header line splitting,
+     *  which is obsoleted in RFC 7230.
+     *
+     *  @param socket if null, use in as InputStream
+     *  @param in if null, use socket.getInputStream() as InputStream
+     *  @param command out parameter, first line
+     *  @throws SocketTimeoutException if timeout is reached before newline
+     *  @throws EOFException if EOF is reached before newline
+     *  @throws LineTooLongException if one header too long, or too many headers, or total size too big
+     *  @throws RequestTooLongException if too long
+     *  @throws BadRequestException on bad headers
+     *  @throws IOException on other errors in the underlying stream
+     */
+    static Map<String, List<String>> readHeaders(I2PSocket socket, InputStream in, StringBuilder command,
                                                            String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
         
         // slowloris / darkloris
         long expire = ctx.clock().now() + TOTAL_HEADER_TIMEOUT;
-        boolean ok = DataHelper.readLine(in, command);
-        if (!ok) throw new IOException("EOF reached while reading the HTTP command [" + command.toString() + "]");
+        if (socket != null) {
+            try {
+                readLine(socket, command, HEADER_TIMEOUT);
+            } catch (LineTooLongException ltle) {
+                // convert for first line
+                throw new RequestTooLongException("Request too long - max " + MAX_LINE_LENGTH);
+            }
+        } else {
+             boolean ok = DataHelper.readLine(in, command);
+             if (!ok)
+                 throw new EOFException("EOF reached before the end of the headers");
+        }
         
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read the http command [" + command.toString() + "]");
         
-        // FIXME we probably don't need or want this in the outgoing direction
-        int trimmed = 0;
-        if (command.length() > 0) {
-            for (int i = 0; i < command.length(); i++) {
-                if (command.charAt(i) == 0) {
-                    command = command.deleteCharAt(i);
-                    i--;
-                    trimmed++;
-                }
-            }
-        }
-        if (trimmed > 0)
-            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
-        
+        int totalSize = command.length();
         int i = 0;
         while (true) {
-            if (++i > MAX_HEADERS)
-                throw new IOException("Too many header lines - max " + MAX_HEADERS);
+            if (++i > MAX_HEADERS) {
+                throw new LineTooLongException("Too many header lines - max " + MAX_HEADERS);
+            }
             buf.setLength(0);
-            ok = DataHelper.readLine(in, buf);
-            if (!ok) throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
+            if (socket != null) {
+                readLine(socket, buf, expire - ctx.clock().now());
+            } else {
+                 boolean ok = DataHelper.readLine(in, buf);
+                 if (!ok)
+                     throw new BadRequestException("EOF reached before the end of the headers");
+            }
             if ( (buf.length() == 0) || 
                  ((buf.charAt(0) == '\n') || (buf.charAt(0) == '\r')) ) {
                 // end of headers reached
                 return headers;
             } else {
-                if (ctx.clock().now() > expire)
-                    throw new IOException("Headers took too long [" + buf.toString() + "]");
+                if (ctx.clock().now() > expire) {
+                    throw new SocketTimeoutException("Headers took too long");
+                }
                 int split = buf.indexOf(":");
-                if (split <= 0) throw new IOException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
+                if (split <= 0)
+                    throw new BadRequestException("Invalid HTTP header, missing colon: \"" + buf +
+                                                  "\" request: \"" + command + '"');
+                totalSize += buf.length();
+                if (totalSize > MAX_TOTAL_HEADER_SIZE)
+                    throw new LineTooLongException("Req+headers too big");
                 String name = buf.substring(0, split).trim();
                 String value = null;
                 if (buf.length() > split + 1)
@@ -711,15 +936,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
                 String lcName = name.toLowerCase(Locale.US);
                 if ("accept-encoding".equals(lcName))
-                    name = "Accept-encoding";
+                    name = "Accept-Encoding";
                 else if ("x-accept-encoding".equals(lcName))
-                    name = "X-Accept-encoding";
+                    name = "X-Accept-Encoding";
                 else if ("x-forwarded-for".equals(lcName))
                     name = "X-Forwarded-For";
                 else if ("x-forwarded-server".equals(lcName))
                     name = "X-Forwarded-Server";
                 else if ("x-forwarded-host".equals(lcName))
                     name = "X-Forwarded-Host";
+                else if ("user-agent".equals(lcName))
+                    name = "User-Agent";
+                else if ("referer".equals(lcName))
+                    name = "Referer";
 
                 // For incoming, we remove certain headers to prevent spoofing.
                 // For outgoing, we remove certain headers to improve anonymity.
@@ -738,6 +967,78 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Read the header [" + name + "] = [" + value + "]");
             }
+        }
+    }
+
+    /**
+     *  Read a line teriminated by newline, with a total read timeout.
+     *
+     *  Warning - strips \n but not \r
+     *  Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     *  Warning - not UTF-8
+     *
+     *  @param buf output
+     *  @param timeout throws SocketTimeoutException immediately if zero or negative
+     *  @throws SocketTimeoutException if timeout is reached before newline
+     *  @throws EOFException if EOF is reached before newline
+     *  @throws LineTooLongException if too long
+     *  @throws IOException on other errors in the underlying stream
+     *  @since 0.9.19 modified from DataHelper
+     */
+    private static void readLine(I2PSocket socket, StringBuilder buf, long timeout) throws IOException {
+        if (timeout <= 0)
+            throw new SocketTimeoutException();
+        long expires = System.currentTimeMillis() + timeout;
+        InputStream in = socket.getInputStream();
+        int c;
+        int i = 0;
+        socket.setReadTimeout(timeout);
+        while ( (c = in.read()) != -1) {
+            if (++i > MAX_LINE_LENGTH)
+                throw new LineTooLongException("Line too long - max " + MAX_LINE_LENGTH);
+            if (c == '\n')
+                break;
+            long newTimeout = expires - System.currentTimeMillis();
+            if (newTimeout <= 0)
+                throw new SocketTimeoutException();
+            buf.append((char)c);
+            if (newTimeout != timeout) {
+                timeout = newTimeout;
+                socket.setReadTimeout(timeout);
+            }
+        }
+        if (c == -1) {
+            if (System.currentTimeMillis() >= expires)
+                throw new SocketTimeoutException();
+            else
+                throw new EOFException();
+        }
+    }
+
+    /**
+     *  @since 0.9.19
+     */
+    private static class LineTooLongException extends IOException {
+        public LineTooLongException(String s) {
+            super(s);
+        }
+    }
+
+    /**
+     *  @since 0.9.20
+     */
+    private static class RequestTooLongException extends IOException {
+        public RequestTooLongException(String s) {
+            super(s);
+        }
+    }
+
+    /**
+     *  @since 0.9.20
+     */
+    private static class BadRequestException extends IOException {
+        public BadRequestException(String s) {
+            super(s);
         }
     }
 }

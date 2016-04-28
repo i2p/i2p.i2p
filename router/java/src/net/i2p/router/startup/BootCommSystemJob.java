@@ -14,6 +14,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.RouterClock;
 import net.i2p.router.tasks.ReadConfigJob;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /** This actually boots almost everything */
 class BootCommSystemJob extends JobImpl {
@@ -46,9 +47,12 @@ class BootCommSystemJob extends JobImpl {
         // start I2CP
         getContext().jobQueue().addJob(new StartAcceptingClientsJob(getContext()));
 
-        Job j = new ReadConfigJob(getContext());
-        j.getTiming().setStartAfter(getContext().clock().now() + 2*60*1000);
-        getContext().jobQueue().addJob(j);
+        if (!SystemVersion.isAndroid()) {
+            Job j = new ReadConfigJob(getContext());
+            j.getTiming().setStartAfter(getContext().clock().now() + 2*60*1000);
+            getContext().jobQueue().addJob(j);
+        }
+
         ((RouterClock) getContext().clock()).addShiftListener(getContext().router());
     }
         

@@ -63,7 +63,7 @@ public class Main {
 	}
 
 	static void wrtxt(OutputStream CMDout, String s) throws IOException {
-		CMDout.write(s.getBytes());
+		CMDout.write(DataHelper.getUTF8(s));
 		CMDout.write('\n');
 		CMDout.flush();
 	}

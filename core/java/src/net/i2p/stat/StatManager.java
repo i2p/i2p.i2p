@@ -1,5 +1,8 @@
 package net.i2p.stat;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.Collator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -216,7 +219,7 @@ public class StatManager {
             String gname = stat.getGroupName();
             SortedSet<String> names = groups.get(gname);
             if (names == null) {
-                names = new TreeSet<String>();
+                names = new TreeSet<String>(Collator.getInstance());
                 groups.put(gname, names);
             }
             names.add(stat.getName());
@@ -225,7 +228,7 @@ public class StatManager {
             String gname = stat.getGroupName();
             SortedSet<String> names = groups.get(gname);
             if (names == null) {
-                names = new TreeSet<String>();
+                names = new TreeSet<String>(Collator.getInstance());
                 groups.put(gname, names);
             }
             names.add(stat.getName());
@@ -245,5 +248,19 @@ public class StatManager {
      */
     public boolean ignoreStat(String statName) {
         return _context.isRouterContext() && !_context.getBooleanProperty(PROP_STAT_FULL);
+    }
+    
+    /**
+     * Serializes all Frequencies and Rates to the provided OutputStream
+     * @param out to write to
+     * @param prefix to use when serializing
+     * @throws IOException if something goes wrong
+     * @since 0.9.23
+     */
+    public void store(OutputStream out, String prefix) throws IOException {
+        for (FrequencyStat fs : _frequencyStats.values())
+            fs.store(out, prefix);
+        for (RateStat rs : _rateStats.values())
+            rs.store(out,prefix);
     }
 }

@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-14 13:33+0000\n"
-"PO-Revision-Date: 2014-08-10 18:13+0000\n"
-"Last-Translator: Shpetim <shpetim@privacysolutions.no>\n"
+"POT-Creation-Date: 2015-07-17 01:08+0000\n"
+"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/I2P/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,6 +51,9 @@ msgstr "Antilet Holandeze"
 
 msgid "Angola"
 msgstr "Angola"
+
+msgid "Asia/Pacific Region"
+msgstr ""
 
 msgid "Antarctica"
 msgstr "Antarktida"
@@ -103,14 +106,20 @@ msgstr "Burundi"
 msgid "Benin"
 msgstr "Benini"
 
+msgid "Saint Barthélemy"
+msgstr ""
+
 msgid "Bermuda"
 msgstr "Bermuda"
 
 msgid "Brunei Darussalam"
-msgstr ""
+msgstr "Brunei Darusalam"
 
 msgid "Bolivia"
 msgstr "Bolivia"
+
+msgid "Bonaire"
+msgstr ""
 
 msgid "Brazil"
 msgstr "Brazili"
@@ -139,14 +148,11 @@ msgstr "Kanada"
 msgid "Cocos (Keeling) Islands"
 msgstr "Ishujt Cocos (Keeling)"
 
-msgid "The Democratic Republic of the Congo"
-msgstr "Republika Demokratike e Kongos"
+msgid "Congo"
+msgstr "Kongo"
 
 msgid "Central African Republic"
 msgstr "Republika e Afrikës Qëndrore. "
-
-msgid "Congo"
-msgstr "Kongo"
 
 msgid "Switzerland"
 msgstr "Zvicrra"
@@ -244,8 +250,8 @@ msgstr "Fixhi"
 msgid "Falkland Islands (Malvinas)"
 msgstr "Ishujt Falkand (Malvinas)"
 
-msgid "Federated States of Micronesia"
-msgstr "Shtetet Federate të Mikronezisë "
+msgid "Micronesia"
+msgstr ""
 
 msgid "Faroe Islands"
 msgstr "Ishujt Faroe"
@@ -346,8 +352,8 @@ msgstr "Territor oqeanik Indiano-Britanik"
 msgid "Iraq"
 msgstr "Iraku"
 
-msgid "Islamic Republic of Iran"
-msgstr "Republika Islamike e Iranit"
+msgid "Iran"
+msgstr ""
 
 msgid "Iceland"
 msgstr "Islanda"
@@ -385,8 +391,8 @@ msgstr "Komorosi"
 msgid "Saint Kitts and Nevis"
 msgstr "Shenjt Kitts dhe Nevis"
 
-msgid "The Democratic People's Republic of Korea"
-msgstr "Republika Demokratike Popullore e Koresë"
+msgid "North Korea"
+msgstr ""
 
 msgid "Republic of Korea"
 msgstr "Republika e Koresë"
@@ -430,8 +436,8 @@ msgstr "Luksemburgu"
 msgid "Latvia"
 msgstr "Latvia"
 
-msgid "Libyan Arab Jamahiriya"
-msgstr "Jamahiriya Libiane Arabe"
+msgid "Libya"
+msgstr ""
 
 msgid "Morocco"
 msgstr "Maroko"
@@ -439,8 +445,8 @@ msgstr "Maroko"
 msgid "Monaco"
 msgstr "Monako"
 
-msgid "Republic of Moldova"
-msgstr "Republika e Moldovës"
+msgid "Moldova"
+msgstr ""
 
 msgid "Montenegro"
 msgstr "Mali i Zi"
@@ -454,8 +460,8 @@ msgstr "Madagaskari"
 msgid "Marshall Islands"
 msgstr "Ishujt Marshall"
 
-msgid "The Former Yugoslav Republic of Macedonia"
-msgstr "Ish-Republika Jugosllave e Maqedonisë"
+msgid "Macedonia"
+msgstr ""
 
 msgid "Mali"
 msgstr "Mali"
@@ -466,8 +472,8 @@ msgstr "Myanmari"
 msgid "Mongolia"
 msgstr "Mongolia"
 
-msgid "Macao"
-msgstr "Makao"
+msgid "Macau"
+msgstr ""
 
 msgid "Northern Mariana Islands"
 msgstr "Ishujt Veriorë të Marianëve"
@@ -646,14 +652,20 @@ msgstr "Somalia"
 msgid "Suriname"
 msgstr "Surinami"
 
+msgid "South Sudan"
+msgstr ""
+
 msgid "Sao Tome and Principe"
 msgstr "Sao Tome dhe Principe"
 
 msgid "El Salvador"
 msgstr "El Salvador"
 
-msgid "Syrian Arab Republic"
-msgstr "Republika Arabe e Sirisë"
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr ""
 
 msgid "Swaziland"
 msgstr "Svaziland"
@@ -703,8 +715,8 @@ msgstr "Tuvalu"
 msgid "Taiwan"
 msgstr "Taivani"
 
-msgid "United Republic of Tanzania"
-msgstr "Republika e Bashkuar e Tanzanisë"
+msgid "Tanzania"
+msgstr ""
 
 msgid "Ukraine"
 msgstr "Ukraina"
@@ -724,8 +736,8 @@ msgstr "Uruguaji"
 msgid "Uzbekistan"
 msgstr "Uzbekistani"
 
-msgid "Holy See (Vatican City State)"
-msgstr "Holy See (Qytetshteti i Vatikanit) "
+msgid "Vatican"
+msgstr ""
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Sankt Vincenti dhe Grenadinet"
@@ -736,8 +748,8 @@ msgstr "Venezuela"
 msgid "Virgin Islands"
 msgstr "Ishujt Virgin"
 
-msgid "Viet Nam"
-msgstr "Vietnami"
+msgid "Vietnam"
+msgstr ""
 
 msgid "Vanuatu"
 msgstr "Vanuatu"

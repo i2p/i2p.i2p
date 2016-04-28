@@ -16,12 +16,12 @@ public class Messages {
     }
 
     /** lang in routerconsole.lang property, else current locale */
-    public String _(String key) {
+    public String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
     /** @since 0.9.11 */
-    public String _(String key, Object o) {
+    public String _t(String key, Object o) {
         return Translate.getString(key, o, _context, BUNDLE_NAME);
     }
 

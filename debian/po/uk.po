@@ -5,14 +5,15 @@
 # Translators:
 # Denis Blank <gribua@gmail.com>, 2011
 # LinuxChata, 2014
+# madjong <madjong@i2pmail.org>, 2015
 # Denis Blank <gribua@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2014-06-22 10:19+0000\n"
-"Last-Translator: LinuxChata\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-04-08 20:08+0000\n"
+"Last-Translator: madjong <madjong@i2pmail.org>\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/"
 "language/uk_UA/)\n"
 "Language: uk_UA\n"
@@ -91,3 +92,19 @@ msgstr ""
 "Роутери з високою швидкістю передачі інформації, так само як роутери з "
 "великою кількістю активних торрентів / плагінів, можуть потребувати "
 "збільшення цього значення."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "Запустити демон I2P, обмежений AppArmor"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""
+"При активації цієї опції I2P працюватиме в пісочниці AppArmor, доступ до "
+"файлів і директорій для I2P буде обмежено"

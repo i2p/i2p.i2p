@@ -243,7 +243,7 @@ public class GarlicMessageBuilder {
             if (config instanceof PayloadGarlicConfig) {
                 byte clove[] = buildClove(ctx, (PayloadGarlicConfig)config);
                 baos = new ByteArrayOutputStream(clove.length + 16);
-                DataHelper.writeLong(baos, 1, 1);
+                baos.write((byte) 1);
                 baos.write(clove);
             } else {
                 byte cloves[][] = new byte[config.getCloveCount()][];
@@ -263,7 +263,7 @@ public class GarlicMessageBuilder {
                 for (int i = 0; i < cloves.length; i++)
                     len += cloves[i].length;
                 baos = new ByteArrayOutputStream(len + 16);
-                DataHelper.writeLong(baos, 1, cloves.length);
+                baos.write((byte) cloves.length);
                 for (int i = 0; i < cloves.length; i++)
                     baos.write(cloves[i]);
             }

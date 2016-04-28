@@ -121,6 +121,114 @@ public interface UpdateManager {
      *  @return true if valid, false if corrupt
      */
     public boolean notifyComplete(UpdateTask task, String actualVersion, File file);
+    
+    /**
+     *  Is an update available?
+     *  Blocking.
+     *  An available update may still have a constraint or lack sources.
+     *  @param type the UpdateType of this request
+     *  @return new version or null if nothing newer is available
+     *  @since 0.9.21
+     */
+    public String checkAvailable(UpdateType type);
+    
+    /**
+     *  Is an update available?
+     *  Blocking.
+     *  An available update may still have a constraint or lack sources.
+     *  @param type the UpdateType of this request
+     *  @param maxWait max time to block
+     *  @return new version or null if nothing newer is available
+     *  @since 0.9.21
+     */
+    public String checkAvailable(UpdateType type, long maxWait);
+    
+    /**
+     *  Is an update available?
+     *  Blocking.
+     *  An available update may still have a constraint or lack sources.
+     *  @param type the UpdateType of this request
+     *  @param maxWait max time to block
+     *  @param id id of this request
+     *  @return new version or null if nothing newer is available
+     *  @since 0.9.21
+     */
+    public String checkAvailable(UpdateType type, String id, long maxWait);
+    
+    /**
+     *  Is a router update being downloaded?
+     *  @return true iff router update is being downloaded
+     *  @since 0.9.21
+     */
+    public boolean isUpdateInProgress();
+    
+    /**
+     *  Is a router update being downloaded?
+     *  @param type the UpdateType of this request
+     *  @return true iff router update is being downloaded
+     *  @since 0.9.21
+     */
+    public boolean isUpdateInProgress(UpdateType type);
+    
+    /**
+     *  Is a router update being downloaded?
+     *  @param type the UpdateType of this request
+     *  @param id of this request
+     *  @return true iff router update is being downloaded
+     *  @since 0.9.21
+     */
+    public boolean isUpdateInProgress(UpdateType type, String id);
+
+    /**
+     *  Non-blocking. Does not check.
+     *  Fails if check or update already in progress.
+     *  If returns true, then call isUpdateInProgress() in a loop
+     *  @param type the UpdateType of this request   
+     *  @return true if task started
+     *  @since 0.9.21
+     */
+    public boolean update(UpdateType type);
+    
+    /**
+     *  Non-blocking. Does not check.
+     *  Fails if check or update already in progress.
+     *  If returns true, then call isUpdateInProgress() in a loop
+     *  @param type the UpdateType of this request   
+     *  @param id id of this request
+     *  @return true if task started
+     *  @since 0.9.21
+     */
+    public boolean update(UpdateType type, String id);
+    
+    /**
+     *  Non-blocking. Does not check.
+     *  Fails if check or update already in progress.
+     *  If returns true, then call isUpdateInProgress() in a loop
+     *  @param type the UpdateType of this request   
+     *  @param maxTime not honored by all Updaters
+     *  @return true if task started
+     *  @since 0.9.21
+     */
+    public boolean update(UpdateType type, long maxTime);
+    
+    /**
+     *  Non-blocking. Does not check.
+     *  Fails if check or update already in progress.
+     *  If returns true, then call isUpdateInProgress() in a loop
+     *  @param type the UpdateType of this request   
+     *  @param maxTime not honored by all Updaters
+     *  @param id id of this request
+     *  @return true if task started
+     *  @since 0.9.21
+     */
+    public boolean update(UpdateType type, String id, long maxTime);
+    
+    /**
+     *  The status on any update current or last finished.
+     *  @return status or ""
+     *  @since 0.9.21
+     */
+    public String getStatus();
 
     /**
      *  For debugging

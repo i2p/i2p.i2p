@@ -100,7 +100,7 @@ class SearchReplyJob extends JobImpl {
                 } else {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Peer " + _peer.toBase64() + " sends us bad replies, so not verifying " + peer.toBase64());
-                    getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
+                    getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1);
                 }
             }
 
@@ -125,14 +125,14 @@ class SearchReplyJob extends JobImpl {
         if (_log.shouldLog(Log.INFO))
             _log.info("Peer reply from " + _peer.toBase64());
         _repliesPendingVerification--;
-        getContext().statManager().addRateData("netDb.searchReplyValidated", 1, 0);
+        getContext().statManager().addRateData("netDb.searchReplyValidated", 1);
     }
     void replyNotVerified() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Peer reply from " + _peer.toBase64());
         _repliesPendingVerification--;
         _invalidPeers++;
-        getContext().statManager().addRateData("netDb.searchReplyNotValidated", 1, 0);
+        getContext().statManager().addRateData("netDb.searchReplyNotValidated", 1);
     }
 }
 

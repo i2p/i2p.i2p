@@ -25,24 +25,24 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-abstract class SAMHandler implements Runnable {
+abstract class SAMHandler implements Runnable, Handler {
 
     protected final Log _log;
 
-    protected I2PAppThread thread = null;
-    protected SAMBridge bridge = null;
+    protected I2PAppThread thread;
+    protected final SAMBridge bridge;
 
     private final Object socketWLock = new Object(); // Guards writings on socket
     protected final SocketChannel socket;
 
-    protected final int verMajor;
-    protected final int verMinor;
+    public final int verMajor;
+    public final int verMinor;
     
     /** I2CP options configuring the I2CP connection (port, host, numHops, etc) */
     protected final Properties i2cpProps;
 
-    private final Object stopLock = new Object();
-    private volatile boolean stopHandler;
+    protected final Object stopLock = new Object();
+    protected boolean stopHandler;
 
     /**
      * SAMHandler constructor (to be called by subclasses)
@@ -53,14 +53,15 @@ abstract class SAMHandler implements Runnable {
      * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
      * @throws IOException 
      */
-    protected SAMHandler(SocketChannel s,
-                         int verMajor, int verMinor, Properties i2cpProps) throws IOException {
+    protected SAMHandler(SocketChannel s, int verMajor, int verMinor,
+                         Properties i2cpProps, SAMBridge parent) throws IOException {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         socket = s;
 
         this.verMajor = verMajor;
         this.verMinor = verMinor;
         this.i2cpProps = i2cpProps;
+        bridge = parent;
     }
 
     /**
@@ -68,12 +69,10 @@ abstract class SAMHandler implements Runnable {
      *
      */
     public final void startHandling() {
-        thread = new I2PAppThread(this, "SAMHandler");
+        thread = new I2PAppThread(this, getClass().getSimpleName());
         thread.start();
     }
-    
-    public void setBridge(SAMBridge bridge) { this.bridge = bridge; }
-    
+
     /**
      * Actually handle the SAM protocol.
      *
@@ -81,10 +80,9 @@ abstract class SAMHandler implements Runnable {
     protected abstract void handle();
 
     /**
-     * Get the input stream of the socket connected to the SAM client
+     * Get the channel of the socket connected to the SAM client
      *
-     * @return input stream
-     * @throws IOException 
+     * @return channel
      */
     protected final SocketChannel getClientSocket() {
         return socket ;
@@ -104,7 +102,10 @@ abstract class SAMHandler implements Runnable {
         }
     }
     
-    static public void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
+    /**
+     *  Caller must synch
+     */
+    private static void writeBytes(ByteBuffer data, SocketChannel out) throws IOException {
         while (data.hasRemaining()) out.write(data);           
         out.socket().getOutputStream().flush();
     }
@@ -134,11 +135,14 @@ abstract class SAMHandler implements Runnable {
         }
     }
 
-    /** @return success */
+    /**
+     * Unsynchronized, use with caution
+     * @return success
+     */
     public static boolean writeString(String str, SocketChannel out)
     {
     	try {
-            writeBytes(ByteBuffer.wrap(DataHelper.getASCII(str)), out);
+            writeBytes(ByteBuffer.wrap(DataHelper.getUTF8(str)), out);
         } catch (IOException e) {
             //_log.debug("Caught IOException", e);
             return false;
@@ -156,13 +160,19 @@ abstract class SAMHandler implements Runnable {
     }
 
     /**
-     * Stop the SAM handler
-     *
+     * Stop the SAM handler, close the client socket,
+     * unregister with the bridge.
      */
-    public final void stopHandling() {
+    public void stopHandling() {
+        if (_log.shouldInfo())
+            _log.info("Stopping: " + this, new Exception("I did it"));
         synchronized (stopLock) {
             stopHandler = true;
         }
+        try {
+            closeClientSocket();
+        } catch (IOException e) {}
+        bridge.unregister(this);
     }
 
     /**
@@ -183,14 +193,23 @@ abstract class SAMHandler implements Runnable {
      */
     @Override
     public final String toString() {
-        return ("SAM handler (class: " + this.getClass().getName()
+        return (this.getClass().getSimpleName()
                 + "; SAM version: " + verMajor + "." + verMinor
                 + "; client: "
                 + this.socket.socket().getInetAddress().toString() + ":"
                 + this.socket.socket().getPort() + ")");
     }
 
+    /**
+     * Register with the bridge, call handle(),
+     * unregister with the bridge.
+     */
     public final void run() {
-        handle();
+        bridge.register(this);
+        try {
+            handle();
+        } finally {
+            bridge.unregister(this);
+        }
     }
 }

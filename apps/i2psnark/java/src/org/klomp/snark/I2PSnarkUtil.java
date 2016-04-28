@@ -3,8 +3,8 @@ package org.klomp.snark;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -74,8 +75,7 @@ public class I2PSnarkUtil {
     private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
-    public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
-    public static final int MAX_CONNECTIONS = 16; // per torrent
+    public static final int MAX_CONNECTIONS = 24; // per torrent
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     public static final boolean DEFAULT_USE_DHT = true;
     public static final String EEPGET_USER_AGENT = "I2PSnark";
@@ -97,7 +97,7 @@ public class I2PSnarkUtil {
         setI2CPConfig("127.0.0.1", 7654, null);
         _banlist = new ConcurrentHashSet<Hash>();
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
-        _maxUpBW = DEFAULT_MAX_UP_BW;
+        _maxUpBW = SnarkManager.DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
@@ -106,8 +106,8 @@ public class I2PSnarkUtil {
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
-        _tmpDir = new SecureDirectory(ctx.getTempDir(), baseName);
-        FileUtil.rmdir(_tmpDir, false);
+        _tmpDir = new SecureDirectory(ctx.getTempDir(), baseName + '-' + ctx.random().nextInt());
+        //FileUtil.rmdir(_tmpDir, false);
         _tmpDir.mkdirs();
     }
     
@@ -136,6 +136,7 @@ public class I2PSnarkUtil {
     
     public boolean configured() { return _configured; }
     
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {
         if (i2cpHost != null)
             _i2cpHost = i2cpHost;
@@ -256,6 +257,8 @@ public class I2PSnarkUtil {
                 opts.setProperty("i2p.streaming.disableRejectLogging", "true");
             if (opts.getProperty("i2p.streaming.answerPings") == null)
                 opts.setProperty("i2p.streaming.answerPings", "false");
+            if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
+                opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
             _connecting = false;
         }
@@ -329,7 +332,7 @@ public class I2PSnarkUtil {
             return rv;
         } catch (I2PException ie) {
             _banlist.add(dest);
-            _context.simpleScheduler().addEvent(new Unbanlist(dest), 10*60*1000);
+            _context.simpleTimer2().addEvent(new Unbanlist(dest), 10*60*1000);
             IOException ioe = new IOException("Unable to reach the peer " + peer);
             ioe.initCause(ie);
             throw ioe;
@@ -457,7 +460,7 @@ public class I2PSnarkUtil {
             return null;
     }
     
-    String getOurIPString() {
+    public String getOurIPString() {
         Destination dest = getMyDestination();
         if (dest != null)
             return dest.toBase64();
@@ -587,10 +590,10 @@ public class I2PSnarkUtil {
      */
     public boolean isKnownOpenTracker(String url) { 
         try {
-           URL u = new URL(url);
+           URI u = new URI(url);
            String host = u.getHost();
            return host != null && SnarkManager.KNOWN_OPENTRACKERS.contains(host);
-        } catch (MalformedURLException mue) {
+        } catch (URISyntaxException use) {
            return false;
         }
     }
@@ -658,7 +661,7 @@ public class I2PSnarkUtil {
      *    The {0} will be replaced by the parameter.
      *    Single quotes must be doubled, i.e. ' -> '' in the string.
      *  @param o parameter, not translated.
-     *    To tranlslate parameter also, use _("foo {0} bar", _("baz"))
+     *    To translate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.
      *    Use autoboxing to call with ints, longs, floats, etc.
      */

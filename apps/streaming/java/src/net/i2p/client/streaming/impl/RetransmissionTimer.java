@@ -12,6 +12,7 @@ public class RetransmissionTimer extends SimpleTimer2 {
      *  @deprecated Don't use this to prestart threads, this is no longer a static instance
      *  @return a new instance as of 0.9
      */
+    @Deprecated
     public static final RetransmissionTimer getInstance() {
         return new RetransmissionTimer(I2PAppContext.getGlobalContext(), "RetransmissionTimer");
     }

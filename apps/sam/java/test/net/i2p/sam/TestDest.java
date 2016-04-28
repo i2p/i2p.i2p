@@ -19,17 +19,17 @@ public class TestDest {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.debug("line read for valid version: " + line);
             String req = "SESSION CREATE STYLE=STREAM DESTINATION=testNaming " + conOptions + "\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.debug("Response to creating the session with destination testNaming: " + line);
             _log.debug("The above should contain SESSION STATUS RESULT=OK\n\n\n");
             String lookup = "DEST GENERATE\n";
-            out.write(lookup.getBytes());
+            out.write(DataHelper.getASCII(lookup));
             line = reader.readLine();
             _log.info("Response from the dest generate: " + line);
             _log.debug("The abouve should be a DEST REPLY");

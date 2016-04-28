@@ -10,7 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Network Peer Profiles")%></h1>
+<h1><%=intl._t("I2P Network Peer Profiles")%></h1>
 <div class="main" id="main"><div class="wideload">
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

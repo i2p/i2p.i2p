@@ -98,7 +98,13 @@ class RebuildRouterInfoJob extends JobImpl {
                     KeyData kd = LoadRouterInfoJob.readKeyData(keyFile, keyFile2);
                     info = new RouterInfo();
                     info.setIdentity(kd.routerIdentity);
-                } catch (Exception e) {
+                } catch (DataFormatException e) {
+                    _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
+                    keyFile.delete();
+                    keyFile2.delete();
+                    rebuildRouterInfo(alreadyRunning);
+                    return;
+                } catch (IOException e) {
                     _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
                     keyFile.delete();
                     keyFile2.delete();
@@ -112,10 +118,8 @@ class RebuildRouterInfoJob extends JobImpl {
             
             try {
                 info.setAddresses(getContext().commSystem().createAddresses());
-                Properties stats = getContext().statPublisher().publishStatistics();
-                stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
+                Properties stats = getContext().statPublisher().publishStatistics(info.getHash());
                 info.setOptions(stats);
-                getContext().router().addCapabilities(info);
                 // info.setPeers(new HashSet()); // this would have the trusted peers
                 info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 

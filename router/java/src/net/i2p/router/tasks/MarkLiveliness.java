@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
@@ -45,7 +46,7 @@ public class MarkLiveliness implements SimpleTimer.TimedEvent {
         FileOutputStream fos = null;
         try { 
             fos = new SecureFileOutputStream(_pingFile);
-            fos.write(Long.toString(System.currentTimeMillis()).getBytes());
+            fos.write(DataHelper.getASCII(Long.toString(System.currentTimeMillis())));
         } catch (IOException ioe) {
             if (!_errorLogged) {
                 Log log = _router.getContext().logManager().getLog(MarkLiveliness.class);

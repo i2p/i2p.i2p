@@ -71,6 +71,7 @@ public class I2CPMessageReader {
      * Have the already started reader pause its reading indefinitely
      * @deprecated unused
      */
+    @Deprecated
     public void pauseReading() {
         _reader.pauseRunner();
     }
@@ -79,6 +80,7 @@ public class I2CPMessageReader {
      * Resume reading after a pause
      * @deprecated unused
      */
+    @Deprecated
     public void resumeReading() {
         _reader.resumeRunner();
     }
@@ -158,6 +160,20 @@ public class I2CPMessageReader {
         }
 
         public void run() {
+            try {
+                run2();
+            } catch (RuntimeException e) {
+                _log.log(Log.CRIT, "Uncaught I2CP error", e);
+                _listener.readError(I2CPMessageReader.this, e);
+                cancelRunner();
+            }
+        }
+
+        /**
+         * Called by run()
+         * @since 0.9.21
+         */
+        protected void run2() {
             while (_stayAlive) {
                 while (_doRun) {
                     // do read
@@ -179,7 +195,7 @@ public class I2CPMessageReader {
                     } catch (OutOfMemoryError oom) {
                         // ooms seen here... maybe log and keep going?
                         throw oom;
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         _log.log(Log.CRIT, "Unhandled error reading I2CP stream", e);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();

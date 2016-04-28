@@ -1,7 +1,11 @@
 package net.i2p.data.i2np;
 
+import java.util.Date;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
@@ -9,7 +13,8 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 
 /**
- * Hold the tunnel request record, managing its ElGamal encryption and decryption.
+ * Holds the unencrypted 222-byte tunnel request record,
+ * with a constructor for ElGamal decryption and a method for ElGamal encryption.
  * Iterative AES encryption/decryption is done elsewhere.
  *
  * Cleartext:
@@ -36,7 +41,7 @@ import net.i2p.data.SessionKey;
  *
  */
 public class BuildRequestRecord {
-    private ByteArray _data;
+    private final byte[] _data;
     
     /** 
      * If set in the flag byte, any peer may send a message into this tunnel, but if
@@ -55,11 +60,10 @@ public class BuildRequestRecord {
     /** we show 16 bytes of the peer hash outside the elGamal block */
     public static final int PEER_SIZE = 16;
     
-    public BuildRequestRecord(ByteArray data) { _data = data; }
-    public BuildRequestRecord() { }
-
-    public ByteArray getData() { return _data; }
-    public void setData(ByteArray data) { _data = data; }
+    /**
+     *  @return 222 bytes, non-null
+     */
+    public byte[] getData() { return _data; }
 
     private static final int OFF_RECV_TUNNEL = 0;
     private static final int OFF_OUR_IDENT = OFF_RECV_TUNNEL + 4;
@@ -67,96 +71,107 @@ public class BuildRequestRecord {
     private static final int OFF_SEND_IDENT = OFF_SEND_TUNNEL + 4;
     private static final int OFF_LAYER_KEY = OFF_SEND_IDENT + Hash.HASH_LENGTH;
     private static final int OFF_IV_KEY = OFF_LAYER_KEY + SessionKey.KEYSIZE_BYTES;
-    private static final int OFF_REPLY_KEY = OFF_IV_KEY + SessionKey.KEYSIZE_BYTES;
+    public static final int OFF_REPLY_KEY = OFF_IV_KEY + SessionKey.KEYSIZE_BYTES;
     private static final int OFF_REPLY_IV = OFF_REPLY_KEY + SessionKey.KEYSIZE_BYTES;
     private static final int OFF_FLAG = OFF_REPLY_IV + IV_SIZE;
     private static final int OFF_REQ_TIME = OFF_FLAG + 1;
     private static final int OFF_SEND_MSG_ID = OFF_REQ_TIME + 4;
+    private static final int PADDING_SIZE = 29;
+    // 222
+    private static final int LENGTH = OFF_SEND_MSG_ID + 4 + PADDING_SIZE;
+    
     
     /** what tunnel ID should this receive messages on */
     public long readReceiveTunnelId() { 
-        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_RECV_TUNNEL, 4);
+        return DataHelper.fromLong(_data, OFF_RECV_TUNNEL, 4);
     }
-    /** true if the identity they expect us to be is who we are */
-    public boolean readOurIdentityMatches(Hash ourIdentity) {
-        return DataHelper.eq(ourIdentity.getData(), 0, _data.getData(), _data.getOffset() + OFF_OUR_IDENT, Hash.HASH_LENGTH);
-    }
+
     /**
      * What tunnel ID the next hop receives messages on.  If this is the outbound tunnel endpoint,
      * this specifies the tunnel ID to which the reply should be sent.
      */
     public long readNextTunnelId() {
-        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_SEND_TUNNEL, 4);
+        return DataHelper.fromLong(_data, OFF_SEND_TUNNEL, 4);
     }
+
     /**
      * Read the next hop from the record.  If this is the outbound tunnel endpoint, this specifies
      * the gateway to which the reply should be sent.
      */
     public Hash readNextIdentity() {
         //byte rv[] = new byte[Hash.HASH_LENGTH];
-        //System.arraycopy(_data.getData(), _data.getOffset() + OFF_SEND_IDENT, rv, 0, Hash.HASH_LENGTH);
+        //System.arraycopy(_data, OFF_SEND_IDENT, rv, 0, Hash.HASH_LENGTH);
         //return new Hash(rv);
-        return Hash.create(_data.getData(), _data.getOffset() + OFF_SEND_IDENT);
+        return Hash.create(_data, OFF_SEND_IDENT);
     }
+
     /**
      * Tunnel layer encryption key that the current hop should use
      */
     public SessionKey readLayerKey() {
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
-        System.arraycopy(_data.getData(), _data.getOffset() + OFF_LAYER_KEY, key, 0, SessionKey.KEYSIZE_BYTES);
+        System.arraycopy(_data, OFF_LAYER_KEY, key, 0, SessionKey.KEYSIZE_BYTES);
         return new SessionKey(key);
     }
+
     /**
      * Tunnel IV encryption key that the current hop should use
      */
     public SessionKey readIVKey() {
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
-        System.arraycopy(_data.getData(), _data.getOffset() + OFF_IV_KEY, key, 0, SessionKey.KEYSIZE_BYTES);
+        System.arraycopy(_data, OFF_IV_KEY, key, 0, SessionKey.KEYSIZE_BYTES);
         return new SessionKey(key);
     }
+
     /**
      * Session key that should be used to encrypt the reply
      */
     public SessionKey readReplyKey() {
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
-        System.arraycopy(_data.getData(), _data.getOffset() + OFF_REPLY_KEY, key, 0, SessionKey.KEYSIZE_BYTES);
+        System.arraycopy(_data, OFF_REPLY_KEY, key, 0, SessionKey.KEYSIZE_BYTES);
         return new SessionKey(key);
     }
+
     /**
      * IV that should be used to encrypt the reply
      */
     public byte[] readReplyIV() {
         byte iv[] = new byte[IV_SIZE];
-        System.arraycopy(_data.getData(), _data.getOffset() + OFF_REPLY_IV, iv, 0, IV_SIZE);
+        System.arraycopy(_data, OFF_REPLY_IV, iv, 0, IV_SIZE);
         return iv;
     }
+
     /** 
      * The current hop is the inbound gateway.  If this is true, it means anyone can send messages to
      * this tunnel, but if it is false, only the current predecessor can.
      *
      */
     public boolean readIsInboundGateway() {
-        return (_data.getData()[_data.getOffset() + OFF_FLAG] & FLAG_UNRESTRICTED_PREV) != 0;
+        return (_data[OFF_FLAG] & FLAG_UNRESTRICTED_PREV) != 0;
     }
+
     /**
      * The current hop is the outbound endpoint.  If this is true, the next identity and next tunnel
      * fields refer to where the reply should be sent.
      */
     public boolean readIsOutboundEndpoint() { 
-        return (_data.getData()[_data.getOffset() + OFF_FLAG] & FLAG_OUTBOUND_ENDPOINT) != 0;
+        return (_data[OFF_FLAG] & FLAG_OUTBOUND_ENDPOINT) != 0;
     }
+
     /**
-     * Time that the request was sent (ms), truncated to the nearest hour
+     * Time that the request was sent (ms), truncated to the nearest hour.
+     * This ignores leap seconds.
      */
     public long readRequestTime() {
-        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_REQ_TIME, 4) * (60 * 60 * 1000L);
+        return DataHelper.fromLong(_data, OFF_REQ_TIME, 4) * (60 * 60 * 1000L);
     }
+
     /**
      * What message ID should we send the request to the next hop with.  If this is the outbound tunnel endpoint,
      * this specifies the message ID with which the reply should be sent.
      */
     public long readReplyMessageId() {
-        return DataHelper.fromLong(_data.getData(), _data.getOffset() + OFF_SEND_MSG_ID, 4);
+        return DataHelper.fromLong(_data, OFF_SEND_MSG_ID, 4);
     }
     
     /**
@@ -164,42 +179,43 @@ public class BuildRequestRecord {
      *   bytes 0-15: truncated SHA-256 of the current hop's identity (the toPeer parameter)
      * bytes 15-527: ElGamal-2048 encrypted block
      * </pre>
+     *
+     * @return non-null
      */
-    public void encryptRecord(I2PAppContext ctx, PublicKey toKey, Hash toPeer, byte out[], int outOffset) {
-        System.arraycopy(toPeer.getData(), 0, out, outOffset, PEER_SIZE);
-        byte preEncr[] = new byte[OFF_SEND_MSG_ID + 4 + PADDING_SIZE];
-        System.arraycopy(_data.getData(), _data.getOffset(), preEncr, 0, preEncr.length);
-        byte encrypted[] = ctx.elGamalEngine().encrypt(preEncr, toKey);
+    public EncryptedBuildRecord encryptRecord(I2PAppContext ctx, PublicKey toKey, Hash toPeer) {
+        byte[] out = new byte[EncryptedBuildRecord.LENGTH];
+        System.arraycopy(toPeer.getData(), 0, out, 0, PEER_SIZE);
+        byte encrypted[] = ctx.elGamalEngine().encrypt(_data, toKey);
         // the elg engine formats it kind of weird, giving 257 bytes for each part rather than 256, so
         // we want to strip out that excess byte and store it in the record
-        System.arraycopy(encrypted, 1, out, outOffset + PEER_SIZE, 256);
-        System.arraycopy(encrypted, 258, out, outOffset + 256 + PEER_SIZE, 256);
+        System.arraycopy(encrypted, 1, out, PEER_SIZE, 256);
+        System.arraycopy(encrypted, 258, out, 256 + PEER_SIZE, 256);
+        return new EncryptedBuildRecord(out);
     }
     
     /**
      * Decrypt the data from the specified record, writing the decrypted record into this instance's
-     * buffer (but not overwriting the array contained within the old buffer)
+     * data buffer
+     *
+     * Caller MUST check that first 16 bytes of our hash matches first 16 bytes of encryptedRecord
+     * before calling this. Not checked here.
+     *
+     * @throws DataFormatException on decrypt fail
+     * @since 0.9.18, was decryptRecord()
      */
-    public boolean decryptRecord(I2PAppContext ctx, PrivateKey ourKey, Hash ourIdent, ByteArray encryptedRecord) {
-        if (DataHelper.eq(ourIdent.getData(), 0, encryptedRecord.getData(), encryptedRecord.getOffset(), PEER_SIZE)) {
+    public BuildRequestRecord(I2PAppContext ctx, PrivateKey ourKey,
+                              EncryptedBuildRecord encryptedRecord) throws DataFormatException {
             byte preDecrypt[] = new byte[514];
-            System.arraycopy(encryptedRecord.getData(), encryptedRecord.getOffset() + PEER_SIZE, preDecrypt, 1, 256);
-            System.arraycopy(encryptedRecord.getData(), encryptedRecord.getOffset() + PEER_SIZE + 256, preDecrypt, 258, 256);
+            System.arraycopy(encryptedRecord.getData(), PEER_SIZE, preDecrypt, 1, 256);
+            System.arraycopy(encryptedRecord.getData(), PEER_SIZE + 256, preDecrypt, 258, 256);
             byte decrypted[] = ctx.elGamalEngine().decrypt(preDecrypt, ourKey);
             if (decrypted != null) {
-                _data = new ByteArray(decrypted);
-                _data.setOffset(0);
-                return true;
+                _data = decrypted;
             } else {
-                return false;
+                throw new DataFormatException("decrypt fail");
             }
-        } else {
-            return false;
-        }
     }
 
-    private static final int PADDING_SIZE = 29;
-    
     /**
      * Populate this instance with data.  A new buffer is created to contain the data, with the 
      * necessary randomized padding.
@@ -215,14 +231,13 @@ public class BuildRequestRecord {
      * @param iv iv to be used when encrypting the reply to this build request
      * @param isInGateway are we the gateway of an inbound tunnel?
      * @param isOutEndpoint are we the endpoint of an outbound tunnel?
+     * @since 0.9.18, was createRecord()
      */
-    public void createRecord(I2PAppContext ctx, long receiveTunnelId, Hash peer, long nextTunnelId, Hash nextHop, long nextMsgId,
+    public BuildRequestRecord(I2PAppContext ctx, long receiveTunnelId, Hash peer, long nextTunnelId, Hash nextHop, long nextMsgId,
                              SessionKey layerKey, SessionKey ivKey, SessionKey replyKey, byte iv[], boolean isInGateway,
                              boolean isOutEndpoint) {
-        if ( (_data == null) || (_data.getData() != null) )
-            _data = new ByteArray();
-        byte buf[] = new byte[OFF_SEND_MSG_ID+4+PADDING_SIZE];
-        _data.setData(buf);
+        byte buf[] = new byte[LENGTH];
+        _data = buf;
         
        /*   bytes     0-3: tunnel ID to receive messages as
         *   bytes    4-35: local router identity hash
@@ -252,6 +267,7 @@ public class BuildRequestRecord {
         long truncatedHour = ctx.clock().now();
         // prevent hop identification at top of the hour
         truncatedHour -= ctx.random().nextInt(90*1000);
+        // this ignores leap seconds
         truncatedHour /= (60l*60l*1000l);
         DataHelper.toLong(buf, OFF_REQ_TIME, 4, truncatedHour);
         DataHelper.toLong(buf, OFF_SEND_MSG_ID, 4, nextMsgId);
@@ -260,5 +276,35 @@ public class BuildRequestRecord {
         byte wroteIV[] = readReplyIV();
         if (!DataHelper.eq(iv, wroteIV))
             throw new RuntimeException("foo");
+    }
+
+    /**
+     *  @since 0.9.24
+     */
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("BRR ");
+        boolean isIBGW = readIsInboundGateway();
+        boolean isOBEP = readIsOutboundEndpoint();
+        if (isIBGW) {
+            buf.append("IBGW in: ").append(readReceiveTunnelId())
+               .append(" out ").append(readNextTunnelId());
+        } else if (isOBEP) {
+            buf.append("OBEP in: ").append(readReceiveTunnelId());
+        } else {
+            buf.append("part. in: ").append(readReceiveTunnelId())
+               .append(" out: ").append(readNextTunnelId());
+        }
+        buf.append(" to: ").append(readNextIdentity())
+           .append(" layer key: ").append(readLayerKey())
+           .append(" IV key: ").append(readIVKey())
+           .append(" reply key: ").append(readReplyKey())
+           .append(" reply IV: ").append(Base64.encode(readReplyIV()))
+           .append(" hour: ").append(new Date(readRequestTime()))
+           .append(" reply msg id: ").append(readReplyMessageId());
+        // to chase i2pd bug
+        //buf.append('\n').append(net.i2p.util.HexDump.dump(readReplyKey().getData()));
+        return buf.toString();
     }
 }   

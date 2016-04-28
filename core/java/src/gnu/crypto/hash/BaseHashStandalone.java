@@ -51,7 +51,9 @@ package gnu.crypto.hash;
  * See SHA256Generator for more information.
  *
  * @version $Revision: 1.1 $
+ * @deprecated to be removed in 0.9.27
  */
+@Deprecated
 public abstract class BaseHashStandalone implements IMessageDigestStandalone {
 
    // Constants and variables

@@ -1,6 +1,8 @@
 package net.i2p.router.news;
 
 import java.util.List;
+
+import net.i2p.data.DataHelper;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -16,7 +18,7 @@ public class NewsMetadata {
     public String feedID;
     public long feedUpdated;
 
-    // I2P metadata
+    /** I2P metadata */
     public List<Release> releases;
 
     public static class Release implements Comparable<Release> {
@@ -31,6 +33,31 @@ public class NewsMetadata {
             // Sort latest version first.
             return VersionComparator.comp(other.i2pVersion, i2pVersion);
         }
+    
+        /**
+         *  For findbugs.
+         *  Warning, not a complete comparison.
+         *  Must be enhanced before using in a Map or Set.
+         *  @since 0.9.21
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o == null)
+                return false;
+            if (!(o instanceof Release))
+                return false;
+            Release r = (Release) o;
+            return DataHelper.eq(i2pVersion, r.i2pVersion);
+        }
+        
+        /**
+         *  For findbugs.
+         *  @since 0.9.21
+         */
+        @Override
+        public int hashCode() {
+            return DataHelper.hashCode(i2pVersion);
+        }
     }
 
     public static class Update implements Comparable<Update> {
@@ -44,6 +71,7 @@ public class NewsMetadata {
             return getTypeOrder() - other.getTypeOrder();
         }
 
+        /** lower is preferred */
         protected int getTypeOrder() {
             if ("su3".equalsIgnoreCase(type))
                 return 1;
@@ -51,6 +79,31 @@ public class NewsMetadata {
                 return 2;
             else
                 return 3;
+        }
+    
+        /**
+         *  For findbugs.
+         *  Warning, not a complete comparison.
+         *  Must be enhanced before using in a Map or Set.
+         *  @since 0.9.21
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o == null)
+                return false;
+            if (!(o instanceof Update))
+                return false;
+            Update u = (Update) o;
+            return getTypeOrder() == u.getTypeOrder();
+        }
+        
+        /**
+         *  For findbugs.
+         *  @since 0.9.21
+         */
+        @Override
+        public int hashCode() {
+            return getTypeOrder();
         }
     }
 }

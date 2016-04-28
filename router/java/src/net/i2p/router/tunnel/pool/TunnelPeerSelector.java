@@ -349,9 +349,7 @@ public abstract class TunnelPeerSelector {
         if (known != null) {
             for (int i = 0; i < known.size(); i++) {
                 RouterInfo peer = known.get(i);
-                String v = peer.getOption("router.version");
-                if (v == null)
-                    continue;
+                String v = peer.getVersion();
                 // RI sigtypes added in 0.9.16
                 // SSU inbound connection bug fixed in 0.9.17, but it won't bid, so NTCP only,
                 // no need to check
@@ -402,8 +400,8 @@ public abstract class TunnelPeerSelector {
         // so don't exclude it based on published capacity
 
         // minimum version check
-        String v = peer.getOption("router.version");
-        if (v == null || VersionComparator.comp(v, MIN_VERSION) < 0)
+        String v = peer.getVersion();
+        if (VersionComparator.comp(v, MIN_VERSION) < 0)
             return true;
 
         // uptime is always spoofed to 90m, so just remove all this

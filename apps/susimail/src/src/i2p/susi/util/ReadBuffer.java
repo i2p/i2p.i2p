@@ -23,6 +23,8 @@
  */
 package i2p.susi.util;
 
+import net.i2p.data.DataHelper;
+
 /**
  * @author susi
  */
@@ -39,6 +41,6 @@ public class ReadBuffer {
 
 	public String toString()
 	{
-		return content != null ? new String( content, offset, length ) : "";
+		return content != null ? DataHelper.getUTF8(content, offset, length) : "";
 	}
 }

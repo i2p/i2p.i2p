@@ -1,23 +1,25 @@
-# Polish debconf translation
-# Copyright (C) 2012 The I2P Project
-# This file is distributed under the same license as the i2p package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-#   <b790979@klzlk.com>, 2011, 2012.
+# PolishAnon <b790979@klzlk.com>, 2011, 2012
+# seb, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2012-01-07 13:15+0000\n"
-"Last-Translator: PolishAnon <b790979@klzlk.com>\n"
-"Language-Team: Polish (http://www.transifex.net/projects/p/I2P/team/pl/)\n"
+"POT-Creation-Date: 2015-02-18 22:14+0000\n"
+"PO-Revision-Date: 2015-06-09 20:57+0000\n"
+"Last-Translator: seb\n"
+"Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/"
+"pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2)\n"
+"|| n%100>=20) ? 1 : 2);\n"
 
 #. Type: boolean
 #. Description
@@ -86,3 +88,19 @@ msgid ""
 msgstr ""
 "Rutery z wysoka przepustowościa oraz rutery z wieloma aktywnymi torrentami/"
 "wtyczkami mogą wymagać zwiększenia tej wartości."
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid "Run I2P daemon confined with AppArmor"
+msgstr "Uruchom I2P deamon ograniczony przez AppArmor"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:5001
+msgid ""
+"With this option enabled I2P will be sandboxed with AppArmor, restricting "
+"which files and directories may be accessed by I2P."
+msgstr ""
+"Z tą opcją I2P będzie w sandboxie z AppArmor, broniąc plików i folderów do "
+"których I2P mogłoby mieć dostęp."

@@ -15,6 +15,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 import net.i2p.util.LHMCache;
+import net.i2p.util.SystemVersion;
 
 /**
  * A Dummy naming service that can only handle base64 and b32 destinations.
@@ -23,7 +24,7 @@ class DummyNamingService extends NamingService {
 
     protected static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
     public final static String PROP_B32 = "i2p.naming.hostsTxt.useB32";
-    protected static final int CACHE_MAX_SIZE = 32;
+    protected static final int CACHE_MAX_SIZE = SystemVersion.isAndroid() ? 32 : 128;
     public static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
 
     /**

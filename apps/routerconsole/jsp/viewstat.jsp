@@ -35,6 +35,7 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
     if ( (rate != null) || (fakeBw) ) {
       java.io.OutputStream cout = response.getOutputStream();
       String format = request.getParameter("format");
+      response.setHeader("X-Content-Type-Options", "nosniff");
       if ("xml".equals(format)) {
         if (!fakeBw) {
           response.setContentType("text/xml");
