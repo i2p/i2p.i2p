@@ -1,5 +1,6 @@
 package net.i2p.router.update;
 
+import java.io.ByteArrayInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +23,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.i2p.app.ClientAppManager;
+import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.Base64;
@@ -585,8 +588,13 @@ class NewsFetcher extends UpdateRunner {
                 continue;
             OutputStream out = null;
             try {
+                byte[] data = DataHelper.getUTF8(e.data);
+                // test for validity
+                CertUtil.loadCRL(new ByteArrayInputStream(data));
                 out = new SecureFileOutputStream(f);
-                out.write(DataHelper.getUTF8(e.data));
+                out.write(data);
+            } catch (GeneralSecurityException gse) {
+                _log.error("Bad CRL", gse);
             } catch (IOException ioe) {
                 _log.error("Failed to write CRL", ioe);
             } finally {

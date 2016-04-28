@@ -1,4 +1,7 @@
 2016-04-28 zzz
+ * News: Parse and store CRLs in news feed
+
+2016-04-28 zzz
 Prop from i2p.i2p.zzz.gmp6-prop:
  * CPUID:
    - Added source of CPUID information

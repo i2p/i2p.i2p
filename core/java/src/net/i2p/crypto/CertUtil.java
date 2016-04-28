@@ -515,9 +515,9 @@ public final class CertUtil {
      *  Load a CRL. Does NOT Close the stream.
      *
      *  @return non-null
-     *  @since 0.9.25
+     *  @since 0.9.25 public since 0.9.26
      */
-    private static X509CRL loadCRL(InputStream in) throws GeneralSecurityException {
+    public static X509CRL loadCRL(InputStream in) throws GeneralSecurityException {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509CRL) cf.generateCRL(in);
     }
