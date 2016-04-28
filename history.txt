@@ -1,3 +1,70 @@
+2016-04-28 zzz
+Prop from i2p.i2p.zzz.gmp6-prop:
+ * CPUID:
+   - Added source of CPUID information
+   - Made CPUIDCPUInfo non-abstract to support looking for
+     CPU features during CPU identification
+   - Add support for extended feature registers EBX/ECX
+   - No such thing as EBX for 0x80000001 call; remove getExtendedEBXCPUFlags(),
+     replaced with getExtendedEBXFeatureFlags()
+   - Check for support of 6 required Core i3/i5/i7 instructions to enable Haswell,
+     since GMP Haswell requires Core i3/i5/i7 support.
+     There are Pentium/Celeron Haswells that do not support these instructions.
+   - Added AVX, AVX2, AVX512, TBM, ADX, BMI1, BMI2, MOVBE, FMA3 feature detection
+   - More diagnostic output in CPUID.main()
+   - More javadocs
+   - Only call getCPUVendorID() once in getInfo()
+   - Recognize Skylake
+   - Do the same checks for Broadwell and Skylake that we do for
+     Haswell, and check ADX as well, which will be used in GMP 6.1
+ * Crypto:
+   - Use constant time modPow() for signing and decryption
+   - Use native modInverse()
+ * libjbigi:
+   - Added nativeJbigiVersion(), nativeGMPMajorVersion(),
+     nativeGMPMinorVersion(), nativeGMPPatchVersion(),
+     nativeModInverse(), nativeModPowCT()
+   - Support negative vaules in conversion functions
+   - Support negative base value in modPow()
+   - Throw ArithmeticException for bad arguments rather than crashing
+   - New build targets
+   - Drop 32-bit corei libs where they are identical to the
+     core2 lib, since we now have a generic fallback in NBI:
+     libjbigi-freebsd-corei.so, libjbigi-linux-corei.so,
+     libjbigi-osx-corei.jnilib
+   - Revamped downloading of gmp files
+   - Revamped cross-compilation support
+   - Added 'osx' alias for darwin
+   - Added FreeBSD cross-compilation instructions
+   - Removed NetBSD, kFreeBSD, Solaris, OpenBSD binaries
+   - Added coreihwl, coreisbr, bulldozer, steamroller,
+     cortex a9, and cortex a15 support
+   - Rebuilt all binaries with GMP 6.0.0a
+ * libjcpuid:
+   - Add nativeJcpuidVersion()
+   - Clear ECX register to ensure it will work with EAX=7
+   - Added jcpuid build instructions for linux/osx/freebsd/windows
+   - Improved build script
+   - Imported Microsoft Visual Studio Community 2015 project files.
+   - Fixed OSX include search path
+   - Rebuilt all binaries
+ * NativeBigInteger:
+   - Version reporting
+   - Total redesign of fallback code
+   - core2 is always a fallback for corei, and
+     core2_64 is always a fallback for corei_64
+   - Remove special case for core2/corei in getMiddleName2()
+     since it's now a fallback in getResourceList()
+   - Added support for new CPUs:
+     Intel Sandy Bridge, Haswell and Broadwell;
+     AMD Bulldozer, Piledriver, Steamroller, Excavator and Jaguar;
+     ARM Cortex A5/A7/A8/A9/A15; ARM A12/A17 using the A15 libs
+   - Test improvements:
+     Output versions; Only warmup crypto once;
+     Add -n option to test native only;
+     Reduce output if only native or only Java tested;
+     Try to prevent not-coprime errors
+
 2016-04-26 zzz
  * Addressbook:
    - Finish implementation of signed actions
