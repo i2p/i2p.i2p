@@ -582,7 +582,8 @@ public class NativeBigInteger extends BigInteger {
                 warn("jbigi version " + _jbigiVersion + " but GMP version not available???", t);
             }
         }
-        warn("jbigi version: " + _jbigiVersion + "; GMP version: " + _libGMPVersion);
+        // Don't overwrite _loadStatus
+        //warn("jbigi version: " + _jbigiVersion + "; GMP version: " + _libGMPVersion);
     }
 
     /**
