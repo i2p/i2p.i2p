@@ -71,13 +71,13 @@ public interface CPUInfo
     
     /**
      * @return true iff the CPU supports the AVX instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasAVX();
     
     /**
      * @return true iff the CPU supports the AVX2 instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasAVX2();
     
@@ -93,7 +93,7 @@ public interface CPUInfo
      * ref: https://en.wikipedia.org/wiki/AVX-512
      *
      * @return true iff the CPU supports the AVX-512 Foundation instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasAVX512();
     
@@ -104,13 +104,13 @@ public interface CPUInfo
      * Unused until GMP 6.1.
      *
      * @return true iff the CPU supports the ADX instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasADX();
     
     /**
      * @return true iff the CPU supports TBM.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasTBM();
 
@@ -122,38 +122,38 @@ public interface CPUInfo
     
     /**
      * @return true iff the CPU supports the 64-bit support
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasX64();
     
     /**
      * @return true iff the CPU supports the BMI1 instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasBMI1();
     
     /**
      * @return true iff the CPU supports the BMI2 instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasBMI2();
     
     /**
      * @return true iff the CPU supports the FMA3 instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasFMA3();
 
     /**
      * @return true iff the CPU supports the MOVBE instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasMOVBE();
 
     /**
      * Also known as LZCNT
      * @return true iff the CPU supports the ABM instruction set.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     public boolean hasABM();
 }

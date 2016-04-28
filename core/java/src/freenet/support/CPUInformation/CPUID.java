@@ -109,14 +109,14 @@ public class CPUID {
     /**
      *  Get the jbigi version, only available since jbigi version 3
      *  Caller must catch Throwable
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private native static int nativeJcpuidVersion();
 
     /**
      *  Get the jcpuid version
      *  @return 0 if no jcpuid available, 2 if version not supported
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private static int fetchJcpuidVersion() {
         if (!_nativeOk)
@@ -226,7 +226,7 @@ public class CPUID {
     }
 
     /**
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     static int getExtendedEBXFeatureFlags()
     {
@@ -239,7 +239,7 @@ public class CPUID {
 
     /**
      *  There's almost nothing in here.
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     static int getExtendedECXFeatureFlags()
     {

@@ -157,10 +157,10 @@ public class NativeBigInteger extends BigInteger {
     /** all libjbibi builds are identical to pentium3, case handled in getMiddleName2() */
     private final static String JBIGI_OPTIMIZATION_VIAC32     = "viac32";
     /**
-     * The optimization levels defined here are since 0.9.25. Each of the 32-bit processors below
+     * The optimization levels defined here are since 0.9.26. Each of the 32-bit processors below
      * needs an explicit fallback in getResourceList() or getMiddleName2().
      * 64-bit processors will fallback to athlon64 and athlon in getResourceList().
-     * @since 0.9.25
+     * @since 0.9.26
      */
     private final static String JBIGI_OPTIMIZATION_COREI_SBR   = "coreisbr";
     private final static String JBIGI_OPTIMIZATION_COREI_HWL   = "coreihwl";
@@ -181,7 +181,7 @@ public class NativeBigInteger extends BigInteger {
     
     /**
      * ARM
-     * @since 0.9.25
+     * @since 0.9.26
      */
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV5           = "armv5";
     private final static String JBIGI_OPTIMIZATION_ARM_ARMV6           = "armv6";
@@ -194,7 +194,7 @@ public class NativeBigInteger extends BigInteger {
     
     /**
      * None, no optimizations. The default fallback for x86.
-     * @since 0.9.25
+     * @since 0.9.26
      */
     private final static String JBIGI_OPTIMIZATION_X86       = "none";
     
@@ -507,51 +507,51 @@ public class NativeBigInteger extends BigInteger {
      *            big endian twos complement representation of the modulus
      * @return big endian twos complement representation of (base ^ exponent) % modulus
      * @throws ArithmeticException if modulus &lt;= 0
-     * @since 0.9.25 and libjbigi version 3
+     * @since 0.9.26 and libjbigi version 3
      */
     private native static byte[] nativeModPowCT(byte base[], byte exponent[], byte modulus[]);
 
     /**
-     *  @since 0.9.25 and libjbigi version 3
+     *  @since 0.9.26 and libjbigi version 3
      *  @throws ArithmeticException
      */
     private native static byte[] nativeModInverse(byte base[], byte d[]);
  
     /**
      *  Only for testing jbigi's negative conversion functions!
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     //private native static byte[] nativeNeg(byte d[]);
 
     /**
      *  Get the jbigi version, only available since jbigi version 3
      *  Caller must catch Throwable
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private native static int nativeJbigiVersion();
  
     /**
      *  Get the libmp version, only available since jbigi version 3
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private native static int nativeGMPMajorVersion();
  
     /**
      *  Get the libmp version, only available since jbigi version 3
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private native static int nativeGMPMinorVersion();
  
     /**
      *  Get the libmp version, only available since jbigi version 3
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private native static int nativeGMPPatchVersion();
 
     /**
      *  Get the jbigi version
      *  @return 0 if no jbigi available, 2 if version not supported
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private static int fetchJbigiVersion() {
         if (!_nativeOk)
@@ -566,7 +566,7 @@ public class NativeBigInteger extends BigInteger {
     /**
      *  Set the jbigi and libgmp versions. Call after loading.
      *  Sets _jbigiVersion, _nativeOk3, and _libGMPVersion.
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     private static void setVersions() {
         _jbigiVersion = fetchJbigiVersion();
@@ -588,7 +588,7 @@ public class NativeBigInteger extends BigInteger {
     /**
      *  Get the jbigi version
      *  @return 0 if no jbigi available, 2 if version info not supported
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     public static int getJbigiVersion() {
         return _jbigiVersion;
@@ -597,7 +597,7 @@ public class NativeBigInteger extends BigInteger {
     /**
      *  Get the libgmp version
      *  @return "unknown" if no jbigi available or if version not supported
-     *  @since 0.9.25
+     *  @since 0.9.26
      */
     public static String getLibGMPVersion() {
         return _libGMPVersion;
@@ -654,7 +654,7 @@ public class NativeBigInteger extends BigInteger {
 
     /**
      *  @throws ArithmeticException if m &lt;= 0
-     *  @since 0.9.25 and libjbigi version 3 and GMP version 5
+     *  @since 0.9.26 and libjbigi version 3 and GMP version 5
      */
     public BigInteger modPowCT(BigInteger exponent, BigInteger m) {
         if (_nativeCTOk)
@@ -665,7 +665,7 @@ public class NativeBigInteger extends BigInteger {
 
     /**
      *  @throws ArithmeticException if not coprime with m, or m &lt;= 0
-     *  @since 0.9.25 and libjbigi version 3
+     *  @since 0.9.26 and libjbigi version 3
      */
     @Override
     public BigInteger modInverse(BigInteger m) {
@@ -1006,12 +1006,12 @@ public class NativeBigInteger extends BigInteger {
             _loadStatus = s;
     }
     
-    /** @since 0.9.25 */
+    /** @since 0.9.26 */
     private static void error(String s) {
         error(s, null);
     }
     
-    /** @since 0.9.25 */
+    /** @since 0.9.26 */
     private static void error(String s, Throwable t) {
         if(_doLog) {
             System.err.println("ERROR: " + s);
