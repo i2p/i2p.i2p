@@ -128,6 +128,15 @@ public class CPUID {
         }
     }
 
+    /**
+     *  Return the jcpuid version
+     *  @return 0 if no jcpuid available, 2 if version not supported
+     *  @since 0.9.26
+     */
+    public static int getJcpuidVersion() {
+        return _jcpuidVersion;
+    }
+
     static String getCPUVendorID()
     {
         CPUIDResult c = doCPUID(0);
