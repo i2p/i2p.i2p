@@ -38,6 +38,8 @@
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
         <echo message="  updaterWithJettyFixesAndGeoIP" />
         <echo message="  updaterWithJettyFixesAndJbigi" />
+        <echo message="  updaterWithJbigi" />
+        <echo message="  updater200WithJbigi" />
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
@@ -1362,6 +1364,7 @@
     <target name="updater200WithJettyAndGeoIP" depends="prepjupdate, prepgeoupdate, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixes" depends="prepjupdatefixes, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, pack200, zipit200" />
+    <target name="updater200WithJbigi" depends="prepupdate, prepjbigiupdate, preplicenses, pack200, zipit200" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
     <target name="updaterRepack" depends="prepupdate, preplicenses, repack200, zipit" />
     <target name="updaterWithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, zipit" />
@@ -1375,6 +1378,7 @@
     <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndGeoIP" depends="prepjupdatefixes, prepgeoupdate, preplicenses, zipit" />
+    <target name="updaterWithJbigi" depends="prepupdate, prepjbigiupdate, preplicenses, zipit" />
     <target name="updaterSmall" depends="prepupdateSmall, zipit" />
     <target name="updaterRouter" depends="prepupdateRouter, zipit" />
 
