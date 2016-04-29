@@ -1129,6 +1129,7 @@
 
     <target name="preppkg-windows" depends="preppkg-base, preplicenses-windows, buildUtilityJar, buildexe">
         <copy file="build/i2p.exe" todir="pkg-temp/" failonerror="false" />
+        <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
         <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
@@ -1173,7 +1174,6 @@
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -2026,6 +2026,9 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <!-- systray4j -->
+            <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
+            <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
@@ -2091,6 +2094,8 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
+            <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />

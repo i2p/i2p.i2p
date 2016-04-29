@@ -31,7 +31,6 @@ pkg-temp/lib/routerconsole.jar usr/share/i2p/lib
 pkg-temp/lib/router.jar usr/share/i2p/lib
 pkg-temp/lib/sam.jar usr/share/i2p/lib
 pkg-temp/lib/streaming.jar usr/share/i2p/lib
-pkg-temp/lib/systray4j.jar usr/share/i2p/lib
 pkg-temp/lib/systray.jar usr/share/i2p/lib
 
 
