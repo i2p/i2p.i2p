@@ -141,9 +141,13 @@ endif
 
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-gettext-base=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/core/java/build
+	ln -sf /usr/share/java/libintl.jar $(CURDIR)/core/java/build/libintl.jar
 
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-libgetopt-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/core/java/build
+	ln -sf /usr/share/java/gnu-getopt.jar $(CURDIR)/core/java/build/gnu-getopt.jar
 
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config

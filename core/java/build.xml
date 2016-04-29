@@ -25,14 +25,14 @@
     <condition property="source.exclude1" value="gnu/gettext/GettextResource.java" else="NOTHING" >
         <istrue value="${with-gettext-base}" />
     </condition>
-    <condition property="javac.classpath.mod1" value="/usr/share/java/libintl.jar:" else="" >
+    <condition property="javac.classpath.mod1" value="build/libintl.jar:" else="" >
         <istrue value="${with-gettext-base}" />
     </condition>
     <!-- fixups if we're using gnu-getopt.jar for gnu/getopt/* -->
     <condition property="source.exclude2" value="gnu/getopt/**" else="NOTHING" >
         <istrue value="${with-libgetopt-java}" />
     </condition>
-    <condition property="javac.classpath.mod2" value="/usr/share/java/gnu-getopt.jar:" else="" >
+    <condition property="javac.classpath.mod2" value="build/gnu-getopt.jar:" else="" >
         <istrue value="${with-libgetopt-java}" />
     </condition>
     <condition property="translation.includes" value="NOTHING" else="gnu/getopt/*.properties" >

@@ -16,6 +16,7 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="../../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../ministreaming/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
@@ -43,6 +44,8 @@
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- gnu-getopt.jar only present for debian builds -->
+                <pathelement location="../../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
