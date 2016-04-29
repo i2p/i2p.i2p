@@ -207,12 +207,12 @@ public class BSkipList<K extends Comparable<? super K>, V> extends SkipList<K, V
 	}
 
 /****
-	@Override
+	//@Override
 	public SkipIterator<K, V> min() {
 		return iterator();
 	}
 
-	@Override
+	//@Override
 	public SkipIterator<K, V> max() {
 		if (!this.fileOnly)
 			return super.max();

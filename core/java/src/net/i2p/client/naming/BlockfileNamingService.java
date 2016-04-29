@@ -1939,7 +1939,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *
      * Throws DataFormatException on duplicate key
      *
-     * @param rawStream stream to read the mapping from
+     * @param in stream to read the mapping from
      * @throws DataFormatException if the format is invalid
      * @throws IOException if there is a problem reading the data
      * @return a Properties

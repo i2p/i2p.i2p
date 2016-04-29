@@ -730,7 +730,7 @@ public class NativeBigInteger extends BigInteger {
      * really big (2Kbit) numbers 100 different times and benchmark the 
      * performance.</p>
      * 
-     * @param args[0] - Manually jbigi lib
+     * @param args -n Disable native test
      *
      */
     public static void main(String args[]) {
