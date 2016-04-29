@@ -1,3 +1,19 @@
+2016-04-29 zzz
+ * Debian:
+   - Add runtime dependency on gettext-base,
+     link to /usr/share/java/libintl.jar
+   - Add runtime dependency on libgetopt-java,
+     link to /usr/share/java/gnu-getopt.jar
+ * SysTray:
+   - Remove systray4j.jar from linux installers
+   - Move SysTray.java to SysTrayImpl.java
+   - New SysTray.java that instantiates SysTrayImpl
+     by reflection, so the SysTrayImpl.java source is optional
+   - Remove systray4j.jar, systray4j.dll, and SysTrayImpl.java
+     from Debian source packages
+   - Remove systray4j.jar from Debian binary packages
+ * Update: Enable libjbigi update for ARM
+
 2016-04-28 zzz
  * News: Parse and store CRLs in news feed
 
