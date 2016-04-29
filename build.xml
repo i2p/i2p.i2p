@@ -2026,6 +2026,8 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <!-- gettext-base -->
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <!-- systray4j -->
             <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
             <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
@@ -2094,6 +2096,7 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
             <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />

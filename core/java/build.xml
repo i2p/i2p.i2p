@@ -21,13 +21,22 @@
     <property name="javac.classpath" value="" />
     <property name="javac.version" value="1.6" />
 
+    <!-- fixups if we're using libintl.jar for GettextResource.java -->
+    <condition property="source.exclude" value="src/gnu/gettext/GettextResource.java" else="" >
+        <istrue value="${with-gettext-base}" />
+    </condition>
+    <condition property="javac.classpath.mod" value="/usr/share/java/libintl.jar ${javac.classpath}" else="${javac.classpath}" >
+        <istrue value="${with-gettext-base}" />
+    </condition>
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
-               destdir="./build/obj" classpath="${javac.classpath}" >
+               excludes="${source.exclude}"
+               destdir="./build/obj" classpath="${javac.classpath.mod}" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -94,7 +103,7 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${javac.classpath}" />
+                <pathelement location="${javac.classpath.mod}" />
                 <pathelement location="${scala-library.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj" />
@@ -115,9 +124,10 @@
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="true"
+               excludes="${source.exclude}"
                destdir="./build/obj" >
             <classpath>
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
@@ -238,7 +248,7 @@
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement location="../../installer/resources/" />
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />

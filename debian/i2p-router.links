@@ -79,3 +79,8 @@ usr/share/java/glassfish-appserv-jstl.jar usr/share/i2p/lib/standard.jar
 # comment out if not building with libjstl1.1-java
 # ubuntu and debian: everywhere
 #usr/share/java/jstl1.1.jar usr/share/i2p/lib/jstl.jar
+
+
+# comment out if not building with gettext-base
+# ubuntu and debian: everywhere
+usr/share/java/libintl.jar usr/share/i2p/lib/libintl.jar
