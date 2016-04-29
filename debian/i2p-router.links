@@ -84,3 +84,8 @@ usr/share/java/glassfish-appserv-jstl.jar usr/share/i2p/lib/standard.jar
 # comment out if not building with gettext-base
 # ubuntu and debian: everywhere
 usr/share/java/libintl.jar usr/share/i2p/lib/libintl.jar
+
+
+# comment out if not building with libgetopt-java
+# ubuntu and debian: everywhere
+usr/share/java/gnu-getopt.jar usr/share/i2p/lib/gnu-getopt.jar

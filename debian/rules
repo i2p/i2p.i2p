@@ -142,6 +142,9 @@ endif
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-gettext-base=true" >> $(CURDIR)/override.properties
 
+	@# debian and ubuntu: everywhere
+	@/bin/echo -e "with-libgetopt-java=true" >> $(CURDIR)/override.properties
+
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
