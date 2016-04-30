@@ -542,19 +542,16 @@ class SAMv3Handler extends SAMv1Handler
 				return writeString(SESSION_ERROR, "Unrecognized opcode");
 			}
 		} catch (DataFormatException e) {
-			if (_log.shouldLog(Log.DEBUG))
-				_log.debug("Invalid destination specified");
+			_log.error("Invalid SAM destination specified", e);
 			return writeString("SESSION STATUS RESULT=INVALID_KEY", e.getMessage());
 		} catch (I2PSessionException e) {
-			if (_log.shouldLog(Log.DEBUG))
-				_log.debug("I2P error when instantiating session", e);
+			_log.error("Failed to start SAM session", e);
 			return writeString(SESSION_ERROR, e.getMessage());
 		} catch (SAMException e) {
-			if (_log.shouldLog(Log.INFO))
-				_log.info("Funny SAM error", e);
+			_log.error("Failed to start SAM session", e);
 			return writeString(SESSION_ERROR, e.getMessage());
 		} catch (IOException e) {
-			_log.error("Unexpected IOException", e);
+			_log.error("Failed to start SAM session", e);
 			return writeString(SESSION_ERROR, e.getMessage());
 		} finally {
 			// unregister the session if it has not been created
