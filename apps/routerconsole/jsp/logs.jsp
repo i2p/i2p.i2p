@@ -32,8 +32,19 @@
 <b>Servlet version:</b> <%=getServletInfo()%><br>
 <b>JSTL version:</b> <jsp:getProperty name="logsHelper" property="jstlVersion" /><br>
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
-<b>Jcpuid version:</b> <%=freenet.support.CPUInformation.CPUID.getJcpuidVersion()%><br>
-<b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
+<%
+   boolean isX86 = net.i2p.util.SystemVersion.isX86();
+   if (isX86) {
+%><b>Jcpuid version:</b> <%=freenet.support.CPUInformation.CPUID.getJcpuidVersion()%><br>
+<%
+   }
+%><b>Processor:</b>
+<%
+   if (isX86) {
+%> <%=net.i2p.util.NativeBigInteger.cpuModel()%>
+<%
+   }
+%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
 <b>Jbigi version:</b> <%=net.i2p.util.NativeBigInteger.getJbigiVersion()%><br>
 <b>GMP version:</b> <%=net.i2p.util.NativeBigInteger.getLibGMPVersion()%><br>
