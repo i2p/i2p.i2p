@@ -503,8 +503,8 @@ public class RouterInfo extends DatabaseEntry {
             Log log = I2PAppContext.getGlobalContext().logManager().getLog(RouterInfo.class);
             if (log.shouldWarn()) {
                 log.warn("Sig verify fail: " + toString(), new Exception("from"));
-            } else {
-                log.error("RI Sig verify fail: " + _identity.getHash());
+            //} else {
+            //    log.error("RI Sig verify fail: " + _identity.getHash());
             }
         }
     }
