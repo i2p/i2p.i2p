@@ -15,6 +15,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,dh-apparmor
  ,gettext
  ,libgetopt-java
+ ,libhttpclient-java, libhttpcore-java
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,hardening-wrapper
@@ -78,6 +79,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  geoip-database,
  gettext-base,
  libgetopt-java,
+ libhttpclient-java, libhttpcore-java,
  libjetty8-java, libservlet3.0-java,
  glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)

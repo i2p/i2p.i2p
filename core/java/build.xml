@@ -38,7 +38,14 @@
     <condition property="translation.includes" value="NOTHING" else="gnu/getopt/*.properties" >
         <istrue value="${with-libgetopt-java}" />
     </condition>
-    <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath.mod2}${javac.classpath}" />
+    <!-- fixups if we're using httpclient.jar and httpcore.jar for org.apache.http classes -->
+    <condition property="source.exclude3" value="org/apache/http/**" else="NOTHING" >
+        <istrue value="${with-libhttpclient-java}" />
+    </condition>
+    <condition property="javac.classpath.mod3" value="build/httpclient.jar:build/httpcore.jar:" else="" >
+        <istrue value="${with-libhttpclient-java}" />
+    </condition>
+    <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath.mod2}${javac.classpath.mod3}${javac.classpath}" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -52,6 +59,7 @@
             <include name="**/*.java" />
             <exclude name="${source.exclude1}" />
             <exclude name="${source.exclude2}" />
+            <exclude name="${source.exclude3}" />
         </javac>
     </target>
 
