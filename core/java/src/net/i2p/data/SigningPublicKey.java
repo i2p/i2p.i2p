@@ -177,7 +177,10 @@ public class SigningPublicKey extends SimpleDataStructure {
      *  @since 0.9.12
      */
     public void writeTruncatedBytes(OutputStream out) throws DataFormatException, IOException {
-        if (_type.getPubkeyLen() <= KEYSIZE_BYTES)
+        // we don't use _type here so we can write the data even for unknown type
+        //if (_type.getPubkeyLen() <= KEYSIZE_BYTES)
+        if (_data == null) throw new DataFormatException("No data to write out");
+        if (_data.length <= KEYSIZE_BYTES)
             out.write(_data);
         else
             out.write(_data, 0, KEYSIZE_BYTES);
