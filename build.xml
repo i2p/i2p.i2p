@@ -133,7 +133,7 @@
         <attribute name="infile" />
         <attribute name="outfile" />
         <sequential>
-            <input message="Enter private signing key file:" addproperty="release.privkey" />
+            <input message="Enter sud/su2 private signing key file:" addproperty="release.privkey" />
             <fail message="You must enter an existing file path." >
                 <condition>
                     <or>
@@ -197,13 +197,13 @@
                 </or>
             </condition>
         </fail>
-        <input message="Enter key name (you@mail.i2p):" addproperty="release.signer.su3" />
+        <input message="Enter su3 key name (you@mail.i2p):" addproperty="release.signer.su3" />
         <fail message="You must enter a name." >
             <condition>
                 <equals arg1="${release.signer.su3}" arg2=""/>
             </condition>
         </fail>
-        <input message="Enter key password for ${release.signer.su3}:" addproperty="release.password.su3" />
+        <input message="Enter su3 key password for ${release.signer.su3}:" addproperty="release.password.su3" />
         <fail message="You must enter a password." >
             <condition>
                 <equals arg1="${release.password.su3}" arg2=""/>
@@ -297,7 +297,7 @@
     </target>
 
     <target name="buildImagegen" depends="buildCore, buildJetty" >
-        <ant dir="apps/imagegen" target="all" />
+        <ant dir="apps/imagegen" target="build" />
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
     </target>
 
