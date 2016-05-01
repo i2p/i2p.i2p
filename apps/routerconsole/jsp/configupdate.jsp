@@ -21,25 +21,22 @@
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <div class="messages">
  <jsp:getProperty name="updatehelper" property="newsStatus" /></div>
-<div class="configure">
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <% /* set hidden default */ %>
  <input type="submit" name="action" value="" style="display:none" >
     <% if (updatehelper.canInstall()) { %>
-      <h3><%=intl._t("Check for I2P and news updates")%></h3>
-      <div class="wideload"><table border="0" cellspacing="5">
-        <tr><td colspan="2"></tr>
-        <tr><td class="mediumtags" align="right"><b><%=intl._t("News &amp; I2P Updates")%>:</b></td>
+      <h3 class="tabletitle"><%=intl._t("Check for I2P and news updates")%></h3>
+      <table id="i2pupdates" class="configtable" border="0" cellspacing="5">
+      <tr><td class="mediumtags" align="right"><b><%=intl._t("News &amp; I2P Updates")%>:</b></td>
      <% } else { %>
       <h3><%=intl._t("Check for news updates")%></h3>
-      <div class="wideload"><table border="0" cellspacing="5">
+      <table id="i2pupdates" class="configtable" border="0" cellspacing="5">
         <tr><td colspan="2"></tr>
         <tr><td class="mediumtags" align="right"><b><%=intl._t("News Updates")%>:</b></td>
      <% }   // if canInstall %>
           <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._t("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" class="check" value="<%=intl._t("Check for updates")%>" />
             <% } %></td></tr>
-        <tr><td colspan="2"><br></td></tr>
         <tr><td class="mediumtags" align="right"><b><%=intl._t("News URL")%>:</b></td>
           <td><input type="text" size="60" name="newsURL" <% if (!updatehelper.isAdvanced()) { %>readonly="readonly"<% } %> value="<jsp:getProperty name="updatehelper" property="newsURL" />"></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("Refresh frequency")%>:</b>
@@ -76,8 +73,7 @@
     <% } else { %>
         <tr><td class="mediumtags" align="center" colspan="2"><b><%=intl._t("Updates will be dispatched via your package manager.")%></b></td></tr>
     <% }   // if canInstall %>
-        <tr class="tablefooter"><td colspan="2">
-        <div class="formaction">
+        <tr class="tablefooter"><td colspan="2" class="optionsave">
             <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
             <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >
-        </div></td></tr></table></div></form></div></div></body></html>
+        </td></tr></table></form></div></body></html>

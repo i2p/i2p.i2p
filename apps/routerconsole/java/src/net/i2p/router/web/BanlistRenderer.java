@@ -50,7 +50,7 @@ class BanlistRenderer {
             return;
         }
 
-        buf.append("<ul>");
+        buf.append("<ul id=\"banlist\">");
         
         for (Map.Entry<Hash, Banlist.Entry> e : entries.entrySet()) {
             Hash key = e.getKey();

@@ -47,13 +47,16 @@ public class JobQueueHelper extends HelperBase {
         int numRunners = _context.jobQueue().getJobs(readyJobs, timedJobs, activeJobs, justFinishedJobs);
         
         StringBuilder buf = new StringBuilder(32*1024);
-        buf.append("<b><div class=\"joblog\"><h3>").append(_t("I2P Job Queue")).append("</h3><br><div class=\"wideload\">")
+        buf.append("<div class=\"wideload\"><div class=\"joblog\">")
+           .append("<h3 id=\"jobrunners\">")
            .append(_t("Job runners")).append(": ").append(numRunners)
-           .append("</b><br>\n");
+           .append("</h3>\n");
 
         long now = _context.clock().now();
 
-        buf.append("<hr><b>").append(_t("Active jobs")).append(": ").append(activeJobs.size()).append("</b><ol>\n");
+        buf.append("<h3 id=\"activejobs\">")
+           .append(_t("Active jobs")).append(": ").append(activeJobs.size())
+           .append("</h3><ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
             Job j = activeJobs.get(i);
             buf.append("<li>(").append(_t("started {0} ago", DataHelper.formatDuration2(now-j.getTiming().getStartAfter()))).append("): ");
@@ -61,7 +64,9 @@ public class JobQueueHelper extends HelperBase {
         }
         buf.append("</ol>\n");
 
-        buf.append("<hr><b>").append(_t("Just finished jobs")).append(": ").append(justFinishedJobs.size()).append("</b><ol>\n");
+        buf.append("<h3 id=\"finishedjobs\">")
+           .append(_t("Just finished jobs")).append(": ").append(justFinishedJobs.size())
+           .append("</h3><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = justFinishedJobs.get(i);
             buf.append("<li>(").append(_t("finished {0} ago", DataHelper.formatDuration2(now-j.getTiming().getActualEnd()))).append("): ");
@@ -69,7 +74,9 @@ public class JobQueueHelper extends HelperBase {
         }
         buf.append("</ol>\n");
 
-        buf.append("<hr><b>").append(_t("Ready/waiting jobs")).append(": ").append(readyJobs.size()).append("</b><ol>\n");
+        buf.append("<h3 id=\"readyjobs\">")
+           .append(_t("Ready/waiting jobs")).append(": ").append(readyJobs.size())
+           .append("</h3><ol>\n");
         ObjectCounter<String> counter = new ObjectCounter<String>();
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = readyJobs.get(i);
@@ -86,7 +93,9 @@ public class JobQueueHelper extends HelperBase {
         out.write(buf.toString());
         buf.setLength(0);
 
-        buf.append("<hr><b>").append(_t("Scheduled jobs")).append(": ").append(timedJobs.size()).append("</b><ol>\n");
+        buf.append("<h3 id=\"scheduledjobs\">")
+           .append(_t("Scheduled jobs")).append(": ").append(timedJobs.size())
+           .append("</h3><ol>\n");
         long prev = Long.MIN_VALUE;
         counter.clear();
         for (int i = 0; i < timedJobs.size(); i++) {
@@ -110,7 +119,9 @@ public class JobQueueHelper extends HelperBase {
         out.write(buf.toString());
         buf.setLength(0);
         
-        buf.append("<hr><b>").append(_t("Total Job Statistics")).append("</b>\n");
+        buf.append("<h3 id=\"totaljobstats\">")
+           .append(_t("Total Job Statistics"))
+           .append("</h3>\n");
         getJobStats(buf);
         out.write(buf.toString());
     }
@@ -120,8 +131,8 @@ public class JobQueueHelper extends HelperBase {
         List<String> names = new ArrayList<String>(counter.objects());
         if (names.size() < 4)
             return;
-        buf.append("<table style=\"width: 30%; margin-left: 100px;\">\n" +
-                   "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Queued")).append("<th>");
+        buf.append("<table id=\"schedjobs\" style=\"width: 30%; margin-left: 100px;\">\n" +
+                   "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Queued")).append("</th></tr>\n");
         Collections.sort(names, new JobCountComparator(counter));
         for (String name : names) {
             buf.append("<tr><td>").append(name)
@@ -137,7 +148,7 @@ public class JobQueueHelper extends HelperBase {
      *  @since 0.8.9
      */
     private void getJobStats(StringBuilder buf) { 
-        buf.append("<table>\n" +
+        buf.append("<table id=\"jobstats\">\n" +
                    "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Runs")).append("</th>" +
                    "<th>").append(_t("Dropped")).append("</th>" +
                    "<th>").append(_t("Time")).append("</th><th><i>").append(_t("Avg")).append("</i></th><th><i>")

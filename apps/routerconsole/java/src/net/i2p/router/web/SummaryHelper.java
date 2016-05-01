@@ -61,6 +61,7 @@ public class SummaryHelper extends HelperBase {
 
     static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
+        "Bandwidth" + S +
         "NewsHeadings" + S +
         "UpdateStatus" + S +
         "NetworkReachability" + S +
@@ -928,7 +929,7 @@ public class SummaryHelper extends HelperBase {
         String imgPath = CSSHelper.BASE_THEME_PATH + theme + "/images/";
 
         StringBuilder buf = new StringBuilder(2048);
-        buf.append("<table class=\"sidebarconf\"><tr><th>")
+        buf.append("<table id=\"sidebarconf\"><tr><th>")
            .append(_t("Remove"))
            .append("</th><th>")
            .append(_t("Name"))
@@ -997,8 +998,7 @@ public class SummaryHelper extends HelperBase {
                    "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
            .append(_t("Delete selected"))
            .append("\"></td><td align=\"left\"><b>")
-           .append(_t("Add")).append(":</b> " +
-                   "<select name=\"name\">\n" +
+           .append("<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
            .append(_t("Select a section to add"))
            .append("</option>\n");
