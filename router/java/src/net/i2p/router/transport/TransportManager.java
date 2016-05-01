@@ -730,8 +730,7 @@ public class TransportManager implements TransportEventListener {
 
     private final String getTransportsLegend() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<h3 id=\"transporthelp\" class\"ptitle\">").append(_t("Help")).append("</h3>")
-           .append("<p class=\"infohelp\">")
+        buf.append("<p class=\"infohelp\">")
            .append(_t("Your transport connection limits are automatically set based on your configured bandwidth."))
            .append('\n')
            .append(_t("To override these limits, add the settings i2np.ntcp.maxConnections=nnn and i2np.udp.maxConnections=nnn on the advanced configuration page."))

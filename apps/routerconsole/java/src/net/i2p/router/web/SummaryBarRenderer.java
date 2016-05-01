@@ -330,7 +330,7 @@ class SummaryBarRenderer {
     public String renderNetworkReachabilityHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
+        buf.append("<h4><a href=\"/help#confignet\" target=\"_top\" title=\"")
            .append(_t("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_t("Network"))

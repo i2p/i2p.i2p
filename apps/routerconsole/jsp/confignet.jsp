@@ -165,103 +165,12 @@
  </tr>
 </table>
 
-<h3><a name="chelp"><%=intl._t("Configuration Help")%></a></h3>
-<div id="confighelp">
- <p>
- <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
- </p><p>
- <%=intl._t("If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you.")%>
-   <%=intl._t("If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic.")%>
-   <%=intl._t("Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm.")%> 
-   <%=intl._t("Certain firewalls such as symmetric NATs may not work well with I2P.")%>
- </p>
 <% /********
 <!-- let's keep this simple...
 <input type="submit" name="recheckReachability" value="Check network reachability..." />
 </p>
 -->
 *********/ %>
-<p>
- <%=intl._t("UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports.")%>
-   <%=intl._t("UPnP support is beta, and may not work for any number of reasons")%>:
-</p>
-<ul id="upnphelp">
-<li class="tidylist"><%=intl._t("No UPnP-compatible device present")%>
-<li class="tidylist"><%=intl._t("UPnP disabled on the device")%>
-<li class="tidylist"><%=intl._t("Software firewall interference with UPnP")%>
-<li class="tidylist"><%=intl._t("Bugs in the device's UPnP implementation")%>
-<li class="tidylist"><%=intl._t("Multiple firewall/routers in the internet connection path")%>
-<li class="tidylist"><%=intl._t("UPnP device change, reset, or address change")%>
-</ul>
-<p><a href="peers#upnp"><%=intl._t("Review the UPnP status here.")%></a>
-<%=intl._t("UPnP may be enabled or disabled above, but a change requires a router restart to take effect.")%></p>
-<p><%=intl._t("Hostnames entered above will be published in the network database.")%>
-    <%=intl._t("They are <b>not private</b>.")%>
-    <%=intl._t("Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1.")%>
-    <%=intl._t("If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially.")%>
-    <%=intl._t("When in doubt, leave the settings at the defaults.")%>
-</p>
-</div>
-<h3><a name="help"><%=intl._t("Reachability Help")%></a></h3>
-<div id="reach_help">
-<p>
- <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
- <%=intl._t("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>
- <%=intl._t("If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem.")%>
-</p>
- <ul id="reachability">
-<li class="tidylist"><b><%=intl._t("OK")%></b> - 
-     <%=intl._t("Your UDP port does not appear to be firewalled.")%>
-<li class="tidylist"><b><%=intl._t("Firewalled")%></b> - 
-     <%=intl._t("Your UDP port appears to be firewalled.")%>
-     <%=intl._t("As the firewall detection methods are not 100% reliable, this may occasionally be displayed in error.")%>
-     <%=intl._t("However, if it appears consistently, you should check whether both your external and internal firewalls are open for your port.")%> 
-     <%=intl._t("I2P will work fine when firewalled, there is no reason for concern. When firewalled, the router uses \"introducers\" to relay inbound connections.")%>
-     <%=intl._t("However, you will get more participating traffic and help the network more if you can open your firewall(s).")%>
-     <%=intl._t("If you think you have already done so, remember that you may have both a hardware and a software firewall, or be behind an additional, institutional firewall you cannot control.")%>
-     <%=intl._t("Also, some routers cannot correctly forward both TCP and UDP on a single port, or may have other limitations or bugs that prevent them from passing traffic through to I2P.")%>
-<li class="tidylist"><b><%=intl._t("Testing")%></b> - 
-     <%=intl._t("The router is currently testing whether your UDP port is firewalled.")%>
-<li class="tidylist"><b><%=intl._t("Hidden")%></b> - 
-     <%=intl._t("The router is not configured to publish its address, therefore it does not expect incoming connections.")%>
-     <%=intl._t("Hidden mode is automatically enabled for added protection in certain countries.")%>
-<li class="tidylist"><b><%=intl._t("WARN - Firewalled and Fast")%></b> - 
-     <%=intl._t("You have configured I2P to share more than 128KBps of bandwidth, but you are firewalled.")%>
-     <%=intl._t("While I2P will work fine in this configuration, if you really have over 128KBps of bandwidth to share, it will be much more helpful to the network if you open your firewall.")%>
-<li class="tidylist"><b><%=intl._t("WARN - Firewalled and Floodfill")%></b> - 
-     <%=intl._t("You have configured I2P to be a floodfill router, but you are firewalled.")%> 
-     <%=intl._t("For best participation as a floodfill router, you should open your firewall.")%>
-<li class="tidylist"><b><%=intl._t("WARN - Firewalled with Inbound TCP Enabled")%></b> - 
-     <%=intl._t("You have configured inbound TCP, however your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well.")%>
-     <%=intl._t("If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact you via TCP, which will hurt the network.")%> 
-     <%=intl._t("Please open your firewall or disable inbound TCP above.")%>
-<li class="tidylist"><b><%=intl._t("WARN - Firewalled with UDP Disabled")%></b> -
-     <%=intl._t("You have configured inbound TCP, however you have disabled UDP.")%> 
-     <%=intl._t("You appear to be firewalled on TCP, therefore your router cannot accept inbound connections.")%>
-     <%=intl._t("Please open your firewall or enable UDP.")%>
-<li class="tidylist"><b><%=intl._t("ERR - Clock Skew")%></b> - 
-     <%=intl._t("Your system's clock is skewed, which will make it difficult to participate in the network.")%> 
-     <%=intl._t("Correct your clock setting if this error persists.")%>
-<li class="tidylist"><b><%=intl._t("ERR - Private TCP Address")%></b> - 
-     <%=intl._t("You must never advertise an unroutable IP address such as 127.0.0.1 or 192.168.1.1 as your external address.")%> 
-     <%=intl._t("Correct the address or disable inbound TCP above.")%>
-<li class="tidylist"><b><%=intl._t("ERR - SymmetricNAT")%></b> - 
-     <%=intl._t("I2P detected that you are firewalled by a Symmetric NAT.")%>
-     <%=intl._t("I2P does not work well behind this type of firewall. You will probably not be able to accept inbound connections, which will limit your participation in the network.")%>
-<li class="tidylist"><b><%=intl._t("ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart")%></b> -
-     <%=intl._t("I2P was unable to bind to the configured port noted on the advanced network configuration page .")%>
-     <%=intl._t("Check to see if another program is using the configured port. If so, stop that program or configure I2P to use a different port.")%> 
-     <%=intl._t("This may be a transient error, if the other program is no longer using the port.")%> 
-     <%=intl._t("However, a restart is always required after this error.")%>
-<li class="tidylist"><b><%=intl._t("ERR - UDP Disabled and Inbound TCP host/port not set")%></b> -
-     <%=intl._t("You have not configured inbound TCP with a hostname and port above, however you have disabled UDP.")%> 
-     <%=intl._t("Therefore your router cannot accept inbound connections.")%>
-     <%=intl._t("Please configure a TCP host and port above or enable UDP.")%>
-<li class="tidylist"><b><%=intl._t("ERR - Client Manager I2CP Error - check logs")%></b> -
-     <%=intl._t("This is usually due to a port 7654 conflict. Check the logs to verify.")%> 
-     <%=intl._t("Do you have another I2P instance running? Stop the conflicting program and restart I2P.")%>
- </ul>
-</div>
 <% /********
       <!--
  <b>Dynamic Router Keys: </b>
