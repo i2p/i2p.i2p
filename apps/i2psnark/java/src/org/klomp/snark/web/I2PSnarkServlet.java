@@ -2103,20 +2103,23 @@ public class I2PSnarkServlet extends BasicServlet {
                   + "\" spellcheck=\"false\" title=\"");
         out.write(_t("File or directory to seed (full path or within the directory {0} )",
                     _manager.getDataDir().getAbsolutePath() + File.separatorChar));
-        out.write("\" ><tr><td>\n");
+        out.write("\" > <input type=\"submit\" class=\"create\" value=\"");
+        out.write(_t("Create torrent"));
+        out.write("\" name=\"foo\" >");
+        out.write("<tr><td>\n");
         out.write(_t("Trackers"));
-        out.write(":<td><table style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
+        out.write(":<td><table id=\"trackerselect\" style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
         out.write(_t("Primary"));
         out.write("</td><td align=\"center\">");
         out.write(_t("Alternates"));
-        out.write("</td><td rowspan=\"0\">" +
-                  " <input type=\"submit\" class=\"create\" value=\"");
-        out.write(_t("Create torrent"));
-        out.write("\" name=\"foo\" >" +
-                  "</td></tr>\n");
+        out.write("</td><td>");
+        out.write(_t("Tracker URL"));
+        out.write("</td></tr>\n");
+
         for (Tracker t : sortedTrackers) {
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
+            String homeURL = t.baseURL;
             out.write("<tr><td>");
             out.write(name);
             out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
@@ -2126,14 +2129,18 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(" checked");
             out.write("></td><td align=\"center\"><input type=\"checkbox\" name=\"backup_");
             out.write(announceURL);
-            out.write("\" value=\"foo\"></td></tr>\n");
+            out.write("\" value=\"foo\"></td><td><a href=\"");
+            out.write(homeURL);
+            out.write("\">");
+            out.write(homeURL);
+            out.write("</a></td></tr>\n");
         }
         out.write("<tr><td><i>");
         out.write(_t("none"));
         out.write("</i></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
         if (_lastAnnounceURL == null)
             out.write(" checked");
-        out.write("></td><td></td></tr></table>\n");
+        out.write("></td><td></td><td></td></tr></table>\n");
         // make the user add a tracker on the config form now
         //out.write(_t("or"));
         //out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
