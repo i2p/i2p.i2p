@@ -497,7 +497,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                       : tx));
         if (showSort)
             out.write("</a>");
-        out.write("</th>\n<th align=\"center\">");
+        out.write("</th>\n<th id=\"pagenav\" align=\"center\">");
         if (total > 0 && (start > 0 || total > pageSize)) {
             writePageNav(out, req, start, pageSize, total, noThinsp);
         }
@@ -2064,14 +2064,14 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
         out.write(" title=\"");
         out.write(_t("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
-        out.write("\"> \n");
+        out.write("\">\n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" class=\"add\" value=\"");
         out.write(_t("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n" +
-
                   "<tr><td>");
+
         out.write(_t("Data dir"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newDir\" size=\"85\" value=\"\" spellcheck=\"false\"");
         out.write(" title=\"");
@@ -2085,7 +2085,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<br></span></table>\n");
         out.write("</div></form></div>");  
     }
-    
+
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
         out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file

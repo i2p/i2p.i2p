@@ -679,7 +679,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public String renderStatusHTML() {
         long uptime = Math.max(1000, _context.clock().now() - _started);
         StringBuilder buf = new StringBuilder(256);
-        buf.append("<br><b>DHT DEBUG</b><br>TX: ").append(_txPkts.get()).append(" pkts / ")
+        buf.append("<br><hr class=\"debug\"><b>DHT DEBUG</b><br><hr class=\"debug\">TX: ").append(_txPkts.get()).append(" pkts / ")
            .append(DataHelper.formatSize2(_txBytes.get())).append("B / ")
            .append(DataHelper.formatSize2(_txBytes.get() * 1000 / uptime)).append("Bps<br>" +
                    "RX: ").append(_rxPkts.get()).append(" pkts / ")
@@ -689,7 +689,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                    "Blacklisted: ").append(_blacklist.size()).append("<br>" +
                    "Sent tokens: ").append(_outgoingTokens.size()).append("<br>" +
                    "Rcvd tokens: ").append(_incomingTokens.size()).append("<br>" +
-                   "Pending queries: ").append(_sentQueries.size()).append("<br>");
+                   "Pending queries: ").append(_sentQueries.size()).append("<br><hr>");
         _tracker.renderStatusHTML(buf);
         _knownNodes.renderStatusHTML(buf);
         return buf.toString();
