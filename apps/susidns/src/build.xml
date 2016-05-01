@@ -149,6 +149,11 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages.sh" />
         </exec>
+        <javac source="${javac.version}" target="${javac.version}" 
+               includeAntRuntime="false"
+               srcdir="build/messages-src" destdir="${bin}">
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
 
     <target name="poupdate" depends="compile, precompilejsp">
@@ -171,7 +176,7 @@
       <delete file="susidns.war" />
       <delete>
         <fileset dir="." includes="**/*.class" />
-        <fileset dir="." includes="tmp" />
+        <fileset dir="." includes="tmp, build" />
         <fileset dir="WEB-INF" includes="web-fragment.xml, web-out.xml" />
       </delete>
       <delete dir="${bin}" />

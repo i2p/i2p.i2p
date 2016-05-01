@@ -97,7 +97,13 @@ do
         echo "Generating ${CLASS}_$LG ResourceBundle..."
 
         # convert to class files in build/obj
-        msgfmt --java --statistics -r $CLASS -l $LG -d src/WEB-INF/classes $i
+        TD=build/messages-src-tmp
+        TDX=$TD/i2p/susi/webmail
+        TD2=build/messages-src
+        TDY=$TD2/i2p/susi/webmail
+        rm -rf $TD
+        mkdir -p $TD $TDY
+        msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i
         if [ $? -ne 0 ]
         then
             echo "ERROR - msgfmt failed on ${i}, not updating translations"
@@ -106,6 +112,8 @@ do
             RC=1
             break
         fi
+        mv $TDX/messages_$LG.java $TDY
+        rm -rf $TD
     fi
 done
 rm -f $TMPFILE
