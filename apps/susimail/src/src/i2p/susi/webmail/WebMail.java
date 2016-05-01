@@ -2356,9 +2356,9 @@ public class WebMail extends HttpServlet
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _t("Logout") ) );
+		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n");
 		if( mail != null ) {
-			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
-					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
+			out.println(	"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
 					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("Subject") +
