@@ -25,9 +25,9 @@
 <jsp:setProperty name="stathelper" property="peer" value="<%=peerB64%>" />
 <% stathelper.storeWriter(out); %>
 <h2><%=intl._t("Profile for peer {0}", peerB64)%></h2>
-<pre>
+<table id="viewprofile"><tbody><tr><td><pre>
 <jsp:getProperty name="stathelper" property="profile" />
-</pre>
+</pre></td></tr></tbody></table>
 <%
     }
 %>

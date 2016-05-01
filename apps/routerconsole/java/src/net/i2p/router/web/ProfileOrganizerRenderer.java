@@ -259,21 +259,24 @@ class ProfileOrganizerRenderer {
       }
       if (mode < 2) {
 
-        buf.append("<h3>").append(_t("Thresholds")).append("</h3>");
+        buf.append("<h3 class=\"tabletitle\">").append(_t("Thresholds")).append("</h3>\n")
+           .append("<table id=\"thresholds\"><tbody><tr><td>");
         buf.append("<p><b>").append(_t("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold()))
            .append(" (").append(fast).append(' ').append(_t("fast peers")).append(")<br>");
         buf.append("<b>").append(_t("Capacity")).append(":</b> ").append(num(_organizer.getCapacityThreshold()))
            .append(" (").append(reliable).append(' ').append(_t("high capacity peers")).append(")<br>");
         buf.append("<b>").append(_t("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold()))
-           .append(" (").append(integrated).append(' ').append(_t(" well integrated peers")).append(")</p>");
-        buf.append("<h3>").append(_t("Definitions")).append("</h3><ul>");
+           .append(" (").append(integrated).append(' ').append(_t(" well integrated peers")).append(")")
+           .append("</td></tr></tbody></table>\n");
+        buf.append("<h3 class=\"tabletitle\">").append(_t("Definitions")).append("</h3>\n")
+           .append("<table id=\"profile_defs\"><tbody><tr><td><ul>");
         buf.append("<li><b>").append(_t("groups")).append("</b>: ").append(_t("as determined by the profile organizer")).append("</li>");
         buf.append("<li><b>").append(_t("caps")).append("</b>: ").append(_t("capabilities in the netDb, not used to determine profiles")).append("</li>");
         buf.append("<li><b>").append(_t("speed")).append("</b>: ").append(_t("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel")).append("</li>");
         buf.append("<li><b>").append(_t("capacity")).append("</b>: ").append(_t("how many tunnels can we ask them to join in an hour?")).append("</li>");
         buf.append("<li><b>").append(_t("integration")).append("</b>: ").append(_t("how many new peers have they told us about lately?")).append("</li>");
         buf.append("<li><b>").append(_t("status")).append("</b>: ").append(_t("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
-        buf.append("</ul>");
+        buf.append("</ul></td></tr></tbody></table>\n");
 
       ////
       //// don't bother reindenting
