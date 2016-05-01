@@ -92,6 +92,9 @@ usr/share/java/gnu-getopt.jar usr/share/i2p/lib/gnu-getopt.jar
 
 
 # comment out if not building with libhttpclient-java and libhttpcore-java
-# ubuntu and debian: everywhere
-usr/share/java/httpclient.jar usr/share/i2p/lib/httpclient.jar
-usr/share/java/httpcore.jar usr/share/i2p/lib/httpcore.jar
+# 2 MB of dependencies vs. 20 KB of copied source
+# Requires 4.4 or higher.
+# Debian: Not in wheezy/jessie
+# Ubuntu: Only in wily and later
+#usr/share/java/httpclient.jar usr/share/i2p/lib/httpclient.jar
+#usr/share/java/httpcore.jar usr/share/i2p/lib/httpcore.jar

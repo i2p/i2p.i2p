@@ -15,7 +15,6 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,dh-apparmor
  ,gettext
  ,libgetopt-java
- ,libhttpclient-java, libhttpcore-java
  ,libgmp-dev (>= 2:5.0.5)
  ,libservice-wrapper-java
  ,hardening-wrapper
