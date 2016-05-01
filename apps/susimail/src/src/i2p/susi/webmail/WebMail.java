@@ -198,7 +198,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIG_THEME = "theme";
 	private static final String DEFAULT_THEME = "light";
 
-	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
+	private static final String spacer = ""; /* this is best done with css */
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
 	
 	static {
@@ -1778,7 +1778,7 @@ public class WebMail extends HttpServlet
 					showConfig(out, sessionObject);
 				
 				//out.println( "</form><div id=\"footer\"><hr><p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></div></div></body>\n</html>");				
-				out.println( "</form><div class=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");				
+				out.println( "</form><div class=\"footer\"><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");
 				out.flush();
 		}
 	}
@@ -2113,11 +2113,9 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _t("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + quoteHTML(bcc) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
-				"<tr><td colspan=\"2\" align=\"center\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea>" +
+				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea></td></tr>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"></td></tr>" +
-				// TODO disable/hide in JS if no file selected
-				"<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" + button(NEW_UPLOAD, _t("Add another attachment")) + "</td></tr>");
+				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td id=\"addattach\" align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\">&nbsp;" + button(NEW_UPLOAD, _t("Add another attachment")) + "</td></tr>");
 		
 		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
@@ -2162,17 +2160,15 @@ public class WebMail extends HttpServlet
 			"<tr><td align=\"right\" width=\"30%\">" + _t("SMTP Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" style=\"text-align: right;\" size=\"5\" name=\"" + SMTP +"\" value=\"" + quoteHTML(smtp) + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
 		}
 		out.println(
-			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
-			"<tr><td></td><td align=\"left\">" + button( LOGIN, _t("Login") ) + spacer +
+			"<tr><td colspan=\"2\"><hr></td></tr>\n" +
+			"<tr><td colspan=\"2\" align=\"center\">" + button( LOGIN, _t("Login") ) + spacer +
 			 button(OFFLINE, _t("Read Mail Offline") ) +
 			 //spacer +
 			 //" <input class=\"cancel\" type=\"reset\" value=\"" + _t("Reset") + "\">" +
 			 spacer +
 			 button(CONFIGURE, _t("Settings")) +
 			"</td></tr>\n" +
-			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
-			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _t("Learn about I2P mail") + "</a></td></tr>\n" +
-			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _t("Create Account") + "</a></td></tr>\n" +
+			"<tr><td align=\"center\" colspan=\"2\"><hr><a href=\"http://hq.postman.i2p/?page_id=14\">" + _t("Learn about I2P mail") + "</a> | <a href=\"http://hq.postman.i2p/?page_id=16\">" + _t("Create Account") + "</a></td></tr>\n" +
 			"</table></div>");
 	}
 
@@ -2267,7 +2263,7 @@ public class WebMail extends HttpServlet
 		if (i == 0)
 			out.println("<tr><td colspan=\"9\" align=\"center\"><div id=\"emptymailbox\"><i>" + _t("No messages") + "</i></div></td></tr>\n</table>");
 		if (i > 0) {
-			out.println( "<tr class=\"bottombuttons\"><td colspan=\"9\"><hr></td></tr>");
+			out.println( "<tr class=\"bottombuttons\"></tr>");
 			if (sessionObject.folder.getPages() > 1 && i > 30) {
 				// show the buttons again if page is big
 				out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
@@ -2308,16 +2304,18 @@ public class WebMail extends HttpServlet
 	 */
 	private static void showPageButtons(PrintWriter out, Folder<?> folder) {
 		out.println(
-			"<br>" +
+			"<table id=\"pagenav\"><tr><td>" +
 			( folder.isFirstPage() ?
 						button2( FIRSTPAGE, _t("First") ) + "&nbsp;" + button2( PREVPAGE, _t("Previous") ) :
 						button( FIRSTPAGE, _t("First") ) + "&nbsp;" + button( PREVPAGE, _t("Previous") ) ) +
-			" &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+			"</td><td>" +
 			_t("Page {0} of {1}", folder.getCurrentPage(), folder.getPages()) +
-			"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
+			"</td><td>" +
 			( folder.isLastPage() ? 
 						button2( NEXTPAGE, _t("Next") ) + "&nbsp;" + button2( LASTPAGE, _t("Last") ) :
-						button( NEXTPAGE, _t("Next") ) + "&nbsp;" + button( LASTPAGE, _t("Last") ) )
+						button( NEXTPAGE, _t("Next") ) + "&nbsp;" + button( LASTPAGE, _t("Last") ) ) +
+			"</td></tr></table>"
+
 		);
 	}
 
@@ -2399,11 +2397,11 @@ public class WebMail extends HttpServlet
 			"\" size=\"4\" value=\"" +  sz + "\">" +
 			"&nbsp;" + 
 			button( SETPAGESIZE, _t("Set") ) );
-		out.println("<p>");
 		out.println("</div>");
+		out.println("<h3 id=\"config\">");
 		out.print(_t("Advanced Configuration"));
 		Properties config = Config.getProperties();
-		out.print(":</p><textarea cols=\"80\" rows=\"" + Math.max(8, config.size() + 2) + "\" spellcheck=\"false\" name=\"" + CONFIG_TEXT + "\">");
+		out.print("</h3><textarea cols=\"80\" rows=\"" + Math.max(8, config.size() + 2) + "\" spellcheck=\"false\" name=\"" + CONFIG_TEXT + "\">");
 		for (Map.Entry<Object, Object> e : config.entrySet()) {
 			out.print(quoteHTML(e.getKey().toString()));
 			out.print('=');
