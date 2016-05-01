@@ -189,12 +189,13 @@ class SybilRenderer {
             tot += d;
         }
         double avgMinDist = tot / count;
-        buf.append("<p>Average closest floodfill distance: " + fmt.format(avgMinDist) + "</p>");
-        buf.append("<p>Routing Data: \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
-           .append("\" Last Changed: ").append(new Date(_context.routerKeyGenerator().getLastChanged()));
-        buf.append("</p><p>Next Routing Data: \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData()))
-           .append("\" Rotates in: ").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight()));
-        buf.append("</p>");
+        buf.append("<div id=\"sybils_summary\">\n");
+        buf.append("<b>Average closest floodfill distance:</b> ").append(fmt.format(avgMinDist)).append("<br>\n");
+        buf.append("<b>Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getModData()))
+           .append("\" <b>Last Changed:</b> ").append(new Date(_context.routerKeyGenerator().getLastChanged())).append("<br>\n");
+        buf.append("<b>Next Routing Data:</b> \"").append(DataHelper.getUTF8(_context.routerKeyGenerator().getNextModData()))
+           .append("\" <b>Rotates in:</b> ").append(DataHelper.formatDuration(_context.routerKeyGenerator().getTimeTillMidnight())).append("\n");
+        buf.append("</div>\n");
 
         Map<Hash, Points> points = new HashMap<Hash, Points>(64);
 
@@ -760,35 +761,35 @@ class SybilRenderer {
      */
     private double renderRouterInfo(StringBuilder buf, RouterInfo info, Hash us, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<table><tr><th><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
+        buf.append("<table class=\"sybil_routerinfo\"><a name=\"").append(hash.substring(0, 6)).append("\" ></a><tr>");
         double distance = 0;
         if (isUs) {
-            buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ": ").append(hash).append("</b></th></tr><tr><td>\n");
+            buf.append("<th colspan=\"4\"><a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b> <code>").append(hash).append("</code></th></tr>\n");
         } else {
-            buf.append("<b>" + _t("Router") + ":</b> ").append(hash).append("\n");
+            buf.append("<th colspan=\"2\"><b>" + _t("Router") + ":</b> <code>").append(hash).append("</code>\n");
             if (!full) {
-                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>]");
+                buf.append("</th><th><a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a></th><th>");
             }
-            buf.append("</th><th><img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
-            buf.append("</th></tr><tr><td colspan=\"2\">\n");
+            buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
+            buf.append("</th></tr>\n");
             if (us != null) {
                 BigInteger dist = HashDistance.getDistance(us, info.getHash());
                 distance = biLog2(dist);
-                buf.append("<b>Hash Distance: ").append(fmt.format(distance)).append("</b><br>");
+                buf.append("<tr><td><b>Hash Distance:</b></td><td colspan=\"3\">").append(fmt.format(distance)).append("</td></tr>\n");
             }
         }
-        buf.append("<b>Routing Key: </b>").append(info.getRoutingKey().toBase64()).append("<br>\n");
-        buf.append("<b>Version: </b>").append(DataHelper.stripHTML(info.getVersion())).append("<br>\n");
-        buf.append("<b>Caps: </b>").append(DataHelper.stripHTML(info.getCapabilities())).append("<br>\n");
+        buf.append("<tr><td><b>Routing Key:</b></td><td colspan=\"3\">").append(info.getRoutingKey().toBase64()).append("</td></tr>\n");
+        buf.append("<tr><td><b>Version:</b></td><td colspan=\"3\">").append(DataHelper.stripHTML(info.getVersion())).append("</td></tr>\n");
+        buf.append("<tr><td><b>Caps:</b></td><td colspan=\"3\">").append(DataHelper.stripHTML(info.getCapabilities())).append("</td></tr>\n");
         String fam = info.getOption("family");
         if (fam != null)
-            buf.append("<b>Family: ").append(DataHelper.escapeHTML(fam)).append("</b><br>\n");
+            buf.append("<tr><td><b>Family:</b></td><td colspan=\"3\">").append(DataHelper.escapeHTML(fam)).append("</td></tr>\n");
         String kls = info.getOption("netdb.knownLeaseSets");
         if (kls != null)
-            buf.append("<b>Lease Sets: </b>").append(DataHelper.stripHTML(kls)).append("<br>\n");
+            buf.append("<tr><td><b>Lease Sets:</b></td><td colspan=\"3\">").append(DataHelper.stripHTML(kls)).append("</td></tr>\n");
         String kr = info.getOption("netdb.knownRouters");
         if (kr != null)
-            buf.append("<b>Routers: </b>").append(DataHelper.stripHTML(kr)).append("<br>\n");
+            buf.append("<tr><td><b>Routers:</b></td><td colspan=\"3\">").append(DataHelper.stripHTML(kr)).append("</td></tr>\n");
         
         long now = _context.clock().now();
         if (!isUs) {
@@ -797,46 +798,46 @@ class SybilRenderer {
                 long heard = prof.getFirstHeardAbout();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<b>First heard about:</b> ")
-                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    buf.append("<tr><td><b>First heard about:</b></td><td colspan=\"3\">")
+                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                 }
                 heard = prof.getLastHeardAbout();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<b>Last heard about:</b> ")
-                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    buf.append("<tr><td><b>Last heard about:</b></td><td colspan=\"3\">")
+                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                 }
                 heard = prof.getLastHeardFrom();
                 if (heard > 0) {
                     long age = Math.max(now - heard, 1);
-                    buf.append("<b>Last heard from:</b> ")
-                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                    buf.append("<tr><td><b>Last heard from:</b></td><td colspan=\"3\">")
+                       .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                 }
                 DBHistory dbh = prof.getDBHistory();
                 if (dbh != null) {
                     heard = dbh.getLastLookupSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<b>Last lookup successful:</b> ")
-                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                        buf.append("<tr><td><b>Last lookup successful:</b></td><td colspan=\"3\">")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                     }
                     heard = dbh.getLastLookupFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<b>Last lookup failed:</b> ")
-                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                        buf.append("<tr><td><b>Last lookup failed:</b></td><td colspan=\"3\"> ")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                     }
                     heard = dbh.getLastStoreSuccessful();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<b>Last store successful:</b> ")
-                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                        buf.append("<tr><td><b>Last store successful:</b></td><td colspan=\"3\">")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                     }
                     heard = dbh.getLastStoreFailed();
                     if (heard > 0) {
                         long age = Math.max(now - heard, 1);
-                        buf.append("<b>Last store failed:</b> ")
-                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+                        buf.append("<tr><td><b>Last store failed:</b></td><td colspan=\"3\">")
+                           .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
                     }
                 }
                 // any other profile stuff?
@@ -844,15 +845,15 @@ class SybilRenderer {
         }
         long age = Math.max(now - info.getPublished(), 1);
         if (isUs && _context.router().isHidden()) {
-            buf.append("<b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b> ")
-               .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+            buf.append("<tr><td><b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b></td><td colspan=\"3\">")
+               .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
         } else {
-            buf.append("<b>").append(_t("Published")).append(":</b> ")
-               .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
+            buf.append("<tr><td><b>").append(_t("Published")).append(":</b></td><td colspan=\"3\">")
+               .append(_t("{0} ago", DataHelper.formatDuration2(age))).append("</td></tr>\n");
         }
-        buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
-           .append(info.getIdentity().getSigningPublicKey().getType().toString());
-        buf.append("<br>\n<b>" + _t("Addresses") + ":</b> ");
+        buf.append("<tr><td><b>").append(_t("Signing Key")).append(":</b></td><td colspan=\"3\">")
+           .append(info.getIdentity().getSigningPublicKey().getType().toString()).append("</td></tr>\n");
+        buf.append("<tr><td><b>" + _t("Addresses") + ":</b></td><td colspan=\"3\">");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
