@@ -30,11 +30,21 @@ public class StatsGenerator {
     
     public void generateStatsPage(Writer out, boolean showAll) throws IOException {
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<div class=\"joblog\"><form action=\"\">");
-        buf.append("<select name=\"go\" onChange='location.href=this.value'>");
+
+        buf.append("<div class=\"joblog\">\n");
+        buf.append("<p id=\"gatherstats\">");
+        buf.append(_t("Statistics gathered during this router's uptime")).append(" (");
+        long uptime = _context.router().getUptime();
+        buf.append(DataHelper.formatDuration2(uptime));
+        buf.append(").  ").append( _t("The data gathered is quantized over a 1 minute period, so should just be used as an estimate."));
+        buf.append(' ').append( _t("These statistics are primarily used for development and debugging."));
+        buf.append("</p>");
+
+        buf.append("<form action=\"\"><b>");
+        buf.append(_t("Jump to section")).append(":</b> <select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
         buf.setLength(0);
-        
+
         Map<String, SortedSet<String>> unsorted = _context.statManager().getStatsByGroup();
         Map<String, Set<String>> groups = new TreeMap<String, Set<String>>(new AlphaComparator());
         groups.putAll(unsorted);
@@ -56,16 +66,10 @@ public class StatsGenerator {
         }
         buf.append("</select> <input type=\"submit\" value=\"").append(_t("GO")).append("\" />");
         buf.append("</form>");
-        
-        buf.append(_t("Statistics gathered during this router's uptime")).append(" (");
-        long uptime = _context.router().getUptime();
-        buf.append(DataHelper.formatDuration2(uptime));
-        buf.append(").  ").append( _t("The data gathered is quantized over a 1 minute period, so should just be used as an estimate."));
-        buf.append(' ').append( _t("These statistics are primarily used for development and debugging."));
 
         out.write(buf.toString());
         buf.setLength(0);
-        
+
         for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
             String group = entry.getKey();
             Set<String> stats = entry.getValue();
@@ -82,7 +86,7 @@ public class StatsGenerator {
                 buf.append(stat);
                 buf.append("\">");
                 buf.append(stat);
-                buf.append("</a></b><br>");
+                buf.append("</a>:</b>&nbsp;");
                 if (_context.statManager().isFrequency(stat))
                     renderFrequency(stat, buf);
                 else
@@ -214,7 +218,7 @@ public class StatsGenerator {
                 buf.append(")");
             }
             if (curRate.getSummaryListener() != null) {
-                buf.append(" <a href=\"graph?stat=").append(name)
+                buf.append("<br><a href=\"graph?stat=").append(name)
                    .append('.').append(periods[i]);
                 buf.append("\">").append(_t("Graph Data")).append("</a> - ");
                 buf.append(" <a href=\"graph?stat=").append(name)
