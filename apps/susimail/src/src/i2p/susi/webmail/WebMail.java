@@ -2147,7 +2147,7 @@ public class WebMail extends HttpServlet
 		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
-		out.println( "<div id=\"dologin\"><table cellspacing=\"3\" cellpadding=\"5\">\n" +
+		out.println( "<div id=\"dologin\"><h1>" + _t("I2PMail Login") + "</h1><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
 			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
