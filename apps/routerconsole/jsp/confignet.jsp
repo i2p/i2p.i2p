@@ -26,8 +26,6 @@
  <table id="netconfig" class="configtable">
  <tr>
   <td class="infohelp">
- <!-- TODO replace static img with css background -->
- <img src="/themes/console/images/itoopie_xsm.png" alt="">
  <b><%=intl._t("The default settings will work for most people.")%>
  <a href="#chelp"><%=intl._t("There is help below.")%></a></b>
  <%=intl._t("Changing these settings will restart your router.")%>

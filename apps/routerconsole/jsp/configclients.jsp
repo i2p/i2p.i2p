@@ -35,8 +35,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <%=intl._t("All changes require restart to take effect.")%>
  </p>
  <p class="infowarn" id="clientconf">
- <!-- TODO use css background -->
- <img src="/themes/console/images/itoopie_xsm.png" alt=""><b><%=intl._t("Be careful changing any settings here. The 'router console' and 'application tunnels' are required for most uses of I2P. Only advanced users should change these.")%></b>
+  <b><%=intl._t("Be careful changing any settings here. The 'router console' and 'application tunnels' are required for most uses of I2P. Only advanced users should change these.")%></b>
  </p><div class="wideload">
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >

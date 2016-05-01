@@ -997,8 +997,7 @@ public class SummaryHelper extends HelperBase {
                    "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
            .append(_t("Delete selected"))
            .append("\"></td><td align=\"left\"><b>")
-           .append(_t("Add")).append(":</b> " +
-                   "<select name=\"name\">\n" +
+           .append("<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
            .append(_t("Select a section to add"))
            .append("</option>\n");

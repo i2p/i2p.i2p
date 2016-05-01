@@ -28,8 +28,6 @@
  <h3 id="bwlimiter" class="tabletitle"><%=intl._t("Bandwidth limiter")%></h3>
  <table id="bandwidthconfig" class="configtable">
  <tr><td class="infohelp" colspan="2">
- <!-- TODO: move to css -->
- <img src="/themes/console/images/itoopie_xsm.png" alt="">
  <b><%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b>
  </td></tr>
    <tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" >
