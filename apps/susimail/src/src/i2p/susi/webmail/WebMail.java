@@ -637,7 +637,7 @@ public class WebMail extends HttpServlet
 			}
 			if( prepareAttachment ) {
 				if( html ) {
-					out.println( "<hr><p class=\"mailbody\">" );
+					out.println( "<hr><div id=\"attached\"><p class=\"mailbody\">" );
 					String type = mailPart.type;
 					if (type != null && type.startsWith("image/")) {
 						// we at least show images safely...
@@ -658,7 +658,7 @@ public class WebMail extends HttpServlet
 							 mailPart.hashCode() + "\">" + _t("Download attachment {0}", ident) + "</a>" +
 							 " (" + _t("File is packed into a zipfile for security reasons.") + ')');
 					}
-					out.println( "</p>" );					
+					out.println( "</p></div>" );
 				}
 				else {
 					out.println( _t("Attachment ({0}).", ident) );
@@ -1754,10 +1754,10 @@ public class WebMail extends HttpServlet
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
-					out.println( "<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>" );
+					out.println( "<div class=\"notifications\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
 				}
 				if( sessionObject.info != null && sessionObject.info.length() > 0 ) {
-					out.println( "<p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p>" );
+					out.println( "<div class=\"notifications\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
 				}
 				/*
 				 * now write body
@@ -2105,7 +2105,7 @@ public class WebMail extends HttpServlet
 		sessionObject.subject = null;
 		sessionObject.body = null;
 		
-		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
+		out.println( "<div id=\"composemail\"><table id=\"newmail\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("From") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_FROM + "\" value=\"" + quoteHTML(from) + "\" " + ( fixed ? "disabled" : "" ) +"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + quoteHTML(to) + "\"></td></tr>\n" +
@@ -2128,14 +2128,14 @@ public class WebMail extends HttpServlet
 				} else {
 					out.println("<tr><td align=\"right\">&nbsp;</td>");
 				}
-				out.println("<td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + quoteHTML(attachment.getFileName()) + "</td></tr>");
+				out.println("<td id=\"attachedfile\" align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + quoteHTML(attachment.getFileName()) + "</td></tr>");
 			}
 			// TODO disable in JS if none selected
-			out.println("<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\">" +
+			out.println("<tr class=\"bottombuttons\"><td>&nbsp;</td><td align=\"left\" id=\"deleteattached\">" +
 			            button( DELETE_ATTACHMENT, _t("Delete selected attachments") ) +
 				    "</td></tr>");
 		}
-		out.println( "</table>" );
+		out.println( "</table></div>" );
 	}
 
 	/**
@@ -2149,7 +2149,7 @@ public class WebMail extends HttpServlet
 		String pop3 = Config.getProperty( CONFIG_PORTS_POP3, "" + DEFAULT_POP3PORT );
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
-		out.println( "<table cellspacing=\"3\" cellpadding=\"5\">\n" +
+		out.println( "<div id=\"dologin\"><table cellspacing=\"3\" cellpadding=\"5\">\n" +
 			// current postman hq length limits 16/12, new postman version 32/32
 			"<tr><td align=\"right\" width=\"30%\">" + _t("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + "\"> @mail.i2p</td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
@@ -2173,7 +2173,7 @@ public class WebMail extends HttpServlet
 			"<tr><td colspan=\"2\">&nbsp;</td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _t("Learn about I2P mail") + "</a></td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _t("Create Account") + "</a></td></tr>\n" +
-			"</table>");
+			"</table></div>");
 	}
 
 	/**
@@ -2265,7 +2265,7 @@ public class WebMail extends HttpServlet
 			i++;
 		}
 		if (i == 0)
-			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _t("No messages") + "</i></td></tr>\n</table>");
+			out.println("<tr><td colspan=\"9\" align=\"center\"><div id=\"emptymailbox\"><i>" + _t("No messages") + "</i></div></td></tr>\n</table>");
 		if (i > 0) {
 			out.println( "<tr class=\"bottombuttons\"><td colspan=\"9\"><hr></td></tr>");
 			if (sessionObject.folder.getPages() > 1 && i > 30) {
