@@ -61,6 +61,7 @@ public class SummaryHelper extends HelperBase {
 
     static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
+        "Bandwidth" + S +
         "NewsHeadings" + S +
         "UpdateStatus" + S +
         "NetworkReachability" + S +
