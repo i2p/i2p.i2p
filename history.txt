@@ -3,6 +3,8 @@
    a backwards clock shift, caused graphs to be blank
    and various router, streaming, and i2ptunnel
    degradations over time (ticket #1776)
+ * Wrapper: Update to wrapper 3.5.29, except for Windows.
+   Fixes wrapper failure on FreeBSD 10 (ticket #1118)
 
 2016-05-01 zzz
  * Build: Compile resource bundles from ant, not msgfmt,

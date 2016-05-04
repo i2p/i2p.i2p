@@ -1035,6 +1035,12 @@
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
+     <!-- Force using the new wrapper.jar.
+          The new jar with the old windows binaries will output a warning on windows.
+          We do not generate release files from this target.
+          See preppkg-windows-only target below.
+      -->
+        <copy overwrite="true" file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
@@ -1139,7 +1145,6 @@
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
         <copy file="build/utility.jar" todir="pkg-temp" />
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" excludes="*.txt" />
@@ -1151,7 +1156,13 @@
 
     <target name="preppkg-windows-only" depends="preppkg-windows, jbigi-windows-only">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+     <!-- Win binaries are down-rev from the others, so use the old jar.
+          This will not overwrite, so preppkg (for all OSes) will get the new jar with
+          the old binaries, which will probably work but will output a warning.
+          The windows-only installer will get the correct jar.
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+      -->
+        <copy overwrite="true" file="installer/lib/wrapper/win-all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <!-- see targets below for conditional copying -->
