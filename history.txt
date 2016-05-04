@@ -1,3 +1,29 @@
+2016-05-04 zzz
+ * Utils: Fix bug in periodic timers triggered by
+   a backwards clock shift, caused graphs to be blank
+   and various router, streaming, and i2ptunnel
+   degradations over time (ticket #1776)
+
+2016-05-01 zzz
+ * Build: Compile resource bundles from ant, not msgfmt,
+   speeding up builds with translations by 20x
+ * Debian: Back out libhttpclient-java dependency,
+   requires 4.4 which is too recent for most distros
+
+2016-04-30 zzz
+ * Blocklist: Add RFC 6598 addresses
+ * Console:
+   - Only display cpuid information on x86
+   - Readme page link fixes (tickets #1789, #1790)
+ * Data: Fix NPE calculating the hash of a RI of unknown sig type
+ * Debian:
+   - Add runtime dependency on libhttpclient-java,
+     link to /usr/share/java/httpclient.jar and httpcore.jar
+ * Eepsite: comment out gzip filtering in cgi context,
+   causes hung threads, root cause unknown
+ * Router: Reduce log level of RI sig failure
+ * SAM: Log tweaks (ticket #1778)
+
 2016-04-29 zzz
  * Debian:
    - Add runtime dependency on gettext-base,
