@@ -488,11 +488,19 @@ else
     esac
 fi
 
-# OSX always places Java in the same location so we can reliably set JAVA_HOME
+# Through Java 6, OSX always places Java in the same location so we can reliably set JAVA_HOME
+# As of OSX 10.5 / Java 7, call /usr/libexec/java_home to find it
+# https://developer.apple.com/library/mac/qa/qa1170/_index.html
 if [ "$DIST_OS" = "macosx" ]
 then
     if [ -z "$JAVA_HOME" ]; then
-        JAVA_HOME="/Library/Java/Home"; export JAVA_HOME
+        if [ -x "/usr/libexec/java_home" ]; then
+            JAVA_HOME=`/usr/libexec/java_home`
+        fi
+        if [ -z "$JAVA_HOME" ]; then
+            JAVA_HOME="/Library/Java/Home"
+        fi
+        export JAVA_HOME
     fi
 fi
 
