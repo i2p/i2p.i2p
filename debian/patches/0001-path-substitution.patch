@@ -71,7 +71,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -177,75 +168,8 @@
+@@ -177,77 +168,8 @@
         exit 1
  fi
  
@@ -104,13 +104,15 @@ Debian wrapper.config to try to prevent confusion.
 -
 -freebsd10() {
 -    echo
--    echo "The current version of the Tanuki wrapper does not"
--    echo "support FreeBSD 10."
+-    echo "The current version of the Tanuki wrapper that is bundled"
+-    echo "with I2P does not support FreeBSD 10."
 -    echo
--    echo "See https://trac.i2p2.de/ticket/1118 for more information"
--    echo "and a workaround for this issue."
+-    echo "See http://trac.i2p2.de/ticket/1118#comment:13 for a work-around."
+-    echo "After applying the work-around, as a normal user or a dedicated"
+-    echo "i2p user, you can then run:"
+-    echo "$ ./i2prouter start"
 -    echo
--    echo "In the meantime, you may start I2P by running the script"
+-    echo "Or, you may also start I2P by running the script:"
 -    echo "${I2P}/runplain.sh"
 -    echo
 -}
@@ -125,11 +127,11 @@ Debian wrapper.config to try to prevent confusion.
 -                    ;;
 -                *)
 -                    # We should never get here on recent versions of FreeBSD
--                    if ! $(pkg_info -E 'libiconv*' > /dev/null 2>&1); then
+-                    if ! $(pkg info -E 'libiconv*' > /dev/null 2>&1); then
 -                        echo
 -                        echo "The wrapper requires libiconv."
 -                        echo
--                        echo "It can be installed with pkg_add -r libiconv"
+-                        echo "It can be installed with pkg install libiconv"
 -                        echo
 -                    fi
 -                    ;;
@@ -147,7 +149,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -1058,7 +982,6 @@
+@@ -1068,7 +982,6 @@
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -155,7 +157,7 @@ Debian wrapper.config to try to prevent confusion.
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1861,7 +1784,7 @@
+@@ -1871,7 +1784,7 @@
  }
  
  showsetusermesg()  {
@@ -164,7 +166,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1869,7 +1792,7 @@
+@@ -1879,7 +1792,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -173,7 +175,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1934,24 +1857,10 @@
+@@ -1944,24 +1857,10 @@
              status
              ;;
  
