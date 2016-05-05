@@ -2,15 +2,18 @@ package net.i2p.desktopgui.router;
 
 import java.io.IOException;
 
-import org.tanukisoftware.wrapper.WrapperManager;
-
 import net.i2p.I2PAppContext;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+//import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.util.Log;
 
 /**
  * Handle communications with the router instance.
+ *
+ * See ConfigServiceHandler for best practices on stopping the router.
+ * We don't bother notifying any Wrapper instance here.
+ *
  * @author mathias
  *
  */
@@ -45,22 +48,53 @@ public class RouterManager {
      * Restart the running I2P instance.
      */
     public static void restart(RouterContext ctx) {
-        ctx.router().restart();
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_HARD_RESTART, false);
+        ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART);
     }
 
     /**
      * Stop the running I2P instance.
      */
     public static void shutDown(RouterContext ctx) {
-            Thread t = new Thread(new Runnable() {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_HARD, false);
+        ctx.router().shutdownGracefully(Router.EXIT_HARD);
+    }
+    
+    /**
+     * Restart the running I2P instance.
+     * @since 0.9.26
+     */
+    public static void restartGracefully(RouterContext ctx) {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_GRACEFUL_RESTART, false);
+        ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+    }
 
-                @Override
-                public void run() {
-                    WrapperManager.signalStopped(Router.EXIT_HARD);    
-                }
-                
-            });
-            t.start();
-            ctx.router().shutdown(Router.EXIT_HARD);
+    /**
+     * Stop the running I2P instance.
+     * @since 0.9.26
+     */
+    public static void shutDownGracefully(RouterContext ctx) {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_GRACEFUL, false);
+        ctx.router().shutdownGracefully();
+    }
+
+    /**
+     * Cancel a graceful shutdown or restart
+     * @since 0.9.26
+     */
+    public static void cancelShutdown(RouterContext ctx) {
+        ctx.router().cancelGracefulShutdown();
+    }
+
+    /**
+     * Is a graceful shutdown or restart in progress?
+     * @since 0.9.26
+     */
+    public static boolean isShutdownInProgress(RouterContext ctx) {
+        return ctx.router().scheduledGracefulExitCode() > 0;
     }
 }

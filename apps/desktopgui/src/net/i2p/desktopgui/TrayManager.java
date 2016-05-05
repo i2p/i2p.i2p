@@ -6,6 +6,8 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.net.URL;
 
 import net.i2p.I2PAppContext;
@@ -48,6 +50,13 @@ abstract class TrayManager {
             tray.add(trayIcon);
             // 16x16 on Windows, 24x24 on Linux, but that will probably vary
             //System.out.println("Tray icon size is " + trayIcon.getSize());
+            trayIcon.addMouseListener(new MouseListener() {
+                public void mouseClicked(MouseEvent m)  { updateMenu(); }
+                public void mouseEntered(MouseEvent m)  { updateMenu(); }
+                public void mouseExited(MouseEvent m)   { updateMenu(); }
+                public void mousePressed(MouseEvent m)  { updateMenu(); }
+                public void mouseReleased(MouseEvent m) { updateMenu(); }
+            });
         } else {
             throw new AWTException("SystemTray not supported");
         }
@@ -76,6 +85,12 @@ abstract class TrayManager {
      * @return popup menu
      */
     protected abstract PopupMenu getMainMenu();
+    
+    /**
+     * Update the menu
+     * @since 0.9.26
+     */
+    protected abstract void updateMenu();
     
     /**
      * Get tray icon image from the desktopgui resources in the jar file.

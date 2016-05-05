@@ -13,7 +13,7 @@ import net.i2p.desktopgui.router.RouterManager;
 
 /**
  *  When started before the router, e.g. with
- *  java -cp i2p.jar:desktopgui.jar net.i2p.desktopgui.Main
+ *  java -cp i2p.jar:router.jar:desktopgui.jar net.i2p.desktopgui.Main
  *
  *  No access to context, very limited abilities.
  *  Not fully supported.
@@ -56,4 +56,10 @@ class ExternalTrayManager extends TrayManager {
         popup.add(startItem);
         return popup;
     }
+
+    /**
+     * Update the menu
+     * @since 0.9.26
+     */
+    protected void updateMenu() {}
 }
