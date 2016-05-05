@@ -4,6 +4,11 @@
 # When executed in OSX: Produces a libjbigi.jnilib
 [ -z "$CC" ] && CC="gcc"
 
+if [ -z $BITS ]; then
+  BITS=64
+  printf "\aBITS variable not set, defaulting to $BITS\n\a" >&2
+fi
+
 # If JAVA_HOME isn't set we'll try to figure it out
 [ -z $JAVA_HOME ] && . `dirname $0`/../find-java-home
 if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
