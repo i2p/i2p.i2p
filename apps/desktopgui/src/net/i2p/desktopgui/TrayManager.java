@@ -8,58 +8,65 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.net.URL;
 
+import net.i2p.I2PAppContext;
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
-import net.i2p.desktopgui.router.RouterManager;
-import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Manages the tray icon life.
  */
-public abstract class TrayManager {
+abstract class TrayManager {
 
-    private static TrayManager instance = null;
+    protected final I2PAppContext _appContext;
     ///The tray area, or null if unsupported
-    protected SystemTray tray = null;
+    protected SystemTray tray;
     ///Our tray icon, or null if unsupported
-    protected TrayIcon trayIcon = null;
-    private final static Log log = new Log(TrayManager.class);
-    
+    protected TrayIcon trayIcon;
+
     /**
      * Instantiate tray manager.
      */
-    protected TrayManager() {}
-    
-    protected static TrayManager getInstance() {
-        if(instance == null) {
-            boolean inI2P = RouterManager.inI2P();
-            if(inI2P) {
-                instance = new InternalTrayManager();
-            }
-            else {
-                instance = new ExternalTrayManager();
-            }
-        }
-        return instance;
+    protected TrayManager(I2PAppContext ctx) {
+        _appContext = ctx;
     }
-
+    
     /**
      * Add the tray icon to the system tray and start everything up.
      */
-    protected void startManager() {
+    public synchronized void startManager()  throws AWTException {
         if(SystemTray.isSupported()) {
+            // TODO figure out how to get menu to pop up on left-click
+            // left-click does nothing by default
+            // MouseListener, MouseEvent, ...
             tray = SystemTray.getSystemTray();
-            trayIcon = new TrayIcon(getTrayImage(), "I2P", getMainMenu());
+            // Windows typically has tooltips; Linux (at least Ubuntu) doesn't
+            String tooltip = SystemVersion.isWindows() ? _t("I2P: Right-click for menu") : null;
+            trayIcon = new TrayIcon(getTrayImage(), tooltip, getMainMenu());
             trayIcon.setImageAutoSize(true); //Resize image to fit the system tray
-            try {
-                tray.add(trayIcon);
-            } catch (AWTException e) {
-                log.log(Log.WARN, "Problem creating system tray icon!", e);
-            }
+            tray.add(trayIcon);
+            // 16x16 on Windows, 24x24 on Linux, but that will probably vary
+            //System.out.println("Tray icon size is " + trayIcon.getSize());
+        } else {
+            throw new AWTException("SystemTray not supported");
+        }
+    }
+
+    /**
+     * Remove the tray icon from the system tray
+     *
+     * @since 0.9.26
+     */
+    public synchronized void stopManager() {
+        if (tray != null && trayIcon != null) {
+            tray.remove(trayIcon);
+            tray = null;
+            trayIcon = null;
         }
     }
     
-    protected void languageChanged() {
-        trayIcon.setPopupMenu(getMainMenu());
+    public synchronized void languageChanged() {
+        if (trayIcon != null)
+            trayIcon.setPopupMenu(getMainMenu());
     }
     
     /**
@@ -71,14 +78,17 @@ public abstract class TrayManager {
     /**
      * Get tray icon image from the desktopgui resources in the jar file.
      * @return image used for the tray icon
+     * @throws AWTException if image not found
      */
-    private Image getTrayImage() {
+    private Image getTrayImage() throws AWTException {
         URL url = getClass().getResource("/desktopgui/resources/images/logo.png");
+        if (url == null)
+            throw new AWTException("cannot load tray image");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
         return image;
     }
     
-    protected static String _t(String s) {
-        return DesktopguiTranslator._t(s);
+    protected String _t(String s) {
+        return DesktopguiTranslator._t(_appContext, s);
     }
 }

@@ -13,8 +13,10 @@ package net.i2p.desktopgui.gui;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.router.RouterManager;
+import net.i2p.router.RouterContext;
 
 /**
  *
@@ -22,9 +24,12 @@ import net.i2p.desktopgui.router.RouterManager;
  */
 public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
 
+    private final RouterContext _context;
+
     /** Creates new form ConfigurationFrame */
-    public DesktopguiConfigurationFrame() {
+    public DesktopguiConfigurationFrame(RouterContext ctx) {
         initComponents();
+        _context = ctx;
     }
 
     /** This method is called from within the constructor to
@@ -98,8 +103,8 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         configureDesktopgui();
     }//GEN-LAST:event_okButtonMouseReleased
 
-    protected static String _t(String s) {
-        return DesktopguiTranslator._t(s);
+    private String _t(String s) {
+        return DesktopguiTranslator._t(_context, s);
     }
 
     private void configureDesktopgui() {
@@ -114,7 +119,7 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
             System.out.println("Enabling desktopgui");
         }
         try {
-            RouterManager.getRouterContext().router().saveConfig(property, value);
+            _context.router().saveConfig(property, value);
         } catch (Exception ex) {
             Logger.getLogger(DesktopguiConfigurationFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

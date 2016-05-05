@@ -8,14 +8,21 @@ import java.awt.event.ActionListener;
 
 import javax.swing.SwingWorker;
 
+import net.i2p.I2PAppContext;
 import net.i2p.desktopgui.router.RouterManager;
-import net.i2p.util.Log;
 
-public class ExternalTrayManager extends TrayManager {
+/**
+ *  When started before the router, e.g. with
+ *  java -cp i2p.jar:desktopgui.jar net.i2p.desktopgui.Main
+ *
+ *  No access to context, very limited abilities.
+ *  Not fully supported.
+ */
+class ExternalTrayManager extends TrayManager {
 	
-    private final static Log log = new Log(ExternalTrayManager.class);
-
-    protected ExternalTrayManager() {}
+    public ExternalTrayManager(I2PAppContext ctx) {
+        super(ctx);
+    }
 
     @Override
     public PopupMenu getMainMenu() {

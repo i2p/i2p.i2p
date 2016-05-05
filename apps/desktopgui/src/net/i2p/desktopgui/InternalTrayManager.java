@@ -11,13 +11,24 @@ import net.i2p.desktopgui.gui.DesktopguiConfigurationFrame;
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.BrowseException;
 import net.i2p.desktopgui.util.I2PDesktop;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
-public class InternalTrayManager extends TrayManager {
+/**
+ *  java -cp i2p.jar:desktopgui.jar net.i2p.desktopgui.Main
+ *
+ *  Full access to router context.
+ */
+class InternalTrayManager extends TrayManager {
 	
-	private final static Log log = new Log(InternalTrayManager.class);
+    private final RouterContext _context;
+    private final Log log;
 
-    protected InternalTrayManager() {}
+    public InternalTrayManager(RouterContext ctx) {
+        super(ctx);
+        _context = ctx;
+        log = ctx.logManager().getLog(InternalTrayManager.class);
+    }
 
     @Override
     public PopupMenu getMainMenu() {
@@ -56,7 +67,7 @@ public class InternalTrayManager extends TrayManager {
 
                     @Override
                     protected Object doInBackground() throws Exception {
-                        new DesktopguiConfigurationFrame().setVisible(true);
+                        new DesktopguiConfigurationFrame(_context).setVisible(true);
                         return null;
                     }
 
@@ -73,7 +84,7 @@ public class InternalTrayManager extends TrayManager {
 
                     @Override
                     protected Object doInBackground() throws Exception {
-                        RouterManager.restart();
+                        RouterManager.restart(_context);
                         return null;
                     }
                     
@@ -91,7 +102,7 @@ public class InternalTrayManager extends TrayManager {
                     
                     @Override
                     protected Object doInBackground() throws Exception {
-                        RouterManager.shutDown();
+                        RouterManager.shutDown(_context);
                         return null;
                     }
                     
