@@ -5,7 +5,17 @@
 [ -z "$CC" ] && CC="gcc"
 
 if [ -z $BITS ]; then
-  BITS=64
+  if [[ $(uname -a) =~ "x86_64" ]]; then
+    BITS=64
+  elif [[ $(uname -a) =~ "i386" ]]; then
+    BITS=32
+  elif [[ $(uname -a) =~ "i686" ]]; then
+    BITS=32
+  else
+    echo "Unable to detect default setting for BITS variable"
+    exit
+  fi
+
   printf "\aBITS variable not set, defaulting to $BITS\n\a" >&2
 fi
 
