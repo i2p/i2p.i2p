@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SwingWorker;
-import net.i2p.desktopgui.gui.DesktopguiConfigurationFrame;
 
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.BrowseException;
@@ -24,8 +23,8 @@ class InternalTrayManager extends TrayManager {
     private final RouterContext _context;
     private final Log log;
 
-    public InternalTrayManager(RouterContext ctx) {
-        super(ctx);
+    public InternalTrayManager(RouterContext ctx, Main main) {
+        super(ctx, main);
         _context = ctx;
         log = ctx.logManager().getLog(InternalTrayManager.class);
     }
@@ -58,8 +57,9 @@ class InternalTrayManager extends TrayManager {
                 }.execute();
             }
         });
-        MenuItem desktopguiConfigurationLauncher = new MenuItem(_t("Configure desktopgui"));
-        desktopguiConfigurationLauncher.addActionListener(new ActionListener() {
+        PopupMenu desktopguiConfigurationLauncher = new PopupMenu(_t("Configure I2P System Tray"));
+        MenuItem configSubmenu = new MenuItem(_t("Disable"));
+        configSubmenu.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -67,7 +67,7 @@ class InternalTrayManager extends TrayManager {
 
                     @Override
                     protected Object doInBackground() throws Exception {
-                        new DesktopguiConfigurationFrame(_context).setVisible(true);
+                        configureDesktopgui(false);
                         return null;
                     }
 
@@ -114,11 +114,30 @@ class InternalTrayManager extends TrayManager {
         
         popup.add(browserLauncher);
         popup.addSeparator();
+        desktopguiConfigurationLauncher.add(configSubmenu);
         popup.add(desktopguiConfigurationLauncher);
         popup.addSeparator();
         popup.add(restartItem);
         popup.add(stopItem);
         
         return popup;
+    }
+
+    /**
+     *  @since 0.9.26 from removed gui/DesktopguiConfigurationFrame
+     */
+    private void configureDesktopgui(boolean enable) {
+        String property = "desktopgui.enabled";
+        String value = Boolean.toString(enable);
+        try {
+
+            _context.router().saveConfig(property, value);
+            if (!enable) {
+                // TODO popup that explains how to re-enable in console
+                _main.shutdown(null);
+            }
+        } catch (Exception ex) {
+            log.error("Error saving config", ex);
+        }
     }
 }

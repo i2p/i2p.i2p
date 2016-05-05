@@ -20,8 +20,8 @@ import net.i2p.desktopgui.router.RouterManager;
  */
 class ExternalTrayManager extends TrayManager {
 	
-    public ExternalTrayManager(I2PAppContext ctx) {
-        super(ctx);
+    public ExternalTrayManager(I2PAppContext ctx, Main main) {
+        super(ctx, main);
     }
 
     @Override

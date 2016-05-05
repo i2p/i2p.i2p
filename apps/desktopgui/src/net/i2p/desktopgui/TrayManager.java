@@ -18,6 +18,7 @@ import net.i2p.util.SystemVersion;
 abstract class TrayManager {
 
     protected final I2PAppContext _appContext;
+    protected final Main _main;
     ///The tray area, or null if unsupported
     protected SystemTray tray;
     ///Our tray icon, or null if unsupported
@@ -26,8 +27,9 @@ abstract class TrayManager {
     /**
      * Instantiate tray manager.
      */
-    protected TrayManager(I2PAppContext ctx) {
+    protected TrayManager(I2PAppContext ctx, Main main) {
         _appContext = ctx;
+        _main = main;
     }
     
     /**

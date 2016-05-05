@@ -5,8 +5,6 @@ package net.i2p.desktopgui;
  */
 
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
@@ -63,9 +61,9 @@ public class Main implements RouterApp {
     private synchronized void startUp() throws Exception {
         final TrayManager trayManager;
         if (_context != null)
-            trayManager = new InternalTrayManager(_context);
+            trayManager = new InternalTrayManager(_context, this);
         else
-            trayManager = new ExternalTrayManager(_appContext);
+            trayManager = new ExternalTrayManager(_appContext, this);
         trayManager.startManager();
         _trayManager = trayManager;
         changeState(RUNNING);
@@ -105,34 +103,7 @@ public class Main implements RouterApp {
             changeState(START_FAILED, "Headless environment: not starting desktopgui!", null);
             return;
         }
-        try {
-            //UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
-            //for (int i = 0; i < lafs.length; i++) {
-            //    System.out.println("LAF " + i + ": " + lafs[i].getName() + ' ' + lafs[i].getClassName());
-            //}
-            String laf = UIManager.getSystemLookAndFeelClassName();
-            //System.out.println("Default: " + laf);
-            UIManager.setLookAndFeel(laf);
-            //laf = UIManager.getCrossPlatformLookAndFeelClassName();
-            //System.out.println("Cross-Platform: " + laf);
-            //UIManager.setLookAndFeel(laf);
-            //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (ClassNotFoundException ex) {
-            log.log(Log.ERROR, null, ex);
-        } catch (InstantiationException ex) {
-            log.log(Log.ERROR, null, ex);
-        } catch (IllegalAccessException ex) {
-            log.log(Log.ERROR, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            log.log(Log.ERROR, null, ex);
-        } catch (Error ex) {
-            // on permissions error (different user)
-            // Exception in thread "main" java.lang.InternalError: Can't connect to X11 window server using ':0' as the value of the DISPLAY variable.
-            log.log(Log.ERROR, "No permissions? Different user?", ex);
-            changeState(START_FAILED, "No permissions? Different user?", new RuntimeException(ex));
-            return;
-        }
-        
+
         // TODO process args with getopt if needed
         
         if (_context == null)
