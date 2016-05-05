@@ -28,8 +28,8 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
 
     /** Creates new form ConfigurationFrame */
     public DesktopguiConfigurationFrame(RouterContext ctx) {
-        initComponents();
         _context = ctx;
+        initComponents();
     }
 
     /** This method is called from within the constructor to
@@ -95,7 +95,7 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cancelButtonMouseReleased
-        System.out.println("Cancelling configuration change.");
+        //System.out.println("Cancelling configuration change.");
         this.dispose();
     }//GEN-LAST:event_cancelButtonMouseReleased
 
@@ -112,18 +112,17 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         String value;
         if(!desktopguiEnabled.isSelected()) {
             value = "false";
-            System.out.println("Disabling desktopgui");
-        }
-        else {
+            //System.out.println("Disabling desktopgui");
+        } else {
             value = "true";
-            System.out.println("Enabling desktopgui");
+            //System.out.println("Enabling desktopgui");
         }
         try {
             _context.router().saveConfig(property, value);
         } catch (Exception ex) {
             Logger.getLogger(DesktopguiConfigurationFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("Applying desktopgui configuration!");
+        //System.out.println("Applying desktopgui configuration!");
         this.dispose();
     }
 
