@@ -173,6 +173,10 @@ Applications:
    Copyright (C) sponge
    See licenses/COPYING-BOB.txt
 
+   Desktopgui
+   Copyright (c) Mathias De Maré
+   See licenses/LICENSE-DesktopGUI.txt
+
    I2PSnark:
    Copyright (C) 2003 Mark J. Wielaard
    GPLv2 (or any later version)
@@ -290,10 +294,6 @@ distributions. See the source package for the additional license information.
    BOB Demos:
    Copyright (C) sponge
    DWTFYWTPL
-
-   Desktopgui
-   Copyright (c) Mathias De Maré
-   See apps/desktopgui/LICENSE
 
    SAM C Library:
    Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>

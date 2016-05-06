@@ -1257,9 +1257,10 @@
           <fileset dir="licenses/" />
         </copy>
         <copy file="apps/imagegen/identicon/README.md" tofile="pkg-temp/licenses/LICENSE-Identicon.txt" />
+        <copy file="apps/desktopgui/LICENSE" tofile="pkg-temp/licenses/LICENSE-DesktopGUI.txt" />
     </target>
 
-    <target name="preplicenses-unlesspkg" unless="${with-libjetty8-java}" >
+    <target name="preplicenses-unlesspkg" unless="${with-libtomcat7-java}" >
         <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
     </target>
 
@@ -1476,15 +1477,16 @@
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         <!-- include systray changes in 0.7.5 -->
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
-       <!-- removed from updater in 0.9
+       <!-- removed from updater in 0.9, added back in 0.9.26 -->
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
-       -->
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
-        <!-- as of 0.7.12; someday, we can remove these from the updater -->
+        <!-- as of 0.7.12; last changed in 0.9; removed from update in 0.9.26 -->
+      <!--
         <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/lib/standard.jar" todir="pkg-temp/lib/" />
+       -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
