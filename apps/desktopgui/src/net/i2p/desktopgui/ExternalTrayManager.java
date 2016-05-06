@@ -6,6 +6,8 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 
 import net.i2p.I2PAppContext;
@@ -20,20 +22,17 @@ import net.i2p.desktopgui.router.RouterManager;
  */
 class ExternalTrayManager extends TrayManager {
 	
-    public ExternalTrayManager(I2PAppContext ctx, Main main) {
-        super(ctx, main);
+    public ExternalTrayManager(I2PAppContext ctx, Main main, boolean useSwing) {
+        super(ctx, main, useSwing);
     }
 
-    @Override
     public PopupMenu getMainMenu() {
         PopupMenu popup = new PopupMenu();
         MenuItem startItem = new MenuItem(_t("Start I2P"));
         startItem.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 new SwingWorker<Object, Object>() {
-
                     @Override
                     protected Object doInBackground() throws Exception {
                         RouterManager.start();
@@ -48,10 +47,36 @@ class ExternalTrayManager extends TrayManager {
                         //since that risks killing the I2P process as well.
                         tray.remove(trayIcon);
                     }
-                    
                 }.execute();
             }
-            
+        });
+        popup.add(startItem);
+        return popup;
+    }
+
+    public JPopupMenu getSwingMainMenu() {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem startItem = new JMenuItem(_t("Start I2P"));
+        startItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new SwingWorker<Object, Object>() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        RouterManager.start();
+                        return null;
+                    }
+                    
+                    @Override
+                    protected void done() {
+                        trayIcon.displayMessage(_t("Starting"), _t("I2P is starting!"), TrayIcon.MessageType.INFO);
+                        //Hide the tray icon.
+                        //We cannot stop the desktopgui program entirely,
+                        //since that risks killing the I2P process as well.
+                        tray.remove(trayIcon);
+                    }
+                }.execute();
+            }
         });
         popup.add(startItem);
         return popup;

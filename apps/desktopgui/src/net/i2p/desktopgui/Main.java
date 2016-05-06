@@ -15,6 +15,7 @@ import net.i2p.desktopgui.util.*;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
@@ -29,6 +30,8 @@ public class Main implements RouterApp {
     private final Log log;
     private ClientAppState _state = UNINITIALIZED;
     private TrayManager _trayManager;
+    public static final String PROP_ENABLE = "desktopgui.enabled";
+    private static final String PROP_SWING = "desktopgui.swing";
 
     /**
      *  @since 0.9.26
@@ -60,10 +63,11 @@ public class Main implements RouterApp {
      */
     private synchronized void startUp() throws Exception {
         final TrayManager trayManager;
+        boolean useSwing = _appContext.getProperty(PROP_SWING, !SystemVersion.isWindows());
         if (_context != null)
-            trayManager = new InternalTrayManager(_context, this);
+            trayManager = new InternalTrayManager(_context, this, useSwing);
         else
-            trayManager = new ExternalTrayManager(_appContext, this);
+            trayManager = new ExternalTrayManager(_appContext, this, useSwing);
         trayManager.startManager();
         _trayManager = trayManager;
         changeState(RUNNING);
@@ -72,14 +76,12 @@ public class Main implements RouterApp {
         
         if (_context != null) {
             _context.addPropertyCallback(new I2PPropertyCallback() {
-
                 @Override
                 public void propertyChanged(String arg0, String arg1) {
                     if(arg0.equals(Translate.PROP_LANG)) {
                         trayManager.languageChanged();
                     }
                 }
-                
             });
         }
     }
