@@ -86,9 +86,21 @@ fi
 
 
 if [ -z $BITS ]; then
-  BITS=32
+  UNAME="$(uname -a)"
+  if test "${UNAME#*x86_64}" != "x86_&4"; then
+    BITS=64
+  elif test "${UNAME#*i386}" != "i386"; then
+    BITS=32
+  elif test "${UNAME#*i686}" != "i686"; then
+    BITS=32
+  else
+    echo "Unable to detect default setting for BITS variable"
+    exit
+  fi
+
   printf "\aBITS variable not set, defaulting to $BITS\n\a" >&2
 fi
+
 
 if [ -z $CC ]; then
   export CC="gcc"

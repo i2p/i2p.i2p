@@ -4,6 +4,21 @@
 # When executed in OSX: Produces a libjbigi.jnilib
 [ -z "$CC" ] && CC="gcc"
 
+if [ -z $BITS ]; then
+  if [[ $(uname -a) =~ "x86_64" ]]; then
+    BITS=64
+  elif [[ $(uname -a) =~ "i386" ]]; then
+    BITS=32
+  elif [[ $(uname -a) =~ "i686" ]]; then
+    BITS=32
+  else
+    echo "Unable to detect default setting for BITS variable"
+    exit
+  fi
+
+  printf "\aBITS variable not set, defaulting to $BITS\n\a" >&2
+fi
+
 # If JAVA_HOME isn't set we'll try to figure it out
 [ -z $JAVA_HOME ] && . `dirname $0`/../find-java-home
 if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
