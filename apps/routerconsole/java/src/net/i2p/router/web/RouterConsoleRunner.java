@@ -131,7 +131,8 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_THREADS = 24;
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
-    private final static String DAEMON_USER = "i2psvc";
+    public static final String DAEMON_USER = "i2psvc";
+    public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
     
     /**
      *  <pre>
@@ -280,7 +281,7 @@ public class RouterConsoleRunner implements RouterApp {
         }
         try {
             // default false for now
-            boolean desktopguiEnabled = _context.getBooleanProperty("desktopgui.enabled");
+            boolean desktopguiEnabled = _context.getBooleanProperty(PROP_DTG_ENABLED);
             if (desktopguiEnabled) {
                 //Check if we are in a headless environment, set properties accordingly
           	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
