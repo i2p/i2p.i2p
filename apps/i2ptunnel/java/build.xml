@@ -123,6 +123,7 @@
 
     <!-- servlet translations go in the war, not the jar -->
     <target name="bundle" depends="compile, precompilejsp" unless="no.bundle">
+        <mkdir dir="build/messages-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -161,6 +162,7 @@
 
     <!-- proxy error page translations go in the jar, not the war -->
     <target name="bundle-proxy" unless="no.bundle">
+        <mkdir dir="build/messages-proxy-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >

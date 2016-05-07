@@ -100,6 +100,7 @@
     </target>
     
     <target name="bundle" depends="compile" unless="no.bundle">
+        <mkdir dir="build/messages-src" />
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <env key="JAVA_HOME" value="${java.home}" />
             <arg value="./bundle-messages.sh" />

@@ -16,6 +16,7 @@
 
 	<target name="init">
 	<mkdir dir="${build}"/>
+	<mkdir dir="${build}/messages-src"/>
 	<mkdir dir="${dist}"/>
 	</target>
 
@@ -37,7 +38,7 @@
             </javac>
         </target>
 
-        <target name="bundle" unless="no.bundle">
+        <target name="bundle" unless="no.bundle" depends="init">
             <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
                 <env key="JAVA_HOME" value="${java.home}" />
                 <arg value="./bundle-messages.sh" />

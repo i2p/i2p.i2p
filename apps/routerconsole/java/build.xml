@@ -145,6 +145,7 @@
 
     <!-- this is tricky because the message classes go in the jar, not in the war -->
     <target name="bundle" depends="jar1, precompilejsp" unless="no.bundle">
+        <mkdir dir="build/messages-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -199,6 +200,7 @@
     </target>
 
     <target name="bundle-news" unless="no.bundle">
+        <mkdir dir="build/messages-news-src" />
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <env key="JAVA_HOME" value="${java.home}" />
             <arg value="./bundle-messages-news.sh" />
@@ -217,6 +219,7 @@
     </target>
 
     <target name="bundle-countries" unless="no.bundle">
+        <mkdir dir="build/messages-countries-src" />
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <env key="JAVA_HOME" value="${java.home}" />
             <arg value="./bundle-messages-countries.sh" />
