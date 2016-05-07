@@ -10,7 +10,7 @@ diff --git a/core/c/jcpuid/build.sh b/core/c/jcpuid/build.sh
 index 5b63c6c..f39148d 100755
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
-@@ -104,12 +104,8 @@
+@@ -125,12 +125,8 @@
              exit 1
          fi
  

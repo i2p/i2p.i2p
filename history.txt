@@ -1,8 +1,42 @@
+2016-05-07 zzz
+ * Build:
+   - Add DTG to updater
+   - Fix and bundle DTG license info
+   - Remove jstl.jar and standard.jar from updater,
+     last changed in 0.9
+   - Fix bundling of Tomcat license info
+   - Add back the old way to build bundles for gettext < 0.19
+ * Console:
+   - Change to new DTG constructor
+   - Don't attempt to start systray or DTG when running as a service
+   - Show systray controls for all OSes on /configservice
+   - Implement backend for systray control
+ * DesktopGui:
+   - Implement second TrayManager menu implementation in Swing.
+   - Use Swing except on Windows
+   - Hide restart menu items if no wrapper
+   - Add graceful restart and shutdown menu items
+   - Add basic adjustment of menu based on shutdown state
+   - Disable wrapper notification for now
+   - Remove Swing DesktopguiConfigurationFrame,
+     move to a submenu.
+   - Remove LookAndFeel setting
+   - Make Main class a RouterApp
+   - Remove all static log, context, and instance fields
+   - Remove unused ConfigurationManager class
+   - Translate tooltip, disable tooltip on linux
+   - Use safer exec call to start i2p
+   - Remove all images, use itoopie
+   - Don't start spinner thread in router context
+   - Handle various startup errors better
+   - Synchs, finals, javadocs, cleanups
+
 2016-05-04 zzz
+ * i2prouter: Set JAVA_HOME correctly on Mac OS X 10.5 and later (ticket #1783)
  * Utils: Fix bug in periodic timers triggered by
    a backwards clock shift, caused graphs to be blank
    and various router, streaming, and i2ptunnel
-   degradations over time (ticket #1776)
+   degradations over time (tickets #1702, #1776)
  * Wrapper: Update to wrapper 3.5.29, except for Windows.
    Fixes wrapper failure on FreeBSD 10 (ticket #1118)
 
