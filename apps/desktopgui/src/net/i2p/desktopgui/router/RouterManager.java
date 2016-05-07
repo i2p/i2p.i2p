@@ -97,4 +97,21 @@ public class RouterManager {
     public static boolean isShutdownInProgress(RouterContext ctx) {
         return ctx.router().scheduledGracefulExitCode() > 0;
     }
+
+    /**
+     * Get time until shutdown
+     * @return -1 if no shutdown in progress.
+     * @since 0.9.26
+     */
+    public static long getShutdownTimeRemaining(RouterContext ctx) {
+        return ctx.router().getShutdownTimeRemaining();
+    }
+
+    /**
+     * Get network status, untranslated
+     * @since 0.9.26
+     */
+    public static String getStatus(RouterContext ctx) {
+        return ctx.commSystem().getStatus().toStatusString();
+    }
 }

@@ -192,4 +192,11 @@ abstract class TrayManager {
     protected String _t(String s) {
         return DesktopguiTranslator._t(_appContext, s);
     }
+    
+    /**
+     * @since 0.9.26
+     */
+    protected String _t(String s, Object o) {
+        return DesktopguiTranslator._t(_appContext, s, o);
+    }
 }

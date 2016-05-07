@@ -12,12 +12,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 
+import net.i2p.data.DataHelper;
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.BrowseException;
 import net.i2p.desktopgui.util.I2PDesktop;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
+import net.i2p.util.Translate;
 
 /**
  *  java -cp i2p.jar:router.jar:desktopgui.jar net.i2p.desktopgui.Main
@@ -28,11 +30,14 @@ class InternalTrayManager extends TrayManager {
 	
     private final RouterContext _context;
     private final Log log;
-    private MenuItem _restartItem, _stopItem, _cancelItem;
-    private JMenuItem _jrestartItem, _jstopItem, _jcancelItem;
+    private MenuItem _statusItem, _browserItem, _configItem, _restartItem, _stopItem,
+                     _restartHardItem, _stopHardItem, _cancelItem;
+    private JMenuItem _jstatusItem, _jbrowserItem, _jconfigItem, _jrestartItem, _jstopItem,
+                      _jrestartHardItem, _jstopHardItem, _jcancelItem;
 
     private static final boolean CONSOLE_ENABLED = Desktop.isDesktopSupported() &&
                                                    Desktop.getDesktop().isSupported(Action.BROWSE);
+    private static final String CONSOLE_BUNDLE_NAME = "net.i2p.router.web.messages";
 
     public InternalTrayManager(RouterContext ctx, Main main, boolean useSwing) {
         super(ctx, main, useSwing);
@@ -40,10 +45,12 @@ class InternalTrayManager extends TrayManager {
         log = ctx.logManager().getLog(InternalTrayManager.class);
     }
 
-    public PopupMenu getMainMenu() {
+    public synchronized PopupMenu getMainMenu() {
         PopupMenu popup = new PopupMenu();
         
-        MenuItem browserLauncher;
+        final MenuItem statusItem = new MenuItem("");
+
+        final MenuItem browserLauncher;
         if (CONSOLE_ENABLED) {
             browserLauncher = new MenuItem(_t("Launch I2P Browser"));
             browserLauncher.addActionListener(new ActionListener() {
@@ -161,6 +168,8 @@ class InternalTrayManager extends TrayManager {
             }
         });
 
+        popup.add(statusItem);
+        popup.addSeparator();
         if (CONSOLE_ENABLED) {
             popup.add(browserLauncher);
             popup.addSeparator();
@@ -176,17 +185,24 @@ class InternalTrayManager extends TrayManager {
         popup.add(stopItem2);
         popup.add(cancelItem);
         
+        _statusItem = statusItem;
+        _browserItem = browserLauncher;
+        _configItem = desktopguiConfigurationLauncher;
         _restartItem = restartItem;
         _stopItem = stopItem;
+        _restartHardItem = restartItem2;
+        _stopHardItem = stopItem2;
         _cancelItem = cancelItem;
 
         return popup;
     }
 
-    public JPopupMenu getSwingMainMenu() {
+    public synchronized JPopupMenu getSwingMainMenu() {
         JPopupMenu popup = new JPopupMenu();
         
-        JMenuItem browserLauncher;
+        final JMenuItem statusItem = new JMenuItem("");
+
+        final JMenuItem browserLauncher;
         if (CONSOLE_ENABLED) {
             browserLauncher = new JMenuItem(_t("Launch I2P Browser"));
             browserLauncher.addActionListener(new ActionListener() {
@@ -304,6 +320,8 @@ class InternalTrayManager extends TrayManager {
             }
         });
 
+        popup.add(statusItem);
+        popup.addSeparator();
         if (CONSOLE_ENABLED) {
             popup.add(browserLauncher);
             popup.addSeparator();
@@ -319,8 +337,13 @@ class InternalTrayManager extends TrayManager {
         popup.add(stopItem2);
         popup.add(cancelItem);
         
+        _jstatusItem = statusItem;
+        _jbrowserItem = browserLauncher;
+        _jconfigItem = desktopguiConfigurationLauncher;
         _jrestartItem = restartItem;
         _jstopItem = stopItem;
+        _jrestartHardItem = restartItem2;
+        _jstopHardItem = stopItem2;
         _jcancelItem = cancelItem;
 
         return popup;
@@ -330,20 +353,59 @@ class InternalTrayManager extends TrayManager {
      * Update the menu
      * @since 0.9.26
      */
-    protected void updateMenu() {
+    protected synchronized void updateMenu() {
         boolean x = RouterManager.isShutdownInProgress(_context);
+        boolean imminent = false;
+        String status;
+        if (x) {
+            long time = RouterManager.getShutdownTimeRemaining(_context);
+            if (time > 5000) {
+                status = _t("Shutdown in {0}", DataHelper.formatDuration2(time).replace("&nbsp;", " "));
+            } else {
+                status = _t("Shutdown imminent");
+                imminent = true;
+            }
+        } else {
+            // status translations are in the console bundle
+            status = _t("Network") + ": " +
+                     Translate.getString(RouterManager.getStatus(_context), _context, CONSOLE_BUNDLE_NAME);
+        }
+        PopupMenu awt = trayIcon.getPopupMenu();
+        if (awt != null) {
+            awt.remove(0);
+            awt.insert(status, 0);
+        }
+        if (_browserItem != null)
+            _browserItem.setEnabled(!imminent);
+        if (_configItem != null)
+            _configItem.setEnabled(!imminent);
         if (_restartItem != null)
             _restartItem.setEnabled(!x);
         if (_stopItem != null)
             _stopItem.setEnabled(!x);
+        if (_restartHardItem != null)
+            _restartHardItem.setEnabled(!imminent);
+        if (_stopHardItem != null)
+            _stopHardItem.setEnabled(!imminent);
         if (_cancelItem != null)
-            _cancelItem.setEnabled(x);
+            _cancelItem.setEnabled(x && !imminent);
+
+        if (_jstatusItem != null)
+            _jstatusItem.setText(status);
+        if (_jbrowserItem != null)
+            _jbrowserItem.setVisible(!imminent);
+        if (_jconfigItem != null)
+            _jconfigItem.setVisible(!imminent);
         if (_jrestartItem != null)
-            _jrestartItem.setEnabled(!x);
+            _jrestartItem.setVisible(!x);
         if (_jstopItem != null)
-            _jstopItem.setEnabled(!x);
+            _jstopItem.setVisible(!x);
+        if (_jrestartHardItem != null)
+            _jrestartHardItem.setVisible(!imminent);
+        if (_jstopHardItem != null)
+            _jstopHardItem.setVisible(!imminent);
         if (_jcancelItem != null)
-            _jcancelItem.setEnabled(x);
+            _jcancelItem.setVisible(x && !imminent);
     }
 
     /**
