@@ -760,6 +760,9 @@
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
+                <!-- following are only for debian builds -->
+                <pathelement location="core/java/build/libintl.jar" />
+                <pathelement location="core/java/build/gnu-getopt.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->
