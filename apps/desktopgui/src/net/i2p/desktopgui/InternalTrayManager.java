@@ -1,5 +1,7 @@
 package net.i2p.desktopgui;
 
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
@@ -15,6 +17,7 @@ import net.i2p.desktopgui.util.BrowseException;
 import net.i2p.desktopgui.util.I2PDesktop;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  *  java -cp i2p.jar:router.jar:desktopgui.jar net.i2p.desktopgui.Main
@@ -28,6 +31,9 @@ class InternalTrayManager extends TrayManager {
     private MenuItem _restartItem, _stopItem, _cancelItem;
     private JMenuItem _jrestartItem, _jstopItem, _jcancelItem;
 
+    private static final boolean CONSOLE_ENABLED = Desktop.isDesktopSupported() &&
+                                                   Desktop.getDesktop().isSupported(Action.BROWSE);
+
     public InternalTrayManager(RouterContext ctx, Main main, boolean useSwing) {
         super(ctx, main, useSwing);
         _context = ctx;
@@ -37,27 +43,28 @@ class InternalTrayManager extends TrayManager {
     public PopupMenu getMainMenu() {
         PopupMenu popup = new PopupMenu();
         
-        MenuItem browserLauncher = new MenuItem(_t("Launch I2P Browser"));
-        browserLauncher.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        return null;
-                    }
-                    
-                    @Override
-                    protected void done() {
-                        try {
-                            I2PDesktop.browse("http://localhost:7657");
-                        } catch (BrowseException e1) {
-                            log.log(Log.WARN, "Failed to open browser!", e1);
-                        }    
-                    }
-                }.execute();
-            }
-        });
+        MenuItem browserLauncher;
+        if (CONSOLE_ENABLED) {
+            browserLauncher = new MenuItem(_t("Launch I2P Browser"));
+            browserLauncher.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    new SwingWorker<Object, Object>() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            return null;
+                        }
+                        
+                        @Override
+                        protected void done() {
+                            launchBrowser();
+                        }
+                    }.execute();
+                }
+            });
+        } else {
+            browserLauncher = null;
+        }
 
         PopupMenu desktopguiConfigurationLauncher = new PopupMenu(_t("Configure I2P System Tray"));
         MenuItem configSubmenu = new MenuItem(_t("Disable"));
@@ -154,8 +161,10 @@ class InternalTrayManager extends TrayManager {
             }
         });
 
-        popup.add(browserLauncher);
-        popup.addSeparator();
+        if (CONSOLE_ENABLED) {
+            popup.add(browserLauncher);
+            popup.addSeparator();
+        }
         desktopguiConfigurationLauncher.add(configSubmenu);
         popup.add(desktopguiConfigurationLauncher);
         popup.addSeparator();
@@ -177,27 +186,28 @@ class InternalTrayManager extends TrayManager {
     public JPopupMenu getSwingMainMenu() {
         JPopupMenu popup = new JPopupMenu();
         
-        JMenuItem browserLauncher = new JMenuItem(_t("Launch I2P Browser"));
-        browserLauncher.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        return null;
-                    }
-                    
-                    @Override
-                    protected void done() {
-                        try {
-                            I2PDesktop.browse("http://localhost:7657");
-                        } catch (BrowseException e1) {
-                            log.log(Log.WARN, "Failed to open browser!", e1);
-                        }    
-                    }
-                }.execute();
-            }
-        });
+        JMenuItem browserLauncher;
+        if (CONSOLE_ENABLED) {
+            browserLauncher = new JMenuItem(_t("Launch I2P Browser"));
+            browserLauncher.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    new SwingWorker<Object, Object>() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            return null;
+                        }
+                        
+                        @Override
+                        protected void done() {
+                            launchBrowser();
+                        }
+                    }.execute();
+                }
+            });
+        } else {
+            browserLauncher = null;
+        }
 
         JMenu desktopguiConfigurationLauncher = new JMenu(_t("Configure I2P System Tray"));
         JMenuItem configSubmenu = new JMenuItem(_t("Disable"));
@@ -294,8 +304,10 @@ class InternalTrayManager extends TrayManager {
             }
         });
 
-        popup.add(browserLauncher);
-        popup.addSeparator();
+        if (CONSOLE_ENABLED) {
+            popup.add(browserLauncher);
+            popup.addSeparator();
+        }
         desktopguiConfigurationLauncher.add(configSubmenu);
         popup.add(desktopguiConfigurationLauncher);
         popup.addSeparator();
@@ -350,5 +362,37 @@ class InternalTrayManager extends TrayManager {
         } catch (Exception ex) {
             log.error("Error saving config", ex);
         }
+    }
+
+    /**
+     * Build the console URL with info from the port mapper,
+     * and launch the browser at it.
+     *
+     * Modified from I2PTunnelHTTPClientBase.
+     * TODO perhaps move this to a new PortMapper method.
+     *
+     * @since 0.9.26
+     */
+    private void launchBrowser() {
+        String unset = "*unset*";
+        PortMapper pm = _context.portMapper();
+        String httpHost = pm.getActualHost(PortMapper.SVC_CONSOLE, unset);
+        String httpsHost = pm.getActualHost(PortMapper.SVC_HTTPS_CONSOLE, unset);
+        int httpPort = pm.getPort(PortMapper.SVC_CONSOLE, 7657);
+        int httpsPort = pm.getPort(PortMapper.SVC_HTTPS_CONSOLE, -1);
+        boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
+        String url;
+        if (httpsOnly) {
+            url = "https://" + httpsHost + ':' + httpsPort + '/';
+        } else {
+            if (httpHost.equals(unset))
+                httpHost = "127.0.0.1";
+            url = "http://" + httpHost + ':' + httpPort + '/';
+        }
+        try {
+            I2PDesktop.browse(url);
+        } catch (BrowseException e1) {
+            log.log(Log.WARN, "Failed to open browser!", e1);
+        }    
     }
 }
