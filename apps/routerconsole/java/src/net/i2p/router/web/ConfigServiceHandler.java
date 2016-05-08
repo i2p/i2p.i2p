@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -191,6 +194,26 @@ public class ConfigServiceHandler extends FormHandler {
         return _context.router().gracefulShutdownInProgress();
     }
 
+    /**
+     *  Should we show the systray controls?
+     *
+     *  @since 0.9.26
+     */
+    public boolean shouldShowSystray() {
+        return !
+            (RouterConsoleRunner.DAEMON_USER.equals(System.getProperty("user.name")) ||
+             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()));
+    }
+
+    /**
+     *  Is the systray enabled?
+     *
+     *  @since 0.9.26
+     */
+    public boolean isSystrayEnabled() {
+        return _context.getBooleanProperty(RouterConsoleRunner.PROP_DTG_ENABLED);
+    }
+
     @Override
     protected void processForm() {
         if (_action == null) return;
@@ -249,6 +272,10 @@ public class ConfigServiceHandler extends FormHandler {
         } else if (_t("Force GC").equals(_action)) {
             Runtime.getRuntime().gc();
             addFormNotice(_t("Full garbage collection requested"));
+        } else if (_t("Show systray icon").equals(_action)) {
+            changeSystray(true);
+        } else if (_t("Hide systray icon").equals(_action)) {
+            changeSystray(false);
         } else {
             //addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }
@@ -291,5 +318,42 @@ public class ConfigServiceHandler extends FormHandler {
             clients.add(ca);
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);
+    }
+
+    /**
+     *  Enable/disable and start/stop systray
+     *
+     *  @since 0.9.26
+     */
+    private void changeSystray(boolean enable) {
+        ClientAppManager mgr = _context.clientAppManager();
+        if (mgr != null) {
+            try {
+                ClientApp dtg = mgr.getRegisteredApp("desktopgui");
+                if (dtg != null) {
+                    if (enable) {
+                        if (dtg.getState() == ClientAppState.STOPPED)
+                            dtg.startup();
+                    } else {
+                        if (dtg.getState() == ClientAppState.RUNNING)
+                            dtg.shutdown(null);
+                    }
+                } else if (enable) {
+                        dtg = new net.i2p.desktopgui.Main(_context, mgr, null);    
+                        dtg.startup();
+                }
+            } catch (Throwable t) {
+                if (enable)
+                    addFormError(_t("Failed to start systray") + ": " + t);
+                else
+                    addFormError(_t("Failed to stop systray") + ": " + t);
+            }
+        }
+
+        boolean saved = _context.router().saveConfig(RouterConsoleRunner.PROP_DTG_ENABLED, Boolean.toString(enable));
+        if (saved) 
+            addFormNotice(_t("Configuration saved successfully"));
+        else
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

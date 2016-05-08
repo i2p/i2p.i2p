@@ -123,6 +123,7 @@
 
     <!-- servlet translations go in the war, not the jar -->
     <target name="bundle" depends="compile, precompilejsp" unless="no.bundle">
+        <mkdir dir="build/messages-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -136,6 +137,11 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages.sh" />
         </exec>
+        <javac source="${javac.version}" target="${javac.version}" 
+               includeAntRuntime="false"
+               srcdir="build/messages-src" destdir="../jsp/WEB-INF/classes">
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
 
     <target name="poupdate" depends="compile, precompilejsp">
@@ -156,6 +162,7 @@
 
     <!-- proxy error page translations go in the jar, not the war -->
     <target name="bundle-proxy" unless="no.bundle">
+        <mkdir dir="build/messages-proxy-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -169,6 +176,11 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages-proxy.sh" />
         </exec>
+        <javac source="${javac.version}" target="${javac.version}" 
+               includeAntRuntime="false"
+               srcdir="build/messages-proxy-src" destdir="build/obj">
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
 
     <target name="extractProxyTags">

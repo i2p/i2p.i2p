@@ -24,9 +24,30 @@ esac
 
 
 if [ -z $BITS ]; then
-  BITS=64
-  printf "\aBITS variable not set, defaulting to $BITS\n\a" >&2
+  UNAME="$(uname -a)"
+  if test "${UNAME#*x86_64}" != "x86_&4"; then
+    BITS=64
+  elif test "${UNAME#*i386}" != "i386"; then
+    BITS=32
+  elif test "${UNAME#*i686}" != "i686"; then
+    BITS=32
+  elif test "${UNAME#*armv6}" != "armv6"; then
+    BITS=32
+  elif test "${UNAME#*armv7}" != "armv7"; then
+    BITS=32
+  elif test "${UNAME#*aarch32}" != "aarch32"; then
+    BITS=32
+  elif test "${UNAME#*aarch64}" != "aarch64"; then
+    BITS=64
+  else
+ 
+    echo "Unable to detect default setting for BITS variable"
+    exit
+  fi
+
+  printf "\aBITS variable not set, $BITS bit system detected\n\a" >&2
 fi
+
 
 if [ -z $CC ]; then
   export CC="gcc"

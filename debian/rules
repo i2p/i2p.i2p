@@ -149,11 +149,14 @@ endif
 	@mkdir -p $(CURDIR)/core/java/build
 	ln -sf /usr/share/java/gnu-getopt.jar $(CURDIR)/core/java/build/gnu-getopt.jar
 
-	@# debian and ubuntu: everywhere
-	@/bin/echo -e "with-libhttpclient-java=true" >> $(CURDIR)/override.properties
-	@mkdir -p $(CURDIR)/core/java/build
-	ln -sf /usr/share/java/httpclient.jar $(CURDIR)/core/java/build/httpclient.jar
-	ln -sf /usr/share/java/httpcore.jar $(CURDIR)/core/java/build/httpcore.jar
+	@# 2 MB of dependencies vs. 20 KB of copied source
+	@# Requires 4.4 or higher.
+	@# Debian: Not in wheezy/jessie
+	@# Ubuntu: Only in wily and later
+	@#/bin/echo -e "with-libhttpclient-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/core/java/build
+	@#ln -sf /usr/share/java/httpclient.jar $(CURDIR)/core/java/build/httpclient.jar
+	@#ln -sf /usr/share/java/httpcore.jar $(CURDIR)/core/java/build/httpcore.jar
 
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config

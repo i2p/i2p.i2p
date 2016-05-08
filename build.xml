@@ -133,7 +133,7 @@
         <attribute name="infile" />
         <attribute name="outfile" />
         <sequential>
-            <input message="Enter private signing key file:" addproperty="release.privkey" />
+            <input message="Enter sud/su2 private signing key file:" addproperty="release.privkey" />
             <fail message="You must enter an existing file path." >
                 <condition>
                     <or>
@@ -197,13 +197,13 @@
                 </or>
             </condition>
         </fail>
-        <input message="Enter key name (you@mail.i2p):" addproperty="release.signer.su3" />
+        <input message="Enter su3 key name (you@mail.i2p):" addproperty="release.signer.su3" />
         <fail message="You must enter a name." >
             <condition>
                 <equals arg1="${release.signer.su3}" arg2=""/>
             </condition>
         </fail>
-        <input message="Enter key password for ${release.signer.su3}:" addproperty="release.password.su3" />
+        <input message="Enter su3 key password for ${release.signer.su3}:" addproperty="release.password.su3" />
         <fail message="You must enter a password." >
             <condition>
                 <equals arg1="${release.password.su3}" arg2=""/>
@@ -297,7 +297,7 @@
     </target>
 
     <target name="buildImagegen" depends="buildCore, buildJetty" >
-        <ant dir="apps/imagegen" target="all" />
+        <ant dir="apps/imagegen" target="build" />
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
     </target>
 
@@ -760,6 +760,9 @@
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
+                <!-- following are only for debian builds -->
+                <pathelement location="core/java/build/libintl.jar" />
+                <pathelement location="core/java/build/gnu-getopt.jar" />
             </classpath>
             <!-- These variables are stored in build.properties.
                   End-users can override by creating the file override.properties -->
@@ -1035,6 +1038,12 @@
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" excludes="*.txt" />
         </copy>
+     <!-- Force using the new wrapper.jar.
+          The new jar with the old windows binaries will output a warning on windows.
+          We do not generate release files from this target.
+          See preppkg-windows-only target below.
+      -->
+        <copy overwrite="true" file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
@@ -1139,7 +1148,6 @@
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
         <copy file="build/utility.jar" todir="pkg-temp" />
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" excludes="*.txt" />
@@ -1151,7 +1159,13 @@
 
     <target name="preppkg-windows-only" depends="preppkg-windows, jbigi-windows-only">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+     <!-- Win binaries are down-rev from the others, so use the old jar.
+          This will not overwrite, so preppkg (for all OSes) will get the new jar with
+          the old binaries, which will probably work but will output a warning.
+          The windows-only installer will get the correct jar.
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+      -->
+        <copy overwrite="true" file="installer/lib/wrapper/win-all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
     <!-- see targets below for conditional copying -->
@@ -1246,9 +1260,10 @@
           <fileset dir="licenses/" />
         </copy>
         <copy file="apps/imagegen/identicon/README.md" tofile="pkg-temp/licenses/LICENSE-Identicon.txt" />
+        <copy file="apps/desktopgui/LICENSE" tofile="pkg-temp/licenses/LICENSE-DesktopGUI.txt" />
     </target>
 
-    <target name="preplicenses-unlesspkg" unless="${with-libjetty8-java}" >
+    <target name="preplicenses-unlesspkg" unless="${with-libtomcat7-java}" >
         <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
     </target>
 
@@ -1465,15 +1480,16 @@
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         <!-- include systray changes in 0.7.5 -->
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
-       <!-- removed from updater in 0.9
+       <!-- removed from updater in 0.9, added back in 0.9.26 -->
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
-       -->
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
-        <!-- as of 0.7.12; someday, we can remove these from the updater -->
+        <!-- as of 0.7.12; last changed in 0.9; removed from update in 0.9.26 -->
+      <!--
         <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/lib/standard.jar" todir="pkg-temp/lib/" />
+       -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
@@ -2032,7 +2048,9 @@
             <!-- libgetopt-java -->
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
             <!-- libhttpclient-java and libhttpcore-java -->
+          <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
+           -->
             <!-- systray4j -->
             <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
             <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
@@ -2103,7 +2121,9 @@
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+          <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
+           -->
             <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
             <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
