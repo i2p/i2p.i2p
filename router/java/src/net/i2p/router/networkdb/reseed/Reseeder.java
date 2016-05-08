@@ -83,19 +83,39 @@ public class Reseeder {
               //"http://netdb.i2p2.no/"; // Only SU3 (v3) support
               "";
 
-    /** @since 0.8.2 */
+    /**
+     *  The I2P reseed servers are managed by backup (backup@mail.i2p).
+     *  Please contact him for support, change requests, or issues.
+     *  See also the reseed forum http://zzz.i2p/forums/18
+     *  and the reseed setup and testing guide
+     *  https://geti2p.net/en/get-involved/guides/reseed
+     *
+     *  All supported reseed hosts need a corresponding reseed (SU3)
+     *  signing certificate installed in the router.
+     *
+     *  All supported reseed hosts with selfsigned SSL certificates
+     *  need the corresponding SSL certificate installed in the router.
+     *
+     *  While this implementation supports SNI, others may not, so
+     *  SNI requirements are noted.
+     *
+     * @since 0.8.2
+     */
     public static final String DEFAULT_SSL_SEED_URL =
-              "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
-              "https://i2p.mooo.com/netDb/" + "," +
-              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
-              "https://us.reseed.i2p2.no:444/" + "," +
-              "https://uk.reseed.i2p2.no:444/" + "," +
-              //"https://www.torontocrypto.org:8443/" + "," +
-              "https://i2p.manas.ca:8443/" + "," +
-              "https://i2p-0.manas.ca:8443/" + "," +
-              "https://reseed.i2p.vzaws.com:8443/" + ", " + // Only SU3 (v3) support
-              "https://user.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://download.xxlspeed.com/"; // Only HTTPS and SU3 (v3) support
+        // newest first, please add new ones at the top
+        //
+        // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
+        // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://i2p.manas.ca:8443/"          + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
+        "https://i2p-0.manas.ca:8443/"        + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
+        "https://reseed.i2p.vzaws.com:8443/"  + ',' +   // parg_at_mail.i2p.crt      // reseed.i2p.vzaws.com.crt
+        "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
+        "https://user.mx24.eu/"               + ',' +   // backup_at_mail.i2p.crt    // user.mx24.eu.crt
+        "https://download.xxlspeed.com/"      + ',' +   // backup_at_mail.i2p.crt    // download.xxlspeed.com.crt  // SNI required
+        "https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // netdb.i2p2.no.crt          // SNI required
+        "https://us.reseed.i2p2.no:444/"      + ',' +   // meeh_at_mail.i2p.crt      // us.reseed.i2p2.no.crt
+        "https://uk.reseed.i2p2.no:444/"      + ',' +   // meeh_at_mail.i2p.crt      // uk.reseed.i2p2.no.crt
+        "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // reseed.i2p-projekt.de.crt
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
 
