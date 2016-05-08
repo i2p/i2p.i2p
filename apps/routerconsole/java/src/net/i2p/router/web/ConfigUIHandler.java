@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
+
 /** set the theme */
 public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
@@ -80,6 +82,16 @@ public class ConfigUIHandler extends FormHandler {
             addFormError(_t("No user name entered"));
             return;
         }
+        // XSS filters # and ; but not =
+        // We store the username as the part of an option key, so we can't handle '='
+        if (name.contains("=")) {
+            addFormError("User name may not contain '='");
+            return;
+        }
+        byte[] b1 = DataHelper.getUTF8(name);
+        byte[] b2 = DataHelper.getASCII(name);
+        if (!DataHelper.eq(b1, b2))
+            addFormError(_t("Warning: User names outside the ISO-8859-1 character set are not recommended. Support is not standardized and varies by browser."));
         String pw = getJettyString("nofilter_pw");
         if (pw == null || pw.length() <= 0) {
             addFormError(_t("No password entered"));
@@ -91,6 +103,8 @@ public class ConfigUIHandler extends FormHandler {
             if (!_context.getBooleanProperty(RouterConsoleRunner.PROP_PW_ENABLE))
                 _context.router().saveConfig(RouterConsoleRunner.PROP_PW_ENABLE, "true");
             addFormNotice(_t("Added user {0}", name));
+            addFormNotice(_t("To recover from a forgotten or non-working password, stop I2P, edit the file {0}, delete the line {1}, and restart I2P.",
+                             _context.router().getConfigFilename(), RouterConsoleRunner.PROP_PW_ENABLE + "=true"));
             addFormError(_t("Restart required to take effect"));
         } else {
             addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs."));

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
@@ -838,16 +839,51 @@ public class RouterConsoleRunner implements RouterApp {
                 HashLoginService realm = new HashLoginService(JETTY_REALM);
                 sec.setLoginService(realm);
                 sec.setAuthenticator(authenticator);
+                String[] role = new String[] {JETTY_ROLE};
                 for (Map.Entry<String, String> e : userpw.entrySet()) {
                     String user = e.getKey();
                     String pw = e.getValue();
-                    realm.putUser(user, Credential.getCredential(MD5.__TYPE + pw), new String[] {JETTY_ROLE});
+                    Credential cred = Credential.getCredential(MD5.__TYPE + pw);
+                    realm.putUser(user, cred, role);
                     Constraint constraint = new Constraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);
                     ConstraintMapping cm = new ConstraintMapping();
                     cm.setConstraint(constraint);
                     cm.setPathSpec("/");
                     constraints.add(cm);
+                    // Jetty does auth checking only with ISO-8859-1,
+                    // so register a 2nd and 3rd user with different encodings if necessary.
+                    // Might work, might not...
+                    // There's no standard and browser behavior varies.
+                    // Chrome sends UTF-8. Firefox doesn't send anything.
+                    // https://bugzilla.mozilla.org/show_bug.cgi?id=41489
+                    // see also RFC 7616/7617 (late 2015) and PasswordManager.md5Hex()
+                    byte[] b1 = DataHelper.getUTF8(user);
+                    byte[] b2 = DataHelper.getASCII(user);
+                    if (!DataHelper.eq(b1, b2)) {
+                        try {
+                            // each char truncated to 8 bytes
+                            String user2 = new String(b2, "ISO-8859-1");
+                            realm.putUser(user2, cred, role);
+                            constraint = new Constraint(user2, JETTY_ROLE);
+                            constraint.setAuthenticate(true);
+                            cm = new ConstraintMapping();
+                            cm.setConstraint(constraint);
+                            cm.setPathSpec("/");
+                            constraints.add(cm);
+
+                            // each UTF-8 byte as a char
+                            // this is what chrome does
+                            String user3 = new String(b1, "ISO-8859-1");
+                            realm.putUser(user3, cred, role);
+                            constraint = new Constraint(user3, JETTY_ROLE);
+                            constraint.setAuthenticate(true);
+                            cm = new ConstraintMapping();
+                            cm.setConstraint(constraint);
+                            cm.setPathSpec("/");
+                            constraints.add(cm);
+                        } catch (UnsupportedEncodingException uee) {}
+                    }
                 }
             }
         }

@@ -1873,7 +1873,9 @@ public class DataHelper {
      *  Roughly the same as orig.getBytes("ISO-8859-1") but much faster and
      *  will not throw an exception.
      *
-     *  @param orig non-null, must be 7-bit chars
+     *  Warning - misnamed, converts to ISO-8859-1.
+     *
+     *  @param orig non-null, truncates to 8-bit chars
      *  @since 0.9.5
      */
     public static byte[] getASCII(String orig) {
