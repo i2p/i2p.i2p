@@ -102,9 +102,12 @@ abstract class TrayManager {
             public void mousePressed(MouseEvent e)  { handle(e); }
             public void mouseReleased(MouseEvent e) { handle(e); }
             private void handle(MouseEvent e) {
+                //System.out.println("Button " + e.getButton() + " Frame was visible? " +
+                //                   frame.isVisible() + " menu was visible? " + menu.isVisible() +
+                //                   " trigger? " + menu.isPopupTrigger(e));
                 // http://stackoverflow.com/questions/17258250/changing-the-laf-of-a-popupmenu-for-a-trayicon-in-java
-                // menu visible check is failsafe, for when menu gets cancelled
-                if (!frame.isVisible() || !menu.isVisible()) {
+                // menu visible check is never true
+                if (!frame.isVisible() /* || !menu.isVisible() */ ) {
                     frame.setLocation(e.getX(), e.getY());
                     frame.setVisible(true);
                     menu.show(frame, 0, 0);
@@ -113,8 +116,8 @@ abstract class TrayManager {
             }
         });
         menu.addPopupMenuListener(new PopupMenuListener() {
-            public void popupMenuCanceled(PopupMenuEvent e)            { frame.setVisible(false); }
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+            public void popupMenuCanceled(PopupMenuEvent e)            { /* frame.setVisible(false); */ }
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { frame.setVisible(false); }
             public void popupMenuWillBecomeVisible(PopupMenuEvent e)   {}
         });
         // this is to make it go away when we click elsewhere
