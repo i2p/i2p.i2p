@@ -2358,14 +2358,16 @@ public class WebMail extends HttpServlet
 		//out.println(button( LOGOUT, _t("Logout") ) );
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n");
 		if( mail != null ) {
-			out.println(	"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("From") +
+			out.println("<tr><td colspan=\"2\"><table id=\"mailhead\">\n" +
+					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
+					"<tr><td align=\"right\" valign=\"top\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("Subject") +
+					"<tr><td align=\"right\" valign=\"top\">" + _t("Subject") +
 					":</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
-					"<tr class=\"mailhead\"><td align=\"right\" valign=\"top\">" + _t("Date") +
+					"<tr><td align=\"right\" valign=\"top\">" + _t("Date") +
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
-					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" );
+					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" +
+					"</table></td></tr>\n" );
 			if( mail.hasPart()) {
 				mail.setNew(false);
 				showPart( out, mail.getPart(), 0, SHOW_HTML );
