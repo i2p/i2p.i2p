@@ -332,15 +332,25 @@ public class ConfigServiceHandler extends FormHandler {
                 ClientApp dtg = mgr.getRegisteredApp("desktopgui");
                 if (dtg != null) {
                     if (enable) {
-                        if (dtg.getState() == ClientAppState.STOPPED)
+                        if (dtg.getState() == ClientAppState.STOPPED) {
                             dtg.startup();
+                            addFormNotice(_t("Enabled system tray"));
+                        }
                     } else {
-                        if (dtg.getState() == ClientAppState.RUNNING)
+                        if (dtg.getState() == ClientAppState.RUNNING) {
                             dtg.shutdown(null);
+                            addFormNotice(_t("Disabled system tray"));
+                        }
                     }
                 } else if (enable) {
+                    // already set to true, GraphicsEnvironment initialized, can't change it now
+                    if (Boolean.valueOf(System.getProperty("java.awt.headless"))) {
+                        addFormError(_t("Restart required to take effect"));
+                    } else {
                         dtg = new net.i2p.desktopgui.Main(_context, mgr, null);    
                         dtg.startup();
+                        addFormNotice(_t("Enabled system tray"));
+                    }
                 }
             } catch (Throwable t) {
                 if (enable)
