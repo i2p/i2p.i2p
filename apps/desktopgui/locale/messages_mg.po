@@ -1,0 +1,56 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# topdog101 <topdog101@free.fr>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-01-09 19:27+0000\n"
+"PO-Revision-Date: 2014-02-20 16:20+0000\n"
+"Last-Translator: topdog101 <topdog101@free.fr>\n"
+"Language-Team: Malagasy (http://www.transifex.com/otf/I2P/language/mg/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: mg\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+msgid "Start I2P"
+msgstr "Velomy i I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "I2P is starting!"
+msgstr "Manomboka ho velona i I2P!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "Starting"
+msgstr "Velona"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+msgid "Launch I2P Browser"
+msgstr "Alefaso ny fijerena tranonkala I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr "Amboary ny takelaka manatrika"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+msgid "Restart I2P"
+msgstr "Avereno alefa i I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+msgid "Stop I2P"
+msgstr "Ajanony i I2P"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:43
+msgid "Tray icon configuration"
+msgstr "Fanitsiana ny bokotra fahita"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:46
+msgid "Should tray icon be enabled?"
+msgstr "Tokony ampiasaina ve ny bokotra fahita?"
