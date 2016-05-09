@@ -33,6 +33,17 @@
 
 1. Ensure all translation updates are imported from Transifex
 
+  - Look for newly translated languages and resources on Transifex
+  - Add any new ones to .tx/config (use your own judgement on which to include
+    based on minimum translated percentage)
+  - `tx pull`
+  - `ant testcripts` to verify that all updated translations are valid
+  - For any invalid that break the test, fix up the po file manually, or fix on
+    tx and pull again, or (if new) comment out in .tx/config (add a comment why)
+    and delete the po file
+  - `mtn add` for any new po files
+  - `mtn ci` all changed po files, and .tx/config if changed
+
 2. Sync with mtn.i2p2.i2p
 
 3. Start with a clean checkout:
