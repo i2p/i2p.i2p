@@ -3,12 +3,14 @@ package net.i2p.router.transport.udp;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -325,6 +327,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
         
         // bind host
+        // This is not exposed in the UI and in practice is always null.
+        // We use PROP_EXTERNAL_HOST instead. See below.
         String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
 
         if (bindTo == null) {
@@ -333,17 +337,66 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // bind only to that.
             String fixedHost = _context.getProperty(PROP_EXTERNAL_HOST);
             if (fixedHost != null && fixedHost.length() > 0) {
-                try {
-                    // TODO getAllByName(), bind to each
-                    String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
-                    if (Addresses.getAddresses().contains(testAddr))
-                        bindTo = testAddr;
-                } catch (UnknownHostException uhe) {}
+                // Generate a comma-separated list of valid IP addresses
+                // that we can bind to,
+                // from the comma-separated PROP_EXTERNAL_HOST config.
+                // The config may contain IPs or hostnames; expand each
+                // hostname to one or more (v4 or v6) IPs.
+                TransportUtil.IPv6Config cfg = getIPv6Config();
+                Set<String> myAddrs;
+                if (cfg == IPV6_DISABLED)
+                    myAddrs = Addresses.getAddresses(false, false);
+                else
+                    myAddrs = Addresses.getAddresses(false, true);
+                StringBuilder buf = new StringBuilder();
+                String[] bta = DataHelper.split(fixedHost, "[,; \r\n\t]");
+                for (int i = 0; i < bta.length; i++) {
+                    String bt = bta[i];
+                    if (bt.length() <= 0)
+                        continue;
+                    try {
+                        InetAddress[] all = InetAddress.getAllByName(bt);
+                        for (int j = 0; j < all.length; j++) {
+                            InetAddress ia = all[j];
+                            if (cfg == IPV6_ONLY && (ia instanceof Inet4Address)) {
+                                if (_log.shouldWarn())
+                                    _log.warn("Configured for IPv6 only, not binding to configured IPv4 host " + bt);
+                                continue;
+                            }
+                            String testAddr = ia.getHostAddress();
+                            if (myAddrs.contains(testAddr)) {
+                                if (buf.length() > 0)
+                                    buf.append(',');
+                                buf.append(testAddr);
+                            } else {
+                                if (_log.shouldWarn())
+                                    _log.warn("Not a local address, not binding to configured IP " + testAddr);
+                            }
+                        }
+                    } catch (UnknownHostException uhe) {
+                        if (_log.shouldWarn())
+                            _log.warn("Not binding to configured host " + bt + " - " + uhe);
+                    }
+                }
+                if (buf.length() > 0) {
+                    bindTo = buf.toString();
+                    if (_log.shouldWarn() && !fixedHost.equals(bindTo))
+                        _log.warn("Expanded external host config \"" + fixedHost + "\" to \"" + bindTo + '"');
+                }
             }
         }
 
-        List<InetAddress> bindToAddrs = new ArrayList<InetAddress>(4);
+        // construct a set of addresses
+        Set<InetAddress> bindToAddrs = new HashSet<InetAddress>(4);
         if (bindTo != null) {
+            // Generate a set IP addresses
+            // that we can bind to,
+            // from the comma-separated PROP_BIND_INTERFACE config,
+            // or as generated from the PROP_EXTERNAL_HOST config.
+            // In theory, the config may contain IPs and/or hostnames.
+            // However, in practice, it's only IPs, because any hostnames
+            // in PROP_EXTERNAL_HOST were expanded above to one or more (v4 or v6) IPs.
+            // PROP_BIND_INTERFACE is not exposed in the UI and is never set.
             String[] bta = DataHelper.split(bindTo, "[,; \r\n\t]");
             for (int i = 0; i < bta.length; i++) {
                 String bt = bta[i];
@@ -500,6 +553,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
                 rebuildExternalAddress(ia.getHostAddress(), newPort, false);
             }
+            // TODO
+            // If we are bound only to v4 addresses,
+            // force _haveIPv6Address to false, or else we get 'no endpoint' errors
+            // If we are bound only to v6 addresses,
+            // override getIPv6Config() ?
         }
         if (isIPv4Firewalled()) {
             if (_lastInboundIPv6 > 0)
