@@ -36,6 +36,9 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.i2p.data.DataHelper;
+import net.i2p.util.HexDump;
+import net.i2p.util.Log;
 
 /**
  * NtpClient - an NTP client for Java.  This program connects to an NTP server
@@ -53,9 +56,12 @@ import java.util.Collections;
  */
 class NtpClient {
     /** difference between the unix epoch and jan 1 1900 (NTP uses that) */
-    private final static double SECONDS_1900_TO_EPOCH = 2208988800.0;
+    public final static double SECONDS_1900_TO_EPOCH = 2208988800.0;
     private final static int NTP_PORT = 123;
     private static final int DEFAULT_TIMEOUT = 10*1000;
+    private static final int OFF_ORIGTIME = 24;
+    private static final int OFF_TXTIME = 40;
+    private static final int MIN_PKT_LEN = 48;
 
     /**
      * Query the ntp servers, returning the current time from first one we find
@@ -63,6 +69,7 @@ class NtpClient {
      * @return milliseconds since january 1, 1970 (UTC)
      * @throws IllegalArgumentException if none of the servers are reachable
      */
+/****
     public static long currentTime(String serverNames[]) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
@@ -77,15 +84,18 @@ class NtpClient {
         }
         throw new IllegalArgumentException("No reachable NTP servers specified");
     }
+****/
     
     /**
      * Query the ntp servers, returning the current time from first one we find
      * Hack to return time and stratum
+     *
+     * @param log may be null
      * @return time in rv[0] and stratum in rv[1]
      * @throws IllegalArgumentException if none of the servers are reachable
      * @since 0.7.12
      */
-    public static long[] currentTimeAndStratum(String serverNames[], int perServerTimeout) {
+    public static long[] currentTimeAndStratum(String serverNames[], int perServerTimeout, Log log) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
         ArrayList<String> names = new ArrayList<String>(serverNames.length);
@@ -93,7 +103,7 @@ class NtpClient {
             names.add(serverNames[i]);
         Collections.shuffle(names);
         for (int i = 0; i < names.size(); i++) {
-            long[] rv = currentTimeAndStratum(names.get(i), perServerTimeout);
+            long[] rv = currentTimeAndStratum(names.get(i), perServerTimeout, log);
             if (rv != null && rv[0] > 0)
                 return rv;
         }
@@ -105,19 +115,23 @@ class NtpClient {
      *
      * @return milliseconds since january 1, 1970 (UTC), or -1 on error
      */
+/****
     public static long currentTime(String serverName) {
          long[] la = currentTimeAndStratum(serverName, DEFAULT_TIMEOUT);
          if (la != null)
              return la[0];
          return -1;
     }
+****/
 
     /**
      * Hack to return time and stratum
+     *
+     * @param log may be null
      * @return time in rv[0] and stratum in rv[1], or null for error
      * @since 0.7.12
      */
-    private static long[] currentTimeAndStratum(String serverName, int timeout) {
+    private static long[] currentTimeAndStratum(String serverName, int timeout, Log log) {
         DatagramSocket socket = null;
         try {
             // Send request
@@ -125,14 +139,19 @@ class NtpClient {
             InetAddress address = InetAddress.getByName(serverName);
             byte[] buf = new NtpMessage().toByteArray();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, NTP_PORT);
+            byte[] txtime = new byte[8];
 
             // Set the transmit timestamp *just* before sending the packet
             // ToDo: Does this actually improve performance or not?
-            NtpMessage.encodeTimestamp(packet.getData(), 40,
+            NtpMessage.encodeTimestamp(packet.getData(), OFF_TXTIME,
                                        (System.currentTimeMillis()/1000.0) 
                                        + SECONDS_1900_TO_EPOCH);
 
             socket.send(packet);
+            // save for check
+            System.arraycopy(packet.getData(), OFF_TXTIME, txtime, 0, 8);
+            if (log != null && log.shouldDebug())
+                log.debug("Sent:\n" + HexDump.dump(buf));
 
             // Get response
             packet = new DatagramPacket(buf, buf.length);
@@ -142,28 +161,51 @@ class NtpClient {
             // Immediately record the incoming timestamp
             double destinationTimestamp = (System.currentTimeMillis()/1000.0) + SECONDS_1900_TO_EPOCH;
 
+            if (packet.getLength() < MIN_PKT_LEN) {
+                if (log != null && log.shouldWarn())
+                    log.warn("Short packet length " + packet.getLength());
+                return null;
+            }
+
             // Process response
             NtpMessage msg = new NtpMessage(packet.getData());
 
-            //double roundTripDelay = (destinationTimestamp-msg.originateTimestamp) -
-            //                        (msg.receiveTimestamp-msg.transmitTimestamp);
-            double localClockOffset = ((msg.receiveTimestamp - msg.originateTimestamp) +
-                                       (msg.transmitTimestamp - destinationTimestamp)) / 2;
+            if (log != null && log.shouldDebug())
+                log.debug("Received from: " + packet.getAddress().getHostAddress() +
+                          '\n' + msg + '\n' + HexDump.dump(packet.getData()));
 
             // Stratum must be between 1 (atomic) and 15 (maximum defined value)
             // Anything else is right out, treat such responses like errors
             if ((msg.stratum < 1) || (msg.stratum > 15)) {
-                //System.out.println("Response from NTP server of unacceptable stratum " + msg.stratum + ", failing.");
+                if (log != null && log.shouldWarn())
+                    log.warn("Response from NTP server of unacceptable stratum " + msg.stratum + ", failing.");
                 return null;
             }
+
+            if (!DataHelper.eq(txtime, 0, packet.getData(), OFF_ORIGTIME, 8)) {
+                if (log != null && log.shouldWarn())
+                    log.warn("Origin time mismatch sent:\n" + HexDump.dump(txtime) +
+                             "rcvd:\n" + HexDump.dump(packet.getData(), OFF_ORIGTIME, 8));
+                return null;
+            }
+
+
+            double localClockOffset = ((msg.receiveTimestamp - msg.originateTimestamp) +
+                                       (msg.transmitTimestamp - destinationTimestamp)) / 2;
             
             long[] rv = new long[2];
             rv[0] = (long)(System.currentTimeMillis() + localClockOffset*1000);
             rv[1] = msg.stratum;
-            //System.out.println("host: " + address.getHostAddress() + " rtt: " + roundTripDelay + " offset: " + localClockOffset + " seconds");
+            if (log != null && log.shouldInfo()) {
+                double roundTripDelay = (destinationTimestamp-msg.originateTimestamp) -
+                                        (msg.receiveTimestamp-msg.transmitTimestamp);
+                log.info("host: " + packet.getAddress().getHostAddress() + " rtt: " +
+                         roundTripDelay + " offset: " + localClockOffset + " seconds");
+            }
             return rv;
         } catch (IOException ioe) {
-            //ioe.printStackTrace();
+            if (log != null && log.shouldWarn())
+                log.warn("NTP failure from " + serverName, ioe);
             return null;
         } finally {
             if (socket != null)
@@ -171,20 +213,19 @@ class NtpClient {
         }
     }
     
-/****
     public static void main(String[] args) throws IOException {
         // Process command-line args
         if(args.length <= 0) {
-            printUsage();
-            return;
-            // args = new String[] { "ntp1.sth.netnod.se", "ntp2.sth.netnod.se" };
+           args = new String[] { "pool.ntp.org" };
         } 
 
-        long now = currentTime(args);
-        System.out.println("Current time: " + new java.util.Date(now));
+        Log log = new Log(NtpClient.class);
+        long[] rv = currentTimeAndStratum(args, DEFAULT_TIMEOUT, log);
+        System.out.println("Current time: " + new java.util.Date(rv[0]) + " (stratum " + rv[1] + ')');
     }
     
-    static void printUsage() {
+/****
+    private static void printUsage() {
         System.out.println(
         "NtpClient - an NTP client for Java.\n" +
         "\n" +
