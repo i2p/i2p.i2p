@@ -25,8 +25,9 @@
 <h2>Snabb vägledning till anonym webbservning på I2P</h2>
 
  <p>Det här är din eepsite, din egen anonyma I2P-webbserver - redigera bara filerna
-     under <code>~/.i2p/eepsite/docroot/</code> (Linux, OS X)
-     eller <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)
+     under <code>~/.i2p/eepsite/docroot/</code> (Linux),
+ <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
+ eller <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),
  så kommer andra kunna nå dem efter att du följt instruktionerna nedan.
  I I2P så adresseras eepsajter med en 'nyckel', som representeras som en väldigt lång Base64-sträng.
  ('Nyckeln' är något så när analog med en IP-adress och visas
@@ -68,7 +69,9 @@
      <li>I din webbläsare, skriv in ditt eepsajtnamn (<i>ettbranamn</i>.i2p) så borde du landa på den här sidan igen.
      Förhoppningsvis fungerade det.</li>
  <li>Innan du berättar för världen om den nya eepsajt borde du lägga till lite innehåll.
-     Gå till <code>~/.i2p/eepsite/docroot/</code> (på Linux eller OS X) eller <code>%APPDATA%\I2P\eepsite\docroot\</code> (på Windows)
+     Gå till <code>~/.i2p/eepsite/docroot/</code>  (Linux),
+ <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
+ eller <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),
      och ersätt omdirigeringssidan index.html med ditt eget innehåll. Virtuella mappar fungerar, så du kan serva filer från en
      underkatalog utan att behöva ge en sida med länkar till filer. Om du behöver en mall för en enkel sajt så
      varsågod och låna och anpassa

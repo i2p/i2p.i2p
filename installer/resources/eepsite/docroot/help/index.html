@@ -24,7 +24,9 @@
 </div>
 <h2>Quick Guide to Anonymous Webserving on I2P</h2>
 
- <p>This is your own anonymous I2P webserver ("eepsite") - simply edit the files under <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)  
+ <p>This is your own anonymous I2P webserver ("eepsite") - simply edit the files under <code>~/.i2p/eepsite/docroot/</code> (Linux),
+ <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
+ or <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),
  and they'll be reachable by others once you follow the instructions below.
  In I2P, hidden services are addressed using a 'key', which is represented as a really long Base64 string.
  (The 'key' is somewhat analogous to an IP address, and
@@ -66,7 +68,9 @@
  <li>In your browser, enter in your website name (<i>something</i>.i2p) and you should
  be right back here. Hopefully it worked.</li>
  <li>Before you tell the world about your new website, you should add some content.
- Go to <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!</li>
+ Go to <code>~/.i2p/eepsite/docroot/</code> (Linux), <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
+ or <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),
+ and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!</li>
 </ul>
 <h2>Register your own .I2P Domain</h2><ul>
  <li>Now it's time to add your website to an I2P address book hosted by a site
