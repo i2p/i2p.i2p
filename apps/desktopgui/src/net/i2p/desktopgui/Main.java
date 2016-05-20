@@ -63,7 +63,8 @@ public class Main implements RouterApp {
      */
     private synchronized void startUp() throws Exception {
         final TrayManager trayManager;
-        boolean useSwing = _appContext.getProperty(PROP_SWING, !SystemVersion.isWindows());
+        boolean useSwingDefault = !(SystemVersion.isWindows() || SystemVersion.isMac());
+        boolean useSwing = _appContext.getProperty(PROP_SWING, useSwingDefault);
         if (_context != null)
             trayManager = new InternalTrayManager(_context, this, useSwing);
         else

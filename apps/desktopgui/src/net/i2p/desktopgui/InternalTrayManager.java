@@ -372,8 +372,10 @@ class InternalTrayManager extends TrayManager {
         }
         PopupMenu awt = trayIcon.getPopupMenu();
         if (awt != null) {
-            awt.remove(0);
-            awt.insert(status, 0);
+            MenuItem item = awt.getItem(0);
+            String oldStatus = item.getLabel();
+            if (!status.equals(oldStatus))
+                item.setLabel(status);
         }
         if (_browserItem != null)
             _browserItem.setEnabled(!imminent);

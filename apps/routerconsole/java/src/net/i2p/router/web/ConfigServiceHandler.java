@@ -202,7 +202,10 @@ public class ConfigServiceHandler extends FormHandler {
     public boolean shouldShowSystray() {
         return !
             (RouterConsoleRunner.DAEMON_USER.equals(System.getProperty("user.name")) ||
-             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()));
+             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()) ||
+             // headless=true is forced in i2prouter script to prevent useless dock icon;
+             // must fix this first
+             SystemVersion.isMac());
     }
 
     /**

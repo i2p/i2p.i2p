@@ -1,3 +1,35 @@
+2016-05-20 zzz
+ * DesktopGui:
+   - Fix systray menu redraw on Mac;
+   - Switch to AWT by default on Mac;
+   - Hide DTG enable on Mac until we fix dock
+
+2016-05-19 zzz
+ * Config files, eepsite help: Add path information for OS X
+   and Windows as a service. (ticket #1495)
+
+2016-05-12 zzz
+ * NTP:
+   - Don't put random data in zeroed fields
+   - Increase random data in originate timestamp from 1 byte to 2 bytes
+   - Verify originate timestamp to prevent injection
+   - Verify received packet size
+ * SSU:
+   - If configured with a hostname, bind to all v4/v6
+     addresses found for that hostname.
+   - Fix binding if more than one IP or host was configured.
+
+2016-05-09 zzz
+ * Console:
+   - Fix escaping of search URLs on /confighome
+   - Fix HTML error on /configui
+ * DesktopGui: Add 9 new translations
+ * i2psnark: Limit cases when we display tracker errors;
+   include host name of tracker when we do
+
+2016-05-08 zzz
+ * Console: Fix UTF-8 passwords, partial fix for usernames
+
 2016-05-07 zzz
  * Build:
    - Add DTG to updater
