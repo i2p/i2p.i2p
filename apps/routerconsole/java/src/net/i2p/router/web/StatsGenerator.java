@@ -106,7 +106,7 @@ public class StatsGenerator {
         buf.append(freq.getDescription());
         buf.append("</i><br>");
         if (freq.getEventCount() <= 0) {
-            buf.append(_t("No lifetime events")).append("<br>\n");
+            buf.append("<ul><li class=\"noevents\">").append(_t("No lifetime events")).append("</li></ul>\n");
             return;
         }
         long uptime = _context.router().getUptime();
@@ -157,7 +157,7 @@ public class StatsGenerator {
             buf.append("</i><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
-            buf.append(_t("No lifetime events")).append("<br>\n");
+            buf.append("<ul><li class=\"noevents\">").append(_t("No lifetime events")).append("</li></ul>\n");
             return;
         }
         long now = _context.clock().now();

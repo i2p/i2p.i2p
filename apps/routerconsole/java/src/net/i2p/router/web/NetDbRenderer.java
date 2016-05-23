@@ -203,7 +203,7 @@ class NetDbRenderer {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
             buf.append("<table class=\"leaseset\">\n")
-               .append("<tr><th><b>").append(_t("LeaseSet")).append(":</b> ").append(key.toBase64()).append("</th>");
+               .append("<tr><th><b>").append(_t("LeaseSet")).append(":</b>&nbsp;<code>").append(key.toBase64()).append("</code></th>");
             if (_context.clientManager().isLocal(dest)) {
                 buf.append("<th><b><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))

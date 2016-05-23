@@ -48,9 +48,9 @@ public class JobQueueHelper extends HelperBase {
         
         StringBuilder buf = new StringBuilder(32*1024);
         buf.append("<div class=\"joblog\">")
-           .append("<h3 id=\"jobrunners\">")
+           .append("<h2 id=\"jobrunners\">")
            .append(_t("Job runners")).append(": ").append(numRunners)
-           .append("</h3>\n");
+           .append("</h2>\n");
 
         long now = _context.clock().now();
 
