@@ -2054,12 +2054,14 @@ public class I2PSnarkServlet extends BasicServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Add");
-        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
+        out.write("<div class=\"addtorrentsection\">");
+        out.write("<input class=\"toggle_input\" id=\"toggle_addtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_addtorrent\">");
         out.write(toThemeImg("add"));
         out.write(' ');
         out.write(_t("Add Torrent"));
+        out.write("</label>");
 
-        out.write("</span><hr>\n<table border=\"0\"><tr><td>");
+        out.write("<hr>\n<table border=\"0\"><tr><td>");
         out.write(_t("From URL"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
         out.write(" title=\"");
@@ -2091,11 +2093,11 @@ public class I2PSnarkServlet extends BasicServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Create");
-        out.write("<span class=\"snarkConfigTitle\">");
+        out.write("<input class=\"toggle_input\" id=\"toggle_createtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_createtorrent\">");
         out.write(toThemeImg("create"));
         out.write(' ');
         out.write(_t("Create Torrent"));
-        out.write("</span><hr>\n<table border=\"0\"><tr><td>");
+        out.write("</label><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_t("Data to seed"));
         out.write(":<td>"
