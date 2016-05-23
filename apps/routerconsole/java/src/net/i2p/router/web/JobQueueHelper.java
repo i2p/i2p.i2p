@@ -56,7 +56,7 @@ public class JobQueueHelper extends HelperBase {
 
         buf.append("<h3 id=\"activejobs\">")
            .append(_t("Active jobs")).append(": ").append(activeJobs.size())
-           .append("</h3><ol>\n");
+           .append("</h3><ol>");
         for (int i = 0; i < activeJobs.size(); i++) {
             Job j = activeJobs.get(i);
             buf.append("<li>(").append(_t("started {0} ago", DataHelper.formatDuration2(now-j.getTiming().getStartAfter()))).append("): ");
@@ -66,7 +66,7 @@ public class JobQueueHelper extends HelperBase {
 
         buf.append("<h3 id=\"finishedjobs\">")
            .append(_t("Just finished jobs")).append(": ").append(justFinishedJobs.size())
-           .append("</h3><ol>\n");
+           .append("</h3><ol>");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
             Job j = justFinishedJobs.get(i);
             buf.append("<li>(").append(_t("finished {0} ago", DataHelper.formatDuration2(now-j.getTiming().getActualEnd()))).append("): ");
@@ -76,7 +76,7 @@ public class JobQueueHelper extends HelperBase {
 
         buf.append("<h3 id=\"readyjobs\">")
            .append(_t("Ready/waiting jobs")).append(": ").append(readyJobs.size())
-           .append("</h3><ol>\n");
+           .append("</h3><ol>");
         ObjectCounter<String> counter = new ObjectCounter<String>();
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = readyJobs.get(i);
@@ -95,7 +95,7 @@ public class JobQueueHelper extends HelperBase {
 
         buf.append("<h3 id=\"scheduledjobs\">")
            .append(_t("Scheduled jobs")).append(": ").append(timedJobs.size())
-           .append("</h3><ol>\n");
+           .append("</h3><ol>");
         long prev = Long.MIN_VALUE;
         counter.clear();
         for (int i = 0; i < timedJobs.size(); i++) {
