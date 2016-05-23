@@ -14,7 +14,7 @@
 <jsp:useBean class="net.i2p.router.web.ConfigFamilyHelper" id="familyHelper" scope="request" />
 <jsp:setProperty name="familyHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <h1><%=intl._t("I2P Router Family Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_family">
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigFamilyHandler" id="formhandler" scope="request" />

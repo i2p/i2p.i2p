@@ -437,10 +437,10 @@ public class SummaryHelper extends HelperBase {
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Add/remove/edit &amp; control your client and server tunnels"))
            .append("\">").append(_t("Local Tunnels"))
-           .append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
+           .append("</a></h3><hr class=\"b\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
-            buf.append("<table>");
+            buf.append("<table id=\"sb_localtunnels\">");
             
             for (Destination client : clients) {
                 String name = getName(client);
@@ -478,7 +478,6 @@ public class SummaryHelper extends HelperBase {
         } else {
             buf.append("<center><i>").append(_t("none")).append("</i></center>");
         }
-        buf.append("</div>\n");
         return buf.toString();
     }
     
@@ -697,7 +696,7 @@ public class SummaryHelper extends HelperBase {
         String status = NewsHelper.getUpdateStatus();
         boolean needSpace = false;
         if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4>\n");
+            buf.append("<h4 class=\"sb_info\">").append(status).append("</h4>\n");
             needSpace = true;
         }
         String dver = NewsHelper.updateVersionDownloaded();
@@ -713,7 +712,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update downloaded")).append("<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update downloaded")).append("<br>");
             if (_context.hasWrapper())
                 buf.append(_t("Click Restart to install"));
             else
@@ -734,7 +733,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUpdateVersion())).append("<br>");
             buf.append(constraint).append("</b></h4>");
             avail = false;
@@ -746,7 +745,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUnsignedUpdateVersion())).append("<br>");
             buf.append(unsignedConstraint).append("</b></h4>");
             unsignedAvail = false;
@@ -758,7 +757,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getDevSU3UpdateVersion())).append("<br>");
             buf.append(devSU3Constraint).append("</b></h4>");
             devSU3Avail = false;
@@ -821,7 +820,7 @@ public class SummaryHelper extends HelperBase {
     public String getFirewallAndReseedStatus() {
         StringBuilder buf = new StringBuilder(256);
         if (showFirewallWarning()) {
-            buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
+            buf.append("<h4 id=\"sb_warning\"><a href=\"/confignet\" target=\"_top\" title=\"")
                .append(_t("Help with firewall configuration"))
                .append("\">")
                .append(_t("Check network connection and NAT/firewall"))

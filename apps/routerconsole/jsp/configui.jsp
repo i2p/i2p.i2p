@@ -23,7 +23,7 @@ input.default {
 <jsp:setProperty name="uihelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h1><%=uihelper._t("I2P UI Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_ui">
 
  <%@include file="confignav.jsi" %>
 

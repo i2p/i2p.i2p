@@ -62,7 +62,7 @@ function toggleAll(category)
 </head><body onLoad="init();">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Stats Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_stats">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />

@@ -14,7 +14,7 @@
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHelper" id="reseedHelper" scope="request" />
 <jsp:setProperty name="reseedHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <h1><%=intl._t("I2P Reseeding Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_reseed">
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigReseedHandler" id="formhandler" scope="request" />

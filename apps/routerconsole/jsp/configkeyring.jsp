@@ -11,7 +11,7 @@
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Keyring Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_keyring">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHandler" id="formhandler" scope="request" />

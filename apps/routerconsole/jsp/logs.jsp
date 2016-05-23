@@ -57,7 +57,7 @@
 <tr><td><b>Encoding:</b></td><td><%=System.getProperty("file.encoding")%></td></tr>
 <tr><td><b>Charset:</b></td><td><%=java.nio.charset.Charset.defaultCharset().name()%></td></tr></tbody></table>
 
-<h3 class="tabletitle"><%=intl._t("Critical Logs")%></h3><a name="criticallogs"> </a>
+<h3 class="tabletitle"><%=intl._t("Critical Logs")%></h3>
 <table id="criticallogs" class="logtable"><tbody>
 <tr><td>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
@@ -78,7 +78,7 @@
 </td></tr>
 </tbody></table>
 
-<h3 class="tabletitle"><%=intl._t("Service (Wrapper) Logs")%></h3><a name="servicelogs"> </a>
+<h3 class="tabletitle" id="servicelogs"><%=intl._t("Service (Wrapper) Logs")%></h3>
 <table id="wrapperlogs" class="logtable"><tbody>
 <tr><td>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />

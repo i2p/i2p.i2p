@@ -2356,7 +2356,7 @@ public class WebMail extends HttpServlet
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _t("Logout") ) );
-		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n");
+		out.println( "<div id=\"viewmail\"><table id=\"message_full\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		if( mail != null ) {
 			out.println("<tr><td colspan=\"2\"><table id=\"mailhead\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
@@ -2373,13 +2373,13 @@ public class WebMail extends HttpServlet
 				showPart( out, mail.getPart(), 0, SHOW_HTML );
 			}
 			else {
-				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail body.") + "</p></td></tr>" );
+				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail body.") + "</p></td></tr>\n" );
 			}
 		}
 		else {
-			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail.") + "</p></td></tr>" );
+			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail.") + "</p></td></tr>\n" );
 		}
-		out.println( "<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n</table>" );
+		out.println( "</table></div>" );
 	}
 
 	/**
@@ -2410,8 +2410,7 @@ public class WebMail extends HttpServlet
 			out.println(quoteHTML(e.getValue().toString()));
 		}
 		out.println("</textarea>");
-		out.println("<div id=\"bottombuttons\">");
-		out.println("<br>");
+		out.println("<div id=\"prefsave\">");
 		out.println(button(SAVE, _t("Save Configuration")));
 		out.println(button(CANCEL, _t("Cancel")));
 		out.println("</div>");

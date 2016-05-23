@@ -139,7 +139,7 @@ class SummaryBarRenderer {
            .append(_t("I2P Services"))
            .append("</a></h3>\n" +
 
-                   "<hr class=\"b\"><table id=\"services\"><tr><td>" +
+                   "<hr class=\"b\"><table id=\"sb_services\"><tr><td>" +
 
                    "<a href=\"/susimail/susimail\" target=\"_blank\" title=\"")
            .append(_t("Anonymous webmail client"))
@@ -177,7 +177,7 @@ class SummaryBarRenderer {
            .append(_t("I2P Internals"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table><tr><td>\n" +
+                   "<table id=\"sb_internals\"><tr><td>\n" +
 
                    "<a href=\"/tunnels\" target=\"_top\" title=\"")
            .append(_t("View existing tunnels and tunnel build status"))
@@ -259,7 +259,7 @@ class SummaryBarRenderer {
            .append(_t("General"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table><tr>" +
+                   "<table id=\"sb_localid\"><tr>" +
                    "<td align=\"left\"><b title=\"")
            .append(_t("Your Local Identity is your unique I2P router identity, similar to an ip address but tailored to I2P. "))
            .append(_t("Never disclose this to anyone, as it can reveal your real world ip."))
@@ -277,7 +277,7 @@ class SummaryBarRenderer {
            .append(_t("show"))
            .append("</a></td></tr>\n" +
 
-                   "</table><table>" + // fix for some rows with a big left side and some with a big right side
+                   "</table><table id=\"sb_version\">" + // fix for some rows with a big left side and some with a big right side
                    "<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
@@ -288,7 +288,7 @@ class SummaryBarRenderer {
            .append(_helper.getVersion())
            .append("</td></tr>\n" +
 
-                   "</table><table>" + // fix for some rows with a big left side and some with a big right side
+                   "</table><table id=\"sb_uptime\">" + // fix for some rows with a big left side and some with a big right side
                    "<tr title=\"")
            .append(_t("How long we've been running for this session"))
            .append("\">" +
@@ -304,7 +304,7 @@ class SummaryBarRenderer {
     public String renderShortGeneralHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<table>" +
+        buf.append("<table id=\"sb_shortgeneral\">" +
                    "<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
@@ -387,7 +387,7 @@ class SummaryBarRenderer {
            .append(_t("Peers"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table>\n" +
+                   "<table id=\"sb_peers\">\n" +
 
                    "<tr title=\"")
            .append(_t("Peers we've been talking to in the last few minutes/last hour"))
@@ -456,7 +456,7 @@ class SummaryBarRenderer {
            .append("\" target=\"_top\">")
            .append(_t("Bandwidth in/out"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table id=\"bandwidth\">\n" +
+                   "<table id=\"sb_bandwidth\">\n" +
 
                    "<tr><td align=\"left\"><b>")
            .append(DataHelper.formatDuration2(3 * 1000))   // lie and say 3 sec since 1 sec would appear as 1000 ms
@@ -500,7 +500,7 @@ class SummaryBarRenderer {
            .append("\">")
            .append(_t("Tunnels"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table>\n" +
+                   "<table id=\"sb_tunnels\">\n" +
 
                    "<tr title=\"")
            .append(_t("Used for building and testing tunnels, and communicating with floodfill peers"))
@@ -550,7 +550,7 @@ class SummaryBarRenderer {
            .append("\">")
            .append(_t("Congestion"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table>\n" +
+                   "<table id=\"sb_queue\">\n" +
 
                    "<tr title=\"")
            .append(_t("Indicates router performance"))

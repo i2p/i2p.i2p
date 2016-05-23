@@ -47,7 +47,7 @@ public class JobQueueHelper extends HelperBase {
         int numRunners = _context.jobQueue().getJobs(readyJobs, timedJobs, activeJobs, justFinishedJobs);
         
         StringBuilder buf = new StringBuilder(32*1024);
-        buf.append("<div class=\"wideload\"><div class=\"joblog\">")
+        buf.append("<div class=\"joblog\">")
            .append("<h3 id=\"jobrunners\">")
            .append(_t("Job runners")).append(": ").append(numRunners)
            .append("</h3>\n");
@@ -148,7 +148,7 @@ public class JobQueueHelper extends HelperBase {
      *  @since 0.8.9
      */
     private void getJobStats(StringBuilder buf) { 
-        buf.append("<table id=\"jobstats\">\n" +
+        buf.append("<div class=\"widescroll\"><table id=\"jobstats\">\n" +
                    "<tr><th>").append(_t("Job")).append("</th><th>").append(_t("Runs")).append("</th>" +
                    "<th>").append(_t("Dropped")).append("</th>" +
                    "<th>").append(_t("Time")).append("</th><th><i>").append(_t("Avg")).append("</i></th><th><i>")

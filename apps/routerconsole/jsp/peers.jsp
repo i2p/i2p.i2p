@@ -11,7 +11,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Network Peers")%></h1>
-<div class="main" id="main">
+<div class="main" id="peers">
  <jsp:useBean class="net.i2p.router.web.PeerHelper" id="peerHelper" scope="request" />
  <jsp:setProperty name="peerHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% peerHelper.storeWriter(out); %>

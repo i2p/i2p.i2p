@@ -12,7 +12,7 @@
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Update Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_update">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHandler" id="formhandler" scope="request" />

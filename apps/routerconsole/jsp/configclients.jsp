@@ -21,7 +21,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter(\"edit\")%>" />
 <h1><%=intl._t("I2P Client Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_clients">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />

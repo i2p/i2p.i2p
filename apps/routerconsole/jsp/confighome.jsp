@@ -18,7 +18,7 @@ input.default {
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Home Page Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_homepage">
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigHomeHandler" id="formhandler" scope="request" />

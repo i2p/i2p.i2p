@@ -16,7 +16,7 @@
 <jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h1><%=intl._t("I2P Advanced Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_advanced">
 
  <%@include file="confignav.jsi" %>
 
