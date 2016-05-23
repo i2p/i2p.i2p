@@ -167,7 +167,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <td>
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <%=intl._t("Select xpi2p or su3 file")%>:&nbsp;
-<input type="file" name="pluginFile" >
+<input type="file" name="pluginFile" accept=".xpi2p,.su3" >
 </td>
 <td class="optionsave" align="right">
 <input type="submit" name="action" class="download" value="<%=intl._t("Install Plugin from File")%>" />

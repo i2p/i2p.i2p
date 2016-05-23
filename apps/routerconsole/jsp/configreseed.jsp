@@ -54,7 +54,7 @@
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
   <td>
 <%=intl._t("Select zip or su3 file")%>:
-<input name="file" type="file" value="" />
+<input name="file" type="file" accept=".zip,.su3" value="" />
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="download" value="<%=intl._t("Reseed from file")%>" />
