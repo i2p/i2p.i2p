@@ -6,6 +6,7 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config stats")%>
+<noscript><style>.script {display: none;}</style></noscript>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 <script type="text/javascript">
@@ -73,7 +74,7 @@ function toggleAll(category)
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <h3 class="ptitle"><%=intl._t("Configure I2P Stat Collection")%></h3>
+ <h3 class="ptitle"><%=intl._t("Configure I2P Stat Collection")%>&nbsp;<a class="script" title="<%=intl._t("Toggle full stat collection and all graphing options")%>" href="javascript:void(null);" onclick="toggleAll('*')">[<%=intl._t("toggle all")%>]</a></h3>
  <p id="enablefullstats"><b><%=intl._t("Enable full stats?")%></b>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
@@ -84,13 +85,13 @@ function toggleAll(category)
   boolean shouldShowLog = statshelper.shouldShowLog();
   if (shouldShowLog) {
 
-%><%=intl._t("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
+%><%=intl._t("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" >
 Warning - Log with care, stat file grows without limit.<br>
 <%
 
   }  // shouldShowLog
 
-%><b><%=intl._t("Filter")%>:</b> (<a href="javascript:void(null);" onclick="toggleAll('*')"><%=intl._t("toggle all")%></a>)<br></p>
+%></p>
  <div class="wideload">
  <table id="configstats">
  <% while (statshelper.hasMoreStats()) {
@@ -98,7 +99,7 @@ Warning - Log with care, stat file grows without limit.<br>
  <tr>
      <th align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
      <b><%=intl._t(statshelper.getCurrentGroupName())%></b>
-     (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._t("toggle all")%></a>)
+     <a class="script" title="<%=intl._t("Toggle section graphing options")%>" href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">[<%=intl._t("toggle all")%>]</a>
      </th></tr>
  <tr class="tablefooter">
 <%
