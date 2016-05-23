@@ -22,27 +22,21 @@
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
- <h3 id="iptransport" class="tabletitle"><%=intl._t("IP and Transport Configuration")%></h3>
+ <h3 id="iptransport" class="tabletitle"><%=intl._t("IP and Transport Configuration")%>&nbsp;<a title="<%=intl._t("Help with router configuration")%>" href="/help#configurationhelp">[<%=intl._t("Configuration Help")%>]</a></h3>
  <table id="netconfig" class="configtable">
  <tr>
   <td class="infohelp">
- <b><%=intl._t("The default settings will work for most people.")%>
- <a href="#chelp"><%=intl._t("There is help below.")%></a></b>
+ <b><%=intl._t("The default settings will work for most people.")%></b> 
  <%=intl._t("Changing these settings will restart your router.")%>
   </td>
  </tr>
  <tr>
-  <td class="infowarn">
-   <b><%=intl._t("Do not reveal your port numbers to anyone as they can be used to discover your ip address.")%></b>
-  </td>
- </tr>
- <tr>
-  <th id="upnpconfig"><%=intl._t("UPnP Configuration")%></th>
+  <th id="upnpconfig"><%=intl._t("UPnP Configuration")%>&nbsp;<a href="peers#upnp">[<%=intl._t("UPnP Status")%>]</a></th>
  </tr>
  <tr>
   <td>
     <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> >
-    <%=intl._t("Enable UPnP to open firewall ports")%> - <a href="peers#upnp"><%=intl._t("UPnP status")%></a>
+    <%=intl._t("Enable UPnP to open firewall ports")%>
   </td>
  </tr>
  <tr>
@@ -105,6 +99,11 @@
  </tr>
  <tr>
   <th id="udpconfig"><%=intl._t("UDP Configuration")%></th>
+ </tr>
+ <tr>
+  <td class="infowarn">
+   <b><%=intl._t("Do not reveal your port numbers to anyone as they can be used to discover your ip address.")%></b>
+  </td>
  </tr>
  <tr>
   <td>

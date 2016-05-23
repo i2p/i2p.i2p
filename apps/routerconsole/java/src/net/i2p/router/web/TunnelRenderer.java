@@ -33,7 +33,7 @@ class TunnelRenderer {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<h3 class=\"tabletitle\" id=\"exploratorytunnels\"><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels") + " (<a href=\"/configtunnels#exploratory\">" + _t("configure") + "</a>)</h3>\n");
+        out.write("<h3 class=\"tabletitle\" id=\"exploratorytunnels\"><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels") + " <a href=\"/configtunnels#exploratory\" title=\"" + _t("Configure tunnels") + "\">[" + _t("configure") + "]</a></h3>\n");
         renderPool(out, _context.tunnelManager().getInboundExploratoryPool(), _context.tunnelManager().getOutboundExploratoryPool());
         
         List<Hash> destinations = null;
@@ -57,7 +57,7 @@ class TunnelRenderer {
             out.write("<h3 class=\"tabletitle\"><a name=\"" + client.toBase64().substring(0,4)
                       + "\" ></a>" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(name)));
             if (isLocal)
-                out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _t("configure") + "</a>)</h3>\n");
+                out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
             else
                 out.write(" (" + _t("dead") + ")</h3>\n");
             renderPool(out, in, outPool);

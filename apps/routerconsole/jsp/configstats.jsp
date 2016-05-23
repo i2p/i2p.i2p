@@ -110,7 +110,7 @@ Warning - Log with care, stat file grows without limit.<br>
 
   }  // shouldShowLog
 
-%>    <td align="center"><b><%=intl._t("Graph")%></b></td>
+%>    <td align="center"><b title="<%=intl._t("Select stats for visualization on /graphs")%>"><%=intl._t("Graph")%></b></td>
     <td></td></tr>
         <%
      } // end iterating over required groups for the current stat %>

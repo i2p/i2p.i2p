@@ -768,7 +768,7 @@ class SybilRenderer {
         } else {
             buf.append("<th colspan=\"2\"><b>" + _t("Router") + ":</b> <code>").append(hash).append("</code>\n");
             if (!full) {
-                buf.append("</th><th><a class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a></th><th>");
+                buf.append("</th><th><a title=\"View extended router info\" class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >[").append(_t("Full entry")).append("]</a></th><th>");
             }
             buf.append("<img src=\"/imagegen/id?s=32&amp;c=" + hash.replace("=", "%3d") + "\" height=\"32\" width=\"32\"> ");
             buf.append("</th></tr>\n");

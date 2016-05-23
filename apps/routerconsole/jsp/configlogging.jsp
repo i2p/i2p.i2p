@@ -22,7 +22,7 @@
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
- <h3 class="tabletitle"><%=intl._t("Configure I2P Logging Options")%></h3>
+ <h3 class="tabletitle"><%=intl._t("Configure I2P Logging Options")%>&nbsp;<a title="<%=intl._t("View Router Logs")%>" href="/logs">[<%=intl._t("View Logs")%>]</a></h3>
       <table id="loggingoptions" border="0" cellspacing="5">
         <tr><td class="mediumtags" align="right"><b><%=intl._t("Log file")%>:</b></td>
           <td><input type="text" name="logfilename" size="40" disabled="disabled" title="<%=intl._t("Edit {0} to change", "logger.config")%>" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" >

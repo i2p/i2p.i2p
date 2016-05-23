@@ -97,7 +97,7 @@
    if (homehelper.shouldShowSearch()) {
 %>
   <div class="search">
-    <form action="/search.jsp" method="POST">
+    <form action="/search.jsp" target="_blank" method="POST">
       <table class="search"><tr><td align="right">
         <input size="40" type="text" class="search" name="query" />
       </td><td align="left">

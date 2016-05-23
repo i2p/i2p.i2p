@@ -25,7 +25,7 @@
  <input type="hidden" name="action" value="blah" >
  <input type="hidden" name="ratesOnly" value="1" >
 
- <h3 id="bwlimiter" class="tabletitle"><%=intl._t("Bandwidth limiter")%></h3>
+ <h3 id="bwlimiter" class="tabletitle"><%=intl._t("Bandwidth Limiter")%>&nbsp;<a href="confignet">[<%=intl._t("Advanced Network Configuration")%>]</a></h3>
  <table id="bandwidthconfig" class="configtable">
  <tr><td class="infohelp" colspan="2">
  <b><%=intl._t("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b>
@@ -76,9 +76,6 @@
         out.print(intl._t("The higher the share bandwidth the more you improve your anonymity and help the network."));
     }
  %></td></tr>
-  <tr><td colspan="2">
-   <a href="confignet"><%=intl._t("Advanced network configuration page")%></a>
-  </td></tr>
   <tr><td class="optionsave" colspan="2">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" class="accept" name="save" value="<%=intl._t("Save changes")%>" >

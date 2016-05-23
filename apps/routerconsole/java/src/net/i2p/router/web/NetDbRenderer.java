@@ -152,7 +152,9 @@ class NetDbRenderer {
             buf.append("<table id=\"leasesetsummary\">\n");
         }
         buf.append("<tr><th colspan=\"3\">Leaseset Summary</th>")
-           .append("<th><a href=\"/configadvanced\">Configure Floodfill Participation</a></th></tr>\n")
+           .append("<th><a href=\"/configadvanced\" title=\"").append(_t("Manually Configure Floodfill Participation")).append("\">[")
+           .append(_t("Configure Floodfill Participation"))
+           .append("]</a></th></tr>\n")
            .append("<tr><td><b>Total Leasesets:</b></td><td colspan=\"3\">").append(leases.size()).append("</td></tr>\n");
         if (debug) {
             buf.append("<tr><td><b>Published (RAP) Leasesets:</b></td><td colspan=\"3\">").append(netdb.getKnownLeaseSets()).append("</td></tr>\n")
@@ -217,7 +219,8 @@ class NetDbRenderer {
                 buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
                 String host = _context.namingService().reverseLookup(dest);
                 if (host == null) {
-                    buf.append("<td>").append("<a href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
+                    buf.append("<td>").append("<a title=\"").append(_t("Add to addressbook"))
+                       .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                        .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
                 }
             } else {
@@ -230,7 +233,8 @@ class NetDbRenderer {
                     buf.append("<code>").append(dest.toBase64().substring(0, 6)).append("</code></th>")
                        .append("</tr>\n<tr>")
                        .append("<td><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n")
-                       .append("<td><a href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
+                       .append("<td><a title=\"").append(_t("Add to addressbook"))
+                       .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                        .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
                 }
             }
@@ -478,7 +482,9 @@ class NetDbRenderer {
         } else {
             buf.append("<b>" + _t("Peer info for") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
             if (!full) {
-                buf.append("<a class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>");
+                buf.append("<a title=\"").append(_t("View extended router info"))
+                   .append("\" class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6))
+                   .append("\" >[").append(_t("Full entry")).append("]</a>");
             }
         }
         buf.append("</th></tr>\n<tr>");

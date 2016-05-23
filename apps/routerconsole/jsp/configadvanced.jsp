@@ -56,7 +56,7 @@
  </table>
 </form>
 
-<h3 id="advancedconfig" class="tabletitle"><%=intl._t("Advanced I2P Configuration")%></h3><b>
+<h3 id="advancedconfig" class="tabletitle"><%=intl._t("Advanced I2P Configuration")%>&nbsp;<a title="Help with additional configuration settings" href="/help#advancedsettings">[Additional Options]</a></h3><b>
 <% if (advancedhelper.isAdvanced()) { %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >

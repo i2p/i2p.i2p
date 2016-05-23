@@ -820,7 +820,7 @@ public class SummaryHelper extends HelperBase {
     public String getFirewallAndReseedStatus() {
         StringBuilder buf = new StringBuilder(256);
         if (showFirewallWarning()) {
-            buf.append("<h4 id=\"sb_warning\"><a href=\"/confignet\" target=\"_top\" title=\"")
+            buf.append("<h4 id=\"sb_warning\"><a href=\"/help#configurationhelp\" target=\"_top\" title=\"")
                .append(_t("Help with firewall configuration"))
                .append("\">")
                .append(_t("Check network connection and NAT/firewall"))

@@ -68,12 +68,10 @@
     <%=intl._t("You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat.")%></p>
  <% } %>
 
- <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%></h3>
+ <h3 class="ptitle" id="servicedebug"><%=intl._t("Debugging")%>&nbsp;<a href="/jobs">[<%=intl._t("View the job queue")%>]</a></h3>
 <% if (System.getProperty("wrapper.version") != null) { %>
  <p class="infohelp">
     <%=intl._t("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%></p>
- <p><a href="/jobs">
-    <%=intl._t("View the job queue")%></a>
  <hr>
 <% } %>
  <div class="formaction" id="dumpthreads">

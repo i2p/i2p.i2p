@@ -64,7 +64,7 @@
 </td></tr>
 </tbody></table>
 
-<h3 class="tabletitle"><%=intl._t("Router Logs")%> (<a href="configlogging"><%=intl._t("configure")%></a>)</h3>
+<h3 class="tabletitle"><%=intl._t("Router Logs")%>&nbsp;<a title="<%=intl._t("Configure router logging options")%>" href="configlogging">[<%=intl._t("Configure")%>]</a></h3>
 <table id="routerlogs" class="logtable"><tbody>
 <tr><td>
  <jsp:getProperty name="logsHelper" property="logs" />
