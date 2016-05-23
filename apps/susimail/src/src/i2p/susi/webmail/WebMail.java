@@ -637,7 +637,7 @@ public class WebMail extends HttpServlet
 			}
 			if( prepareAttachment ) {
 				if( html ) {
-					out.println( "<hr><div id=\"attached\"><p class=\"mailbody\">" );
+					out.println( "<hr><div class=\"attached\">" );
 					String type = mailPart.type;
 					if (type != null && type.startsWith("image/")) {
 						// we at least show images safely...
@@ -658,7 +658,7 @@ public class WebMail extends HttpServlet
 							 mailPart.hashCode() + "\">" + _t("Download attachment {0}", ident) + "</a>" +
 							 " (" + _t("File is packed into a zipfile for security reasons.") + ')');
 					}
-					out.println( "</p></div>" );
+					out.println( "</div>" );
 				}
 				else {
 					out.println( _t("Attachment ({0}).", ident) );

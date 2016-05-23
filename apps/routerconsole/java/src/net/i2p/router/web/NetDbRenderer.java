@@ -200,7 +200,7 @@ class NetDbRenderer {
           for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
-            buf.append("<table id=\"leaseset\">\n")
+            buf.append("<table class=\"leaseset\">\n")
                .append("<tr><th><b>").append(_t("LeaseSet")).append(":</b> ").append(key.toBase64()).append("</th>");
             if (_context.clientManager().isLocal(dest)) {
                 buf.append("<th><b><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
@@ -471,14 +471,14 @@ class NetDbRenderer {
      */
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
-        buf.append("<table id=\"netdbentry\">")
+        buf.append("<table class=\"netdbentry\">")
            .append("<tr><th colspan=\"2\"><a name=\"").append(hash.substring(0, 6)).append("\" ></a>");
         if (isUs) {
             buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
         } else {
-            buf.append("<b>" + _t("Peer info for") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th id=\"viewfullentry\">");
+            buf.append("<b>" + _t("Peer info for") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
             if (!full) {
-                buf.append("<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>");
+                buf.append("<a class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_t("Full entry")).append("</a>");
             }
         }
         buf.append("</th></tr>\n<tr>");
