@@ -20,6 +20,7 @@
 <div id="sidebarhelp"><%@include file="help-sidebar.jsi" %></div>
 <div id="configurationhelp"><%@include file="help-configuration.jsi" %></div>
 <div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>
+<div id="advancedsettings"><%@include file="help-advancedsettings.jsi" %></div>
 <div id="legal"><%@include file="help-legal.jsi" %></div>
 <div id="changelog">
 <h2>Change Log</h2>
