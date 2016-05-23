@@ -35,7 +35,9 @@ class SummaryRenderer {
     private final Log _log;
     private final SummaryListener _listener;
     private final I2PAppContext _context;
-    private static final Color RESTART_BAR_COLOR = new Color(255, 144, 0, 224);
+    private static final Color AREA_COLOR = new Color(100, 160, 200, 240);
+    private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
+    private static final Color RESTART_BAR_COLOR = new Color(210, 10, 10, 200);
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -184,9 +186,9 @@ class SummaryRenderer {
 
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
             if (descr.length() > 0) {
-                def.area(plotName, Color.BLUE, descr + "\\r");
+                def.area(plotName, AREA_COLOR, descr + "\\r");
             } else {
-                def.area(plotName, Color.BLUE);
+                def.area(plotName, AREA_COLOR);
             }
             if (!hideLegend) {
                 def.gprint(plotName, SummaryListener.CF, _t("avg") + ": %.2f %s");
@@ -200,7 +202,7 @@ class SummaryRenderer {
                 String path2 = lsnr2.getData().getPath();
                 String descr2 = _t(lsnr2.getRate().getRateStat().getDescription());
                 def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendName());
-                def.line(plotName2, Color.RED, descr2 + "\\r", 3);
+                def.line(plotName2, LINE_COLOR, descr2 + "\\r", 3);
                 if (!hideLegend) {
                     def.gprint(plotName2, SummaryListener.CF, _t("avg") + ": %.2f %s");
                     def.gprint(plotName2, "MAX", ' ' + _t("max") + ": %.2f %S");
@@ -227,8 +229,8 @@ class SummaryRenderer {
             // (but with the same coordinates, so the values may look pretty skewed)
                 def.datasource(dsNames[0], path, dsNames[0], "AVERAGE", "MEMORY");
                 def.datasource(dsNames[1], path, dsNames[1], "AVERAGE", "MEMORY");
-                def.area(dsNames[0], Color.BLUE, _listener.getRate().getRateStat().getDescription());
-                def.line(dsNames[1], Color.RED, "Events per period");
+                def.area(dsNames[0], AREA_COLOR, _listener.getRate().getRateStat().getDescription());
+                def.line(dsNames[1], LINE_COLOR, "Events per period");
             */
             if (hideLegend) 
                 def.setNoLegend(true);

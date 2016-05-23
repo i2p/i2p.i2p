@@ -9,8 +9,8 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %><h1>Proof of Ownership</h1>
-<div class="main" id="main">
+<div class="main" id="main"><p id="proof">
 <jsp:useBean class="net.i2p.router.web.ProofHelper" id="proofHelper" scope="request" />
 <jsp:setProperty name="proofHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <textarea cols="70" rows="15" wrap="off" readonly="readonly" spellcheck="false"><jsp:getProperty name="proofHelper" property="proof" /></textarea>
-</div></body></html>
+</p></div></body></html>

@@ -9,15 +9,23 @@ public class ConfigUIHelper extends HelperBase {
 
     public String getSettings() {
         StringBuilder buf = new StringBuilder(512);
+        buf.append("<div id=\"availablethemes\">");
         String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         Set<String> themes = themeSet();
         for (String theme : themes) {
-            buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
+            buf.append("<div class=\"themechoice\">")
+               .append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
                 buf.append(CHECKED);
-            buf.append("value=\"").append(theme).append("\">").append(_t(theme)).append("<br>\n");
+            buf.append("value=\"").append(theme).append("\">")
+               .append("<object height=\"48\" width=\"48\" data=\"/themes/console/").append(theme).append("/images/thumbnail.png\">")
+               .append("<img height=\"48\" width=\"48\" alt=\"\" src=\"/themes/console/images/thumbnail.png\">")
+               .append("</object><br>")
+               .append("<div class=\"themelabel\">").append(_t(theme)).append("</div>")
+               .append("</div>\n");
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
+        buf.append("</div><div id=\"themeoptions\">");
         buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
             buf.append(CHECKED);
@@ -35,7 +43,7 @@ public class ConfigUIHelper extends HelperBase {
             buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Force the mobile console to be used"))
-           .append("<br>\n");
+           .append("</div>\n");
         return buf.toString();
     }
 
@@ -140,11 +148,12 @@ public class ConfigUIHelper extends HelperBase {
             if (lang.equals("xx") && !isAdvanced())
                 continue;
             // we use "lang" so it is set automagically in CSSHelper
-            buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
+            buf.append("<div class=\"langselect\"><input type=\"radio\" class=\"optbox\" name=\"lang\" ");
             if (lang.equals(current))
                 buf.append(CHECKED);
             buf.append("value=\"").append(lang).append("\">")
-               .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\"> ");
+               .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\">")
+               .append("<div class=\"ui_lang\">");
             int under = lang.indexOf('_');
             String slang = (under > 0) ? lang.substring(0, under) : lang;
             buf.append(Messages.getDisplayLanguage(slang, langs[i][2], _context));
@@ -154,7 +163,7 @@ public class ConfigUIHelper extends HelperBase {
                    .append(Messages.getString(name, _context, Messages.COUNTRY_BUNDLE_NAME))
                    .append(')');
             }
-            buf.append("<br>\n");
+            buf.append("</div></div>\n");
         }
         return buf.toString();
     }
@@ -164,7 +173,7 @@ public class ConfigUIHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(512);
         ConsolePasswordManager mgr = new ConsolePasswordManager(_context);
         Map<String, String> userpw = mgr.getMD5(RouterConsoleRunner.PROP_CONSOLE_PW);
-        buf.append("<table>");
+        buf.append("<table id=\"consolepass\">");
         if (userpw.isEmpty()) {
             buf.append("<tr><td colspan=\"3\">");
             buf.append(_t("Add a user and password to enable."));
@@ -173,7 +182,7 @@ public class ConfigUIHelper extends HelperBase {
             buf.append("<tr><th>")
                .append(_t("Remove"))
                .append("</th><th>")
-               .append(_t("User Name"))
+               .append(_t("Username"))
                .append("</th><th>&nbsp;</th></tr>\n");
             for (String name : userpw.keySet()) {
                 buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
@@ -183,13 +192,13 @@ public class ConfigUIHelper extends HelperBase {
                    .append("</td></tr>\n");
             }
         }
-        buf.append("<tr><td align=\"center\"><b>")
-           .append(_t("Add")).append(":</b>" +
-                   "</td><td align=\"left\"><input type=\"text\" name=\"name\">" +
-                   "</td><td align=\"left\"><b>");
-        buf.append(_t("Password")).append(":</b> " +
-                   "<input type=\"password\" size=\"40\" name=\"nofilter_pw\"></td></tr>" +
-                   "</table>\n");
+        buf.append("<tr><td id=\"pw_adduser\" align=\"left\" colspan=\"3\"><b>")
+           .append("<b>").append(_t("Username")).append(":</b> ")
+           .append("<input type=\"text\" name=\"name\">")
+           .append("<b>").append(_t("Password")).append(":</b> ")
+           .append("<input type=\"password\" size=\"40\" name=\"nofilter_pw\">")
+           .append("</td></tr>")
+           .append("</table>\n");
         return buf.toString();
     }
 }

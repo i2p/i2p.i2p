@@ -24,10 +24,11 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Performance Graphs")%></h1>
-<div class="main" id="main">
- <div class="graphspanel">
+<div class="main" id="graphs">
  <div class="widepanel">
  <jsp:getProperty name="graphHelper" property="allMessages" />
+ <div class="graphspanel">
  <jsp:getProperty name="graphHelper" property="images" />
+ </div>
  <jsp:getProperty name="graphHelper" property="form" />
-</div></div></div></body></html>
+</div></div></body></html>

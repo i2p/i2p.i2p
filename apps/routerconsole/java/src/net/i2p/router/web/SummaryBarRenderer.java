@@ -139,7 +139,7 @@ class SummaryBarRenderer {
            .append(_t("I2P Services"))
            .append("</a></h3>\n" +
 
-                   "<hr class=\"b\"><table><tr><td>" +
+                   "<hr class=\"b\"><table id=\"services\"><tr><td>" +
 
                    "<a href=\"/susimail/susimail\" target=\"_blank\" title=\"")
            .append(_t("Anonymous webmail client"))
@@ -330,7 +330,7 @@ class SummaryBarRenderer {
     public String renderNetworkReachabilityHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
+        buf.append("<h4><a href=\"/help#confignet\" target=\"_top\" title=\"")
            .append(_t("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_t("Network"))
@@ -456,7 +456,7 @@ class SummaryBarRenderer {
            .append("\" target=\"_top\">")
            .append(_t("Bandwidth in/out"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table>\n" +
+                   "<table id=\"bandwidth\">\n" +
 
                    "<tr><td align=\"left\"><b>")
            .append(DataHelper.formatDuration2(3 * 1000))   // lie and say 3 sec since 1 sec would appear as 1000 ms

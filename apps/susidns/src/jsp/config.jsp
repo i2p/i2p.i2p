@@ -72,7 +72,7 @@
 <form method="POST" action="config">
 <div id="config">
 <input type="hidden" name="serial" value="${cfg.serial}" >
-<textarea name="config" rows="10" cols="80">${cfg.config}</textarea>
+<textarea name="config" rows="10" cols="80" spellcheck="false">${cfg.config}</textarea>
 </div>
 <div id="buttons">
 <input class="reload" type="submit" name="action" value="<%=intl._t("Reload")%>" >

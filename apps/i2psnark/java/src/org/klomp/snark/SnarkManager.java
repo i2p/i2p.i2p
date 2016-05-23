@@ -1014,7 +1014,7 @@ public class SnarkManager implements CompleteListener {
         if (theme != null) {
             if(!theme.equals(_config.getProperty(PROP_THEME))) {
                 _config.setProperty(PROP_THEME, theme);
-                addMessage(_t("{0} theme loaded, return to main i2psnark page to view.", theme));
+                addMessage(_t("{0} theme loaded.", theme));
                 changed = true;
             }
         }

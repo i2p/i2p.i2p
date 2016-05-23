@@ -916,7 +916,7 @@ public class Blocklist {
         Set<Integer> singles = new TreeSet<Integer>();
         singles.addAll(_singleIPBlocklist);
         if (!(singles.isEmpty() && _singleIPv6Blocklist.isEmpty())) {
-            out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
+            out.write("<table id=\"banneduntilrestart\"><tr><th align=\"center\" colspan=\"2\"><b>");
             out.write(_t("IPs Banned Until Restart"));
             out.write("</b></td></tr>");
             // first 0 - 127
@@ -953,7 +953,7 @@ public class Blocklist {
             out.write("</table>");
         }
         if (_blocklistSize > 0) {
-            out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
+            out.write("<table id=\"permabanned\"><tr><th align=\"center\" colspan=\"2\"><b>");
             out.write(_t("IPs Permanently Banned"));
             out.write("</b></th></tr><tr><td align=\"center\" width=\"50%\"><b>");
             out.write(_t("From"));

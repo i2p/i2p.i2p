@@ -21,4 +21,4 @@
 %>
  <jsp:setProperty name="profilesHelper" property="full" value="<%=request.getParameter(\"f\")%>" />
  <jsp:getProperty name="profilesHelper" property="summary" />
-<hr></div></div></body></html>
+</div></div></body></html>

@@ -210,25 +210,21 @@ public class ConfigNetHelper extends HelperBase {
             }
         }
         StringBuilder buf = new StringBuilder(128);
-        buf.append("<div class=\"indent\">");
         for (String addr : addrs) {
-            buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                       "<input type=\"checkbox\" class=\"optbox\" value=\"foo\" name=\"addr_");
+            buf.append("<input type=\"checkbox\" class=\"optbox\" value=\"foo\" name=\"addr_");
             buf.append(addr);
             buf.append('"');
             if (addrs.size() == 1 || configs.contains(addr))
                 buf.append(CHECKED);
             buf.append("> ");
             buf.append(addr);
-            buf.append("<br>");
+            buf.append("<br>\n");
         }
-        buf.append("\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         if (!addrs.isEmpty()) {
             buf.append(_t("Add host name or IP"))
                .append(": ");
         }
-        buf.append("<input name=\"udpHost1\" type=\"text\" size=\"16\" >" +
-                   "</div>");
+        buf.append("<input name=\"udpHost1\" type=\"text\" size=\"16\" >");
         return buf.toString();
     }
 
