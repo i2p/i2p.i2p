@@ -28,7 +28,7 @@ class SummaryBarRenderer {
     static final String ALL_SECTIONS[] =
         {"HelpAndFAQ", "I2PServices", "I2PInternals", "General", "ShortGeneral", "NetworkReachability",
         "UpdateStatus", "RestartStatus", "Peers", "FirewallAndReseedStatus", "Bandwidth", "Tunnels",
-        "Congestion", "TunnelStatus", "Destinations", "NewsHeadings" };
+        "Congestion", "TunnelStatus", "Destinations", "NewsHeadings", "Advanced" };
     static final Map<String, String> SECTION_NAMES;
 
     static {
@@ -49,6 +49,7 @@ class SummaryBarRenderer {
         aMap.put("TunnelStatus", "Tunnel Status");
         aMap.put("Destinations", "Local Tunnels");
         aMap.put("NewsHeadings", "News &amp; Updates");
+        aMap.put("Advanced", "Advanced");
         SECTION_NAMES = Collections.unmodifiableMap(aMap);
     }
 
@@ -88,6 +89,8 @@ class SummaryBarRenderer {
                 buf.append(renderI2PServicesHTML());
             else if ("I2PInternals".equals(section))
                 buf.append(renderI2PInternalsHTML());
+            else if ("Advanced".equals(section))
+                buf.append(renderAdvancedHTML());
             else if ("General".equals(section))
                 buf.append(renderGeneralHTML());
             else if ("ShortGeneral".equals(section))
@@ -223,13 +226,7 @@ class SummaryBarRenderer {
                .append("</a>\n");
         }
 
-        buf.append("<a href=\"/stats\" target=\"_top\" title=\"")
-           .append(_t("Textual router performance statistics"))
-           .append("\">")
-           .append(nbsp(_t("Stats")))
-           .append("</a>\n" +
-
-                   "<a href=\"/dns\" target=\"_top\" title=\"")
+        buf.append("<a href=\"/dns\" target=\"_top\" title=\"")
            .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
            .append(nbsp(_t("Addressbook")))
@@ -241,12 +238,74 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Hidden Services Manager")))
            .append("</a>\n");
 
-        if (_context.getBooleanProperty(HelperBase.PROP_ADVANCED))
-            buf.append("<a href=\"/debug\">Debug</a>\n");
+        buf.append("</td></tr></table>\n");
+        return buf.toString();
+    }
+
+    public String renderAdvancedHTML() {
+        StringBuilder buf = new StringBuilder(512);
+
+        buf.append("<h3 id=\"advanced\"><a title=\"")
+           .append(_t("Advanced Configuration"))
+           .append("\" href=\"/configadvanced\">")
+           .append(_t("Advanced"))
+           .append("</a></h3>\n")
+
+           .append("<hr class=\"b\"><table id=\"sb_advanced\"><tr><td>")
+
+           .append("<a title=\"")
+           .append(_t("Review active encryption certificates used in console"))
+           .append("\" href=\"certs\">")
+           .append(nbsp(_t("Certs")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("View full changelog"))
+           .append("\" href=\"viewhistory\" target=\"_blank\">")
+           .append(nbsp(_t("Changelog")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("View router debug information"))
+           .append("\" href=\"debug\">")
+           .append(nbsp(_t("Debug")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Review extended info about installed .jar and .war files"))
+           .append("\" href=\"jars\">")
+           .append(nbsp(_t("Jars")))
+           .append("</a>\n");
+
         File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
         if (javadoc.exists())
             buf.append("<a href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");
-        buf.append("</td></tr></table>\n");
+
+        buf.append("<a title=\"")
+           .append(_t("View active leasesets (debug mode)"))
+           .append("\" href=\"/netdb?l=2\">")
+           .append(nbsp(_t("Leasesets")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Signed proof of ownership of this router"))
+           .append("\" href=\"proof\">")
+           .append(nbsp(_t("Proof")))
+           .append("</a>\n")
+
+           .append("<a href=\"/stats\" target=\"_top\" title=\"")
+           .append(_t("Textual router performance statistics"))
+           .append("\">")
+           .append(nbsp(_t("Stats")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Review possible sybils in network database"))
+           .append("\" href=\"/netdb?f=3\">")
+           .append(nbsp(_t("Sybils")))
+           .append("</a>\n")
+
+           .append("</td></tr></table>");
         return buf.toString();
     }
 
