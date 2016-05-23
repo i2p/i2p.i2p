@@ -79,6 +79,7 @@ public class ConfigUIHelper extends HelperBase {
      *  Any language-specific flag added to the icon set must be
      *  added to the top-level build.xml for the updater.
      *  As of 0.9.12, ISO 639-2 three-letter codes are supported also.
+     *  Note: To avoid truncation, ensure language name is no longer than 17 chars.
      */
     private static final String langs[][] = {
         { "ar", "lang_ar", _x("Arabic"), null },
@@ -109,7 +110,7 @@ public class ConfigUIHelper extends HelperBase {
         { "vi", "vn", _x("Vietnamese"), null },
         { "zh", "cn", _x("Chinese"), null },
         { "zh_TW", "tw", _x("Chinese"), "Taiwan" },
-        { "xx", "a1", "Debug: Find untagged strings", null },
+        { "xx", "a1", "Untagged strings", null },
     };
 
 
