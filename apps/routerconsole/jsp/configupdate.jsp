@@ -26,7 +26,7 @@
  <% /* set hidden default */ %>
  <input type="submit" name="action" value="" style="display:none" >
     <% if (updatehelper.canInstall()) { %>
-      <h3 class="tabletitle"><%=intl._t("Check for I2P and news updates")%></h3>
+      <h3 class="tabletitle"><%=intl._t("Check for I2P and News Updates")%></h3>
       <table id="i2pupdates" class="configtable" border="0" cellspacing="5">
       <tr><td class="mediumtags" align="right"><b><%=intl._t("News &amp; I2P Updates")%>:</b></td>
      <% } else { %>
