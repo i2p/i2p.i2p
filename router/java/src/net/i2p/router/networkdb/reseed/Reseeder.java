@@ -500,6 +500,9 @@ public class Reseeder {
             }
             if (!isSNISupported()) {
                 try {
+                    URLList.remove(new URI("https://i2p.manas.ca:8443/"));
+                    URLList.remove(new URI("https://i2p-0.manas.ca:8443/"));
+                    URLList.remove(new URI("https://download.xxlspeed.com/"));
                     URLList.remove(new URI("https://netdb.i2p2.no/"));
                 } catch (URISyntaxException mue) {}
             }
