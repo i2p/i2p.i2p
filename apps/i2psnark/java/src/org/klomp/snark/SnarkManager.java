@@ -2147,7 +2147,7 @@ public class SnarkManager implements CompleteListener {
                 }
                 _magnets.remove(snark.getName());
                 removeMagnetStatus(snark.getInfoHash());
-                addMessage(_t("Metainfo received for {0}", snark.getName()));
+                //addMessage(_t("Metainfo received for {0}", snark.getName()));
                 addMessageNoEscape(_t("Starting up torrent {0}", linkify(snark)));
                 return name;
             } catch (IOException ioe) {
