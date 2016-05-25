@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P startup script\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:16+0000\n"
+"POT-Creation-Date: 2016-05-25 12:29+0000\n"
 "PO-Revision-Date: 2012-12-21 23:34+0000\n"
 "Last-Translator: kytv <killyourtv@mail.i2p>\n"
 "Language-Team: English \n"
@@ -18,180 +18,180 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: ../i2prouter:221
+#: ../i2prouter:224
 msgid "Failed to load the wrapper"
 msgstr ""
 
-#: ../i2prouter:978 ../i2prouter:1006 ../i2prouter:1080 ../i2prouter:1108
-#: ../i2prouter:1129
+#: ../i2prouter:989 ../i2prouter:1017 ../i2prouter:1091 ../i2prouter:1119
+#: ../i2prouter:1140
 #, sh-format
 msgid "$APP_LONG_NAME is already running."
 msgstr ""
 
-#: ../i2prouter:989
+#: ../i2prouter:1000
 #, sh-format
 msgid "Running $APP_LONG_NAME"
 msgstr ""
 
-#: ../i2prouter:1013
+#: ../i2prouter:1024
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME"
 msgstr ""
 
-#: ../i2prouter:1060
+#: ../i2prouter:1071
 #, sh-format
 msgid "WARNING: $APP_LONG_NAME may have failed to start."
 msgstr ""
 
-#: ../i2prouter:1074 ../i2prouter:1102 ../i2prouter:1308 ../i2prouter:1597
+#: ../i2prouter:1085 ../i2prouter:1113 ../i2prouter:1319 ../i2prouter:1608
 msgid "Must be root to perform this action."
 msgstr ""
 
-#: ../i2prouter:1118
+#: ../i2prouter:1129
 #, sh-format
 msgid "Starting $APP_LONG_NAME"
 msgstr ""
 
-#: ../i2prouter:1140
+#: ../i2prouter:1151
 #, sh-format
 msgid "Stopping $APP_LONG_NAME"
 msgstr ""
 
-#: ../i2prouter:1144 ../i2prouter:1212 ../i2prouter:1765
+#: ../i2prouter:1155 ../i2prouter:1223 ../i2prouter:1776
 #, sh-format
 msgid "$APP_LONG_NAME was not running."
 msgstr ""
 
-#: ../i2prouter:1157 ../i2prouter:1165 ../i2prouter:1227 ../i2prouter:1235
+#: ../i2prouter:1168 ../i2prouter:1176 ../i2prouter:1238 ../i2prouter:1246
 #, sh-format
 msgid "Unable to stop $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1183
+#: ../i2prouter:1194
 #, sh-format
 msgid "Waiting for $APP_LONG_NAME to exit"
 msgstr ""
 
-#: ../i2prouter:1197
+#: ../i2prouter:1208
 #, sh-format
 msgid "Failed to stop $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1200
+#: ../i2prouter:1211
 #, sh-format
 msgid "Stopped $APP_LONG_NAME."
 msgstr ""
 
-#: ../i2prouter:1208
+#: ../i2prouter:1219
 #, sh-format
 msgid "Stopping $APP_LONG_NAME gracefully"
 msgstr ""
 
-#: ../i2prouter:1254
+#: ../i2prouter:1265
 #, sh-format
 msgid "$APP_LONG_NAME is not running."
 msgstr ""
 
-#: ../i2prouter:1259
+#: ../i2prouter:1270
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid"
 msgstr ""
 
-#: ../i2prouter:1262
+#: ../i2prouter:1273
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
 msgstr ""
 
-#: ../i2prouter:1315 ../i2prouter:1327 ../i2prouter:1346 ../i2prouter:1363
-#: ../i2prouter:1430 ../i2prouter:1450 ../i2prouter:1464 ../i2prouter:1478
-#: ../i2prouter:1506 ../i2prouter:1544 ../i2prouter:1579
+#: ../i2prouter:1326 ../i2prouter:1338 ../i2prouter:1357 ../i2prouter:1374
+#: ../i2prouter:1441 ../i2prouter:1461 ../i2prouter:1475 ../i2prouter:1489
+#: ../i2prouter:1517 ../i2prouter:1555 ../i2prouter:1590
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is already installed."
 msgstr ""
 
-#: ../i2prouter:1318 ../i2prouter:1333 ../i2prouter:1435 ../i2prouter:1467
-#: ../i2prouter:1481 ../i2prouter:1495 ../i2prouter:1509 ../i2prouter:1547
-#: ../i2prouter:1582
+#: ../i2prouter:1329 ../i2prouter:1344 ../i2prouter:1446 ../i2prouter:1478
+#: ../i2prouter:1492 ../i2prouter:1506 ../i2prouter:1520 ../i2prouter:1558
+#: ../i2prouter:1593
 #, sh-format
 msgid "Installing the $APP_LONG_NAME daemon"
 msgstr ""
 
-#: ../i2prouter:1589
+#: ../i2prouter:1600
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
 msgstr ""
 
-#: ../i2prouter:1605 ../i2prouter:1618 ../i2prouter:1632 ../i2prouter:1641
-#: ../i2prouter:1651 ../i2prouter:1675 ../i2prouter:1688 ../i2prouter:1700
-#: ../i2prouter:1718 ../i2prouter:1731 ../i2prouter:1745
+#: ../i2prouter:1616 ../i2prouter:1629 ../i2prouter:1643 ../i2prouter:1652
+#: ../i2prouter:1662 ../i2prouter:1686 ../i2prouter:1699 ../i2prouter:1711
+#: ../i2prouter:1729 ../i2prouter:1742 ../i2prouter:1756
 #, sh-format
 msgid "Removing $APP_LONG_NAME daemon"
 msgstr ""
 
-#: ../i2prouter:1611 ../i2prouter:1626 ../i2prouter:1635 ../i2prouter:1645
-#: ../i2prouter:1656 ../i2prouter:1669 ../i2prouter:1681 ../i2prouter:1694
-#: ../i2prouter:1712 ../i2prouter:1725 ../i2prouter:1739 ../i2prouter:1750
+#: ../i2prouter:1622 ../i2prouter:1637 ../i2prouter:1646 ../i2prouter:1656
+#: ../i2prouter:1667 ../i2prouter:1680 ../i2prouter:1692 ../i2prouter:1705
+#: ../i2prouter:1723 ../i2prouter:1736 ../i2prouter:1750 ../i2prouter:1761
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is not currently installed."
 msgstr ""
 
-#: ../i2prouter:1754
+#: ../i2prouter:1765
 #, sh-format
 msgid "Remove not currently supported for $DIST_OS"
 msgstr ""
 
-#: ../i2prouter:1841
+#: ../i2prouter:1852
 msgid "Commands:"
 msgstr ""
 
-#: ../i2prouter:1842
+#: ../i2prouter:1853
 msgid "Launch in the current console."
 msgstr ""
 
-#: ../i2prouter:1843
+#: ../i2prouter:1854
 msgid "Start in the background as a daemon process."
 msgstr ""
 
-#: ../i2prouter:1844
+#: ../i2prouter:1855
 msgid "Stop if running as a daemon or in another console."
 msgstr ""
 
-#: ../i2prouter:1845
+#: ../i2prouter:1856
 msgid "Stop gracefully, may take up to 11 minutes."
 msgstr ""
 
-#: ../i2prouter:1846
+#: ../i2prouter:1857
 msgid "Stop if running and then start."
 msgstr ""
 
-#: ../i2prouter:1847
+#: ../i2prouter:1858
 msgid "Restart only if already running."
 msgstr ""
 
-#: ../i2prouter:1848
+#: ../i2prouter:1859
 msgid "Query the current status."
 msgstr ""
 
-#: ../i2prouter:1849
+#: ../i2prouter:1860
 msgid "Install to start automatically when system boots."
 msgstr ""
 
-#: ../i2prouter:1850
+#: ../i2prouter:1861
 msgid "Uninstall."
 msgstr ""
 
-#: ../i2prouter:1851
+#: ../i2prouter:1862
 msgid "Request a Java thread dump if running."
 msgstr ""
 
-#: ../i2prouter:1864
+#: ../i2prouter:1875
 msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 msgstr ""
 
-#: ../i2prouter:1869
+#: ../i2prouter:1880
 msgid "Running I2P as the root user is *not* recommended."
 msgstr ""
 
-#: ../i2prouter:1872
+#: ../i2prouter:1883
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 msgstr ""
