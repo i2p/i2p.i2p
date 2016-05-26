@@ -39,20 +39,21 @@ Generate files to upload
 
 - export TZ=UTC
 - cd i2p.i2p.foobar
+- copy debian-alt/(series)/changelog to debian/
 - edit debian/changelog to add the release at the top
   * version MUST be 0.9.XX-1ubuntu1
     next version for fixes would be 0.9.XX-2ubunutu1
-  * series MUST be trusty
+  * series MUST be trusty (or precise)
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
     (or add -kkeyid argument to debuild, which you must do
      if you want to sign with a subkey)
     run gpg -K to list your private keys
-- edit debian/control to uncomment libservice-wrapper-java line
 - ant debian-release-tarball
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
   and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
+- cp debian-alt/(series)/(other files besides changelog) to ../i2p-0.9.XX-0-xxxxxxxx/debian/
 - cd ../i2p-0.9.XX-0-xxxxxxxx/
 - Build the *1ubuntu1* files:
   If you have NOT done a successful dput for this release yet:
