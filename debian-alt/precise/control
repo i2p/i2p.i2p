@@ -4,7 +4,7 @@ Section: net
 Standards-Version: 3.9.6
 Priority: optional
 Bugs: mailto:zzz@i2pmail.org
-Homepage: https://geti2p.net
+Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
@@ -13,9 +13,11 @@ Build-Depends: debhelper (>= 7.0.50~)
 # Ant requires java 6 tools.jar:
 # Unable to locate tools.jar. Expected to find it in /usr/lib/jvm/java-6-openjdk-amd64/lib/tools.jar
  ,openjdk-6-jdk
+ ,glassfish-javaee
  ,dh-apparmor
  ,gettext
- ,libgmp3-dev
+ ,libgetopt-java
+ ,libgmp-dev (>= 2:5.0.2)
  ,libservice-wrapper-java
  ,hardening-wrapper
  ,po-debconf
@@ -45,7 +47,7 @@ Architecture: any
 Section: java
 Priority: optional
 Depends: ${shlibs:Depends}, i2p-router
-Homepage: http://www.i2p2.de/jbigi
+Homepage: https://geti2p.net/
 Description: Java Big Integer library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .
@@ -72,7 +74,12 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-8-jre-headless | openjdk-7-jre-headless | java8-runtime-headless | java7-runtime-headless, libecj-java
+ openjdk-8-jre-headless | openjdk-7-jre-headless | java8-runtime-headless | java7-runtime-headless,
+ libecj-java,
+ geoip-database,
+ gettext-base,
+ libgetopt-java,
+ glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
