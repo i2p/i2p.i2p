@@ -45,13 +45,13 @@ if [ -z $BITS ]; then
     exit
   fi
 
-  printf "\aBITS variable not set, $BITS bit system detected\n\a" >&2
+  printf "BITS variable not set, $BITS bit system detected\n" >&2
 fi
 
 
 if [ -z $CC ]; then
   export CC="gcc"
-  printf "\aCC variable not set, defaulting to $CC\n\a" >&2
+  printf "CC variable not set, defaulting to $CC\n" >&2
 fi
 
 
@@ -64,7 +64,7 @@ elif [ $BITS -eq 64 ]; then
   export CFLAGS="-m64 -mtune=generic"
   export LDFLAGS="-m64"
 else
-  printf "\aBITS value \"$BITS\" not valid, please select 32 or 64\n\a" >&2
+  printf "BITS value \"$BITS\" not valid, please select 32 or 64\n" >&2
   exit 1
 fi
 
