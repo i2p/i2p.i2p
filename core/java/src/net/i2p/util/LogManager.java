@@ -163,7 +163,7 @@ public class LogManager implements Flushable {
         // yeah, this doesn't always work, _writer should be volatile
         if (_writer != null)
             return;
-        _writer = new LogWriter(this);
+        _writer = new FileLogWriter(this);
         _writer.setFlushInterval(_flushInterval * 1000);
         // if you enable logging in I2PThread again, you MUST change this back to Thread
         Thread t = new I2PThread(_writer, "LogWriter");
