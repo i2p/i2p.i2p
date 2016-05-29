@@ -19,6 +19,7 @@ import java.io.Writer;
  * File-based log writer thread that pulls log records from the LogManager,
  * writes them to the current logfile, and rotates the logs as necessary.
  *
+ * @since 0.9.26 moved from LogWriter
  */
 class FileLogWriter extends LogWriter {
     // volatile as it changes on log file rotation
