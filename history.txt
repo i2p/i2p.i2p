@@ -1,7 +1,13 @@
+2016-05-29 zzz
+ * Console: Fix /configfamily form (ticket #1797)
+
 2016-05-29 str4d
  * CertUtil: Dynamically load javax.naming classes to avoid
    VerifyErrors on some Androids
  * LogWriter: Dynamically load Android writer
+
+2016-05-26 zzz
+ * Build: Launchpad build fixes
 
 2016-05-25 zzz
  * DesktopGui: Add monochrome icons for Windows and Mac
