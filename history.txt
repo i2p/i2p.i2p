@@ -1,4 +1,6 @@
 2016-05-29 str4d
+ * CertUtil: Dynamically load javax.naming classes to avoid
+   VerifyErrors on some Androids
  * LogWriter: Dynamically load Android writer
 
 2016-05-25 zzz

@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -31,9 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import javax.security.auth.x500.X500Principal;
 
 import net.i2p.I2PAppContext;
@@ -199,13 +199,25 @@ public final class CertUtil {
             return null;
         type = type.toUpperCase(Locale.US);
         String subj = p.getName();
+        // Use reflection for this to avoid VerifyErrors on some Androids
         try {
-            LdapName name = new LdapName(subj);
-            for (Rdn rdn : name.getRdns()) {
-                if (type.equals(rdn.getType().toUpperCase(Locale.US)))
-                    return (String) rdn.getValue();
+            Class<?> ldapName = Class.forName("javax.naming.ldap.LdapName");
+            Constructor<?> ldapCtor = ldapName.getConstructor(String.class);
+            Object name = ldapCtor.newInstance(subj);
+            Method getRdns = ldapName.getDeclaredMethod("getRdns");
+            Class<?> rdnClass = Class.forName("javax.naming.ldap.Rdn");
+            Method getType = rdnClass.getDeclaredMethod("getType");
+            Method getValue = rdnClass.getDeclaredMethod("getValue");
+            for (Object rdn : (List) getRdns.invoke(name)) {
+                if (type.equals(((String) getType.invoke(rdn)).toUpperCase(Locale.US)))
+                    return (String) getValue.invoke(rdn);
             }
-        } catch (InvalidNameException ine) {}
+        } catch (ClassNotFoundException e) {
+        } catch (IllegalAccessException e) {
+        } catch (InstantiationException e) {
+        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
+        }
         return null;
     }
 
