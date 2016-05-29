@@ -167,9 +167,11 @@ public class LogManager implements Flushable {
             return;
         if (SystemVersion.isAndroid()) {
             try {
-                Class<?> clazz = Class.forName("net.i2p.util.AndroidLogWriter");
-                Constructor<?> ctor = clazz.getDeclaredConstructor(LogManager.class);
-                _writer = (LogWriter) ctor.newInstance(this);
+                Class<? extends LogWriter> clazz = Class.forName(
+                        "net.i2p.util.AndroidLogWriter"
+                    ).asSubclass(LogWriter.class);
+                Constructor<? extends LogWriter> ctor = clazz.getDeclaredConstructor(LogManager.class);
+                _writer = ctor.newInstance(this);
             } catch (ClassNotFoundException e) {
             } catch (InstantiationException e) {
             } catch (IllegalAccessException e) {
