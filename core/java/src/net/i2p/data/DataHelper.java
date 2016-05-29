@@ -89,7 +89,7 @@ public class DataHelper {
             "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
-            "a", "s",
+            "a", "m", "s", "v"
         };
         _propertiesKeyCache = new HashMap<String, String>(keys.length);
         for (int i = 0; i < keys.length; i++) {
