@@ -55,9 +55,7 @@ public class ConfigNavHelper extends HelperBase {
      */
     public void renderNavBar(String requestURI, boolean graphical) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
-        // TODO fix up the non-light themes
-        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME);
-        boolean span = graphical && (theme == null || theme.equals(CSSHelper.DEFAULT_THEME));
+        boolean span = graphical;
         if (!span)
             buf.append("<center>");
         List<Tab> tabs = new ArrayList<Tab>(pages.length);
@@ -79,9 +77,9 @@ public class ConfigNavHelper extends HelperBase {
                 buf.append("<a href=\"").append(page).append("\">").append(tabs.get(i).title).append("</a>");
             }
             if (span)
-                buf.append(" </span>\n");
+                buf.append("</span>\n");
             else if (i != pages.length - 1)
-                buf.append(" |\n");
+                buf.append("&nbsp;&nbsp;\n");
         }
         if (!span)
             buf.append("</center>");

@@ -1,0 +1,29 @@
+<h2>Advanced Router Configuration</h2>
+
+<p class="infohelp">The router configuration options listed below are not available in the user interface, usually because they are rarely used or provide access to advanced settings that most users will not need. This is not a comprehensive list. Some settings will require a restart of the router to take effect. Note that all settings are case sensitive. You will need to edit your <code>router.config</code> file to add options, or, once you have added <code>routerconsole.advanced=true</code> to the router.config file, you may edit settings within the console on the <a href="/configadvanced">Advanced Configuration page</a>.</p>
+
+<table id="configinfo"> <!-- sections separated for legibility -->
+
+<tr><th>i2p.vmCommSystem={true|false}</th></tr>
+<tr><td>When set to true, I2P runs without network connectivity, which is helpful if you are constantly restarting the router to test code updates as this prevents network disruption.</td></tr>
+
+<tr><th>routerconsole.advanced={true|false}</th></tr>
+<tr><td>When set to true, additional functionality will be enabled in the console and the user will be able to edit settings directly on the <a href="/configadvanced">Advanced Configuration page</a>. Extra display options are provided in the <a href="/netdb">Network Database section</a>, including the Sybil Analysis tool, and there are additional configuration options on the <a href="/configclients">Clients Configuration page</a>. You may also wish to enable the "Advanced" sidebar section on the <a href="/configsidebar">Summary Bar Configuration page</a>.</td></tr>
+<tr><td><p class="infowarn">Only set this to true if you know what you are doing!</p></td></tr>
+
+<tr><th>routerconsole.browser={/path/to/browser}</th></tr>
+<tr><td>This setting allows the manual selection of the browser which I2P will launch on startup (if the console is <a href="/configservice#browseronstart">configured</a> to launch a browser on startup), overriding the OS default browser.</td></tr>
+
+<tr><th>routerconsole.showSearch={true|false}</th></tr>
+<tr><td>When set to true, a configurable search bar will appear on the <a href="/home">console homepage</a>. Additional searches may then be added on the <a href="/confighome">home configuration page</a>.</td></tr>
+
+<tr><th>router.buildHandlerThreads={n}</th></tr>
+<tr><td>Allocate number of processor threads for building tunnels. If your processor supports hyperthreading, you may multiply the number of processor cores by 2 to get the maximum number of threads to allocate, otherwise number of processor cores = maximum number of threads available. Note that you may wish to allocate less than the theoretical maximum to ensure you have headroom for other tasks.</td></tr>
+
+<tr><th>router.maxParticipatingTunnels={n}</th></tr>
+<tr><td>Determines the maximum number of participating tunnels the router can build. To disable participation completely, set to 0.</td></tr>
+
+<tr><th>router.networkDatabase.flat={true|false}</th></tr>
+<tr><td>When set to true, the router info files stored in your profile's netDB directory will not be split into 64 sub-directories. 
+
+</table>

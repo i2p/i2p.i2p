@@ -97,11 +97,11 @@
    if (homehelper.shouldShowSearch()) {
 %>
   <div class="search">
-    <form action="/search.jsp" method="POST">
+    <form action="/search.jsp" target="_blank" method="POST">
       <table class="search"><tr><td align="right">
         <input size="40" type="text" class="search" name="query" />
       </td><td align="left">
-        <button type="submit" value="search" class="search"><%=intl._t("Search I2P")%></button>
+        <button type="submit" value="search" class="search"><%=intl._t("Search")%></button>
       </td><td align="left">
         <jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
         <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />

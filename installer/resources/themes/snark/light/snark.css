@@ -402,7 +402,7 @@ td:first-child {
      line-height: 130% !important;
 }
 
-.snarkConfigTitle {
+.snarkConfigTitle, label.toggleview {
      font-size: 10.5pt;
      font-weight: bold;
      padding: 1px 15px 4px 12px;
@@ -423,7 +423,7 @@ div.newtorrentsection .snarkConfigTitle, div.addtorrentsection .snarkConfigTitle
      padding-top: 0 !important;	
 }
 
-.snarkConfigTitle img {
+.snarkConfigTitle img, label.toggleview img {
      margin-right: -3px;
      padding-bottom: 3px;
 }
@@ -886,4 +886,10 @@ input.trackerhome {
 
 input.trackerannounce {
      width: 230px;
+}
+
+/* toggle create/add panel view */
+
+input.toggle_input { /* hide checkbox and use label as faux panel heading */
+     display: none;
 }

@@ -14,7 +14,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P Router Help &amp; Support</h1>
-<div class="main" id="main"><p>
+<div class="main" id="help"><p>
 Als je wilt helpen om de documentatie te verbeteren of vertalen, of wilt helpen
 met andere aspecten van het project, zie dan de documentatie voor 
 <a href="http://i2p-projekt.i2p/nl/get-involved">vrijwilligers.</a>
