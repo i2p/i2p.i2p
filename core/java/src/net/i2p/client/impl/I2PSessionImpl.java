@@ -605,7 +605,11 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                             Constructor<?> ctor = clazz.getDeclaredConstructor(I2PAppContext.class);
                             Object fact = ctor.newInstance(_context);
                             Method createSocket = clazz.getDeclaredMethod("createSocket", String.class);
-                            _socket = (Socket) createSocket.invoke(fact, _options.getProperty(PROP_DOMAIN_SOCKET));
+                            try {
+                                _socket = (Socket) createSocket.invoke(fact, _options.getProperty(PROP_DOMAIN_SOCKET));
+                            } catch (InvocationTargetException e) {
+                                throw new I2PSessionException("Cannot create domain socket", e);
+                            }
                         } catch (ClassNotFoundException e) {
                             throw new I2PSessionException("Cannot load DomainSocketFactory", e);
                         } catch (NoSuchMethodException e) {
