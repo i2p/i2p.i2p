@@ -34,6 +34,9 @@ export DEB_BUILD_HARDENING=1
 #export EXTRAPREFIX := deb
 export JAVA_HOME I2P
 export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{print $$2}' |sed 's/.*-\([.0-9A-Za-z~+]\{1,\}\)$$/\1/')
+# required for jbigi/jcpuid build
+export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
+#export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
 	dh $@
@@ -62,8 +65,6 @@ binary-indep: build-indep
 build-indep:
 	dh_prep
 	mkdir -p $(CURDIR)/installer/lib/wrapper/all
-	mkdir -p $(CURDIR)/installer/lib/launch4j/lib/
-	ln -sf /usr/share/java/commons-logging.jar $(CURDIR)/installer/lib/launch4j/lib/commons-logging.jar
 	ln -sf /usr/share/java/wrapper.jar $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	if [ ! -e $(CURDIR)/debian/routerversion.java.bak ]; then \
 		cp $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak; \
@@ -74,11 +75,92 @@ ifeq "$(findstring deb,$(shell grep 'deb' $(ROUTERVERSION)))" ""
 else
 	@echo "Already found deb in version, not doing anything"
 endif
-	# build options
+	@# build options
 	@/bin/echo -e "javac.version=1.7" > $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
+
+	@# debian and ubuntu: everywhere
+	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
+
+	@# ubuntu: not in precise
+	@# debian: in wheezy jessie stretch sid
+	@#/bin/echo -e "with-libjetty8-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#ln -sf /usr/share/java/jetty8-continuation.jar $(CURDIR)/apps/jetty/jettylib/jetty-continuation.jar
+	@#ln -sf /usr/share/java/jetty8-deploy.jar $(CURDIR)/apps/jetty/jettylib/jetty-deploy.jar
+	@#ln -sf /usr/share/java/jetty8-http.jar $(CURDIR)/apps/jetty/jettylib/jetty-http.jar
+	@#ln -sf /usr/share/java/jetty8-io.jar $(CURDIR)/apps/jetty/jettylib/jetty-io.jar
+	@#ln -sf /usr/share/java/jetty8-rewrite.jar $(CURDIR)/apps/jetty/jettylib/jetty-rewrite-handler.jar
+	@#ln -sf /usr/share/java/jetty8-security.jar $(CURDIR)/apps/jetty/jettylib/jetty-security.jar
+	@#ln -sf /usr/share/java/jetty8-servlet.jar $(CURDIR)/apps/jetty/jettylib/jetty-servlet.jar
+	@#ln -sf /usr/share/java/jetty8-servlets.jar $(CURDIR)/apps/jetty/jettylib/jetty-servlets.jar
+	@#ln -sf /usr/share/java/jetty8-start.jar $(CURDIR)/apps/jetty/jettylib/jetty-start.jar
+	@#ln -sf /usr/share/java/jetty8-util.jar $(CURDIR)/apps/jetty/jettylib/jetty-util.jar
+	@#ln -sf /usr/share/java/jetty8-webapp.jar $(CURDIR)/apps/jetty/jettylib/jetty-webapp.jar
+	@#ln -sf /usr/share/java/jetty8-xml.jar $(CURDIR)/apps/jetty/jettylib/jetty-xml.jar
+	@#ln -sf /usr/share/java/jetty8-server.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jetty.jar
+	@#ln -sf /usr/share/java/jetty8-jmx.jar $(CURDIR)/apps/jetty/jettylib/org.mortbay.jmx.jar
+	@# following two are from libservlet3.0-java which is a dependency of libjetty8-java
+	@#ln -sf /usr/share/java/servlet-api-3.0.jar $(CURDIR)/apps/jetty/jettylib/javax.servlet.jar
+	@#ln -sf /usr/share/java/jsp-api-2.2.jar $(CURDIR)/apps/jetty/jettylib/jsp-api.jar
+
+	@# ubuntu: only in precise trusty vivid
+	@# debian: only in wheezy
+	@#@/bin/echo -e "with-libtomcat6-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#ln -sf /usr/share/java/jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	@#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	@#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+	@#ln -sf /usr/share/java/jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
+	@# following is from libservlet2.5-java which is a dependency of libtomcat6-java
+	@#ln -sf /usr/share/java/el-api-2.1.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+
+	@# debian and ubuntu: everywhere
+	@#/bin/echo -e "with-libtomcat7-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#ln -sf /usr/share/java/tomcat-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	@#ln -sf /usr/share/java/tomcat-api.jar $(CURDIR)/apps/jetty/jettylib/tomcat-api.jar
+	@#ln -sf /usr/share/java/tomcat-util.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util.jar
+	@#ln -sf /usr/share/java/tomcat-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	@#ln -sf /usr/share/java/tomcat-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+	@#ln -sf /usr/share/java/tomcat-jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
+	@# following is from libservlet3.0-java which is a dependency of libtomcat7-java
+	@#ln -sf /usr/share/java/el-api-2.2.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+
+	@# debian and ubuntu: everywhere
+	@/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
+	ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
+	ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
+
+	@# debian and ubuntu: everywhere
+	@#/bin/echo -e "with-libjakarta-taglibs-standard-java=true" >> $(CURDIR)/override.properties
+	@#ln -sf /usr/share/java/standard.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
+
+	@# debian and ubuntu: everywhere
+	@#/bin/echo -e "with-libjstl1.1-java=true" >> $(CURDIR)/override.properties
+	@#ln -sf /usr/share/java/jstl1.1.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
+
+	@# debian and ubuntu: everywhere
+	@/bin/echo -e "with-gettext-base=true" >> $(CURDIR)/override.properties
+	@mkdir -p $(CURDIR)/core/java/build
+	ln -sf /usr/share/java/libintl.jar $(CURDIR)/core/java/build/libintl.jar
+
+	@# debian and ubuntu: everywhere
+	@/bin/echo -e "with-libgetopt-java=true" >> $(CURDIR)/override.properties
+	@mkdir -p $(CURDIR)/core/java/build
+	ln -sf /usr/share/java/gnu-getopt.jar $(CURDIR)/core/java/build/gnu-getopt.jar
+
+	@# 2 MB of dependencies vs. 20 KB of copied source
+	@# Requires 4.4 or higher.
+	@# Debian: Not in wheezy/jessie
+	@# Ubuntu: Only in wily and later
+	@#/bin/echo -e "with-libhttpclient-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/core/java/build
+	@#ln -sf /usr/share/java/httpclient.jar $(CURDIR)/core/java/build/httpclient.jar
+	@#ln -sf /usr/share/java/httpcore.jar $(CURDIR)/core/java/build/httpcore.jar
+
 	TZ=UTC JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8 ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper

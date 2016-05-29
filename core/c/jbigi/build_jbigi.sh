@@ -26,7 +26,7 @@ if [ -z $BITS ]; then
     exit
   fi
 
-  printf "\aBITS variable not set, $BITS bit system detected\n\a" >&2
+  printf "BITS variable not set, $BITS bit system detected\n" >&2
 fi
 
 # If JAVA_HOME isn't set we'll try to figure it out

@@ -1,9 +1,7 @@
 The files in ../debian/ are for jessie/stable.
 Alternates are in the subdirectories here.
 
-trusty may be copied to utopic and vivid.
-They do not have libjetty8-java.
-wily has libjetty8-java.
+trusty may be copied to utopic, vivid, wily, xenial.
 
 tails-jessie and tails-wheezy are currently the same as
 jessie and wheezy, respectively. If they diverge, put the changes here.

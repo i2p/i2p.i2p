@@ -38,6 +38,11 @@ abstract class TrayManager {
     ///Our tray icon, or null if unsupported
     protected TrayIcon trayIcon;
 
+    private static final String PNG_DIR = "/desktopgui/resources/images/";
+    private static final String MAC_ICON = "itoopie_black_24.png";
+    private static final String WIN_ICON = "itoopie_white_24.png";
+    private static final String LIN_ICON = "logo.png";
+
     /**
      * Instantiate tray manager.
      */
@@ -185,9 +190,16 @@ abstract class TrayManager {
      * @throws AWTException if image not found
      */
     private Image getTrayImage() throws AWTException {
-        URL url = getClass().getResource("/desktopgui/resources/images/logo.png");
+        String img;
+        if (SystemVersion.isWindows())
+            img = WIN_ICON;
+        else if (SystemVersion.isMac())
+            img = MAC_ICON;
+        else
+            img = LIN_ICON;
+        URL url = getClass().getResource(PNG_DIR + img);
         if (url == null)
-            throw new AWTException("cannot load tray image");
+            throw new AWTException("cannot load tray image " + img);
         Image image = Toolkit.getDefaultToolkit().getImage(url);
         return image;
     }

@@ -63,6 +63,8 @@ public class Reseeder {
     private static final boolean ENABLE_SU3 = true;
     /** if false, use su3 only, and disable fallback reading directory index and individual dat files */
     private static final boolean ENABLE_NON_SU3 = false;
+    private static final int MIN_RI_WANTED = 100;
+    private static final int MIN_RESEED_SERVERS = 2;
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
@@ -240,6 +242,9 @@ public class Reseeder {
     /**
      *  Since Java 7 or Android 2.3 (API 9),
      *  which is the lowest Android we support anyway.
+     *
+     *  Not guaranteed to be correct, e.g. FreeBSD:
+     *  https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=201446
      *
      *  @since 0.9.20
      */
@@ -500,6 +505,9 @@ public class Reseeder {
             }
             if (!isSNISupported()) {
                 try {
+                    URLList.remove(new URI("https://i2p.manas.ca:8443/"));
+                    URLList.remove(new URI("https://i2p-0.manas.ca:8443/"));
+                    URLList.remove(new URI("https://download.xxlspeed.com/"));
                     URLList.remove(new URI("https://netdb.i2p2.no/"));
                 } catch (URISyntaxException mue) {}
             }
@@ -521,6 +529,7 @@ public class Reseeder {
         */
         private int reseed(List<URI> URLList, boolean echoStatus) {
             int total = 0;
+            int fetched_reseed_servers = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
                 if (_context.router().gracefulShutdownInProgress()) {
                     System.out.println("Reseed aborted, shutdown in progress");
@@ -539,8 +548,9 @@ public class Reseeder {
                 }
                 if (dl > 0) {
                     total += dl;
+                    fetched_reseed_servers++;
                     // Don't go on to the next URL if we have enough
-                    if (total >= 100)
+                    if (total >= MIN_RI_WANTED && fetched_reseed_servers >= MIN_RESEED_SERVERS)
                         break;
                     // remove alternate versions if we haven't tried them yet
                     for (int j = i + 1; j < URLList.size(); ) {

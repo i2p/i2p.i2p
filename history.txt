@@ -1,3 +1,10 @@
+2016-05-25 zzz
+ * DesktopGui: Add monochrome icons for Windows and Mac
+ * Reseed:
+   - Require two sources minimum (ticket #1794)
+   - Update list of sources requiring SNI
+ * Translations: Update English po files
+
 2016-05-20 zzz
  * DesktopGui:
    - Fix systray menu redraw on Mac;

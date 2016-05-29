@@ -12,6 +12,8 @@ package net.i2p.util;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -163,7 +165,21 @@ public class LogManager implements Flushable {
         // yeah, this doesn't always work, _writer should be volatile
         if (_writer != null)
             return;
-        _writer = new LogWriter(this);
+        if (SystemVersion.isAndroid()) {
+            try {
+                Class<?> clazz = Class.forName("net.i2p.util.AndroidLogWriter");
+                Constructor<?> ctor = clazz.getDeclaredConstructor(LogManager.class);
+                _writer = (LogWriter) ctor.newInstance(this);
+            } catch (ClassNotFoundException e) {
+            } catch (InstantiationException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            } catch (NoSuchMethodException e) {
+            }
+        }
+        // Default writer
+        if (_writer == null)
+            _writer = new FileLogWriter(this);
         _writer.setFlushInterval(_flushInterval * 1000);
         // if you enable logging in I2PThread again, you MUST change this back to Thread
         Thread t = new I2PThread(_writer, "LogWriter");

@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.nio.channels.SocketChannel;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketAddress;
 import net.i2p.client.streaming.I2PSocketOptions;
 
 /**
@@ -117,11 +118,12 @@ class StandardSocket extends Socket {
     }
 
     /**
-     *  @return null always
+     *  @return an I2PSocketAddress as of 0.9.26; prior to that, returned null
+     *  @since implemented in 0.9.26
      */
     @Override
     public SocketAddress getLocalSocketAddress() {
-        return null;
+        return new I2PSocketAddress(_socket.getThisDestination(), _socket.getLocalPort());
     }
 
     /**
@@ -157,11 +159,12 @@ class StandardSocket extends Socket {
     }
 
     /**
-     *  @throws UnsupportedOperationException always
+     *  @return an I2PSocketAddress as of 0.9.26; prior to that, threw UnsupportedOperationException
+     *  @since implemented in 0.9.26
      */
     @Override
     public SocketAddress getRemoteSocketAddress() {
-        throw new UnsupportedOperationException();
+        return new I2PSocketAddress(_socket.getPeerDestination(), _socket.getPort());
     }
 
     /**

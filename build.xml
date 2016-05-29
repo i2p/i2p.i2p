@@ -2094,6 +2094,86 @@
         </tar>
     </target>
 
+    <!-- same as debian-tarball but with bundled jetty -->
+    <target name="precise-tarball" depends="getExtendedVersion">
+        <!-- this will use the monotonerc file in the current workspace -->
+        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
+            <condition>
+                <not>
+                    <isset property="mtn.available" />
+                </not>
+            </condition>
+        </fail>
+        <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
+        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
+        <delete dir="../i2p-${Extended.Version}" />
+        <exec executable="mtn" failonerror="true">
+            <arg value="co" />
+            <!-- w: is the revision of the current workspace -->
+            <arg value="-r" />
+            <arg value="w:" />
+            <arg value="../i2p-${Extended.Version}" />
+        </exec>
+        <delete includeemptydirs="true" quiet="false">
+            <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/Slackware" />
+            <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <!-- gettext-base -->
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
+            <!-- libgetopt-java -->
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+            <!-- libhttpclient-java and libhttpcore-java -->
+          <!--
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
+           -->
+            <!-- systray4j -->
+            <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
+            <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
+            <!-- geoip-database -->
+            <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
+            <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <!-- libjetty8-java -->
+          <!--
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+           -->
+            <!-- libjstl1.1-java or glassfish-javaee -->
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
+            <!-- libjakarta-taglibs-standard-java or glassfish-javaee -->
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <!-- libtomcat6-java or libtomcat7-java -->
+          <!--
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
+           -->
+            <!-- anything added above, add in debian-release-tarball also -->
+        </delete>
+        <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
+            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}">
+                <include name="**/**" />
+                <exclude name="debian/**"/>
+                <exclude name="debian-alt/**"/>
+                <exclude name="**/*.sh"/>
+                <exclude name="installer/resources/geoip.txt"/>
+                <exclude name="installer/resources/geoipv6.dat.gz"/>
+          <!--
+                <exclude name="apps/jetty/jetty-distribution-*/**"/>
+           -->
+                <exclude name="apps/susidns/src/lib/jstl.jar" />
+                <exclude name="apps/susidns/src/lib/standard.jar" />
+          <!--
+                <exclude name="apps/jetty/apache-tomcat/**"/>
+                <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
+           -->
+                <!-- anything added above, add in debian-release-tarball also -->
+            </tarfileset>
+            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
+                <exclude name="debian/**" />
+                <include name="**/*.sh" />
+            </tarfileset>
+        </tar>
+    </target>
+
     <!-- same as debian-tarball but with a release tar.bz2 file name and tar prefix -->
     <target name="debian-release-tarball" depends="getExtendedVersion">
         <!-- this will use the monotonerc file in the current workspace -->
