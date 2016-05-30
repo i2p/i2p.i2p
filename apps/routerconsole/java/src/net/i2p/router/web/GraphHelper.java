@@ -237,7 +237,8 @@ public class GraphHelper extends FormHandler {
             if (_end > 0)
                 _out.write(' ' + _t("ending {0} ago", DataHelper.formatDuration2(_end * period)));
 
-            _out.write("</h3><div class=\"graphspanel\"><img class=\"statimage\" border=\"0\""
+            _out.write("&nbsp;<a href=\"graphs\">[" + _t("Return to main graphs page") + "]</a></h3>\n"
+                       + "<div class=\"graphspanel\"><img class=\"statimage\" border=\"0\""
                        + " src=\"viewstat.jsp?stat="
                        + name
                        + "&amp;showEvents=" + _showEvents
@@ -322,8 +323,6 @@ public class GraphHelper extends FormHandler {
             _out.write("</a>");
 
             _out.write("</p><p><i>" + _t("All times are UTC.") + "</i></p>\n");
-
-            _out.write("<p><a href=\"graphs\">" + _t("Return to main graphs page") + "</a></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
