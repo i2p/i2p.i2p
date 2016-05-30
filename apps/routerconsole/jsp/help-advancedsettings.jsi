@@ -8,8 +8,8 @@
 <tr><td>When set to true, I2P runs without network connectivity, which is helpful if you are constantly restarting the router to test code updates as this prevents network disruption.</td></tr>
 
 <tr><th>routerconsole.advanced={true|false}</th></tr>
+<tr><td class="infowarn">Only set this to true if you know what you are doing!</td></tr>
 <tr><td>When set to true, additional functionality will be enabled in the console and the user will be able to edit settings directly on the <a href="/configadvanced">Advanced Configuration page</a>. Extra display options are provided in the <a href="/netdb">Network Database section</a>, including the Sybil Analysis tool, and there are additional configuration options on the <a href="/configclients">Clients Configuration page</a>. You may also wish to enable the "Advanced" sidebar section on the <a href="/configsidebar">Summary Bar Configuration page</a>.</td></tr>
-<tr><td><p class="infowarn">Only set this to true if you know what you are doing!</p></td></tr>
 
 <tr><th>routerconsole.browser={/path/to/browser}</th></tr>
 <tr><td>This setting allows the manual selection of the browser which I2P will launch on startup (if the console is <a href="/configservice#browseronstart">configured</a> to launch a browser on startup), overriding the OS default browser.</td></tr>
