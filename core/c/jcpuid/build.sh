@@ -19,30 +19,30 @@ case $TARGET in
         echo "Building `uname -s |tr [A-Z] [a-z]` .sos";;
     *)
         echo "Unsupported build environment"
-        exit;;
+        exit 1;;
 esac
 
 
 if [ -z $BITS ]; then
-  UNAME="$(uname -a)"
-  if test "${UNAME#*x86_64}" != "x86_&4"; then
+  UNAME="$(uname -m)"
+  if test "${UNAME#*x86_64}" != "$UNAME"; then
     BITS=64
-  elif test "${UNAME#*i386}" != "i386"; then
+  elif test "${UNAME#*i386}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*i686}" != "i686"; then
+  elif test "${UNAME#*i686}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*armv6}" != "armv6"; then
+  elif test "${UNAME#*armv6}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*armv7}" != "armv7"; then
+  elif test "${UNAME#*armv7}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*aarch32}" != "aarch32"; then
+  elif test "${UNAME#*aarch32}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*aarch64}" != "aarch64"; then
+  elif test "${UNAME#*aarch64}" != "$UNAME"; then
     BITS=64
   else
  
     echo "Unable to detect default setting for BITS variable"
-    exit
+    exit 1
   fi
 
   printf "BITS variable not set, $BITS bit system detected\n" >&2

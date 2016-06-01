@@ -1,3 +1,6 @@
+2016-06-01 zzz
+ * Build: Fix Debian build on ARM (ticket #1801)
+
 2016-05-29 zzz
  * Console: Fix /configfamily form (ticket #1797)
 

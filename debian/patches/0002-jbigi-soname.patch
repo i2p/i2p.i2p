@@ -23,7 +23,7 @@ index 1521392..6a89c92 100755
          LIBFILE="libjbigi.so";;
  *)
 @@ -89,8 +89,8 @@
- [ $BITS -eq 64 ] && COMPILEFLAGS="-m64 $COMPILEFLAGS" && LINKFLAGS="-m64 $LINKFLAGS"
+ [ $BITS -eq 64 -a "${UNAME#*86}" != "$UNAME" ] && COMPILEFLAGS="-m64 $COMPILEFLAGS" && LINKFLAGS="-m64 $LINKFLAGS"
  
  echo "Compiling C code..."
 -echo "Compile: \"$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c\""
