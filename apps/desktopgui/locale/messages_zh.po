@@ -3,56 +3,94 @@
 # This file is distributed under the same license as the desktopgui package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
-# ducki2p <ducki2p@gmail.com>, 2011.
-# walking <walking@i2pmail.org>, 2011.
+# Translators:
+# ducki2p <ducki2p@gmail.com>, 2011
+# walking <walking@i2pmail.org>, 2011
+# Y.F Yang <yfdyh000@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-03-03 18:29+0000\n"
-"PO-Revision-Date: 2011-03-24 09:18+0000\n"
-"Last-Translator: walking <walking@i2pmail.org>\n"
-"Language-Team: Chinese (China) (http://www.transifex.net/projects/p/I2P/team/zh_CN/)\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-25 12:29+0000\n"
+"PO-Revision-Date: 2016-05-25 14:00+0000\n"
+"Last-Translator: Y.F Yang <yfdyh000@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: zh_CN\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:31
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:59
 msgid "Start I2P"
 msgstr "启动 I2P"
 
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
 msgid "I2P is starting!"
 msgstr "正在启动 I2P !"
 
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
 msgid "Starting"
 msgstr "正在启动"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+#: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
 msgstr "正在启动I2P浏览器"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:50
-msgid "Configure desktopgui"
-msgstr "设置desktopgui"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:76
+#: src/net/i2p/desktopgui/InternalTrayManager.java:228
+msgid "Configure I2P System Tray"
+msgstr "配置 I2P 系统托盘"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+#: src/net/i2p/desktopgui/InternalTrayManager.java:77
+#: src/net/i2p/desktopgui/InternalTrayManager.java:229
+msgid "Disable"
+msgstr "禁用"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:93
+#: src/net/i2p/desktopgui/InternalTrayManager.java:245
 msgid "Restart I2P"
 msgstr "重启 I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+#: src/net/i2p/desktopgui/InternalTrayManager.java:110
+#: src/net/i2p/desktopgui/InternalTrayManager.java:262
 msgid "Stop I2P"
 msgstr "停止 I2P"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
-msgid "Tray icon configuration"
-msgstr "托盘图标配置"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:126
+#: src/net/i2p/desktopgui/InternalTrayManager.java:278
+msgid "Restart I2P Immediately"
+msgstr "立即重启 I2P"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
-msgid "Should tray icon be enabled?"
-msgstr "是否启用托盘图标？"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:143
+#: src/net/i2p/desktopgui/InternalTrayManager.java:295
+msgid "Stop I2P Immediately"
+msgstr "立即停止 I2P"
 
+#: src/net/i2p/desktopgui/InternalTrayManager.java:157
+#: src/net/i2p/desktopgui/InternalTrayManager.java:309
+msgid "Cancel I2P Shutdown"
+msgstr "取消 I2P 关闭"
 
+#: src/net/i2p/desktopgui/InternalTrayManager.java:363
+#, java-format
+msgid "Shutdown in {0}"
+msgstr "{0} 后关闭"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:365
+msgid "Shutdown imminent"
+msgstr "立即关闭"
+
+#. status translations are in the console bundle
+#: src/net/i2p/desktopgui/InternalTrayManager.java:370
+msgid "Network"
+msgstr "网络"
+
+#. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
+#: src/net/i2p/desktopgui/TrayManager.java:63
+msgid "I2P: Right-click for menu"
+msgstr "I2P：右击获得菜单"

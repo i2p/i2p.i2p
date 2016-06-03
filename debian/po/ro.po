@@ -1,23 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
+# Rusu_C <crrusu@yahoo.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2015-03-29 14:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/"
-"ro/)\n"
-"Language: ro\n"
+"PO-Revision-Date: 2016-05-02 20:29+0000\n"
+"Last-Translator: Rusu_C <crrusu@yahoo.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
-"2:1));\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
 #. Type: boolean
 #. Description
@@ -31,9 +30,7 @@ msgstr "Router-ul I2P trebuie sa fie pornit la încărcarea? "
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr ""
-"Router-ul I2P poate fi rulat ca un demon care pornește automat atunci când "
-"calculatorul se porneste. Aceasta este configurația recomandată."
+msgstr "Router-ul I2P poate fi rulat ca un demon care pornește automat atunci când calculatorul se porneste. Aceasta este configurația recomandată."
 
 #. Type: string
 #. Description
@@ -45,16 +42,11 @@ msgstr "I2P daemon utilizator:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as "
-"a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at /"
-"home/user/i2p, you may enter 'user' here."
-msgstr ""
-"În mod implicit I2P este configurat pentru a rula sub contul i2psvc  atunci "
-"când se rulează ca un demon. Pentru a utiliza o ** profil I2P existent**  s-"
-"ar putea introduce aici un nume de cont diferit. De exemplu, în cazul în "
-"care instalarea I2P anterioara este de la / home/user/i2p, s-ar putea "
-"introduce \"user\" aici."
+"By default I2P is configured to run under the account i2psvc when running as"
+" a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at "
+"/home/user/i2p, you may enter 'user' here."
+msgstr "În mod implicit I2P este configurat pentru a rula sub contul i2psvc  atunci când se rulează ca un demon. Pentru a utiliza o ** profil I2P existent**  s-ar putea introduce aici un nume de cont diferit. De exemplu, în cazul în care instalarea I2P anterioara este de la / home/user/i2p, s-ar putea introduce \"user\" aici."
 
 #. Type: string
 #. Description
@@ -62,10 +54,7 @@ msgstr ""
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr ""
-"FOARTE IMPORTANT: Dacă o altă persoană decât cea de utilizator implicit "
-"\"i2psvc\" este introdus aici,  numele de utilizator *TREBUIE* sa exista "
-"deja."
+msgstr "FOARTE IMPORTANT: Dacă o altă persoană decât cea de utilizator implicit \"i2psvc\" este introdus aici,  numele de utilizator *TREBUIE* sa exista deja."
 
 #. Type: string
 #. Description
@@ -77,9 +66,7 @@ msgstr "Memorie care poate fi alocata la I2P:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr ""
-"În mod implicit, I2P li se va permite să utilizeze numai până la 128MB de "
-"RAM."
+msgstr "În mod implicit, I2P li se va permite să utilizeze numai până la 128MB de RAM."
 
 #. Type: string
 #. Description
@@ -87,15 +74,13 @@ msgstr ""
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr ""
-"Routere în bandă largă, precum și routere, cu o mulțime de torente/plugin-"
-"uri active, ar putea avea nevoie pentru a avea această valoare marita."
+msgstr "Routere în bandă largă, precum și routere, cu o mulțime de torente/plugin-uri active, ar putea avea nevoie pentru a avea această valoare marita."
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
 msgid "Run I2P daemon confined with AppArmor"
-msgstr ""
+msgstr "Rulează I2P alături de AppArmor"
 
 #. Type: boolean
 #. Description
@@ -103,4 +88,4 @@ msgstr ""
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr ""
+msgstr "Cu această opțiune activată I2P va fi "

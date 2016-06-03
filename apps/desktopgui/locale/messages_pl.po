@@ -6,52 +6,91 @@
 # Translators:
 # PolishAnon <b790979@klzlk.com>, 2011
 # polacco <polacco@i2pmail.org>, 2015
+# Verdulo :-) <cybertomek@openmailbox.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-09 19:27+0000\n"
-"PO-Revision-Date: 2015-02-17 20:54+0000\n"
-"Last-Translator: polacco <polacco@i2pmail.org>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/I2P/language/pl/)\n"
+"POT-Creation-Date: 2016-05-25 12:29+0000\n"
+"PO-Revision-Date: 2016-05-25 19:49+0000\n"
+"Last-Translator: Verdulo :-) <cybertomek@openmailbox.org>\n"
+"Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:31
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:59
 msgid "Start I2P"
 msgstr "Uruchom I2P"
 
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
 msgid "I2P is starting!"
 msgstr "Uruchamianie I2P!"
 
-#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:44
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:72
 msgid "Starting"
 msgstr "Uruchamianie"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+#: src/net/i2p/desktopgui/InternalTrayManager.java:55
+#: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
 msgstr "Uruchom przeglądarkę I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:50
-msgid "Configure desktopgui"
-msgstr "Skonfiguruj intrefejs pulpitu (desktopgui)"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:76
+#: src/net/i2p/desktopgui/InternalTrayManager.java:228
+msgid "Configure I2P System Tray"
+msgstr "Konfiguruj I2P w zasobniku systemowym"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+#: src/net/i2p/desktopgui/InternalTrayManager.java:77
+#: src/net/i2p/desktopgui/InternalTrayManager.java:229
+msgid "Disable"
+msgstr "Wyłącz"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:93
+#: src/net/i2p/desktopgui/InternalTrayManager.java:245
 msgid "Restart I2P"
 msgstr "Zrestartuj I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+#: src/net/i2p/desktopgui/InternalTrayManager.java:110
+#: src/net/i2p/desktopgui/InternalTrayManager.java:262
 msgid "Stop I2P"
 msgstr "Zatrzymaj I2P"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:43
-msgid "Tray icon configuration"
-msgstr "Konfiguracja ikony zasobnika"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:126
+#: src/net/i2p/desktopgui/InternalTrayManager.java:278
+msgid "Restart I2P Immediately"
+msgstr "Zrestartuj I2P natychmiast"
 
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:46
-msgid "Should tray icon be enabled?"
-msgstr "Czy ikona zasobnika powinna być aktywna?"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:143
+#: src/net/i2p/desktopgui/InternalTrayManager.java:295
+msgid "Stop I2P Immediately"
+msgstr "Wyłącz I2P natychmiast"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:157
+#: src/net/i2p/desktopgui/InternalTrayManager.java:309
+msgid "Cancel I2P Shutdown"
+msgstr "Anuluj zamykanie I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:363
+#, java-format
+msgid "Shutdown in {0}"
+msgstr "Wyłączenie za {0}"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:365
+msgid "Shutdown imminent"
+msgstr "Zaraz zamknę"
+
+#. status translations are in the console bundle
+#: src/net/i2p/desktopgui/InternalTrayManager.java:370
+msgid "Network"
+msgstr "Sieć"
+
+#. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
+#: src/net/i2p/desktopgui/TrayManager.java:63
+msgid "I2P: Right-click for menu"
+msgstr "I2P: kliknij prawym aby otworzyć menu"

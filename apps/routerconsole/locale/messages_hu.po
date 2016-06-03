@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-05 14:30+0000\n"
-"PO-Revision-Date: 2016-03-05 14:52+0000\n"
+"POT-Creation-Date: 2016-05-25 12:28+0000\n"
+"PO-Revision-Date: 2016-05-25 12:33+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Hungarian (http://www.transifex.com/otf/I2P/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -32,8 +32,8 @@ msgstr ""
 #. locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1532
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1585
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1524
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1577
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
@@ -42,8 +42,8 @@ msgstr[1] "{0,number,####} ms"
 
 #. seconds
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1536
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1587
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1528
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1579
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
@@ -52,8 +52,8 @@ msgstr[1] "{0} mp"
 
 #. minutes
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1540
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1589
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1532
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1581
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
@@ -62,8 +62,8 @@ msgstr[1] "{0} perc"
 
 #. hours
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1544
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1591
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1536
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1583
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
@@ -71,8 +71,8 @@ msgstr[0] "1 óra"
 msgstr[1] "{0} óra"
 
 #. days
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1547
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1594
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1539
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1586
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -80,28 +80,28 @@ msgstr[0] "1 nap"
 msgstr[1] "{0} nap"
 
 #. years
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1550
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1597
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1542
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1589
 #, java-format
 msgid "1 year"
 msgid_plural "{0} years"
 msgstr[0] "1 év"
 msgstr[1] "{0} év"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1552
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1599
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:339
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1544
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1591
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:336
 msgid "n/a"
 msgstr "nem elérhető"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1581
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1573
 #, java-format
 msgid "1 ns"
 msgid_plural "{0,number,###} ns"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1583
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1575
 #, java-format
 msgid "1 μs"
 msgid_plural "{0,number,###} μs"
@@ -287,43 +287,43 @@ msgstr "Alagutak elutasítva: kikapcsolás folyamatban"
 msgid "Rejecting tunnels"
 msgstr "Alagutak elutasítása"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:208
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:228
 #, java-format
 msgid "Reseeding: got router info from file ({0} successful, {1} errors)."
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:280
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:300
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:28
 msgid "Reseeding"
 msgstr "Újratáplálás (reseed) folyamatban"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:303
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:323
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
 msgstr[0] "Az újratáplálás csak 1 routert hozott."
 msgstr[1] "Az újratáplálás csak {0} routert hozott."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:312
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:332
 msgid "Reseed failed."
 msgstr "Újratáplálás (reseed) sikertelen."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:313
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:333
 #, java-format
 msgid "See {0} for help."
 msgstr "Segítségért lásd {0}."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:314
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:334
 msgid "reseed configuration page"
 msgstr "újratáplálás (reseed) beállítási oldal"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:562
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:693
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:585
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:716
 msgid "Reseeding: fetching seed URL."
 msgstr "Újratáplálás: táplálási URL kézbesítése."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:619
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:729
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:642
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:752
 #, java-format
 msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
@@ -388,12 +388,12 @@ msgid "Unreachable on any transport"
 msgstr "Egyik átvitelen sem érhető el"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:687
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:566
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:577
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:604
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:622
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:569
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:580
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:607
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:625
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1363
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2583
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2641
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:94
 msgid "Status"
 msgstr "Állapot"
@@ -431,13 +431,13 @@ msgid ""
 msgstr "E határok felülírásához a következő beállításokat a haladó beállitások oldalon: i2np.ntcp.maxConnections=nnn és i2np.udp.maxConnections=nnn ."
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:738
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:271
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:268
 msgid "Definitions"
 msgstr "Meghatározások"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:739
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1367
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2587
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2645
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:24
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:33
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:35
@@ -452,7 +452,7 @@ msgstr "A távoli társ, router hash alapján azonosítva"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:740
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1368
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2591
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2649
 msgid "Dir"
 msgstr "Könyvtár"
 
@@ -479,13 +479,13 @@ msgstr "Mennyi idő telt el az utolsó csomag fogadása / küldése óta"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:748
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1370
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2593
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2651
 msgid "Idle"
 msgstr "Üres"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:749
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1371
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2598
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2656
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:167
 msgid "In/Out"
 msgstr "Be/Ki"
@@ -500,14 +500,14 @@ msgstr "Mennyi ideje lett a kapcsolat létrehozva"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:750
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1372
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2603
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2661
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:963
 msgid "Up"
 msgstr "Fel"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:751
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1373
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2605
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2663
 msgid "Skew"
 msgstr "Pontatlanság"
 
@@ -556,7 +556,7 @@ msgstr "Jelenlegi maximális küldési csomag méret / becsült maximális fogad
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:761
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1374
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2622
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2680
 msgid "TX"
 msgstr "Küldött"
 
@@ -566,7 +566,7 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:762
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1375
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2624
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2682
 msgid "RX"
 msgstr "Fogadott"
 
@@ -575,7 +575,7 @@ msgid "The total number of messages received from the peer"
 msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:763
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2627
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2685
 msgid "Dup TX"
 msgstr "Duplex Küldött"
 
@@ -584,7 +584,7 @@ msgid "The total number of packets retransmitted to the peer"
 msgstr "A társnak újraközölt csomagok teljes száma"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:764
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2629
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2687
 msgid "Dup RX"
 msgstr "Duplex Fogadott"
 
@@ -592,104 +592,104 @@ msgstr "Duplex Fogadott"
 msgid "The total number of duplicate packets received from the peer"
 msgstr "A társtól érkezett duplikált csomagok teljes száma"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:561
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:564
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:26
 msgid "Service"
 msgstr "Szolgáltatás"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:565
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:568
 msgid "WAN Common Interface Configuration"
 msgstr "WAN Általános Interfész Beállítás"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:568
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:588
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:615
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:571
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:591
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:618
 msgid "Type"
 msgstr "Típus"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:570
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:590
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:573
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:593
 msgid "Upstream"
 msgstr "Felfelé menő"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:572
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:592
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:575
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:595
 msgid "Downstream"
 msgstr "Lefelé jövő"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:576
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:579
 msgid "WAN PPP Connection"
 msgstr "WAP PPP Kapcsolat"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:584
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:611
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:587
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:614
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:296
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:322
 msgid "Uptime"
 msgstr "Indítás óta eltelt idő"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:594
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:617
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:597
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:620
 msgid "External IP"
 msgstr "Külső IP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:598
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:601
 msgid "Layer 3 Forwarding"
 msgstr "3. réteg Továbbítás"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:599
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:602
 msgid "Default Connection Service"
 msgstr "Alapértelmezett Csatlakozási Szolgáltatás"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:603
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:606
 msgid "WAN IP Connection"
 msgstr "WAN IP Kapcsolat"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:621
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:624
 msgid "WAN Ethernet Link Configuration"
 msgstr "WAN Ethernet"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:642
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:645
 msgid "Found Device"
 msgstr "Megvan az Eszköz"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:644
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:647
 msgid "Subdevice"
 msgstr "Aleszköz"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:665
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:668
 msgid "UPnP Status"
 msgstr "UPnP Státusz"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:669
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:672
 msgid "Disabled UPnP Devices"
 msgstr "Letiltott UPnP Készülékek"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:683
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:686
 msgid ""
 "UPnP has been disabled; Do you have more than one UPnP Internet Gateway "
 "Device on your LAN ?"
 msgstr "UPnP letiltva; van egynél több UPnP Internet Átjáró (Gateway) Eszköz a Helyi Hálózaton?"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:686
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:689
 msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
 msgstr "UPnP nem talált UPnP-t használó kompatibilis eszköt a Helyi Hálózaton."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:694
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:697
 #, java-format
 msgid "The current external IP address reported by UPnP is {0}"
 msgstr "Az UPnP által visszajelzett jelenlegi külső IP Cím a következő: {0}"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:696
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:699
 msgid "The current external IP address is not available."
 msgstr "A jelenleg külső IP cím nem áll rendelkezésre."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:700
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:703
 #, java-format
 msgid "UPnP reports the maximum downstream bit rate is {0}bits/sec"
 msgstr "Az UPnP jelentése szerint a maximális lefelé jövő bitráta {0} bit/mp"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:702
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:705
 #, java-format
 msgid "UPnP reports the maximum upstream bit rate is {0}bits/sec"
 msgstr "Az UPnP jelentése szerint a maximális felfelé menő bitráta {0} bit/mp"
@@ -698,12 +698,12 @@ msgstr "Az UPnP jelentése szerint a maximális felfelé menő bitráta {0} bit/
 #. {1,number,#####} prevents 12345 from being output as 12,345 in the English
 #. locale.
 #. If you want the digit separator in your locale, translate as {1}.
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:710
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:713
 #, java-format
 msgid "{0} port {1,number,#####} was successfully forwarded by UPnP."
 msgstr "UPnP sikeresen átirányította a következőt: {0} port {1,number,#####}."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:712
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:715
 #, java-format
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "Nincs átirányítva az UPnP által a következő: {0} port {1,number,#####}."
@@ -719,17 +719,17 @@ msgid "NTCP connections"
 msgstr "NTCP kapcsolatok"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1360
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2580
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2638
 msgid "Limit"
 msgstr "Határ"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1361
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2581
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2639
 msgid "Timeout"
 msgstr "Időtúllépés"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1369
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2592
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2650
 msgid "IPv6"
 msgstr "IPv6"
 
@@ -742,126 +742,126 @@ msgid "Backlogged?"
 msgstr "Visszanaplózva?"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1390
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2646
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2704
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:91
 msgid "Inbound"
 msgstr "Bejövő"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1392
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2648
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2706
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:91
 msgid "Outbound"
 msgstr "Kimenő"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:1447
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2813
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2871
 #, java-format
 msgid "{0} peer"
 msgid_plural "{0} peers"
 msgstr[0] "{0} peer"
 msgstr[1] "{0} peer"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2579
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2637
 msgid "UDP connections"
 msgstr "UDP csatlakozások"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2589
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2647
 msgid "Sort by peer hash"
 msgstr "Rendezés társ hash szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2591
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2649
 msgid "Direction/Introduction"
 msgstr "Irány/Bemutató"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2594
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2652
 msgid "Sort by idle inbound"
 msgstr "Rendezés üres bejövő szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2596
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2654
 msgid "Sort by idle outbound"
 msgstr "Rendezés üres kimenő szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2599
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2657
 msgid "Sort by inbound rate"
 msgstr "Rendezés bejövő sebesség szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2601
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2659
 msgid "Sort by outbound rate"
 msgstr "Rendezés kimenő sebeeség szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2604
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2662
 msgid "Sort by connection uptime"
 msgstr "Rendezés kapcsolat indítása óta eltelt idő szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2606
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2664
 msgid "Sort by clock skew"
 msgstr "Rendezés óra eltérése szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2609
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2667
 msgid "Sort by congestion window"
 msgstr "Rendezés torlódás ablak szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2611
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2669
 msgid "Sort by slow start threshold"
 msgstr "Rendezés lassú indítás küszöb szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2614
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2672
 msgid "Sort by round trip time"
 msgstr "Rendezés körbejárási idő szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2618
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2676
 msgid "Sort by retransmission timeout"
 msgstr "Rendezés újraátviteli időtúllépés szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2621
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2679
 msgid "Sort by outbound maximum transmit unit"
 msgstr "Rendezés maximális kimenő továbbítási egységenként"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2623
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2681
 msgid "Sort by packets sent"
 msgstr "Rendezés küldött csomagok szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2625
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2683
 msgid "Sort by packets received"
 msgstr "Rendezés fogadott csomagok szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2628
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2686
 msgid "Sort by packets retransmitted"
 msgstr "Rendezés újraközvetített csomagok szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2630
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2688
 msgid "Sort by packets received more than once"
 msgstr "Rendezés több, mint egyszer fogadott csomagok szerint"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2650
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2708
 msgid "We offered to introduce them"
 msgstr "Fejajánlottuk, hogy bemutatjuk őket"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2652
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2710
 msgid "They offered to introduce us"
 msgstr "Felajánlották, hogy bemutatnak minket"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2656
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2714
 msgid "Choked"
 msgstr "Eltömődött"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2664
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2722
 msgid "1 fail"
 msgstr "1 sikertelen"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2666
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2724
 #, java-format
 msgid "{0} fails"
 msgstr "{0} sikertelen"
 
 #. 1
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2672
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2730
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:168
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:13
 msgid "Banned"
 msgstr "Kitiltva"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2731
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2789
 msgid "backlogged"
 msgstr ""
 
@@ -878,24 +878,24 @@ msgstr ""
 msgid "Dropping tunnel requests: Overloaded"
 msgstr "Alagút kérések elvetése: túlterhelt"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:724
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:732
 msgid "Rejecting tunnels: Hidden mode"
 msgstr "Alagutak elvetése: Rejtett mód"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:752
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:760
 msgid "Rejecting tunnels: Request overload"
 msgstr "Alagutak elvetése: kérés túlterhelt"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:783
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:791
 msgid "Rejecting tunnels: Connection limit"
 msgstr "Alagutak elvetése: Kapcsolódási korlát"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1001
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1034
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1009
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1042
 msgid "Dropping tunnel requests: High load"
 msgstr "Alagút kérések elvetése: Magas töltöttség"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1117
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:1125
 msgid "Dropping tunnel requests: Queue time"
 msgstr "Alagút kérések elvetése: Sorba állítási idő"
 
@@ -978,7 +978,7 @@ msgid "HTTP client proxy tunnel must be running"
 msgstr "HTTP kliens proxy alagútnak futnia kell"
 
 #: ../java/src/net/i2p/router/update/DevSU3UpdateChecker.java:83
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:254
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:260
 #: ../java/src/net/i2p/router/update/UnsignedUpdateChecker.java:88
 #, java-format
 msgid "Requires Java version {0} but installed Java version is {1}"
@@ -993,23 +993,23 @@ msgstr "{0} Java verzió szükséges, de a telepített Java verzió {1}"
 msgid "Updating"
 msgstr "Frissítés"
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:218
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:224
 msgid "In-network updates disabled. Check package manager."
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:224
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:230
 msgid "No write permission for I2P install directory."
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:230
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:236
 msgid "No Pack200 support in Java runtime."
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:236
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:242
 msgid "No update certificates installed."
 msgstr ""
 
-#: ../java/src/net/i2p/router/update/NewsFetcher.java:244
+#: ../java/src/net/i2p/router/update/NewsFetcher.java:250
 #, java-format
 msgid "You must first update to version {0}"
 msgstr "Először frissítened kell a {0} verzióra"
@@ -1344,6 +1344,7 @@ msgstr "Hiba a beállítások frissítésekor - kérlek, nézd át a hibanaplót
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:72
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:96
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:392
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:368
 msgid "Configuration saved successfully"
 msgstr "Beállítások sikeresen elmentve"
 
@@ -1356,6 +1357,7 @@ msgstr "Beállítások sikeresen elmentve"
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:394
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:109
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:160
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:370
 msgid ""
 "Error saving the configuration (applied but not saved) - please see the "
 "error logs"
@@ -1533,7 +1535,7 @@ msgid "Error starting plugin {0}"
 msgstr "Hiba a következő kiegészítő indítása közben: {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:604
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:93
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:105
 #, java-format
 msgid "Added user {0}"
 msgstr ""
@@ -1547,9 +1549,10 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ConfigFamilyHandler.java:83
 #: ../java/src/net/i2p/router/web/ConfigFamilyHandler.java:102
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:345
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:351
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:122
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:94
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:118
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:108
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:132
 msgid "Restart required to take effect"
 msgstr ""
 
@@ -1684,7 +1687,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigHomeHandler.java:21
 #: ../java/src/net/i2p/router/web/ConfigSummaryHandler.java:22
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:19
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:21
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:998
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:497
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:517
@@ -1818,7 +1821,7 @@ msgstr "Érvényes szintek a következők: DEBUG, INFO, WARN, ERROR, CRIT . DEBU
 #. http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
 #. but pink instead of yellow for WARN
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:65
-#: ../java/src/net/i2p/router/web/LogsHelper.java:141
+#: ../java/src/net/i2p/router/web/LogsHelper.java:170
 msgid "CRIT"
 msgstr "CRIT"
 
@@ -1827,17 +1830,17 @@ msgid "DEBUG"
 msgstr "DEBUG"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:65
-#: ../java/src/net/i2p/router/web/LogsHelper.java:143
+#: ../java/src/net/i2p/router/web/LogsHelper.java:172
 msgid "ERROR"
 msgstr "ERROR"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:65
-#: ../java/src/net/i2p/router/web/LogsHelper.java:147
+#: ../java/src/net/i2p/router/web/LogsHelper.java:176
 msgid "INFO"
 msgstr "INFO"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:65
-#: ../java/src/net/i2p/router/web/LogsHelper.java:145
+#: ../java/src/net/i2p/router/web/LogsHelper.java:174
 msgid "WARN"
 msgstr "WARN"
 
@@ -2214,8 +2217,8 @@ msgstr ""
 
 #. Normal browsers send value, IE sends button label
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:34
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:203
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:207
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:229
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:233
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:474
 msgid "Shutdown immediately"
 msgstr "Azonnali Kikapcsolás"
@@ -2271,120 +2274,147 @@ msgstr[1] ""
 msgid "Restart in {0}"
 msgstr "Újraindítás: {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:198
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:224
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:472
 msgid "Shutdown gracefully"
 msgstr "Türelmes kikapcsolás"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:202
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:228
 msgid "Graceful shutdown initiated"
 msgstr "Türelmes kikapcsolás elindítva"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:208
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:234
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:478
 msgid "Cancel graceful shutdown"
 msgstr "Türelmes kikapcsolás elvetése"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:210
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:236
 msgid "Graceful shutdown cancelled"
 msgstr "Türelmes kikapcsolás elvetve"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:211
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:237
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:492
 msgid "Graceful restart"
 msgstr "Türelmes újraindítás"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:216
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:242
 msgid "Graceful restart requested"
 msgstr "Türelmes újraindítás kérve"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:217
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:243
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:494
 msgid "Hard restart"
 msgstr "Erős újraindítás"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:222
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:248
 msgid "Hard restart requested"
 msgstr "Erős újraindítás kérve"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:223
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:249
 msgid "Rekey and Restart"
 msgstr "Kulcsmódosítás és Újraindítás"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:224
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:250
 msgid "Rekeying after graceful restart"
 msgstr "Kulcsmódosítás türelmes újraindítás után"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:227
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:253
 msgid "Rekey and Shutdown"
 msgstr "Kulcsmódosítás és Kikapcsolás"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:228
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:254
 msgid "Rekeying after graceful shutdown"
 msgstr "Kulcsmódosítás türelmes kikapcsolás után"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:231
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:520
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:257
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:526
 msgid "Run I2P on startup"
 msgstr "I2P futtatása indításkor"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:233
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:522
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:259
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:528
 msgid "Don't run I2P on startup"
 msgstr "Ne futtassa az I2P-t indításkor"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:235
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:546
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:261
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:552
 msgid "Dump threads"
 msgstr "Szálak lerakása"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:242
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:268
 #, java-format
 msgid "Threads dumped to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:243
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:554
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:269
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:560
 msgid "View console on startup"
 msgstr "Konzol megjelenítése indításkor"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:245
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:271
 msgid "Console is to be shown on startup"
 msgstr "Konzol legyen mutatva indításkor"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:246
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:556
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:272
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:562
 msgid "Do not view console on startup"
 msgstr "Ne nézzel meg a konzolt indításkor"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:248
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:274
 msgid "Console is not to be shown on startup"
 msgstr "Indításnál a konzol ne legyen mutatva"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:249
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:542
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:275
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:548
 msgid "Force GC"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:251
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:277
 msgid "Full garbage collection requested"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:260
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:278
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:506
+msgid "Show systray icon"
+msgstr "Tálcaikon mutatása"
+
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:280
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:510
+msgid "Hide systray icon"
+msgstr "Tálcaikon elrejtése"
+
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:290
 msgid "Service installed"
 msgstr "Szolgáltatás telepítve"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:262
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:292
 msgid "Warning: unable to install the service"
 msgstr "Figyelmeztetés: szolgáltatás telepítése sikertelen"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:269
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:299
 msgid "Service removed"
 msgstr "Szolgáltatás eltávolítva"
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:271
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:301
 msgid "Warning: unable to remove the service"
 msgstr "Figyelmeztetés: szolgáltatás eltávolítása sikertelen"
+
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:340
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:355
+msgid "Enabled system tray"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:345
+msgid "Disabled system tray"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:360
+msgid "Failed to start systray"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:362
+msgid "Failed to stop systray"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigStatsHandler.java:116
 msgid "Stat filter and location updated successfully to"
@@ -2480,9 +2510,9 @@ msgid "Exploratory tunnel configuration saved successfully."
 msgstr "A felfedező alagút beállításai sikeresen mentve."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHandler.java:137
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:73
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:96
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:114
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:75
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:110
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:128
 msgid ""
 "Error saving the configuration (applied but not saved) - please see the "
 "error logs."
@@ -2554,34 +2584,47 @@ msgstr "Bejövő opciók"
 msgid "Outbound options"
 msgstr "Kimenő opciók"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:21
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:23
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:472
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:478
 msgid "Add user"
 msgstr "Felhasználó hozzáadása"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:63
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:65
 msgid "Theme change saved."
 msgstr "A témaváltoztatás mentve."
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:65
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:70
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:67
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:72
 msgid "Refresh the page to view."
 msgstr "Megtenkintéshez az oldal frissítése szükséges."
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:68
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:70
 msgid "Mobile console option saved."
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:80
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:82
 msgid "No user name entered"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:85
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:94
+msgid ""
+"Warning: User names outside the ISO-8859-1 character set are not "
+"recommended. Support is not standardized and varies by browser."
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:97
 msgid "No password entered"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:111
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:106
+#, java-format
+msgid ""
+"To recover from a forgotten or non-working password, stop I2P, edit the file"
+" {0}, delete the line {1}, and restart I2P."
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUIHandler.java:125
 #, java-format
 msgid "Removed user {0}"
 msgstr ""
@@ -3041,7 +3084,7 @@ msgid "Periods"
 msgstr "periódus"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:362
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:518
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:524
 msgid "or"
 msgstr "vagy"
 
@@ -3234,23 +3277,14 @@ msgstr "Mikroblog"
 msgid "Your premier microblogging service on I2P"
 msgstr "Az elsőszámú mikroblog szolgáltatás az I2P hálózaton"
 
-#: ../java/src/net/i2p/router/web/HomeHelper.java:56
-msgid "Javadocs"
-msgstr "Java dokumentumok"
-
-#: ../java/src/net/i2p/router/web/HomeHelper.java:56
-#: ../java/src/net/i2p/router/web/HomeHelper.java:69
-msgid "Technical documentation"
-msgstr "Szakmai dokumentáció"
-
+#. _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-
+#. javadocs.i2p/" + S + I + "education.png" + S +
 #. "jisko.i2p" + S + _x("Simple and fast microblogging website") + S +
 #. "http://jisko.i2p/" + S + I + "jisko_console_icon.png" + S +
 #. _x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S
 #. + I + "education.png" + S +
-#: ../java/src/net/i2p/router/web/HomeHelper.java:59
-msgid "Debian and Tahoe-LAFS repositories"
-msgstr "Debian és Tahoe-LAFS szoftvertár"
-
+#. "killyourtv.i2p" + S + _x("Debian and Tahoe-LAFS repositories") + S +
+#. "http://killyourtv.i2p/" + S + I + "television_delete.png" + S +
 #: ../java/src/net/i2p/router/web/HomeHelper.java:60
 msgid "Free Web Hosting"
 msgstr ""
@@ -3307,6 +3341,10 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:69
 msgid "Technical Docs"
+msgstr "Szakmai dokumentáció"
+
+#: ../java/src/net/i2p/router/web/HomeHelper.java:69
+msgid "Technical documentation"
 msgstr "Szakmai dokumentáció"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:70
@@ -3434,16 +3472,16 @@ msgstr ""
 msgid "Summary"
 msgstr "Összegzés"
 
-#: ../java/src/net/i2p/router/web/LogsHelper.java:49
-#: ../java/src/net/i2p/router/web/LogsHelper.java:103
+#: ../java/src/net/i2p/router/web/LogsHelper.java:78
+#: ../java/src/net/i2p/router/web/LogsHelper.java:132
 msgid "File location"
 msgstr "Fájl helye"
 
-#: ../java/src/net/i2p/router/web/LogsHelper.java:100
+#: ../java/src/net/i2p/router/web/LogsHelper.java:129
 msgid "File not found"
 msgstr "Fájl nem található"
 
-#: ../java/src/net/i2p/router/web/LogsHelper.java:118
+#: ../java/src/net/i2p/router/web/LogsHelper.java:147
 msgid "No log messages"
 msgstr "Nincs naplóüzenet"
 
@@ -3740,19 +3778,19 @@ msgid "Groups (Caps)"
 msgstr "Csoport"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:91
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:265
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:262
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:517
 msgid "Speed"
 msgstr "Sebesség"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:92
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:267
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:264
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:521
 msgid "Capacity"
 msgstr "Kapacitás"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:93
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:269
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:266
 msgid "Integration"
 msgstr "Integráltság"
 
@@ -3852,71 +3890,71 @@ msgstr "Sikertelen ráta 1 óra alatt"
 msgid "1d Fail Rate"
 msgstr "Sikertelen ráta 1 nap alatt"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:264
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:261
 msgid "Thresholds"
 msgstr "Küszöb"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:266
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:263
 msgid "fast peers"
 msgstr "gyors társak"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:268
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:265
 msgid "high capacity peers"
 msgstr "nagy kapacitású társak"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:270
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:267
 msgid " well integrated peers"
 msgstr "jól integrálódott társak"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:272
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:269
 msgid "as determined by the profile organizer"
 msgstr "ahogy a profil rendezőben meghatározva"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:272
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:269
 msgid "groups"
 msgstr "csoport"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:273
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:270
 msgid "capabilities in the netDb, not used to determine profiles"
 msgstr "Adottságok a NetDb-ben, nincs felhasználva a profilok meghatározásához"
 
 #. capabilities
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:273
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:270
 #: ../java/strings/Strings.java:82
 msgid "caps"
 msgstr "tető"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:274
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:271
 msgid ""
 "peak throughput (bytes per second) over a 1 minute period that the peer has "
 "sustained in a single tunnel"
 msgstr "csúcs átvilel (bájt / másodperc) az alatt az 1 perces időtartam alatt, melyben a társ egyedülálló alagutat tartott fenn"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:274
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:271
 msgid "speed"
 msgstr "sebesség"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:275
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:272
 msgid "capacity"
 msgstr "kapacitás"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:275
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:272
 msgid "how many tunnels can we ask them to join in an hour?"
 msgstr "Óránként hány alagútba kérhetjük őket, hogy csatlakozzanak?"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:276
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:273
 msgid "how many new peers have they told us about lately?"
 msgstr "A közelmúltban hány új társról szóltak nekünk?"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:276
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:273
 msgid "integration"
 msgstr "integráció"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:277
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:274
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
 msgstr "a társ kitiltva, nem elérhető vagy az alagút tesztjei sikertelenek?"
 
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:277
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:274
 msgid "status"
 msgstr "állapot"
 
@@ -4557,7 +4595,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:36
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:60
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:416
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:441
 msgid "configure"
 msgstr "beállít"
 
@@ -6285,81 +6323,60 @@ msgid "Systray integration"
 msgstr "Tálca integráció"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:502
-msgid ""
-"On the windows platform, there is a small application to sit in the system "
-"tray, allowing you to view the router's status"
-msgstr "A Windows platformon egy kis alkalmazás foglal helyet a tálcán, mely lehetővé teszi a router állapotának megtekintését."
+msgid "Control the system tray icon"
+msgstr ""
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:504
-msgid ""
-"(later on, I2P client applications will be able to integrate their own "
-"functionality into the system tray as well)."
-msgstr "(később az I2P kliens alkalmazásai is képesek lesznek saját funkciójukat a tálcára integrálni)."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:506
-msgid ""
-"If you are on windows, you can either enable or disable that icon here."
-msgstr "Ha Windows alatt vagy, itt engedélyezheted vagy letilthatod az ikont."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:508
-msgid "Show systray icon"
-msgstr "Tálcaikon mutatása"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:510
-msgid "Hide systray icon"
-msgstr "Tálcaikon elrejtése"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:512
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:518
 msgid "Run on startup"
 msgstr "Futtatás indításkor"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:514
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:520
 msgid ""
 "You can control whether I2P is run on startup or not by selecting one of the"
 " following options - I2P will install (or remove) a service accordingly."
 msgstr "Egy kiválasztásával az alábbi opciók közül irányítható, hogy az I2P fusson indításkor vagy ne - az I2P ennek megfelelően fog szolgáltatást telepíteni (vagy eltávolítani)."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:516
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:522
 msgid "If you prefer the command line, you can also run the "
 msgstr "Ha a parancssort kedveled, futtathatod a következőt is:"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:524
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:530
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:498
 msgid "Note"
 msgstr "Megjegyzés"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:526
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:532
 msgid ""
 "If you are running I2P as service right now, removing it will shut down your"
 " router immediately."
 msgstr "Ha jelen pillanatban az I2P-t szolgáltatásként futtatot, az eltávolítás teljesen le fogja kapcsolni a routered."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:528
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:534
 msgid ""
 "You may want to consider shutting down gracefully, as above, then running "
 "uninstall_i2p_service_winnt.bat."
 msgstr "Célszerű fontolóra venni a tülermes kikapcsolást, mint fentett, azután futtatni a uninstall_i2p_service_winnt.bat fájlt."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:532
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:538
 msgid "Debugging"
 msgstr "Hibaelhárítás"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:534
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:540
 msgid "View the job queue"
 msgstr "Feladat sor megtekintése"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:538
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:544
 msgid ""
 "At times, it may be helpful to debug I2P by getting a thread dump. To do so,"
 " please select the following option and review the thread dumped to <a "
 "href=\"logs.jsp#servicelogs\">wrapper.log</a>."
 msgstr "Bizonyos esetekben segíthet az I2P hibajavításában a szál lerakás (thread dump). Ennek eléréséhez kérlek, válaszd ki a következő opciót és nézd át a lerakott szálat a következőn: <a href=\"logs.jsp#servicelogs\">wrapper.log</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:550
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:556
 msgid "Launch browser on router startup?"
 msgstr "Böngésző indítása a router indításakor?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:552
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:558
 msgid ""
 "I2P's main configuration interface is this web console, so for your "
 "convenience I2P can launch a web browser on startup pointing at"
@@ -6685,7 +6702,7 @@ msgid "I2P Version and Running Environment"
 msgstr "I2P Verzió és Futtatási Környezet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:259
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:408
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:433
 msgid ""
 "Note that system information, log timestamps, and log messages may provide "
 "clues to your location; please review everything you include in a bug "
@@ -6758,23 +6775,23 @@ msgstr "napló"
 msgid "I2P Router Logs"
 msgstr "I2P Router Napló"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:410
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:435
 msgid "Critical Logs"
 msgstr "Kritikus Napló"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:414
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:439
 msgid "Router Logs"
 msgstr "Router Napló"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:420
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:445
 msgid "Event Logs"
 msgstr "Eseménynaplók"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:422
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:447
 msgid "View event logs"
 msgstr "Eseménynaplók megtekintése"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:424
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:449
 msgid "Service (Wrapper) Logs"
 msgstr "Szolgáltatás (Wrapper) Napló"
 

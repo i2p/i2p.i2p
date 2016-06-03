@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 08:33+0000\n"
-"PO-Revision-Date: 2015-05-17 20:51+0000\n"
-"Last-Translator: Nathan Follens\n"
-"Language-Team: Dutch (http://www.transifex.com/projects/p/I2P/language/nl/)\n"
+"POT-Creation-Date: 2016-05-25 12:28+0000\n"
+"PO-Revision-Date: 2016-05-25 12:34+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -51,35 +51,35 @@ msgid ""
 " unavailable in this JVM"
 msgstr "Hostnaam \"{0}\" vereist conversie naar ASCII, maar de conversiebibliotheek is niet beschikbaar in deze JVM"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:219
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:223
 msgid "None"
 msgstr "Geen"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:227
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:231
 msgid "Hashcash"
 msgstr "Hashcash"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:229
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:233
 msgid "Hidden"
 msgstr "Verborgen"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:231
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:235
 msgid "Signed"
 msgstr "Ondertekend"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:233
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:237
 msgid "Key"
 msgstr "Sleutel"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:235
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:260
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:239
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:264
 #, java-format
 msgid "Type {0}"
 msgstr "Type {0}"
 
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:247
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:254
-#: ../src/java/src/i2p/susi/dns/AddressBean.java:257
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:251
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:258
+#: ../src/java/src/i2p/susi/dns/AddressBean.java:261
 msgid "DSA 1024 bit"
 msgstr "DSA 1024-bits"
 
@@ -117,27 +117,27 @@ msgid "Showing {0} of {1}"
 msgstr "Toon {0} van {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:425
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:453
 msgid "Add"
 msgstr "Toevoegen"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:232
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:423
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:246
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:451
 msgid "Replace"
 msgstr "Vervang"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:254
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:243
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
 msgstr "Hostnaam {0} is al in het adresboek, ongewijzigd."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:256
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
 #, java-format
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
@@ -145,63 +145,63 @@ msgid ""
 msgstr "Hostnaam {0} is al in het adresboek met een andere bestemming. Klik op \"Vervangen\" om te overschrijven."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:258
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:260
 #, java-format
 msgid "Destination added for {0}."
 msgstr "Destination toegevoegd voor {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:271
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:260
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "Destination gewijzigd voor {0}."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:273
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:264
 msgid "Warning - host name does not end with \".i2p\""
 msgstr "Waarschuwing - hostnaam eindigt niet op \".i2p\""
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:270
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:272
 msgid "Invalid Base 64 destination."
 msgstr "Ongeldige Base 64 destination."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:276
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
 #, java-format
 msgid "Invalid host name \"{0}\"."
 msgstr "Ongeldige hostnaam \"{0}\"."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:279
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:281
 msgid "Please enter a host name and destination"
 msgstr "Voer een host naam en destination in"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:312
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:308
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:270
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:285
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:310
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:285
 msgid "Delete Entry"
 msgstr "Item verwijderen"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:283
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:351
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:285
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:369
 msgid "Delete Selected"
 msgstr "Verwijderen Selectie"
 
 #. parameter is a host name
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:300
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:302
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "Destination {0} verwijderd."
 
 #. parameter will always be >= 2
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:305
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
@@ -209,12 +209,12 @@ msgstr[0] "1 bestemming verwijderd."
 msgstr[1] "{0} bestemmingen verwijderd."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:305
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:307
 msgid "No entries selected to delete."
 msgstr "Geen items geselecteerd om te verwijderen."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:312
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:314
 msgid "Address book saved."
 msgstr "Adresboek opgeslagen."
 
@@ -224,8 +224,8 @@ msgstr "ERROR: Kan het adresboek bestand niet wegschrijven."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:316
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
@@ -233,17 +233,17 @@ msgstr "Ongeldig formulier verzonden, waarschijnlijk omdat je de \"terug\" or \"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:155
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:320
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:159
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
 msgstr "Als het probleem zich blijft voordoen, controleer dan dat je cookies in je browser hebt aangezet."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:128
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:160
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:151
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:161
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:152
 msgid "Save"
 msgstr "Opgeslagen"
 
@@ -252,9 +252,9 @@ msgid "Configuration saved."
 msgstr "Configuratie opgeslagen."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:158
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:149
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:159
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:150
 msgid "Reload"
 msgstr "Herladen"
 
@@ -262,461 +262,473 @@ msgstr "Herladen"
 msgid "Configuration reloaded."
 msgstr "Configuratie herladen."
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:104
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:106
 #, java-format
 msgid "{0} address book in {1} database"
 msgstr "{0} adresboek in {1} database"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:253
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:255
 msgid "Manually added via SusiDNS"
 msgstr "Handmatig toegevoegd via SusiDNS"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:267
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:269
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
 msgstr "Toevoegen van Bestemming voor {0} naar naamdienst {1} mislukt"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:291
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:293
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "Verwijderen van Bestemming voor {0} van naamdienst {1} mislukt"
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:140
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr "Subscriptions opgeslagen, adresboek wordt nu vernieuwd van de subscription bronnen."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
 msgid "Subscriptions saved."
 msgstr "Subscriptions opgeslagen."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:149
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions reloaded."
 msgstr "Subscriptions herladen."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:127
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:135
 msgid "address book"
 msgstr "adresboek"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:133
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:149
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:132
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:148
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:118
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:134
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:135
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:123
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:139
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:141
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:157
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:133
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:149
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:125
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:141
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:136
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:124
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:140
 msgid "Overview"
 msgstr "Overzicht"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:135
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:134
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:120
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:121
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:125
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:143
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:135
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:127
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:122
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:126
 msgid "Address books"
 msgstr "Adresboeken"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:137
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:136
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:122
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:123
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:127
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:145
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:137
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:129
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:124
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:128
 msgid "private"
 msgstr "privé"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:139
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:138
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:124
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:125
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:129
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:147
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:139
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:131
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:126
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:130
 msgid "master"
 msgstr "hoofd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:141
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:140
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:126
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:127
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:131
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:149
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:141
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:133
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:128
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:132
 msgid "router"
 msgstr "router"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:143
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:142
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:128
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:129
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:133
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:151
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:143
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:135
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:130
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:134
 msgid "published"
 msgstr "gepubliceerd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:145
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:144
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:130
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:131
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:135
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:153
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:145
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:137
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:132
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:136
 msgid "Subscriptions"
 msgstr "Abonnementen"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:147
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:146
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:132
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:133
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:137
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:155
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:147
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:139
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:134
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:138
 msgid "Configuration"
 msgstr "Configuratie"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:151
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:136
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:159
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:143
 msgid "Address book"
 msgstr "Adresboek"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:156
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:141
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:164
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:148
 msgid "Storage"
 msgstr "Opslag"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:174
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:184
 msgid "Filter"
 msgstr "Filter"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:177
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:187
 msgid "other"
 msgstr "andere"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:179
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:189
 msgid "all"
 msgstr "alle"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:193
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:201
 msgid "Current filter"
 msgstr "Huidige filter"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:198
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:206
 msgid "clear filter"
 msgstr "wis filter"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:211
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:215
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:219
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:223
 msgid "Search"
 msgstr "Zoek"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:262
 msgid "Name"
 msgstr "Naam"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:250
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:264
 msgid "Links"
 msgstr "Links"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:252
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:417
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:262
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:266
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:445
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:277
 msgid "Destination"
 msgstr "Destination"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:288
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:302
 msgid "Mark for deletion"
 msgstr "Markeer voor verwijdering"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:307
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:321
 msgid "Base 32 address"
 msgstr "Base-32 adres"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:311
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:325
 msgid "More information on this entry"
 msgstr "Meer informatie over dit item"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:328
 msgid "details"
 msgstr "details"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:349
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:421
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:367
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:449
 msgid "Cancel"
 msgstr "Annuleer"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:373
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
 msgid "Export in hosts.txt format"
 msgstr "Exporteren in hosts.txt-formaat"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:424
 msgid "This address book is empty."
 msgstr "Dit adresboek is leeg."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:411
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:439
 msgid "Add new destination"
 msgstr "Nieuwe destination toevoegen"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:413
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:168
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:441
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:177
 msgid "Host Name"
 msgstr "Hostnaam"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:126
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:127
 msgid "configuration"
 msgstr "configuratie"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:162
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:163
 msgid "Hints"
 msgstr "Hints"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:164
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:165
 msgid ""
 "File and directory paths here are relative to the addressbook's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%APPDATA%\\I2P\\addressbook\\ (Windows)."
 msgstr "De bestands en directory paden hier zijn relatief aan de werk directory van het adresboek. Dit is gewoonlijk ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P\\addressbook\\ (Windows)."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:166
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:167
 msgid ""
 "If you want to manually add lines to an addressbook, add them to the private"
 " or master addressbooks."
 msgstr "Indien je handmatig regels wilt toevoegen aan het adresboek, voeg ze toe aan het privé of hoofd adresboek."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:168
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:169
 msgid ""
 "The router addressbook and the published addressbook are updated by the "
 "addressbook application."
 msgstr "Het router adresboek en het gepubliceerde adresboek worden geupdate door de adresboek applicatie."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:170
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:171
 msgid ""
 "When you publish your addressbook, ALL destinations from the master and "
 "router addressbooks appear there."
 msgstr "Wanneer je je adresboek publiceert, zullen ALLE destinations uit de hoofd en router adresboeken hierin verschijnen."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:172
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:173
 msgid ""
 "Use the private addressbook for private destinations, these are not "
 "published."
 msgstr "Gebruik het privé adresboek voor privé destinations, deze worden niet gepubliceerd."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:174
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:175
 msgid "Options"
 msgstr "Opties"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:176
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:177
 msgid "File containing the list of subscriptions URLs (no need to change)"
 msgstr "Bestand bevat de lijst met subscription URLs (wijzigen niet nodig)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:178
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:179
 msgid "Update interval in hours"
 msgstr "Vernieuw interval in uren"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:180
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:181
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
 msgstr "Je publieke hosts.txt bestand (specificeer een pad binnen de document root van je webserver)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:182
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:183
 msgid "Your hosts.txt (don't change)"
 msgstr "Je hosts.txt (niet wijzigen)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:184
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:185
 msgid "Your personal addressbook, these hosts will be published"
 msgstr "Je persoonlijke adresboek, deze hosts zullen worden gepubliceerd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:186
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:187
 msgid "Your private addressbook, it is never published"
 msgstr "Je privé adresboek, dit wordt nooit gepubliceerd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:188
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:189
 msgid "Port for your eepProxy (no need to change)"
 msgstr "Poort voor je eepProxy (wijzigen niet nodig)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:190
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:191
 msgid "Hostname for your eepProxy (no need to change)"
 msgstr "Hostnaam voor je eepProxy (wijzigen niet nodig)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:192
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:193
 msgid "Whether to update the published addressbook"
 msgstr "Of het gepubliceerde adresboek geupdate moet worden"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:194
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:195
 msgid ""
 "File containing the etags header from the fetched subscription URLs (no need"
 " to change)"
 msgstr "Bestand bevat de etags header van de gedownloade subscription URLs (wijzigens niet nodig)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:196
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:197
 msgid ""
 "File containing the modification timestamp for each fetched subscription URL"
 " (no need to change)"
 msgstr "Bestand bevat de wijzigings timestap voor elke gedownloade subscription URLs (wijzigens niet nodig)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:198
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:199
 msgid "File to log activity to (change to /dev/null if you like)"
 msgstr "Bestand om activiteit naar te loggen (wijzig naar /dev/null indien gewenst)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:201
 msgid "Name of the theme to use (defaults to 'light')"
 msgstr "Naam van het te gebruiken thema (standaard: 'light')"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:112
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:119
 msgid "addressbook"
 msgstr "adresboek"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:182
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:191
 msgid "Encoded Name"
 msgstr "Gecodeerde naam"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:196
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:205
 msgid "Base 32 Address"
 msgstr "Base-32 adres"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:204
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
 msgid "Base 64 Hash"
 msgstr "Base-64 hash"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:210
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
 msgid "Address Helper"
 msgstr "Adreshelper"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:216
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:225
 msgid "link"
 msgstr "link"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:229
 msgid "Public Key"
 msgstr "Publieke sleutel"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:222
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:231
 msgid "ElGamal 2048 bit"
 msgstr "ElGamal 2048-bits"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:226
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:235
 msgid "Signing Key"
 msgstr "Ondertekeningssleutel"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:232
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:241
 msgid "Certificate"
 msgstr "Certificaat"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:238
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:247
 msgid "Added Date"
 msgstr "Datum toegevoegd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:244
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:253
+msgid "Validated"
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:255
+msgid "no"
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:255
+msgid "yes"
+msgstr ""
+
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:259
 msgid "Source"
 msgstr "Bron"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:250
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:265
 msgid "Last Modified"
 msgstr "Laatst gewijzigd"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:256
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:271
 msgid "Notes"
 msgstr "Opmerkingen"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:115
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:116
 msgid "Introduction"
 msgstr "Introductie"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:137
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:138
 msgid "What is the addressbook?"
 msgstr "Wat is het adresboek?"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:139
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
 msgid "The addressbook application is part of your I2P installation."
 msgstr "De adresboek-applicatie is een onderdeel van je I2P-installatie."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:141
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
 msgstr "Het update je hosts.txt bestand regelmatig vanaf gedistribueerde bronnen of \"subscriptions\"."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:143
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:144
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
 msgstr "In de standaardconfiguratie is het adresboek enkel geabonneerd op {0}."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:145
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:146
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a> file."
 msgstr "Abonneren op andere sites is makkelijk, je hoeft ze gewoon toe te voegen aan je <a href=\"subscriptions\">subscriptions</a>-bestand."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:147
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:148
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_top\">the overview</a>."
 msgstr "Voor meer informatie over namen in I2P, zie <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">het overzicht</a>."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:149
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:150
 msgid "How does the addressbook application work?"
 msgstr "Hoe werkt de adresboek-applicatie?"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:151
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:152
 msgid ""
 "The addressbook application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
 msgstr "De adresboek-applicatie polst je abonnementen regelmatig en voegt hun inhoud bij je \"router\"-adresboek."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:153
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:154
 msgid ""
 "Then it merges your \"master\" address book into the router address book as "
 "well."
 msgstr "Daarna voegt het ook je \"master\"-adresboek bij je router-adresboek."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:155
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:156
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
 msgstr "Indien ingesteld wordt het router-adresboek nu geschreven naar het \"uitgegeven\" adresboek, dat publiek beschikbaar is als je een eepsite hebt."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:157
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:158
 msgid ""
 "The router also uses a private address book (not shown in the picture), "
 "which is not merged or published."
 msgstr "De router gebruikt ook een privé adresboek (niet weergegeven in de afbeelding) dat niet wordt samengevoegd of uitgegeven."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:159
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:160
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
 msgstr "Hosts in het privé adresboek kunnen door jou benaderd worden, maar hun adressen worden nooit gedistribueerd naar anderen."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:161
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:162
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."
 msgstr "Het privé adresboek kan ook gebruikt worden voor aliassen van hosts in je andere adresboeken."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:117
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:118
 msgid "subscriptions"
 msgstr "subscriptions"
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:153
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:154
 msgid "The subscription file contains a list of i2p URLs."
 msgstr "Het subscription bestand bevat een lijst met i2p URLs."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:155
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:156
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
 msgstr "De adresboek applicatie controlleert deze lijst regelmatig op nieuwe eepsites."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:157
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:158
 msgid "Those URLs refer to published hosts.txt files."
 msgstr "Deze URLs verwijzen naar gepubliceerde hosts.txt bestanden."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:159
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:160
 #, java-format
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
 msgstr "Het standaardabonnement is hosts.txt van {0}, dat zelden bijgewerkt wordt."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:161
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:162
 msgid ""
 "So it is a good idea to add additional subscriptions to sites that have the "
 "latest addresses."
 msgstr "Dus is het een goed idee om extra subscriptions toe te voegen op sites met de laatste adressen."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:163
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:164
 msgid "See the FAQ for a list of subscription URLs."
 msgstr "Zie de FAQ voor een lijst met subscription URLs."
