@@ -163,6 +163,7 @@ public class SnarkManager implements CompleteListener {
        ,"DgTrack", "http://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p/a=http://opentracker.dg2.i2p/"
        // The following is ECDSA_SHA256_P256
        ,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
+       ,"psi's open tracker", "http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/announce=http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/"
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
@@ -182,7 +183,9 @@ public class SnarkManager implements CompleteListener {
         "psi.i2p", "avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p",
         "opentracker.psi.i2p", "vmow3h54yljn7zvzbqepdddt5fmygijujycod2q6yznpy2rrzuwa.b32.i2p",
         "tracker.killyourtv.i2p", "5mpvzxfbd4rtped3c7ln4ddw52e7i7t56s36ztky4ustxtxrjdpa.b32.i2p",
-        "opendiftracker.i2p", "bikpeyxci4zuyy36eau5ycw665dplun4yxamn7vmsastejdqtfoq.b32.i2p"
+        "opendiftracker.i2p", "bikpeyxci4zuyy36eau5ycw665dplun4yxamn7vmsastejdqtfoq.b32.i2p",
+        // psi go - unregistered
+        "uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p"
     }));
 
     static {
