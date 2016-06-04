@@ -1,0 +1,169 @@
+Instructions to upload to launchpad PPA
+
+You must have a GPG key already uploaded to the
+usual public key servers, where launchpad can find it.
+
+Prep
+----
+
+- Make a launchpad account
+- Log into launchpad
+- Get your GPG fingerprint (gpg -K --fingerprint)
+- Add your GPG fingerprint at the form on
+  https://launchpad.net/~/+editpgpkeys
+- Wait for the encrypted email response
+- Decrypt and click the confirmation link in the email
+- Click confirm on the page
+- Make a PPA, lets call it 'test'
+- OPTIONAL: Go to i2p.packages PPA and copy over existing I2P to your PPA:
+  (select "copy existing binaries")
+    trusty, vivid, wily, xenial
+    not precise (only if building for precise which you probably aren't)
+    not utopic (obsolete, disabled by launchpad)
+- Go to i2p.packages PPA and copy over service-wrapper-java to your PPA.
+  This is required for the build.
+  (select "copy existing binaries")
+    trusty
+    not precise (only if building for precise which you probably aren't)
+    not vivid, wily, xenial (more recent versions 3.5.25-2 or 3.5.26-3 are in official launchpad)
+    not utopic (obsolete, disabled by launchpad)
+
+- you need the following packages
+  sudo apt-get install devscripts dput dh_systemd
+
+- check out clean copy of release:
+  mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-0.9.xx
+
+Generate files to upload
+------------------------
+
+- export TZ=UTC
+- cd i2p.i2p.foobar
+- copy debian-alt/(series)/changelog to debian/
+- edit debian/changelog to add the release at the top
+  * version MUST be 0.9.XX-1ubuntu1
+    next version for fixes would be 0.9.XX-2ubunutu1
+  * series MUST be trusty (or precise)
+  * name and email MUST EXACTLY match what's in your GPG keyring
+    or the signing will fail.
+    (or add -kkeyid argument to debuild, which you must do
+     if you want to sign with a subkey)
+    run gpg -K to list your private keys
+- ant debian-release-tarball
+  this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
+  and a tarball ../i2p_0.9.XX.orig.tar.bz2
+- cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
+- cp debian-alt/(series)/(other files besides changelog) to ../i2p-0.9.XX-0-xxxxxxxx/debian/
+- cd ../i2p-0.9.XX-0-xxxxxxxx/
+- Build the *1ubuntu1* files:
+  If you have NOT done a successful dput for this release yet:
+    debuild -S -sa -kkeyid
+  otherwise, if just fixing up the control files, patches, etc:
+    debuild -S -sd -kkeyid
+  (note: no space allowed in -kkeyid)
+- If patches fail, you must fix them up, either manually or with quilt
+  (quilt instructions go here)
+
+- You will now have the following files in ..:
+  i2p_0.9.XX-1ubuntu1.debian.tar.xz
+  i2p_0.9.XX-1ubuntu1.dsc
+  i2p_0.9.XX-1ubuntu1_source.changes
+  i2p_0.9.XX-1ubuntu1_source.build
+- And from the copy above:
+  i2p_0.9.XX.orig.tar.bz2
+
+Upload to launchpad
+-------------------
+
+- cd ..
+- Upload to launchpad:
+  dput ppa:your-lp-id/your-ppa-name i2p_0.9.XX-1ubuntu1_source.changes
+
+This will upload the following files:
+  i2p_0.9.XX-1ubuntu1.dsc            (the GPG signature)
+  i2p_0.9.XX-1ubuntu1.debian.tar.xz  (basically the debian/ directory tarball)
+  i2p_0.9.XX-1ubuntu1_source.changes (the changelog text file)
+  i2p_0.9.XX.orig.tar.bz2            (the source tarball)
+
+Note: If you didn't add your GPG fingerprint to your launchpad account
+way up there above in step 2 or so, the upload will work,
+but you will get no email back, and it will never build or show up on
+the pending-build page.
+
+Wait for it to build and be published.
+Could be minutes to hours.
+
+The amd64 build produces one deb:
+   libjbigi-jni (amd64)
+The i386 build produces three debs:
+   i2p-doc (arch-independent), i2p-router (arch-independent), and libjbigi-jni (i386)
+So the build isn't done until both arch builds are complete.
+Don't
+
+
+If it works, copy trusty to vivid, wily, and xenial in your PPA
+  (select "copy existing binaries")
+  Wait a few minutes for that to happen
+
+Test
+----
+
+Add your PPA following the instructions at http://i2p-projekt.i2p/en/download/debian:
+     sudo apt-add-repository ppa:your-lp-id/your-ppa-name
+     sudo apt-get update
+     sudo apt-get install i2p
+     mv ~/.i2p ~/.i2p-save
+     i2prouter start
+     (test...)
+     stop router
+     sudo dpkg-reconfigure i2p
+     (reconfigure as a service)
+     (i2p should start as a service. test...)
+
+
+Release
+-------
+
+Then copy trusty, vivid, wily, and xenial from your PPA to the i2p-maintainers PPA
+  (select "copy existing binaries")
+  Copy trusty first and wait for it to be published in i2p-maintainers or the others will fail.
+
+
+Creating milestone, release, and uploading files
+----------------------------------------------
+
+You must first create a milestone, then create a release
+and attach it to the milestone.
+Go to https://launchpad.net/i2p/trunk
+Down at bottom, click 'create milestone'
+    Name: 0.9.xx (NOT i2p 0.9.xx)
+    Code name: empty
+    Date targeted: Actual release date
+    Tags: empty
+    Summary: empty
+Click 'register milestone'
+Now you are back on https://launchpad.net/i2p/trunk
+At your milestone, 'release now'
+    Date released: Actual release date
+    Release notes: empty
+    Changelog: empty
+Click 'create release'
+Now you on the page for that milestone
+Click 'add download file'
+For each of the four files
+    i2psource_0.9.xx.tar.bz2
+      Description: I2P 0.9.xx Source Code
+      Sig: i2psource_0.9.xx.tar.bz2.sig
+      File Content Type: Code Release Tarball
+    i2pinstall_0.9.xx_windows.exe
+      Description: I2P 0.9.xx Installer for Windows
+      Sig: i2pinstall_0.9.xx_windows.exe.sig
+      File Content Type: Installer File
+    i2pinstall_0.9.xx.jar
+      Description: I2P 0.9.xx Installer (Linux / OSX / FreeBSD / Solaris)
+      Sig: i2pinstall_0.9.xx.jar.sig
+      File Content Type: Installer File
+    i2pupdate_0.9.xx.zip
+      Description: I2P 0.9.xx Update
+      Sig: i2pupdate_0.9.xx.zip.sig
+      File Content Type: Installer File

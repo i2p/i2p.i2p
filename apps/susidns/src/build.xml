@@ -10,15 +10,26 @@
 	<path id="cp">
 		<pathelement path="${classpath}" />
 		<pathelement location="${bin}" />
+                <!-- commons-el MUST be first to ensure we get the right (2.2) version
+                  -  otherwise:
+                  -  Exception in thread "main" java.lang.NoSuchMethodError: javax.el.ExpressionFactory.newInstance()Ljavax/el/ExpressionFactory;
+                  -->
+		<pathelement location="${lib}/commons-el.jar" />
 		<pathelement location="${lib}/javax.servlet.jar"/>
-        <pathelement location="WEB-INF/lib/jstl.jar" />
-        <pathelement location="WEB-INF/lib/standard.jar" />
-        <pathelement location="${lib}/jasper-runtime.jar" />
-        <pathelement location="${lib}/javax.servlet.jar" />
-        <pathelement location="${lib}/commons-logging.jar" />
-        <pathelement location="${lib}/commons-el.jar" />
-        <pathelement location="${ant.home}/lib/ant.jar" />
-        <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="${lib}/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="${lib}/tomcat-api.jar" />
+                <!-- tomcat-util.jar only present for debian builds -->
+                <pathelement location="${lib}/tomcat-util.jar" />
+		<pathelement location="lib/jstl.jar" />
+		<pathelement location="lib/standard.jar" />
+		<pathelement location="${lib}/jasper-runtime.jar" />
+		<pathelement location="${lib}/commons-logging.jar" />
+                <!-- jasper-el.jar only present for debian builds -->
+		<pathelement location="${lib}/jasper-el.jar" />
+		<pathelement location="${ant.home}/lib/ant.jar" />
+		<pathelement location="../../../core/java/build/i2p.jar" />
  	</path>
 
 	<property name="javac.compilerargs" value="" />
@@ -61,7 +72,7 @@
          </javac>
         <copy file="WEB-INF/web-template.xml" tofile="WEB-INF/web-out.xml" />
         <loadfile property="jspc.web.fragment" srcfile="WEB-INF/web-fragment.xml" />
-        <replace file="WEB-INF//web-out.xml">
+        <replace file="WEB-INF/web-out.xml">
             <replacefilter token="&lt;!-- precompiled servlets --&gt;" value="${jspc.web.fragment}" />
         </replace>
     </target>
@@ -125,6 +136,7 @@
     </target>
 
     <target name="bundle" depends="compile, precompilejsp" unless="no.bundle">
+        <mkdir dir="build/messages-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -138,6 +150,11 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages.sh" />
         </exec>
+        <javac source="${javac.version}" target="${javac.version}" 
+               includeAntRuntime="false"
+               srcdir="build/messages-src" destdir="${bin}">
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
 
     <target name="poupdate" depends="compile, precompilejsp">
@@ -160,7 +177,7 @@
       <delete file="susidns.war" />
       <delete>
         <fileset dir="." includes="**/*.class" />
-        <fileset dir="." includes="tmp" />
+        <fileset dir="." includes="tmp, build" />
         <fileset dir="WEB-INF" includes="web-fragment.xml, web-out.xml" />
       </delete>
       <delete dir="${bin}" />

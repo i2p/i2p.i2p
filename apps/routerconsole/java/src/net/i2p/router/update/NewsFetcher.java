@@ -1,5 +1,6 @@
 package net.i2p.router.update;
 
+import java.io.ByteArrayInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,11 +23,14 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.i2p.app.ClientAppManager;
+import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
+import net.i2p.router.news.CRLEntry;
 import net.i2p.router.news.NewsEntry;
 import net.i2p.router.news.NewsManager;
 import net.i2p.router.news.NewsMetadata;
@@ -41,6 +46,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
 import net.i2p.util.ReusableGZIPInputStream;
+import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.SystemVersion;
@@ -509,6 +515,12 @@ class NewsFetcher extends UpdateRunner {
                     nmgr.storeEntries(nodes);
                 }
             }
+            // Persist any new CRL entries
+            List<CRLEntry> crlEntries = parser.getCRLEntries();
+            if (crlEntries != null)
+                persistCRLEntries(crlEntries);
+            else
+                _log.info("No CRL entries found in news feed");
             // store entries and metadata in old news.xml format
             String sudVersion = su3.getVersionString();
             String signingKeyName = su3.getSignerString();
@@ -542,6 +554,57 @@ class NewsFetcher extends UpdateRunner {
             } catch (IOException ioe) {}
             ReusableGZIPInputStream.release(in);
         }
+    }
+
+    /**
+     *  Output any updated CRL entries
+     *
+     *  @since 0.9.26
+     */
+    private void persistCRLEntries(List<CRLEntry> entries) {
+        File dir = new SecureFile(_context.getConfigDir(), "certificates");
+        if (!dir.exists() && !dir.mkdir()) {
+            _log.error("Failed to create CRL directory " + dir);
+            return;
+        }
+        dir = new SecureFile(dir, "revocations");
+        if (!dir.exists() && !dir.mkdir()) {
+            _log.error("Failed to create CRL directory " + dir);
+            return;
+        }
+        int i = 0;
+        for (CRLEntry e : entries) {
+            if (e.id == null || e.data == null) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad CRL entry received");
+                continue;
+            }
+            byte[] bid = DataHelper.getUTF8(e.id);
+            byte[] hash = new byte[32];
+            _context.sha().calculateHash(bid, 0, bid.length, hash, 0);
+            String name = "crl-" + Base64.encode(hash) + ".crl";
+            File f = new File(dir, name);
+            if (f.exists() && f.lastModified() >= e.updated)
+                continue;
+            OutputStream out = null;
+            try {
+                byte[] data = DataHelper.getUTF8(e.data);
+                // test for validity
+                CertUtil.loadCRL(new ByteArrayInputStream(data));
+                out = new SecureFileOutputStream(f);
+                out.write(data);
+            } catch (GeneralSecurityException gse) {
+                _log.error("Bad CRL", gse);
+            } catch (IOException ioe) {
+                _log.error("Failed to write CRL", ioe);
+            } finally {
+                if (out != null) try { out.close(); } catch (IOException ioe) {}
+            }
+            f.setLastModified(e.updated);
+            i++;
+        }
+        if (i > 0)
+            _log.logAlways(Log.WARN, "Stored " + i + " new CRL " + (i > 1 ? "entries" : "entry"));
     }
 
     /**

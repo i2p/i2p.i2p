@@ -37,6 +37,6 @@ _Description: Memory that can be allocated to I2P:
 Template: i2p/aa
 Type: boolean
 Default: true
-_Description: Run I2P daemon confined with AppArmor
+_Description: Should the I2P daemon be confined with AppArmor?
  With this option enabled I2P will be sandboxed with AppArmor, restricting which files and
  directories may be accessed by I2P.

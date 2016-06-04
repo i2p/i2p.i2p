@@ -39,12 +39,33 @@ public interface AMDCPUInfo extends CPUInfo {
      * @return true if the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
      */
     public boolean IsAthlon64Compatible();
+    /** 
+     * @return true if the CPU present in the machine is at least an 'k10' CPU
+     */
+    public boolean IsK10Compatible();
     /**
-     * @return true if the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
+     * @return true if the CPU present in the machine is at least an 'bobcat' CPU
      */
 	public boolean IsBobcatCompatible();
+    /**
+     * @return true if the CPU present in the machine is at least an 'jaguar' CPU
+     */
+	public boolean IsJaguarCompatible();
     /**
      * @return true if the CPU present in the machine is at least a 'bulldozer' CPU
      */
 	public boolean IsBulldozerCompatible();
+    /**
+     * @return true if the CPU present in the machine is at least a 'piledriver' CPU
+     */
+	public boolean IsPiledriverCompatible();
+    /**
+     * @return true if the CPU present in the machine is at least a 'steamroller' CPU
+     */
+	public boolean IsSteamrollerCompatible();
+    /**
+     * @return true if the CPU present in the machine is at least a 'excavator' CPU
+     */
+	public boolean IsExcavatorCompatible();
+
 }

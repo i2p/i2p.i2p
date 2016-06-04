@@ -5,8 +5,7 @@
 	<property name="build" value="build"/>
 	<property name="dist"  location="dist"/>
 	<property name="jar" value="desktopgui.jar"/>
-	<property name="resources" value="resources"/>
-    <property name="javadoc" value="javadoc"/>
+	<property name="javadoc" value="javadoc"/>
 	<property name="javac.compilerargs" value=""/>
 	<property name="javac.version" value="1.6" />
 	<property name="require.gettext" value="true" />
@@ -17,9 +16,8 @@
 
 	<target name="init">
 	<mkdir dir="${build}"/>
-	<mkdir dir="${build}/${resources}"/>
-        <mkdir dir="${build}/${javadoc}"/>
-		<mkdir dir="${dist}"/>
+	<mkdir dir="${build}/messages-src"/>
+	<mkdir dir="${dist}"/>
 	</target>
 
 	<target name="clean">
@@ -27,35 +25,36 @@
 		<delete dir="${dist}"/>
 	</target>
 
-	<target name="compile" depends="init">
+        <target name="compile" depends="init">
             <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                        includeAntRuntime="false"
                        srcdir="${src}" destdir="${build}">
-            <compilerarg line="${javac.compilerargs}" />
-            <classpath>
-                <pathelement location="../../core/java/build/i2p.jar" />
-                <pathelement location="../../installer/lib/wrapper/all/wrapper.jar" />
-            	<pathelement location="../../router/java/build/router.jar" />
-            </classpath>
-		</javac>
-        <copy todir="${build}/desktopgui/${resources}">
-            <fileset dir="${resources}" />
-        </copy>
-	</target>
+                <compilerarg line="${javac.compilerargs}" />
+                <classpath>
+                    <pathelement location="../../core/java/build/i2p.jar" />
+                    <pathelement location="../../installer/lib/wrapper/all/wrapper.jar" />
+                    <pathelement location="../../router/java/build/router.jar" />
+                </classpath>
+            </javac>
+        </target>
 
-	<target name="bundle" unless="no.bundle">
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
-            <env key="JAVA_HOME" value="${java.home}" />
-            <arg value="./bundle-messages.sh" />
-        </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
-            <arg value="./bundle-messages.sh" />
-        </exec>
-		<!-- multi-lang is optional -->
-        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
-            <arg value="./bundle-messages.sh" />
-        </exec>
-	</target>
+        <target name="bundle" unless="no.bundle" depends="init">
+            <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
+                <env key="JAVA_HOME" value="${java.home}" />
+                <arg value="./bundle-messages.sh" />
+            </exec>
+            <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
+                <arg value="./bundle-messages.sh" />
+            </exec>
+            <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+                <arg value="./bundle-messages.sh" />
+            </exec>
+            <javac source="${javac.version}" target="${javac.version}" 
+                   includeAntRuntime="false"
+                   srcdir="${build}/messages-src" destdir="${build}">
+                <compilerarg line="${javac.compilerargs}" />
+            </javac>
+        </target>
 
         <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
@@ -74,7 +73,11 @@
 	<target name="jar" depends="compile, bundle, listChangedFiles" unless="jar.uptodate" >
 		<!-- set if unset -->
 		<property name="workspace.changes.tr" value="" />
-		<jar basedir="${build}" destfile="${dist}/${jar}">
+                <!-- ideal for linux: 24x24, but transparency doesn't work -->
+                <copy tofile="${build}/desktopgui/resources/images/logo.png" file="../../installer/resources/themes/console/images/itoopie_xsm.png" />
+                <copy todir="${build}/desktopgui/resources/images" file="images/itoopie_black_24.png" />
+                <copy todir="${build}/desktopgui/resources/images" file="images/itoopie_white_24.png" />
+		<jar basedir="${build}" excludes="messages-src/**" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
 				<attribute name="Build-Date" value="${build.timestamp}" />

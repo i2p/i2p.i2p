@@ -124,7 +124,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        if (clientshelper.isPluginInstallEnabled()) {
 %>
 <h3><a name="plugin"></a><%=intl._t("Plugin Installation from URL")%></h3><p>
- <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://plugins.i2p\">plugins.i2p</a>")%>
+ <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://i2pwiki.i2p/index.php?title=Plugins\">i2pwiki.i2p</a>")%>
  <%=intl._t("To install a plugin, enter the download URL:")%>
  </p>
 <div class="wideload">

@@ -27,7 +27,7 @@ import java.io.OutputStream;
 public class TunnelId extends DataStructureImpl {
     private long _tunnelId;
     
-    public static final long MAX_ID_VALUE = (1l<<32l)-2l;
+    public static final long MAX_ID_VALUE = (1L << 32) - 2L;
     
     public TunnelId() { 
         _tunnelId = -1;
@@ -35,22 +35,22 @@ public class TunnelId extends DataStructureImpl {
 
     /**
      *  @param id 1 to 0xffffffff
-     *  @throws IllegalArgumentException if less than or equal to zero
+     *  @throws IllegalArgumentException if less than or equal to zero or greater than max value
      */
     public TunnelId(long id) { 
-        if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
-        _tunnelId = id;
+        setTunnelId(id);
     }
 
     public long getTunnelId() { return _tunnelId; }
 
     /**
      *  @param id 1 to 0xffffffff
-     *  @throws IllegalArgumentException if less than or equal to zero
+     *  @throws IllegalArgumentException if less than or equal to zero or greater than max value
      */
     public void setTunnelId(long id) { 
+        if (id <= 0 || id > MAX_ID_VALUE)
+            throw new IllegalArgumentException("bad id " + id);
         _tunnelId = id; 
-        if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
     }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {

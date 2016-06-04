@@ -16,6 +16,7 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="../../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../ministreaming/java/build/obj" />
             </classpath>
         </depend>
@@ -35,7 +36,7 @@
             debug="true" deprecation="on" source="1.7" target="1.7" 
             includeAntRuntime="false"
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>

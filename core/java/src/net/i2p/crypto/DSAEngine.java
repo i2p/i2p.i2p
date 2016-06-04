@@ -404,13 +404,13 @@ public final class DSAEngine {
         BigInteger k;
         boolean ok;
         do {
-            k = new BigInteger(160, _context.random());
+            k = new NativeBigInteger(160, _context.random());
             ok = k.compareTo(CryptoConstants.dsaq) != 1;
             ok = ok && !k.equals(BigInteger.ZERO);
             //System.out.println("K picked (ok? " + ok + "): " + k.bitLength() + ": " + k.toString());
         } while (!ok);
 
-        BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
+        BigInteger r = CryptoConstants.dsag.modPowCT(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
         BigInteger kinv = k.modInverse(CryptoConstants.dsaq);
 
         BigInteger M = new NativeBigInteger(1, hash.getData());

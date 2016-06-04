@@ -8,16 +8,16 @@
 # ducki2p <ducki2p@gmail.com>, 2011
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
-# syl_, 2015
+# syl_, 2015-2016
 # Towinet, 2013-2016
 # zzzi2p, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-05 14:31+0000\n"
-"PO-Revision-Date: 2016-03-19 13:20+0000\n"
-"Last-Translator: zzzi2p\n"
+"POT-Creation-Date: 2016-05-25 12:28+0000\n"
+"PO-Revision-Date: 2016-05-25 18:47+0000\n"
+"Last-Translator: syl_\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -326,20 +326,20 @@ msgstr "Avertissement : conflit de clé de destination"
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr "Le lien d'aide d'adresse que vous avez suivi spécifie une clé de destination différente de celle inscrite dans votre carnet d'adresses."
+msgstr "Le lien d'assistant d'adresse que vous avez suivi spécifie une clé de destination différente de celle inscrite dans votre carnet d'adresses."
 
 #: ../java/build/Proxy.java:131
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr "Quelqu'un pourrait essayer d'interpréter le rôle d'un autre site Web, ou des gens ayant donné des noms identiques à deux sites Web."
+msgstr "Quelqu'un pourrait être en train d'essayer d'imiter un autre site web, ou des personnes ont donné des noms identiques à deux sites web."
 
 #: ../java/build/Proxy.java:132
 msgid ""
 "Resolve the conflict by deciding which key you trust, and then either ignore"
 " the address helper link, or delete the host entry from your address book "
 "and click the address helper link again."
-msgstr "Résolvez le conflit en décidant en laquelle des clés vous avez confiance, puis ensuite ignorez le lien d'aide d'adresse, ou supprimez l'entrée hôte contenu dans votre carnet d'adresses puis cliquez de nouveau sur le lien d'aide d'adresse."
+msgstr "Résolvez le conflit en décidant en laquelle des clés vous avez confiance, puis ensuite ignorez le lien d'assistant d'adresse, ou supprimez l'entrée hôte contenu dans votre carnet d'adresses puis cliquez de nouveau sur le lien d'assistant d'adresse."
 
 #: ../java/build/Proxy.java:133 ../java/build/Proxy.java:139
 msgid "Warning: Bad Address Helper"
@@ -456,7 +456,7 @@ msgid ""
 "To visit the destination in your address book, click <a "
 "href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
 "click <a href=\"{1}\">here</a>."
-msgstr "Pour visiter la destination contenue dans votre carnet d''adresses, cliquez  <a href=\"{0}\">ici</a>. Pour visiter la destination de l''aide d''adresse conflictuelle, cliquez <a href=\"{1}\">ici</a>."
+msgstr "Pour visiter la destination contenue dans votre carnet d''adresses, cliquez  <a href=\"{0}\">ici</a>. Pour visiter la destination de l''assistant d''adresse conflictuel, cliquez <a href=\"{1}\">ici</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:741
 #, java-format
@@ -465,7 +465,7 @@ msgstr "Destination pour {0} dans le carnet d'adresses"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:744
 msgid "Conflicting address helper destination"
-msgstr "Conflit de destination d'aide d'adresse"
+msgstr "Destination de l'assistant d'adresse conflictuel"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1169
 msgid "Destination lease set not found"

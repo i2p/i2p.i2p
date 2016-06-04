@@ -207,5 +207,10 @@ public final class ByteCache {
                     //    _log.debug("Removing " + toRemove + " cached entries of size " + _entrySize);
             }
         }
+
+        @Override
+        public String toString() {
+            return "Cleaner for " + _entrySize + " byte cache";
+        }
     }
 }

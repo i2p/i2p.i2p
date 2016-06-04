@@ -60,7 +60,7 @@ public class HomeHelper extends HelperBase {
         _x("Free Web Hosting") + S + _x("Free eepsite hosting with PHP and MySQL") + S + "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
         _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
         _x("Planet I2P") + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "world.png" + S +
-        //_x("Plugins") + S + _x("Add-on directory") + S + "http://plugins.i2p/" + S + I + "plugin.png" + S +
+        _x("Plugins") + S + _x("Add-on directory") + S + "http://i2pwiki.i2p/index.php?title=Plugins" + S + I + "plugin.png" + S +
         _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
         _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "info_rhombus.png" + S +
         _x("Russian News Feed") + S + "lenta.i2p" + S + "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +

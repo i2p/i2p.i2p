@@ -1,8 +1,9 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
+# idevk <kraidx@gmail.com>, 2016
 # wtfisthis <low_fps11@yahoo.com>, 2015
 # wtfisthis <low_fps11@yahoo.com>, 2013
 # Rafael Ferrari, 2013
@@ -11,14 +12,13 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2015-03-31 20:53+0000\n"
-"Last-Translator: wtfisthis <low_fps11@yahoo.com>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/"
-"pt/)\n"
-"Language: pt\n"
+"PO-Revision-Date: 2016-05-13 11:36+0000\n"
+"Last-Translator: idevk <kraidx@gmail.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Type: boolean
@@ -33,9 +33,7 @@ msgstr "Devera o i2p router ser iniciado no arranque "
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr ""
-"O i2p router pode correr como serviso que inicaiara quando o computudor "
-"iniciar. Esta é a configuração recomendada"
+msgstr "O i2p router pode correr como serviso que inicaiara quando o computudor iniciar. Esta é a configuração recomendada"
 
 #. Type: string
 #. Description
@@ -47,15 +45,11 @@ msgstr "Utilizador do serviço I2P:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as "
-"a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at /"
-"home/user/i2p, you may enter 'user' here."
-msgstr ""
-"Por padrão o I2P é configurado para executar como usuário i2psvc no modo "
-"Serviço. Para usar um perfil I2P **existente** você pode digitar um nome de "
-"usuário diferente aqui. Por exemplo, se a sua instalação antiga está em /"
-"home/user/i2p, você pode digitar 'user'."
+"By default I2P is configured to run under the account i2psvc when running as"
+" a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at "
+"/home/user/i2p, you may enter 'user' here."
+msgstr "Por padrão o I2P é configurado para executar como utilizador i2psvc no modo Serviço. Para usar um perfil I2P **existente** você pode digitar um nome de utilizador diferente aqui. Por exemplo, se a sua instalação antiga está em /home/user/i2p, você pode digitar 'user'."
 
 #. Type: string
 #. Description
@@ -63,9 +57,7 @@ msgstr ""
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr ""
-"Muito importante: Se um usuário diferente de 'i2psvc' for digitado aqui, "
-"este usuário PRECISA existir."
+msgstr "Muito importante: Se um utilizador diferente de 'i2psvc' for introduzido aqui, este utilizador PRECISA existir."
 
 #. Type: string
 #. Description
@@ -85,9 +77,7 @@ msgstr "Por defeito o I2P apenas vai ser autorizado a usar até 128MB de RAM."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr ""
-"Roteadores I2P com internet rápida, e também com muitos torrents e plugins "
-"ativos, podem precisar aumentar este valor."
+msgstr "Routers I2P com internet rápida, e também com muitos torrents e plugins ativos, podem precisar aumentar este valor."
 
 #. Type: boolean
 #. Description
@@ -101,6 +91,4 @@ msgstr "Correr daemon I2p confinado com o AppArmor"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr ""
-"Com esta opção ativada  o I2P Vai correr em sandbox com AppArmor, retingindo "
-"que ficheiros  e diretórios são acessíveis pelo I2P "
+msgstr "Com esta opção ativada  o I2P Vai correr em sandbox com AppArmor, restringindo que ficheiros  e diretórios são acessíveis pelo I2P "

@@ -40,6 +40,11 @@ public class Messages {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 
+    /** @since 0.9.26 */
+    public String _t(String s, Object o1, Object o2) {
+        return Translate.getString(s, o1, o2, _context, BUNDLE_NAME);
+    }
+
     /** translate (ngettext)
      *  @since 0.9.7
      */

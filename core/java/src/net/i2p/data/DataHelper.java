@@ -56,8 +56,6 @@ import net.i2p.util.Translate;
  * @author jrandom
  */
 public class DataHelper {
-    private static final byte[] EQUAL_BYTES = getUTF8("=");
-    private static final byte[] SEMICOLON_BYTES = getUTF8(";");
 
     /**
      *  Map of String to itself to cache common
@@ -91,7 +89,7 @@ public class DataHelper {
             "family", "family.key", "family.sig",
             // BlockfileNamingService
             "version", "created", "upgraded", "lists",
-            "a", "s",
+            "a", "m", "s", "v"
         };
         _propertiesKeyCache = new HashMap<String, String>(keys.length);
         for (int i = 0; i < keys.length; i++) {
@@ -148,22 +146,18 @@ public class DataHelper {
         int read = read(rawStream, data);
         if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-        byte eqBuf[] = new byte[EQUAL_BYTES.length];
-        byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key = readString(in);
             String cached = _propertiesKeyCache.get(key);
             if (cached != null)
                 key = cached;
-            read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
+            int b = in.read();
+            if (b != '=')
                 throw new DataFormatException("Bad key");
-            }
             String val = readString(in);
-            read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
+            b = in.read();
+            if (b != ';')
                 throw new DataFormatException("Bad value");
-            }
             Object old = props.put(key, val);
             if (old != null)
                 throw new DataFormatException("Duplicate key " + key);
@@ -182,7 +176,7 @@ public class DataHelper {
      * Properties from the defaults table of props (if any) are not written out by this method.
      *
      * @param rawStream stream to write to
-     * @param props properties to write out
+     * @param props properties to write out, may be null
      * @throws DataFormatException if there is not enough valid data to write out,
      *                             or a length limit is exceeded
      * @throws IOException if there is an IO error writing out the data
@@ -239,7 +233,7 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8, boolean sort) 
             throws DataFormatException, IOException {
-        if (props != null) {
+        if (props != null && !props.isEmpty()) {
             Properties p;
             if (sort) {
                 p = new OrderedProperties();
@@ -255,12 +249,12 @@ public class DataHelper {
                     writeStringUTF8(baos, key);
                 else
                     writeString(baos, key);
-                baos.write(EQUAL_BYTES);
+                baos.write('=');
                 if (utf8)
                     writeStringUTF8(baos, val);
                 else
                     writeString(baos, val);
-                baos.write(SEMICOLON_BYTES);
+                baos.write(';');
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
@@ -301,9 +295,9 @@ public class DataHelper {
                 String key = (String) entry.getKey();
                 String val = (String) entry.getValue();
                 writeStringUTF8(baos, key);
-                baos.write(EQUAL_BYTES);
+                baos.write('=');
                 writeStringUTF8(baos, val);
-                baos.write(SEMICOLON_BYTES);
+                baos.write(';');
             }
             if (baos.size() > 65535)
                 throw new DataFormatException("Properties too big (65535 max): " + baos.size());
@@ -335,8 +329,6 @@ public class DataHelper {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
         ByteArrayInputStream in = new ByteArrayInputStream(source, offset, size);
-        byte eqBuf[] = new byte[EQUAL_BYTES.length];
-        byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key;
             try {
@@ -344,20 +336,18 @@ public class DataHelper {
                 String cached = _propertiesKeyCache.get(key);
                 if (cached != null)
                     key = cached;
-                int read = read(in, eqBuf);
-                if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
+                int b = in.read();
+                if (b != '=')
                     throw new DataFormatException("Bad key");
-                }
             } catch (IOException ioe) {
                 throw new DataFormatException("Bad key", ioe);
             }
             String val;
             try {
                 val = readString(in);
-                int read = read(in, semiBuf);
-                if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
+                int b = in.read();
+                if (b != ';')
                     throw new DataFormatException("Bad value");
-                }
             } catch (IOException ioe) {
                 throw new DataFormatException("Bad value", ioe);
             }
@@ -910,8 +900,9 @@ public class DataHelper {
      *               cause a DataFormatException to be thrown
      * @throws DataFormatException if the string is not valid
      * @throws IOException if there is an IO error writing the string
+     * @since public since 0.9.26
      */
-    private static void writeStringUTF8(OutputStream out, String string) 
+    public static void writeStringUTF8(OutputStream out, String string) 
         throws DataFormatException, IOException {
         if (string == null) {
             out.write((byte) 0);
@@ -936,6 +927,7 @@ public class DataHelper {
      * @return boolean value, or null
      * @deprecated unused
      */
+    @Deprecated
     public static Boolean readBoolean(InputStream in) throws DataFormatException, IOException {
         int val = in.read();
         switch (val) {
@@ -1881,7 +1873,9 @@ public class DataHelper {
      *  Roughly the same as orig.getBytes("ISO-8859-1") but much faster and
      *  will not throw an exception.
      *
-     *  @param orig non-null, must be 7-bit chars
+     *  Warning - misnamed, converts to ISO-8859-1.
+     *
+     *  @param orig non-null, truncates to 8-bit chars
      *  @since 0.9.5
      */
     public static byte[] getASCII(String orig) {

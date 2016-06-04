@@ -24,7 +24,7 @@ public class ConfigFamilyHandler extends FormHandler {
     @Override
     protected void processForm() {
 
-        if (_action.equals(_t("Create Router Family"))) {
+        if (_action.equals(_t("Create New Router Family"))) {
             String family = getJettyString("family");
             String old = _context.getProperty(FamilyKeyCrypto.PROP_FAMILY_NAME);
             if (family == null || family.trim().length() <= 0) {
@@ -39,7 +39,7 @@ public class ConfigFamilyHandler extends FormHandler {
             } else {
                 addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
             }
-        } else if (_action.equals(_t("Join Router Family"))) {
+        } else if (_action.equals(_t("Join Existing Router Family"))) {
             InputStream in = _requestWrapper.getInputStream("file");
             try {
                 // non-null but zero bytes if no file entered, don't know why

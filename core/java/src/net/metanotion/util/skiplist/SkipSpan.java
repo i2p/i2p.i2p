@@ -32,16 +32,16 @@ import java.io.Flushable;
 
 //import net.metanotion.io.block.BlockFile;
 
-public class SkipSpan implements Flushable {
+public class SkipSpan<K extends Comparable<? super K>, V> implements Flushable {
 	/** This is actually limited by BlockFile.spanSize which is much smaller */
 	public static final int MAX_SIZE = 256;
 
 	public int nKeys = 0;
-	public Comparable[] keys;
-	public Object[] vals;
-	public SkipSpan next, prev;
+	public K[] keys;
+	public V[] vals;
+	public SkipSpan<K, V> next, prev;
 
-	public SkipSpan newInstance(SkipList sl) { return new SkipSpan(keys.length); }
+	public SkipSpan<K, V> newInstance(SkipList<K, V> sl) { return new SkipSpan<K, V>(keys.length); }
 	public void killInstance() { }
 	public void flush() { }
 
@@ -50,11 +50,12 @@ public class SkipSpan implements Flushable {
 	/*
 	 *  @throws IllegalArgumentException if size too big or too small
 	 */
+	@SuppressWarnings("unchecked")
 	public SkipSpan(int size) {
 		if(size < 1 || size > MAX_SIZE)
 			throw new IllegalArgumentException("Invalid span size " + size);
-		keys = new Comparable[size];
-		vals = new Object[size];
+		keys = (K[]) new Comparable[size];
+		vals = (V[]) new Object[size];
 	}
 
 	/** dumps all the data from here to the end */
@@ -70,7 +71,7 @@ public class SkipSpan implements Flushable {
 		return buf.toString();
 	}
 
-	private int binarySearch(Comparable key) {
+	private int binarySearch(K key) {
  		int high = nKeys - 1;
  		int low = 0;
  		int cur;
@@ -89,12 +90,12 @@ public class SkipSpan implements Flushable {
  		return (-1 * (low + 1));
 	}
 
-	public SkipSpan getEnd() {
+	public SkipSpan<K, V> getEnd() {
 		if(next == null) { return this; }
 		return next.getEnd();
 	}
 
-	public SkipSpan getSpan(Comparable key, int[] search) {
+	public SkipSpan<K, V> getSpan(K key, int[] search) {
 		if(nKeys == 0) {
 			search[0] = -1;
 			return this;
@@ -111,7 +112,7 @@ public class SkipSpan implements Flushable {
 		return this;
 	}
 
-	public Object get(Comparable key) {
+	public V get(K key) {
 		if(nKeys == 0) { return null; }
 		if(keys[nKeys - 1].compareTo(key) < 0) {
 			if(next == null) { return null; }
@@ -138,8 +139,8 @@ public class SkipSpan implements Flushable {
 		nKeys++;
 	}
 
-	private void split(int loc, Comparable key, Object val, SkipList sl) {
-		SkipSpan right = newInstance(sl);
+	private void split(int loc, K key, V val, SkipList<K, V> sl) {
+		SkipSpan<K, V> right = newInstance(sl);
 
 		if(this.next != null) { this.next.prev = right; }
 		right.next = this.next;
@@ -175,7 +176,7 @@ public class SkipSpan implements Flushable {
 	/**
 	 *  @return the new span if it caused a split, else null if it went in this span
 	 */
-	private SkipSpan insert(int loc, Comparable key, Object val, SkipList sl) {
+	private SkipSpan<K, V> insert(int loc, K key, V val, SkipList<K, V> sl) {
 		sl.addItem();
 		if(nKeys == keys.length) {
 			// split.
@@ -193,7 +194,7 @@ public class SkipSpan implements Flushable {
 	/**
 	 *  @return the new span if it caused a split, else null if it went in an existing span
 	 */
-	public SkipSpan put(Comparable key, Object val, SkipList sl)	{
+	public SkipSpan<K, V> put(K key, V val, SkipList<K, V> sl)	{
 		if(nKeys == 0) {
 			sl.addItem();
 			keys[0] = key;
@@ -246,7 +247,7 @@ public class SkipSpan implements Flushable {
 	 *          rv[1] is the deleted SkipSpan if the removed object was the last in the SkipSpan.
 	 *          rv is null if no object was removed.
 	 */
-	public Object[] remove(Comparable key, SkipList sl) {
+	public Object[] remove(K key, SkipList<K, V> sl) {
 		if(nKeys == 0) { return null; }
 		if(keys[nKeys - 1].compareTo(key) < 0) {
 			if(next == null) { return null; }
@@ -270,7 +271,7 @@ public class SkipSpan implements Flushable {
 				nKeys = next.nKeys;
 				//BlockFile.log.error("Killing next span " + next + ") and copying to this span " + this + " in remove of " + key);
 				// Make us point to next.next and him point back to us
-				SkipSpan nn = next.next;
+				SkipSpan<K, V> nn = next.next;
 				next.killInstance();
 				if (nn != null) {
 					nn.prev = this;
@@ -311,7 +312,7 @@ public class SkipSpan implements Flushable {
 	}
 
 	/** I2P */
-	public Comparable firstKey() {
+	public K firstKey() {
 		return keys[0];
 	}
 }

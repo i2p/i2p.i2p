@@ -524,6 +524,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket connect(Destination peer, I2PSocketOptions options) 
                              throws I2PException, NoRouteToHostException {
+        if (peer == null)
+            throw new NullPointerException();
         if (options == null)
             options = _defaultOptions;
         ConnectionOptions opts = null;

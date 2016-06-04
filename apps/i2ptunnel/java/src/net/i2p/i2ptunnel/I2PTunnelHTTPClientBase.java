@@ -463,6 +463,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             " realm=\"" + getRealm() + '"' +
             (isDigest ? ", nonce=\"" + getNonce() + "\"," +
                         " algorithm=MD5," +
+                        " charset=UTF-8," +     // RFC 7616/7617
                         " qop=\"auth\"" +
                         (isStale ? ", stale=true" : "")
                       : "") +

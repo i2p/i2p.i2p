@@ -2,43 +2,26 @@ package net.i2p.desktopgui.router;
 
 import java.io.IOException;
 
-import org.tanukisoftware.wrapper.WrapperManager;
-
 import net.i2p.I2PAppContext;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+//import net.i2p.router.web.ConfigServiceHandler;
 import net.i2p.util.Log;
 
 /**
  * Handle communications with the router instance.
+ *
+ * See ConfigServiceHandler for best practices on stopping the router.
+ * We don't bother notifying any Wrapper instance here.
+ *
  * @author mathias
  *
  */
 public class RouterManager {
 	
-	private final static Log log = new Log(RouterManager.class);
-	private static I2PAppContext context = I2PAppContext.getCurrentContext();
-	
-	public static I2PAppContext getAppContext() {
-		return context;
-	}
-	
-	public static RouterContext getRouterContext() throws Exception {
-		if(context.isRouterContext()) {
-			return (RouterContext) context;
-		}
-		else {
-			throw new Exception("No RouterContext available!");
-		}
-	}
-	
-	private static Router getRouter() {
-		try {
-			return getRouterContext().router();
-		} catch (Exception e) {
-	        log.error("Failed to get router. Why did we request it if no RouterContext is available?", e);
-            return null;
-        }
+    /** @return non-null */
+    private static I2PAppContext getAppContext() {
+        return I2PAppContext.getGlobalContext();
     }
     
     /**
@@ -53,9 +36,10 @@ public class RouterManager {
             //TODO: set/get PID
             String separator = System.getProperty("file.separator");
             String location = getAppContext().getBaseDir().getAbsolutePath();
-            
-            Runtime.getRuntime().exec(location + separator + "i2psvc " + location + separator + "wrapper.config");
+            String[] args = new String[] { location + separator + "i2psvc", location + separator + "wrapper.config" };
+            Runtime.getRuntime().exec(args);
         } catch (IOException e) {
+            Log log = getAppContext().logManager().getLog(RouterManager.class);
             log.log(Log.WARN, "Failed to start I2P", e);
         }
     }
@@ -63,34 +47,71 @@ public class RouterManager {
     /**
      * Restart the running I2P instance.
      */
-    public static void restart() {
-        if(inI2P()) {
-            getRouter().restart();
-        }
+    public static void restart(RouterContext ctx) {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_HARD_RESTART, false);
+        ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART);
     }
 
     /**
      * Stop the running I2P instance.
      */
-    public static void shutDown() {
-        if(inI2P()) {
-            Thread t = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    WrapperManager.signalStopped(Router.EXIT_HARD);    
-                }
-                
-            });
-            t.start();
-            getRouter().shutdown(Router.EXIT_HARD);
-        }
+    public static void shutDown(RouterContext ctx) {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_HARD, false);
+        ctx.router().shutdownGracefully(Router.EXIT_HARD);
     }
     
     /**
-     * Check if we are running inside I2P.
+     * Restart the running I2P instance.
+     * @since 0.9.26
      */
-    public static boolean inI2P() {
-        return context.isRouterContext();
+    public static void restartGracefully(RouterContext ctx) {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_GRACEFUL_RESTART, false);
+        ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+    }
+
+    /**
+     * Stop the running I2P instance.
+     * @since 0.9.26
+     */
+    public static void shutDownGracefully(RouterContext ctx) {
+        //if (ctx.hasWrapper())
+        //    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_GRACEFUL, false);
+        ctx.router().shutdownGracefully();
+    }
+
+    /**
+     * Cancel a graceful shutdown or restart
+     * @since 0.9.26
+     */
+    public static void cancelShutdown(RouterContext ctx) {
+        ctx.router().cancelGracefulShutdown();
+    }
+
+    /**
+     * Is a graceful shutdown or restart in progress?
+     * @since 0.9.26
+     */
+    public static boolean isShutdownInProgress(RouterContext ctx) {
+        return ctx.router().scheduledGracefulExitCode() > 0;
+    }
+
+    /**
+     * Get time until shutdown
+     * @return -1 if no shutdown in progress.
+     * @since 0.9.26
+     */
+    public static long getShutdownTimeRemaining(RouterContext ctx) {
+        return ctx.router().getShutdownTimeRemaining();
+    }
+
+    /**
+     * Get network status, untranslated
+     * @since 0.9.26
+     */
+    public static String getStatus(RouterContext ctx) {
+        return ctx.commSystem().getStatus().toStatusString();
     }
 }

@@ -15,11 +15,14 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     private static boolean isGeodeCompatible;
     private static boolean isAthlonCompatible;
     private static boolean isAthlon64Compatible;
+    private static boolean isK10Compatible;
     private static boolean isBobcatCompatible;
+    private static boolean isJaguarCompatible;
     private static boolean isBulldozerCompatible;
+    private static boolean isPiledriverCompatible;
+    private static boolean isSteamrollerCompatible;
+    private static boolean isExcavatorCompatible;
 
-    // If modelString != null, the cpu is considered correctly identified.
-    private static final String smodel = identifyCPU();
 
     public boolean IsK6Compatible(){ return isK6Compatible; }
 
@@ -33,22 +36,34 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
 
     public boolean IsAthlon64Compatible(){ return isAthlon64Compatible; }
 
+    public boolean IsK10Compatible(){ return isK10Compatible; }
+
     public boolean IsBobcatCompatible(){ return isBobcatCompatible; }
+    
+    public boolean IsJaguarCompatible(){ return isJaguarCompatible; }
 
     public boolean IsBulldozerCompatible(){ return isBulldozerCompatible; }
 
+    public boolean IsPiledriverCompatible(){ return isPiledriverCompatible; }
+
+    public boolean IsSteamrollerCompatible(){ return isSteamrollerCompatible; }
+
+    public boolean IsExcavatorCompatible(){ return isExcavatorCompatible; }
+
+    
     public String getCPUModelString() throws UnknownCPUException
     {
+        String smodel = identifyCPU();
         if (smodel != null)
             return smodel;
         throw new UnknownCPUException("Unknown AMD CPU; Family="+CPUID.getCPUFamily() + '/' + CPUID.getCPUExtendedFamily()+
                                       ", Model="+CPUID.getCPUModel() + '/' + CPUID.getCPUExtendedModel());
     }
     
-
-    private static String identifyCPU()
+    private String identifyCPU()
     {
         // http://en.wikipedia.org/wiki/Cpuid
+    	// #include "llvm/Support/Host.h", http://llvm.org/docs/doxygen/html/Host_8cpp_source.html
         String modelString = null;
         int family = CPUID.getCPUFamily();
         int model = CPUID.getCPUModel();
@@ -181,7 +196,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             switch (model) {
                 case 4:
                     modelString = "Athlon 64/Mobile XP-M";
@@ -313,7 +327,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
+            isK10Compatible = true;
             switch (model) {
                 case 2:
                     modelString = "Phenom / Athlon / Opteron Gen 3 (Barcelona/Agena/Toliman/Kuma, 65 nm)";
@@ -350,7 +364,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             switch (model) {
                 case 3:
                     modelString = "AMD Turion X2/Athlon X2/Sempron (Lion/Sable, 65 nm)";
@@ -373,7 +386,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isX64 = true;
             modelString = "AMD APU model " + model;
           }
           break;
@@ -386,7 +398,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
             isBobcatCompatible = true;
-            isX64 = true;
             switch (model) {
                 case 1:                    
                 // Case 3 is uncertain but most likely a Bobcat APU
@@ -407,26 +418,26 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isK6_3_Compatible = true;
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
-            isBobcatCompatible = true;
             isBulldozerCompatible = true;
-            isX64 = true;
-            switch (model) {
-                // 32 nm
-                case 1:                    
-                    modelString = "Bulldozer FX-6100/8100";
-                    break;
-                // 32 nm
-                case 2:                    
-                    modelString = "Bulldozer FX-6300/8300";
-                    break;
-                // 28 nm ?
-                case 3:                    
-                    modelString = "Bulldozer FX-6500/8500";
-                    break;
-                default:
-                    modelString = "AMD Bulldozer model " + model;
-                    break;
+            if (!this.hasAVX()) {
+            	modelString = "Bulldozer";
+            	break;
             }
+	        if (model >= 0x50 && model <= 0x5F) {
+	        	isPiledriverCompatible = true;
+	        	isSteamrollerCompatible = true;
+	        	isExcavatorCompatible = true;
+	            modelString = "Excavator";
+	        } else if (model >= 0x30 && model <= 0x3F) {
+	        	isPiledriverCompatible = true;
+	        	isSteamrollerCompatible = true;
+	            modelString = "Steamroller";
+	        } else if ((model >= 0x10 && model <= 0x1F) || hasTBM()) {
+	        	isPiledriverCompatible = true;
+	        	modelString = "Piledriver";
+	        } else {
+	        	modelString = "Bulldozer";
+	        }
           }
           break;
 
@@ -438,24 +449,11 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             isAthlonCompatible = true;
             isAthlon64Compatible = true;
             isBobcatCompatible = true;
-            isX64 = true;
-            switch (model) {
-                case 0:                    
-                    modelString = "Athlon 5350 APU";
-                    break;
-                default:
-                    modelString = "AMD Jaguar APU model " + model;
-                    break;
-            }
+            isJaguarCompatible = true;
+            modelString = "Jaguar";
           }
           break;
         }
         return modelString;
     }
-
-    public boolean hasX64()
-    {
-        return isX64;
-    }
-
 }

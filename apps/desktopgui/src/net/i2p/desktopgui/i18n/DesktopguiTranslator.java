@@ -7,20 +7,11 @@ public class DesktopguiTranslator {
     
     private static final String BUNDLE_NAME = "net.i2p.desktopgui.messages";
     
-    private static I2PAppContext ctx;
-    
-    private static I2PAppContext getRouterContext() {
-        if(ctx == null) {
-            ctx = I2PAppContext.getCurrentContext();
-        }
-        return ctx;
-    }
-    
-    public static String _t(String s) {
-        return Translate.getString(s, getRouterContext(), BUNDLE_NAME);
+    public static String _t(I2PAppContext ctx, String s) {
+        return Translate.getString(s, ctx, BUNDLE_NAME);
     }
 
-    public static String _t(String s, Object o) {
-        return Translate.getString(s, o, getRouterContext(), BUNDLE_NAME);
+    public static String _t(I2PAppContext ctx, String s, Object o) {
+        return Translate.getString(s, o, ctx, BUNDLE_NAME);
     }
 }

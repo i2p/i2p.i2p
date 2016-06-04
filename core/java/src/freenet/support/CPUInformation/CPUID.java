@@ -34,6 +34,7 @@ public class CPUID {
 
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
+    private static int _jcpuidVersion;
 
     /**
      * do we want to dump some basic success/failure info to stderr during
@@ -105,6 +106,36 @@ public class CPUID {
      */
     private static native CPUIDResult doCPUID(int iFunction);
 
+    /**
+     *  Get the jbigi version, only available since jbigi version 3
+     *  Caller must catch Throwable
+     *  @since 0.9.26
+     */
+    private native static int nativeJcpuidVersion();
+
+    /**
+     *  Get the jcpuid version
+     *  @return 0 if no jcpuid available, 2 if version not supported
+     *  @since 0.9.26
+     */
+    private static int fetchJcpuidVersion() {
+        if (!_nativeOk)
+            return 0;
+        try {
+            return nativeJcpuidVersion();
+        } catch (Throwable t) {
+            return 2;
+        }
+    }
+
+    /**
+     *  Return the jcpuid version
+     *  @return 0 if no jcpuid available, 2 if version not supported
+     *  @since 0.9.26
+     */
+    public static int getJcpuidVersion() {
+        return _jcpuidVersion;
+    }
 
     static String getCPUVendorID()
     {
@@ -190,12 +221,6 @@ public class CPUID {
         return c.ECX;
     }
 
-    static int getExtendedEBXCPUFlags()
-    {
-        CPUIDResult c = doCPUID(0x80000001);
-        return c.EBX;
-    }
-
     static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
@@ -207,6 +232,31 @@ public class CPUID {
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EDX;
+    }
+
+    /**
+     *  @since 0.9.26
+     */
+    static int getExtendedEBXFeatureFlags()
+    {
+        // Supposed to set ECX to 0 before calling?
+        // But we don't have support for that in jcpuid.
+        // And it works just fine without that.
+        CPUIDResult c = doCPUID(7);
+        return c.EBX;
+    }
+
+    /**
+     *  There's almost nothing in here.
+     *  @since 0.9.26
+     */
+    static int getExtendedECXFeatureFlags()
+    {
+        // Supposed to set ECX to 0 before calling?
+        // But we don't have support for that in jcpuid.
+        // And it works just fine without that.
+        CPUIDResult c = doCPUID(7);
+        return c.ECX;
     }
 
     /**
@@ -255,15 +305,16 @@ public class CPUID {
     {
         if(!_nativeOk)
             throw new UnknownCPUException("Failed to read CPU information from the system. Please verify the existence of the jcpuid dll/so.");
-        if(getCPUVendorID().equals("CentaurHauls"))
+        String id = getCPUVendorID();
+        if(id.equals("CentaurHauls"))
             return new VIAInfoImpl();
         if(!isX86)
             throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPU's only");
-        if(getCPUVendorID().equals("AuthenticAMD"))
+        if(id.equals("AuthenticAMD"))
             return new AMDInfoImpl();
-        if(getCPUVendorID().equals("GenuineIntel"))
+        if(id.equals("GenuineIntel"))
             return new IntelInfoImpl();
-        throw new UnknownCPUException("Unknown CPU type: '"+getCPUVendorID()+"'");
+        throw new UnknownCPUException("Unknown CPU type: '" + id + '\'');
     }
 
 
@@ -273,6 +324,7 @@ public class CPUID {
         if(!_nativeOk){
             System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
         }
+        System.out.println("JCPUID Version: " + _jcpuidVersion);
         System.out.println(" **CPUInfo**");
         String mname = getCPUModelName();
         if (mname != null)
@@ -294,19 +346,34 @@ public class CPUID {
         System.out.println("CPU Family: " + family);
         System.out.println("CPU Model: " + model);
         System.out.println("CPU Stepping: " + getCPUStepping());
-        System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
+        System.out.println("CPU Flags (EDX):      0x" + Integer.toHexString(getEDXCPUFlags()));
+        System.out.println("CPU Flags (ECX):      0x" + Integer.toHexString(getECXCPUFlags()));
+        System.out.println("CPU Ext. Info. (EDX): 0x" + Integer.toHexString(getExtendedEDXCPUFlags()));
+        System.out.println("CPU Ext. Info. (ECX): 0x" + Integer.toHexString(getExtendedECXCPUFlags()));
+        System.out.println("CPU Ext. Feat. (EBX): 0x" + Integer.toHexString(getExtendedEBXFeatureFlags()));
+        System.out.println("CPU Ext. Feat. (ECX): 0x" + Integer.toHexString(getExtendedECXFeatureFlags()));
 
         CPUInfo c = getInfo();
         System.out.println("\n **More CPUInfo**");
         System.out.println("CPU model string: " + c.getCPUModelString());
-        System.out.println("CPU has MMX: " + c.hasMMX());
-        System.out.println("CPU has SSE: " + c.hasSSE());
-        System.out.println("CPU has SSE2: " + c.hasSSE2());
-        System.out.println("CPU has SSE3: " + c.hasSSE3());
+        System.out.println("CPU has MMX:    " + c.hasMMX());
+        System.out.println("CPU has SSE:    " + c.hasSSE());
+        System.out.println("CPU has SSE2:   " + c.hasSSE2());
+        System.out.println("CPU has SSE3:   " + c.hasSSE3());
         System.out.println("CPU has SSE4.1: " + c.hasSSE41());
         System.out.println("CPU has SSE4.2: " + c.hasSSE42());
-        System.out.println("CPU has SSE4A: " + c.hasSSE4A());
+        System.out.println("CPU has SSE4A:  " + c.hasSSE4A());
         System.out.println("CPU has AES-NI: " + c.hasAES());
+        System.out.println("CPU has AVX:    " + c.hasAVX());
+        System.out.println("CPU has AVX2:   " + c.hasAVX2());
+        System.out.println("CPU has AVX512: " + c.hasAVX512());
+        System.out.println("CPU has ADX:    " + c.hasADX());
+        System.out.println("CPU has TBM:    " + c.hasTBM());
+        System.out.println("CPU has BMI1:   " + c.hasBMI1());
+        System.out.println("CPU has BMI2:   " + c.hasBMI2());
+        System.out.println("CPU has FMA3:   " + c.hasFMA3());
+        System.out.println("CPU has MOVBE:  " + c.hasMOVBE());
+        System.out.println("CPU has ABM:    " + c.hasABM());
         if(c instanceof IntelCPUInfo){
             System.out.println("\n **Intel-info**");
             System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
@@ -316,13 +383,17 @@ public class CPUID {
             System.out.println("Is Pentium M compatible: "+((IntelCPUInfo)c).IsPentiumMCompatible());
             System.out.println("Is Core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
             System.out.println("Is Corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
+            System.out.println("Is Sandy-compatible: "+((IntelCPUInfo)c).IsSandyCompatible());
+            System.out.println("Is Ivy-compatible: "+((IntelCPUInfo)c).IsIvyCompatible());
+            System.out.println("Is Haswell-compatible: "+((IntelCPUInfo)c).IsHaswellCompatible());
+            System.out.println("Is Broadwell-compatible: "+((IntelCPUInfo)c).IsBroadwellCompatible());
         }
         if(c instanceof AMDCPUInfo){
             System.out.println("\n **AMD-info**");
             System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsK6Compatible());
             System.out.println("Is K6_2-compatible: "+((AMDCPUInfo)c).IsK6_2_Compatible());
             System.out.println("Is K6_3-compatible: "+((AMDCPUInfo)c).IsK6_3_Compatible());
-            System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsGeodeCompatible());
+            System.out.println("Is Geode-compatible: "+((AMDCPUInfo)c).IsGeodeCompatible());
             System.out.println("Is Athlon-compatible: "+((AMDCPUInfo)c).IsAthlonCompatible());
             System.out.println("Is Athlon64-compatible: "+((AMDCPUInfo)c).IsAthlon64Compatible());
             System.out.println("Is Bobcat-compatible: "+((AMDCPUInfo)c).IsBobcatCompatible());
@@ -358,6 +429,7 @@ public class CPUID {
                         System.err.println("WARNING: Native CPUID library jcpuid not loaded - will not be able to read CPU information using CPUID");
                 }
             }
+            _jcpuidVersion = fetchJcpuidVersion();
         } else {
             if (_doLog)
                 System.err.println("INFO: Native CPUID library jcpuid not loaded - will not be able to read CPU information using CPUID");

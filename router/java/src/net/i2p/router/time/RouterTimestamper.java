@@ -273,7 +273,7 @@ public class RouterTimestamper extends Timestamper {
             //    // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
             //    try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
             //}
-            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout);
+            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout, _log);
             now = timeAndStratum[0];
             stratum = (int) timeAndStratum[1];
             long delta = now - _context.clock().now();

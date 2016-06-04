@@ -585,12 +585,12 @@ public class TrackerClient implements Runnable {
                   {
                     // Probably not fatal (if it doesn't last to long...)
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn
-                      ("WARNING: Could not contact tracker at '"
-                       + tr.announce + "': " + ioe);
+                        _log.warn("Could not contact tracker at '" + tr.announce + "': " + ioe);
                     tr.trackerProblems = ioe.getMessage();
                     // don't show secondary tracker problems to the user
-                    if (tr.isPrimary)
+                    // ... and only if we don't have any peers at all. Otherwise, PEX/DHT will save us.
+                    if (tr.isPrimary && coordinator.getPeers() <= 0 &&
+                        (!completed || _util.getDHT() == null || _util.getDHT().size() <= 0))
                       snark.setTrackerProblems(tr.trackerProblems);
                     String tplc = tr.trackerProblems.toLowerCase(Locale.US);
                     if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2) ||
@@ -780,6 +780,11 @@ public class TrackerClient implements Runnable {
      }
   }
   
+  /**
+   *
+   *  Note: IOException message text gets displayed in the UI
+   *
+   */
   private TrackerInfo doRequest(TCTracker tr, String infoHash,
                                 String peerID, long uploaded,
                                 long downloaded, long left, String event)
@@ -821,24 +826,24 @@ public class TrackerClient implements Runnable {
     boolean fast = _fastUnannounce && event.equals(STOPPED_EVENT);
     byte[] fetched = _util.get(s, true, fast ? -1 : 0, small ? 128 : 1024, small ? 1024 : 32*1024);
     if (fetched == null)
-        throw new IOException("Error fetching");
+        throw new IOException("No response from " + tr.host);
     if (fetched.length == 0)
-        throw new IOException("No data");
+        throw new IOException("No data from " + tr.host);
     // The HTML check only works if we didn't exceed the maxium fetch size specified in get(),
     // otherwise we already threw an IOE.
     if (fetched[0] == '<')
-        throw new IOException(ERROR_GOT_HTML);
+        throw new IOException(ERROR_GOT_HTML + " from " + tr.host);
     
         InputStream in = new ByteArrayInputStream(fetched);
 
         TrackerInfo info = new TrackerInfo(in, snark.getID(),
                                            snark.getInfoHash(), snark.getMetaInfo(), _util);
         if (_log.shouldLog(Log.INFO))
-            _log.info("TrackerClient response: " + info);
+            _log.info("TrackerClient " + tr.host + " response: " + info);
 
         String failure = info.getFailureReason();
         if (failure != null)
-          throw new IOException(failure);
+            throw new IOException("Tracker " + tr.host + " responded with: " + failure);
 
         tr.interval = Math.max(MIN_TRACKER_ANNOUNCE_INTERVAL, info.getInterval() * 1000l);
         return info;
@@ -925,6 +930,7 @@ public class TrackerClient implements Runnable {
   private static class TCTracker
   {
       final String announce;
+      final String host;
       final boolean isPrimary;
       long interval;
       long lastRequestTime;
@@ -938,6 +944,8 @@ public class TrackerClient implements Runnable {
       public TCTracker(String a, boolean p)
       {
           announce = a;
+          String s = a.substring(7);
+          host = s.substring(0, s.indexOf("/"));
           isPrimary = p;
           interval = INITIAL_SLEEP;
       }

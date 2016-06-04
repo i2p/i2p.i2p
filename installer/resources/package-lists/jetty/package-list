@@ -13,6 +13,7 @@ org.eclipse.jetty.deploy.jmx
 org.eclipse.jetty.deploy.providers
 org.eclipse.jetty.deploy.util
 org.eclipse.jetty.embedded
+org.eclipse.jetty.example.asyncrest
 org.eclipse.jetty.http
 org.eclipse.jetty.http.gzip
 org.eclipse.jetty.http.spi
@@ -34,20 +35,17 @@ org.eclipse.jetty.nested
 org.eclipse.jetty.nosql
 org.eclipse.jetty.nosql.mongodb
 org.eclipse.jetty.nosql.mongodb.jmx
+org.eclipse.jetty.osgi.annotations
 org.eclipse.jetty.osgi.boot
 org.eclipse.jetty.osgi.boot.internal.jsp
 org.eclipse.jetty.osgi.boot.internal.serverfactory
 org.eclipse.jetty.osgi.boot.internal.webapp
 org.eclipse.jetty.osgi.boot.jasper
 org.eclipse.jetty.osgi.boot.jsp
-org.eclipse.jetty.osgi.boot.logback
-org.eclipse.jetty.osgi.boot.logback.internal
 org.eclipse.jetty.osgi.boot.utils
 org.eclipse.jetty.osgi.boot.utils.internal
 org.eclipse.jetty.osgi.boot.warurl
 org.eclipse.jetty.osgi.boot.warurl.internal
-org.eclipse.jetty.osgi.equinoxtools
-org.eclipse.jetty.osgi.equinoxtools.console
 org.eclipse.jetty.osgi.httpservice
 org.eclipse.jetty.osgi.nested
 org.eclipse.jetty.overlays
@@ -78,7 +76,6 @@ org.eclipse.jetty.server.session
 org.eclipse.jetty.server.session.jmx
 org.eclipse.jetty.server.ssl
 org.eclipse.jetty.servlet
-org.eclipse.jetty.servlet.api
 org.eclipse.jetty.servlet.jmx
 org.eclipse.jetty.servlet.listener
 org.eclipse.jetty.servlets

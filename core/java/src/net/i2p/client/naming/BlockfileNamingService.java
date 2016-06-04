@@ -10,6 +10,7 @@ package net.i2p.client.naming;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -28,6 +29,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -35,6 +37,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.LHMCache;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.VersionComparator;
 
 import net.metanotion.io.RAIFile;
@@ -54,7 +57,7 @@ import net.metanotion.util.skiplist.SkipList;
  *
  * "%%__INFO__%%" is the master database skiplist, containing one entry:
  *     "info": a Properties, serialized with DataHelper functions:
- *             "version": "2"
+ *             "version": "4"
  *             "created": Java long time (ms)
  *             "upgraded": Java long time (ms) (as of database version 2)
  *             "lists":   Comma-separated list of host databases, to be
@@ -74,8 +77,12 @@ import net.metanotion.util.skiplist.SkipList;
  * the hosts for that database.
  * The keys/values in these skiplists are as follows:
  *      key: a UTF-8 String
- *      value: a DestEntry, which is a Properties (serialized with DataHelper)
- *             followed by a Destination (serialized as usual).
+ *      value: a DestEntry, which is:
+ *             a one-byte count of the Properties/Destination pairs to follow
+ *               (as of database version 4, otherwise one)
+ *             that many pairs of:
+ *               Properties (serialized with DataHelper)
+ *               Destination (serialized as usual).
  *
  *
  * The DestEntry Properties typically contains:
@@ -98,12 +105,17 @@ public class BlockfileNamingService extends DummyNamingService {
     private final Map<String, String> _negativeCache;
     private volatile boolean _isClosed;
     private final boolean _readOnly;
+    private String _version = "0";
+    private volatile boolean _isVersion4;
     private boolean _needsUpgrade;
 
-    private static final Serializer _infoSerializer = new PropertiesSerializer();
-    private static final Serializer _stringSerializer = new UTF8StringBytes();
-    private static final Serializer _destSerializer = new DestEntrySerializer();
-    private static final Serializer _hashIndexSerializer = new IntBytes();
+    private static final Serializer<Properties> _infoSerializer = new PropertiesSerializer();
+    private static final Serializer<String> _stringSerializer = new UTF8StringBytes();
+    private static final Serializer<DestEntry> _destSerializerV1 = new DestEntrySerializer();
+    private static final Serializer<DestEntry> _destSerializerV4 = new DestEntrySerializerV4();
+    // upgrade(), initExisting(), and initNew() will change this to _destSerializerV4
+    private volatile Serializer<DestEntry> _destSerializer = _destSerializerV1;
+    private static final Serializer<Integer> _hashIndexSerializer = new IntBytes();
 
     private static final String HOSTS_DB = "hostsdb.blockfile";
     private static final String FALLBACK_LIST = "hosts.txt";
@@ -113,16 +125,21 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String REVERSE_SKIPLIST = "%%__REVERSE__%%";
     private static final String PROP_INFO = "info";
     private static final String PROP_VERSION = "version";
+    private static final String PROP_LISTVERSION = "listversion";
     private static final String PROP_LISTS = "lists";
     private static final String PROP_CREATED = "created";
     private static final String PROP_UPGRADED = "upgraded";
-    private static final String VERSION = "3";
+    private static final String VERSION = "4";
 
     private static final String PROP_ADDED = "a";
+    private static final String PROP_MODDED = "m";
     private static final String PROP_SOURCE = "s";
+    private static final String PROP_VALIDATED = "v";
     
     private static final String DUMMY = "";
     private static final int NEGATIVE_CACHE_SIZE = 32;
+    private static final int MAX_VALUE_LENGTH = 4096;
+    private static final int MAX_DESTS_PER_HOST = 8;
 
     /**
      *  Opens the database at hostsdb.blockfile or creates a new
@@ -169,8 +186,9 @@ public class BlockfileNamingService extends DummyNamingService {
                 if (raf != null) {
                     try { raf.close(); } catch (IOException e) {}
                 }
-                File corrupt = new File(_context.getRouterDir(), HOSTS_DB + ".corrupt");
-                _log.log(Log.CRIT, "Corrupt or unreadable database " + f + ", moving to " + corrupt +
+                File corrupt = new File(_context.getRouterDir(), HOSTS_DB + '.' + System.currentTimeMillis() + ".corrupt");
+                _log.log(Log.CRIT, "Corrupt, unsupported version, or unreadable database " +
+                                   f + ", moving to " + corrupt +
                                    " and creating new database", ioe);
                 boolean success = f.renameTo(corrupt);
                 if (!success)
@@ -183,7 +201,7 @@ public class BlockfileNamingService extends DummyNamingService {
                 // so we must create and retain a RAF so we may close it later
                 raf = new RAIFile(f, true, true);
                 SecureFileOutputStream.setPerms(f);
-                bf = init(raf);
+                bf = initNew(raf);
             } catch (IOException ioe) {
                 if (raf != null) {
                     try { raf.close(); } catch (IOException e) {}
@@ -206,11 +224,14 @@ public class BlockfileNamingService extends DummyNamingService {
      *  privatehosts.txt, userhosts.txt, and hosts.txt,
      *  creating a skiplist in the database for each.
      */
-    private BlockFile init(RAIFile f) throws IOException {
+    private BlockFile initNew(RAIFile f) throws IOException {
         long start = _context.clock().now();
+        _version = VERSION;
+        _destSerializer = _destSerializerV4;
+        _isVersion4 = true;
         try {
             BlockFile rv = new BlockFile(f, true);
-            SkipList hdr = rv.makeIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+            SkipList<String, Properties> hdr = rv.makeIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
             Properties info = new Properties();
             info.setProperty(PROP_VERSION, VERSION);
             info.setProperty(PROP_CREATED, Long.toString(_context.clock().now()));
@@ -282,10 +303,10 @@ public class BlockfileNamingService extends DummyNamingService {
         try {
             BlockFile bf = new BlockFile(raf, false);
             // TODO all in one skiplist or separate?
-            SkipList hdr = bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+            SkipList<String, Properties> hdr = bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
             if (hdr == null)
                 throw new IOException("No db header");
-            Properties info = (Properties) hdr.get(PROP_INFO);
+            Properties info = hdr.get(PROP_INFO);
             if (info == null)
                 throw new IOException("No header info");
 
@@ -301,15 +322,26 @@ public class BlockfileNamingService extends DummyNamingService {
             }
 
             String version = info.getProperty(PROP_VERSION);
-            _needsUpgrade = needsUpgrade(bf, version);
+            if (version == null)
+                throw new IOException("No version");
+            if (VersionComparator.comp(version, VERSION) > 0)
+                throw new IOException("Database version is " + version +
+                                      " but this implementation only supports versions 1-" + VERSION +
+                                      " Did you downgrade I2P??");
+            _version = version;
+            if (VersionComparator.comp(version, "4") >= 0) {
+                _destSerializer = _destSerializerV4;
+                _isVersion4 = true;
+            }
+            _needsUpgrade = needsUpgrade(bf);
             if (_needsUpgrade) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Upgrading from database version " + version + " to " + VERSION +
-                              " created " + (new Date(createdOn)).toString() +
+                    _log.warn("Upgrading database from version " + _version + " to " + VERSION +
+                              ", created " + (new Date(createdOn)).toString() +
                               " containing lists: " + list);
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Found database version " + version +
+                    _log.info("Found database version " + _version +
                               " created " + (new Date(createdOn)).toString() +
                               " containing lists: " + list);
             }
@@ -333,12 +365,11 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @throws IOE on bad version
      *  @since 0.8.9
      */
-    private boolean needsUpgrade(BlockFile bf, String version) throws IOException {
-        if (version != null && VersionComparator.comp(version, VERSION) >= 0)
+    private boolean needsUpgrade(BlockFile bf) throws IOException {
+        if (VersionComparator.comp(_version, VERSION) >= 0)
             return false;
         if (!bf.file.canWrite()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Not upgrading read-only database version " + version);
+            _log.logAlways(Log.WARN, "Not upgrading read-only database version " + _version);
             return false;
         }
         return true;
@@ -350,41 +381,81 @@ public class BlockfileNamingService extends DummyNamingService {
      *  Version 1->2: Add reverse skiplist and populate
      *  Version 2->3: Re-populate reverse skiplist as version 2 didn't keep it updated
      *                after the upgrade. No change to format.
+     *  Version 3->4: Change format to support multiple destinations per hostname
      *
      *  @return true if upgraded successfully
      *  @since 0.8.9
      */
     private boolean upgrade() {
         try {
-            // wasn't there in version 1, is there in version 2
-            SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
-            if (rev == null) {
+            // version 1 -> version 2
+            // Add reverse skiplist
+            if (VersionComparator.comp(_version, "2") < 0) {
+                SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+                if (rev == null) {
+                    rev = _bf.makeIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Created reverse index");
+                }
+                setVersion("2");
+            }
+
+            // version 2 -> version 3
+            // no change in format, just regenerate skiplist
+            if (VersionComparator.comp(_version, "3") < 0) {
+                Map<String, Destination> entries = getEntries();
+                int i = 0;
+                for (Map.Entry<String, Destination> entry : entries.entrySet()) {
+                     addReverseEntry(entry.getKey(), entry.getValue());
+                     i++;
+                }
+                // i may be greater than skiplist keys if there are dups
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Created reverse index");
-                rev = _bf.makeIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+                    _log.warn("Updated reverse index with " + i + " entries");
+                setVersion("3");
             }
-            Map<String, Destination> entries = getEntries();
-            long start = System.currentTimeMillis();
-            int i = 0;
-            for (Map.Entry<String, Destination> entry : entries.entrySet()) {
-                 addReverseEntry(entry.getKey(), entry.getValue());
-                 i++;
+
+            // version 3 -> version 4
+            // support multiple destinations per hostname
+            if (VersionComparator.comp(_version, "4") < 0) {
+                // Upgrade of 4K entry DB on RPi 2 is over 2 1/2 minutes, disable for now
+                if (SystemVersion.isAndroid() || SystemVersion.isARM()) {
+                    if (_log.shouldWarn())
+                        _log.warn("Deferring upgrade to version 4 on Android/ARM");
+                    return true;
+                }
+                SkipList<String, Properties> hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+                if (hdr == null)
+                    throw new IOException("No db header");
+                Properties info = hdr.get(PROP_INFO);
+                if (info == null)
+                    throw new IOException("No header info");
+                for (String list : _lists) { 
+                    try {
+                        // so that we can handle an aborted upgrade,
+                        // we keep track of the version of each list
+                        String vprop = PROP_LISTVERSION + '_' + list;
+                        String listVersion = info.getProperty(vprop);
+                        if (listVersion == null || VersionComparator.comp(listVersion, "4") < 0) {
+                            if (_log.shouldWarn())
+                                _log.warn("Upgrading " + list + " from database version 3 to 4");
+                            _bf.reformatIndex(list, _stringSerializer, _destSerializerV1,
+                                              _stringSerializer, _destSerializerV4);
+                            info.setProperty(vprop, "4");
+                            hdr.put(PROP_INFO, info);
+                        } else {
+                            if (_log.shouldWarn())
+                                _log.warn("Partial upgrade, " + list + " already at version " + listVersion);
+                        }
+                    } catch (IOException ioe) {
+                        _log.error("Failed upgrade of list " + list + " to version 4", ioe);
+                    }
+                }
+                _destSerializer = _destSerializerV4;
+                _isVersion4 = true;
+                setVersion("4");
             }
-            // i may be greater than skiplist keys if there are dups
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Updated reverse index with " + i + " entries");
-            SkipList hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
-            if (hdr == null)
-                throw new IOException("No db header");
-            Properties info = (Properties) hdr.get(PROP_INFO);
-            if (info == null)
-                throw new IOException("No header info");
-            info.setProperty(PROP_VERSION, VERSION);
-            info.setProperty(PROP_UPGRADED, Long.toString(_context.clock().now()));
-            hdr.put(PROP_INFO, info);
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Upgraded to version " + VERSION + " in " +
-                          DataHelper.formatDuration(System.currentTimeMillis() - start));
+
             return true;
         } catch (IOException ioe) {
             _log.error("Error upgrading DB", ioe);
@@ -395,15 +466,39 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     /**
+     *  Save new version number in blockfile after upgrade.
+     *  Blockfile must be writable, of course.
+     *  Side effect: sets _version field
+     *
+     *  Caller must synchronize
+     *  @since 0.9.26 pulled out of upgrade()
+     */
+    private void setVersion(String version) throws IOException {
+        SkipList<String, Properties> hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
+        if (hdr == null)
+            throw new IOException("No db header");
+        Properties info = hdr.get(PROP_INFO);
+        if (info == null)
+            throw new IOException("No header info");
+        info.setProperty(PROP_VERSION, version);
+        info.setProperty(PROP_UPGRADED, Long.toString(_context.clock().now()));
+        hdr.put(PROP_INFO, info);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Upgraded database from version " + _version + " to version " + version);
+        _version = version;
+    }
+
+    /**
+     *  For either v1 or v4.
      *  Caller must synchronize
      *  @return entry or null, or throws ioe
      */
     private DestEntry getEntry(String listname, String key) throws IOException {
         try {
-            SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+            SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
             if (sl == null)
                 return null;
-            DestEntry rv = (DestEntry) sl.get(key);
+            DestEntry rv = sl.get(key);
             return rv;
         } catch (IOException ioe) {
             _log.error("DB Lookup error", ioe);
@@ -422,7 +517,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private void addEntry(BlockFile bf, String listname, String key, Destination dest, String source) throws IOException {
         try {
             // catch IOE and delete index??
-            SkipList sl = bf.getIndex(listname, _stringSerializer, _destSerializer);
+            SkipList<String, DestEntry> sl = bf.getIndex(listname, _stringSerializer, _destSerializer);
             if (sl == null) {
                 //_log.info("Making new skiplist " + listname);
                 sl = bf.makeIndex(listname, _stringSerializer, _destSerializer);
@@ -458,14 +553,35 @@ public class BlockfileNamingService extends DummyNamingService {
 ****/
 
     /**
+     *  Single dest version.
      *  Caller must synchronize
+     *
      *  @param props may be null
      *  @throws RuntimeException
      */
-    private static void addEntry(SkipList sl, String key, Destination dest, Properties props) {
+    private static void addEntry(SkipList<String, DestEntry> sl, String key, Destination dest, Properties props) {
         DestEntry de = new DestEntry();
         de.dest = dest;
         de.props = props;
+        sl.put(key, de);
+    }
+
+    /**
+     *  Multiple dests version.
+     *  DB MUST be version 4.
+     *  Caller must synchronize
+     *
+     *  @param propsList may be null, or entries may be null
+     *  @throws RuntimeException
+     *  @since 0.9.26
+     */
+    private static void addEntry(SkipList<String, DestEntry> sl, String key, List<Destination> dests, List<Properties> propsList) {
+        DestEntry de = new DestEntry();
+        de.destList = dests;
+        de.dest = dests.get(0);
+        de.propsList = propsList;
+        if (propsList != null)
+            de.props = propsList.get(0);
         sl.put(key, de);
     }
 
@@ -482,7 +598,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @return removed object or null
      *  @throws RuntimeException
      */
-    private static Object removeEntry(SkipList sl, String key) {
+    private static <V> V removeEntry(SkipList<String, V> sl, String key) {
         return sl.remove(key);
     }
 
@@ -504,26 +620,34 @@ public class BlockfileNamingService extends DummyNamingService {
      *  Returns null without exception on error (logs only).
      *  Returns without logging if no reverse skiplist (version 1).
      *
-     *  @return the first one found if more than one
-     *  @since 0.8.9
+     *  @return all found if more than one
+     *  @since 0.9.26 from getReverseEntry() 0.8.9
      */
-    private String getReverseEntry(Hash hash) {
+    private List<String> getReverseEntries(Hash hash) {
         try {
-            SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
                 return null;
             Integer idx = getReverseKey(hash);
             //_log.info("Get reverse " + idx + ' ' + hash);
-            Properties props = (Properties) rev.get(idx);
+            Properties props = rev.get(idx);
             if (props == null)
                 return null;
-            for (Object okey : props.keySet()) {
-                String key = (String) okey;
+            List<String> rv = new ArrayList<String>(props.size());
+            for (String key : props.stringPropertyNames()) {
                 // now do the forward lookup to verify (using the cache)
-                Destination d = lookup(key);
-                if (d != null && d.calculateHash().equals(hash))
-                    return key;
+                List<Destination> ld = lookupAll(key);
+                if (ld != null) {
+                    for (Destination d : ld) {
+                        if (d.calculateHash().equals(hash)) {
+                            rv.add(key);
+                            break;
+                        }
+                    }
+                }
             }
+            if (!rv.isEmpty())
+                return rv;
         } catch (IOException ioe) {
             _log.error("DB get reverse error", ioe);
         } catch (RuntimeException e) {
@@ -556,11 +680,11 @@ public class BlockfileNamingService extends DummyNamingService {
     private static void addReverseEntry(BlockFile bf, String key, Destination dest, Log log) {
         //log.info("Add reverse " + key);
         try {
-            SkipList rev = bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            SkipList<Integer, Properties> rev = bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
                 return;
             Integer idx = getReverseKey(dest);
-            Properties props = (Properties) rev.get(idx);
+            Properties props = rev.get(idx);
             if (props != null) {
                 if (props.getProperty(key) != null)
                     return;
@@ -584,11 +708,11 @@ public class BlockfileNamingService extends DummyNamingService {
     private void removeReverseEntry(String key, Destination dest) {
         //_log.info("Remove reverse " + key);
         try {
-            SkipList rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
+            SkipList<Integer, Properties> rev = _bf.getIndex(REVERSE_SKIPLIST, _hashIndexSerializer, _infoSerializer);
             if (rev == null)
                 return;
             Integer idx = getReverseKey(dest);
-            Properties props = (Properties) rev.get(idx);
+            Properties props = rev.get(idx);
             if (props == null || props.remove(key) == null)
                 return;
             if (props.isEmpty())
@@ -644,7 +768,9 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     /*
-     * @param options If non-null and contains the key "list", lookup in
+     * Single dest version.
+     *
+     * @param lookupOptions If non-null and contains the key "list", lookup in
      *                that list only, otherwise all lists
      */
     private Destination lookup2(String hostname, Properties lookupOptions, Properties storedOptions) {
@@ -700,6 +826,74 @@ public class BlockfileNamingService extends DummyNamingService {
         return d;
     }
 
+    /*
+     * Multiple dests version.
+     * DB MUST be version 4.
+     *
+     * @param lookupOptions If non-null and contains the key "list", lookup in
+     *                that list only, otherwise all lists
+     * @since 0.9.26
+     */
+    private List<Destination> lookupAll2(String hostname, Properties lookupOptions, List<Properties> storedOptions) {
+        // only use cache for b32
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+            Destination d = super.lookup(hostname, null, null);
+            if (d != null) {
+                if (storedOptions != null)
+                    storedOptions.add(null);
+                return Collections.singletonList(d);
+            }
+            // Base32 failed?
+            return null;
+        }
+        String key = hostname.toLowerCase(Locale.US);
+        synchronized(_negativeCache) {
+            if (_negativeCache.get(key) != null)
+                return null;
+        }
+        String listname = null;
+        if (lookupOptions != null)
+            listname = lookupOptions.getProperty("list");
+
+        List<Destination> rv = null;
+        synchronized(_bf) {
+            if (_isClosed)
+                return null;
+            for (String list : _lists) { 
+                if (listname != null && !list.equals(listname))
+                    continue;
+                try {
+                    DestEntry de = getEntry(list, key);
+                    if (de != null) {
+                        if (!validate(key, de, listname))
+                            continue;
+                        if (de.destList != null) {
+                            rv = de.destList;
+                            if (storedOptions != null)
+                                storedOptions.addAll(de.propsList);
+                        } else {
+                            rv = Collections.singletonList(de.dest);
+                            if (storedOptions != null)
+                                storedOptions.add(de.props);
+                        }
+                        break;
+                    }
+                } catch (IOException ioe) {
+                    break;
+                }
+            }
+            deleteInvalid();
+        }
+        if (rv != null) {
+            putCache(hostname, rv.get(0));
+        } else {
+            synchronized(_negativeCache) {
+                _negativeCache.put(key, DUMMY);
+            }
+        }
+        return rv;
+    }
+
     /**
      * @param options If non-null and contains the key "list", add to that list
      *                (default "hosts.txt")
@@ -722,6 +916,12 @@ public class BlockfileNamingService extends DummyNamingService {
         return put(hostname, d, options, true);
     }
 
+    /**
+     * Single dest version
+     * This does not prevent adding b32. Caller must check.
+     *
+     * @param checkExisting if true, fail if entry already exists
+     */
     private boolean put(String hostname, Destination d, Properties options, boolean checkExisting) {
         if (_readOnly) {
             _log.error("Add entry failed, read-only hosts database");
@@ -746,7 +946,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return false;
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     sl = _bf.makeIndex(listname, _stringSerializer, _destSerializer);
                 boolean changed =  (checkExisting || !_listeners.isEmpty()) && sl.get(key) != null;
@@ -763,6 +963,82 @@ public class BlockfileNamingService extends DummyNamingService {
                         nsl.entryChanged(this, hostname, d, options);
                     else
                         nsl.entryAdded(this, hostname, d, options);
+                }
+                return true;
+            } catch (IOException ioe) {
+                _log.error("DB add error", ioe);
+                return false;
+            } catch (RuntimeException re) {
+                _log.error("DB add error", re);
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Multiple dests version.
+     * DB MUST be version 4.
+     * This does not prevent adding b32. Caller must check.
+     *
+     * @param propsList may be null, or entries may be null
+     * @param checkExisting if true, fail if entry already exists
+     * @since 0.9.26
+     */
+    private boolean put(String hostname, List<Destination> dests, List<Properties> propsList, boolean checkExisting) {
+        int sz = dests.size();
+        if (sz <= 0)
+            throw new IllegalArgumentException();
+        if (sz == 1)
+            return put(hostname, dests.get(0), propsList != null ? propsList.get(0) : null, checkExisting);
+        if (_readOnly) {
+            _log.error("Add entry failed, read-only hosts database");
+            return false;
+        }
+        String key = hostname.toLowerCase(Locale.US);
+        synchronized(_negativeCache) {
+            _negativeCache.remove(key);
+        }
+        String listname = FALLBACK_LIST;
+        String date = Long.toString(_context.clock().now());
+        List<Properties> outProps = new ArrayList<Properties>(propsList.size());
+        for (Properties options : propsList) {
+            Properties props = new Properties();
+            props.setProperty(PROP_ADDED, date);
+            if (options != null) {
+                props.putAll(options);
+                String list = options.getProperty("list");
+                if (list != null) {
+                    listname = list;
+                    props.remove("list");
+                }
+            }
+            outProps.add(props);
+        }
+        synchronized(_bf) {
+            if (_isClosed)
+                return false;
+            try {
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null)
+                    sl = _bf.makeIndex(listname, _stringSerializer, _destSerializer);
+                boolean changed =  (checkExisting || !_listeners.isEmpty()) && sl.get(key) != null;
+                if (changed && checkExisting)
+                        return false;
+                addEntry(sl, key, dests, outProps);
+                if (changed) {
+                    removeCache(hostname);
+                    // removeReverseEntry(key, oldDest) ???
+                }
+                for (int i = 0; i < dests.size(); i++) {
+                    Destination d = dests.get(i);
+                    Properties options = propsList.get(i);
+                    addReverseEntry(key, d);
+                    for (NamingServiceListener nsl : _listeners) { 
+                        if (changed)
+                            nsl.entryChanged(this, hostname, d, options);
+                        else
+                            nsl.entryAdded(this, hostname, d, options);
+                    }
                 }
                 return true;
             } catch (IOException ioe) {
@@ -797,15 +1073,15 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return false;
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     return false;
-                Object removed = removeEntry(sl, key);
+                DestEntry removed = removeEntry(sl, key);
                 boolean rv = removed != null;
                 if (rv) {
                     removeCache(hostname);
                     try {
-                        removeReverseEntry(key, ((DestEntry)removed).dest);
+                        removeReverseEntry(key, removed.dest);
                     } catch (ClassCastException cce) {
                         _log.error("DB reverse remove error", cce);
                     }
@@ -874,13 +1150,13 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return Collections.emptyMap();
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.emptyMap();
                 }
-                SkipIterator iter;
+                SkipIterator<String, DestEntry> iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
@@ -891,7 +1167,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
-                    String key = (String) iter.nextKey();
+                    String key = iter.nextKey();
                     if (startsWith != null) {
                         if (startsWith.equals("[0-9]")) {
                             if (key.charAt(0) > '9')
@@ -900,7 +1176,7 @@ public class BlockfileNamingService extends DummyNamingService {
                             break;
                         }
                     }
-                    DestEntry de = (DestEntry) iter.next();
+                    DestEntry de = iter.next();
                     if (!validate(key, de, listname))
                         continue;
                     if (search != null && key.indexOf(search) < 0)
@@ -968,13 +1244,13 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return Collections.emptyMap();
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.emptyMap();
                 }
-                SkipIterator iter;
+                SkipIterator<String, DestEntry> iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
@@ -985,7 +1261,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
-                    String key = (String) iter.nextKey();
+                    String key = iter.nextKey();
                     if (startsWith != null) {
                         if (startsWith.equals("[0-9]")) {
                             if (key.charAt(0) > '9')
@@ -994,7 +1270,7 @@ public class BlockfileNamingService extends DummyNamingService {
                             break;
                         }
                     }
-                    DestEntry de = (DestEntry) iter.next();
+                    DestEntry de = iter.next();
                     if (!validate(key, de, listname))
                         continue;
                     if (search != null && key.indexOf(search) < 0)
@@ -1062,13 +1338,13 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return Collections.emptySet();
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.emptySet();
                 }
-                SkipIterator iter;
+                SkipIterator<String, DestEntry> iter;
                 if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
@@ -1078,7 +1354,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
-                    String key = (String) iter.nextKey();
+                    String key = iter.nextKey();
                     if (startsWith != null) {
                         if (startsWith.equals("[0-9]")) {
                             if (key.charAt(0) > '9')
@@ -1117,10 +1393,33 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     @Override
     public String reverseLookup(Hash h) {
+        List<String> ls;
         synchronized(_bf) {
             if (_isClosed)
                 return null;
-            return getReverseEntry(h);
+            ls = getReverseEntries(h);
+        }
+        return (ls != null) ? ls.get(0) : null;
+    }
+
+    /**
+     * @param options ignored
+     * @since 0.9.26
+     */
+    @Override
+    public List<String> reverseLookupAll(Destination d, Properties options) {
+        return reverseLookupAll(d.calculateHash());
+    }
+
+    /**
+     * @since 0.9.26
+     */
+    @Override
+    public List<String> reverseLookupAll(Hash h) {
+        synchronized(_bf) {
+            if (_isClosed)
+                return null;
+            return getReverseEntries(h);
         }
     }
 
@@ -1141,7 +1440,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_isClosed)
                 return 0;
             try {
-                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
                     return 0;
                 return sl.size();
@@ -1161,6 +1460,133 @@ public class BlockfileNamingService extends DummyNamingService {
 
     ////////// End NamingService API
 
+    //// Begin new API for multiple Destinations
+
+    /**
+     *  Return all of the entries found in the first list found, or in the list
+     *  specified in lookupOptions. Does not aggregate all destinations found
+     *  in all lists.
+     *
+     *  If storedOptions is non-null, it must be a List that supports null entries.
+     *  If the returned value (the List of Destinations) is non-null,
+     *  the same number of Properties objects will be added to storedOptions.
+     *  If no properties were found for a given Destination, the corresponding
+     *  entry in the storedOptions list will be null.
+     *
+     *  @param lookupOptions input parameter, NamingService-specific, may be null
+     *  @param storedOptions output parameter, NamingService-specific, any stored properties will be added if non-null
+     *  @return non-empty List of Destinations, or null if nothing found
+     *  @since 0.9.26
+     */
+    @Override
+    public List<Destination> lookupAll(String hostname, Properties lookupOptions, List<Properties> storedOptions) {
+        if (!_isVersion4)
+            return super.lookupAll(hostname, lookupOptions, storedOptions);
+        List<Destination> rv = lookupAll2(hostname, lookupOptions, storedOptions);
+        if (rv == null) {
+            // if hostname starts with "www.", strip and try again
+            // but not for www.i2p
+            hostname = hostname.toLowerCase(Locale.US);
+            if (hostname.startsWith("www.") && hostname.length() > 7) {
+                hostname = hostname.substring(4);
+                rv = lookupAll2(hostname, lookupOptions, storedOptions);
+            }
+        }
+        // we sort the destinations in addDestionation(),
+        // which is a lot easier than sorting them here
+        return rv;
+    }
+
+    /**
+     *  Add a Destination to an existing hostname's entry in the addressbook.
+     *
+     *  This does not prevent adding b32. Caller must check.
+     *
+     *  @param options NamingService-specific, may be null
+     *  @return success
+     *  @since 0.9.26
+     */
+    @Override
+    public boolean addDestination(String hostname, Destination d, Properties options) {
+        if (!_isVersion4)
+            return putIfAbsent(hostname, d, options);
+        List<Properties> storedOptions = new ArrayList<Properties>(4);
+        synchronized(_bf) {
+            // We use lookupAll2(), not lookupAll(), because if hostname starts with www.,
+            // we do not want to read in from the
+            // non-www hostname and then copy it to a new www hostname.
+            List<Destination> dests = lookupAll2(hostname, options, storedOptions);
+            if (dests == null)
+                return put(hostname, d, options, false);
+            if (dests.contains(d))
+                return false;
+            if (dests.size() >= MAX_DESTS_PER_HOST)
+                return false;
+            List<Destination> newDests = new ArrayList<Destination>(dests.size() + 1);
+            newDests.addAll(dests);
+            // TODO better sort by sigtype preference.
+            // For now, non-DSA at the front, DSA at the end
+            SigType type = d.getSigningPublicKey().getType();
+            if (type != SigType.DSA_SHA1 && type.isAvailable()) {
+                newDests.add(0, d);
+                storedOptions.add(0, options);
+            } else {
+                newDests.add(d);
+                storedOptions.add(options);
+            }
+            return put(hostname, newDests, storedOptions, false);
+        }
+    }
+
+    /**
+     *  Remove a hostname's entry only if it contains the Destination d.
+     *  If the NamingService supports multiple Destinations per hostname,
+     *  and this is the only Destination, removes the entire entry.
+     *  If aditional Destinations remain, it only removes the
+     *  specified Destination from the entry.
+     *
+     *  @param options NamingService-specific, may be null
+     *  @return true if entry containing d was successfully removed.
+     *  @since 0.9.26
+     */
+    @Override
+    public boolean remove(String hostname, Destination d, Properties options) {
+        if (!_isVersion4) {
+            // super does a get-test-remove, so lock around that
+            synchronized(_bf) {
+                return super.remove(hostname, d, options);
+            }
+        }
+        List<Properties> storedOptions = new ArrayList<Properties>(4);
+        synchronized(_bf) {
+            // We use lookupAll2(), not lookupAll(), because if hostname starts with www.,
+            // we do not want to read in from the
+            // non-www hostname and then copy it to a new www hostname.
+            List<Destination> dests = lookupAll2(hostname, options, storedOptions);
+            if (dests == null)
+                return false;
+            for (int i = 0; i < dests.size(); i++) {
+                Destination dd = dests.get(i);
+                if (dd.equals(d)) {
+                    // Found it. Remove and return.
+                    if (dests.size() == 1)
+                        return remove(hostname, options);
+                    List<Destination> newDests = new ArrayList<Destination>(dests.size() - 1);
+                    for (int j = 0; j < dests.size(); j++) {
+                        if (j != i)
+                            newDests.add(dests.get(j));
+                    }
+                    storedOptions.remove(i);
+                    removeReverseEntry(hostname, d);
+                    return put(hostname, newDests, storedOptions, false);
+                }
+            }
+        }
+        return false;
+    }
+
+    //// End new API for multiple Destinations
+
     /**
      *  Continuously validate anything we read in.
      *  Queue anything invalid to be removed at the end of the operation.
@@ -1176,6 +1602,12 @@ public class BlockfileNamingService extends DummyNamingService {
                      de != null &&
                      de.dest != null &&
                      de.dest.getPublicKey() != null;
+        if (_isVersion4 && rv && de.destList != null) {
+            // additional checks for multi-dest
+            rv = de.propsList != null &&
+                 de.destList.size() == de.propsList.size() &&
+                 !de.destList.contains(null);
+        }
         if ((!rv) && (!_readOnly))
             _invalid.add(new InvalidEntry(key, listname));
         return rv;
@@ -1195,7 +1627,7 @@ public class BlockfileNamingService extends DummyNamingService {
             String key = ie.key;
             String list = ie.list;
             try {
-                SkipList sl = _bf.getIndex(list, _stringSerializer, _destSerializer);
+                SkipList<String, DestEntry> sl = _bf.getIndex(list, _stringSerializer, _destSerializer);
                 if (sl == null) {
                     _log.error("No list found to remove corrupt \"" + key + "\" from database " + list);
                     continue;
@@ -1288,12 +1720,11 @@ public class BlockfileNamingService extends DummyNamingService {
      *  but if we threw a RuntimeException we would prevent access to entries later in
      *  the SkipSpan.
      */
-    private static class PropertiesSerializer implements Serializer {
+    private static class PropertiesSerializer implements Serializer<Properties> {
         /**
          *  A format error on the properties is non-fatal (returns an empty properties)
          */
-        public byte[] getBytes(Object o) {
-            Properties p = (Properties) o;
+        public byte[] getBytes(Properties p) {
             try {
                 return DataHelper.toProperties(p);
             } catch (DataFormatException dfe) {
@@ -1304,7 +1735,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
 
         /** returns null on error */
-        public Object construct(byte[] b) {
+        public Properties construct(byte[] b) {
             Properties rv = new Properties();
             try {
                 DataHelper.fromProperties(b, 0, rv);
@@ -1321,10 +1752,27 @@ public class BlockfileNamingService extends DummyNamingService {
      *  and is serialized in that order.
      */
     private static class DestEntry {
-        /** may be null */
+        /** May be null.
+         *  If more than one dest, contains the first props.
+         */
         public Properties props;
-        /** may not be null */
+
+        /** May not be null.
+         *  If more than one dest, contains the first dest.
+         */
         public Destination dest;
+
+        /** May be null - v4 only - same size as destList - may contain null entries
+         *  Only non-null if more than one dest.
+         *  First entry always equal to props.
+         */
+        public List<Properties> propsList;
+
+        /** May be null - v4 only - same size as propsList
+         *  Only non-null if more than one dest.
+         *  First entry always equal to dest.
+         */
+        public List<Destination> destList;
 
         @Override
         public String toString() {
@@ -1340,14 +1788,13 @@ public class BlockfileNamingService extends DummyNamingService {
      *  but if we threw a RuntimeException we would prevent access to entries later in
      *  the SkipSpan.
      */
-    private static class DestEntrySerializer implements Serializer {
+    private static class DestEntrySerializer implements Serializer<DestEntry> {
 
         /**
          *  A format error on the properties is non-fatal (only the properties are lost)
          *  A format error on the destination is fatal
          */
-        public byte[] getBytes(Object o) {
-            DestEntry de = (DestEntry) o;
+        public byte[] getBytes(DestEntry de) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             try {
                 try {
@@ -1356,7 +1803,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     logError("DB Write Fail - properties too big?", dfe);
                     // null properties is a two-byte length of 0.
                     baos.write(new byte[2]);
-		}
+                }
                 de.dest.writeBytes(baos);
             } catch (IOException ioe) {
                 logError("DB Write Fail", ioe);
@@ -1367,7 +1814,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
 
         /** returns null on error */
-        public Object construct(byte[] b) {
+        public DestEntry construct(byte[] b) {
             DestEntry rv = new DestEntry();
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             try {
@@ -1384,6 +1831,200 @@ public class BlockfileNamingService extends DummyNamingService {
             }
             return rv;
         }
+    }
+
+    /**
+     *  For multiple destinations per hostname
+     *  @since 0.9.26
+     */
+    private static class DestEntrySerializerV4 implements Serializer<DestEntry> {
+
+        public byte[] getBytes(DestEntry de) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+            int sz = de.destList != null ? de.destList.size() : 1;
+            try {
+                baos.write((byte) sz);
+                for (int i = 0; i < sz; i++) {
+                    Properties p;
+                    Destination d;
+                    if (i == 0) {
+                        p = de.props;
+                        d = de.dest;
+                    } else {
+                        p = de.propsList.get(i);
+                        d = de.destList.get(i);
+                    }
+                    try {
+                        writeProperties(baos, p);
+                    } catch (DataFormatException dfe) {
+                        logError("DB Write Fail - properties too big?", dfe);
+                        baos.write(new byte[2]);
+                    }
+                    d.writeBytes(baos);
+                }
+            } catch (IOException ioe) {
+                logError("DB Write Fail", ioe);
+            } catch (DataFormatException dfe) {
+                logError("DB Write Fail", dfe);
+            }
+            return baos.toByteArray();
+        }
+
+        /** returns null on error */
+        public DestEntry construct(byte[] b) {
+            DestEntry rv = new DestEntry();
+            ByteArrayInputStream bais = new ByteArrayInputStream(b);
+            try {
+                int sz = bais.read() & 0xff;
+                if (sz <= 0)
+                    throw new DataFormatException("bad dest count " + sz);
+                rv.props = readProperties(bais);
+                rv.dest = Destination.create(bais);
+                if (sz > 1) {
+                    rv.propsList = new ArrayList<Properties>(sz);
+                    rv.destList = new ArrayList<Destination>(sz);
+                    rv.propsList.add(rv.props);
+                    rv.destList.add(rv.dest);
+                    for (int i = 1; i < sz; i++) {
+                        rv.propsList.add(readProperties(bais));
+                        rv.destList.add(Destination.create(bais));
+                    }
+                }
+            } catch (IOException ioe) {
+                logError("DB Read Fail", ioe);
+                return null;
+            } catch (DataFormatException dfe) {
+                logError("DB Read Fail", dfe);
+                return null;
+            }
+            return rv;
+        }
+    }
+
+    /**
+     * Same as DataHelper.writeProperties, UTF-8, unsorted,
+     * except that values may up to 4K bytes.
+     *
+     * @param props source may be null
+     * @throws DataFormatException if any key string is over 255 bytes long,
+     *                             if any value string is over 4096 bytes long, or if the total length
+     *                             (not including the two length bytes) is greater than 65535 bytes.
+     * @since 0.9.26
+     */
+    private static void writeProperties(ByteArrayOutputStream rawStream, Properties p) 
+            throws DataFormatException, IOException {
+        if (p != null && !p.isEmpty()) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 32);
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
+                String key = (String) entry.getKey();
+                String val = (String) entry.getValue();
+                DataHelper.writeStringUTF8(baos, key);
+                baos.write('=');
+                writeLongStringUTF8(baos, val);
+                baos.write(';');
+            }
+            if (baos.size() > 65535)
+                throw new DataFormatException("Properties too big (65535 max): " + baos.size());
+            byte propBytes[] = baos.toByteArray();
+            DataHelper.writeLong(rawStream, 2, propBytes.length);
+            rawStream.write(propBytes);
+        } else {
+            DataHelper.writeLong(rawStream, 2, 0);
+        }
+    }
+
+    /**
+     * Same as DataHelper.readProperties, UTF-8, unsorted,
+     * except that values may up to 4K bytes.
+     *
+     * Throws DataFormatException on duplicate key
+     *
+     * @param in stream to read the mapping from
+     * @throws DataFormatException if the format is invalid
+     * @throws IOException if there is a problem reading the data
+     * @return a Properties
+     * @since 0.9.26
+     */
+    public static Properties readProperties(ByteArrayInputStream in) 
+        throws DataFormatException, IOException {
+        Properties props = new Properties();
+        int size = (int) DataHelper.readLong(in, 2);
+        // this doesn't prevent reading past the end on corruption
+        int ignore = in.available() - size;
+        while (in.available() > ignore) {
+            String key = DataHelper.readString(in);
+            int b = in.read();
+            if (b != '=')
+                throw new DataFormatException("Bad key " + b);
+            String val = readLongString(in);
+            b = in.read();
+            if (b != ';')
+                throw new DataFormatException("Bad value");
+            Object old = props.put(key, val);
+            if (old != null)
+                throw new DataFormatException("Duplicate key " + key);
+        }
+        return props;
+    }
+
+    /**
+     * Same as DataHelper.writeStringUTF8, except that
+     * strings up to 4K bytes are allowed.
+     * Format is: one-byte length + data, or 0xff + two-byte length + data
+     *
+     * @param out stream to write string
+     * @param string to write out: null strings are valid, but strings of excess length will
+     *               cause a DataFormatException to be thrown
+     * @throws DataFormatException if the string is not valid
+     * @throws IOException if there is an IO error writing the string
+     */
+    private static void writeLongStringUTF8(ByteArrayOutputStream out, String string) 
+        throws DataFormatException, IOException {
+        if (string == null) {
+            out.write(0);
+        } else {
+            byte[] raw = string.getBytes("UTF-8");
+            int len = raw.length;
+            if (len >= 255) {
+                if (len > MAX_VALUE_LENGTH)
+                    throw new DataFormatException(MAX_VALUE_LENGTH + " max, but this is "
+                                              + len + " [" + string + "]");
+                out.write(0xff);
+                DataHelper.writeLong(out, 2, len);
+            } else {
+                out.write(len);
+            }
+            out.write(raw);
+        }
+    }
+
+    /**
+     * Same as DataHelper.readString, except that
+     * strings up to 4K bytes are allowed.
+     * Format is: one-byte length + data, or 0xff + two-byte length + data
+     *
+     * @param in stream to read from
+     * @throws DataFormatException if the stream doesn't contain a validly formatted string
+     * @throws EOFException if there aren't enough bytes to read the string
+     * @throws IOException if there is an IO error reading the string
+     * @return UTF-8 string
+     */
+    private static String readLongString(ByteArrayInputStream in) throws DataFormatException, IOException {
+        int size = in.read();
+        if (size < 0)
+            throw new EOFException("EOF reading string");
+        if (size == 0xff) {
+            size = (int) DataHelper.readLong(in, 2);
+            if (size > MAX_VALUE_LENGTH)
+                throw new DataFormatException(MAX_VALUE_LENGTH + " max, but this is " + size);
+        }
+        if (size == 0)
+            return "";
+        byte raw[] = new byte[size];
+        int read = DataHelper.read(in, raw);
+        if (read != size)
+            throw new EOFException("EOF reading string");
+        return new String(raw, "UTF-8");
     }
 
     /**
@@ -1409,6 +2050,17 @@ public class BlockfileNamingService extends DummyNamingService {
             ctxProps.setProperty(PROP_FORCE, "true");
         I2PAppContext ctx = new I2PAppContext(ctxProps);
         BlockfileNamingService bns = new BlockfileNamingService(ctx);
+        Properties sprops = new Properties();
+        String lname = "privatehosts.txt";
+        sprops.setProperty("list", lname);
+        System.out.println("List " + lname + " contains " + bns.size(sprops));
+        lname = "userhosts.txt";
+        sprops.setProperty("list", lname);
+        System.out.println("List " + lname + " contains " + bns.size(sprops));
+        lname = "hosts.txt";
+        sprops.setProperty("list", lname);
+        System.out.println("List " + lname + " contains " + bns.size(sprops));
+
 /****
         List<String> names = null;
         Properties props = new Properties();
@@ -1479,12 +2131,14 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         System.out.println("BFNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
         System.out.println("Added " + found + " not added " + notfound);
-
+        System.out.println("size() reports " + bns.size());
 
 
         //bns.dumpDB();
 ****/
         bns.close();
+        ctx.logManager().flush();
+        System.out.flush();
 /****
         if (true) return;
 

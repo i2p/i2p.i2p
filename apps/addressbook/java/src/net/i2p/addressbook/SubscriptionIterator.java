@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.util.PortMapper;
 
 /**
@@ -37,9 +38,9 @@ import net.i2p.util.PortMapper;
  */
 class SubscriptionIterator implements Iterator<AddressBook> {
 
-    private Iterator<Subscription> subIterator;
-    private String proxyHost;
-    private int proxyPort;
+    private final Iterator<Subscription> subIterator;
+    private final String proxyHost;
+    private final int proxyPort;
     private final long delay;
 
     /**
@@ -75,7 +76,10 @@ class SubscriptionIterator implements Iterator<AddressBook> {
      */
     public AddressBook next() {
         Subscription sub = this.subIterator.next();
-        if (sub.getLastFetched() + this.delay < I2PAppContext.getGlobalContext().clock().now() &&
+        if (sub.getLocation().startsWith("file:")) {
+            // test only
+            return new AddressBook(sub.getLocation().substring(5));
+        } else if (sub.getLastFetched() + this.delay < I2PAppContext.getGlobalContext().clock().now() &&
             I2PAppContext.getGlobalContext().portMapper().getPort(PortMapper.SVC_HTTP_PROXY) >= 0 &&
             !I2PAppContext.getGlobalContext().getBooleanProperty("i2p.vmCommSystem")) {
             //System.err.println("Fetching addressbook from " + sub.getLocation());
@@ -85,7 +89,7 @@ class SubscriptionIterator implements Iterator<AddressBook> {
             //                   DataHelper.formatDuration(I2PAppContext.getGlobalContext().clock().now() - sub.getLastFetched()) +
             //                   " ago but the minimum delay is " +
             //                   DataHelper.formatDuration(this.delay));
-            return new AddressBook(Collections.<String, String> emptyMap());
+            return new AddressBook(Collections.<String, HostTxtEntry>emptyMap());
         }
     }
 

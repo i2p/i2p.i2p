@@ -103,9 +103,14 @@ Public domain except as listed below:
    http://creativecommons.org/licenses/by-sa/3.0/
    This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/
 
+   GeoIP API 1.3.1:
+   See licenses/LICENSE-LGPLv2.1.txt
+
 
 Installer:
    Launch4j 3.0.1:
+   (Launch4j is only included in the upstream source package and Windows binaries.
+    Not applicable for non-Windows binaries or Debian/Launchpad packages.)
    Copyright (c) 2004, 2008 Grzegorz Kowal
    See licenses/LICENSE-Launch4j.txt (in binary packages)
    See installer/lib/launch4j/LICENSE.txt (in source packages)
@@ -167,6 +172,10 @@ Applications:
    BOB:
    Copyright (C) sponge
    See licenses/COPYING-BOB.txt
+
+   Desktopgui
+   Copyright (c) Mathias De Maré
+   See licenses/LICENSE-DesktopGUI.txt
 
    I2PSnark:
    Copyright (C) 2003 Mark J. Wielaard
@@ -285,10 +294,6 @@ distributions. See the source package for the additional license information.
    BOB Demos:
    Copyright (C) sponge
    DWTFYWTPL
-
-   Desktopgui
-   Copyright (c) Mathias De Maré
-   See apps/desktopgui/LICENSE
 
    SAM C Library:
    Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>

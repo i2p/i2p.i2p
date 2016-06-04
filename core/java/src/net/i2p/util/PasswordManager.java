@@ -30,7 +30,7 @@ public class PasswordManager {
     protected static final String PROP_PW = ".password";
     /** stored obfuscated as b64 of the UTF-8 bytes */
     protected static final String PROP_B64 = ".b64";
-    /** stored as the hex of the MD5 hash of the ISO-8859-1 bytes. Compatible with Jetty. */
+    /** stored as the hex of the MD5 hash of the UTF-8 bytes. Compatible with Jetty. */
     protected static final String PROP_MD5 = ".md5";
     /** stored as a Unix crypt string */
     protected static final String PROP_CRYPT = ".crypt";
@@ -185,6 +185,10 @@ public class PasswordManager {
      *  Will return the MD5 sum of "user:subrealm:pw", compatible with Jetty
      *  and RFC 2617.
      *
+     *  Updated in 0.9.26 to use UTF-8, as implied in RFC 7616/7617
+     *  See also http://stackoverflow.com/questions/7242316/what-encoding-should-i-use-for-http-basic-authentication
+     *  http://stackoverflow.com/questions/702629/utf-8-characters-mangled-in-http-basic-auth-username
+     *
      *  @param subrealm to be used in creating the checksum
      *  @param user non-null, non-empty, already trimmed
      *  @param pw non-null, plain text, already trimmed
@@ -200,17 +204,18 @@ public class PasswordManager {
      *  Will return the MD5 sum of the data, compatible with Jetty
      *  and RFC 2617.
      *
+     *  Updated in 0.9.26 to use UTF-8, as implied in RFC 7616/7617
+     *  See also http://stackoverflow.com/questions/7242316/what-encoding-should-i-use-for-http-basic-authentication
+     *
      *  @param fullpw non-null, plain text, already trimmed
      *  @return lower-case hex with leading zeros, 32 chars, or null on error
      */
     public static String md5Hex(String fullpw) {
-        try {
-            byte[] data = fullpw.getBytes("ISO-8859-1");
-            byte[] sum = md5Sum(data);
-            if (sum != null)
-                // adds leading zeros if necessary
-                return DataHelper.toString(sum);
-        } catch (UnsupportedEncodingException uee) {}
+        byte[] data = DataHelper.getUTF8(fullpw);
+        byte[] sum = md5Sum(data);
+        if (sum != null)
+            // adds leading zeros if necessary
+            return DataHelper.toString(sum);
         return null;
     }
 

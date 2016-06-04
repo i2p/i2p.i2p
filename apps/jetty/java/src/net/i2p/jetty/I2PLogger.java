@@ -115,10 +115,14 @@ public class I2PLogger implements Logger
     {
         // some of these are serious, some aren't
         // no way to get it right
-        if (th != null)
-            _log.logAlways(Log.WARN, msg + ": " + th);
-        else
+        if (th != null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(msg, th);
+            else
+                _log.logAlways(Log.WARN, msg + ": " + th);
+        } else {
             _log.logAlways(Log.WARN, msg);
+        }
     }
     
     private void format(String msg, Object arg0, Object arg1)

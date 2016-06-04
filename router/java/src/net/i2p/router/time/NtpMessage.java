@@ -31,6 +31,7 @@ package net.i2p.router.time;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import net.i2p.util.RandomSource;
@@ -117,7 +118,7 @@ class NtpMessage {
      * in the request and the server sets it to 4 (server) in the reply. In
      * multicast mode, the server sets this field to 5 (broadcast).
      */
-    public byte mode = 0;
+    public final byte mode;
     
     
     /**
@@ -233,12 +234,14 @@ class NtpMessage {
      * This is the time at which the reply departed the server for the client,
      * in seconds since 00:00 1-Jan-1900.
      */
-    public double transmitTimestamp = 0;
+    public final double transmitTimestamp;
     
     
     
     /**
      * Constructs a new NtpMessage from an array of bytes.
+     *
+     * @param array 48 bytes minimum
      */
     public NtpMessage(byte[] array) {
         // See the packet format diagram in RFC 2030 for details
@@ -280,13 +283,15 @@ class NtpMessage {
         // Note that all the other member variables are already set with
         // appropriate default values.
         this.mode = 3;
-        this.transmitTimestamp = (System.currentTimeMillis()/1000.0) + 2208988800.0;
+        this.transmitTimestamp = (System.currentTimeMillis()/1000.0) + NtpClient.SECONDS_1900_TO_EPOCH;
     }
     
     
     
     /**
      * This method constructs the data bytes of a raw NTP packet.
+     *
+     * @return 48 bytes
      */
     public byte[] toByteArray() {
         // All bytes are automatically set to 0
@@ -368,6 +373,10 @@ class NtpMessage {
      * Will read 8 bytes of a message beginning at <code>pointer</code>
      * and return it as a double, according to the NTP 64-bit timestamp
      * format.
+     *
+     * @param array 8 bytes starting at pointer
+     * @param pointer the offset
+     * @return the time since 1900 (NOT Java time)
      */
     public static double decodeTimestamp(byte[] array, int pointer) {
         double r = 0.0;
@@ -383,10 +392,21 @@ class NtpMessage {
     
     /**
      * Encodes a timestamp in the specified position in the message
+     *
+     * @param array output 8 bytes starting at pointer
+     * @param pointer the offset
+     * @param timestamp the time to encode (since 1900, NOT Java time)
      */
     public static void encodeTimestamp(byte[] array, int pointer, double timestamp) {
+        if (timestamp == 0.0) {
+            // don't put in random data
+            Arrays.fill(array, pointer, pointer + 8, (byte) 0);
+            return;
+        }
+
         // Converts a double into a 64-bit fixed point
-        for(int i=0; i<8; i++) {
+        // 6 bytes of real data
+        for(int i=0; i<7; i++) {
             // 2^24, 2^16, 2^8, .. 2^-32
             double base = Math.pow(2, (3-i)*8);
             
@@ -401,7 +421,8 @@ class NtpMessage {
         // low order bits of the timestamp with a random, unbiased
         // bitstring, both to avoid systematic roundoff errors and as
         // a means of loop detection and replay detection.
-        array[7+pointer] = (byte) (RandomSource.getInstance().nextInt());
+        // 2 bytes of random data
+        RandomSource.getInstance().nextBytes(array, pointer + 6, 2);
     }
     
     
@@ -415,7 +436,7 @@ class NtpMessage {
         
         // timestamp is relative to 1900, utc is used by Java and is relative
         // to 1970
-        double utc = timestamp - (2208988800.0);
+        double utc = timestamp - NtpClient.SECONDS_1900_TO_EPOCH;
         
         // milliseconds
         long ms = (long) (utc * 1000.0);
@@ -425,7 +446,7 @@ class NtpMessage {
         
         // fraction
         double fraction = timestamp - ((long) timestamp);
-        String fractionSting = new DecimalFormat(".000000").format(fraction);
+        String fractionSting = new DecimalFormat(".000000000").format(fraction);
         
         return date + fractionSting;
     }

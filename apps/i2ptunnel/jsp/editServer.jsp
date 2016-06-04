@@ -228,6 +228,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
             </div>
 
+<%
+  /******
+%>
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
                    String sig = editBean.getNameSignature(curTunnel);
                    if (sig.length() > 0) {
@@ -240,6 +243,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
          <%
                    }  // sig
                }  // type
+  ****/
 
             String b64 = editBean.getDestinationBase64(curTunnel);
             if (!"".equals(b64)) {
@@ -256,11 +260,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               <a class="control" title="<%=intl._t("Generate QR Code")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=b64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
               </label>
               <a class="control" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>    
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <a class="control" href="register?tunnel=<%=curTunnel%>"><%=intl._t("Registration Authentication")%></a>    
         <%
                 } else {
           %>
               <label> </label>
               <span class="comment"><%=intl._t("Set name with .i2p suffix to enable QR code generation")%></span>
+              <span class="comment"><%=intl._t("Set name with .i2p suffix to enable registration authentication")%></span>
         <%
                 }  // name
          %>

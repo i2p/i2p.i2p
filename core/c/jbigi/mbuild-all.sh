@@ -1,13 +1,17 @@
 #!/bin/sh
+#
+# Run with BITS=32 to generate 32-bit libs on a 64-bit platform
+# On Ubuntu you will need sudo apt-get install gcc-multilib libc6-i386 libc6-dev-i386
+#
 
 # ON Solaris 11 (at least) this variable must be set.
 # Linux and *BSD will do the right thing.
 #
-#BITS=32
 
-# FIXME Is this all?
-DARWIN_PLATFORMS="core2 corei"
-MISC_DARWIN_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle"
+#
+# look in configure file in gmp source for supported host CPUs, at about line 5000
+#
+
 
 # Note: You will have to add the CPU ID for the platform in the CPU ID code
 # for a new CPU. Just adding them here won't let I2P use the code!
@@ -17,7 +21,7 @@ MISC_DARWIN_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle"
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
-MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
+MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
 
 #
 # If you know of other platforms i2p on *BSD works on,
@@ -29,20 +33,32 @@ MISC_NETBSD_PLATFORMS="armv5tel mips64el ultrasparc2i sgi hppa2.0 alphaev56 powe
 MISC_OPENBSD_PLATFORMS="alphaev56 ultrasparc2i sgi powerpc powerpc64 hppa2.0 alphaev56 armv5tel mips64el"
 
 #
-# MINGW/Windows??
+# ARM
 #
-MISC_MINGW_PLATFORMS=""
+# These platforms exist as of GMP 6.0.0.
+# Some of them will be renamed in the next version of GMP.
+ARM_PLATFORMS="armv5 armv6 armv7a armcortex8 armcortex9 armcortex15"
+# Rename output of armv7a to armv7 since that's what NBI expects.
+# This is due to versions after GMP 6.0.0 changing the target name.
+TRANSLATE_NAME_armv7a="armv7"
 
+#
+# X86_64
 #
 # Are there any other X86 platforms that work on i2p? Add them here.
 #
-
 # Note! these build on 32bit as 32bit when operating as 32bit...
-X86_64_PLATFORMS="atom athlon64 core2 corei nano pentium4"
+# starting with k10 added for 6.0.0
+# As of GMP 6.0.0, libgmp 3,
+X86_64_PLATFORMS="coreisbr coreihwl coreibwl bobcat jaguar bulldozer piledriver steamroller excavator atom athlon64 core2 corei nano pentium4 k10 x86_64"
+TRANSLATE_NAME_x86_64="none" # Rename x86_64 to none_64, since that is what NativeBigInteger refers to it as
 
-# Note! these are 32bit _ONLY_
-X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 ${X86_64_PLATFORMS}"
+# Note! these are 32bit _ONLY_ (after the 64 bit ones)
+# Also note that the 64-bit entry "x86_64" is filtered out since it already has the more appropriate "i386" entry
+X86_PLATFORMS="$(echo $X86_64_PLATFORMS | sed 's/x86_64//g') pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 i386"
+TRANSLATE_NAME_i386="none" # Rename i386 to none, , since that is what NativeBigInteger refers to it as
 
+DARWIN_PLATFORMS="core2 corei coreisbr coreihwl coreibwl"
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
@@ -50,9 +66,9 @@ FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
 NETBSD_PLATFORMS="${FREEBSD_PLATFORMS} ${MISC_LINUX_PLATFORMS} ${MISC_NETBSD_PLATFORMS}"
 OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
 
-#
-# You should not need to edit anything below this comment.
-#
+
+# Import gmp version variables and download gmp.
+. ./download_gmp.sh
 
 # If JAVA_HOME isn't set we'll try to figure it out
 [ -z $JAVA_HOME ] && . ../find-java-home
@@ -62,68 +78,145 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     exit 1
 fi
 
-if [ ! $(which m4)  ]; then
+if ! command -v m4 > /dev/null; then
     printf "\aWARNING: \`m4\` not found. If this process fails to complete, install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
-    sleep 10
+    exit 1
 fi
 
+
+if [ -z $BITS ]; then
+  UNAME="$(uname -a)"
+  if test "${UNAME#*x86_64}" != "x86_&4"; then
+    BITS=64
+  elif test "${UNAME#*i386}" != "i386"; then
+    BITS=32
+  elif test "${UNAME#*i686}" != "i686"; then
+    BITS=32
+  elif test "${UNAME#*armv6}" != "armv6"; then
+    BITS=32
+  elif test "${UNAME#*armv7}" != "armv7"; then
+    BITS=32
+  elif test "${UNAME#*aarch32}" != "aarch32"; then
+    BITS=32
+  elif test "${UNAME#*aarch64}" != "aarch64"; then
+    BITS=64
+  else
+ 
+    echo "Unable to detect default setting for BITS variable"
+    exit
+  fi
+
+  printf "\aBITS variable not set, $BITS bit system detected\n\a" >&2
+fi
+
+
+if [ -z $CC ]; then
+  export CC="gcc"
+  printf "\aCC variable not set, defaulting to $CC\n\a" >&2
+fi
+
+if [ $BITS -eq 32 ]; then
+  export ABI=32
+  export CFLAGS="-m32"
+  export LDFLAGS="-m32"
+elif [ $BITS -eq 64 ]; then
+  export ABI=64
+  export CFLAGS="-m64"
+  export LDFLAGS="-m64"
+else
+  printf "\aBITS value \"$BITS\" not valid, please select 32 or 64\n\a" >&2
+  exit 1
+fi
+
+if ! command -v ${CC} > /dev/null; then
+  echo "The compiler you've selected \"$CC\" does not appear to exist"
+  exit 1
+fi
+
+# Set the "_64" filname filename suffix for 64-bit builds
+if [ $BITS -ne 32 ]; then
+    [ -z $SUFFIX ] && SUFFIX="_64"
+fi
 
 # Allow TARGET to be overridden (e.g. for use with cross compilers)
 [ -z $TARGET ] && TARGET=$(uname -s |tr "[A-Z]" "[a-z]")
 
+# Note, this line does not support windows (and needs to generate a win32/win64 string for that to work)
+BUILD_OS=$(uname -s | tr "[A-Z]" "[a-z]")
 
-# Set the version to 5.0.2 for OSX because AFAIK there are only 64bit capable CPUs for the Intel Macs
-# FIXME do this without sed (and tail) (= portably)
-if [ `echo $TARGET|grep darwin` ]; then
-        VER=5.0.2
-elif [ `echo $TARGET|grep sunos` ]; then
-        VER=$(echo gmp-*.tar.bz2 | sed -e "s/\(.*-\)\(.*\)\(.*.tar.bz2\)$/\2/" | /usr/xpg4/bin/tail -n 1)
-else
-        VER=$(echo gmp-*.tar.bz2 | sed -e "s/\(.*-\)\(.*\)\(.*.tar.bz2\)$/\2/" | tail -n 1)
-fi
+# Do some sanity checks for when we're cross-compiling and
+# set up host string, ARCH_VENDOR_OS. The "\$2" will be replaced
+# with the name of the arch at configuration time
+if [ "$TARGET" != "$BUILD_OS" ]; then
+  case "$TARGET" in
+  windows*)
+    HOST_CONFIGURE_FLAG="\$2-w64-mingw32"
+    case "$CC" in
+    *i*86*mingw32*gcc)
+      [ $BITS -ne 32 ] && echo "Error, 32-bit cross-compiler used with non 32-bit architecture" && exit 1
+      ;;
+    *x86_64*mingw32*gcc)
+      [ $BITS -ne 64 ] && echo "Error, 64-bit cross-compiler used with non 64-bit architecture" && exit 1
+      ;;
+    *)
+      echo "No recognized cross-compiler provided in CC env variable."
+      [ $BITS -eq 32 ] && echo "For 32-bit targets, i686-w64-mingw32-gcc is recommended"
+      [ $BITS -eq 64 ] && echo "For 64-bit targets, x86_64-w64-mingw32-gcc is recommended"
+      exit 1;
+      ;;
+    esac
+  ;;
+  freebsd*)
+    HOST_CONFIGURE_FLAG="\$2-pc-freebsd"
+  ;;
+  darwin*|osx)
+    HOST_CONFIGURE_FLAG="\$2-darwin"
+#     case "$CC" in
+#     *i*86*darwin*)
 
-if [ "$VER" = "" ] ; then
-        echo "ERROR! Can't find gmp source tarball."
-        exit 1
-fi
 
-# If the BITS variable isn't set above we'll proceed without setting the *FLAGS
-# variables ourselves.
-[ -z $BITS ] && BITS=0
-
-if [ $BITS -eq 32 ]; then
-    export CC="gcc -m32"
-    export CFLAGS="-m32"
-    export LDFLAGS="-m32"
-    SUFFIX=
-elif [ $BITS -eq 64 ]; then
-    export CC="gcc -m64"
-    export CFLAGS="-m64"
+#       [ $BITS -ne 32 ] && echo "Error, 32-bit cross-compiler used with non 32-bit architecture" && exit 1
+      ;;
+#     *x86_64*darwin*)
+#       HOST_CONFIGURE_FLAG="\$2-apple-darwin"
+#       [ $BITS -ne 64 ] && echo "Error, 64-bit cross-compiler used with non 64-bit architecture" && exit 1
+#       ;;
+#     *)
+#       echo "No recognized cross-compiler provided in CC env variable."
+#       [ $BITS -eq 32 ] && echo "For 32-bit targets, i686-apple-darwin10-gcc recommended"
+#       [ $BITS -eq 64 ] && echo "For 64-bit targets, x86_64-apple-darwin10-gcc recommended"
+#       exit 1;
+#       ;;
+#     esac
+#   ;;
+  esac
 fi
 
 case "$TARGET" in
-mingw*)
-        PLATFORM_LIST="${MINGW_PLATFORMS}"
+mingw*|windows*)
         NAME="jbigi"
         TYPE="dll"
         TARGET="windows"
-        echo "Building windows .dlls for all architectures";;
-darwin*)
-        PLATFORM_LIST="${DARWIN_PLATFORMS}"
+        if [ $BITS -ne 32 ]; then
+                PLATFORM_LIST="${X86_64_PLATFORMS}"
+        else
+                PLATFORM_LIST="${X86_PLATFORMS}"
+        fi
+        echo "Building ${TARGET} .dlls for all architectures";;
+darwin*|osx)
         NAME="libjbigi"
         TYPE="jnilib"
         TARGET="osx"
+        PLATFORM_LIST="${DARWIN_PLATFORMS}"
         echo "Building ${TARGET} .jnilibs for all architectures";;
 sunos*)
-        PLATFORM_LIST="${X86_64_PLATFORMS}"
         NAME="libjbigi"
         TYPE="so"
-        UNIXTYPE="solaris"
-        TARGET="${UNIXTYPE}"
-        if $(echo "$CFLAGS" | grep -q "\-m64") ; then
-            [ -z $SUFFIX ] && SUFFIX="_64"
-            PLATFORM_LIST="${X86_64_PLATFORMS}"
+        BUILD_OS="solaris"
+        TARGET="${BUILD_OS}"
+        if [ $BITS -eq 32 ]; then
+            PLATFORM_LIST="${X86_PLATFORMS}"
         else
             PLATFORM_LIST="${X86_PLATFORMS}"
         fi
@@ -140,45 +233,37 @@ linux*|*kfreebsd)
                 TARGET="linux"
                 ;;
         esac
-        arch=$(uname -m | cut -f1 -d" ")
-        case ${arch} in
-                i[3-6]86)
-                        arch="x86";;
-        esac
-        case ${arch} in
-                x86_64 | amd64)
-                        PLATFORM_LIST="${X86_64_PLATFORMS}"
-                        if [ $BITS -ne 32 ]; then
-                            [ -z $SUFFIX ] && SUFFIX="_64"
-                        fi
-                        ;;
-                #ia64)
-                #        PLATFORM_LIST="${X86_64_PLATFORMS}"
-                #        TARGET="$TARGET-ia64";;
-                x86)
-                        PLATFORM_LIST="${X86_PLATFORMS}";;
+        ARCH=$(uname -m | cut -f1 -d" ")
+
+        case ${ARCH} in
+                x86_64 | amd64 | i*86)
+                        if [ $BITS -eq 32 ]; then
+                          PLATFORM_LIST="${X86_PLATFORMS}"
+                          ARCH="x86"
+                        else
+                          PLATFORM_LIST="${X86_64_PLATFORMS}"
+                          ARCH="x86_64"
+                        fi;;
+                arm*)
+                        PLATFORM_LIST="${ARM_PLATFORMS}";;
                 *)
                         PLATFORM_LIST="${LINUX_PLATFORMS}";;
         esac
-        echo "Building ${TARGET} .sos for ${arch}";;
+        echo "Building ${TARGET} .sos for ${ARCH}";;
 netbsd*|freebsd*|openbsd*)
         NAME="libjbigi"
         TYPE="so"
         PLATFORM_LIST=
-        arch=$(uname -m | cut -f1 -d" ")
-        case ${arch} in
-                i[3-6]86)
-                        arch="x86";;
-        esac
-        case ${arch} in
-                x86_64|amd64)
-                        PLATFORM_LIST="${X86_64_PLATFORMS}"
-                       [ -z $SUFFIX ] && SUFFIX="_64";;
-                #ia64)
-                #        PLATFORM_LIST="${X86_64_PLATFORMS}"
-                #        SUFFIX="{SYS}-ia64";;
-                x86)
-                        PLATFORM_LIST="${X86_PLATFORMS}";;
+        ARCH=$(uname -m | cut -f1 -d" ")
+        case ${ARCH} in
+                x86_64 | amd64 | i*86)
+                        if [ $BITS -eq 32 ]; then
+                          PLATFORM_LIST="${X86_PLATFORMS}"
+                          ARCH="x86"
+                        else
+                          PLATFORM_LIST="${X86_64_PLATFORMS}"
+                          ARCH="x86_64"
+                        fi;;
                 *)
                         case ${TARGET} in
                                 netbsd)
@@ -192,7 +277,7 @@ netbsd*|freebsd*|openbsd*)
                                         exit 1;;
                         esac
         esac
-        echo "Building ${TARGET} .sos for ${arch}";;
+        echo "Building ${TARGET} .sos for ${ARCH}";;
 *)
         echo "Unsupported build environment"
         exit;;
@@ -210,14 +295,24 @@ esac
 make_static () {
         echo "Attempting .${4} creation for ${3}${5}${2}${6}"
         ../../build_jbigi.sh static || return 1
-        cp ${3}.${4} ../../lib/net/i2p/util/${3}${5}${2}${6}.${4}
+        PLATFORM="${2}"
+        
+        # Some platforms have different build-time names from
+        # what java and NativeBigInteger refers to them as.
+        # Translate to the proper name here
+        eval TRANSLATED_NAME=\$TRANSLATE_NAME_$PLATFORM
+        if [ -n "$TRANSLATED_NAME" ]; then
+            PLATFORM="${TRANSLATED_NAME}"
+        fi
+        
+        cp ${3}.${4} ../../lib/net/i2p/util/${3}${5}${PLATFORM}${6}.${4}
         return 0
 }
 
 make_file () {
         # Nonfatal bail out on Failed build.
         echo "Attempting build for ${3}${5}${2}"
-        make && return 0
+        make -j && return 0
         cd ..
         rm -R "$2"
         printf "\n\nFAILED! ${3}${5}${2} not made.\a"
@@ -232,14 +327,28 @@ configure_file () {
         elif [ $BITS -eq 32 ] && [ "$2" != "none" ]; then
             export ABI=32
         fi
-        sleep 10
+
         # Nonfatal bail out on unsupported platform.
-        if [ $(echo $TARGET| grep -q osx) ]; then
-                ../../gmp-${1}/configure --build=${2}-apple-darwin --with-pic && return 0
+        (cd ../../gmp-${1}; make clean)
+        if [ "$TARGET" != "$BUILD_OS" ]; then
+            # We're cross-compiling, supply a --host flag
+            
+            # Here we're making sure that the platform we're target is injected into
+            # the HOST_CONFIGURE_FLAG string. The string looks somehing like this
+            # before the eval: "$2_VENDOR_OS"
+            # and this after:  "x86_VENDOR_OS"
+            eval HOST_CONFIGURE_FLAG=$HOST_CONFIGURE_FLAG
+            echo "../../gmp-${1}/configure --host=${HOST_CONFIGURE_FLAG} --with-pic && return 0"
+            ../../gmp-${1}/configure --host=${HOST_CONFIGURE_FLAG} --with-pic && return 0
         else
-                ../../gmp-${1}/configure --build=${2} --with-pic && return 0
+            # We're not cross-compiling, we are however building
+            # optimized versions for other platforms on our OS.
+            echo "../../gmp-${1}/configure --build=${2}-${BUILD_OS} --with-pic && return 0"
+            ../../gmp-${1}/configure --build=${2}-${BUILD_OS} --with-pic && return 0
         fi
+
         cd ..
+        
         rm -R "$2"
         printf "\n\nSorry, ${3}${5}${2} is not supported on your build environment.\a"
         sleep 10
@@ -253,37 +362,27 @@ build_file () {
         return 1
 }
 
-echo "Extracting GMP Version $VER ..."
-if [ -e gmp-$VER.tar.bz2 ]; then
-    tar -xjf gmp-$VER.tar.bz2 || ( echo "Error in tarball file!" >&2 ; exit 1 )
-else
-    echo "ERROR: gmp tarball not found in current directory" >&2
-    exit 1
-fi
 
 if [ ! -d bin ]; then
         mkdir bin
 fi
+
 if [ ! -d lib/net/i2p/util ]; then
         mkdir -p lib/net/i2p/util
 fi
 
-# Don't touch this one.
-NO_PLATFORM=none
-
-for x in $NO_PLATFORM $PLATFORM_LIST
+for x in $PLATFORM_LIST
 do
-        (
-                if [ ! -d bin/$x ]; then
-                        mkdir bin/$x
-                        cd bin/$x
-                else
-                        cd bin/$x
-                        rm -Rf *
-                fi
-
-                build_file "$VER" "$x" "$NAME" "$TYPE" "-$TARGET-" "$SUFFIX"
-        )
+  (
+    if [ ! -d bin/$x ]; then
+      mkdir bin/$x
+      cd bin/$x
+    else
+      cd bin/$x
+      rm -Rf *
+    fi
+    build_file "$GMP_VER" "$x" "$NAME" "$TYPE" "-$TARGET-" "$SUFFIX"
+  )
 done
 
 echo "Success!"

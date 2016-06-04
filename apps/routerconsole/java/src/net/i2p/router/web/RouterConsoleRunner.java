@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
@@ -39,6 +40,7 @@ import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
+
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -68,6 +70,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
+
+import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
  *  Start the router console.
@@ -128,6 +132,8 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_THREADS = 24;
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
+    public static final String DAEMON_USER = "i2psvc";
+    public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
     
     /**
      *  <pre>
@@ -213,7 +219,7 @@ public class RouterConsoleRunner implements RouterApp {
     public synchronized void startup() {
         changeState(STARTING);
         checkJavaVersion();
-        startTrayApp(_context);
+        startTrayApp();
         startConsole();
     }
 
@@ -265,18 +271,23 @@ public class RouterConsoleRunner implements RouterApp {
         return _server;
     }
 
-    private static void startTrayApp(I2PAppContext ctx) {
+    private void startTrayApp() {
+        // if no permissions, don't even try
+        // isLaunchedAsService() always returns true on Linux
+        if (DAEMON_USER.equals(System.getProperty("user.name")) ||
+            (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService())) {
+            // required true for jrobin to work
+            System.setProperty("java.awt.headless", "true");
+            return;
+        }
         try {
-            //TODO: move away from routerconsole into a separate application.
-            //ApplicationManager?
-            boolean recentJava = SystemVersion.isJava6();
             // default false for now
-            boolean desktopguiEnabled = ctx.getBooleanProperty("desktopgui.enabled");
-            if (recentJava && desktopguiEnabled) {
+            boolean desktopguiEnabled = _context.getBooleanProperty(PROP_DTG_ENABLED);
+            if (desktopguiEnabled) {
                 //Check if we are in a headless environment, set properties accordingly
           	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
-                String[] args = new String[0];
-                net.i2p.desktopgui.Main.beginStartup(args);    
+                net.i2p.desktopgui.Main dtg = new net.i2p.desktopgui.Main(_context, _mgr, null);    
+                dtg.startup();
             } else {
                 // required true for jrobin to work
           	System.setProperty("java.awt.headless", "true");
@@ -292,9 +303,10 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.17 */
     private void checkJavaVersion() {
         boolean noJava7 = !SystemVersion.isJava7();
-        boolean noPack200 = !FileUtil.isPack200Supported();
+        boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
+                            !FileUtil.isPack200Supported();
         boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
-        if (noJava7 || noPack200) {
+        if (noJava7 || noPack200 || openARM) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -308,7 +320,7 @@ public class RouterConsoleRunner implements RouterApp {
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 is required for automatic updates, please upgrade Java";
+                s = "Pack200 is required for plugins and automatic updates, please upgrade Java";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -827,16 +839,51 @@ public class RouterConsoleRunner implements RouterApp {
                 HashLoginService realm = new HashLoginService(JETTY_REALM);
                 sec.setLoginService(realm);
                 sec.setAuthenticator(authenticator);
+                String[] role = new String[] {JETTY_ROLE};
                 for (Map.Entry<String, String> e : userpw.entrySet()) {
                     String user = e.getKey();
                     String pw = e.getValue();
-                    realm.putUser(user, Credential.getCredential(MD5.__TYPE + pw), new String[] {JETTY_ROLE});
+                    Credential cred = Credential.getCredential(MD5.__TYPE + pw);
+                    realm.putUser(user, cred, role);
                     Constraint constraint = new Constraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);
                     ConstraintMapping cm = new ConstraintMapping();
                     cm.setConstraint(constraint);
                     cm.setPathSpec("/");
                     constraints.add(cm);
+                    // Jetty does auth checking only with ISO-8859-1,
+                    // so register a 2nd and 3rd user with different encodings if necessary.
+                    // Might work, might not...
+                    // There's no standard and browser behavior varies.
+                    // Chrome sends UTF-8. Firefox doesn't send anything.
+                    // https://bugzilla.mozilla.org/show_bug.cgi?id=41489
+                    // see also RFC 7616/7617 (late 2015) and PasswordManager.md5Hex()
+                    byte[] b1 = DataHelper.getUTF8(user);
+                    byte[] b2 = DataHelper.getASCII(user);
+                    if (!DataHelper.eq(b1, b2)) {
+                        try {
+                            // each char truncated to 8 bytes
+                            String user2 = new String(b2, "ISO-8859-1");
+                            realm.putUser(user2, cred, role);
+                            constraint = new Constraint(user2, JETTY_ROLE);
+                            constraint.setAuthenticate(true);
+                            cm = new ConstraintMapping();
+                            cm.setConstraint(constraint);
+                            cm.setPathSpec("/");
+                            constraints.add(cm);
+
+                            // each UTF-8 byte as a char
+                            // this is what chrome does
+                            String user3 = new String(b1, "ISO-8859-1");
+                            realm.putUser(user3, cred, role);
+                            constraint = new Constraint(user3, JETTY_ROLE);
+                            constraint.setAuthenticate(true);
+                            cm = new ConstraintMapping();
+                            cm.setConstraint(constraint);
+                            cm.setPathSpec("/");
+                            constraints.add(cm);
+                        } catch (UnsupportedEncodingException uee) {}
+                    }
                 }
             }
         }

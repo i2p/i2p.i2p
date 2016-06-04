@@ -14,6 +14,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
@@ -29,7 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
-import net.i2p.client.DomainSocketFactory;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
@@ -597,9 +599,28 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                     _reader = new QueuedI2CPMessageReader(_queue, this);
                 } else {
                     if (SystemVersion.isAndroid() &&
-                            Boolean.parseBoolean(_options.getProperty(PROP_DOMAIN_SOCKET))) {
-                        final DomainSocketFactory fact = new DomainSocketFactory(_context);
-                        _socket = fact.createSocket(DomainSocketFactory.I2CP_SOCKET_ADDRESS);
+                            _options.getProperty(PROP_DOMAIN_SOCKET) != null) {
+                        try {
+                            Class<?> clazz = Class.forName("net.i2p.client.DomainSocketFactory");
+                            Constructor<?> ctor = clazz.getDeclaredConstructor(I2PAppContext.class);
+                            Object fact = ctor.newInstance(_context);
+                            Method createSocket = clazz.getDeclaredMethod("createSocket", String.class);
+                            try {
+                                _socket = (Socket) createSocket.invoke(fact, _options.getProperty(PROP_DOMAIN_SOCKET));
+                            } catch (InvocationTargetException e) {
+                                throw new I2PSessionException("Cannot create domain socket", e);
+                            }
+                        } catch (ClassNotFoundException e) {
+                            throw new I2PSessionException("Cannot load DomainSocketFactory", e);
+                        } catch (NoSuchMethodException e) {
+                            throw new I2PSessionException("Cannot load DomainSocketFactory", e);
+                        } catch (InstantiationException e) {
+                            throw new I2PSessionException("Cannot load DomainSocketFactory", e);
+                        } catch (IllegalAccessException e) {
+                            throw new I2PSessionException("Cannot load DomainSocketFactory", e);
+                        } catch (InvocationTargetException e) {
+                            throw new I2PSessionException("Cannot load DomainSocketFactory", e);
+                        }
                     } else if (Boolean.parseBoolean(_options.getProperty(PROP_ENABLE_SSL))) {
                         try {
                             I2PSSLSocketFactory fact = new I2PSSLSocketFactory(_context, false, "certificates/i2cp");
@@ -684,8 +705,8 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
             if (_context.isRouterContext())
                 msg = "Failed to build tunnels";
             else if (SystemVersion.isAndroid() &&
-                    Boolean.parseBoolean(_options.getProperty(PROP_DOMAIN_SOCKET)))
-                msg = "Failed to bind to the router and build tunnels";
+                    _options.getProperty(PROP_DOMAIN_SOCKET) != null)
+                msg = "Failed to bind to the router on " + _options.getProperty(PROP_DOMAIN_SOCKET) + " and build tunnels";
             else
                 msg = "Cannot connect to the router on " + _hostname + ':' + _portNum + " and build tunnels";
             throw new I2PSessionException(getPrefix() + msg, ioe);

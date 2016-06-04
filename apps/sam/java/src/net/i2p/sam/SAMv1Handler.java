@@ -308,18 +308,16 @@ class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramRece
                 return writeString(SESSION_ERROR, "Unrecognized opcode");
             }
         } catch (DataFormatException e) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Invalid destination specified");
+            _log.error("Invalid SAM destination specified", e);
             return writeString("SESSION STATUS RESULT=INVALID_KEY", e.getMessage());
         } catch (I2PSessionException e) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("I2P error when instantiating session", e);
+            _log.error("Failed to start SAM session", e);
             return writeString(SESSION_ERROR, e.getMessage());
         } catch (SAMException e) {
-            _log.error("Unexpected SAM error", e);
+            _log.error("Failed to start SAM session", e);
             return writeString(SESSION_ERROR, e.getMessage());
         } catch (IOException e) {
-            _log.error("Unexpected IOException", e);
+            _log.error("Failed to start SAM session", e);
             return writeString(SESSION_ERROR, e.getMessage());
         }
     }

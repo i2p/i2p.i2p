@@ -1,9 +1,15 @@
 #!/bin/sh
 
 cd `dirname $0`
+rm -rf lib
+mkdir -p lib/freenet/support/CPUInformation
 
-case `uname -s` in
-    MINGW*|CYGWIN*)
+[ -z $CC_PREFIX ] && CC_PREFIX=""
+[ -z $TARGET ] && TARGET="$(uname -s)"
+[ -z $HOST ] && HOST="$(uname -s | tr '[:upper:]' '[:lower:]')"
+
+case $TARGET in
+    MINGW*|CYGWIN*|windows*)
         echo "Building windows .dlls";;
     SunOS*)
         echo "Building solaris .sos";;
@@ -13,26 +19,93 @@ case `uname -s` in
         echo "Building `uname -s |tr [A-Z] [a-z]` .sos";;
     *)
         echo "Unsupported build environment"
-        exit;;
+        exit 1;;
 esac
 
-rm -rf lib
-mkdir -p lib/freenet/support/CPUInformation
 
-[ -z $CC ] && CC="gcc"
+if [ -z $BITS ]; then
+  UNAME="$(uname -m)"
+  if test "${UNAME#*x86_64}" != "$UNAME"; then
+    BITS=64
+  elif test "${UNAME#*i386}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*i686}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*armv6}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*armv7}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*aarch32}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*aarch64}" != "$UNAME"; then
+    BITS=64
+  else
+ 
+    echo "Unable to detect default setting for BITS variable"
+    exit 1
+  fi
 
-case `uname -s` in
-    MINGW*|CYGWIN*)
-        JAVA_HOME="/c/software/j2sdk1.4.2_05"
-        COMPILEFLAGS="-Wall"
-        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/win32/"
-        LINKFLAGS="-shared -static -static-libgcc -Wl,--kill-at"
-        LIBFILE="lib/freenet/support/CPUInformation/jcpuid-x86-windows.dll";;
+  printf "BITS variable not set, $BITS bit system detected\n" >&2
+fi
+
+
+if [ -z $CC ]; then
+  export CC="gcc"
+  printf "CC variable not set, defaulting to $CC\n" >&2
+fi
+
+
+if [ $BITS -eq 32 ]; then
+  export ABI=32
+  export CFLAGS="-m32 -mtune=i686 -march=i686"
+  export LDFLAGS="-m32"
+elif [ $BITS -eq 64 ]; then
+  export ABI=64
+  export CFLAGS="-m64 -mtune=generic"
+  export LDFLAGS="-m64"
+else
+  printf "BITS value \"$BITS\" not valid, please select 32 or 64\n" >&2
+  exit 1
+fi
+
+[ -z $ARCH ] && case `uname -m` in
+    x86_64*|amd64)
+        if [ $BITS -eq 64 ]; then
+          ARCH="x86_64"
+        else
+          ARCH="x86"
+        fi
+        ;;
+    ia64*)
+        ARCH="ia64";;
+    i?86*)
+        ARCH="x86";;
+    # Solaris x86
+    i86pc)
+        if [ $BITS -eq 64 ]; then
+          ARCH="x86_64"
+        else
+          ARCH="x86"
+        fi
+        ;;
+    *)
+        echo "Unsupported build environment. jcpuid is only used on x86 systems."
+        exit 0;;
+esac
+
+
+case $TARGET in
+    MINGW*|CYGWIN*|windows*)
+        [ -z $JAVA_HOME ] && JAVA_HOME="/c/software/j2sdk1.4.2_05"
+        CFLAGS="${CFLAGS} -Wall"
+        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/$HOST/"
+        LDFLAGS="${LDFLAGS} -shared -static -static-libgcc -Wl,--kill-at"
+        LIBFILE="lib/freenet/support/CPUInformation/jcpuid-${ARCH}-windows.dll";;
     Darwin*)
         JAVA_HOME=$(/usr/libexec/java_home)
-        COMPILEFLAGS="-fPIC -Wall -arch x86_64 -arch i386"
-        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/"
-        LINKFLAGS="-dynamiclib -framework JavaVM"
+        CFLAGS="${CFLAGS} -fPIC -Wall -arch x86_64 -arch i386"
+        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/dawrin/"
+        LDFLAGS="${LDFLAGS} -dynamiclib -framework JavaVM"
         LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
     Linux*|OpenBSD*|NetBSD*|*FreeBSD*|SunOS*)
         KFREEBSD=0
@@ -52,41 +125,26 @@ case `uname -s` in
             exit 1
         fi
 
-        # Abort script on uncaught errors
-        set -e
-
-        case `uname -m` in
-            x86_64*|amd64)
-                ARCH="x86_64";;
-            ia64*)
-                ARCH="ia64";;
-            i?86*)
-                ARCH="x86";;
-            # Solaris x86
-            i86pc)
-                if $(echo $CC | grep -q '\-m64') ; then
-                    ARCH="x86_64"
-                else
-                    ARCH="x86"
-                fi
-                ;;
-            *)
-                echo "Unsupported build environment. jcpuid is only used on x86 systems."
-                exit 0;;
-        esac
-
-        LINKFLAGS="-shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
+        LDFLAGS="${LDFLAGS} -shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
         if [ $KFREEBSD -eq 1 ]; then
             LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-kfreebsd.so"
         else
             LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
         fi
-        COMPILEFLAGS="-fPIC -Wall"
+        CFLAGS="${CFLAGS} -fPIC -Wall"
         INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include -I${JAVA_HOME}/include/${UNIXTYPE}";;
 esac
 
+echo "CC_PREFIX:$CC_PREFIX"
+echo "TARGET:$TARGET"
+echo "HOST:$HOST"
+echo "ARCH:$ARCH"
+echo "CFLAGS:$CFLAGS"
+echo "LDFLAGS:$LDFLAGS"
+echo ""
+
 echo "Compiling C code..."
 rm -f ${LIBFILE}
-${CC} ${COMPILEFLAGS} ${LINKFLAGS} ${INCLUDES} src/*.c -o ${LIBFILE} || (echo "Failed to compile ${LIBFILE}"; exit 1)
-strip ${LIBFILE} || (echo "Failed to strip ${LIBFILE}" ; exit 1)
+${CC_PREFIX}${CC} ${CFLAGS} ${LDFLAGS} ${INCLUDES} src/*.c -o ${LIBFILE} || (echo "Failed to compile ${LIBFILE}"; exit 1)
+${CC_PREFIX}strip ${LIBFILE} || (echo "Failed to strip ${LIBFILE}" ; exit 1)
 echo Built `dirname $0`/${LIBFILE}

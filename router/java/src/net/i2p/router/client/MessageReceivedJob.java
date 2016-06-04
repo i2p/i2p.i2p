@@ -60,8 +60,11 @@ class MessageReceivedJob extends JobImpl {
                 messageAvailable(id, _payload.getSize());
             }
         } catch (I2CPMessageException ime) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error writing out the message", ime);
+            String msg = "Error sending data to client " + _runner.getDestHash();
+            if (_log.shouldWarn())
+                _log.warn(msg, ime);
+            else
+                _log.logAlways(Log.WARN, msg);
             if (id != null && !_sendDirect)
                 _runner.removePayload(id);
         }

@@ -32,6 +32,7 @@ public class NewsXMLParser {
     private final I2PAppContext _context;
     private final Log _log;
     private List<NewsEntry> _entries;
+    private List<CRLEntry> _crlEntries;
     private NewsMetadata _metadata;
     private XHTMLMode _mode;
 
@@ -145,11 +146,23 @@ public class NewsXMLParser {
         return _metadata;
     }
 
+    /**
+     *  The news CRL entries.
+     *  Must call parse() first.
+     *
+     *  @return unsorted, null if none
+     *  @since 0.9.26
+     */
+    public List<CRLEntry> getCRLEntries() {
+        return _crlEntries;
+    }
+
     private void extract(Node root) throws I2PParserException {
         if (!root.getName().equals("feed"))
             throw new I2PParserException("no feed in XML");
         _metadata = extractNewsMetadata(root);
         _entries = extractNewsEntries(root);
+        _crlEntries = extractCRLEntries(root);
     }
 
     private static NewsMetadata extractNewsMetadata(Node feed) throws I2PParserException {
@@ -252,7 +265,7 @@ public class NewsXMLParser {
 
     /**
      *  This does not check for any missing values.
-     *  Any fields in any NewsEntry may be null.
+     *  Any field in any NewsEntry may be null.
      */
     private List<NewsEntry> extractNewsEntries(Node feed) throws I2PParserException {
         List<NewsEntry> rv = new ArrayList<NewsEntry>();
@@ -347,6 +360,40 @@ public class NewsXMLParser {
             rv.add(e);
         }
         Collections.sort(rv);
+        return rv;
+    }
+
+    /**
+     *  This does not check for any missing values.
+     *  Any field in any CRLEntry may be null.
+     *
+     *  @return null if none
+     *  @since 0.9.26
+     */
+    private List<CRLEntry> extractCRLEntries(Node feed) throws I2PParserException {
+        Node rev = feed.getNode("i2p:revocations");
+        if (rev == null)
+            return null;
+        List<Node> entries = getNodes(rev, "i2p:crl");
+        if (entries.isEmpty())
+            return null;
+        List<CRLEntry> rv = new ArrayList<CRLEntry>(entries.size());
+        for (Node entry : entries) {
+            CRLEntry e = new CRLEntry();
+            String a = entry.getAttributeValue("id");
+            if (a.length() > 0)
+                e.id = a;
+            a = entry.getAttributeValue("updated");
+            if (a.length() > 0) {
+                long time = RFC3339Date.parse3339Date(a.trim());
+                if (time > 0)
+                    e.updated = time;
+            }
+            a = entry.getValue();
+            if (a != null)
+                e.data = a.trim();
+            rv.add(e);
+        }
         return rv;
     }
 
