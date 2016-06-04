@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <gmp.h>
 #include "jbigi.h"
 
@@ -15,7 +16,7 @@ void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue);
  * 2: (I2P 0.8.7)
  *    Removed nativeDoubleValue()
  *
- * 3: (I2P 0.9.18)
+ * 3: (I2P 0.9.26)
  *    Added:
  *      nativeJbigiVersion()
  *      nativeGMPMajorVersion()
@@ -26,8 +27,12 @@ void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue);
  *    Support negative base value in modPow()
  *    Throw ArithmeticException for bad arguments in modPow()
  *
+ * 4: (I2P 0.9.27)
+ *    Fix nativeGMPMajorVersion(), nativeGMPMinorVersion(), and nativeGMPPatchVersion()
+ *    when built as a shared library
+ *
  */
-#define JBIGI_VERSION 3
+#define JBIGI_VERSION 4
 
 /*****************************************
  *****Native method implementations*******
@@ -39,22 +44,31 @@ JNIEXPORT jint JNICALL Java_net_i2p_util_NativeBigInteger_nativeJbigiVersion
     return (jint) JBIGI_VERSION;
 }
 
-/* since version 3 */
+/* since version 3, fixed for dynamic builds in version 4 */
 JNIEXPORT jint JNICALL Java_net_i2p_util_NativeBigInteger_nativeGMPMajorVersion
         (JNIEnv* env, jclass cls) {
-    return (jint) __GNU_MP_VERSION;
+    int v = gmp_version[0] - '0';
+    return (jint) v;
 }
 
-/* since version 3 */
+/* since version 3, fixed for dynamic builds in version 4 */
 JNIEXPORT jint JNICALL Java_net_i2p_util_NativeBigInteger_nativeGMPMinorVersion
         (JNIEnv* env, jclass cls) {
-    return (jint) __GNU_MP_VERSION_MINOR;
+    int v = 0;
+    if (strlen(gmp_version) > 2) {
+        v = gmp_version[2] - '0';
+    }
+    return (jint) v;
 }
 
-/* since version 3 */
+/* since version 3, fixed for dynamic builds in version 4 */
 JNIEXPORT jint JNICALL Java_net_i2p_util_NativeBigInteger_nativeGMPPatchVersion
         (JNIEnv* env, jclass cls) {
-    return (jint) __GNU_MP_VERSION_PATCHLEVEL;
+    int v = 0;
+    if (strlen(gmp_version) > 4) {
+        v = gmp_version[4] - '0';
+    }
+    return (jint) v;
 }
 
 /******** nativeModPow() */
