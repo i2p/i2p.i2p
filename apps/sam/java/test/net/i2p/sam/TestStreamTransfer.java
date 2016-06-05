@@ -75,10 +75,7 @@ public class TestStreamTransfer {
             req = "NAMING LOOKUP NAME=ME\n";
             out.write(DataHelper.getASCII(req));
             line = reader.readLine();
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+            Properties props = SAMUtils.parseParams(line);
             String value = props.getProperty("VALUE");
             if (value == null) {
                 _log.error("No value for ME found!  [" + line + "]");
@@ -124,10 +121,9 @@ public class TestStreamTransfer {
         private void doRun() throws IOException, SAMException {
             String line = _reader.readLine();
             _log.debug("Read: " + line);
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+            Properties props = SAMUtils.parseParams(line);
+            String maj = props.getProperty(SAMUtils.COMMAND);
+            String min = props.getProperty(SAMUtils.OPCODE);
             if ( ("STREAM".equals(maj)) && ("CONNECTED".equals(min)) ) {
                 String dest = props.getProperty("DESTINATION");
                 String id = props.getProperty("ID");
@@ -225,10 +221,7 @@ public class TestStreamTransfer {
             out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.info("Response to the stream connect from "+sessionName+" to Alice: " + line);
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+            Properties props = SAMUtils.parseParams(line);
             _log.info("props = " + props);
             String result = props.getProperty("RESULT");
             if (!("OK".equals(result))) {
