@@ -41,6 +41,7 @@ public interface AMDCPUInfo extends CPUInfo {
     public boolean IsAthlon64Compatible();
     /** 
      * @return true if the CPU present in the machine is at least an 'k10' CPU
+     * @since 0.9.26
      */
     public boolean IsK10Compatible();
     /**
@@ -49,6 +50,7 @@ public interface AMDCPUInfo extends CPUInfo {
 	public boolean IsBobcatCompatible();
     /**
      * @return true if the CPU present in the machine is at least an 'jaguar' CPU
+     * @since 0.9.26
      */
 	public boolean IsJaguarCompatible();
     /**
@@ -57,14 +59,17 @@ public interface AMDCPUInfo extends CPUInfo {
 	public boolean IsBulldozerCompatible();
     /**
      * @return true if the CPU present in the machine is at least a 'piledriver' CPU
+     * @since 0.9.26
      */
 	public boolean IsPiledriverCompatible();
     /**
      * @return true if the CPU present in the machine is at least a 'steamroller' CPU
+     * @since 0.9.26
      */
 	public boolean IsSteamrollerCompatible();
     /**
      * @return true if the CPU present in the machine is at least a 'excavator' CPU
+     * @since 0.9.26
      */
 	public boolean IsExcavatorCompatible();
 
