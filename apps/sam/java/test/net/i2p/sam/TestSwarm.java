@@ -143,15 +143,15 @@ public class TestSwarm {
                 _samOut.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
                 _samOut.flush();
                 _log.debug("Hello sent");
-                boolean ok = _eventHandler.waitForHelloReply();
-                _log.debug("Hello reply found: " + ok);
-                if (!ok) 
+                String serverVersion = _eventHandler.waitForHelloReply();
+                _log.debug("Hello reply found: " + serverVersion);
+                if (serverVersion == null)
                     throw new IOException("wtf, hello failed?");
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + _destFile + " " + _conOptions + "\n";
                 _samOut.write(DataHelper.getUTF8(req));
                 _samOut.flush();
                 _log.debug("Session create sent");
-                ok = _eventHandler.waitForSessionCreateReply();
+                boolean ok = _eventHandler.waitForSessionCreateReply();
                 _log.debug("Session create reply found: " + ok);
 
                 req = "NAMING LOOKUP NAME=ME\n";

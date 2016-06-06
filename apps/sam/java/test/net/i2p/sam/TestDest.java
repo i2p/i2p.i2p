@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class TestDest {

@@ -1492,7 +1492,7 @@ public class BlockfileNamingService extends DummyNamingService {
                 rv = lookupAll2(hostname, lookupOptions, storedOptions);
             }
         }
-        // we sort the destinations in addDestionation(),
+        // we sort the destinations in addDestination(),
         // which is a lot easier than sorting them here
         return rv;
     }
