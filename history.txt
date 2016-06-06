@@ -1,3 +1,5 @@
+* 2016-06-07 0.9.26 released
+
 2016-06-03 zzz
  * Update translations from Transifex
 
