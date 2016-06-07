@@ -19,8 +19,9 @@ Debian wrapper.config to try to prevent confusion.
 @@ -1,3 +1,3 @@
  #!/bin/sh
 -I2P="%INSTALL_PATH"
+-java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
 +I2P="/usr/share/i2p"
- java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
++java -cp "$I2P/lib/i2p.jar:/usr/share/java/gnu-getopt.jar" net.i2p.util.EepGet "$@"
 --- a/installer/resources/i2prouter
 +++ b/installer/resources/i2prouter
 @@ -10,7 +10,7 @@
