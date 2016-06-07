@@ -1,3 +1,9 @@
+i2p (0.9.26-1ubuntu1) trusty; urgency=medium
+
+  * New upstream version 0.9.26
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Tue, 07 Jun 2016 12:12:12 +0000
+
 i2p (0.9.25-1ubuntu1) trusty; urgency=medium
 
   * New upstream version 0.9.25

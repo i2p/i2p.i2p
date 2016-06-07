@@ -49,7 +49,7 @@ Generate files to upload
     (or add -kkeyid argument to debuild, which you must do
      if you want to sign with a subkey)
     run gpg -K to list your private keys
-- ant debian-release-tarball
+- ant debian-release-tarball (ant precise-release-tarball for precise)
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
   and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/

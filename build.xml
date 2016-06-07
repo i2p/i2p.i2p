@@ -2094,8 +2094,11 @@
         </tar>
     </target>
 
-    <!-- same as debian-tarball but with bundled jetty -->
-    <target name="precise-tarball" depends="getExtendedVersion">
+    <!-- same as debian-release-tarball but with bundled jetty
+      -  We add a 'p' to the release name and tarball since the source package is different;
+      -  Launchpad does not allow different source packages with the same name.
+      -->
+    <target name="precise-release-tarball" depends="getExtendedVersion">
         <!-- this will use the monotonerc file in the current workspace -->
         <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
             <condition>
@@ -2104,7 +2107,7 @@
                 </not>
             </condition>
         </fail>
-        <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
+        <property name="debian.tarball.name" value="i2p_${release.number}p.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />
         <exec executable="mtn" failonerror="true">
@@ -2112,6 +2115,8 @@
             <!-- w: is the revision of the current workspace -->
             <arg value="-r" />
             <arg value="w:" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
             <arg value="../i2p-${Extended.Version}" />
         </exec>
         <delete includeemptydirs="true" quiet="false">
@@ -2192,6 +2197,8 @@
             <!-- w: is the revision of the current workspace -->
             <arg value="-r" />
             <arg value="w:" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
             <arg value="../i2p-${Extended.Version}" />
         </exec>
         <delete includeemptydirs="true" quiet="false">
