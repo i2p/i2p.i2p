@@ -2,6 +2,10 @@
 
 ## One week before
 
+- Announce string freeze on #i2p-dev
+- Update local English po files: `ant poupdate`
+- Revert non-English changes if any
+- Push to Transifex: `tx push -s`
 - Make announcement on Transifex with checkin deadline
 
 
@@ -52,7 +56,8 @@
     mtn -d i2p.mtn co --branch=i2p.i2p /path/to/releasedir
     ```
 
-  - You may build with Java 7 or higher, but ensure you have the Java 6 JRE installed for the bootclasspath
+  - You must build with Java 7 or higher, but ensure you also have the Java 6 JRE installed for the bootclasspath.
+    If you build with Java 8 or higher, you must also have the Java 7 JRE installed for the bootclasspath.
 
 4. Create override.properties with (adjust as necessary):
 
@@ -165,21 +170,21 @@
     - Reconnect ethernet / turn wifi back on
   - Load torrents in i2psnark on your production router, verify infohashes
 
-3. If all goes well, tag and sync the release:
+3. If all goes well, tag and push the release:
 
     ```
     mtn tag h: i2p-0.x.xx
     mtn cert t:i2p-0.x.xx branch i2p.i2p.release
-    mtn sync (with e.g. mtn.killyourtv.i2p)
+    mtn push
     ```
 
 ### Distribute updates
 
 1. Update news with new version:
   - Add magnet links, change release dates and release number in to old-format
-    news.xml, and distribute to news hosts
+    news.xml, and distribute to news hosts (no longer necessary)
   - In the i2p.newsxml branch, edit magnet links, release dates and release
-    number in data/releases.json, and check in
+    number in data/releases.json, check in and push
 
 2. Add i2pupdate-0.9.xx.su3 torrent to tracker2.postman.i2p and start seeding
 
@@ -198,22 +203,37 @@
 
 6. Tell news hosts to flip the switch
 
+7. Monitor torrent for activity to verify that the new news is now live
+
+
 ### Notify release
 
-1. Wait for files to be updated on download server
+1. Upload files to launchpad release (download mirror)
+   (see debian-alt/doc/launchpad.txt for instructions)
 
-2. Website files to change:
+2. Wait for files to be updated on download server
+   Verify at http://download.i2p2.no/releases/
+
+3. Website files to change:
   - Sync with mtn.i2p-projekt.i2p
   - `i2p2www/static/hosts.txt` if it changed (copy from i2p.i2p mtn branch)
   - `i2p2www/__init__.py` (release number)
-  - `i2p2www/pages/downloads/list.html` (release signer)
+  - `i2p2www/pages/downloads/list.html` (release signer, if changed)
   - `i2p2www/pages/downloads/macros` (checksums)
-  - `i2p2www/static/news/news.xml`
+  - `i2p2www/static/news/news.xml` (no longer necessary)
   - Sync with mtn.i2p-projekt.i2p
-
-3. Wait for debian packages to be ready
 
 4. Announce on:
   - #i2p, #i2p-dev (also on Freenode side)
   - forum.i2p
   - Twitter
+
+5. Launchpad builds
+   (see debian-alt/doc/launchpad.txt for instructions)
+
+6. Debian builds
+   (see debian-alt/doc/debian-build.txt for instructions)
+
+7. Announce Launchpad and Debian builds on Twitter
+
+8. Notify Tails that new Debian builds are available

@@ -182,6 +182,7 @@
       </delete>
       <delete dir="${bin}" />
       <delete dir="${tmp}" />
+      <delete dir="build" />
     </target>
     <target name="distclean" depends="clean" />
 </project>

@@ -17,7 +17,7 @@ cd i2p_0.9.xx-x-xxxxxxxx/
 ant debchange
 vi debian/changelog
    change i2p_0.9.xx-x-xxxxxxxx-1 to i2p_0.9.xx-1
-   change UNRELEASED to unstable
+   change UNRELEASED to stable
    change comment to "New upstream version 0.9.xx"
    fix your name and email
 # fix up the control and rules files as necessary
@@ -57,16 +57,22 @@ This will make the following files in ..:
 ssh to reprepro server
 sudo su kytv (he owns the reprepro directories)
 
-reprepro includedeb unstable i2p-doc_0.9.xx-1_all.deb
-reprepro includedeb unstable i2p-router_0.9.xx-1_all.deb
-reprepro includedeb unstable i2p_0.9.xx-1_all.deb
-reprepro includedeb unstable libjbigi-jni_0.9.xx-1_amd64.deb
+reprepro includedeb stable i2p-doc_0.9.xx-1_all.deb
+reprepro includedeb stable i2p-router_0.9.xx-1_all.deb
+reprepro includedeb stable libjbigi-jni_0.9.xx-1_amd64.deb
+reprepro includedeb stable i2p_0.9.xx-1_all.deb
 # if you already got the source from launchpad
 # with reprepro update, skip this?
-reprepro includedsc unstable i2p_0.9.XX-1.dsc
+reprepro includedsc stable i2p_0.9.XX-1.dsc
+
+# copy built packages from launchpad
+reprepro -v update precise
+reprepro -v update trusty
+reprepro -v update vivid
+reprepro -v update wily
+reprepro -v update xenial
 
 
-# To copy precise to wheezy if you build precise on launchpad
-# and then did a reprepro update:
+# To copy precise to wheezy:
 # Note that syntax is reprepro copysrc TO FROM package!
-reprepro copysrc wheezy precise i2p
+reprepro -v copysrc wheezy precise i2p
