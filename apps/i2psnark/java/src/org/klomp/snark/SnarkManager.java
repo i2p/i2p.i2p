@@ -388,6 +388,8 @@ public class SnarkManager implements CompleteListener {
     }
 
     private int getStartupDelayMinutes() { 
+        if (!_context.isRouterContext())
+            return 0;
         try {
 	    return Integer.parseInt(_config.getProperty(PROP_STARTUP_DELAY));
         } catch (NumberFormatException nfe) {
@@ -675,7 +677,8 @@ public class SnarkManager implements CompleteListener {
      * @return String[] -- Array of all the themes found, non-null, unsorted
      */
     public String[] getThemes() {
-            String[] themes;
+         String[] themes;
+         if (_context.isRouterContext()) {
             // "docs/themes/snark/"
             File dir = new File(_context.getBaseDir(), "docs/themes/snark");
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
@@ -689,8 +692,10 @@ public class SnarkManager implements CompleteListener {
             } else {
                 themes = new String[0];
             }
-            // return the map.
-            return themes;
+        } else {
+            themes = new String[] { "light", "ubergine", "vanilla" };
+        }
+        return themes;
     }
 
 
@@ -815,7 +820,7 @@ public class SnarkManager implements CompleteListener {
             }
         }
         
-	if (startDelay != null){
+	if (startDelay != null && _context.isRouterContext()) {
 		int minutes = _util.getStartupDelay();
                 try { minutes = Integer.parseInt(startDelay.trim()); } catch (NumberFormatException nfe) {}
 	        if ( minutes != _util.getStartupDelay()) {

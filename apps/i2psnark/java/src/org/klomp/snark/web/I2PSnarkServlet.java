@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -192,7 +191,10 @@ public class I2PSnarkServlet extends BasicServlet {
             return;
         }
 
-        _themePath = "/themes/snark/" + _manager.getTheme() + '/';
+        if (_context.isRouterContext())
+            _themePath = "/themes/snark/" + _manager.getTheme() + '/';
+        else
+            _themePath = _contextPath + WARBASE + "themes/snark/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
         req.setCharacterEncoding("UTF-8");
 
@@ -285,8 +287,9 @@ public class I2PSnarkServlet extends BasicServlet {
         if (!isConfigure) {
             delay = _manager.getRefreshDelaySeconds();
             if (delay > 0) {
+                String jsPfx = _context.isRouterContext() ? "" : ".resources";
                 //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
-                out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
+                out.write("<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + _t("Router is down") + "<\\/b><\\/div>\";\n" +
                           "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" +
@@ -324,17 +327,19 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(_t("I2PSnark"));
             else
                 out.write(_contextName);
-            out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
-            out.write(_t("Forum"));
             out.write("</a>\n");
-
             sortedTrackers = _manager.getSortedTrackers();
-            for (Tracker t : sortedTrackers) {
-                if (t.baseURL == null || !t.baseURL.startsWith("http"))
-                    continue;
-                if (_manager.util().isKnownOpenTracker(t.announceURL))
-                    continue;
-                out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
+            if (_context.isRouterContext()) {
+                out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
+                out.write(_t("Forum"));
+                out.write("</a>\n");
+                for (Tracker t : sortedTrackers) {
+                    if (t.baseURL == null || !t.baseURL.startsWith("http"))
+                        continue;
+                    if (_manager.util().isKnownOpenTracker(t.announceURL))
+                        continue;
+                    out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
+                }
             }
         }
         out.write("</div>\n");
@@ -2229,12 +2234,14 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</select><br>" +
 
                   "<tr><td>");
-        out.write(_t("Startup delay"));
-        out.write(": <td><input name=\"startupDelay\" size=\"4\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
-        out.write(_t("minutes"));
-        out.write("<br>\n" +
+        if (_context.isRouterContext()) {
+            out.write(_t("Startup delay"));
+            out.write(": <td><input name=\"startupDelay\" size=\"4\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
+            out.write(_t("minutes"));
+            out.write("<br>\n" +
 
-                  "<tr><td>");
+                      "<tr><td>");
+        }
         out.write(_t("Page size"));
         out.write(": <td><input name=\"pageSize\" size=\"4\" maxlength=\"6\" class=\"r\" value=\"" + _manager.getPageSize() + "\"> ");
         out.write(_t("torrents"));

@@ -50,6 +50,10 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <!-- jsp-api.jar only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <!-- jetty-i2p.jar only for RunStandalone -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
+                <!-- systray.jar only for RunStandalone -->
+                <pathelement location="../../systray/java/build/systray.jar" />
             </classpath>
         </javac>
     </target>
@@ -71,7 +75,7 @@
     <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/web/* **/messages_*.class">
+        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/web/* **/messages_*.class, **/standalone/*">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.CommandLine" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
@@ -179,29 +183,111 @@
           <zipfileset dir="./dist/" prefix="i2psnark/" />
         </zip>
     </target>
-    <target name="standalone_prep" depends="war">
+
+    <!-- make a fat jar for standalone -->
+    <target name="standalone_jar" depends="war">
+      <jar destfile="build/i2psnark-standalone.jar">
+        <fileset dir="build/obj" includes="**/standalone/*.class" />
+        <zipfileset src="build/i2psnark.jar" />
+        <zipfileset src="../../../core/java/build/i2p.jar" />
+        <zipfileset src="../../jetty/jettylib/commons-logging.jar"  />
+        <zipfileset src="../../jetty/jettylib/jasper-runtime.jar"  />
+        <zipfileset src="../../jetty/jettylib/javax.servlet.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-continuation.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-deploy.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-http.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-i2p.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-io.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-security.jar"  />
+        <zipfileset src="../../jetty/jettylib/jetty-servlet.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-util.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-webapp.jar" />
+        <zipfileset src="../../jetty/jettylib/jetty-xml.jar" />
+        <zipfileset src="../../jetty/jettylib/org.mortbay.jetty.jar"  />
+        <zipfileset src="../../ministreaming/java/build/mstreaming.jar" />
+        <zipfileset src="../../streaming/java/build/streaming.jar" />
+        <zipfileset src="../../systray/java/build/systray.jar" />
+        <manifest>
+            <attribute name="Main-Class" value="org.klomp.snark.standalone.RunStandalone"/>
+            <attribute name="Implementation-Version" value="${full.version}" />
+            <attribute name="Built-By" value="${build.built-by}" />
+            <attribute name="Build-Date" value="${build.timestamp}" />
+            <attribute name="Base-Revision" value="${workspace.version}" />
+            <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+        </manifest>
+      </jar>
+    </target>
+
+    <!-- add css, image, and js files for standalone snark to the war -->
+    <target name="standalone_war" depends="war">
+        <mkdir dir="build/standalone-resources/.resources/themes/snark" />
+        <copy todir="build/standalone-resources/.resources/themes/snark" >
+            <fileset dir="../../../installer/resources/themes/snark/" />
+        </copy>
+        <replace dir="build/standalone-resources/.resources/themes/snark"
+            summary="true"
+            token="url('/themes/"
+            value="url('/i2psnark/.resources/themes/" >
+            <include name="**/*.css" />
+        </replace>
+        <replace dir="build/standalone-resources/.resources/themes/snark"
+            summary="true"
+            token="url('../../console/images/"
+            value="url('/i2psnark/.resources/themes/snark/ubergine/images/" >
+            <include name="**/*.css" />
+        </replace>
+        <replace dir="build/standalone-resources/.resources/themes/snark"
+            summary="true"
+            token="url('../../console/dark/images/"
+            value="url('/i2psnark/.resources/themes/snark/ubergine/images/" >
+            <include name="**/*.css" />
+        </replace>
+        <replace dir="build/standalone-resources/.resources/themes/snark"
+            summary="true"
+            token="url(&quot;../../console/light/images/"
+            value="url(&quot;/i2psnark/.resources/themes/snark/ubergine/images/" >
+            <include name="**/*.css" />
+        </replace>
+        <replace dir="build/standalone-resources/.resources/themes/snark"
+            summary="true"
+            token="url('images/"
+            value="url('/i2psnark/.resources/themes/snark/ubergine/images/" >
+            <include name="**/*.css" />
+        </replace>
+        <copy todir="build/standalone-resources/.resources/themes/snark/ubergine/images" >
+            <!-- we really don't need all of these -->
+            <fileset dir="../../../installer/resources/themes/console/images/" />
+        </copy>
+        <copy file="../../../installer/resources/themes/console/dark/images/transparent.gif"
+              todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
+        <copy file="../../../installer/resources/themes/console/dark/images/header.png"
+              todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
+        <mkdir dir="build/standalone-resources/.resources/js" />
+        <copy file="../../routerconsole/jsp/js/ajax.js" todir="build/standalone-resources/.resources/js" />
+        <zip destfile="../i2psnark.war" update="true" duplicate="preserve" >
+            <fileset dir="build/standalone-resources" />
+        </zip>
+    </target>
+    
+    <target name="standalone_prep" depends="standalone_jar, standalone_war">
         <delete dir="./dist" />
         <mkdir dir="./dist" />
         <copy file="../launch-i2psnark" todir="./dist/" />
+        <mkdir dir="./dist/contexts" />
+        <!-- todo put in root context.xml -->
+        <mkdir dir="./dist/docroot" />
+        <!-- todo put in index.html to redirect -->
         <mkdir dir="./dist/webapps" />
         <copy file="../i2psnark.war" tofile="./dist/webapps/i2psnark.war" />
-        <mkdir dir="./dist/lib" />
-        <copy file="./build/i2psnark.jar" tofile="./dist/lib/i2psnark.jar" />
-        <copy file="../../../core/java/build/i2p.jar" tofile="./dist/lib/i2p.jar" />
-        <copy file="../../jetty/jettylib/commons-el.jar" tofile="./dist/lib/commons-el.jar" />
-        <copy file="../../jetty/jettylib/commons-logging.jar" tofile="./dist/lib/commons-logging.jar" />
-        <copy file="../../jetty/jettylib/javax.servlet.jar" tofile="./dist/lib/javax.servlet.jar" />
-        <copy file="../../jetty/jettylib/org.mortbay.jetty.jar" tofile="./dist/lib/org.mortbay.jetty.jar" />
-        <copy file="../../jetty/jettylib/jasper-runtime.jar" tofile="./dist/lib/jasper-runtime.jar" />
-        <copy file="../../ministreaming/java/build/mstreaming.jar" tofile="./dist/lib/mstreaming.jar" />
-        <copy file="../../streaming/java/build/streaming.jar" tofile="./dist/lib/streaming.jar" />
         <copy file="../jetty-i2psnark.xml" tofile="./dist/jetty-i2psnark.xml" />
+        <copy file="./build/i2psnark-standalone.jar" tofile="./dist/i2psnark.jar" />
         <copy file="../readme-standalone.txt" tofile="./dist/readme.txt" />
+        <!-- temp so announces work -->
+        <copy file="../../../installer/resources/hosts.txt" tofile="./dist/hosts.txt" />
+        <copy todir="./dist/licenses" >
+            <fileset dir="../../../licenses" includes="LICENSE-GPLv2.txt, ABOUT-Jetty.html" />
+        </copy>
         <mkdir dir="./dist/logs" />
-
-        <zip destfile="i2psnark-standalone.zip">
-         <zipfileset dir="./dist/" prefix="i2psnark/" />
-        </zip>
     </target>
 
     <target name="clean">
