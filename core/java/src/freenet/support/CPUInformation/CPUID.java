@@ -376,27 +376,33 @@ public class CPUID {
         System.out.println("CPU has ABM:    " + c.hasABM());
         if(c instanceof IntelCPUInfo){
             System.out.println("\n **Intel-info**");
-            System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
-            System.out.println("Is PIII-compatible: "+((IntelCPUInfo)c).IsPentium3Compatible());
-            System.out.println("Is PIV-compatible: "+((IntelCPUInfo)c).IsPentium4Compatible());
-            System.out.println("Is Atom-compatible: "+((IntelCPUInfo)c).IsAtomCompatible());
+            System.out.println("Is PII-compatible:       "+((IntelCPUInfo)c).IsPentium2Compatible());
+            System.out.println("Is PIII-compatible:      "+((IntelCPUInfo)c).IsPentium3Compatible());
+            System.out.println("Is PIV-compatible:       "+((IntelCPUInfo)c).IsPentium4Compatible());
+            System.out.println("Is Atom-compatible:      "+((IntelCPUInfo)c).IsAtomCompatible());
             System.out.println("Is Pentium M compatible: "+((IntelCPUInfo)c).IsPentiumMCompatible());
-            System.out.println("Is Core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
-            System.out.println("Is Corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
-            System.out.println("Is Sandy-compatible: "+((IntelCPUInfo)c).IsSandyCompatible());
-            System.out.println("Is Ivy-compatible: "+((IntelCPUInfo)c).IsIvyCompatible());
-            System.out.println("Is Haswell-compatible: "+((IntelCPUInfo)c).IsHaswellCompatible());
+            System.out.println("Is Core2-compatible:     "+((IntelCPUInfo)c).IsCore2Compatible());
+            System.out.println("Is Corei-compatible:     "+((IntelCPUInfo)c).IsCoreiCompatible());
+            System.out.println("Is Sandy-compatible:     "+((IntelCPUInfo)c).IsSandyCompatible());
+            System.out.println("Is Ivy-compatible:       "+((IntelCPUInfo)c).IsIvyCompatible());
+            System.out.println("Is Haswell-compatible:   "+((IntelCPUInfo)c).IsHaswellCompatible());
             System.out.println("Is Broadwell-compatible: "+((IntelCPUInfo)c).IsBroadwellCompatible());
         }
         if(c instanceof AMDCPUInfo){
             System.out.println("\n **AMD-info**");
-            System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsK6Compatible());
-            System.out.println("Is K6_2-compatible: "+((AMDCPUInfo)c).IsK6_2_Compatible());
-            System.out.println("Is K6_3-compatible: "+((AMDCPUInfo)c).IsK6_3_Compatible());
-            System.out.println("Is Geode-compatible: "+((AMDCPUInfo)c).IsGeodeCompatible());
-            System.out.println("Is Athlon-compatible: "+((AMDCPUInfo)c).IsAthlonCompatible());
-            System.out.println("Is Athlon64-compatible: "+((AMDCPUInfo)c).IsAthlon64Compatible());
-            System.out.println("Is Bobcat-compatible: "+((AMDCPUInfo)c).IsBobcatCompatible());
+            System.out.println("Is K6-compatible:          "+((AMDCPUInfo)c).IsK6Compatible());
+            System.out.println("Is K6_2-compatible:        "+((AMDCPUInfo)c).IsK6_2_Compatible());
+            System.out.println("Is K6_3-compatible:        "+((AMDCPUInfo)c).IsK6_3_Compatible());
+            System.out.println("Is Geode-compatible:       "+((AMDCPUInfo)c).IsGeodeCompatible());
+            System.out.println("Is Athlon-compatible:      "+((AMDCPUInfo)c).IsAthlonCompatible());
+            System.out.println("Is Athlon64-compatible:    "+((AMDCPUInfo)c).IsAthlon64Compatible());
+            System.out.println("Is Bobcat-compatible:      "+((AMDCPUInfo)c).IsBobcatCompatible());
+            System.out.println("Is K10-compatible:         "+((AMDCPUInfo)c).IsK10Compatible());
+            System.out.println("Is Jaguar-compatible:      "+((AMDCPUInfo)c).IsJaguarCompatible());
+            System.out.println("Is Bulldozer-compatible:   "+((AMDCPUInfo)c).IsBulldozerCompatible());
+            System.out.println("Is Piledriver-compatible:  "+((AMDCPUInfo)c).IsPiledriverCompatible());
+            System.out.println("Is Steamroller-compatible: "+((AMDCPUInfo)c).IsSteamrollerCompatible());
+            System.out.println("Is Excavator-compatible:   "+((AMDCPUInfo)c).IsExcavatorCompatible());
         }
     }
 

@@ -33,6 +33,7 @@ public class FloodSearchJob extends JobImpl {
     protected final AtomicInteger _lookupsRemaining = new AtomicInteger();
     protected volatile boolean _dead;
     protected final long _created;
+    protected boolean _success;
 
     /**
      *  @param onFind may be null
@@ -69,6 +70,7 @@ public class FloodSearchJob extends JobImpl {
      *  @param isLease ignored
      */
     void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
+        boolean success;
         synchronized (this) {
             if (!_dead) {
                 if (onFind != null)
@@ -77,9 +79,13 @@ public class FloodSearchJob extends JobImpl {
                     _onFailed.add(onFailed);
                 return;
             }
+            success = _success;
         }
         // outside synch to avoid deadlock with job queue
-        getContext().jobQueue().addJob(onFailed);
+        if (success && onFind != null)
+            getContext().jobQueue().addJob(onFind);
+        else if (!success && onFailed != null)
+            getContext().jobQueue().addJob(onFailed);
     }
 
     /** using context clock */
@@ -193,8 +199,11 @@ public class FloodSearchJob extends JobImpl {
      *  Deprecated, unused, see FOSJ override
      */
     void success() {
-        throw new UnsupportedOperationException("use override");
+        synchronized(this) {
+            _success = true;
+        }
 /****
+        throw new UnsupportedOperationException("use override");
         if (_dead) return;
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " successful");

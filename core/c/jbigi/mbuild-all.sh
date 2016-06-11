@@ -79,34 +79,32 @@ if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
 fi
 
 if ! command -v m4 > /dev/null; then
-    printf "\aWARNING: \`m4\` not found. If this process fails to complete, install m4 " >&2
+    printf "\aWARNING: \`m4\` not found. Install m4 " >&2
     printf "and re-run this script.\n\n\n\a" >&2
     exit 1
 fi
 
 
 if [ -z $BITS ]; then
-  UNAME="$(uname -a)"
-  if test "${UNAME#*x86_64}" != "x86_&4"; then
+  UNAME="$(uname -m)"
+  if test "${UNAME#*x86_64}" != "$UNAME"; then
     BITS=64
-  elif test "${UNAME#*i386}" != "i386"; then
+  elif test "${UNAME#*i386}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*i686}" != "i686"; then
+  elif test "${UNAME#*i686}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*armv6}" != "armv6"; then
+  elif test "${UNAME#*armv6}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*armv7}" != "armv7"; then
+  elif test "${UNAME#*armv7}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*aarch32}" != "aarch32"; then
+  elif test "${UNAME#*aarch32}" != "$UNAME"; then
     BITS=32
-  elif test "${UNAME#*aarch64}" != "aarch64"; then
+  elif test "${UNAME#*aarch64}" != "$UNAME"; then
     BITS=64
   else
- 
     echo "Unable to detect default setting for BITS variable"
-    exit
+    exit 1
   fi
-
   printf "\aBITS variable not set, $BITS bit system detected\n\a" >&2
 fi
 
@@ -116,6 +114,7 @@ if [ -z $CC ]; then
   printf "\aCC variable not set, defaulting to $CC\n\a" >&2
 fi
 
+# FIXME -m32 and -m64 are only for x86
 if [ $BITS -eq 32 ]; then
   export ABI=32
   export CFLAGS="-m32"

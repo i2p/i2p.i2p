@@ -587,6 +587,7 @@ class IterativeSearchJob extends FloodSearchJob {
         synchronized(this) {
             if (_dead) return;
             _dead = true;
+            _success = true;
             tries = _unheardFrom.size() + _failedPeers.size();
             if (_unheardFrom.size() == 1) {
                 peer = _unheardFrom.iterator().next();

@@ -301,7 +301,7 @@
         <copy file="apps/imagegen/imagegen/build/imagegen.war" todir="build/" />
     </target>
 
-    <target name="buildI2PSnark" depends="buildStreaming, buildJetty" >
+    <target name="buildI2PSnark" depends="buildStreaming, buildJetty, buildSystray" >
         <ant dir="apps/i2psnark/java/" target="war" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
@@ -325,7 +325,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel-ui.jar" todir="build/" />
     </target>
 
-    <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
+    <target name="buildI2PTunnel" depends="buildStreaming, buildJetty, buildImagegen" >
         <ant dir="apps/i2ptunnel/java/" target="build" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
@@ -1809,10 +1809,13 @@
         <ant dir="apps/syndie/java/" target="standalone" />
         <copy file="apps/syndie/java/syndie-standalone.zip" todir="." />
     </target> -->
-    <target name="i2psnark" depends="buildProperties" >
+
+    <!-- standalone i2psnark zip -->
+    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray" >
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>
+
     <target name="slackpkg">
         <ant dir="Slackware/i2p/" target="slackpkg" />
     </target>
