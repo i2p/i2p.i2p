@@ -233,6 +233,8 @@ public class SnarkManager implements CompleteListener {
         _configFile = new File(_configDir, CONFIG_FILE);
         _trackerMap = new ConcurrentHashMap<String, Tracker>(4);
         loadConfig(null);
+        if (!ctx.isRouterContext())
+            Runtime.getRuntime().addShutdownHook(new Thread(new TempDeleter(_util.getTempDir()), "Snark Temp Dir Deleter"));
     }
 
     /** Caller _must_ call loadConfig(file) before this if setting new values
@@ -245,13 +247,23 @@ public class SnarkManager implements CompleteListener {
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         // only if default instance
-        if ("i2psnark".equals(_contextName))
+        if (_context.isRouterContext() && "i2psnark".equals(_contextName))
             // delay until UpdateManager is there
             _context.simpleTimer2().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
         _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
         _idleChecker.schedule(5*60*1000);
+    }
+
+    /**
+     * Only used in app context
+     * @since 0.9.27
+     */
+    private static class TempDeleter implements Runnable {
+        private final File file;
+        public TempDeleter(File f) { file = f; }
+        public void run() { FileUtil.rmdir(file, false); }
     }
 
     /** @since 0.9.4 */

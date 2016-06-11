@@ -166,7 +166,7 @@ tr {
 }
 
 thead, tfoot {
-     background: url("images/bling2.png") repeat-x scroll center center #867;
+     background: url('images/bling2.png') repeat-x scroll center center #867;
      font-weight: bold;
      color: #503;
 }

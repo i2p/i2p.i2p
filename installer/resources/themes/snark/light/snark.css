@@ -29,7 +29,7 @@ body.iframed {
      font-weight: bold;
      font-size: 9pt;
      color: #559;
-     background: #fff url("../../console/light/images/header.png") repeat-x scroll center center;
+     background: #fff url('../../console/light/images/header.png') repeat-x scroll center center;
      -moz-border-radius: 0px;
      -khtml-border-radius: 3px;
      border-radius: 0px;
@@ -167,7 +167,7 @@ th {
      border-bottom: 1px solid #66f;
      color: #001;
       whitespace: nowrap;
-     background: #fff url("../../console/light/images/header.png") repeat-x scroll center center;
+     background: #fff url('../../console/light/images/header.png') repeat-x scroll center center;
 }
 
 th:first-child {
@@ -414,7 +414,7 @@ td:first-child {
      border-radius: 0 0 5px 5px;
      border-top: 0;
      text-shadow: 0 1px 0 #aaa;
-     background: #fff url("../../console/light/images/header.png") repeat-x scroll center center;
+     background: #fff url('../../console/light/images/header.png') repeat-x scroll center center;
      font-variant: small-caps !important;
      box-shadow: 0 1px 3px #999;
 }
