@@ -209,6 +209,8 @@
         <zipfileset src="../../ministreaming/java/build/mstreaming.jar" />
         <zipfileset src="../../streaming/java/build/streaming.jar" />
         <zipfileset src="../../systray/java/build/systray.jar" />
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <manifest>
             <attribute name="Main-Class" value="org.klomp.snark.standalone.RunStandalone"/>
             <attribute name="Implementation-Version" value="${full.version}" />
@@ -216,6 +218,11 @@
             <attribute name="Build-Date" value="${build.timestamp}" />
             <attribute name="Base-Revision" value="${workspace.version}" />
             <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            <!-- this is so Jetty will report its version correctly -->
+            <section name="org/eclipse/jetty/server/" >
+                <attribute name="Implementation-Vendor" value="Eclipse.org - Jetty" />
+                <attribute name="Implementation-Version" value="8.1.17.v20150415" />
+            </section>
         </manifest>
       </jar>
     </target>
