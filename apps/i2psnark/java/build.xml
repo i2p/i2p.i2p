@@ -186,6 +186,8 @@
 
     <!-- make a fat jar for standalone -->
     <target name="standalone_jar" depends="war">
+      <!-- set if unset -->
+      <property name="workspace.changes.tr" value="" />
       <jar destfile="build/i2psnark-standalone.jar">
         <fileset dir="build/obj" includes="**/standalone/*.class" />
         <zipfileset src="build/i2psnark.jar" />
@@ -209,8 +211,6 @@
         <zipfileset src="../../ministreaming/java/build/mstreaming.jar" />
         <zipfileset src="../../streaming/java/build/streaming.jar" />
         <zipfileset src="../../systray/java/build/systray.jar" />
-        <!-- set if unset -->
-        <property name="workspace.changes.tr" value="" />
         <manifest>
             <attribute name="Main-Class" value="org.klomp.snark.standalone.RunStandalone"/>
             <attribute name="Implementation-Version" value="${full.version}" />
@@ -283,9 +283,9 @@
         <mkdir dir="./dist" />
         <copy file="../launch-i2psnark" todir="./dist/" />
         <mkdir dir="./dist/contexts" />
-        <!-- todo put in root context.xml -->
+        <copy file="../standalone-context.xml" tofile="./dist/contexts/context.xml" />
         <mkdir dir="./dist/docroot" />
-        <!-- todo put in index.html to redirect -->
+        <copy file="../standalone-index.html" tofile="./dist/docroot/index.html" />
         <mkdir dir="./dist/webapps" />
         <copy file="../i2psnark.war" tofile="./dist/webapps/i2psnark.war" />
         <copy file="../jetty-i2psnark.xml" tofile="./dist/jetty-i2psnark.xml" />
