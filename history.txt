@@ -1,3 +1,22 @@
+2016-06-11 zzz
+Prop from i2p.i2p.zzz.test2:
+ * CPUID: Add CLI output for new AMD tests
+ * i2psnark standalone:
+   - Cherry-pick fixes from psi's github i2psnark_rpc branch
+   - Fix up Jetty XML file for Jetty 8
+   - Start with JettyStart
+   - Add UrlLauncher to launch browser
+   - Fix up paths in CSS files during build
+   - Force startup delay to 0
+   - Fix theme selection
+   - Adjust CSS and image paths
+   - Add shutdown hook to delete temp dir
+ * i2ptunnel CLI: Don't set the listen host to the I2CP host
+ * jbigi:
+   - Fix GMP version reporting for shared library (ticket #1800)
+   - mbuild-all script fixes
+ * NetDB: Improve handling of deferred search result jobs
+
 * 2016-06-07 0.9.26 released
 
 2016-06-03 zzz

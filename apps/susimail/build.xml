@@ -150,6 +150,7 @@
     <target name="clean">
     	<delete dir="src/WEB-INF/classes"/>
     	<delete file="susimail.war"/>
+    	<delete dir="build"/>
     </target>
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean" />

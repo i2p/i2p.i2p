@@ -37,11 +37,8 @@ public class TestDatagramTransfer {
             line = reader.readLine();
             _log.info("Response from the lookup for ME: " + line);
             _log.debug("The above should be a NAMING REPLY");
-            
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+
+            Properties props = SAMUtils.parseParams(line);
             String value = props.getProperty("VALUE");
             if (value == null) {
                 _log.error("No value for ME found!  [" + line + "]");
@@ -53,10 +50,7 @@ public class TestDatagramTransfer {
             String send = "DATAGRAM SEND DESTINATION=" + value + " SIZE=3\nYo!";
             out.write(DataHelper.getASCII(send));
             line = reader.readLine();
-            tok = new StringTokenizer(line);
-            maj = tok.nextToken();
-            min = tok.nextToken();
-            props = SAMUtils.parseParams(tok);
+            props = SAMUtils.parseParams(line);
             String size = props.getProperty("SIZE");
             String from = props.getProperty("DESTINATION");
             if ( (value == null) || (size == null) ||

@@ -232,6 +232,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         synchronized (this) {
             if (_dead) return;
             _dead = true;
+            super.success();
         }
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Floodfill search for " + _key + " successful");

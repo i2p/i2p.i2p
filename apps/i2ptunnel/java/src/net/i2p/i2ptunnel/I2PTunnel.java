@@ -1338,7 +1338,6 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
             if (i < args.length) {
                 host = args[i++];
-                listenHost = host;
             }
             if (i < args.length)
                 port = args[i];

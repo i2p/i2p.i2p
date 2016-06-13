@@ -233,6 +233,8 @@ public class SnarkManager implements CompleteListener {
         _configFile = new File(_configDir, CONFIG_FILE);
         _trackerMap = new ConcurrentHashMap<String, Tracker>(4);
         loadConfig(null);
+        if (!ctx.isRouterContext())
+            Runtime.getRuntime().addShutdownHook(new Thread(new TempDeleter(_util.getTempDir()), "Snark Temp Dir Deleter"));
     }
 
     /** Caller _must_ call loadConfig(file) before this if setting new values
@@ -245,13 +247,23 @@ public class SnarkManager implements CompleteListener {
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         // only if default instance
-        if ("i2psnark".equals(_contextName))
+        if (_context.isRouterContext() && "i2psnark".equals(_contextName))
             // delay until UpdateManager is there
             _context.simpleTimer2().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
         _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
         _idleChecker.schedule(5*60*1000);
+    }
+
+    /**
+     * Only used in app context
+     * @since 0.9.27
+     */
+    private static class TempDeleter implements Runnable {
+        private final File file;
+        public TempDeleter(File f) { file = f; }
+        public void run() { FileUtil.rmdir(file, false); }
     }
 
     /** @since 0.9.4 */
@@ -388,6 +400,8 @@ public class SnarkManager implements CompleteListener {
     }
 
     private int getStartupDelayMinutes() { 
+        if (!_context.isRouterContext())
+            return 0;
         try {
 	    return Integer.parseInt(_config.getProperty(PROP_STARTUP_DELAY));
         } catch (NumberFormatException nfe) {
@@ -675,7 +689,8 @@ public class SnarkManager implements CompleteListener {
      * @return String[] -- Array of all the themes found, non-null, unsorted
      */
     public String[] getThemes() {
-            String[] themes;
+         String[] themes;
+         if (_context.isRouterContext()) {
             // "docs/themes/snark/"
             File dir = new File(_context.getBaseDir(), "docs/themes/snark");
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
@@ -689,8 +704,10 @@ public class SnarkManager implements CompleteListener {
             } else {
                 themes = new String[0];
             }
-            // return the map.
-            return themes;
+        } else {
+            themes = new String[] { "light", "ubergine", "vanilla" };
+        }
+        return themes;
     }
 
 
@@ -815,7 +832,7 @@ public class SnarkManager implements CompleteListener {
             }
         }
         
-	if (startDelay != null){
+	if (startDelay != null && _context.isRouterContext()) {
 		int minutes = _util.getStartupDelay();
                 try { minutes = Integer.parseInt(startDelay.trim()); } catch (NumberFormatException nfe) {}
 	        if ( minutes != _util.getStartupDelay()) {

@@ -37,10 +37,6 @@ to serve static html files and images.
     <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
     <Arg>/</Arg>
   </Call>
-  <Call name="addServlet">
-    <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
-    <Arg>/</Arg>
-  </Call>
   <Call name="addFilter">
     <!-- Add a filter to gzip on-the fly, since if we don't do it, I2P will.
       -  This lowers the resource usage in the Java process on the client side,
