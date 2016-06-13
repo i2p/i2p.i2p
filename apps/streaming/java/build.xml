@@ -239,6 +239,19 @@
             splitindex="true"
             windowtitle="Streaming" />
     </target>
+
+    <!-- for Maven Central -->
+    <target name="javadocJar" depends="javadoc">
+        <jar jarfile="./build/streaming-${release.number}-javadoc.jar">
+            <fileset dir="./build/javadoc" />
+        </jar>
+    </target>
+    <target name="sourcesJar">
+        <jar jarfile="./build/streaming-${release.number}-sources.jar">
+            <fileset dir="./src" />
+        </jar>
+    </target>
+
     <target name="clean">
         <delete dir="./build" />
     </target>

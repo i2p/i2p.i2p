@@ -107,6 +107,18 @@
         <javadoc sourcepath="./src:./test/junit" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
     </target>
 
+    <!-- for Maven Central -->
+    <target name="javadocJar" depends="javadoc">
+        <jar jarfile="./build/i2p-${release.number}-javadoc.jar">
+            <fileset dir="./build/javadoc" />
+        </jar>
+    </target>
+    <target name="sourcesJar">
+        <jar jarfile="./build/i2p-${release.number}-sources.jar">
+            <fileset dir="./src" />
+        </jar>
+    </target>
+
     <!-- scala paths -->
     <target name="scala.init">
         <property name="scala-library.jar" value="${scalatest.libs}/scala-library.jar" />

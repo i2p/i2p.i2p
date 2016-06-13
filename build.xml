@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project basedir="." default="all" name="i2p">
+<project basedir="." default="all" name="i2p"
+    xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <!-- Include property files so that values can be easily overridden.
          Users should create an override.properties file to make changes.
@@ -92,6 +93,24 @@
             <chmod type="file" perm="444">
                 <fileset dir="${basedir}">
                     <include name="@{file} @{file}.sig" />
+                </fileset>
+            </chmod>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="gpgsignasc">
+        <attribute name="file" />
+        <sequential>
+            <delete file="@{file}.asc" quiet="true" />
+            <exec executable="gpg" failonerror="true">
+                <arg value="--default-key" />
+                <arg value="${release.gpg.keyid}" />
+                <arg value="-ab" />
+                <arg value="@{file}" />
+            </exec>
+            <chmod type="file" perm="444">
+                <fileset dir="${basedir}">
+                    <include name="@{file} @{file}.asc" />
                 </fileset>
             </chmod>
         </sequential>
@@ -943,6 +962,9 @@
         <delete file="javadoc.zip" />
         <delete file="i2p.fba" />
         <delete file="${sloccount.report.file}" />
+        <delete file="mavencentral-i2p.jar" />
+        <delete file="mavencentral-mstreaming.jar" />
+        <delete file="mavencentral-streaming.jar" />
     </target>
 
     <target name="distclean" depends="clean">
@@ -1343,6 +1365,7 @@
 
     <target name="deletepkg-temp">
         <delete dir="pkg-temp" />
+        <delete dir="./pkg-mavencentral" />
     </target>
 
     <!-- readme and proxy error page files, initialNews.xml files, GeoIP files, and flag icons -->
@@ -1964,6 +1987,109 @@
         <mktorrent file="i2pupdate-${release.number}.su3" />
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
+    </target>
+
+    <target name="mavenCentral.deps" depends="buildStreaming">
+        <ant dir="core/java/" target="javadocJar" />
+        <ant dir="core/java/" target="sourcesJar" />
+        <ant dir="apps/ministreaming/java/" target="javadocJar" />
+        <ant dir="apps/ministreaming/java/" target="sourcesJar" />
+        <ant dir="apps/streaming/java/" target="javadocJar" />
+        <ant dir="apps/streaming/java/" target="sourcesJar" />
+    </target>
+
+    <target name="mavenCentral" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, mavenCentral.deps">
+        <mkdir dir="./pkg-mavencentral" />
+        <!-- Libraries -->
+        <copy file="build/i2p.jar" tofile="pkg-mavencentral/i2p-${release.number}.jar" />
+        <copy file="build/mstreaming.jar" tofile="pkg-mavencentral/mstreaming-${release.number}.jar" />
+        <copy file="build/streaming.jar" tofile="pkg-mavencentral/streaming-${release.number}.jar" />
+        <!-- JavaDocs -->
+        <copy file="core/java/build/i2p-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
+        <copy file="apps/ministreaming/java/build/mstreaming-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
+        <copy file="apps/streaming/java/build/streaming-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
+        <!-- Sources -->
+        <copy file="core/java/build/i2p-${release.number}-sources.jar" todir="pkg-mavencentral/" />
+        <copy file="apps/ministreaming/java/build/mstreaming-${release.number}-sources.jar" todir="pkg-mavencentral/" />
+        <copy file="apps/streaming/java/build/streaming-${release.number}-sources.jar" todir="pkg-mavencentral/" />
+        <!-- POMs -->
+        <artifact:pom id="i2ppom" groupId="net.i2p" artifactId="i2p" version="${release.number}"
+                name="I2P Core"
+                description="The core I2P APIs"
+                url="https://geti2p.net/">
+            <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
+            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 url="git@github.com:i2p/i2p.i2p.git" />
+        </artifact:pom>
+        <artifact:pom id="mstreamingpom" groupId="net.i2p.client" artifactId="mstreaming" version="${release.number}"
+                name="I2P Ministreaming"
+                description="API, interfaces, and factory for a TCP-like set of sockets for communicating over I2P."
+                url="https://geti2p.net/en/docs/api/streaming">
+            <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
+            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 url="git@github.com:i2p/i2p.i2p.git" />
+            <dependency groupId="net.i2p" artifactId="i2p" version="${release.number}" />
+        </artifact:pom>
+        <artifact:pom id="streamingpom" groupId="net.i2p.client" artifactId="streaming" version="${release.number}"
+                name="I2P Streaming"
+                description="Implementation of a TCP-like set of sockets for communicating over I2P."
+                url="https://geti2p.net/en/docs/api/streaming">
+            <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
+            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 url="git@github.com:i2p/i2p.i2p.git" />
+            <dependency groupId="net.i2p" artifactId="i2p" version="${release.number}" />
+            <dependency groupId="net.i2p.client" artifactId="mstreaming" version="${release.number}" />
+        </artifact:pom>
+        <artifact:writepom pomRefId="i2ppom" file="pkg-mavencentral/i2p-${release.number}.pom"/>
+        <artifact:writepom pomRefId="mstreamingpom" file="pkg-mavencentral/mstreaming-${release.number}.pom" />
+        <artifact:writepom pomRefId="streamingpom" file="pkg-mavencentral/streaming-${release.number}.pom" />
+        <!-- Signatures -->
+        <echo message="Sign the files:" />
+        <input message="Enter GPG key ID (e.g. 0x12345678) for signing:" addproperty="release.gpg.keyid" />
+        <fail message="You must enter a key ID." >
+            <condition>
+                <equals arg1="${release.gpg.keyid}" arg2=""/>
+            </condition>
+        </fail>
+        <!-- the gpgsign macro sets the permission of signed files and the sigs themselves to 444 -->
+        <gpgsignasc file="pkg-mavencentral/i2p-${release.number}.jar" />
+        <gpgsignasc file="pkg-mavencentral/i2p-${release.number}.pom" />
+        <gpgsignasc file="pkg-mavencentral/i2p-${release.number}-javadoc.jar" />
+        <gpgsignasc file="pkg-mavencentral/i2p-${release.number}-sources.jar" />
+        <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}.jar" />
+        <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}.pom" />
+        <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}-javadoc.jar" />
+        <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}-sources.jar" />
+        <gpgsignasc file="pkg-mavencentral/streaming-${release.number}.jar" />
+        <gpgsignasc file="pkg-mavencentral/streaming-${release.number}.pom" />
+        <gpgsignasc file="pkg-mavencentral/streaming-${release.number}-javadoc.jar" />
+        <gpgsignasc file="pkg-mavencentral/streaming-${release.number}-sources.jar" />
+        <!-- Bundle -->
+        <jar destfile="mavencentral-i2p.jar">
+            <fileset dir="./pkg-mavencentral">
+                <include name="i2p-*" />
+            </fileset>
+        </jar>
+        <jar destfile="mavencentral-mstreaming.jar">
+            <fileset dir="./pkg-mavencentral">
+                <include name="mstreaming-*" />
+            </fileset>
+        </jar>
+        <jar destfile="mavencentral-streaming.jar">
+            <fileset dir="./pkg-mavencentral">
+                <include name="streaming-*" />
+            </fileset>
+        </jar>
+        <echo message="Now upload mavencentral-*.jar to Maven Central." />
     </target>
 
     <target name="debian" depends="debian-clean, debchange, debian-binary" />

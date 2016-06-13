@@ -145,6 +145,18 @@
             windowtitle="I2P ministreaming library" />
     </target>
 
+    <!-- for Maven Central -->
+    <target name="javadocJar" depends="javadoc">
+        <jar jarfile="./build/mstreaming-${release.number}-javadoc.jar">
+            <fileset dir="./build/javadoc" />
+        </jar>
+    </target>
+    <target name="sourcesJar">
+        <jar jarfile="./build/mstreaming-${release.number}-sources.jar">
+            <fileset dir="./src" />
+        </jar>
+    </target>
+
     <target name="builddeptest">
         <ant dir="../../../core/java" target="jar" />
     </target>
