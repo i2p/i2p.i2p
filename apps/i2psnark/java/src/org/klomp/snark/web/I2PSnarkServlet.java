@@ -289,10 +289,11 @@ public class I2PSnarkServlet extends BasicServlet {
             delay = _manager.getRefreshDelaySeconds();
             if (delay > 0) {
                 String jsPfx = _context.isRouterContext() ? "" : ".resources";
+                String downMsg = _context.isRouterContext() ? _t("Router is down") : _t("I2PSnark has stopped");
                 //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
                 out.write("<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
-                          "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + _t("Router is down") + "<\\/b><\\/div>\";\n" +
+                          "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
                           "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" +
                           peerString.replace("&amp;", "&") +  // don't html escape in js
                           "\", \"mainsection\", " + (delay*1000) + "); }\n" +
@@ -2292,11 +2293,12 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"4\" maxlength=\"4\" > KBps <i>");
         out.write(_t("Half available bandwidth recommended."));
-        out.write(" [<a href=\"/config.jsp\" target=\"blank\">");
-        out.write(_t("View or change router bandwidth"));
-        out.write("</a>]</i><br>\n" +
-        
-                  "<tr><td>");
+        if (_context.isRouterContext()) {
+            out.write(" [<a href=\"/config.jsp\" target=\"blank\">");
+            out.write(_t("View or change router bandwidth"));
+            out.write("</a>]</i>");
+        }
+        out.write("<br>\n<tr><td>");
         out.write(_t("Use open trackers also"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
