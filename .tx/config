@@ -156,6 +156,7 @@ trans.fi = apps/i2psnark/locale/messages_fi.po
 trans.fr = apps/i2psnark/locale/messages_fr.po
 trans.hu = apps/i2psnark/locale/messages_hu.po
 trans.it = apps/i2psnark/locale/messages_it.po
+trans.ja = apps/i2psnark/locale/messages_ja.po
 trans.nb = apps/i2psnark/locale/messages_nb.po
 trans.nl = apps/i2psnark/locale/messages_nl.po
 trans.pl = apps/i2psnark/locale/messages_pl.po
@@ -166,6 +167,7 @@ trans.ru_RU = apps/i2psnark/locale/messages_ru.po
 trans.sk = apps/i2psnark/locale/messages_sk.po
 trans.sv_SE = apps/i2psnark/locale/messages_sv.po
 trans.tr_TR = apps/i2psnark/locale/messages_tr.po
+trans.uk_UA = apps/i2psnark/locale/messages_uk.po
 trans.vi = apps/i2psnark/locale/messages_vi.po
 trans.zh_CN = apps/i2psnark/locale/messages_zh.po
 

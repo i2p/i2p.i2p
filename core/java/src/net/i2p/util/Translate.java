@@ -27,10 +27,14 @@ public abstract class Translate {
     public static final String PROP_LANG = "routerconsole.lang";
     /** @since 0.9.10 */
     public static final String PROP_COUNTRY = "routerconsole.country";
-    /** non-null, two-letter lower case, may be "" */
+    /** non-null, two- or three-letter lower case, may be "" */
     private static final String _localeLang = Locale.getDefault().getLanguage();
     /** non-null, two-letter upper case, may be "" */
     private static final String _localeCountry = Locale.getDefault().getCountry();
+    /** App context only, two- or three-letter lower case, may be null */
+    private static String _overrideLang = null;
+    /** App context only, two-letter upper case, may be "" or null */
+    private static String _overrideCountry = null;
     private static final Map<String, ResourceBundle> _bundles = new ConcurrentHashMap<String, ResourceBundle>(16);
     private static final Set<String> _missing = new ConcurrentHashSet<String>(16);
     /** use to look for untagged strings */
@@ -139,6 +143,12 @@ public abstract class Translate {
      *  @return lang in routerconsole.lang property, else current locale
      */
     public static String getLanguage(I2PAppContext ctx) {
+        if (!ctx.isRouterContext()) {
+            synchronized(Translate.class) {
+                if (_overrideLang != null)
+                    return _overrideLang;
+            }
+        }
         String lang = ctx.getProperty(PROP_LANG);
         if (lang == null || lang.length() <= 0)
             lang = _localeLang;
@@ -151,9 +161,30 @@ public abstract class Translate {
      *  @since 0.9.10
      */
     public static String getCountry(I2PAppContext ctx) {
+        if (!ctx.isRouterContext()) {
+            synchronized(Translate.class) {
+                if (_overrideCountry != null)
+                    return _overrideCountry;
+            }
+        }
         // property may be empty so we don't have a non-default
         // language and a default country
         return ctx.getProperty(PROP_COUNTRY, _localeCountry);
+    }
+
+    /**
+     *  Only for use by standalone apps in App Context.
+     *  NOT for use in Router Context.
+     *  Does not persist, apps must implement their own persistence.
+     *  Overrides in all contexts.
+     *
+     *  @param lang Two- or three-letter lower case, or null for default
+     *  @param country Two-letter upper case, or null for default, or "" for none
+     *  @since 0.9.27
+     */
+    public synchronized static void setLanguage(String lang, String country) {
+        _overrideLang = lang;
+        _overrideCountry = country;
     }
 
     /**

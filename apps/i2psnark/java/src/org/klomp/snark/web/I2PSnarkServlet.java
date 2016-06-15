@@ -44,6 +44,7 @@ import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
+import org.klomp.snark.standalone.ConfigUIHelper;
 
 /**
  *  Refactored to eliminate Jetty dependencies.
@@ -954,6 +955,7 @@ public class I2PSnarkServlet extends BasicServlet {
             } else
           *****/
             if (newURL != null) {
+                newURL = newURL.trim();
                 String newDir = req.getParameter("nofilter_newDir");
                 File dir = null;
                 if (newDir != null) {
@@ -1141,9 +1143,10 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean useDHT = req.getParameter("useDHT") != null;
             //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
+            String lang = req.getParameter("lang");
             _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
-                                  upLimit, upBW, useOpenTrackers, useDHT, theme);
+                                  upLimit, upBW, useOpenTrackers, useDHT, theme, lang);
             // update servlet
             try {
                 setResourceBase(_manager.getDataDir());
@@ -2198,9 +2201,19 @@ public class I2PSnarkServlet extends BasicServlet {
                   + (smartSort ? "checked " : "") 
                   + "title=\"");
         out.write(_t("If checked, ignore words such as 'the' when sorting"));
-        out.write("\" >" +
+        out.write("\" >");
 
-                  "<tr><td>");
+        if (!_context.isRouterContext()) {
+            try {
+                out.write("<tr><td>");
+                out.write(_t("Language"));
+                out.write(": <td>");
+                // class only in standalone builds
+                out.write(ConfigUIHelper.getLangSettings(_context));
+            } catch (Throwable t) {}
+        }
+
+        out.write("<tr><td>");
         out.write(_t("Theme"));
         out.write(": <td><select name='theme'>");
         String theme = _manager.getTheme();
@@ -2358,7 +2371,7 @@ public class I2PSnarkServlet extends BasicServlet {
                   "<tr><td colspan=\"2\">&nbsp;\n" +  // spacer
                   "</table></div></div></form>");
     }
-    
+
     /** @since 0.9 */
     private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
         StringBuilder buf = new StringBuilder(1024);

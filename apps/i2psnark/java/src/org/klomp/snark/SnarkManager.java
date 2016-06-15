@@ -42,6 +42,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.dht.KRPC;
@@ -127,6 +128,8 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
     private static final String PROP_USE_DHT = "i2psnark.enableDHT";
     private static final String PROP_SMART_SORT = "i2psnark.smartSort";
+    private static final String PROP_LANG = "i2psnark.lang";
+    private static final String PROP_COUNTRY = "i2psnark.country";
 
     public static final int MIN_UP_BW = 10;
     public static final int DEFAULT_MAX_UP_BW = 25;
@@ -254,6 +257,13 @@ public class SnarkManager implements CompleteListener {
         //_context.addShutdownTask(new SnarkManagerShutdown());
         _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
         _idleChecker.schedule(5*60*1000);
+        if (!_context.isRouterContext()) {
+            String lang = _config.getProperty(PROP_LANG);
+            if (lang != null) {
+                String country = _config.getProperty(PROP_COUNTRY, "");
+                Translate.setLanguage(lang, country);
+            }
+        }
     }
 
     /**
@@ -774,19 +784,22 @@ public class SnarkManager implements CompleteListener {
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
+                             String lang) {
         synchronized(_configLock) {
             locked_updateConfig(dataDir, filesPublic, autoStart, smartSort,refreshDelay,
                                 startDelay,  pageSize,  seedPct,  eepHost, 
                                 eepPort,  i2cpHost,  i2cpPort,  i2cpOpts,
-                                upLimit,  upBW, useOpenTrackers, useDHT,  theme);
+                                upLimit,  upBW, useOpenTrackers, useDHT,  theme,
+                                lang);
         }
     }
 
     private void locked_updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
+                             String lang) {
         boolean changed = false;
         boolean interruptMonitor = false;
         //if (eepHost != null) {
@@ -892,6 +905,32 @@ public class SnarkManager implements CompleteListener {
             }
 
         }
+
+	// Standalone (app context) language.
+	// lang will generally be null since it is hidden from the form if in router context.
+
+        if (lang != null && !_context.isRouterContext() &&
+            lang.length() >= 2 && lang.length() <= 6) {
+            int under = lang.indexOf('_');
+            String nlang, ncountry;
+            if (under > 0 && lang.length() > under + 1) {
+                nlang = lang.substring(0, under);
+                ncountry = lang.substring(under + 1);
+            } else {
+                nlang = lang;
+                ncountry = "";
+            }
+            String olang = _config.getProperty(PROP_LANG);
+            String ocountry = _config.getProperty(PROP_COUNTRY);
+            if (!nlang.equals(olang) || !ncountry.equals(ocountry)) {
+                changed = true;
+                _config.setProperty(PROP_LANG, nlang);
+                _config.setProperty(PROP_COUNTRY, ncountry);
+                Translate.setLanguage(nlang, ncountry);
+            }
+        }
+
+
 
 	// Start of I2CP stuff.
 	// i2cpHost will generally be null since it is hidden from the form if in router context.
