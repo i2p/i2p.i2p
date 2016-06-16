@@ -4,7 +4,7 @@
 
 <html><head>
 <%@include file="css.jsi" %>
-<%=intl.title("config clients")%>
+<%=intl.title("config webapps")%>
 <style type='text/css'>
 button span.hide{
     display:none;
@@ -20,28 +20,24 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter(\"edit\")%>" />
-<h1><%=intl._t("I2P Client Configuration")%></h1>
+<h1><%=intl._t("WebApp Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <div class="configure">
- <h3><%=intl._t("Client Configuration")%></h3><p>
- <%=intl._t("The Java clients listed below are started by the router and run in the same JVM.")%><br>
- <img src="/themes/console/images/itoopie_xsm.png" alt=""><b><%=intl._t("Be careful changing any settings here. The 'router console' and 'application tunnels' are required for most uses of I2P. Only advanced users should change these.")%></b>
+<h3><a name="webapp"></a><%=intl._t("WebApp Configuration")%></h3><p>
+ <%=intl._t("The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook).")%>
+ </p><p>
+ <%=intl._t("A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method.")%>
  </p><div class="wideload">
-<form action="" method="POST">
+<form action="configwebapps" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<jsp:getProperty name="clientshelper" property="form1" />
-<p><i><%=intl._t("To change other client options, edit the file")%>
- <%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.
- <%=intl._t("All changes require restart to take effect.")%></i>
+ <jsp:getProperty name="clientshelper" property="form2" />
+ <p><i><%=intl._t("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" class="cancel" name="foo" value="<%=intl._t("Cancel")%>" />
-<% if (clientshelper.isClientChangeEnabled() && request.getParameter("edit") == null) { %>
- <input type="submit" name="edit" class="add" value="<%=intl._t("Add Client")%>" />
-<% } %>
- <input type="submit" class="accept" name="action" value="<%=intl._t("Save Client Configuration")%>" />
+ <input type="submit" name="action" class="accept" value="<%=intl._t("Save WebApp Configuration")%>" />
 </div></form></div>
 </div></div></body></html>

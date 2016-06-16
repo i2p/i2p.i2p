@@ -19,12 +19,14 @@ public class ConfigNavHelper extends HelperBase {
     private static final String pages[] =
                                           {"", "net", "ui", "sidebar", "home", "service", "update", "tunnels",
                                            "clients", "peer", "keyring", "logging", "stats",
+                                           "i2cp", "plugins", "webapps",
                                            "reseed", "advanced", "family" };
 
     private static final String titles[] =
                                           {_x("Bandwidth"), _x("Network"), _x("UI"), _x("Summary Bar"), _x("Home Page"),
                                            _x("Service"), _x("Update"), _x("Tunnels"),
                                            _x("Clients"), _x("Peers"), _x("Keyring"), _x("Logging"), _x("Stats"),
+                                           _x("I2CP"), _x("Plugins"), _x("Web Apps"),
                                            _x("Reseeding"), _x("Advanced"), _x("Router Family") };
 
     /** @since 0.9.19 */
@@ -61,7 +63,10 @@ public class ConfigNavHelper extends HelperBase {
         if (!span)
             buf.append("<center>");
         List<Tab> tabs = new ArrayList<Tab>(pages.length);
+        boolean hidePlugins = !PluginStarter.pluginsEnabled(_context);
         for (int i = 0; i < pages.length; i++) {
+            if (hidePlugins && pages[i].equals("plugins"))
+                continue;
             tabs.add(new Tab(pages[i], _t(titles[i])));
         }
         Collections.sort(tabs, new TabComparator());
