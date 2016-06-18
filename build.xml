@@ -1834,8 +1834,7 @@
     </target> -->
 
     <!-- standalone i2psnark zip -->
-    <!-- console dependency for countries bundle -->
-    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray, buildRouterConsole" >
+    <target name="i2psnark" depends="buildStreaming, buildJetty, buildSystray" >
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>

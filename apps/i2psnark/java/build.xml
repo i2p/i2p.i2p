@@ -213,7 +213,9 @@
         <zipfileset src="../../systray/java/build/systray.jar" />
         <!-- Countries translations. The i2psnark translations are in the war but it's easier to put these here -->
         <!-- 300KB just to translate "Brazil", but why not... -->
+      <!--
         <fileset dir="../../routerconsole/java/build/obj" includes="net/i2p/router/countries/*.class" />
+       -->
         <manifest>
             <attribute name="Main-Class" value="org.klomp.snark.standalone.RunStandalone"/>
             <attribute name="Implementation-Version" value="${full.version}" />

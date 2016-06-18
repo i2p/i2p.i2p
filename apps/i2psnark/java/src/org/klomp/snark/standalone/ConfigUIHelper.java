@@ -1,5 +1,7 @@
 package org.klomp.snark.standalone;
 
+import java.util.Locale;
+
 import net.i2p.I2PAppContext;
 import net.i2p.util.Translate;
 
@@ -12,7 +14,7 @@ public class ConfigUIHelper {
 
     private static final String CHECKED = " selected=\"selected\" ";
     private static final String BUNDLE_NAME = "org.klomp.snark.web.messages";
-    private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
+    //private static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
 
     /**
      *  Each language has the ISO code, the flag, the name, and the optional country name.
@@ -107,8 +109,12 @@ public class ConfigUIHelper {
             buf.append(Translate.getDisplayLanguage(slang, langs[i][2], ctx, BUNDLE_NAME));
             String name = langs[i][3];
             if (name != null) {
+                String cou = (under > 0) ? lang.substring(under + 1) : lang;
+                Locale cur = new Locale(current);
+                Locale loc = new Locale(slang, cou);
                 buf.append(" (")
-                   .append(Translate.getString(name, ctx, COUNTRY_BUNDLE_NAME))
+                   //.append(Translate.getString(name, ctx, COUNTRY_BUNDLE_NAME))
+                   .append(loc.getDisplayCountry(cur))
                    .append(')');
             }
             buf.append("</option>\n");
