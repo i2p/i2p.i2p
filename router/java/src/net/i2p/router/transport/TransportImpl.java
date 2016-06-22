@@ -819,6 +819,13 @@ public abstract class TransportImpl implements Transport {
         return TransportUtil.isIPv4Firewalled(_context, getStyle());
     }
 
+    /**
+     *  @since 0.9.27
+     */
+    protected boolean isIPv6Firewalled() {
+        return TransportUtil.isIPv4Firewalled(_context, getStyle());
+    }
+
     public boolean isBacklogged(Hash peer) { return false; }
     public boolean isEstablished(Hash peer) { return false; }
 

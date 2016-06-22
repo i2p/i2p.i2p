@@ -1,7 +1,23 @@
+2016-06-22 zzz
+ * SSU peer testing:
+   - Forget the test and don't keep retransmitting to Charlie
+     if we receive the Bob reply after the 2nd Charlie reply
+   - Only fire a peer test on connection if address has changed
+
+2016-06-16 zzz
+ * Console: Split up configclients, add configi2cp,
+   configplugins, configwebapps (ticket #1804)
+
+2016-06-15 zzz
+ * Utils: Add method to set language in standalone app context
+ * i2psnark:
+   - Add form to set language in standalone context
+   - Add Ukrainian and Japanese translations
+
 2016-06-11 zzz
 Prop from i2p.i2p.zzz.test2:
  * CPUID: Add CLI output for new AMD tests
- * i2psnark standalone:
+ * i2psnark standalone (ticket #1191):
    - Cherry-pick fixes from psi's github i2psnark_rpc branch
    - Fix up Jetty XML file for Jetty 8
    - Start with JettyStart
