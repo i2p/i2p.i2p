@@ -44,4 +44,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <% } %>
  <input type="submit" class="accept" name="action" value="<%=intl._t("Save Client Configuration")%>" />
 </div></form></div>
-</div></div></body></html>
+</div><hr>
+<p><a href="configi2cp"><%=intl._t("Advanced Client Interface Configuration")%></a></p>
+<p><a href="configwebapps"><%=intl._t("WebApp Configuration")%></a></p>
+<p><a href="configplugins"><%=intl._t("Plugin Configuration")%></a></p>
+</div></body></html>
