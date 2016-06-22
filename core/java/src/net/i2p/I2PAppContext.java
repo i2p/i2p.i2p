@@ -436,8 +436,9 @@ public class I2PAppContext {
      */
     public String getProperty(String propName) {
         if (_overrideProps != null) {
-            if (_overrideProps.containsKey(propName))
-                return _overrideProps.getProperty(propName);
+            String rv = _overrideProps.getProperty(propName);
+            if (rv != null)
+                return rv;
         }
         return System.getProperty(propName);
     }
