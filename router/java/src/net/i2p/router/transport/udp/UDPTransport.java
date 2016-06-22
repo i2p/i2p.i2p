@@ -1008,6 +1008,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         if (fireTest) {
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1);
+            _testEvent.forceRunImmediately();
         } else if (updated) {
             _context.statManager().addRateData("udp.addressUpdated", 1);
             Map<String, String> changes = new HashMap<String, String>();
@@ -1060,8 +1061,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             // deadlock thru here ticket #1699
             _context.router().rebuildRouterInfo();
+            _testEvent.forceRunImmediately();
         }
-        _testEvent.forceRunImmediately();
         return updated;
     }
 
