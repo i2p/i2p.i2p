@@ -343,7 +343,7 @@ class PeerTestManager {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Receive test reply from Bob: " + test);
                 if (test.getAlicePortFromCharlie() > 0)
-                    testComplete(false);
+                    testComplete(true);
             } catch (UnknownHostException uhe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to get our IP (length " + ipSize +
