@@ -57,7 +57,7 @@
 <h3><%=intl._t("Router Logs")%> (<a href="configlogging"><%=intl._t("configure")%></a>)</h3>
  <jsp:getProperty name="logsHelper" property="logs" />
 <h3><%=intl._t("Event Logs")%></h3>
- <a href="events"><%=intl._t("View event logs")%></a>
+ <p><a href="events"><%=intl._t("View event logs")%></a></p>
 <h3><%=intl._t("Service (Wrapper) Logs")%></h3><a name="servicelogs"> </a>
  <jsp:getProperty name="logsHelper" property="serviceLogs" />
 </div></div></body></html>
