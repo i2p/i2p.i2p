@@ -95,7 +95,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  Do we have a public IPv6 address?
      *  TODO periodically update via CSFI.NetMonitor?
      */
-    private boolean _haveIPv6Address;
+    private volatile boolean _haveIPv6Address;
     private long _lastInboundIPv6;
     
     /** do we need to rebuild our external router address asap? */
@@ -218,6 +218,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  fixed in 0.9.17, we cannot connect out to routers before that version.
      */
     private static final String MIN_SIGTYPE_VERSION = "0.9.17";
+
+    /**
+     *  IPv6 Peer Testing supported
+     */
+///////////////////////////////////// Testing only, set to 0.9.27 before release ////////////////////////////////////////
+    private static final String MIN_V6_PEER_TEST_VERSION = "0.9.26";
 
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
@@ -535,7 +541,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     // change to firewalled maybe? but we don't have any test to restore
                     // a v6 address after it's removed.
                     _lastInboundIPv6 = _context.clock().now();
-                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                    if (!isIPv6Firewalled())
+                        setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
                 } else {
                     if (!isIPv4Firewalled())
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
@@ -546,7 +553,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             for (InetAddress ia : bindToAddrs) {
                 if (ia.getAddress().length == 16) {
                     _lastInboundIPv6 = _context.clock().now();
-                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                    if (!isIPv6Firewalled())
+                        setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
                 } else {
                     if (!isIPv4Firewalled())
                         setReachabilityStatus(Status.IPV4_OK_IPV6_UNKNOWN);
@@ -763,12 +771,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     void inboundConnectionReceived(boolean isIPv6) {
         if (isIPv6) {
-            // FIXME we need to check and time out after an hour of no inbound ipv6,
-            // change to firewalled maybe? but we don't have any test to restore
-            // a v6 address after it's removed.
             _lastInboundIPv6 = _context.clock().now();
-            if (_currentOurV6Address != null)
-                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+            // former workaround for lack of IPv6 peer testing
+            //if (_currentOurV6Address != null)
+            //    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
         } else {
             // Introduced connections are still inbound, this is not evidence
             // that we are not firewalled.
@@ -845,7 +851,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             } else if (ip.length == 16) {
                 // TODO should we set both to unknown and wait for an inbound v6 conn,
                 // since there's no v6 testing?
-                setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK);
+                if (!isIPv6Firewalled())
+                    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
             }
         }
     }
@@ -1007,8 +1014,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
         if (fireTest) {
+            // always false, commented out above
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1);
-            _testEvent.forceRunImmediately();
+            _testEvent.forceRunImmediately(isIPv6);
         } else if (updated) {
             _context.statManager().addRateData("udp.addressUpdated", 1);
             Map<String, String> changes = new HashMap<String, String>();
@@ -1061,7 +1069,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             // deadlock thru here ticket #1699
             _context.router().rebuildRouterInfo();
-            _testEvent.forceRunImmediately();
+            _testEvent.forceRunImmediately(isIPv6);
         }
         return updated;
     }
@@ -1329,7 +1337,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 status != Status.IPV4_DISABLED_IPV6_FIREWALLED &&
                 status != Status.DISCONNECTED &&
                 _reachabilityStatusUnchanged < 7) {
-                _testEvent.forceRunSoon();
+                // IPv4 only for now
+                _testEvent.forceRunSoon(false);
             }
         }
         return true;
@@ -3076,17 +3085,31 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    void setReachabilityStatus(Status status) { 
+    /**
+     *  IPv4 only
+     */
+    private void setReachabilityStatus(Status status) { 
+        setReachabilityStatus(status, false);
+    }
+    
+    /**
+     *  @since 0.9.27
+     *  @param isIPv6 Is the change an IPv6 change?
+     */
+    void setReachabilityStatus(Status status, boolean isIPv6) { 
         synchronized (_rebuildLock) {
-            locked_setReachabilityStatus(status);
+            locked_setReachabilityStatus(status, isIPv6);
         }
     }
 
-    private void locked_setReachabilityStatus(Status newStatus) { 
+    /**
+     *  @param isIPv6 Is the change an IPv6 change?
+     */
+    private void locked_setReachabilityStatus(Status newStatus, boolean isIPv6) { 
         Status old = _reachabilityStatus;
         // merge new status into old
         Status status = Status.merge(old, newStatus);
-        _testEvent.setLastTested();
+        _testEvent.setLastTested(isIPv6);
         // now modify if we are IPv6 only
         TransportUtil.IPv6Config config = getIPv6Config();
         if (config == IPV6_ONLY) {
@@ -3099,7 +3122,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         if (status != Status.UNKNOWN) {
             // now modify if we have no IPv6 address
-            if (_currentOurV6Address == null) {
+            if (_currentOurV6Address == null && !_haveIPv6Address) {
                 if (status == Status.IPV4_OK_IPV6_UNKNOWN)
                     status = Status.OK;
                 else if (status == Status.IPV4_FIREWALLED_IPV6_UNKNOWN)
@@ -3175,19 +3198,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  Pick a Bob (if we are Alice) or a Charlie (if we are Bob).
      *
-     *  For Bob (as called from PeerTestEvent below), returns an established IPv4 peer.
+     *  For Bob (as called from PeerTestEvent below), returns an established IPv4/v6 peer.
      *  While the protocol allows Alice to select an unestablished Bob, we don't support that.
      *
      *  For Charlie (as called from PeerTestManager), returns an established IPv4 or IPv6 peer.
      *  (doesn't matter how Bob and Charlie communicate)
      *
      *  Any returned peer must advertise an IPv4 address to prove it is IPv4-capable.
+     *  Ditto for v6.
      *
-     *  @param peerRole BOB or CHARLIE only
+     *  @param peerRole The role of the peer we are looking for, BOB or CHARLIE only (NOT our role)
+     *  @param isIPv6 true to get a v6-capable peer back
      *  @param dontInclude may be null
      *  @return IPv4 peer or null
      */
-    PeerState pickTestPeer(PeerTestState.Role peerRole, RemoteHostId dontInclude) {
+    PeerState pickTestPeer(PeerTestState.Role peerRole, boolean isIPv6, RemoteHostId dontInclude) {
         if (peerRole == ALICE)
             throw new IllegalArgumentException();
         List<PeerState> peers = new ArrayList<PeerState>(_peersByIdent.values());
@@ -3195,20 +3220,31 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             PeerState peer = iter.next();
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
-            // enforce IPv4 connection if we are ALICE looking for a BOB
+            // enforce IPv4/v6 connection if we are ALICE looking for a BOB
             byte[] ip = peer.getRemoteIP();
-            if (peerRole == BOB && ip.length != 4)
+            if (peerRole == BOB) {
+                if ((!isIPv6 && ip.length != 4) ||
+                    (isIPv6 && ip.length != 16))
                 continue;
-            // enforce IPv4 advertised for all
+            }
+            // enforce IPv4/v6 advertised for all
             RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
             if (peerInfo == null)
                 continue;
+            if (isIPv6) {
+                String v = peerInfo.getVersion();
+                if (VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0)
+                    continue;
+            }
             ip = null;
             List<RouterAddress> addrs = getTargetAddresses(peerInfo);
             for (RouterAddress addr : addrs) {
                 ip = addr.getIP();
-                if (ip != null && ip.length == 4)
+                if (ip != null) {
+                    if ((!isIPv6 && ip.length != 4) ||
+                        (isIPv6 && ip.length != 16))
                     break;
+                }
             }
             if (ip == null)
                 continue;
@@ -3221,7 +3257,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     private boolean shouldTest() {
         return ! (_context.router().isHidden() ||
-                  isIPv4Firewalled());
+                  (isIPv4Firewalled() && isIPv6Firewalled()));
         //String val = _context.getProperty(PROP_SHOULD_TEST);
         //return ( (val != null) && ("true".equals(val)) );
     }
@@ -3233,47 +3269,67 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private boolean _alive;
         /** when did we last test our reachability */
         private final AtomicLong _lastTested = new AtomicLong();
-        private boolean _forceRun;
+        private final AtomicLong _lastTestedV6 = new AtomicLong();
+        private static final int NO_FORCE = 0, FORCE_IPV4 = 1, FORCE_IPV6 = 2;
+        private int _forceRun;
 
         PeerTestEvent() {
             super(_context.simpleTimer2());
         }
         
         public synchronized void timeReached() {
+            // just for IPv6 for now
             if (shouldTest()) {
-                long sinceRun = _context.clock().now() - _lastTested.get();
-                if ( (_forceRun && sinceRun >= MIN_TEST_FREQUENCY) || (sinceRun >= TEST_FREQUENCY) ) {
-                    locked_runTest();
+                long now = _context.clock().now();
+                long sinceRunV4 = now - _lastTested.get();
+                long sinceRunV6 = now - _lastTestedV6.get();
+                if (_forceRun == FORCE_IPV4 && sinceRunV4 >= MIN_TEST_FREQUENCY) {
+                    locked_runTest(false);
+                } else if (_haveIPv6Address &&_forceRun == FORCE_IPV6 && sinceRunV6 >= MIN_TEST_FREQUENCY) {
+                    locked_runTest(true);
+                } else if (sinceRunV4 >= TEST_FREQUENCY) {
+                    locked_runTest(false);
+                } else if (_haveIPv6Address && sinceRunV6 >= TEST_FREQUENCY) {
+                    locked_runTest(true);
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("PTE timeReached(), no test run, last v4 test: " + new java.util.Date(_lastTested.get()) +
+                                  " last v6 test: " + new java.util.Date(_lastTestedV6.get()));
                 }
             }
             if (_alive) {
                 long delay = (TEST_FREQUENCY / 2) + _context.random().nextInt(TEST_FREQUENCY);
+                // if we have 2 addresses, give IPv6 a chance also
+                if (_haveIPv6Address)
+                    delay /= 2;
                 schedule(delay);
             }
         }
         
-        private void locked_runTest() {
-            PeerState bob = pickTestPeer(BOB, null);
+        private void locked_runTest(boolean isIPv6) {
+            PeerState bob = pickTestPeer(BOB, isIPv6, null);
             if (bob != null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Running periodic test with bob = " + bob);
                 _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
-                setLastTested();
+                setLastTested(isIPv6);
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unable to run a periodic test, as there are no peers with the capacity required");
+                    _log.warn("Unable to run peer test, no peers available - v6? " + isIPv6);
             }
-            _forceRun = false;
+            _forceRun = NO_FORCE;
         }
         
         /**
          *  Run within the next 45 seconds at the latest
          *  @since 0.9.13
          */
-        public synchronized void forceRunSoon() {
-            if (isIPv4Firewalled())
+        public synchronized void forceRunSoon(boolean isIPv6) {
+            if (!isIPv6 && isIPv4Firewalled())
                 return;
-            _forceRun = true;
+            if (isIPv6 && isIPv6Firewalled())
+                return;
+            _forceRun = isIPv6 ? FORCE_IPV6 : FORCE_IPV4;
             reschedule(MIN_TEST_FREQUENCY);
         }
         
@@ -3282,11 +3338,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  Run within the next 5 seconds at the latest
          *  @since 0.9.13
          */
-        public synchronized void forceRunImmediately() {
-            if (isIPv4Firewalled())
+        public synchronized void forceRunImmediately(boolean isIPv6) {
+            if (!isIPv6 && isIPv4Firewalled())
                 return;
-            _lastTested.set(0);
-            _forceRun = true;
+            if (isIPv6 && isIPv6Firewalled())
+                return;
+            if (isIPv6)
+                _lastTestedV6.set(0);
+            else
+                _lastTested.set(0);
+            _forceRun = isIPv6 ? FORCE_IPV6 : FORCE_IPV4;
             reschedule(5*1000);
         }
         
@@ -3304,9 +3365,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          *  Set the last-tested timer to now
          *  @since 0.9.13
          */
-        public void setLastTested() {
+        public void setLastTested(boolean isIPv6) {
             // do not synchronize - deadlock with PeerTestManager
-            _lastTested.set(_context.clock().now());
+            long now = _context.clock().now();
+            if (isIPv6)
+                _lastTestedV6.set(now);
+            else
+                _lastTested.set(now);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("PTE.setLastTested() - v6? " + isIPv6, new Exception());
         }
         
     }

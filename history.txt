@@ -1,3 +1,6 @@
+2016-06-26 zzz
+ * SSU peer testing: Add implementation (ticket #1752; proposal #126)
+
 2016-06-22 zzz
  * SSU peer testing:
    - Forget the test and don't keep retransmitting to Charlie
