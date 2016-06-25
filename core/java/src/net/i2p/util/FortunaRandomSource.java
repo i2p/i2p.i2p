@@ -13,6 +13,7 @@ import gnu.crypto.prng.AsyncFortunaStandalone;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Random;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
@@ -40,7 +41,9 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
             _fortuna.seed(seed);
         } else {
             // may block forever
-            SecureRandom sr = new SecureRandom();
+            //SecureRandom sr = new SecureRandom();
+            // SecureRandom already failed in initSeed(), so try Random
+            Random sr = new Random();
             sr.nextBytes(seed);
             _fortuna.seed(seed);
         }
