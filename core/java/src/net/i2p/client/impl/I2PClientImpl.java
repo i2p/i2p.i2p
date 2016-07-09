@@ -46,6 +46,8 @@ public class I2PClientImpl implements I2PClient {
      * This is not bound to the I2PClient, you must supply the data back again
      * in createSession().
      *
+     * Caller must close stream.
+     *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      */
@@ -58,6 +60,8 @@ public class I2PClientImpl implements I2PClient {
      * It will have a null certificate for DSA 1024/160 and KeyCertificate otherwise.
      * This is not bound to the I2PClient, you must supply the data back again
      * in createSession().
+     *
+     * Caller must close stream.
      *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
@@ -81,6 +85,8 @@ public class I2PClientImpl implements I2PClient {
      * The KeyCertificate data must be .............................
      * The padding if any will be randomized. The extra key data if any will be set in the
      * key cert.
+     *
+     * Caller must close stream.
      *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
