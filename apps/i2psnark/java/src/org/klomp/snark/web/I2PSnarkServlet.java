@@ -504,7 +504,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                       : tx));
         if (showSort)
             out.write("</a>");
-        out.write("</th>\n<th align=\"center\">");
+        out.write("</th>\n<th id=\"pagenav\" align=\"center\">");
         if (total > 0 && (start > 0 || total > pageSize)) {
             writePageNav(out, req, start, pageSize, total, noThinsp);
         }
@@ -830,7 +830,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("<a href=\"" + _contextPath);
                 out.write(getQueryString(req, null, "", null));
                 out.write("\">");
-                out.write(toThemeImg("control_rewind_blue", _t("First"), _t("First page")));
+                out.write(toThemeImg("first", _t("First"), _t("First page")));
                 out.write("</a>&nbsp;");
                 int prev = Math.max(0, start - pageSize);
                 //if (prev > 0) {
@@ -840,16 +840,16 @@ public class I2PSnarkServlet extends BasicServlet {
                     String sprev = (prev > 0) ? Integer.toString(prev) : "";
                     out.write(getQueryString(req, null, sprev, null));
                     out.write("\">");
-                    out.write(toThemeImg("control_back_blue", _t("Prev"), _t("Previous page")));
+                    out.write(toThemeImg("previous", _t("Prev"), _t("Previous page")));
                     out.write("</a>&nbsp;");
                 }
             } else {
                 out.write(
                           "<img alt=\"\" border=\"0\" class=\"disable\" src=\"" +
-                          _imgPath + "control_rewind_blue.png\">" +
+                          _imgPath + "first.png\">" +
                           "&nbsp;" +
                           "<img alt=\"\" border=\"0\" class=\"disable\" src=\"" +
-                          _imgPath + "control_back_blue.png\">" +
+                          _imgPath + "previous.png\">" +
                           "&nbsp;");
             }
             // Page count
@@ -873,7 +873,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     out.write("&nbsp;<a href=\"" + _contextPath);
                     out.write(getQueryString(req, null, Integer.toString(next), null));
                     out.write("\">");
-                    out.write(toThemeImg("control_play_blue", _t("Next"), _t("Next page")));
+                    out.write(toThemeImg("next", _t("Next"), _t("Next page")));
                     out.write("</a>&nbsp;");
                 }
                 // Last
@@ -881,15 +881,15 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("&nbsp;<a href=\"" + _contextPath);
                 out.write(getQueryString(req, null, Integer.toString(last), null));
                 out.write("\">");
-                out.write(toThemeImg("control_fastforward_blue", _t("Last"), _t("Last page")));
+                out.write(toThemeImg("last", _t("Last"), _t("Last page")));
                 out.write("</a>&nbsp;");
             } else {
                 out.write("&nbsp;" +
                           "<img alt=\"\" border=\"0\" class=\"disable\" src=\"" +
-                          _imgPath + "control_play_blue.png\">" +
+                          _imgPath + "next.png\">" +
                           "&nbsp;" +
                           "<img alt=\"\" border=\"0\" class=\"disable\" src=\"" +
-                          _imgPath + "control_fastforward_blue.png\">");
+                          _imgPath + "last.png\">");
             }
     }
     
@@ -2063,24 +2063,26 @@ public class I2PSnarkServlet extends BasicServlet {
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Add");
-        out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
+        out.write("<div class=\"addtorrentsection\">");
+        out.write("<input class=\"toggle_input\" id=\"toggle_addtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_addtorrent\">");
         out.write(toThemeImg("add"));
         out.write(' ');
         out.write(_t("Add Torrent"));
+        out.write("</label>");
 
-        out.write("</span><hr>\n<table border=\"0\"><tr><td>");
+        out.write("<hr>\n<table border=\"0\"><tr><td>");
         out.write(_t("From URL"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newURL\" size=\"85\" value=\"" + newURL + "\" spellcheck=\"false\"");
         out.write(" title=\"");
         out.write(_t("Enter the torrent file download URL (I2P only), magnet link, maggot link, or info hash"));
-        out.write("\"> \n");
+        out.write("\">\n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" class=\"add\" value=\"");
         out.write(_t("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n" +
-
                   "<tr><td>");
+
         out.write(_t("Data dir"));
         out.write(":<td><input type=\"text\" name=\"nofilter_newDir\" size=\"85\" value=\"\" spellcheck=\"false\"");
         out.write(" title=\"");
@@ -2094,17 +2096,17 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("<br></span></table>\n");
         out.write("</div></form></div>");  
     }
-    
+
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
         out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
         writeHiddenInputs(out, req, "Create");
-        out.write("<span class=\"snarkConfigTitle\">");
+        out.write("<input class=\"toggle_input\" id=\"toggle_createtorrent\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_createtorrent\">");
         out.write(toThemeImg("create"));
         out.write(' ');
         out.write(_t("Create Torrent"));
-        out.write("</span><hr>\n<table border=\"0\"><tr><td>");
+        out.write("</label><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_t("Data to seed"));
         out.write(":<td>"
@@ -2112,20 +2114,23 @@ public class I2PSnarkServlet extends BasicServlet {
                   + "\" spellcheck=\"false\" title=\"");
         out.write(_t("File or directory to seed (full path or within the directory {0} )",
                     _manager.getDataDir().getAbsolutePath() + File.separatorChar));
-        out.write("\" ><tr><td>\n");
+        out.write("\" > <input type=\"submit\" class=\"create\" value=\"");
+        out.write(_t("Create torrent"));
+        out.write("\" name=\"foo\" >");
+        out.write("<tr><td>\n");
         out.write(_t("Trackers"));
-        out.write(":<td><table style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
+        out.write(":<td><table id=\"trackerselect\" style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
         out.write(_t("Primary"));
         out.write("</td><td align=\"center\">");
         out.write(_t("Alternates"));
-        out.write("</td><td rowspan=\"0\">" +
-                  " <input type=\"submit\" class=\"create\" value=\"");
-        out.write(_t("Create torrent"));
-        out.write("\" name=\"foo\" >" +
-                  "</td></tr>\n");
+        out.write("</td><td>");
+        out.write(_t("Tracker URL"));
+        out.write("</td></tr>\n");
+
         for (Tracker t : sortedTrackers) {
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
+            String homeURL = t.baseURL;
             out.write("<tr><td>");
             out.write(name);
             out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
@@ -2135,14 +2140,18 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(" checked");
             out.write("></td><td align=\"center\"><input type=\"checkbox\" name=\"backup_");
             out.write(announceURL);
-            out.write("\" value=\"foo\"></td></tr>\n");
+            out.write("\" value=\"foo\"></td><td><a href=\"");
+            out.write(homeURL);
+            out.write("\">");
+            out.write(homeURL);
+            out.write("</a></td></tr>\n");
         }
         out.write("<tr><td><i>");
         out.write(_t("none"));
         out.write("</i></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
         if (_lastAnnounceURL == null)
             out.write(" checked");
-        out.write("></td><td></td></tr></table>\n");
+        out.write("></td><td></td><td></td></tr></table>\n");
         // make the user add a tracker on the config form now
         //out.write(_t("or"));
         //out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +

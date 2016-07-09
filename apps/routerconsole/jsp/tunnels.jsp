@@ -10,7 +10,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %><h1><%=intl._t("I2P Tunnel Summary")%></h1>
-<div class="main" id="main">
+<div class="main" id="tunnels">
  <jsp:useBean class="net.i2p.router.web.TunnelHelper" id="tunnelHelper" scope="request" />
  <jsp:setProperty name="tunnelHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% tunnelHelper.storeWriter(out); %>
