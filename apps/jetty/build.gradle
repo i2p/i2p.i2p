@@ -9,7 +9,7 @@ sourceSets {
 }
 
 dependencies {
-    ext.jettyVersion = '8.1.15.v20140411'
+    ext.jettyVersion = '8.1.17.v20150415'
     compile project(':core')
     compile 'commons-logging:commons-logging:1.0.4'
     compile 'org.eclipse.jetty.orbit:javax.servlet.jsp:2.2.0.v201112011158'
