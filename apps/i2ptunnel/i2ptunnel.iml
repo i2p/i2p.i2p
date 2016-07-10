@@ -26,5 +26,6 @@
     <orderEntry type="module" module-name="core" />
     <orderEntry type="module" module-name="ministreaming" />
     <orderEntry type="library" scope="TEST" name="junit:junit:4.12" level="application" />
+    <orderEntry type="library" name="jettylib" level="project" />
   </component>
 </module>
