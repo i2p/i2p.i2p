@@ -27,10 +27,10 @@
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
     response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
+    response.setHeader("X-Content-Type-Options", "nosniff");
 
 %>
 <%@page pageEncoding="UTF-8"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />
@@ -76,11 +76,12 @@
         %><p>No host specified</p><%
     } else {
         detail = net.i2p.data.DataHelper.stripHTML(detail);
-        i2p.susi.dns.AddressBean addr = book.getLookup();
-        if (addr == null) {
+        java.util.List<i2p.susi.dns.AddressBean> addrs = book.getLookupAll();
+        if (addrs == null) {
             %><p>Not found: <%=detail%></p><%
         } else {
-            String b32 = addr.getB32();
+            for (i2p.susi.dns.AddressBean addr : addrs) {
+                String b32 = addr.getB32();
 %>
 <jsp:setProperty name="book" property="trClass"	value="0" />
 <table class="book" cellspacing="0" cellpadding="5">
@@ -118,6 +119,9 @@
 <td><%=intl._t("Added Date")%></td>
 <td><%=addr.getAdded()%></td>
 </tr><tr class="list${book.trClass}">
+<td><%=intl._t("Validated")%></td>
+<td><%=addr.isValidated() ? intl._t("yes") : intl._t("no")%></td>
+</tr><tr class="list${book.trClass}">
 <td><%=intl._t("Source")%></td>
 <td><%=addr.getSource()%></td>
 </tr><tr class="list${book.trClass}">
@@ -142,12 +146,21 @@
 </p>
 </form>
 </div>
+<div><table><tr><td>
+<img src="/imagegen/id?s=320&amp;c=<%=addr.getB64().replace("=", "%3d")%>" width="320" height="320">
+</td><td>
+<img src="/imagegen/qr?s=320&amp;t=<%=addr.getName()%>&amp;c=http%3a%2f%2f<%=addr.getName()%>%2f%3fi2paddresshelper%3d<%=addr.getDestination()%>">
+</td></tr></table>
+<hr>
 <%
-        }
-    }
+            }  // foreach addr
+%>
+</div>
+<%
+        }  // addrs == null
+    }  // detail == null
 %>
 <div id="footer">
-<hr>
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
 </div>
 </div>

@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.io;
 
-public interface Serializer {
-	public byte[] getBytes(Object o);
-	public Object construct(byte[] b);
+public interface Serializer<T> {
+	public byte[] getBytes(T o);
+	public T construct(byte[] b);
 }

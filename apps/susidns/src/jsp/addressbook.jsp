@@ -30,10 +30,10 @@
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
     response.setHeader("Content-Security-Policy", "default-src 'self'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
+    response.setHeader("X-Content-Type-Options", "nosniff");
 
 %>
 <%@page pageEncoding="UTF-8"%>
-<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />

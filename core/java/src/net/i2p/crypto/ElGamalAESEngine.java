@@ -32,7 +32,7 @@ import net.i2p.util.SimpleByteCache;
  *
  * No, this does not extend AESEngine or CryptixAESEngine.
  */
-public class ElGamalAESEngine {
+public final class ElGamalAESEngine {
     private final Log _log;
     private final static int MIN_ENCRYPTED_SIZE = 80; // smallest possible resulting size
     private final I2PAppContext _context;

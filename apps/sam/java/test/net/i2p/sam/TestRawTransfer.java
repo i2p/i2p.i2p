@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class TestRawTransfer {
@@ -36,11 +37,8 @@ public class TestRawTransfer {
             line = reader.readLine();
             _log.info("Response from the lookup for ME: " + line);
             _log.debug("The above should be a NAMING REPLY");
-            
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+
+            Properties props = SAMUtils.parseParams(line);
             String value = props.getProperty("VALUE");
             if (value == null) {
                 _log.error("No value for ME found!  [" + line + "]");
@@ -53,10 +51,7 @@ public class TestRawTransfer {
             out.write(DataHelper.getASCII(send));
             line = reader.readLine();
             try {
-                tok = new StringTokenizer(line);
-                maj = tok.nextToken();
-                min = tok.nextToken();
-                props = SAMUtils.parseParams(tok);
+                props = SAMUtils.parseParams(line);
             } catch (Exception e) {
                 _log.error("Error parsing response line: [" + line + "]", e);
                 return;

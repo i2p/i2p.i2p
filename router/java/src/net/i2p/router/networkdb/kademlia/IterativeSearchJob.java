@@ -10,6 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -30,6 +31,7 @@ import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.SystemVersion;
+import net.i2p.util.VersionComparator;
 
 /**
  * A traditional Kademlia search that continues to search
@@ -288,6 +290,20 @@ class IterativeSearchJob extends FloodSearchJob {
     private void sendQuery(Hash peer) {
             TunnelManagerFacade tm = getContext().tunnelManager();
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(peer);
+            if (ri != null) {
+                // Now that most of the netdb is Ed RIs and EC LSs, don't even bother
+                // querying old floodfills that don't know about those sig types.
+                // This is also more recent than the version that supports encrypted replies,
+                // so we won't request unencrypted replies anymore either.
+                String v = ri.getVersion();
+                String since = SigType.EdDSA_SHA512_Ed25519.getSupportedSince();
+                if (VersionComparator.comp(v, since) < 0) {
+                    failed(peer, false);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(getJobId() + ": not sending query to old version " + v + ": " + peer);
+                    return;
+                }
+            }
             TunnelInfo outTunnel;
             TunnelInfo replyTunnel;
             boolean isClientReplyTunnel;
@@ -381,7 +397,9 @@ class IterativeSearchJob extends FloodSearchJob {
                 // if we have the ff RI, garlic encrypt it
                 if (ri != null) {
                     // request encrypted reply
-                    if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
+                    // now covered by version check above, which is more recent
+                    //if (DatabaseLookupMessage.supportsEncryptedReplies(ri)) {
+                    if (true) {
                         MessageWrapper.OneTimeSession sess;
                         if (isClientReplyTunnel)
                             sess = MessageWrapper.generateSession(getContext(), _fromLocalDest);
@@ -569,6 +587,7 @@ class IterativeSearchJob extends FloodSearchJob {
         synchronized(this) {
             if (_dead) return;
             _dead = true;
+            _success = true;
             tries = _unheardFrom.size() + _failedPeers.size();
             if (_unheardFrom.size() == 1) {
                 peer = _unheardFrom.iterator().next();

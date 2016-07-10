@@ -157,22 +157,22 @@ public abstract class TransportImpl implements Transport {
                     def *= 3;
                     break;
                 case Router.CAPABILITY_BW128:
-                    def *= 4;
+                    def *= 5;
                     break;
                 case Router.CAPABILITY_BW256:
-                    def *= 7;
-                    break;
-                case Router.CAPABILITY_BW512:
                     def *= 9;
                     break;
+                case Router.CAPABILITY_BW512:
+                    def *= 11;
+                    break;
                 case Router.CAPABILITY_BW_UNLIMITED:
-                    def *= 12;
+                    def *= 14;
                     break;
             }
 
         if (_context.netDb().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {
-            def *= 17; def /= 10;  // 425 for Class O ff
+            def *= 17; def /= 10;
         }
         // increase limit for SSU, for now
         if (style.equals("SSU"))
@@ -816,6 +816,13 @@ public abstract class TransportImpl implements Transport {
      *  @since 0.9.20
      */
     protected boolean isIPv4Firewalled() {
+        return TransportUtil.isIPv4Firewalled(_context, getStyle());
+    }
+
+    /**
+     *  @since 0.9.27
+     */
+    protected boolean isIPv6Firewalled() {
         return TransportUtil.isIPv4Firewalled(_context, getStyle());
     }
 

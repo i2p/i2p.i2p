@@ -42,6 +42,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.dht.KRPC;
@@ -127,6 +128,8 @@ public class SnarkManager implements CompleteListener {
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
     private static final String PROP_USE_DHT = "i2psnark.enableDHT";
     private static final String PROP_SMART_SORT = "i2psnark.smartSort";
+    private static final String PROP_LANG = "i2psnark.lang";
+    private static final String PROP_COUNTRY = "i2psnark.country";
 
     public static final int MIN_UP_BW = 10;
     public static final int DEFAULT_MAX_UP_BW = 25;
@@ -162,7 +165,8 @@ public class SnarkManager implements CompleteListener {
 //       ,"Exotrack", "http://blbgywsjubw3d2zih2giokakhe3o2cko7jtte4risb3hohbcoyva.b32.i2p/announce.php=http://exotrack.i2p/"
        ,"DgTrack", "http://w7tpbzncbcocrqtwwm3nezhnnsw4ozadvi2hmvzdhrqzfxfum7wa.b32.i2p/a=http://opentracker.dg2.i2p/"
        // The following is ECDSA_SHA256_P256
-       ,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/stats?mode=peer"
+       ,"TheBland", "http://s5ikrdyjwbcgxmqetxb3nyheizftms7euacuub2hic7defkh3xhq.b32.i2p/a=http://tracker.thebland.i2p/tracker/index.jsp"
+       ,"psi's open tracker", "http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/announce=http://uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p/"
     };
     
     /** URL. This is our equivalent to router.utorrent.com for bootstrap */
@@ -182,7 +186,9 @@ public class SnarkManager implements CompleteListener {
         "psi.i2p", "avviiexdngd32ccoy4kuckvc3mkf53ycvzbz6vz75vzhv4tbpk5a.b32.i2p",
         "opentracker.psi.i2p", "vmow3h54yljn7zvzbqepdddt5fmygijujycod2q6yznpy2rrzuwa.b32.i2p",
         "tracker.killyourtv.i2p", "5mpvzxfbd4rtped3c7ln4ddw52e7i7t56s36ztky4ustxtxrjdpa.b32.i2p",
-        "opendiftracker.i2p", "bikpeyxci4zuyy36eau5ycw665dplun4yxamn7vmsastejdqtfoq.b32.i2p"
+        "opendiftracker.i2p", "bikpeyxci4zuyy36eau5ycw665dplun4yxamn7vmsastejdqtfoq.b32.i2p",
+        // psi go - unregistered
+        "uajd4nctepxpac4c4bdyrdw7qvja2a5u3x25otfhkptcjgd53ioq.b32.i2p"
     }));
 
     static {
@@ -230,6 +236,8 @@ public class SnarkManager implements CompleteListener {
         _configFile = new File(_configDir, CONFIG_FILE);
         _trackerMap = new ConcurrentHashMap<String, Tracker>(4);
         loadConfig(null);
+        if (!ctx.isRouterContext())
+            Runtime.getRuntime().addShutdownHook(new Thread(new TempDeleter(_util.getTempDir()), "Snark Temp Dir Deleter"));
     }
 
     /** Caller _must_ call loadConfig(file) before this if setting new values
@@ -242,13 +250,30 @@ public class SnarkManager implements CompleteListener {
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         // only if default instance
-        if ("i2psnark".equals(_contextName))
+        if (_context.isRouterContext() && "i2psnark".equals(_contextName))
             // delay until UpdateManager is there
             _context.simpleTimer2().addEvent(new Register(), 4*60*1000);
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
         _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
         _idleChecker.schedule(5*60*1000);
+        if (!_context.isRouterContext()) {
+            String lang = _config.getProperty(PROP_LANG);
+            if (lang != null) {
+                String country = _config.getProperty(PROP_COUNTRY, "");
+                Translate.setLanguage(lang, country);
+            }
+        }
+    }
+
+    /**
+     * Only used in app context
+     * @since 0.9.27
+     */
+    private static class TempDeleter implements Runnable {
+        private final File file;
+        public TempDeleter(File f) { file = f; }
+        public void run() { FileUtil.rmdir(file, false); }
     }
 
     /** @since 0.9.4 */
@@ -385,6 +410,8 @@ public class SnarkManager implements CompleteListener {
     }
 
     private int getStartupDelayMinutes() { 
+        if (!_context.isRouterContext())
+            return 0;
         try {
 	    return Integer.parseInt(_config.getProperty(PROP_STARTUP_DELAY));
         } catch (NumberFormatException nfe) {
@@ -672,7 +699,8 @@ public class SnarkManager implements CompleteListener {
      * @return String[] -- Array of all the themes found, non-null, unsorted
      */
     public String[] getThemes() {
-            String[] themes;
+         String[] themes;
+         if (_context.isRouterContext()) {
             // "docs/themes/snark/"
             File dir = new File(_context.getBaseDir(), "docs/themes/snark");
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
@@ -686,8 +714,10 @@ public class SnarkManager implements CompleteListener {
             } else {
                 themes = new String[0];
             }
-            // return the map.
-            return themes;
+        } else {
+            themes = new String[] { "light", "ubergine", "vanilla" };
+        }
+        return themes;
     }
 
 
@@ -754,19 +784,22 @@ public class SnarkManager implements CompleteListener {
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
+                             String lang) {
         synchronized(_configLock) {
             locked_updateConfig(dataDir, filesPublic, autoStart, smartSort,refreshDelay,
                                 startDelay,  pageSize,  seedPct,  eepHost, 
                                 eepPort,  i2cpHost,  i2cpPort,  i2cpOpts,
-                                upLimit,  upBW, useOpenTrackers, useDHT,  theme);
+                                upLimit,  upBW, useOpenTrackers, useDHT,  theme,
+                                lang);
         }
     }
 
     private void locked_updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme) {
+                             String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
+                             String lang) {
         boolean changed = false;
         boolean interruptMonitor = false;
         //if (eepHost != null) {
@@ -812,7 +845,7 @@ public class SnarkManager implements CompleteListener {
             }
         }
         
-	if (startDelay != null){
+	if (startDelay != null && _context.isRouterContext()) {
 		int minutes = _util.getStartupDelay();
                 try { minutes = Integer.parseInt(startDelay.trim()); } catch (NumberFormatException nfe) {}
 	        if ( minutes != _util.getStartupDelay()) {
@@ -872,6 +905,32 @@ public class SnarkManager implements CompleteListener {
             }
 
         }
+
+	// Standalone (app context) language.
+	// lang will generally be null since it is hidden from the form if in router context.
+
+        if (lang != null && !_context.isRouterContext() &&
+            lang.length() >= 2 && lang.length() <= 6) {
+            int under = lang.indexOf('_');
+            String nlang, ncountry;
+            if (under > 0 && lang.length() > under + 1) {
+                nlang = lang.substring(0, under);
+                ncountry = lang.substring(under + 1);
+            } else {
+                nlang = lang;
+                ncountry = "";
+            }
+            String olang = _config.getProperty(PROP_LANG);
+            String ocountry = _config.getProperty(PROP_COUNTRY);
+            if (!nlang.equals(olang) || !ncountry.equals(ocountry)) {
+                changed = true;
+                _config.setProperty(PROP_LANG, nlang);
+                _config.setProperty(PROP_COUNTRY, ncountry);
+                Translate.setLanguage(nlang, ncountry);
+            }
+        }
+
+
 
 	// Start of I2CP stuff.
 	// i2cpHost will generally be null since it is hidden from the form if in router context.
@@ -1117,7 +1176,7 @@ public class SnarkManager implements CompleteListener {
     }
     
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
-    public static final int MAX_FILES_PER_TORRENT = 999;
+    public static final int MAX_FILES_PER_TORRENT = 2000;
     
     /**
      *  Set of canonical .torrent filenames that we are dealing with.
@@ -2147,7 +2206,7 @@ public class SnarkManager implements CompleteListener {
                 }
                 _magnets.remove(snark.getName());
                 removeMagnetStatus(snark.getInfoHash());
-                addMessage(_t("Metainfo received for {0}", snark.getName()));
+                //addMessage(_t("Metainfo received for {0}", snark.getName()));
                 addMessageNoEscape(_t("Starting up torrent {0}", linkify(snark)));
                 return name;
             } catch (IOException ioe) {

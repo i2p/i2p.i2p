@@ -11,6 +11,7 @@ import net.i2p.util.ConcurrentHashSet;
  *
  * @deprecated unused
  */
+@Deprecated
 class HashSetIVValidator implements IVValidator {
     private final Set<ByteArray> _received;
     

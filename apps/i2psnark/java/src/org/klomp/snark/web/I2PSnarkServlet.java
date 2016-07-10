@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +44,7 @@ import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
+import org.klomp.snark.standalone.ConfigUIHelper;
 
 /**
  *  Refactored to eliminate Jetty dependencies.
@@ -192,7 +192,10 @@ public class I2PSnarkServlet extends BasicServlet {
             return;
         }
 
-        _themePath = "/themes/snark/" + _manager.getTheme() + '/';
+        if (_context.isRouterContext())
+            _themePath = "/themes/snark/" + _manager.getTheme() + '/';
+        else
+            _themePath = _contextPath + WARBASE + "themes/snark/" + _manager.getTheme() + '/';
         _imgPath = _themePath + "images/";
         req.setCharacterEncoding("UTF-8");
 
@@ -285,10 +288,12 @@ public class I2PSnarkServlet extends BasicServlet {
         if (!isConfigure) {
             delay = _manager.getRefreshDelaySeconds();
             if (delay > 0) {
+                String jsPfx = _context.isRouterContext() ? "" : ".resources";
+                String downMsg = _context.isRouterContext() ? _t("Router is down") : _t("I2PSnark has stopped");
                 //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
-                out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
+                out.write("<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
-                          "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + _t("Router is down") + "<\\/b><\\/div>\";\n" +
+                          "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
                           "function requestAjax1() { ajax(\"" + _contextPath + "/.ajax/xhr1.html" +
                           peerString.replace("&amp;", "&") +  // don't html escape in js
                           "\", \"mainsection\", " + (delay*1000) + "); }\n" +
@@ -324,17 +329,19 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(_t("I2PSnark"));
             else
                 out.write(_contextName);
-            out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
-            out.write(_t("Forum"));
             out.write("</a>\n");
-
             sortedTrackers = _manager.getSortedTrackers();
-            for (Tracker t : sortedTrackers) {
-                if (t.baseURL == null || !t.baseURL.startsWith("http"))
-                    continue;
-                if (_manager.util().isKnownOpenTracker(t.announceURL))
-                    continue;
-                out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
+            if (_context.isRouterContext()) {
+                out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
+                out.write(_t("Forum"));
+                out.write("</a>\n");
+                for (Tracker t : sortedTrackers) {
+                    if (t.baseURL == null || !t.baseURL.startsWith("http"))
+                        continue;
+                    if (_manager.util().isKnownOpenTracker(t.announceURL))
+                        continue;
+                    out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
+                }
             }
         }
         out.write("</div>\n");
@@ -379,6 +386,7 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
+        resp.setHeader("X-Content-Type-Options", "nosniff");
     }
 
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
@@ -948,6 +956,7 @@ public class I2PSnarkServlet extends BasicServlet {
             } else
           *****/
             if (newURL != null) {
+                newURL = newURL.trim();
                 String newDir = req.getParameter("nofilter_newDir");
                 File dir = null;
                 if (newDir != null) {
@@ -1135,9 +1144,10 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean useDHT = req.getParameter("useDHT") != null;
             //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
+            String lang = req.getParameter("lang");
             _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
-                                  upLimit, upBW, useOpenTrackers, useDHT, theme);
+                                  upLimit, upBW, useOpenTrackers, useDHT, theme, lang);
             // update servlet
             try {
                 setResourceBase(_manager.getDataDir());
@@ -2192,9 +2202,19 @@ public class I2PSnarkServlet extends BasicServlet {
                   + (smartSort ? "checked " : "") 
                   + "title=\"");
         out.write(_t("If checked, ignore words such as 'the' when sorting"));
-        out.write("\" >" +
+        out.write("\" >");
 
-                  "<tr><td>");
+        if (!_context.isRouterContext()) {
+            try {
+                out.write("<tr><td>");
+                out.write(_t("Language"));
+                out.write(": <td>");
+                // class only in standalone builds
+                out.write(ConfigUIHelper.getLangSettings(_context));
+            } catch (Throwable t) {}
+        }
+
+        out.write("<tr><td>");
         out.write(_t("Theme"));
         out.write(": <td><select name='theme'>");
         String theme = _manager.getTheme();
@@ -2228,12 +2248,14 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("</select><br>" +
 
                   "<tr><td>");
-        out.write(_t("Startup delay"));
-        out.write(": <td><input name=\"startupDelay\" size=\"4\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
-        out.write(_t("minutes"));
-        out.write("<br>\n" +
+        if (_context.isRouterContext()) {
+            out.write(_t("Startup delay"));
+            out.write(": <td><input name=\"startupDelay\" size=\"4\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
+            out.write(_t("minutes"));
+            out.write("<br>\n" +
 
-                  "<tr><td>");
+                      "<tr><td>");
+        }
         out.write(_t("Page size"));
         out.write(": <td><input name=\"pageSize\" size=\"4\" maxlength=\"6\" class=\"r\" value=\"" + _manager.getPageSize() + "\"> ");
         out.write(_t("torrents"));
@@ -2271,11 +2293,12 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"4\" maxlength=\"4\" > KBps <i>");
         out.write(_t("Half available bandwidth recommended."));
-        out.write(" [<a href=\"/config.jsp\" target=\"blank\">");
-        out.write(_t("View or change router bandwidth"));
-        out.write("</a>]</i><br>\n" +
-        
-                  "<tr><td>");
+        if (_context.isRouterContext()) {
+            out.write(" [<a href=\"/config.jsp\" target=\"blank\">");
+            out.write(_t("View or change router bandwidth"));
+            out.write("</a>]</i>");
+        }
+        out.write("<br>\n<tr><td>");
         out.write(_t("Use open trackers also"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
@@ -2350,7 +2373,7 @@ public class I2PSnarkServlet extends BasicServlet {
                   "<tr><td colspan=\"2\">&nbsp;\n" +  // spacer
                   "</table></div></div></form>");
     }
-    
+
     /** @since 0.9 */
     private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
         StringBuilder buf = new StringBuilder(1024);

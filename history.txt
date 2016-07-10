@@ -1,3 +1,509 @@
+2016-06-26 zzz
+ * SSU peer testing: Add implementation (ticket #1752; proposal #126)
+
+2016-06-22 zzz
+ * SSU peer testing:
+   - Forget the test and don't keep retransmitting to Charlie
+     if we receive the Bob reply after the 2nd Charlie reply
+   - Only fire a peer test on connection if address has changed
+
+2016-06-16 zzz
+ * Console: Split up configclients, add configi2cp,
+   configplugins, configwebapps (ticket #1804)
+
+2016-06-15 zzz
+ * Utils: Add method to set language in standalone app context
+ * i2psnark:
+   - Add form to set language in standalone context
+   - Add Ukrainian and Japanese translations
+
+2016-06-11 zzz
+Prop from i2p.i2p.zzz.test2:
+ * CPUID: Add CLI output for new AMD tests
+ * i2psnark standalone (ticket #1191):
+   - Cherry-pick fixes from psi's github i2psnark_rpc branch
+   - Fix up Jetty XML file for Jetty 8
+   - Start with JettyStart
+   - Add UrlLauncher to launch browser
+   - Fix up paths in CSS files during build
+   - Force startup delay to 0
+   - Fix theme selection
+   - Adjust CSS and image paths
+   - Add shutdown hook to delete temp dir
+ * i2ptunnel CLI: Don't set the listen host to the I2CP host
+ * jbigi:
+   - Fix GMP version reporting for shared library (ticket #1800)
+   - mbuild-all script fixes
+ * NetDB: Improve handling of deferred search result jobs
+
+* 2016-06-07 0.9.26 released
+
+2016-06-03 zzz
+ * Update translations from Transifex
+
+2016-06-01 zzz
+ * Build: Fix Debian build on ARM (ticket #1801)
+
+2016-05-29 zzz
+ * Console: Fix /configfamily form (ticket #1797)
+
+2016-05-29 str4d
+ * CertUtil: Dynamically load javax.naming classes to avoid
+   VerifyErrors on some Androids
+ * LogWriter: Dynamically load Android writer
+
+2016-05-26 zzz
+ * Build: Launchpad build fixes
+
+2016-05-25 zzz
+ * DesktopGui: Add monochrome icons for Windows and Mac
+ * Reseed:
+   - Require two sources minimum (ticket #1794)
+   - Update list of sources requiring SNI
+ * Translations: Update English po files
+
+2016-05-22 str4d
+ * I2CP: Dynamically load Android domain socket code
+
+2016-05-20 zzz
+ * DesktopGui:
+   - Fix systray menu redraw on Mac;
+   - Switch to AWT by default on Mac;
+   - Hide DTG enable on Mac until we fix dock
+
+2016-05-19 zzz
+ * Config files, eepsite help: Add path information for OS X
+   and Windows as a service. (ticket #1495)
+
+2016-05-12 zzz
+ * NTP:
+   - Don't put random data in zeroed fields
+   - Increase random data in originate timestamp from 1 byte to 2 bytes
+   - Verify originate timestamp to prevent injection
+   - Verify received packet size
+ * SSU:
+   - If configured with a hostname, bind to all v4/v6
+     addresses found for that hostname.
+   - Fix binding if more than one IP or host was configured.
+
+2016-05-09 zzz
+ * Console:
+   - Fix escaping of search URLs on /confighome
+   - Fix HTML error on /configui
+ * DesktopGui: Add 9 new translations
+ * i2psnark: Limit cases when we display tracker errors;
+   include host name of tracker when we do
+
+2016-05-08 zzz
+ * Console: Fix UTF-8 passwords, partial fix for usernames
+
+2016-05-07 zzz
+ * Build:
+   - Add DTG to updater
+   - Fix and bundle DTG license info
+   - Remove jstl.jar and standard.jar from updater,
+     last changed in 0.9
+   - Fix bundling of Tomcat license info
+   - Add back the old way to build bundles for gettext < 0.19
+ * Console:
+   - Change to new DTG constructor
+   - Don't attempt to start systray or DTG when running as a service
+   - Show systray controls for all OSes on /configservice
+   - Implement backend for systray control
+ * DesktopGui:
+   - Implement second TrayManager menu implementation in Swing.
+   - Use Swing except on Windows
+   - Hide restart menu items if no wrapper
+   - Add graceful restart and shutdown menu items
+   - Add basic adjustment of menu based on shutdown state
+   - Disable wrapper notification for now
+   - Remove Swing DesktopguiConfigurationFrame,
+     move to a submenu.
+   - Remove LookAndFeel setting
+   - Make Main class a RouterApp
+   - Remove all static log, context, and instance fields
+   - Remove unused ConfigurationManager class
+   - Translate tooltip, disable tooltip on linux
+   - Use safer exec call to start i2p
+   - Remove all images, use itoopie
+   - Don't start spinner thread in router context
+   - Handle various startup errors better
+   - Synchs, finals, javadocs, cleanups
+
+2016-05-04 zzz
+ * i2prouter: Set JAVA_HOME correctly on Mac OS X 10.5 and later (ticket #1783)
+ * Utils: Fix bug in periodic timers triggered by
+   a backwards clock shift, caused graphs to be blank
+   and various router, streaming, and i2ptunnel
+   degradations over time (tickets #1702, #1776)
+ * Wrapper: Update to wrapper 3.5.29, except for Windows.
+   Fixes wrapper failure on FreeBSD 10 (ticket #1118)
+
+2016-05-01 zzz
+ * Build: Compile resource bundles from ant, not msgfmt,
+   speeding up builds with translations by 20x
+ * Debian: Back out libhttpclient-java dependency,
+   requires 4.4 which is too recent for most distros
+
+2016-04-30 zzz
+ * Blocklist: Add RFC 6598 addresses
+ * Console:
+   - Only display cpuid information on x86
+   - Readme page link fixes (tickets #1789, #1790)
+ * Data: Fix NPE calculating the hash of a RI of unknown sig type
+ * Debian:
+   - Add runtime dependency on libhttpclient-java,
+     link to /usr/share/java/httpclient.jar and httpcore.jar
+ * Eepsite: comment out gzip filtering in cgi context,
+   causes hung threads, root cause unknown
+ * Router: Reduce log level of RI sig failure
+ * SAM: Log tweaks (ticket #1778)
+
+2016-04-29 zzz
+ * Debian:
+   - Add runtime dependency on gettext-base,
+     link to /usr/share/java/libintl.jar
+   - Add runtime dependency on libgetopt-java,
+     link to /usr/share/java/gnu-getopt.jar
+ * SysTray:
+   - Remove systray4j.jar from linux installers
+   - Move SysTray.java to SysTrayImpl.java
+   - New SysTray.java that instantiates SysTrayImpl
+     by reflection, so the SysTrayImpl.java source is optional
+   - Remove systray4j.jar, systray4j.dll, and SysTrayImpl.java
+     from Debian source packages
+   - Remove systray4j.jar from Debian binary packages
+ * Update: Enable libjbigi update for ARM
+
+2016-04-28 zzz
+ * News: Parse and store CRLs in news feed
+
+2016-04-28 zzz
+Prop from i2p.i2p.zzz.gmp6-prop:
+ * CPUID:
+   - Added source of CPUID information
+   - Made CPUIDCPUInfo non-abstract to support looking for
+     CPU features during CPU identification
+   - Add support for extended feature registers EBX/ECX
+   - No such thing as EBX for 0x80000001 call; remove getExtendedEBXCPUFlags(),
+     replaced with getExtendedEBXFeatureFlags()
+   - Check for support of 6 required Core i3/i5/i7 instructions to enable Haswell,
+     since GMP Haswell requires Core i3/i5/i7 support.
+     There are Pentium/Celeron Haswells that do not support these instructions.
+   - Added AVX, AVX2, AVX512, TBM, ADX, BMI1, BMI2, MOVBE, FMA3 feature detection
+   - More diagnostic output in CPUID.main()
+   - More javadocs
+   - Only call getCPUVendorID() once in getInfo()
+   - Recognize Skylake
+   - Do the same checks for Broadwell and Skylake that we do for
+     Haswell, and check ADX as well, which will be used in GMP 6.1
+ * Crypto:
+   - Use constant time modPow() for signing and decryption
+   - Use native modInverse()
+ * libjbigi:
+   - Added nativeJbigiVersion(), nativeGMPMajorVersion(),
+     nativeGMPMinorVersion(), nativeGMPPatchVersion(),
+     nativeModInverse(), nativeModPowCT()
+   - Support negative vaules in conversion functions
+   - Support negative base value in modPow()
+   - Throw ArithmeticException for bad arguments rather than crashing
+   - New build targets
+   - Drop 32-bit corei libs where they are identical to the
+     core2 lib, since we now have a generic fallback in NBI:
+     libjbigi-freebsd-corei.so, libjbigi-linux-corei.so,
+     libjbigi-osx-corei.jnilib
+   - Revamped downloading of gmp files
+   - Revamped cross-compilation support
+   - Added 'osx' alias for darwin
+   - Added FreeBSD cross-compilation instructions
+   - Removed NetBSD, kFreeBSD, Solaris, OpenBSD binaries
+   - Added coreihwl, coreisbr, bulldozer, steamroller,
+     cortex a9, and cortex a15 support
+   - Rebuilt all binaries with GMP 6.0.0a
+ * libjcpuid:
+   - Add nativeJcpuidVersion()
+   - Clear ECX register to ensure it will work with EAX=7
+   - Added jcpuid build instructions for linux/osx/freebsd/windows
+   - Improved build script
+   - Imported Microsoft Visual Studio Community 2015 project files.
+   - Fixed OSX include search path
+   - Rebuilt all binaries
+ * NativeBigInteger:
+   - Version reporting
+   - Total redesign of fallback code
+   - core2 is always a fallback for corei, and
+     core2_64 is always a fallback for corei_64
+   - Remove special case for core2/corei in getMiddleName2()
+     since it's now a fallback in getResourceList()
+   - Added support for new CPUs:
+     Intel Sandy Bridge, Haswell and Broadwell;
+     AMD Bulldozer, Piledriver, Steamroller, Excavator and Jaguar;
+     ARM Cortex A5/A7/A8/A9/A15; ARM A12/A17 using the A15 libs
+   - Test improvements:
+     Output versions; Only warmup crypto once;
+     Add -n option to test native only;
+     Reduce output if only native or only Java tested;
+     Try to prevent not-coprime errors
+
+2016-04-26 zzz
+ * Addressbook:
+   - Finish implementation of signed actions
+   - Move HostTxtEntry to net.i2p.client.naming for use by i2ptunnel
+   - Add tests for Daemon to read local subscription file
+   - Store last-modified date
+   - Logging cleanups and consolidation
+ * Blockfile: Remove unused code and classes
+ * BlockfileNamingService:
+   - Implementation and fixes for new API methods
+   - Add support for long property values, backward compatbile, no version bump
+ * DataHelper: Properties methods cleanup
+ * i2ptunnel:
+   - New page for registration authentication
+   - Remove old, unused hostname signature generation
+ * NamingService: Add new API methods for reverseLookupAll()
+ * PrivateKeyFile:
+   - Add InputStream constructor for i2ptunnel
+   - Ensure initialization before returning private keys
+ * SusiDNS:
+   - Display signature validation on details page
+   - Add support for multiple dests per hostname
+
+2016-04-20 zzz
+ * Addressbook:
+   - Add sign/verify methods for inner signature
+   - Add preliminary handling of incoming actions
+ * Blockfile:
+   - Add generics
+   - Add method to change serialization schema for a skiplist
+   - Fix delIndex() method
+ * BlockfileNamingService:
+   - New database version 4, for multiple destinations per hostname
+   - Disallow database version higher than supported
+ * NamingService: Add new API methods for multiple Destinations per hostname
+
+2016-04-17 zzz
+ * Addressbook:
+   - Several cleanups and refactoring
+   - Add initial support for signatures in subscriptions
+   - Fix main-class in addressbook.jar
+   - Fix corrupted manifest in addressbook.jar
+ * Build: Fix broken build from scratch in jetty build.xml
+ * Console:
+   - Add JSTL version to /logs
+   - Update version warnings
+   - Add OpenJDK check for ARM
+ * PrivateKeyFile: Add method to specify sig type on creation
+ * SingleFileNamingService: Store signature properties on write
+ * TunnelId: Add max value check
+
+2016-04-13 zzz
+ * SOCKS: Fix NPE on lookup failure in SOCKS 4a
+
+2016-04-07 zzz
+ * Debian builds:
+   - Prep for depending on tomcat packages
+   - Minor fixes
+
+2016-04-04 zzz
+ * Debian builds:
+   - Depend on glassfish-javaee for JSTL 1.2 by default
+
+2016-04-03 zzz
+ * Debian builds:
+   - Add build options to depend on various packages
+   - Depend on geoip-database and libjetty8-java by default
+   - Add debian-alt directory with configurations for alternate series
+   - Prep for depending on additional packages
+   - Improvements in ant debian build targets
+ * Transport:
+   - Add library to read standard Maxmind geoip database format
+   - Use system Maxmind geoip files if available
+
+* 2016-03-22 0.9.25 released
+
+2016-03-14 zzz
+ * Console: Replace pastethis with zerobin
+ * Peer selection: Don't truncate data used for random slice
+ * Router: Fix corner cases maintaining local leasesets (ticket #1768)
+ * Susimail: Fix NPE
+ * UPnP: Fix NPE in HTML output on /peers (ticket #1779)
+
+2016-03-01 zzz
+ * i2psnark: Fix handling of HAVE messages received before metainfo
+ * i2ptunnel: Don't default to a private key file that exists (ticket #1628)
+ * NetDb:
+   - Search for new leaseset before expiration;
+   - Reduce expiration for router infos with introducers
+   - Add missing reseed cert
+ * SSU: Switch introducers less often
+
+2016-02-26 zzz
+ * Console:
+   - Add X-Content-Type-Options header everywhere (ticket #1763)
+   - Don't display error after clicking restart on /graph page (ticket #1582)
+ * i2ptunnel:
+   - Fix default shouldBundleReplyInfo for non-HTTP servers
+   - Fix display of hostname signature
+   - Add QR code generation
+ * Router: Log full path to wrapper.log when dumping threads
+ * Transports: Increase connection limits for class N and higher
+ * Utils: Add main classes to i2p.jar and router.jar
+   for simple command line access to utilities
+
+2016-02-22 zzz
+ * Console: Improve news CSS (ticket #1710)
+ * Crypto: Blacklist certificates by SHA1 hash, not by serial/CN/OU
+ * I2CP: Improve client error message when internal router connection fails 
+ * Graphs: Increase font size
+ * Transports: Increase default max inbound bandwidth,
+   increase minimum in/out bandwidths
+
+2016-02-19 zzz
+ * Clock: Add sanity checks to detect invalid system clock
+
+2016-02-18 zzz
+ * Console: Clean up display and form handling
+   for specifying a fixed host name or IP on /confignet
+ * Crypto: Add utilities for loading CRLs from disk;
+   check for revocation when reading in certificates
+ * Transport:
+   - Implement mayDisconnect() for outbound connections also,
+     use when publishing RI directly to floodfill
+   - Run SSU idle disconnect check faster if floodfill or near connection limit
+ * NetDB: Fix bug publishing router info too often
+
+2016-02-17 zzz
+ * i2psnark: Increase max files per torrent to 2000
+ * I2PTunnel: Improve layout of blacklist radio buttons
+ * Router: Switch to new lease sooner before expiration
+ * SAM: Don't log an error on datagram send success
+
+2016-02-13 zzz
+ * I2PTunnel:
+   - Add options to block by referer and user-agent
+   - Log blocked destinations in b32, not b64
+ * Imagegen: Add text to QR codes
+
+2016-02-10 zzz
+ * Crypto: Use new internal key generation instead of calling
+   out to keytool; save CRL for new su3 amd family keys
+
+2016-02-09 zzz
+ * Crypto: Fix raw (su3) signing, broken in test2 prop (-2)
+
+2016-02-08 zzz
+ * BOB: Fix invalid output after getnick (ticket #1204)
+ * SAM v3.3:
+   - Add support for MASTER sessions
+   - Add support for per-packet optins SEND_TAGS, TAG_THRESHOLD, EXPIRES, and SEND_LEASESET
+   - Refactoring and cleanups
+   - Client test enhancements
+   - Fix bug receiving datagrams on v3 sessions with UTF-8 session IDs
+
+2016-02-03 zzz
+Prop from i2p.i2p.zzz.test2:
+ * Build: More checks in release target
+ * Console:
+   - New /configfamily for export/import and setup (ticket #1510)
+   - Custom icons for non-webapp plugins (ticket #1550)
+   - Add secure.thethinhat.i2p to console home page and hosts.txt
+ * Crypto:
+   - Implement EdDSA key encoding and decoding (ticket #1723, github issue #13)
+   - Fix I2P crypto provider and add it
+   - Specify I2P provider in keytool arguments when necessary
+   - Add EdDSA key generator support to provider
+   - Synch fix in EdDSA (github issue #10)
+   - Add hashCode() and equals() everywhere it was missing in EdDSA
+   - Put unknown class name in EdDSA exceptions
+   - Implement one-shot methods in EdDSA so we don't copy
+     the data if all the data is available (ticket #1750)
+   - Fix API violation if EdDSA signing object is reused (ticket #1750)
+   - Add ElGamal classes, from Bouncy Castle 1.53, for provider
+   - Implement Java ElGamal keys built on the BC classes
+   - Add KeyFactory and KeyPairGenerator for ElGamal
+   - Add ElGamal signature implementation, to be reviewed
+   - KeyGenerator: Check that dsax is greater than zero
+   - SHA256Generator: Don't fall back to Sha256Standalone,
+     SHA-256 support must now be in the JRE.
+     Deprecate all uses of Sha256Standalone, schedule for removal.
+     This will require a new Syndie release.
+   - New utils to support private key import/export
+   - Add support for CRL generation and export
+   - Consolidate PEM encoding
+   - Improve ASN.1 signature encoding/decoding utilities
+   - New selfsigned key and cert generator,
+     to be hooked in to KeyStoreUtil to replace keytool.
+   - Add EdDSA_SHA512_Ed25519ph sig type
+   - Add OIDs to sig types
+ * I2PTunnel: Fix exception message choice that was backwards
+   for router/non-router context
+ * Jetty: Add gzip filter to eepsite Jetty (new installs only)
+ * Random: Don't bother trying to seed from /dev/urandom on Windows
+ * Router: Make network ID configurable
+ * Utils: New ArraySet implementation
+
+2016-02-01 zzz
+ * Imagegen:
+   - Return 403 if no code specified in QR or RA
+   - Mode parameter for html or text in RA
+   - Set RA text-mode character encoding
+   - Fix up test page
+
+2016-02-01 zzz
+Prop from i2p.i2p.zzz.imagegen:
+ * Console:
+   - New imagegen webapp, including servlets for identicons, QR codes,
+     and random art. Bundles a small part of zxing, most of identicon,
+     and a rewrite of randomart from gnutls (ticket #1652)
+   - Add identicons to sybil page.
+ * i2ptunnel: Add identicons to i2ptunnel address helper conflict page.
+     Clean up text on the conflict page for readability.
+ * SusiDNS:
+   - Display QR and identicon images on details page
+   - Fix title whitespace
+
+* 2016-01-27 0.9.24 released
+
+2016-01-27 zzz
+ * SocksHeader: Fix arraycopy argument order
+ * SSU: Fix minimum version for extended options
+
+2016-01-20 zzz
+ * SusiDNS: Replace image (ticket #1301)
+
+2016-01-17 zzz
+ * BuildHandler: Disable tunnel removal on next-hop timeout
+ * Console:
+   - Fix mime type for svg in themes directory
+   - Add zh_TW translation
+ * Fortuna: Add getByte() method
+ * i2psnark: add opendocument mime types
+ * i2ptunnel: Remove unused stats
+ * Utils: Move CachedIteratorArrayList from core to router
+
+2016-01-13 zzz
+ * BuildHandler: More early-disconnect cases
+ * Family: Add i2p-dev cert
+
+2016-01-10 zzz
+ * Tunnels: Fix build request Bloom filter (ticket #1746)
+
+2016-01-07 zzz
+ * Console: Fixed summary bar overflow (ticket #1739)
+
+2016-01-06 zzz
+ * Build: Remove big geoip files from release again
+ * Console: Properly register listen hosts with PortMapper
+ * DataHelper: Optimize checks in storeProps()
+ * I2PTunnel: Fixup console links in error pages if console is
+   on a non-standard host or port, or on https
+ * Jetty: Change default source logging from b64 to b32.
+   To change back to b64, add the following to the RequestLogImpl
+   section of jetty.xml: <Set name="b64">true</Set>
+ * NetDB: Don't query floodfills if they are too old to
+   support sig types or encrypted replies (ticket #1742)
+ * PortMapper: Add method to convert wildcard host to actual host
+
 2015-12-21 zzz
  * SSU: Hand all messages pending after establishment to the
    outbound queue at once, for efficiency.
@@ -6,7 +512,7 @@
 2015-12-20 zzz
  * BuildHandler: Additional fixes (ticket #1738)
  * CertUtil: Add methods to export private keys
- * Console: Sybil tool enhancementsrivate keys
+ * Console: Sybil tool enhancements
  * Transports:
    - Disconnect faster when first message is a
      tunnel build request which we reject
@@ -96,12 +602,12 @@
    - Increase max peers and uploaders per torrent
    - Increase default max total uploaders
    - Increase max peers sent and returned in DHT
-* SAM:
+ * SAM:
    - Don't map keys to upper case in parser, corrupts I2CP options
    - Register SSL and UDP ports with PortMapper
-* SSU: Allow IP and port in relay request if it matches the source
-* Transport: Interrupt DH refiller thread when pool is empty,
-  to speed refilling and reduce pumper stalls
+ * SSU: Allow IP and port in relay request if it matches the source
+ * Transport: Interrupt DH refiller thread when pool is empty,
+   to speed refilling and reduce pumper stalls
 
 2015-11-30 zzz
  * SAM:
@@ -173,7 +679,7 @@ Prop from i2p.i2p.zzz.test2:
  * SSU:
    - Support extended options
    - Add support for requesting a relay tag via
-     Session Request extended options (ticket #1465)
+     Session Request extended options (tickets #1465, #1656)
  * Tunnels:
    - Locking fixes
    - Don't set stats in our own profile

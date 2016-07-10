@@ -10,6 +10,7 @@ import net.i2p.data.Hash;
  *
  * @deprecated unused
  */
+@Deprecated
 class RouterDoSThrottle extends RouterThrottleImpl {
     public RouterDoSThrottle(RouterContext context) {
         super(context);

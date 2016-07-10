@@ -204,6 +204,7 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.participantLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
         // following is for BuildMessageProcessor
         ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.buildRequestBadReplyKey", "Build requests with bad reply keys", "Tunnels", new long[] { 60*60*1000 });
         // following are for FragmentHandler
         ctx.statManager().createRateStat("tunnel.smallFragments", "How many pad bytes are in small fragments?", 
                                               "Tunnels", RATES);
@@ -450,8 +451,8 @@ public class TunnelDispatcher implements Service {
     public void remove(TunnelCreatorConfig cfg) {
         if (cfg.isInbound()) {
             TunnelId recvId = cfg.getConfig(cfg.getLength()-1).getReceiveTunnel();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing our own inbound " + cfg);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("removing our own inbound " + cfg);
             TunnelParticipant participant = _participants.remove(recvId);
             if (participant == null) {
                 _inboundGateways.remove(recvId);
@@ -469,8 +470,8 @@ public class TunnelDispatcher implements Service {
                 }
             }
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing our own outbound " + cfg);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("removing our own outbound " + cfg);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
             TunnelGateway gw = _outboundGateways.remove(outId);
             if (gw != null) {
@@ -497,8 +498,8 @@ public class TunnelDispatcher implements Service {
         
         boolean removed = (null != _participatingConfig.remove(recvId));
         if (removed) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("removing " + cfg /* , new Exception() */ );
+            if (_log.shouldLog(Log.INFO))
+                _log.info("removing " + cfg /* , new Exception() */ );
         } else {
             // this is normal, this can get called twice
             if (_log.shouldLog(Log.DEBUG))
@@ -603,7 +604,7 @@ public class TunnelDispatcher implements Service {
                            + " messageId " + msg.getUniqueId()
                            + "/" + msg.getMessage().getUniqueId()
                            + " messageType: " + msg.getMessage().getClass().getSimpleName()
-                           + " existing = " + _inboundGateways.size(), new Exception("source"));
+                           + " existing = " + _inboundGateways.size());
         }
         
         //long dispatchTime = _context.clock().now() - before;
@@ -948,6 +949,7 @@ public class TunnelDispatcher implements Service {
     }
     
     /** @deprecated moved to router console */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {}    
     
     /**

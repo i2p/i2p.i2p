@@ -24,6 +24,7 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
      * list of Destination objects that we point at
      * @deprecated why protected? Is anybody using out-of-tree? Protected from the beginning (2004)
      */
+    @Deprecated
     protected List<Destination> dests;
 
     /**

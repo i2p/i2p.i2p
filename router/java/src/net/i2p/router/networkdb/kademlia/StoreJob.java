@@ -562,9 +562,12 @@ class StoreJob extends JobImpl {
         private final TunnelInfo _sendThrough;
         private final int _msgSize;
         
+        /** direct */
         public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer) {
             this(enclosingContext, peer, null, 0);
         }
+
+        /** through tunnel */
         public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer, TunnelInfo sendThrough, int size) {
             super(enclosingContext);
             _peer = peer;
@@ -596,6 +599,10 @@ class StoreJob extends JobImpl {
                 for (int i = 0; i < _sendThrough.getLength(); i++)
                     getContext().profileManager().tunnelDataPushed(_sendThrough.getPeer(i), howLong, _msgSize);
                 _sendThrough.incrementVerifiedBytesTransferred(_msgSize);
+            }
+            if (_sendThrough == null) {
+                // advise comm system, to reduce lifetime of direct connections to floodfills
+                getContext().commSystem().mayDisconnect(_peer.getHash());
             }
             
             if (_state.getCompleteCount() >= getRedundancy()) {

@@ -37,6 +37,7 @@ public class I2PSocketManagerFactory {
      *  Ignored since 0.9.12, cannot be changed via properties.
      *  @deprecated
      */
+    @Deprecated
     public static final String PROP_MANAGER = "i2p.streaming.manager";
 
     /**

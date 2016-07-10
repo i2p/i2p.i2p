@@ -62,6 +62,7 @@ public class ArgumentList extends Vector<Argument>
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	public void set(ArgumentList inArgList)
 	{
 		int nInArgs = inArgList.size();

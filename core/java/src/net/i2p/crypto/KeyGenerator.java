@@ -15,6 +15,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.ProviderException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -34,6 +35,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.eddsa.EdDSAPrivateKey;
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
+import net.i2p.crypto.provider.I2PProvider;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
@@ -55,8 +57,12 @@ import net.i2p.util.RandomSource;
 /** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
  */
-public class KeyGenerator {
+public final class KeyGenerator {
     private final I2PAppContext _context;
+
+    static {
+        I2PProvider.addProvider();
+    }
 
     public KeyGenerator(I2PAppContext context) {
         _context = context;
@@ -208,10 +214,10 @@ public class KeyGenerator {
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         BigInteger x = null;
 
-        // make sure the random key is less than the DSA q
+        // make sure the random key is less than the DSA q and greater than zero
         do {
             x = new NativeBigInteger(160, _context.random());
-        } while (x.compareTo(CryptoConstants.dsaq) >= 0);
+        } while (x.compareTo(CryptoConstants.dsaq) >= 0 || x.equals(BigInteger.ZERO));
 
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
         keys[0] = new SigningPublicKey();
@@ -411,19 +417,30 @@ public class KeyGenerator {
         else
             System.out.println(type + " private-to-public test FAILED");
         //System.out.println("privkey " + keys[1]);
+          MessageDigest md = type.getDigestInstance();
         for (int i = 0; i < runs; i++) {
             RandomSource.getInstance().nextBytes(src);
+              md.update(src);
+              byte[] sha = md.digest();
+              SimpleDataStructure hash = type.getHashInstance();
+              hash.setData(sha);
             long start = System.nanoTime();
             Signature sig = DSAEngine.getInstance().sign(src, privkey);
+            Signature sig2 = DSAEngine.getInstance().sign(hash, privkey);
             if (sig == null)
                 throw new GeneralSecurityException("signature generation failed");
+            if (sig2 == null)
+                throw new GeneralSecurityException("signature generation (H) failed");
             long mid = System.nanoTime();
             boolean ok = DSAEngine.getInstance().verifySignature(sig, src, pubkey);
+            boolean ok2 = DSAEngine.getInstance().verifySignature(sig2, hash, pubkey);
             long end = System.nanoTime();
             stime += mid - start;
             vtime += end - mid;
             if (!ok)
                 throw new GeneralSecurityException(type + " V(S(data)) fail");
+            if (!ok2)
+                throw new GeneralSecurityException(type + " V(S(H(data))) fail");
         }
         stime /= 1000*1000;
         vtime /= 1000*1000;

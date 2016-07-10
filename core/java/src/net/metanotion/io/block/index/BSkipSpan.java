@@ -59,19 +59,19 @@ import net.i2p.util.Log;
  *     next overflow page (unsigned int)
  *</pre>
  */
-public class BSkipSpan extends SkipSpan {
+public class BSkipSpan<K extends Comparable<? super K>, V> extends SkipSpan<K, V> {
 	protected static final int MAGIC = 0x5370616e;  // "Span"
 	protected static final int HEADER_LEN = 20;
 	public static final int CONT_HEADER_LEN = 8;
 	protected final BlockFile bf;
-	private final BSkipList bsl;
+	private final BSkipList<K, V> bsl;
 	protected int page;
 	protected int overflowPage;
 
 	protected int prevPage;
 	protected int nextPage = 0;
-	protected Serializer keySer;
-	protected Serializer valSer;
+	protected Serializer<K> keySer;
+	protected Serializer<V> valSer;
 
 	// I2P
 	protected int spanSize;
@@ -88,11 +88,11 @@ public class BSkipSpan extends SkipSpan {
 	}
 
 	@Override
-	public SkipSpan newInstance(SkipList sl) {
+	public SkipSpan<K, V> newInstance(SkipList<K, V> sl) {
 		try {
 			int newPage = bf.allocPage();
 			init(bf, newPage, bf.spanSize);
-			return new BSkipSpan(bf, (BSkipList) sl, newPage, keySer, valSer);
+			return new BSkipSpan<K, V>(bf, (BSkipList<K, V>) sl, newPage, keySer, valSer);
 		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
 
@@ -237,7 +237,8 @@ public class BSkipSpan extends SkipSpan {
 		//bsl.flush();
 	}
 
-	private static void load(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+	private static <X extends Comparable<? super X>, Y> void load(BSkipSpan<X, Y> bss, BlockFile bf, BSkipList<X, Y> bsl,
+	                                                   int spanPage, Serializer<X> key, Serializer<Y> val) throws IOException {
 		loadInit(bss, bf, bsl, spanPage, key, val);
 		bss.loadData();
 	}
@@ -246,7 +247,8 @@ public class BSkipSpan extends SkipSpan {
 	 * I2P - first half of load()
 	 * Only read the span headers
 	 */
-	protected static void loadInit(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+	protected static <X extends Comparable<? super X>, Y> void loadInit(BSkipSpan<X, Y> bss, BlockFile bf, BSkipList<X, Y> bsl,
+	                                                         int spanPage, Serializer<X> key, Serializer<Y> val) throws IOException {
 		if (bss.isKilled)
 			throw new IOException("Already killed!! " + bss);
 		bss.page = spanPage;
@@ -285,11 +287,12 @@ public class BSkipSpan extends SkipSpan {
 	 * Load the whole span's keys and values into memory
 	 * @param flushOnError set to false if you are going to flush anyway
 	 */
+	@SuppressWarnings("unchecked")
 	protected void loadData(boolean flushOnError) throws IOException {
 		if (isKilled)
 			throw new IOException("Already killed!! " + this);
-		this.keys = new Comparable[this.spanSize];
-		this.vals = new Object[this.spanSize];
+		this.keys = (K[]) new Comparable[this.spanSize];
+		this.vals = (V[]) new Object[this.spanSize];
 
 		int ksz, vsz;
 		int curPage = this.page;
@@ -327,7 +330,7 @@ public class BSkipSpan extends SkipSpan {
 				break;
 			}
 //			System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
-			this.keys[i] = (Comparable) this.keySer.construct(k);
+			this.keys[i] = this.keySer.construct(k);
 			this.vals[i] = this.valSer.construct(v);
 			// Drop bad entry without throwing exception
 			if (this.keys[i] == null || this.vals[i] == null) {
@@ -377,31 +380,31 @@ public class BSkipSpan extends SkipSpan {
 		}
 	}
 
-	protected BSkipSpan(BlockFile bf, BSkipList bsl) {
+	protected BSkipSpan(BlockFile bf, BSkipList<K, V> bsl) {
 		this.bf = bf;
 		this.bsl = bsl;
 	}
 
-	public BSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+	public BSkipSpan(BlockFile bf, BSkipList<K, V> bsl, int spanPage, Serializer<K> key, Serializer<V> val) throws IOException {
 		this.bf = bf;
 		this.bsl = bsl;
 		BSkipSpan.load(this, bf, bsl, spanPage, key, val);
 		this.next = null;
 		this.prev = null;
 
-		BSkipSpan bss = this;
+		BSkipSpan<K, V> bss = this;
 		// findbugs ok (set in load() above)
 		int np = nextPage;
 		while(np != 0) {
-			BSkipSpan temp = bsl.spanHash.get(Integer.valueOf(np));
+			BSkipSpan<K, V> temp = bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.next = temp;
 				break;
 			}
-			bss.next = new BSkipSpan(bf, bsl);
+			bss.next = new BSkipSpan<K, V>(bf, bsl);
 			bss.next.next = null;
 			bss.next.prev = bss;
-			bss = (BSkipSpan) bss.next;
+			bss = (BSkipSpan<K, V>) bss.next;
 			
 			BSkipSpan.load(bss, bf, bsl, np, key, val);
 			np = bss.nextPage;
@@ -411,15 +414,15 @@ public class BSkipSpan extends SkipSpan {
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
-			BSkipSpan temp = bsl.spanHash.get(Integer.valueOf(np));
+			BSkipSpan<K, V> temp = bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.prev = temp;
 				break;
 			}
-			bss.prev = new BSkipSpan(bf, bsl);
+			bss.prev = new BSkipSpan<K, V>(bf, bsl);
 			bss.prev.next = bss;
 			bss.prev.prev = null;
-			bss = (BSkipSpan) bss.prev;
+			bss = (BSkipSpan<K, V>) bss.prev;
 			
 			BSkipSpan.load(bss, bf, bsl, np, key, val);
 			np = bss.prevPage;

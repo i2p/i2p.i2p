@@ -18,6 +18,7 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
     private String _version;
     private final Object _helloLock = new Object();
     private Boolean _sessionCreateOk;
+    private Boolean _sessionAddOk;
     private Boolean _streamStatusOk;
     private final Object _sessionCreateLock = new Object();
     private final Object _namingReplyLock = new Object();
@@ -41,13 +42,19 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
         }
     }
 
+    /** may be called twice, first for CREATE and second for ADD */
     @Override
     public void sessionStatusReceived(String result, String destination, String msg) {
         synchronized (_sessionCreateLock) {
+            Boolean ok;
             if (SAMReader.SAMClientEventListener.SESSION_STATUS_OK.equals(result))
-                _sessionCreateOk = Boolean.TRUE;
+                ok = Boolean.TRUE;
             else 
-                _sessionCreateOk = Boolean.FALSE;
+                ok = Boolean.FALSE;
+            if (_sessionCreateOk == null)
+                _sessionCreateOk = ok;
+            else if (_sessionAddOk == null)
+                _sessionAddOk = ok;
             _sessionCreateLock.notifyAll();
         }
     }
@@ -115,6 +122,25 @@ public class SAMEventHandler extends SAMClientEventListenerImpl {
                         _sessionCreateLock.wait();
                     else
                         return _sessionCreateOk.booleanValue();
+                }
+            } catch (InterruptedException ie) { return false; }
+        }
+    }
+
+    /**
+     * Wait for the session to be added, returning true if everything went ok
+     *
+     * @return true if everything ok
+     * @since 0.9.25
+     */
+    public boolean waitForSessionAddReply() {
+        while (true) {
+            try {
+                synchronized (_sessionCreateLock) {
+                    if (_sessionAddOk == null)
+                        _sessionCreateLock.wait();
+                    else
+                        return _sessionAddOk.booleanValue();
                 }
             } catch (InterruptedException ie) { return false; }
         }

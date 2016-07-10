@@ -34,6 +34,7 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
+@Deprecated
 public class I2NPMessageReader {
     private Log _log;
     private RouterContext _context;
@@ -70,12 +71,14 @@ public class I2NPMessageReader {
      * Have the already started reader pause its reading indefinitely
      * @deprecated unused
      */
+    @Deprecated
     public void pauseReading() { _reader.pauseRunner(); }
 
     /**
      * Resume reading after a pause
      * @deprecated unused
      */
+    @Deprecated
     public void resumeReading() { _reader.resumeRunner(); }
 
     /**

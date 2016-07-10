@@ -12,6 +12,7 @@ import net.i2p.data.SessionKey;
 class PeerTestState {
     private final long _testNonce;
     private final Role _ourRole;
+    private final boolean _isIPv6;
     private InetAddress _aliceIP;
     private int _alicePort;
     private InetAddress _bobIP;
@@ -33,8 +34,9 @@ class PeerTestState {
     
     public enum Role {ALICE, BOB, CHARLIE};
     
-    public PeerTestState(Role role, long nonce, long now) {
+    public PeerTestState(Role role, boolean isIPv6, long nonce, long now) {
         _ourRole = role;
+        _isIPv6 = isIPv6;
         _testNonce = nonce;
         _beginTime = now;
     }
@@ -43,6 +45,12 @@ class PeerTestState {
 
     /** Are we Alice, bob, or Charlie. */
     public Role getOurRole() { return _ourRole; }
+
+    /**
+     * Is this an IPv6 test?
+     * @since 0.9.27
+     */
+    public boolean isIPv6() { return _isIPv6; }
 
     /**
      * If we are Alice, this will contain the IP that Bob says we

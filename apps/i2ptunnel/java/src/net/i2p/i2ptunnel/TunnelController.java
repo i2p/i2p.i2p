@@ -79,7 +79,7 @@ public class TunnelController implements Logging {
     public static final String PFX_OPTION = "option.";
 
     private static final String OPT_PERSISTENT = PFX_OPTION + "persistentClientKey";
-    private static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
+    public static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
     private static final String OPT_TAGS_SEND = PFX_OPTION + "crypto.tagsToSend";
     private static final String OPT_LOW_TAGS = PFX_OPTION + "crypto.lowTagThreshold";
     private static final String OPT_SIG_TYPE = PFX_OPTION + I2PClient.PROP_SIGTYPE;
@@ -652,7 +652,11 @@ public class TunnelController implements Logging {
             if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
-            } else if (type.contains("irc") || type.equals(TYPE_STREAMR_CLIENT)) {
+            } else if (!isClient(type)) {
+                // override UI that sets it to false
+                _config.setProperty(OPT_BUNDLE_REPLY, "true");
+            }
+            if (type.contains("irc") || type.equals(TYPE_STREAMR_CLIENT)) {
                 // maybe a bad idea for ircclient if DCC is enabled
                 if (!_config.containsKey(OPT_TAGS_SEND))
                     _config.setProperty(OPT_TAGS_SEND, "20");
@@ -752,6 +756,7 @@ public class TunnelController implements Logging {
      *  @return one big string of "key=val key=val ..."
      *  @deprecated why would you want this? Use getClientOptionProps() instead
      */
+    @Deprecated
     public String getClientOptions() {
         StringBuilder opts = new StringBuilder(64);
         for (Map.Entry<Object, Object> e : _config.entrySet()) {
@@ -869,6 +874,7 @@ public class TunnelController implements Logging {
      *  A text description of the tunnel.
      *  @deprecated unused
      */
+    @Deprecated
     public void getSummary(StringBuilder buf) {
         String type = getType();
         buf.append(type);

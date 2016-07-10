@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.util.EepGet;
 import net.i2p.util.SecureFile;
 
@@ -38,14 +39,16 @@ import net.i2p.util.SecureFile;
  * destinations. AddressBooks can be created from local and remote files, merged
  * together, and written out to local files.
  * 
+ * Methods are NOT thread-safe.
+ * 
  * @author Ragnarok
  *  
  */
-class AddressBook {
+class AddressBook implements Iterable<Map.Entry<String, HostTxtEntry>> {
 
     private final String location;
     /** either addresses or subFile will be non-null, but not both */
-    private final Map<String, String> addresses;
+    private final Map<String, HostTxtEntry> addresses;
     private final File subFile;
     private boolean modified;
     private static final boolean DEBUG = false;
@@ -77,7 +80,7 @@ class AddressBook {
      *            A Map containing human readable addresses as keys, mapped to
      *            base64 i2p destinations.
      */
-    public AddressBook(Map<String, String> addresses) {
+    public AddressBook(Map<String, HostTxtEntry> addresses) {
         this.addresses = addresses;
         this.subFile = null;
         this.location = null;
@@ -107,7 +110,7 @@ class AddressBook {
         new File("addressbook.tmp").delete();
     }
 */
-    static final long MAX_SUB_SIZE = 3 * 1024 * 1024l; //about 5,000 hosts
+    static final long MAX_SUB_SIZE = 5 * 1024 * 1024l; //about 8,000 hosts
 
     /**
      * Construct an AddressBook from the Subscription subscription. If the
@@ -128,7 +131,7 @@ class AddressBook {
      * @param proxyPort port number of proxy
      */
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
-        Map<String, String> a = null;
+        Map<String, HostTxtEntry> a = null;
         File subf = null;
         try {
             File tmp = SecureFile.createTempFile("addressbook", null, I2PAppContext.getGlobalContext().getTempDir());
@@ -165,28 +168,40 @@ class AddressBook {
      */
     public AddressBook(File file) {
         this.location = file.toString();
-        Map<String, String> a;
+        Map<String, HostTxtEntry> a;
         try {
-            a = ConfigParser.parse(file);
+            a = HostTxtParser.parse(file);
         } catch (IOException exp) {
-            a = new HashMap<String, String>();
+            a = new HashMap<String, HostTxtEntry>();
         }
         this.addresses = a;
         this.subFile = null;
     }
 
     /**
+     * Test only.
+     * 
+     * @param testsubfile path to a file containing the simulated fetch of a subscription
+     * @since 0.9.26
+     */
+    public AddressBook(String testsubfile) {
+        this.location = testsubfile;
+        this.addresses = null;
+        this.subFile = new File(testsubfile);
+    }
+
+    /**
      * Return an iterator over the addresses in the AddressBook.
      * @since 0.8.7
      */
-    public Iterator<Map.Entry<String, String>> iterator() {
+    public Iterator<Map.Entry<String, HostTxtEntry>> iterator() {
         if (this.subFile != null) {
             try {
-                return new ConfigIterator(this.subFile);
+                return new HostTxtIterator(this.subFile);
             } catch (IOException ioe) {
-                return new ConfigIterator();
+                return new HostTxtIterator();
             }
-       }
+        }
         return this.addresses.entrySet().iterator();
     }
 
@@ -229,7 +244,7 @@ class AddressBook {
 
     /**
      * Do basic validation of the hostname
-     * hostname was already converted to lower case by ConfigParser.parse()
+     * hostname was already converted to lower case by HostTxtParser.parse()
      */
     public static boolean isValidKey(String host) {
 	return
@@ -291,15 +306,15 @@ class AddressBook {
     public void merge(AddressBook other, boolean overwrite, Log log) {
         if (this.addresses == null)
             throw new IllegalStateException();
-        for (Iterator<Map.Entry<String, String>> iter = other.iterator(); iter.hasNext(); ) {
-            Map.Entry<String, String> entry = iter.next();
+        for (Iterator<Map.Entry<String, HostTxtEntry>> iter = other.iterator(); iter.hasNext(); ) {
+            Map.Entry<String, HostTxtEntry> entry = iter.next();
             String otherKey = entry.getKey();
-            String otherValue = entry.getValue();
+            HostTxtEntry otherValue = entry.getValue();
 
-            if (isValidKey(otherKey) && isValidDest(otherValue)) {
+            if (isValidKey(otherKey) && isValidDest(otherValue.getDest())) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {
                     if (DEBUG && log != null &&
-                        !this.addresses.get(otherKey).equals(otherValue)) {
+                        !this.addresses.get(otherKey).equals(otherValue.getDest())) {
                         log.append("Conflict for " + otherKey + " from "
                                 + other.location
                                 + ". Destination in remote address book is "
@@ -332,7 +347,7 @@ class AddressBook {
             throw new IllegalStateException();
         if (this.modified) {
             try {
-                ConfigParser.write(this.addresses, file);
+                HostTxtParser.write(this.addresses, file);
             } catch (IOException exp) {
                 System.err.println("Error writing addressbook " + file.getAbsolutePath() + " : " + exp.toString());
             }

@@ -100,7 +100,9 @@ public class Router implements RouterClock.ClockShiftListener {
     public final static long CLOCK_FUDGE_FACTOR = 1*60*1000; 
 
     /** used to differentiate routerInfo files on different networks */
-    public static final int NETWORK_ID = 2;
+    private static final int DEFAULT_NETWORK_ID = 2;
+    private static final String PROP_NETWORK_ID = "router.networkID";
+    private final int _networkID;
     
     /** coalesce stats this often - should be a little less than one minute, so the graphs get updated */
     public static final int COALESCE_TIME = 50*1000;
@@ -347,6 +349,14 @@ public class Router implements RouterClock.ClockShiftListener {
             _config.put("router.previousVersion", RouterVersion.VERSION);
             saveConfig();
         }
+        int id = DEFAULT_NETWORK_ID;
+        String sid = _config.get(PROP_NETWORK_ID);
+        if (sid != null) {
+            try {
+                id = Integer.parseInt(sid);
+            } catch (NumberFormatException nfe) {}
+        }
+        _networkID = id;
         changeState(State.INITIALIZED);
         // *********  Start no threads before here ********* //
     }
@@ -440,12 +450,14 @@ public class Router implements RouterClock.ClockShiftListener {
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
 
     /** @deprecated unused */
+    @Deprecated
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
     /** @return absolute path */
     public String getConfigFilename() { return _configFilename; }
 
     /** @deprecated unused */
+    @Deprecated
     public void setConfigFilename(String filename) { _configFilename = filename; }
     
     public String getConfigSetting(String name) { 
@@ -459,6 +471,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.13
      *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
+    @Deprecated
     public void setConfigSetting(String name, String value) { 
             _config.put(name, value); 
     }
@@ -470,6 +483,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *  @since 0.8.13
      *  @deprecated use saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove)
      */
+    @Deprecated
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
             // remove the backing default also
@@ -536,6 +550,14 @@ public class Router implements RouterClock.ClockShiftListener {
         if (_started <= 0) return 1000; // racing on startup
         return Math.max(1000, System.currentTimeMillis() - _started);
     }
+
+    /**
+     *  The network ID. Default 2.
+     *  May be changed with the config property router.networkID (restart required).
+     *  Change only if running a test network to prevent cross-network contamination.
+     *  @since 0.9.25
+     */
+    public int getNetworkID() { return _networkID; }
     
     /**
      *  Non-null, but take care when accessing context items before runRouter() is called
@@ -919,6 +941,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
     /** @deprecated unused */
+    @Deprecated
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
     /**

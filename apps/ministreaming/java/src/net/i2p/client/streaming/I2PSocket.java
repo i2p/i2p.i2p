@@ -62,6 +62,7 @@ public interface I2PSocket extends Closeable {
      *  @return null always
      *  @since 0.8.9
      */
+    @Deprecated
     public SelectableChannel getChannel() throws IOException;
 
     /** 

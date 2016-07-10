@@ -226,26 +226,56 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <%=intl._t("Local destination")%>(<span class="accessKey">L</span>):
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
-         <% String b64 = editBean.getDestinationBase64(curTunnel);
-            if (!"".equals(b64)) {
-                String name = editBean.getSpoofedHost(curTunnel);
-                if (name == null || name.equals(""))
-                    name = editBean.getTunnelName(curTunnel);
-                if (!"".equals(name)) { %>
-                    <a href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>    
-         <%     }
-            } %>
             </div>
 
+<%
+  /******
+%>
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+                   String sig = editBean.getNameSignature(curTunnel);
+                   if (sig.length() > 0) {
           %><div id="sigField" class="rowItem">
                 <label for="signature">
                     <%=intl._t("Hostname Signature")%>
                 </label>
-                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=editBean.getNameSignature(curTunnel)%>" wrap="off" class="freetext" />                
+                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=sig%>" wrap="off" class="freetext" />                
             </div>
-            <% } %>
+         <%
+                   }  // sig
+               }  // type
+  ****/
 
+            String b64 = editBean.getDestinationBase64(curTunnel);
+            if (!"".equals(b64)) {
+         %>
+            <div id="destinationField" class="rowItem">
+        <%
+                b64 = b64.replace("=", "%3d");
+                String name = editBean.getSpoofedHost(curTunnel);
+                if (name == null || name.equals(""))
+                    name = editBean.getTunnelName(curTunnel);
+                if (name != null && !name.equals("") && !name.contains(" ") && name.endsWith(".i2p")) {
+         %>
+              <label>
+              <a class="control" title="<%=intl._t("Generate QR Code")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=b64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
+              </label>
+              <a class="control" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=b64%>#add"><%=intl._t("Add to local addressbook")%></a>    
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <a class="control" href="register?tunnel=<%=curTunnel%>"><%=intl._t("Registration Authentication")%></a>    
+        <%
+                } else {
+          %>
+              <label> </label>
+              <span class="comment"><%=intl._t("Set name with .i2p suffix to enable QR code generation")%></span>
+              <span class="comment"><%=intl._t("Set name with .i2p suffix to enable registration authentication")%></span>
+        <%
+                }  // name
+         %>
+            </div>
+        <%
+            }  // b64
+
+         %>
             <div class="footer">
             </div>
         </div>
@@ -398,18 +428,19 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
             </div>
             <div id="portField" class="rowItem">
-                <label><%=intl._t("Disable")%></label>
-                <input value="0" type="radio" id="startOnLoad" name="accessMode" title="Allow all clients"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <label><%=intl._t("Whitelist")%></label>
-                <input value="1" type="radio" id="startOnLoad" name="accessMode" title="Allow listed clients only"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <label><%=intl._t("Blacklist")%></label>
-                <input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <% /* can't use <label> here */ %>
+                <p><input value="0" type="radio" id="startOnLoad" name="accessMode" title="Allow all clients"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <b><%=intl._t("Disable")%></b></p>
+                <p><input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <b><%=intl._t("Blacklist")%></b></p>
+                <p><input value="1" type="radio" id="startOnLoad" name="accessMode" title="Allow listed clients only"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <b><%=intl._t("Whitelist")%></b></p>
             </div>
-            <div id="hostField" class="rowItem">
+            <div id="accessListField" class="rowItem">
                 <label for="accessList" accesskey="s">
                     <%=intl._t("Access List")%>:
                 </label>
-                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <textarea rows="2" style="height: 8em;" cols="60" name="accessList" title="Access List" wrap="off" spellcheck="false"><%=editBean.getAccessList(curTunnel)%></textarea>               
             </div>
                  
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
@@ -424,6 +455,35 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         <%=intl._t("Enable")%>:
                     </label>
                     <input value="1" type="checkbox" id="startOnLoad" name="rejectInproxy" title="Deny inproxy access when enabled"<%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+              </div>
+            <div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._t("Block Accesses containing Referers")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._t("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="rejectReferer" title="Deny accesseses with referers (probably from inproxies)"<%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+              </div>
+            <div class="rowItem">
+                <div id="optionsField" class="rowItem">
+                    <label>
+                        <%=intl._t("Block these User-Agents")%>:
+                    </label>
+                </div>
+                <div id="portField" class="rowItem">
+                    <label for="access" accesskey="d">
+                        <%=intl._t("Enable")%>:
+                    </label>
+                    <input value="1" type="checkbox" id="startOnLoad" name="rejectUserAgents" title="Deny User-Agents matching these strings (probably from inproxies)"<%=(editBean.isRejectUserAgents(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                </div>
+                <div id="optionsHostField" class="rowItem">
+                    <input type="text" id="userAgents" name="userAgents" size="20" title="comma separated, e.g. Mozilla,Opera (case-sensitive)" value="<%=editBean.getUserAgents(curTunnel)%>" class="freetext" />                
                 </div>
               </div>
             <% } // httpserver

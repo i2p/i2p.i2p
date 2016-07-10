@@ -281,6 +281,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             //getContext().statManager().addRateData("client.leaseSetFoundLocally", 1);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
+
+            if (!_leaseSet.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
+                // If it's about to expire, refetch in the background, we'll
+                // probably need it again. This will prevent stalls later.
+                // We don't know if the other end is actually publishing his LS, so this could be a waste of time.
+                // When we move to LS2, we will have a bit that tells us if it is published.
+                if (_log.shouldWarn()) {
+                    long exp = now - _leaseSet.getLatestLeaseDate();
+                    _log.warn(getJobId() + ": leaseSet expired " + DataHelper.formatDuration(exp) + " ago, firing search: " + _leaseSet.getHash().toBase32());
+                }
+                getContext().netDb().lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
+            }
+
             success.runJob();
         } else {
             _leaseSetLookupBegin = getContext().clock().now();
@@ -373,7 +386,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _lease = _cache.leaseCache.get(_hashPair);
             if (_lease != null) {
                 // if outbound tunnel length == 0 && lease.firsthop.isBacklogged() don't use it ??
-                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
+                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR / 4)) {
                     // see if the current leaseSet contains the old lease, so that if the dest removes
                     // it (due to failure for example) we won't continue to use it.
                     for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
@@ -397,14 +410,21 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
         // get the possible leases
         List<Lease> leases = new ArrayList<Lease>(_leaseSet.getLeaseCount());
+        // first try to get ones that really haven't expired
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
             Lease lease = _leaseSet.getLease(i);
-            if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": getNextLease() - expired lease! - " + lease + " for " + _toString);
-                continue;
-            } else {
+            if (!lease.isExpired(Router.CLOCK_FUDGE_FACTOR / 4))
                 leases.add(lease);
+        }
+
+        if (leases.isEmpty()) {
+            // TODO if _lease != null, fire off
+            // a lookup ? KNDF will keep giving us the current ls until CLOCK_FUDGE_FACTOR
+            // try again with a fudge factor
+            for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
+                Lease lease = _leaseSet.getLease(i);
+                if (!lease.isExpired(Router.CLOCK_FUDGE_FACTOR))
+                    leases.add(lease);
             }
         }
         

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="wrapper-win">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/installer/lib/wrapper/win-all/wrapper.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

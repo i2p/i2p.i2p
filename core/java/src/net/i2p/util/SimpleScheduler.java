@@ -28,12 +28,14 @@ import net.i2p.I2PAppContext;
  *
  * @author zzz
  */
+@Deprecated
 public class SimpleScheduler {
 
     /**
      *  If you have a context, use context.simpleScheduler() instead
      *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
+    @Deprecated
     public static SimpleScheduler getInstance() {
         return I2PAppContext.getGlobalContext().simpleScheduler();
     }
@@ -51,6 +53,7 @@ public class SimpleScheduler {
      *  Others should use context.simpleTimer() instead
      *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
+    @Deprecated
     public SimpleScheduler(I2PAppContext context) {
         this(context, "SimpleScheduler");
     }
@@ -60,6 +63,7 @@ public class SimpleScheduler {
      *  Others should use context.simpleTimer() instead
      *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
+    @Deprecated
     private SimpleScheduler(I2PAppContext context, String name) {
         _log = context.logManager().getLog(SimpleScheduler.class);
         _name = name;

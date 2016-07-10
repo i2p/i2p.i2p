@@ -30,6 +30,7 @@ import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SystemVersion;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -140,7 +141,16 @@ public class I2PSimpleSession extends I2PSessionImpl2 {
         } catch (UnknownHostException uhe) {
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
-            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
+            // Generate the best error message as this will be logged
+            String msg;
+            if (_context.isRouterContext())
+                msg = "Failed internal router binding";
+            else if (SystemVersion.isAndroid() &&
+                    Boolean.parseBoolean(getOptions().getProperty(PROP_DOMAIN_SOCKET)))
+                msg = "Failed to bind to the router";
+            else
+                msg = "Cannot connect to the router on " + _hostname + ':' + _portNum;
+            throw new I2PSessionException(getPrefix() + msg, ioe);
         } finally {
             changeState(success ? State.OPEN : State.CLOSED);
         }

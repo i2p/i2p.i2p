@@ -538,6 +538,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @deprecated This doesn't appear to be used.
      * @return receive window size.
      */
+    @Deprecated
     public int getReceiveWindow() { return _receiveWindow; } 
     public void setReceiveWindow(int numMsgs) { _receiveWindow = numMsgs; }
     

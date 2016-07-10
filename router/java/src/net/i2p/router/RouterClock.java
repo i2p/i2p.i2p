@@ -1,10 +1,12 @@
 package net.i2p.router;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.time.RouterTimestamper;
+import net.i2p.time.BuildTime;
 import net.i2p.time.Timestamper;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
@@ -108,7 +110,7 @@ public class RouterClock extends Clock {
     private synchronized void setOffset(long offsetMs, boolean force, int stratum) {
         long delta = offsetMs - _offset;
         if (!force) {
-            if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
+            if (!_isSystemClockBad && (offsetMs > MAX_OFFSET || offsetMs < 0 - MAX_OFFSET)) {
                 Log log = getLog();
                 if (log.shouldLog(Log.WARN))
                     log.warn("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
@@ -218,6 +220,15 @@ public class RouterClock extends Clock {
      */
     @Override
     public void setNow(long realTime, int stratum) {
+        if (realTime < BuildTime.getEarliestTime() || realTime > BuildTime.getLatestTime()) {
+            Log log = getLog();
+            String msg = "Invalid time received: " + new Date(realTime);
+            if (log.shouldWarn())
+                log.warn(msg, new Exception());
+            else
+                log.logAlways(Log.WARN, msg);
+            return;
+        }
         long diff = realTime - System.currentTimeMillis();
         setOffset(diff, stratum);
     }
@@ -330,6 +341,7 @@ public class RouterClock extends Clock {
      *  @since 0.7.12
      *  @deprecated for debugging only
      */
+    @Deprecated
     public long getDeltaOffset() {
         return _desiredOffset - _offset;
     }

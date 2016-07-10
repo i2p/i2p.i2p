@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="identicon">
+    <target name="all" depends="clean, build" />
+
+    <target name="build">
+        <ant dir="identicon" target="build" />
+        <ant dir="zxing" target="build" />
+        <ant dir="imagegen" target="build" />
+    </target>
+
+    <target name="compile">
+        <ant dir="identicon" target="compile" />
+        <ant dir="zxing" target="compile" />
+        <ant dir="imagegen" target="compile" />
+    </target>
+
+    <target name="compileTest">
+        <ant dir="identicon" target="compileTest" />
+        <ant dir="zxing" target="compileTest" />
+    </target>
+
+    <target name="jarTest">
+        <ant dir="identicon" target="jarTest" />
+        <ant dir="zxing" target="jarTest" />
+    </target>
+
+    <!-- not used, war bundles the classes -->
+    <target name="jar">
+        <ant dir="identicon" target="jar" />
+        <ant dir="zxing" target="jar" />
+    </target>
+
+    <target name="war" depends="compile">
+        <ant dir="imagegen" target="war" />
+    </target>
+
+    <target name="javadoc">
+        <ant dir="identicon" target="javadoc" />
+        <ant dir="zxing" target="javadoc" />
+        <ant dir="imagegen" target="javadoc" />
+    </target>
+
+    <target name="clean">
+        <ant dir="identicon" target="clean" />
+        <ant dir="zxing" target="clean" />
+        <ant dir="imagegen" target="clean" />
+    </target>
+
+    <target name="distclean">
+        <ant dir="identicon" target="distclean" />
+        <ant dir="zxing" target="distclean" />
+        <ant dir="imagegen" target="distclean" />
+    </target>
+</project>

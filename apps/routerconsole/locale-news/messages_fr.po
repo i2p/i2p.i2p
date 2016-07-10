@@ -8,15 +8,16 @@
 # Boxoa590, 2013
 # foo <foo@bar>, 2009
 # Boxoa590, 2013
-# Towatowa441, 2014
+# Towinet, 2014,2016
+# zzzi2p, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-05-09 19:12+0000\n"
-"Last-Translator: bassmax\n"
-"Language-Team: French (http://www.transifex.com/projects/p/I2P/language/fr/)\n"
+"PO-Revision-Date: 2016-03-19 13:22+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,7 +28,7 @@ msgid "Congratulations on getting I2P installed!"
 msgstr "Merci d'utiliser I2P !"
 
 msgid "Welcome to I2P!"
-msgstr "Bienvenue sur I2P !"
+msgstr "Bienvenue dans I2P !"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
@@ -37,16 +38,16 @@ msgstr "Merci de {0}patienter{1} le temps qu''I2P démarre et trouve des pairs."
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr "Pendant ce temps, merci d''{0}adjuster vos réglages de bande passante{1} sur la page de {2}configuration{3}."
+msgstr "Pendant ce temps, merci d''{0}ajuster vos réglages de bande passante{1} sur la page de {2}configuration{3}."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Vous pouvez également configurer votre navigateur afin d'utiliser le proxy I2P pour consulter les eepsites."
+msgstr "Vous pouvez également configurer votre navigateur afin qu'il utilise le proxy I2P pour consulter les eepsites."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "Il suffit d'entrer en tant que proxy http dans les paramètres de votre navigateur 127.0.0.1 (ou localhost) port 4444."
+msgstr "Il suffit d'aller dans les paramètres de votre navigateur afin de saisir le proxy HTTP : 127.0.0.1 (ou localhost) port 4444."
 
 msgid "Do not use SOCKS for this."
 msgstr "Ne pas utiliser SOCKS pour cela."
@@ -54,7 +55,7 @@ msgstr "Ne pas utiliser SOCKS pour cela."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Davantage d''informations sont disponibles sur la {1}page de configuration du proxy I2P{0}."
+msgstr "Davantage d''informations sont disponibles sur la {0}page de configuration du proxy I2P{1}."
 
 #, java-format
 msgid ""

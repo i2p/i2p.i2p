@@ -55,13 +55,13 @@ import net.i2p.util.Log;
  *
  * Always fits on one page.
  */
-public class BSkipLevels extends SkipLevels {
+public class BSkipLevels<K extends Comparable<? super K>, V> extends SkipLevels<K, V> {
 	private static final long MAGIC = 0x42534c6576656c73l;  // "BSLevels"
 	static final int HEADER_LEN = 16;
 	public final int levelPage;
 	public final int spanPage;
 	public final BlockFile bf;
-	private final BSkipList bsl;
+	private final BSkipList<K, V> bsl;
 	private boolean isKilled;
 	// the level pages, passed from the constructor to initializeLevels(),
 	// NOT kept up to date
@@ -73,7 +73,8 @@ public class BSkipLevels extends SkipLevels {
 	 *  after the constructor, unless it's a new empty
 	 *  level and init() was previously called.
 	 */
-	public BSkipLevels(BlockFile bf, int levelPage, BSkipList bsl) throws IOException {
+	@SuppressWarnings("unchecked")
+	public BSkipLevels(BlockFile bf, int levelPage, BSkipList<K, V> bsl) throws IOException {
 		this.levelPage = levelPage;
 		this.bf = bf;
 		this.bsl = bsl;
@@ -97,7 +98,7 @@ public class BSkipLevels extends SkipLevels {
 			throw new IOException("No span found in cache???");
 		}
 
-		this.levels = new BSkipLevels[maxLen];
+		this.levels = (BSkipLevels<K, V>[]) new BSkipLevels[maxLen];
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("Reading New BSkipLevels with " + nonNull + " / " + maxLen + " valid levels page " + levelPage +
 				     " in skiplist " + bsl);
@@ -118,14 +119,14 @@ public class BSkipLevels extends SkipLevels {
 	 *  @since 0.9.20
 	 */
 	public void initializeLevels() {
-		List<BSkipLevels> toInit = new ArrayList<BSkipLevels>(32);
-		List<BSkipLevels> nextInit = new ArrayList<BSkipLevels>(32);
+		List<BSkipLevels<K, V>> toInit = new ArrayList<BSkipLevels<K, V>>(32);
+		List<BSkipLevels<K, V>> nextInit = new ArrayList<BSkipLevels<K, V>>(32);
 		initializeLevels(toInit);
 		while (!toInit.isEmpty()) {
-			for (BSkipLevels bsl : toInit) {
+			for (BSkipLevels<K, V> bsl : toInit) {
 				bsl.initializeLevels(nextInit);
 			}
-			List<BSkipLevels> tmp = toInit;
+			List<BSkipLevels<K, V>> tmp = toInit;
 			toInit = nextInit;
 			nextInit = tmp;
 			nextInit.clear();
@@ -139,7 +140,7 @@ public class BSkipLevels extends SkipLevels {
 	 *  @param nextInit out parameter, next levels to initialize
 	 *  @since 0.9.20
 	 */
-	private void initializeLevels(List<BSkipLevels> nextInit) {
+	private void initializeLevels(List<BSkipLevels<K, V>> nextInit) {
 		boolean fail = false;
 		for(int i = 0; i < lps.length; i++) {
 			int lp = lps[i];
@@ -147,7 +148,7 @@ public class BSkipLevels extends SkipLevels {
 				levels[i] = bsl.levelHash.get(Integer.valueOf(lp));
 				if(levels[i] == null) {
 					try {
-						BSkipLevels lev = new BSkipLevels(bf, lp, bsl);
+						BSkipLevels<K, V> lev = new BSkipLevels<K, V>(bf, lp, bsl);
 						levels[i] = lev;
 						nextInit.add(lev);
 					} catch (IOException ioe) {
@@ -158,8 +159,8 @@ public class BSkipLevels extends SkipLevels {
 						continue;
 					}
 				}
-				Comparable ourKey = key();
-				Comparable nextKey = levels[i].key();
+				K ourKey = key();
+				K nextKey = levels[i].key();
 				if (ourKey != null && nextKey != null &&
 				    ourKey.compareTo(nextKey) >= 0) {
 					bf.log.warn("Corrupt database, level out of order " + this +
@@ -215,9 +216,9 @@ public class BSkipLevels extends SkipLevels {
 					break;
 			}
 			bf.file.writeShort(i);
-			bf.file.writeInt(((BSkipSpan) bottom).page);
+			bf.file.writeInt(((BSkipSpan<K, V>) bottom).page);
 			for(int j = 0; j < i; j++) {
-				bf.file.writeInt(((BSkipLevels) levels[j]).levelPage);
+				bf.file.writeInt(((BSkipLevels<K, V>) levels[j]).levelPage);
 			}
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
@@ -229,22 +230,22 @@ public class BSkipLevels extends SkipLevels {
 			return;
 		}
 		if (bf.log.shouldLog(Log.DEBUG))
-			bf.log.debug("Killing " + this + ' ' + print(), new Exception());
+			bf.log.debug("Killing " + this + ' ' + print() /* , new Exception() */ );
 		isKilled = true;
 		bsl.levelHash.remove(Integer.valueOf(levelPage));
 		bf.freePage(levelPage);
 	}
 
 	@Override
-	public SkipLevels newInstance(int levels, SkipSpan ss, SkipList sl) {
+	public SkipLevels<K, V> newInstance(int levels, SkipSpan<K, V> ss, SkipList<K, V> sl) {
 		try {
-			BSkipSpan bss = (BSkipSpan) ss;
-			BSkipList bsl = (BSkipList) sl;
+			BSkipSpan<K, V> bss = (BSkipSpan<K, V>) ss;
+			BSkipList<K, V> bsl = (BSkipList<K, V>) sl;
 			int page = bf.allocPage();
 			BSkipLevels.init(bf, page, bss.page, levels);
 			if (bf.log.shouldLog(Log.DEBUG))
 				bf.log.debug("New BSkipLevels height " + levels + " page " + page);
-			return new BSkipLevels(bf, page, bsl);
+			return new BSkipLevels<K, V>(bf, page, bsl);
 			// do not need to call initLevels() here
 		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
@@ -273,7 +274,7 @@ public class BSkipLevels extends SkipLevels {
 	 *  @since 0.8.8
 	 */
 	private boolean blvlfix() {
-		TreeSet<SkipLevels> lvls = new TreeSet<SkipLevels>(new LevelComparator());
+		TreeSet<SkipLevels<K, V>> lvls = new TreeSet<SkipLevels<K, V>>(new LevelComparator<K, V>());
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("Starting level search");
 		getAllLevels(this, lvls);
@@ -285,15 +286,15 @@ public class BSkipLevels extends SkipLevels {
 		}
 		// traverse the levels, back-to-front
 		boolean rv = false;
-		SkipLevels after = null;
-		for (SkipLevels lv : lvls) {
+		SkipLevels<K, V> after = null;
+		for (SkipLevels<K, V> lv : lvls) {
 			boolean modified = false;
 			if (bf.log.shouldLog(Log.DEBUG))
 				bf.log.debug("Checking " + lv.print());
 			if (after != null) {
 				int min = Math.min(after.levels.length, lv.levels.length);
 				for (int i = 0; i < min; i++) {
-					SkipLevels cur = lv.levels[i];
+					SkipLevels<K, V> cur = lv.levels[i];
 					if (cur != after) {
 						if (cur != null)
 							bf.log.warn("Level " + i + " was wrong, fixing for " + lv.print());
@@ -331,12 +332,12 @@ public class BSkipLevels extends SkipLevels {
 	 *  @param lvlSet out parameter, the result
 	 *  @since 0.8.8
 	 */
-	private void getAllLevels(SkipLevels l, Set<SkipLevels> lvlSet) {
+	private void getAllLevels(SkipLevels<K, V> l, Set<SkipLevels<K, V>> lvlSet) {
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("GAL " + l.print());
 		// Do level 0 without recursion, on the assumption everything is findable
 		// from the root
-		SkipLevels cur = l;
+		SkipLevels<K, V> cur = l;
 		while (cur != null && lvlSet.add(cur)) {
 			if (bf.log.shouldLog(Log.DEBUG))
 				bf.log.debug("Adding " + cur.print());
@@ -347,7 +348,7 @@ public class BSkipLevels extends SkipLevels {
 		// If there were no nulls at level 0 in the middle,
 		// i.e. there are no problems, this won't find anything
 		for (int i = 1; i < l.levels.length; i++) {
-			SkipLevels lv = l.levels[i];
+			SkipLevels<K, V> lv = l.levels[i];
 			if (lv != null && !lvlSet.contains(lv))
 				getAllLevels(lv, lvlSet);
 		}
@@ -358,10 +359,10 @@ public class BSkipLevels extends SkipLevels {
          *  Sorts in REVERSE order.
 	 *  @since 0.8.8
 	 */
-	private static class LevelComparator implements Comparator<SkipLevels>, Serializable {
-		public int compare(SkipLevels l, SkipLevels r) {
-			Comparable lk = l.key();
-			Comparable rk = r.key();
+	private static class LevelComparator<K extends Comparable<? super K>, V> implements Comparator<SkipLevels<K, V>>, Serializable {
+		public int compare(SkipLevels<K, V> l, SkipLevels<K, V> r) {
+			K lk = l.key();
+			K rk = r.key();
 			if (lk == null && rk == null)
 				return 0;
 			if (lk == null)
@@ -378,13 +379,14 @@ public class BSkipLevels extends SkipLevels {
 	 *  This needs work.
 	 */
 	@Override
-	public boolean blvlck(boolean fix, int width, SkipLevels[] prevLevels) {
+	@SuppressWarnings("unchecked")
+	public boolean blvlck(boolean fix, int width, SkipLevels<K, V>[] prevLevels) {
 		bf.log.warn("    Skip level at width " + width);
 		bf.log.warn("        levels " + this.levels.length);
 		bf.log.warn("        first key " + this.key());
 		bf.log.warn("        spanPage " + this.spanPage);
 		bf.log.warn("        levelPage " + this.levelPage);
-		SkipLevels higher = null;
+		SkipLevels<K, V> higher = null;
 		for (int i = levels.length - 1; i >= 0; i--) {
 			if (levels[i] != null) {
 				bf.log.info("                level " + i + " -> " + levels[i].key() + " ");
@@ -418,7 +420,7 @@ public class BSkipLevels extends SkipLevels {
 				}
 			}
 		} else {
-			prevLevels = new SkipLevels[levels.length];
+			prevLevels = (SkipLevels<K, V>[]) new SkipLevels[levels.length];
 			System.arraycopy(levels, 0, prevLevels, 0, levels.length);
 		}
 		if (levels[0] != null)

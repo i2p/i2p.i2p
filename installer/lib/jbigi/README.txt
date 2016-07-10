@@ -68,3 +68,23 @@ Updates May/June 2011:
      4.3.2 for 32 bit. For 64-bit processors, both performance testing and
      the GMP changelog led us to use 5.0.2 for both the 32- and 64-bit versions.
    - See also checkin comments, javadoc and code in NativeBigInteger.java
+
+
+Updates April 2016:
+  jcpuid:
+   - Rebuilt for OSX/Windows/FreeBSD/Linux
+   - Rebuilt _all_ unmentioned jcpuid binaries
+
+  jbigi:
+  - Moved to GMP 6.0.0a
+  - Removed NetBSD binaries
+  - Removed kFreeBSD binaries
+  - Removed Solaris binaries
+  - Removed OpenBSD binaries
+  - Added coreihwl jbigi support
+  - Added coreisbr jbigi support
+  - Added bulldozer jbigi support
+  - Added steamroller jbigi support
+  - Added cortex a9 suppot support
+  - Added cortex a15 jbigi support
+  - Rebuilt _all_ unmentioned jbigi binaries

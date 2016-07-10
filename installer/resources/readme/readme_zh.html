@@ -7,10 +7,9 @@
  <li><B>浏览 I2P 匿名站点</B> -  I2P 网络内匿名运行的小站(EepSite) - 您要首先设置浏览器的 <b>HTTP 代理</b> 为 127.0.0.1:4444， 然后才能浏览 I2P 站点 - <ul class="links">
          <li><a href="http://forum.i2p/">forum.i2p</a>:I2P官方论坛 <a href="http://forum.i2p/">forum.i2p</a>&nbsp;的匿名入口&nbsp;(个人的I2P站点会在论坛的EEPSITE讨论区发布)</li>
          <li><a href="http://i2p-projekt.i2p/zh/">i2p-projekt.i2p</a>:&nbsp;可以安全匿名的访问I2P官网 <a href="https://geti2p.net/zh/">geti2p.net</a></li>
-         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>:&nbsp;I2P网络里的 “Google” 可以用来搜索各个匿名小站</li>
-         <li><a href="http://ugha.i2p/">ugha.i2p</a>:UGHA 的 I2P 小站，开放编辑的WIKI，有丰富的链接</li>
+         <li><a href="http://i2pwiki.i2p/">i2pwiki.i2p</a>:I2PWIKI 的 I2P 小站，开放编辑的WIKI，有丰富的链接</li>
          <li><a href="http://echelon.i2p/">echelon.i2p</a>:软件存档及有关I2P的相关文档&nbsp;(例如 I2P&nbsp;Messenger 基于I2P的匿名聊天工具等)&nbsp;</li>
-         <li><a href="http://pastethis.i2p/">pastethis.i2p</a>:安全匿名的公共剪贴板</li>
+         <li><a href="http://zerobin.i2p/">zerobin.i2p</a>:安全匿名的公共剪贴板</li>
      </ul> <br>
       I2P网络中还有很多其他站点 - 访问上面的网站你会找到更多，别忘了收藏你喜爱的 I2P 网站方便访问。<br>
  <li><b>浏览 Web 网页</b> - 目前 IP2 网络中的出口代理("Outproxy")只有一个，它的HTTP代理映射在本机的4444端口上。- 将浏览器的代理设置指向为上述地址(127.0.0.1:4444)后，访问任何普通链接即可 - 您的HTTP请求将在 I2P 网络内部传递。</li>
@@ -23,7 +22,7 @@
 
 <h2>想创建属于自己的 I2P 站点？</h2>
 
-<p>I2P 已经集成了Jetty服务器来帮助你运行自己的匿名站点 - &nbsp;<a href="http://jetty.mortbay.org/">Jetty</a> 实例运行于本机 <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>上。只要将你的文件放在 I2P目录下的&nbsp;<code>eepsite/docroot/</code> 文件夹中 (或将任何标准的 JSP/Servlet <code>.war</code> 文件放置于 <code>eepsite/webapps</code> 中, 标准的 CGI 脚本请置于 <code>eepsite/cgi-bin</code> 目录内) ，通过上面的地址就可以浏览啦。然后&nbsp;<a href="/i2ptunnel/">在I2PTunnel中创建一个I2P站点隧道</a> 将其指向上面的本地端口, 您的匿名站点就可以供他人访问了。创建 I2P站点的具体操作参见 <a href="http://127.0.0.1:7658/">您的I2P站点临时页面</a>。</p>
+<p>I2P 已经集成了Jetty服务器来帮助你运行自己的匿名站点 - &nbsp;<a href="https://www.eclipse.org/jetty/">Jetty</a> 实例运行于本机 <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>上。只要将你的文件放在 I2P目录下的&nbsp;<code>eepsite/docroot/</code> 文件夹中 (或将任何标准的 JSP/Servlet <code>.war</code> 文件放置于 <code>eepsite/webapps</code> 中, 标准的 CGI 脚本请置于 <code>eepsite/cgi-bin</code> 目录内) ，通过上面的地址就可以浏览啦。然后&nbsp;<a href="/i2ptunnel/">在I2PTunnel中创建一个I2P站点隧道</a> 将其指向上面的本地端口, 您的匿名站点就可以供他人访问了。创建 I2P站点的具体操作参见 <a href="http://127.0.0.1:7658/">您的I2P站点临时页面</a>。</p>
 
 <h2><a name="trouble">疑难解答</a></h2>
 

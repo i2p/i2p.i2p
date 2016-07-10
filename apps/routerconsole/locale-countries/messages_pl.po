@@ -10,14 +10,15 @@
 # polacco <polacco@i2pmail.org>, 2012
 # PolishAnon <b790979@klzlk.com>, 2011
 # Taporpo Ne <taporpone@gmail.com>, 2015
+# Verdulo :-) <cybertomek@openmailbox.org>, 2016
 # Tracerneo <ziolkoneo@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:08+0000\n"
-"PO-Revision-Date: 2015-08-30 16:58+0000\n"
-"Last-Translator: Taporpo Ne <taporpone@gmail.com>\n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2016-05-25 19:42+0000\n"
+"Last-Translator: Verdulo :-) <cybertomek@openmailbox.org>\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -719,7 +720,7 @@ msgid "Tuvalu"
 msgstr "Tuvalu"
 
 msgid "Taiwan"
-msgstr "Republika Chińska"
+msgstr "Tajwan (Republika Chińska)"
 
 msgid "Tanzania"
 msgstr "Tanzania"

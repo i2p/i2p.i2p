@@ -28,6 +28,7 @@ import net.i2p.util.I2PAppThread;
  * Makes sure everything ends correctly when shutting down.
  * @deprecated unused
  */
+@Deprecated
 public class SnarkShutdown extends I2PAppThread
 {
   private final Storage storage;

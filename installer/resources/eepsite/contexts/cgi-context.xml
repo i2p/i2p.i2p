@@ -33,4 +33,38 @@ Configure a custom context for the eepsite.
     <Arg>org.eclipse.jetty.servlets.CGI</Arg>
     <Arg>/</Arg>
   </Call>
+  <!-- See base-context.xml for info.
+       Unlike for DefaultServlet, there's not even a theoretical
+       inefficiency for using this.
+    -->
+  <!-- FIXME broken, threads get hung -->
+<!--
+  <Call name="addFilter">
+    <Arg>
+      <New class="org.eclipse.jetty.servlet.FilterHolder" >
+        <Arg>
+          <New class="org.eclipse.jetty.servlets.GzipFilter" />
+        </Arg>
+        <Call name="setInitParameter">
+          <Arg>minGzipSize</Arg>
+          <Arg>512</Arg>
+        </Call>
+        <Call name="setInitParameter">
+          <Arg>mimeTypes</Arg>
+          <Arg>application/pdf,application/x-javascript,application/xhtml+xml,application/xml,image/svg+xml,text/css,text/html,text/plain</Arg>
+        </Call>
+      </New>
+    </Arg>
+    <Arg>/*</Arg>
+    <Arg>
+      <Call class="java.util.EnumSet" name="of" >
+        <Arg>
+          <Call class="javax.servlet.DispatcherType" name="valueOf" >
+            <Arg>REQUEST</Arg>
+          </Call>
+        </Arg>
+      </Call>
+    </Arg>
+  </Call>
+-->
 </Configure>

@@ -8,6 +8,7 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -70,6 +71,7 @@ public class EditBean extends IndexBean {
         return _helper.getPrivateKeyFile(tunnel);
     }
     
+/****
     public String getNameSignature(int tunnel) {
         String spoof = getSpoofedHost(tunnel);
         if (spoof.length() <= 0)
@@ -79,7 +81,10 @@ public class EditBean extends IndexBean {
             return "";
         String keyFile = tun.getPrivKeyFile();
         if (keyFile != null && keyFile.trim().length() > 0) {
-            PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
+            File f = new File(keyFile);
+            if (!f.isAbsolute())
+                f = new File(_context.getConfigDir(), keyFile);
+            PrivateKeyFile pkf = new PrivateKeyFile(f);
             try {
                 Destination d = pkf.getDestination();
                 if (d == null)
@@ -87,13 +92,34 @@ public class EditBean extends IndexBean {
                 SigningPrivateKey privKey = pkf.getSigningPrivKey();
                 if (privKey == null)
                     return "";
-                //System.err.println("Signing " + spoof + " with " + Base64.encode(privKey.getData()));
                 Signature sig = _context.dsa().sign(spoof.getBytes("UTF-8"), privKey);
+                if (sig == null)
+                    return "";
                 return Base64.encode(sig.getData());
             } catch (I2PException e) {
             } catch (IOException e) {}
         }
         return "";
+    }
+****/
+    
+    /**
+     *  @since 0.9.26
+     *  @return key or null
+     */
+    public SigningPrivateKey getSigningPrivateKey(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun == null)
+            return null;
+        String keyFile = tun.getPrivKeyFile();
+        if (keyFile != null && keyFile.trim().length() > 0) {
+            File f = new File(keyFile);
+            if (!f.isAbsolute())
+                f = new File(_context.getConfigDir(), keyFile);
+            PrivateKeyFile pkf = new PrivateKeyFile(f);
+            return pkf.getSigningPrivKey();
+        }
+        return null;
     }
     
     public boolean startAutomatically(int tunnel) {
@@ -255,6 +281,11 @@ public class EditBean extends IndexBean {
         return _helper.getMultihome(tunnel);
     }
 
+    /** @since 0.9.25 */
+    public String getUserAgents(int tunnel) {
+        return _helper.getUserAgents(tunnel);
+    }
+    
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
         return _helper.getProxyAuth(tunnel) != "false";

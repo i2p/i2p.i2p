@@ -37,7 +37,10 @@ class PeerState implements DataLoader
   private final Peer peer;
   /** Fixme, used by Peer.disconnect() to get to the coordinator */
   final PeerListener listener;
+  /** Null before we have it. locking: this */
   private MetaInfo metainfo;
+  /** Null unless needed. Contains -1 for all. locking: this */
+  private List<Integer> havesBeforeMetaInfo;
 
   // Interesting and choking describes whether we are interested in or
   // are choking the other side.
@@ -49,7 +52,7 @@ class PeerState implements DataLoader
   volatile boolean interested;
   volatile boolean choked = true;
 
-  /** the pieces the peer has */
+  /** the pieces the peer has. locking: this */
   BitField bitfield;
 
   // Package local for use by Peer.
@@ -66,6 +69,7 @@ class PeerState implements DataLoader
   private final static int MAX_PIPELINE_BYTES = 128*1024;  // this is for inbound requests
   public final static int PARTSIZE = 16*1024; // outbound request
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
+  private static final Integer PIECE_ALL = Integer.valueOf(-1);
 
   /**
    * @param metainfo null if in magnet mode
@@ -131,26 +135,48 @@ class PeerState implements DataLoader
   {
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv have(" + piece + ")");
-    // FIXME we will lose these until we get the metainfo
-    if (metainfo == null)
-        return;
     // Sanity check
-    if (piece < 0 || piece >= metainfo.getPieces())
-      {
-        // XXX disconnect?
-        if (_log.shouldLog(Log.WARN))
+    if (piece < 0) {
+        if (_log.shouldWarn())
             _log.warn("Got strange 'have: " + piece + "' message from " + peer);
         return;
-      }
+    }
 
-    synchronized(this)
-      {
+    synchronized(this) {
+        if (metainfo == null) {
+            if (_log.shouldWarn())
+                _log.warn("Got HAVE " + piece + " before metainfo from " + peer);
+            if (bitfield != null) {
+                if (piece < bitfield.size())
+                      bitfield.set(piece);
+            } else {
+                // note reception for later
+                if (havesBeforeMetaInfo == null) {
+                    havesBeforeMetaInfo = new ArrayList<Integer>(8);
+                } else if (havesBeforeMetaInfo.size() > 1000) {
+                    // don't blow up
+                    if (_log.shouldWarn())
+                        _log.warn("Got too many haves before metainfo from " + peer);
+                    return;
+                }
+                havesBeforeMetaInfo.add(Integer.valueOf(piece));
+            }
+            return;
+        }
+
+        // Sanity check
+        if (piece >= metainfo.getPieces()) {
+            // XXX disconnect?
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Got strange 'have: " + piece + "' message from " + peer);
+            return;
+        }
+
         // Can happen if the other side never send a bitfield message.
         if (bitfield == null)
-          bitfield = new BitField(metainfo.getPieces());
-
+            bitfield = new BitField(metainfo.getPieces());
         bitfield.set(piece);
-      }
+    }
 
     if (listener.gotHave(peer, piece))
       setInteresting(true);
@@ -174,6 +200,7 @@ class PeerState implements DataLoader
         else
             _log.debug(peer + " rcv bitfield HAVE_NONE");
     }
+
     synchronized(this) {
         if (bitfield != null)
           {
@@ -184,17 +211,25 @@ class PeerState implements DataLoader
           }
         
         // XXX - Check for weird bitfield and disconnect?
-        // FIXME will have to regenerate the bitfield after we know exactly
+        // Will have to regenerate the bitfield after we know exactly
         // how many pieces there are, as we don't know how many spare bits there are.
+        // This happens in setMetaInfo() below.
         if (metainfo == null) {
             if (bitmap != null) {
                 bitfield = new BitField(bitmap, bitmap.length * 8);
             } else {
-                // we can't handle this situation
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("have_x w/o metainfo: " + isAll);
-                return;
+                if (isAll) {
+                    // note reception for later
+                    if (havesBeforeMetaInfo == null)
+                        havesBeforeMetaInfo = new ArrayList<Integer>(1);
+                    else
+                        havesBeforeMetaInfo.clear();
+                    havesBeforeMetaInfo.add(PIECE_ALL);
+                } // else HAVE_NONE, ignore
             }
+            return;
         } else {
             if (bitmap != null) {
                 bitfield = new BitField(bitmap, metainfo.getPieces());
@@ -204,9 +239,8 @@ class PeerState implements DataLoader
                     bitfield.setAll();
             }
         }
-      }
-    if (metainfo == null)
-        return;
+    }  // synch
+
     boolean interest = listener.gotBitField(peer, bitfield);
     setInteresting(interest);
     if (bitfield.complete() && !interest) {
@@ -566,22 +600,43 @@ class PeerState implements DataLoader
    *  @param meta non-null
    *  @since 0.8.4
    */
-  public void setMetaInfo(MetaInfo meta) {
+  public synchronized void setMetaInfo(MetaInfo meta) {
       if (metainfo != null)
           return;
-      BitField oldBF = bitfield;
-      if (oldBF != null) {
-          if (oldBF.size() != meta.getPieces())
+      if (bitfield != null) {
+          if (bitfield.size() != meta.getPieces())
               // fix bitfield, it was too big by 1-7 bits
-              bitfield = new BitField(oldBF.getFieldBytes(), meta.getPieces());
+              bitfield = new BitField(bitfield.getFieldBytes(), meta.getPieces());
           // else no extra
+      } else if (havesBeforeMetaInfo != null) {
+          // initialize it now
+          bitfield = new BitField(meta.getPieces());
       } else {
           // it will be initialized later
           //bitfield = new BitField(meta.getPieces());
       }
       metainfo = meta;
-      if (bitfield != null && bitfield.count() > 0)
-          setInteresting(true);
+      if (bitfield != null) {
+          if (havesBeforeMetaInfo != null) {
+              // set all 'haves' we got before the metainfo in the bitfield
+              for (Integer i : havesBeforeMetaInfo) {
+                  if (i.equals(PIECE_ALL)) {
+                      bitfield.setAll();
+                      if (_log.shouldLog(Log.WARN))
+                          _log.warn("set have_all after rcv metainfo");
+                      break;
+                  }
+                  int piece = i.intValue();
+                  if (piece >= 0 && piece < meta.getPieces())
+                      bitfield.set(piece);
+                  if (_log.shouldLog(Log.WARN))
+                      _log.warn("set have " + piece + " after rcv metainfo");
+              }
+              havesBeforeMetaInfo = null;
+          }
+          if (bitfield.count() > 0)
+              setInteresting(true);
+      }
   }
 
   /**
@@ -744,6 +799,7 @@ class PeerState implements DataLoader
    * @deprecated deadlocks
    * @since 0.8.1
    */
+  @Deprecated
   synchronized boolean isRequesting(int piece) {
       if (pendingRequest != null && pendingRequest.getPiece() == piece)
           return true;

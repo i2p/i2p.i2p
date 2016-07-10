@@ -29,10 +29,8 @@ package net.i2p.addressbook;
  */
 class Subscription {
 
-    private String location;
-
+    private final String location;
     private String etag;
-
     private String lastModified;
     private long lastFetched;
 
@@ -41,14 +39,15 @@ class Subscription {
      * was last read at the time represented by etag and lastModified.
      * 
      * @param location
-     *            A String representing a url to a remote address book.
+     *            A String representing a url to a remote address book. Non-null.
      * @param etag
-     *            The etag header that we recieved the last time we read this
-     *            subscription.
+     *            The etag header that we received the last time we read this
+     *            subscription. May be null.
      * @param lastModified
-     *            the last-modified header we recieved the last time we read
-     *            this subscription.
-     * @param lastFetched when the subscription was last fetched (Java time, as a String)
+     *            the last-modified header we received the last time we read
+     *            this subscription. May be null.
+     * @param lastFetched when the subscription was last fetched (Java time, as a String).
+     *            May be null.
      */
     public Subscription(String location, String etag, String lastModified, String lastFetched) {
         this.location = location;
@@ -71,7 +70,7 @@ class Subscription {
     }
 
     /**
-     * Return the etag header that we recieved the last time we read this
+     * Return the etag header that we received the last time we read this
      * subscription.
      * 
      * @return A String containing the etag header.
@@ -91,7 +90,7 @@ class Subscription {
     }
 
     /**
-     * Return the last-modified header that we recieved the last time we read
+     * Return the last-modified header that we received the last time we read
      * this subscription.
      * 
      * @return A String containing the last-modified header.

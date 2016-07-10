@@ -114,9 +114,11 @@ public class FIFOBandwidthLimiter {
     //public void setMaxOutboundBytes(int numBytes) { _maxOutboundBytes = numBytes; }
 
     /** @deprecated unused for now, we are always limited */
+    @Deprecated
     void setInboundUnlimited(boolean isUnlimited) { _inboundUnlimited = isUnlimited; }
 
     /** @deprecated unused for now, we are always limited */
+    @Deprecated
     void setOutboundUnlimited(boolean isUnlimited) { _outboundUnlimited = isUnlimited; }
 
     /** @return smoothed one second rate */
@@ -735,6 +737,7 @@ public class FIFOBandwidthLimiter {
     }
 
     /** @deprecated not worth translating */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
 /*******
         long now = now();

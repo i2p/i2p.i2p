@@ -1,0 +1,777 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Agustín Wu <losangwuyts@gmail.com>, 2016
+# Huang Yanru <r1235613@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2016-01-24 04:41+0000\n"
+"Last-Translator: Agustín Wu <losangwuyts@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Anonymous Proxy"
+msgstr "匿名代理"
+
+msgid "Satellite Provider"
+msgstr ""
+
+msgid "Andorra"
+msgstr "安道爾"
+
+msgid "United Arab Emirates"
+msgstr "阿拉伯聯合大公國"
+
+msgid "Afghanistan"
+msgstr "阿富汗"
+
+msgid "Antigua and Barbuda"
+msgstr "安地卡及巴布達"
+
+msgid "Anguilla"
+msgstr "安圭拉島"
+
+msgid "Albania"
+msgstr "阿爾巴尼亞"
+
+msgid "Armenia"
+msgstr "亞美尼亞"
+
+msgid "Netherlands Antilles"
+msgstr "荷屬安地列斯"
+
+msgid "Angola"
+msgstr "安哥拉"
+
+msgid "Asia/Pacific Region"
+msgstr "亞太地區"
+
+msgid "Antarctica"
+msgstr "南極洲"
+
+msgid "Argentina"
+msgstr "阿根廷"
+
+msgid "American Samoa"
+msgstr "美屬薩摩亞"
+
+msgid "Austria"
+msgstr "奧地利"
+
+msgid "Australia"
+msgstr "澳大利亞"
+
+msgid "Aruba"
+msgstr "阿魯巴"
+
+msgid "Åland Islands"
+msgstr "奧蘭"
+
+msgid "Azerbaijan"
+msgstr "亞塞拜然"
+
+msgid "Bosnia and Herzegovina"
+msgstr "波士尼亞與赫塞哥維納"
+
+msgid "Barbados"
+msgstr "巴貝多"
+
+msgid "Bangladesh"
+msgstr "孟加拉"
+
+msgid "Belgium"
+msgstr "比利時"
+
+msgid "Burkina Faso"
+msgstr "布吉納法索"
+
+msgid "Bulgaria"
+msgstr "保加利亞"
+
+msgid "Bahrain"
+msgstr "巴林"
+
+msgid "Burundi"
+msgstr "蒲隆地"
+
+msgid "Benin"
+msgstr "貝南"
+
+msgid "Saint Barthélemy"
+msgstr "聖巴瑟米"
+
+msgid "Bermuda"
+msgstr "百慕達"
+
+msgid "Brunei Darussalam"
+msgstr "汶萊"
+
+msgid "Bolivia"
+msgstr "玻利維亞"
+
+msgid "Bonaire"
+msgstr "波奈"
+
+msgid "Brazil"
+msgstr "巴西"
+
+msgid "Bahamas"
+msgstr "巴哈馬"
+
+msgid "Bhutan"
+msgstr "不丹"
+
+msgid "Bouvet Island"
+msgstr "布威島"
+
+msgid "Botswana"
+msgstr "波紮那"
+
+msgid "Belarus"
+msgstr "白俄羅斯"
+
+msgid "Belize"
+msgstr "貝里斯"
+
+msgid "Canada"
+msgstr "加拿大"
+
+msgid "Cocos (Keeling) Islands"
+msgstr "科科斯（基林）群島"
+
+msgid "Congo"
+msgstr "剛果"
+
+msgid "Central African Republic"
+msgstr "中非共和國"
+
+msgid "Switzerland"
+msgstr "瑞士"
+
+msgid "Cote D'Ivoire"
+msgstr "象牙海岸共和國"
+
+msgid "Cook Islands"
+msgstr "庫克群島"
+
+msgid "Chile"
+msgstr "智利"
+
+msgid "Cameroon"
+msgstr "喀麥隆"
+
+msgid "China"
+msgstr "中華人民共和國"
+
+msgid "Colombia"
+msgstr "哥倫比亞"
+
+msgid "Costa Rica"
+msgstr "哥斯大黎加"
+
+msgid "Serbia and Montenegro"
+msgstr "塞爾維亞與蒙特內哥羅"
+
+msgid "Cuba"
+msgstr "古巴"
+
+msgid "Cape Verde"
+msgstr "維德角共和國"
+
+msgid "Curaçao"
+msgstr "古拉索"
+
+msgid "Christmas Island"
+msgstr "聖誕島"
+
+msgid "Cyprus"
+msgstr "賽普勒斯"
+
+msgid "Czech Republic"
+msgstr "捷克"
+
+msgid "Germany"
+msgstr "德國"
+
+msgid "Djibouti"
+msgstr "吉布地"
+
+msgid "Denmark"
+msgstr "丹麥"
+
+msgid "Dominica"
+msgstr "多米尼克"
+
+msgid "Dominican Republic"
+msgstr "多明尼加"
+
+msgid "Algeria"
+msgstr "阿爾及利亞"
+
+msgid "Ecuador"
+msgstr "厄瓜多爾"
+
+msgid "Estonia"
+msgstr "愛沙尼亞"
+
+msgid "Egypt"
+msgstr "埃及"
+
+msgid "Western Sahara"
+msgstr "西撒哈拉"
+
+msgid "Eritrea"
+msgstr "厄立特里亞"
+
+msgid "Spain"
+msgstr "西班牙"
+
+msgid "Ethiopia"
+msgstr "衣索比亞"
+
+msgid "European Union"
+msgstr "歐盟"
+
+msgid "Finland"
+msgstr "芬蘭"
+
+msgid "Fiji"
+msgstr "斐濟"
+
+msgid "Falkland Islands (Malvinas)"
+msgstr "福克蘭群島"
+
+msgid "Micronesia"
+msgstr "密克羅西尼亞"
+
+msgid "Faroe Islands"
+msgstr "法羅群島"
+
+msgid "France"
+msgstr "法國"
+
+msgid "Gabon"
+msgstr "加彭"
+
+msgid "United Kingdom"
+msgstr "英國"
+
+msgid "Grenada"
+msgstr "格拉那達"
+
+msgid "Georgia"
+msgstr "喬治亞"
+
+msgid "French Guiana"
+msgstr "法屬圭亞那"
+
+msgid "Guernsey"
+msgstr "格恩西島"
+
+msgid "Ghana"
+msgstr "迦納"
+
+msgid "Gibraltar"
+msgstr "直布羅陀"
+
+msgid "Greenland"
+msgstr "格陵蘭"
+
+msgid "Gambia"
+msgstr "甘比亞"
+
+msgid "Guinea"
+msgstr "日內瓦"
+
+msgid "Guadeloupe"
+msgstr "瓜德羅普"
+
+msgid "Equatorial Guinea"
+msgstr "赤道幾內亞"
+
+msgid "Greece"
+msgstr "希臘"
+
+msgid "South Georgia and the South Sandwich Islands"
+msgstr "南喬治亞和南三明治群島"
+
+msgid "Guatemala"
+msgstr "瓜地馬拉"
+
+msgid "Guam"
+msgstr "關島"
+
+msgid "Guinea-Bissau"
+msgstr "幾內亞比索共和國"
+
+msgid "Guyana"
+msgstr "蓋亞那"
+
+msgid "Hong Kong"
+msgstr "香港"
+
+msgid "Honduras"
+msgstr "宏都拉斯"
+
+msgid "Croatia"
+msgstr "克羅埃西亞"
+
+msgid "Haiti"
+msgstr "海地"
+
+msgid "Hungary"
+msgstr "匈牙利"
+
+msgid "Indonesia"
+msgstr "印尼"
+
+msgid "Ireland"
+msgstr "愛爾蘭"
+
+msgid "Israel"
+msgstr "以色列"
+
+msgid "Isle of Man"
+msgstr "英國屬地曼島"
+
+msgid "India"
+msgstr "印度"
+
+msgid "British Indian Ocean Territory"
+msgstr "英屬印度洋領地"
+
+msgid "Iraq"
+msgstr "伊拉克"
+
+msgid "Iran"
+msgstr "伊朗"
+
+msgid "Iceland"
+msgstr "冰島"
+
+msgid "Italy"
+msgstr "義大利"
+
+msgid "Jersey"
+msgstr "澤西島"
+
+msgid "Jamaica"
+msgstr "牙買加"
+
+msgid "Jordan"
+msgstr "約旦"
+
+msgid "Japan"
+msgstr "日本"
+
+msgid "Kenya"
+msgstr "肯亞"
+
+msgid "Kyrgyzstan"
+msgstr "吉爾吉斯坦共和國"
+
+msgid "Cambodia"
+msgstr "柬普寨"
+
+msgid "Kiribati"
+msgstr "吉里巴斯"
+
+msgid "Comoros"
+msgstr "科摩洛"
+
+msgid "Saint Kitts and Nevis"
+msgstr "聖克里斯多福及尼維斯聯邦"
+
+msgid "North Korea"
+msgstr "北韓"
+
+msgid "Republic of Korea"
+msgstr "南韓"
+
+msgid "Kuwait"
+msgstr "科威特"
+
+msgid "Cayman Islands"
+msgstr "開曼群島"
+
+msgid "Kazakhstan"
+msgstr "哈薩克"
+
+msgid "Lao People's Democratic Republic"
+msgstr "寮國"
+
+msgid "Lebanon"
+msgstr "黎巴嫩"
+
+msgid "Saint Lucia"
+msgstr "聖路西亞"
+
+msgid "Liechtenstein"
+msgstr "列支敦支登"
+
+msgid "Sri Lanka"
+msgstr "斯里蘭卡"
+
+msgid "Liberia"
+msgstr "賴比瑞亞"
+
+msgid "Lesotho"
+msgstr "賴索托"
+
+msgid "Lithuania"
+msgstr "立陶宛"
+
+msgid "Luxembourg"
+msgstr "盧森堡"
+
+msgid "Latvia"
+msgstr "拉托維亞"
+
+msgid "Libya"
+msgstr "利比亞"
+
+msgid "Morocco"
+msgstr "摩洛哥"
+
+msgid "Monaco"
+msgstr "摩納哥"
+
+msgid "Moldova"
+msgstr "摩爾多瓦"
+
+msgid "Montenegro"
+msgstr "蒙特內哥羅共和國"
+
+msgid "Saint Martin"
+msgstr "聖馬丁島"
+
+msgid "Madagascar"
+msgstr "馬達加斯加"
+
+msgid "Marshall Islands"
+msgstr "馬紹爾群島"
+
+msgid "Macedonia"
+msgstr "馬其頓"
+
+msgid "Mali"
+msgstr "馬利共和國"
+
+msgid "Myanmar"
+msgstr "緬甸"
+
+msgid "Mongolia"
+msgstr "蒙古"
+
+msgid "Macau"
+msgstr "澳門"
+
+msgid "Northern Mariana Islands"
+msgstr "北馬利安納群島自由邦"
+
+msgid "Martinique"
+msgstr "馬丁尼克"
+
+msgid "Mauritania"
+msgstr "茅利塔尼亞"
+
+msgid "Montserrat"
+msgstr "蒙哲臘"
+
+msgid "Malta"
+msgstr "馬爾他"
+
+msgid "Mauritius"
+msgstr "模里西斯"
+
+msgid "Maldives"
+msgstr "馬爾地夫"
+
+msgid "Malawi"
+msgstr "馬拉威"
+
+msgid "Mexico"
+msgstr "墨西哥"
+
+msgid "Malaysia"
+msgstr "馬來西亞"
+
+msgid "Mozambique"
+msgstr "莫三比克"
+
+msgid "Namibia"
+msgstr "納米比亞"
+
+msgid "New Caledonia"
+msgstr "新喀里多尼亞"
+
+msgid "Niger"
+msgstr "尼日"
+
+msgid "Norfolk Island"
+msgstr "諾福克島"
+
+msgid "Nigeria"
+msgstr "奈及利亞"
+
+msgid "Nicaragua"
+msgstr "尼加拉瓜"
+
+msgid "Netherlands"
+msgstr "荷蘭"
+
+msgid "Norway"
+msgstr "挪威"
+
+msgid "Nepal"
+msgstr "尼泊爾"
+
+msgid "Nauru"
+msgstr "諾魯"
+
+msgid "Niue"
+msgstr "紐埃"
+
+msgid "New Zealand"
+msgstr "紐西蘭"
+
+msgid "Oman"
+msgstr "阿曼蘇丹國"
+
+msgid "Panama"
+msgstr "巴拿馬"
+
+msgid "Peru"
+msgstr "秘魯"
+
+msgid "French Polynesia"
+msgstr ""
+
+msgid "Papua New Guinea"
+msgstr "巴布亞新吉內雅"
+
+msgid "Philippines"
+msgstr "菲律賓"
+
+msgid "Pakistan"
+msgstr "巴基斯坦"
+
+msgid "Poland"
+msgstr "波蘭"
+
+msgid "Saint Pierre and Miquelon"
+msgstr ""
+
+msgid "Pitcairn Islands"
+msgstr ""
+
+msgid "Puerto Rico"
+msgstr "波多黎各"
+
+msgid "Palestinian Territory"
+msgstr "巴勒斯坦"
+
+msgid "Portugal"
+msgstr "葡萄牙"
+
+msgid "Palau"
+msgstr ""
+
+msgid "Paraguay"
+msgstr "巴拉圭"
+
+msgid "Qatar"
+msgstr ""
+
+msgid "Réunion"
+msgstr ""
+
+msgid "Romania"
+msgstr "羅馬尼亞"
+
+msgid "Serbia"
+msgstr ""
+
+msgid "Russian Federation"
+msgstr "蘇聯"
+
+msgid "Rwanda"
+msgstr ""
+
+msgid "Saudi Arabia"
+msgstr "沙烏地阿拉伯"
+
+msgid "Solomon Islands"
+msgstr "所羅門群島"
+
+msgid "Seychelles"
+msgstr ""
+
+msgid "Sudan"
+msgstr "蘇丹"
+
+msgid "Sweden"
+msgstr "瑞典"
+
+msgid "Singapore"
+msgstr "新加坡"
+
+msgid "Saint Helena"
+msgstr ""
+
+msgid "Slovenia"
+msgstr "斯洛維尼亞"
+
+msgid "Svalbard and Jan Mayen"
+msgstr ""
+
+msgid "Slovakia"
+msgstr "斯洛伐克"
+
+msgid "Sierra Leone"
+msgstr ""
+
+msgid "San Marino"
+msgstr ""
+
+msgid "Senegal"
+msgstr "塞內加爾"
+
+msgid "Somalia"
+msgstr "索馬利亞"
+
+msgid "Suriname"
+msgstr "蘇利南"
+
+msgid "South Sudan"
+msgstr ""
+
+msgid "Sao Tome and Principe"
+msgstr ""
+
+msgid "El Salvador"
+msgstr "薩爾瓦多"
+
+msgid "Sint Maarten"
+msgstr ""
+
+msgid "Syria"
+msgstr "敘利亞"
+
+msgid "Swaziland"
+msgstr "史瓦濟蘭"
+
+msgid "Turks and Caicos Islands"
+msgstr ""
+
+msgid "Chad"
+msgstr "查德"
+
+msgid "French Southern Territories"
+msgstr ""
+
+msgid "Togo"
+msgstr ""
+
+msgid "Thailand"
+msgstr "泰國"
+
+msgid "Tajikistan"
+msgstr ""
+
+msgid "Tokelau"
+msgstr ""
+
+msgid "Timor-Leste"
+msgstr ""
+
+msgid "Turkmenistan"
+msgstr "土庫曼斯坦"
+
+msgid "Tunisia"
+msgstr "突尼西亞"
+
+msgid "Tonga"
+msgstr ""
+
+msgid "Turkey"
+msgstr "土耳其"
+
+msgid "Trinidad and Tobago"
+msgstr ""
+
+msgid "Tuvalu"
+msgstr "吐哇魯"
+
+msgid "Taiwan"
+msgstr "臺灣"
+
+msgid "Tanzania"
+msgstr "坦尚尼亞"
+
+msgid "Ukraine"
+msgstr "烏克蘭"
+
+msgid "Uganda"
+msgstr "烏干達"
+
+msgid "United States Minor Outlying Islands"
+msgstr ""
+
+msgid "United States"
+msgstr "美國"
+
+msgid "Uruguay"
+msgstr "烏拉圭"
+
+msgid "Uzbekistan"
+msgstr "烏茲別克"
+
+msgid "Vatican"
+msgstr "梵蒂岡"
+
+msgid "Saint Vincent and the Grenadines"
+msgstr "聖文森"
+
+msgid "Venezuela"
+msgstr "委內瑞拉"
+
+msgid "Virgin Islands"
+msgstr ""
+
+msgid "Vietnam"
+msgstr "越南"
+
+msgid "Vanuatu"
+msgstr ""
+
+msgid "Wallis and Futuna"
+msgstr ""
+
+msgid "Samoa"
+msgstr ""
+
+msgid "Yemen"
+msgstr "葉門"
+
+msgid "Mayotte"
+msgstr ""
+
+msgid "South Africa"
+msgstr "南非"
+
+msgid "Zambia"
+msgstr "贊比亞"
+
+msgid "Zimbabwe"
+msgstr "辛巴威"

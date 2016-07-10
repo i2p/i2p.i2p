@@ -49,7 +49,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     //public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
 
     // no longer allow unlimited bandwidth - the user must specify a value, else use defaults below (KBps)
-    public static final int DEFAULT_INBOUND_BANDWIDTH = 96;
+    public static final int DEFAULT_INBOUND_BANDWIDTH = 300;
     /**
      *  Caution, do not make DEFAULT_OUTBOUND_BANDWIDTH * DEFAULT_SHARE_PCT > 32
      *  without thinking about the implications (default connection limits, for example)
@@ -57,19 +57,19 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  adjusting bandwidth class boundaries.
      */
     public static final int DEFAULT_OUTBOUND_BANDWIDTH = 60;
-    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 96;
+    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 300;
     public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 60;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
     
-    /** For now, until there is some tuning and safe throttling, we set the floor at 3KBps inbound */
-    public static final int MIN_INBOUND_BANDWIDTH = 3;
-    /** For now, until there is some tuning and safe throttling, we set the floor at 3KBps outbound */
-    public static final int MIN_OUTBOUND_BANDWIDTH = 3;
-    /** For now, until there is some tuning and safe throttling, we set the floor at a 3KBps during burst */
-    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 3;
-    /** For now, until there is some tuning and safe throttling, we set the floor at a 3KBps during burst */
-    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 3;
+    /** For now, until there is some tuning and safe throttling, we set the floor at this inbound (KBps) */
+    public static final int MIN_INBOUND_BANDWIDTH = 5;
+    /** For now, until there is some tuning and safe throttling, we set the floor at this outbound (KBps) */
+    public static final int MIN_OUTBOUND_BANDWIDTH = 5;
+    /** For now, until there is some tuning and safe throttling, we set the floor at this during burst (KBps) */
+    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 5;
+    /** For now, until there is some tuning and safe throttling, we set the floor at this during burst (KBps) */
+    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 5;
     /**
      *  Max for reasonable Bloom filter false positive rate.
      *  Do not increase without adding a new Bloom filter size!

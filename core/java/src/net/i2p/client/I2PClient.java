@@ -84,6 +84,8 @@ public interface I2PClient {
     /** Create a new destination with the default certificate creation properties and store
      * it, along with the private encryption and signing keys at the specified location
      *
+     * Caller must close stream.
+     *
      * @param destKeyStream create a new destination and write out the object to the given stream, 
      *			    formatted as Destination, PrivateKey, and SigningPrivateKey
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
@@ -97,6 +99,8 @@ public interface I2PClient {
      * This is not bound to the I2PClient, you must supply the data back again
      * in createSession().
      *
+     * Caller must close stream.
+     *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @since 0.9.12
@@ -105,6 +109,8 @@ public interface I2PClient {
 
     /** Create a new destination with the given certificate and store it, along with the private 
      * encryption and signing keys at the specified location
+     *
+     * Caller must close stream.
      *
      * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
      *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}

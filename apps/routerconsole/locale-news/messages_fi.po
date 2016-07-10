@@ -5,14 +5,15 @@
 # 
 # Translators:
 # oselotti, 2014
+# outolumo <outolumo@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2014-08-23 08:23+0000\n"
-"Last-Translator: oselotti\n"
-"Language-Team: Finnish (http://www.transifex.com/projects/p/I2P/language/fi/)\n"
+"PO-Revision-Date: 2016-06-01 20:07+0000\n"
+"Last-Translator: outolumo <outolumo@gmail.com>\n"
+"Language-Team: Finnish (http://www.transifex.com/otf/I2P/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -42,7 +43,7 @@ msgstr "Voit myös asettaa selaimesi käyttämään I2P-välityspalvelinta pää
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr "Aseta 127.0.0.1 (tai localhost) portti 4444 http-välityspalvelimeksi selaimen asetuksiin."
+msgstr "Riittää, kun laitat selaimen asetuksiin http-välityspalvelimeksi 127.0.0.1 (tai localhost) ja portti 4444."
 
 msgid "Do not use SOCKS for this."
 msgstr "Älä käytä SOCKS:ia tähän."

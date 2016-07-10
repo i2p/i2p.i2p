@@ -39,25 +39,30 @@
  <input type="submit" class="reload" name="action" value="<%=intl._t("Hard restart")%>" >
  <% } %></div>
 
- <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
+<% if (formhandler.shouldShowSystray()) { %>
  <h3><%=intl._t("Systray integration")%></h3>
- <p><%=intl._t("On the windows platform, there is a small application to sit in the system tray, allowing you to view the router's status")%> 
-    <%=intl._t("(later on, I2P client applications will be able to integrate their own functionality into the system tray as well).")%> 
-    <%=intl._t("If you are on windows, you can either enable or disable that icon here.")%></p>
+ <p><%=intl._t("Control the system tray icon")%> 
  <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._t("Show systray icon")%>" >
- <input type="submit" name="action" value="<%=intl._t("Hide systray icon")%>" >
+<% if (!formhandler.isSystrayEnabled()) { %>
+ <input type="submit" name="action" class="accept" value="<%=intl._t("Show systray icon")%>" >
+<% } else {%>
+ <input type="submit" name="action" class="cancel" value="<%=intl._t("Hide systray icon")%>" >
+<% } %>
  </div>
+<%
+   }  
+   if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
+%>
  <h3><%=intl._t("Run on startup")%></h3>
  <p><%=intl._t("You can control whether I2P is run on startup or not by selecting one of the following options - I2P will install (or remove) a service accordingly.")%> 
     <%=intl._t("If you prefer the command line, you can also run the ")%> <code>install_i2p_service_winnt.bat</code> (<%=intl._t("or")%>
  <code>uninstall_i2p_service_winnt.bat</code>).</p>
  <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._t("Run I2P on startup")%>" >
-<input type="submit" name="action" value="<%=intl._t("Don't run I2P on startup")%>" ></div>
+ <input type="submit" name="action" class="accept" value="<%=intl._t("Run I2P on startup")%>" >
+<input type="submit" name="action" class="cancel" value="<%=intl._t("Don't run I2P on startup")%>" ></div>
  <p><b><%=intl._t("Note")%>:</b> <%=intl._t("If you are running I2P as service right now, removing it will shut down your router immediately.")%> 
     <%=intl._t("You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat.")%></p>
- <% } %>
+<% } %>
 
  <h3><%=intl._t("Debugging")%></h3>
  <p><a href="/jobs"><%=intl._t("View the job queue")%></a>

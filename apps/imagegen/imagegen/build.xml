@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="imagegen">
+    <property name="project" value="imagegen" />
+    <property name="jetty" value="../../jetty/" />
+    <property name="lib" value="${jetty}/jettylib" />
+    <path id="cp">
+        <pathelement location="${lib}/javax.servlet.jar" />
+        <pathelement location="../identicon/build/identicon.jar" />
+        <pathelement location="../zxing/build/zxing.jar" />
+        <pathelement location="../../../build/i2p.jar" />
+    </path>
+
+    <target name="all" depends="war" />
+    <target name="build" depends="builddep, war" />
+    <target name="builddep">
+        <!-- run from top level build.xml to get dependencies built -->
+    </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../../build"
+            srcdir="./webapp/src/main/java" 
+            destdir="./build/obj" >
+        </depend>
+    </target>
+
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.6" />
+
+    <target name="compile" depends="depend">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/WEB-INF" />
+        <mkdir dir="./build/WEB-INF/classes" />
+        <javac srcdir="./webapp/src/main/java" debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
+               includeAntRuntime="false"
+ 	       classpathref="cp"
+               destdir="./build/WEB-INF/classes" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="listChangedFiles" if="shouldListChanges" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="war" depends="compile, warUpToDate" unless="war.uptodate" > 
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <!-- put the identicon and zxing classes in the war -->
+        <copy todir="build/WEB-INF/classes">
+            <fileset dir="../identicon/build/obj"/>
+            <fileset dir="../zxing/build/obj"/>
+        </copy>
+        <war destfile="build/${project}.war" webxml="webapp/src/main/webapp/WEB-INF/web.xml">
+            <fileset dir="build">
+                <include name="WEB-INF/**/*.class"/>
+            </fileset>
+            <fileset dir="webapp/src/main/webapp"/>
+            <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </war>
+    </target>
+
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="${project}.war">
+            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class images/*.png css.css index.html WEB-INF/classes/${project}.properties" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="war.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
+    
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./webapp/src/main/java" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="imagegen webapp" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+        <delete dir="./buildTest" />
+    </target>
+    <target name="cleandep" depends="clean">
+    </target>
+    <target name="distclean" depends="clean">
+    </target>
+</project>

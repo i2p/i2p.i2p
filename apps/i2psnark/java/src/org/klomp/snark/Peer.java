@@ -194,6 +194,7 @@ public class Peer implements Comparable<Peer>
    * Compares the PeerIDs.
    * @deprecated unused?
    */
+  @Deprecated
   public int compareTo(Peer p)
   {
     int rv = peerID.compareTo(p.peerID);
@@ -531,6 +532,7 @@ public class Peer implements Comparable<Peer>
    * @deprecated deadlocks
    * @since 0.8.1
    */
+  @Deprecated
   boolean isRequesting(int p) {
     PeerState s = state;
     return s != null && s.isRequesting(p);
@@ -563,6 +565,7 @@ public class Peer implements Comparable<Peer>
    * us then we start downloading from it. Has no effect when not connected.
    * @deprecated unused
    */
+  @Deprecated
   public void setInteresting(boolean interest)
   {
     PeerState s = state;

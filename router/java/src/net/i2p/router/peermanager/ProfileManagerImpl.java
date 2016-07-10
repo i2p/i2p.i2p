@@ -357,6 +357,7 @@ public class ProfileManagerImpl implements ProfileManager {
      *  provide a simple summary of a number of peers, suitable for publication in the netDb
      *  @deprecated unused
      */
+    @Deprecated
     public Properties summarizePeers(int numPeers) {
 /****
         Set peers = new HashSet(numPeers);

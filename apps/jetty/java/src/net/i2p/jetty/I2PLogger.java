@@ -31,12 +31,12 @@ public class I2PLogger implements Logger
 {    
     private final Log _log;
     
-    StringBuilder _buffer = new StringBuilder();
+    private final StringBuilder _buffer = new StringBuilder();
     
-    static {
+    //static {
         // So people don't wonder where the logs went
-        System.out.println("INFO: Jetty " + Server.getVersion() + " logging to I2P logs using class " + Server.class.getName());
-    }
+        //System.out.println("INFO: Jetty " + Server.getVersion() + " logging to I2P logs using class " + Server.class.getName());
+    //}
 
     public I2PLogger()
     {
@@ -115,10 +115,14 @@ public class I2PLogger implements Logger
     {
         // some of these are serious, some aren't
         // no way to get it right
-        if (th != null)
-            _log.logAlways(Log.WARN, msg + ": " + th);
-        else
+        if (th != null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(msg, th);
+            else
+                _log.logAlways(Log.WARN, msg + ": " + th);
+        } else {
             _log.logAlways(Log.WARN, msg);
+        }
     }
     
     private void format(String msg, Object arg0, Object arg1)

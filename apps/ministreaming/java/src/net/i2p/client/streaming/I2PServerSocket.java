@@ -42,6 +42,7 @@ public interface I2PServerSocket {
      *  @return null always
      *  @since 0.8.11
      */
+    @Deprecated
     public AcceptingChannel getChannel();
 
     /**

@@ -255,6 +255,7 @@ public class OutboundMessageRegistry {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {}
     
     private class CleanupTask extends SimpleTimer2.TimedEvent {

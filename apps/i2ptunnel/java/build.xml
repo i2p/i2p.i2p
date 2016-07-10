@@ -16,6 +16,7 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="../../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../ministreaming/java/build/obj" />
             </classpath>
         </depend>
@@ -38,7 +39,7 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -122,6 +123,7 @@
 
     <!-- servlet translations go in the war, not the jar -->
     <target name="bundle" depends="compile, precompilejsp" unless="no.bundle">
+        <mkdir dir="build/messages-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -135,6 +137,11 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages.sh" />
         </exec>
+        <javac source="${javac.version}" target="${javac.version}" 
+               includeAntRuntime="false"
+               srcdir="build/messages-src" destdir="../jsp/WEB-INF/classes">
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
 
     <target name="poupdate" depends="compile, precompilejsp">
@@ -155,6 +162,7 @@
 
     <!-- proxy error page translations go in the jar, not the war -->
     <target name="bundle-proxy" unless="no.bundle">
+        <mkdir dir="build/messages-proxy-src" />
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
@@ -168,6 +176,11 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages-proxy.sh" />
         </exec>
+        <javac source="${javac.version}" target="${javac.version}" 
+               includeAntRuntime="false"
+               srcdir="build/messages-proxy-src" destdir="build/obj">
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
     </target>
 
     <target name="extractProxyTags">
@@ -235,6 +248,7 @@
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="build/i2ptunnel.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp" />
+            <srcfiles dir= "build/obj" includes="**/ui/*.class **/web/*.class" />
         </uptodate>
         <condition property="shouldListChanges2" >
             <and>
@@ -257,12 +271,20 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
+                <!-- jasper-el.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jasper-el.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- required for multipart form handling in register.jsp -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
@@ -281,11 +303,19 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <!-- jsp-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <!-- tomcat-api.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
+                <!-- jasper-el.jar only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/jasper-el.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
                 <pathelement location="build/temp-beans.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
+                <!-- required for multipart form handling in register.jsp -->
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
             </classpath>
         </javac>
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />

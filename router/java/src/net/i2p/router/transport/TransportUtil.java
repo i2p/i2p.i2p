@@ -93,6 +93,16 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  @param transportStyle ignored
+     *  @since 0.9.27
+     */
+    public static boolean isIPv6Firewalled(RouterContext ctx, String transportStyle) {
+        // TODO
+        //return ctx.getBooleanProperty(PROP_IPV6_FIREWALLED);
+        return false;
+    }
+
+    /**
      *  Addresses without a host (i.e. w/introducers)
      *  are assumed to be IPv4
      */

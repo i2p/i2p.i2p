@@ -328,6 +328,7 @@ class UDPPacket implements CDQEntry {
      *  @since 0.9.21
      *  @deprecated unused
      */
+    @Deprecated
     public synchronized void requestInboundBandwidth() {
         verifyNotReleased();
         _bandwidthRequest = _context.bandwidthLimiter().requestInbound(_packet.getLength(), "UDP receiver");

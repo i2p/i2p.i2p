@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <display-name>WebAppExample - Identicon</display-name>
+
+    <servlet>
+     <servlet-name>net.i2p.imagegen.IdenticonServlet</servlet-name>
+     <servlet-class>net.i2p.imagegen.IdenticonServlet</servlet-class>
+     <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+     <servlet-name>net.i2p.imagegen.QRServlet</servlet-name>
+     <servlet-class>net.i2p.imagegen.QRServlet</servlet-class>
+     <load-on-startup>1</load-on-startup>
+    </servlet>
+     
+    <servlet>
+     <servlet-name>net.i2p.imagegen.RandomArtServlet</servlet-name>
+     <servlet-class>net.i2p.imagegen.RandomArtServlet</servlet-class>
+     <load-on-startup>1</load-on-startup>
+    </servlet>
+     
+    <!-- precompiled servlets -->
+    
+    <servlet-mapping> 
+      <servlet-name>net.i2p.imagegen.IdenticonServlet</servlet-name>
+      <url-pattern>/id</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
+      <servlet-name>net.i2p.imagegen.QRServlet</servlet-name>
+      <url-pattern>/qr</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
+      <servlet-name>net.i2p.imagegen.RandomArtServlet</servlet-name>
+      <url-pattern>/ra</url-pattern>
+    </servlet-mapping>
+    
+    <!-- this webapp doesn't actually use sessions or cookies -->
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+    </session-config>
+
+</web-app>

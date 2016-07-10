@@ -77,15 +77,15 @@
         <!-- unused for now (except for Android), as we oddly ship addressbook as a .war -->
 	<target name="jar" depends="compile, changes">
 		<!-- set if unset -->
-		<property name="workspace.changes" value="" />
+		<property name="workspace.changes.tr" value="" />
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
-				<attribute name="Main-Class" value="addressbook.Daemon"/>
+				<attribute name="Main-Class" value="net.i2p.addressbook.Daemon"/>
 				<attribute name="Implementation-Version" value="${full.version}" />
 				<attribute name="Built-By" value="${build.built-by}" />
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
-		                <attribute name="Workspace-Changes" value="${workspace.changes}" />
+		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
 			</manifest>
 		</jar>
 	</target>

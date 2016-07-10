@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="javax.servlet.jsp-2.2.0.v201112011158">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jsp/javax.servlet.jsp-2.2.0.v201112011158.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

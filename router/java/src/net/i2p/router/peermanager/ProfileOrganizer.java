@@ -240,6 +240,7 @@ public class ProfileOrganizer {
     public int countFastPeers() { return count(_fastPeers); }
     public int countHighCapacityPeers() { return count(_highCapacityPeers); }
     /** @deprecated use ProfileManager.getPeersByCapability('f').size() */
+    @Deprecated
     public int countWellIntegratedPeers() { return count(_wellIntegratedPeers); }
     public int countNotFailingPeers() { return count(_notFailingPeers); }
     public int countFailingPeers() { return count(_failingPeers); }
@@ -492,6 +493,7 @@ public class ProfileOrganizer {
      *
      * @deprecated unused
      */
+    @Deprecated
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
     }
@@ -503,6 +505,7 @@ public class ProfileOrganizer {
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      * @deprecated unused
      */
+    @Deprecated
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
@@ -1386,12 +1389,12 @@ public class ProfileOrganizer {
      *  @return 0-3
      */
     private int getSubTier(Hash peer, Hash randomKey) {
-        // input is first 36 bytes; output is last 32 bytes
-        byte[] data = new byte[Hash.HASH_LENGTH + 4 + Hash.HASH_LENGTH];
-        System.arraycopy(peer.getData(), 0, data, 0, Hash.HASH_LENGTH);
-        System.arraycopy(randomKey.getData(), 0, data, Hash.HASH_LENGTH, 4);
-        _context.sha().calculateHash(data, 0, Hash.HASH_LENGTH + 4, data, Hash.HASH_LENGTH + 4);
-        return data[Hash.HASH_LENGTH + 4] & 0x03;
+        // input is first 64 bytes; output is last 32 bytes
+        byte[] data = new byte[96];
+        System.arraycopy(peer.getData(), 0, data, 0, 32);
+        System.arraycopy(randomKey.getData(), 0, data, 32, 32);
+        _context.sha().calculateHash(data, 0, 64, data, 64);
+        return data[64] & 0x03;
     }
 
     public boolean isSelectable(Hash peer) {

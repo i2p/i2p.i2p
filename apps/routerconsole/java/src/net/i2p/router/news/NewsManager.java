@@ -186,7 +186,8 @@ public class NewsManager implements ClientApp {
             }
             List<NewsEntry> rv = parseNews(out.toString(), true);
             if (!rv.isEmpty()) {
-                rv.get(0).updated = RFC3339Date.parse3339Date("2015-01-01");
+                //rv.get(0).updated = RFC3339Date.parse3339Date("2015-01-01");
+                rv.get(0).updated = _context.clock().now();
             } else {
                 if (_log.shouldWarn())
                     _log.warn("failed to load " + file);

@@ -96,3 +96,10 @@ certificates/ssl/jp.reseed.i2p2.no.crt
 certificates/ssl/ieb9oopo.mooo.com2.crt
 certificates/ssl/netdb.i2p2.no2.crt
 certificates/ssl/i2p.mooo.com2.crt
+certificates/ssl/ieb9oopo.mooo.com.crt
+certificates/ssl/i2pseed.zarrenspry.info.crt
+certificates/reseed/cheezybudz_at_mail.i2p.crt
+certificates/reseed/j_at_torontocrypto.org.crt
+# vanished
+certificates/news/killyourtv_at_mail.i2p.crt
+certificates/router/killyourtv_at_mail.i2p.crt

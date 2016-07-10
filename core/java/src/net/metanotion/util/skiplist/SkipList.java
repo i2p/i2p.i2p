@@ -35,13 +35,13 @@ import net.i2p.util.RandomSource;
 
 //import net.metanotion.io.block.BlockFile;
 
-public class SkipList implements Flushable {
+public class SkipList<K extends Comparable<? super K>, V> implements Flushable, Iterable<V> {
 	/** the probability of each next higher level */
 	protected static final int P = 2;
 	private static final int MIN_SLOTS = 4;
 	// these two are really final
-	protected SkipSpan first;
-	protected SkipLevels stack;
+	protected SkipSpan<K, V> first;
+	protected SkipLevels<K, V> stack;
 	// I2P mod
 	public static final Random rng = RandomSource.getInstance();
 
@@ -57,8 +57,8 @@ public class SkipList implements Flushable {
 	public SkipList(int span) {
 		if(span < 1 || span > SkipSpan.MAX_SIZE)
 			throw new IllegalArgumentException("Invalid span size");
-		first = new SkipSpan(span);
-		stack = new SkipLevels(1, first);
+		first = new SkipSpan<K, V>(span);
+		stack = new SkipLevels<K, V>(1, first);
 		//rng = new Random(System.currentTimeMillis());
 	}
 
@@ -95,14 +95,15 @@ public class SkipList implements Flushable {
 		return max;
 	}
 
-	public void put(Comparable key, Object val)	{
+	@SuppressWarnings("unchecked")
+	public void put(K key, V val)	{
 		if(key == null) { throw new NullPointerException(); }
 		if(val == null) { throw new NullPointerException(); }
-		SkipLevels slvls = stack.put(stack.levels.length - 1, key, val, this);
+		SkipLevels<K, V> slvls = stack.put(stack.levels.length - 1, key, val, this);
 		if(slvls != null) {
 			// grow our stack
 			//BlockFile.log.info("Top level old hgt " + stack.levels.length +  " new hgt " + slvls.levels.length);
-			SkipLevels[] levels = new SkipLevels[slvls.levels.length];
+			SkipLevels<K, V>[] levels = (SkipLevels<K, V>[]) new SkipLevels[slvls.levels.length];
 			for(int i=0;i < slvls.levels.length; i++) {
 				if(i < stack.levels.length) {
 					levels[i] = stack.levels[i];
@@ -116,12 +117,13 @@ public class SkipList implements Flushable {
 		}
 	}
 
-	public Object remove(Comparable key) {
+	@SuppressWarnings("unchecked")
+	public V remove(K key) {
 		if(key == null) { throw new NullPointerException(); }
 		Object[] res = stack.remove(stack.levels.length - 1, key, this);
 		if(res != null) {
 			if(res[1] != null) {
-				SkipLevels slvls = (SkipLevels) res[1];
+				SkipLevels<K, V> slvls = (SkipLevels<K, V>) res[1];
 				for(int i=0;i < slvls.levels.length; i++) {
 					if(stack.levels[i] == slvls) {
 						stack.levels[i] = slvls.levels[i];
@@ -130,7 +132,7 @@ public class SkipList implements Flushable {
 				stack.flush();
 			}
 			flush();
-			return res[0];
+			return (V) res[0];
 		}
 		return null;
 	}
@@ -139,6 +141,7 @@ public class SkipList implements Flushable {
 	 * dumps all the skip levels
 	 * @deprecated goes to System.out
 	 */
+	@Deprecated
 	public void printSL() {
 		System.out.println("List size " + size);
 		System.out.println(stack.printAll());
@@ -148,33 +151,35 @@ public class SkipList implements Flushable {
 	 * dumps all the data
 	 * @deprecated goes to System.out
 	 */
+	@Deprecated
 	public void print() {
 		System.out.println("List size " + size);
 		System.out.println(first.print());
 	}
 
-	public Object get(Comparable key) {
+	public V get(K key) {
 		if(key == null) { throw new NullPointerException(); }
 		return stack.get(stack.levels.length - 1, key);
 	}
 
-	public SkipIterator iterator() { return new SkipIterator(first, 0); }
+	public SkipIterator<K, V> iterator() { return new SkipIterator<K, V>(first, 0); }
 
-	public SkipIterator min() { return new SkipIterator(first, 0); }
+/****
+	public SkipIterator<K, V> min() { return new SkipIterator<K, V>(first, 0); }
 
-	public SkipIterator max() {
-		SkipSpan ss = stack.getEnd();
-		return new SkipIterator(ss, ss.nKeys - 1);
+	public SkipIterator<K, V> max() {
+		SkipSpan<K, V> ss = stack.getEnd();
+		return new SkipIterator<K, V>(ss, ss.nKeys - 1);
 	}
+****/
 
 	/** @return an iterator where nextKey() is the first one greater than or equal to 'key' */
-	public SkipIterator find(Comparable key) {
+	public SkipIterator<K, V> find(K key) {
 		int[] search = new int[1];
-		SkipSpan ss = stack.getSpan(stack.levels.length - 1, key, search);
+		SkipSpan<K, V> ss = stack.getSpan(stack.levels.length - 1, key, search);
 		if(search[0] < 0) { search[0] = -1 * (search[0] + 1); }
-		return new SkipIterator(ss, search[0]);
+		return new SkipIterator<K, V>(ss, search[0]);
 	}
-
 
 	// Levels adjusted to guarantee O(log n) search
 	// This is expensive proportional to the number of spans.

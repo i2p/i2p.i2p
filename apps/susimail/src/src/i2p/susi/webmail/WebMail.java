@@ -1138,9 +1138,15 @@ public class WebMail extends HttpServlet
 			sessionObject.info = _t("Configuration reloaded");
 		}
 		if( buttonPressed( request, REFRESH ) ) {
+			POP3MailBox mailbox = sessionObject.mailbox;
+			if (mailbox == null) {
+				sessionObject.error += _t("Internal error, lost connection.") + '\n';
+				sessionObject.state = STATE_AUTH;
+				return;
+			}
 			// TODO how to do a "No new mail" message?
-			sessionObject.mailbox.refresh();
-			sessionObject.error += sessionObject.mailbox.lastError();
+			mailbox.refresh();
+			sessionObject.error += mailbox.lastError();
 			sessionObject.mailCache.getMail(MailCache.FetchMode.HEADER);
 			// get through cache so we have the disk-only ones too
 			String[] uidls = sessionObject.mailCache.getUIDLs();
@@ -1593,6 +1599,7 @@ public class WebMail extends HttpServlet
                 response.setHeader("X-Frame-Options", "SAMEORIGIN");
                 response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
                 response.setHeader("X-XSS-Protection", "1; mode=block");
+		response.setHeader("X-Content-Type-Options", "nosniff");
 		RequestWrapper request = new RequestWrapper( httpRequest );
 		
 		SessionObject sessionObject = null;

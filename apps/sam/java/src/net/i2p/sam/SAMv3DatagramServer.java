@@ -137,6 +137,7 @@ class SAMv3DatagramServer implements Handler {
 
 	private static class MessageDispatcher implements Runnable {
 		private final ByteArrayInputStream is;
+		private static final int MAX_LINE_LENGTH = 2*1024;
 	
 		public MessageDispatcher(byte[] buf) {
 			this.is = new ByteArrayInputStream(buf) ;
@@ -144,8 +145,21 @@ class SAMv3DatagramServer implements Handler {
 	
 		public void run() {
 			try {
-				String header = DataHelper.readLine(is).trim();
+				// not UTF-8
+				//String header = DataHelper.readLine(is).trim();
 				// we cannot use SAMUtils.parseParams() here
+				final UTF8Reader reader = new UTF8Reader(is);
+				final StringBuilder buf = new StringBuilder(MAX_LINE_LENGTH);
+				int c;
+				int i = 0;
+				while ((c = reader.read()) != -1) {
+					if (++i > MAX_LINE_LENGTH)
+						throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
+					if (c == '\n')
+						break;
+					buf.append((char)c);
+				}
+				String header = buf.toString();
 				StringTokenizer tok = new StringTokenizer(header, " ");
 				if (tok.countTokens() < 3) {
 					// This is not a correct message, for sure
@@ -160,57 +174,89 @@ class SAMv3DatagramServer implements Handler {
 				String nick = tok.nextToken();
 				String dest = tok.nextToken();
 
-				SAMv3Handler.SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
+				SessionRecord rec = SAMv3Handler.sSessionsHash.get(nick);
 				if (rec!=null) {
 					Properties sprops = rec.getProps();
+					// 3.2 props
 					String pr = sprops.getProperty("PROTOCOL");
 					String fp = sprops.getProperty("FROM_PORT");
 					String tp = sprops.getProperty("TO_PORT");
+					// 3.3 props
+					// If this is a straight DATAGRAM or RAW session, we
+					// don't need to send these, the router already got them in
+					// the options, but if a subsession, we must, so just
+					// do it all the time.
+					String st = sprops.getProperty("crypto.tagsToSend");
+					String tt = sprops.getProperty("crypto.lowTagThreshold");
+					String sl = sprops.getProperty("shouldBundleReplyInfo");
+					String exms = sprops.getProperty("clientMessageTimeout");  // ms
+					String exs = null;                                         // seconds
 					while (tok.hasMoreTokens()) {
 						String t = tok.nextToken();
+						// 3.2 props
 						if (t.startsWith("PROTOCOL="))
 							pr = t.substring("PROTOCOL=".length());
 						else if (t.startsWith("FROM_PORT="))
 							fp = t.substring("FROM_PORT=".length());
 						else if (t.startsWith("TO_PORT="))
 							tp = t.substring("TO_PORT=".length());
+						// 3.3 props
+						else if (t.startsWith("SEND_TAGS="))
+							st = t.substring("SEND_TAGS=".length());
+						else if (t.startsWith("TAG_THRESHOLD="))
+							tt = t.substring("TAG_THRESHOLD=".length());
+						else if (t.startsWith("EXPIRES="))
+							exs = t.substring("EXPIRES=".length());
+						else if (t.startsWith("SEND_LEASESET="))
+							sl = t.substring("SEND_LEASESET=".length());
 					}
 
+					// 3.2 props
 					int proto = I2PSession.PROTO_UNSPECIFIED;
 					int fromPort = I2PSession.PORT_UNSPECIFIED;
 					int toPort = I2PSession.PORT_UNSPECIFIED;
-					if (pr != null) {
-						try {
+					// 3.3 props
+					int sendTags = 0;
+					int tagThreshold = 0;
+					int expires = 0; // seconds
+					boolean sendLeaseSet = true;
+					try {
+						// 3.2 props
+						if (pr != null)
 							proto = Integer.parseInt(pr);
-						} catch (NumberFormatException nfe) {
-							warn("Bad datagram header received");
-							return;
-						}
-					}
-					if (fp != null) {
-						try {
+						if (fp != null)
 							fromPort = Integer.parseInt(fp);
-						} catch (NumberFormatException nfe) {
-							warn("Bad datagram header received");
-							return;
-						}
-					}
-					if (tp != null) {
-						try {
+						if (tp != null)
 							toPort = Integer.parseInt(tp);
-						} catch (NumberFormatException nfe) {
-							warn("Bad datagram header received");
-							return;
-						}
+						// 3.3 props
+						if (st != null)
+							sendTags = Integer.parseInt(st);
+						if (tt != null)
+							tagThreshold = Integer.parseInt(tt);
+						if (exs != null)
+							expires = Integer.parseInt(exs);
+						else if (exms != null)
+							expires = Integer.parseInt(exms) / 1000;
+						if (sl != null)
+							sendLeaseSet = Boolean.parseBoolean(sl);
+					} catch (NumberFormatException nfe) {
+						warn("Bad datagram header received");
+						return;
 					}
 					// TODO too many allocations and copies. One here and one in Listener above.
 					byte[] data = new byte[is.available()];
 					is.read(data);
-					SAMv3Handler.Session sess = rec.getHandler().getSession();
-					if (sess != null)
-						sess.sendBytes(dest, data, proto, fromPort, toPort);
-					else
+					Session sess = rec.getHandler().getSession();
+					if (sess != null) {
+						if (sendTags > 0 || tagThreshold > 0 || expires > 0 || !sendLeaseSet) {
+							sess.sendBytes(dest, data, proto, fromPort, toPort,
+							               sendLeaseSet, sendTags, tagThreshold, expires);
+						} else {
+							sess.sendBytes(dest, data, proto, fromPort, toPort);
+						}
+					} else {
 						warn("Dropping datagram, no session for " + nick);
+					}
 				} else {
 					warn("Dropping datagram, no session for " + nick);
 				}

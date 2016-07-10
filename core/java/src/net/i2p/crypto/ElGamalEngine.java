@@ -52,7 +52,7 @@ import net.i2p.util.SimpleByteCache;
  * @author thecrypto, jrandom
  */
 
-public class ElGamalEngine {
+public final class ElGamalEngine {
     private final Log _log;
     private final I2PAppContext _context;
     private final YKGenerator _ykgen;
@@ -197,8 +197,8 @@ public class ElGamalEngine {
         // we use this buf first for Y, then for D, then for the hash
         byte[] buf = SimpleByteCache.acquire(257);
         System.arraycopy(encrypted, 0, buf, 0, 257);
-        BigInteger y = new NativeBigInteger(1, buf);
-        BigInteger ya = y.modPow(y1p, CryptoConstants.elgp);
+        NativeBigInteger y = new NativeBigInteger(1, buf);
+        BigInteger ya = y.modPowCT(y1p, CryptoConstants.elgp);
         System.arraycopy(encrypted, 257, buf, 0, 257);
         BigInteger d = new NativeBigInteger(1, buf);
         BigInteger m = ya.multiply(d);

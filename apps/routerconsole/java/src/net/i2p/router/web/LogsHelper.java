@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,8 @@ import org.tanukisoftware.wrapper.WrapperManager;
 public class LogsHelper extends HelperBase {
 
     private static final String LOCATION_AVAILABLE = "3.3.7";
-    
+    private static final String _jstlVersion = jstlVersion();
+
     /** @since 0.8.12 */
     public String getJettyVersion() {
         return Server.getVersion();
@@ -39,6 +41,33 @@ public class LogsHelper extends HelperBase {
             }
         }
         return buf.toString();
+    }
+
+    /**
+     * @return non-null, "n/a" on failure
+     * @since 0.9.26
+     */
+    public String getJstlVersion() {
+        return _jstlVersion;
+    }
+
+    /**
+     * @return non-null, "n/a" on failure
+     * @since 0.9.26
+     */
+    private static String jstlVersion() {
+        String rv = "n/a";
+        try {
+            Class<?> cls = Class.forName("org.apache.taglibs.standard.Version", true, ClassLoader.getSystemClassLoader());
+            Method getVersion = cls.getMethod("getVersion");
+            // returns "standard-taglib 1.2.0"
+            Object version = getVersion.invoke(null, (Object[]) null);
+            rv = (String) version;
+            //int sp = rv.indexOf(' ');
+            //if (sp >= 0 && rv.length() > sp + 1)
+            //    rv = rv.substring(sp + 1);
+        } catch (Exception e) {}
+        return rv;
     }
 
     /**

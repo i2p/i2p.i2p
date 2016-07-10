@@ -125,15 +125,40 @@ do
         # only generate for non-source language
         echo "Generating ${CLASS}_$LG ResourceBundle..."
 
-        # convert to class files in build/obj
-        msgfmt --java --statistics -r $CLASS -l $LG -d build/obj $i
+        msgfmt -V | grep -q '0\.19'
         if [ $? -ne 0 ]
         then
-            echo "ERROR - msgfmt failed on ${i}, not updating translations"
-            # msgfmt leaves the class file there so the build would work the next time
-            find build/obj -name messages_${LG}.class -exec rm -f {} \;
-            RC=1
-            break
+            # slow way
+            # convert to class files in build/obj
+            msgfmt --java --statistics -r $CLASS -l $LG -d build/obj $i
+            if [ $? -ne 0 ]
+            then
+                echo "ERROR - msgfmt failed on ${i}, not updating translations"
+                # msgfmt leaves the class file there so the build would work the next time
+                find build -name messages_${LG}.class -exec rm -f {} \;
+                RC=1
+                break
+            fi
+        else
+            # fast way
+            # convert to java files in build/messages-src
+            TD=build/messages-src-tmp
+            TDX=$TD/net/i2p/router/web
+            TD2=build/messages-src
+            TDY=$TD2/net/i2p/router/web
+            rm -rf $TD
+            mkdir -p $TD $TDY
+            msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i
+            if [ $? -ne 0 ]
+            then
+                echo "ERROR - msgfmt failed on ${i}, not updating translations"
+                # msgfmt leaves the class file there so the build would work the next time
+                find build/obj -name messages_${LG}.class -exec rm -f {} \;
+                RC=1
+                break
+            fi
+            mv $TDX/messages_$LG.java $TDY
+            rm -rf $TD
         fi
     fi
 done

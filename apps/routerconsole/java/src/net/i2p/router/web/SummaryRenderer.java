@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -48,9 +49,10 @@ class SummaryRenderer {
      * DOM level 3 load and store support.  Perhaps we can bundle that, or
      * specify who can get it from where, etc.
      *
-     * @deprecated unsed
+     * @deprecated unused
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         throw new UnsupportedOperationException();
 /*****
@@ -121,6 +123,20 @@ class SummaryRenderer {
         ImageOutputStream ios = null;
         try {
             RrdGraphDef def = new RrdGraphDef();
+            // improve text legibility
+            String lang = Messages.getLanguage(_context);
+            Font small = def.getSmallFont();
+            Font large = def.getLargeFont();
+            if ("ar".equals(lang) || "jp".equals(lang) || ("zh".equals(lang) && !IS_WIN)) {
+                small = small.deriveFont(small.getSize2D() + 2.0f);
+                large = large.deriveFont(Font.PLAIN, large.getSize2D() + 3.0f);
+            } else {
+                small = small.deriveFont(small.getSize2D() + 1.0f);
+                large = large.deriveFont(large.getSize2D() + 1.0f);
+            }
+            def.setSmallFont(small);
+            def.setLargeFont(large);
+
             def.setTimeSpan(start/1000, end/1000);
             def.setMinValue(0d);
             String name = _listener.getRate().getRateStat().getName();

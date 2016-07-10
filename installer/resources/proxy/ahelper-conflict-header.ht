@@ -18,9 +18,9 @@ Proxy-Connection: close
 <div class="warning" id="warning">
 <h3>_("Warning: Destination Key Conflict")</h3>
 <p>
-_("The addresshelper link you followed specifies a different destination key than a host entry in your host database.")
+_("The address helper link you followed specifies a different destination key than the entry in your address book.")
 _("Someone could be trying to impersonate another website, or people have given two websites identical names.")
 </p>
 <p>
-_("You can resolve the conflict by considering which key you trust, and either discarding the addresshelper link, discarding the host entry from your host database, or naming one of them differently.")
+_("Resolve the conflict by deciding which key you trust, and then either ignore the address helper link, or delete the host entry from your address book and click the address helper link again.")
 </p>

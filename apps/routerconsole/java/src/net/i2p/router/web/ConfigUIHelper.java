@@ -99,7 +99,9 @@ public class ConfigUIHelper extends HelperBase {
         { "tr", "tr", _x("Turkish"), null },
         { "uk", "ua", _x("Ukrainian"), null },
         { "vi", "vn", _x("Vietnamese"), null },
-        { "zh", "cn", _x("Chinese"), null }
+        { "zh", "cn", _x("Chinese"), null },
+        { "zh_TW", "tw", _x("Chinese"), "Taiwan" },
+        { "xx", "a1", "Debug: Find untagged strings", null },
     };
 
 
@@ -134,9 +136,11 @@ public class ConfigUIHelper extends HelperBase {
         }
         StringBuilder buf = new StringBuilder(512);
         for (int i = 0; i < langs.length; i++) {
+            String lang = langs[i][0];
+            if (lang.equals("xx") && !isAdvanced())
+                continue;
             // we use "lang" so it is set automagically in CSSHelper
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
-            String lang = langs[i][0];
             if (lang.equals(current))
                 buf.append(CHECKED);
             buf.append("value=\"").append(lang).append("\">")

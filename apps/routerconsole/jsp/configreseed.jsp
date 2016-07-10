@@ -78,7 +78,7 @@
 <b><%=intl._t("Use non-SSL only")%></b></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._t("Reseed URLs")%>:</b></td>
 <td><textarea wrap="off" name="reseedURL" cols="60" rows="7" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea>
-<div class="formaction"><input type="submit" name="action" value="<%=intl._t("Reset URL list")%>" /></div>
+<div class="formaction"><input type="submit" name="action" class="reload" value="<%=intl._t("Reset URL list")%>" /></div>
 </td></tr>
 
 <tr><td class="mediumtags" align="right"><b><%=intl._t("Enable HTTP Proxy?")%></b></td>

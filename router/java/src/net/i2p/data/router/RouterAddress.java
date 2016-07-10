@@ -112,6 +112,7 @@ public class RouterAddress extends DataStructureImpl {
      * @deprecated unused for now
      * @return null for never, or a Date
      */
+    @Deprecated
     public Date getExpiration() {
         //return _expiration;
         if (_expiration > 0)
@@ -127,6 +128,7 @@ public class RouterAddress extends DataStructureImpl {
      * @return 0 for never
      * @since 0.9.12
      */
+    @Deprecated
     public long getExpirationTime() {
         return _expiration;
     }
@@ -141,6 +143,7 @@ public class RouterAddress extends DataStructureImpl {
      * Unused for now, always null
      * @deprecated unused for now
      */
+    @Deprecated
     public void setExpiration(Date expiration) {
         _expiration = expiration.getDate();
     }
@@ -159,6 +162,7 @@ public class RouterAddress extends DataStructureImpl {
      * @throws IllegalStateException if was already set
      * @deprecated unused, use 3-arg constructor
      */
+    @Deprecated
     public void setTransportStyle(String transportStyle) {
         if (_transportStyle != null)
             throw new IllegalStateException();
@@ -171,6 +175,7 @@ public class RouterAddress extends DataStructureImpl {
      * @deprecated use getOptionsMap()
      * @return sorted, non-null, NOT a copy, do not modify
      */
+    @Deprecated
     public Properties getOptions() {
         return _options;
     }
@@ -199,6 +204,7 @@ public class RouterAddress extends DataStructureImpl {
      * @throws IllegalStateException if was already set
      * @deprecated unused, use 3-arg constructor
      */
+    @Deprecated
     public void setOptions(Properties options) {
         if (!_options.isEmpty())
             throw new IllegalStateException();

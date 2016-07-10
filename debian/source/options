@@ -1,2 +1,2 @@
-compression="bzip2"
+compression="xz"
 compression-level=9

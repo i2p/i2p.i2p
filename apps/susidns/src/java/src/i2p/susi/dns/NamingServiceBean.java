@@ -24,6 +24,8 @@ package i2p.susi.dns;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -353,6 +355,34 @@ public class NamingServiceBean extends AddressbookBean
 			return null;
 		AddressBean rv = new AddressBean(this.detail, dest.toBase64());
 		rv.setProperties(outProps);
+		return rv;
+	}
+
+	/**
+	 *  @since 0.9.26
+	 */
+	public List<AddressBean> getLookupAll() {
+		if (this.detail == null)
+			return null;
+		if (isDirect()) {
+			// won't work for the published addressbook
+			AddressBean ab = getLookup();
+			if (ab != null)
+				return Collections.singletonList(ab);
+			return null;
+		}
+		Properties nsOptions = new Properties();
+		List<Properties> propsList = new ArrayList<Properties>(4);
+		nsOptions.setProperty("list", getFileName());
+		List<Destination> dests = getNamingService().lookupAll(this.detail, nsOptions, propsList);
+		if (dests == null)
+			return null;
+		List<AddressBean> rv = new ArrayList<AddressBean>(dests.size());
+		for (int i = 0; i < dests.size(); i++) {
+			AddressBean ab = new AddressBean(this.detail, dests.get(i).toBase64());
+			ab.setProperties(propsList.get(i));
+			rv.add(ab);
+		}
 		return rv;
 	}
 

@@ -292,6 +292,7 @@ class ClientConnectionRunner {
      *  Currently allocated leaseSet.
      *  IS subsession aware.
      */
+/****
     void setLeaseSet(LeaseSet ls) {
         Hash h = ls.getDestination().calculateHash();
         SessionParams sp = _sessions.get(h);
@@ -299,6 +300,7 @@ class ClientConnectionRunner {
             return;
         sp.currentLeaseSet = ls;
     }
+****/
 
     /**
      *  Equivalent to getConfig().getDestination().calculateHash();
@@ -590,14 +592,16 @@ class ClientConnectionRunner {
             return;
         LeaseRequestState state;
         synchronized (this) {
+            sp.currentLeaseSet = ls;
             state = sp.leaseRequest;
             if (state == null) {
+                // We got the LS after the timeout?
+                // ClientMessageEventListener told the router to publish.
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("LeaseRequest is null and we've received a new lease?! perhaps this is odd... " + ls);
+                    _log.warn("LeaseRequest is null and we've received a new lease? " + ls);
                 return;
             } else {
                 state.setIsSuccessful(true);
-                setLeaseSet(ls);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("LeaseSet created fully: " + state + " / " + ls);
                 sp.leaseRequest = null;
@@ -1071,7 +1075,7 @@ class ClientConnectionRunner {
             synchronized (_alreadyProcessed) {
                 inLock = _context.clock().now();
                 if (_alreadyProcessed.contains(_messageId)) {
-                    _log.warn("Status already updated");
+                    _log.info("Status already updated");
                     alreadyProcessed = true;
                 } else {
                     _alreadyProcessed.add(_messageId);

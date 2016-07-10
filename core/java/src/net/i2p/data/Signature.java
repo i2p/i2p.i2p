@@ -35,6 +35,7 @@ public class Signature extends SimpleDataStructure {
      * all zeros
      * @deprecated to be removed
      */
+    @Deprecated
     public final static byte[] FAKE_SIGNATURE = new byte[SIGNATURE_BYTES];
 
     private final SigType _type;

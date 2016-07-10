@@ -168,6 +168,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @deprecated use 4-arg constructor
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public I2PSocketManagerFull() {
         throw new UnsupportedOperationException();
     }
@@ -176,6 +177,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @deprecated use 4-arg constructor
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
         throw new UnsupportedOperationException();
     }
@@ -522,6 +524,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket connect(Destination peer, I2PSocketOptions options) 
                              throws I2PException, NoRouteToHostException {
+        if (peer == null)
+            throw new NullPointerException();
         if (options == null)
             options = _defaultOptions;
         ConnectionOptions opts = null;

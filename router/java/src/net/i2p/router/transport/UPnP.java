@@ -544,7 +544,10 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				_lastService = serv;
 				_lastArgumentList = getIP.getOutputArgumentList();
 			}
-			String rv = _lastArgumentList.getArgument(arg).getValue();
+			Argument a = _lastArgumentList.getArgument(arg);
+			if (a == null)
+				return "";
+			String rv = a.getValue();
 			return DataHelper.escapeHTML(rv);
 		}
 	}

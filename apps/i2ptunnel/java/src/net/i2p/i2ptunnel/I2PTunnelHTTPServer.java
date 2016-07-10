@@ -25,6 +25,7 @@ import javax.net.ssl.SSLException;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -37,8 +38,8 @@ import net.i2p.util.Log;
  * Simple extension to the I2PTunnelServer that filters the HTTP
  * headers sent from the client to the server, replacing the Host
  * header with whatever this instance has been configured with, and
- * if the browser set Accept-encoding: x-i2p-gzip, gzip the http 
- * message body and set Content-encoding: x-i2p-gzip.
+ * if the browser set Accept-Encoding: x-i2p-gzip, gzip the http 
+ * message body and set Content-Encoding: x-i2p-gzip.
  *
  */
 public class I2PTunnelHTTPServer extends I2PTunnelServer {
@@ -50,6 +51,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public static final String OPT_POST_MAX = "maxPosts";
     public static final String OPT_POST_TOTAL_MAX = "maxTotalPosts";
     public static final String OPT_REJECT_INPROXY = "rejectInproxy";
+    public static final String OPT_REJECT_REFERER = "rejectReferer";
+    public static final String OPT_REJECT_USER_AGENTS = "rejectUserAgents";
+    public static final String OPT_USER_AGENTS = "userAgentRejectList";
     public static final int DEFAULT_POST_WINDOW = 5*60;
     public static final int DEFAULT_POST_BAN_TIME = 30*60;
     public static final int DEFAULT_POST_TOTAL_BAN_TIME = 10*60;
@@ -64,7 +68,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER, DEST64_HEADER, DEST32_HEADER};
     private static final String SERVER_HEADER = "Server";
     private static final String X_POWERED_BY_HEADER = "X-Powered-By";
-    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER};
+    private static final String X_RUNTIME_HEADER = "X-Runtime"; // Rails
+    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER };
     /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
     /** total timeout for the request and all the headers */
@@ -357,7 +362,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                  headers.containsKey("X-Forwarded-Host"))) {
                 if (_log.shouldLog(Log.WARN)) {
                     StringBuilder buf = new StringBuilder();
-                    buf.append("Refusing inproxy access: ").append(peerHash.toBase64());
+                    buf.append("Refusing inproxy access: ").append(Base32.encode(peerHash.getData())).append(".b32.i2p");
                     List<String> h = headers.get("X-Forwarded-For");
                     if (h != null)
                         buf.append(" from: ").append(h.get(0));
@@ -380,12 +385,55 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return;
             }
 
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_REFERER)) &&
+                headers.containsKey("Referer")) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Refusing access from: " +
+                              Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                              " with Referer: " + headers.get("Referer").get(0));
+                try {
+                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                } catch (IOException ioe) {}
+                try {
+                    socket.close();
+                } catch (IOException ioe) {}
+                return;
+            }
+
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_USER_AGENTS)) &&
+                headers.containsKey("User-Agent")) {
+                String ua = headers.get("User-Agent").get(0);
+                if (!ua.startsWith("MYOB")) {
+                    String blockAgents = opts.getProperty(OPT_USER_AGENTS);
+                    if (blockAgents != null) {
+                        String[] agents = DataHelper.split(blockAgents, ",");
+                        for (int i = 0; i < agents.length; i++) {
+                            String ag = agents[i].trim();
+                            if (ag.length() > 0 && ua.contains(ag)) {
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("Refusing access from: " +
+                                              Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                              " with User-Agent: " + ua);
+                                try {
+                                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                                } catch (IOException ioe) {}
+                                try {
+                                    socket.close();
+                                } catch (IOException ioe) {}
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (_postThrottler != null &&
                 command.length() >= 5 &&
                 command.substring(0, 5).toUpperCase(Locale.US).equals("POST ")) {
                 if (_postThrottler.shouldThrottle(peerHash)) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Refusing POST since peer is throttled: " + peerHash.toBase64());
+                        _log.warn("Refusing POST since peer is throttled: " +
+                                  Base32.encode(peerHash.getData()) + ".b32.i2p");
                     try {
                         // Send a 403, so the user doesn't get an HTTP Proxy error message
                         // and blame his router or the network.
@@ -433,7 +481,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             long afterSocket = getTunnel().getContext().clock().now();
             // instead of i2ptunnelrunner, use something that reads the HTTP 
             // request from the socket, modifies the headers, sends the request to the 
-            // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
+            // server, reads the response headers, rewriting to include Content-Encoding: x-i2p-gzip
             // if it was one of the Accept-Encoding: values, and gzip the payload       
             boolean allowGZIP = true;
             String val = opts.getProperty("i2ptunnel.gzip");
@@ -490,7 +538,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 socket.close();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error while receiving the new HTTP request", ex);
+                _log.warn("Error while receiving the new HTTP request from: " + Base32.encode(peerHash.getData()) + ".b32.i2p", ex);
         } catch (OutOfMemoryError oom) {
             // Often actually a file handle limit problem so we can safely send a response
             // java.lang.OutOfMemoryError: unable to create new native thread
@@ -702,7 +750,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Including x-i2p-gzip as the content encoding in the response");
             if (shouldCompress())
-                out.write(DataHelper.getASCII("Content-encoding: x-i2p-gzip\r\n"));
+                out.write(DataHelper.getASCII("Content-Encoding: x-i2p-gzip\r\n"));
             super.finishHeaders();
         }
 
@@ -814,6 +862,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
      *  From I2P to server: socket non-null, in null.
      *  From server to I2P: socket null, in non-null.
      *
+     *  Note: This does not handle RFC 2616 header line splitting,
+     *  which is obsoleted in RFC 7230.
+     *
      *  @param socket if null, use in as InputStream
      *  @param in if null, use socket.getInputStream() as InputStream
      *  @param command out parameter, first line
@@ -871,7 +922,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
                 int split = buf.indexOf(":");
                 if (split <= 0)
-                    throw new BadRequestException("Invalid HTTP header, missing colon");
+                    throw new BadRequestException("Invalid HTTP header, missing colon: \"" + buf +
+                                                  "\" request: \"" + command + '"');
                 totalSize += buf.length();
                 if (totalSize > MAX_TOTAL_HEADER_SIZE)
                     throw new LineTooLongException("Req+headers too big");
@@ -893,6 +945,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     name = "X-Forwarded-Server";
                 else if ("x-forwarded-host".equals(lcName))
                     name = "X-Forwarded-Host";
+                else if ("user-agent".equals(lcName))
+                    name = "User-Agent";
+                else if ("referer".equals(lcName))
+                    name = "Referer";
 
                 // For incoming, we remove certain headers to prevent spoofing.
                 // For outgoing, we remove certain headers to improve anonymity.

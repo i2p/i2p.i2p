@@ -30,6 +30,7 @@
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
     response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
+    response.setHeader("X-Content-Type-Options", "nosniff");
 
 %>
 <%@page pageEncoding="UTF-8"%>
@@ -87,7 +88,7 @@
 <%=intl._t("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
 <%=intl._t("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
-<center><img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
+<center><img src="/themes/susidns/images/how.svg" height="367" width="600" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
 </div>
 <div id="footer">
 <hr>

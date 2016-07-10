@@ -10,6 +10,7 @@ import java.nio.channels.ServerSocketChannel;
 
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketAddress;
 
 /**
  * Bridge to I2PServerSocket.
@@ -99,11 +100,14 @@ class StandardServerSocket extends ServerSocket {
     }
 
     /**
-     *  @return null always
+     *  Port in returned SocketAddress will be zero.
+     *
+     *  @return an I2PSocketAddress as of 0.9.26; prior to that, returned null
+     *  @since implemented in 0.9.26
      */
     @Override
     public SocketAddress getLocalSocketAddress() {
-        return null;
+        return new I2PSocketAddress(_socket.getManager().getSession().getMyDestination(), 0);
     }
 
     @Override

@@ -24,8 +24,9 @@
 </div>
 <h2>Guide rapide pour faire un serveur web anonyme dans I2P</h2>
 
- <p>Ceci est votre eepsite, fonctionnant sur votre propre serveur web anonyme I2P. Pour le modifier, il suffit d'éditer les fichiers dans <code>~/.i2p/eepsite/
- docroot/</code> (Linux) ou <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)
+ <p>Ceci est votre eepsite, fonctionnant sur votre propre serveur web anonyme I2P. Pour le modifier, il suffit d'éditer les fichiers dans <code>~/.i2p/eepsite/docroot/</code> (Linux),
+ <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
+ ou <code>/Users/(user)/Library/Application Support/i2p</code> (Mac),
  et ils deviendront accessibles aux autres utilisateurs une fois que vous aurez suivi les instructions ci-dessous.
  Dans I2P, on accède aux eepsites en utilisant une 'clé', qui est représentée par une longue chaîne de caractères de type Base64 (la 'clé' est semblable à une adresse IP, et elle est affichée sur la
  <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">page de configuration</a>) de l'eepsite de I2PTunnel.
@@ -65,7 +66,9 @@
  <li>Dans votre navigateur web, entrez le nom de votre eepsite (<i>quelquechose</i>.i2p) et vous devriez vous retrouver sur cette page.
  Avec un peu de chance - si vous êtes arrivé ici, c'est que ça a marché !</li>
  <li>Avant de parler à tout le monde de votre nouvel eepsite, vous devriez ajouter du contenu.
- Allez à <code>~/.i2p/eepsite/docroot/</code> (Linux) ou <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) et remplacez la page index.html avec votre propre page. Les dossiers virtuels fonctionnent, 
+ Allez à <code>~/.i2p/eepsite/docroot/</code> (Linux),
+ <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
+ ou <code>/Users/(user)/Library/Application Support/i2p</code> (Mac), et remplacez la page index.html avec votre propre page. Les dossiers virtuels fonctionnent, 
  donc vous pouvez héberger un sous-dossier sans explicitement ajouter des liens vers des fichiers. Si vous avez besoin d'un gabarit pour un site de base, n'hésitez pas à utiliser et à changer <a href="pagetemplate.html">cette page</a> et <a href="lib/">contenu</a>!</li>
 </ul>
 <h2>Enregistrer votre propre domaine .I2P</h2><ul>

@@ -495,7 +495,7 @@ public class NTCPTransport extends TransportImpl {
     @Override
     public void mayDisconnect(final Hash peer) {
         final NTCPConnection con = _conByIdent.get(peer);
-        if (con != null && con.isEstablished() && con.isInbound() &&
+        if (con != null && con.isEstablished() &&
             con.getMessagesReceived() <= 2 && con.getMessagesSent() <= 1) {
             con.setMayDisconnect();
         }

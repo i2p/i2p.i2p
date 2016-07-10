@@ -1338,7 +1338,6 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
             if (i < args.length) {
                 host = args[i++];
-                listenHost = host;
             }
             if (i < args.length)
                 port = args[i];
@@ -1831,6 +1830,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * just call context.namingService.lookup() directly.
      * @deprecated Don't use i2ptunnel for lookup! Use I2PAppContext.getGlobalContext().namingService().lookup(name) from i2p.jar
      */
+    @Deprecated
     public static Destination destFromName(String name) throws DataFormatException {
         return destFromName(name, null, null, false, null, null);
     }

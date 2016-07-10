@@ -6,6 +6,7 @@ trans.cs = apps/i2ptunnel/locale/messages_cs.po
 trans.da = apps/i2ptunnel/locale/messages_da.po
 trans.de = apps/i2ptunnel/locale/messages_de.po
 trans.es = apps/i2ptunnel/locale/messages_es.po
+trans.fi = apps/i2ptunnel/locale/messages_fi.po
 trans.fr = apps/i2ptunnel/locale/messages_fr.po
 trans.hu = apps/i2ptunnel/locale/messages_hu.po
 trans.it = apps/i2ptunnel/locale/messages_it.po
@@ -23,6 +24,7 @@ trans.sv_SE = apps/i2ptunnel/locale/messages_sv.po
 trans.uk_UA = apps/i2ptunnel/locale/messages_uk.po
 trans.vi = apps/i2ptunnel/locale/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale/messages_zh.po
+trans.zh_TW = apps/i2ptunnel/locale/messages_zh_TW.po
 
 [I2P.proxy]
 source_file = apps/i2ptunnel/locale-proxy/messages_en.po
@@ -31,6 +33,7 @@ trans.ar = apps/i2ptunnel/locale-proxy/messages_ar.po
 trans.cs = apps/i2ptunnel/locale-proxy/messages_cs.po
 trans.de = apps/i2ptunnel/locale-proxy/messages_de.po
 trans.es = apps/i2ptunnel/locale-proxy/messages_es.po
+trans.fi = apps/i2ptunnel/locale-proxy/messages_fi.po
 trans.fr = apps/i2ptunnel/locale-proxy/messages_fr.po
 trans.hu = apps/i2ptunnel/locale-proxy/messages_hu.po
 ;; Java converts id to in
@@ -45,6 +48,7 @@ trans.ro = apps/i2ptunnel/locale-proxy/messages_ro.po
 trans.ru_RU = apps/i2ptunnel/locale-proxy/messages_ru.po
 trans.sk = apps/i2ptunnel/locale-proxy/messages_sk.po
 trans.sv_SE = apps/i2ptunnel/locale-proxy/messages_sv.po
+trans.tr_TR = apps/i2ptunnel/locale-proxy/messages_tr.po
 trans.uk_UA = apps/i2ptunnel/locale-proxy/messages_uk.po
 trans.vi = apps/i2ptunnel/locale-proxy/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale-proxy/messages_zh.po
@@ -76,6 +80,7 @@ trans.tr_TR = apps/routerconsole/locale/messages_tr.po
 trans.uk_UA = apps/routerconsole/locale/messages_uk.po
 trans.vi = apps/routerconsole/locale/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale/messages_zh.po
+trans.zh_TW = apps/routerconsole/locale/messages_zh_TW.po
 
 [I2P.welcome]
 source_file = apps/routerconsole/locale-news/messages_en.po
@@ -105,6 +110,7 @@ trans.sv_SE = apps/routerconsole/locale-news/messages_sv.po
 trans.tr_TR = apps/routerconsole/locale-news/messages_tr.po
 trans.uk_UA = apps/routerconsole/locale-news/messages_uk.po
 trans.zh_CN = apps/routerconsole/locale-news/messages_zh.po
+trans.zh_TW = apps/routerconsole/locale-news/messages_zh_TW.po
 
 [I2P.countries]
 type = PO
@@ -116,6 +122,7 @@ trans.de = apps/routerconsole/locale-countries/messages_de.po
 trans.el = apps/routerconsole/locale-countries/messages_el.po
 trans.es = apps/routerconsole/locale-countries/messages_es.po
 trans.et_EE = apps/routerconsole/locale-countries/messages_et.po
+trans.fa = apps/routerconsole/locale-countries/messages_fa.po
 trans.fi = apps/routerconsole/locale-countries/messages_fi.po
 trans.fr = apps/routerconsole/locale-countries/messages_fr.po
 trans.hu = apps/routerconsole/locale-countries/messages_hu.po
@@ -136,6 +143,7 @@ trans.uk_UA = apps/routerconsole/locale-countries/messages_uk.po
 trans.tr_TR = apps/routerconsole/locale-countries/messages_tr.po
 trans.vi = apps/routerconsole/locale-countries/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale-countries/messages_zh.po
+trans.zh_TW = apps/routerconsole/locale-countries/messages_zh_TW.po
 
 [I2P.i2psnark]
 source_file = apps/i2psnark/locale/messages_en.po
@@ -144,18 +152,22 @@ trans.ar = apps/i2psnark/locale/messages_ar.po
 trans.cs = apps/i2psnark/locale/messages_cs.po
 trans.de = apps/i2psnark/locale/messages_de.po
 trans.es = apps/i2psnark/locale/messages_es.po
+trans.fi = apps/i2psnark/locale/messages_fi.po
 trans.fr = apps/i2psnark/locale/messages_fr.po
 trans.hu = apps/i2psnark/locale/messages_hu.po
 trans.it = apps/i2psnark/locale/messages_it.po
+trans.ja = apps/i2psnark/locale/messages_ja.po
 trans.nb = apps/i2psnark/locale/messages_nb.po
 trans.nl = apps/i2psnark/locale/messages_nl.po
 trans.pl = apps/i2psnark/locale/messages_pl.po
 trans.pt = apps/i2psnark/locale/messages_pt.po
-trans.pt_BR = apps/i2psnark/locale/messages_pt_bR.po
+trans.pt_BR = apps/i2psnark/locale/messages_pt_BR.po
 trans.ro = apps/i2psnark/locale/messages_ro.po
 trans.ru_RU = apps/i2psnark/locale/messages_ru.po
 trans.sk = apps/i2psnark/locale/messages_sk.po
 trans.sv_SE = apps/i2psnark/locale/messages_sv.po
+trans.tr_TR = apps/i2psnark/locale/messages_tr.po
+trans.uk_UA = apps/i2psnark/locale/messages_uk.po
 trans.vi = apps/i2psnark/locale/messages_vi.po
 trans.zh_CN = apps/i2psnark/locale/messages_zh.po
 
@@ -168,6 +180,7 @@ trans.da = apps/susidns/locale/messages_da.po
 trans.de = apps/susidns/locale/messages_de.po
 trans.el = apps/susidns/locale/messages_el.po
 trans.es = apps/susidns/locale/messages_es.po
+trans.fi = apps/susidns/locale/messages_fi.po
 trans.fr = apps/susidns/locale/messages_fr.po
 trans.hu = apps/susidns/locale/messages_hu.po
 trans.it = apps/susidns/locale/messages_it.po
@@ -188,22 +201,33 @@ trans.zh_CN = apps/susidns/locale/messages_zh.po
 source_file = apps/desktopgui/locale/messages_en.po
 source_lang = en
 trans.ar = apps/desktopgui/locale/messages_ar.po
+trans.bg = apps/desktopgui/locale/messages_bg.po
+trans.ca = apps/desktopgui/locale/messages_ca.po
 trans.cs = apps/desktopgui/locale/messages_cs.po
 trans.da = apps/desktopgui/locale/messages_da.po
 trans.de = apps/desktopgui/locale/messages_de.po
 trans.el = apps/desktopgui/locale/messages_el.po
 trans.es = apps/desktopgui/locale/messages_es.po
+trans.fa = apps/desktopgui/locale/messages_fa.po
+trans.fi = apps/desktopgui/locale/messages_fi.po
 trans.fr = apps/desktopgui/locale/messages_fr.po
 trans.hu = apps/desktopgui/locale/messages_hu.po
+;; Java converts id to in
+trans.id = apps/desktopgui/locale/messages_in.po
 trans.it = apps/desktopgui/locale/messages_it.po
 trans.ja = apps/desktopgui/locale/messages_ja.po
+trans.ko = apps/desktopgui/locale/messages_ko.po
+trans.mg = apps/desktopgui/locale/messages_mg.po
+trans.nb = apps/desktopgui/locale/messages_nb.po
 trans.nl = apps/desktopgui/locale/messages_nl.po
 trans.pl = apps/desktopgui/locale/messages_pl.po
+trans.pt = apps/desktopgui/locale/messages_pt.po
 trans.pt_BR = apps/desktopgui/locale/messages_pt_BR.po
 trans.ro = apps/desktopgui/locale/messages_ro.po
 trans.ru_RU = apps/desktopgui/locale/messages_ru.po
 trans.sk = apps/desktopgui/locale/messages_sk.po
 trans.sv_SE = apps/desktopgui/locale/messages_sv.po
+trans.sq = apps/desktopgui/locale/messages_sq.po
 trans.uk_UA = apps/desktopgui/locale/messages_uk.po
 trans.tr_TR = apps/desktopgui/locale/messages_tr.po
 trans.vi = apps/desktopgui/locale/messages_vi.po
@@ -232,6 +256,7 @@ trans.ro = apps/susimail/locale/messages_ro.po
 trans.ru_RU = apps/susimail/locale/messages_ru.po
 trans.sq = apps/susimail/locale/messages_sq.po
 trans.sv_SE = apps/susimail/locale/messages_sv.po
+trans.tr_TR = apps/susimail/locale/messages_tr.po
 trans.uk_UA = apps/susimail/locale/messages_uk.po
 trans.vi = apps/susimail/locale/messages_vi.po
 trans.zh_CN = apps/susimail/locale/messages_zh.po
@@ -259,8 +284,8 @@ trans.ru_RU = debian/po/ru.po
 trans.sk = debian/po/sk.po
 trans.sq = debian/po/sq.po
 trans.sv_SE = debian/po/sv.po
-trans.uk_UA = debian/po/uk.po
 trans.tr_TR = debian/po/tr.po
+trans.uk_UA = debian/po/uk.po
 trans.zh_CN = debian/po/zh.po
 
 [I2P.i2prouter-script]
@@ -319,6 +344,8 @@ trans.ru_RU = core/java/src/gnu/getopt/MessagesBundle_ru.properties
 trans.sk = core/java/src/gnu/getopt/MessagesBundle_sk.properties
 ;; currently corrupt, non-UTF-8
 ;;trans.sq = core/java/src/gnu/getopt/MessagesBundle_sq.properties
+;; currently corrupt, non-UTF-8
+;;trans.tr_TR = core/java/src/gnu/getopt/MessagesBundle_tr.properties
 trans.uk_UA = core/java/src/gnu/getopt/MessagesBundle_uk.properties
 trans.zh_CN = core/java/src/gnu/getopt/MessagesBundle_zh.properties
 
@@ -326,17 +353,22 @@ trans.zh_CN = core/java/src/gnu/getopt/MessagesBundle_zh.properties
 source_file = apps/ministreaming/locale/messages_en.po
 source_lang = en
 trans.ca = apps/ministreaming/locale/messages_ca.po
+trans.cs = apps/ministreaming/locale/messages_cs.po
 trans.de = apps/ministreaming/locale/messages_de.po
 trans.es = apps/ministreaming/locale/messages_es.po
+trans.fi = apps/ministreaming/locale/messages_fi.po
 trans.fr = apps/ministreaming/locale/messages_fr.po
 ;; Java converts id to in
 trans.id = apps/ministreaming/locale/messages_in.po
 trans.it = apps/ministreaming/locale/messages_it.po
 trans.nb = apps/ministreaming/locale/messages_nb.po
+trans.nl = apps/ministreaming/locale/messages_nl.po
 trans.pl = apps/ministreaming/locale/messages_pl.po
+trans.pt_BR = apps/ministreaming/locale/messages_pt_BR.po
 trans.ro = apps/ministreaming/locale/messages_ro.po
 trans.ru_RU = apps/ministreaming/locale/messages_ru.po
 trans.sv_SE = apps/ministreaming/locale/messages_sv.po
+trans.tr_TR = apps/ministreaming/locale/messages_tr.po
 trans.uk_UA = apps/ministreaming/locale/messages_uk.po
 trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 

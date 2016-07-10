@@ -51,7 +51,7 @@ import net.i2p.util.Log;
  *
  * Always fits on one page.
  */
-public class BSkipList extends SkipList implements Closeable {
+public class BSkipList<K extends Comparable<? super K>, V> extends SkipList<K, V> implements Closeable {
 	private static final long MAGIC = 0x536b69704c697374l;  // "SkipList"
 	public int firstSpanPage = 0;
 	public int firstLevelPage = 0;
@@ -59,16 +59,16 @@ public class BSkipList extends SkipList implements Closeable {
 	public final BlockFile bf;
 	private boolean isClosed;
 
-	final HashMap<Integer, BSkipSpan> spanHash = new HashMap<Integer, BSkipSpan>();
-	final HashMap<Integer, SkipLevels> levelHash = new HashMap<Integer, SkipLevels>();
+	final HashMap<Integer, BSkipSpan<K, V>> spanHash = new HashMap<Integer, BSkipSpan<K, V>>();
+	final HashMap<Integer, SkipLevels<K, V>> levelHash = new HashMap<Integer, SkipLevels<K, V>>();
 
 	private final boolean fileOnly;
 
-	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer key, Serializer val) throws IOException {
+	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer<K> key, Serializer<V> val) throws IOException {
 		this(spanSize, bf, skipPage, key, val, false);
 	}
 
-	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer key, Serializer val, boolean fileOnly) throws IOException {
+	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer<K> key, Serializer<V> val, boolean fileOnly) throws IOException {
 		if(spanSize < 1) { throw new RuntimeException("Span size too small"); }
 
 		this.skipPage = skipPage;
@@ -89,10 +89,10 @@ public class BSkipList extends SkipList implements Closeable {
 
 		this.fileOnly = fileOnly;
 		if (fileOnly)
-			first = new IBSkipSpan(bf, this, firstSpanPage, key, val);
+			first = new IBSkipSpan<K, V>(bf, this, firstSpanPage, key, val);
 		else
-			first = new BSkipSpan(bf, this, firstSpanPage, key, val);
-		BSkipLevels bstack = new BSkipLevels(bf, firstLevelPage, this);
+			first = new BSkipSpan<K, V>(bf, this, firstSpanPage, key, val);
+		BSkipLevels<K, V> bstack = new BSkipLevels<K, V>(bf, firstLevelPage, this);
 		bstack.initializeLevels();
 		stack = bstack;
 		int total = 0;
@@ -104,7 +104,8 @@ public class BSkipList extends SkipList implements Closeable {
 		if (bf.file.canWrite() &&
 		    (levelCount != levelHash.size() || spans != spanHash.size() || size != total)) {
 			if (bf.log.shouldLog(Log.WARN))
-				bf.log.warn("On-disk counts were " + levelCount + " / " + spans + " / " +  size + ", correcting");
+				bf.log.warn("On-disk counts were " + levelCount + " levels / " + spans +
+				            " spans / " +  size + " entries, correcting to " + total + " entries");
 			size = total;
 			flush();
 		}
@@ -151,7 +152,6 @@ public class BSkipList extends SkipList implements Closeable {
 			curLevel.killInstance();
 			curLevel = nextLevel;
 		}
-		stack.killInstance();
 
 		SkipSpan curSpan = first;
 		while(curSpan != null) {
@@ -200,33 +200,35 @@ public class BSkipList extends SkipList implements Closeable {
 	}
 
 	@Override
-	public SkipIterator iterator() {
+	public SkipIterator<K, V> iterator() {
 		if (!this.fileOnly)
 			return super.iterator();
-		return new IBSkipIterator(first, 0);
+		return new IBSkipIterator<K, V>(first, 0);
 	}
 
-	@Override
-	public SkipIterator min() {
+/****
+	//@Override
+	public SkipIterator<K, V> min() {
 		return iterator();
 	}
 
-	@Override
-	public SkipIterator max() {
+	//@Override
+	public SkipIterator<K, V> max() {
 		if (!this.fileOnly)
 			return super.max();
-		SkipSpan ss = stack.getEnd();
-		return new IBSkipIterator(ss, ss.nKeys - 1);
+		SkipSpan<K, V> ss = stack.getEnd();
+		return new IBSkipIterator<K, V>(ss, ss.nKeys - 1);
 	}
+****/
 
 	@Override
-	public SkipIterator find(Comparable key) {
+	public SkipIterator<K, V> find(K key) {
 		if (!this.fileOnly)
 			return super.find(key);
 		int[] search = new int[1];
-		SkipSpan ss = stack.getSpan(stack.levels.length - 1, key, search);
+		SkipSpan<K, V> ss = stack.getSpan(stack.levels.length - 1, key, search);
 		if(search[0] < 0) { search[0] = -1 * (search[0] + 1); }
-		return new IBSkipIterator(ss, search[0]);
+		return new IBSkipIterator<K, V>(ss, search[0]);
 	}
 
 	/**

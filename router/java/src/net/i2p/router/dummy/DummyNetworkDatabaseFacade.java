@@ -43,6 +43,7 @@ public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {}
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, Hash fromLocalDest) {}
     public LeaseSet lookupLeaseSetLocally(Hash key) { return null; }
+    public void lookupLeaseSetRemotely(Hash key, Hash fromLocalDest) {}
 
     public void lookupDestination(Hash key, Job onFinishedJob, long timeoutMs, Hash fromLocalDest) {}
 

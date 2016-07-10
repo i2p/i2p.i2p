@@ -55,16 +55,21 @@ public class SAMStreamSend {
     private static I2PSSLSocketFactory _sslSocketFactory;
     
     private static final int STREAM=0, DG=1, V1DG=2, RAW=3, V1RAW=4;
-    private static final String USAGE = "Usage: SAMStreamSend [-s] [-m mode] [-v version] [-b samHost] [-p samPort] [-o opt=val] [-u user] [-w password] peerDestFile dataDir\n" +
+    private static final int MASTER=8;
+    private static final String USAGE = "Usage: SAMStreamSend [-s] [-x] [-m mode] [-v version] [-b samHost] [-p samPort]\n" +
+                                        "                     [-o opt=val] [-u user] [-w password] peerDestFile dataDir\n" +
                                         "       modes: stream: 0; datagram: 1; v1datagram: 2; raw: 3; v1raw: 4\n" +
+                                        "              default is stream\n" +
                                         "       -s: use SSL\n" +
+                                        "       -x: use master session (forces -v 3.3)\n" +
                                         "       multiple -o session options are allowed";
 
     public static void main(String args[]) {
-        Getopt g = new Getopt("SAM", args, "sb:m:o:p:u:v:w:");
+        Getopt g = new Getopt("SAM", args, "sxhb:m:o:p:u:v:w:");
         boolean isSSL = false;
+        boolean isMaster = false;
         int mode = STREAM;
-        String version = "1.0";
+        String version = "3.3";
         String host = "127.0.0.1";
         String port = "7656";
         String user = null;
@@ -75,6 +80,10 @@ public class SAMStreamSend {
           switch (c) {
             case 's':
                 isSSL = true;
+                break;
+
+            case 'x':
+                isMaster = true;
                 break;
 
             case 'm':
@@ -123,6 +132,10 @@ public class SAMStreamSend {
             System.err.println(USAGE);
             return;
         }
+        if (isMaster) {
+            mode += MASTER;
+            version = "3.3";
+        }
         if ((user == null && password != null) ||
             (user != null && password == null)) {
             System.err.println("both user and password or neither");
@@ -162,6 +175,8 @@ public class SAMStreamSend {
                 _log.debug("Reader created");
             OutputStream out = sock.getOutputStream();
             String ourDest = handshake(out, version, true, eventHandler, mode, user, password, sessionOpts);
+            if (mode >= MASTER)
+                mode -= MASTER;
             if (ourDest == null)
                 throw new IOException("handshake failed");
             if (_log.shouldLog(Log.DEBUG))
@@ -230,7 +245,10 @@ public class SAMStreamSend {
         return sock;
     }
     
-    /** @return our b64 dest or null */
+    /**
+     * @param isMaster is this the control socket
+     * @return our b64 dest or null
+     */
     private String handshake(OutputStream samOut, String version, boolean isMaster,
                              SAMEventHandler eventHandler, int mode, String user, String password,
                              String opts) {
@@ -261,24 +279,66 @@ public class SAMStreamSend {
                         _v3ID = "xx€€xx" + _v3ID;
                     _conOptions = "ID=" + _v3ID;
                 }
+                boolean masterMode;  // are we using v3.3 master session
+                String command;
+                if (mode >= MASTER) {
+                    masterMode = true;
+                    command = "ADD";
+                    mode -= MASTER;
+                } else {
+                    masterMode = false;
+                    command = "CREATE DESTINATION=TRANSIENT";
+                }
                 String style;
                 if (mode == STREAM)
                     style = "STREAM";
                 else if (mode == DG || mode == V1DG)
                     style = "DATAGRAM";
-                else
+                else   // RAW or V1RAW
                     style = "RAW";
-                String req = "SESSION CREATE STYLE=" + style + " DESTINATION=TRANSIENT " + _conOptions + ' ' + opts + '\n';
+
+                if (masterMode) {
+                    if (mode == V1DG || mode == V1RAW)
+                        throw new IllegalArgumentException("v1 dg/raw incompatible with master session");
+                    String req = "SESSION CREATE DESTINATION=TRANSIENT STYLE=MASTER ID=masterSend " + opts + '\n';
+                    samOut.write(req.getBytes("UTF-8"));
+                    samOut.flush();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("SESSION CREATE STYLE=MASTER sent");
+                    boolean ok = eventHandler.waitForSessionCreateReply();
+                    if (!ok) 
+                        throw new IOException("SESSION CREATE STYLE=MASTER failed");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("SESSION CREATE STYLE=MASTER reply found: " + ok);
+                    // PORT required even if we aren't listening for this test
+                    if (mode != STREAM)
+                        opts += " PORT=9999";
+                }
+                String req = "SESSION " + command + " STYLE=" + style + ' ' + _conOptions + ' ' + opts + '\n';
                 samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Session create sent");
-                boolean ok = eventHandler.waitForSessionCreateReply();
+                    _log.debug("SESSION " + command + " sent");
+                boolean ok;
+                if (masterMode)
+                    ok = eventHandler.waitForSessionAddReply();
+                else
+                    ok = eventHandler.waitForSessionCreateReply();
                 if (!ok) 
-                    throw new IOException("Session create failed");
+                    throw new IOException("SESSION " + command + " failed");
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Session create reply found: " + ok);
+                    _log.debug("SESSION " + command + " reply found: " + ok);
 
+                if (masterMode) {
+                    // do a bunch more
+                    req = "SESSION ADD STYLE=STREAM FROM_PORT=99 ID=stream99\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION ADD STYLE=STREAM FROM_PORT=98 ID=stream98\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    req = "SESSION REMOVE ID=stream99\n";
+                    samOut.write(req.getBytes("UTF-8"));
+                    samOut.flush();
+                }
                 req = "NAMING LOOKUP NAME=ME\n";
                 samOut.write(req.getBytes("UTF-8"));
                 samOut.flush();
@@ -453,6 +513,7 @@ public class SAMStreamSend {
                                     baos.write(DataHelper.getUTF8(" PROTOCOL=123 TO_PORT=5678"));
                                 else
                                     baos.write(DataHelper.getUTF8(" TO_PORT=5678"));
+                                baos.write(DataHelper.getUTF8(" SEND_TAGS=19 TAG_THRESHOLD=13 EXPIRES=33 SEND_LEASESET=true"));
                             }
                             baos.write((byte) '\n');
                             baos.write(data, 0, read);

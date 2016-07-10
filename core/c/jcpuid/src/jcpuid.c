@@ -1,5 +1,27 @@
 #include "jcpuid.h"
 
+/*
+ * Versions:
+ *
+ * 1: Original version
+ *
+ * 2: (I2P 0.8.7)
+ *    Add PIC-compatibility
+ *
+ * 3: (I2P 0.9.25)
+ *    Added:
+ *      nativeJcpuidVersion()
+ *    Set ECX to 0 to support function 7
+ *
+ */
+#define JCPUID_VERSION 3
+
+/* since version 3 */
+JNIEXPORT jint JNICALL Java_freenet_support_CPUInformation_CPUID_nativeJcpuidVersion
+        (JNIEnv* env, jclass cls) {
+    return (jint) JCPUID_VERSION;
+}
+
 /**
 
 From: http://sam.zoy.org/blog/2007-04-13-shlib-with-non-pic-code-have-inline-assembly-and-pic-mix-well
@@ -52,6 +74,8 @@ JNIEXPORT jobject JNICALL Java_freenet_support_CPUInformation_CPUID_doCPUID
 		_asm 
 		{
 			mov eax, iFunction
+			// When iFunction is 7, ECX must be 0, just set it all the time
+			mov ecx, 0
 			cpuid
 			mov a, eax
 			mov b, ebx
@@ -76,7 +100,8 @@ JNIEXPORT jobject JNICALL Java_freenet_support_CPUInformation_CPUID_doCPUID
 			/* 64 bit */
 			: "=a" (a), "=b" (b), "=c" (c), "=d" (d)
 #endif
-			:"a"(iFunction)
+			/* When iFunction is 7, ECX must be 0, just set it all the time */
+			:"a"(iFunction), "c"(0)
 			: "cc"
 		);
 	#endif

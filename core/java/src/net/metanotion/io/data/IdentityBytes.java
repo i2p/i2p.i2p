@@ -35,11 +35,11 @@ import net.metanotion.io.Serializer;
  * Will never return null.
  * Added by I2P.
  */
-public class IdentityBytes implements Serializer {
+public class IdentityBytes implements Serializer<byte[]> {
 
 	/** @return byte[] */
-	public byte[] getBytes(Object o) { return (byte[])o; }
+	public byte[] getBytes(byte[] o) { return o; }
 
 	/** @return b */
-	public Object construct(byte[] b) { return b; }
+	public byte[] construct(byte[] b) { return b; }
 }

@@ -33,6 +33,11 @@
      margin-right: 4px;
 }
 
+#tunnelEditPage #accessListField {
+     width: 434px;
+     margin-right: 4px;
+}
+
 #tunnelEditPage #portField, #tunnelEditPage #optionsPortField, #tunnelEditPage #backupField, #tunnelEditPage #varianceField {
      width: 140px;
 }

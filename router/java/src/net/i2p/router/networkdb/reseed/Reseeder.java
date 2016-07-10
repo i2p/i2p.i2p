@@ -63,6 +63,8 @@ public class Reseeder {
     private static final boolean ENABLE_SU3 = true;
     /** if false, use su3 only, and disable fallback reading directory index and individual dat files */
     private static final boolean ENABLE_NON_SU3 = false;
+    private static final int MIN_RI_WANTED = 100;
+    private static final int MIN_RESEED_SERVERS = 2;
 
     /**
      *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname,
@@ -83,18 +85,39 @@ public class Reseeder {
               //"http://netdb.i2p2.no/"; // Only SU3 (v3) support
               "";
 
-    /** @since 0.8.2 */
+    /**
+     *  The I2P reseed servers are managed by backup (backup@mail.i2p).
+     *  Please contact him for support, change requests, or issues.
+     *  See also the reseed forum http://zzz.i2p/forums/18
+     *  and the reseed setup and testing guide
+     *  https://geti2p.net/en/get-involved/guides/reseed
+     *
+     *  All supported reseed hosts need a corresponding reseed (SU3)
+     *  signing certificate installed in the router.
+     *
+     *  All supported reseed hosts with selfsigned SSL certificates
+     *  need the corresponding SSL certificate installed in the router.
+     *
+     *  While this implementation supports SNI, others may not, so
+     *  SNI requirements are noted.
+     *
+     * @since 0.8.2
+     */
     public static final String DEFAULT_SSL_SEED_URL =
-              "https://reseed.i2p-projekt.de/" + "," + // Only HTTPS
-              //"https://i2pseed.zarrenspry.info/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://i2p.mooo.com/netDb/" + "," +
-              "https://netdb.i2p2.no/" + "," + // Only SU3 (v3) support, SNI required
-              "https://us.reseed.i2p2.no:444/" + "," +
-              "https://uk.reseed.i2p2.no:444/" + "," +
-              "https://www.torontocrypto.org:8443/" + "," +
-              "https://reseed.i2p.vzaws.com:8443/" + ", " + // Only SU3 (v3) support
-              "https://user.mx24.eu/" + "," + // Only HTTPS and SU3 (v3) support
-              "https://ieb9oopo.mooo.com/"; // Only HTTPS and SU3 (v3) support
+        // newest first, please add new ones at the top
+        //
+        // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
+        // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://i2p.manas.ca:8443/"          + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
+        "https://i2p-0.manas.ca:8443/"        + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
+        "https://reseed.i2p.vzaws.com:8443/"  + ',' +   // parg_at_mail.i2p.crt      // reseed.i2p.vzaws.com.crt
+        "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
+        "https://user.mx24.eu/"               + ',' +   // backup_at_mail.i2p.crt    // user.mx24.eu.crt
+        "https://download.xxlspeed.com/"      + ',' +   // backup_at_mail.i2p.crt    // download.xxlspeed.com.crt  // SNI required
+        "https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // netdb.i2p2.no.crt          // SNI required
+        "https://us.reseed.i2p2.no:444/"      + ',' +   // meeh_at_mail.i2p.crt      // us.reseed.i2p2.no.crt
+        "https://uk.reseed.i2p2.no:444/"      + ',' +   // meeh_at_mail.i2p.crt      // uk.reseed.i2p2.no.crt
+        "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // reseed.i2p-projekt.de.crt
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
 
@@ -219,6 +242,9 @@ public class Reseeder {
     /**
      *  Since Java 7 or Android 2.3 (API 9),
      *  which is the lowest Android we support anyway.
+     *
+     *  Not guaranteed to be correct, e.g. FreeBSD:
+     *  https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=201446
      *
      *  @since 0.9.20
      */
@@ -479,6 +505,9 @@ public class Reseeder {
             }
             if (!isSNISupported()) {
                 try {
+                    URLList.remove(new URI("https://i2p.manas.ca:8443/"));
+                    URLList.remove(new URI("https://i2p-0.manas.ca:8443/"));
+                    URLList.remove(new URI("https://download.xxlspeed.com/"));
                     URLList.remove(new URI("https://netdb.i2p2.no/"));
                 } catch (URISyntaxException mue) {}
             }
@@ -500,6 +529,7 @@ public class Reseeder {
         */
         private int reseed(List<URI> URLList, boolean echoStatus) {
             int total = 0;
+            int fetched_reseed_servers = 0;
             for (int i = 0; i < URLList.size() && _isRunning; i++) {
                 if (_context.router().gracefulShutdownInProgress()) {
                     System.out.println("Reseed aborted, shutdown in progress");
@@ -518,8 +548,9 @@ public class Reseeder {
                 }
                 if (dl > 0) {
                     total += dl;
+                    fetched_reseed_servers++;
                     // Don't go on to the next URL if we have enough
-                    if (total >= 100)
+                    if (total >= MIN_RI_WANTED && fetched_reseed_servers >= MIN_RESEED_SERVERS)
                         break;
                     // remove alternate versions if we haven't tried them yet
                     for (int j = i + 1; j < URLList.size(); ) {
