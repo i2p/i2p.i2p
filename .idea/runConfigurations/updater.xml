@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="updater" type="AntRunConfiguration" factoryName="Ant Target">
+    <antsettings antfile="file://$PROJECT_DIR$/build.xml" target="updater" />
+    <method />
+  </configuration>
+</component>

@@ -1,0 +1,22 @@
+<component name="libraryTable">
+  <library name="jettylib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-security-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-servlets-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-deploy-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-util-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-servlet-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-http-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-xml-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-server-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/servlet-api-3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-jmx-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-webapp-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-io-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-continuation-8.1.17.v20150415.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/jetty-distribution-8.1.17.v20150415/lib/jetty-rewrite-8.1.17.v20150415.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
