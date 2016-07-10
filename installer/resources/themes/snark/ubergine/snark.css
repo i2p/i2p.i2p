@@ -454,7 +454,7 @@ table.SnarkDirInfo {
      line-height: 130% !important;
 }
 
-.snarkConfigTitle {
+.snarkConfigTitle, label.toggleview {
      font-size: 11pt;
      font-weight: bold;
      padding: 0 25px 3px 25px;
@@ -920,4 +920,10 @@ input.trackerhome {
 
 input.trackerannounce {
      width: 230px;
+}
+
+/* toggle create/add panel view */
+
+input.toggle_input { /* hide checkbox and use label as faux panel heading */
+     display: none;
 }

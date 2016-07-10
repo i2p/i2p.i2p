@@ -112,8 +112,8 @@ ${book.loadBookMessages}
 <a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._t("other")%></a>
 <a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a></p>
 <c:if test="${book.hasFilter}">
-<p><%=intl._t("Current filter")%>: ${book.filter}
-(<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a>)</p>
+<p><%=intl._t("Current filter")%>: <b>${book.filter}</b>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a></p>
 </c:if>
 </div>
 

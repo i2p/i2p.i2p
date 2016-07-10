@@ -15,7 +15,7 @@
 <%@include file="summary.jsi" %>
 <!-- Traduction de mars 2011 (magma@mail.i2p) -->
 <h1>Aide et assistance du routeur I2P</h1>
-<div class="main" id="main"><p>
+<div class="main" id="help"><p>
 Si vous souhaitez améliorer ou traduire la documentation ou d'autres versants du projet, merci de vous reporter à 
 la page consacrée aux <a href="http://i2p-projekt.i2p/fr/get-involved">volontaires</a>.
 </p>D'autres détails sont disponibles ici:

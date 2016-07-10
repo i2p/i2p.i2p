@@ -466,7 +466,7 @@ thead img.disable, img.disable:hover {
      line-height: 130% !important;
 }
 
-.snarkConfigTitle {
+.snarkConfigTitle, label.toggleview {
      font-size: 11pt;
      font-weight: bold;
      padding: 0 15px 3px 12px;
@@ -484,7 +484,7 @@ thead img.disable, img.disable:hover {
      box-shadow: 0 1px 1px #777;
 }
 
-.snarkConfigTitle img {
+.snarkConfigTitle img, label.toggleview img {
      margin-right: -3px;    
 } 
 .snarkConfig {
@@ -937,4 +937,10 @@ input.trackerhome {
 
 input.trackerannounce {
      width: 230px;
+}
+
+/* toggle create/add panel view */
+
+input.toggle_input { /* hide checkbox and use label as faux panel heading */
+     display: none;
 }

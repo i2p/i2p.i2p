@@ -9,7 +9,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %><h1><%=intl._t("Certificates")%></h1>
-<div class="main" id="main">
+<div class="main" id="certs">
 <jsp:useBean class="net.i2p.router.web.CertHelper" id="certhelper" scope="request" />
 <jsp:setProperty name="certhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% certhelper.storeWriter(out); %>

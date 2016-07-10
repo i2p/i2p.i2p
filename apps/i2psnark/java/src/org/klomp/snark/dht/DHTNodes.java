@@ -138,7 +138,7 @@ class DHTNodes {
      * @since 0.9.4
      */
     public void renderStatusHTML(StringBuilder buf) {
-        buf.append(_kad.toString().replace("\n", "<br>\n"));
+        buf.append(_kad.toString().replace("\n", "<br><hr class=\"debug\">\n"));
     }
 
     /** */

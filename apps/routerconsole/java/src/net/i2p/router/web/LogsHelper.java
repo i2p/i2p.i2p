@@ -129,7 +129,7 @@ public class LogsHelper extends HelperBase {
             return "<p>" + _t("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
         } else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            return "<p>" + _t("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p><pre>" + str + "</pre>";
+            return "<p>" + _t("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p></td></tr>\n<tr><td><pre>" + str + "</pre>";
         }
     }
     
@@ -144,10 +144,10 @@ public class LogsHelper extends HelperBase {
     /** formats in reverse order */
     private String formatMessages(List<String> msgs) {
         if (msgs.isEmpty())
-            return "<p><i>" + _t("No log messages") + "</i></p>";
+            return "</td></tr><tr><td><p><i>" + _t("No log messages") + "</i></p>";
         boolean colorize = _context.getBooleanPropertyDefaultTrue("routerconsole.logs.color");
         StringBuilder buf = new StringBuilder(16*1024); 
-        buf.append("<ul>");
+        buf.append("</td></tr><tr><td><ul>");
         for (int i = msgs.size() - 1; i >= 0; i--) { 
             String msg = msgs.get(i);
             // don't display the dup message if it is last

@@ -50,7 +50,7 @@ class BanlistRenderer {
             return;
         }
 
-        buf.append("<ul>");
+        buf.append("<ul id=\"banlist\">");
         
         for (Map.Entry<Hash, Banlist.Entry> e : entries.entrySet()) {
             Hash key = e.getKey();
@@ -78,8 +78,8 @@ class BanlistRenderer {
                     buf.append(_t(entry.cause));
             }
             if (!key.equals(Hash.FAKE_HASH)) {
-                buf.append(" (<a href=\"configpeer?peer=").append(key.toBase64())
-                   .append("#unsh\">").append(_t("unban now")).append("</a>)");
+                buf.append(" <a href=\"configpeer?peer=").append(key.toBase64())
+                   .append("#unsh\">[").append(_t("unban now")).append("]</a>");
             }
             buf.append("</li>\n");
         }
