@@ -2348,11 +2348,11 @@ public class WebMail extends HttpServlet
 			out.println(button2(DELETE, _t("Delete")));
 		else
 			out.println(button(DELETE, _t("Delete")));
-		out.println("<br>" +
+		out.println("<div id=\"messagenav\">" +
 			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _t("Previous") ) : button( PREV, _t("Previous") ) ) + spacer +
 			button( LIST, _t("Back to Folder") ) + spacer +
 			( sessionObject.folder.isLastElement( sessionObject.showUIDL ) ? button2( NEXT, _t("Next") ) : button( NEXT, _t("Next") ) ));
-		out.println("</div>");
+		out.println("</div></div>");
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		//out.println(button( LOGOUT, _t("Logout") ) );
