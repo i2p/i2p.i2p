@@ -54,14 +54,13 @@
 <hr>
 <div id="navi">
 <p>
-<%=intl._t("Address books")%>:
-<a href="addressbook?book=private"><%=intl._t("private")%></a> |
-<a href="addressbook?book=master"><%=intl._t("master")%></a> |
-<a href="addressbook?book=router"><%=intl._t("router")%></a> |
-<a href="addressbook?book=published"><%=intl._t("published")%></a> *
-<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
-<a href="config"><%=intl._t("Configuration")%></a> *
-<%=intl._t("Overview")%>
+<a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
+<a class="abook" href="addressbook?book=private"><%=intl._t("Private")%></a>&nbsp;
+<a class="abook" href="addressbook?book=master"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=router"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook" href="addressbook?book=published"><%=intl._t("Published")%></a>&nbsp;
+<a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
+<a id="config" href="config"><%=intl._t("Configuration")%></a>
 </p>
 </div>
 <hr>
