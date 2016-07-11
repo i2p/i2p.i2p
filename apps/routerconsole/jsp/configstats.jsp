@@ -6,6 +6,7 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config stats")%>
+<noscript><style>.script {display: none;}</style></noscript>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 <script type="text/javascript">
@@ -62,7 +63,7 @@ function toggleAll(category)
 </head><body onLoad="init();">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Stats Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_stats">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
@@ -73,8 +74,8 @@ function toggleAll(category)
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <h3><%=intl._t("Configure I2P Stat Collection")%></h3>
- <p><%=intl._t("Enable full stats?")%>
+ <h3 class="ptitle"><%=intl._t("Configure I2P Stat Collection")%>&nbsp;<a class="script" title="<%=intl._t("Toggle full stat collection and all graphing options")%>" href="javascript:void(null);" onclick="toggleAll('*')">[<%=intl._t("toggle all")%>]</a></h3>
+ <p id="enablefullstats"><b><%=intl._t("Enable full stats?")%></b>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
  (<%=intl._t("change requires restart to take effect")%>)<br>
@@ -84,22 +85,22 @@ function toggleAll(category)
   boolean shouldShowLog = statshelper.shouldShowLog();
   if (shouldShowLog) {
 
-%><%=intl._t("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
+%><%=intl._t("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" >
 Warning - Log with care, stat file grows without limit.<br>
 <%
 
   }  // shouldShowLog
 
-%><%=intl._t("Filter")%>: (<a href="javascript:void(null);" onclick="toggleAll('*')"><%=intl._t("toggle all")%></a>)<br></p>
+%></p>
  <div class="wideload">
- <table>
+ <table id="configstats">
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
- <tr class="tablefooter">
-     <td align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
+ <tr>
+     <th align="left" colspan="3" id=<%=statshelper.getCurrentGroupName()%>>
      <b><%=intl._t(statshelper.getCurrentGroupName())%></b>
-     (<a href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')"><%=intl._t("toggle all")%></a>)
-     </td></tr>
+     <a class="script" title="<%=intl._t("Toggle section graphing options")%>" href="javascript:void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">[<%=intl._t("toggle all")%>]</a>
+     </th></tr>
  <tr class="tablefooter">
 <%
 
@@ -110,7 +111,7 @@ Warning - Log with care, stat file grows without limit.<br>
 
   }  // shouldShowLog
 
-%>    <td align="center"><b><%=intl._t("Graph")%></b></td>
+%>    <td align="center"><b title="<%=intl._t("Select stats for visualization on /graphs")%>"><%=intl._t("Graph")%></b></td>
     <td></td></tr>
         <%
      } // end iterating over required groups for the current stat %>
@@ -131,7 +132,7 @@ Warning - Log with care, stat file grows without limit.<br>
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
        <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
        if (statshelper.getCurrentIsGraphed()) { %>checked="checked" <% } %> ><% } %></td>
-     <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br>
+     <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b>&nbsp;
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats
 
@@ -145,7 +146,7 @@ Warning - Log with care, stat file grows without limit.<br>
 
   }  // shouldShowLog
 
-%>   <tr class="tablefooter"><td colspan="3" align="right">
+%>   <tr class="tablefooter"><td colspan="3" align="right" class="optionsave">
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Save changes")%>" >
 </td></tr>

@@ -16,7 +16,7 @@
 <jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h1><%=intl._t("I2P Advanced Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_advanced">
 
  <%@include file="confignav.jsi" %>
 
@@ -24,9 +24,14 @@
 <%@include file="formhandler.jsi" %>
  <div class="configure">
  <div class="wideload">
-<h3><%=intl._t("Floodfill Configuration")%></h3>
-<p><%=intl._t("Floodill participation helps the network, but may use more of your computer's resources.")%>
-</p><p>
+
+<h3 id="ffconf" class="tabletitle"><%=intl._t("Floodfill Configuration")%></h3>
+<form action="" method="POST">
+ <table id="floodfillconfig" class="configtable">
+  <tr><td class="infohelp">
+<%=intl._t("Floodill participation helps the network, but may use more of your computer's resources.")%>
+  </td></tr>
+  <tr><td>
 <%
     if (advancedhelper.isFloodfill()) {
 %><%=intl._t("This router is currently a floodfill participant.")%><%
@@ -34,33 +39,50 @@
 %><%=intl._t("This router is not currently a floodfill participant.")%><%
     }
 %>
-</p>
-<form action="" method="POST">
+  </td></tr>
+  <tr><td>
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <input type="hidden" name="action" value="ff" >
 <input type="radio" class="optbox" name="ff" value="auto" <%=advancedhelper.getFFChecked(2) %> >
-<%=intl._t("Automatic")%><br>
+<%=intl._t("Automatic")%>&nbsp;
 <input type="radio" class="optbox" name="ff" value="true" <%=advancedhelper.getFFChecked(1) %> >
-<%=intl._t("Force On")%><br>
+<%=intl._t("Force On")%>&nbsp;
 <input type="radio" class="optbox" name="ff" value="false" <%=advancedhelper.getFFChecked(0) %> >
-<%=intl._t("Disable")%><br>
-<div class="formaction">
+<%=intl._t("Disable")%>
+  </td></tr>
+  <tr><td class="optionsave" align="right">
 <input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Save changes")%>" >
-</div></form>
-<h3><%=intl._t("Advanced I2P Configuration")%></h3>
+  </td></tr>
+ </table>
+</form>
+
+<h3 id="advancedconfig" class="tabletitle"><%=intl._t("Advanced I2P Configuration")%>&nbsp;<a title="Help with additional configuration settings" href="/help#advancedsettings">[Additional Options]</a></h3><b>
 <% if (advancedhelper.isAdvanced()) { %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="action" value="blah" >
 <% }  // isAdvanced %>
- <textarea rows="32" cols="60" name="nofilter_config" wrap="off" spellcheck="false" <% if (!advancedhelper.isAdvanced()) { %>readonly="readonly"<% } %>><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
+<table class="configtable" id="advconf">
 <% if (advancedhelper.isAdvanced()) { %>
-      <div class="formaction">
+ <tr><td class="infohelp">
+<%=intl._t("NOTE")%>:</b> <%=intl._t("Some changes may require a restart to take effect.")%>
+ </td></tr>
+<% } else { %>
+ <tr><td>
+<%=intl._t("To make changes, edit the file {0}.", "<tt>" + advancedhelper.getConfigFileName() + "</tt>")%>
+ </td></tr>
+<% }  // isAdvanced %>
+ <tr><td class="tabletextarea">
+ <textarea id="advancedsettings"rows="32" cols="60" name="nofilter_config" wrap="off" spellcheck="false" <% if (!advancedhelper.isAdvanced()) { %>readonly="readonly"<% } %>><jsp:getProperty name="advancedhelper" property="settings" /></textarea>
+ </td></tr>
+<% if (advancedhelper.isAdvanced()) { %>
+ <tr><td class="optionsave" align="right">
         <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
         <input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Save changes")%>" >
- <br><b><%=intl._t("NOTE")%>:</b> <%=intl._t("Some changes may require a restart to take effect.")%>
- </div></form>
-<% } else { %>
-<%=intl._t("To make changes, edit the file {0}.", "<tt>" + advancedhelper.getConfigFileName() + "</tt>")%>
+ </td></tr>
+<% }  // isAdvanced %>
+</table>
+<% if (advancedhelper.isAdvanced()) { %>
+</form>
 <% }  // isAdvanced %>
 </div></div></div></body></html>

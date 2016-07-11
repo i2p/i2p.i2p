@@ -14,7 +14,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P مساعدة لوحة التحكم</h1>
-<div class="main" id="main" dir="rtl" lang="ar"><p>
+<div class="main" id="help" dir="rtl" lang="ar"><p>
 اذا رغبت في المساعدة أو ترجمة الوثائق، أو المساعدة في أشياء أخرى، انظر اسفله
 
 <a href="http://i2p-projekt.i2p/ar/get-involved">تطوع</a>

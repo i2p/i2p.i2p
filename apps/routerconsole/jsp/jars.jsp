@@ -9,7 +9,7 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %><h1>Jar File Dump</h1>
-<div class="main" id="main">
+<div class="main" id="jardump">
 <jsp:useBean class="net.i2p.router.web.FileDumpHelper" id="dumpHelper" scope="request" />
 <jsp:setProperty name="dumpHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:getProperty name="dumpHelper" property="fileSummary" />
