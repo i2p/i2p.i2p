@@ -54,15 +54,14 @@ class ConnectionHandler {
         if (_log.shouldLog(Log.WARN))
             _log.warn("setActive(" + active + ") called, previously " + _active, new Exception("I did it"));
         // if starting, clear any old poison
-        // if stopping, the accept() loop will clear any pending sockets
         if (active && !_active)
             _synQueue.clear();
         boolean wasActive = _active;
         _active = active; 
         if (wasActive && !active) {
-            try {
-                _synQueue.put(new PoisonPacket()); // so we break from the accept() - waits until space is available
-            } catch (InterruptedException ie) {}
+            // stopping, clear any pending sockets
+            _synQueue.clear();
+            _synQueue.offer(new PoisonPacket());
         }
     }
 

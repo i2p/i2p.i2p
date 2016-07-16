@@ -1,5 +1,10 @@
-2016-06-26 zzz
+2016-07-16 zzz
+ * I2CP Client: Handle disconnect properly if received before first LS
+ * Streaming: Kill accept() when session disconnects
+
+2016-06-25 zzz
  * SSU peer testing: Add implementation (ticket #1752; proposal #126)
+ * Utils: Improve random seed initialization
 
 2016-06-22 zzz
  * SSU peer testing:

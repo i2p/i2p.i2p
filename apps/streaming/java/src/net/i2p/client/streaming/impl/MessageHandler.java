@@ -103,6 +103,8 @@ class MessageHandler implements I2PSessionMuxedListener {
         if (_log.shouldLog(Log.WARN))
             _log.warn("I2PSession disconnected");
         _manager.disconnectAllHard();
+        // kill anybody waiting in accept()
+        _manager.getConnectionHandler().setActive(false);
         
         for (I2PSocketManager.DisconnectListener lsnr : _listeners) {
             lsnr.sessionDisconnected();
@@ -119,9 +121,7 @@ class MessageHandler implements I2PSessionMuxedListener {
      */
     public void errorOccurred(I2PSession session, String message, Throwable error) {
         if (_log.shouldLog(Log.WARN))
-            _log.warn("error occurred: " + message + "- " + error.getMessage()); 
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("cause", error);
+            _log.warn("error occurred: " + message + "- " + error.getMessage(), error); 
         //_manager.disconnectAllHard();
     }
     
