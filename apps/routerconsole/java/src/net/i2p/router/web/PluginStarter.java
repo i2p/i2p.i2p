@@ -911,6 +911,7 @@ public class PluginStarter implements Runnable {
         
         // Plugins start before the eepsite, and will create the static Timer thread
         // in RolloverFileOutputStream, which never stops. Don't count it.
+        // Ditto HSQLDB Timer (jwebcache)
         if (rv) {
             Log log = ctx.logManager().getLog(PluginStarter.class);
             Thread[] activeThreads = new Thread[128];
@@ -919,10 +920,11 @@ public class PluginStarter implements Runnable {
             for (int i = 0; i < count; i++) {
                 if (activeThreads[i] != null) {
                     String name = activeThreads[i].getName();
-                    if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name))
+                    if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name) &&
+                        !name.startsWith("HSQLDB Timer"))
                         notRollover = true;
                     if (log.shouldLog(Log.DEBUG))
-                        log.debug("Found " + activeThreads[i].getState() + " thread for " + pluginName + ": " + name);
+                        log.debug("Found " + activeThreads[i].getState() + " thread " + name + " for " + pluginName + ": " + name);
                 }
             }
             rv = notRollover;
