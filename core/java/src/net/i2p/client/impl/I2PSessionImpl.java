@@ -673,6 +673,9 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                     // InterruptedException caught below
                     _leaseSetWait.wait(1000);
                 }
+                // if we got a disconnect message while waiting
+                if (isClosed())
+                    throw new IOException("Disconnected from router while waiting for tunnels");
             }
             if (_log.shouldLog(Log.INFO)) {
                 long connected = _context.clock().now();
@@ -1277,6 +1280,10 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
         closeSocket();
         changeState(State.CLOSED);
+        // break out of wait for initial LS in connect()
+        synchronized (_leaseSetWait) {
+            _leaseSetWait.notifyAll();
+        }
     }
 
     private final static int MAX_RECONNECT_DELAY = 320*1000;
