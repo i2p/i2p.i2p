@@ -69,7 +69,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String SERVER_HEADER = "Server";
     private static final String X_POWERED_BY_HEADER = "X-Powered-By";
     private static final String X_RUNTIME_HEADER = "X-Runtime"; // Rails
-    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER };
+    // https://httpoxy.org
+    private static final String PROXY_HEADER = "Proxy";
+    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER, PROXY_HEADER};
     /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
     /** total timeout for the request and all the headers */
