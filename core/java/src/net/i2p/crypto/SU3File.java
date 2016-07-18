@@ -314,6 +314,7 @@ public class SU3File {
             if (_certFile != null) {
                 _signerPubkey = loadKey(_certFile);
             } else {
+                // look in both install dir and config dir for the signer cert
                 KeyRing ring = new DirKeyRing(new File(_context.getBaseDir(), "certificates"));
                 try {
                     _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
@@ -322,8 +323,24 @@ public class SU3File {
                     ioe.initCause(gse);
                     throw ioe;
                 }
-                if (_signerPubkey == null)
-                    throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+                if (_signerPubkey == null) {
+                    boolean diff = true;
+                    try {
+                        diff = !_context.getBaseDir().getCanonicalPath().equals(_context.getConfigDir().getCanonicalPath());
+                    } catch (IOException ioe) {}
+                    if (diff) {
+                        ring = new DirKeyRing(new File(_context.getConfigDir(), "certificates"));
+                        try {
+                            _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
+                        } catch (GeneralSecurityException gse) {
+                            IOException ioe = new IOException("keystore error");
+                            ioe.initCause(gse);
+                            throw ioe;
+                        }
+                    }
+                    if (_signerPubkey == null)
+                        throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+                }
             }
         }
         _headerVerified = true;

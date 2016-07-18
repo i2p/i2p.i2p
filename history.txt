@@ -1,3 +1,6 @@
+2016-07-18 zzz
+ * SU3File: Also look in config dir for signer certificate
+
 2016-07-16 zzz
  * I2CP Client: Handle disconnect properly if received before first LS
  * Streaming: Kill accept() when session disconnects
