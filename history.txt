@@ -1,4 +1,5 @@
 2016-07-18 zzz
+ * i2ptunnel: Block 'Proxy' header
  * SU3File: Also look in config dir for signer certificate
 
 2016-07-16 zzz
