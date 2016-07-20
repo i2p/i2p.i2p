@@ -1706,7 +1706,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     /** minimum active peers to maintain IP detection, etc. */
-    private static final int MIN_PEERS = 3;
+    private static final int MIN_PEERS = 5;
+    private static final int MIN_PEERS_IF_HAVE_V6 = 30;
     /** minimum peers volunteering to be introducers if we need that */
     private static final int MIN_INTRODUCER_POOL = 5;
 
@@ -1764,7 +1765,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to);
 
-            // Try to maintain at least 3 peers so we can determine our IP address and
+            // Try to maintain at least 5 peers (30 for v6) so we can determine our IP address and
             // we have a selection to run peer tests with.
             // If we are firewalled, and we don't have enough peers that volunteered to
             // also introduce us, also bid aggressively so we are preferred over NTCP.
@@ -1772,6 +1773,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // never get any introducers)
             int count = _peersByIdent.size();
             if (alwaysPreferUDP() || count < MIN_PEERS ||
+                (_haveIPv6Address && count < MIN_PEERS_IF_HAVE_V6) ||
                 (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
                 return _cachedBid[SLOW_PREFERRED_BID];
             else if (preferUDP())
@@ -3223,9 +3225,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // enforce IPv4/v6 connection if we are ALICE looking for a BOB
             byte[] ip = peer.getRemoteIP();
             if (peerRole == BOB) {
-                if ((!isIPv6 && ip.length != 4) ||
-                    (isIPv6 && ip.length != 16))
-                continue;
+                if (isIPv6) {
+                    if (ip.length != 16)
+                        continue;
+                } else {
+                    if (ip.length != 4)
+                        continue;
+                }
             }
             // enforce IPv4/v6 advertised for all
             RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
@@ -3239,11 +3245,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             ip = null;
             List<RouterAddress> addrs = getTargetAddresses(peerInfo);
             for (RouterAddress addr : addrs) {
-                ip = addr.getIP();
-                if (ip != null) {
-                    if ((!isIPv6 && ip.length != 4) ||
-                        (isIPv6 && ip.length != 16))
-                    break;
+                byte[] rip = addr.getIP();
+                if (rip != null) {
+                    if (isIPv6) {
+                        if (rip.length != 16)
+                            continue;
+                    } else {
+                        if (rip.length != 4)
+                            continue;
+                    }
+                    // as of 0.9.27, we trust the 'B' cap for IPv6
+                    String caps = addr.getOption(UDPAddress.PROP_CAPACITY);
+                    if (caps != null && caps.contains(CAP_TESTING)) {
+                        ip = rip;
+                        break;
+                    }
                 }
             }
             if (ip == null)

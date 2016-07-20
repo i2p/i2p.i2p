@@ -1,3 +1,9 @@
+2016-07-20 zzz
+ * SSU:
+   - Increase minimum peers if we have a IPv6 address
+   - Check for 'B' cap for peer test
+   - Fix peer test IP length check
+
 2016-07-18 zzz
  * i2ptunnel: Block 'Proxy' header
  * SU3File: Also look in config dir for signer certificate
