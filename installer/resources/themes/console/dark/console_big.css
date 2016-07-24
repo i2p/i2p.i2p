@@ -2,30 +2,69 @@
 /* Comment: Larger text (and other tweaks) for Chinese & other doublebyte charactersets */
 /* Author: dr|z3d */
 
+h1, h2, h3, h4 {
+     text-shadow: none !important;
+     font-weight: normal !important;
+}
+
+h1 {
+     font-size: 20pt;
+     padding: 11px 15px;
+}
+
+h3 {
+     font-size: 14pt !important;
+}
+
 body {
-     font: 9pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font-size: 12pt;
+     line-height: 130%;
 }
 
 div.news {
-     font-size: 9.5pt;
+     font-size: 10pt;
      font-style: normal !important;
 }
 
-div.routersummary table {
-    font-size: 8.5pt;
+div.main, div.news, h1 {
+     margin-left: 232px !important;
+}
+
+div.routersummary {
+     width: 200px;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     transform: scale(1.2);
+}
+
+div.routersummary table, table#sb_localtunnels {
+    font-size: 10pt;
+    width: 215px !important;
+}
+
+div.routersummary table td {
+     padding: 2px 1px;
 }
 
 div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
      text-shadow: 0 0 0 0 !important;
 }
 
+div.routersummary h3 a {
+     font-size: 14pt !important;
+     text-transform: uppercase !important;
+     letter-spacing: 0.15em !important;
+}
+
 div.routersummary h4 {
-     font-size: 10pt;
+     font-size: 11pt;
      font-weight: normal;
 }
 
 div.routersummary b {
-     font-size: 9pt;
+     font-size: 10pt;
      font-weight: normal;
 }
 
@@ -34,26 +73,46 @@ div.routersummary a {
      font-weight: normal;
 }
 
+div.messages, div.error, .error ul li {
+     font-size: 11pt;
+     font-weight: normal !important;
+}
+
 b, a, a:link, a:hover, a:visited {
      font-weight: normal;
+     font-size: 11pt !important;
 }
 
 h2 {
-     font-size: 15pt;
+     font-size: 16pt;
      text-shadow: none;
      font-weight: normal;
 }
 
-p {
-     font-size: 9.5pt;
+h3 {
+     font-size: 15pt;
+}
+
+h4, h4.app, h4.app2 {
+     font-size: 14pt;
+}
+
+p, div.main {
+     font-size: 11pt;
 }
 
 button, button:visited {
-    font: normal 10pt Verdana,"Bitstream Vera Sans",Tahoma,Helvetica,sans-serif !important;
+    font: normal 10pt "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif !important;
+}
+
+button.reload, button.stop {
+     padding: 2px !important;
+     font-size: 12pt !important;
+     min-width: 100px;
 }
 
 code, pre, tt {
-     font-size: 10pt;
+     font-size: 12pt;
      font-weight: normal;
 }
 
@@ -63,9 +122,34 @@ code, pre, tt {
 }
 
 table {
-     font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font: 10pt/130% "Droid Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
 }
 
 div.applabel {
-     font-size: 8.5pt;
+     font-size: 10pt;
+     width: 134px;
+}
+
+div.app {
+     height: 64px;
+     width: 138px;
+}
+
+div.confignav {
+     font-size: 13pt;
+}
+
+input[type="submit"], input[type="reset"] {
+     padding: 3px 2px;
+     font-size: 12pt;
+     min-width: 80px;
+     font-weight: normal;
+}
+
+.langselect, .themechoice {
+     font-size: 11pt !important;
+}
+
+.langselect .optbox {
+     min-height: 68px;
 }

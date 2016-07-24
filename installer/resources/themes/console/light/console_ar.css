@@ -12,6 +12,7 @@ pre {
 
 table {
      direction: rtl;
+     margin-right: -16px;
 }
 
 td {
@@ -20,24 +21,59 @@ td {
 
 h1,h2,h3,h4 {
      direction: rtl;
-     text-align: right;
+     text-align: right !important;
+}
+
+.routersummary h4 {
+     text-align: center;
 }
 
 h1 {
-     margin: 10px 210px 0px 10px;
-     padding: 7px 0px 30px 20px;
+     margin: 10px 210px -15px 10px;
+     padding: 20px 20px 20px 10px;
 }
 
 form {
     text-align: right;
+    margin: 0 16px 0 -16px;
+}
+
+#statsForm, #joinfamily, #newfamily, table#permabanned {
+     margin-left: 0;
+     margin-right: 0;
+}
+
+form[action="configpeer"] {
+     margin-left: -16px;
+     margin-right: 16px;
+}
+
+form[action="configpeer"] > h3.tabletitle {
+     margin-left: 16px;
+     margin-right: -16px;
+}
+
+#config_summarybar table.configtable {
+     margin-right: 0;
 }
 
 div.routersummary form {
     text-align: center;
 }
 
-div.routersummary h3 {
-     text-align: center;
+div.wideload {
+     margin-left: -16px;
+     margin-right: 16px;
+}
+
+.routersummary h3, .routersummary h4 {
+     text-align: center !important;
+}
+
+#sb_services a {
+     text-align: right !important;
+     padding-right: 20px !important;
+     background-position: right center !important;
 }
 
 div.routersummary td:last-child {
@@ -70,8 +106,13 @@ div.main li {
 
 div.news {
      margin: 10px 210px 0px 10px;
-     padding: 7px 0px 30px 20px;
+     padding: 7px 20px 10px 20px;
      direction: ltr;
+}
+
+div.news h3, #news h3 {
+     background: url(images/news.png) right 8px center no-repeat, linear-gradient(to right, #fff, #eef) !important;
+     padding: 5px 30px 5px 10px;
 }
 
 div.graphspanel form {
@@ -81,10 +122,37 @@ div.graphspanel form {
 .langbox {
      float: left;
      text-align: left;
+     padding-left: 0;
+     margin-left: 4px;
+}
+
+.confignav {
+     margin-left: -19px !important;
+     margin-right: -19px !important;
+     direction: ltr;
 }
 
 .formaction {
      text-align: left;
+     margin: 0 -16px 0 16px;
+}
+
+.formaction#consolepass, .formaction#tunnelconfigsave, .formaction#homeapps {
+     margin-bottom: 15px;
+}
+
+div[lang="ar"] p, div[lang="ar"] ul {
+     padding: 0 20px;
+     font-size: 10pt;
+}
+
+div[lang="ar"] li.tidylist {
+     list-style: none;
+     margin-bottom: 15px; 
+}
+
+ul.links li:first-child {
+     margin-top: 15px !important;
 }
 
 .tidylist code {
@@ -93,6 +161,14 @@ div.graphspanel form {
 
 code {
      text-align: right;
+}
+
+th {
+     text-align:right; 
+}
+
+th a.script {
+     float: left;
 }
 
 div.joblog li, div.newsheadings li {
@@ -105,4 +181,268 @@ span.newtab {
      font-size: 8pt;
      float: left;
      letter-spacing: 0;
+}
+
+/*
+#consolepass {
+     margin-right: 0;
+}
+*/
+
+#tunnelconfig + hr {
+     background: #fff ;
+}
+
+#plugininstall {
+     margin: 0 0 0 -16px;
+}
+
+#updateplugins {
+     margin: 0;
+}
+
+#pluginconfig td:first-child {
+     min-width: 100px;
+     white-space: normal;
+     text-align: left;
+     padding-right: 5px;
+}
+
+td.optionsave {
+     text-align: left;
+}
+
+p.infohelp, p.infowarn, td.infohelp, td.infowarn,
+table#bugreports td.infohelp,
+p#debugmode,
+p#sybilinfo,
+#bandwidthconfig tr:first-child .infohelp,
+#addkeyring td.infohelp,
+#joinfamily tr:nth-child(3) td:first-child,
+#newfamily tr:last-child td:first-child,
+#oldhome td:first-child,
+#floodfillconfig .infohelp,
+p#clientconf.infohelp, p#webappconfig.infohelp,
+p#pluginconfig,
+#plugininstall .infohelp,
+#manualreseed tr:nth-last-child(2) td.infohelp,
+#config_peers tr:nth-child(3) td.infohelp,
+h3#shutdownrouter + p.infohelp,
+h3#restartrouter + p.infohelp,
+h3#systray + p.infohelp,
+h3#servicedebug + p.infohelp,
+h3#browseronstart + p.infohelp,
+.main#config_reseed p.infohelp,
+p#enablefullstats, p#gatherstats,
+#config_family .infohelp,
+#consolepass tr:first-child td,
+form[action="events"],
+#plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2),
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2),
+#config_summarybar .configtable td:not(.optionsave) {
+     background-position: right 12px center !important;
+     padding: 15px 50px 15px 10px !important;
+}
+
+#themesettings, #langsettings {
+     margin-left: 16px !important;
+     margin-right: -16px !important;
+}
+
+#sidebarconf tr:last-child td:last-child {
+     text-align: right;
+}
+
+#sidebardefaults, #loggingoptions, #reseedconfig, #addkeyring, #netconfig, #advconf {
+     margin-bottom: 15px;
+}
+
+.homelinkedit tr:last-child td:first-child {
+     text-align: left;
+}
+
+table#manualreseed, #config_keyring .configtable { 
+     margin-right: 0 !important;
+}
+
+#config_keyring form h3, #config_update form h3, form h3 {
+     margin-right: -16px;
+     margin-left: 16px;
+}
+
+#clientconfig, #webappconfig {
+     margin-right: -32px;
+}
+
+table#plugininstall {
+     margin-right: 0 !important;
+}
+
+table#pluginconfig {
+     margin-right: -32px !important;
+}
+
+.formaction#clientsconfig, .formaction#pluginconfig {
+     margin-left: 32px;
+     margin-right: -32px;
+}
+
+.infohelp#webappconfig, h3#webappconfig, #pluginconfig, h3#pluginconfig {
+     margin-right: 0; 
+}
+
+textarea[name="levels"] {
+     text-align: left;
+}
+
+.mediumtags {
+     text-align: left;
+}
+
+h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, th#upnpconfig a, h3#graphinfo a, h3#graphdisplay a {
+     float: left;
+}
+
+.main#config_advanced .wideload {
+     margin-left: 0 !important;
+     margin-right: 0 !important;
+}
+
+#config_service p.infohelp {
+     margin-right: -16px;
+     margin-left: 16px;
+}
+
+#browserstart {
+     margin-bottom: 15px;
+}
+
+#config_update.main .messages {
+     text-align: right;
+     padding-right: 50px;
+}
+
+table#addkeyring tr:last-child td {
+     text-align: left;
+}
+
+#banlist li {
+     padding: 5px 35px 5px 5px;
+     background-position: right 10px center;
+}
+
+.tab, .tab2 {
+     font-size: 10pt;
+     margin-top: -5px;
+}
+
+table.search {
+     margin-top: -26px;
+     margin-bottom: 15px;
+}
+
+h4.app, h4.app2, #news h3, .news h3 {
+     background-position: right 10px center;
+     padding: 6px 32px 6px 10px;
+     direction: ltr !important;
+}
+
+#netdboverview, #netdboverview td, #netdboverview table {
+     direction: ltr;
+}
+
+#netdboverview table td {
+     border: 1px solid #7778bf !important;
+}
+
+#sb_internals td, #sb_advanced td {
+     text-align: center;
+}
+
+table#leasesetdebug th:last-child, table#leasesetsummary th:last-child,
+table.leaseset th:last-child, table.leaseset td:nth-child(2) {
+     text-align: left;
+}
+
+table#leasesetdebug th, table#leasesetsummary th, table.leaseset th {
+     text-align: right;
+}
+
+.leaseset th:first-child code, .leaseset th:first-child b {
+     float: right !important;
+}
+
+.leaseset th:first-child code {
+     direction: ltr;
+     padding-right: 5px;
+}
+
+table#leasesetdebug td:nth-child(2n+1) {
+     text-align: left;
+}
+
+table#leasesetdebug td:nth-child(2n) {
+     text-align: right;
+}
+
+table#leasesetdebug, table#leasesetsummary, table.leaseset, table.sybil_routerinfo, #netdboverview, .netdbentry {
+     margin-right: 0;
+}
+
+table#profiles, p#profiles_overview, #profiles + h3, #thresholds + h3, ul#banlist {
+     margin-right: -16px;
+}
+
+p#profiles_overview, #profiles + h3, #thresholds + h3, ul#banlist {
+     margin-left: 16px;
+}
+
+table.leaseset:last-child, table.netdbentry:last-child, #profile_defs {
+     margin-bottom: -10px;
+}
+
+table.netdbentry th:first-child {
+     text-align: right;
+}
+
+table.netdbentry th:last-child {
+     text-align: left;
+}
+
+#sybilnav li {
+     background: url(images/eye.png) right 5px center no-repeat, linear-gradient(to right, #eef 30%, #fff);
+     padding: 3px 24px 3px 3px;
+}
+
+.threatpoints + ul li {
+     margin-right: 20px;
+}
+
+#profiles td:nth-child(2) {
+     text-align: right;
+}
+
+#profiles td:last-child {
+     text-align: left !important;
+}
+
+#thresholds p {
+     padding-right: 10px;
+}
+
+.wideload .confignav {
+     margin-left: -3px !important;
+     margin-right: -35px !important;
+}
+
+.main#profiles ul#banlist {
+     margin-bottom: -10px !important;
+}
+
+#peers table, #tunnels table, #logs table, #debug table {
+     margin-right: 0 !important;
+}
+
+#logs table td:first-child {
+     text-align: left;
 }

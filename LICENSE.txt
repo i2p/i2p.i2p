@@ -238,6 +238,7 @@ Applications:
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        Silk icons: See licenses/LICENSE-SilkIcons.txt
        FatCow icons: See licenses/LICENSE-FatCowIcons.txt
+       Fugue Icons: See licenses/LICENSE-FugueIcons.txt
 
        GeoIP Data:
        This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/

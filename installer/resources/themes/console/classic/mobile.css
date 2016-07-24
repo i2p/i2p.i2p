@@ -1,6 +1,8 @@
+/* Console Theme "Classic" - Mobile Override */
+
 div.routersummaryouter {
      float: none;
-     margin: 0 1px 0 0;
+     margin: 0 !important;
      position: relative;
      width: auto;
 }
@@ -8,23 +10,109 @@ div.routersummaryouter {
 div.routersummary {
      float: none;
      width: auto;
+     max-width: 600px;
+     margin: 0 auto -6px;
 }
 
-div.routersummary table {
+#xhr {
+     margin-top: 9px !important;
+}
+
+#xhr hr:first-child {
+     margin-bottom: 7px !important;
+}
+
+.routersummary div[style="height: 36px;"] {
+     margin: 0 0 15px !important;
+}
+
+.routersummary div[style="height: 36px;"] + a {
+     margin: -5px 0 -3px !important;
+     display: inline-block;
+}
+
+.routersummary hr:first-child {
+     margin-bottom: 11px;
+}
+
+.routersummary td, .routersummary h4, .routersummary a {
+     font-size: 9pt !important;
+}
+
+div.routersummary table, table[id^="sb_"] {
      width: 100% !important;
+     margin: -6px 0 -7px !important;
+}
+
+table[id^="sb_"] td {
+     padding: 4px 2px !important;
+}
+
+table#sb_localtunnels {
+     margin-top: -6px !important;
+}
+
+table#sb_localtunnels td {
+     padding: 4px 2px !important;
+}
+
+#sb_localtunnels td:last-child {
+     padding-right: 4px !important;
+}
+
+table[id^="sb_"] tr:nth-child(even) td {
+     background: #eef;
+     background: rgba(238, 238, 255, 0.4);
+}
+
+table[id^="sb_"] tr:nth-child(odd) td {
+     background: #ddf;
+     background: rgba(221, 221, 255, 0.4);
+}
+
+table[id^="sb_"] tr:hover td {
+     background: #ccf !important;
+}
+
+#sb_services {
+     text-align: center;
+}
+
+/*
+#sb_services a {
+     display: inline-block;
+     width: 24% !important;
+     min-width: 100px;
+     box-sizing: border-box;
+     white-space: nowrap;
+     border: none !important;
+}
+*/
+
+#sb_localtunnels td:nth-child(2) {
+     width: auto !important;
+}
+
+.routersummary button[type="submit"], .routersummary button[type="cancel"] {
+     margin: 5px 5px 3px !important;
+     padding: 8px 5px !important;
+     min-width: 120px !important;
 }
 
 h1 {
-     margin: 0 1px 0 0;
-     min-width: 0;
+     margin: 9px 0 -1px;
+     min-width: 510px;
 }
 
 div.news {
-     margin: -1px 1px 0 0;
-     min-width: 0;
+     margin: 0 0 -10px;
+     min-width: 500px;
 }
 
 div.main {
-     margin: 0 1px 0 0;
-     min-width: 0;
+     margin: 1px 0 0;
+     min-width: 500px;
+}
+
+.confignav {
 }

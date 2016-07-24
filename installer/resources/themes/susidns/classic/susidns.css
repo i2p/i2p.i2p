@@ -1,0 +1,648 @@
+/* SusiDNS theme "Classic" */
+/* Author: dr|z3d */
+
+body {
+     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     background: #eef;
+     color: #0c153d;
+}
+
+body.iframed {
+     background: #fff !important;
+     margin: 0;
+}
+
+#logo {
+     text-align: center;
+     background: #eef url(/themes/susidns/images/logo.png) center center no-repeat;
+     background: url(/themes/susidns/images/logo.png) center center no-repeat;
+     height: 55px;
+     background-size: auto 50px;
+}
+
+#logo img {
+     display: none;
+}
+
+.iframed #logo {
+     display: none;
+}
+
+hr {
+     display: none;
+}
+
+table {
+     width: 100%;
+}
+
+table.book {
+     border: 1px solid #89f;
+     margin: -2px 0 10px !important;
+     border-collapse: collapse;
+}
+
+.book tr {
+     border-top: 1px inset #fff;
+     border-bottom: 1px inset #fff;
+}
+
+table.book td {
+     padding: 2px 5px;
+}
+
+table.book th {
+     text-align: left;
+     padding-left: 5px;
+}
+
+table.book tr:hover textarea {
+     background: #fff;
+     border: none;
+     box-shadow: none;
+}
+
+table.book tr:hover {
+     border-top: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+}
+
+
+table.book td:first-child	 {
+     width: 20px;
+     white-space: no-wrap;
+}
+
+table.book td:nth-child(2) {
+     width: 200px;
+     white-space: nowrap;
+}
+
+table.book td:nth-child(3), table.book td:nth-child(4) {
+     width: 50px;
+     white-space: nowrap;
+}
+
+td.destinations {
+     padding: 0 !important;
+}
+
+#add {
+     background: #fff;
+}
+
+/*
+.iframed #add {
+     margin: 0 -10px;
+}
+*/
+
+#add td:first-child {
+     width: 100px;
+     white-space: nowrap;
+     text-align: right;
+}
+
+div#navi {
+     border: 1px solid #89f;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     margin: -1px -11px 0;
+     padding: 0;
+}
+
+.iframed #navi p {
+     margin: 8px 0 7px;
+}
+
+.iframed #navi, .iframed h3, .iframed h4, .iframed #help, .iframed p.buttons, .iframed #filter {
+     border-left: none !important;
+     border-right: none !important;
+}
+
+.iframed #content h3 {
+     border: none;
+     margin: 0;
+     border-bottom: 1px dotted #89f;
+     background: none;
+}
+
+.iframed #content h3:first-child {
+     margin-top: 10px;
+}
+
+div.page {
+     border: 1px solid #89f;
+     background: #fff !important;
+     margin: 0;
+     padding: 0 10px;
+     color: #0c153d;
+     font-size: 9pt !important;
+     line-height: 160% !important;
+}
+
+.iframed .page {
+     background: transparent !important;
+     margin: 0 1px !important;
+     border: none;
+}
+
+div.help {
+     border: 1px solid #89f;
+     margin: 0 0 -1px;
+     background: #eef;
+}
+
+/*
+.iframed #help {
+     margin: 0 -10px -1px;
+}
+*/
+
+#helpconfig {
+     margin: 0 0 -1px;
+}
+
+#helpconfig h3 {
+     margin: -1px;
+}
+
+.iframed #helpconfig h3 {
+     margin: -1px 0;
+}
+
+.help ul, .help ol {
+     margin-left: -25px;
+     list-style-type: square;
+}
+
+#navi p {
+     text-align: center !important;
+     text-transform: capitalize;
+     font-weight: bold;
+     line-height: 130%;
+}
+
+p {
+     line-height: 140%;
+     margin-left: 10px;
+     margin-right: 10px;
+     font-size: 9pt;
+     text-align: justify;
+}
+
+/*
+span.addrhlpr {
+     font-size: 8pt;
+}
+*/
+
+h3 {
+     color: #0c153d;
+     font-size: 11pt;
+     font-weight: bold;
+     border: 1px solid #89f;
+     margin: -1px -11px 10px;
+     padding: 5px 10px;
+     background: #fff;
+     text-transform: capitalize;
+}
+
+#help h3 {
+     margin: -1px -1px 10px;
+}
+
+h4 {
+     border: 1px solid #89f;
+     padding: 3px 10px;
+     margin: -11px -11px 5px;
+     background: linear-gradient(to right, #fff 0%, #eef 100%);
+}
+
+a {
+     color:#006;
+     text-decoration:none;
+     font-weight: bold;
+}
+
+a:visited {
+     color: #448;
+}
+
+a:hover {
+     text-decoration: none;
+     color: #f60;
+}
+
+a:active {
+     color: #f90;
+}
+
+th {
+     line-height:12pt;
+     padding:5px 10px;
+     font-size:10pt;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     border-bottom: 1px solid #89f; 
+}
+
+td {
+     padding:5px 10px;
+     font-size:9pt;
+     vertical-align:center;
+}
+
+li {
+     margin-left:15px;
+     margin-right:15px;
+     font-size:9pt;
+}
+
+tr.list1 {
+     background-color:#dde1ff;
+}
+
+tr.list0 {
+     background-color:#eff1ff;
+}
+
+tr.list0:hover, tr.list1:hover {
+     background: #fff;
+     background: linear-gradient(to bottom, #fff 0%, #ffe 100%) !important;
+}
+
+p.messages {
+     background: #ffe;
+     border: 1px solid #89f;
+     border: 1px solid #89f;
+     padding: 15px 15px 15px 45px;
+     margin: -6px -11px 5px;
+     background: #ffe url(/themes/console/images/info/infohelp.png) 8px center no-repeat;
+     line-height: 125%;
+     box-shadow: inset 0 0 0 1px #ff9;
+}
+
+.iframed p.messages {
+     border-left: none;
+     border-right: none;
+}
+
+p.help {
+     padding: 15px 15px 15px 45px;
+     margin: 0;
+     background: #ffe url(/themes/console/images/info/infohelp.png) 8px center no-repeat;
+}
+
+p.book, #messages + p {
+     background: url(/themes/susidns/images/addressbook.png) center left no-repeat;
+     padding: 10px 10px 10px 38px; 
+}
+
+p.footer {
+     font-size:7pt;
+     text-align: center;
+     padding: 10px 0 0;
+}
+
+.iframed #footer {
+     display: none;
+}
+
+div#filter {
+     border: 1px solid #89f;
+     padding: 0 10px;
+     margin: 0 -11px;
+     word-spacing: 0.2em;
+     background: #fff;
+     text-align: center;
+}
+
+#filter p {
+     line-height: 220%;
+     text-transform: capitalize;
+     text-align: center;
+}
+
+#filter a, #filter a:visited {
+     border: 1px solid #ccc;
+     padding: 3px 8px;
+     border-radius: 2px;
+     background: #fff;
+     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     font-size: 10pt;
+     box-shadow: inset 0 0 0 1px #fff;
+     text-transform: capitalize;
+     color: #006;
+}
+
+#filter a:hover {
+     text-decoration: none;
+     color: #f60;
+     border: 1px solid #f60;
+     border-radius: 2px;
+     background: #fff;
+}
+
+#filter p b {
+     font-size: 12pt;
+     vertical-align: bottom;
+/*     border-bottom: 2px solid #0c153d;*/
+     margin-right: 5px;
+}
+
+#filter span {
+     display: inline-block;
+     border: 1px solid #89f;
+     margin-top: -1px;
+     min-width: 300px;
+     padding: 5px;
+     font-weight: bold;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+}
+
+#filter span > * {
+     vertical-align: middle;
+}
+
+#filter span b {
+     font-size: 11pt;
+     text-transform: uppercase;
+     color: #115;
+     line-height: 80%;
+     display: inline-block;
+     margin-top: -2px;
+}
+
+#filter span a {
+     margin: 0 5px !important;
+     display:inline-block;
+     padding: 1px 5px; 
+}
+
+#search {
+     text-align: center !important;
+}
+
+td.search:first-child {
+     text-align: right;
+     white-space: nowrap;
+     font-weight: bold;
+     width: 20%;
+}
+
+td.search:last-child {
+     text-align: left;
+     width: 20%;
+}
+
+#search form {
+     text-align: center !important;
+}
+
+#search table {
+     border: 1px solid #89f;
+     margin: -1px auto;
+     background: #fff;
+     width: 400px;
+}
+
+#search td {
+     padding: 5px;
+}
+
+#search input[type="text"] {
+     width: 200px;
+}
+
+#messages:empty {
+     display: none;
+}
+
+#buttons + div > table {
+     width: 50%;
+     margin: auto;
+} 
+
+img[src*="imagegen"] {
+     width: 256px;
+     height: 256px;
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     filter: drop-shadow(0 0 3px #ccc);
+}
+
+.illustrate {
+     max-width: 90%;
+     height: auto;
+}
+
+img.illustrate {
+     margin: 10px 10px 20px;
+     padding: 10px;
+     border-radius: 4px;
+     border: 1px solid #337;
+     font-size: 10pt;
+     box-shadow: inset 0 0 1px #002;
+     background: #fff;
+     filter: drop-shadow(0 0 1px #999);
+     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+#buttons, .buttons {
+     text-align: right;
+}
+
+p.buttons {
+     border: 1px solid #89f;
+     padding: 10px;
+     margin: 0 -11px -13px;
+     background: #fff;
+}
+
+button, input, select {
+     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+}
+
+input[type="text"], input[type="password"], textarea {
+     margin: 3px 3px 3px 0;
+     vertical-align: middle;
+     min-width: 160px;
+     border: 1px solid #bbb;
+     box-shadow: inset 1px 1px 1px #ddd;
+     border-radius: 2px;
+     padding: 3px 2px;
+     color: #222;
+     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+     box-shadow: inset 0 0 0 1px #89f;
+     color: #000;
+}
+
+input[type="submit"], input[type="reset"] {
+     min-width: 80px;
+}
+
+textarea {
+     width: 100%;
+     resize: none;
+     margin: 0 auto 10px;
+     color: #444;
+}
+
+td.destinations textarea, td.destinations textarea:focus {
+     resize: none;
+     font-size: 8pt;
+     padding: 0 !important;
+     border: none;
+     border-left: 1px solid #888 !important;
+     border-radius: 0;
+     margin: 0px !important;
+     background: none;
+     box-shadow: 0 none !important;
+}
+
+button, input[type="submit"], input[type="reset"] {
+     padding: 4px 3px !important;
+     border-radius: 2px;
+     border: 1px solid #bbb;
+     box-shadow: inset 0 0 0 1px #fff;
+     background: #eee;
+     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     margin: 2px 0 2px 4px;
+}
+
+button:hover, input[type="submit"]:hover, input[type="reset"]:hover {
+     background: #fff;
+     background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     border: 1px solid #bbb;
+}
+
+button:active, input[type="submit"]:active, input[type="reset"]:active {
+     background: #ddd;
+     border: 1px solid #bbb;
+}
+
+form[action="subscriptions"], form[action="config"] {
+     margin: 10px 0;
+}
+
+form[action="subscriptions"] textarea {
+     height: 120px !important;
+}
+
+/* topnav */
+
+#navi {
+     padding: 3px !important;
+}
+
+#navi a {
+     border: 1px solid #6b78bf;
+     border-radius: 2px;
+     margin: 3px 0 !important;
+     filter: drop-shadow(0 0 1px #ccc);
+     -webkit-filter: drop-shadow(0 0 1px #ccc);
+     display: inline-block;
+     outline: none;
+}
+
+#navi a:hover, #navi a:focus {
+    border: 1px solid #f60;
+}
+
+#navi a:active {
+    border: 1px solid #f90;
+    box-shadow: inset 2px 2px 2px #555;
+    background-blend-mode: luminosity;
+}
+
+#navi a.abook {
+     background: #fff url(/themes/susidns/images/abook.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ddf 100%);
+     padding: 3px 5px 3px 24px;
+}
+
+#navi a.abook:hover {
+     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+}
+
+#navi a#subs {
+     background: #fff url(/themes/susidns/images/subs.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ddf 100%);
+     padding: 3px 5px 3px 24px;
+}
+
+#navi a#subs:hover {
+     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+}
+
+#navi a#config {
+     background: #fff url(/themes/console/images/buttons/configure.png) 5px center no-repeat;
+     background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ddf 100%);
+     padding: 3px 5px 3px 24px;
+}
+
+#navi a#config:hover {
+     background: url(/themes/console/images/buttons/configure_hover.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+}
+
+#navi a#overview {
+     background: #fff url(/themes/susidns/images/overview.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ddf 100%);
+     padding: 3px 5px 3px 24px;
+}
+
+#navi a#overview:hover {
+     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+}
+
+#navi p {
+     text-align: center !important;
+     text-transform: capitalize;
+     font-weight: bold;
+     padding: 2px 5px !important;
+     margin: 0 !important;
+}
+
+#navi p > * {
+     vertical-align: middle;
+}
+
+.headline + #book > table {
+     margin-top: 10px !important;
+} 
+
+/* page titles */
+
+.headline h3 {
+     padding: 10px 5px 10px 40px;
+     background: url(/themes/susidns/images/addressbook.png) 10px center no-repeat;
+     font-size: 11pt;
+     text-transform: uppercase;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+}
+
+.headline#subscriptions h3 {
+     background: url(/themes/susidns/images/subs_24.png) 10px center no-repeat;
+}
+
+.headline#config h3 {
+     background: url(/themes/susidns/images/configure_24.png) 10px center no-repeat;
+}
+
+.headline h4 {
+     padding: 5px 10px 5px 40px;
+     background: #eff2ff url(/themes/susidns/images/drive.png) 13px center no-repeat;
+}
+
+p#filtered {
+     background: #fff url(/themes/susidns/images/filter.png) 18px center no-repeat;
+     padding: 0 10px 0 38px !important;
+}
+
+p.book {
+     background: #fff url(/themes/susidns/images/abook.png) 18px center no-repeat;
+     padding: 0 10px 0 38px !important;
+}

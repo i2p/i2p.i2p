@@ -2,37 +2,68 @@
 /* I2P Description: Larger fontsize override for console to accomodate foreign charactersets */
 /* Author: Dr|Z3d */
 
+* {
+     text-shadow: none !important;
+     font-weight: normal !important;
+     font-size: 12pt !important;
+     letter-spacing: normal !important;
+     word-spacing: normal !important;
+     line-height: 115% !important;
+}
+
+input[type="submit"], input[type="cancel"], input[type="file"], button {
+     font-size: 14pt !important;
+}
+
+.routersummary button {
+     min-width: 100px !important;
+}
 
 /* sidepanel */
 
-div.routersummary {
-     font: 9.5pt/125%;
+div.routersummary h3, .routersummary h3 a  {
+     font-size: 14pt !important;
 }
 
-div.routersummary h3 {
-     font-size: 12.5pt;
-}
-
-div.routersummary h4 {
-     font-size: 11.5pt;
+div.routersummary h4, .routersummary h4 a {
+     font-size: 14pt !important;
      letter-spacing: 0;
 }
 
 div.routersummary table {
-     font-size: 9pt;
+     font-size: 12pt;
+}
+
+div.routersummary {
+     width: 220px;
+}
+
+div.routersummary table {
+     width: 219px !important;
+}
+
+.routersummary #bandwidth td:first-child {
+     width: 20px !important;
+     white-space: nowrap;
+}
+
+.routersummary #bandwidth td:last-child {
+     width: 80% !important;
 }
 
 div.routersummary table a:link, div.routersummary table a:visited {
-     font-size: 10.5pt;
+     font-size: 12pt;
+     font-weight: normal;
+     text-shadow: none;
 }
 
-div.routersummary a {
-     word-spacing: 0em !important;
-     letter-spacing: 0.2em !important;
+.routersummary a img:first-child {
+     transform: scale(1.2);
+     -webkit-transform: scale(1.2);
 }
 
 div.tunnels a {
-     font-size: 9pt !important;
+     font-size: 12pt !important;
 }
 
 div.tunnels table {
@@ -56,20 +87,40 @@ a, b, div.routersummary h3 a, div.routersummary h4 {
     font-size: 100%;
 }
 
-b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4{
+b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4, .messages {
      font-weight: normal !important;
      font-style: normal !important;
-     -moz-text-shadow: 0 0 0;
-     -khtml-text-shadow: 0 0 0;
-     text-shadow: 0 0 0;
+     text-shadow: none;
 }
 
-body {
-     font: 10pt Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
+body, .main {
+     font: 12pt "Droid Sans", Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
 }
 
 div.main, div.main p, div.news p {
      line-height: 140%;
+}
+
+div.main, div.news, h1 {
+     margin-left: 226px;
+}
+
+h1 {
+     font-size: 18pt !important;
+     padding: 16px 20px;
+}
+
+h2 {
+     font-size: 17pt !important;
+}
+
+h3, .configtable th {
+     font-size: 16pt !important;
+}
+
+.langbox {
+     width: 400px;
+     margin-top: 2px;
 }
 
 div.joblog li i {
@@ -83,4 +134,26 @@ b, div.joblog b {
 
 table code {
      font-size: 120%;
+}
+
+.confignav a, .tab, .tab2 {
+     font-size: 16pt !important;
+     font-weight: normal;
+}
+
+.themelabel, .ui_lang {
+     font-size: 12pt !important;
+     font-weight: normal !important;
+     overflow: hidden;
+     text-overflow: hidden;
+     margin-bottom: -2px;
+     padding-bottom: 4px !important;
+}
+
+div.themechoice, div.langselect {
+     width: 128px;
+}
+
+.tab2::before, .tab2::after {
+     font-size: 16pt;
 }

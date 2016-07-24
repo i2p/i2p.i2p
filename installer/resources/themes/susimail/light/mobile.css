@@ -1,17 +1,27 @@
-#mailbox tr, #mailbox td {
-     display: block;
+/* Susimail Mobile Theme Override "Light" */
+
+body {
+     margin: 0;
 }
 
-#mailbox th {
-     position: absolute;
-     top: -9999px;
-     left: -9999px;
+.page {
+     min-width: 560px;
+     padding: 5px 5px 0 !important;
+     border-radius: 0;
 }
 
-#mailbox .optbox {
-     float: left;
+form {
+     margin-bottom: 5px;
 }
 
-div.header, div.footer {
+#dologin {
+     width: 500px !important;
+}
+
+#mailbox td:nth-child(6), #mailbox th:nth-child(6), #mailbox td:nth-child(8), #mailbox th:nth-child(8) {
+     display: none;
+}
+
+.header, .footer {
      display: none;
 }
