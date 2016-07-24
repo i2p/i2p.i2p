@@ -59,18 +59,17 @@
 <hr>
 <div id="navi">
 <p>
-<%=intl._t("Address books")%>:
-<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("private")%></a> |
-<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("master")%></a> |
-<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("router")%></a> |
-<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("published")%></a> *
-<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
-<a href="config"><%=intl._t("Configuration")%></a> *
-<a href="index"><%=intl._t("Overview")%></a>
+<a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
+<a class="abook" href="addressbook?book=private"><%=intl._t("Private")%></a>&nbsp;
+<a class="abook" href="addressbook?book=master"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=router"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook" href="addressbook?book=published"><%=intl._t("Published")%></a>&nbsp;
+<a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
+<a id="config" href="config"><%=intl._t("Configuration")%></a>
 </p>
 </div>
 <hr>
-<div id="headline">
+<div class="headline" id="addressbook">
 <h3><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
 <h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
 </div>
@@ -81,7 +80,14 @@ ${book.loadBookMessages}
 
 <c:if test="${book.notEmpty}">
 <div id="filter">
-<p><%=intl._t("Filter")%>:
+<c:if test="${book.hasFilter}">
+<span><%=intl._t("Current filter")%>: <b>${book.filter}</b>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a></span>
+</c:if>
+<c:if test="${!book.hasFilter}">
+<span><%=intl._t("Filter")%></span>
+</c:if>
+<p>
 <a href="addressbook?filter=a&amp;begin=0&amp;end=49">a</a>
 <a href="addressbook?filter=b&amp;begin=0&amp;end=49">b</a>
 <a href="addressbook?filter=c&amp;begin=0&amp;end=49">c</a> 
@@ -111,10 +117,6 @@ ${book.loadBookMessages}
 <a href="addressbook?filter=0-9&amp;begin=0&amp;end=49">0-9</a>
 <a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._t("other")%></a>
 <a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a></p>
-<c:if test="${book.hasFilter}">
-<p><%=intl._t("Current filter")%>: ${book.filter}
-(<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a>)</p>
-</c:if>
 </div>
 
 <div id="search">
@@ -144,7 +146,7 @@ ${book.loadBookMessages}
 <tr class="head">
 
 <c:if test="${book.master || book.router || book.published || book.private}">
-<th>&nbsp;</th>
+<th></th>
 </c:if>
 
 <% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>

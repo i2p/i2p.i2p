@@ -19,7 +19,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Event Log")%></h1>
-<div class="main" id="main">
+<div class="main" id="events">
  <div class="eventspanel">
  <div class="widepanel">
  <jsp:getProperty name="eventHelper" property="allMessages" />

@@ -9,7 +9,7 @@ public class ProfilesHelper extends HelperBase {
 
     private static final String titles[] =
                                           {_x("High Capacity"),                 // 0
-                                           _x("Floodfill "),                    // 1
+                                           _x("Floodfill"),                     // 1
                                            _x("Banned"),                        // 2
                                            _x("All"),      };                   // 3
 
@@ -93,9 +93,7 @@ public class ProfilesHelper extends HelperBase {
     private void renderNavBar() throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"confignav\" id=\"confignav\">");
-        // TODO fix up the non-light themes
-        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME);
-        boolean span = _graphical && (theme == null || theme.equals(CSSHelper.DEFAULT_THEME));
+        boolean span = _graphical;
         if (!span)
             buf.append("<center>");
         int tab = getTab();
@@ -112,9 +110,9 @@ public class ProfilesHelper extends HelperBase {
                 buf.append("<a href=\"profiles").append(links[i]).append("\">").append(_t(titles[i])).append("</a>");
             }
             if (span)
-                buf.append(" </span>\n");
+                buf.append("</span>\n");
             else if (i != titles.length - 1)
-                buf.append(" |\n");
+                buf.append("&nbsp;&nbsp;\n");
         }
         if (!span)
             buf.append("</center>");

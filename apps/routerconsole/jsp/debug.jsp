@@ -14,7 +14,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>Router Debug</h1>
-<div class="main" id="main">
+<div class="main" id="debug">
 <%
     /*
      *  Quick and easy place to put debugging stuff
