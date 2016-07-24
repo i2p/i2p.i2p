@@ -1,0 +1,121 @@
+body {
+     background: #235;
+     color: #333;
+     font-family: sans-serif;
+     margin: 0;
+}
+
+h1 {
+     text-shadow: 1px 1px 1px #000;
+     font-size: 12pt;
+     color: #fff;
+     width: auto;
+     padding: 5px 5px 5px 30px;
+     background: #227 url(itoopie.png) 5px center no-repeat;
+     background-size: auto 80%, 100% 100%;
+}
+
+a {
+     text-decoration: none;
+     outline: none;
+     color: #620;
+}
+
+a:hover, a:focus {
+     color: #d40;
+}
+
+a:visited {
+     color: #a20;
+}
+
+table {
+     border-collapse: collapse;
+     font-size: 10pt;
+     width: 100%;
+     margin-top: -11px;
+     color: #333;
+}
+
+tr {
+     border: 1px solid #337;
+}
+
+tr:hover td {
+     background: #ffd;
+     color: #111;
+}
+
+tr:nth-child(odd) {
+     background: #eee;
+}
+
+tr:nth-child(even) {
+     background: #fff;
+}
+
+td {
+     padding: 5px;
+     text-align: right;
+     white-space: nowrap;
+}
+
+td:first-child {
+     width: 90%;
+     white-space: nowrap;
+     text-align: left;
+}
+
+td:last-child {
+     text-align: right;
+     font-style: italic;
+/*     display: none;*/
+}
+
+td:first-child a {
+     display: inline-block;
+     padding: 0 0 0 25px;
+     width: 100%;
+     background: url(resources/file.png) left center no-repeat;
+}
+
+td:first-child a[href$="/"] {
+     background: url(resources/folder.png) left center no-repeat;
+}
+
+td:first-child a:hover[href$="/"] {
+     background: url(resources/folder_open.png) left center no-repeat;
+}
+
+td:first-child a[href$=".png"],
+td:first-child a[href$=".jpg"],
+td:first-child a[href$=".gif"] {
+     background: url(resources/image.png) left center no-repeat;
+}
+
+td:first-child a[href$=".txt"],
+td:first-child a[href$=".css"],
+td:first-child a[href$=".html"],
+td:first-child a[href$=".htm"],
+td:first-child a[href$=".css"] {
+     background: url(resources/image.png) left center no-repeat;
+}
+
+td:first-child a[href$=".wav"],
+td:first-child a[href$=".mp3"],
+td:first-child a[href$=".mpa"],
+td:first-child a[href$=".wma"],
+td:first-child a[href$=".ape"] {
+     background: url(resources/audio.png) left center no-repeat;
+}
+
+td:first-child a[href$=".mpg"],
+td:first-child a[href$=".mp4"],
+td:first-child a[href$=".mov"],
+td:first-child a[href$=".wmv"],
+td:first-child a[href$=".flv"],
+td:first-child a[href$=".avi"],
+td:first-child a[href$=".webm"],
+td:first-child a[href$=".divx"] {
+     background: url(resources/video.png) left center no-repeat;
+}
