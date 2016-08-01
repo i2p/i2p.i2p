@@ -640,7 +640,9 @@ public class NativeBigInteger extends BigInteger {
     }
 
     /**
-     *  @throws ArithmeticException if m &lt;= 0
+     *  @param m must be postive
+     *  @param exponent must be postive
+     *  @throws ArithmeticException if m &lt;= 0 or exponent &lt;=0
      */
     @Override
     public BigInteger modPow(BigInteger exponent, BigInteger m) {
@@ -654,7 +656,9 @@ public class NativeBigInteger extends BigInteger {
     }
 
     /**
-     *  @throws ArithmeticException if m &lt;= 0
+     *  @param exponent must be postive
+     *  @param m must be postive and odd
+     *  @throws ArithmeticException if m &lt;= 0 or m is even or exponent &lt;=0
      *  @since 0.9.26 and libjbigi version 3 and GMP version 5
      */
     public BigInteger modPowCT(BigInteger exponent, BigInteger m) {
