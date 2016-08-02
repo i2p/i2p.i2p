@@ -780,7 +780,12 @@ class Packet {
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
-        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG ").append(_optionSignature.length());
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
+            if (_optionSignature != null)
+                buf.append(" SIG ").append(_optionSignature.length());
+            else
+                buf.append(" (to be signed)");
+        }
         if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
         if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
     }

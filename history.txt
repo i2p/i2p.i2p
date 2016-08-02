@@ -1,3 +1,8 @@
+2016-08-02 zzz
+ * i2psnark: Fix SIOOBE on bad announce URL (ticket #1823)
+ * SSU: Fix peer test stuck when IPv6-only (ticket #1819)
+ * Streaming: Fix debug NPE (ticket #1821)
+
 2016-07-20 zzz
  * SSU:
    - Increase minimum peers if we have a IPv6 address
