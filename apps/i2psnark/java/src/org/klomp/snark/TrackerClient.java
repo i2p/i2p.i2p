@@ -893,11 +893,16 @@ public class TrackerClient implements Runnable {
     } catch (URISyntaxException use) {
         return false;
     }
+    String path = url.getPath();
+    if (path == null || !path.startsWith("/"))
+        return false;
     return "http".equals(url.getScheme()) && url.getHost() != null &&
            (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p"));
   }
 
   /**
+   *  This also validates the URL.
+   *
    *  @param ann an announce URL non-null
    *  @return a Hash for i2p hosts only, null otherwise
    *  @since 0.9.5
@@ -914,8 +919,12 @@ public class TrackerClient implements Runnable {
     String host = url.getHost();
     if (host == null)
         return null;
-    if (host.endsWith(".i2p"))
+    if (host.endsWith(".i2p")) {
+        String path = url.getPath();
+        if (path == null || !path.startsWith("/"))
+            return null;
         return ConvertToHash.getHash(host);
+    }
     if (host.equals("i2p")) {
         String path = url.getPath();
         if (path == null || path.length() < 517 ||
@@ -941,6 +950,10 @@ public class TrackerClient implements Runnable {
       int consecutiveFails;
       int seenPeers;
 
+      /**
+       *  @param a must be a valid http URL with a path
+       *  @param p true if primary
+       */
       public TCTracker(String a, boolean p)
       {
           announce = a;
