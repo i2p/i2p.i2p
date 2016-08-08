@@ -3318,10 +3318,11 @@ public class I2PSnarkServlet extends BasicServlet {
         else if (mime.equals("text/plain") ||
                  mime.equals("text/x-sfv") ||
                  mime.equals("application/rtf") ||
-                 mime.equals("application/epub+zip") ||
-                 mime.equals("application/x-mobipocket-ebook") ||
                  plc.endsWith(".azw4"))
             icon = "page";
+        else if  (mime.equals("application/epub+zip") ||
+                 mime.equals("application/x-mobipocket-ebook"))
+            icon = "ebook";
         else if (mime.equals("application/java-archive") ||
                  plc.endsWith(".deb"))
             icon = "package";
@@ -3347,7 +3348,7 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "compress";
         else if (plc.endsWith(".exe"))
             icon = "application";
-        else if (plc.endsWith(".iso"))
+        else if (plc.endsWith(".iso") || plc.endsWith(".nrg"))
             icon = "cd";
         else if (mime.equals("application/x-bittorrent"))
             icon = "magnet";

@@ -272,7 +272,7 @@
             <!-- we really don't need all of these -->
             <fileset dir="../../../installer/resources/themes/console/images/" />
         </copy>
-        <copy file="../../../installer/resources/themes/console/dark/images/transparent.gif"
+        <copy file="../../../installer/resources/themes/console/images/transparent.gif"
               todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
         <copy file="../../../installer/resources/themes/console/dark/images/header.png"
               todir="build/standalone-resources/.resources/themes/snark/ubergine/images" />
