@@ -3303,7 +3303,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     locked_runTest(false);
                 } else if (_haveIPv6Address &&_forceRun == FORCE_IPV6 && sinceRunV6 >= MIN_TEST_FREQUENCY) {
                     locked_runTest(true);
-                } else if (sinceRunV4 >= TEST_FREQUENCY) {
+                } else if (sinceRunV4 >= TEST_FREQUENCY && getIPv6Config() != IPV6_ONLY) {
                     locked_runTest(false);
                 } else if (_haveIPv6Address && sinceRunV6 >= TEST_FREQUENCY) {
                     locked_runTest(true);
@@ -3316,7 +3316,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_alive) {
                 long delay = (TEST_FREQUENCY / 2) + _context.random().nextInt(TEST_FREQUENCY);
                 // if we have 2 addresses, give IPv6 a chance also
-                if (_haveIPv6Address)
+                if (_haveIPv6Address && getIPv6Config() != IPV6_ONLY)
                     delay /= 2;
                 schedule(delay);
             }

@@ -1085,8 +1085,9 @@ public class I2PSnarkServlet extends BasicServlet {
                                     // should be only one
                                     if (df.delete())
                                         _manager.addMessage(_t("Data file deleted: {0}", df.getAbsolutePath()));
-                                    else
+                                    else if (df.exists())
                                         _manager.addMessage(_t("Data file could not be deleted: {0}", df.getAbsolutePath()));
+                                    // else already gone
                                 }
                                 break;
                             }
@@ -1094,8 +1095,9 @@ public class I2PSnarkServlet extends BasicServlet {
                             for (File df : storage.getFiles()) {
                                 if (df.delete()) {
                                     //_manager.addMessage(_t("Data file deleted: {0}", df.getAbsolutePath()));
-                                } else {
+                                } else if (df.exists()) {
                                     _manager.addMessage(_t("Data file could not be deleted: {0}", df.getAbsolutePath()));
+                                // else already gone
                                 }
                             }
                             // step 2 delete dirs bottom-up
@@ -1109,11 +1111,12 @@ public class I2PSnarkServlet extends BasicServlet {
                                 if (df.delete()) {
                                     ok = true;
                                     //_manager.addMessage(_t("Data dir deleted: {0}", df.getAbsolutePath()));
-                                } else {
+                                } else if (df.exists()) {
                                     ok = false;
                                     _manager.addMessage(_t("Directory could not be deleted: {0}", df.getAbsolutePath()));
                                     if (_log.shouldLog(Log.WARN))
                                         _log.warn("Could not delete dir " + df);
+                                // else already gone
                                 }
                             }
                             // step 3 message for base (last one)
