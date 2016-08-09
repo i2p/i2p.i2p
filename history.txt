@@ -1,3 +1,6 @@
+2016-08-09 zzz
+ * Console: Fix UPnP NPE on /peers (ticket #1830)
+
 2016-08-02 zzz
  * i2psnark: Fix SIOOBE on bad announce URL (ticket #1823)
  * SSU: Fix peer test stuck when IPv6-only (ticket #1819)

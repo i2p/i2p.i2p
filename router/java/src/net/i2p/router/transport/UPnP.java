@@ -420,7 +420,10 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return null;
 
-		String rv = (getIP.getOutputArgumentList().getArgument("NewExternalIPAddress")).getValue();
+		Argument a = getIP.getOutputArgumentList().getArgument("NewExternalIPAddress");
+		if (a == null)
+			return null;
+		String rv = a.getValue();
 		// I2P some devices return 0.0.0.0 when not connected
 		if ("0.0.0.0".equals(rv) || rv == null || rv.length() <= 0)
 			return null;
@@ -442,8 +445,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
+		Argument a = getIP.getOutputArgumentList().getArgument("NewUpstreamMaxBitRate");
+		if (a == null)
+			return -1;
 		try {
-		    return Integer.parseInt(getIP.getOutputArgumentList().getArgument("NewUpstreamMaxBitRate").getValue());
+		    return Integer.parseInt(a.getValue());
 		} catch (NumberFormatException nfe) {
 		    return -1;
 		}
@@ -464,8 +470,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		if(getIP == null || !getIP.postControlAction())
 			return -1;
 
+		Argument a = getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate");
+		if (a == null)
+			return -1;
 		try {
-		    return Integer.parseInt(getIP.getOutputArgumentList().getArgument("NewDownstreamMaxBitRate").getValue());
+		    return Integer.parseInt(a.getValue());
 		} catch (NumberFormatException nfe) {
 		    return -1;
 		}
