@@ -666,6 +666,7 @@ public class TunnelController implements Logging {
             // same default logic as in EditBean.getSigType()
             if (!isClient(type) ||
                 type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
+                type.equals(TYPE_SOCKS) ||
                 type.equals(TYPE_SOCKS_IRC) || type.equals(TYPE_STREAMR_CLIENT) ||
                 (type.equals(TYPE_HTTP_CLIENT) && Boolean.valueOf(getSharedClient()))) {
                 if (!_config.containsKey(OPT_SIG_TYPE))

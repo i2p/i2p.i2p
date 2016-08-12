@@ -452,6 +452,7 @@ public class GeneralHelper {
             if (!TunnelController.isClient(ttype) ||
                 TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
+                TunnelController.TYPE_SOCKS.equals(ttype) ||
                 TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
                 (TunnelController.TYPE_HTTP_CLIENT.equals(ttype) && isShared))
