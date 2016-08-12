@@ -19,6 +19,9 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.Outproxy;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
@@ -32,10 +35,8 @@ import net.i2p.util.Log;
  *
  * @author zzz modded from SOCKS5Server
  */
-public class SOCKS4aServer extends SOCKSServer {
-    private final Log _log;
+class SOCKS4aServer extends SOCKSServer {
 
-    private final Socket clientSock;
     private boolean setupCompleted;
 
     /**
@@ -49,15 +50,12 @@ public class SOCKS4aServer extends SOCKSServer {
      * @param clientSock client socket
      * @param props non-null
      */
-    public SOCKS4aServer(Socket clientSock, Properties props) {
-        this.clientSock = clientSock;
-        this.props = props;
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(SOCKS4aServer.class);
+    public SOCKS4aServer(I2PAppContext ctx, Socket clientSock, Properties props) {
+        super(ctx, clientSock, props);
     }
 
     public Socket getClientSocket() throws SOCKSException {
         setupServer();
-
         return clientSock;
     }
 
@@ -211,12 +209,8 @@ public class SOCKS4aServer extends SOCKSServer {
         I2PSocket destSock;
 
         try {
-            if (connHostName.toLowerCase(Locale.US).endsWith(".i2p") ||
-                connHostName.toLowerCase(Locale.US).endsWith(".onion")) {
-                // Let's not do a new Dest for every request, huh?
-                //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
-                //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
-                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(connHostName);
+            if (connHostName.toLowerCase(Locale.US).endsWith(".i2p")) {
+                Destination dest = _context.namingService().lookup(connHostName);
                 if (dest == null) {
                     try {
                         sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
@@ -236,6 +230,7 @@ public class SOCKS4aServer extends SOCKSServer {
                     sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
                 } catch (IOException ioe) {}
                 throw new SOCKSException(err);
+          /****
             } else if (connPort == 80) {
                 // rewrite GET line to include hostname??? or add Host: line???
                 // or forward to local eepProxy (but that's a Socket not an I2PSocket)
@@ -246,30 +241,43 @@ public class SOCKS4aServer extends SOCKSServer {
                     sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
                 } catch (IOException ioe) {}
                 throw new SOCKSException(err);
+           ****/
             } else {
-                List<String> proxies = t.getProxies(connPort);
-                if (proxies == null || proxies.isEmpty()) {
-                    String err = "No outproxy configured for port " + connPort + " and no default configured either - host: " + connHostName;
-                    _log.error(err);
+                Outproxy outproxy = getOutproxyPlugin();
+                if (outproxy != null) {
                     try {
-                        sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
-                    } catch (IOException ioe) {}
-                    throw new SOCKSException(err);
+                        destSock = new SocketWrapper(outproxy.connect(connHostName, connPort));
+                    } catch (IOException ioe) {
+                        try {
+                            sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
+                        } catch (IOException ioe2) {}
+                        throw new SOCKSException("connect failed via outproxy plugin", ioe);
+                    }
+                } else {
+                    List<String> proxies = t.getProxies(connPort);
+                    if (proxies == null || proxies.isEmpty()) {
+                        String err = "No outproxy configured for port " + connPort + " and no default configured either - host: " + connHostName;
+                        _log.error(err);
+                        try {
+                            sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
+                        } catch (IOException ioe) {}
+                        throw new SOCKSException(err);
+                    }
+                    int p = _context.random().nextInt(proxies.size());
+                    String proxy = proxies.get(p);
+                    Destination dest = _context.namingService().lookup(proxy);
+                    if (dest == null) {
+                        try {
+                            sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
+                        } catch (IOException ioe) {}
+                        throw new SOCKSException("Outproxy not found");
+                    }
+                    if (_log.shouldDebug())
+                        _log.debug("connecting to port " + connPort + " proxy " + proxy + " for " + connHostName + "...");
+                    // this isn't going to work, these need to be socks outproxies so we need
+                    // to do a socks session to them?
+                    destSock = t.createI2PSocket(dest);
                 }
-                int p = I2PAppContext.getGlobalContext().random().nextInt(proxies.size());
-                String proxy = proxies.get(p);
-                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(proxy);
-                if (dest == null) {
-                    try {
-                        sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
-                    } catch (IOException ioe) {}
-                    throw new SOCKSException("Outproxy not found");
-                }
-                if (_log.shouldDebug())
-                    _log.debug("connecting to port " + connPort + " proxy " + proxy + " for " + connHostName + "...");
-                // this isn't going to work, these need to be socks outproxies so we need
-                // to do a socks session to them?
-                destSock = t.createI2PSocket(dest);
             }
             confirmConnection();
             _log.debug("connection confirmed - exchanging data...");

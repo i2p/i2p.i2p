@@ -21,6 +21,9 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.Outproxy;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
@@ -37,12 +40,10 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SOCKS5Server extends SOCKSServer {
-    private final Log _log;
+class SOCKS5Server extends SOCKSServer {
 
     private static final int SOCKS_VERSION_5 = 0x05;
 
-    private final Socket clientSock;
     private boolean setupCompleted = false;
     private final boolean authRequired;
 
@@ -57,14 +58,12 @@ public class SOCKS5Server extends SOCKSServer {
      * @param clientSock client socket
      * @param props non-null
      */
-    public SOCKS5Server(Socket clientSock, Properties props) {
-        this.clientSock = clientSock;
-        this.props = props;
+    public SOCKS5Server(I2PAppContext ctx, Socket clientSock, Properties props) {
+        super(ctx, clientSock, props);
         this.authRequired =
                     Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_USER) &&
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_PW);
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(SOCKS5Server.class);
     }
 
     public Socket getClientSocket() throws SOCKSException {
@@ -366,7 +365,7 @@ public class SOCKS5Server extends SOCKSServer {
                 // Let's not do a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
-                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(connHostName);
+                Destination dest = _context.namingService().lookup(connHostName);
                 if (dest == null) {
                     try {
                         sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
@@ -399,27 +398,40 @@ public class SOCKS5Server extends SOCKSServer {
                 throw new SOCKSException(err);
            ****/
             } else {
-                List<String> proxies = t.getProxies(connPort);
-                if (proxies == null || proxies.isEmpty()) {
-                    String err = "No outproxy configured for port " + connPort + " and no default configured either";
-                    _log.error(err);
+                Outproxy outproxy = getOutproxyPlugin();
+                if (outproxy != null) {
+                    // In HTTPClient, we use OutproxyRunner to run a Socket,
+                    // but here, we wrap a Socket in a I2PSocket and use the regular Runner.
                     try {
-                        sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
-                    } catch (IOException ioe) {}
-                    throw new SOCKSException(err);
-                }
-                int p = I2PAppContext.getGlobalContext().random().nextInt(proxies.size());
-                String proxy = proxies.get(p);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("connecting to proxy " + proxy + " for " + connHostName + " port " + connPort);
-
-                try {
-                    destSock = outproxyConnect(t, proxy);
-                } catch (SOCKSException se) {
+                        destSock = new SocketWrapper(outproxy.connect(connHostName, connPort));
+                    } catch (IOException ioe) {
+                        try {
+                            sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                        } catch (IOException ioe2) {}
+                        throw new SOCKSException("connect failed via outproxy plugin", ioe);
+                    }
+                } else {
+                    List<String> proxies = t.getProxies(connPort);
+                    if (proxies == null || proxies.isEmpty()) {
+                        String err = "No outproxy configured for port " + connPort + " and no default configured either";
+                        _log.error(err);
+                        try {
+                            sendRequestReply(Reply.CONNECTION_NOT_ALLOWED_BY_RULESET, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                        } catch (IOException ioe) {}
+                        throw new SOCKSException(err);
+                    }
+                    int p = _context.random().nextInt(proxies.size());
+                    String proxy = proxies.get(p);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("connecting to proxy " + proxy + " for " + connHostName + " port " + connPort);
                     try {
-                        sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
-                    } catch (IOException ioe) {}
-                    throw se;
+                        destSock = outproxyConnect(t, proxy);
+                    } catch (SOCKSException se) {
+                        try {
+                            sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
+                        } catch (IOException ioe) {}
+                        throw se;
+                    }
                 }
             }
             confirmConnection();
@@ -466,7 +478,7 @@ public class SOCKS5Server extends SOCKSServer {
         Properties overrides = new Properties();
         overrides.setProperty("option.i2p.streaming.connectDelay", "1000");
         I2PSocketOptions proxyOpts = tun.buildOptions(overrides);
-        Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(proxy);
+        Destination dest = _context.namingService().lookup(proxy);
         if (dest == null)
             throw new SOCKSException("Outproxy not found");
         I2PSocket destSock = tun.createI2PSocket(dest, proxyOpts);

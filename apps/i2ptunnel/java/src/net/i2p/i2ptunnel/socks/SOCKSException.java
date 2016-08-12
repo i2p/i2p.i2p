@@ -20,4 +20,9 @@ public class SOCKSException extends Exception {
     public SOCKSException(String s) {
         super(s);
     }
+
+    /** @since 0.9.27 */
+    public SOCKSException(String s, Throwable t) {
+        super(s, t);
+    }
 }
