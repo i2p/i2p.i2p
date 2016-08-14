@@ -108,6 +108,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://reseed.atomike.ninja/"       + "," +   // atomike_at_mail.i2p.crt   // CA                         // SNI required, Java 8+ only
         "https://i2p.manas.ca:8443/"          + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
         "https://i2p-0.manas.ca:8443/"        + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
         "https://reseed.i2p.vzaws.com:8443/"  + ',' +   // parg_at_mail.i2p.crt      // reseed.i2p.vzaws.com.crt
