@@ -316,8 +316,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             this.isr = new InternalSocketRunner(this);
             this.isr.start();
             int port = getLocalPort();
-            _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, port);
-            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, port);
+            _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, getTunnel().listenHost, port);
+            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getTunnel().listenHost, port);
         }
     }
 

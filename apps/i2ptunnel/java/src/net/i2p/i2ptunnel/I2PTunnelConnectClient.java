@@ -125,7 +125,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     public void startRunning() {
         super.startRunning();
         if (open)
-            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getLocalPort());
+            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getTunnel().listenHost, getLocalPort());
     }
 
     @Override
