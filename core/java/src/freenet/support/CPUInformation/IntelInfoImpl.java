@@ -461,6 +461,38 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                         break;
                     }
 
+                // following are for extended model == 8 or 9
+                // most flags are set above
+                // isCoreiCompatible = true is the default
+
+                    // Kaby Lake
+                    // ref: https://github.com/InstLatx64/InstLatx64/commit/9d2ea1a9eb727868dc514900da9e2f175710f9bf
+                    // See Haswell notes above
+                    case 0x8e:
+                    case 0x9e: {
+                        CPUIDCPUInfo c = new CPUIDCPUInfo();
+                        if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
+                            c.hasFMA3() && c.hasMOVBE() && c.hasABM()) {
+                            isSandyCompatible = true;
+                            isIvyCompatible = true;
+                            isHaswellCompatible = true;
+                            if (c.hasADX())
+                                isBroadwellCompatible = true;
+                            modelString = "Kaby Lake Core i3/i5/i7";
+                        } else {
+                            // This processor is "corei" compatible, as we define it,
+                            // i.e. SSE4.2 but not necessarily AVX.
+                            if (c.hasAVX()) {
+                                isSandyCompatible = true;
+                                isIvyCompatible = true;
+                                modelString = "Kaby Lake Celeron/Pentium w/ AVX";
+                            } else {
+                                modelString = "Kaby Lake Celeron/Pentium";
+                            }
+                        }
+                        break;
+                    }
+
                     // others
                     default:
                         modelString = "Intel model " + model;
