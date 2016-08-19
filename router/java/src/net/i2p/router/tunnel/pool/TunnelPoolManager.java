@@ -556,8 +556,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         if (cfg.getLength() > 1 &&
-            (!_context.router().gracefulShutdownInProgress()) &&
-            !_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
+            !_context.router().gracefulShutdownInProgress() &&
+            (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting") ||
+             _context.router().isHidden() ||
+             _context.router().getRouterInfo().getAddressCount() <= 0)) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
                 // never seen this before, do we reallly need to bother

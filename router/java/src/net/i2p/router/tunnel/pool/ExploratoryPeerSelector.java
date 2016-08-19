@@ -66,7 +66,9 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             // If hidden and inbound, use fast peers - that we probably have recently
             // connected to and so they have our real RI - to maximize the chance
             // that the adjacent hop can connect to us.
-            if (settings.isInbound() && ctx.router().isHidden()) {
+            if (settings.isInbound() &&
+                (ctx.router().isHidden() ||
+                 ctx.router().getRouterInfo().getAddressCount() <= 0)) {
                 if (l.shouldLog(Log.INFO))
                     l.info("EPS SFP " + length + (settings.isInbound() ? " IB" : " OB") + " exclude " + exclude.size());
                 ctx.profileOrganizer().selectFastPeers(length, exclude, matches);

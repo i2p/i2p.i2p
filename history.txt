@@ -1,3 +1,23 @@
+2016-08-19 zzz
+ * CPUID: Add IDs for Kaby Lake
+ * JettyStart: Fix main()
+ * Router: Fix return code in getShutdownTimeRemaining()
+ * Tunnels:
+   - Enable tunnel testing when in hidden mode (ticket #1192)
+   - Enable tunnel testing when without addresses (ticket #1835)
+   - Use fast peers for inbound tunnels when without addresses (ticket #1835)
+
+2016-08-14 zzz
+ * i2ptunnel:
+   - Register actual listen host with port mapper
+   - Register POP and SMTP ports with port mapper
+ * Reseed: Add new 'atomike' reseed
+
+2016-08-12 zzz
+ * i2ptunnel:
+   - Add outproxy plugin support to SOCKS (ticket #1824)
+   - Use preferred sigtype for new SOCKS tunnels
+
 2016-08-09 zzz
  * Console: Fix UPnP NPE on /peers (ticket #1830)
 

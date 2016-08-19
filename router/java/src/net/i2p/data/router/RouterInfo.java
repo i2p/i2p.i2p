@@ -181,6 +181,16 @@ public class RouterInfo extends DatabaseEntry {
     }
 
     /**
+     * Return the number of router addresses.
+     * More efficient than getAddresses().size()
+     *
+     * @since 0.9.27
+     */
+    public int getAddressCount() {
+        return _addresses.size();
+    }
+
+    /**
      * Retrieve the set of RouterAddress structures at which this
      * router can be contacted.
      *
