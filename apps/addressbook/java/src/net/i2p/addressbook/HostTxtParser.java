@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.data.DataHelper;
@@ -234,7 +235,41 @@ class HostTxtParser {
         }
     }
 
+    /**
+     * Usage: HostTxtParser validate example.i2p=b64dest[#!key1=val1#key2=val2]
+     */
     public static void main(String[] args) throws Exception {
+        if (args.length != 2 || !args[0].equals("validate")) {
+            System.err.println("Usage: HostTxtParser validate example.i2p=b64dest[#!key1=val1#key2=val2]");
+            System.exit(1);
+        }
+        HostTxtEntry e = parse(args[1].trim(), false);
+        if (e == null) {
+            System.err.println("Bad format");
+            System.exit(1);
+        }
+        if (!e.hasValidSig()) {
+            System.err.println("Bad signature");
+            System.exit(1);
+        }
+        Properties p = e.getProps();
+        if (p != null) {
+            if (p.containsKey(HostTxtEntry.PROP_ACTION) ||
+                p.containsKey(HostTxtEntry.PROP_OLDDEST) ||
+                p.containsKey(HostTxtEntry.PROP_OLDNAME) ||
+                p.containsKey(HostTxtEntry.PROP_OLDSIG)) {
+                if (!e.hasValidSig()) {
+                    System.err.println("Bad inner signature");
+                    System.exit(1);
+                }
+            }
+        }
+        System.err.println("Good signature for " + e.getName());
+        System.exit(0);
+    }
+
+/****
+    public static void test(String[] args) throws Exception {
         File f = new File("tmp-hosts.txt");
         Map<String, HostTxtEntry> map = parse(f);
         for (HostTxtEntry e : map.values()) {
@@ -246,5 +281,5 @@ class HostTxtParser {
                                '\n');
         }
     }
-
+****/
 }

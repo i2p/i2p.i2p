@@ -436,6 +436,7 @@ public class HostTxtEntry {
     /**
      *  Usage: HostTxtEntry [-i] [-x] [hostname.i2p] [key=val]...
      */
+/****
     public static void main(String[] args) throws Exception {
         boolean inner = false;
         boolean remove = false;
@@ -531,4 +532,5 @@ public class HostTxtEntry {
         //out.write("Test passed\n");
         //out.flush();
     }
+****/
 }
