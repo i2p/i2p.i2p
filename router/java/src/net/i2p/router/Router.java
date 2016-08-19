@@ -1406,9 +1406,9 @@ public class Router implements RouterClock.ClockShiftListener {
             return 0;
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
-            return -1;
+            return 0;
         else
-            return exp + 2*CLOCK_FUDGE_FACTOR - _context.clock().now();
+            return Math.max(0, exp + 2*CLOCK_FUDGE_FACTOR - _context.clock().now());
     }
     
     /**
