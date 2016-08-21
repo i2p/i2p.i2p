@@ -37,7 +37,12 @@ abstract class LogWriter implements Runnable {
         _lastReadConfig = Clock.getInstance().now();
     }
 
+    /**
+     *  File may not exist or have old logs in it if not opened yet
+     *  @return non-null
+     */
     public abstract String currentFile();
+
     /**
      * Write the provided LogRecord to the writer.
      * @param rec the LogRecord to write.

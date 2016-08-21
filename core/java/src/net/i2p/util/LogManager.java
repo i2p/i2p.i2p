@@ -264,6 +264,10 @@ public class LogManager implements Flushable {
         loadConfig();
     }
 
+    /**
+     *  File may not exist or have old logs in it if not opened yet
+     *  @return non-null
+     */
     public String currentFile() {
         if (_writer == null)
             return ("No log file created yet");

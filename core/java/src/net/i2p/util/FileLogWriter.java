@@ -37,6 +37,7 @@ class FileLogWriter extends LogWriter {
 
     /**
      *  File may not exist or have old logs in it if not opened yet
+     *  @return non-null
      */
     public synchronized String currentFile() {
         if (_currentFile != null)

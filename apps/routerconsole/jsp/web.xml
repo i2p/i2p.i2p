@@ -43,6 +43,16 @@
       <url-pattern>/history.txt</url-pattern>
     </servlet-mapping>
     
+    <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewrouterlog_jsp</servlet-name>
+      <url-pattern>/router.log</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewwrapperlog_jsp</servlet-name>
+      <url-pattern>/wrapper.log</url-pattern>
+    </servlet-mapping>
+    
     <session-config>
         <session-timeout>
             30

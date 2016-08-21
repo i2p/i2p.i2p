@@ -75,7 +75,7 @@ public class LogsHelper extends HelperBase {
      */
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
-        return "<p>" + _t("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b></p>" + str;
+        return "<p>" + _t("File location") + ": <a href=\"/router.log\">" + _context.logManager().currentFile() + "</a></p>" + str;
     }
     
     /**
@@ -88,9 +88,11 @@ public class LogsHelper extends HelperBase {
     
     /**
      *  Does not necessarily exist.
-     *  @since 0.9.1
+     *
+     *  @return non-null, doesn't necessarily exist
+     *  @since 0.9.1, public since 0.9.27
      */
-    static File wrapperLogFile(I2PAppContext ctx) {
+    public static File wrapperLogFile(I2PAppContext ctx) {
         File f = null;
         if (ctx.hasWrapper()) {
             String wv = System.getProperty("wrapper.version");
@@ -129,7 +131,7 @@ public class LogsHelper extends HelperBase {
             return "<p>" + _t("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
         } else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            return "<p>" + _t("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p><pre>" + str + "</pre>";
+            return "<p>" + _t("File location") + ": <a href=\"/wrapper.log\">" + f.getAbsolutePath() + "</a></p><pre>" + str + "</pre>";
         }
     }
     
