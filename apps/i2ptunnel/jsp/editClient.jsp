@@ -284,10 +284,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 </label>
                 <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Length" class="selectbox">
                     <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
-                  %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop variance (no randomisation, consistant performance)")%></option>
-                    <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-1 hop variance (medium additive randomisation, subtractive performance)")%></option>
-                    <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-2 hop variance (high additive randomisation, subtractive performance)")%></option>
-                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-1 hop variance (standard randomisation, standard performance)")%></option>
+                  %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop variance (no ransomization, consistent performance)")%></option>
+                    <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-1 hop variance (medium additive ransomization, subtractive performance)")%></option>
+                    <option value="2"<%=(tunnelVariance  ==  2 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-2 hop variance (high additive ransomization, subtractive performance)")%></option>
+                    <option value="-1"<%=(tunnelVariance == -1 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-1 hop variance (standard ransomization, standard performance)")%></option>
                     <option value="-2"<%=(tunnelVariance == -2 ? " selected=\"selected\"" : "") %>><%=intl._t("+/- 0-2 hop variance (not recommended)")%></option>
                 <% if (tunnelVariance > 2 || tunnelVariance < -2) {
                 %>    <option value="<%=tunnelVariance%>" selected="selected"><%= (tunnelVariance > 2 ? "+ " : "+/- ") %>0-<%=tunnelVariance%> <%=intl._t("hop variance")%></option>

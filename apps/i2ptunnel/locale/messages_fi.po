@@ -341,24 +341,24 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:361
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:401
-msgid "0 hop variance (no randomisation, consistant performance)"
+msgid "0 hop variance (no randomization, consistent performance)"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:365
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:405
 msgid ""
-"+ 0-1 hop variance (medium additive randomisation, subtractive performance)"
+"+ 0-1 hop variance (medium additive randomization, subtractive performance)"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:369
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:409
 msgid ""
-"+ 0-2 hop variance (high additive randomisation, subtractive performance)"
+"+ 0-2 hop variance (high additive randomization, subtractive performance)"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:373
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:413
-msgid "+/- 0-1 hop variance (standard randomisation, standard performance)"
+msgid "+/- 0-1 hop variance (standard randomization, standard performance)"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:377
