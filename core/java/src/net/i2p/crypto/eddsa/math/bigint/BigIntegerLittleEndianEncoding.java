@@ -29,8 +29,11 @@ public class BigIntegerLittleEndianEncoding extends Encoding implements Serializ
      *  Constant time.
      *
      *  @return array of length b/8
+     *  @throws IllegalStateException if field not set
      */
     public byte[] encode(BigInteger x) {
+        if (f == null)
+            throw new IllegalStateException("field not set");
         byte[] in = x.toByteArray();
         byte[] out = new byte[f.getb()/8];
         for (int i = 0; i < in.length; i++) {
@@ -42,7 +45,18 @@ public class BigIntegerLittleEndianEncoding extends Encoding implements Serializ
         return out;
     }
 
+    /**
+     *  Decode a FieldElement from its (b-1)-bit encoding.
+     *  The highest bit is masked out.
+     *
+     *  @param in the (b-1)-bit encoding of a FieldElement.
+     *  @return the FieldElement represented by 'val'.
+     *  @throws IllegalStateException if field not set
+     *  @throws IllegalArgumentException if encoding is invalid
+     */
     public FieldElement decode(byte[] in) {
+        if (f == null)
+            throw new IllegalStateException("field not set");
         if (in.length != f.getb()/8)
             throw new IllegalArgumentException("Not a valid encoding");
         return new BigIntegerFieldElement(f, toBigInteger(in).and(mask));
