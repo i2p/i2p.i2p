@@ -1272,28 +1272,38 @@ public class DataHelper {
     /**
      *  This is different than InputStream.read(target), in that it
      *  does repeated reads until the full data is received.
+     *
+     *  As of 0.9.27, throws EOFException if the full length is not read.
+     *
+     *  @return target.length
+     *  @throws EOFException if the full length is not read (since 0.9.27)
      */
     public static int read(InputStream in, byte target[]) throws IOException {
         return read(in, target, 0, target.length);
     }
 
     /**
-     *  This is different than InputStream.read(target, offset, length), in that it
-     *  returns the new offset (== old offset + bytes read).
+     *  WARNING - This is different than InputStream.read(target, offset, length)
+     *  for a nonzero offset, in that it
+     *  returns the new offset (== old offset + length).
      *  It also does repeated reads until the full data is received.
-     *  @return the new offset (== old offset + bytes read)
+     *
+     *  WARNING - Broken for nonzero offset before 0.9.27.
+     *  As of 0.9.27, throws EOFException if the full length is not read.
+     *
+     *  @return the new offset (== old offset + length)
+     *  @throws EOFException if the full length is not read (since 0.9.27)
      */
     public static int read(InputStream in, byte target[], int offset, int length) throws IOException {
-        int cur = offset;
+        int cur = 0;
         while (cur < length) {
-            int numRead = in.read(target, cur, length - cur);
+            int numRead = in.read(target, offset + cur, length - cur);
             if (numRead == -1) {
-                if (cur == offset) return -1; // throw new EOFException("EOF Encountered during reading");
-                return cur;
+                throw new EOFException("EOF after reading " + cur + " bytes of " + length + " byte value");
             }
             cur += numRead;
         }
-        return cur;
+        return offset + cur;
     }
     
     
