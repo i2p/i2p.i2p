@@ -54,7 +54,8 @@ abstract class IRCFilter {
                 "AUTHENTICATE", // SASL, also requires CAP below
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CAP",
-                "PROTOCTL"
+                "PROTOCTL",
+                "AWAY"
         };
         
 
