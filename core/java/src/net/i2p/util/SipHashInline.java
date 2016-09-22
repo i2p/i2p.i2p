@@ -33,14 +33,25 @@ package net.i2p.util;
  * 
  * I2P mods: add off/len version
  * 
- * @since 0.9.5
+ * @since 0.9.5, public since 0.9.27
  */
-abstract class SipHashInline {
+public final class SipHashInline {
 
+    /** @since 0.9.27 */
+    private SipHashInline() {};
+
+    /**
+     *  @param k0 the first 8 bytes of the key
+     *  @param k1 the last 8 bytes of the key
+     */
     public static long hash24(long k0, long k1, byte[] data) {
         return hash24(k0, k1, data, 0, data.length);
     }
 
+    /**
+     *  @param k0 the first 8 bytes of the key
+     *  @param k1 the last 8 bytes of the key
+     */
     public static long hash24(long k0, long k1, byte[] data, int off, int len) {
         long v0 = 0x736f6d6570736575L ^ k0;
         long v1 = 0x646f72616e646f6dL ^ k1;
