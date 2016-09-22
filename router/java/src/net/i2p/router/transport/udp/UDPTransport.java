@@ -1324,7 +1324,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _introManager.add(peer);
         
         if (oldEstablishedOn > 0)
-            _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn, 0);
+            _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn);
         
         synchronized(_rebuildLock) {
             rebuildIfNecessary();

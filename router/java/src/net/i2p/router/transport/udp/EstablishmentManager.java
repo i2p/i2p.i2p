@@ -410,7 +410,7 @@ class EstablishmentManager {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Too many pending, rejecting outbound establish to " + to);
             _transport.failed(msg, "Too many pending outbound connections");
-            _context.statManager().addRateData("udp.establishRejected", deferred, 0);
+            _context.statManager().addRateData("udp.establishRejected", deferred);
             return;
         }
         if (queueCount >= MAX_QUEUED_PER_PEER) {
@@ -732,7 +732,7 @@ class EstablishmentManager {
         _transport.inboundConnectionReceived(isIPv6);
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
-        _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
+        _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime());
         sendInboundComplete(peer);
         OutNetMessage msg;
         while ((msg = state.getNextQueuedMessage()) != null) {
@@ -832,7 +832,7 @@ class EstablishmentManager {
         _transport.addRemotePeerState(peer);
         _transport.setIP(remote.calculateHash(), state.getSentIP());
         
-        _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
+        _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime());
         DatabaseStoreMessage dbsm = null;
         if (!state.isFirstMessageOurDSM()) {
             dbsm = getOurInfo();
@@ -941,7 +941,7 @@ class EstablishmentManager {
             } while (old != null);
             state.setIntroNonce(nonce);
         }
-        _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
+        _context.statManager().addRateData("udp.sendIntroRelayRequest", 1);
         List<UDPPacket> requests = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());
         if (requests.isEmpty()) {
             // FIXME need a failed OB state
@@ -989,7 +989,7 @@ class EstablishmentManager {
             // TODO either put the nonce back in liveintroductions, or fail
             return;
         }
-        _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime(), 0);
+        _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime());
         if (_log.shouldLog(Log.INFO))
             _log.info("Received RelayResponse for " + state.getRemoteIdentity().calculateHash() + " - they are on " 
                       + addr.toString() + ":" + port + " (according to " + bob + ") nonce=" + nonce);
@@ -1230,7 +1230,7 @@ class EstablishmentManager {
                     break;
 
                   case IB_STATE_COMPLETE:  // fall through
-                  case IB_STATE_FAILED:
+                  case IB_STATE_FAILED: // leak here if fail() was called in IES???
                     break; // already removed;
 
                   case IB_STATE_UNKNOWN:
@@ -1387,7 +1387,7 @@ class EstablishmentManager {
             if (removed) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send intro for " + outboundState + " timed out");
-                _context.statManager().addRateData("udp.sendIntroRelayTimeout", 1, 0);
+                _context.statManager().addRateData("udp.sendIntroRelayTimeout", 1);
             }
         }
         // only if == state

@@ -312,7 +312,7 @@ class UDPSender {
             UDPPacket packet = null;
             while ( (_keepRunning) && (packet == null || packet.getLifetime() > MAX_HEAD_LIFETIME) ) {
                 if (packet != null) {
-                    _context.statManager().addRateData("udp.sendQueueTrimmed", 1, 0);
+                    _context.statManager().addRateData("udp.sendQueueTrimmed", 1);
                     packet.release();
                 }
                 try {

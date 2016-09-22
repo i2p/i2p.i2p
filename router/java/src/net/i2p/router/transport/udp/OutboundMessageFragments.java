@@ -222,7 +222,7 @@ class OutboundMessageFragments {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add a new message to an existing peer " + peer.getRemotePeer());
         }
-        _context.statManager().addRateData("udp.outboundActivePeers", _activePeers.size(), 0);
+        _context.statManager().addRateData("udp.outboundActivePeers", _activePeers.size());
 
         // Avoid sync if possible
         // no, this doesn't always work.
