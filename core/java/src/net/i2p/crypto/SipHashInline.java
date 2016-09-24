@@ -1,4 +1,4 @@
-package net.i2p.util;
+package net.i2p.crypto;
 
 /*
  *  As pulled from https://github.com/nahi/siphash-java-inline
@@ -33,7 +33,9 @@ package net.i2p.util;
  * 
  * I2P mods: add off/len version
  * 
- * @since 0.9.5, public since 0.9.27
+ * For constant keys see net.i2p.util.SipHash
+ * 
+ * @since 0.9.5, Moved to net.i2p.crypto and public since 0.9.27
  */
 public final class SipHashInline {
 
