@@ -254,7 +254,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 String name = editBean.getSpoofedHost(curTunnel);
                 if (name == null || name.equals(""))
                     name = editBean.getTunnelName(curTunnel);
-                if (name != null && !name.equals("") && !name.contains(" ") && name.endsWith(".i2p")) {
+                // mysite.i2p is set in the installed i2ptunnel.config
+                if (name != null && !name.equals("") && !name.equals("mysite.i2p") && !name.contains(" ") && name.endsWith(".i2p")) {
          %>
               <label>
               <a class="control" title="<%=intl._t("Generate QR Code")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=b64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
