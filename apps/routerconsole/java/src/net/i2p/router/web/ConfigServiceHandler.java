@@ -214,7 +214,10 @@ public class ConfigServiceHandler extends FormHandler {
      *  @since 0.9.26
      */
     public boolean isSystrayEnabled() {
-        return _context.getBooleanProperty(RouterConsoleRunner.PROP_DTG_ENABLED);
+        // default false for now, except on non-service windows
+        String sdtg = _context.getProperty(RouterConsoleRunner.PROP_DTG_ENABLED);
+        return Boolean.parseBoolean(sdtg) ||
+               (sdtg == null && SystemVersion.isWindows());
     }
 
     @Override

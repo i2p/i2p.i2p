@@ -281,8 +281,10 @@ public class RouterConsoleRunner implements RouterApp {
             return;
         }
         try {
-            // default false for now
-            boolean desktopguiEnabled = _context.getBooleanProperty(PROP_DTG_ENABLED);
+            // default false for now, except on non-service windows
+            String sdtg = _context.getProperty(PROP_DTG_ENABLED);
+            boolean desktopguiEnabled = Boolean.parseBoolean(sdtg) ||
+                                        (sdtg == null && SystemVersion.isWindows());
             if (desktopguiEnabled) {
                 //Check if we are in a headless environment, set properties accordingly
           	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
