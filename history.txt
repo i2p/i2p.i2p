@@ -1,3 +1,19 @@
+2016-10-02 zzz
+ * Crypto: Add EdDSA private key spec constructor for hash
+ * i2psnark: Add standalone shutdown method
+ * i2ptunnel: Registration page layout fixes
+ * SusiMail:
+   - Show settings button even if no messages
+   - Add nonce to forms
+
+2016-09-24 zzz
+ * DesktopGUI: Enable by default on Windows
+ * i2ptunnel:
+   - Accept default 'mysite.i2p' as a valid spoof host
+   - Don't wrap destination in status message box
+ * Reseed: Remove user.mx24.eu as requested
+ * Utils: Move SipHashInline from util to crypto
+
 2016-09-22 zzz
  * Crypto: Don't NPE in encoding when field not set
  * DataHelper: Fix read() for nonzero offset

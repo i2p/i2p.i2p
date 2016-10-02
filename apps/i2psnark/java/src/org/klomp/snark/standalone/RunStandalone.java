@@ -15,6 +15,7 @@ public class RunStandalone {
     private final I2PAppContext _context;
     private int _port = 8002;
     private String _host = "127.0.0.1";
+    private static RunStandalone _instance;
 
     private RunStandalone(String args[]) throws Exception {
         _context = I2PAppContext.getGlobalContext();
@@ -32,10 +33,11 @@ public class RunStandalone {
     /**
      *  Usage: RunStandalone [host [port]] (but must match what's in the jetty-i2psnark.xml file)
      */
-    public static void main(String args[]) {
+    public synchronized static void main(String args[]) {
         try {
             RunStandalone runner = new RunStandalone(args);
             runner.start();
+            _instance = runner;
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -58,5 +60,16 @@ public class RunStandalone {
     
     public void stop() {
         _jettyStart.shutdown(null);
+    }
+    
+    /** @since 0.9.27 */
+    public synchronized static void shutdown() {
+        if (_instance != null)
+            _instance.stop();
+        // JettyStart.shutdown() is threaded
+        try {
+           Thread.sleep(3000);
+        } catch (InterruptedException ie) {}
+        System.exit(1);
     }
 }
