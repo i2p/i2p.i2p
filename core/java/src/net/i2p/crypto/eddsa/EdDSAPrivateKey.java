@@ -90,6 +90,9 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
      *  This will hopefully be clarified in the next draft.
      *  But sun.security.pkcs.PKCS8Key expects them so we must include them for keytool to work.
      *
+     *  This encodes the seed. It will return null if constructed from
+     *  a spec which was directly constructed from H, in which case seed is null.
+     *
      *  @return 49 bytes for Ed25519, null for other curves
      *  @since implemented in 0.9.25
      */
@@ -174,22 +177,38 @@ public class EdDSAPrivateKey implements EdDSAKey, PrivateKey {
         return edDsaSpec;
     }
 
+    /**
+     *  @return will be null if constructed from a spec which was
+     *          directly constructed from H
+     */
     public byte[] getSeed() {
         return seed;
     }
 
+    /**
+     *  @return the hash of the seed
+     */
     public byte[] getH() {
         return h;
     }
 
+    /**
+     *  @return the private key
+     */
     public byte[] geta() {
         return a;
     }
 
+    /**
+     *  @return the public key
+     */
     public GroupElement getA() {
         return A;
     }
 
+    /**
+     *  @return the public key
+     */
     public byte[] getAbyte() {
         return Abyte;
     }

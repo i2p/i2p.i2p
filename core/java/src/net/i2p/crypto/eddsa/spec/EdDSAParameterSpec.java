@@ -56,6 +56,9 @@ public class EdDSAParameterSpec implements AlgorithmParameterSpec, Serializable 
         return sc;
     }
 
+    /**
+     *  @return the base (generator)
+     */
     public GroupElement getB() {
         return B;
     }
