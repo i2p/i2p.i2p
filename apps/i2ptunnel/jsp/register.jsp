@@ -1,5 +1,5 @@
 <%@page contentType="text/html" import="java.io.InputStream,net.i2p.i2ptunnel.web.EditBean,net.i2p.servlet.RequestWrapper,net.i2p.client.I2PSessionException,net.i2p.client.naming.HostTxtEntry,net.i2p.data.PrivateKeyFile,net.i2p.data.SigningPrivateKey,net.i2p.util.OrderedProperties"
-%><%@page trimDirectiveWhitespaces="true"
+%><%@page
 %><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%
@@ -74,9 +74,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
     if (!"new".equals(tunnelType)) {      
 %>
-  <span class="comment">
+  <div class="rowItem"><span class="comment">
     <%=intl._t("Please be sure to select, copy, and paste the entire contents of the appropriate authentication data into the form of your favorite registration site")%>
-  </span>
+  </span><br /></div>
             <div class="separator">
                 <hr />
             </div>
@@ -143,7 +143,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="signature">
                     <%=intl._t("Authentication for removing host")%>
                 </label>
-                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeRemove(out); %></textarea>               
+                <textarea rows="1" style="height: 3em; margin: 0 10px 0 0;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeRemove(out); %></textarea>               
                 <span class="comment"><%=intl._t("This will remove the entry for {0}", name)%></span>
             </div>
             <div class="separator">
@@ -243,7 +243,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                props.remove(HostTxtEntry.PROP_SIG);
                props.remove(HostTxtEntry.PROP_OLDSIG);
           %><div id="sigField" class="rowItem">
-                <label for="signature">
+                <label for="signature" style="height: 42px;" >
                     <%=intl._t("Authentication for adding alternate destination")%>
                 </label>
 <%
@@ -311,7 +311,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
   <span class="comment">
     <%=intl._t("This is only required for advanced authentication.")%>
     <%=intl._t("See above for required items.")%>
-  </span>
+  </span><br />
 <%
                String oldname = wrequest.getParameter("oldname");
                if (oldname == null) oldname = "";
