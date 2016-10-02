@@ -70,6 +70,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
+import net.i2p.util.Translate;
 
 /**
  * @author susi23
@@ -129,6 +130,7 @@ public class WebMail extends HttpServlet
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
 	private static final String RAW_ATTACHMENT = "att";
+	private static final String SUSI_NONCE = "susiNonce";
 	
 	private static final String MARKALL = "markall";
 	private static final String CLEAR = "clearselection";
@@ -200,6 +202,7 @@ public class WebMail extends HttpServlet
 
 	private static final String spacer = "&nbsp;&nbsp;&nbsp;";
 	private static final String thSpacer = "<th>&nbsp;</th>\n";
+	private static final String CONSOLE_BUNDLE_NAME = "net.i2p.router.web.messages";
 	
 	static {
 		Config.setPrefix( "susimail" );
@@ -409,11 +412,14 @@ public class WebMail extends HttpServlet
 		String themePath, imgPath;
 		boolean isMobile;
 		boolean bccToSelf;
+		private final List<String> nonces;
+		private static final int MAX_NONCES = 15;
 		
 		SessionObject()
 		{
 			state = STATE_AUTH;
 			bccToSelf = Boolean.parseBoolean(Config.getProperty( CONFIG_BCC_TO_SELF, "true" ));
+			nonces = new ArrayList<String>(MAX_NONCES + 1);
 		}
 
 		/** @since 0.9.13 */
@@ -445,6 +451,23 @@ public class WebMail extends HttpServlet
 			if (mc != null && f != null) {
 				String[] uidls = mc.getUIDLs();
 				f.setElements(uidls);
+			}
+		}
+
+		/** @since 0.9.27 */
+		public void addNonce(String nonce) {
+			synchronized(nonces) {
+				nonces.add(0, nonce);
+				if (nonces.size() > MAX_NONCES) {
+					nonces.remove(MAX_NONCES);
+				}
+			}
+		}
+
+		/** @since 0.9.27 */
+		public boolean isValidNonce(String nonce) {
+			synchronized(nonces) {
+				return nonces.contains(nonce);
 			}
 		}
 	}
@@ -1467,6 +1490,16 @@ public class WebMail extends HttpServlet
 					return;
 				Properties props = new Properties();
 				DataHelper.loadProps(props, new ByteArrayInputStream(DataHelper.getUTF8(raw)));
+				// for safety, disallow changing host via UI
+				String oldHost = Config.getProperty(CONFIG_HOST, DEFAULT_HOST);
+				String newHost = props.getProperty(CONFIG_HOST);
+				if (newHost == null) {
+					props.setProperty(CONFIG_HOST, oldHost);
+				} else if (!newHost.equals(oldHost) && !newHost.equals("localhost")) {
+					props.setProperty(CONFIG_HOST, oldHost);
+					File cfg = new File(I2PAppContext.getGlobalContext().getConfigDir(), "susimail.config");
+					sessionObject.error += _t("Host unchanged. Edit configation file {0} to change host.", cfg.getAbsolutePath()) + '\n';
+				}
 				Config.saveConfiguration(props);
 				String ps = props.getProperty(Folder.PAGESIZE);
 				if (sessionObject.folder != null && ps != null) {
@@ -1619,9 +1652,24 @@ public class WebMail extends HttpServlet
 			sessionObject.imgPath = sessionObject.themePath + "images/";
 			sessionObject.isMobile = isMobile;
 			
+			if (isPOST) {
+				String nonce = request.getParameter(SUSI_NONCE);
+				if (nonce == null || !sessionObject.isValidNonce(nonce)) {
+					// These two strings are already in the router console FormHandler,
+					// so translate with that bundle.
+					sessionObject.error = Translate.getString(
+						"Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.",
+						ctx, CONSOLE_BUNDLE_NAME)
+						+ '\n' +
+						Translate.getString("If the problem persists, verify that you have cookies enabled in your browser.",
+						ctx, CONSOLE_BUNDLE_NAME);
+					isPOST = false;
+				}
+			}
+
 			// This must be called to add the attachment before
 			// processStateChangeButtons() sends the message
-			if( sessionObject.state == STATE_NEW )
+			if(isPOST && sessionObject.state == STATE_NEW)
 				processComposeButtons( sessionObject, request );
 		
 			int oldState = sessionObject.state;
@@ -1667,7 +1715,7 @@ public class WebMail extends HttpServlet
 					// download or raw view sent, or 404
 					return;
 				}
-				if (processSaveAsLink(sessionObject, request, response)) {
+				if (isPOST && processSaveAsLink(sessionObject, request, response)) {
 					// download or sent, or 404
 					return;
 				}
@@ -1749,9 +1797,12 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
 				}
 				out.print("</head>\n<body" + (sessionObject.state == STATE_LIST ? " onload=\"deleteboxclicked()\">" : ">"));
+				String nonce = Long.toString(ctx.random().nextLong());
+				sessionObject.addNonce(nonce);
 				out.println(
 					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
-					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">" );
+					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
+					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">");
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p>" );
@@ -2265,16 +2316,16 @@ public class WebMail extends HttpServlet
 			i++;
 		}
 		if (i == 0)
-			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _t("No messages") + "</i></td></tr>\n</table>");
+			out.println("<tr><td colspan=\"9\" align=\"center\"><i>" + _t("No messages") + "</i></td></tr>");
+		out.println( "<tr class=\"bottombuttons\"><td colspan=\"9\"><hr></td></tr>");
+		if (sessionObject.folder.getPages() > 1 && i > 30) {
+			// show the buttons again if page is big
+			out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
+			showPageButtons(out, sessionObject.folder);
+			out.println("</td></tr>");
+		}
+		out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 		if (i > 0) {
-			out.println( "<tr class=\"bottombuttons\"><td colspan=\"9\"><hr></td></tr>");
-			if (sessionObject.folder.getPages() > 1 && i > 30) {
-				// show the buttons again if page is big
-				out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
-				showPageButtons(out, sessionObject.folder);
-				out.println("</td></tr>");
-			}
-			out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
 			if( sessionObject.reallyDelete ) {
 				// TODO ngettext
 				out.println("<p class=\"error\">" + _t("Really delete the marked messages?") +
@@ -2290,16 +2341,16 @@ public class WebMail extends HttpServlet
 					//button( INVERT, _t("Invert Selection") ) +
 					//"<br>");
 			}
-			out.print("</td>\n<td colspan=\"4\" align=\"right\">");
-			// moved to config page
-			//out.print(
-			//	_t("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
-			//	"&nbsp;" + 
-			//	button( SETPAGESIZE, _t("Set") ) );
-			out.print("<br>");
-			out.print(button(CONFIGURE, _t("Settings")));
-			out.println("</td></tr>");
 		}
+		out.print("</td>\n<td colspan=\"4\" align=\"right\">");
+		// moved to config page
+		//out.print(
+		//	_t("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
+		//	"&nbsp;" + 
+		//	button( SETPAGESIZE, _t("Set") ) );
+		out.print("<br>");
+		out.print(button(CONFIGURE, _t("Settings")));
+		out.println("</td></tr>");
 		out.println( "</table>");
 	}
 
