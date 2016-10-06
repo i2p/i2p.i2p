@@ -8,6 +8,15 @@
 - Push to Transifex: `tx push -s`
 - Make announcement on Transifex with checkin deadline
 
+- GeoIP: Maxmind update is usually first week of the month, time accordingly
+- wget http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip
+- unzip GeoIPCountryCSV.zip
+- cut -d, -f3-5 < GeoIPCountryWhois.csv|sed 's/"//g' > geoip.txt
+- replace header
+- fix date in header (get date from HEAD)
+- ./makegeoipv6.sh
+- mtn ci geoip.txt geoipv5.dat.gz
+
 
 ## A day or two before
 
