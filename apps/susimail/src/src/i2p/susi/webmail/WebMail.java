@@ -1657,12 +1657,12 @@ public class WebMail extends HttpServlet
 				if (nonce == null || !sessionObject.isValidNonce(nonce)) {
 					// These two strings are already in the router console FormHandler,
 					// so translate with that bundle.
-					sessionObject.error = Translate.getString(
+					sessionObject.error = consoleGetString(
 						"Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.",
-						ctx, CONSOLE_BUNDLE_NAME)
+						ctx)
 						+ '\n' +
-						Translate.getString("If the problem persists, verify that you have cookies enabled in your browser.",
-						ctx, CONSOLE_BUNDLE_NAME);
+						consoleGetString("If the problem persists, verify that you have cookies enabled in your browser.",
+						ctx);
 					isPOST = false;
 				}
 			}
@@ -1832,6 +1832,14 @@ public class WebMail extends HttpServlet
 				out.println( "</form><div class=\"footer\"><hr><p class=\"footer\">susimail &copy; 2004-2005 susi</p></div></div></body>\n</html>");				
 				out.flush();
 		}
+	}
+
+	/**
+	 * Translate with the console bundle.
+	 * @since 0.9.27
+	 */
+	private static String consoleGetString(String s, I2PAppContext ctx) {
+		return Translate.getString(s, ctx, CONSOLE_BUNDLE_NAME);
 	}
 
 	/**
