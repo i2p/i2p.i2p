@@ -32,9 +32,12 @@ import net.i2p.util.Log;
  *  Generate compressed geoipv6.dat.gz file, and
  *  lookup entries in it.
  *
+ *  Public only for command line use,
+ *  not a public API, not for external use.
+ *
  *  @since IPv6
  */
-class GeoIPv6 {
+public class GeoIPv6 {
 
     private static final String GEOIP_DIR_DEFAULT = "geoip";
     private static final String GEOIP_FILE_DEFAULT = "geoipv6.dat.gz";
