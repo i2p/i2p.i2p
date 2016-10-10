@@ -1,15 +1,21 @@
+2016-10-10 zzz
+ * Debian: Don't use glassfish-javaee.jar for jstl.jar (ticket #1793)
+
+2016-10-06 zzz
+ * GeoIP: Update from Maxmind 2016-10-04
+
 2016-10-02 zzz
  * Crypto: Add EdDSA private key spec constructor for hash
  * i2psnark: Add standalone shutdown method
  * i2ptunnel: Registration page layout fixes
  * SusiMail:
    - Show settings button even if no messages
-   - Add nonce to forms
+   - Add nonce to forms (thx Kevin Froman)
 
 2016-09-24 zzz
  * DesktopGUI: Enable by default on Windows
  * i2ptunnel:
-   - Accept default 'mysite.i2p' as a valid spoof host
+   - Don't accept default 'mysite.i2p' as a valid spoof host
    - Don't wrap destination in status message box
  * Reseed: Remove user.mx24.eu as requested
  * Utils: Move SipHashInline from util to crypto
@@ -65,7 +71,7 @@
  * Streaming: Kill accept() when session disconnects
 
 2016-06-25 zzz
- * SSU peer testing: Add implementation (ticket #1752; proposal #126)
+ * SSU peer testing: Add IPv6 implementation (ticket #1752; proposal #126)
  * Utils: Improve random seed initialization
 
 2016-06-22 zzz

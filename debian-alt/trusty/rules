@@ -130,7 +130,8 @@ endif
 
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
-	ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
+	@# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
+	@#ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
 	ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
 
 	@# debian and ubuntu: everywhere

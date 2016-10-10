@@ -67,7 +67,8 @@ usr/share/java/jsp-api-2.2.jar usr/share/i2p/lib/jsp-api.jar
 
 
 # comment out if not building with glassfish-javaee
-usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/jstl.jar
+# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
+#usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/jstl.jar
 usr/share/java/glassfish-appserv-jstl.jar usr/share/i2p/lib/standard.jar
 
 

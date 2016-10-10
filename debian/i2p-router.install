@@ -64,7 +64,8 @@ pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 
 # uncomment if not building with either glassfish-javaee or libjakarta-taglibs-standard-java
 # ubuntu and debian: everywhere
-#pkg-temp/lib/jstl.jar usr/share/i2p/lib
+# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
+pkg-temp/lib/jstl.jar usr/share/i2p/lib
 
 
 # uncomment if not building with either glassfish-javaee or libjstl1.1-java

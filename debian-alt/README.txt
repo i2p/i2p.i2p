@@ -18,3 +18,5 @@ Starting with release 0.9.26, we will attempt to test debian builds
 before the release, and check in any required changes to debian/
 and debian-alt/ before the release, so that the files
 may actually be used to build the release.
+
+See additional documentation in the doc/ directory.
