@@ -222,8 +222,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  IPv6 Peer Testing supported
      */
-///////////////////////////////////// Testing only, set to 0.9.27 before release ////////////////////////////////////////
-    private static final String MIN_V6_PEER_TEST_VERSION = "0.9.26";
+    private static final String MIN_V6_PEER_TEST_VERSION = "0.9.27";
 
 
     public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
