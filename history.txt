@@ -1,3 +1,6 @@
+2016-10-14 zzz
+ * Translations: Update from Transifex
+
 2016-10-10 zzz
  * Debian: Don't use glassfish-javaee.jar for jstl.jar (ticket #1793)
 
