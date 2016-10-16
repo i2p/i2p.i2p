@@ -1,3 +1,5 @@
+* 2016-10-17 0.9.27 released
+
 2016-10-16 zzz
  * Fix test for IPv6 firewalled configuration
 
