@@ -85,6 +85,8 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
      *  @param transportStyle ignored
      *  @since 0.9.20
      */
@@ -93,6 +95,8 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
      *  @param transportStyle ignored
      *  @since 0.9.27
      */

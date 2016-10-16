@@ -813,6 +813,8 @@ public abstract class TransportImpl implements Transport {
     public void recheckReachability() {}
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
      *  @since 0.9.20
      */
     protected boolean isIPv4Firewalled() {
@@ -820,10 +822,12 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
      *  @since 0.9.27
      */
     protected boolean isIPv6Firewalled() {
-        return TransportUtil.isIPv4Firewalled(_context, getStyle());
+        return TransportUtil.isIPv6Firewalled(_context, getStyle());
     }
 
     public boolean isBacklogged(Hash peer) { return false; }
