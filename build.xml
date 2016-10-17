@@ -581,6 +581,7 @@
     <target name="jbigi-nowindows" depends="buildProperties, jbigi-list-changes">
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
+        <delete file="build/jbigi.jar" failonerror="false" quiet="true" />
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.jnilib" />
             <manifest>
@@ -667,6 +668,7 @@
     <target name="jbigi-windows-only" depends="buildProperties, jbigi-list-changes" >
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
+        <delete file="build/jbigi.jar" failonerror="false" quiet="true" />
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
             <manifest>
