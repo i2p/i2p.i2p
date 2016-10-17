@@ -17,7 +17,7 @@ Prep
 - Make a PPA, lets call it 'test'
 - OPTIONAL: Go to i2p.packages PPA and copy over existing I2P to your PPA:
   (select "copy existing binaries")
-    trusty, vivid, wily, xenial
+    trusty, vivid, wily, xenial, yakkety, zesty
     not precise (only if building for precise which you probably aren't)
     not utopic (obsolete, disabled by launchpad)
 - Go to i2p.packages PPA and copy over service-wrapper-java to your PPA.
@@ -25,7 +25,7 @@ Prep
   (select "copy existing binaries")
     trusty
     not precise (only if building for precise which you probably aren't)
-    not vivid, wily, xenial (more recent versions 3.5.25-2 or 3.5.26-3 are in official launchpad)
+    not vivid, wily, xenial, yakkety, zesty (more recent versions 3.5.25-2 or 3.5.26-3 are in official launchpad)
     not utopic (obsolete, disabled by launchpad)
 
 - you need the following packages
@@ -101,7 +101,7 @@ So the build isn't done until both arch builds are complete.
 Don't
 
 
-If it works, copy trusty to vivid, wily, and xenial in your PPA
+If it works, copy trusty to vivid, wily, xenial, yakkety, zesty in your PPA
   (select "copy existing binaries")
   Wait a few minutes for that to happen
 
@@ -124,7 +124,7 @@ Add your PPA following the instructions at http://i2p-projekt.i2p/en/download/de
 Release
 -------
 
-Then copy trusty, vivid, wily, and xenial from your PPA to the i2p-maintainers PPA
+Then copy trusty, vivid, wily, xenial, yakkety, zesty, from your PPA to the i2p-maintainers PPA
   (select "copy existing binaries")
   Copy trusty first and wait for it to be published in i2p-maintainers or the others will fail.
 

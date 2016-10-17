@@ -372,16 +372,16 @@ Debian wrapper.config to try to prevent confusion.
 @@ -185,7 +185,7 @@
  msgstr ""
  
- #: ../i2prouter:1875
+ #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1880
+ #: ../i2prouter:1879
 @@ -193,5 +193,5 @@
  msgstr ""
  
- #: ../i2prouter:1883
+ #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""

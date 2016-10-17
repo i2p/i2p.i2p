@@ -2219,7 +2219,9 @@
                 <exclude name="installer/resources/geoip.txt"/>
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
+          <!--
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
+           -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
           <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
@@ -2306,7 +2308,9 @@
           <!--
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
            -->
+          <!--
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
+           -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
           <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
@@ -2358,7 +2362,9 @@
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+          <!--
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
+           -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
           <!--
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
@@ -2375,7 +2381,9 @@
                 <exclude name="installer/resources/geoip.txt"/>
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
+          <!--
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
+           -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
           <!--
                 <exclude name="apps/jetty/apache-tomcat/**"/>
