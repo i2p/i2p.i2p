@@ -1,3 +1,9 @@
+i2p (0.9.27-1~deb8u+1) stable; urgency=medium
+
+  * Backport to Jessie
+
+ -- zzz on i2p <zzz@i2pmail.org>  Tue, 18 Oct 2016 12:12:12 +0000
+
 i2p (0.9.26-1~deb8u+1) stable; urgency=medium
 
   * Backport to Jessie
