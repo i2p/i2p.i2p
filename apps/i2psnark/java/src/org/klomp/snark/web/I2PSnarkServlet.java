@@ -1485,6 +1485,8 @@ public class I2PSnarkServlet extends BasicServlet {
             remainingSeconds = -1;
         
         MetaInfo meta = snark.getMetaInfo();
+        String b64 = Base64.encode(snark.getInfoHash());
+        String b64Short = b64.substring(0, 6);
         // isValid means isNotMagnet
         boolean isValid = meta != null;
         boolean isMultiFile = isValid && meta.getFiles() != null;
@@ -1542,57 +1544,59 @@ public class I2PSnarkServlet extends BasicServlet {
                     img = "complete";
                     txt = _t("Complete");
                 }
-                if (curPeers > 0 && !showPeers)
+                if (curPeers > 0 && !showPeers) {
                     statusString = toThemeImg(img, "", txt) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
-                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, b64, null, null) + '#' + b64Short + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
-                else
+                } else {
                     statusString = toThemeImg(img, "", txt) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + txt +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
+                }
             } else {
                 statusString = toThemeImg("complete", "", _t("Complete")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("Complete");
             }
         } else {
-            if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
+            if (isRunning && curPeers > 0 && downBps > 0 && !showPeers) {
                 statusString = toThemeImg("downloading", "", _t("OK")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("OK") +
-                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, b64, null, null) + '#' + b64Short + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
-            else if (isRunning && curPeers > 0 && downBps > 0)
+            } else if (isRunning && curPeers > 0 && downBps > 0) {
                 statusString = toThemeImg("downloading", "", _t("OK")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("OK") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
-            else if (isRunning && curPeers > 0 && !showPeers)
+            } else if (isRunning && curPeers > 0 && !showPeers) {
                 statusString = toThemeImg("stalled", "", _t("Stalled")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("Stalled") +
-                               ": <a href=\"" + uri + getQueryString(req, Base64.encode(snark.getInfoHash()), null, null) + "\">" +
+                               ": <a href=\"" + uri + getQueryString(req, b64, null, null) + '#' + b64Short + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
-            else if (isRunning && curPeers > 0)
+            } else if (isRunning && curPeers > 0) {
                 statusString = toThemeImg("stalled", "", _t("Stalled")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("Stalled") +
                                ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
-            else if (isRunning && knownPeers > 0)
+            } else if (isRunning && knownPeers > 0) {
                 statusString = toThemeImg("nopeers", "", _t("No Peers")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("No Peers") +
                                ": 0" + thinsp(noThinsp) + knownPeers ;
-            else if (isRunning)
+            } else if (isRunning) {
                 statusString = toThemeImg("nopeers", "", _t("No Peers")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("No Peers");
-            else
+            } else {
                 statusString = toThemeImg("stopped", "", _t("Stopped")) + "</td>" +
                                "<td class=\"snarkTorrentStatus\">" + _t("Stopped");
+            }
         }
         
-        out.write("<tr class=\"" + rowClass + "\">");
+        out.write("<tr class=\"" + rowClass + "\" id=\"" + b64Short + "\">");
         out.write("<td class=\"center\">");
         out.write(statusString + "</td>\n\t");
 
@@ -1697,7 +1701,6 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction\">");
-        String b64 = Base64.encode(snark.getInfoHash());
         if (snark.isChecking()) {
             // show no buttons
         } else if (isRunning) {
