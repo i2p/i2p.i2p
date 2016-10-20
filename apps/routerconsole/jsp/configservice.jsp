@@ -51,7 +51,7 @@
  </div>
 <%
    }  
-   if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
+   if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) {
 %>
  <h3><%=intl._t("Run on startup")%></h3>
  <p><%=intl._t("You can control whether I2P is run on startup or not by selecting one of the following options - I2P will install (or remove) a service accordingly.")%> 
