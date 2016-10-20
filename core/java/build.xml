@@ -47,6 +47,17 @@
     </condition>
     <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath.mod2}${javac.classpath.mod3}${javac.classpath}" />
 
+    <!-- jar classpath fixups -->
+    <condition property="gettext.jar" value="/usr/share/java/libintl.jar" else="" >
+        <istrue value="${with-gettext-base}" />
+    </condition>
+    <condition property="getopt.jar" value="/usr/share/java/gnu-getopt.jar" else="" >
+        <istrue value="${with-libgetopt-java}" />
+    </condition>
+    <condition property="httpclient.jar" value="/usr/share/java/httpclient.jar /usr/share/java/httpcore.jar" else="" >
+        <istrue value="${with-libhttpclient-java}" />
+    </condition>
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -85,6 +96,7 @@
             <!-- the getopt translation files -->
             <fileset dir="src" includes="${translation.includes}" />
             <manifest>
+                <attribute name="Class-Path" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
                 <attribute name="Specification-Title" value="I2P Core API" />
                 <attribute name="Specification-Version" value="${release.number}" />
                 <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
