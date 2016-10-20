@@ -1,3 +1,10 @@
+2016-10-20 zzz
+ * Build: Add library jars to i2p.jar classpath for Debian builds
+ * Console: Fix HTML error on /configservice
+ * Debian: Update package descriptions, allow Java 9
+ * i2psnark: Add ids to rows, add to per-torrent show peers link
+ * SSU: Fix minimum version check for IPv6 peer test (ticket #1861)
+
 * 2016-10-17 0.9.27 released
 
 2016-10-16 zzz

@@ -3238,7 +3238,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 continue;
             if (isIPv6) {
                 String v = peerInfo.getVersion();
-                if (VersionComparator.comp(v, MIN_SIGTYPE_VERSION) < 0)
+                if (VersionComparator.comp(v, MIN_V6_PEER_TEST_VERSION) < 0)
                     continue;
             }
             ip = null;
