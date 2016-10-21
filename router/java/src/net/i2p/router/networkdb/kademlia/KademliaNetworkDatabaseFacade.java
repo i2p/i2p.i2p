@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.DatabaseEntry;
@@ -1080,7 +1081,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                     try {
                         KeyCertificate kc = c.toKeyCertificate();
                         SigType type = kc.getSigType();
-                        if (type == null || !type.isAvailable()) {
+                        if (type == null || !type.isAvailable() || type.getBaseAlgorithm() == SigAlgo.RSA) {
                             failPermanently(d);
                             String stype = (type != null) ? type.toString() : Integer.toString(kc.getSigTypeCode());
                             if (_log.shouldLog(Log.WARN))
