@@ -30,6 +30,7 @@ public class CryptoTestSuite {
         suite.addTestSuite(KeyGeneratorTest.class);
         suite.addTestSuite(SHA1HashTest.class);
         suite.addTestSuite(SHA256Test.class);
+        suite.addTestSuite(SipHashInlineTest.class);
         
         return suite;
     }

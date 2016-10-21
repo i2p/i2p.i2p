@@ -1,4 +1,4 @@
-package net.i2p.util;
+package net.i2p.crypto;
 
 /*
  *  As pulled from https://github.com/nahi/siphash-java-inline
