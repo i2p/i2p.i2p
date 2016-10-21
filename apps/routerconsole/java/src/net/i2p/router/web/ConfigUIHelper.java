@@ -73,6 +73,14 @@ public class ConfigUIHelper extends HelperBase {
      *  As of 0.9.12, ISO 639-2 three-letter codes are supported also.
      */
     private static final String langs[][] = {
+        //
+        // Note: any additions, also add to:
+        // apps/i2psnark/java/src/org/klomp/snark/standalone/ConfigUIHelper.java
+        // apps/routerconsole/jsp/console.jsp
+        // apps/routerconsole/jsp/home.jsp
+        // .tx/config
+        // New lang_xx flags: Add to top-level build.xml
+        //
         { "ar", "lang_ar", _x("Arabic"), null },
         { "cs", "cz", _x("Czech"), null },
         { "da", "dk", _x("Danish"), null },
@@ -83,6 +91,7 @@ public class ConfigUIHelper extends HelperBase {
         { "es", "es", _x("Spanish"), null },
         { "fi", "fi", _x("Finnish"), null },
         { "fr", "fr", _x("French"), null },
+        { "gl", "lang_gl", _x("Galician"), null },
         { "hu", "hu", _x("Hungarian"), null },
         { "it", "it", _x("Italian"), null },
         { "ja", "jp", _x("Japanese"), null },

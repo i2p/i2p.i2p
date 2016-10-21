@@ -90,6 +90,7 @@ trans.de = apps/routerconsole/locale-news/messages_de.po
 trans.es = apps/routerconsole/locale-news/messages_es.po
 trans.fi = apps/routerconsole/locale-news/messages_fi.po
 trans.fr = apps/routerconsole/locale-news/messages_fr.po
+trans.gl = apps/routerconsole/locale-news/messages_gl.po
 trans.he = apps/routerconsole/locale-news/messages_he.po
 ;; Java converts id to in
 trans.id = apps/routerconsole/locale-news/messages_in.po
@@ -125,6 +126,7 @@ trans.et_EE = apps/routerconsole/locale-countries/messages_et.po
 trans.fa = apps/routerconsole/locale-countries/messages_fa.po
 trans.fi = apps/routerconsole/locale-countries/messages_fi.po
 trans.fr = apps/routerconsole/locale-countries/messages_fr.po
+trans.gl = apps/routerconsole/locale-countries/messages_gl.po
 trans.hu = apps/routerconsole/locale-countries/messages_hu.po
 trans.it = apps/routerconsole/locale-countries/messages_it.po
 trans.ja = apps/routerconsole/locale-countries/messages_ja.po
@@ -182,6 +184,7 @@ trans.el = apps/susidns/locale/messages_el.po
 trans.es = apps/susidns/locale/messages_es.po
 trans.fi = apps/susidns/locale/messages_fi.po
 trans.fr = apps/susidns/locale/messages_fr.po
+trans.gl = apps/susidns/locale/messages_gl.po
 trans.hu = apps/susidns/locale/messages_hu.po
 trans.it = apps/susidns/locale/messages_it.po
 trans.ja = apps/susidns/locale/messages_ja.po
@@ -211,6 +214,7 @@ trans.es = apps/desktopgui/locale/messages_es.po
 trans.fa = apps/desktopgui/locale/messages_fa.po
 trans.fi = apps/desktopgui/locale/messages_fi.po
 trans.fr = apps/desktopgui/locale/messages_fr.po
+trans.gl = apps/desktopgui/locale/messages_gl.po
 trans.hu = apps/desktopgui/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/desktopgui/locale/messages_in.po
@@ -242,6 +246,7 @@ trans.de = apps/susimail/locale/messages_de.po
 trans.es = apps/susimail/locale/messages_es.po
 trans.fi = apps/susimail/locale/messages_fi.po
 trans.fr = apps/susimail/locale/messages_fr.po
+trans.gl = apps/susimail/locale/messages_gl.po
 trans.hu = apps/susimail/locale/messages_hu.po
 ;; Java converts id to in
 trans.id = apps/susimail/locale/messages_in.po
@@ -358,6 +363,7 @@ trans.de = apps/ministreaming/locale/messages_de.po
 trans.es = apps/ministreaming/locale/messages_es.po
 trans.fi = apps/ministreaming/locale/messages_fi.po
 trans.fr = apps/ministreaming/locale/messages_fr.po
+trans.gl = apps/ministreaming/locale/messages_gl.po
 ;; Java converts id to in
 trans.id = apps/ministreaming/locale/messages_in.po
 trans.it = apps/ministreaming/locale/messages_it.po
