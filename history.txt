@@ -1,3 +1,10 @@
+2016-10-21 zzz
+ * Crypto: Actually use a random nonzero byte in ElGamal
+ * Data: Cache serialized leasesets on floodfills
+ * NetDB: Disallow RSA for RI or LS
+ * Tomcat 6.0.47
+ * Wrapper 3.5.30
+
 2016-10-20 zzz
  * Build: Add library jars to i2p.jar classpath for Debian builds
  * Console: Fix HTML error on /configservice
