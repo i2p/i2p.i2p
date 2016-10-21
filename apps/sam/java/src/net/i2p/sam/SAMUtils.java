@@ -26,7 +26,6 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.SigningPrivateKey;
-import net.i2p.util.Log;
 
 /**
  * Miscellaneous utility methods used by SAM protocol handlers.
