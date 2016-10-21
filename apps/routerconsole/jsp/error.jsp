@@ -12,7 +12,8 @@
     final String ERROR_MESSAGE = (String) request.getAttribute("javax.servlet.error.message");
     if (ERROR_CODE != null && ERROR_MESSAGE != null) {
         // this is deprecated but we don't want sendError()
-        response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);
+        //response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);
+        response.setStatus(ERROR_CODE.intValue());
     }
     // If it can't find the iframe or viewtheme.jsp I wonder if the whole thing blows up...
 %>

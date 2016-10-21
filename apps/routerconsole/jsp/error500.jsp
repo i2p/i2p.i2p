@@ -13,7 +13,8 @@
     final Throwable ERROR_THROWABLE = (Throwable) request.getAttribute("javax.servlet.error.exception");
     if (ERROR_CODE != null && ERROR_MESSAGE != null) {
         // this is deprecated but we don't want sendError()
-        response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);
+        //response.setStatus(ERROR_CODE.intValue(), ERROR_MESSAGE);
+        response.setStatus(ERROR_CODE.intValue());
     }
 %>
 <html><head>

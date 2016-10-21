@@ -2,7 +2,7 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
-    response.setStatus(404, "Not Found");
+    response.setStatus(404);
 %>
 <html><head>
 <%@include file="css.jsi" %>

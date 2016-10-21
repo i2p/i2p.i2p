@@ -19,7 +19,7 @@
 Searching...
 <%
     } else {
-        response.setStatus(403, "Bad");
+        response.setStatus(403);
         String query = request.getParameter("query");
         if (query == null || query.trim().length() <= 0) {
 %>
