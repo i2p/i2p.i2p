@@ -13,12 +13,18 @@ import net.i2p.util.SystemVersion;
 /**
  * Get the MTU for the network interface of an address.
  * Not available until Java 6 / Android API 9.
- * @since 0.9.2
+ *
+ * Public only for command line test.
+ * Not for external use, not a public API.
+ *
+ * @since 0.9.2. public since 0.9.27
  */
-abstract class MTU {
+public class MTU {
 
     private static final boolean hasMTU = SystemVersion.isJava6();
     
+    private MTU() {};
+
     /**
      * The MTU for the socket interface, if available.
      * Not available for Java 5.
@@ -100,8 +106,8 @@ abstract class MTU {
         return Math.max(PeerState.MIN_MTU, Math.min(PeerState.LARGE_MTU, rv));
     }
 
-/****
     public static void main(String args[]) {
+/****
         System.out.println("Cmd line interfaces:");
         for (int i = 0; i < args.length; i++) {
             try {
@@ -112,6 +118,7 @@ abstract class MTU {
             }
         }
         System.out.println("All interfaces:");
+****/
         try {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
             if (ifcs != null) {
@@ -119,7 +126,7 @@ abstract class MTU {
                     NetworkInterface ifc = ifcs.nextElement();
                     for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                         InetAddress addr = addrs.nextElement();
-                        System.out.println("MTU of " + addr.getHostAddress() + " is " + getMTU(addr));
+                        System.out.println("I2P MTU for " + addr.getHostAddress() + " is " + getMTU(addr));
                     }
                 }
             }
@@ -127,5 +134,4 @@ abstract class MTU {
              System.out.println("no interfaces");
         }
     }
-****/
 }
