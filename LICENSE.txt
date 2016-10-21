@@ -276,8 +276,8 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 6.0.44:
-   Copyright 1999-2015 The Apache Software Foundation
+   Tomcat 6.0.47:
+   Copyright 1999-2016 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt
 
