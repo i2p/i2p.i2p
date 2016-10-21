@@ -866,7 +866,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     @SuppressWarnings("unchecked")
     private ReplyWaiter sendQuery(NodeInfo nInfo, Map<String, Object> map, boolean repliable) {
         if (nInfo.equals(_myNodeInfo))
-            throw new IllegalArgumentException("wtf don't send to ourselves");
+            throw new IllegalArgumentException("don't send to ourselves");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending query to: " + nInfo);
         if (nInfo.getDestination() == null) {
@@ -916,7 +916,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     @SuppressWarnings("unchecked")
     private boolean sendResponse(NodeInfo nInfo, MsgID msgID, Map<String, Object> map) {
         if (nInfo.equals(_myNodeInfo))
-            throw new IllegalArgumentException("wtf don't send to ourselves");
+            throw new IllegalArgumentException("don't send to ourselves");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending response to: " + nInfo);
         if (nInfo.getDestination() == null) {
@@ -946,7 +946,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      */
     private boolean sendError(NodeInfo nInfo, MsgID msgID, Map<String, Object> map) {
         if (nInfo.equals(_myNodeInfo))
-            throw new IllegalArgumentException("wtf don't send to ourselves");
+            throw new IllegalArgumentException("don't send to ourselves");
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending error to: " + nInfo);
         if (nInfo.getDestination() == null) {
@@ -1004,7 +1004,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             return false;
         }
         if (dest.calculateHash().equals(_myNodeInfo.getHash()))
-            throw new IllegalArgumentException("wtf don't send to ourselves");
+            throw new IllegalArgumentException("don't send to ourselves");
         byte[] payload = BEncoder.bencode(map);
         if (_log.shouldLog(Log.DEBUG)) {
             ByteArrayInputStream bais = new ByteArrayInputStream(payload);
@@ -1020,7 +1020,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             payload = dgMaker.makeI2PDatagram(payload);
             if (payload == null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("WTF DGM fail");
+                    _log.warn("DGM fail");
                 return false;
             }
         }
@@ -1040,7 +1040,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 _txBytes.addAndGet(payload.length);
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("WTF sendMessage fail");
+                    _log.warn("sendMessage fail");
             }
             return success;
         } catch (I2PSessionException ise) {

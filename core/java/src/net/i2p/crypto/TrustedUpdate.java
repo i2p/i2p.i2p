@@ -493,7 +493,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + uee.getMessage());
+            throw new RuntimeException("your JVM doesnt support utf-8? " + uee.getMessage());
         } catch (IOException ioe) {
             return "";
         } finally {
@@ -532,7 +532,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + uee.getMessage());
+            throw new RuntimeException("your JVM doesnt support utf-8? " + uee.getMessage());
         } catch (IOException ioe) {
             return "";
         } finally {
@@ -746,7 +746,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         try {
             versionRawBytes = version.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + e.getMessage());
+            throw new RuntimeException("your JVM doesnt support utf-8? " + e.getMessage());
         }
 
         System.arraycopy(versionRawBytes, 0, versionHeader, 0, versionRawBytes.length);

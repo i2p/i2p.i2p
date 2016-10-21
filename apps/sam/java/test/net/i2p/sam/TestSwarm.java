@@ -97,7 +97,7 @@ public class TestSwarm {
                 flooder.closed();
                 _log.debug("Connection " + flooder.getConnectionId() + " closed to " + flooder.getDestination());
             } else {
-                _log.error("wtf, not connected to " + id + " but we were just closed?");
+                _log.error("not connected to " + id + " but we were just closed?");
             }
         }
         public void streamDataReceived(int id, byte data[], int offset, int length) {
@@ -109,7 +109,7 @@ public class TestSwarm {
             if (flooder != null) {
                 flooder.received(length, value);
             } else {
-                _log.error("wtf, not connected to " + id + " but we received " + value + "?");
+                _log.error("not connected to " + id + " but we received " + value + "?");
             }
         }
         public void streamConnectedReceived(String dest, int id) {  
@@ -146,7 +146,7 @@ public class TestSwarm {
                 String serverVersion = _eventHandler.waitForHelloReply();
                 _log.debug("Hello reply found: " + serverVersion);
                 if (serverVersion == null)
-                    throw new IOException("wtf, hello failed?");
+                    throw new IOException("hello failed?");
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + _destFile + " " + _conOptions + "\n";
                 _samOut.write(DataHelper.getUTF8(req));
                 _samOut.flush();

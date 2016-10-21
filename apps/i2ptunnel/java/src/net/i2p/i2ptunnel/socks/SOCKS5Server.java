@@ -168,7 +168,7 @@ class SOCKS5Server extends SOCKSServer {
     private int manageRequest(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
         int socksVer = in.readUnsignedByte();
         if (socksVer != SOCKS_VERSION_5) {
-            _log.debug("error in SOCKS5 request (protocol != 5? wtf?)");
+            _log.debug("error in SOCKS5 request (protocol != 5?)");
             throw new SOCKSException("Invalid protocol version in request: " + socksVer);
         }
 
@@ -221,7 +221,7 @@ class SOCKS5Server extends SOCKSServer {
             {
                 int addrLen = in.readUnsignedByte();
                 if (addrLen == 0) {
-                    _log.debug("0-sized address length? wtf?");
+                    _log.debug("0-sized address length?");
                     throw new SOCKSException("Illegal DOMAINNAME length");
                 }
                 byte addr[] = new byte[addrLen];
@@ -315,7 +315,7 @@ class SOCKS5Server extends SOCKSServer {
             dreps.writeBytes(domainName);
             break;
         default:
-            _log.error("unknown address type passed to sendReply() (" + Integer.toHexString(addressType) + ")! wtf?");
+            _log.error("unknown address type passed to sendReply() (" + Integer.toHexString(addressType) + ")!");
             return;
         }
 

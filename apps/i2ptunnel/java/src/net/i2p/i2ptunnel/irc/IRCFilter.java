@@ -64,7 +64,7 @@ abstract class IRCFilter {
                 idx++;
             command = field[idx++].toUpperCase(Locale.US);
         } catch (IndexOutOfBoundsException ioobe) {
-            // wtf, server sent borked command?
+            // server sent borked command?
            //_log.warn("Dropping defective message: index out of bounds while extracting command.");
            return null;
         }
@@ -282,7 +282,7 @@ abstract class IRCFilter {
         
         
         if(field[0].charAt(0)==':')
-            return null; // wtf
+            return null; // ???
         
         String command = field[0].toUpperCase(Locale.US);
 

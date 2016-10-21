@@ -170,9 +170,9 @@ public class SimpleScheduler {
                 _log.debug("Running: " + _timedEvent);
             long before = System.currentTimeMillis();
             if (_log.shouldLog(Log.WARN) && before < _scheduled - 100)
-                _log.warn(_name + " wtf, early execution " + (_scheduled - before) + ": " + _timedEvent);
+                _log.warn(_name + " early execution " + (_scheduled - before) + ": " + _timedEvent);
             else if (_log.shouldLog(Log.WARN) && before > _scheduled + 1000)
-                _log.warn(" wtf, late execution " + (before - _scheduled) + ": " + _timedEvent + debug());
+                _log.warn("late execution " + (before - _scheduled) + ": " + _timedEvent + debug());
             try {
                 _timedEvent.timeReached();
             } catch (Throwable t) {
@@ -180,7 +180,7 @@ public class SimpleScheduler {
             }
             long time = System.currentTimeMillis() - before;
             if (time > 1000 && _log.shouldLog(Log.WARN))
-                _log.warn(_name + " wtf, event execution took " + time + ": " + _timedEvent);
+                _log.warn(_name + " event execution took " + time + ": " + _timedEvent);
             if (_log.shouldLog(Log.INFO)) {
                  // this call is slow - iterates through a HashMap -
                  // would be better to have a local AtomicLong if we care

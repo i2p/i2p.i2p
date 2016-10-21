@@ -661,7 +661,7 @@ public class DataHelper {
         }
         
         if (rv < 0)
-            throw new DataFormatException("wtf, fromLong got a negative? " + rv + " numBytes=" + numBytes);
+            throw new DataFormatException("fromLong got a negative? " + rv + " numBytes=" + numBytes);
         return rv;
     }
     
@@ -753,7 +753,7 @@ public class DataHelper {
             rv |= src[i] & 0xFF;
         }
         if (rv < 0)
-            throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
+            throw new IllegalArgumentException("fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
         return rv;
     }
     
@@ -774,7 +774,7 @@ public class DataHelper {
             rv |= src[i] & 0xFF;
         }
         if (rv < 0)
-            throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
+            throw new IllegalArgumentException("fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
         return rv;
     }
     

@@ -1136,7 +1136,7 @@ class Connection {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there are unacked packets");
                 return;
             }
-            // wtf, this shouldn't have been scheduled
+            // this shouldn't have been scheduled
             if (_options.getInactivityTimeout() <= 0) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is no timer...");
                 return;

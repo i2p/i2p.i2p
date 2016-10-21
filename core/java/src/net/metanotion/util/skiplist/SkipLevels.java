@@ -202,11 +202,11 @@ public class SkipLevels<K extends Comparable<? super K>, V> implements Flushable
 		if((bottom.nKeys == 0) && (sl.first != bottom)) {
 			// from debugging other problems
 			if (res == null) {
-				_log.warn("WTF killing with no return value " + print());
+				_log.warn("killing with no return value " + print());
 			} else if (res[1] == null) {
-				_log.warn("WTF killing with no return value 1 " + print());
+				_log.warn("killing with no return value 1 " + print());
 			} else if (res[1] != this) {
-				_log.warn("WTF killing with return value not us " + res[1] + ' ' + print());
+				_log.warn("killing with return value not us " + res[1] + ' ' + print());
 			}
 			this.killInstance();
 		}

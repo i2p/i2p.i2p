@@ -542,7 +542,7 @@ class ConnectionPacketHandler {
             }
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Received a packet for the wrong connection?  wtf: " 
+                _log.warn("Received a packet for the wrong connection? " 
                           + con + " / " + packet);
             return;
         }

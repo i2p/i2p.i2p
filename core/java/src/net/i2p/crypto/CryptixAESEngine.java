@@ -214,7 +214,7 @@ public final class CryptixAESEngine extends AESEngine {
                 sessionKey.setPreparedKey(key);
             } catch (InvalidKeyException ike) {
                 _log.log(Log.CRIT, "Invalid key", ike);
-                throw new IllegalArgumentException("wtf, invalid key?  " + ike.getMessage());
+                throw new IllegalArgumentException("invalid key?  " + ike.getMessage());
             }
         }
         
@@ -241,7 +241,7 @@ public final class CryptixAESEngine extends AESEngine {
                 sessionKey.setPreparedKey(key);
             } catch (InvalidKeyException ike) {
                 _log.log(Log.CRIT, "Invalid key", ike);
-                throw new IllegalArgumentException("wtf, invalid key?  " + ike.getMessage());
+                throw new IllegalArgumentException("invalid key?  " + ike.getMessage());
             }
         }
 

@@ -403,10 +403,10 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
                     throw new RuntimeException("read=" + read + " expected " + orig.length);
                 for (int j = 0; j < read; j++) {
                     if (readBuf[j] != orig[j])
-                        throw new RuntimeException("wtf, j=" + j + " readBuf=" + readBuf[j] + " orig=" + orig[j]);
+                        throw new RuntimeException("j=" + j + " readBuf=" + readBuf[j] + " orig=" + orig[j]);
                 }
                 boolean ok = (-1 == i.read());
-                if (!ok) throw new RuntimeException("wtf, not EOF after the data?");
+                if (!ok) throw new RuntimeException("not EOF after the data?");
                 //System.out.println("Match ok");
                 // try both closing and not
                 if ((k % 2) != 0)

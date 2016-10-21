@@ -173,7 +173,7 @@ public class BSkipLevels<K extends Comparable<? super K>, V> extends SkipLevels<
 				// TODO also check that the level[] array is not out-of-order
 			} else {
 				if (bf.log.shouldLog(Log.WARN))
-					bf.log.warn("WTF " + this + " i = " + i + " of " +
+					bf.log.warn(this + " i = " + i + " of " +
 						    lps.length + " / " + levels.length +
 						    " valid levels but page is zero");
 				levels[i] = null;

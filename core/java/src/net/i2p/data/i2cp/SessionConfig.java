@@ -155,7 +155,7 @@ public class SessionConfig extends DataStructureImpl {
         }
         byte data[] = getBytes();
         if (data == null) {
-            //if (_log.shouldLog(Log.WARN)) _log.warn("Bytes could not be found - wtf?");
+            //if (_log.shouldLog(Log.WARN)) _log.warn("Bytes could not be found");
             return false;
         }
 

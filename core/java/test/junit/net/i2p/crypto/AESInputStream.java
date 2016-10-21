@@ -195,7 +195,7 @@ public class AESInputStream extends FilterInputStream {
             throw new IOException("Error decrypting - no data to decrypt");
         
         if (_decryptedSize != 0)
-            throw new IOException("wtf, decrypted size is not 0? " + _decryptedSize);
+            throw new IOException("decrypted size is not 0? " + _decryptedSize);
         
         _context.aes().decrypt(_encryptedBuf, 0, _encryptedBuf, 0, _key, _lastBlock, BLOCK_SIZE);
         DataHelper.xor(_encryptedBuf, 0, _lastBlock, 0, _encryptedBuf, 0, BLOCK_SIZE);
