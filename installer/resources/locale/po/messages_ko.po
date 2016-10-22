@@ -1,0 +1,199 @@
+# I2P
+# Copyright (C) 2012 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# HelloKS <kqwe1859@gmail.com>, 2015
+# zzzi2p, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-06 13:42+0000\n"
+"PO-Revision-Date: 2016-10-22 13:33+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../i2prouter:223
+msgid "Failed to load the wrapper"
+msgstr "wrapper 불러오기에 실패했습니다"
+
+#: ../i2prouter:988 ../i2prouter:1016 ../i2prouter:1090 ../i2prouter:1118
+#: ../i2prouter:1139
+#, sh-format
+msgid "$APP_LONG_NAME is already running."
+msgstr "$APP_LONG_NAME 은 이미 실행중입니다."
+
+#: ../i2prouter:999
+#, sh-format
+msgid "Running $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME 실행중"
+
+#: ../i2prouter:1023
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME 기다리는 중"
+
+#: ../i2prouter:1070
+#, sh-format
+msgid "WARNING: $APP_LONG_NAME may have failed to start."
+msgstr "경고: $APP_LONG_NAME 시작에 실패했을지도 모릅니다."
+
+#: ../i2prouter:1084 ../i2prouter:1112 ../i2prouter:1318 ../i2prouter:1607
+msgid "Must be root to perform this action."
+msgstr "이 작업을 수행하기 위해선 루트가 필요합니다."
+
+#: ../i2prouter:1128
+#, sh-format
+msgid "Starting $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME 시작중"
+
+#: ../i2prouter:1150
+#, sh-format
+msgid "Stopping $APP_LONG_NAME"
+msgstr "$APP_LONG_NAME 정지중"
+
+#: ../i2prouter:1154 ../i2prouter:1222 ../i2prouter:1775
+#, sh-format
+msgid "$APP_LONG_NAME was not running."
+msgstr "$APP_LONG_NAME 은 실행되고 있지 않았습니다."
+
+#: ../i2prouter:1167 ../i2prouter:1175 ../i2prouter:1237 ../i2prouter:1245
+#, sh-format
+msgid "Unable to stop $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME 을 멈출 수 없습니다."
+
+#: ../i2prouter:1193
+#, sh-format
+msgid "Waiting for $APP_LONG_NAME to exit"
+msgstr "$APP_LONG_NAME 이 종료되기까지 기다리는 중"
+
+#: ../i2prouter:1207
+#, sh-format
+msgid "Failed to stop $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME 정지에 실패했습니다."
+
+#: ../i2prouter:1210
+#, sh-format
+msgid "Stopped $APP_LONG_NAME."
+msgstr "$APP_LONG_NAME 정지됨"
+
+#: ../i2prouter:1218
+#, sh-format
+msgid "Stopping $APP_LONG_NAME gracefully"
+msgstr "우아하게 $APP_LONG_NAME 정지하는 중"
+
+#: ../i2prouter:1264
+#, sh-format
+msgid "$APP_LONG_NAME is not running."
+msgstr "$APP_LONG_NAME 은 실행중이 아닙니다."
+
+#: ../i2prouter:1269
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid"
+msgstr "$APP_LONG_NAME 은 실행중입니다: PID:$pid"
+
+#: ../i2prouter:1272
+#, sh-format
+msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME 은 실행중입니다: PID:$pid, Wrapper:$STATUS,Java:$JAVASTATUS"
+
+#: ../i2prouter:1325 ../i2prouter:1337 ../i2prouter:1356 ../i2prouter:1373
+#: ../i2prouter:1440 ../i2prouter:1460 ../i2prouter:1474 ../i2prouter:1488
+#: ../i2prouter:1516 ../i2prouter:1554 ../i2prouter:1589
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is already installed."
+msgstr "$APP_LONG_NAME 데몬은 이미 설치되어 있습니다."
+
+#: ../i2prouter:1328 ../i2prouter:1343 ../i2prouter:1445 ../i2prouter:1477
+#: ../i2prouter:1491 ../i2prouter:1505 ../i2prouter:1519 ../i2prouter:1557
+#: ../i2prouter:1592
+#, sh-format
+msgid "Installing the $APP_LONG_NAME daemon"
+msgstr "$APP_LONG_NAME 데몬 설치 중"
+
+#: ../i2prouter:1599
+#, sh-format
+msgid "Install not currently supported for $DIST_OS"
+msgstr "설치는 현재 $DIST_OS 에서 지원되지 않습니다"
+
+#: ../i2prouter:1615 ../i2prouter:1628 ../i2prouter:1642 ../i2prouter:1651
+#: ../i2prouter:1661 ../i2prouter:1685 ../i2prouter:1698 ../i2prouter:1710
+#: ../i2prouter:1728 ../i2prouter:1741 ../i2prouter:1755
+#, sh-format
+msgid "Removing $APP_LONG_NAME daemon"
+msgstr "$APP_LONG_NAME 데몬 제거중"
+
+#: ../i2prouter:1621 ../i2prouter:1636 ../i2prouter:1645 ../i2prouter:1655
+#: ../i2prouter:1666 ../i2prouter:1679 ../i2prouter:1691 ../i2prouter:1704
+#: ../i2prouter:1722 ../i2prouter:1735 ../i2prouter:1749 ../i2prouter:1760
+#, sh-format
+msgid "The $APP_LONG_NAME daemon is not currently installed."
+msgstr "$APP_LONG_NAME 데몬은 현재 설치되어 있지 않습니다."
+
+#: ../i2prouter:1764
+#, sh-format
+msgid "Remove not currently supported for $DIST_OS"
+msgstr "제거는 현재 $DIST_OS 에서 지원되지 않습니다"
+
+#: ../i2prouter:1851
+msgid "Commands:"
+msgstr "명령어:"
+
+#: ../i2prouter:1852
+msgid "Launch in the current console."
+msgstr "현재 콘솔에서 실행."
+
+#: ../i2prouter:1853
+msgid "Start in the background as a daemon process."
+msgstr "데몬 프로세스로 백그라운드에서 시작."
+
+#: ../i2prouter:1854
+msgid "Stop if running as a daemon or in another console."
+msgstr "다른 콘솔이나 데몬으로 실행중일 경우 정지."
+
+#: ../i2prouter:1855
+msgid "Stop gracefully, may take up to 11 minutes."
+msgstr "우아하게 종료, 11분 이상 걸릴 수 있음."
+
+#: ../i2prouter:1856
+msgid "Stop if running and then start."
+msgstr "실행중이면 정지하고 시작."
+
+#: ../i2prouter:1857
+msgid "Restart only if already running."
+msgstr "현재 실행중일때만 재시작."
+
+#: ../i2prouter:1858
+msgid "Query the current status."
+msgstr "현재 상태를 쿼리함."
+
+#: ../i2prouter:1859
+msgid "Install to start automatically when system boots."
+msgstr "시스템 부트시에 자동으로 실행함."
+
+#: ../i2prouter:1860
+msgid "Uninstall."
+msgstr "제거."
+
+#: ../i2prouter:1861
+msgid "Request a Java thread dump if running."
+msgstr "실행중일 경우 Java 쓰레드 덤프를 요청함."
+
+#: ../i2prouter:1874
+msgid "Please edit i2prouter and set the variable RUN_AS_USER"
+msgstr "i2prouter를 편집하여 RUN_AS_USER 변수를 설정하세요"
+
+#: ../i2prouter:1879
+msgid "Running I2P as the root user is *not* recommended."
+msgstr "I2P를 루트 유저로 실행하는 것은 *비권장* 됩니다."
+
+#: ../i2prouter:1882
+msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+msgstr "그래도 루트로 실행하고자 하면, i2prouter를 편집하며 ALLOW_ROOT=true를 설정하세요."

@@ -43,6 +43,7 @@ public class ConfigUIHelper {
         { "hu", "hu", "Hungarian", null },
         { "it", "it", "Italian", null },
         { "ja", "jp", "Japanese", null },
+        { "ko", "kr", "Korean", null },
         //{ "mg", "mg", "Malagasy", null },
         { "nl", "nl", "Dutch", null },
         { "nb", "no", "Norwegian Bokmaal", null },
