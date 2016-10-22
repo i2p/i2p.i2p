@@ -341,6 +341,7 @@ trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
 trans.es = core/java/src/gnu/getopt/MessagesBundle_es.properties
 trans.fi = core/java/src/gnu/getopt/MessagesBundle_fi.properties
 trans.fr = core/java/src/gnu/getopt/MessagesBundle_fr.properties
+trans.gl = core/java/src/gnu/getopt/MessagesBundle_gl.properties
 trans.hu = core/java/src/gnu/getopt/MessagesBundle_hu.properties
 ;; Java converts id to in
 trans.id = core/java/src/gnu/getopt/MessagesBundle_in.properties
