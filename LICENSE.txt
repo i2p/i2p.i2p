@@ -210,7 +210,7 @@ Applications:
      Zxing:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 8.1.17.v20150415:
+   Jetty 8.1.21.v20160908:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt

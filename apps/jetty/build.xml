@@ -13,11 +13,11 @@
          the source in the java/ directory.
      -->
 
-    <property name="jetty.ver" value="8.1.17.v20150415" />
+    <property name="jetty.ver" value="8.1.21.v20160908" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
-    <property name="jetty.sha1" value="ce7bcd1bdcdac4cf130467f6d55155b9e1517e71" />
+    <property name="jetty.sha1" value="9780e99e765fd7b9bb1aac8ba2bba374ac039764" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
-    <property name="jetty.url" value="http://download.eclipse.org/jetty/${jetty.ver}/dist/${jetty.filename}" />
+    <property name="jetty.url" value="http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/${jetty.ver}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.6" />
