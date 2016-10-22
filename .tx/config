@@ -207,6 +207,7 @@ trans.tr_TR = apps/susidns/locale/messages_tr.po
 trans.uk_UA = apps/susidns/locale/messages_uk.po
 trans.vi = apps/susidns/locale/messages_vi.po
 trans.zh_CN = apps/susidns/locale/messages_zh.po
+trans.zh_TW = apps/susidns/locale/messages_zh_TW.po
 
 [I2P.desktopgui]
 source_file = apps/desktopgui/locale/messages_en.po
@@ -274,6 +275,7 @@ trans.tr_TR = apps/susimail/locale/messages_tr.po
 trans.uk_UA = apps/susimail/locale/messages_uk.po
 trans.vi = apps/susimail/locale/messages_vi.po
 trans.zh_CN = apps/susimail/locale/messages_zh.po
+trans.zh_TW = apps/susimail/locale/messages_zh_TW.po
 
 [I2P.debconf]
 source_file = debian/po/templates.pot
@@ -301,6 +303,7 @@ trans.sv_SE = debian/po/sv.po
 trans.tr_TR = debian/po/tr.po
 trans.uk_UA = debian/po/uk.po
 trans.zh_CN = debian/po/zh.po
+trans.zh_TW = debian/po/zh_TW.po
 
 [I2P.i2prouter-script]
 source_file = installer/resources/locale/po/messages_en.po
