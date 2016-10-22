@@ -1,27 +1,35 @@
 UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
 if [ $UNIXTYPE = "freebsd" ]; then
-    if [ -d /usr/local/openjdk6 ]; then
-        JAVA_HOME="/usr/local/openjdk6"
+    if [ -d /usr/local/openjdk8 ]; then
+        JAVA_HOME="/usr/local/openjdk8"
     elif [ -d /usr/local/openjdk7 ]; then
         JAVA_HOME="/usr/local/openjdk7"
+    elif [ -d /usr/local/openjdk6 ]; then
+        JAVA_HOME="/usr/local/openjdk6"
     fi
 elif [ $UNIXTYPE = "sunos" ]; then
     UNIXTYPE="solaris"
     if [ -d /usr/jdk/latest/ ]; then
         JAVA_HOME="/usr/jdk/latest"
+    elif [ -d /usr/jdk/instances/jdk1.8.0/ ]; then
+        JAVA_HOME="/usr/jdk/instances/jdk1.8.0"
     elif [ -d /usr/jdk/instances/jdk1.7.0/ ]; then
         JAVA_HOME="/usr/jdk/instances/jdk1.7.0"
     elif [ -d /usr/jdk/instances/jdk1.6.0 ]; then
         JAVA_HOME="/usr/jdk/instances/jdk1.6.0"
     fi
 elif [ $UNIXTYPE = "openbsd" ]; then
-    if [ -d /usr/local/jdk-1.7.0 ]; then
+    if [ -d /usr/local/jdk-1.8.0 ]; then
+        JAVA_HOME="/usr/local/jdk-1.8.0"
+    elif [ -d /usr/local/jdk-1.7.0 ]; then
         JAVA_HOME="/usr/local/jdk-1.7.0"
     elif [ -d /usr/local/jdk-1.6.0 ]; then
         JAVA_HOME="/usr/local/jdk-1.6.0"
     fi
 elif [ $UNIXTYPE = "netbsd" ]; then
-    if [ -d /usr/pkg/java/openjdk7 ]; then
+    if [ -d /usr/pkg/java/openjdk8 ]; then
+        JAVA_HOME="/usr/pkg/java/openjdk8"
+    elif [ -d /usr/pkg/java/openjdk7 ]; then
         JAVA_HOME="/usr/pkg/java/openjdk7"
     fi
 elif [ $UNIXTYPE = "linux" ] && [ -e /etc/debian_version ]; then
@@ -29,7 +37,9 @@ elif [ $UNIXTYPE = "linux" ] && [ -e /etc/debian_version ]; then
        JAVA_HOME="/usr/lib/jvm/default-java"
     fi
 elif [ $UNIXTYPE = "linux" ] && [ -e /etc/arch-release ]; then
-    if [ -d /usr/lib/jvm/java-7-openjdk ]; then
+    if [ -d /usr/lib/jvm/java-8-openjdk ]; then
+        JAVA_HOME="/usr/lib/jvm/java-8-openjdk"
+    elif [ -d /usr/lib/jvm/java-7-openjdk ]; then
         JAVA_HOME="/usr/lib/jvm/java-7-openjdk"
     elif [ -d /usr/lib/jvm/java-6-openjdk ]; then
         JAVA_HOME="/usr/lib/jvm/java-6-openjdk"
@@ -41,7 +51,11 @@ elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
     # kFreeBSD has $JAVA_HOME/include/linux instead of $JAVA_HOME/include/*bsd
     UNIXTYPE="linux"
     # OpenJDK 7 is supported as of Debian Jessie
-    if [ -d /usr/lib/jvm/java-7-openjdk-kfreebsd-amd64/ ]; then
+    if [ -d /usr/lib/jvm/java-8-openjdk-kfreebsd-amd64/ ]; then
+        JAVA_HOME="/usr/lib/jvm/java-8-openjdk-kfreebsd-amd64"
+    elif [ -d /usr/lib/jvm/java-8-openjdk-kfreebsd-i386/ ]; then
+        JAVA_HOME="/usr/lib/jvm/java-8-openjdk-kfreebsd-i386"
+    elif [ -d /usr/lib/jvm/java-7-openjdk-kfreebsd-amd64/ ]; then
         JAVA_HOME="/usr/lib/jvm/java-7-openjdk-kfreebsd-amd64"
     elif [ -d /usr/lib/jvm/java-7-openjdk-kfreebsd-i386/ ]; then
         JAVA_HOME="/usr/lib/jvm/java-7-openjdk-kfreebsd-i386"
