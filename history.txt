@@ -1,8 +1,23 @@
+2016-10-23 zzz
+ * Crypto: Create keystore directory when making SSL keys (ticket #1866)
+
+2016-10-22 zzz
+ * Build: Fix jbigi build in Arch Linux and others for Java 8 (ticket #1863)
+ * Console:
+   - New Korean translation
+   - New Chinese (Taiwan) translations for susidns, susimail, debian
+   - New initial news translations: Czech, Greek
+ * Jetty 8.1.21.v20160908
+
 2016-10-21 zzz
+ * Console:
+   - New Galician translation
+   - Remove calls to deprecated two-arg setStatus()
  * Crypto: Actually use a random nonzero byte in ElGamal
  * Data: Cache serialized leasesets on floodfills
  * NetDB: Disallow RSA for RI or LS
  * Tomcat 6.0.47
+ * Utils: Add MTU to command line utils
  * Wrapper 3.5.30
 
 2016-10-20 zzz

@@ -591,6 +591,12 @@ public final class KeyStoreUtil {
     public static Object[] createKeysAndCRL(File ks, String ksPW, String alias, String cname, String ou,
                                             int validDays, SigType type, String keyPW)
                                                 throws GeneralSecurityException, IOException {
+        File dir = ks.getParentFile();
+        if (dir != null && !dir.exists()) {
+            File sdir = new SecureDirectory(dir.getAbsolutePath());
+            if (!sdir.mkdirs())
+                throw new IOException("Can't create directory " + dir);
+        }
         Object[] rv = SelfSignedGenerator.generate(cname, ou, "XX", "I2P Anonymous Network", "XX", "XX", validDays, type);
         PublicKey jpub = (PublicKey) rv[0];
         PrivateKey jpriv = (PrivateKey) rv[1];
