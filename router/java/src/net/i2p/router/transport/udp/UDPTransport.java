@@ -2143,7 +2143,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 mtu = _mtu;
             }
         }
-        if (mtu < PeerState.LARGE_MTU)
+        if (mtu != PeerState.LARGE_MTU)
             options.setProperty(UDPAddress.PROP_MTU, Integer.toString(mtu));
 
         if (directIncluded || introducersIncluded) {

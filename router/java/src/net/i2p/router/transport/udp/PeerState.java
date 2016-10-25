@@ -253,7 +253,9 @@ class PeerState {
      */
     private static final int MAX_SEND_MSGS_PENDING = 128;
 
-    /*
+    /**
+     * IPv4 Min MTU
+     *
      * 596 gives us 588 IP byes, 568 UDP bytes, and with an SSU data message, 
      * 522 fragment bytes, which is enough to send a tunnel data message in 2 
      * packets. A tunnel data message sent over the wire is 1044 bytes, meaning 
@@ -277,10 +279,12 @@ class PeerState {
      * IPv6/UDP header is 48 bytes, so we want MTU % 16 == 0.
      */
     public static final int MIN_IPV6_MTU = 1280;
-    public static final int MAX_IPV6_MTU = 1472;  // TODO 1488
+    public static final int MAX_IPV6_MTU = 1488;
     private static final int DEFAULT_MTU = MIN_MTU;
 
-    /* 
+    /**
+     * IPv4 Max MTU
+     *
      * based on measurements, 1350 fits nearly all reasonably small I2NP messages
      * (larger I2NP messages may be up to 1900B-4500B, which isn't going to fit
      * into a live network MTU anyway)
@@ -300,6 +304,12 @@ class PeerState {
      * and so PacketBuilder.buildPacket() works correctly.
      */
     public static final int LARGE_MTU = 1484;
+    
+    /**
+     *  Max of IPv4 and IPv6 max MTUs
+     *  @since 0.9.28
+     */
+    public static final int MAX_MTU = Math.max(LARGE_MTU, MAX_IPV6_MTU);
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int INIT_RTO = 3*1000;

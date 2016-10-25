@@ -189,7 +189,7 @@ class UDPSender {
     public void add(UDPPacket packet) {
         if (packet == null || !_keepRunning) return;
         int psz = packet.getPacket().getLength();
-        if (psz > PeerState.LARGE_MTU) {
+        if (psz > PeerState.MAX_MTU) {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet);
             return;
         }
