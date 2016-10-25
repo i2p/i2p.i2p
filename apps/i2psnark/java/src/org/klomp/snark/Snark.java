@@ -1337,7 +1337,7 @@ public class Snark
     int totalUploaders = 0;
     for (PeerCoordinator c : _peerCoordinatorSet) {
       if (!c.halted())
-        totalUploaders += c.uploaders;
+        totalUploaders += c.getInterestedUploaders();
     }
     int limit = _util.getMaxUploaders();
     if (_log.shouldLog(Log.DEBUG))

@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
@@ -74,16 +75,23 @@ class PeerCoordinator implements PeerListener
   public static final long MAX_INACTIVE = 8*60*1000;
 
   /**
-   * Approximation of the number of current uploaders.
+   * Approximation of the number of current uploaders (unchoked peers),
+   * whether interested or not.
    * Resynced by PeerChecker once in a while.
-   * External use by PeerCheckerTask only.
    */
-  int uploaders;
+  private final AtomicInteger uploaders = new AtomicInteger();
+
+  /**
+   * Approximation of the number of current uploaders (unchoked peers),
+   * that are interested.
+   * Resynced by PeerChecker once in a while.
+   */
+  private final AtomicInteger interestedUploaders = new AtomicInteger();
 
   /**
    * External use by PeerCheckerTask only.
    */
-  int interestedAndChoking;
+  private final AtomicInteger interestedAndChoking = new AtomicInteger();
 
   // final static int MAX_DOWNLOADERS = MAX_CONNECTIONS;
   // int downloaders = 0;
@@ -627,8 +635,9 @@ class PeerCoordinator implements PeerListener
     return false;
   }
 
-
-  // (Optimistically) unchoke. Should be called with peers synchronized
+  /**
+   * (Optimistically) unchoke. Must be called with peers synchronized
+   */
   void unchokePeer()
   {
     // linked list will contain all interested peers that we choke.
@@ -645,7 +654,7 @@ class PeerCoordinator implements PeerListener
             if (peer.isChoking() && peer.isInterested())
               {
                 count++;
-                if (uploaders < maxUploaders)
+                if (uploaders.get() < maxUploaders)
                   {
                     if (peer.isInteresting() && !peer.isChoked())
                       interested.add(unchokedCount++, peer);
@@ -655,20 +664,22 @@ class PeerCoordinator implements PeerListener
               }
           }
 
-        while (uploaders < maxUploaders && !interested.isEmpty())
+        int up = uploaders.get();
+        while (up < maxUploaders && !interested.isEmpty())
           {
             Peer peer = interested.remove(0);
             if (_log.shouldLog(Log.DEBUG))
               _log.debug("Unchoke: " + peer);
             peer.setChoking(false);
-            uploaders++;
+            up = uploaders.incrementAndGet();
+            interestedUploaders.incrementAndGet();
             count--;
             // Put peer back at the end of the list.
             peers.remove(peer);
             peers.add(peer);
             peerCount = peers.size();
           }
-        interestedAndChoking = count;
+        interestedAndChoking.set(count);
   }
 
   /**
@@ -1098,11 +1109,12 @@ class PeerCoordinator implements PeerListener
   {
     if (interest)
       {
-            if (uploaders < allowedUploaders())
+            if (uploaders.get() < allowedUploaders())
               {
                 if(peer.isChoking())
                   {
-                    uploaders++;
+                    uploaders.incrementAndGet();
+                    interestedUploaders.incrementAndGet();
                     peer.setChoking(false);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Unchoke: " + peer);
@@ -1487,22 +1499,102 @@ class PeerCoordinator implements PeerListener
    */
   public int allowedUploaders()
   {
-    if (listener != null && listener.overUploadLimit(uploaders)) {
+    int up = uploaders.get();
+    if (listener != null && listener.overUploadLimit(interestedUploaders.get())) {
            if (_log.shouldLog(Log.DEBUG))
-             _log.debug("Over limit, uploaders was: " + uploaders);
-        return uploaders - 1;
-    } else if (uploaders < MAX_UPLOADERS)
-        return uploaders + 1;
-    else
+             _log.debug("Over limit, uploaders was: " + up);
+        return up - 1;
+    } else if (up < MAX_UPLOADERS) {
+        return up + 1;
+    } else {
         return MAX_UPLOADERS;
+    }
   }
 
   /**
+   *  Uploaders whether interested or not
+   *  Use this for per-torrent limits.
+   *
    *  @return current
    *  @since 0.8.4
    */
   public int getUploaders() {
-      return uploaders;
+      int rv = uploaders.get();
+      if (rv > 0) {
+          int max = getPeers();
+          if (rv > max)
+              rv = max;
+      }
+      return rv;
+  }
+
+  /**
+   *  Uploaders, interested only.
+   *  Use this to calculate the global total, so that
+   *  unchoked but uninterested peers don't count against the global limit.
+   *
+   *  @return current
+   *  @since 0.9.28
+   */
+  public int getInterestedUploaders() {
+      int rv = interestedUploaders.get();
+      if (rv > 0) {
+          int max = getPeers();
+          if (rv > max)
+              rv = max;
+      }
+      return rv;
+  }
+
+  /**
+   *  Set the uploaders and interestedUploaders counts
+   *
+   *  @since 0.9.28
+   *  @param upl whether interested or not
+   *  @param inter interested only
+   */
+  public void setUploaders(int upl, int inter) {
+      if (upl < 0)
+          upl = 0;
+      else if (upl > MAX_UPLOADERS)
+          upl = MAX_UPLOADERS;
+      uploaders.set(upl);
+      if (inter < 0)
+          inter = 0;
+      else if (inter > MAX_UPLOADERS)
+          inter = MAX_UPLOADERS;
+      interestedUploaders.set(inter);
+  }
+
+  /**
+   *  Decrement the uploaders and (if set) the interestedUploaders counts
+   *
+   *  @since 0.9.28
+   */
+  public void decrementUploaders(boolean isInterested) {
+      int up = uploaders.decrementAndGet();
+      if (up < 0)
+          uploaders.set(0);
+      if (isInterested) {
+          up = interestedUploaders.decrementAndGet();
+          if (up < 0)
+              interestedUploaders.set(0);
+      }
+  }
+
+  /**
+   *  @return current
+   *  @since 0.9.28
+   */
+  public int getInterestedAndChoking() {
+      return interestedAndChoking.get();
+  }
+
+  /**
+   *  @since 0.9.28
+   */
+  public void addInterestedAndChoking(int toAdd) {
+      interestedAndChoking.addAndGet(toAdd);
   }
 
   public boolean overUpBWLimit()
