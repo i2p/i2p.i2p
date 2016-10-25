@@ -519,7 +519,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-                <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar lib/desktopgui.jar lib/i2psnark.jar lib/jrobin.jar lib/jstl.jar lib/standard.jar lib/jetty-continuation.jar lib/jetty-deploy.jar lib/jetty-http.jar lib/jetty-i2p.jar lib/jetty-io.jar lib/jetty-rewrite-handler.jar lib/jetty-security.jar lib/jetty-servlet.jar lib/jetty-servlets.jar lib/jetty-start.jar lib/jetty-util.jar lib/jetty-webapp.jar lib/jetty-xml.jar" />
+                <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/desktopgui.jar lib/i2psnark.jar lib/jrobin.jar lib/jstl.jar lib/standard.jar lib/jetty-continuation.jar lib/jetty-deploy.jar lib/jetty-http.jar lib/jetty-i2p.jar lib/jetty-io.jar lib/jetty-rewrite-handler.jar lib/jetty-security.jar lib/jetty-servlet.jar lib/jetty-servlets.jar lib/jetty-start.jar lib/jetty-util.jar lib/jetty-webapp.jar lib/jetty-xml.jar" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -778,7 +778,6 @@
                 <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-webapp.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-xml.jar" />
-                <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
                 <!-- following are only for debian builds -->
@@ -1162,10 +1161,6 @@
 
     <target name="preppkg-windows" depends="preppkg-base, preplicenses-windows, buildUtilityJar, buildexe">
         <copy file="build/i2p.exe" todir="pkg-temp/" failonerror="false" />
-        <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
-        <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
-        <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
-        <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
         <copy file="installer/resources/eepget.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
         <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
@@ -1889,7 +1884,7 @@
             <arg value="-output"/>
             <arg value="i2p.fba"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:installer/lib/wrapper/all/wrapper.jar:apps/susidns/src/lib/standard.jar:apps/susidns/src/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/:installer/java/src"/>
             <!-- start of the files to be analyzed -->
@@ -2190,9 +2185,6 @@
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
-            <!-- systray4j -->
-            <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
-            <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
@@ -2275,9 +2267,6 @@
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
-            <!-- systray4j -->
-            <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
-            <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
@@ -2358,8 +2347,6 @@
           <!--
             <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
            -->
-            <fileset dir="../i2p-${Extended.Version}/apps/systray/java/lib" />
-            <file name="../i2p-${Extended.Version}/apps/systray/java/src/net/i2p/apps/systray/SysTrayImpl.java" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
@@ -2489,9 +2476,6 @@
 	</target>
 <!-- *3* os dependent procedure/commands -->
 	<target name = "preppkg-portable-win32" depends="preppkg-portable-win32-jbigi,preppkg-portable-basic">
-			<!-- systray4.j  - why do we need trayicons for portable version ? dependency hardcoded in console -->
-		<copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
-		<copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
 			<!--wrapper - dont even think about it. i2p cosumes appreantly more mem without it on win32-->
 		<copy file="installer/lib/wrapper/win32/wrapper.dll" todir="pkg-temp/lib" />
 		<copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />

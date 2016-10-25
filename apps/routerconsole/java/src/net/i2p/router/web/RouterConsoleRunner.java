@@ -25,7 +25,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
-import net.i2p.apps.systray.SysTray;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
@@ -294,8 +293,8 @@ public class RouterConsoleRunner implements RouterApp {
                 // required true for jrobin to work
           	System.setProperty("java.awt.headless", "true");
                 // this check is in SysTray but do it here too
-                if (SystemVersion.isWindows() && (!Boolean.getBoolean("systray.disable")) && (!SystemVersion.is64Bit()))
-                    SysTray.getInstance();
+                //if (SystemVersion.isWindows() && (!Boolean.getBoolean("systray.disable")) && (!SystemVersion.is64Bit()))
+                //    SysTray.getInstance();
             }
         } catch (Throwable t) {
             t.printStackTrace();
