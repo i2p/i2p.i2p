@@ -1,5 +1,8 @@
 <img align="right" src="https://raw.github.com/wiki/zxing/zxing/zxing-logo.png"/>
 
+##Get Started Developing
+To get started, please visit: https://github.com/zxing/zxing/wiki/Getting-Started-Developing
+
 ZXing ("zebra crossing") is an open-source, multi-format 1D/2D barcode image processing
 library implemented in Java, with ports to other languages.
 
@@ -50,6 +53,7 @@ library implemented in Java, with ports to other languages.
 | [zxing_cpp.rb](https://github.com/glassechidna/zxing_cpp.rb)    | bindings for Ruby (not just JRuby), powered by [zxing-cpp](https://github.com/glassechidna/zxing-cpp)
 | [python-zxing](https://github.com/oostendo/python-zxing)        | bindings for Python
 | [ZXing .NET](http://zxingnet.codeplex.com/)                     | port to .NET and C#, and related Windows platform
+| [php-qrcode-detector-decoder](https://github.com/khanamiryan/php-qrcode-detector-decoder)                     | port to PHP
 
 ### Other related third-party open source projects
 
@@ -61,11 +65,10 @@ library implemented in Java, with ports to other languages.
 
 ## Links
 
-* [Online Decoder](http://zxing.org/w/decode.jspx)
-* [QR Code Generator](http://zxing.appspot.com/generator)
-* [Javadoc](http://zxing.github.io/zxing/apidocs/)
-* [Documentation Site](http://zxing.github.io/zxing/)
-* [Google+](https://plus.google.com/u/0/b/105889184633382354358/105889184633382354358/posts)
+* [Online Decoder](https://zxing.org/w/decode.jspx)
+* [QR Code Generator](https://zxing.appspot.com/generator)
+* [Javadoc](https://zxing.github.io/zxing/apidocs/)
+* [Documentation Site](https://zxing.github.io/zxing/)
 
 ## Contacting
 

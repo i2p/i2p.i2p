@@ -207,7 +207,7 @@ Applications:
        Copyright (c) 2000, 2001 Markus Friedl.  All rights reserved.
        Copyright (c) 2008 Alexander von Gernler.  All rights reserved.
        See licenses/LICENSE-BSD.txt
-     Zxing:
+     Zxing 3.3.0:
        See licenses/LICENSE-Apache2.0.txt
 
    Jetty 8.1.21.v20160908:
