@@ -24,7 +24,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 
-import sun.nio.ch.DirectBuffer;
+import engine.misc.DeallocationHelper;
 
 /**
  * JRobin backend which is used to store RRD data to ordinary disk files by
@@ -35,6 +35,7 @@ import sun.nio.ch.DirectBuffer;
 public class RrdNioBackend extends RrdFileBackend {
     private final SyncManager m_syncManager;
     private MappedByteBuffer m_byteBuffer = null;
+    private static final DeallocationHelper _dHelper = new DeallocationHelper();
 
     /**
      * Creates RrdFileBackend object for the given file path, backed by
@@ -105,9 +106,7 @@ public class RrdNioBackend extends RrdFileBackend {
             stopSchedule();
         }
         if (m_byteBuffer != null) {
-            if (m_byteBuffer instanceof DirectBuffer) {
-                ((DirectBuffer) m_byteBuffer).cleaner().clean();
-            }
+            _dHelper.deallocate(m_byteBuffer);
             m_byteBuffer = null;
         }
     }

@@ -221,6 +221,9 @@ Applications:
    Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
    Copyright (c) 2011 The OpenNMS Group, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
+   DeallocationHelper:
+   Copyright (c) 2006-2016 Julien Gouesse
+   See licenses/LICENSE-GPLv2.txt
 
    Ministreaming Lib:
    By mihi.
