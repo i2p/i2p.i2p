@@ -19,7 +19,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
-    <property name="javac.version" value="1.6" />
+    <property name="javac.version" value="1.7" />
 
     <!-- fixups if we're using libintl.jar for GettextResource.java -->
     <condition property="source.exclude1" value="gnu/gettext/GettextResource.java" else="NOTHING" >

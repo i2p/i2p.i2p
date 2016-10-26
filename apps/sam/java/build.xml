@@ -22,10 +22,8 @@
         </depend>
     </target>
 
-    <!-- ignored for now, we require java 7 here -->
     <property name="javac.compilerargs7" value="" />
-    <!-- ignored for now, we require java 7 here -->
-    <property name="javac.version" value="1.6" />
+    <property name="javac.version" value="1.7" />
 
     <!-- compile everything including client classes -->
     <target name="compile" depends="depend">
@@ -33,7 +31,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" deprecation="on" source="1.7" target="1.7" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >

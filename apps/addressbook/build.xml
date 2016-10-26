@@ -7,7 +7,7 @@
 	<property name="jar" value="addressbook.jar"/>
 	<property name="war" value="addressbook.war"/>
 	<property name="javac.compilerargs" value="" />
-	<property name="javac.version" value="1.6" />
+	<property name="javac.version" value="1.7" />
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
