@@ -358,7 +358,7 @@
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
     </target>
 
-    <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildDesktopGui, buildJetty" >
+    <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildDesktopGui, buildJetty, buildJrobin" >
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
 
@@ -401,16 +401,8 @@
     </target>
 
     <target name="buildJrobin" depends="buildProperties" >
-        <!-- take only what we need from the jrobin jar -->
-        <jar destfile="build/jrobin.jar" >
-            <zipfileset src="apps/jrobin/jrobin-1.5.9.1.jar"
-                        excludes="org/jrobin/cmd/ org/jrobin/convertor/ org/jrobin/inspector/" />
-            <manifest>
-                <attribute name="Built-By" value="${build.built-by}" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-            </manifest>
-        </jar>
+        <ant dir="apps/jrobin/java/" target="jar" />
+        <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
 
     <target name="buildProperties" depends="getMtnRev, getReleaseNumber, getBuildNumber" >
@@ -541,7 +533,7 @@
           in the build* targets
       -->
      <target name="jar" depends="jarSmall" />
-     <target name="jarSmall" depends="builddepSmall, buildJrobin" />
+     <target name="jarSmall" depends="builddepSmall" />
 
     <!-- Custom target to collect the jars that I2P-Bote needs to compile, so it can compile from source. -->
     <target name="jarBote" depends="buildRouter, buildStreaming, buildJetty" >
@@ -739,6 +731,7 @@
             <group title="Imagegen Application" packages="com.docuverse.identicon:com.google.zxing:com.google.zxing.*:net.i2p.imagegen" />
             <group title="Installer Utilities" packages="net.i2p.installer" />
             <group title="Jetty Utilities" packages="net.i2p.jetty:net.i2p.servlet:net.i2p.servlet.*:org.mortbay.servlet:org.mortbay.util" />
+            <group title="JRobin Library" packages="org.jrobin:org.jrobin.*" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
@@ -766,6 +759,7 @@
                 <pathelement location="apps/imagegen/identicon/core/src/main/java" />
                 <pathelement location="apps/imagegen/zxing/core/src/main/java" />
                 <pathelement location="apps/imagegen/zxing/javase/src/main/java" />
+                <pathelement location="apps/jrobin/java/src" />
                 <pathelement location="installer/java/src" />
             </sourcepath>
             <classpath>
@@ -989,6 +983,7 @@
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
         <ant dir="apps/imagegen/" target="distclean" />
+        <ant dir="apps/jrobin/java" target="distclean" />
         <delete dir="core/c/jbigi/bin" />
         <delete dir="core/c/jbigi/lib" />
         <delete dir="core/c/jcpuid/lib" />
@@ -1201,7 +1196,7 @@
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <!-- pulled out of routerconsole.jar in 0.7.12; name without version so we can overwrite if we upgrade  -->
+        <!-- Updated in 0.9.28; name without version so we can overwrite if we upgrade  -->
         <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
@@ -1538,7 +1533,7 @@
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <!-- pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater -->
+        <!-- Updated in 0.9.28 -->
         <!-- name without version so we can overwrite if we upgrade  -->
         <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
