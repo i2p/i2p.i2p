@@ -61,22 +61,38 @@ public final class SelfSignedGenerator {
     private static final String OID_OU = "2.5.4.11";
     // Subject Key Identifier
     private static final String OID_SKI = "2.5.29.14";
+    // Key Usage
+    private static final String OID_USAGE = "2.5.29.15";
+    // Subject Alternative Name
+    private static final String OID_SAN = "2.5.29.17";
+    // Basic Constraints
+    private static final String OID_BASIC = "2.5.29.19";
     // CRL number
     private static final String OID_CRLNUM = "2.5.29.20";
+    // Authority Key Identifier
+    private static final String OID_AKI = "2.5.29.35";
 
     private static final Map<String, String> OIDS;
     static {
         OIDS = new HashMap<String, String>(16);
+        // only OIDs in the distinguished name need to be in here
         OIDS.put(OID_CN, "CN");
         OIDS.put(OID_C, "C");
         OIDS.put(OID_L, "L");
         OIDS.put(OID_ST, "ST");
         OIDS.put(OID_O, "O");
         OIDS.put(OID_OU, "OU");
-        OIDS.put(OID_SKI, "SKI");
     }
 
     /**
+     *  @param cname the common name, non-null
+     *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param st The ST (state or province) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param c The C (country) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *
+     *  @return length 4 array:
      *  rv[0] is a Java PublicKey
      *  rv[1] is a Java PrivateKey
      *  rv[2] is a Java X509Certificate
@@ -235,6 +251,14 @@ public final class SelfSignedGenerator {
         return rv;
     }
 
+    /**
+     *  @param cname the common name, non-null
+     *  @param ou The OU (organizational unit) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param o The O (organization)in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param l The L (city or locality) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param st The ST (state or province) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     *  @param c The C (country) in the distinguished name, non-null before 0.9.28, may be null as of 0.9.28
+     */
     private static byte[] genTBS(String cname, String ou, String o, String l, String st, String c,
                           int validDays, byte[] sigoid, PublicKey jpub) throws GeneralSecurityException {
         // a0 ???, int = 2
@@ -248,13 +272,25 @@ public final class SelfSignedGenerator {
         serial[2] &= 0x7f;
 
         // going to use this for both issuer and subject
-        String dname = "CN=" + cname + ",OU=" + ou + ",O=" + o + ",L=" + l + ",ST=" + st + ",C=" + c;
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("CN=").append(cname);
+        if (ou != null)
+            buf.append(",OU=").append(ou);
+        if (o != null)
+            buf.append(",O=").append(o);
+        if (l != null)
+            buf.append(",L=").append(l);
+        if (st != null)
+            buf.append(",ST=").append(st);
+        if (c != null)
+            buf.append(",C=").append(c);
+        String dname = buf.toString();
         byte[] issuer = (new X500Principal(dname, OIDS)).getEncoded();
         byte[] validity = getValidity(validDays);
         byte[] subject = issuer;
 
         byte[] pubbytes = jpub.getEncoded();
-        byte[] extbytes = getExtensions(pubbytes);
+        byte[] extbytes = getExtensions(pubbytes, cname);
 
         int len = version.length + serial.length + sigoid.length + issuer.length +
                   validity.length + subject.length + pubbytes.length + extbytes.length;
@@ -436,11 +472,20 @@ public final class SelfSignedGenerator {
     }
 
     /**
+     *  Add the following extensions:
+     *   1) Subject Key Identifier
+     *   2) Key Usage
+     *   3) Basic Constraints
+     *   4) Subject Alternative Name
+     *   5) Authority Key Identifier
+     *  (not necessarily output in that order)
+     *
+     *  Ref: RFC 5280
      *
      *  @param pubbytes bit string
-     *  @return 35 bytes ASN.1 encoded object
+     *  @return ASN.1 encoded object
      */
-    private static byte[] getExtensions(byte[] pubbytes) {
+    private static byte[] getExtensions(byte[] pubbytes, String cname) {
         // RFC 2549 sec. 4.2.1.2
         // subject public key identifier is the sha1 hash of the bit string of the public key
         // without the tag, length, and igore fields
@@ -452,29 +497,115 @@ public final class SelfSignedGenerator {
         MessageDigest md = SHA1.getInstance();
         md.update(pubbytes, pidx, pubbytes.length - pidx);
         byte[] sha = md.digest();
-        byte[] oid = getEncodedOID(OID_SKI);
+        byte[] oid1 = getEncodedOID(OID_SKI);
+        byte[] oid2 = getEncodedOID(OID_USAGE);
+        byte[] oid3 = getEncodedOID(OID_BASIC);
+        byte[] oid4 = getEncodedOID(OID_SAN);
+        byte[] oid5 = getEncodedOID(OID_AKI);
+        byte[] TRUE = new byte[] { 1, 1, (byte) 0xff };
 
-        int wraplen = spaceFor(sha.length);
-        int extlen = oid.length + spaceFor(wraplen);
-        int extslen = spaceFor(extlen);
+        int wrap1len = spaceFor(sha.length);
+        int ext1len = oid1.length + spaceFor(wrap1len);
+
+        int wrap2len = 4;
+        int ext2len = oid2.length + TRUE.length + spaceFor(wrap2len);
+
+        int wrap3len = spaceFor(TRUE.length);
+        int ext3len = oid3.length + TRUE.length + spaceFor(wrap3len);
+
+        byte[] cnameBytes = DataHelper.getASCII(cname);
+        int wrap41len = spaceFor(cnameBytes.length);
+        int wrap4len = spaceFor(wrap41len);
+        int ext4len = oid4.length + spaceFor(wrap4len);
+
+        int wrap51len = wrap1len;
+        int wrap5len = spaceFor(wrap51len);
+        int ext5len = oid5.length + spaceFor(wrap5len);
+
+        int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext3len) + spaceFor(ext4len) + spaceFor(ext5len);
         int seqlen = spaceFor(extslen);
         int totlen = spaceFor(seqlen);
         byte[] rv = new byte[totlen];
         int idx = 0;
+
         rv[idx++] = (byte) 0xa3;
         idx = intToASN1(rv, idx, seqlen);
         rv[idx++] = (byte) 0x30;
         idx = intToASN1(rv, idx, extslen);
+
+        // Subject Key Identifier
         rv[idx++] = (byte) 0x30;
-        idx = intToASN1(rv, idx, extlen);
-        System.arraycopy(oid, 0, rv, idx, oid.length);
-        idx += oid.length;
-        // don't know why we wrap the octet string in an octet string
+        idx = intToASN1(rv, idx, ext1len);
+        System.arraycopy(oid1, 0, rv, idx, oid1.length);
+        idx += oid1.length;
+        // octet string wraps an octet string
         rv[idx++] = (byte) 0x04;
-        idx = intToASN1(rv, idx, wraplen);
+        idx = intToASN1(rv, idx, wrap1len);
         rv[idx++] = (byte) 0x04;
         idx = intToASN1(rv, idx, sha.length);
         System.arraycopy(sha, 0, rv, idx, sha.length);
+        idx += sha.length;
+
+        // Authority Key Identifier
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, ext5len);
+        System.arraycopy(oid5, 0, rv, idx, oid5.length);
+        idx += oid5.length;
+        // octet string wraps a sequence containing a choice 0 (key identifier) byte string
+        rv[idx++] = (byte) 0x04;
+        idx = intToASN1(rv, idx, wrap5len);
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, wrap51len);
+        rv[idx++] = (byte) 0x80; // choice
+        idx = intToASN1(rv, idx, sha.length);
+        System.arraycopy(sha, 0, rv, idx, sha.length);
+        idx += sha.length;
+
+        // Basic Constraints (critical)
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, ext3len);
+        System.arraycopy(oid3, 0, rv, idx, oid3.length);
+        idx += oid3.length;
+        System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
+        idx += TRUE.length;
+        // octet string wraps an sequence containing TRUE
+        rv[idx++] = (byte) 0x04;
+        idx = intToASN1(rv, idx, wrap3len);
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, TRUE.length);
+        System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
+        idx += TRUE.length;
+
+        // Key Usage (critical)
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, ext2len);
+        System.arraycopy(oid2, 0, rv, idx, oid2.length);
+        idx += oid2.length;
+        System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
+        idx += TRUE.length;
+        // octet string wraps a bit string
+        rv[idx++] = (byte) 0x04;
+        idx = intToASN1(rv, idx, wrap2len);
+        rv[idx++] = (byte) 0x03;
+        rv[idx++] = (byte) 0x02;
+        rv[idx++] = (byte) 0x01;
+        rv[idx++] = (byte) 0xa6; // sig, key encipherment, cert, CRL
+
+        // Subject Alternative Name
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, ext4len);
+        System.arraycopy(oid4, 0, rv, idx, oid4.length);
+        idx += oid4.length;
+        // octet string wraps a sequence containing a choice 2 (DNSName) IA5String
+        rv[idx++] = (byte) 0x04;
+        idx = intToASN1(rv, idx, wrap4len);
+        rv[idx++] = (byte) 0x30;
+        idx = intToASN1(rv, idx, wrap41len);
+        rv[idx++] = (byte) 0x82; // choice, IA5String implied
+        idx = intToASN1(rv, idx, cnameBytes.length);
+        System.arraycopy(cnameBytes, 0, rv, idx, cnameBytes.length);
+        idx += cnameBytes.length;
+
         return rv;
     }
 
@@ -579,7 +710,7 @@ public final class SelfSignedGenerator {
     }
 
     private static final void test(String name, SigType type) throws Exception {
-            Object[] rv = generate("cname", "ou", "l", "o", "st", "c", 3652, type);
+            Object[] rv = generate("cname.example.com", "ou", "o", null, "st", "c", 3652, type);
             PublicKey jpub = (PublicKey) rv[0];
             PrivateKey jpriv = (PrivateKey) rv[1];
             X509Certificate cert = (X509Certificate) rv[2];

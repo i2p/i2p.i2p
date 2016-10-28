@@ -597,7 +597,7 @@ public final class KeyStoreUtil {
             if (!sdir.mkdirs())
                 throw new IOException("Can't create directory " + dir);
         }
-        Object[] rv = SelfSignedGenerator.generate(cname, ou, "XX", "I2P Anonymous Network", "XX", "XX", validDays, type);
+        Object[] rv = SelfSignedGenerator.generate(cname, ou, null, "I2P Anonymous Network", null, null, validDays, type);
         PublicKey jpub = (PublicKey) rv[0];
         PrivateKey jpriv = (PrivateKey) rv[1];
         X509Certificate cert = (X509Certificate) rv[2];
