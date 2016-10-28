@@ -315,11 +315,18 @@ public class DeallocationHelper {
                         "java.nio.ByteBufferAsShortBufferL", "java.nio.ByteBufferAsShortBufferRB",
                         "java.nio.ByteBufferAsShortBufferRL" };
                 final String[] javaVersionElements = System.getProperty("java.version").split("\\.");
-                final int indexOfEarlyAccessSuffix = javaVersionElements[0].lastIndexOf("-ea");
+                int indexOfEarlyAccessSuffix = javaVersionElements[0].lastIndexOf("-ea");
                 if (indexOfEarlyAccessSuffix != -1) {
                     // drops the "-ea" suffix from the major version number for
                     // an early access build
                     javaVersionElements[0] = javaVersionElements[0].substring(0, indexOfEarlyAccessSuffix);
+                } else {
+                    indexOfEarlyAccessSuffix = javaVersionElements[0].lastIndexOf("-internal");
+                    if (indexOfEarlyAccessSuffix != -1) {
+                        // drops the "-internal" suffix from the major version number for
+                        // an early access build (Ubuntu)
+                        javaVersionElements[0] = javaVersionElements[0].substring(0, indexOfEarlyAccessSuffix);
+                    }
                 }
                 final int major, minor;
                 if (javaVersionElements.length >= 2) {
