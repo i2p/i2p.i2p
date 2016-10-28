@@ -174,7 +174,7 @@ public final class KeyStoreUtil {
 
     /**
      *  Loads certs from location of javax.net.ssl.keyStore property,
-     *  else from $JAVA_HOME/lib/security/jssacacerts,
+     *  else from $JAVA_HOME/lib/security/jssecacerts,
      *  else from $JAVA_HOME/lib/security/cacerts.
      *
      *  @return null on catastrophic failure, returns empty KeyStore if can't load system file
