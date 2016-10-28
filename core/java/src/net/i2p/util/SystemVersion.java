@@ -70,13 +70,19 @@ public abstract class SystemVersion {
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
             _oneDotSeven = _androidSDK >= 19;
+            // https://developer.android.com/guide/platform/j8-jack.html
+            // some stuff in 23, some in 24
             _oneDotEight = false;
             _oneDotNine = false;
         } else {
-            _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
-            _oneDotSeven = _oneDotSix && VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
-            _oneDotEight = _oneDotSeven && VersionComparator.comp(System.getProperty("java.version"), "1.8") >= 0;
-            _oneDotNine = _oneDotEight && VersionComparator.comp(System.getProperty("java.version"), "1.9") >= 0;
+            String version = System.getProperty("java.version");
+            // handle versions like "8-ea" or "9-internal"
+            if (!version.startsWith("1."))
+                version = "1." + version;
+            _oneDotSix = VersionComparator.comp(version, "1.6") >= 0;
+            _oneDotSeven = _oneDotSix && VersionComparator.comp(version, "1.7") >= 0;
+            _oneDotEight = _oneDotSeven && VersionComparator.comp(version, "1.8") >= 0;
+            _oneDotNine = _oneDotEight && VersionComparator.comp(version, "1.9") >= 0;
         }
     }
 
