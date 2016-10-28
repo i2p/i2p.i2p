@@ -107,14 +107,38 @@ To build the 64-bit binaries run something like this:
 OSX Compilation
 ---------------
 No working cross-compilation setup has been found. The gmp6 binaries were produced on an OSX host.
+For more information on OSX compilation, see http://trac.i2p2.i2p/ticket/1865 or
+https://trac.i2p2.de/ticket/1865
+
+There is no /usr/local/lib/libgmp.so dynamic library for macOS.
+The easiest way to get this is with Macports.
+These commands download, compile, and set Macports gcc as the default compiler
+if you put /opt/local/bin first in the PATH environment variable.
+
+	sudo port install gmp
+	sudo port select --list gcc
+	sudo port select --set gcc mp-gcc6
+	export PATH=/opt/local/bin:$PATH
+	gcc --version
+
+Now replace /usr/local/lib with /opt/local/lib in the file core/c/jbigi/build_jbigi.sh.
+
+	$ diff build_jbigi.sh build_jbigi.sh.orig
+	81c81
+	<         LIBPATH="-L.libs -L/opt/local/lib"
+	---
+	>         LIBPATH="-L.libs -L/usr/local/lib"
+
 
 
 Installation and testing
 ========================
 
-To test, copy jbigi/lib/libjbigi.so
-and jcpuid/lib/freenet/support/CPUInformation/libjcpuid-*.so
-to your i2p installation directory ($I2P). You may also copy jbigi.jar to the $I2P/lib/ directory;
+To test, copy jbigi/lib/libjbigi.so (Windows: jbigi.dll; Mac: libjbigi.jnilib)
+to your i2p installation directory ($I2P).
+Copy jcpuid/lib/freenet/support/CPUInformation/libjcpuid-*.so (Windows: jcpuid-*.dll; Mac: libjcpuid-*.jnilib)
+to your i2p installation directory ($I2P) as libjcpuid.so (Windows: jcpuid.dll; Mac: libjcpuid.jnilib)
+You may also copy jbigi.jar to the $I2P/lib/ directory;
 it will be used only if the router fails to load the native library
 from the I2P installation directory.
 

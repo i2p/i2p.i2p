@@ -104,9 +104,9 @@ case $TARGET in
     Darwin*)
         JAVA_HOME=$(/usr/libexec/java_home)
         CFLAGS="${CFLAGS} -fPIC -Wall -arch x86_64 -arch i386"
-        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/dawrin/"
+        INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include/ -I${JAVA_HOME}/include/darwin/"
         LDFLAGS="${LDFLAGS} -dynamiclib -framework JavaVM"
-        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
+        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86_64-osx.jnilib";;
     Linux*|OpenBSD*|NetBSD*|*FreeBSD*|SunOS*)
         KFREEBSD=0
         UNIXTYPE="`uname -s | tr [A-Z] [a-z]`"
