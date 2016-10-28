@@ -9,7 +9,10 @@ import java.net.Inet4Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -292,6 +295,79 @@ public abstract class Addresses {
             } catch (UnknownHostException uhe) {}
         }
         return rv;
+    }
+
+    /**
+     *  For literal IP addresses, this is the same as getIP(String).
+     *  For host names, will return the preferred type (IPv4/v6) if available,
+     *  else the other type if available.
+     *  Will resolve but not cache DNS host names.
+     *
+     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @return IP or null
+     *  @since 0.9.28
+     */
+    public static byte[] getIP(String host, boolean preferIPv6) {
+        if (host == null)
+            return null;
+        if (InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host))
+            return getIP(host);
+        byte[] rv = null;
+        try {
+            InetAddress[] addrs = InetAddress.getAllByName(host);
+            if (addrs == null || addrs.length == 0)
+                return null;
+            for (int i = 0; i < addrs.length; i++) {
+                rv = addrs[i].getAddress();
+                if (preferIPv6) {
+                    if (rv.length == 16)
+                        break;
+                } else {
+                    if (rv.length == 4)
+                        break;
+                }
+            }
+        } catch (UnknownHostException uhe) {}
+        return rv;
+    }
+
+    /**
+     *  For literal IP addresses, this is the same as getIP(String).
+     *  For host names, will return the preferred type (IPv4/v6) if available,
+     *  else the other type if available.
+     *  Will resolve but not cache DNS host names.
+     *
+     *  Note that order of returned results, and whether
+     *  multiple results for either IPv4 or IPv6 or both are actually
+     *  returned, is platform-specific and may also depend on
+     *  JVM options such as java.net.preverIPv4Stack and java.net.preferIPv6Addresses.
+     *  Number of results may also change based on caching at various layers,
+     *  even if the ultimate name server results did not change.
+     *
+     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @return non-empty list IPs, or null if none
+     *  @since 0.9.28
+     */
+    public static List<byte[]> getIPs(String host) {
+        if (host == null)
+            return null;
+        if (InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host)) {
+            byte[] brv = getIP(host);
+            if (brv == null)
+                return null;
+            return Collections.singletonList(brv);
+        }
+        try {
+            InetAddress[] addrs = InetAddress.getAllByName(host);
+            if (addrs == null || addrs.length == 0)
+                return null;
+            List<byte[]> rv = new ArrayList<byte[]>(addrs.length);
+            for (int i = 0; i < addrs.length; i++) {
+                rv.add(addrs[i].getAddress());
+            }
+            return rv;
+        } catch (UnknownHostException uhe) {}
+        return null;
     }
 
     /**
