@@ -9,8 +9,6 @@ package net.i2p.data;
  *
  */
 
-import gnu.crypto.hash.Sha256Standalone;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -1326,26 +1324,6 @@ public class DataHelper {
      *
      * @param hash null OK
      * @return null on EOF
-     * @deprecated use MessageDigest version to be removed in 0.9.27
-     */
-    @Deprecated
-    public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
-        StringBuilder buf = new StringBuilder(128);
-        boolean ok = readLine(in, buf, hash);
-        if (ok)
-            return buf.toString();
-        else
-            return null;
-    }
-
-    /**
-     * update the hash along the way
-     * Warning - strips \n but not \r
-     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
-     * Warning - not UTF-8
-     *
-     * @param hash null OK
-     * @return null on EOF
      * @since 0.8.8
      */
     public static String readLine(InputStream in, MessageDigest hash) throws IOException {
@@ -1357,49 +1335,9 @@ public class DataHelper {
             return null;
     }
 
-    /**
-     * Read in a line, placing it into the buffer (excluding the newline).
-     * Warning - strips \n but not \r
-     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
-     * Warning - not UTF-8
-     *
-     * @deprecated use StringBuilder version
-     * @return true if the line was read, false if eof was reached on an empty line
-     *              (returns true for non-empty last line without a newline)
-     */
-    @Deprecated
-    public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
-        return readLine(in, buf, null);
-    }
-
     /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
     private static final int MAX_LINE_LENGTH = 8*1024;
 
-    /**
-     * update the hash along the way
-     * Warning - strips \n but not \r
-     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
-     * Warning - not UTF-8
-     *
-     * @return true if the line was read, false if eof was reached on an empty line
-     *              (returns true for non-empty last line without a newline)
-     * @deprecated use StringBuilder / MessageDigest version, to be removed in 0.9.27
-     */
-    @Deprecated
-    public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
-        int c = -1;
-        int i = 0;
-        while ( (c = in.read()) != -1) {
-            if (++i > MAX_LINE_LENGTH)
-                throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
-            if (hash != null) hash.update((byte)c);
-            if (c == '\n')
-                break;
-            buf.append((char)c);
-        }
-        return c != -1 || i > 0;
-    }
-    
     /**
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
@@ -1411,33 +1349,6 @@ public class DataHelper {
      */
     public static boolean readLine(InputStream in, StringBuilder buf) throws IOException {
         return readLine(in, buf, (MessageDigest) null);
-    }
-
-    /**
-     * update the hash along the way
-     * Warning - strips \n but not \r
-     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
-     * Warning - not UTF-8
-     *
-     *
-     * @param hash null OK
-     * @return true if the line was read, false if eof was reached on an empty line
-     *              (returns true for non-empty last line without a newline)
-     * @deprecated use MessageDigest version, to be removed in 0.9.27
-     */
-    @Deprecated
-    public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
-        int c = -1;
-        int i = 0;
-        while ( (c = in.read()) != -1) {
-            if (++i > MAX_LINE_LENGTH)
-                throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
-            if (hash != null) hash.update((byte)c);
-            if (c == '\n')
-                break;
-            buf.append((char)c);
-        }
-        return c != -1 || i > 0;
     }
     
     /**
@@ -1463,16 +1374,6 @@ public class DataHelper {
             buf.append((char)c);
         }
         return c != -1 || i > 0;
-    }
-    
-    /**
-     *  update the hash along the way
-     *  @deprecated use MessageDigest version, to be removed in 0.9.27
-     */
-    @Deprecated
-    public static void write(OutputStream out, byte data[], Sha256Standalone hash) throws IOException {
-        hash.update(data);
-        out.write(data);
     }
     
     /**
