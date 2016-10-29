@@ -434,8 +434,12 @@ public class PluginStarter implements Runnable {
                     if (f.getName().endsWith(".jar")) {
                         try {
                             addPath(f.toURI().toURL());
-                            log.error("INFO: Adding translation plugin to classpath: " + f);
+                            log.info("INFO: Adding translation plugin to classpath: " + f);
                             added = true;
+                        } catch (ClassCastException e) {
+                            log.logAlways(Log.WARN, "Java version: " + System.getProperty("java.version") +
+                                                    " does not support adding classpath element: " + f +
+                                                    " for plugin " + appName);
                         } catch (RuntimeException e) {
                             log.error("Plugin " + appName + " bad classpath element: " + f, e);
                         }
@@ -987,6 +991,8 @@ public class PluginStarter implements Runnable {
 
     /**
      *  http://jimlife.wordpress.com/2007/12/19/java-adding-new-classpath-at-runtime/
+     *
+     *  @throws ClassCastException in Java 9
      */
     private static void addPath(URL u) throws Exception {
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();

@@ -1,3 +1,15 @@
+2016-10-29 zzz
+ * Console: Java 9 fixes for classloader (ticket #1870)
+
+2016-10-28 zzz
+ * Build: Fix typo in jcpuid build.sh for Mac (ticket #1865)
+ * Crypto:
+   - Generate more-conforming selfsigned certs (ticket #1853)
+   - Remove deprecated Sha256Standalone as scheduled
+ * Utils:
+   - Fix Java version detection for Java 9 (ticket #1870)
+   - Add Addresses methods for multiple DNS results (ticket #1050)
+
 2016-10-26 zzz
  * Build: Mac jbigi/jcpuid improvements and docs (ticket #1865)
  * JRobin 1.6.0-1
