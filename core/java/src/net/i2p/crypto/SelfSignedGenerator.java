@@ -522,7 +522,10 @@ public final class SelfSignedGenerator {
         int wrap5len = spaceFor(wrap51len);
         int ext5len = oid5.length + spaceFor(wrap5len);
 
-        int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext3len) + spaceFor(ext4len) + spaceFor(ext5len);
+        int extslen = spaceFor(ext1len) + spaceFor(ext2len) + spaceFor(ext4len) + spaceFor(ext5len);
+        final boolean isCA = !cname.contains("@");
+        if (isCA)
+            extslen += spaceFor(ext3len);
         int seqlen = spaceFor(extslen);
         int totlen = spaceFor(seqlen);
         byte[] rv = new byte[totlen];
@@ -561,20 +564,22 @@ public final class SelfSignedGenerator {
         System.arraycopy(sha, 0, rv, idx, sha.length);
         idx += sha.length;
 
-        // Basic Constraints (critical)
-        rv[idx++] = (byte) 0x30;
-        idx = intToASN1(rv, idx, ext3len);
-        System.arraycopy(oid3, 0, rv, idx, oid3.length);
-        idx += oid3.length;
-        System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
-        idx += TRUE.length;
-        // octet string wraps an sequence containing TRUE
-        rv[idx++] = (byte) 0x04;
-        idx = intToASN1(rv, idx, wrap3len);
-        rv[idx++] = (byte) 0x30;
-        idx = intToASN1(rv, idx, TRUE.length);
-        System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
-        idx += TRUE.length;
+        if (isCA) {
+            // Basic Constraints (critical)
+            rv[idx++] = (byte) 0x30;
+            idx = intToASN1(rv, idx, ext3len);
+            System.arraycopy(oid3, 0, rv, idx, oid3.length);
+            idx += oid3.length;
+            System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
+            idx += TRUE.length;
+            // octet string wraps an sequence containing TRUE
+            rv[idx++] = (byte) 0x04;
+            idx = intToASN1(rv, idx, wrap3len);
+            rv[idx++] = (byte) 0x30;
+            idx = intToASN1(rv, idx, TRUE.length);
+            System.arraycopy(TRUE, 0, rv, idx, TRUE.length);
+            idx += TRUE.length;
+        }
 
         // Key Usage (critical)
         rv[idx++] = (byte) 0x30;
@@ -601,7 +606,7 @@ public final class SelfSignedGenerator {
         idx = intToASN1(rv, idx, wrap4len);
         rv[idx++] = (byte) 0x30;
         idx = intToASN1(rv, idx, wrap41len);
-        rv[idx++] = (byte) 0x82; // choice, IA5String implied
+        rv[idx++] = (byte) (isCA ? 0x82 : 0x81); // choice, dNSName or rfc822Name, IA5String implied
         idx = intToASN1(rv, idx, cnameBytes.length);
         System.arraycopy(cnameBytes, 0, rv, idx, cnameBytes.length);
         idx += cnameBytes.length;
@@ -695,22 +700,19 @@ public final class SelfSignedGenerator {
 /****
     public static void main(String[] args) {
         try {
-            test("test0", SigType.DSA_SHA1);
-            test("test1", SigType.ECDSA_SHA256_P256);
-            test("test2", SigType.ECDSA_SHA384_P384);
-            test("test3", SigType.ECDSA_SHA512_P521);
-            test("test4", SigType.RSA_SHA256_2048);
-            test("test5", SigType.RSA_SHA384_3072);
-            test("test6", SigType.RSA_SHA512_4096);
-            test("test7", SigType.EdDSA_SHA512_Ed25519);
-            test("test8", SigType.EdDSA_SHA512_Ed25519ph);
+            int i = 0;
+            for (SigType t : java.util.EnumSet.allOf(SigType.class)) {
+                if (t.isAvailable())
+                    test("test" + i, t);
+                i++;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private static final void test(String name, SigType type) throws Exception {
-            Object[] rv = generate("cname.example.com", "ou", "o", null, "st", "c", 3652, type);
+            Object[] rv = generate("cname@example.com", "ou", "o", null, "st", "c", 3652, type);
             PublicKey jpub = (PublicKey) rv[0];
             PrivateKey jpriv = (PrivateKey) rv[1];
             X509Certificate cert = (X509Certificate) rv[2];
