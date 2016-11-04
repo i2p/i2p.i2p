@@ -97,6 +97,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private volatile boolean _haveIPv6Address;
     private long _lastInboundIPv6;
+    private final int _min_peers;
+    private final int _min_v6_peers;
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
@@ -196,6 +198,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int TEST_FREQUENCY = 13*60*1000;
     private static final int MIN_TEST_FREQUENCY = 45*1000;
     static final long[] RATES = { 10*60*1000 };
+    /** minimum active peers to maintain IP detection, etc. */
+    private static final int MIN_PEERS = 5;
+    private static final int MIN_PEERS_IF_HAVE_V6 = 30;
+    /** minimum peers volunteering to be introducers if we need that */
+    private static final int MIN_INTRODUCER_POOL = 5;
     
     private static final int[] BID_VALUES = { 15, 20, 50, 65, 80, 95, 100, 115, TransportBid.TRANSIENT_FAIL };
     private static final int FAST_PREFERRED_BID = 0;
@@ -267,6 +274,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _mtu_ipv6 = PeerState.MIN_IPV6_MTU;
         setupPort();
         _needsRebuild = true;
+        _min_peers = _context.getProperty("i2np.udp.minpeers", MIN_PEERS);
+        _min_v6_peers = _context.getProperty("i2np.udp.minv6peers", MIN_PEERS_IF_HAVE_V6);
         
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", RATES);
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", RATES);
@@ -1695,12 +1704,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
 
-    /** minimum active peers to maintain IP detection, etc. */
-    private static final int MIN_PEERS = 5;
-    private static final int MIN_PEERS_IF_HAVE_V6 = 30;
-    /** minimum peers volunteering to be introducers if we need that */
-    private static final int MIN_INTRODUCER_POOL = 5;
-
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
         if (dataSize > OutboundMessageState.MAX_MSG_SIZE) {
             // NTCP max is lower, so msg will get dropped
@@ -1762,8 +1765,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // (Otherwise we only talk UDP to those that are firewalled, and we will
             // never get any introducers)
             int count = _peersByIdent.size();
-            if (alwaysPreferUDP() || count < MIN_PEERS ||
-                (_haveIPv6Address && count < MIN_PEERS_IF_HAVE_V6) ||
+            if (alwaysPreferUDP() || count < _min_peers ||
+                (_haveIPv6Address && count < _min_v6_peers) ||
                 (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
                 return _cachedBid[SLOW_PREFERRED_BID];
             else if (preferUDP())
