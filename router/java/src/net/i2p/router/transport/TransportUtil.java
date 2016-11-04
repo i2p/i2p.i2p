@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.router.RouterContext;
 
@@ -131,6 +132,8 @@ public abstract class TransportUtil {
      *  @since IPv6
      */
     public static boolean isPubliclyRoutable(byte addr[], boolean allowIPv4, boolean allowIPv6) {
+        if (I2PAppContext.getGlobalContext().getBooleanProperty("i2np.allowLocal"))
+            return true;
         if (addr.length == 4) {
             if (!allowIPv4)
                 return false;

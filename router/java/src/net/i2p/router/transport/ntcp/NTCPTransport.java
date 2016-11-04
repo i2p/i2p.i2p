@@ -436,7 +436,7 @@ public class NTCPTransport extends TransportImpl {
                 continue;
             }
             if (!isValid(ip)) {
-                if (! _context.getBooleanProperty("i2np.ntcp.allowLocal")) {
+                if (! allowLocal()) {
                     //_context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1);
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug("no bid when trying to send to " + peer + " as they have a private ntcp address");

@@ -1093,16 +1093,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return true;
         return allowLocal();
     }
-    
-    /**
-     * Are we allowed to connect to local addresses?
-     *
-     * @since IPv6
-     */
-    boolean allowLocal() {
-        return _context.getBooleanProperty("i2np.udp.allowLocal");
-    }
-    
+
     /**
      *  Was true before 0.9.2
      *  Now false if we need introducers (as perhaps that's why we need them,

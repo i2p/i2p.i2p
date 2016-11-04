@@ -944,6 +944,15 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
+     * Are we allowed to connect to local addresses?
+     *
+     * @since 0.9.28 moved from UDPTransport
+     */
+    protected boolean allowLocal() {
+        return _context.getBooleanProperty("i2np.allowLocal");
+    }
+
+    /**
      * IP of the peer from the last connection (in or out, any transport).
      *
      * @param ip IPv4 or IPv6, non-null

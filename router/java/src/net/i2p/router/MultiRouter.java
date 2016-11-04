@@ -193,8 +193,7 @@ public class MultiRouter {
         props.setProperty("i2np.udp.host", "127.0.0.1");
         props.setProperty("i2np.ntcp.port", BASE_PORT + id + "");
         props.setProperty("i2np.udp.port", BASE_PORT + id + "");
-        props.setProperty("i2np.ntcp.allowLocal", "true");
-        props.setProperty("i2np.udp.allowLocal", "true");
+        props.setProperty("i2np.allowLocal", "true");
         props.setProperty("i2np.udp.internalPort", BASE_PORT + id + "");
         props.setProperty("i2cp.port", Integer.toString((BASE_PORT + nbrRouters + id)));   
 
