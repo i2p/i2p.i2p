@@ -386,7 +386,7 @@ public class ConfigClientsHandler extends FormHandler {
                         WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
                         addFormNoticeNoEscape(_t("WebApp") + " <a href=\"/" + app + "/\">" + _t(app) + "</a> " + _t("started") + '.');
                     } catch (Throwable e) {
-                        addFormError(_t("Failed to start") + ' ' + _t(app) + " " + e + '.');
+                        addFormError(_t("Failed to start") + ' ' + _t(app) + ": " + e);
                         _log.error("Failed to start webapp " + app, e);
                     }
                     return;
