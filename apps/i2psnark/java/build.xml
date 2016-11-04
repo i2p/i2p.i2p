@@ -287,6 +287,7 @@
         <delete dir="./dist" />
         <mkdir dir="./dist" />
         <copy file="../launch-i2psnark" todir="./dist/" />
+        <copy file="../launch-i2psnark.bat" todir="./dist/" />
         <mkdir dir="./dist/contexts" />
         <copy file="../standalone-context.xml" tofile="./dist/contexts/context.xml" />
         <mkdir dir="./dist/docroot" />
