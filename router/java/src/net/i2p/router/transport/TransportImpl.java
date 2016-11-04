@@ -948,7 +948,7 @@ public abstract class TransportImpl implements Transport {
      *
      * @since 0.9.28 moved from UDPTransport
      */
-    protected boolean allowLocal() {
+    public boolean allowLocal() {
         return _context.getBooleanProperty("i2np.allowLocal");
     }
 
