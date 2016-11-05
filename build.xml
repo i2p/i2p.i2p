@@ -1250,8 +1250,17 @@
         </copy>
     </target>
 
-    <!-- todo handle alt package too -->
-    <target name="copytomcat-unlesspkg" unless="${with-libtomcat7-java}" >
+    <target name="settomcatprop" >
+        <condition property="with-libtomcat-java" >
+            <or>
+                <istrue value="${with-libtomcat6-java}" />
+                <istrue value="${with-libtomcat7-java}" />
+                <istrue value="${with-libtomcat8-java}" />
+            </or>
+        </condition>
+    </target>
+
+    <target name="copytomcat-unlesspkg" depends="settomcatprop" unless="${with-libtomcat-java}" >
         <copy todir="pkg-temp/lib" >
             <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar" />
         </copy>
@@ -1281,7 +1290,7 @@
         <copy file="apps/desktopgui/LICENSE" tofile="pkg-temp/licenses/LICENSE-DesktopGUI.txt" />
     </target>
 
-    <target name="preplicenses-unlesspkg" unless="${with-libtomcat7-java}" >
+    <target name="preplicenses-unlesspkg" depends="settomcatprop" unless="${with-libtomcat-java}" >
         <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
     </target>
 

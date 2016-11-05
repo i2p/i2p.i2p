@@ -128,6 +128,17 @@ endif
 	@# following is from libservlet3.0-java which is a dependency of libtomcat7-java
 	@#ln -sf /usr/share/java/el-api-2.2.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
 
+	@# debian and ubuntu: wheezy-backports, jessie+, xenial+
+	@#/bin/echo -e "with-libtomcat8-java=true" >> $(CURDIR)/override.properties
+	@#mkdir -p $(CURDIR)/apps/jetty/jettylib
+	@#ln -sf /usr/share/java/tomcat8-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	@#ln -sf /usr/share/java/tomcat8-api.jar $(CURDIR)/apps/jetty/jettylib/tomcat-api.jar
+	@#ln -sf /usr/share/java/tomcat8-util.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util.jar
+	@#ln -sf /usr/share/java/tomcat8-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	@#ln -sf /usr/share/java/tomcat8-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
+	@#ln -sf /usr/share/java/tomcat8-jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
+	@#ln -sf /usr/share/java/tomcat8-el-api.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
 	@# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail

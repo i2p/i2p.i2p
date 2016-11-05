@@ -225,6 +225,7 @@
             <or>
                 <istrue value="${with-libtomcat6-java}" />
                 <istrue value="${with-libtomcat7-java}" />
+                <istrue value="${with-libtomcat8-java}" />
             </or>
         </condition>
     </target>
