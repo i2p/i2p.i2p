@@ -143,7 +143,7 @@ ${book.loadBookMessages}
 <table class="book" cellspacing="0" cellpadding="5">
 <tr class="head">
 
-<c:if test="${book.master || book.router || book.published || book.private}">
+<c:if test="${book.validBook}">
 <th>&nbsp;</th>
 </c:if>
 
@@ -155,7 +155,7 @@ ${book.loadBookMessages}
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
 <c:forEach items="${book.entries}" var="addr" begin="${book.resultBegin}" end="${book.resultEnd}">
 <tr class="list${book.trClass}">
-<c:if test="${book.master || book.router || book.published || book.private}">
+<c:if test="${book.validBook}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._t("Mark for deletion")%>"></td>
 </c:if>
 <td class="names"><a href="http://${addr.name}/" target="_top">${addr.displayName}</a>
@@ -172,7 +172,7 @@ ${book.loadBookMessages}
 </div>
 
 <% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
-<c:if test="${book.master || book.router || book.published || book.private}">
+<c:if test="${book.validBook}">
 <div id="buttons">
 <p class="buttons">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >

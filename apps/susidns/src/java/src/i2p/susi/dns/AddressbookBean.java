@@ -111,6 +111,9 @@ public class AddressbookBean extends BaseBean
 		return entries;
 	}
 
+	/**
+	 * This always returns a valid book, non-null.
+	 */
 	public String getBook()
 	{
 		if( book == null || ( !book.equalsIgnoreCase( "master" ) &&
@@ -357,6 +360,7 @@ public class AddressbookBean extends BaseBean
 		return filter;
 	}
 
+/****
 	public boolean isMaster()
 	{
 		return getBook().equalsIgnoreCase("master");
@@ -373,6 +377,28 @@ public class AddressbookBean extends BaseBean
 	{
 		return getBook().equalsIgnoreCase("private");
 	}
+****/
+
+	/**
+	 * Because the following from addressbook.jsp fails parsing in the new EL:
+	 * javax.el.ELException: Failed to parse the expression
+	 * Can't figure out why, so just replace it with book.validBook:
+	 * &lt;c:if test="${book.master || book.router || book.published || book.private}"&gt;
+	 *
+	 * This always returns true anyway, because getBook() always
+	 * returns a valid book.
+	 *
+	 * @return true
+	 * @since 0.9.28
+	 */
+	public boolean isValidBook() {
+		String s = getBook().toLowerCase(Locale.US);
+		return s.equals("router") ||
+		       s.equals("master") ||
+		       s.equals("published") ||
+		       s.equals("private");
+	}
+
 	public void setFilter(String filter) {
 		if( filter != null && ( filter.length() == 0 || filter.equalsIgnoreCase("none"))) {
 			filter = null;
