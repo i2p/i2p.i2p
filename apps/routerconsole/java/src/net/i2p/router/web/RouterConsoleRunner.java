@@ -625,6 +625,12 @@ public class RouterConsoleRunner implements RouterApp {
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
+            if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
+                _context.getBaseDir().getAbsolutePath().equals("/usr/share/i2p")) {
+               // We are using Tomcat 6, so the Debian patch doesn't apply.
+               // Remove when we switch to Tomcat 8
+               _context.logManager().getLog(Server.class).logAlways(net.i2p.util.Log.INFO, "Please ignore any InstanceManager warnings");
+            }
             rootServletHandler = new ServletHandler();
             rootWebApp = new LocaleWebAppHandler(_context,
                                                   "/", _webAppsDir + ROUTERCONSOLE + ".war",
