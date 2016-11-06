@@ -279,10 +279,10 @@ public abstract class SystemVersion {
             System.out.println("  Version: " + getAndroidVersion());
         System.out.println("Apache   : " + isApache());
         System.out.println("ARM      : " + isARM());
-        System.out.println("Mac      : " + isMac());
         System.out.println("Gentoo   : " + isGentoo());
         System.out.println("GNU      : " + isGNU());
         System.out.println("Linux Svc: " + isLinuxService());
+        System.out.println("Mac      : " + isMac());
         System.out.println("OpenJDK  : " + isOpenJDK());
         System.out.println("Windows  : " + isWindows());
         System.out.println("Wrapper  : " + hasWrapper());
