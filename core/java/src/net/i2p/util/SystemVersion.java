@@ -16,6 +16,11 @@ import net.i2p.I2PAppContext;
  */
 public abstract class SystemVersion {
 
+    /*
+     *  @since 0.9.28
+     */
+    public static final String DAEMON_USER = "i2psvc";
+
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
@@ -29,6 +34,8 @@ public abstract class SystemVersion {
     private static final boolean _isOpenJDK;
     private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
+    private static final boolean _isLinuxService = !_isWin && !_isMac &&
+                                                   DAEMON_USER.equals(System.getProperty("user.name"));
 
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
@@ -193,6 +200,13 @@ public abstract class SystemVersion {
         return _is64;
     }
 
+    /*
+     *  @since 0.9.28
+     */
+    public static boolean isLinuxService() {
+        return _isLinuxService;
+    }
+
     /**
      *  Identical to android.os.Build.VERSION.SDK_INT.
      *  For use outside of Android code.
@@ -268,6 +282,7 @@ public abstract class SystemVersion {
         System.out.println("Mac      : " + isMac());
         System.out.println("Gentoo   : " + isGentoo());
         System.out.println("GNU      : " + isGNU());
+        System.out.println("Linux Svc: " + isLinuxService());
         System.out.println("OpenJDK  : " + isOpenJDK());
         System.out.println("Windows  : " + isWindows());
         System.out.println("Wrapper  : " + hasWrapper());

@@ -53,8 +53,7 @@ public class OOMListener implements I2PThread.OOMEventListener {
                 // Can't find any System property or wrapper property that gives
                 // you the actual config file path, have to guess
                 String path;
-                if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
-                    "i2psvc".equals(System.getProperty("user.name"))) {
+                if (SystemVersion.isLinuxService()) {
                     path = "/etc/i2p";
                 } else {
                     path = _context.getBaseDir().toString();

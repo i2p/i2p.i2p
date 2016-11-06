@@ -106,8 +106,7 @@ class BloomFilterIVValidator implements IVValidator {
         // you the actual config file path, have to guess
         // TODO if !SystemVersion.hasWrapper ...
         String path;
-        if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
-            "i2psvc".equals(System.getProperty("user.name"))) {
+        if (SystemVersion.isLinuxService()) {
             path = "/etc/i2p";
         } else {
             path = _context.getBaseDir().toString();

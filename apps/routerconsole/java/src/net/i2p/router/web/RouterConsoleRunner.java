@@ -131,7 +131,6 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_THREADS = 24;
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
-    public static final String DAEMON_USER = "i2psvc";
     public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
     
     /**
@@ -273,7 +272,7 @@ public class RouterConsoleRunner implements RouterApp {
     private void startTrayApp() {
         // if no permissions, don't even try
         // isLaunchedAsService() always returns true on Linux
-        if (DAEMON_USER.equals(System.getProperty("user.name")) ||
+        if (SystemVersion.isLinuxService() ||
             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService())) {
             // required true for jrobin to work
             System.setProperty("java.awt.headless", "true");
