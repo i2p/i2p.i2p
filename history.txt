@@ -1,3 +1,20 @@
+2016-11-06 zzz
+ * Console: Add Java 9 log warning (ticket #1870)
+ * Security: Consistently log authentication failures for all interfaces
+ * Util: Consolidate linux service detection code
+
+2016-11-05 zzz
+ * Build: Add support for using libtomcat8-java package
+ * Console: Add message to ignore InstanceManager warning (ticket #1818)
+ * SusiDNS: Fix jsp EL syntax error with EL 3.0 (Tomcat 8) (ticket #1870)
+
+2016-11-04 zzz
+ * Console: Improve handling and logging of webapps that fail to start
+ * i2psnark: Add launch-i2psnark.bat (ticket #1871)
+ * Transports:
+   - New config i2np.allowLocal, fixes test networks (ticket #1875)
+   - New configs i2np.udp.minpeers and i2np.udp.minv6peers, for testing (ticket #1876)
+
 2016-10-29 zzz
  * Console: Java 9 fixes for classloader (ticket #1870)
 
@@ -47,7 +64,7 @@
  * Console: Fix HTML error on /configservice
  * Debian: Update package descriptions, allow Java 9
  * i2psnark: Add ids to rows, add to per-torrent show peers link
- * SSU: Fix minimum version check for IPv6 peer test (ticket #1861)
+ * SSU: Fix minimum version check for IPv6 peer test (tickets #1829, #1861)
 
 * 2016-10-17 0.9.27 released
 

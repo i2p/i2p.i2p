@@ -48,6 +48,7 @@ import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -848,7 +849,8 @@ public class RouterConsoleRunner implements RouterApp {
                 enable = false;
                 ctx.router().saveConfig(PROP_CONSOLE_PW, "false");
             } else {
-                HashLoginService realm = new HashLoginService(JETTY_REALM);
+                HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
+                                                                    ctx.logManager().getLog(RouterConsoleRunner.class));
                 sec.setLoginService(realm);
                 sec.setAuthenticator(authenticator);
                 String[] role = new String[] {JETTY_ROLE};
@@ -930,6 +932,30 @@ public class RouterConsoleRunner implements RouterApp {
         sec.setConstraintMappings(cmarr);
 
         context.setSecurityHandler(sec);
+    }
+    
+    /**
+     * For logging authentication failures
+     * @since 0.9.28
+     */
+    private static class CustomHashLoginService extends HashLoginService {
+        private final String _webapp;
+        private final net.i2p.util.Log _log;
+
+        public CustomHashLoginService(String realm, String webapp, net.i2p.util.Log log) {
+            super(realm);
+            _webapp = webapp;
+            _log = log;
+        }
+
+        @Override
+        public UserIdentity login(String username, Object credentials) {
+            UserIdentity rv = super.login(username, credentials);
+            if (rv == null)
+                //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
+                _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);
+            return rv;
+        }
     }
     
     /** @since 0.8.8 */

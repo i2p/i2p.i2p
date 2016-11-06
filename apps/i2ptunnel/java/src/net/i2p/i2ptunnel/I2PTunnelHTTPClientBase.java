@@ -304,7 +304,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                             return AuthResult.AUTH_GOOD;
                         }
                     }
-                    _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+                    _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
                 } catch (UnsupportedEncodingException uee) {
                     _log.error(getPrefix(requestId) + "No UTF-8 support? B64: " + authorization, uee);
                 } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -363,7 +363,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String ha1 = getTunnel().getClientOptions().getProperty(PROP_PROXY_DIGEST_PREFIX + user +
                                                                 PROP_PROXY_DIGEST_SUFFIX);
         if (ha1 == null) {
-            _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
             return AuthResult.AUTH_BAD;
         }
         // get H(A2)
@@ -373,7 +373,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
         String hkd = PasswordManager.md5Hex(kd);
         if (!response.equals(hkd)) {
-            _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Bad digest auth: " + DataHelper.toString(args));
             return AuthResult.AUTH_BAD;
