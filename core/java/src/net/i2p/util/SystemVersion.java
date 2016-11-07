@@ -34,8 +34,7 @@ public abstract class SystemVersion {
     private static final boolean _isOpenJDK;
     private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
-    private static final boolean _isLinuxService = !_isWin && !_isMac &&
-                                                   DAEMON_USER.equals(System.getProperty("user.name"));
+    private static final boolean _isLinuxService;
 
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
@@ -63,6 +62,8 @@ public abstract class SystemVersion {
                  vendor.startsWith("Free Software Foundation");      // gij
         String runtime = System.getProperty("java.runtime.name");
         _isOpenJDK = runtime != null && runtime.contains("OpenJDK");
+        _isLinuxService = !_isWin && !_isMac && !_isAndroid &&
+                          DAEMON_USER.equals(System.getProperty("user.name"));
 
         int sdk = 0;
         if (_isAndroid) {
