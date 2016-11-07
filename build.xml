@@ -965,6 +965,7 @@
         <delete file="i2p.fba" />
         <delete file="${sloccount.report.file}" />
         <delete file="mavencentral-i2p.jar" />
+        <delete file="mavencentral-router.jar" />
         <delete file="mavencentral-mstreaming.jar" />
         <delete file="mavencentral-streaming.jar" />
     </target>
@@ -2001,9 +2002,11 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 
-    <target name="mavenCentral.deps" depends="buildStreaming">
+    <target name="mavenCentral.deps" depends="buildRouter, buildStreaming">
         <ant dir="core/java/" target="javadocJar" />
         <ant dir="core/java/" target="sourcesJar" />
+        <ant dir="router/java/" target="javadocJar" />
+        <ant dir="router/java/" target="sourcesJar" />
         <ant dir="apps/ministreaming/java/" target="javadocJar" />
         <ant dir="apps/ministreaming/java/" target="sourcesJar" />
         <ant dir="apps/streaming/java/" target="javadocJar" />
@@ -2014,14 +2017,17 @@
         <mkdir dir="./pkg-mavencentral" />
         <!-- Libraries -->
         <copy file="build/i2p.jar" tofile="pkg-mavencentral/i2p-${release.number}.jar" />
+        <copy file="build/router.jar" tofile="pkg-mavencentral/router-${release.number}.jar" />
         <copy file="build/mstreaming.jar" tofile="pkg-mavencentral/mstreaming-${release.number}.jar" />
         <copy file="build/streaming.jar" tofile="pkg-mavencentral/streaming-${release.number}.jar" />
         <!-- JavaDocs -->
         <copy file="core/java/build/i2p-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
+        <copy file="router/java/build/router-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
         <copy file="apps/ministreaming/java/build/mstreaming-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
         <copy file="apps/streaming/java/build/streaming-${release.number}-javadoc.jar" todir="pkg-mavencentral/" />
         <!-- Sources -->
         <copy file="core/java/build/i2p-${release.number}-sources.jar" todir="pkg-mavencentral/" />
+        <copy file="router/java/build/router-${release.number}-sources.jar" todir="pkg-mavencentral/" />
         <copy file="apps/ministreaming/java/build/mstreaming-${release.number}-sources.jar" todir="pkg-mavencentral/" />
         <copy file="apps/streaming/java/build/streaming-${release.number}-sources.jar" todir="pkg-mavencentral/" />
         <!-- POMs -->
@@ -2035,6 +2041,18 @@
             <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
                  url="git@github.com:i2p/i2p.i2p.git" />
+        </artifact:pom>
+        <artifact:pom id="routerpom" groupId="net.i2p" artifactId="router" version="${release.number}"
+                name="I2P Router"
+                description="The I2P router"
+                url="https://geti2p.net/">
+            <license name="Public Domain" url="http://en.wikipedia.org/wiki/Public_domain" />
+            <developer name="zzz" organization="I2P" organizationUrl="https://geti2p.net/" />
+            <developer name="str4d" email="str4d@i2pmail.org" organization="I2P" organizationUrl="https://geti2p.net/"/>
+            <scm connection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 developerConnection="scm:git:git@github.com:i2p/i2p.i2p.git"
+                 url="git@github.com:i2p/i2p.i2p.git" />
+            <dependency groupId="net.i2p" artifactId="i2p" version="${release.number}" />
         </artifact:pom>
         <artifact:pom id="mstreamingpom" groupId="net.i2p.client" artifactId="mstreaming" version="${release.number}"
                 name="I2P Ministreaming"
@@ -2062,6 +2080,7 @@
             <dependency groupId="net.i2p.client" artifactId="mstreaming" version="${release.number}" />
         </artifact:pom>
         <artifact:writepom pomRefId="i2ppom" file="pkg-mavencentral/i2p-${release.number}.pom"/>
+        <artifact:writepom pomRefId="routerpom" file="pkg-mavencentral/router-${release.number}.pom"/>
         <artifact:writepom pomRefId="mstreamingpom" file="pkg-mavencentral/mstreaming-${release.number}.pom" />
         <artifact:writepom pomRefId="streamingpom" file="pkg-mavencentral/streaming-${release.number}.pom" />
         <!-- Signatures -->
@@ -2077,6 +2096,10 @@
         <gpgsignasc file="pkg-mavencentral/i2p-${release.number}.pom" />
         <gpgsignasc file="pkg-mavencentral/i2p-${release.number}-javadoc.jar" />
         <gpgsignasc file="pkg-mavencentral/i2p-${release.number}-sources.jar" />
+        <gpgsignasc file="pkg-mavencentral/router-${release.number}.jar" />
+        <gpgsignasc file="pkg-mavencentral/router-${release.number}.pom" />
+        <gpgsignasc file="pkg-mavencentral/router-${release.number}-javadoc.jar" />
+        <gpgsignasc file="pkg-mavencentral/router-${release.number}-sources.jar" />
         <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}.jar" />
         <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}.pom" />
         <gpgsignasc file="pkg-mavencentral/mstreaming-${release.number}-javadoc.jar" />
@@ -2089,6 +2112,11 @@
         <jar destfile="mavencentral-i2p.jar">
             <fileset dir="./pkg-mavencentral">
                 <include name="i2p-*" />
+            </fileset>
+        </jar>
+        <jar destfile="mavencentral-router.jar">
+            <fileset dir="./pkg-mavencentral">
+                <include name="router-*" />
             </fileset>
         </jar>
         <jar destfile="mavencentral-mstreaming.jar">
