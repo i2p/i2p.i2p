@@ -264,11 +264,11 @@ public final class SelfSignedGenerator {
         // a0 ???, int = 2
         byte[] version = { (byte) 0xa0, 3, 2, 1, 2 };
 
-        // postive serial number (int)
-        byte[] serial = new byte[6];
+        // positive serial number (long)
+        byte[] serial = new byte[10];
         serial[0] = 2;
-        serial[1] = 4;
-        RandomSource.getInstance().nextBytes(serial, 2, 4);
+        serial[1] = 8;
+        RandomSource.getInstance().nextBytes(serial, 2, 8);
         serial[2] &= 0x7f;
 
         // going to use this for both issuer and subject
