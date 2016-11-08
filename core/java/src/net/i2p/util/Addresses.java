@@ -4,14 +4,21 @@ package net.i2p.util;
  * public domain
  */
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +28,8 @@ import java.util.TreeSet;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+
 
 /**
  * Methods to get the local addresses, and other IP utilities
@@ -30,6 +39,16 @@ import net.i2p.I2PAppContext;
  */
 public abstract class Addresses {
     
+    private static final File IF_INET6_FILE = new File("/proc/net/if_inet6");
+    private static final long INET6_CACHE_EXPIRE = 10*60*1000;
+    private static final boolean INET6_CACHE_ENABLED = !SystemVersion.isMac() && !SystemVersion.isWindows() &&
+                                                    !SystemVersion.isAndroid() && IF_INET6_FILE.exists();
+    private static final int FLAG_PERMANENT = 0x80;
+    private static final int FLAG_DEPRECATED = 0x20;
+    private static final int FLAG_TEMPORARY = 0x01;
+    private static long _ifCacheTime;
+    private static final Map<Inet6Address, Inet6Addr> _ifCache = INET6_CACHE_ENABLED ? new HashMap<Inet6Address, Inet6Addr>(8) : null;
+
     /**
      *  Do we have any non-loop, non-wildcard IPv4 address at all?
      *  @since 0.9.4
@@ -101,18 +120,25 @@ public abstract class Addresses {
         boolean haveIPv4 = false;
         boolean haveIPv6 = false;
         SortedSet<String> rv = new TreeSet<String>();
+        final boolean omitDeprecated = INET6_CACHE_ENABLED && !includeSiteLocal && includeIPv6;
         try {
             InetAddress localhost = InetAddress.getLocalHost();
             InetAddress[] allMyIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
             if (allMyIps != null) {
                 for (int i = 0; i < allMyIps.length; i++) {
-                    if (allMyIps[i] instanceof Inet4Address)
+                    boolean isv4 = allMyIps[i] instanceof Inet4Address;
+                    if (isv4)
                         haveIPv4 = true;
                     else
                         haveIPv6 = true;
+                    if (omitDeprecated && !isv4) {
+                        if (isDeprecated((Inet6Address) allMyIps[i]))
+                            continue;
+                    }
                     if (shouldInclude(allMyIps[i], includeSiteLocal,
-                                      includeLoopbackAndWildcard, includeIPv6))
+                                      includeLoopbackAndWildcard, includeIPv6)) {
                         rv.add(stripScope(allMyIps[i].getHostAddress()));
+                    }
                 }
             }
         } catch (UnknownHostException e) {}
@@ -124,13 +150,19 @@ public abstract class Addresses {
                     NetworkInterface ifc = ifcs.nextElement();
                     for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                         InetAddress addr = addrs.nextElement();
-                        if (addr instanceof Inet4Address)
+                        boolean isv4 = addr instanceof Inet4Address;
+                        if (isv4)
                             haveIPv4 = true;
                         else
                             haveIPv6 = true;
+                        if (omitDeprecated && !isv4) {
+                            if (isDeprecated((Inet6Address) addr))
+                                continue;
+                        }
                         if (shouldInclude(addr, includeSiteLocal,
-                                          includeLoopbackAndWildcard, includeIPv6))
+                                          includeLoopbackAndWildcard, includeIPv6)) {
                             rv.add(stripScope(addr.getHostAddress()));
+                        }
                     }
                 }
             }
@@ -333,8 +365,8 @@ public abstract class Addresses {
 
     /**
      *  For literal IP addresses, this is the same as getIP(String).
-     *  For host names, will return the preferred type (IPv4/v6) if available,
-     *  else the other type if available.
+     *  For host names, may return multiple addresses, both IPv4 and IPv6,
+     *  even if those addresses are not reachable due to configuration or available interfaces.
      *  Will resolve but not cache DNS host names.
      *
      *  Note that order of returned results, and whether
@@ -370,6 +402,136 @@ public abstract class Addresses {
         return null;
     }
 
+    //////// IPv6 Cache Utils ///////
+
+    /**
+     *  @since 0.9.28
+     */
+    private static class Inet6Addr {
+        private final Inet6Address addr;
+        private final boolean isDyn, isDep, isTemp;
+
+        public Inet6Addr(Inet6Address a, int flags) {
+            addr = a;
+            isDyn = (flags & FLAG_PERMANENT) == 0;
+            isDep = (flags & FLAG_DEPRECATED) != 0;
+            isTemp = (flags & FLAG_TEMPORARY) != 0;
+        }
+
+        public Inet6Address getAddress() { return addr; }
+        public boolean isDynamic() { return isDyn; }
+        public boolean isDeprecated() { return isDep; }
+        public boolean isTemporary() { return isTemp; }
+    }
+
+    /**
+     *  Only call if INET6_CACHE_ENABLED.
+     *  Caller must sync on _ifCache.
+     *  @since 0.9.28
+     */
+    private static void refreshCache() {
+        long now = System.currentTimeMillis();
+        if (now - _ifCacheTime < INET6_CACHE_EXPIRE)
+            return;
+        _ifCache.clear();
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(IF_INET6_FILE), "ISO-8859-1"), 4096);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                // http://tldp.org/HOWTO/html_single/Linux+IPv6-HOWTO/#PROC-NET
+                // 00000000000000000000000000000001 01 80 10 80       lo
+                String[] parts = DataHelper.split(line, " ", 6);
+                if (parts.length < 5)
+                    continue;
+                String as = parts[0];
+                if (as.length() != 32)
+                    continue;
+                StringBuilder buf = new StringBuilder(40);
+                int i = 0;
+                while(true) {
+                    buf.append(as.substring(i, i+4));
+                    i += 4;
+                    if (i >= 32)
+                        break;
+                    buf.append(':');
+                }
+                Inet6Address addr;
+                try {
+                    addr = (Inet6Address) InetAddress.getByName(buf.toString());
+                } catch (UnknownHostException uhe) {
+                    continue;
+                }
+                int flags = FLAG_PERMANENT;
+                try {
+                    flags = Integer.parseInt(parts[4], 16);
+                } catch (NumberFormatException nfe) {}
+                Inet6Addr a = new Inet6Addr(addr, flags);
+                _ifCache.put(addr, a);
+            }
+        } catch (IOException ioe) {
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
+        _ifCacheTime = now;
+    }
+
+    /**
+     *  Is this address dynamic?
+     *  Returns false if unknown.
+     *  @since 0.9.28
+     */
+    public static boolean isDynamic(Inet6Address addr) {
+        if (!INET6_CACHE_ENABLED)
+            return false;
+        Inet6Addr a;
+        synchronized(_ifCache) {
+            refreshCache();
+            a = _ifCache.get(addr);
+        }
+        if (a == null)
+            return false;
+        return a.isDynamic();
+    }
+
+    /**
+     *  Is this address deprecated?
+     *  Returns false if unknown.
+     *  @since 0.9.28
+     */
+    public static boolean isDeprecated(Inet6Address addr) {
+        if (!INET6_CACHE_ENABLED)
+            return false;
+        Inet6Addr a;
+        synchronized(_ifCache) {
+            refreshCache();
+            a = _ifCache.get(addr);
+        }
+        if (a == null)
+            return false;
+        return a.isDeprecated();
+    }
+
+    /**
+     *  Is this address temporary?
+     *  Returns false if unknown.
+     *  @since 0.9.28
+     */
+    public static boolean isTemporary(Inet6Address addr) {
+        if (!INET6_CACHE_ENABLED)
+            return false;
+        Inet6Addr a;
+        synchronized(_ifCache) {
+            refreshCache();
+            a = _ifCache.get(addr);
+        }
+        if (a == null)
+            return false;
+        return a.isTemporary();
+    }
+
+    //////// End IPv6 Cache Utils ///////
+
     /**
      *  @since 0.9.3
      */
@@ -377,32 +539,66 @@ public abstract class Addresses {
         synchronized(_IPAddress) {
             _IPAddress.clear();
         }
+        if (_ifCache != null) {
+            synchronized(_ifCache) {
+                _ifCache.clear();
+                _ifCacheTime = 0;
+            }
+        }
     }
 
     /**
      *  Print out the local addresses
      */
     public static void main(String[] args) {
-        System.err.println("External IPv4 Addresses:");
+        System.out.println("External IPv4 Addresses:");
         Set<String> a = getAddresses(false, false, false);
         for (String s : a)
-            System.err.println(s);
-        System.err.println("\nExternal and Local IPv4 Addresses:");
+            System.out.println(s);
+        System.out.println("\nExternal and Local IPv4 Addresses:");
         a = getAddresses(true, false, false);
         for (String s : a)
-            System.err.println(s);
-        System.err.println("\nAll External Addresses:");
+            System.out.println(s);
+        System.out.println("\nAll External Addresses:");
         a = getAddresses(false, false, true);
         for (String s : a)
-            System.err.println(s);
-        System.err.println("\nAll External and Local Addresses:");
+            System.out.println(s);
+        System.out.println("\nAll External and Local Addresses:");
         a = getAddresses(true, false, true);
         for (String s : a)
-            System.err.println(s);
-        System.err.println("\nAll addresses:");
+            System.out.println(s);
+        System.out.println("\nAll addresses:");
         a = getAddresses(true, true, true);
         for (String s : a)
-            System.err.println(s);
-        System.err.println("\nIs connected? " + isConnected());
+            System.out.println(s);
+        System.out.println("\nIPv6 address flags:");
+        for (String s : a) {
+            if (!s.contains(":"))
+                continue;
+            StringBuilder buf = new StringBuilder(64);
+            buf.append(s);
+            Inet6Address addr;
+            try {
+                addr = (Inet6Address) InetAddress.getByName(buf.toString());
+                if (addr.isSiteLocalAddress())
+                    buf.append(" host");
+                else if (addr.isLinkLocalAddress())
+                    buf.append(" link");
+                else if (addr.isAnyLocalAddress())
+                    buf.append(" wildcard");
+                else if (addr.isLoopbackAddress())
+                    buf.append(" loopback");
+                else
+                    buf.append(" global");
+                if (isTemporary(addr))
+                    buf.append(" temporary");
+                if (isDeprecated(addr))
+                    buf.append(" deprecated");
+                if (isDynamic(addr))
+                    buf.append(" dynamic");
+            } catch (UnknownHostException uhe) {}
+            System.out.println(buf.toString());
+        }
+        System.out.println("\nIs connected? " + isConnected());
     }
 }
