@@ -49,16 +49,22 @@ public class OOMListener implements I2PThread.OOMEventListener {
             log.log(Log.CRIT, "Thread ran out of memory, shutting down I2P", oom);
             log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
                               " total mem: " + Runtime.getRuntime().totalMemory());
+            // Can't find any System property or wrapper property that gives
+            // you the actual config file path, have to guess
+            String path;
+            if (SystemVersion.isLinuxService()) {
+                path = "/etc/i2p";
+            } else {
+                path = _context.getBaseDir().toString();
+            }
             if (_context.hasWrapper()) {
-                // Can't find any System property or wrapper property that gives
-                // you the actual config file path, have to guess
-                String path;
-                if (SystemVersion.isLinuxService()) {
-                    path = "/etc/i2p";
-                } else {
-                    path = _context.getBaseDir().toString();
-                }
                 log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in " +
+                                  path + File.separatorChar + "wrapper.config");
+            } else if (!SystemVersion.isWindows()) {
+                log.log(Log.CRIT, "To prevent future shutdowns, increase MAXMEMOPT in " +
+                                  path + File.separatorChar + "runplain.sh or /usr/bin/i2prouter-nowrapper");
+            } else {
+                log.log(Log.CRIT, "To prevent future shutdowns, run the restartable version of I2P, and increase wrapper.java.maxmemory in " +
                                   path + File.separatorChar + "wrapper.config");
             }
         } catch (OutOfMemoryError oome) {}
