@@ -150,6 +150,8 @@ public class NTCPTransport extends TransportImpl {
         //_context.statManager().createRateStat("ntcp.inboundCheckConnection", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablished", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablishedDuplicate", "", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.inboundIPv4Conn", "Inbound IPv4 NTCP Connection", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.inboundIPv6Conn", "Inbound IPv6 NTCP Connection", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.infoMessageEnqueued", "", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.floodInfoMessageEnqueued", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.invalidDH", "", "ntcp", RATES);
@@ -213,10 +215,13 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_conLock) {
             old = _conByIdent.put(peer, con);
         }
-        if (con.isIPv6())
+        if (con.isIPv6()) {
             _lastInboundIPv6 = con.getCreated();
-        else
+            _context.statManager().addRateData("ntcp.inboundIPv6Conn", 1);
+        } else {
             _lastInboundIPv4 = con.getCreated();
+            _context.statManager().addRateData("ntcp.inboundIPv4Conn", 1);
+        }
         return old;
     }
 

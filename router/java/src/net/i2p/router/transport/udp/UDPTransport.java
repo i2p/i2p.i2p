@@ -289,6 +289,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
+        _context.statManager().createRateStat("udp.inboundIPv4Conn", "Inbound IPv4 UDP Connection", "udp", RATES);
+        _context.statManager().createRateStat("udp.inboundIPv6Conn", "Inbound IPv4 UDP Connection", "udp", RATES);
         // following are for PacketBuider
         //_context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
         //_context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
@@ -780,6 +782,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     void inboundConnectionReceived(boolean isIPv6) {
         if (isIPv6) {
             _lastInboundIPv6 = _context.clock().now();
+            _context.statManager().addRateData("udp.inboundIPv6Conn", 1);
             // former workaround for lack of IPv6 peer testing
             //if (_currentOurV6Address != null)
             //    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
@@ -788,6 +791,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // that we are not firewalled.
             // use OS clock since its an ordering thing, not a time thing
             _lastInboundReceivedOn = System.currentTimeMillis(); 
+            _context.statManager().addRateData("udp.inboundIPv4Conn", 1);
         }
     }
     
