@@ -1,3 +1,18 @@
+2016-11-10 zzz
+ * Transport: Use NTCP for some outbound connections even before
+   SSU minimums are met (ticket #1835)
+
+2016-11-09 zzz
+ * Transport: Add stats for inbound v4/v6 connections (ticket #1854)
+ * Tunnels: Reduce default VTBM records from 5 to 4
+
+2016-11-08 zzz
+ * Build: Fix minimum Java version for Windows
+ * Install: Add max memory option to runplain.sh
+ * Crypto: Change serial number in selfsigned certs from int to long
+ * Router: Fix low-memory log messages for non-wrapper (ticket #1795)
+ * Transport: Improve IPv6 selection logic
+
 2016-11-06 zzz
  * Console: Add Java 9 log warning (ticket #1870)
  * Security: Consistently log authentication failures for all interfaces

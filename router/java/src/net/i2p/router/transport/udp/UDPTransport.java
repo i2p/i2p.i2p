@@ -1769,13 +1769,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // (Otherwise we only talk UDP to those that are firewalled, and we will
             // never get any introducers)
             int count = _peersByIdent.size();
-            if (alwaysPreferUDP() || count < _min_peers ||
-                (_haveIPv6Address && count < _min_v6_peers) ||
-                (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
+            if (alwaysPreferUDP()) {
                 return _cachedBid[SLOW_PREFERRED_BID];
-            else if (preferUDP())
+            } else if (count < _min_peers ||
+                       (_haveIPv6Address && count < _min_v6_peers) ||
+                       (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL)) {
+                 // Even if we haven't hit our minimums, give NTCP a chance some of the time.
+                 // This may make things work a little faster at startup
+                 // (especially when we have an IPv6 address and the increased minimums),
+                 // and if UDP is completely blocked we'll still have some connectivity.
+                 // TODO After some time, decide that UDP is blocked/broken and return TRANSIENT_FAIL_BID?
+                if (_context.random().nextInt(4) == 0)
+                    return _cachedBid[SLOWEST_BID];
+                else
+                    return _cachedBid[SLOW_PREFERRED_BID];
+            } else if (preferUDP()) {
                 return _cachedBid[SLOW_BID];
-            else if (haveCapacity()) {
+            } else if (haveCapacity()) {
                 if (addr.getCost() > DEFAULT_COST)
                     return _cachedBid[SLOWEST_COST_BID];
                 else
