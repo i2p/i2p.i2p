@@ -878,7 +878,7 @@ public class WebMail extends HttpServlet
 		if( sessionObject.state == STATE_AUTH && isPOST )
 			processLogin( sessionObject, request );
 
-		if( sessionObject.state != STATE_AUTH && sessionObject.state != STATE_CONFIG )
+		if( sessionObject.state != STATE_AUTH )
 			processLogout( sessionObject, request, isPOST );
 
 		/*
@@ -2409,6 +2409,7 @@ public class WebMail extends HttpServlet
 			out.println(button2(DELETE, _t("Delete")));
 		else
 			out.println(button(DELETE, _t("Delete")));
+		out.println(spacer + button(LOGOUT, _t("Logout") ));
 		out.println("<br>" +
 			( sessionObject.folder.isFirstElement( sessionObject.showUIDL ) ? button2( PREV, _t("Previous") ) : button( PREV, _t("Previous") ) ) + spacer +
 			button( LIST, _t("Back to Folder") ) + spacer +
@@ -2416,7 +2417,6 @@ public class WebMail extends HttpServlet
 		out.println("</div>");
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
-		//out.println(button( LOGOUT, _t("Logout") ) );
 		if( mail != null ) {
 			out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
@@ -2473,6 +2473,8 @@ public class WebMail extends HttpServlet
 		out.println("<br>");
 		out.println(button(SAVE, _t("Save Configuration")));
 		out.println(button(CANCEL, _t("Cancel")));
+		if (sessionObject.folder != null)
+			out.println(spacer + button(LOGOUT, _t("Logout") ));
 		out.println("</div>");
 	}
 
