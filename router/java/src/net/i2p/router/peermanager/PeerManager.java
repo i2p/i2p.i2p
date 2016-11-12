@@ -57,6 +57,7 @@ class PeerManager {
      */
     private static final long REORGANIZE_TIME_LONG = 351*1000;
     private static final long STORE_TIME = 19*60*60*1000;
+    private static final long EXPIRE_AGE = 3*24*60*60*1000;
     
     public static final String TRACKED_CAPS = "" +
         FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL +
@@ -102,7 +103,8 @@ class PeerManager {
     }
 
     /**
-     *  Reorganize the profiles. Also periodically store them.
+     *  Reorganize the profiles. Also periodically store them,
+     *  and delete very old ones.
      *
      *  This takes too long to run on the SimpleTimer2 queue
      *  @since 0.9.10
@@ -131,6 +133,7 @@ class PeerManager {
                 try {
                     _log.debug("Periodic profile store start");
                     storeProfiles();
+                    _persistenceHelper.deleteOldProfiles(EXPIRE_AGE);
                     _log.debug("Periodic profile store end");
                 } catch (Throwable t) {
                     _log.log(Log.CRIT, "Error storing profiles", t);

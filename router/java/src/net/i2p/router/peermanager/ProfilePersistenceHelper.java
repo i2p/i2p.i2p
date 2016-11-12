@@ -229,6 +229,26 @@ class ProfilePersistenceHelper {
         }
     }
     
+    /**
+     *  Delete profile files with timestamps older than 'age' ago
+     *  @since 0.9.28
+     */
+    public void deleteOldProfiles(long age) {
+        long cutoff = System.currentTimeMillis() - age;
+        List<File> files = selectFiles();
+        int i = 0;
+        for (File f :  files) {
+            if (!f.isFile())
+                continue;
+            if (f.lastModified() < cutoff) {
+                i++;
+                f.delete();
+            }
+        }
+        if (_log.shouldWarn())
+            _log.warn("Deleted " + i + " old profiles");
+    }
+
     private boolean isExpired(long lastSentToSuccessfully) {
         long timeSince = _context.clock().now() - lastSentToSuccessfully;
         return (timeSince > EXPIRE_AGE);
