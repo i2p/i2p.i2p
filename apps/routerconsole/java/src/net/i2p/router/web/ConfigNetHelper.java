@@ -90,6 +90,11 @@ public class ConfigNetHelper extends HelperBase {
         return getChecked(TransportUtil.PROP_IPV4_FIREWALLED);
     }
 
+    /** @since 0.9.28 */
+    public String getIPv6FirewalledChecked() {
+        return getChecked(TransportUtil.PROP_IPV6_FIREWALLED);
+    }
+
     public String getTcpAutoPortChecked(int mode) {
         String port = _context.getProperty(PROP_I2NP_NTCP_PORT); 
         boolean specified = port != null && port.length() > 0;
