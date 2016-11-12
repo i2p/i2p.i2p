@@ -9,6 +9,7 @@ package net.i2p.client.impl;
  *
  */
 
+import java.io.EOFException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -185,7 +186,16 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         } catch (DataFormatException dfe) {
             session.propogateError("Error signing the leaseSet", dfe);
         } catch (I2PSessionException ise) {
-            session.propogateError("Error sending the signed leaseSet", ise);
+            if (session.isClosed()) {
+                // race, closed while signing leaseset
+                // EOFExceptions are logged at WARN level (see I2PSessionImpl.propogateError())
+                // so the user won't see this
+                EOFException eof = new EOFException("Session closed while signing leaseset");
+                eof.initCause(ise);
+                session.propogateError("Session closed while signing leaseset", eof);
+            } else {
+                session.propogateError("Error sending the signed leaseSet", ise);
+            }
         }
     }
 
