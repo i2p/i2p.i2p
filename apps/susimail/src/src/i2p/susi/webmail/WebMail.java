@@ -87,6 +87,7 @@ public class WebMail extends HttpServlet
 	private static final int version = 13;
 	
 	private static final long serialVersionUID = 1L;
+	private static final String LOGIN_NONCE = Long.toString(I2PAppContext.getGlobalContext().random().nextLong());
 	
 	private static final String DEFAULT_HOST = "127.0.0.1";
 	private static final int DEFAULT_POP3PORT = 7660;
@@ -466,6 +467,8 @@ public class WebMail extends HttpServlet
 
 		/** @since 0.9.27 */
 		public boolean isValidNonce(String nonce) {
+			if (state == STATE_AUTH && LOGIN_NONCE.equals(nonce))
+				return true;
 			synchronized(nonces) {
 				return nonces.contains(nonce);
 			}
@@ -856,7 +859,7 @@ public class WebMail extends HttpServlet
 			}
 			sessionObject.info += _t("User logged out.") + '\n';
 			sessionObject.state = STATE_AUTH;
-		} else if( sessionObject.mailbox == null ) {
+		} else if( sessionObject.mailbox == null  && !buttonPressed(request, CANCEL)) {
 			sessionObject.error += _t("Internal error, lost connection.") + '\n';
 			sessionObject.state = STATE_AUTH;
 		}
@@ -1797,7 +1800,8 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/folder.js\" type=\"text/javascript\"></script>");
 				}
 				out.print("</head>\n<body" + (sessionObject.state == STATE_LIST ? " onload=\"deleteboxclicked()\">" : ">"));
-				String nonce = Long.toString(ctx.random().nextLong());
+				String nonce = sessionObject.state == STATE_AUTH ? LOGIN_NONCE :
+				                                                   Long.toString(ctx.random().nextLong());
 				sessionObject.addNonce(nonce);
 				out.println(
 					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
