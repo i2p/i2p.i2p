@@ -188,7 +188,7 @@ public class RRDFile implements Constants {
 		if(this.debug) {
 			System.out.println(value);
 		}
-		return (int)value;
+		return value;
 	}
 
 	String readString(int maxLength) throws IOException, RrdException {

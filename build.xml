@@ -400,7 +400,7 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
     </target>
 
-    <target name="buildJrobin" depends="buildProperties" >
+    <target name="buildJrobin" depends="buildCore" >
         <ant dir="apps/jrobin/java/" target="jar" />
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
