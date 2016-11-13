@@ -116,6 +116,9 @@ public class HTTPHeader
 
 	public final static String getValue(String data, String name)
 	{
+		// I2P #1480 avoid IAE
+		if (data.length() <= 0)
+			return "";
 		/* Thanks for Stephan Mehlhase (2010-10-26) */
 		StringReader strReader = new StringReader(data);
 		LineNumberReader lineReader = new LineNumberReader(strReader, Math.min(data.length(), MAX_LENGTH));
