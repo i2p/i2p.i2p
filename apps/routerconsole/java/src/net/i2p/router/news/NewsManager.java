@@ -172,6 +172,23 @@ public class NewsManager implements ClientApp {
         return parseNews(newsContent, false);
     }
 
+    /**
+     *  The initial (welcome to i2p) news
+     *
+     *  @return entry with first-installed date stamp, or null
+     *  @since 0.9.28
+     */
+    public NewsEntry getInitialNews() {
+        List<NewsEntry> list = parseInitialNews();
+        if (list.isEmpty())
+            return null;
+        NewsEntry rv = list.get(0);
+        long installed = _context.getProperty("router.firstInstalled", 0L);
+        if (installed > 0)
+            rv.updated = installed;
+        return rv;
+    }
+
     private List<NewsEntry> parseInitialNews() {
         NewsEntry entry = new NewsEntry();
         File file = new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml");

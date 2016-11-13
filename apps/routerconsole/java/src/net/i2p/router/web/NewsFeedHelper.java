@@ -50,8 +50,15 @@ public class NewsFeedHelper extends HelperBase {
         ClientAppManager cmgr = ctx.clientAppManager();
         if (cmgr != null) {
             NewsManager nmgr = (NewsManager) cmgr.getRegisteredApp(NewsManager.APP_NAME);
-            if (nmgr != null)
+            if (nmgr != null) {
                 entries = nmgr.getEntries();
+                NewsEntry init = nmgr.getInitialNews();
+                if (init != null) {
+                    // crude check to see if it's already in there
+                    if (entries.size() != 1 || !DataHelper.eq(entries.get(0).title, init.title))
+                        entries.add(init);
+                }
+            }
         }
         if (!entries.isEmpty()) {
             DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
