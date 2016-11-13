@@ -92,6 +92,9 @@ public class HTTPUSocket
 	{
 		if (0 < localAddr.length())
 			return localAddr;
+		// I2P prevent NPE #1681
+		if (ssdpUniSock == null)
+			return "";
 		return ssdpUniSock.getLocalAddress().getHostAddress();
 	}
 
