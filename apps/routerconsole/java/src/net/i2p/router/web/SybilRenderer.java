@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.text.Collator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.crypto.FamilyKeyCrypto;
 import net.i2p.router.peermanager.DBHistory;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.tunnel.pool.TunnelPool;
@@ -61,6 +63,8 @@ class SybilRenderer {
     private static final double POINTS_US24 = 25.0;
     private static final double POINTS_US16 = 10.0;
     private static final double POINTS_FAMILY = -2.0;
+    private static final double POINTS_BAD_OUR_FAMILY = 100.0;
+    private static final double POINTS_OUR_FAMILY = -100.0;
     private static final double MIN_CLOSE = 242.0;
     private static final double PAIR_DISTANCE_FACTOR = 2.0;
     private static final double OUR_KEY_FACTOR = 4.0;
@@ -370,6 +374,7 @@ class SybilRenderer {
 
     private static class FoofComparator implements Comparator<String>, Serializable {
          private final ObjectCounter<String> _o;
+         private final Collator _comp = Collator.getInstance();
          public FoofComparator(ObjectCounter<String> o) { _o = o;}
          public int compare(String l, String r) {
              // reverse by count
@@ -377,7 +382,7 @@ class SybilRenderer {
              if (rv != 0)
                  return rv;
              // foward by name
-             return l.compareTo(r);
+             return _comp.compare(l, r);
         }
     }
 
@@ -578,6 +583,8 @@ class SybilRenderer {
         }
         List<String> foo = new ArrayList<String>(oc.objects());
         Collections.sort(foo, new FoofComparator(oc));
+        FamilyKeyCrypto fkc = _context.router().getFamilyKeyCrypto();
+        String ourFamily = fkc != null ? fkc.getOurFamilyName() : null;
         boolean found = false;
         for (String s : foo) {
             int count = oc.count(s);
@@ -593,10 +600,16 @@ class SybilRenderer {
                 // limit display
                 //renderRouterInfo(buf, info, null, false, false);
                 double point = POINTS_FAMILY;
-                if (count > 1)
+                if (fkc != null && s.equals(ourFamily)) {
+                    if (fkc.verifyOurFamily(info))
+                        addPoints(points, info.getHash(), POINTS_OUR_FAMILY, "Our family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                    else
+                        addPoints(points, info.getHash(), POINTS_BAD_OUR_FAMILY, "Spoofed our family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
+                } else if (count > 1) {
                     addPoints(points, info.getHash(), point, "Same declared family \"" + DataHelper.escapeHTML(s) + "\" with " + (count - 1) + " other" + (( count > 2) ? "s" : ""));
-                else
+                } else {
                     addPoints(points, info.getHash(), point, "Declared family \"" + DataHelper.escapeHTML(s) + '"');
+                }
             }
         }
         if (!found)
