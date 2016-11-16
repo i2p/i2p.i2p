@@ -597,9 +597,13 @@ class SOCKS5Server extends SOCKSServer {
             // todo pass the response through?
         } catch (IOException e) {
             try { destSock.close(); } catch (IOException ioe) {}
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
             throw e;
         } catch (SOCKSException e) {
             try { destSock.close(); } catch (IOException ioe) {}
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
             throw e;
         }
         // that's it, caller will send confirmation to our client
@@ -607,9 +611,10 @@ class SOCKS5Server extends SOCKSServer {
     }
 
     // This isn't really the right place for this, we can't stop the tunnel once it starts.
-    static SOCKSUDPTunnel _tunnel;
-    static final Object _startLock = new Object();
-    static byte[] dummyIP = new byte[4];
+    private static SOCKSUDPTunnel _tunnel;
+    private static final Object _startLock = new Object();
+    private static final byte[] dummyIP = new byte[4];
+
     /**
      * We got a UDP associate command.
      * Loop here looking for more, never return normally,
