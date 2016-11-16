@@ -1,3 +1,37 @@
+2016-11-16 zzz
+ * Console: Remove dead home page links (ticket #1882)
+ * Profiles: Pull same-IP detection into a utility class
+ * Router: Add methods to verify and track members of our family
+
+2016-11-15 zzz
+ * Certs: Add Let's Encrypt ISRG Root X1 cert
+
+2016-11-14 zzz
+ * Logs: Fix output of dup message after 30 minutes
+
+2016-11-13 zzz
+ * Console: Add initial news to bottom of news page (ticket #1153)
+ * i2psnark: Periodically DHT nodes (ticket #1328)
+ * UPnP:
+   - Prevent exception on bad HTTP header (ticket #1480)
+   - Prevent NPE on socket creation fail (tickets #728, #1681)
+
+2016-11-12 zzz
+ * Console:
+   - Fix inadvertent config save when clicking sidebar
+     buttons on /configstats
+   - Add IPv6 firewalled setting on /confignet
+ * I2CP: Reduce error level on session closed while signing LS (ticket #1606)
+ * JRobin: Move DeallocationHelper logging from wrapper log to router log
+ * Profiles: Periodically save, delete old ones after saving (ticket #1328)
+ * Susimail:
+   - Add logout button to more pages (ticket #1374)
+   - Fix nonce error on login after logout
+   - Fix internal error after cancel button on settings form when not logged in
+
+2016-11-11 zzz
+ * Build: Truncate history.txt bundled in installers
+
 2016-11-10 zzz
  * Transport: Use NTCP for some outbound connections even before
    SSU minimums are met (ticket #1835)
