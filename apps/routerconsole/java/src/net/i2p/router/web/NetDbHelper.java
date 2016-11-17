@@ -7,6 +7,7 @@ public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
     private String _version;
     private String _country;
+    private String _family;
     private int _full;
     private boolean _lease;
     private boolean _debug;
@@ -49,6 +50,12 @@ public class NetDbHelper extends HelperBase {
             _country = DataHelper.stripHTML(c);  // XSS
     }
 
+    /** @since 0.9.28 */
+    public void setFamily(String c) {
+        if (c != null)
+            _family = DataHelper.stripHTML(c);  // XSS
+    }
+
     public void setFull(String f) {
         try {
             _full = Integer.parseInt(f);
@@ -75,8 +82,8 @@ public class NetDbHelper extends HelperBase {
         NetDbRenderer renderer = new NetDbRenderer(_context);
         try {
             renderNavBar();
-            if (_routerPrefix != null || _version != null || _country != null)
-                renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country);
+            if (_routerPrefix != null || _version != null || _country != null || _family != null)
+                renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country, _family);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
             else if (_full == 3)

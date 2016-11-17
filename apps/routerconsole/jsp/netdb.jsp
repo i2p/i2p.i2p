@@ -25,5 +25,6 @@
  <jsp:setProperty name="netdbHelper" property="lease" value="<%=request.getParameter(\"l\")%>" />
  <jsp:setProperty name="netdbHelper" property="version" value="<%=request.getParameter(\"v\")%>" />
  <jsp:setProperty name="netdbHelper" property="country" value="<%=request.getParameter(\"c\")%>" />
+ <jsp:setProperty name="netdbHelper" property="family" value="<%=request.getParameter(\"fam\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div></div></body></html>

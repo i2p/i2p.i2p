@@ -588,8 +588,9 @@ class SybilRenderer {
         boolean found = false;
         for (String s : foo) {
             int count = oc.count(s);
-            buf.append("<p><b>").append(count).append(" floodfills in declared family \"").append(DataHelper.escapeHTML(s) + '"')
-               .append("</b></p>");
+            String ss = DataHelper.escapeHTML(s);
+            buf.append("<p><b>").append(count).append(" floodfills in declared family \"<a href=\"/netdb?fam=")
+               .append(ss).append("\">").append(ss).append("</a>\"</b></p>");
             for (RouterInfo info : ris) {
                 String fam = info.getOption("family");
                 if (fam == null)

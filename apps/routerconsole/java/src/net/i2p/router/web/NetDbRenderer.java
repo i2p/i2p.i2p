@@ -85,8 +85,10 @@ class NetDbRenderer {
      *  @param routerPrefix may be null. "." for our router only
      *  @param version may be null
      *  @param country may be null
+     *  @param family may be null
      */
-    public void renderRouterInfoHTML(Writer out, String routerPrefix, String version, String country) throws IOException {
+    public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
+                                     String country, String family) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
@@ -97,7 +99,8 @@ class NetDbRenderer {
                 Hash key = ri.getIdentity().getHash();
                 if ((routerPrefix != null && key.toBase64().startsWith(routerPrefix)) ||
                     (version != null && version.equals(ri.getVersion())) ||
-                    (country != null && country.equals(_context.commSystem().getCountry(key)))) {
+                    (country != null && country.equals(_context.commSystem().getCountry(key))) ||
+                    (family != null && family.equals(ri.getOption("family")))) {
                     renderRouterInfo(buf, ri, false, true);
                     notFound = false;
                 }
@@ -110,6 +113,8 @@ class NetDbRenderer {
                     buf.append(version);
                 else if (country != null)
                     buf.append(country);
+                else if (family != null)
+                    buf.append(_t("Family")).append(' ').append(family);
                 buf.append(' ').append(_t("not found in network database"));
             }
         }
