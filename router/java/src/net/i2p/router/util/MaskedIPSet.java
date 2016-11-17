@@ -32,17 +32,31 @@ public class MaskedIPSet extends HashSet<String> {
       *
       * As of 0.9.24, returned set will include netdb family as well.
       *
+      * @param peer non-null
       * @param mask is 1-4 (number of bytes to match)
       * @return an opaque set of masked IPs for this peer
       */
     public MaskedIPSet(RouterContext ctx, Hash peer, int mask) {
+        this(ctx, ctx.netDb().lookupRouterInfoLocally(peer), mask);
+    }
+
+    /**
+      * The Set of IPs for this peer, with a given mask.
+      * Includes the comm system's record of the IP, and all netDb addresses.
+      *
+      * As of 0.9.24, returned set will include netdb family as well.
+      *
+      * @param pinfo may be null
+      * @param mask is 1-4 (number of bytes to match)
+      * @return an opaque set of masked IPs for this peer
+      */
+    public MaskedIPSet(RouterContext ctx, RouterInfo pinfo, int mask) {
         super(4);
-        byte[] commIP = ctx.commSystem().getIP(peer);
-        if (commIP != null)
-            add(maskedIP(commIP, mask));
-        RouterInfo pinfo = ctx.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null)
             return;
+        byte[] commIP = ctx.commSystem().getIP(pinfo.getHash());
+        if (commIP != null)
+            add(maskedIP(commIP, mask));
         Collection<RouterAddress> paddr = pinfo.getAddresses();
         for (RouterAddress pa : paddr) {
             byte[] pib = pa.getIP();
