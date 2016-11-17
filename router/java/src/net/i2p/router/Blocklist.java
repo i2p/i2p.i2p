@@ -248,6 +248,10 @@ public class Blocklist {
     *   hostname (DNS looked up at list readin time, not dynamically, so may not be much use)
     *   44-byte Base64 router hash
     *
+    * Acceptable formats (IPV6 only):
+    *   comment:IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+    *   IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+    *
     * No whitespace allowed after the last ':'.
     *
     * For further information and downloads:
@@ -290,10 +294,14 @@ public class Blocklist {
                     continue;
                 }
                 byte[] ip1 = e.ip1;
-                byte[] ip2 = e.ip2;
-
-                store(ip1, ip2, count++);
-                ipcount += 1 + toInt(ip2) - toInt(ip1); // includes dups, oh well
+                if (ip1.length == 4) {
+                    byte[] ip2 = e.ip2;
+                    store(ip1, ip2, count++);
+                    ipcount += 1 + toInt(ip2) - toInt(ip1); // includes dups, oh well
+                } else {
+                    // IPv6
+                    add(ip1);
+                }
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
@@ -393,25 +401,25 @@ public class Blocklist {
         int start2 = -1;
         int mask = -1;
         String comment = null;
-        int index = buf.indexOf("#");
+        int index = buf.indexOf('#');
         if (index == 0)
             return null;  // comment
-        index = buf.lastIndexOf(":");
+        index = buf.lastIndexOf(':');
         if (index >= 0) {
             comment = buf.substring(0, index);
             start1 = index + 1;
         }
-        if (end1 - start1 == 44 && buf.substring(start1).indexOf(".") < 0) {
+        if (end1 - start1 == 44 && buf.substring(start1).indexOf('.') < 0) {
             byte b[] = Base64.decode(buf.substring(start1));
             if (b != null)
                 return new Entry(comment, Hash.create(b), null, null);
         }
-        index = buf.indexOf("-", start1);
+        index = buf.indexOf('-', start1);
         if (index >= 0) {
             end1 = index;
             start2 = index + 1;
         } else {
-            index = buf.indexOf("/", start1);
+            index = buf.indexOf('/', start1);
             if (index >= 0) {
                 end1 = index;
                 mask = index + 1;
@@ -420,11 +428,14 @@ public class Blocklist {
         if (end1 - start1 <= 0)
             return null;  // blank
         try {
-            InetAddress pi = InetAddress.getByName(buf.substring(start1, end1));
+            String sip = buf.substring(start1, end1);
+            // IPv6
+            sip = sip.replace(';', ':');
+            InetAddress pi = InetAddress.getByName(sip);
             if (pi == null) return null;
             ip1 = pi.getAddress();
-            if (ip1.length != 4)
-                throw new UnknownHostException();
+            //if (ip1.length != 4)
+            //    throw new UnknownHostException();
             if (start2 >= 0) {
                 pi = InetAddress.getByName(buf.substring(start2));
                 if (pi == null) return null;
@@ -462,16 +473,16 @@ public class Blocklist {
                 ip2 = ip1;
             }
         } catch (UnknownHostException uhe) {
-            if (shouldLog && _log.shouldLog(Log.ERROR))
-                _log.error("Format error in the blocklist file: " + buf);
+            if (shouldLog)
+                _log.logAlways(Log.WARN, "Format error in the blocklist file: " + buf);
             return null;
         } catch (NumberFormatException nfe) {
-            if (shouldLog && _log.shouldLog(Log.ERROR))
-                _log.error("Format error in the blocklist file: " + buf);
+            if (shouldLog)
+                _log.logAlways(Log.WARN, "Format error in the blocklist file: " + buf);
             return null;
         } catch (IndexOutOfBoundsException ioobe) {
-            if (shouldLog && _log.shouldLog(Log.ERROR))
-                _log.error("Format error in the blocklist file: " + buf);
+            if (shouldLog)
+                _log.logAlways(Log.WARN, "Format error in the blocklist file: " + buf);
             return null;
         }
         return new Entry(comment, null, ip1, ip2);
@@ -743,6 +754,9 @@ public class Blocklist {
         return entry;
     }
 
+    /**
+     *  IPv4 only
+     */
     private void store(byte ip1[], byte ip2[], int idx) {
         _blocklist[idx] = toEntry(ip1, ip2);
     }
@@ -1035,10 +1049,16 @@ public class Blocklist {
     }
 
 /****
-    public static void main(String args[]) {
-        Blocklist b = new Blocklist();
-        if ( (args != null) && (args.length == 1) )
-            b.readBlocklistFile(args[0]);
+    public static void main(String args[]) throws Exception {
+        Blocklist b = new Blocklist(new Router().getContext());
+        if (args != null && args.length == 1) {
+            File f = new File(args[0]);
+            b.allocate(Collections.singletonList(f));
+            int count = b.readBlocklistFile(f, 0);
+            b.merge(count);
+            Writer w = new java.io.OutputStreamWriter(System.out);
+            b.renderStatusHTML(w);
+        }
         System.out.println("Saved " + b._blocklistSize + " records");
         String tests[] = {"0.0.0.0", "0.0.0.1", "0.0.0.2", "0.0.0.255", "1.0.0.0",
                                         "3.3.3.3", "77.1.2.3", "127.0.0.0", "127.127.127.127", "128.0.0.0",

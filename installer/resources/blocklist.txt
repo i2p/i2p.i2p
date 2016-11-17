@@ -45,6 +45,10 @@
 #   *   hostname (DNS looked up at list readin time, not dynamically, so may not be much use)
 #   *   44-byte Base64 router hash
 #   *
+#   * Acceptable formats (IPV6 only):
+#   *   comment:IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+#   *   IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+#   *
 #   * No whitespace allowed after the last ':'.
 #   *
 #   * For further information and downloads:
