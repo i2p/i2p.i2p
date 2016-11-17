@@ -22,7 +22,7 @@
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
-    <property name="tomcat.ver" value="6.0.47" />
+    <property name="tomcat.ver" value="6.0.48" />
     <property name="tomcat2.lib" value="apache-tomcat-${tomcat.ver}/lib" />
     <property name="tomcat2.lib.small" value="apache-tomcat/lib" />
 
