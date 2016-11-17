@@ -108,6 +108,8 @@
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Main-Class" value="net.i2p.util.CommandLine" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
         </jar>
     </target>

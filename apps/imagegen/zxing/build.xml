@@ -17,6 +17,7 @@
     </target>
 
     <!-- only used if not set by a higher build.xml -->
+    <property name="javac.version" value="1.7" />
     <property name="javac.compilerargs7" value="" />
 
     <target name="compile" depends="depend">
@@ -39,7 +40,7 @@
 	<mkdir dir="./buildTest/obj" />
         <javac
             srcdir="./test/junit"
-            debug="true" deprecation="on" source="1.7" target="1.7"
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}"
             includeAntRuntime="false"
             destdir="./buildTest/obj"
             classpath="./build/zxing.jar" >
@@ -75,6 +76,8 @@
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
         </jar>
     </target>
