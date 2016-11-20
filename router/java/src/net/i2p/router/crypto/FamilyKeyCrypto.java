@@ -62,8 +62,10 @@ public class FamilyKeyCrypto {
     private static final int DEFAULT_KEY_VALID_DAYS = 3652;  // 10 years
     // Note that we can't use RSA here, as the b64 sig would exceed the 255 char limit for a Mapping
     // Note that we can't use EdDSA here, as keystore doesn't know how, and encoding/decoding is unimplemented
-    private static final String DEFAULT_KEY_ALGORITHM = SigType.ECDSA_SHA256_P256.isAvailable() ? "EC" : "DSA";
-    private static final int DEFAULT_KEY_SIZE = SigType.ECDSA_SHA256_P256.isAvailable() ? 256 : 1024;
+    //private static final String DEFAULT_KEY_ALGORITHM = SigType.ECDSA_SHA256_P256.isAvailable() ? "EC" : "DSA";
+    //private static final int DEFAULT_KEY_SIZE = SigType.ECDSA_SHA256_P256.isAvailable() ? 256 : 1024;
+    private static final String DEFAULT_KEY_ALGORITHM = "EdDSA";
+    private static final int DEFAULT_KEY_SIZE = 256;
     private static final String KS_DIR = "keystore";
     private static final String CERT_DIR = "certificates/family";
     private static final String CRL_DIR = "crls";
