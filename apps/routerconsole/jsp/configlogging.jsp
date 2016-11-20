@@ -28,20 +28,20 @@
       <table border="0" cellspacing="5">
         <tr><td class="mediumtags" align="right"><b><%=intl._t("Log file")%>:</b></td>
           <td><input type="text" name="logfilename" size="40" disabled="disabled" title="<%=intl._t("Edit {0} to change", "logger.config")%>" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" >
-            <br> <i><%=intl._t("(the symbol '@' will be replaced during log rotation)")%></i></td>
+            <br><p style="margin: 0px 12px"><i><%=intl._t("(the symbol '@' will be replaced during log rotation)")%></i></p></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("Log record format")%>:</b></td>
           <td><input type="text" name="logformat" size="20" value="<jsp:getProperty name="logginghelper" property="recordPattern" />" >
-            <br> <i><%=intl._t("(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)")%>
-            </i></td>
+            <br><p style="margin: 0px 12px"><i><%=intl._t("(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)")%>
+            </i></p></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("Log date format")%>:</b></td>
           <td><input type="text" name="logdateformat" size="20" value="<jsp:getProperty name="logginghelper" property="datePattern" />" >
-            <br> <i><%=intl._t("('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)")%>
-            </i></td>
+            <br><p style="margin: 0px 12px"><i><%=intl._t("('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)")%>
+            </i></p></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("Max log file size")%>:</b></td>
           <td><input type="text" name="logfilesize" size="10" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" ><br></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("Default log level")%>:</b></td>
-          <td><jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /><br><i><%=intl._t("(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)")%>
-          </i></td>
+          <td><jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /><br><p style="margin: 0px 12px"><i><%=intl._t("(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)")%>
+          </i></p></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("Log level overrides")%>:</b></td>
           <td><jsp:getProperty name="logginghelper" property="logLevelTable" /></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._t("New override")%>:</b></td>
