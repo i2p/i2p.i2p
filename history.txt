@@ -1,3 +1,14 @@
+2016-11-20 zzz
+ * NetDB: When doing lookups, don't use floodfills too close
+ * Router: Change default family sig type to EdDSA
+
+2016-11-17 zzz
+ * Build: Add attributes for java version to all jars and wars
+ * Blocklist: Add support for IPv6 in blocklist.txt
+ * Console: Add netdb lookup by family
+ * NetDB: When verifying store, don't use floodfills too close
+ * Tomcat 6.0.48
+
 2016-11-16 zzz
  * Console: Remove dead home page links (ticket #1882)
  * Profiles: Pull same-IP detection into a utility class

@@ -27,6 +27,7 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
+import net.i2p.router.util.MaskedIPSet;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
@@ -73,12 +74,17 @@ class IterativeSearchJob extends FloodSearchJob {
     private static Hash _alwaysQueryHash;
     /** Max number of peers to query */
     private final int _totalSearchLimit;
+    private final MaskedIPSet _ipSet;
+    private final Set<Hash> _skippedPeers;
     
     private static final int MAX_NON_FF = 3;
     /** Max number of peers to query */
     private static final int TOTAL_SEARCH_LIMIT = 5;
     /** Max number of peers to query if we are ff */
     private static final int TOTAL_SEARCH_LIMIT_WHEN_FF = 3;
+    /** Extra peers to get from peer selector, as we may discard some before querying */
+    private static final int EXTRA_PEERS = 2;
+    private static final int IP_CLOSE_BYTES = 3;
     /** TOTAL_SEARCH_LIMIT * SINGLE_SEARCH_TIME, plus some extra */
     private static final int MAX_SEARCH_TIME = 30*1000;
     /**
@@ -138,10 +144,12 @@ class IterativeSearchJob extends FloodSearchJob {
         int totalSearchLimit = (facade.floodfillEnabled() && ctx.router().getUptime() > 30*60*1000) ?
                             TOTAL_SEARCH_LIMIT_WHEN_FF : TOTAL_SEARCH_LIMIT;
         _totalSearchLimit = ctx.getProperty("netdb.searchLimit", totalSearchLimit);
+        _ipSet = new MaskedIPSet(2 * (_totalSearchLimit + EXTRA_PEERS));
         _singleSearchTime = ctx.getProperty("netdb.singleSearchTime", SINGLE_SEARCH_TIME);
         _maxConcurrent = ctx.getProperty("netdb.maxConcurrent", MAX_CONCURRENT);
         _unheardFrom = new HashSet<Hash>(CONCURRENT_SEARCHES);
         _failedPeers = new HashSet<Hash>(_totalSearchLimit);
+        _skippedPeers = new HashSet<Hash>(4);
         _sentTime = new ConcurrentHashMap<Hash, Long>(_totalSearchLimit);
         _fromLocalDest = fromLocalDest;
         if (fromLocalDest != null && !isLease && _log.shouldLog(Log.WARN))
@@ -163,7 +171,7 @@ class IterativeSearchJob extends FloodSearchJob {
         if (ks != null) {
             // Ideally we would add the key to an exclude list, so we don't try to query a ff peer for itself,
             // but we're passing the rkey not the key, so we do it below instead in certain cases.
-            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, _totalSearchLimit, ks);
+            floodfillPeers = ((FloodfillPeerSelector)_facade.getPeerSelector()).selectFloodfillParticipants(_rkey, _totalSearchLimit + EXTRA_PEERS, ks);
         } else {
             floodfillPeers = new ArrayList<Hash>(_totalSearchLimit);
         }
@@ -245,7 +253,7 @@ class IterativeSearchJob extends FloodSearchJob {
             return;
         }
         while (true) {
-            Hash peer;
+            Hash peer = null;
             final int done, pend;
             synchronized (this) {
                 if (_dead) return;
@@ -274,9 +282,22 @@ class IterativeSearchJob extends FloodSearchJob {
                 } else {
                     if (_toTry.isEmpty())
                         return;
-                    Iterator<Hash> iter = _toTry.iterator();
-                    peer = iter.next();
-                    iter.remove();
+                    for (Iterator<Hash> iter = _toTry.iterator(); iter.hasNext(); ) {
+                        Hash h = iter.next();
+                        iter.remove();
+                        Set<String> peerIPs = new MaskedIPSet(getContext(), h, IP_CLOSE_BYTES);
+                        if (!_ipSet.containsAny(peerIPs)) {
+                            _ipSet.addAll(peerIPs);
+                            peer = h;
+                            break;
+                        }
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info(getJobId() + ": Skipping query w/ router too close to others " + h);
+                        _skippedPeers.add(h);
+                        // go around again
+                    }
+                    if (peer == null)
+                        return;
                 }
                 _unheardFrom.add(peer);
             }
@@ -499,8 +520,9 @@ class IterativeSearchJob extends FloodSearchJob {
         }
         synchronized (this) {
             if (_failedPeers.contains(peer) ||
-                _unheardFrom.contains(peer))
-                return;  // already tried
+                _unheardFrom.contains(peer) ||
+                _skippedPeers.contains(peer))
+                return;  // already tried or skipped
             if (!_toTry.add(peer))
                 return;  // already in the list
         }
