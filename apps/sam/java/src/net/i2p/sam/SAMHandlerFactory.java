@@ -91,14 +91,23 @@ class SAMHandlerFactory {
         if (Boolean.parseBoolean(i2cpProps.getProperty(SAMBridge.PROP_AUTH))) {
             String user = props.getProperty("USER");
             String pw = props.getProperty("PASSWORD");
-            if (user == null || pw == null)
+            if (user == null || pw == null) {
+                if (user == null)
+                    log.logAlways(Log.WARN, "SAM authentication failed");
+                else
+                    log.logAlways(Log.WARN, "SAM authentication failed, user: " + user);
                 throw new SAMException("USER and PASSWORD required");
+            }
             String savedPW = i2cpProps.getProperty(SAMBridge.PROP_PW_PREFIX + user + SAMBridge.PROP_PW_SUFFIX);
-            if (savedPW == null)
+            if (savedPW == null) {
+                log.logAlways(Log.WARN, "SAM authentication failed, user: " + user);
                 throw new SAMException("Authorization failed");
+            }
             PasswordManager pm = new PasswordManager(I2PAppContext.getGlobalContext());
-            if (!pm.checkHash(savedPW, pw))
+            if (!pm.checkHash(savedPW, pw)) {
+                log.logAlways(Log.WARN, "SAM authentication failed, user: " + user);
                 throw new SAMException("Authorization failed");
+            }
         }
 
         // Let's answer positively

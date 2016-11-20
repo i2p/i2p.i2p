@@ -2,7 +2,7 @@ This is Apache Tomcat 6.x, supporting Servlet 2.5 and JSP 2.1.
 The Glassfish JSP 2.1 bundled in Jetty 6 is way too old.
 
 Retrieved from the file
-	apache-tomcat-6.0.44-deployer.tar.gz
+	apache-tomcat-6.0.48-deployer.tar.gz
 
 minus the following files and directores:
 

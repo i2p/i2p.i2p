@@ -11,6 +11,7 @@ package net.i2p.router.transport;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.InetAddress;
+import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -165,7 +166,7 @@ public class TransportManager implements TransportEventListener {
                 // so that NTCP may bind early
                 int port = udp.getRequestedPort();
                 if (port > 0)
-                    ntcp.externalAddressReceived(SOURCE_CONFIG, null, port);
+                    ntcp.externalAddressReceived(SOURCE_CONFIG, (byte[]) null, port);
             }
         }
         if (_transports.isEmpty())
@@ -182,14 +183,51 @@ public class TransportManager implements TransportEventListener {
      */
     private void initializeAddress(Transport t) {
         Set<String> ipset = Addresses.getAddresses(false, true);  // non-local, include IPv6
+        //
+        // Avoid IPv6 temporary addresses if we have a non-temporary one
+        //
+        boolean hasNonTempV6Address = false;
+        List<InetAddress> addresses = new ArrayList<InetAddress>(4);
+        List<Inet6Address> tempV6Addresses = new ArrayList<Inet6Address>(4);
         for (String ips : ipset) {
             try {
-                InetAddress ia = InetAddress.getByName(ips);
-                byte[] ip = ia.getAddress();
-                t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
+                InetAddress addr = InetAddress.getByName(ips);
+                if (ips.contains(":") && (addr instanceof Inet6Address)) {
+                    Inet6Address v6addr = (Inet6Address) addr;
+                    // getAddresses(false, true) will not return deprecated addresses
+                    //if (Addresses.isDeprecated(v6addr)) {
+                    //    if (_log.shouldWarn())
+                    //        _log.warn("Not binding to deprecated temporary address " + bt);
+                    //    continue;
+                    //}
+                    if (Addresses.isTemporary(v6addr)) {
+                        // Save temporary addresses
+                        // we only use these if we don't have a non-temporary adress
+                        tempV6Addresses.add(v6addr);
+                        continue;
+                    }
+                    hasNonTempV6Address = true;
+                }
+                addresses.add(addr);
             } catch (UnknownHostException e) {
                 _log.error("UDP failed to bind to local address", e);
             }
+        }
+        // we only use these if we don't have a non-temporary adress
+        if (!tempV6Addresses.isEmpty()) {
+            if (hasNonTempV6Address) {
+                if (_log.shouldWarn()) {
+                    for (Inet6Address addr : tempV6Addresses) {
+                        _log.warn("Not binding to temporary address " + addr.getHostAddress());
+                    }
+                }
+            } else {
+                addresses.addAll(tempV6Addresses);
+            }
+        }
+        for (InetAddress ia : addresses) {
+            byte[] ip = ia.getAddress();
+            t.externalAddressReceived(SOURCE_INTERFACE, ip, 0);
         }
     }
 

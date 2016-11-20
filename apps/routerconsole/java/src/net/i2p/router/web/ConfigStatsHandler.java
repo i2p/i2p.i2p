@@ -31,7 +31,9 @@ public class ConfigStatsHandler extends FormHandler {
     
     @Override
     protected void processForm() {
-        saveChanges();
+        if (_action != null && _action.equals("foo")) {
+            saveChanges();
+        }
     }
     
     public void setFilename(String filename) {

@@ -123,6 +123,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private final AtomicLong _rxBytes = new AtomicLong();
     private final AtomicLong _txBytes = new AtomicLong();
     private long _started;
+    private long _nodesLastSaved;
 
     /** all-zero NID used for pings */
     public static final NID FAKE_NID = new NID(new byte[NID.HASH_LENGTH]);
@@ -156,6 +157,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final long CLEAN_TIME = 63*1000;
     private static final long EXPLORE_TIME = 877*1000;
     private static final long BLACKLIST_CLEAN_TIME = 17*60*1000;
+    private static final long NODES_SAVE_TIME = 3*60*60*1000;
     public static final String DHT_FILE_SUFFIX = ".dht.dat";
 
     private static final int SEND_CRYPTO_TAGS = 8;
@@ -635,6 +637,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _txBytes.set(0);
         _rxBytes.set(0);
         _started = _context.clock().now();
+        _nodesLastSaved = _started;
     }
 
     /**
@@ -1674,6 +1677,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 // lastSeen() is actually when-added
                 if (nid.lastSeen() < expire)
                     iter.remove();
+            }
+            if (now - _nodesLastSaved > NODES_SAVE_TIME) {
+                PersistDHT.saveDHT(_knownNodes, false, _dhtFile);
+                _nodesLastSaved = now;
             }
             // TODO sent queries?
             if (_log.shouldLog(Log.DEBUG))

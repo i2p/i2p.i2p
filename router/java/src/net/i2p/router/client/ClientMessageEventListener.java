@@ -329,14 +329,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 pw = props.getProperty("i2cp.password");
             }
             if (user == null || user.length() == 0 || pw == null || pw.length() == 0) {
-                _log.error("I2CP auth failed");
+                _log.logAlways(Log.WARN, "I2CP authentication failed");
                 _runner.disconnectClient("Authorization required, specify i2cp.username and i2cp.password in options");
                 _authorized = false;
                 return false;
             }
             PasswordManager mgr = new PasswordManager(_context);
             if (!mgr.checkHash(PROP_AUTH, user, pw)) {
-                _log.error("I2CP auth failed user: " + user);
+                _log.logAlways(Log.WARN, "I2CP authentication failed, user: " + user);
                 _runner.disconnectClient("Authorization failed, user = " + user);
                 _authorized = false;
                 return false;

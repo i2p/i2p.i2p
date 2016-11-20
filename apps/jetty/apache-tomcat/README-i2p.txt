@@ -1,7 +1,7 @@
 This is Apache Tomcat 6.x, supporting Servlet 2.5 and JSP 2.1.
 
 Retrieved from the file
-	apache-tomcat-6.0.44.tar.gz
+	apache-tomcat-6.0.48.tar.gz
 
 containing only a small subset of lib/tomcat-coyote.jar.
 

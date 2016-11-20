@@ -19,6 +19,7 @@ import net.i2p.router.MessageSelector;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.util.MaskedIPSet;
 import net.i2p.util.Log;
 
 /**
@@ -39,11 +40,13 @@ class FloodfillVerifyStoreJob extends JobImpl {
     private final boolean _isRouterInfo;
     private MessageWrapper.WrappedMessage _wrappedMessage;
     private final Set<Hash> _ignore;
+    private final MaskedIPSet _ipSet;
     
     private static final int START_DELAY = 18*1000;
     private static final int START_DELAY_RAND = 9*1000;
     private static final int VERIFY_TIMEOUT = 20*1000;
     private static final int MAX_PEERS_TO_TRY = 4;
+    private static final int IP_CLOSE_BYTES = 3;
     
     /**
      *  Delay a few seconds, then start the verify
@@ -60,7 +63,10 @@ class FloodfillVerifyStoreJob extends JobImpl {
         _facade = facade;
         _ignore = new HashSet<Hash>(MAX_PEERS_TO_TRY);
         if (sentTo != null) {
+            _ipSet = new MaskedIPSet(ctx, sentTo, IP_CLOSE_BYTES);
             _ignore.add(_sentTo);
+        } else {
+            _ipSet = new MaskedIPSet(4);
         }
         // wait some time before trying to verify the store
         getTiming().setStartAfter(ctx.clock().now() + START_DELAY + ctx.random().nextInt(START_DELAY_RAND));
@@ -188,10 +194,19 @@ class FloodfillVerifyStoreJob extends JobImpl {
                     break;
                 Hash peer = peers.get(0);
                 RouterInfo ri = _facade.lookupRouterInfoLocally(peer);
-                if (ri != null && StoreJob.supportsCert(ri, keyCert))
-                    return peer;
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": Skipping verify w/ router that doesn't support key certs " + peer);
+                if (ri != null && StoreJob.supportsCert(ri, keyCert)) {
+                    Set<String> peerIPs = new MaskedIPSet(getContext(), ri, IP_CLOSE_BYTES);
+                    if (!_ipSet.containsAny(peerIPs)) {
+                        _ipSet.addAll(peerIPs);
+                        return peer;
+                    } else {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info(getJobId() + ": Skipping verify w/ router too close to the store " + peer);
+                    }
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": Skipping verify w/ router that doesn't support key certs " + peer);
+                }
                 _ignore.add(peer);
             }
         } else {

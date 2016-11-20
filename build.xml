@@ -400,7 +400,7 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
     </target>
 
-    <target name="buildJrobin" depends="buildProperties" >
+    <target name="buildJrobin" depends="buildCore" >
         <ant dir="apps/jrobin/java/" target="jar" />
         <copy file="apps/jrobin/java/build/jrobin.jar" todir="build/" />
     </target>
@@ -1184,7 +1184,7 @@
     </target>
 
     <!-- see targets below for conditional copying -->
-    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates, prepRouterInfos, copyjetty, copytomcat-unlesspkg, copyjstl-unlesspkg, copystandard-unlesspkg, truncatehistory">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <!-- Also remove deletelist.txt used for updater only -->
         <delete>
@@ -1218,8 +1218,6 @@
         <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
         <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
-        <!-- overwrite the truncated history put in by the updater -->
-        <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
         <copy file="apps/apparmor/home.i2p.i2prouter" todir="pkg-temp/scripts/" />
@@ -1506,7 +1504,7 @@
         </exec>
     </target>
 
-    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation">
+    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation, truncatehistory">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
@@ -1523,6 +1521,14 @@
         <copy file="apps/susidns/src/lib/standard.jar" todir="pkg-temp/lib/" />
        -->
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
+        <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
+        <copy todir="pkg-temp/man/">
+            <fileset dir="installer/resources/man/" />
+        </copy>
+    </target>
+
+    <target name="truncatehistory">
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
         <copy file="history.txt" tofile="pkg-temp/history.txt" overwrite="true">
@@ -1530,12 +1536,7 @@
                 <headfilter lines="1500" />
             </filterchain>
         </copy>
-        <concat append="true" destfile="pkg-temp/history.txt">&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE"</concat>
-        <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
-        <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
-        <copy todir="pkg-temp/man/">
-            <fileset dir="installer/resources/man/" />
-        </copy>
+        <concat append="true" destfile="pkg-temp/history.txt">&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE</concat>
     </target>
 
     <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepjupdatefixes, prepthemeupdates">

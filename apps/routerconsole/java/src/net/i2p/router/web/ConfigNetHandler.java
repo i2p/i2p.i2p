@@ -52,6 +52,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _udpDisabled;
     private String _ipv6Mode;
     private boolean _ipv4Firewalled;
+    private boolean _ipv6Firewalled;
     private final Map<String, String> changes = new HashMap<String, String>();
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
@@ -87,6 +88,9 @@ public class ConfigNetHandler extends FormHandler {
 
     /** @since 0.9.20 */
     public void setIPv4Firewalled(String moo) { _ipv4Firewalled = true; }
+
+    /** @since 0.9.28 */
+    public void setIPv6Firewalled(String moo) { _ipv6Firewalled = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -365,6 +369,16 @@ public class ConfigNetHandler extends FormHandler {
                 restartRequired = true;
             }
             changes.put(TransportUtil.PROP_IPV4_FIREWALLED, "" + _ipv4Firewalled);
+
+            if (Boolean.parseBoolean(_context.getProperty(TransportUtil.PROP_IPV6_FIREWALLED)) !=
+                _ipv6Firewalled) {
+                if (_ipv6Firewalled)
+                    addFormNotice(_t("Disabling inbound IPv6"));
+                else
+                    addFormNotice(_t("Enabling inbound IPv6"));
+                restartRequired = true;
+            }
+            changes.put(TransportUtil.PROP_IPV6_FIREWALLED, "" + _ipv6Firewalled);
 
             if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) !=
                 !_udpDisabled) {

@@ -24,6 +24,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.pool.TunnelPeerSelector;
+import net.i2p.router.util.MaskedIPSet;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -1245,7 +1246,7 @@ public class ProfileOrganizer {
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
-        Set<String> IPSet = new HashSet<String>(8);
+        MaskedIPSet IPSet = new MaskedIPSet(8);
         // use RandomIterator to avoid shuffling the whole thing
         for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
@@ -1277,75 +1278,12 @@ public class ProfileOrganizer {
      * @param mask is 1-4 (number of bytes to match)
      * @param IPMatches all IPs so far, modified by this routine
      */
-    private boolean notRestricted(Hash peer, Set<String> IPSet, int mask) {
-        Set<String> peerIPs = maskedIPSet(peer, mask);
-        if (containsAny(IPSet, peerIPs))
+    private boolean notRestricted(Hash peer, MaskedIPSet IPSet, int mask) {
+        Set<String> peerIPs = new MaskedIPSet(_context, peer, mask);
+        if (IPSet.containsAny(peerIPs))
             return false;
         IPSet.addAll(peerIPs);
         return true;
-    }
-
-    /**
-      * The Set of IPs for this peer, with a given mask.
-      * Includes the comm system's record of the IP, and all netDb addresses.
-      *
-      * As of 0.9.24, returned set will include netdb family as well.
-      *
-      * @return an opaque set of masked IPs for this peer
-      */
-    private Set<String> maskedIPSet(Hash peer, int mask) {
-        Set<String> rv = new HashSet<String>(4);
-        byte[] commIP = _context.commSystem().getIP(peer);
-        if (commIP != null)
-            rv.add(maskedIP(commIP, mask));
-        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
-        if (pinfo == null)
-            return rv;
-        Collection<RouterAddress> paddr = pinfo.getAddresses();
-        for (RouterAddress pa : paddr) {
-            byte[] pib = pa.getIP();
-            if (pib == null) continue;
-            rv.add(maskedIP(pib, mask));
-        }
-        String family = pinfo.getOption("family");
-        if (family != null) {
-            // TODO should KNDF put a family-verified indicator in the RI,
-            // after checking the sig, or does it matter?
-            // What's the threat here of not avoid ding a router
-            // falsely claiming to be in the family?
-            // Prefix with something so an IP can't be spoofed
-            rv.add('x' + family);
-        }
-        return rv;
-    }
-
-    /**
-     * generate an arbitrary unique value for this ip/mask (mask = 1-4)
-     * If IPv6, force mask = 6.
-     */
-    private static String maskedIP(byte[] ip, int mask) {
-        final StringBuilder buf = new StringBuilder(1 + (mask*2));
-        final char delim;
-        if (ip.length == 16) {
-            mask = 6;
-            delim = ':';
-        } else {
-            delim = '.';
-        }
-        buf.append(delim);
-        buf.append(Long.toHexString(DataHelper.fromLong(ip, 0, mask)));
-        return buf.toString();
-    }
-
-    /** does a contain any of the elements in b? */
-    private static <T> boolean  containsAny(Set<T> a, Set<T> b) {
-        if (a.isEmpty() || b.isEmpty())
-            return false;
-        for (T o : b) {
-            if (a.contains(o))
-                return true;
-        }
-        return false;
     }
 
     /**

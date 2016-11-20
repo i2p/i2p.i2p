@@ -10,6 +10,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.cert.X509CRL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ public class FamilyKeyCrypto {
     private final Log _log;
     private final Map<Hash, String> _verified;
     private final Set<Hash> _negativeCache;
+    private final Set<Hash> _ourFamily;
     // following for verification only, otherwise null
     private final String _fname;
     private final SigningPrivateKey _privkey;
@@ -82,13 +84,15 @@ public class FamilyKeyCrypto {
         _fname = _context.getProperty(PROP_FAMILY_NAME);
         if (_fname != null) {
             if (_fname.contains("/") || _fname.contains("\\") ||
-                _fname.contains("..") || (new File(_fname)).isAbsolute())
-                throw new GeneralSecurityException("Illegal family name");
+                _fname.contains("..") || (new File(_fname)).isAbsolute() ||
+                _fname.length() <= 0)
+                throw new GeneralSecurityException("Illegal family name: " + _fname);
         }
         _privkey = (_fname != null) ? initialize() : null;
         _pubkey = (_privkey != null) ? _privkey.toPublic() : null;
         _verified = new ConcurrentHashMap<Hash, String>(4);
         _negativeCache = new ConcurrentHashSet<Hash>(4);
+        _ourFamily = (_privkey != null) ? new ConcurrentHashSet<Hash>(4) : Collections.<Hash>emptySet();
     }
     
     /** 
@@ -145,6 +149,35 @@ public class FamilyKeyCrypto {
     }
 
     /** 
+     *  Do we have a valid family?
+     *  @since 0.9.28
+     */
+    public boolean hasFamily() {
+        return _pubkey != null;
+    }
+
+    /** 
+     *  Get verified members of our family.
+     *  Will not contain ourselves.
+     *
+     *  @return non-null, not a copy, do not modify
+     *  @since 0.9.28
+     */
+    public Set<Hash> getOurFamily() {
+        return _ourFamily;
+    }
+
+    /** 
+     *  Get our family name.
+     *
+     *  @return name or null
+     *  @since 0.9.28
+     */
+    public String getOurFamilyName() {
+        return _fname;
+    }
+
+    /** 
      *  Verify the family signature in a RouterInfo.
      *  @return true if good sig or if no family specified at all
      */
@@ -152,6 +185,44 @@ public class FamilyKeyCrypto {
         String name = ri.getOption(OPT_NAME);
         if (name == null)
             return true;
+        return verify(ri, name);
+    }
+
+    /** 
+     *  Verify the family in a RouterInfo matches ours and the signature is good.
+     *  Returns false if we don't have a family and sig, or they don't.
+     *  Returns false for ourselves.
+     *
+     *  @return true if family matches with good sig
+     *  @since 0.9.28
+     */
+    public boolean verifyOurFamily(RouterInfo ri) {
+        if (_pubkey == null)
+            return false;
+        String name = ri.getOption(OPT_NAME);
+        if (!_fname.equals(name))
+            return false;
+        Hash h = ri.getHash();
+        if (_ourFamily.contains(h))
+            return true;
+        if (h.equals(_context.routerHash()))
+            return false;
+        boolean rv = verify(ri, name);
+        if (rv) {
+            _ourFamily.add(h);
+            _log.logAlways(Log.INFO, "Found and verified member of our family (" + _fname + "): " + h);
+        } else {
+            if (_log.shouldWarn())
+                _log.warn("Found spoofed member of our family (" + _fname + "): " + h);
+        }
+        return rv;
+    }
+
+    /** 
+     *  Verify the family in a RouterInfo, name already retrieved
+     *  @since 0.9.28
+     */
+    private boolean verify(RouterInfo ri, String name) {
         Hash h = ri.getHash();
         String ssig = ri.getOption(OPT_SIG);
         if (ssig == null) {

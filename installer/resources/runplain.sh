@@ -3,7 +3,7 @@
 # This runs the router by itself, WITHOUT the wrapper.
 # This means the router will not restart if it crashes.
 # Also, you will be using the default memory size, which is
-# probably not enough for i2p.
+# probably not enough for i2p, unless you set it below.
 # You should really use the i2prouter script instead.
 #
 
@@ -18,6 +18,10 @@ I2PTEMP="%SYSTEM_java_io_tmpdir"
 # next value to true may help.
 PREFERv4="false"
 CP=
+
+# Uncomment to set the maximum memory. The default and the option may vary in different JVMs.
+# Check your java documentation to be sure.
+#MAXMEMOPT="-Xmx256m"
 
 # Try using the Java binary that I2P was installed with.
 # If it's not found, try looking in the system PATH.
@@ -39,7 +43,7 @@ done
 if [ $(uname -s) = "Darwin" ]; then
     export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
 fi
-JAVAOPTS="-Djava.net.preferIPv4Stack=${PREFERv4} -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
+JAVAOPTS="${MAXMEMOPT} -Djava.net.preferIPv4Stack=${PREFERv4} -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
 (
     nohup ${JAVA} -cp \"${CP}\" ${JAVAOPTS} net.i2p.router.RouterLaunch > /dev/null 2>&1
 ) &

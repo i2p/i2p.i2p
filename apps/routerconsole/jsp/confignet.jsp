@@ -56,6 +56,8 @@
     <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%>
  </p><p>
  <%=intl._t("IPv6 Configuration")%>:<br>
+    <input type="checkbox" class="optbox" name="IPv6Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv6FirewalledChecked" /> >
+    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%><br>
     <input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
     <%=intl._t("Disable IPv6")%><br>
     <input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >

@@ -58,6 +58,8 @@ import org.freenetproject.ForwardPortStatus;
  *
  * some code has been borrowed from Limewire : @see com.limegroup.gnutella.UPnPManager
  *
+ * Public only for command line usage. Not a public API, not for external use.
+ *
  * @see "http://www.upnp.org/"
  * @see "http://en.wikipedia.org/wiki/Universal_Plug_and_Play"
  * @since 0.7.4
@@ -68,7 +70,7 @@ import org.freenetproject.ForwardPortStatus;
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  */ 
-class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
+public class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private final Log _log;
 	private final I2PAppContext _context;
 	

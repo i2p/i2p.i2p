@@ -535,8 +535,6 @@ public final class CertUtil {
     }
 
 
-
-/****
     public static final void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Usage: [loadcert | loadcrl | loadcrldir | loadcrldirs | isrevoked | loadprivatekey] file");
@@ -545,7 +543,8 @@ public final class CertUtil {
         try {
             File f = new File(args[1]);
             if (args[0].equals("loadcert")) {
-                loadCert(f);
+                X509Certificate cert = loadCert(f);
+                System.out.println(net.i2p.util.HexDump.dump(cert.getEncoded()));
             } else if (args[0].equals("loadcrl")) {
                 loadCRL(f);
             } else if (args[0].equals("loadcrldir")) {
@@ -569,5 +568,4 @@ public final class CertUtil {
             System.exit(1);
         }
     }
-****/
 }

@@ -29,6 +29,7 @@ abstract class LogWriter implements Runnable {
 
     protected volatile boolean _write;
     private LogRecord _last;
+    private long _firstTimestamp;
     // ms
     private volatile long _flushInterval = FLUSH_INTERVAL;
 
@@ -95,7 +96,7 @@ abstract class LogWriter implements Runnable {
             Queue<LogRecord> records = _manager.getQueue();
             if (records == null) return;
             if (!records.isEmpty()) {
-                if (_last != null && _last.getDate() < _manager.getContext().clock().now() - 30*60*1000)
+                if (_last != null && _firstTimestamp < _manager.getContext().clock().now() - 30*60*1000)
                     _last = null;
                 LogRecord rec;
                 int dupCount = 0;
@@ -108,6 +109,7 @@ abstract class LogWriter implements Runnable {
                             dupCount = 0;
                         }
                         writeRecord(rec);
+                        _firstTimestamp = rec.getDate();
                     }
                     _last = rec;
                 }

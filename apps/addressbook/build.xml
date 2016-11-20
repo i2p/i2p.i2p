@@ -86,6 +86,8 @@
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
 		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+				<attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+				<attribute name="X-Compile-Target-JDK" value="${javac.version}" />
 			</manifest>
 		</jar>
 	</target>
@@ -106,6 +108,8 @@
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
 		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+				<attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+				<attribute name="X-Compile-Target-JDK" value="${javac.version}" />
 			</manifest>
 		</war>
 		<delete dir="${dist}/tmp"/>

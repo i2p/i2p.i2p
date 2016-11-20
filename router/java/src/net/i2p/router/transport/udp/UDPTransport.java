@@ -289,6 +289,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
+        _context.statManager().createRateStat("udp.inboundIPv4Conn", "Inbound IPv4 UDP Connection", "udp", RATES);
+        _context.statManager().createRateStat("udp.inboundIPv6Conn", "Inbound IPv4 UDP Connection", "udp", RATES);
         // following are for PacketBuider
         //_context.statManager().createRateStat("udp.packetAuthTime", "How long it takes to encrypt and MAC a packet for sending", "udp", RATES);
         //_context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", RATES);
@@ -780,6 +782,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     void inboundConnectionReceived(boolean isIPv6) {
         if (isIPv6) {
             _lastInboundIPv6 = _context.clock().now();
+            _context.statManager().addRateData("udp.inboundIPv6Conn", 1);
             // former workaround for lack of IPv6 peer testing
             //if (_currentOurV6Address != null)
             //    setReachabilityStatus(Status.IPV4_UNKNOWN_IPV6_OK, true);
@@ -788,6 +791,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // that we are not firewalled.
             // use OS clock since its an ordering thing, not a time thing
             _lastInboundReceivedOn = System.currentTimeMillis(); 
+            _context.statManager().addRateData("udp.inboundIPv4Conn", 1);
         }
     }
     
@@ -1765,13 +1769,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // (Otherwise we only talk UDP to those that are firewalled, and we will
             // never get any introducers)
             int count = _peersByIdent.size();
-            if (alwaysPreferUDP() || count < _min_peers ||
-                (_haveIPv6Address && count < _min_v6_peers) ||
-                (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
+            if (alwaysPreferUDP()) {
                 return _cachedBid[SLOW_PREFERRED_BID];
-            else if (preferUDP())
+            } else if (count < _min_peers ||
+                       (_haveIPv6Address && count < _min_v6_peers) ||
+                       (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL)) {
+                 // Even if we haven't hit our minimums, give NTCP a chance some of the time.
+                 // This may make things work a little faster at startup
+                 // (especially when we have an IPv6 address and the increased minimums),
+                 // and if UDP is completely blocked we'll still have some connectivity.
+                 // TODO After some time, decide that UDP is blocked/broken and return TRANSIENT_FAIL_BID?
+                if (_context.random().nextInt(4) == 0)
+                    return _cachedBid[SLOWEST_BID];
+                else
+                    return _cachedBid[SLOW_PREFERRED_BID];
+            } else if (preferUDP()) {
                 return _cachedBid[SLOW_BID];
-            else if (haveCapacity()) {
+            } else if (haveCapacity()) {
                 if (addr.getCost() > DEFAULT_COST)
                     return _cachedBid[SLOWEST_COST_BID];
                 else

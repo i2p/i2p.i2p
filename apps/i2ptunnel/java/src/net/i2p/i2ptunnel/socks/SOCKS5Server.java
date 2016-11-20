@@ -131,26 +131,32 @@ class SOCKS5Server extends SOCKSServer {
      */
     private void verifyPassword(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
         int c = in.readUnsignedByte();
-        if (c != AUTH_VERSION)
+        if (c != AUTH_VERSION) {
+            _log.logAlways(Log.WARN, "SOCKS proxy authentication failed");
             throw new SOCKSException("Unsupported authentication version");
+        }
         c = in.readUnsignedByte();
-        if (c <= 0)
+        if (c <= 0) {
+            _log.logAlways(Log.WARN, "SOCKS proxy authentication failed");
             throw new SOCKSException("Bad authentication");
+        }
         byte[] user = new byte[c];
+        String u = new String(user, "UTF-8");
         in.readFully(user);
         c = in.readUnsignedByte();
-        if (c <= 0)
+        if (c <= 0) {
+            _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u);
             throw new SOCKSException("Bad authentication");
+        }
         byte[] pw = new byte[c];
         in.readFully(pw);
         // Hopefully these are in UTF-8, since that's what our config file is in
         // these throw UnsupportedEncodingException which is an IOE
-        String u = new String(user, "UTF-8");
         String p = new String(pw, "UTF-8");
         String configUser =  props.getProperty(I2PTunnelHTTPClientBase.PROP_USER);
         String configPW = props.getProperty(I2PTunnelHTTPClientBase.PROP_PW);
         if ((!u.equals(configUser)) || (!p.equals(configPW))) {
-            _log.error("SOCKS authorization failure");
+            _log.logAlways(Log.WARN, "SOCKS proxy authentication failed, user: " + u);
             sendAuthReply(AUTH_FAILURE, out);
             throw new SOCKSException("SOCKS authorization failure");
         }
@@ -591,9 +597,13 @@ class SOCKS5Server extends SOCKSServer {
             // todo pass the response through?
         } catch (IOException e) {
             try { destSock.close(); } catch (IOException ioe) {}
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
             throw e;
         } catch (SOCKSException e) {
             try { destSock.close(); } catch (IOException ioe) {}
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
             throw e;
         }
         // that's it, caller will send confirmation to our client
@@ -601,9 +611,10 @@ class SOCKS5Server extends SOCKSServer {
     }
 
     // This isn't really the right place for this, we can't stop the tunnel once it starts.
-    static SOCKSUDPTunnel _tunnel;
-    static final Object _startLock = new Object();
-    static byte[] dummyIP = new byte[4];
+    private static SOCKSUDPTunnel _tunnel;
+    private static final Object _startLock = new Object();
+    private static final byte[] dummyIP = new byte[4];
+
     /**
      * We got a UDP associate command.
      * Loop here looking for more, never return normally,
