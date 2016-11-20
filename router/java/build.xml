@@ -99,6 +99,18 @@
             windowtitle="I2P Router" />
     </target>
 
+    <!-- for Maven Central -->
+    <target name="javadocJar" depends="javadoc">
+        <jar jarfile="./build/router-${release.number}-javadoc.jar">
+            <fileset dir="./build/javadoc" />
+        </jar>
+    </target>
+    <target name="sourcesJar">
+        <jar jarfile="./build/router-${release.number}-sources.jar">
+            <fileset dir="./src" />
+        </jar>
+    </target>
+
     <!-- scala paths -->
     <target name="scala.init">
         <property name="scala-library.jar" value="${scalatest.libs}/scala-library.jar" />
