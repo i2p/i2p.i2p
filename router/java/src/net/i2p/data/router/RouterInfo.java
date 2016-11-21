@@ -92,13 +92,14 @@ public class RouterInfo extends DatabaseEntry {
      * NOTE: individual chars defined in Router.java
      */
     public static final String BW_CAPABILITY_CHARS = "" +
-        Router.CAPABILITY_BW12 +
-        Router.CAPABILITY_BW32 +
-        Router.CAPABILITY_BW64 +
-        Router.CAPABILITY_BW128 +
-        Router.CAPABILITY_BW256 +
+        // reverse, so e.g. "POfR" works correctly
+        Router.CAPABILITY_BW_UNLIMITED +
         Router.CAPABILITY_BW512 +
-        Router.CAPABILITY_BW_UNLIMITED;
+        Router.CAPABILITY_BW256 +
+        Router.CAPABILITY_BW128 +
+        Router.CAPABILITY_BW64 +
+        Router.CAPABILITY_BW32 +
+        Router.CAPABILITY_BW12;
     
     public RouterInfo() {
         _addresses = new ArrayList<RouterAddress>(2);
@@ -450,7 +451,7 @@ public class RouterInfo extends DatabaseEntry {
         String capabilities = getCapabilities();
         // Iterate through capabilities, searching for known bandwidth tier
         for (int i = 0; i < capabilities.length(); i++) {
-            if (bwTiers.indexOf(String.valueOf(capabilities.charAt(i))) != -1) {
+            if (bwTiers.indexOf(capabilities.charAt(i)) != -1) {
                 bwTier = String.valueOf(capabilities.charAt(i));
                 break;
             }
