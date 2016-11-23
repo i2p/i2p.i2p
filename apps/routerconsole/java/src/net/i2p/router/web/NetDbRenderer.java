@@ -95,6 +95,21 @@ class NetDbRenderer {
         } else {
             boolean notFound = true;
             Set<RouterInfo> routers = _context.netDb().getRouters();
+            int ipMode = 0;
+            if (ip != null) {
+                if (ip.endsWith("/24")) {
+                    ipMode = 1;
+                } else if (ip.endsWith("/16")) {
+                    ipMode = 2;
+                } else if (ip.endsWith("/8")) {
+                    ipMode = 3;
+                }
+                for (int i = 0; i < ipMode; i++) {
+                    int last = ip.lastIndexOf('.');
+                    if (last > 0)
+                        ip = ip.substring(0, last + 1);
+                }
+            }
             for (RouterInfo ri : routers) {
                 Hash key = ri.getIdentity().getHash();
                 if ((routerPrefix != null && key.toBase64().startsWith(routerPrefix)) ||
@@ -106,10 +121,19 @@ class NetDbRenderer {
                     notFound = false;
                 } else if (ip != null) {
                     for (RouterAddress ra : ri.getAddresses()) {
-                        if (ip.equals(ra.getHost())) {
-                            renderRouterInfo(buf, ri, false, true);
-                            notFound = false;
-                            break;
+                        if (ipMode == 0) {
+                            if (ip.equals(ra.getHost())) {
+                                renderRouterInfo(buf, ri, false, true);
+                                notFound = false;
+                                break;
+                            }
+                        } else {
+                            String host = ra.getHost();
+                            if (host != null && host.startsWith(ip)) {
+                                renderRouterInfo(buf, ri, false, true);
+                                notFound = false;
+                                break;
+                            }
                         }
                     }
                 }
