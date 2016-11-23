@@ -170,6 +170,8 @@ class FloodfillPeerSelector extends PeerSelector {
     private static final int NO_FAIL_LOOKUP_OK = 75*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
     private static final int MAX_GOOD_RESP_TIME = 5*1000;
+    private static final long HEARD_AGE = 48*60*60*1000L;
+    private static final long INSTALL_AGE = HEARD_AGE + (60*60*1000L);
 
     /**
      *  See above for description
@@ -206,6 +208,8 @@ class FloodfillPeerSelector extends PeerSelector {
         List<Hash> badff = new ArrayList<Hash>(ffs.size());
         int found = 0;
         long now = _context.clock().now();
+        long installed = _context.getProperty("router.firstInstalled", 0L);
+        boolean enforceHeard = installed > 0 && (now - installed) > INSTALL_AGE;
 
         double maxFailRate = 100;
         if (_context.router().getUptime() > 60*60*1000) {
@@ -249,6 +253,10 @@ class FloodfillPeerSelector extends PeerSelector {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Bad country: " + entry);
+            } else if (info != null && info.getBandwidthTier().equals("L")) {
+                badff.add(entry);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Slow: " + entry);
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 double maxGoodRespTime = MAX_GOOD_RESP_TIME;
@@ -258,27 +266,43 @@ class FloodfillPeerSelector extends PeerSelector {
                     if (tunnelTestTime != null && tunnelTestTime.getAverageValue() > 500)
                         maxGoodRespTime = 2 * tunnelTestTime.getAverageValue();
                 }
-                if (prof != null && prof.getDBHistory() != null
-                    && prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
-                    && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
-                    && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD
-                    && prof.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getAverageValue() < maxFailRate) {
-                    // good
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Good: " + entry);
-                    rv.add(entry);
-                    found++;
-                } else if (prof != null && prof.getDBHistory() != null
-                           && (prof.getDBHistory().getLastStoreFailed() <= prof.getDBHistory().getLastStoreSuccessful()
-                               || prof.getDBHistory().getLastLookupFailed() <= prof.getDBHistory().getLastLookupSuccessful()
-                               || (prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
-                                   && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK))) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("OK: " + entry);
-                    okff.add(entry);
+                if (prof != null) {
+                    if (enforceHeard && prof.getFirstHeardAbout() > now - HEARD_AGE) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Bad (new): " + entry);
+                        badff.add(entry);
+                    } else if (prof.getDBHistory() != null) {
+                        if (prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
+                            && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
+                            && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD
+                            && prof.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getAverageValue() < maxFailRate) {
+                            // good
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Good: " + entry);
+                            rv.add(entry);
+                            found++;
+                        } else if (prof.getDBHistory().getLastStoreFailed() <= prof.getDBHistory().getLastStoreSuccessful()
+                                   || prof.getDBHistory().getLastLookupFailed() <= prof.getDBHistory().getLastLookupSuccessful()
+                                   || (prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
+                                       && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK)) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("OK: " + entry);
+                            okff.add(entry);
+                        } else {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Bad (DB): " + entry);
+                            badff.add(entry);
+                        }
+                    } else {
+                        // no DBHistory
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Bad (no hist): " + entry);
+                        badff.add(entry);
+                    }
                 } else {
+                    // no profile
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Bad: " + entry);
+                        _log.debug("Bad (no prof): " + entry);
                     badff.add(entry);
                 }
             }

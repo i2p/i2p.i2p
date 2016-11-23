@@ -1,3 +1,11 @@
+2016-11-23 zzz
+ * NetDB: Penalize new and slow peers
+ * News: Add command line utility support
+ * Router: Support blocklist in the news feed (proposal #129)
+
+2016-11-21 zzz
+ * NetDB: Fix detection of bandwidth class with multiple values specified
+
 2016-11-20 zzz
  * NetDB: When doing lookups, don't use floodfills too close
  * Router: Change default family sig type to EdDSA
