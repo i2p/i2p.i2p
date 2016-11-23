@@ -448,9 +448,10 @@ class SybilRenderer {
             int i1 = (i >> 16) & 0xff;
             int i2 = (i >> 8) & 0xff;
             int i3 = i & 0xff;
-            buf.append("<p><b>").append(count).append(" floodfills with IP ").append(i0).append('.')
-               .append(i1).append('.').append(i2).append('.').append(i3)
-               .append(":</b></p>");
+            String sip = i0 + "." + i1 + '.' + i2 + '.' + i3;
+            buf.append("<p><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
+               .append(sip).append("\">").append(sip)
+               .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
                 if (ip == null)
