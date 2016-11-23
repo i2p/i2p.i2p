@@ -104,7 +104,14 @@ class NetDbRenderer {
                     (caps != null && caps.equals(ri.getCapabilities()))) {
                     renderRouterInfo(buf, ri, false, true);
                     notFound = false;
-                // } else { ip TODO
+                } else if (ip != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        if (ip.equals(ra.getHost())) {
+                            renderRouterInfo(buf, ri, false, true);
+                            notFound = false;
+                            break;
+                        }
+                    }
                 }
             }
             if (notFound) {
