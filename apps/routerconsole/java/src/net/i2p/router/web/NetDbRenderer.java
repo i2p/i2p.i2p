@@ -88,7 +88,7 @@ class NetDbRenderer {
      *  @param family may be null
      */
     public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
-                                     String country, String family) throws IOException {
+                                     String country, String family, String caps, String ip) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
@@ -100,9 +100,11 @@ class NetDbRenderer {
                 if ((routerPrefix != null && key.toBase64().startsWith(routerPrefix)) ||
                     (version != null && version.equals(ri.getVersion())) ||
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
-                    (family != null && family.equals(ri.getOption("family")))) {
+                    (family != null && family.equals(ri.getOption("family"))) ||
+                    (caps != null && caps.equals(ri.getCapabilities()))) {
                     renderRouterInfo(buf, ri, false, true);
                     notFound = false;
+                // } else { ip TODO
                 }
             }
             if (notFound) {

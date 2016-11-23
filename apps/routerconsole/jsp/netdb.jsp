@@ -26,5 +26,7 @@
  <jsp:setProperty name="netdbHelper" property="version" value="<%=request.getParameter(\"v\")%>" />
  <jsp:setProperty name="netdbHelper" property="country" value="<%=request.getParameter(\"c\")%>" />
  <jsp:setProperty name="netdbHelper" property="family" value="<%=request.getParameter(\"fam\")%>" />
+ <jsp:setProperty name="netdbHelper" property="caps" value="<%=request.getParameter(\"caps\")%>" />
+ <jsp:setProperty name="netdbHelper" property="ip" value="<%=request.getParameter(\"ip\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div></div></body></html>
