@@ -76,6 +76,7 @@ public class Blocklist {
     private final Object _lock = new Object();
     private Entry _wrapSave;
     private final Set<Hash> _inProcess = new HashSet<Hash>(4);
+    private final File _blocklistFeedFile;
     // temp
     private Map<Hash, String> _peerBlocklist = new HashMap<Hash, String>(4);
 
@@ -95,18 +96,21 @@ public class Blocklist {
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
+        _blocklistFeedFile = new File(context.getConfigDir(), BLOCKLIST_FEED_FILE);
     }
     
     /** only for testing with main() */
     private Blocklist() {
         _context = null;
         _log = new Log(Blocklist.class);
+        _blocklistFeedFile = new File(BLOCKLIST_FEED_FILE);
     }
     
     private static final String PROP_BLOCKLIST_ENABLED = "router.blocklist.enable";
     private static final String PROP_BLOCKLIST_DETAIL = "router.blocklist.detail";
     private static final String PROP_BLOCKLIST_FILE = "router.blocklist.file";
     private static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
+    private static final String BLOCKLIST_FEED_FILE = "docs/feed/blocklist/blocklist.txt";
 
     /**
      *  Loads the following files in-order:
@@ -117,7 +121,7 @@ public class Blocklist {
     public void startup() {
         if (! _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_ENABLED))
             return;
-        List<File> files = new ArrayList<File>(3);
+        List<File> files = new ArrayList<File>(4);
 
         // install dir
         File blFile = new File(_context.getBaseDir(), BLOCKLIST_FILE_DEFAULT);
@@ -135,6 +139,7 @@ public class Blocklist {
                  blFile = new File(_context.getConfigDir(), file);
             files.add(blFile);
         }
+        files.add(_blocklistFeedFile);
         Job job = new ReadinJob(files);
         job.getTiming().setStartAfter(_context.clock().now() + 30*1000);
         _context.jobQueue().addJob(job);
@@ -277,6 +282,7 @@ public class Blocklist {
         int badcount = 0;
         int peercount = 0;
         long ipcount = 0;
+        final boolean isFeedFile = blFile.equals(_blocklistFeedFile);
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(
@@ -295,9 +301,14 @@ public class Blocklist {
                 }
                 byte[] ip1 = e.ip1;
                 if (ip1.length == 4) {
-                    byte[] ip2 = e.ip2;
-                    store(ip1, ip2, count++);
-                    ipcount += 1 + toInt(ip2) - toInt(ip1); // includes dups, oh well
+                    if (isFeedFile) {
+                        // temporary
+                        add(ip1);
+                    } else {
+                        byte[] ip2 = e.ip2;
+                        store(ip1, ip2, count++);
+                        ipcount += 1 + toInt(ip2) - toInt(ip1); // includes dups, oh well
+                    }
                 } else {
                     // IPv6
                     add(ip1);
@@ -575,10 +586,32 @@ public class Blocklist {
             _log.warn("Adding IP to blocklist: " + Addresses.toString(ip));
     }
 
+    /**
+     * Remove from the in-memory single-IP blocklist.
+     * This is only works to undo add()s, NOT for the main list
+     * of IP ranges read in from the file.
+     *
+     * @param ip IPv4 or IPv6
+     * @since 0.9.28
+     */
+    public void remove(byte ip[]) {
+        if (ip.length == 4)
+            remove(toInt(ip));
+        else if (ip.length == 16)
+            remove(new BigInteger(1, ip));
+    }
+
     private boolean add(int ip) {
         if (_singleIPBlocklist.size() >= MAX_IPV4_SINGLES)
             return false;
         return _singleIPBlocklist.add(Integer.valueOf(ip));
+    }
+
+    /**
+     * @since 0.9.28
+     */
+    private void remove(int ip) {
+        _singleIPBlocklist.remove(Integer.valueOf(ip));
     }
 
     private boolean isOnSingleList(int ip) {
@@ -592,6 +625,16 @@ public class Blocklist {
     private boolean add(BigInteger ip) {
         synchronized(_singleIPv6Blocklist) {
             return _singleIPv6Blocklist.put(ip, DUMMY) == null;
+        }
+    }
+
+    /**
+     * @param ip IPv6 non-negative
+     * @since 0.9.28
+     */
+    private void remove(BigInteger ip) {
+        synchronized(_singleIPv6Blocklist) {
+            _singleIPv6Blocklist.remove(ip);
         }
     }
 

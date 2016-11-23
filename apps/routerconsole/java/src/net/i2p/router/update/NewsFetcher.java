@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -28,8 +29,12 @@ import net.i2p.crypto.SU3File;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.router.Banlist;
+import net.i2p.router.Blocklist;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
+import net.i2p.router.news.BlocklistEntries;
 import net.i2p.router.news.CRLEntry;
 import net.i2p.router.news.NewsEntry;
 import net.i2p.router.news.NewsManager;
@@ -41,6 +46,7 @@ import net.i2p.router.web.NewsHelper;
 import net.i2p.update.*;
 import static net.i2p.update.UpdateType.*;
 import static net.i2p.update.UpdateMethod.*;
+import net.i2p.util.Addresses;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -71,6 +77,9 @@ class NewsFetcher extends UpdateRunner {
     private boolean _success;
 
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
+    private static final String PROP_BLOCKLIST_TIME = "router.blocklistVersion";
+    private static final String BLOCKLIST_DIR = "docs/feed/blocklist";
+    private static final String BLOCKLIST_FILE = "blocklist.txt";
     
     public NewsFetcher(RouterContext ctx, ConsoleUpdateManager mgr, List<URI> uris) { 
         super(ctx, mgr, NEWS, uris);
@@ -521,6 +530,14 @@ class NewsFetcher extends UpdateRunner {
                 persistCRLEntries(crlEntries);
             else
                 _log.info("No CRL entries found in news feed");
+
+            // Block any new blocklist entries
+            BlocklistEntries ble = parser.getBlocklistEntries();
+            if (ble != null && ble.isVerified())
+                processBlocklistEntries(ble);
+            else
+                _log.info("No blocklist entries found in news feed");
+
             // store entries and metadata in old news.xml format
             String sudVersion = su3.getVersionString();
             String signingKeyName = su3.getSignerString();
@@ -608,6 +625,94 @@ class NewsFetcher extends UpdateRunner {
     }
 
     /**
+     *  Process blocklist entries
+     *
+     *  @since 0.9.28
+     */
+    private void processBlocklistEntries(BlocklistEntries ble) {
+        long oldTime = _context.getProperty(PROP_BLOCKLIST_TIME, 0L);
+        if (ble.updated <= oldTime) {
+            if (_log.shouldWarn())
+                _log.warn("Not processing blocklist " + new Date(ble.updated) +
+                          ", already have " + new Date(oldTime));
+            return;
+        }
+        Blocklist bl = _context.blocklist();
+        Banlist ban = _context.banlist();
+        int banned = 0;
+        for (Iterator<String> iter = ble.entries.iterator(); iter.hasNext(); ) {
+            String s = iter.next();
+            if (s.length() == 44) {
+                byte[] b = Base64.decode(s);
+                if (b == null || b.length != Hash.HASH_LENGTH) {
+                    iter.remove();
+                    continue;
+                }
+                Hash h = Hash.create(b);
+                if (!ban.isBanlistedForever(h))
+                    ban.banlistRouterForever(h, "News feed");
+            } else {
+                byte[] ip = Addresses.getIP(s);
+                if (ip == null) {
+                    iter.remove();
+                    continue;
+                }
+                if (!bl.isBlocklisted(ip))
+                    bl.add(ip);
+            }
+            if (++banned >= BlocklistEntries.MAX_ENTRIES) {
+                // prevent somebody from destroying the whole network
+                break;
+            }
+        }
+        for (String s : ble.removes) {
+            if (s.length() == 44) {
+                byte[] b = Base64.decode(s);
+                if (b == null || b.length != Hash.HASH_LENGTH)
+                    continue;
+                Hash h = Hash.create(b);
+                if (ban.isBanlistedForever(h))
+                    ban.unbanlistRouter(h);
+            } else {
+                byte[] ip = Addresses.getIP(s);
+                if (ip == null)
+                    continue;
+                if (bl.isBlocklisted(ip))
+                    bl.remove(ip);
+            }
+        }
+        // Save the blocks. We do not save the unblocks.
+        File f = new SecureFile(_context.getConfigDir(), BLOCKLIST_DIR);
+        f.mkdirs();
+        f = new File(f, BLOCKLIST_FILE);
+        boolean fail = false;
+        BufferedWriter out = null;
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(f), "UTF-8"));
+            out.write("# ");
+            out.write(ble.supdated);
+            out.newLine();
+            for (String s : ble.entries) {
+                s = s.replace(':', ';');  // IPv6
+                out.write("Blocklist Feed:");
+                out.write(s);
+                out.newLine();
+            }
+        } catch (IOException ioe) {
+            _log.error("Error writing blocklist", ioe);
+            fail = true;
+        } finally {
+            if (out != null) try { 
+                out.close(); 
+            } catch (IOException ioe) {}
+        }
+        if (!fail)
+            _context.router().saveConfig(PROP_BLOCKLIST_TIME, Long.toString(ble.updated));
+        if (_log.shouldWarn())
+            _log.warn("Processed " + ble.entries.size() + " blocks and " + ble.removes.size() + " unblocks from news feed");
+    }
+
+    /**
      *  Output in the old format.
      *
      *  @since 0.9.17
@@ -617,7 +722,7 @@ class NewsFetcher extends UpdateRunner {
         NewsMetadata.Release latestRelease = data.releases.get(0);
         Writer out = null;
         try {
-            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(to), "UTF-8"));
+            out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(to), "UTF-8"));
             out.write("<!--\n");
             // update metadata in old format
             out.write("<i2p.release ");

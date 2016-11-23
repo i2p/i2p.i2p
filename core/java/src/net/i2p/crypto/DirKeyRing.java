@@ -21,9 +21,9 @@ import net.i2p.util.SystemVersion;
  *  Simple storage of each cert in a separate file in a directory.
  *  Limited sanitization of filenames.
  *
- *  @since 0.9.9
+ *  @since 0.9.9, public since 0.9.28
  */
-class DirKeyRing implements KeyRing {
+public class DirKeyRing implements KeyRing {
 
     private final File _base;
 

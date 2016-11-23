@@ -33,6 +33,7 @@ public class NewsXMLParser {
     private final Log _log;
     private List<NewsEntry> _entries;
     private List<CRLEntry> _crlEntries;
+    private BlocklistEntries _blocklistEntries;
     private NewsMetadata _metadata;
     private XHTMLMode _mode;
 
@@ -157,12 +158,24 @@ public class NewsXMLParser {
         return _crlEntries;
     }
 
+    /**
+     *  The blocklist entries.
+     *  Must call parse() first.
+     *
+     *  @return null if none
+     *  @since 0.9.28
+     */
+    public BlocklistEntries getBlocklistEntries() {
+        return _blocklistEntries;
+    }
+
     private void extract(Node root) throws I2PParserException {
         if (!root.getName().equals("feed"))
             throw new I2PParserException("no feed in XML");
         _metadata = extractNewsMetadata(root);
         _entries = extractNewsEntries(root);
         _crlEntries = extractCRLEntries(root);
+        _blocklistEntries = extractBlocklistEntries(root);
     }
 
     private static NewsMetadata extractNewsMetadata(Node feed) throws I2PParserException {
@@ -370,7 +383,7 @@ public class NewsXMLParser {
      *  @return null if none
      *  @since 0.9.26
      */
-    private List<CRLEntry> extractCRLEntries(Node feed) throws I2PParserException {
+    private static List<CRLEntry> extractCRLEntries(Node feed) throws I2PParserException {
         Node rev = feed.getNode("i2p:revocations");
         if (rev == null)
             return null;
@@ -394,6 +407,53 @@ public class NewsXMLParser {
                 e.data = a.trim();
             rv.add(e);
         }
+        return rv;
+    }
+
+    /**
+     *  This does not check for any missing values.
+     *  Any field in a BlocklistEntry may be null.
+     *  Signature is verified here.
+     *
+     *  @return null if none
+     *  @since 0.9.28
+     */
+    private BlocklistEntries extractBlocklistEntries(Node feed) throws I2PParserException {
+        Node bl = feed.getNode("i2p:blocklist");
+        if (bl == null)
+            return null;
+        List<Node> entries = getNodes(bl, "i2p:block");
+        BlocklistEntries rv = new BlocklistEntries(entries.size());
+        String a = bl.getAttributeValue("signed-by");
+        if (a.length() > 0)
+            rv.signer = a;
+        a = bl.getAttributeValue("sig");
+        if (a.length() > 0) {
+            rv.sig = a;
+        }
+        a = bl.getAttributeValue("updated");
+        if (a.length() > 0) {
+            rv.supdated = a;
+            long time = RFC3339Date.parse3339Date(a.trim());
+            if (time > 0)
+                rv.updated = time;
+        }
+        for (Node entry : entries) {
+            a = entry.getValue();
+            if (a != null) {
+                rv.entries.add(a.trim());
+            }
+        }
+        List<Node> rentries = getNodes(bl, "i2p:unblock");
+        if (entries.isEmpty() && rentries.isEmpty())
+            return null;
+        for (Node entry : rentries) {
+            a = entry.getValue();
+            if (a != null) {
+                rv.removes.add(a.trim());
+            }
+        }
+        rv.verify(_context);
         return rv;
     }
 
