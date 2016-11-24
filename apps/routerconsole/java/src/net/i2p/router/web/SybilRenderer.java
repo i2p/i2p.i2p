@@ -216,10 +216,12 @@ class SybilRenderer {
 
         // Distance to our router analysis
         buf.append("<h3 id=\"ritoday\">Closest Floodfills to Our Routing Key (Where we Store our RI)</h3>");
+        buf.append("<p><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
         renderRouterInfoHTML(out, buf, ourRKey, avgMinDist, ris, points);
         RouterKeyGenerator rkgen = _context.routerKeyGenerator();
         Hash nkey = rkgen.getNextRoutingKey(us);
         buf.append("<h3 id=\"ritmrw\">Closest Floodfills to Tomorrow's Routing Key (Where we will Store our RI)</h3>");
+        buf.append("<p><a href=\"/netdb?caps=f&amp;sybil\">See all</a></p>");
         renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
 
         buf.append("<h3 id=\"dht\">Closest Floodfills to Our Router Hash (DHT Neighbors if we are Floodfill)</h3>");
@@ -243,9 +245,11 @@ class SybilRenderer {
             TunnelPool in = clientInboundPools.get(client);
             String name = (in != null) ? in.getSettings().getDestinationNickname() : client.toBase64().substring(0,4);
             buf.append("<h3>Closest floodfills to the Routing Key for " + DataHelper.escapeHTML(name) + " (where we store our LS)</h3>");
+            buf.append("<p><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
             renderRouterInfoHTML(out, buf, rkey, avgMinDist, ris, points);
             nkey = rkgen.getNextRoutingKey(ls.getHash());
             buf.append("<h3>Closest floodfills to Tomorrow's Routing Key for " + DataHelper.escapeHTML(name) + " (where we will store our LS)</h3>");
+            buf.append("<p><a href=\"/netdb?caps=f&amp;sybil=" + ls.getHash().toBase64() + "\">See all</a></p>");
             renderRouterInfoHTML(out, buf, nkey, avgMinDist, ris, points);
         }
 
