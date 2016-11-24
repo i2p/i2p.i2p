@@ -28,5 +28,6 @@
  <jsp:setProperty name="netdbHelper" property="family" value="<%=request.getParameter(\"fam\")%>" />
  <jsp:setProperty name="netdbHelper" property="caps" value="<%=request.getParameter(\"caps\")%>" />
  <jsp:setProperty name="netdbHelper" property="ip" value="<%=request.getParameter(\"ip\")%>" />
+ <jsp:setProperty name="netdbHelper" property="sybil" value="<%=request.getParameter(\"sybil\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div></div></body></html>

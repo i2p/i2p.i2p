@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -23,6 +24,7 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.data.router.RouterKeyGenerator;
+import net.i2p.kademlia.XORComparator;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.crypto.FamilyKeyCrypto;
@@ -450,7 +452,7 @@ class SybilRenderer {
             int i3 = i & 0xff;
             String sip = i0 + "." + i1 + '.' + i2 + '.' + i3;
             buf.append("<p><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
-               .append(sip).append("\">").append(sip)
+               .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
@@ -503,7 +505,7 @@ class SybilRenderer {
             int i2 = i & 0xff;
             String sip = i0 + "." + i1 + '.' + i2 + ".0/24";
             buf.append("<p><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
-               .append(sip).append("\">").append(sip)
+               .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a>:</b></p>");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
@@ -553,7 +555,7 @@ class SybilRenderer {
             int i1 = i & 0xff;
             String sip = i0 + "." + i1 + ".0/16";
             buf.append("<p><b>").append(count).append(" floodfills with IP <a href=\"/netdb?ip=")
-               .append(sip).append("\">").append(sip)
+               .append(sip).append("&amp;sybil\">").append(sip)
                .append("</a></b></p>");
             for (RouterInfo info : ris) {
                 byte[] ip = getIP(info);
@@ -595,7 +597,7 @@ class SybilRenderer {
             int count = oc.count(s);
             String ss = DataHelper.escapeHTML(s);
             buf.append("<p><b>").append(count).append(" floodfills in declared family \"<a href=\"/netdb?fam=")
-               .append(ss).append("\">").append(ss).append("</a>\"</b></p>");
+               .append(ss).append("&amp;sybil\">").append(ss).append("</a>\"</b></p>");
             for (RouterInfo info : ris) {
                 String fam = info.getOption("family");
                 if (fam == null)
@@ -899,6 +901,77 @@ class SybilRenderer {
         buf.append("</td></tr>\n");
         buf.append("</table>\n");
         return distance;
+    }
+
+    /**
+     *  Called from NetDbRenderer
+     *
+     *  @since 0.9.28
+     */
+    public static void renderSybilHTML(Writer out, RouterContext ctx, List<Hash> sybils, String victim) throws IOException {
+        if (sybils.isEmpty())
+            return;
+        final DecimalFormat fmt = new DecimalFormat("#0.00");
+        XORComparator<Hash> xor = new XORComparator<Hash>(Hash.FAKE_HASH);
+        out.write("<h3>Group Distances</h3><table><tr><th>Hash<th>Distance from previous</tr>\n");
+        Collections.sort(sybils, xor);
+        Hash prev = null;
+        for (Hash h : sybils) {
+            out.write("<tr><td><tt>" + h.toBase64() + "</tt><td>");
+            if (prev != null) {
+                BigInteger dist = HashDistance.getDistance(prev, h);
+                writeDistance(out, fmt, dist);
+            }
+            prev = h;
+            out.write("</tr>\n");
+        }
+        out.write("</table>\n");
+        out.flush();
+
+        RouterKeyGenerator rkgen = ctx.routerKeyGenerator();
+        long now = ctx.clock().now();
+        final int days = 7;
+        Hash from = ctx.routerHash();
+        if (victim != null) {
+            byte[] b = Base64.decode(victim);
+            if (b != null && b.length == Hash.HASH_LENGTH)
+                from = Hash.create(b);
+        }
+        out.write("<h3>Distance to " + from.toBase64() + "</h3>");
+        prev = null;
+        for (int i = 0; i < days; i++) {
+            out.write("<h3>Distance for " + new Date(now) +
+                      "</h3><table><tr><th>Hash<th>Distance<th>Distance from previous</tr>\n");
+            Hash rkey = rkgen.getRoutingKey(from, now);
+            xor = new XORComparator<Hash>(rkey);
+            Collections.sort(sybils, xor);
+            for (Hash h : sybils) {
+                out.write("<tr><td><tt>" + h.toBase64() + "</tt><td>");
+                BigInteger dist = HashDistance.getDistance(rkey, h);
+                writeDistance(out, fmt, dist);
+                out.write("<td>");
+                if (prev != null) {
+                    dist = HashDistance.getDistance(prev, h);
+                    writeDistance(out, fmt, dist);
+                }
+                prev = h;
+                out.write("</tr>\n");
+            }
+            out.write("</table>\n");
+            out.flush();
+            now += 24*60*60*1000;
+            prev = null;
+        }
+    }
+
+    /** @since 0.9.28 */
+    private static void writeDistance(Writer out, DecimalFormat fmt, BigInteger dist) throws IOException {
+        double distance = biLog2(dist);
+        if (distance < MIN_CLOSE)
+            out.write("<font color=\"red\">");
+        out.write(fmt.format(distance));
+        if (distance < MIN_CLOSE)
+            out.write("</font>");
     }
 
     /** translate a string */

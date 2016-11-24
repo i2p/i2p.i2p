@@ -88,8 +88,10 @@ class NetDbRenderer {
      *  @param family may be null
      */
     public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
-                                     String country, String family, String caps, String ip) throws IOException {
+                                     String country, String family, String caps,
+                                     String ip, String sybil) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
+        List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
         if (".".equals(routerPrefix)) {
             renderRouterInfo(buf, _context.router().getRouterInfo(), true, true);
         } else {
@@ -116,14 +118,18 @@ class NetDbRenderer {
                     (version != null && version.equals(ri.getVersion())) ||
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
                     (family != null && family.equals(ri.getOption("family"))) ||
-                    (caps != null && caps.equals(ri.getCapabilities()))) {
+                    (caps != null && ri.getCapabilities().contains(caps))) {
                     renderRouterInfo(buf, ri, false, true);
+                    if (sybil != null)
+                        sybils.add(key);
                     notFound = false;
                 } else if (ip != null) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (ipMode == 0) {
                             if (ip.equals(ra.getHost())) {
                                 renderRouterInfo(buf, ri, false, true);
+                                if (sybil != null)
+                                    sybils.add(key);
                                 notFound = false;
                                 break;
                             }
@@ -131,6 +137,8 @@ class NetDbRenderer {
                             String host = ra.getHost();
                             if (host != null && host.startsWith(ip)) {
                                 renderRouterInfo(buf, ri, false, true);
+                                if (sybil != null)
+                                    sybils.add(key);
                                 notFound = false;
                                 break;
                             }
@@ -153,6 +161,8 @@ class NetDbRenderer {
         }
         out.write(buf.toString());
         out.flush();
+        if (sybil != null)
+            SybilRenderer.renderSybilHTML(out, _context, sybils, sybil);
     }
 
     /**

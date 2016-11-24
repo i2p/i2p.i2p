@@ -187,6 +187,26 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
     }
     
     /**
+     * Get the routing key for the specified date, not today's
+     *
+     * @param time Java time
+     * @since 0.9.28
+     */
+    public Hash getRoutingKey(Hash origKey, long time) {
+        String modVal;
+        synchronized(this) {
+            modVal = _fmt.format(time);
+        }
+        if (modVal.length() != LENGTH)
+            throw new IllegalStateException();
+        byte[] mod = new byte[LENGTH];
+        for (int i = 0; i < LENGTH; i++) {
+            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
+        }
+        return getKey(origKey, mod);
+    }
+    
+    /**
      * Generate a modified (yet consistent) hash from the origKey by generating the
      * SHA256 of the targetKey with the specified modData appended to it
      *
