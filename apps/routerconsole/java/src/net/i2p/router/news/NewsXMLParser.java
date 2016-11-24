@@ -424,15 +424,18 @@ public class NewsXMLParser {
             return null;
         List<Node> entries = getNodes(bl, "i2p:block");
         BlocklistEntries rv = new BlocklistEntries(entries.size());
-        String a = bl.getAttributeValue("signed-by");
+        String a = bl.getAttributeValue("signer");
         if (a.length() > 0)
             rv.signer = a;
         a = bl.getAttributeValue("sig");
         if (a.length() > 0) {
             rv.sig = a;
         }
-        a = bl.getAttributeValue("updated");
-        if (a.length() > 0) {
+        Node n =  bl.getNode("updated");
+        if (n == null)
+            return null;
+        a = n.getValue();
+        if (a != null) {
             rv.supdated = a;
             long time = RFC3339Date.parse3339Date(a.trim());
             if (time > 0)

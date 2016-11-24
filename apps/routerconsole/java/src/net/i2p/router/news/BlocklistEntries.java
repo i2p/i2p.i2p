@@ -40,6 +40,7 @@ public class BlocklistEntries {
     private boolean verified;
     public static final int MAX_ENTRIES = 2000;
     private static final String CONTENT_ROUTER = "router";
+    public static final long MAX_FUTURE = 2*24*60*60*1000L;
 
     public BlocklistEntries(int capacity) {
         entries = new ArrayList<String>(capacity);
@@ -54,6 +55,8 @@ public class BlocklistEntries {
         if (verified)
             return true;
         if (signer == null || sig == null || supdated == null)
+            return false;
+        if (updated > ctx.clock().now() + MAX_FUTURE)
             return false;
         Log log = ctx.logManager().getLog(BlocklistEntries.class);
         String[] ss = DataHelper.split(sig, ":", 2);
@@ -267,7 +270,8 @@ public class BlocklistEntries {
             System.exit(1);
         }
 
-        System.out.println("  <i2p:blocklist updated=\"" + date + "\" signed-by=\"" + signerName + "\" sig=\"" + type.getCode() + ':' + bsig + "\">");
+        System.out.println("  <i2p:blocklist signer=\"" + signerName + "\" sig=\"" + type.getCode() + ':' + bsig + "\">");
+        System.out.println("    <updated>" + date + "</updated>");
         for (String e : elist) {
             System.out.println("    <i2p:block>" + e + "</i2p:block>");
         }

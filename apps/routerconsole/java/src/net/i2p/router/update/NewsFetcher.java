@@ -639,6 +639,9 @@ class NewsFetcher extends UpdateRunner {
         }
         Blocklist bl = _context.blocklist();
         Banlist ban = _context.banlist();
+        DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
+        fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+        String reason = "Blocklist feed " + new Date(ble.updated);
         int banned = 0;
         for (Iterator<String> iter = ble.entries.iterator(); iter.hasNext(); ) {
             String s = iter.next();
@@ -650,7 +653,7 @@ class NewsFetcher extends UpdateRunner {
                 }
                 Hash h = Hash.create(b);
                 if (!ban.isBanlistedForever(h))
-                    ban.banlistRouterForever(h, "News feed");
+                    ban.banlistRouterForever(h, reason);
             } else {
                 byte[] ip = Addresses.getIP(s);
                 if (ip == null) {
@@ -692,11 +695,15 @@ class NewsFetcher extends UpdateRunner {
             out.write("# ");
             out.write(ble.supdated);
             out.newLine();
+            banned = 0;
             for (String s : ble.entries) {
                 s = s.replace(':', ';');  // IPv6
-                out.write("Blocklist Feed:");
+                out.write(reason);
+                out.write(':');
                 out.write(s);
                 out.newLine();
+                if (++banned >= BlocklistEntries.MAX_ENTRIES)
+                    break;
             }
         } catch (IOException ioe) {
             _log.error("Error writing blocklist", ioe);
@@ -706,8 +713,10 @@ class NewsFetcher extends UpdateRunner {
                 out.close(); 
             } catch (IOException ioe) {}
         }
-        if (!fail)
+        if (!fail) {
+            f.setLastModified(ble.updated);
             _context.router().saveConfig(PROP_BLOCKLIST_TIME, Long.toString(ble.updated));
+        }
         if (_log.shouldWarn())
             _log.warn("Processed " + ble.entries.size() + " blocks and " + ble.removes.size() + " unblocks from news feed");
     }
