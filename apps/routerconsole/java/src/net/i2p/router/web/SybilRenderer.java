@@ -16,7 +16,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -35,6 +34,7 @@ import net.i2p.router.util.HashDistance;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.Log;
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.Translate;
@@ -921,7 +921,8 @@ class SybilRenderer {
         Collections.sort(sybils, xor);
         Hash prev = null;
         for (Hash h : sybils) {
-            out.write("<tr><td><tt>" + h.toBase64() + "</tt><td>");
+            String hh = h.toBase64();
+            out.write("<tr><td><a href=\"#" + hh.substring(0, 6) + "\"><tt>" + hh + "</tt></a><td>");
             if (prev != null) {
                 BigInteger dist = HashDistance.getDistance(prev, h);
                 writeDistance(out, fmt, dist);
@@ -937,20 +938,23 @@ class SybilRenderer {
         final int days = 7;
         Hash from = ctx.routerHash();
         if (victim != null) {
-            byte[] b = Base64.decode(victim);
-            if (b != null && b.length == Hash.HASH_LENGTH)
-                from = Hash.create(b);
+            Hash v = ConvertToHash.getHash(victim);
+            if (v != null)
+                from = v;
         }
         out.write("<h3>Distance to " + from.toBase64() + "</h3>");
         prev = null;
+        final int limit = Math.min(10, sybils.size());
         for (int i = 0; i < days; i++) {
             out.write("<h3>Distance for " + new Date(now) +
                       "</h3><table><tr><th>Hash<th>Distance<th>Distance from previous</tr>\n");
             Hash rkey = rkgen.getRoutingKey(from, now);
             xor = new XORComparator<Hash>(rkey);
             Collections.sort(sybils, xor);
-            for (Hash h : sybils) {
-                out.write("<tr><td><tt>" + h.toBase64() + "</tt><td>");
+            for (int j = 0; j < limit; j++) {
+                Hash h = sybils.get(j);
+                String hh = h.toBase64();
+                out.write("<tr><td><a href=\"#" + hh.substring(0, 6) + "\"><tt>" + hh + "</tt></a><td>");
                 BigInteger dist = HashDistance.getDistance(rkey, h);
                 writeDistance(out, fmt, dist);
                 out.write("<td>");
