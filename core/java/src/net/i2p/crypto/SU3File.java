@@ -79,6 +79,8 @@ public class SU3File {
     public static final int TYPE_HTML = 2;
     /** @since 0.9.17 */
     public static final int TYPE_XML_GZ = 3;
+    /** @since 0.9.28 */
+    public static final int TYPE_TXT_GZ = 4;
 
     public static final int CONTENT_UNKNOWN = 0;
     public static final int CONTENT_ROUTER = 1;
@@ -86,6 +88,8 @@ public class SU3File {
     public static final int CONTENT_RESEED = 3;
     /** @since 0.9.15 */
     public static final int CONTENT_NEWS = 4;
+    /** @since 0.9.28 */
+    public static final int CONTENT_BLOCKLIST = 5;
 
     /**
      *  The ContentType is the trust domain for the content.
@@ -97,7 +101,8 @@ public class SU3File {
         ROUTER(CONTENT_ROUTER, "router"),
         PLUGIN(CONTENT_PLUGIN, "plugin"),
         RESEED(CONTENT_RESEED, "reseed"),
-        NEWS(CONTENT_NEWS, "news")
+        NEWS(CONTENT_NEWS, "news"),
+        BLOCKLIST(CONTENT_BLOCKLIST, "blocklist")
         ;
 
         private final int code;
@@ -676,12 +681,13 @@ public class SU3File {
                 buf.append(" DEFAULT");
             buf.append('\n');
         }
-        buf.append("Available file types (-f):\n");
-        buf.append("      ZIP\t(code: 0) DEFAULT\n");
-        buf.append("      XML\t(code: 1)\n");
-        buf.append("      HTML\t(code: 2)\n");
-        buf.append("      XML_GZ\t(code: 3)\n");
-        buf.append("      (user defined)\t(code: 4-255)\n");
+        buf.append("Available file types (-f):\n" +
+                   "      ZIP\t(code: 0) DEFAULT\n" +
+                   "      XML\t(code: 1)\n" +
+                   "      HTML\t(code: 2)\n" +
+                   "      XML_GZ\t(code: 3)\n" +
+                   "      TXT_GZ\t(code: 4)\n" +
+                   "      (user defined)\t(code: 5-255)\n");
         return buf.toString();
     }
 
