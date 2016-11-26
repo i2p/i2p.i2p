@@ -75,6 +75,7 @@ class SybilRenderer {
     private static final double POINTS_BAD_VERSION = 50.0;
     private static final double POINTS_UNREACHABLE = 4.0;
     private static final double POINTS_NEW = 4.0;
+    private static final double POINTS_BANLIST = 25.0;
 
     public SybilRenderer(RouterContext ctx) {
         _context = ctx;
@@ -638,6 +639,8 @@ class SybilRenderer {
         RateAverages ra = RateAverages.getTemp();
         for (RouterInfo info : ris) {
             Hash h = info.getHash();
+            if (_context.banlist().isBanlisted(h))
+                addPoints(points, h, POINTS_BANLIST, "Banlisted");
             PeerProfile prof = _context.profileOrganizer().getProfileNonblocking(h);
             if (prof != null) {
                 long heard = prof.getFirstHeardAbout();

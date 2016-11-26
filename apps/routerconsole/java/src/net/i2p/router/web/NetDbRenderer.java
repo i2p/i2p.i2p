@@ -107,7 +107,7 @@ class NetDbRenderer {
                     ipMode = 3;
                 }
                 for (int i = 0; i < ipMode; i++) {
-                    int last = ip.lastIndexOf('.');
+                    int last = ip.substring(0, ip.length() - 1).lastIndexOf('.');
                     if (last > 0)
                         ip = ip.substring(0, last + 1);
                 }
