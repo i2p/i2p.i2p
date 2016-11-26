@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.IOException;
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 
 public class NetDbHelper extends HelperBase {
@@ -8,10 +9,11 @@ public class NetDbHelper extends HelperBase {
     private String _version;
     private String _country;
     private String _family, _caps, _ip, _sybil;
-    private int _full;
+    private int _full, _port;
     private boolean _lease;
     private boolean _debug;
     private boolean _graphical;
+    private SigType _type;
     
     private static final String titles[] =
                                           {_x("Summary"),                       // 0
@@ -84,6 +86,19 @@ public class NetDbHelper extends HelperBase {
             _sybil = DataHelper.stripHTML(c);  // XSS
     }
 
+    /** @since 0.9.28 */
+    public void setPort(String f) {
+        try {
+            _port = Integer.parseInt(f);
+        } catch (NumberFormatException nfe) {}
+    }
+
+    /** @since 0.9.28 */
+    public void setType(String f) {
+        if (f != null && f.length() > 0)
+            _type = SigType.parseSigType(f);
+    }
+
     public void setFull(String f) {
         try {
             _full = Integer.parseInt(f);
@@ -111,9 +126,10 @@ public class NetDbHelper extends HelperBase {
         try {
             renderNavBar();
             if (_routerPrefix != null || _version != null || _country != null ||
-                _family != null || _caps != null || _ip != null || _sybil != null)
+                _family != null || _caps != null || _ip != null || _sybil != null ||
+                _port != 0 || _type != null)
                 renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country,
-                                              _family, _caps, _ip, _sybil);
+                                              _family, _caps, _ip, _sybil, _port, _type);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
             else if (_full == 3)
@@ -139,7 +155,8 @@ public class NetDbHelper extends HelperBase {
         if (".".equals(_routerPrefix))
             return 1;
         if (_routerPrefix != null || _version != null || _country != null ||
-            _family != null || _caps != null || _ip != null || _sybil != null)
+            _family != null || _caps != null || _ip != null || _sybil != null ||
+            _port != 0 || _type != null)
             return 2;
         if (_full == 2)
             return 3;
@@ -201,6 +218,8 @@ public class NetDbHelper extends HelperBase {
                    "Family <input type=\"text\" name=\"fam\"><br>\n" +
                    "Hash prefix <input type=\"text\" name=\"r\"><br>\n" +
                    "IP <input type=\"text\" name=\"ip\">IPv4 or IPv6, /24,/16,/8 suffixes optional for IPv4<br>\n" +
+                   "Port <input type=\"text\" name=\"port\"><br>\n" +
+                   "Sig Type <input type=\"text\" name=\"type\"><br>\n" +
                    "Version <input type=\"text\" name=\"v\"><br>\n" +
                    "<p><b>Add Sybil analysis (must pick one above):</b></p>\n" +
                    "Sybil close to <input type=\"text\" name=\"sybil2\">Router hash, dest hash, b32, or from address book<br>\n" +

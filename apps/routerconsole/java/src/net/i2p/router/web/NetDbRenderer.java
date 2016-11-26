@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -89,7 +90,7 @@ class NetDbRenderer {
      */
     public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
                                      String country, String family, String caps,
-                                     String ip, String sybil) throws IOException {
+                                     String ip, String sybil, int port, SigType type) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
         if (".".equals(routerPrefix)) {
@@ -118,7 +119,8 @@ class NetDbRenderer {
                     (version != null && version.equals(ri.getVersion())) ||
                     (country != null && country.equals(_context.commSystem().getCountry(key))) ||
                     (family != null && family.equals(ri.getOption("family"))) ||
-                    (caps != null && ri.getCapabilities().contains(caps))) {
+                    (caps != null && ri.getCapabilities().contains(caps)) ||
+                    (type != null && type == ri.getIdentity().getSigType())) {
                     renderRouterInfo(buf, ri, false, true);
                     if (sybil != null)
                         sybils.add(key);
@@ -142,6 +144,16 @@ class NetDbRenderer {
                                 notFound = false;
                                 break;
                             }
+                        }
+                    }
+                } else if (port != 0) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        if (port == ra.getPort()) {
+                            renderRouterInfo(buf, ri, false, true);
+                            if (sybil != null)
+                                sybils.add(key);
+                            notFound = false;
+                            break;
                         }
                     }
                 }
