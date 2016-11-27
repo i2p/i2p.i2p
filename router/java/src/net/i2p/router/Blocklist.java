@@ -116,6 +116,7 @@ public class Blocklist {
      *  Loads the following files in-order:
      *  $I2P/blocklist.txt
      *  ~/.i2p/blocklist.txt
+     *  ~/.i2p/docs/feed/blocklist/blocklist.txt
      *  File if specified with router.blocklist.file
      */
     public void startup() {
@@ -131,6 +132,7 @@ public class Blocklist {
             blFile = new File(_context.getConfigDir(), BLOCKLIST_FILE_DEFAULT);
             files.add(blFile);
         }
+        files.add(_blocklistFeedFile);
         // user specified
         String file = _context.getProperty(PROP_BLOCKLIST_FILE);
         if (file != null && !file.equals(BLOCKLIST_FILE_DEFAULT)) {
@@ -139,7 +141,6 @@ public class Blocklist {
                  blFile = new File(_context.getConfigDir(), file);
             files.add(blFile);
         }
-        files.add(_blocklistFeedFile);
         Job job = new ReadinJob(files);
         job.getTiming().setStartAfter(_context.clock().now() + 30*1000);
         _context.jobQueue().addJob(job);
