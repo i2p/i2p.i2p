@@ -37,7 +37,7 @@ public class MaskedIPSet extends HashSet<String> {
       * @return an opaque set of masked IPs for this peer
       */
     public MaskedIPSet(RouterContext ctx, Hash peer, int mask) {
-        this(ctx, ctx.netDb().lookupRouterInfoLocally(peer), mask);
+        this(ctx, peer, ctx.netDb().lookupRouterInfoLocally(peer), mask);
     }
 
     /**
@@ -51,10 +51,24 @@ public class MaskedIPSet extends HashSet<String> {
       * @return an opaque set of masked IPs for this peer
       */
     public MaskedIPSet(RouterContext ctx, RouterInfo pinfo, int mask) {
+        this(ctx, pinfo != null ? pinfo.getHash() : null, pinfo, mask);
+    }
+
+    /**
+      * The Set of IPs for this peer, with a given mask.
+      * Includes the comm system's record of the IP, and all netDb addresses.
+      *
+      * As of 0.9.24, returned set will include netdb family as well.
+      *
+      * @param pinfo may be null
+      * @param mask is 1-4 (number of bytes to match)
+      * @return an opaque set of masked IPs for this peer
+      */
+    public MaskedIPSet(RouterContext ctx, Hash peer, RouterInfo pinfo, int mask) {
         super(4);
         if (pinfo == null)
             return;
-        byte[] commIP = ctx.commSystem().getIP(pinfo.getHash());
+        byte[] commIP = ctx.commSystem().getIP(peer);
         if (commIP != null)
             add(maskedIP(commIP, mask));
         Collection<RouterAddress> paddr = pinfo.getAddresses();
@@ -62,6 +76,11 @@ public class MaskedIPSet extends HashSet<String> {
             byte[] pib = pa.getIP();
             if (pib == null) continue;
             add(maskedIP(pib, mask));
+            // Routers with a common port may be run
+            // by a single entity with a common configuration
+            int port = pa.getPort();
+            if (port > 0)
+                add("p" + port);
         }
         String family = pinfo.getOption("family");
         if (family != null) {

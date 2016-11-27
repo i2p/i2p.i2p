@@ -1,4 +1,23 @@
+2016-11-27 zzz
+ * NetDb: Add same-port check in peer selector
+
+2016-11-26 zzz
+ * NetDb:
+   - Add advanced lookup form
+   - Add port and sig type lookups
+   - Fix /16 and /8 lookup
+   - Fix tab highlighted for all lookups
+   - Add sybil points for banlist
+
+2016-11-25 zzz
+ * SU3File: Add types for blocklist (proposal #130)
+
+2016-11-24 zzz
+ * Sybil tool enhancements
+ * Blocklist feed tweaks
+
 2016-11-23 zzz
+ * Console: Support RI lookup by caps or IP
  * NetDB: Penalize new and slow peers
  * News: Add command line utility support
  * Router: Support blocklist in the news feed (proposal #129)
