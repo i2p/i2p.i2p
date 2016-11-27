@@ -8,8 +8,8 @@ public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
     private String _version;
     private String _country;
-    private String _family, _caps, _ip, _sybil;
-    private int _full, _port;
+    private String _family, _caps, _ip, _sybil, _mtu, _ssucaps, _ipv6;
+    private int _full, _port, _cost;
     private boolean _lease;
     private boolean _debug;
     private boolean _graphical;
@@ -99,6 +99,34 @@ public class NetDbHelper extends HelperBase {
             _type = SigType.parseSigType(f);
     }
 
+    /** @since 0.9.28 */
+    public void setMtu(String f) {
+        if (f != null && f.length() > 0)
+            _mtu = DataHelper.stripHTML(f);  // XSS
+    }
+
+    /** @since 0.9.28 */
+    public void setIpv6(String f) {
+        if (f != null && f.length() > 0) {
+            _ipv6 = DataHelper.stripHTML(f);  // XSS
+            if (!_ipv6.endsWith(":"))
+                _ipv6 = _ipv6 + ':';
+        }
+    }
+
+    /** @since 0.9.28 */
+    public void setSsucaps(String f) {
+        if (f != null && f.length() > 0)
+            _ssucaps = DataHelper.stripHTML(f);  // XSS
+    }
+
+    /** @since 0.9.28 */
+    public void setCost(String f) {
+        try {
+            _cost = Integer.parseInt(f);
+        } catch (NumberFormatException nfe) {}
+    }
+
     public void setFull(String f) {
         try {
             _full = Integer.parseInt(f);
@@ -127,9 +155,11 @@ public class NetDbHelper extends HelperBase {
             renderNavBar();
             if (_routerPrefix != null || _version != null || _country != null ||
                 _family != null || _caps != null || _ip != null || _sybil != null ||
-                _port != 0 || _type != null)
+                _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
+                _ssucaps != null || _cost != 0)
                 renderer.renderRouterInfoHTML(_out, _routerPrefix, _version, _country,
-                                              _family, _caps, _ip, _sybil, _port, _type);
+                                              _family, _caps, _ip, _sybil, _port, _type,
+                                              _mtu, _ipv6, _ssucaps, _cost);
             else if (_lease)
                 renderer.renderLeaseSetHTML(_out, _debug);
             else if (_full == 3)
@@ -156,7 +186,8 @@ public class NetDbHelper extends HelperBase {
             return 1;
         if (_routerPrefix != null || _version != null || _country != null ||
             _family != null || _caps != null || _ip != null || _sybil != null ||
-            _port != 0 || _type != null)
+            _port != 0 || _type != null || _mtu != null || _ipv6 != null ||
+            _ssucaps != null || _cost != 0)
             return 2;
         if (_full == 2)
             return 3;
@@ -214,12 +245,16 @@ public class NetDbHelper extends HelperBase {
     private void renderLookupForm() throws IOException {
         _out.write("<form action=\"/netdb\" method=\"GET\"><p><b>Pick One</b></p>\n" +
                    "Caps <input type=\"text\" name=\"caps\">e.g. f or XOfR<br>\n" +
+                   "Cost <input type=\"text\" name=\"cost\"><br>\n" +
                    "Country code <input type=\"text\" name=\"c\">e.g. ru<br>\n" +
                    "Family <input type=\"text\" name=\"fam\"><br>\n" +
                    "Hash prefix <input type=\"text\" name=\"r\"><br>\n" +
-                   "IP <input type=\"text\" name=\"ip\">IPv4 or IPv6, /24,/16,/8 suffixes optional for IPv4<br>\n" +
+                   "IP <input type=\"text\" name=\"ip\">host name, IPv4, or IPv6, /24,/16,/8 suffixes optional for IPv4<br>\n" +
+                   "IPv6 Prefix <input type=\"text\" name=\"ipv6\"><br>\n" +
+                   "MTU <input type=\"text\" name=\"mtu\"><br>\n" +
                    "Port <input type=\"text\" name=\"port\"><br>\n" +
                    "Sig Type <input type=\"text\" name=\"type\"><br>\n" +
+                   "SSU Caps <input type=\"text\" name=\"ssucaps\"><br>\n" +
                    "Version <input type=\"text\" name=\"v\"><br>\n" +
                    "<p><b>Add Sybil analysis (must pick one above):</b></p>\n" +
                    "Sybil close to <input type=\"text\" name=\"sybil2\">Router hash, dest hash, b32, or from address book<br>\n" +

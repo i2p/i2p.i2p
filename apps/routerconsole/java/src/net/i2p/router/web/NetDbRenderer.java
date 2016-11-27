@@ -90,7 +90,8 @@ class NetDbRenderer {
      */
     public void renderRouterInfoHTML(Writer out, String routerPrefix, String version,
                                      String country, String family, String caps,
-                                     String ip, String sybil, int port, SigType type) throws IOException {
+                                     String ip, String sybil, int port, SigType type,
+                                     String mtu, String ipv6, String ssucaps, int cost) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         List<Hash> sybils = sybil != null ? new ArrayList<Hash>(128) : null;
         if (".".equals(routerPrefix)) {
@@ -149,6 +150,49 @@ class NetDbRenderer {
                 } else if (port != 0) {
                     for (RouterAddress ra : ri.getAddresses()) {
                         if (port == ra.getPort()) {
+                            renderRouterInfo(buf, ri, false, true);
+                            if (sybil != null)
+                                sybils.add(key);
+                            notFound = false;
+                            break;
+                        }
+                    }
+                } else if (mtu != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        if (mtu.equals(ra.getOption("mtu"))) {
+                            renderRouterInfo(buf, ri, false, true);
+                            if (sybil != null)
+                                sybils.add(key);
+                            notFound = false;
+                            break;
+                        }
+                    }
+                } else if (ipv6 != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        String host = ra.getHost();
+                        if (host != null && host.startsWith(ipv6)) {
+                            renderRouterInfo(buf, ri, false, true);
+                            if (sybil != null)
+                                sybils.add(key);
+                            notFound = false;
+                            break;
+                        }
+                    }
+                } else if (ssucaps != null) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        if (!"SSU".equals(ra.getTransportStyle()))
+                            continue;
+                        if (ssucaps.equals(ra.getOption("caps"))) {
+                            renderRouterInfo(buf, ri, false, true);
+                            if (sybil != null)
+                                sybils.add(key);
+                            notFound = false;
+                            break;
+                        }
+                    }
+                } else if (cost != 0) {
+                    for (RouterAddress ra : ri.getAddresses()) {
+                        if (cost == ra.getCost()) {
                             renderRouterInfo(buf, ri, false, true);
                             if (sybil != null)
                                 sybils.add(key);

@@ -32,5 +32,9 @@
  <jsp:setProperty name="netdbHelper" property="sybil2" value="<%=request.getParameter(\"sybil2\")%>" />
  <jsp:setProperty name="netdbHelper" property="port" value="<%=request.getParameter(\"port\")%>" />
  <jsp:setProperty name="netdbHelper" property="type" value="<%=request.getParameter(\"type\")%>" />
+ <jsp:setProperty name="netdbHelper" property="ipv6" value="<%=request.getParameter(\"ipv6\")%>" />
+ <jsp:setProperty name="netdbHelper" property="cost" value="<%=request.getParameter(\"cost\")%>" />
+ <jsp:setProperty name="netdbHelper" property="mtu" value="<%=request.getParameter(\"mtu\")%>" />
+ <jsp:setProperty name="netdbHelper" property="ssucaps" value="<%=request.getParameter(\"ssucaps\")%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div></div></body></html>
