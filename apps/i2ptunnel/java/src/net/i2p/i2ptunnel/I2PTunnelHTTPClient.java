@@ -1414,7 +1414,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     }
 
     public static final String DEFAULT_JUMP_SERVERS =
-                               "http://i2host.i2p/cgi-bin/i2hostjump?," +
+            //"http://i2host.i2p/cgi-bin/i2hostjump?," +
             "http://stats.i2p/cgi-bin/jump.cgi?a=," +
 	    "http://no.i2p/jump/," +
 	    "http://i2pjump.i2p/jump/";
