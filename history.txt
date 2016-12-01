@@ -1,5 +1,10 @@
+2016-12-01 zzz
+ * NetDb: Peer selection tweaks
+
 2016-11-27 zzz
- * NetDb: Add same-port check in peer selector
+ * NetDb:
+   - Add same-port check in peer selector
+   - Add MTU, SSU caps, IPv6 prefix, and cost lookups
 
 2016-11-26 zzz
  * NetDb:

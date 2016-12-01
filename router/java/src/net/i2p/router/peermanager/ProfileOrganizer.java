@@ -1246,7 +1246,7 @@ public class ProfileOrganizer {
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
-        MaskedIPSet IPSet = new MaskedIPSet(8);
+        MaskedIPSet IPSet = new MaskedIPSet(16);
         // use RandomIterator to avoid shuffling the whole thing
         for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
