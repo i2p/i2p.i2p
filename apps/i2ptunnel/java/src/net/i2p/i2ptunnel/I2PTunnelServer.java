@@ -430,7 +430,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 try {
                     int myPort = Integer.parseInt(key);
                     String host = (String) e.getValue();
-                    int colon = host.indexOf(":");
+                    int colon = host.indexOf(':');
                     int port = Integer.parseInt(host.substring(colon + 1));
                     host = host.substring(0, colon);
                     InetSocketAddress isa = new InetSocketAddress(host, port);

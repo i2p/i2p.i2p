@@ -958,7 +958,7 @@ public class TrackerClient implements Runnable {
       {
           announce = a;
           String s = a.substring(7);
-          host = s.substring(0, s.indexOf("/"));
+          host = s.substring(0, s.indexOf('/'));
           isPrimary = p;
           interval = INITIAL_SLEEP;
       }

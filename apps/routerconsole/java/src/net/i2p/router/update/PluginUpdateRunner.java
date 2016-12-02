@@ -370,9 +370,9 @@ class PluginUpdateRunner extends UpdateRunner {
             String appName = props.getProperty("name");
             String version = props.getProperty("version");
             if (appName == null || version == null || appName.length() <= 0 || version.length() <= 0 ||
-                appName.indexOf("<") >= 0 || appName.indexOf(">") >= 0 ||
-                version.indexOf("<") >= 0 || version.indexOf(">") >= 0 ||
-                appName.startsWith(".") || appName.indexOf("/") >= 0 || appName.indexOf("\\") >= 0) {
+                appName.indexOf('<') >= 0 || appName.indexOf('>') >= 0 ||
+                version.indexOf('<') >= 0 || version.indexOf('>') >= 0 ||
+                appName.startsWith(".") || appName.indexOf('/') >= 0 || appName.indexOf('\\') >= 0) {
                 to.delete();
                 statusDone("<b>" + _t("Plugin from {0} has invalid name or version", url) + "</b>");
                 return;

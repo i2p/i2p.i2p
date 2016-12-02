@@ -190,7 +190,7 @@ public abstract class Addresses {
      *  @since IPv6
      */
     private static String stripScope(String ip) {
-        int pct = ip.indexOf("%");
+        int pct = ip.indexOf('%');
         if (pct > 0)
             ip = ip.substring(0, pct);
         return ip;

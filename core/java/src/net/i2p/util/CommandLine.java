@@ -58,7 +58,7 @@ public class CommandLine {
     protected static void exec(String args[], List<String> classes) {
         String cmd = args[0].toLowerCase(Locale.US);
         for (String cls : classes) {
-            String ccmd = cls.substring(cls.lastIndexOf(".") + 1).toLowerCase(Locale.US);
+            String ccmd = cls.substring(cls.lastIndexOf('.') + 1).toLowerCase(Locale.US);
             if (cmd.equals(ccmd)) {
                 try {
                     String[] cargs = new String[args.length - 1];
@@ -85,7 +85,7 @@ public class CommandLine {
         System.err.println("Available commands:");
         List<String> cmds = new ArrayList<String>(classes.size());
         for (String cls : classes) {
-            String ccmd = cls.substring(cls.lastIndexOf(".") + 1).toLowerCase(Locale.US);
+            String ccmd = cls.substring(cls.lastIndexOf('.') + 1).toLowerCase(Locale.US);
             cmds.add(ccmd);
         }
         Collections.sort(cmds);

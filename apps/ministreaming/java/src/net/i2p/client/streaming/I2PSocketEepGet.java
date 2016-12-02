@@ -128,7 +128,7 @@ public class I2PSocketEepGet extends EepGet {
                 if ("i2p".equals(host)) {
                     String file = url.getRawPath();
                     try {
-                        int slash = 1 + file.substring(1).indexOf("/");
+                        int slash = 1 + file.substring(1).indexOf('/');
                         host = file.substring(1, slash);
                         _actualURL = "http://" + host + file.substring(slash);
                         String query = url.getRawQuery();

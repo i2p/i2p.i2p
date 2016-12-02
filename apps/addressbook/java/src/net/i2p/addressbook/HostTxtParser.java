@@ -76,7 +76,7 @@ class HostTxtParser {
     public static HostTxtEntry parse(String inputLine, boolean allowCommandOnly) {
         if (inputLine.startsWith(";"))
             return null;
-        int comment = inputLine.indexOf("#");
+        int comment = inputLine.indexOf('#');
         String kv;
         String sprops;
         if (comment >= 0) {

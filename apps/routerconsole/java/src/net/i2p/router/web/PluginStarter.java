@@ -725,7 +725,7 @@ public class PluginStarter implements Runnable {
                 // argument array comparison in getClientApp() works.
                 // Do this after parsing so we don't need to worry about quoting
                 for (int i = 0; i < argVal.length; i++) {
-                    if (argVal[i].indexOf("$") >= 0) {
+                    if (argVal[i].indexOf('$') >= 0) {
                         argVal[i] = argVal[i].replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                         argVal[i] = argVal[i].replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                         argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
@@ -764,7 +764,7 @@ public class PluginStarter implements Runnable {
             }
             // do this after parsing so we don't need to worry about quoting
             for (int i = 0; i < argVal.length; i++) {
-                if (argVal[i].indexOf("$") >= 0) {
+                if (argVal[i].indexOf('$') >= 0) {
                     argVal[i] = argVal[i].replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                     argVal[i] = argVal[i].replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                     argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
@@ -774,7 +774,7 @@ public class PluginStarter implements Runnable {
             ClassLoader cl = null;
             if (app.classpath != null) {
                 String cp = app.classpath;
-                if (cp.indexOf("$") >= 0) {
+                if (cp.indexOf('$') >= 0) {
                     cp = cp.replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                     cp = cp.replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                     cp = cp.replace("$PLUGIN", pluginDir.getAbsolutePath());

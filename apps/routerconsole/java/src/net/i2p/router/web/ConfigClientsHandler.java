@@ -246,7 +246,7 @@ public class ConfigClientsHandler extends FormHandler {
                 isAdvanced()) {
                 String desc = getJettyString("nofilter_desc" + cur);
                 if (desc != null) {
-                    int spc = desc.indexOf(" ");
+                    int spc = desc.indexOf(' ');
                     String clss = desc;
                     String args = null;
                     if (spc >= 0) {
@@ -267,7 +267,7 @@ public class ConfigClientsHandler extends FormHandler {
             String newDesc = getJettyString("nofilter_desc" + newClient);
             if (newDesc != null && newDesc.trim().length() > 0) {
                 // new entry
-                int spc = newDesc.indexOf(" ");
+                int spc = newDesc.indexOf(' ');
                 String clss = newDesc;
                 String args = null;
                 if (spc >= 0) {

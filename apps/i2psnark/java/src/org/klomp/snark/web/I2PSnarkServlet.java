@@ -1466,7 +1466,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String fullBasename = basename;
         if (basename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
             String start = basename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
-            if (start.indexOf(" ") < 0 && start.indexOf("-") < 0) {
+            if (start.indexOf(' ') < 0 && start.indexOf('-') < 0) {
                 // browser has nowhere to break it
                 basename = start + HELLIP;
             }
@@ -3086,7 +3086,7 @@ public class I2PSnarkServlet extends BasicServlet {
                             : tx + ": " + directory);
         if (showSort)
             buf.append("</a>");
-        int dirSlash = directory.indexOf("/");
+        int dirSlash = directory.indexOf('/');
         if (dirSlash > 0) {
             buf.append("&nbsp;");
             buf.append(DataHelper.escapeHTML(directory.substring(dirSlash + 1)));

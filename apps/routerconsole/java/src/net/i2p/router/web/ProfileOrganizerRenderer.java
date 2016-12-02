@@ -52,7 +52,7 @@ class ProfileOrganizerRenderer {
                 continue;
             if (mode == 2) {
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
-                if (info != null && info.getCapabilities().indexOf("f") >= 0)
+                if (info != null && info.getCapabilities().indexOf('f') >= 0)
                     order.add(prof);
                 continue;
             }

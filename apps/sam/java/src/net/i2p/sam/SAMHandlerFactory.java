@@ -172,7 +172,7 @@ class SAMHandlerFactory {
     private static int getMajor(String ver) {
         if (ver == null)
             return -1;
-        int dot = ver.indexOf(".");
+        int dot = ver.indexOf('.');
         if (dot == 0)
             return -1;
         if (dot > 0)
@@ -189,7 +189,7 @@ class SAMHandlerFactory {
         if ( (ver == null) || (ver.indexOf('.') < 0) )
             return -1;
         try {
-            String major = ver.substring(ver.indexOf(".") + 1);
+            String major = ver.substring(ver.indexOf('.') + 1);
             return Integer.parseInt(major);
         } catch (NumberFormatException e) {
             return -1;

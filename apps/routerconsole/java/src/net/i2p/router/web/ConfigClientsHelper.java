@@ -250,7 +250,7 @@ public class ConfigClientsHelper extends HelperBase {
                     .append(_t("Signed by")).append("</b></td><td>");
                 String s = stripHTML(appProps, "signer");
                 if (s != null) {
-                    if (s.indexOf("@") > 0)
+                    if (s.indexOf('@') > 0)
                         desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
                     else
                         desc.append(s);
@@ -271,7 +271,7 @@ public class ConfigClientsHelper extends HelperBase {
                 if (s != null) {
                     desc.append("<tr><td><b>")
                         .append(_t("Author")).append("</b></td><td>");
-                    if (s.indexOf("@") > 0)
+                    if (s.indexOf('@') > 0)
                         desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
                     else
                         desc.append(s);

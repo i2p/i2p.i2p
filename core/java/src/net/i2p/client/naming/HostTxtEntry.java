@@ -117,7 +117,7 @@ public class HostTxtEntry {
         String[] entries = DataHelper.split(line, "#");
         for (int i = 0; i < entries.length; i++) {
             String kv = entries[i];
-            int eq = kv.indexOf("=");
+            int eq = kv.indexOf('=');
             if (eq <= 0 || eq == kv.length() - 1)
                 throw new IllegalArgumentException("No value: \"" + kv + '"');
             String k = kv.substring(0, eq);

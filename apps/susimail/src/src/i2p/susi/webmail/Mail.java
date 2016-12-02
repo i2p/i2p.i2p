@@ -187,8 +187,8 @@ class Mail {
 		
 		address = address.trim();
 		
-		if( address.indexOf( "\n" ) != -1 ||
-				address.indexOf( "\r" ) != -1 )
+		if( address.indexOf('\n') != -1 ||
+				address.indexOf('\r') != -1 )
 			return false;
 		
 		String[] tokens = DataHelper.split(address, "[ \t]+");

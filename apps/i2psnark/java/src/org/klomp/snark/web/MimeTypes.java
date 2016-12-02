@@ -105,7 +105,7 @@ class MimeTypes
             int i=-1;
             while(type==null)
             {
-                i=filename.indexOf(".",i+1);
+                i=filename.indexOf('.',i+1);
 
                 if (i<0 || i>=filename.length())
                     break;

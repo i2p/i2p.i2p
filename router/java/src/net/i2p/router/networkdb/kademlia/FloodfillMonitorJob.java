@@ -170,7 +170,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (wasFF)
             ffcount++;
         int good = ffcount - failcount;
-        boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf("R") >= 0;
+        boolean happy = getContext().router().getRouterInfo().getCapabilities().indexOf('R') >= 0;
         // TODO - limit may still be too high
         // For reference, the avg lifetime job lag on my Pi is 6.
         // Should we consider avg. dropped ff jobs?

@@ -1197,10 +1197,10 @@ public class WebMail extends HttpServlet
 		if (filename != null &&
 		    (buttonPressed(request, NEW_UPLOAD) || buttonPressed(request, SEND))) {
 			Debug.debug(Debug.DEBUG, "Got filename in compose form: " + filename);
-			int i = filename.lastIndexOf( "/" );
+			int i = filename.lastIndexOf('/');
 			if( i != - 1 )
 				filename = filename.substring( i + 1 );
-			i = filename.lastIndexOf( "\\" );
+			i = filename.lastIndexOf('\\');
 			if( i != -1 )
 				filename = filename.substring( i + 1 );
 			if( filename != null && filename.length() > 0 ) {

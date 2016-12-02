@@ -167,8 +167,8 @@ public class I2Ping extends I2PTunnelClientBase {
                 if (line.startsWith("#")) continue; // comments
                 if (line.startsWith(";")) continue;
                 if (line.startsWith("!")) continue;
-                if (line.indexOf("=") != -1) { // maybe file is hosts.txt?
-                    line = line.substring(0, line.indexOf("="));
+                if (line.indexOf('=') != -1) { // maybe file is hosts.txt?
+                    line = line.substring(0, line.indexOf('='));
                 }
                 PingHandler ph = new PingHandler(line, count, localPort, remotePort,
                                                  timeout, countPing, reportTimes);

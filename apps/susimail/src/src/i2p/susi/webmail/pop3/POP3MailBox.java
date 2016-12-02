@@ -490,7 +490,7 @@ public class POP3MailBox implements NewMailListener {
 		}
 		response = response.trim();
 		try {
-			int i = response.indexOf(" ", 5);
+			int i = response.indexOf(' ', 5);
 			mails =
 				Integer.parseInt(
 					i != -1
@@ -510,7 +510,7 @@ public class POP3MailBox implements NewMailListener {
 			uidlToID.clear();
 			if (lines != null) {
 				for (String line : lines) {
-					int j = line.indexOf( " " );
+					int j = line.indexOf(' ');
 					if( j != -1 ) {
 						try {
 							int n = Integer.parseInt( line.substring( 0, j ) );
@@ -541,7 +541,7 @@ public class POP3MailBox implements NewMailListener {
 		sizes.clear();
 		if (lines != null) {
 			for (String line : lines) {
-				int j = line.indexOf(" ");
+				int j = line.indexOf(' ');
 				if (j != -1) {
 					try {
 						int key = Integer.parseInt(line.substring(0, j));

@@ -380,7 +380,7 @@ abstract class IRCFilter {
         if("USER".equals(command)) {
             if (field.length < 3)
                 return s;  // invalid, allow server response
-            int idx = field[2].lastIndexOf(":");
+            int idx = field[2].lastIndexOf(':');
             if(idx<0)
                 return "USER user hostname localhost :realname";
             String realname = field[2].substring(idx+1);

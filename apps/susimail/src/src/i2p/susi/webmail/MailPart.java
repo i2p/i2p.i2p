@@ -213,7 +213,7 @@ class MailPart {
 		String result = null;
 		int i = line.indexOf( ": " );
 		if( i != - 1 ) {
-			int j = line.indexOf( ";", i + 2 );
+			int j = line.indexOf(';', i + 2 );
 			if( j == -1 )
 				result = line.substring( i + 2 );
 			else
@@ -234,11 +234,11 @@ class MailPart {
 			if( i == -1 )
 				break;
 			h = i + l;
-			int j = line.indexOf( "=", i + l );
+			int j = line.indexOf('=', i + l );
 			// System.err.println( "j=" + j );
 			if( j != -1 ) {
-				int k = line.indexOf( "\"", j + 1 );
-				int m = line.indexOf( ";", j + 1 );
+				int k = line.indexOf('"', j + 1 );
+				int m = line.indexOf(';', j + 1 );
 				// System.err.println( "k=" + k );
 				if( k != -1 && ( m == -1 || k < m ) ) {
 					/*
@@ -249,7 +249,7 @@ class MailPart {
 					m = -1;
 					int k2 = k + 1;
 					while( true ) {
-						m = line.indexOf( "\"", k2 );
+						m = line.indexOf('"', k2 );
 						// System.err.println( "m=" + m + " '" + line.substring( m ) + "'" );
 						if( m == -1 ) {
 							break;

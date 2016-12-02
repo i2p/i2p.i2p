@@ -165,7 +165,7 @@ public class BOB implements Runnable, ClientApp {
 		if (classResource != null) {
 		    String classPath = classResource.toString();
 		    if (classPath.startsWith("jar")) {
-		        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+		        String manifestPath = classPath.substring(0, classPath.lastIndexOf('!') + 1) +
 		                "/META-INF/MANIFEST.MF";
 		        try {
 		            Manifest manifest = new Manifest(new URL(manifestPath).openStream());
