@@ -46,7 +46,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._t("configuration")%> - susidns</title>
-<link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css">
+<link rel="stylesheet" type="text/css" href="<%=base.getTheme()%>susidns.css?<%=net.i2p.CoreVersion.VERSION%>">
 </head>
 <body>
 <div class="page">

@@ -28,8 +28,8 @@
     
     <% if (indexBean.allowCSS()) {
   %><link rel="icon" href="<%=indexBean.getTheme()%>images/favicon.ico" />
-    <link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
-    <link href="<%=indexBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
+    <link href="<%=indexBean.getTheme()%>default.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
+    <link href="<%=indexBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" />
     <% }
   %>
 </head>

@@ -49,7 +49,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>${book.book} <%=intl._t("address book")%> - susidns</title>
-<link rel="stylesheet" type="text/css" href="<%=book.getTheme()%>susidns.css">
+<link rel="stylesheet" type="text/css" href="<%=book.getTheme()%>susidns.css?<%=net.i2p.CoreVersion.VERSION%>">
 </head>
 <body>
 <div class="page">
