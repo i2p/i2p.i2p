@@ -18,6 +18,8 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.i2p.data.DataHelper;
+
 // Pack200 now loaded dynamically in unpack() below
 //
 // For Sun, OpenJDK, IcedTea, etc, use this
@@ -104,7 +106,6 @@ public class FileUtil {
         int files = 0;
         ZipFile zip = null;
         try {
-            byte buf[] = new byte[16*1024];
             zip = new ZipFile(zipfile);
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
@@ -152,10 +153,7 @@ public class FileUtil {
                                 System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
                         } else {
                             fos = new FileOutputStream(target);
-                            int read = 0;
-                            while ( (read = in.read(buf)) != -1) {
-                                fos.write(buf, 0, read);
-                            }
+                            DataHelper.copy(in, fos);
                             if (logLevel <= Log.INFO)
                                 System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
@@ -405,13 +403,10 @@ public class FileUtil {
         String rootDirStr = rootDir.getCanonicalPath();
         if (!targetStr.startsWith(rootDirStr)) throw new FileNotFoundException("Requested file is outside the root dir: " + path);
 
-        byte buf[] = new byte[4*1024];
         FileInputStream in = null;
         try {
             in = new FileInputStream(target);
-            int read = 0;
-            while ( (read = in.read(buf)) != -1) 
-                out.write(buf, 0, read);
+            DataHelper.copy(in, out);
             try { out.close(); } catch (IOException ioe) {}
         } finally {
             if (in != null) 
@@ -448,17 +443,12 @@ public class FileUtil {
         if (!src.exists()) return false;
         if (dst.exists() && !overwriteExisting) return false;
         
-        byte buf[] = new byte[4096];
         InputStream in = null;
         OutputStream out = null;
         try {
             in = new FileInputStream(src);
             out = new FileOutputStream(dst);
-            
-            int read = 0;
-            while ( (read = in.read(buf)) != -1)
-                out.write(buf, 0, read);
-            
+            DataHelper.copy(in, out);
             return true;
         } catch (IOException ioe) {
             if (!quiet)

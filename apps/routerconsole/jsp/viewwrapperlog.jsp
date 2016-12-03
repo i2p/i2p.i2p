@@ -22,11 +22,7 @@ if (length <= 0 || !f.isFile()) {
     try {
         in = new java.io.FileInputStream(f);
         java.io.OutputStream bout = response.getOutputStream();
-        int read = 0;
-        byte buf[] = new byte[4*1024];
-        while ((read = in.read(buf)) != -1) {
-            bout.write(buf, 0, read);
-        }
+        net.i2p.data.DataHelper.copy(in, bout);
     } catch (java.io.IOException ioe) {
         // prevent 'Committed' IllegalStateException from Jetty
         if (!response.isCommitted()) {

@@ -434,11 +434,7 @@ public class ConfigClientsHandler extends FormHandler {
             tmp =  new File(_context.getTempDir(), "plugin-" + _context.random().nextInt() + (isSU3 ? ".su3" : ".xpi2p"));
             out = new BufferedOutputStream(new SecureFileOutputStream(tmp));
             out.write(magic);
-            byte buf[] = new byte[16*1024];
-            int read = 0;
-            while ( (read = in.read(buf)) != -1)  {
-                out.write(buf, 0, read);
-            }
+            DataHelper.copy(in, out);
             out.close();
             String url = tmp.toURI().toString();
             // threaded... TODO inline to get better result to UI?

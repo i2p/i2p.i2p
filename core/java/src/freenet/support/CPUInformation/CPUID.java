@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Locale;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.SystemVersion;
 
@@ -535,12 +536,7 @@ public class CPUID {
             InputStream libStream = resource.openStream();
             outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
-            byte buf[] = new byte[4096];
-            while (true) {
-                int read = libStream.read(buf);
-                if (read < 0) break;
-                fos.write(buf, 0, read);
-            }
+            DataHelper.copy(libStream, fos);
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath());//System.load requires an absolute path to the lib

@@ -1103,12 +1103,7 @@ public class NativeBigInteger extends BigInteger {
             InputStream libStream = resource.openStream();
             outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
-            byte buf[] = new byte[4096];
-            while (true) {
-                int read = libStream.read(buf);
-                if (read < 0) break;
-                fos.write(buf, 0, read);
-            }
+            DataHelper.copy(libStream, fos);
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib

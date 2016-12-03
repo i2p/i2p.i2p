@@ -658,8 +658,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         private final String _name;
         // shadows _log in super()
         private final Log _log;
-        private static final int BUF_SIZE = 8*1024;
-        private static final ByteCache _cache = ByteCache.getInstance(16, BUF_SIZE);
 
         public Sender(OutputStream out, InputStream in, String name, Log log) {
             _out = out;
@@ -671,25 +669,15 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         public void run() {
             if (_log.shouldLog(Log.INFO))
                 _log.info(_name + ": Begin sending");
-            ByteArray ba = _cache.acquire();
             try {
-                byte buf[] = ba.getData();
-                int read = 0;
-                long total = 0;
-                while ( (read = _in.read(buf)) != -1) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info(_name + ": read " + read + " and sending through the stream");
-                    _out.write(buf, 0, read);
-                    total += read;
-                }
+                DataHelper.copy(_in, _out);
                 if (_log.shouldLog(Log.INFO))
-                    _log.info(_name + ": Done sending: " + total);
+                    _log.info(_name + ": Done sending");
                 //_out.flush();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Error sending", ioe);
             } finally {
-                _cache.release(ba);
                 if (_out != null) try { _out.close(); } catch (IOException ioe) {}
                 if (_in != null) try { _in.close(); } catch (IOException ioe) {}
             }

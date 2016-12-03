@@ -22,11 +22,8 @@ try {
         response.addHeader("Content-Disposition", "attachment; filename=\"i2preseed.zip\"");
         byte buf[] = new byte[16*1024];
         in = new java.io.FileInputStream(zip);
-        int read = 0;
         java.io.OutputStream cout = response.getOutputStream();
-        while ( (read = in.read(buf)) != -1) { 
-            cout.write(buf, 0, read);
-        }
+        net.i2p.data.DataHelper.copy(in, cout);
     } finally {
         if (in != null) 
             try { in.close(); } catch (java.io.IOException ioe) {}

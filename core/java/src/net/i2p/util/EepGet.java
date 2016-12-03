@@ -1735,8 +1735,6 @@ public class EepGet {
     protected class Gunzipper implements Runnable {
         private final InputStream _inRaw;
         private final OutputStream _out;
-        private static final int CACHE_SIZE = 8*1024;
-        private final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
 
         public Gunzipper(InputStream in, OutputStream out) {
             _inRaw = in;
@@ -1750,12 +1748,7 @@ public class EepGet {
             try {
                 // blocking
                 in.initialize(_inRaw);
-                ba = _cache.acquire();
-                byte buf[] = ba.getData();
-                int read = -1;
-                while ( (read = in.read(buf)) != -1) {
-                    _out.write(buf, 0, read);
-                }
+                DataHelper.copy(in, _out);
             } catch (IOException ioe) {
                 _decompressException = ioe;
                 if (_log.shouldLog(Log.WARN))
@@ -1768,8 +1761,6 @@ public class EepGet {
                     _out.close(); 
                 } catch (IOException ioe) {}
                 ReusableGZIPInputStream.release(in);
-                if (ba != null)
-                    _cache.release(ba);
             }
         }
     }

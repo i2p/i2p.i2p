@@ -430,11 +430,7 @@ public class WorkingDir {
         try {
             in = new FileInputStream(src);
             out = new SecureFileOutputStream(dst);
-            
-            int read = 0;
-            while ( (read = in.read(buf)) != -1)
-                out.write(buf, 0, read);
-            
+            DataHelper.copy(in, out);
             System.err.println("Copied " + src.getPath());
         } catch (IOException ioe) {
             System.err.println("FAILED copy " + src.getPath() + ": " + ioe);

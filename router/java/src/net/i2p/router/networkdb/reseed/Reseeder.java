@@ -210,10 +210,7 @@ public class Reseeder {
             tmp =  new File(_context.getTempDir(), "manualreseeds-" + _context.random().nextInt() + (isSU3 ? ".su3" : ".zip"));
             out = new BufferedOutputStream(new SecureFileOutputStream(tmp));
             out.write(magic);
-            byte buf[] = new byte[16*1024];
-            int read = 0;
-            while ( (read = in.read(buf)) != -1) 
-                out.write(buf, 0, read);
+            DataHelper.copy(in, out);
             out.close();
             int[] stats;
             ReseedRunner reseedRunner = new ReseedRunner();

@@ -560,11 +560,7 @@ class NewsFetcher extends UpdateRunner {
         try {
             in.initialize(new FileInputStream(from));
             out = new SecureFileOutputStream(to);
-            byte buf[] = new byte[4096];
-            int read;
-            while ((read = in.read(buf)) != -1) {
-                out.write(buf, 0, read);
-            }
+            DataHelper.copy(in, out);
         } finally {
             if (out != null) try { 
                 out.close(); 

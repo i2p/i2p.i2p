@@ -272,11 +272,7 @@ class PersistentMailCache {
 			}
 			in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(f)));
 			ByteArrayOutputStream out = new ByteArrayOutputStream((int) len);
-			int read = 0;
-			byte buf[] = new byte[4*1024];
-			while ( (read = in.read(buf)) != -1)  {
-				out.write(buf, 0, read);
-			}
+			DataHelper.copy(in, out);
 			ReadBuffer rb = new ReadBuffer(out.toByteArray(), 0, out.size());
 			return rb;
 		} catch (IOException ioe) {

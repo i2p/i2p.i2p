@@ -102,12 +102,7 @@ public class Base32 {
 
     private static byte[] read(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
-        byte buf[] = new byte[64];
-        while (true) {
-            int read = in.read(buf);
-            if (read < 0) break;
-            baos.write(buf, 0, read);
-        }
+        DataHelper.copy(in, baos);
         return baos.toByteArray();
     }
 

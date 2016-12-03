@@ -1830,4 +1830,25 @@ public class DataHelper {
         }
         return p.split(s, limit);
     }
+
+    /**
+      * Copy in to out. Caller MUST close the streams.
+      *
+      * @param in non-null
+      * @param out non-null
+      * @since 0.9.29
+      */
+    public static void copy(InputStream in, OutputStream out) throws IOException {
+        final ByteCache cache = ByteCache.getInstance(8, 8*1024);
+        final ByteArray ba = cache.acquire();
+        try {
+            final byte buf[] = ba.getData();
+            int read;
+            while ((read = in.read(buf)) != -1) {
+                out.write(buf, 0, read);
+            }   
+        } finally {
+            cache.release(ba);
+        }
+    }
 }
