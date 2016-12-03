@@ -34,7 +34,6 @@ public class MaskedIPSet extends HashSet<String> {
       *
       * @param peer non-null
       * @param mask is 1-4 (number of bytes to match)
-      * @return an opaque set of masked IPs for this peer
       */
     public MaskedIPSet(RouterContext ctx, Hash peer, int mask) {
         this(ctx, peer, ctx.netDb().lookupRouterInfoLocally(peer), mask);
@@ -48,7 +47,6 @@ public class MaskedIPSet extends HashSet<String> {
       *
       * @param pinfo may be null
       * @param mask is 1-4 (number of bytes to match)
-      * @return an opaque set of masked IPs for this peer
       */
     public MaskedIPSet(RouterContext ctx, RouterInfo pinfo, int mask) {
         this(ctx, pinfo != null ? pinfo.getHash() : null, pinfo, mask);
@@ -62,7 +60,6 @@ public class MaskedIPSet extends HashSet<String> {
       *
       * @param pinfo may be null
       * @param mask is 1-4 (number of bytes to match)
-      * @return an opaque set of masked IPs for this peer
       */
     public MaskedIPSet(RouterContext ctx, Hash peer, RouterInfo pinfo, int mask) {
         super(4);

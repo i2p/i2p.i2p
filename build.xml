@@ -783,7 +783,6 @@
             <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
             <link offline="true" href="${javaeedocs.url}" packagelistLoc="installer/resources/package-lists/javaee/" />
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
-            <link offline="true" href="${jrobindocs.url}" packagelistLoc="installer/resources/package-lists/jrobin/" />
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
