@@ -642,12 +642,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             fileOutputStream = new FileOutputStream(outputFile);
 
             DataHelper.skip(fileInputStream, HEADER_BYTES);
-
-            byte[] buffer = new byte[16*1024];
-            int bytesRead = 0;
-
-            while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
-                fileOutputStream.write(buffer, 0, bytesRead);
+            DataHelper.copy(fileInputStream, fileOutputStream);
         } catch (IOException ioe) {
             // probably permissions or disk full, so bring the message out to the console
             return "Error copying update: " + ioe;
@@ -784,10 +779,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             fileOutputStream.write(signature.getData());
             fileOutputStream.write(versionHeader);
             fileInputStream = new FileInputStream(inputFile);
-            byte[] buffer = new byte[1024];
-            int bytesRead = 0;
-            while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
-                fileOutputStream.write(buffer, 0, bytesRead);
+            DataHelper.copy(fileInputStream, fileOutputStream);
             fileOutputStream.close();
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
