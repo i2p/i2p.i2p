@@ -32,9 +32,9 @@ import net.i2p.util.I2PAppThread;
 public class I2PtoTCP implements Runnable {
 
 	private I2PSocket I2P;
-	private NamedDB info,  database;
+	private final NamedDB info, database;
 	private Socket sock;
-	private AtomicBoolean lives;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor

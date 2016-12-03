@@ -42,10 +42,10 @@ import net.i2p.util.I2PAppThread;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	private NamedDB info,  database;
-	private Socket sock;
-	private I2PSocketManager socketManager;
-	private AtomicBoolean lives;
+	private final NamedDB info, database;
+	private final Socket sock;
+	private final I2PSocketManager socketManager;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor

@@ -48,17 +48,17 @@ public class DoCMDS implements Runnable {
 	// I need a better way to do versioning, but this will do for now.
 	public static final String BMAJ = "00",  BMIN = "00",  BREV = "10",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
-	private Socket server;
-	private Properties props;
-	private NamedDB database;
+	private final Socket server;
+	private final Properties props;
+	private final NamedDB database;
 	private String line;
 	private Destination d;
 	private ByteArrayOutputStream prikey;
 	private boolean dk,  ns,  ip,  op;
 	private NamedDB nickinfo;
-	private Logger _log;
-	private AtomicBoolean LIVE;
-	private AtomicBoolean lock;
+	private final Logger _log;
+	private final AtomicBoolean LIVE;
+	private final AtomicBoolean lock;
 	/* database strings */
 	private static final String P_DEST = "DESTINATION";
 	private static final String P_INHOST = "INHOST";

@@ -38,18 +38,18 @@ import net.i2p.util.Log;
  */
 public class MUXlisten implements Runnable {
 
-	private NamedDB database,  info;
-	private Logger _log;
-	private I2PSocketManager socketManager;
-	private ByteArrayInputStream prikey;
+	private final NamedDB database, info;
+	private final Logger _log;
+	private final I2PSocketManager socketManager;
+	private final ByteArrayInputStream prikey;
 	private ThreadGroup tg;
-	private String N;
-	private ServerSocket listener = null;
-	private int backlog = 50; // should this be more? less?
-	boolean go_out;
-	boolean come_in;
-	private AtomicBoolean lock;
-	private AtomicBoolean lives;
+	private final String N;
+	private ServerSocket listener;
+	private final int backlog = 50; // should this be more? less?
+	private final boolean go_out;
+	private final boolean come_in;
+	private final AtomicBoolean lock;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor Will fail if INPORT is occupied.
@@ -61,16 +61,15 @@ public class MUXlisten implements Runnable {
 	 * @throws java.io.IOException
 	 */
 	MUXlisten(AtomicBoolean lock, NamedDB database, NamedDB info, Logger _log) throws I2PException, IOException, RuntimeException {
+		int port = 0;
+		InetAddress host = null;
+		this.lock = lock;
+		this.tg = null;
+		this.database = database;
+		this.info = info;
+		this._log = _log;
+		lives = new AtomicBoolean(false);
 		try {
-			int port = 0;
-			InetAddress host = null;
-			this.lock = lock;
-			this.tg = null;
-			this.database = database;
-			this.info = info;
-			this._log = _log;
-			lives = new AtomicBoolean(false);
-
 			this.database.getWriteLock();
 			this.info.getWriteLock();
 			this.info.add("STARTING", Boolean.valueOf(true));
