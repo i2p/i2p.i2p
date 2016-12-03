@@ -364,25 +364,30 @@ public class BOB implements Runnable, ClientApp {
 			// We could order them to stop, but that could cause nasty issues in the locks.
 			visitAllThreads();
 			database.getReadLock();
-			int all = database.getcount();
-			database.releaseReadLock();
 			NamedDB nickinfo;
-			for (i = 0; i < all; i++) {
-				database.getReadLock();
-				nickinfo = (NamedDB) database.getnext(i);
-				nickinfo.getReadLock();
-				if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
-					nickinfo.releaseReadLock();
-					database.releaseReadLock();
-					database.getWriteLock();
-					nickinfo.getWriteLock();
-					nickinfo.add(P_STOPPING, Boolean.valueOf(true));
-					nickinfo.releaseWriteLock();
-					database.releaseWriteLock();
-				} else {
-					nickinfo.releaseReadLock();
-					database.releaseReadLock();
+			try {
+				for (Object ndb : database.values()) {
+					nickinfo = (NamedDB) ndb;
+					nickinfo.getReadLock();
+					boolean released = false;
+					try {
+						if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
+							nickinfo.releaseReadLock();
+							released = true;
+							nickinfo.getWriteLock();
+							try {
+								nickinfo.add(P_STOPPING, Boolean.TRUE);
+							} finally {
+								nickinfo.releaseWriteLock();
+							}
+						}
+					} finally {
+						if (!released)
+							nickinfo.releaseReadLock();
+					}
 				}
+			} finally {
+				database.releaseReadLock();
 			}
 			changeState(STOPPED);
 			_log.info("BOB is now stopped.");

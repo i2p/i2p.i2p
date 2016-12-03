@@ -42,7 +42,6 @@ import net.i2p.util.I2PAppThread;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	private final NamedDB info, database;
 	private final Socket sock;
 	private final I2PSocketManager socketManager;
 	private final AtomicBoolean lives;
@@ -51,13 +50,11 @@ public class TCPtoI2P implements Runnable {
 	 * Constructor
 	 * @param i2p
 	 * @param socket
-	 * param info
-	 * param database
+	 * @param info unused
+	 * @param database unused
 	 */
 	TCPtoI2P(I2PSocketManager i2p, Socket socket, NamedDB info, NamedDB database, AtomicBoolean lives) {
 		this.sock = socket;
-		this.info = info;
-		this.database = database;
 		this.socketManager = i2p;
 		this.lives = lives;
 	}
@@ -104,16 +101,6 @@ public class TCPtoI2P implements Runnable {
 		out.write(13);
 		out.write(10);
 		out.flush();
-	}
-
-	private void rlock() {
-		database.getReadLock();
-		info.getReadLock();
-	}
-
-	private void runlock() {
-		info.releaseReadLock();
-		database.releaseReadLock();
 	}
 
 	/**

@@ -56,8 +56,8 @@ public class I2PtoTCP implements Runnable {
 	}
 
 	private void runlock() {
-		database.releaseReadLock();
 		info.releaseReadLock();
+		database.releaseReadLock();
 	}
 
 	/**
@@ -78,23 +78,15 @@ public class I2PtoTCP implements Runnable {
 			die:
 			{
 				try {
-					try {
-						rlock();
-					} catch (Exception e) {
-						break die;
-					}
+					rlock();
 					try {
 						host = info.get("OUTHOST").toString();
 						port = Integer.parseInt(info.get("OUTPORT").toString());
 						tell = info.get("QUIET").equals(Boolean.FALSE);
 					} catch (Exception e) {
-						runlock();
 						break die;
-					}
-					try {
+					} finally {
 						runlock();
-					} catch (Exception e) {
-						break die;
 					}
 					sock = new Socket(host, port);
 					sock.setKeepAlive(true);

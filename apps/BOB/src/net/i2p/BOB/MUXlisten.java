@@ -70,33 +70,30 @@ public class MUXlisten implements Runnable {
 		this._log = _log;
 		lives = new AtomicBoolean(false);
 		try {
-			this.database.getWriteLock();
-			this.info.getWriteLock();
-			this.info.add("STARTING", Boolean.valueOf(true));
-			this.info.releaseWriteLock();
-			this.database.releaseWriteLock();
-			this.database.getReadLock();
-			this.info.getReadLock();
-
-			N = this.info.get("NICKNAME").toString();
-			prikey = new ByteArrayInputStream((byte[]) info.get("KEYS"));
-			// Make a new copy so that anything else won't muck with our database.
-			Properties R = (Properties) info.get("PROPERTIES");
-			Properties Q = new Properties();
-			Lifted.copyProperties(R, Q);
-			this.database.releaseReadLock();
-			this.info.releaseReadLock();
-
-			this.database.getReadLock();
-			this.info.getReadLock();
-			this.go_out = info.exists("OUTPORT");
-			this.come_in = info.exists("INPORT");
-			if (this.come_in) {
-				port = Integer.parseInt(info.get("INPORT").toString());
-				host = InetAddress.getByName(info.get("INHOST").toString());
+			wlock();
+			try {
+				this.info.add("STARTING", Boolean.TRUE);
+			} finally {
+				wunlock();
 			}
-			this.database.releaseReadLock();
-			this.info.releaseReadLock();
+			Properties Q = new Properties();
+			rlock();
+			try {
+				N = this.info.get("NICKNAME").toString();
+				prikey = new ByteArrayInputStream((byte[]) info.get("KEYS"));
+				// Make a new copy so that anything else won't muck with our database.
+				Properties R = (Properties) info.get("PROPERTIES");
+				Lifted.copyProperties(R, Q);
+
+				this.go_out = info.exists("OUTPORT");
+				this.come_in = info.exists("INPORT");
+				if (this.come_in) {
+					port = Integer.parseInt(info.get("INPORT").toString());
+					host = InetAddress.getByName(info.get("INHOST").toString());
+				}
+			} finally {
+				runlock();
+			}
 
 			String i2cpHost = Q.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
 			int i2cpPort = 7654;
@@ -114,48 +111,51 @@ public class MUXlisten implements Runnable {
 					prikey, i2cpHost, i2cpPort, Q);
 		} catch (IOException e) {
 			// Something went bad.
-			this.database.getWriteLock();
-			this.info.getWriteLock();
-			this.info.add("STARTING", Boolean.valueOf(false));
-			this.info.releaseWriteLock();
-			this.database.releaseWriteLock();
-			throw new IOException(e.toString());
+			wlock();
+			try {
+				this.info.add("STARTING", Boolean.FALSE);
+			} finally {
+				wunlock();
+			}
+			throw e;
 		} catch (RuntimeException e) {
 			// Something went bad.
-			this.database.getWriteLock();
-			this.info.getWriteLock();
-			this.info.add("STARTING", Boolean.valueOf(false));
-			this.info.releaseWriteLock();
-			this.database.releaseWriteLock();
-			throw new RuntimeException(e);
+			wlock();
+			try {
+				this.info.add("STARTING", Boolean.FALSE);
+			} finally {
+				wunlock();
+			}
+			throw e;
 		} catch (Exception e) {
 			// Something else went bad.
-			this.database.getWriteLock();
-			this.info.getWriteLock();
-			this.info.add("STARTING", Boolean.valueOf(false));
-			this.info.releaseWriteLock();
-			this.database.releaseWriteLock();
+			wlock();
+			try {
+				this.info.add("STARTING", Boolean.FALSE);
+			} finally {
+				wunlock();
+			}
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void rlock() throws Exception {
+	private void rlock() {
 		database.getReadLock();
 		info.getReadLock();
 	}
 
-	private void runlock() throws Exception {
-		database.releaseReadLock();
+	private void runlock() {
 		info.releaseReadLock();
+		database.releaseReadLock();
 	}
 
-	private void wlock() throws Exception {
+	private void wlock() {
 		database.getWriteLock();
 		info.getWriteLock();
 	}
 
-	private void wunlock() throws Exception {
+	private void wunlock() {
 		info.releaseWriteLock();
 		database.releaseWriteLock();
 	}
@@ -169,24 +169,19 @@ public class MUXlisten implements Runnable {
 		Thread t = null;
 		Thread q = null;
 		try {
+			wlock();
 			try {
-				wlock();
 				try {
-					info.add("RUNNING", Boolean.valueOf(true));
+					info.add("RUNNING", Boolean.TRUE);
 				} catch (Exception e) {
 					lock.set(false);
-					wunlock();
 					return;
 				}
 			} catch (Exception e) {
 				lock.set(false);
 				return;
-			}
-			try {
+			} finally {
 				wunlock();
-			} catch (Exception e) {
-				lock.set(false);
-				return;
 			}
 			lives.set(true);
 			lock.set(false);
@@ -213,21 +208,17 @@ public class MUXlisten implements Runnable {
 							q.start();
 						}
 
+						wlock();
 						try {
-							wlock();
 							try {
-								info.add("STARTING", Boolean.valueOf(false));
+								info.add("STARTING", Boolean.FALSE);
 							} catch (Exception e) {
-								wunlock();
 								break quit;
 							}
 						} catch (Exception e) {
 							break quit;
-						}
-						try {
+						} finally {
 							wunlock();
-						} catch (Exception e) {
-							break quit;
 						}
 						boolean spin = true;
 						while (spin && lives.get()) {
@@ -236,21 +227,17 @@ public class MUXlisten implements Runnable {
 							} catch (InterruptedException e) {
 								break quit;
 							}
+							rlock();
 							try {
-								rlock();
 								try {
 									spin = info.get("STOPPING").equals(Boolean.FALSE);
 								} catch (Exception e) {
-									runlock();
 									break quit;
 								}
 							} catch (Exception e) {
 								break quit;
-							}
-							try {
+							} finally {
 								runlock();
-							} catch (Exception e) {
-								break quit;
 							}
 						}
 					} // die
@@ -270,16 +257,16 @@ public class MUXlisten implements Runnable {
 			try {
 				wlock();
 				try {
-					info.add("STARTING", Boolean.valueOf(false));
-					info.add("STOPPING", Boolean.valueOf(true));
-					info.add("RUNNING", Boolean.valueOf(false));
+					info.add("STARTING", Boolean.FALSE);
+					info.add("STOPPING", Boolean.TRUE);
+					info.add("RUNNING", Boolean.FALSE);
 				} catch (Exception e) {
 					lock.set(false);
-					wunlock();
 					return;
 				}
-				wunlock();
 			} catch (Exception e) {
+			} finally {
+				wunlock();
 			}
 			// Start cleanup.
 			while (!lock.compareAndSet(false, true)) {
@@ -321,15 +308,15 @@ public class MUXlisten implements Runnable {
 			try {
 				wlock();
 				try {
-					info.add("STARTING", Boolean.valueOf(false));
-					info.add("STOPPING", Boolean.valueOf(false));
-					info.add("RUNNING", Boolean.valueOf(false));
+					info.add("STARTING", Boolean.FALSE);
+					info.add("STOPPING", Boolean.FALSE);
+					info.add("RUNNING", Boolean.FALSE);
 				} catch (Exception e) {
 					lock.set(false);
-					wunlock();
 					return;
-				}
-				wunlock();
+				} finally {
+					wunlock();
+				}	
 			} catch (Exception e) {
 			}
 

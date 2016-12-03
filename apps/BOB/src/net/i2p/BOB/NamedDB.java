@@ -15,6 +15,12 @@
  */
 package net.i2p.BOB;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+
 /**
  * Internal database to relate nicknames to options to values
  *
@@ -22,129 +28,62 @@ package net.i2p.BOB;
  */
 public class NamedDB {
 
-	private volatile Object[][] data;
-	private int index,  writersWaiting,  readers;
+	private final Map<String, Object> data;
+	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
 
 	/**
-	 * make initial NULL object
 	 *
 	 */
 	public NamedDB() {
-		this.data = new Object[1][2];
+		this.data = new HashMap<String, Object>();
 	}
 
-	synchronized public void getReadLock() {
-		while ((writersWaiting != 0)) {
-			try {
-				wait();
-			} catch (InterruptedException ie) {
-			}
-		}
-		readers++;
+	public void getReadLock() {
+		lock.readLock().lock();
 	}
 
-	synchronized public void releaseReadLock() {
-		readers--;
-		notifyAll();
+	public void releaseReadLock() {
+		lock.readLock().unlock();
 	}
 
-	synchronized public void getWriteLock() {
-		writersWaiting++;
-		while (readers != 0 && writersWaiting != 1) {
-			try {
-				wait();
-			} catch (InterruptedException ie) {
-			}
-		}
+	public void getWriteLock() {
+		lock.writeLock().lock();
 	}
 
-	synchronized public void releaseWriteLock() {
-		writersWaiting--;
-		notifyAll();
+	public void releaseWriteLock() {
+		lock.writeLock().unlock();
 	}
 
 	/**
-	 * Find objects in the array, returns its index or throws exception
-	 * @param key
-	 * @return an objects index
-	 * @throws ArrayIndexOutOfBoundsException when key does not exist
-	 */
-	public int idx(Object key) throws ArrayIndexOutOfBoundsException {
-		for (int i = 0; i < index; i++) {
-			if (key.equals(data[i][0])) {
-				return i;
-			}
-		}
-		throw new ArrayIndexOutOfBoundsException("Can't locate key for index");
-	}
-
-	/**
-	 * Delete an object from array if it exists
+	 * Delete an object if it exists
 	 *
 	 * @param key
 	 */
-	public void kill(Object key) {
-
-		int i, j, k, l;
-		Object[][] olddata;
-		int didsomething = 0;
-
-		try {
-			k = idx(key);
-		} catch (ArrayIndexOutOfBoundsException b) {
-			return;
-		}
-		olddata = new Object[index + 2][2];
-		// copy to olddata, skipping 'k'
-		for (i = 0, l = 0; l < index; i++, l++) {
-			if (i == k) {
-				l++;
-				didsomething++;
-			}
-			for (j = 0; j < 2; j++) {
-				olddata[i][j] = data[l][j];
-			}
-		}
-		index -= didsomething;
-		data = olddata;
+	public void kill(String key) {
+		data.remove(key);
 	}
 
 	/**
-	 * Add object to the array, deletes the old one if it exists
+	 * Add object, deletes the old one if it exists
 	 *
 	 * @param key
 	 * @param val
 	 */
-	public void add(Object key, Object val) {
-		Object[][] olddata;
-		int i, j;
-		i = 0;
-		kill(key);
-
-		olddata = new Object[index + 2][2];
-		// copy to olddata
-		for (i = 0; i < index; i++) {
-			for (j = 0; j < 2; j++) {
-				olddata[i][j] = data[i][j];
-			}
-		}
-		data = olddata;
-		data[index++] = new Object[]{key, val};
+	public void add(String key, Object val) {
+		data.put(key, val);
 	}
 
 	/**
-	 * Get the object, and return it, throws RuntimeException
+	 * Get the object, and return it, throws RuntimeException if not found
 	 *
-	 * @param key
-	 * @return Object
-	 * @throws java.lang.RuntimeException
+	 * @param key non-null
+	 * @return Object non-null
+	 * @throws java.lang.RuntimeException if not found
 	 */
-	public Object get(Object key) throws RuntimeException {
-		for (int i = 0; i < index; i++) {
-			if (key.equals(data[i][0])) {
-				return data[i][1];
-			}
-		}
+	public Object get(String key) throws RuntimeException {
+		Object rv = data.get(key);
+		if (rv != null)
+			return rv;
 		throw new RuntimeException("Key not found");
 	}
 
@@ -154,33 +93,14 @@ public class NamedDB {
 	 * @param key
 	 * @return true if an object exists, else returns false
 	 */
-	public boolean exists(Object key) {
-		for (int i = 0; i < index; i++) {
-			if (key.equals(data[i][0])) {
-				return true;
-			}
-		}
-		return false;
-
+	public boolean exists(String key) {
+		return data.containsKey(key);
 	}
 
 	/**
-	 *
-	 * @param i index
-	 * @return an indexed Object
-	 * @throws java.lang.RuntimeException
+	 * @since 0.9.29 replaces getcount() and getnext(int)
 	 */
-	public Object getnext(int i) throws RuntimeException {
-		if (i < index && i > -1) {
-			return data[i][1];
-		}
-		throw new RuntimeException("No more data");
-	}
-
-	/**
-	 * @return the count of how many objects
-	 */
-	public int getcount() {
-		return index;
+	public Collection<Object> values() {
+		return data.values();
 	}
 }
