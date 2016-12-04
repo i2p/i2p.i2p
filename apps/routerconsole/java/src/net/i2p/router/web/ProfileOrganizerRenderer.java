@@ -322,11 +322,12 @@ class ProfileOrganizerRenderer {
         
     /**
      *  Used for floodfill-only page
+     *  As of 0.9.29, sorts in true binary order, not base64 string
      *  @since 0.9.8
      */
     private static class HashComparator implements Comparator<PeerProfile>, Serializable {
         public int compare(PeerProfile left, PeerProfile right) {
-            return left.getPeer().toBase64().compareTo(right.getPeer().toBase64());
+            return DataHelper.compareTo(left.getPeer().getData(), right.getPeer().getData());
         }
         
     }

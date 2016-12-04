@@ -31,9 +31,12 @@ class BanlistRenderer {
         _context = context;
     }
     
+    /**
+     *  As of 0.9.29, sorts in true binary order, not base64 string
+     */
     private static class HashComparator implements Comparator<Hash>, Serializable {
          public int compare(Hash l, Hash r) {
-             return l.toBase64().compareTo(r.toBase64());
+             return DataHelper.compareTo(l.getData(), r.getData());
         }
     }
 
