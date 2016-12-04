@@ -1,24 +1,20 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config peers")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
-
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Peer Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
-
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHelper" id="peerhelper" scope="request" />
  <jsp:setProperty name="peerhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
-
  <% String peer = "";
     if (request.getParameter("peer") != null)
         peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
@@ -41,7 +37,6 @@
         <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
       </div>
-
  <h3><%=intl._t("Adjust Profile Bonuses")%></h3>
  <p><%=intl._t("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles"><%=intl._t("profiles page")%></a>.</p>
  <% long speed = 0; long capacity = 0;
@@ -62,5 +57,4 @@
  <jsp:getProperty name="profilesHelper" property="banlistSummary" />
  <div class="wideload"><h2><%=intl._t("Banned IPs")%></h2>
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
-
-</div><hr></div></div></body></html>
+</div></div></div></body></html>
