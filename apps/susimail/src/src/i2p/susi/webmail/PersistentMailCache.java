@@ -66,7 +66,7 @@ class PersistentMailCache {
 	private static final String FILE_PREFIX = "mail-";
 	private static final String HDR_SUFFIX = ".hdr.txt.gz";
 	private static final String FULL_SUFFIX = ".full.txt.gz";
-	private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+	private static final String B64 = Base64.ALPHABET_I2P;
 
 	/**
 	 *  Use the params to generate a unique directory name.

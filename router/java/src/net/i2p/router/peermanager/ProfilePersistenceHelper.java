@@ -45,7 +45,7 @@ class ProfilePersistenceHelper {
     private static final String UNCOMPRESSED_SUFFIX = ".txt";
     private static final String OLD_SUFFIX = ".dat";
     private static final String DIR_PREFIX = "p";
-    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+    private static final String B64 = Base64.ALPHABET_I2P;
     
     /**
      * If we haven't been able to get a message through to the peer in this much time,

@@ -59,7 +59,7 @@ public class PersistentDataStore extends TransientDataStore {
     private final static int READ_DELAY = 2*60*1000;
     private static final String PROP_FLAT = "router.networkDatabase.flat";
     static final String DIR_PREFIX = "r";
-    static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+    private static final String B64 = Base64.ALPHABET_I2P;
     
     /**
      *  @param dbDir relative path

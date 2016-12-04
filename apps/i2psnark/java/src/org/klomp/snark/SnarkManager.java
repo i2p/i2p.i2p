@@ -139,7 +139,7 @@ public class SnarkManager implements CompleteListener {
     public static final int DEFAULT_TUNNEL_QUANTITY = 3;
     public static final String CONFIG_DIR_SUFFIX = ".d";
     private static final String SUBDIR_PREFIX = "s";
-    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+    private static final String B64 = Base64.ALPHABET_I2P;
 
     /**
      *  "name", "announceURL=websiteURL" pairs
