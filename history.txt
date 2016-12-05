@@ -1,3 +1,12 @@
+2016-12-05 zzz
+ * Router:
+   - Revert default family sig type back to ECDSA
+   - Update blocklist
+
+2016-12-02 zzz
+ * Cleanup: Single char indexOf()
+ * Console: Version the css links
+
 2016-12-01 zzz
  * NetDb: Peer selection tweaks
 
