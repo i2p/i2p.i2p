@@ -1,3 +1,6 @@
+2016-12-06 zzz
+ * GeoIP: Update from Maxmind 2016-12-06
+
 2016-12-05 zzz
  * Router:
    - Revert default family sig type back to ECDSA
