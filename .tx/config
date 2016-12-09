@@ -22,6 +22,7 @@ trans.ro = apps/i2ptunnel/locale/messages_ro.po
 trans.ru_RU = apps/i2ptunnel/locale/messages_ru.po
 trans.sk = apps/i2ptunnel/locale/messages_sk.po
 trans.sv_SE = apps/i2ptunnel/locale/messages_sv.po
+trans.tr_TR = apps/i2ptunnel/locale/messages_tr.po
 trans.uk_UA = apps/i2ptunnel/locale/messages_uk.po
 trans.vi = apps/i2ptunnel/locale/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale/messages_zh.po
@@ -147,8 +148,8 @@ trans.ru_RU = apps/routerconsole/locale-countries/messages_ru.po
 trans.sk = apps/routerconsole/locale-countries/messages_sk.po
 trans.sq = apps/routerconsole/locale-countries/messages_sq.po
 trans.sv_SE = apps/routerconsole/locale-countries/messages_sv.po
-trans.uk_UA = apps/routerconsole/locale-countries/messages_uk.po
 trans.tr_TR = apps/routerconsole/locale-countries/messages_tr.po
+trans.uk_UA = apps/routerconsole/locale-countries/messages_uk.po
 trans.vi = apps/routerconsole/locale-countries/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale-countries/messages_zh.po
 trans.zh_TW = apps/routerconsole/locale-countries/messages_zh_TW.po
@@ -341,7 +342,8 @@ trans.de = core/java/src/gnu/getopt/MessagesBundle_de.properties
 trans.es = core/java/src/gnu/getopt/MessagesBundle_es.properties
 trans.fi = core/java/src/gnu/getopt/MessagesBundle_fi.properties
 trans.fr = core/java/src/gnu/getopt/MessagesBundle_fr.properties
-trans.gl = core/java/src/gnu/getopt/MessagesBundle_gl.properties
+;; currently corrupt, non-UTF-8
+;;trans.gl = core/java/src/gnu/getopt/MessagesBundle_gl.properties
 trans.hu = core/java/src/gnu/getopt/MessagesBundle_hu.properties
 ;; Java converts id to in
 trans.id = core/java/src/gnu/getopt/MessagesBundle_in.properties
@@ -378,6 +380,7 @@ trans.gl = apps/ministreaming/locale/messages_gl.po
 ;; Java converts id to in
 trans.id = apps/ministreaming/locale/messages_in.po
 trans.it = apps/ministreaming/locale/messages_it.po
+trans.ko = apps/ministreaming/locale/messages_ko.po
 trans.nb = apps/ministreaming/locale/messages_nb.po
 trans.nl = apps/ministreaming/locale/messages_nl.po
 trans.pl = apps/ministreaming/locale/messages_pl.po
