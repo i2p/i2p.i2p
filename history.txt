@@ -1,3 +1,6 @@
+2016-12-09 zzz
+ * Translation updates
+
 2016-12-06 zzz
  * GeoIP: Update from Maxmind 2016-12-06
 
@@ -66,7 +69,7 @@
 
 2016-11-13 zzz
  * Console: Add initial news to bottom of news page (ticket #1153)
- * i2psnark: Periodically DHT nodes (ticket #1328)
+ * i2psnark: Periodically save DHT nodes (ticket #1328)
  * UPnP:
    - Prevent exception on bad HTTP header (ticket #1480)
    - Prevent NPE on socket creation fail (tickets #728, #1681)
@@ -100,7 +103,7 @@
  * Install: Add max memory option to runplain.sh
  * Crypto: Change serial number in selfsigned certs from int to long
  * Router: Fix low-memory log messages for non-wrapper (ticket #1795)
- * Transport: Improve IPv6 selection logic
+ * Transport: Improve IPv6 address selection logic
 
 2016-11-06 zzz
  * Console: Add Java 9 log warning (ticket #1870)
