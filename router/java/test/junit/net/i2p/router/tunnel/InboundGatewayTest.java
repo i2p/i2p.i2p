@@ -37,7 +37,7 @@ public class InboundGatewayTest extends GatewayTestBase {
         @Override
         protected void handleAtEndpoint(byte []encrypted) {
             // now handle it at the endpoint
-            InboundEndpointProcessor end = new InboundEndpointProcessor(_context, _config);
+            InboundEndpointProcessor end = new InboundEndpointProcessor(_context, _config); // InboundEndpointProcessor(...) is deprecated
             assertTrue(end.retrievePreprocessedData(encrypted, 0, encrypted.length, _config.getPeer(_config.getLength()-2)));
         }
     }

@@ -35,12 +35,12 @@ public class InboundTest extends RouterTestBase {
         p.process(message, 0, message.length, null);
         
         for (int i = 1; i < numHops-1; i++) {
-            HopProcessor hop = new HopProcessor(_context, _config.getConfig(i));
+            HopProcessor hop = new HopProcessor(_context, _config.getConfig(i)); // HopProcessor(...) is deprecated
             Hash prev = _config.getConfig(i).getReceiveFrom();
             assertTrue(hop.process(message, 0, message.length, prev));
         }
         
-        InboundEndpointProcessor end = new InboundEndpointProcessor(_context, _config);
+        InboundEndpointProcessor end = new InboundEndpointProcessor(_context, _config); // InboundEndpointProcessor(...) is deprecated
         assertTrue(end.retrievePreprocessedData(message, 0, message.length, _config.getPeer(numHops-2)));
         
         assertTrue(DataHelper.eq(orig, 16, message, 16, orig.length - 16));
