@@ -1,3 +1,9 @@
+i2p (0.9.28p-1~precise+1) precise; urgency=medium
+
+  * Backport to Precise
+
+ -- zzz on i2p <zzz@i2pmail.org>  Tue, 13 Dec 2016 12:12:12 +0000
+
 i2p (0.9.27p-1~precise+1) precise; urgency=medium
 
   * Backport to Precise

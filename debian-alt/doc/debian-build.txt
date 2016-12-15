@@ -74,15 +74,15 @@ reprepro includedsc stable i2p_0.9.XX-1.dsc
 reprepro -v update precise
 reprepro -v update trusty
 reprepro -v update vivid
-reprepro -v update wily
 reprepro -v update xenial
 reprepro -v update yakkety
+reprepro -v update zesty
 # todo when set up
 # To add or remove distributions, edit /var/www/debian/conf/distributions
 # and /var/www/debian/conf/updates
 # and then: reprepro export foo (for new foo)
+# and then: reprepro -v update foo
 # If you remove, you must do: reprepro clearvanished
-# reprepro -v update zesty
 
 
 # To copy precise to wheezy:

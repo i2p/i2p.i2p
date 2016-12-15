@@ -9,17 +9,15 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
  ,debconf
- ,openjdk-7-jdk
- ,libjetty8-java, libservlet3.0-java
+ ,openjdk-8-jdk
  ,glassfish-javaee
  ,dh-apparmor
  ,gettext
  ,libgetopt-java
- ,libgmp-dev (>= 2:5.0.5)
+ ,libgmp-dev (>= 2:5.0.2)
  ,libservice-wrapper-java
  ,hardening-wrapper
  ,po-debconf
- ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -74,12 +72,11 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-9-jre-headless | openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java9-runtime-headless | java8-runtime-headless | java7-runtime-headless,
+ openjdk-8-jre-headless | java8-runtime-headless,
  libecj-java,
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjetty8-java, libservlet3.0-java,
  glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)

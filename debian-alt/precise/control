@@ -59,6 +59,7 @@ Description: I2P libjbigi library
 Package: i2p-doc
 Architecture: all
 Section: doc
+Priority: extra
 Depends: ${misc:Depends}
 Suggests: i2p, default-jdk-doc
 Description: I2P developer documentation

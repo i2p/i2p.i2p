@@ -2221,7 +2221,7 @@
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <!-- libjetty8-java -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.21.v20160908" />
             <!-- libjstl1.1-java or glassfish-javaee -->
           <!--
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
@@ -2304,7 +2304,7 @@
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <!-- libjetty8-java -->
           <!--
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.21.v20160908" />
            -->
             <!-- libjstl1.1-java or glassfish-javaee -->
           <!--
@@ -2381,7 +2381,7 @@
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.17.v20150415" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.21.v20160908" />
           <!--
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
            -->
