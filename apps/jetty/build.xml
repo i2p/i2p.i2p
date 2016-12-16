@@ -13,6 +13,7 @@
          the source in the java/ directory.
      -->
 
+    <!-- Note: Please change all references in top-level build.xml if you update to a new Jetty! -->
     <property name="jetty.ver" value="8.1.21.v20160908" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
     <property name="jetty.sha1" value="9780e99e765fd7b9bb1aac8ba2bba374ac039764" />

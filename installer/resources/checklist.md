@@ -65,7 +65,7 @@
     mtn -d i2p.mtn co --branch=i2p.i2p /path/to/releasedir
     ```
 
-  - You must build with Java 7 or higher, but ensure you also have the Java 6 JRE installed for the bootclasspath.
+  - You must build with Java 7 or higher.
     If you build with Java 8 or higher, you must also have the Java 7 JRE installed for the bootclasspath.
 
 4. Create override.properties with (adjust as necessary):
@@ -75,7 +75,7 @@
     release.gpg.keyid=0xnnnnnnnn
     release.signer.su3=xxx@mail.i2p
     build.built-by=xxx
-    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-6-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-6-openjdk-amd64/jre/lib/jce.jar
+    javac.compilerargs=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
     javac.compilerargs7=-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar
     ```
 

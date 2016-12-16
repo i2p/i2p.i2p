@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# HelloKS <kqwe1859@gmail.com>, 2016
+# Yeon-Ung Choi <kqwe1859@gmail.com>, 2016
 # SEPT____ <xpressengine3@mail.beo.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2016-09-28 08:58+0000\n"
+"PO-Revision-Date: 2016-12-05 15:35+0000\n"
 "Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -132,7 +132,7 @@ msgid "Bhutan"
 msgstr "부탄"
 
 msgid "Bouvet Island"
-msgstr ""
+msgstr "부베 섬"
 
 msgid "Botswana"
 msgstr "보츠와나"
@@ -159,7 +159,7 @@ msgid "Switzerland"
 msgstr "스위스"
 
 msgid "Cote D'Ivoire"
-msgstr ""
+msgstr "코르티부아르"
 
 msgid "Cook Islands"
 msgstr "쿡 아일랜드"
@@ -186,10 +186,10 @@ msgid "Cuba"
 msgstr "쿠바"
 
 msgid "Cape Verde"
-msgstr ""
+msgstr "카보베르데"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "퀴라소"
 
 msgid "Christmas Island"
 msgstr "크리스마스 아일랜드"
@@ -276,7 +276,7 @@ msgid "French Guiana"
 msgstr "프랑스령 기아나"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "건지 섬"
 
 msgid "Ghana"
 msgstr "가나"
@@ -294,10 +294,10 @@ msgid "Guinea"
 msgstr "기니"
 
 msgid "Guadeloupe"
-msgstr ""
+msgstr "과들루프"
 
 msgid "Equatorial Guinea"
-msgstr ""
+msgstr "적도 기니"
 
 msgid "Greece"
 msgstr "그리스"
@@ -321,13 +321,13 @@ msgid "Hong Kong"
 msgstr "홍콩"
 
 msgid "Honduras"
-msgstr ""
+msgstr "온두라스"
 
 msgid "Croatia"
-msgstr ""
+msgstr "크로아티아"
 
 msgid "Haiti"
-msgstr ""
+msgstr "아이티"
 
 msgid "Hungary"
 msgstr "헝가리"
@@ -342,13 +342,13 @@ msgid "Israel"
 msgstr "이스라엘"
 
 msgid "Isle of Man"
-msgstr ""
+msgstr "맨 섬"
 
 msgid "India"
 msgstr "인도"
 
 msgid "British Indian Ocean Territory"
-msgstr ""
+msgstr "영국령 인도양 지역"
 
 msgid "Iraq"
 msgstr "이라크"
@@ -363,7 +363,7 @@ msgid "Italy"
 msgstr "이탈리아"
 
 msgid "Jersey"
-msgstr ""
+msgstr "저지 섬"
 
 msgid "Jamaica"
 msgstr "자메이카"
@@ -390,7 +390,7 @@ msgid "Comoros"
 msgstr "코모로"
 
 msgid "Saint Kitts and Nevis"
-msgstr ""
+msgstr "세인트키츠 네비스"
 
 msgid "North Korea"
 msgstr "북한"
@@ -402,13 +402,13 @@ msgid "Kuwait"
 msgstr "쿠웨이트"
 
 msgid "Cayman Islands"
-msgstr ""
+msgstr "케이맨 제도"
 
 msgid "Kazakhstan"
 msgstr "카자흐스탄"
 
 msgid "Lao People's Democratic Republic"
-msgstr ""
+msgstr "라오스"
 
 msgid "Lebanon"
 msgstr "레바논"
@@ -426,7 +426,7 @@ msgid "Liberia"
 msgstr "라이베리아"
 
 msgid "Lesotho"
-msgstr ""
+msgstr "레소토"
 
 msgid "Lithuania"
 msgstr "리투아니아"
@@ -450,55 +450,55 @@ msgid "Moldova"
 msgstr "몰도바"
 
 msgid "Montenegro"
-msgstr ""
+msgstr "몬테네그로"
 
 msgid "Saint Martin"
-msgstr ""
+msgstr "세인트 마틴 섬"
 
 msgid "Madagascar"
-msgstr ""
+msgstr "마다가스카르"
 
 msgid "Marshall Islands"
-msgstr ""
+msgstr "마셜 제도"
 
 msgid "Macedonia"
-msgstr ""
+msgstr "마케도니아 공화국"
 
 msgid "Mali"
-msgstr ""
+msgstr "말리"
 
 msgid "Myanmar"
-msgstr ""
+msgstr "미얀마"
 
 msgid "Mongolia"
-msgstr ""
+msgstr "몽골"
 
 msgid "Macau"
-msgstr ""
+msgstr "마카오"
 
 msgid "Northern Mariana Islands"
-msgstr ""
+msgstr "북마리아나 제도"
 
 msgid "Martinique"
-msgstr ""
+msgstr "마르티니크"
 
 msgid "Mauritania"
-msgstr ""
+msgstr "모리타니"
 
 msgid "Montserrat"
-msgstr ""
+msgstr "몬세트라"
 
 msgid "Malta"
-msgstr ""
+msgstr "몰타"
 
 msgid "Mauritius"
-msgstr ""
+msgstr "모리셔스"
 
 msgid "Maldives"
-msgstr ""
+msgstr "몰디브"
 
 msgid "Malawi"
-msgstr ""
+msgstr "말라우"
 
 msgid "Mexico"
 msgstr "멕시코"
@@ -519,13 +519,13 @@ msgid "Niger"
 msgstr "니제르"
 
 msgid "Norfolk Island"
-msgstr ""
+msgstr "노퍽 아일랜드"
 
 msgid "Nigeria"
-msgstr ""
+msgstr "나이지리아"
 
 msgid "Nicaragua"
-msgstr ""
+msgstr "니카라과"
 
 msgid "Netherlands"
 msgstr "네덜란드"
@@ -537,13 +537,13 @@ msgid "Nepal"
 msgstr "네팔"
 
 msgid "Nauru"
-msgstr ""
+msgstr "나울루"
 
 msgid "Niue"
-msgstr ""
+msgstr "니우에"
 
 msgid "New Zealand"
-msgstr ""
+msgstr "뉴질랜드"
 
 msgid "Oman"
 msgstr "오만"
@@ -570,10 +570,10 @@ msgid "Poland"
 msgstr "폴란드"
 
 msgid "Saint Pierre and Miquelon"
-msgstr ""
+msgstr "세인트 피어 & 미클롱"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "핏케언 아일랜드"
 
 msgid "Puerto Rico"
 msgstr "푸에르토 리코"
@@ -588,13 +588,13 @@ msgid "Palau"
 msgstr "팔라우"
 
 msgid "Paraguay"
-msgstr ""
+msgstr "파라과이"
 
 msgid "Qatar"
-msgstr ""
+msgstr "카타르"
 
 msgid "Réunion"
-msgstr ""
+msgstr "레위니옹"
 
 msgid "Romania"
 msgstr "로마니아"
@@ -615,7 +615,7 @@ msgid "Solomon Islands"
 msgstr "솔로몬 제도"
 
 msgid "Seychelles"
-msgstr ""
+msgstr "세이셸"
 
 msgid "Sudan"
 msgstr "수단"
@@ -627,43 +627,43 @@ msgid "Singapore"
 msgstr "싱가포르"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "성 헤레나"
 
 msgid "Slovenia"
 msgstr "슬로베니아"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "스발바르 얀마옌 제도"
 
 msgid "Slovakia"
-msgstr ""
+msgstr "슬로바키아"
 
 msgid "Sierra Leone"
-msgstr ""
+msgstr "시에라리온"
 
 msgid "San Marino"
-msgstr ""
+msgstr "산마리노"
 
 msgid "Senegal"
-msgstr ""
+msgstr "세네갈"
 
 msgid "Somalia"
-msgstr ""
+msgstr "소말리아"
 
 msgid "Suriname"
-msgstr ""
+msgstr "수리남"
 
 msgid "South Sudan"
 msgstr "남수단"
 
 msgid "Sao Tome and Principe"
-msgstr ""
+msgstr "상투메 프린시페"
 
 msgid "El Salvador"
-msgstr ""
+msgstr "엘살바도르"
 
 msgid "Sint Maarten"
-msgstr ""
+msgstr "신트마르턴"
 
 msgid "Syria"
 msgstr "시리아"
@@ -672,13 +672,13 @@ msgid "Swaziland"
 msgstr "스와질랜드"
 
 msgid "Turks and Caicos Islands"
-msgstr ""
+msgstr "터크스 케이커스 제도"
 
 msgid "Chad"
-msgstr ""
+msgstr "차드"
 
 msgid "French Southern Territories"
-msgstr ""
+msgstr "프랑스령 남방 및 남극"
 
 msgid "Togo"
 msgstr "토고"
@@ -687,16 +687,16 @@ msgid "Thailand"
 msgstr "태국"
 
 msgid "Tajikistan"
-msgstr ""
+msgstr "타지키스탄"
 
 msgid "Tokelau"
-msgstr ""
+msgstr "토켈라우"
 
 msgid "Timor-Leste"
-msgstr ""
+msgstr "동티모르"
 
 msgid "Turkmenistan"
-msgstr ""
+msgstr "투르크메니스탄"
 
 msgid "Tunisia"
 msgstr "튀니ㅣ"
@@ -708,10 +708,10 @@ msgid "Turkey"
 msgstr "터키"
 
 msgid "Trinidad and Tobago"
-msgstr ""
+msgstr "트리니다드 토바고"
 
 msgid "Tuvalu"
-msgstr ""
+msgstr "투발루"
 
 msgid "Taiwan"
 msgstr "타이완"
@@ -726,25 +726,25 @@ msgid "Uganda"
 msgstr "우간다"
 
 msgid "United States Minor Outlying Islands"
-msgstr ""
+msgstr "미국령 군소 제도"
 
 msgid "United States"
 msgstr "미국"
 
 msgid "Uruguay"
-msgstr ""
+msgstr "우루과이"
 
 msgid "Uzbekistan"
-msgstr ""
+msgstr "우즈베키스탄"
 
 msgid "Vatican"
 msgstr "바티칸"
 
 msgid "Saint Vincent and the Grenadines"
-msgstr ""
+msgstr "세인트빈센트 그레나딘"
 
 msgid "Venezuela"
-msgstr ""
+msgstr "베네수엘라"
 
 msgid "Virgin Islands"
 msgstr "버진 아일랜드"
@@ -753,10 +753,10 @@ msgid "Vietnam"
 msgstr "베트남"
 
 msgid "Vanuatu"
-msgstr ""
+msgstr "바누아투"
 
 msgid "Wallis and Futuna"
-msgstr ""
+msgstr "왈리스 퓌튀나"
 
 msgid "Samoa"
 msgstr "사모아"
@@ -765,7 +765,7 @@ msgid "Yemen"
 msgstr "예맨"
 
 msgid "Mayotte"
-msgstr ""
+msgstr "마요트"
 
 msgid "South Africa"
 msgstr "남아프리카"

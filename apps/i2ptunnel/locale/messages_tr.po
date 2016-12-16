@@ -4,193 +4,175 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# tengo <akin@rbcmail.ru>, 2013
-# Aleksey Orekhov <opexob@yandex.ru>, 2013
-# Aleksey Vyskubov <viskubov@gmail.com>, 2016
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
-# sfix <anon-9b36b2e@lycos.com>, 2013
-# Dmitriy Mamonov <sassy.but.classic@gmail.com>, 2014
-# ducki2p <ducki2p@gmail.com>, 2011
-# Eugene, 2013
-# foo <foo@bar>, 2009
-# Alexander Georgievskiy <galeksandrp@gmail.com>, 2016
-# gmind, 2012-2013
-# gmind, 2013,2015
-# gmind, 2012
-# Nikolay Parukhin <parukhin@gmail.com>, 2014
-# sfix <anon-9b36b2e@lycos.com>, 2013
-# brianhopes <voganc-12@live.ru>, 2015
-# yume, 2014-2015
+# Kaya Zeren <kayazeren@gmail.com>, 2016
+# Ozancan Karataş <ozanc27@icloud.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-11-30 15:48+0000\n"
-"PO-Revision-Date: 2016-12-04 22:58+0000\n"
-"Last-Translator: Alexander Georgievskiy <galeksandrp@gmail.com>\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/otf/I2P/language/ru_RU/)\n"
+"PO-Revision-Date: 2016-11-30 16:04+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: Turkish (Turkey) (http://www.transifex.com/otf/I2P/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru_RU\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:396
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:406
 msgid "internal"
-msgstr "внутренний"
+msgstr "iç"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:440
 #, java-format
 msgid "{0} inbound, {0} outbound tunnel"
 msgid_plural "{0} inbound, {0} outbound tunnels"
-msgstr[0] "{0} входящий, {0} исходящий туннель"
-msgstr[1] "{0} входящих, {0} исходящих туннеля"
-msgstr[2] "{0} входящих, {0} исходящих туннелей"
-msgstr[3] "{0} входящих, {0} исходящих туннелей"
+msgstr[0] "{0} gelen, {0} giden tünel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:444
 msgid "lower bandwidth and reliability"
-msgstr "меньшая пропускная способность и надёжность"
+msgstr "daha düşük bant genişliği ve tutarlılık"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:446
 msgid "standard bandwidth and reliability"
-msgstr "обычная пропускная способность и надёжность"
+msgstr "standart bant genişliği ve tutarlılık"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:448
 msgid "higher bandwidth and reliability"
-msgstr "более высокая пропускная способность и надёжность"
+msgstr "daha yüksek bant genişliği ve tutarlılık"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:89
 msgid "Tunnels are not initialized yet, please reload in two minutes."
-msgstr "Туннели ещё не инициализированы, перезагрузите страницу через 2 минуты."
+msgstr "Tüneller henüz hazır değil, lütfen iki dakika sonra yeniden yükleyin."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:162
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
-msgstr "Неправильно переданная форма, возможно вы использовали действие браузера \"назад\" или \"обновить\". Пожалуйста повторите попытку."
+msgstr "Form gönderimi geçersiz. Tarayıcınızın \"geri\" ya da \"yenile\" düğmelerini kullandığınızdan olabilir. Lütfen formu yeniden gönderin."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:164
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
 "browser."
-msgstr "Если проблема сохраняется, проверьте, что в Вашем браузере разрешены cookies."
+msgstr "Sorun sürerse, web tarayıcınızda çerezlerin etkinleştirilmiş olduğundan emin olun."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:210
 msgid "Configuration reloaded for all tunnels"
-msgstr "Конфигурация для всех туннелей перечитана"
+msgstr "Tüm tüneller için ayarlar yeniden yüklendi"
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:224
 msgid "Starting tunnel"
-msgstr "Запуск туннеля"
+msgstr "Tünel başlatılıyor"
 
 #. and give them something to look at in any case
 #. FIXME name will be HTML escaped twice
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:238
 msgid "Stopping tunnel"
-msgstr "Остановка туннеля"
+msgstr "Tünel durduruluyor"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:327
 msgid "New Tunnel"
-msgstr "Новый туннель"
+msgstr "Yeni Tünel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:347
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:367
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:453
 msgid "Port not set"
-msgstr "Порт не задан"
+msgstr "Kapı ayarlanmamış"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:350
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:455
 msgid "Invalid port"
-msgstr "неверный порт"
+msgstr "Kapı geçersiz"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:353
 msgid "Warning - ports less than 1024 are not recommended"
-msgstr "Внимание - порты с номером менее чем 1024 не рекомендуются"
+msgstr "Uyarı - 1024 altındaki kapı numaralarının kullanılması önerilmez"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:362
 msgid "Warning - duplicate port"
-msgstr "Внимание - повторное использование порта"
+msgstr "Uyarı - Çift kapı numarası"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:379
 msgid "Standard client"
-msgstr "Обычный клиент"
+msgstr "Standart istemci"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:380
 msgid "HTTP/HTTPS client"
-msgstr "HTTP/HTTPS клиент"
+msgstr "HTTP/HTTPS İstemcisi"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:381
 msgid "IRC client"
-msgstr "IRC-клиент"
+msgstr "IRC İstemcisi"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:382
 msgid "Standard server"
-msgstr "Обычный сервер"
+msgstr "Standart Sunucu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:383
 msgid "HTTP server"
-msgstr "HTTP-сервер"
+msgstr "HTTP Sunucu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:384
 msgid "SOCKS 4/4a/5 proxy"
-msgstr "SOCKS 4/4a/5 прокси"
+msgstr "SOCKS 4/4a/5 Vekil Sunucusu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:385
 msgid "SOCKS IRC proxy"
-msgstr "SOCKS IRC прокси"
+msgstr "SOCKS IRC Vekil Sunucusu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:386
 msgid "CONNECT/SSL/HTTPS proxy"
-msgstr "CONNECT/SSL/HTTPS прокси"
+msgstr "CONNECT/SSL/HTTPS Vekil Sunucusu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:387
 msgid "IRC server"
-msgstr "IRC-сервер"
+msgstr "IRC Sunucusu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:388
 msgid "Streamr client"
-msgstr "Streamr-клиент"
+msgstr "Streamr İstemcisi"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
 msgid "Streamr server"
-msgstr "Streamr-сервер"
+msgstr "Streamr Sunucusu"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:390
 msgid "HTTP bidir"
-msgstr "HTTP bidir (экспериментальный двунаправленный режим, инструкцию спрашивайте у sponge)"
+msgstr "HTTP bidir"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:447
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:319
 msgid "Host not set"
-msgstr "Хост не задан"
+msgstr "Sunucu ayarlanmamış"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:449
 msgid "Invalid address"
-msgstr "Некорректный адрес"
+msgstr "Adres geçersiz"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:82
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:82
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:86
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:98
 msgid "Hidden Services Manager"
-msgstr "Управление скрытыми сервисами"
+msgstr "Gizli Hizmetler Yönetimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:86
 msgid "Edit Client Tunnel"
-msgstr "Редактировать клиентский туннель"
+msgstr "İstemci Tünelini Düzenle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:114
 msgid "Edit proxy settings"
-msgstr "Редактирование настроек клиентского туннеля"
+msgstr "Vekil sunucu ayarlarını düzenle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:122
 msgid "New proxy settings"
-msgstr "Настройки нового клиентского туннеля"
+msgstr "Yeni vekil sunucu ayarları"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:162
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:162
@@ -201,14 +183,14 @@ msgstr "Настройки нового клиентского туннеля"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:159
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:330
 msgid "Name"
-msgstr "Название"
+msgstr "Ad"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:166
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:166
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:279
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:308
 msgid "Type"
-msgstr "Тип"
+msgstr "Tür"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:170
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:170
@@ -216,18 +198,18 @@ msgstr "Тип"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:428
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:334
 msgid "Description"
-msgstr "Описание"
+msgstr "Açıklama"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:176
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:186
 msgid "Target"
-msgstr "Точка доступа"
+msgstr "Hedef"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:180
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:182
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:219
 msgid "Access Point"
-msgstr "Точка доступа"
+msgstr "Erişim Noktası"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:187
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:200
@@ -236,31 +218,31 @@ msgstr "Точка доступа"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:224
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:269
 msgid "required"
-msgstr "*"
+msgstr "zorunlu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:208
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:234
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:486
 msgid "Reachable by"
-msgstr "Кому будет доступно (Сетевой интерфейс)"
+msgstr "Şuradan erişilebilir"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:229
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:212
 msgid "Use SSL?"
-msgstr "Использовать SSL?"
+msgstr "SSL Kullanılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:238
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:362
 msgid "Outproxies"
-msgstr "Список outproxy"
+msgstr "Çıkış Vekil Sunucuları"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:245
 msgid "SSL Outproxies"
-msgstr "Внешние SSL прокси"
+msgstr "SSL Çıkış Vekil Sunucuları"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
 msgid "Use Outproxy Plugin"
-msgstr "Использовать модуль внешнего прокси"
+msgstr "Çıkış Vekil Sunucu Uygulama Eki Kullanılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:255
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:293
@@ -268,196 +250,196 @@ msgstr "Использовать модуль внешнего прокси"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:178
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:530
 msgid "(Check the Box for 'YES')"
-msgstr "(поставьте галочку для включения)"
+msgstr "('EVET' için kutuyu işaretleyin)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:260
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:382
 msgid "Tunnel Destination"
-msgstr "Адрес назначения туннеля"
+msgstr "Tünel Hedefi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:386
 msgid "name, name:port, or destination"
-msgstr "имя, имя:порт, или назначение"
+msgstr "ad, ad:kapı ya da hedef"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:275
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:390
 msgid "b32 not recommended"
-msgstr "b32 не рекомендуется"
+msgstr "b32 önerilmez"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:281
 msgid "Shared Client"
-msgstr "Коллективный клиент"
+msgstr "Paylaşılmış İstemci"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:285
 msgid ""
 "(Share tunnels with other clients and irc/httpclients? Change requires "
 "restart of client proxy)"
-msgstr "(Использовать туннели коллективно/совместно с другими прокси-клиентами? Изменение настройки потребует перезапуска туннеля)"
+msgstr "(Tüneller diğer istemci ve irc/http istemcileri ile paylaşılır. Değişiklik yapılırsa istemci vekil sunucusunun yeniden başlatılması gerekir)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:289
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:174
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:526
 msgid "Auto Start"
-msgstr "Автозапуск"
+msgstr "Otomatik Başlasın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:297
 msgid "Enable DCC"
-msgstr "Включить DCC"
+msgstr "DCC Kullanılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:348
 msgid "Advanced networking options"
-msgstr "Расширенные сетевые настройки"
+msgstr "Gelişmiş ağ ayarları"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:307
 msgid ""
 "(NOTE: when this client proxy is configured to share tunnels, then these "
 "options are for all the shared proxy clients!)"
-msgstr "(ПРИМЕЧАНИЕ: при коллективном использовании туннелей  эти опции будут применяться ко всем коллективным прокси-клиентам!)"
+msgstr "(UNUTMAYIN: Bu istemci vekil sunucusu tünelleri paylaşacak şekilde ayarlandığında, bu ayarlar tüm paylaşılmış vekil sunucu istemcileri için geçerli olur!)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:309
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:350
 msgid "Tunnel Options"
-msgstr "Параметры туннеля"
+msgstr "Tünel Ayarları"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:311
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:352
 msgid "Length"
-msgstr "Длина"
+msgstr "Uzunluk"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:318
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:359
 msgid "0 hop tunnel (no anonymity)"
-msgstr "Тоннель 0 прыжков (без анонимизации)"
+msgstr "0 sıçrama tüneli (isimsiz değil)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:322
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:363
 msgid "1 hop tunnel (low anonymity)"
-msgstr "Тоннель с 1 прыжком (низкая анонимность)"
+msgstr "1 sıçrama tüneli (düşük düzeyde isimsizlik)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:326
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:367
 msgid "2 hop tunnel (medium anonymity)"
-msgstr "Тоннель с 2 прыжками (средняя анонимность)"
+msgstr "2 sıçrama tüneli (orta düzeyde isimsizlik)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:330
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:371
 msgid "3 hop tunnel (high anonymity)"
-msgstr "Тоннель с 3 прыжками (высокая анонимность)"
+msgstr "3 sıçrama tüneli (yüksek düzeyde isimsizlik)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:349
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:390
 msgid "hop tunnel (very poor performance)"
-msgstr "хопов (очень низкая производительность)"
+msgstr "sıçrama tüneli (çok düşük başarım)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:354
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:395
 msgid "Variance"
-msgstr "Разброс"
+msgstr "Değişim"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:361
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:402
 msgid "0 hop variance (no randomization, consistent performance)"
-msgstr ""
+msgstr "0 sıçrama değişimi (rastgelelik yok, başarım sabit)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:365
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:406
 msgid ""
 "+ 0-1 hop variance (medium additive randomization, subtractive performance)"
-msgstr ""
+msgstr "+ 0-1 sıçrama değişimi (orta rastgelelik, çıkarılan başarım)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:369
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:410
 msgid ""
 "+ 0-2 hop variance (high additive randomization, subtractive performance)"
-msgstr ""
+msgstr "+ 0-2 sıçrama değişimi (yüksek eklenen rastgelelik, çıkarılan başarım)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:373
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:414
 msgid "+/- 0-1 hop variance (standard randomization, standard performance)"
-msgstr ""
+msgstr "+/- 0-1 sıçrama değişimi (standart rastgelelik, standart başarım)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:377
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:418
 msgid "+/- 0-2 hop variance (not recommended)"
-msgstr "+/- 0-2 разброс (не рекомендуется)"
+msgstr "+/- 0-2 sıçrama değişimi (önerilmez)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:388
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:429
 msgid "hop variance"
-msgstr "разброс"
+msgstr "sıçrama değişimi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:393
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:434
 msgid "Count"
-msgstr "Количество"
+msgstr "Sayı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:397
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:438
 msgid "Backup Count"
-msgstr "Резервное количество"
+msgstr "Yedekleme Sayısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:404
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:445
 msgid "0 backup tunnels (0 redundancy, no added resource usage)"
-msgstr "без резервных туннелей (отсутствие избыточности, отсутствие дополнительной нагрузки на систему)"
+msgstr "0 yedek tüneli (0 yedeklilik, fazladan kaynak kullanımı yok)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:408
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:449
 msgid "1 backup tunnel each direction (low redundancy, low resource usage)"
-msgstr "1 резервный туннель в каждом направлении (низкая избыточность, низкая нагрузка на систему)"
+msgstr "1 yedek tüneli her yön için (düşük yedeklilik, düşük kaynak kullanımı)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:412
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:453
 msgid ""
 "2 backup tunnels each direction (medium redundancy, medium resource usage)"
-msgstr "2 резервных туннеля в каждом направлении (умеренная избыточность, умеренная нагрузка на систему)"
+msgstr "2 yedek tüneli her yön için (orta yedeklilik, orta kaynak kullanımı)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:416
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:457
 msgid "3 backup tunnels each direction (high redundancy, high resource usage)"
-msgstr "3 резервных туннеля в каждом направлении (высокая избыточность, высокая нагрузка на систему)"
+msgstr "3 yedek kullanımı her yönde (yüksek yedeklilik, yüksek kaynak kullanımı)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:424
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:465
 msgid "backup tunnels"
-msgstr "резервных туннелей"
+msgstr "yedekleme tünelleri"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:431
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:472
 msgid "Profile"
-msgstr "Режим"
+msgstr "Profil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:438
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:479
 msgid "interactive connection"
-msgstr "оптимизировать для малых задержек (irc)"
+msgstr "etkileşimli bağlantı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:442
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:483
 msgid "bulk connection (downloads/websites/BT)"
-msgstr "оптимизировать для большого обьема (www/bittorrent)"
+msgstr "toplu bağlantı (indirmeler/websiteleri/BT)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:444
 msgid "Delay Connect"
-msgstr "Задержка соединения"
+msgstr "Bağlantı Gecikmesi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:448
 msgid "for request/response connections"
-msgstr "оптимизация для соединений, начинающихся с запроса клиента/ответа сервера"
+msgstr "istek/yanıt bağlantıları için"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:452
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:487
 msgid "Router I2CP Address"
-msgstr "I2CP Адрес Роутера"
+msgstr "Yöneltici I2CP Adresi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:454
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:192
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:489
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:417
 msgid "Host"
-msgstr "Адрес"
+msgstr "Sunucu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:462
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:198
@@ -466,11 +448,11 @@ msgstr "Адрес"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:299
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:438
 msgid "Port"
-msgstr "Порт"
+msgstr "Kapı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:472
 msgid "Delay tunnel open until required"
-msgstr "Отложить запуск до первого запроса"
+msgstr "Gerekene kadar tünel açılması geciktirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:474
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:482
@@ -491,335 +473,335 @@ msgstr "Отложить запуск до первого запроса"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:575
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:637
 msgid "Enable"
-msgstr "Включить"
+msgstr "Etkinleştir"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:480
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:635
 msgid "Reduce tunnel quantity when idle"
-msgstr "Снижать количество туннелей при простое"
+msgstr "Boştayken tünel sayısı azaltılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:486
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:641
 msgid "Reduced tunnel count"
-msgstr "Количество туннелей"
+msgstr "Azaltılan tünel sayısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:490
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:510
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:645
 msgid "Idle minutes"
-msgstr "Минут простоя"
+msgstr "Boşta bekleme dakikası"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:494
 msgid "Close tunnels when idle"
-msgstr "Закрыть туннели при простое"
+msgstr "Boştayken tüneller kapatılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:500
 msgid "New Keys on Reopen"
-msgstr "Генерировать новый ключ при переоткрытии"
+msgstr "Yeniden açıldığından yeni anahtarlar oluşturulsun"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:508
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:527
 msgid "Disable"
-msgstr "Выключить"
+msgstr "Devre Dışı Bırak"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:516
 msgid "Persistent private key"
-msgstr "Постоянный секретный ключ"
+msgstr "Sürekli kişisel anahtar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:522
 msgid "File"
-msgstr "Файл"
+msgstr "Dosya"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:531
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:276
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:175
 msgid "Local destination"
-msgstr "Локальный адрес назначения"
+msgstr "Yerel konum"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:535
 msgid "Local Base 32"
-msgstr "Локальный Base32"
+msgstr "Yerel Base 32"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:544
 msgid "Pass User-Agent header through"
-msgstr "Пропускать заголовок User-Agent через"
+msgstr "'User-Agent' üstbilgisi geçirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:550
 msgid "Pass Referer header through"
-msgstr "Пропускать заголовок Referer через"
+msgstr "'Referer' üstbilgisi geçirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:556
 msgid "Pass Accept headers through"
-msgstr "Пропускать заголовки Accept через"
+msgstr "'Accept' üstbilgisi geçirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:562
 msgid "Allow SSL to I2P addresses"
-msgstr "Разрешить SSL до I2P адресов"
+msgstr "I2P adreslerinde SSL kullanılabilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:573
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:688
 msgid "Signature type"
-msgstr "Тип подписи"
+msgstr "İmza türü"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:575
 msgid "Experts only!"
-msgstr "Только для продвинутых пользователей!"
+msgstr "Yalnız deneyimli kullanıcılar!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:603
 msgid "Local Authorization"
-msgstr "Локальная авторизация"
+msgstr "Yerel Kimlik Doğrulama"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:609
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:619
 msgid "Username"
-msgstr "Имя пользователя"
+msgstr "Kullanıcı Adı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:611
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:623
 msgid "Password"
-msgstr "Пароль"
+msgstr "Parola"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:613
 msgid "Outproxy Authorization"
-msgstr "Авторизация outproxy"
+msgstr "Giden Vekil Sunucu Kimlik Doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:630
 msgid "Jump URL List"
-msgstr "Список адресов jump-сервисов"
+msgstr "Sıçrama İnternet Adresi Listesi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:636
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:717
 msgid "Custom options"
-msgstr "Дополнительные параметры"
+msgstr "Uyarlanmış seçenekler"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:640
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:721
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:433
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:706
 msgid "Cancel"
-msgstr "Отмена"
+msgstr "İptal"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:644
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:725
 msgid "Delete"
-msgstr "Удалить"
+msgstr "Sil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:646
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:727
 msgid "Save"
-msgstr "Сохранить"
+msgstr "Kaydet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:86
 msgid "Edit Hidden Service"
-msgstr "Настроить скрытые сервисы"
+msgstr "Gizli Hizmeti Düzenle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:114
 msgid "Edit server settings"
-msgstr "Редактирование настроек серверного туннеля"
+msgstr "Sunucu ayarlarını düzenle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:122
 msgid "New server settings"
-msgstr "Настройки нового серверного туннеля"
+msgstr "Yeni sunucu ayarları"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:255
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:167
 msgid "Website name"
-msgstr "Имя веб-сайта"
+msgstr "Web sitesi adı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:259
 msgid "(leave blank for outproxies)"
-msgstr "(не заполнять для outproxy)"
+msgstr "(giden vekil sunucular için boş bırakın)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:264
 msgid "Private key file"
-msgstr "Файл секретного ключа"
+msgstr "Kişisel anahtar dosyası"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:310
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:318
 msgid "Generate QR Code"
-msgstr "Сгенерировать QR код"
+msgstr "QR Kodu Üret"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:324
 msgid "Add to local addressbook"
-msgstr "Добавить в локальную адресную книгу"
+msgstr "Yerel adres defterine ekle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:329
 msgid "Registration Authentication"
-msgstr "Аутентификация регистрации"
+msgstr "Kayıt Kimlik Doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:335
 msgid "Set name with .i2p suffix to enable QR code generation"
-msgstr "Задайте имя, оканчивающееся на .i2p для генерации QR кодов"
+msgstr "QR kod üretilmesini sağlamak için ada .i2p uzantısını ekleyin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:337
 msgid "Set name with .i2p suffix to enable registration authentication"
-msgstr "Задайте имя, оканчивающееся на .i2p для аутентификации регистрации"
+msgstr "Kayıt kimlik doğrulamasını sağlamak .i2p uzantılı bir ad yazın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:505
 msgid "Encrypt Leaseset"
-msgstr "Шифровать LeaseSet"
+msgstr "Kiralama Kümesini Şifrele"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:511
 msgid "Encryption Key"
-msgstr "Ключ шифрования"
+msgstr "Şifreleme Anahtarı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:515
 msgid "Generate New Key"
-msgstr "Сгенерировать новый ключ"
+msgstr "Yeni Anahtar Üret"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:517
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:435
 msgid "Generate"
-msgstr "Сгенерировать"
+msgstr "Üret"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:519
 msgid "(Tunnel must be stopped first)"
-msgstr "(Туннель перед этим следует остановить)"
+msgstr "(Önce tünel durdurulmalıdır)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:521
 msgid "Restricted Access List"
-msgstr "Ограниченный доступ"
+msgstr "Kısıtlanmış Erişim Listesi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:531
 msgid "Blacklist"
-msgstr "Чёрный список"
+msgstr "Kara liste"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:535
 msgid "Whitelist"
-msgstr "Белый список"
+msgstr "Beyaz liste"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:537
 msgid "Access List"
-msgstr "Список доступа"
+msgstr "Erişim Listesi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:544
 msgid "Block Access via Inproxies"
-msgstr "Блокировать доступ через входные прокси"
+msgstr "Erişimi Giriş Vekil Sunucuları ile Engelle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:550
 msgid "Block Accesses containing Referers"
-msgstr "Блокировать запросы с заголовками источника"
+msgstr "Şu Referrer Bilgisiyle Gelen Erişimleri Engelle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:556
 msgid "Block these User-Agents"
-msgstr "Блокировать эти User-Agent"
+msgstr "Şu User-Agent Bilgisiyle Gelen Erişimleri Engelle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:567
 msgid "Unique Local Address per Client"
-msgstr "Уникальный локальный адрес для каждого клиента"
+msgstr "Her İstemci için Eşsiz Yerel Adres"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:573
 msgid "Optimize for Multihoming"
-msgstr "Оптимизировать для множественной адресации"
+msgstr "Çoklu Ev için İyileştirilsin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:579
 msgid "Inbound connection limits (0=unlimited)"
-msgstr "Ограничение входящих соединений (0=неограниченно)"
+msgstr "Genel bağlantı sınırlaması (0=sınırsız)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:581
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:612
 msgid "Per client"
-msgstr "На клиента"
+msgstr "Bir istemcide"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:583
 msgid "Per minute"
-msgstr "В минуту"
+msgstr "Bir dakikada"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:587
 msgid "Per hour"
-msgstr "В час"
+msgstr "Bir saatte"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:591
 msgid "Per day"
-msgstr "В сутки"
+msgstr "Bir günde"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:595
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:622
 msgid "Total"
-msgstr "Всего"
+msgstr "Toplam"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:603
 msgid "Max concurrent connections (0=unlimited)"
-msgstr "Максимум одновременных соединений (0=неограниченно)"
+msgstr "En fazla eşzamanlı bağlantı sayısı (0=sınırsız)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:610
 msgid "POST limits (0=unlimited)"
-msgstr "Лимиты POST (0=без ограничений)"
+msgstr "POST sınırlaması (0=sınırsız)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:614
 msgid "Per period"
-msgstr "В период"
+msgstr "Bir aralıkta"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:618
 msgid "Ban minutes"
-msgstr "Минут блокировки"
+msgstr "Engellenecek dakika"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:628
 msgid "POST limit period (minutes)"
-msgstr "Ограничение периода POST (минуты)"
+msgstr "POST sınırlama süresi (dakika)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:690
 msgid "Experts only! Changes B32!"
-msgstr "Только для продвинутых пользователей! Изменяет B32!"
+msgstr "Yalnız deneyimli kullanıcılar! B32 ayarını değiştirir!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:100
 msgid "Status Messages"
-msgstr "Сообщения о состоянии"
+msgstr "Durum İletileri"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:104
 msgid "Refresh"
-msgstr "Обновить"
+msgstr "Yenile"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:113
 msgid "Tunnel Wizard"
-msgstr "Мастер туннелей"
+msgstr "Tünel Yardımcısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:117
 msgid "Stop All"
-msgstr "Остановить все"
+msgstr "Tümünü Durdur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:121
 msgid "Start All"
-msgstr "Запустить все"
+msgstr "Tümünü Başlat"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:125
 msgid "Restart All"
-msgstr "Перезапустить все"
+msgstr "Tümünü Yeniden Başlat"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:128
 msgid "I2P Hidden Services"
-msgstr "Скрытые сервисы I2P"
+msgstr "I2P Gizli Hizmetleri"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:132
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:153
 msgid "Points at"
-msgstr "Указывает на"
+msgstr "Şurayı gösteren"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:134
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:186
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:190
 msgid "Preview"
-msgstr "Предпросмотр"
+msgstr "Önizleme"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:136
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:210
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:283
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:326
 msgid "Status"
-msgstr "Состояние"
+msgstr "Duru"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:196
 msgid "Base32 Address"
-msgstr "Base32-адрес"
+msgstr "Base32 Adresi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:204
 msgid "No Preview"
-msgstr "Предпросмотр недоступен"
+msgstr "Önizleme Yok"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:217
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:333
 msgid "Starting..."
-msgstr "Запускается..."
+msgstr "Başlatılıyor..."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:224
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:238
@@ -827,26 +809,26 @@ msgstr "Запускается..."
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:354
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:368
 msgid "Stop"
-msgstr "Остановить"
+msgstr "Durdur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:231
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:361
 msgid "Running"
-msgstr "Запущен"
+msgstr "Çalışıyor"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:245
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:375
 msgid "Stopped"
-msgstr "Остановлен"
+msgstr "Durduruldu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:252
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:382
 msgid "Start"
-msgstr "Запустить"
+msgstr "Başlat"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:267
 msgid "New hidden service"
-msgstr "Новый скрытый сервис"
+msgstr "Yeni gizli hizmet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:269
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:438
@@ -856,530 +838,530 @@ msgstr "Новый скрытый сервис"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:305
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:580
 msgid "Standard"
-msgstr "Стандартный"
+msgstr "Standart"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:271
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:440
 msgid "Create"
-msgstr "Создать"
+msgstr "Oluştur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:273
 msgid "I2P Client Tunnels"
-msgstr "Клиентские I2P туннели"
+msgstr "I2P İstemci Tünelleri"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:281
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:312
 msgid "Interface"
-msgstr "Сетевой интерфейс"
+msgstr "Arayüz"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:347
 msgid "Standby"
-msgstr "Режим ожидания"
+msgstr "Hazırda Bekle"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:391
 msgid "Outproxy"
-msgstr "Outproxy"
+msgstr "Giden Vekil Sunucusu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:394
 msgid "Destination"
-msgstr "Адрес назначения"
+msgstr "Hedef"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:401
 msgid "internal plugin"
-msgstr "внутренний модуль"
+msgstr "iç uygulama eki"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:420
 msgid "none"
-msgstr "нет"
+msgstr "yok"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:436
 msgid "New client tunnel"
-msgstr "Новый клиентский туннель"
+msgstr "Yeni istemci tüneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:102
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:131
 msgid "Registration Helper"
-msgstr "Помощник регистрации"
+msgstr "Kayıt Yardımcısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:157
 msgid ""
 "Please be sure to select, copy, and paste the entire contents of the "
 "appropriate authentication data into the form of your favorite registration "
 "site"
-msgstr "Пожалуйста, полностью выделите, скопируйте и вставьте содержимое соответствующих данных аутентификации в форму на вашем любимом сайте регистрации"
+msgstr "Uygun kimlik doğrulama verilerinin tamamını kopyalayıp sık kullandığınız kayıt sitenizin formuna yapıştırdığınıza emin olun"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:182
 msgid "Local destination is not available. Start the tunnel."
-msgstr "Локальное место назначения недоступно. Запустите туннель."
+msgstr "Yerel hedef yok. Tüneli başlatın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:187
 msgid ""
 "To enable registration verification, edit tunnel and set name (or website "
 "name) to a valid host name ending in '.i2p'"
-msgstr "Чтобы включить подтверждение регистрации, отредактируйте туннель и назначьте имя (или имя веб-сайта), чтобы оно было правильным именем хоста и заканчивалось на '.i2p'"
+msgstr "Kayıt doğrulamasını etkinleştirmek için tüneli düzenleyerek adı (ya da web sitesi adını) '.i2p' ile biten geçerli bir sunucu adı şeklinde yazın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:191
 msgid ""
 "To enable registration verification, edit tunnel and set name to a valid "
 "host name ending in '.i2p'"
-msgstr ""
+msgstr "Kayıt doğrulamasını etkinleştirmek için tüneli düzenleyerek adı '.i2p' ile biten geçerli bir sunucu adı şeklinde yazın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:198
 msgid "Destination signing key is not available. Start the tunnel."
-msgstr ""
+msgstr "Hedef imzalama anahtarı yok. Tüneli başlatın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:207
 msgid "Authentication for adding host"
-msgstr "Аутентификация для добавления хоста"
+msgstr "Sunucu ekleme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:211
 msgid "Advanced authentication strings"
-msgstr "Расширенные строки аутентификации"
+msgstr "Gelişmiş kimlik doğrulama dizgeleri"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:219
 msgid "Authentication for removing host"
-msgstr "Аутентификация для удаления хоста"
+msgstr "Sunucu silme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:223
 #, java-format
 msgid "This will remove the entry for {0}"
-msgstr ""
+msgstr "Bu işlem {0} kaydını siler"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:249
 msgid "Authentication for changing name"
-msgstr "Аутентификация для смены имени"
+msgstr "Ad değiştirme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:260
 #, java-format
 msgid "This will change the name from {0} to {1}, using the same destination"
-msgstr ""
+msgstr "Bu işlem aynı hedefi kullanarak {0} adını {1} olarak değiştirir"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:266
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:295
 msgid "This tunnel must be configured with the new host name."
-msgstr ""
+msgstr "Bu tünel yeni bir sunucu adına göre ayarlanmalıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:268
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:297
 msgid "Enter old host name below."
-msgstr "Введите старое имя хоста ниже."
+msgstr "Aşağıya eski sunucu adını yazın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:278
 msgid "Authentication for adding alias"
-msgstr "Аутентификация для добавления псевдонима"
+msgstr "Kısaltma ekleme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:289
 #, java-format
 msgid "This will add an alias {0} for {1}, using the same destination"
-msgstr ""
+msgstr "Bu işlem aynı hedefi kullanarak {0} kısaltmasını {1} olarak değiştirir"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:307
 msgid "Authentication for changing destination"
-msgstr "Аутентификация для изменения назначения"
+msgstr "Hedef değiştirme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:319
 #, java-format
 msgid "This will change the destination for {0}"
-msgstr ""
+msgstr "Bu işlem {0} hedefini değiştirir"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:325
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:356
 msgid "This tunnel must be configured with the new destination."
-msgstr ""
+msgstr "Bu tünel yeni bir hedefe göre ayarlanmalıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:327
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:358
 msgid "Enter old destination below."
-msgstr "Введите старое назначение ниже."
+msgstr "Aşağıya eski hedefi yazın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:338
 msgid "Authentication for adding alternate destination"
-msgstr "Аутентификация для добавления альтернативного назначения"
+msgstr "Alternatif hedef ekleme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:350
 #, java-format
 msgid "This will add an alternate destination for {0}"
-msgstr ""
+msgstr "Bu işlem {0} için alternatif bir hedef ekler"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:369
 msgid "Authentication for adding subdomain"
-msgstr "Аутентификация для добавления поддомена"
+msgstr "Alt etki alanı ekleme kimlik doğrulaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:382
 #, java-format
 msgid "This will add a subdomain {0} of {1}, with a different destination"
-msgstr ""
+msgstr "Bu işlem farklı bir hedef kullanarak {0} /  {1} bir alt etki alanı ekler"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:388
 msgid "This tunnel must be configured with the new subdomain and destination."
-msgstr ""
+msgstr "Bu tünel yeni bir alt etki alanı ve hedefe göre ayarlanmalıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:390
 msgid "Enter higher-level domain and destination below."
-msgstr "Введите домен верхнего уровня и назначение ниже."
+msgstr "Aşağıya daha yüksek düzeydeki bir etki alanı ve hedef yazın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:406
 msgid "Go back and edit the tunnel"
-msgstr "Вернитесь и отредактируйте туннель"
+msgstr "Geri dönüp tüneli düzenleyin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:416
 msgid "Specify old name and destination"
-msgstr "Укажите старое имя и назначение"
+msgstr "Eski adı ve hedefi belirtin"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:418
 msgid "This is only required for advanced authentication."
-msgstr ""
+msgstr "Bu seçenek yalnız gelişmiş kimlik doğrulama için gereklidir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:420
 msgid "See above for required items."
-msgstr ""
+msgstr "Gerekli ögeler için yukarıya bakın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:427
 msgid "Old Host Name"
-msgstr "Прежнее имя хоста"
+msgstr "Eski Sunucu Adı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:431
 msgid "Private Key File for old Destination"
-msgstr "Файл приватного ключа для старого назначения"
+msgstr "Eski Hedefin Kişisel Anahtar Dosyası"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:123
 msgid "I2P Tunnel Manager - Tunnel Creation Wizard"
-msgstr "Менеджер туннелей I2P - Мастер создания туннелей"
+msgstr "I2P Tünel Yönetimi - Tunnel Oluşturma Yardımcısı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:143
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:571
 msgid "Server or client tunnel?"
-msgstr "Серверный или клиентский туннель?"
+msgstr "Sunucu ya da istemci tüneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:149
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:575
 msgid "Tunnel type"
-msgstr "Тип туннеля"
+msgstr "Tünel türü"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:155
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:605
 msgid "Tunnel name and description"
-msgstr "Имя и описание"
+msgstr "Tünel adı ve açıklaması"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:161
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:614
 msgid "Tunnel destination"
-msgstr "Назначение туннеля"
+msgstr "Tünel hedefi"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:167
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:630
 msgid "Binding address and port"
-msgstr "Привязка адреса и порта"
+msgstr "Bağlanılacak adres ve kapı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:173
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:656
 msgid "Tunnel auto-start"
-msgstr "Автозапуск туннеля"
+msgstr "Tünel otomatik başlatılsın"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:179
 msgid "Wizard completed"
-msgstr "Работа мастера завершена"
+msgstr "Yardımcı tamamlandı"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:193
 msgid ""
 "This wizard will take you through the various options available for creating"
 " tunnels in I2P."
-msgstr "Мастер проведет вас через всевозможные опции, доступные для создания туннелей в I2P."
+msgstr "Bu yardımcı I2P tünelleri oluşturmak için çeşitli ayarları yapmanızı sağlayacak."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:195
 msgid ""
 "The first thing to decide is whether you want to create a server or a client"
 " tunnel."
-msgstr "Сперва вам нужно выбрать, хотите ли вы создать клиентский или серверный туннель."
+msgstr "İlk olarak oluşturacağınız tünel türünü sunucu ya da istemci olarak seçmelisiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:197
 msgid ""
 "If you need to connect to a remote service, such as an IRC server inside I2P"
 " or a code repository, then you will require a CLIENT tunnel."
-msgstr "Если вам необходимо подключаться к внешнему сервису, такому как IRC сервер внутри I2P или репозиторий с кодом, вам необходим КЛИЕНТСКИЙ туннель."
+msgstr "I2P içindeki bir IRC sunucusu ya da bir kod deposu gibi uzak bir hizmete bağlanmak istiyorsanız, bir İSTEMCİ tüneli oluşturmalısınız."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:199
 msgid ""
 "On the other hand, if you wish to host a service for others to connect to "
 "you'll need to create a SERVER tunnel."
-msgstr "С другой стороны, если вы собираетесь размещать службу для других, то вы должны создать СЕРВЕРНЫЙ туннель."
+msgstr "Diğer taraftan başka kişilerin bağlanabileceği bir hizmet sunmak istiyorsanız bir SUNUCU tüneli oluşturmalısınız."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:201
 msgid "Server Tunnel"
-msgstr "Серверный туннель"
+msgstr "Sunucu Tüneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:203
 msgid "Client Tunnel"
-msgstr "Клиентский туннель"
+msgstr "İstemci Tüneli"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:221
 msgid "There are several types of tunnels to choose from:"
-msgstr "Несколько типов туннелей на выбор"
+msgstr "Seçebileceğiniz birkaç tünel türü bulunur:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:229
 msgid "Basic tunnel for connecting to a single service inside I2P."
-msgstr "Базовый туннель для подключения к одиночному сервису внутри I2P."
+msgstr "I2P içindeki tek bir hizmete bağlanmak için temel bir tünel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:231
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:273
 msgid ""
 "Try this if none of the tunnel types below fit your requirements, or you "
 "don't know what type of tunnel you need."
-msgstr "Попробуйте если ни один тип туннеля из перечисленных вам не подходит или вы не знаете какой тип вам нужен."
+msgstr "Aşağıdaki tünel türlerinden hiçbiri isteklerinize uygun değilse ya da hangi türde bir tünele gerek duyduğunuzu bilmiyorsanız bunu deneyin."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:233
 msgid "Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P."
-msgstr "Туннель который действует как HTTP прокси для доступа к eep-сайтам внутри I2P."
+msgstr "I2P içindeki eepsitelerine erişmek için HTTP vekil sunucusu olarak davranan tünel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:235
 msgid ""
 "Set your browser to use this tunnel as an http proxy, or set your "
 "\"http_proxy\" environment variable for command-line applications in "
 "GNU/Linux."
-msgstr "Установите этот туннель как HTTP-прокси в вашем браузере, или установите переменную \"http_proxy\" для консольных приложений в GNU/Linux."
+msgstr "Web tarayıcınızı ya da GNU/Linux üzerinde komut satırı uygulamaları için \"http_proxy\" ortam değişkenini bu tüneli HTTP vekil sunucusu olarak kullanacak şekilde ayarlayın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:237
 msgid ""
 "Websites outside I2P can also be reached if an HTTP proxy within I2P is "
 "known."
-msgstr "На сайты вне I2P также можно попасть, если известен HTTP прокси в I2P"
+msgstr "I2P içindeki bir HTTP vekil sunucusu biliniyorsa I2P dışındaki web sitelerine de erişilebilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:239
 msgid "Customised client tunnel specific for IRC connections."
-msgstr "Настраиваемый клиентский туннель для IRC."
+msgstr "IRC bağlantıları için isteğe göre uyarlanmış istemci tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:241
 msgid ""
 "With this tunnel type, your IRC client will be able to connect to an IRC "
 "network inside I2P."
-msgstr "С помощью этого туннеля ваш IRC клиент сможет соединяться с сетью IRC внутри I2P."
+msgstr "Bu tünel türü ile IRC istemciniz I2P içindeki bir IRC ağına bağlanabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:243
 msgid ""
 "Each IRC network in I2P that you wish to connect to will require its own "
 "tunnel. (See Also, SOCKS IRC)"
-msgstr "Каждая сеть IRC внутри I2P, с которой вы захотите соединиться, потребует отдельного туннеля. (см. SOCKS IRC)"
+msgstr "I2P içindeki her IRC ağı için ayrı bir tünel olmalıdır (Ayrıca SOCKS IRC bölümüne bakın)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:245
 msgid "A tunnel that implements the SOCKS protocol."
-msgstr "Туннель, реализующий протокол SOCKS."
+msgstr "SOCKS iletişim kuralını kullanan bir tünel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:247
 msgid ""
 "This enables both TCP and UDP connections to be made through a SOCKS "
 "outproxy within I2P."
-msgstr "Это позволяет устанавливать как TCP так и UDP соединения через SOCKS outproxy в I2P."
+msgstr "Bu tünel I2P içindeki TCP ve UDP bağlantılarının SOCKS çıkış vekil sunucusu üzerinden yapılmasını sağlar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:249
 msgid ""
 "A client tunnel implementing the SOCKS protocol, which is customised for "
 "connecting to IRC networks."
-msgstr "Клиентский туннель, реализующий SOCKS протокол, который предназначен для подключения к IRC сетям"
+msgstr "IRC ağlarına bağlanmak için SOCKS iletişim kuralını kullanan isteğe göre uyarlanmış bir istemci tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:251
 msgid ""
 "With this tunnel type, IRC networks in I2P can be reached by typing the I2P "
 "address into your IRC client, and configuring the IRC client to use this "
 "SOCKS tunnel."
-msgstr "С туннелем данного типа, подключиться к IRC сети через I2P можно, набрав I2P адрес в Вашем IRC клиенте, настроенном для использования этого SOCKS туннеля"
+msgstr "Bu tünel türüyle, IRC istemcisi bu SOCKS tünelini kullanacak şekilde ayarlanarak ve I2P adresi IRC istemcisine yazılarak I2P içindeki IRC ağlarına erişilebilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:253
 msgid ""
 "This means that only one I2P tunnel is required rather than a separate "
 "tunnel per IRC network."
-msgstr "Это означает, что необходим лишь один I2P туннель, вместо отдельных туннелей для каждой IRC сети."
+msgstr "Böylece ayrı IRC ağlarına erişmek için ayrı tüneller yerine bu tek I2P tüneli kullanılabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:255
 msgid ""
 "IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P "
 "is known, though it depends on whether or not the outproxy has been blocked "
 "by the IRC network."
-msgstr "IRC-сети вне I2P также могут быть доступны, если известен SOCKS outproxy в I2P, но это зависит от того, заблокирован или нет outproxy IRC-сетью."
+msgstr "I2P içindeki bir SOCKS çıkış vekil sunucusu biliniyorsa I2P dışındaki IRC ağlarına da erişilebilir. Çıkış vekil sunucusunun IRC ağı tarafından engellenip engellenmediğine bağlıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:257
 msgid "A client tunnel that implements the HTTP CONNECT command."
-msgstr "Клиентский туннель, поддерживающий команду HTTP CONNECT."
+msgstr "HTTP CONNECT komutunu kullanan bir istemci tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:259
 msgid ""
 "This enables TCP connections to be made through an HTTP outproxy, assuming "
 "the proxy supports the CONNECT command."
-msgstr "Это позволяет TCP соединениям идти через HTTP outproxy, если прокси поддерживает метод CONNECT."
+msgstr "Bu tünel türü, vekil sunucunun CONNECT komutunu desteklediğini varsayarak, bir HTTP çıkış vekil sunucusu üzerinden TCP bağlantıları yapılmasını sağlar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:261
 msgid "A customised client tunnel for Streamr."
-msgstr "Настраиваемый клиентский туннель для Streamr."
+msgstr "Streamr için isteğe göre uyarlanmış bir istemci tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:271
 msgid "A basic server tunnel for hosting a generic service inside I2P."
-msgstr "Базовый туннель для подключения к одиночному сервису внутри I2P."
+msgstr "I2P içindeki genel bir hizmeti sunmak için temel bir sunucu tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:275
 msgid "A server tunnel that is customised for HTTP connections."
-msgstr "Серверный туннель, настроенный для http соединений."
+msgstr "HTTP bağlantıları için isteğe göre uyarlanmış bir sunucu tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:277
 msgid "Use this tunnel type if you want to host an eepsite."
-msgstr "Используйте этот тип туннеля, если вы хотите запустить eepsite."
+msgstr "Bir eepsitesi sunmak için bu tünel türünü kullanın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:279
 msgid ""
 "A customised server tunnel that can both serve HTTP data and connect to "
 "other server tunnels."
-msgstr "Настроенный серверный туннель который может передавать данные HTTP и соединяться с другими серверными туннелями."
+msgstr "İsteğe göre uyarlanmış bir sunucu tüneli HTTP verilerini sunarken diğer sunucu tünellerine de bağlanabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:281
 msgid "This tunnel type is predominantly used when running a Seedless server."
-msgstr "Этот тип туннеля обычно используется вместе с Seedless сервером."
+msgstr "Tohumlanmamış bir sunucu kullanılırken bu tünel türünün kullanılması dayatılır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:283
 msgid "A customised server tunnel for hosting IRC networks inside I2P."
-msgstr "Настроенный туннель для подключения к одиночной службе внутри I2P."
+msgstr "I2P içinde IRC ağları sunmak için isteğe göre uyarlanmış bir sunucu tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:285
 msgid ""
 "Usually, a separate tunnel needs to be created for each IRC server that is "
 "to be accessible inside I2P."
-msgstr "Обычно для каждого IRC сервера, который должен быть доступен внутри I2P, нужен отдельный туннель."
+msgstr "Genellikle I2P içinden erişilebilen ayrı IRC sunucuları için ayrı tüneller gerekir. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:287
 msgid "A customised server tunnel for Streamr."
-msgstr "Настраиваемый серверный туннель для Streamr."
+msgstr "Streamr için isteğe göre uyarlanmış bir sunucu tüneli."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:326
 msgid "Choose a name and description for your tunnel."
-msgstr "Выберите имя и описание для вашего туннеля"
+msgstr "Tüneliniz için bir ad ve açıklama yazın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:328
 msgid ""
 "These can be anything you want - they are just for ease of identifying the "
 "tunnel in the routerconsole."
-msgstr "Здесь может быть что угодно - просто для удобства идентификации туннеля в консоли."
+msgstr "İstediğiniz gibi yazabilirsiniz. Bu bilgiler Yöneltici Konsolunda tünellerin kolayca ayırt edilebilmesi için kullanılır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:358
 msgid ""
 "If you know of any outproxies for this type of tunnel (either HTTP or "
 "SOCKS), fill them in below."
-msgstr "Если вам известны какие-либо внешние прокси для этого типа туннеля (HTTP либо SOCKS), введите их ниже."
+msgstr "Bu tünel türü için bildiğiniz çıkış vekil sunucularını (HTTP ya da SOCKS) aşağıya yazın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:360
 msgid "Separate multiple proxies with commas."
-msgstr "Разделяйте несколько прокси запятыми."
+msgstr "Virgül ile ayırarak birden çok sunucu yazabilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:378
 msgid ""
 "Type in the I2P destination of the service that this client tunnel should "
 "connect to."
-msgstr "Введите адрес назначения для службы внутри I2P к которой должен подключаться клиентский туннель."
+msgstr "Bu istemci tünelinin bağlanması gereken I2P hedef hizmetini yazın."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:380
 msgid ""
 "This could be the full base 64 destination key, or an I2P URL from your "
 "address book."
-msgstr "Это может быть base64 ключ или I2P URL из вашей адресной книги."
+msgstr "Tam Base 64 hedef anahtarı, ya da adres defterinizdeki bir I2P İnternet adresi olabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:413
 msgid ""
 "This is the IP that your service is running on, this is usually on the same "
 "machine so 127.0.0.1 is autofilled."
-msgstr "IP-адрес, на котором запущен ваш сервис. Обычно это тот же компьютер, значение 127.0.0.1 будет вставлено автоматически."
+msgstr "Çalıştırdığınız hizmetin IP adresi. Genellikle aynı bilgisayarda olduğundan otomatik olarak 127.0.0.1 yazılır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:436
 msgid "This is the port that the service is accepting connections on."
-msgstr "Это порт по которому служба принимает соединения."
+msgstr "Hizmetin bağlantıları kabul edeceği kapı numarası."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:457
 msgid "This is the port that the client tunnel will be accessed from locally."
-msgstr "Это порт по которому клиентский туннель будет доступен локально."
+msgstr "İstemci tüneline yerel olarak erişilebilecek kapı numarası."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:459
 msgid "This is also the client port for the HTTPBidir server tunnel."
-msgstr "Это также клиентский порт для серверного туннеля HTTPBidir."
+msgstr "HTTPBidir sunucu tünelinin de istemci kapı numarasıdır."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:478
 msgid ""
 "How do you want this tunnel to be accessed? By just this machine, your "
 "entire subnet, or external internet?"
-msgstr "Кому вы бы хотели открыть доступ к этому туннелю? Вашей машине, всей подсети или внешнему интернету?"
+msgstr "Bu tünele nasıl erişilmesini istiyorsunuz? Yalnız bu bilgisayar üzerinden, tüm alt ağınızdan ya da dış İnternet üzerinden?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:480
 msgid "You will most likely want to just allow 127.0.0.1"
-msgstr "Скорее всего здесь нужно разрешить только 127.0.0.1"
+msgstr "Büyük olasılıkla yalnız 127.0.0.1 adresine izin vermek isteyeceksiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:522
 msgid ""
 "The I2P router can automatically start this tunnel for you when the router "
 "is started."
-msgstr "Маршрутизатор I2P может автоматически запустить этот туннель при запуске."
+msgstr "Bu tünel I2P yönelticisi başlatıldığında otomatik olarak başlatılabilir."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:524
 msgid ""
 "This can be useful for frequently-used tunnels (especially server tunnels), "
 "but for tunnels that are only used occassionally it would mean that the I2P "
 "router is creating and maintaining unnecessary tunnels."
-msgstr "Это может быть полезно для часто используемых туннелей (особенно серверных туннелей), но для туннелей которые используются только иногда это будет означать что маршрутизатор I2P создаёт и поддерживает лишние туннели."
+msgstr "Bu özellik sık kullanılan tüneller için (özellikle sunucu tünelleri) kullanışlıdır. Arada bir kullanılan tüneller için I2P yönelticisinin gereksiz tüneller oluşturmasına ve gözetmesine neden olur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:550
 msgid "The wizard has now collected enough information to create your tunnel."
-msgstr "Мастер собрал достаточно информации чтобы создать туннель."
+msgstr "Yardımcı tünelinizi oluşturmak için gerekli tüm bilgileri topladı."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:552
 msgid ""
 "Upon clicking the Save button below, the wizard will set up the tunnel, and "
 "take you back to the main I2PTunnel page."
-msgstr "После нажатия кнопки \"Сохранить\" мастер создаст туннель и вернёт вас на главную страницу."
+msgstr "Aşağıdaki Kaydet düğmesine tıkladığınızda tüneliniz oluşturulacak ve I2PTunnel sayfasına yönlendirileceksiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:557
 msgid ""
 "Because you chose to automatically start the tunnel when the router starts, "
 "you don't have to do anything further."
-msgstr "Поскольку вы выбрали запускать туннель автоматически при запуске роутера, больше ничего делать не требуется."
+msgstr "Tüneli yöneltici başlatıldığında otomatik olarak başlatılacak şekilde ayarladığınız için başka bir işlem yapmanıza gerek yok."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:559
 msgid "The router will start the tunnel once it has been set up."
-msgstr " Маршрутизатор запустится как только будет создан туннель."
+msgstr "Tünel ayarları tamamlandığında yöneltici tarafından başlatılacak."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:563
 msgid ""
 "Because you chose not to automatically start the tunnel, you will have to "
 "manually start it."
-msgstr "Поскольку вы выбрали не запускать туннель автоматически, вы необходимо будет запустить его вручную."
+msgstr "Tüneli yöneltici başlatıldığında otomatik olarak başlatılmayacak şekilde ayarladığınız için el ile başlatmanız gerekecek."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:565
 msgid ""
 "You can do this by clicking the Start button on the main page which "
 "corresponds to the new tunnel."
-msgstr "Вы можете это сделать нажав кнопку \"Пуск\" на главной странице, которая отвечает за новый туннель."
+msgstr "Bu işlemi ana sayfada istediğiniz tünele uygun Başlat düğmesine tıklayarak yapabilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:569
 msgid "Below is a summary of the options you chose:"
-msgstr "Вот итог опций которые вы выбрали:"
+msgstr "Aşağıda belirttiğiniz ayarların özetini görebilirsiniz:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:667
 msgid ""
 "Alongside these basic settings, there are a number of advanced options for "
 "tunnel configuration."
-msgstr "Кроме этих основных настроек существует и некоторый набор расширенных настроек для конфигурации туннеля."
+msgstr "Bu temel ayarların yanında tünel ayarları için gelişmiş ayarlar da bulunur."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:669
 msgid ""
 "The wizard will set reasonably sensible default values for these, but you "
 "can view and/or edit these by clicking on the tunnel's name in the main "
 "I2PTunnel page."
-msgstr "Мастер установит разумные параметры по умолчанию, но вы можете их отредактировать нажав на название туннеля на главной странице туннелей I2P."
+msgstr "Yardımcı gelişmiş ayarlar için makul varsayılan değerler kullanır. Bununla birlikte I2PTunnel sayfasından yeni tünelin adına tıklayarak gelişmiş ayarları görüp değiştirebilirsiniz."
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:711
 msgid "Previous"
-msgstr "Предыдущее"
+msgstr "Önceki"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:719
 msgid "Save Tunnel"
-msgstr "Сохранить"
+msgstr "Tüneli Kaydet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:725
 msgid "Finish"
-msgstr "Закончить"
+msgstr "Tamam"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/wizard_jsp.java:731
 msgid "Next"
-msgstr "Следующее"
+msgstr "Sonraki"
