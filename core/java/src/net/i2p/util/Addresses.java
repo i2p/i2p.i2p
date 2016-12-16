@@ -436,7 +436,7 @@ public abstract class Addresses {
         _ifCache.clear();
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(IF_INET6_FILE), "ISO-8859-1"), 4096);
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(IF_INET6_FILE), "ISO-8859-1"), 1024);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 // http://tldp.org/HOWTO/html_single/Linux+IPv6-HOWTO/#PROC-NET
