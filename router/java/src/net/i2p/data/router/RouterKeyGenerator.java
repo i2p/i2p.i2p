@@ -19,6 +19,7 @@ import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.util.HexDump;
@@ -130,9 +131,7 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
         String modVal = _fmt.format(today);
         if (modVal.length() != LENGTH)
             throw new IllegalStateException();
-        byte[] mod = new byte[LENGTH];
-        for (int i = 0; i < LENGTH; i++)
-            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
+        byte[] mod = DataHelper.getASCII(modVal);
         return mod;
     }
 
@@ -199,10 +198,7 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
         }
         if (modVal.length() != LENGTH)
             throw new IllegalStateException();
-        byte[] mod = new byte[LENGTH];
-        for (int i = 0; i < LENGTH; i++) {
-            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
-        }
+        byte[] mod = DataHelper.getASCII(modVal);
         return getKey(origKey, mod);
     }
     
