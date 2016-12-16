@@ -111,13 +111,17 @@ public class ConfigRestartBean {
     }
 
     private static boolean isShuttingDown(RouterContext ctx) {
-        return Router.EXIT_GRACEFUL == ctx.router().scheduledGracefulExitCode() ||
-               Router.EXIT_HARD == ctx.router().scheduledGracefulExitCode();
+        int code = ctx.router().scheduledGracefulExitCode();
+        return Router.EXIT_GRACEFUL == code ||
+               Router.EXIT_HARD == code;
     }
+
     private static boolean isRestarting(RouterContext ctx) {
-        return Router.EXIT_GRACEFUL_RESTART == ctx.router().scheduledGracefulExitCode() ||
-               Router.EXIT_HARD_RESTART == ctx.router().scheduledGracefulExitCode();
+        int code = ctx.router().scheduledGracefulExitCode();
+        return Router.EXIT_GRACEFUL_RESTART == code ||
+               Router.EXIT_HARD_RESTART == code;
     }
+
     /** this is for summaryframe.jsp */
     public static long getRestartTimeRemaining() {
         RouterContext ctx = ContextHelper.getContext(null);

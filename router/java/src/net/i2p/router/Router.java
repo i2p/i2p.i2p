@@ -1361,8 +1361,8 @@ public class Router implements RouterClock.ClockShiftListener {
             if (isFinalShutdownInProgress())
                 return; // too late
             changeState(State.GRACEFUL_SHUTDOWN);
+            _gracefulExitCode = exitCode;
         }
-        _gracefulExitCode = exitCode;
         //_config.put(PROP_SHUTDOWN_IN_PROGRESS, "true");
         _context.throttle().setShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
@@ -1380,8 +1380,8 @@ public class Router implements RouterClock.ClockShiftListener {
             if (isFinalShutdownInProgress())
                 return; // too late
             changeState(State.RUNNING);
+            _gracefulExitCode = -1;
         }
-        _gracefulExitCode = -1;
         //_config.remove(PROP_SHUTDOWN_IN_PROGRESS);
         _context.throttle().cancelShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
@@ -1394,16 +1394,22 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      * @return one of the EXIT_* values or -1
      */
-    public int scheduledGracefulExitCode() { return _gracefulExitCode; }
+    public int scheduledGracefulExitCode() {
+        synchronized(_stateLock) {
+            return _gracefulExitCode;
+        }
+    }
 
     /**
      *  How long until the graceful shutdown will kill us?
      *  @return -1 if no shutdown in progress.
      */
     public long getShutdownTimeRemaining() {
-        if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
-        if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART)
-            return 0;
+        synchronized(_stateLock) {
+            if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
+            if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART)
+                return 0;
+        }
         long exp = _context.tunnelManager().getLastParticipatingExpiration();
         if (exp < 0)
             return 0;
