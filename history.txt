@@ -1,3 +1,28 @@
+2016-12-16 zzz
+ * Router: Synchronize graceful exit code access
+ * Update: Save blocklist version in UpdateManager
+
+2016-12-16 zzz
+Prop from i2p.i2p.zzz.test2:
+ * BOB:
+   - Refactor NamedDB implementation to HashMap
+   - Refactor NamedDB locks to ReentrantReadWriteLock
+   - All unlocks in finally blocks, remove redundant unlocking
+   - Remove throw declaration from methods that don't
+   - Read under write lock when that's simpler
+   - Use Boolean fields rather than valueOf()
+   - Fix unlock order inversion in I2PtoTCP and MUXlisten
+   - Remove unused locking in TCPtoI2P
+   - Add missing locking in status command
+   - Remove redundant locking
+   - Remove unnecessary catch-and-rethrows
+   - Spelling fix in error message
+   - Make some methods static
+ * Console: Sort banlist and floodfills in true binary order, not by base64 string
+ * Utils:
+   - Consolidate stream copy code
+   - Consolidate base64 alphabet string
+
 * 2016-12-12 0.9.28 released
 
 2016-12-09 zzz

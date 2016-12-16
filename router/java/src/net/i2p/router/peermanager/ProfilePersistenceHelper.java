@@ -44,6 +44,7 @@ class ProfilePersistenceHelper {
     private static final String SUFFIX = ".txt.gz";
     private static final String UNCOMPRESSED_SUFFIX = ".txt";
     private static final String OLD_SUFFIX = ".dat";
+    private static final int MIN_NAME_LENGTH = PREFIX.length() + 44 + OLD_SUFFIX.length();
     private static final String DIR_PREFIX = "p";
     private static final String B64 = Base64.ALPHABET_I2P;
     
@@ -193,6 +194,7 @@ class ProfilePersistenceHelper {
     private static class ProfileFilter implements FilenameFilter {
         public boolean accept(File dir, String filename) {
             return (filename.startsWith(PREFIX) &&
+                    filename.length() >= MIN_NAME_LENGTH &&
                     (filename.endsWith(SUFFIX) || filename.endsWith(OLD_SUFFIX) || filename.endsWith(UNCOMPRESSED_SUFFIX)));
         }
     }
