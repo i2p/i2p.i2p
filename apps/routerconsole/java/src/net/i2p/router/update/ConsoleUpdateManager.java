@@ -142,6 +142,9 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         notifyInstalled(ROUTER_SIGNED, "", RouterVersion.VERSION);
         notifyInstalled(ROUTER_SIGNED_SU3, "", RouterVersion.VERSION);
         notifyInstalled(ROUTER_DEV_SU3, "", RouterVersion.FULL_VERSION);
+        String blist = _context.getProperty(NewsFetcher.PROP_BLOCKLIST_TIME);
+        if (blist != null)
+            notifyInstalled(BLOCKLIST, "", blist);
         // hack to init from the current news file... do this before we register Updaters
         // This will not kick off any Updaters as none are yet registered
         (new NewsFetcher(_context, this, Collections.<URI> emptyList())).checkForUpdates();
@@ -789,7 +792,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
                                           UpdateType type, String id,
                                           Map<UpdateMethod, List<URI>> sourceMap,
                                           String newVersion, String minVersion) {
-        if (type == NEWS || type == NEWS_SU3) {
+        if (type == NEWS || type == NEWS_SU3 || type == BLOCKLIST) {
             // shortcut
             notifyInstalled(type, "", newVersion);
             return true;

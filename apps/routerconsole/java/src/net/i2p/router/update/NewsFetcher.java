@@ -77,7 +77,7 @@ class NewsFetcher extends UpdateRunner {
     private boolean _success;
 
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
-    private static final String PROP_BLOCKLIST_TIME = "router.blocklistVersion";
+    static final String PROP_BLOCKLIST_TIME = "router.blocklistVersion";
     private static final String BLOCKLIST_DIR = "docs/feed/blocklist";
     private static final String BLOCKLIST_FILE = "blocklist.txt";
     
@@ -711,7 +711,10 @@ class NewsFetcher extends UpdateRunner {
         }
         if (!fail) {
             f.setLastModified(ble.updated);
-            _context.router().saveConfig(PROP_BLOCKLIST_TIME, Long.toString(ble.updated));
+            String upd = Long.toString(ble.updated);
+            _context.router().saveConfig(PROP_BLOCKLIST_TIME, upd);
+            _mgr.notifyVersionAvailable(this, _currentURI, BLOCKLIST, "", HTTP,
+                                        null, upd, "");
         }
         if (_log.shouldWarn())
             _log.warn("Processed " + ble.entries.size() + " blocks and " + ble.removes.size() + " unblocks from news feed");
