@@ -72,6 +72,8 @@ import net.i2p.util.RandomSource;
  * inspired by http://www.pps.jussieu.fr/~jch/enseignement/reseaux/
  * NTPMessage.java which is copyright (c) 2003 by Juliusz Chroboczek
  *
+ * TODO NOT 2036-compliant, see RFC 4330
+ *
  * @author Adam Buckley
  * @since 0.9.1 moved from net.i2p.time
  */
@@ -206,7 +208,7 @@ class NtpMessage {
      * GPS      Global Positioning Service
      * GOES     Geostationary Orbit Environment Satellite
      */
-    public byte[] referenceIdentifier = {0, 0, 0, 0};
+    public final byte[] referenceIdentifier = {0, 0, 0, 0};
     
     
     /**
@@ -347,7 +349,7 @@ class NtpMessage {
                "Precision: " + precision + " (" + precisionStr + " seconds)\n" +
                "Root delay: " + new DecimalFormat("0.00").format(rootDelay*1000) + " ms\n" +
                "Root dispersion: " + new DecimalFormat("0.00").format(rootDispersion*1000) + " ms\n" +
-               "Reference identifier: " + referenceIdentifierToString(referenceIdentifier, stratum, version) + "\n" +
+               "Reference identifier: " + referenceIdentifierToString() + "\n" +
                "Reference timestamp: " + timestampToString(referenceTimestamp) + "\n" +
                "Originate timestamp: " + timestampToString(originateTimestamp) + "\n" +
                "Receive timestamp:   " + timestampToString(receiveTimestamp) + "\n" +
@@ -360,7 +362,7 @@ class NtpMessage {
      * Converts an unsigned byte to a short.  By default, Java assumes that
      * a byte is signed.
      */
-    public static short unsignedByteToShort(byte b) {
+    private static short unsignedByteToShort(byte b) {
         if((b & 0x80)==0x80) 
             return (short) (128 + (b & 0x7f));
         else 
@@ -378,7 +380,7 @@ class NtpMessage {
      * @param pointer the offset
      * @return the time since 1900 (NOT Java time)
      */
-    public static double decodeTimestamp(byte[] array, int pointer) {
+    private static double decodeTimestamp(byte[] array, int pointer) {
         double r = 0.0;
         
         for(int i=0; i<8; i++) {
@@ -431,7 +433,7 @@ class NtpMessage {
      * Returns a timestamp (number of seconds since 00:00 1-Jan-1900) as a
      * formatted date/time string.
      */
-    public static String timestampToString(double timestamp) {
+    private static String timestampToString(double timestamp) {
         if(timestamp==0) return "0";
         
         // timestamp is relative to 1900, utc is used by Java and is relative
@@ -451,13 +453,20 @@ class NtpMessage {
         return date + fractionSting;
     }
     
-    
+    /**
+     * @since 0.9.29
+     * @return non-null, "" if unset
+     */
+    public String referenceIdentifierToString() {
+        return referenceIdentifierToString(referenceIdentifier, stratum, version);
+    }
     
     /**
      * Returns a string representation of a reference identifier according
      * to the rules set out in RFC 2030.
+     * @return non-null, "" if unset
      */
-    public static String referenceIdentifierToString(byte[] ref, short stratum, byte version) {
+    private static String referenceIdentifierToString(byte[] ref, short stratum, byte version) {
         // From the RFC 2030:
         // In the case of NTP Version 3 or Version 4 stratum-0 (unspecified)
         // or stratum-1 (primary) servers, this is a four-character ASCII
@@ -484,6 +493,10 @@ class NtpMessage {
         // In NTP Version 4 secondary servers, this is the low order 32 bits
         // of the latest transmit timestamp of the reference source.
         else if(version==4) {
+            // Unimplemented RFC 4330:
+            // For IPv6 and OSI secondary servers, the value is the first 32 bits of
+            // the MD5 hash of the IPv6 or NSAP address of the synchronization
+            // source.
             return "" + ((unsignedByteToShort(ref[0]) / 256.0) +
                    (unsignedByteToShort(ref[1]) / 65536.0) +
                    (unsignedByteToShort(ref[2]) / 16777216.0) +

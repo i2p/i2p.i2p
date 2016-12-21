@@ -33,8 +33,13 @@ import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Inet6Address;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.util.HexDump;
@@ -50,18 +55,24 @@ import net.i2p.util.Log;
  * Note that on windows platforms, the curent time-of-day timestamp is limited
  * to an resolution of 10ms and adversely affects the accuracy of the results.
  *
+ * Public only for main(), not a public API, not for external use.
+ *
+ * TODO NOT 2036-compliant, see RFC 4330
+ *
  * @author Adam Buckley
  * (minor refactoring by jrandom)
  * @since 0.9.1 moved from net.i2p.time
  */
-class NtpClient {
+public class NtpClient {
     /** difference between the unix epoch and jan 1 1900 (NTP uses that) */
-    public final static double SECONDS_1900_TO_EPOCH = 2208988800.0;
+    final static double SECONDS_1900_TO_EPOCH = 2208988800.0;
     private final static int NTP_PORT = 123;
     private static final int DEFAULT_TIMEOUT = 10*1000;
     private static final int OFF_ORIGTIME = 24;
     private static final int OFF_TXTIME = 40;
     private static final int MIN_PKT_LEN = 48;
+    // IP:reason for servers that sent us a kiss of death
+    private static final Map<String, String> kisses = new ConcurrentHashMap<String, String>(2);
 
     /**
      * Query the ntp servers, returning the current time from first one we find
@@ -95,7 +106,7 @@ class NtpClient {
      * @throws IllegalArgumentException if none of the servers are reachable
      * @since 0.7.12
      */
-    public static long[] currentTimeAndStratum(String serverNames[], int perServerTimeout, Log log) {
+    static long[] currentTimeAndStratum(String serverNames[], int perServerTimeout, boolean preferIPv6, Log log) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
         ArrayList<String> names = new ArrayList<String>(serverNames.length);
@@ -103,7 +114,7 @@ class NtpClient {
             names.add(serverNames[i]);
         Collections.shuffle(names);
         for (int i = 0; i < names.size(); i++) {
-            long[] rv = currentTimeAndStratum(names.get(i), perServerTimeout, log);
+            long[] rv = currentTimeAndStratum(names.get(i), perServerTimeout, preferIPv6, log);
             if (rv != null && rv[0] > 0)
                 return rv;
         }
@@ -131,16 +142,39 @@ class NtpClient {
      * @return time in rv[0] and stratum in rv[1], or null for error
      * @since 0.7.12
      */
-    private static long[] currentTimeAndStratum(String serverName, int timeout, Log log) {
+    private static long[] currentTimeAndStratum(String serverName, int timeout, boolean preferIPv6, Log log) {
         DatagramSocket socket = null;
         try {
             // Send request
-            socket = new DatagramSocket();
-            InetAddress address = InetAddress.getByName(serverName);
+            InetAddress address;
+            if (preferIPv6) {
+                InetAddress[] addrs = InetAddress.getAllByName(serverName);
+                if (addrs == null || addrs.length == 0)
+                    throw new UnknownHostException();
+                address = null;
+                for (int i = 0; i < addrs.length; i++) {
+                    if (addrs[i] instanceof Inet6Address) {
+                        address = addrs[i];
+                        break;
+                    }
+                    if (address == null)
+                        address = addrs[0];
+                }
+            } else {
+                address = InetAddress.getByName(serverName);
+            }
+            String who = address.getHostAddress();
+            String why = kisses.get(who);
+            if (why != null) {
+                if (log != null)
+                    log.warn("Not querying, previous KoD from NTP server " + serverName + " (" + who + ") " + why);
+                return null;
+            }
             byte[] buf = new NtpMessage().toByteArray();
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, NTP_PORT);
             byte[] txtime = new byte[8];
 
+            socket = new DatagramSocket();
             // Set the transmit timestamp *just* before sending the packet
             // ToDo: Does this actually improve performance or not?
             NtpMessage.encodeTimestamp(packet.getData(), OFF_TXTIME,
@@ -151,7 +185,7 @@ class NtpClient {
             // save for check
             System.arraycopy(packet.getData(), OFF_TXTIME, txtime, 0, 8);
             if (log != null && log.shouldDebug())
-                log.debug("Sent:\n" + HexDump.dump(buf));
+                log.debug("Sent to " + serverName + " (" + who + ")\n" + HexDump.dump(buf));
 
             // Get response
             packet = new DatagramPacket(buf, buf.length);
@@ -170,22 +204,44 @@ class NtpClient {
             // Process response
             NtpMessage msg = new NtpMessage(packet.getData());
 
+            String from = packet.getAddress().getHostAddress();
+            int port = packet.getPort();
             if (log != null && log.shouldDebug())
-                log.debug("Received from: " + packet.getAddress().getHostAddress() +
+                log.debug("Received from: " + from + " port " + port +
                           '\n' + msg + '\n' + HexDump.dump(packet.getData()));
 
-            // Stratum must be between 1 (atomic) and 15 (maximum defined value)
-            // Anything else is right out, treat such responses like errors
-            if ((msg.stratum < 1) || (msg.stratum > 15)) {
+            // spoof check
+            if (port != NTP_PORT || !who.equals(from)) {
                 if (log != null && log.shouldWarn())
-                    log.warn("Response from NTP server of unacceptable stratum " + msg.stratum + ", failing.");
+                    log.warn("Sent to " + who + " port " + NTP_PORT+ " but received from " + packet.getSocketAddress());
                 return null;
             }
 
+            // Stratum must be between 1 (atomic) and 15 (maximum defined value)
+            // Anything else is right out, treat such responses like errors
+            // KoD (stratum 0) processing is below, after origin time check
+            if (msg.stratum > 15) {
+                if (log != null && log.shouldWarn())
+                    log.warn("NTP server " + serverName + " bad stratum " + msg.stratum);
+                return null;
+            }
+
+            // spoof check
             if (!DataHelper.eq(txtime, 0, packet.getData(), OFF_ORIGTIME, 8)) {
                 if (log != null && log.shouldWarn())
                     log.warn("Origin time mismatch sent:\n" + HexDump.dump(txtime) +
                              "rcvd:\n" + HexDump.dump(packet.getData(), OFF_ORIGTIME, 8));
+                return null;
+            }
+
+            // KoD check (AFTER spoof checks)
+            if (msg.stratum == 0) {
+                why = msg.referenceIdentifierToString();
+                // Remember the specific IP, not the server name, although RFC 4330
+                // probably wants us to block the name
+                kisses.put(who, why);
+                if (log != null)
+                    log.logAlways(Log.WARN, "KoD from NTP server " + serverName + " (" + who + ") " + why);
                 return null;
             }
 
@@ -213,15 +269,32 @@ class NtpClient {
         }
     }
     
+    /**
+     * Usage: NtpClient [-6] [servers...]
+     * default pool.ntp.org
+     */
     public static void main(String[] args) throws IOException {
-        // Process command-line args
-        if(args.length <= 0) {
+        boolean ipv6 = false;
+        if (args.length > 0 && args[0].equals("-6")) {
+            ipv6 = true;
+            if (args.length == 1)
+                args = new String[0];
+            else
+                args = Arrays.copyOfRange(args, 1, args.length);
+        }
+        if (args.length <= 0) {
            args = new String[] { "pool.ntp.org" };
         } 
+        System.out.println("Querying " + Arrays.toString(args));
 
         Log log = new Log(NtpClient.class);
-        long[] rv = currentTimeAndStratum(args, DEFAULT_TIMEOUT, log);
-        System.out.println("Current time: " + new java.util.Date(rv[0]) + " (stratum " + rv[1] + ')');
+        try {
+            long[] rv = currentTimeAndStratum(args, DEFAULT_TIMEOUT, ipv6, log);
+            System.out.println("Current time: " + new java.util.Date(rv[0]) + " (stratum " + rv[1] +
+                               ") offset " + (rv[0] - System.currentTimeMillis()) + "ms");
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Failed: " + iae.getMessage());
+        }
     }
     
 /****
