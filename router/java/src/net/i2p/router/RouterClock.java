@@ -285,7 +285,7 @@ public class RouterClock extends Clock {
         long nowNanos = System.nanoTime();
         // try to prevent dups, not guaranteed
         // nanoTime() isn't guaranteed to be monotonic either :(
-        if (nowNanos < _lastShiftNanos + MASSIVE_SHIFT_FORWARD)
+        if (nowNanos < _lastShiftNanos + (MASSIVE_SHIFT_FORWARD * 1000*1000L))
             return;
         _lastShiftNanos = nowNanos;
 
