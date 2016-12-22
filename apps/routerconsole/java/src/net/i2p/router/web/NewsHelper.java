@@ -231,7 +231,8 @@ public class NewsHelper extends ContentHelper {
      */
     @Override
     public String getContent() {
-        return NewsFeedHelper.getEntries(_context, 0, 2);
+        // show a min of 1, max of 3, none older than 60 days over min
+        return NewsFeedHelper.getEntries(_context, 0, 3, 60*24*60*60*1000L);
     }
 
     /**

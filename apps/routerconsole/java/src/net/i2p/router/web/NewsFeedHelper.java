@@ -20,7 +20,7 @@ import net.i2p.util.SystemVersion;
  */
 public class NewsFeedHelper extends HelperBase {
     
-    private int _start = 0;
+    private int _start;
     private int _limit = 2;
 
     /**
@@ -35,14 +35,15 @@ public class NewsFeedHelper extends HelperBase {
     }
 
     public String getEntries() {
-        return getEntries(_context, _start, _limit);
+        return getEntries(_context, _start, _limit, 0);
     }
 
     /**
      *  @param max less than or equal to zero means all
+     *  @param ageLimit time before now, less than or equal to zero means all (after the first)
      *  @return non-null, "" if none
      */
-    static String getEntries(I2PAppContext ctx, int start, int max) {
+    static String getEntries(I2PAppContext ctx, int start, int max, long ageLimit) {
         if (max <= 0)
             max = Integer.MAX_VALUE;
         StringBuilder buf = new StringBuilder(512);
@@ -69,8 +70,11 @@ public class NewsFeedHelper extends HelperBase {
             fmt.setTimeZone(SystemVersion.getSystemTimeZone(ctx));
             int i = 0;
             for (NewsEntry entry : entries) {
-                if (i++ < start)
+                if (i < start)
                     continue;
+                if (i > start && entry.updated > 0 && ageLimit > 0 &&
+                    entry.updated < ctx.clock().now() - ageLimit)
+                    break;
                 buf.append("<div class=\"newsentry\"><h3>");
                 if (entry.updated > 0) {
                     Date date = new Date(entry.updated);
@@ -91,7 +95,7 @@ public class NewsFeedHelper extends HelperBase {
                 buf.append("</h3>\n<div class=\"newscontent\">\n")
                    .append(entry.content)
                    .append("\n</div></div>\n");
-                if (i >= start + max)
+                if (++i >= start + max)
                     break;
             }
         }

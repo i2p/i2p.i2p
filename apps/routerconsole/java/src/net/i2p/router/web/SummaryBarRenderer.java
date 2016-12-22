@@ -637,8 +637,13 @@ class SummaryBarRenderer {
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
                 fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 int i = 0;
-                final int max = 2;
+                // show a min of 1, max of 3, none older than 60 days over min
+                final int min = 1;
+                final int max = 3;
                 for (NewsEntry entry : entries) {
+                    if (i >= min && entry.updated > 0 &&
+                        entry.updated < _context.clock().now() - 60*24*60*60*1000L)
+                        break;
                     buf.append("<li><a href=\"/?news=1&amp;consoleNonce=")
                        .append(consoleNonce)
                        .append("\">");
