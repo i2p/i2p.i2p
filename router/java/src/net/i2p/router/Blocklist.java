@@ -77,6 +77,7 @@ public class Blocklist {
     private Entry _wrapSave;
     private final Set<Hash> _inProcess = new HashSet<Hash>(4);
     private final File _blocklistFeedFile;
+    private boolean _started;
     // temp
     private Map<Hash, String> _peerBlocklist = new HashMap<Hash, String>(4);
     
@@ -99,6 +100,9 @@ public class Blocklist {
 
     private static final Object DUMMY = Integer.valueOf(0);    
 
+    /**
+     *  Router MUST call startup()
+     */
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
@@ -119,7 +123,10 @@ public class Blocklist {
      *  ~/.i2p/docs/feed/blocklist/blocklist.txt
      *  File if specified with router.blocklist.file
      */
-    public void startup() {
+    public synchronized void startup() {
+        if (_started)
+            return;
+        _started = true;
         if (! _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_ENABLED))
             return;
         List<File> files = new ArrayList<File>(4);
@@ -142,7 +149,12 @@ public class Blocklist {
             files.add(blFile);
         }
         Job job = new ReadinJob(files);
-        job.getTiming().setStartAfter(_context.clock().now() + 30*1000);
+        // Run immediately, so it's initialized before netdb.
+        // As this is called by Router.runRouter() before job queue parallel operation,
+        // this will block StartupJob, and will complete before netdb initialization.
+        // If there is a huge blocklist, it will delay router startup,
+        // but it's important to have this initialized before we read in the netdb.
+        //job.getTiming().setStartAfter(_context.clock().now() + 30*1000);
         _context.jobQueue().addJob(job);
     }
 
@@ -171,6 +183,7 @@ public class Blocklist {
                 return;
             }
             merge(ccount);
+         /**** debug, and now run before netdb is initialized anyway
             if (_log.shouldLog(Log.WARN)) {
                 if (_blocklistSize <= 0)
                     return;
@@ -184,6 +197,7 @@ public class Blocklist {
                 if (count > 0)
                     _log.warn("Blocklisted " + count + " routers in the netDb");
             }
+          ****/
             _peerBlocklist = null;
         }
 

@@ -523,6 +523,10 @@ public class PersistentDataStore extends TransientDataStore {
                         // Don't store but don't delete
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Skipping since netdb newer than " + _routerFile);
+                    } else if (getContext().blocklist().isBlocklisted(ri)) {
+                        corrupt = true;
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(ri.getHash() + " is blocklisted");
                     } else {
                         try {
                             // persist = false so we don't write what we just read
