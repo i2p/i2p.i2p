@@ -1,3 +1,21 @@
+2016-12-22 zzz
+ * Blocklist:
+   - More efficiently check blocklist when receiving new RI
+   - Check blocklist when loading RIs
+   - Ensure blocklist is initialized before netdb
+ * Console: Limit age of news entries displayed
+ * Update: Fix JVM crash and i2p.jar corruption when updating from -1
+
+2016-12-21 zzz
+ * NTP:
+   - Verify source address and port
+   - Add to command line
+   - Add KoD support (ticket #1896)
+   - Add initial IPv6 support (ticket #1897)
+
+2016-12-20 zzz
+ * Build: Fix installer compile failure
+
 2016-12-16 zzz
  * Router: Synchronize graceful exit code access
  * Update: Save blocklist version in UpdateManager

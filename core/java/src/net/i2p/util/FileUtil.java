@@ -98,6 +98,9 @@ public class FileUtil {
     }
 
     /**
+      * Warning - do not call any new classes from here, or
+      * update will crash the JVM.
+      *
       * @param logLevel Log.WARN, etc.
       * @return true if it was copied successfully
       * @since 0.9.7
@@ -106,6 +109,7 @@ public class FileUtil {
         int files = 0;
         ZipFile zip = null;
         try {
+            final byte buf[] = new byte[8192];
             zip = new ZipFile(zipfile);
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
@@ -153,7 +157,13 @@ public class FileUtil {
                                 System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
                         } else {
                             fos = new FileOutputStream(target);
-                            DataHelper.copy(in, fos);
+                            // We do NOT use DataHelper.copy() because it loads new classes
+                            // and causes the update to crash.
+                            //DataHelper.copy(in, fos);
+                            int read;
+                            while ((read = in.read(buf)) != -1) {
+                                   fos.write(buf, 0, read);
+                            }   
                             if (logLevel <= Log.INFO)
                                 System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
