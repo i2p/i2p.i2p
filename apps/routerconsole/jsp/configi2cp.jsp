@@ -63,7 +63,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <input name="user" type="text" value="" /><br>
 <%=intl._t("Password")%>:
 <input name="nofilter_pw" type="password" value="" /><br>
-</p><p><b><%=intl._t("The default settings will work for most people.")%></b>
+</p><p><img src="/themes/console/images/itoopie_xsm.png" alt=""><b><%=intl._t("The default settings will work for most people.")%></b>
 <%=intl._t("Any changes made here must also be configured in the external client.")%>
 <%=intl._t("Many clients do not support SSL or authorization.")%>
 <i><%=intl._t("All changes require restart to take effect.")%></i>
