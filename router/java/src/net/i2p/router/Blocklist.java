@@ -79,6 +79,12 @@ public class Blocklist {
     private final File _blocklistFeedFile;
     // temp
     private Map<Hash, String> _peerBlocklist = new HashMap<Hash, String>(4);
+    
+    private static final String PROP_BLOCKLIST_ENABLED = "router.blocklist.enable";
+    private static final String PROP_BLOCKLIST_DETAIL = "router.blocklist.detail";
+    private static final String PROP_BLOCKLIST_FILE = "router.blocklist.file";
+    private static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
+    private static final String BLOCKLIST_FEED_FILE = "docs/feed/blocklist/blocklist.txt";
 
     /**
      *  Limits of transient (in-memory) blocklists.
@@ -105,12 +111,6 @@ public class Blocklist {
         _log = new Log(Blocklist.class);
         _blocklistFeedFile = new File(BLOCKLIST_FEED_FILE);
     }
-    
-    private static final String PROP_BLOCKLIST_ENABLED = "router.blocklist.enable";
-    private static final String PROP_BLOCKLIST_DETAIL = "router.blocklist.detail";
-    private static final String PROP_BLOCKLIST_FILE = "router.blocklist.file";
-    private static final String BLOCKLIST_FILE_DEFAULT = "blocklist.txt";
-    private static final String BLOCKLIST_FEED_FILE = "docs/feed/blocklist/blocklist.txt";
 
     /**
      *  Loads the following files in-order:
@@ -656,6 +656,14 @@ public class Blocklist {
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null)
             return Collections.emptyList();
+        return getAddresses(pinfo);
+    }
+
+    /**
+     * Will not contain duplicates.
+     * @since 0.9.29
+     */
+    private static List<byte[]> getAddresses(RouterInfo pinfo) {
         List<byte[]> rv = new ArrayList<byte[]>(4);
         // for each peer address
         for (RouterAddress pa : pinfo.getAddresses()) {
@@ -685,6 +693,27 @@ public class Blocklist {
             return false;
         for (byte[] ip : ips) {
             if (isBlocklisted(ip)) {
+                if (! _context.banlist().isBanlisted(peer))
+                    // nice knowing you...
+                    banlist(peer, ip);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Does the peer's IP address appear in the blocklist?
+     * If so, and it isn't banlisted, banlist it forever...
+     * @since 0.9.29
+     */
+    public boolean isBlocklisted(RouterInfo pinfo) {
+        List<byte[]> ips = getAddresses(pinfo);
+        if (ips.isEmpty())
+            return false;
+        for (byte[] ip : ips) {
+            if (isBlocklisted(ip)) {
+                Hash peer = pinfo.getHash();
                 if (! _context.banlist().isBanlisted(peer))
                     // nice knowing you...
                     banlist(peer, ip);
