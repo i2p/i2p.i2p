@@ -196,6 +196,7 @@ public abstract class LocalHTTPServer {
             tbook = book;
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
+                  "Referrer-Policy: no-referrer\r\n"+
                   "Connection: close\r\n"+
                   "Proxy-Connection: close\r\n"+
                   "\r\n"+
