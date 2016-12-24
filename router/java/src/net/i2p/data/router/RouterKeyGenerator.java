@@ -222,25 +222,31 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
      */
     public static void main(String args[]) {
         if (args.length <= 0) {
-            System.err.println("Usage: RouterKeyGenerator [-days] [+days] hash|hostname|destination");
+            System.err.println("Usage: RouterKeyGenerator [-days] [+days] hash|hostname|destination...");
             System.exit(1);
         }
         long now = System.currentTimeMillis();
-        Hash h;
+        int st = 0;
         if (args.length > 1 && (args[0].startsWith("+") || args[0].startsWith("-"))) {
             now += Integer.parseInt(args[0]) * 24*60*60*1000L;
-            h = ConvertToHash.getHash(args[1]);
-        } else {
-            h = ConvertToHash.getHash(args[0]);
-        }
-        if (h == null) {
-            System.err.println("Bad hash");
-            System.exit(1);
+            st++;
         }
         RouterKeyGenerator rkg = new RouterKeyGenerator(I2PAppContext.getGlobalContext());
-        Hash rkey = rkg.getRoutingKey(h, now);
-        System.out.println("Date:         " + rkg._fmt.format(now));
-        System.out.println("Original key: " + h.toBase64());
-        System.out.println("Routing key:  " + rkey.toBase64());
+        System.out.println("Date: " + rkg._fmt.format(now) + '\n' +
+                           "Hash                                         Routing Key\n" +
+                           "----                                         -----------");
+        for (int i = st; i < args.length; i++) {
+            String s = args[i];
+            String sp = " ";
+            if (s.length() < 44)
+                sp = "                                            ".substring(0, 45 - s.length());
+            Hash h = ConvertToHash.getHash(s);
+            if (h == null) {
+                System.out.println(s + sp + "Bad hash");
+                continue;
+            }
+            Hash rkey = rkg.getRoutingKey(h, now);
+            System.out.println(s + sp + rkey.toBase64());
+        }
     }
 }
