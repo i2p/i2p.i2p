@@ -15,6 +15,7 @@ public class CommandLine extends net.i2p.util.CommandLine {
 
     protected static final List<String> RCLASSES = Arrays.asList(new String[] {
         "net.i2p.data.router.RouterInfo",
+        "net.i2p.data.router.RouterKeyGenerator",
         "net.i2p.router.MultiRouter",
         "net.i2p.router.Router",
         "net.i2p.router.RouterLaunch",

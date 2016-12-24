@@ -22,6 +22,7 @@ import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RoutingKeyGenerator;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
@@ -216,23 +217,30 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
         return SHA256Generator.getInstance().calculateHash(modVal);
     }
 
-/****
+    /**
+     * @since 0.9.29
+     */
     public static void main(String args[]) {
-        Hash k1 = new Hash();
-        byte k1d[] = new byte[Hash.HASH_LENGTH];
-        RandomSource.getInstance().nextBytes(k1d);
-        k1.setData(k1d);
-
-        for (int i = 0; i < 10; i++) {
-            System.out.println("K1:  " + k1);
-            Hash k1m = RoutingKeyGenerator.getInstance().getRoutingKey(k1);
-            System.out.println("MOD: " + new String(RoutingKeyGenerator.getInstance().getModData()));
-            System.out.println("K1M: " + k1m);
+        if (args.length <= 0) {
+            System.err.println("Usage: RouterKeyGenerator [-days] [+days] hash|hostname|destination");
+            System.exit(1);
         }
-        try {
-            Thread.sleep(2000);
-        } catch (Throwable t) { // nop
+        long now = System.currentTimeMillis();
+        Hash h;
+        if (args.length > 1 && (args[0].startsWith("+") || args[0].startsWith("-"))) {
+            now += Integer.parseInt(args[0]) * 24*60*60*1000L;
+            h = ConvertToHash.getHash(args[1]);
+        } else {
+            h = ConvertToHash.getHash(args[0]);
         }
+        if (h == null) {
+            System.err.println("Bad hash");
+            System.exit(1);
+        }
+        RouterKeyGenerator rkg = new RouterKeyGenerator(I2PAppContext.getGlobalContext());
+        Hash rkey = rkg.getRoutingKey(h, now);
+        System.out.println("Date:         " + rkg._fmt.format(now));
+        System.out.println("Original key: " + h.toBase64());
+        System.out.println("Routing key:  " + rkey.toBase64());
     }
-****/
 }
