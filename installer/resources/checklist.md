@@ -215,6 +215,13 @@
 7. Monitor torrent for activity to verify that the new news is now live
 
 
+### Distribute libraries
+
+1. `ant mavenCentral`
+
+2. Upload the bundles to Maven Central via https://oss.sonatype.org
+
+
 ### Notify release
 
 1. Upload files to launchpad release (download mirror)
