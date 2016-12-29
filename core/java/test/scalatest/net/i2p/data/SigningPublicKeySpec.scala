@@ -1,12 +1,12 @@
 package net.i2p.data
 
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 /**
  * @author str4d
  */
-class SigningPublicKeySpec extends FunSpec with ShouldMatchers {
+class SigningPublicKeySpec extends FunSpec with Matchers {
     val signingPublicKey = new SigningPublicKey
 
     describe("A SigningPublicKey") {

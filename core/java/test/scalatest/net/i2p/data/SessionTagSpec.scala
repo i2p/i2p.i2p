@@ -1,12 +1,12 @@
 package net.i2p.data
 
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 /**
  * @author str4d
  */
-class SessionTagSpec extends FunSpec with ShouldMatchers {
+class SessionTagSpec extends FunSpec with Matchers {
     val sessionTag = new SessionTag
 
     describe("A SessionTag") {

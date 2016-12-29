@@ -455,10 +455,14 @@
     <!-- scala paths -->
     <target name="scala.init">
         <property name="scala-library.jar" value="${scalatest.libs}/scala-library.jar" />
+        <property name="scala-xml.jar" value="${scalatest.libs}/scala-xml.jar" />
+        <property name="scalactic.jar" value="${scalatest.libs}/scalactic.jar" />
         <property name="scalatest.jar" value="${scalatest.libs}/scalatest.jar" />
+        <property name="mockito.home" value="${ant.home}/lib" />
         <taskdef resource="scala/tools/ant/antlib.xml">
             <classpath>
                 <pathelement location="${scalatest.libs}/scala-compiler.jar" />
+                <pathelement location="${scalatest.libs}/scala-reflect.jar" />
                 <pathelement location="${scala-library.jar}" />
             </classpath>
         </taskdef>
@@ -475,8 +479,11 @@
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
                 <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
-                <pathelement location="${scalatest.libs}/mockito-all.jar" />
+                <pathelement location="${mockito.home}/byte-buddy.jar" />
+                <pathelement location="${mockito.home}/objenesis.jar" />
+                <pathelement location="${mockito.home}/mockito-core.jar" />
                 <pathelement location="../../../core/java/build/i2pscalatest.jar" />
                 <pathelement location="../../../router/java/build/routerscalatest.jar" />
                 <pathelement location="./build/obj" />
@@ -513,6 +520,8 @@
             <classpath>
                 <pathelement location="${classpath}" />
                 <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scala-xml.jar}" />
+                <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />

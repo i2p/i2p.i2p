@@ -116,10 +116,13 @@
     <!-- scala paths -->
     <target name="scala.init">
         <property name="scala-library.jar" value="${scalatest.libs}/scala-library.jar" />
+        <property name="scala-xml.jar" value="${scalatest.libs}/scala-xml.jar" />
+        <property name="scalactic.jar" value="${scalatest.libs}/scalactic.jar" />
         <property name="scalatest.jar" value="${scalatest.libs}/scalatest.jar" />
         <taskdef resource="scala/tools/ant/antlib.xml">
             <classpath>
                 <pathelement location="${scalatest.libs}/scala-compiler.jar" />
+                <pathelement location="${scalatest.libs}/scala-reflect.jar" />
                 <pathelement location="${scala-library.jar}" />
             </classpath>
         </taskdef>
@@ -140,6 +143,7 @@
             <classpath>
                 <pathelement location="${javac.classpath}" />
                 <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="../../core/java/build/i2pscalatest.jar" />
                 <pathelement location="./build/obj" />
@@ -222,6 +226,8 @@
         <taskdef name="scalatest" classname="org.scalatest.tools.ScalaTestAntTask">
             <classpath>
                 <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scala-xml.jar}" />
+                <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />

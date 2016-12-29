@@ -3,6 +3,7 @@ package net.i2p.router.update
 import org.scalatest.FunSpec
 import org.scalatest.mock.MockitoSugar
 
+import net.i2p.app.ClientAppManager;
 import net.i2p.router.RouterContext
 
 /**
@@ -11,7 +12,8 @@ import net.i2p.router.RouterContext
 class ConsoleUpdateManagerSpec extends FunSpec with UpdateManagerBehaviors with MockitoSugar {
     def consoleUpdateManager = {
         val mockCtx = mock[RouterContext]
-        val cum = new ConsoleUpdateManager(mockCtx)
+        val mockMgr = mock[ClientAppManager]
+        val cum = new ConsoleUpdateManager(mockCtx, mockMgr, null)
         cum
     }
 
