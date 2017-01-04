@@ -62,9 +62,7 @@ public class RouterInfo extends DatabaseEntry {
     private RouterIdentity _identity;
     private volatile long _published;
     /**
-     *  Addresses must be sorted by SHA256.
-     *  When an RI is created, they are sorted in setAddresses().
-     *  Save addresses in the order received so we need not resort.
+     *  Save addresses in the order received so the signature works.
      */
     private final List<RouterAddress> _addresses;
     /** may be null to save memory, no longer final */
@@ -205,10 +203,6 @@ public class RouterInfo extends DatabaseEntry {
      * Specify a set of RouterAddress structures at which this router
      * can be contacted.
      *
-     * Warning - Sorts the addresses here. Do not modify any address
-     *           after calling this, as the sort order is based on the
-     *           hash of the entire address structure.
-     *
      * @param addresses may be null
      * @throws IllegalStateException if RouterInfo is already signed or addresses previously set
      */
@@ -217,12 +211,6 @@ public class RouterInfo extends DatabaseEntry {
             throw new IllegalStateException();
         if (addresses != null) {
             _addresses.addAll(addresses);
-            if (_addresses.size() > 1) {
-                // WARNING this sort algorithm cannot be changed, as it must be consistent
-                // network-wide. The signature is not checked at readin time, but only
-                // later, and the addresses are stored in a Set, not a List.
-                SortHelper.sortStructureList(_addresses);
-            }
         }
     }
 
