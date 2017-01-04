@@ -1677,7 +1677,7 @@ public class DataHelper {
     
     /**
      *  Decompress the GZIP compressed data (returning null on error).
-     *  @throws IOE if uncompressed is over 40 KB
+     *  @throws IOException if uncompressed is over 40 KB
      */
     public static byte[] decompress(byte orig[]) throws IOException {
         return (orig != null ? decompress(orig, 0, orig.length) : null);
@@ -1685,7 +1685,7 @@ public class DataHelper {
 
     /**
      *  Decompress the GZIP compressed data (returning null on error).
-     *  @throws IOE if uncompressed is over 40 KB
+     *  @throws IOException if uncompressed is over 40 KB
      */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
@@ -1698,24 +1698,26 @@ public class DataHelper {
         // don't make this a static field, or else I2PAppContext gets initialized too early
         ByteCache cache = ByteCache.getInstance(8, MAX_UNCOMPRESSED);
         ByteArray outBuf = cache.acquire();
-        int written = 0;
-        while (true) {
-            int read = in.read(outBuf.getData(), written, MAX_UNCOMPRESSED-written);
-            if (read == -1)
-                break;
-            written += read;
-            if (written >= MAX_UNCOMPRESSED) {
-                if (in.available() > 0)
-                    throw new IOException("Uncompressed data larger than " + MAX_UNCOMPRESSED);
-                break;
+        try {
+            int written = 0;
+            while (true) {
+                int read = in.read(outBuf.getData(), written, MAX_UNCOMPRESSED-written);
+                if (read == -1)
+                    break;
+                written += read;
+                if (written >= MAX_UNCOMPRESSED) {
+                    if (in.available() > 0)
+                        throw new IOException("Uncompressed data larger than " + MAX_UNCOMPRESSED);
+                    break;
+                }
             }
+            byte rv[] = new byte[written];
+            System.arraycopy(outBuf.getData(), 0, rv, 0, written);
+            return rv;
+        } finally {
+            cache.release(outBuf);
+            ReusableGZIPInputStream.release(in);
         }
-        byte rv[] = new byte[written];
-        System.arraycopy(outBuf.getData(), 0, rv, 0, written);
-        cache.release(outBuf);
-        // TODO release in finally block
-        ReusableGZIPInputStream.release(in);
-        return rv;
     }
 
     /**
