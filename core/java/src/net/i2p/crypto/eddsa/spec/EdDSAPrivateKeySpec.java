@@ -21,9 +21,12 @@ public class EdDSAPrivateKeySpec implements KeySpec {
     private final EdDSAParameterSpec spec;
 
     /**
-     *  @throws IllegalArgumentException if hash algorithm is unsupported
+     *  @throws IllegalArgumentException if seed length is wrong or hash algorithm is unsupported
      */
     public EdDSAPrivateKeySpec(byte[] seed, EdDSAParameterSpec spec) {
+        if (seed.length != spec.getCurve().getField().getb()/8)
+            throw new IllegalArgumentException("seed length is wrong");
+
         this.spec = spec;
         this.seed = seed;
 
@@ -56,9 +59,13 @@ public class EdDSAPrivateKeySpec implements KeySpec {
      *  getSeed() will return null if this constructor is used.
      *
      *  @param h the private key
+     *  @throws IllegalArgumentException if hash length is wrong
      *  @since 0.9.27 (GitHub issue #17)
      */
     public EdDSAPrivateKeySpec(EdDSAParameterSpec spec, byte[] h) {
+        if (h.length != spec.getCurve().getField().getb()/4)
+            throw new IllegalArgumentException("hash length is wrong");
+
 	this.seed = null;
 	this.h = h;
 	this.spec = spec;
@@ -77,7 +84,7 @@ public class EdDSAPrivateKeySpec implements KeySpec {
         this.h = h;
         this.a = a;
         this.A = A;
-        this.spec = spec;        
+        this.spec = spec;
     }
 
     /**
