@@ -473,7 +473,7 @@ public final class KeyStoreUtil {
     /**
      *  Create a keypair and store it in the keystore at ks, creating it if necessary.
      *
-     *  For new code, the createKeys() with the SigType argument is recommended over this one,
+     *  For new code, the createKeysAndCRL() with the SigType argument is recommended over this one,
      *  as it throws exceptions, and returns the certificate and CRL.
      *
      *  Warning, may take a long time.
