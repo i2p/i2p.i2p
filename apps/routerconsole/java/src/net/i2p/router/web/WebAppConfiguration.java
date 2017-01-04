@@ -136,7 +136,7 @@ public class WebAppConfiguration implements Configuration {
                 if (!ctxPath.equals("/susimail"))
                     continue;
             }
-            System.err.println("Adding " + path + " to classpath for " + appName);
+            //System.err.println("Adding " + path + " to classpath for " + appName);
             buf.append(path);
         }
         if (buf.length() <= 0)
