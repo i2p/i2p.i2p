@@ -114,8 +114,8 @@ public class Router implements RouterClock.ClockShiftListener {
     public final static String PROP_DYNAMIC_KEYS = "router.dynamicKeys";
     /** deprecated, use gracefulShutdownInProgress() */
     private final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
-    private static final String PROP_IB_RANDOM_KEY = TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
-    private static final String PROP_OB_RANDOM_KEY = TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
+    public static final String PROP_IB_RANDOM_KEY = TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
+    public static final String PROP_OB_RANDOM_KEY = TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
     private final static String DNS_CACHE_TIME = "" + (5*60);
     private static final String EVENTLOG = "eventlog.txt";
     private static final String PROP_JBIGI = "jbigi.loadedResource";
@@ -621,6 +621,7 @@ public class Router implements RouterClock.ClockShiftListener {
 
         synchronized(_configFileLock) {
             // persistent key for peer ordering since 0.9.17
+            // These will be replaced in CreateRouterInfoJob if we rekey
             if (!_config.containsKey(PROP_IB_RANDOM_KEY)) {
                 byte rk[] = new byte[32];
                 _context.random().nextBytes(rk);
