@@ -938,7 +938,9 @@ class SybilRenderer {
 
         RouterKeyGenerator rkgen = ctx.routerKeyGenerator();
         long now = ctx.clock().now();
-        final int days = 7;
+        final int start = -3;
+        now += start * 24*60*60*1000L;
+        final int days = 10;
         Hash from = ctx.routerHash();
         if (victim != null) {
             Hash v = ConvertToHash.getHash(victim);
@@ -948,7 +950,7 @@ class SybilRenderer {
         out.write("<h3>Distance to " + from.toBase64() + "</h3>");
         prev = null;
         final int limit = Math.min(10, sybils.size());
-        for (int i = 0; i < days; i++) {
+        for (int i = start; i <= days; i++) {
             out.write("<h3>Distance for " + new Date(now) +
                       "</h3><table><tr><th>Hash<th>Distance<th>Distance from previous</tr>\n");
             Hash rkey = rkgen.getRoutingKey(from, now);
