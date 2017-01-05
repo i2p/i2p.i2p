@@ -1,0 +1,193 @@
+This document is for Debian package maintainers.
+It contains an overview of current package dependencies,
+the plan for improvement, and other notes.
+These notes will also be helpful for non-Debian package maintainers.
+
+We are not packaging experts, but we are doing the best we can to
+improve our official packages and support other packagers.
+Our packages are available at https://deb.i2p2.de/ and
+instructions are at https://geti2p.net/debian
+
+This document is current as of release 0.9.28, 2016-12-12.
+
+
+Build-only Dependencies
+-----------------------
+
+* ant
+  This is the standard java build system.
+
+
+Current Runtime Dependencies
+----------------------------
+
+* Java JDK/JRE
+  We require openjdk-7-java to build, and any Java 7, 8, or 9 runtime to run.
+  Java 9 may still have some issues; see https://trac.i2p2.de/ticket/1870 for status
+
+* libecj-java
+  This is for compilation on-the-fly of webapps, but we don't really support that,
+  not sure why it's in there, to be researched, candidate for removal.
+
+* geoip-database
+  In non-Debian builds we bundle our own geoip data;
+  for Debian builds we use the system data.
+
+* gettext-base
+  For /usr/share/java/libintl.jar.
+  In non-Debian builds we bundle the source code; it's removed in the Debian source package.
+
+* libgetopt-java
+  For /usr/share/java/gnu-getopt.jar.
+  In non-Debian builds we bundle the source code; it's removed in the Debian source package.
+
+* libjetty8-java
+  For /usr/share/java/jetty8-*.jar.
+  In non-Debian builds we bundle the jars; it's removed in the Debian source package.
+  For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
+  which is 8.1.21, but there's no particular version that we need.
+  Jetty 8 is now EOL and we plan to migrate to Jetty 9.x in late 2017.
+  Jetty 9.2.x is in recent Ubuntu, but not Debian?
+  Jetty 9 ticket is https://trac.i2p2.de/ticket/1512
+  Updating Jetty may break external plugins. Extensive testing is required.
+  Note that the libjetty8-java dependency brings in libservlet3.0-java which we require.
+
+* glassfish-javaee
+  We need jstl.jar and standard.jar version 1.2.
+  This is an ancient and terrible package, but it's the only place we've found version 1.2 jars.
+  standard.jar classes are inside /usr/share/java/glassfish-appserv-jstl.jar
+  jstl.jar classes are inside /usr/share/java/glassfish-javaee.jar but we can't use it
+  because there are too many conflicting, old, unrelated classes in there, so we currently
+  bundle jstl.jar even in Debian builds.
+  We've found some other packages that contain version 1.1 jars:
+  libjakarta-taglibs-standard-java (containing standard.jar only)
+  and libjstl1.1-java (containing jstl.jar only).
+  They may be inside tomcat or jetty packages also?
+  It's not clear why there isn't a libjstl1.2-java package.
+  It also isn't clear why we upgraded to 1.2 years ago, but the rest of the world didn't.
+  And it isn't clear why 1.1 won't work for us.
+
+* service-wrapper
+  In non-Debian builds we bundle the jars; it's removed in the Debian source package.
+  For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
+  which is 3.5.30, but there's no particular version that we need.
+
+* libgmp-dev
+  In non-Debian builds we bundle compiled C code; in the Debian packages we have a small
+  C shim that links to the libgmp .so file.
+  We depend on libgmp-dev for both the build and the runtime, but perhaps only the
+  libgmp10 package is required for runtime? To be researched.
+
+
+Bundled code, NOT current dependencies
+--------------------------------------
+
+These are packages that we at least partially bundle jars or java source for,
+even in Debian builds. For most of these we could remove the code and add
+a dependency if the package were widely available.
+We have not created private packages for any of these, we just bundle
+the binaries or sources.
+
+* geoip-java
+  Java interface to access geoip data.
+  We bundle source from https://github.com/maxmind/geoip-api-java
+  No package or not widely available.
+
+* hashcash
+  One Java source file.
+  From http://www.nettgryppa.com/code/
+  No package or not widely available.
+  We don't really use this code anyway, but it would break compilation if we took it out.
+
+* identicon
+  Small number of Java source files, modified.
+  From https://github.com/PauloMigAlmeida/identicon
+  No package or not widely available.
+
+* jrobin
+  This is the Java graphing package.
+  We bundle a large portion of the 1.6.0 source from https://github.com/OpenNMS/jrobin
+  No package or not widely available.
+
+* libtomcat6-java
+  We currently require Tomcat 6, which is EOL and not available in newer Debian/Ubuntu releases.
+  We plan to migrate to Tomcat 8 in mid-to-late 2017. It's not currently clear if we can
+  or will update Tomcat before we update to Jetty 9, or if we must couple the two.
+  Newer packages are libtomcat7-java and libtomcat8-java. We will probably skip over 7 and go straight to 8.
+  This page is quite helpful: http://tomcat.apache.org/whichversion.html
+  The Tomcat upgrade may also affect the glassfish/standard.jar/jstl.jar issue above.
+  See also the Java 9 ticket https://trac.i2p2.de/ticket/1870
+  Updating Tomcat may break external plugins, especially Bote. Extensive testing is required.
+  Tomcat 8 may not be available in older distributions.
+  Pretty sure we will have to pick 6 or 8, we can't leave it as either-or.
+
+* libhttpclient-java
+  We only use a few classes from this large package.
+  We require 4.4 or higher which is not available in older distributions.
+  This is 2 MB of dependencies, instead we bundle 20 KB of copied source.
+  If we do add this dependency, we use only the code in
+  /usr/share/java/httpclient.jar and /usr/share/java/httpcore.jar.
+
+* UPnP (cybergarage)
+  Large subsystem, large number of Java source files, modified with several fixes.
+  From https://github.com/cybergarage/cybergarage-upnp
+  No package or not widely available.
+  There is a competing UPnP library (libupnp-java) that is packaged, but it would be
+  a huge effort on our part to port our code to use that library instead.
+  Maybe we will do this some day, but it won't be soon.
+
+* zxing
+  This is the QR/barcode library from Google.
+  We bundle a portion of the source from https://github.com/zxing/zxing
+  No package or not widely available.
+
+
+Other Issues and TODO
+---------------------
+
+* Building
+  As of 0.9.28, our Debian repo at https://deb.i2p2.de just contains
+  binaries copied from Launchpad. It's much easier than building them
+  ourselves, but it leaves non-x86 architectures out of date.
+  The directory above (debian-alt) contains various changes for different distros.
+
+* Configuration
+  So that we may easily support dependency changes in various distributions,
+  and test alternatives, we output configuration settings to the override.properties
+  file in the rules script. There are extensive comments in the
+  rules, i2p-router.install, and i2p-router.links files.
+  There's probably a better or more-standard way to do this, but this makes it
+  easier for us, and for non-Debian packagers, if there are any.
+
+* i2p-doc
+  This is just javadocs.
+  Added priority of 'extra' for 0.9.29, before that, everybody was installing it?
+
+* Init/systemd
+  Kytv did the systemd and init script parts, no idea if it's compliant,
+  needs review.
+
+* JCA issues.
+  This has never been a problem for Debian/Ubuntu, but many Gentoo, Redhat, and Fedora
+  distributions are missing or have broken ECDSA support in the Java Cryptography subsystem.
+  The console sidebar will show a warning and the router will log warnings if
+  ECDSA is not working. The router will still work, but the user will not be able
+  to access newer hidden services on the network. For best results, packagers
+  should ensure that the JCA supports ECDSA.
+  For further info, see https://trac.i2p2.de/wiki/Crypto/ECDSA
+
+* Raspberry Pi
+  The performance of OpenJDK 8 on the raspberry pi is terrible, it's almost
+  unusable. The Oracle JDK is several times faster. But there's no package for that.
+  We tell people to use Oracle for ARM on our download page, but there's no
+  solution for package users.
+
+* Splitting packages further
+  Might be nice to further split up the i2p-router package into just the
+  core headless router and the routerconsole/UI part.
+  Or even the susimail/susidns/i2psnark/i2ptunnel webapps also.
+
+* Plugins
+  We don't have a strategy for building, installing, or finding packages for
+  3rd-party plugins using our plugin system. If we do that, then we can
+  have packages for popular plugins such as i2p-bote.
