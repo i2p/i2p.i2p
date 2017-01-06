@@ -927,8 +927,17 @@ public class EepGet {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("rc: " + _responseCode + " for " + _actualURL);
         boolean rcOk = false;
+        // https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         switch (_responseCode) {
             case 200: // full
+            case 201: // various other success codes follow
+            case 202:
+            case 203:
+            case 204: // no content, TODO separate case?
+            case 205: // no content, TODO separate case?
+            case 207:
+            case 208:
+            case 226:
                 if (_outputStream != null)
                     _out = _outputStream;
 		else
@@ -961,15 +970,35 @@ public class EepGet {
             case 402: // payment required
             case 403: // bad req
             case 404: // not found
+            case 405: // method
+            case 406: // not acceptable
             case 408: // req timeout
             case 409: // bad addr helper
             case 410: // gone
+            case 411: // length
+            case 413: // payload
             case 414: // URI too long
+            case 415: // unsupported
             case 418: // backoff
             case 420: // backoff
+            case 421: // misdirected
+            case 423: // locked
+            case 424: // dependency
+            case 426: // upgrade
+            case 428: // precondition
             case 429: // too many requests
             case 431: // headers too long
+            case 451: // legal
+            case 500: // internal
+            case 501: // not implemented
+            case 502: // bad gateway
             case 503: // no outproxy
+            case 505: // version
+            case 506: // variant
+            case 507: // insufficient
+            case 508: // loop
+            case 510: // not extended
+            case 511: // network auth
                 _transferFailed = true;
                 if (_alreadyTransferred > 0 || !_shouldWriteErrorToOutput) {
                     _keepFetching = false;
