@@ -53,7 +53,7 @@
    }  // shouldShowNews()
 %>
 
-<div class="main" id="main">
+<div class="main" id="home">
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
