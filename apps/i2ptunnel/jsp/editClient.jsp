@@ -494,12 +494,16 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td colspan="2">
                 <b><%=intl._t("New Keys on Reopen")%>:</b>
-                <input value="1" type="radio" name="newDest" title="New Destination"
+                <span class="multiOption">
+                    <input value="1" type="radio" name="newDest" title="New Destination"
                         <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Enable")%>
-                <input value="0" type="radio" name="newDest" title="New Destination"
+                    <%=intl._t("Enable")%>
+                </span> 
+                <span class="multiOption">
+                    <input value="0" type="radio" name="newDest" title="New Destination"
                         <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />
-                <%=intl._t("Disable")%>
+                    <%=intl._t("Disable")%>
+                </span>
             </td>
         </tr>
 

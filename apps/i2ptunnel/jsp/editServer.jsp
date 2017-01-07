@@ -184,7 +184,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
          <% if ("httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
 
             <td>
-                <b><%=intl._t("Reachable by")%></b>:
+                <b><%=intl._t("Reachable by")%>:</b>
 
                 <select id="reachableBy" name="reachableBy" title="IP for Client Access" class="selectbox">
               <%

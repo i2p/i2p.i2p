@@ -129,7 +129,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
         </td>
     </tr>
 </table>
@@ -150,7 +150,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.writeRemove(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.writeRemove(out); %></textarea>
         </td>
     </tr>
 
@@ -190,7 +190,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
         </td>
     </tr>
     <tr>
@@ -223,7 +223,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
         </td>
     </tr>
     <tr>
@@ -259,7 +259,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
         </td>
     </tr>
     <tr>
@@ -296,7 +296,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
         </td>
     </tr>
     <tr>
@@ -335,7 +335,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he.write(out); %></textarea>
+            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
         </td>
     </tr>
     <tr>
