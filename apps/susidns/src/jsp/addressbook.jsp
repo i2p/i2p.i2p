@@ -79,6 +79,20 @@
 ${book.loadBookMessages}
 
 <c:if test="${book.notEmpty}">
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
+<form action="export" method="GET" target="_top">
+<div id="export">
+<input type="hidden" name="book" value="${book.book}">
+<c:if test="${book.search} != null && ${book.search}.length() > 0">
+<input type="hidden" name="search" value="${book.search}">
+</c:if>
+<c:if test="${book.hasFilter}">
+<input type="hidden" name="filter" value="${book.filter}">
+</c:if>
+<input type="submit" class="export" value="<%=intl._t("Export in hosts.txt format")%>" />
+</div></form>
+<% } /* book.getEntries().length() > 0 */ %>
+
 <div id="filter">
 <c:if test="${book.hasFilter}">
 <span><%=intl._t("Current filter")%>: <b>${book.filter}</b>
@@ -184,22 +198,6 @@ ${book.loadBookMessages}
 </c:if>
 <% } /* book..getEntries().length() > 0 */ %>
 </form>
-
-<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
-<form action="export" method="GET" target="_top">
-<div id="buttons">
-<p class="buttons">
-<input type="hidden" name="book" value="${book.book}">
-<c:if test="${book.search} != null && ${book.search}.length() > 0">
-<input type="hidden" name="search" value="${book.search}">
-</c:if>
-<c:if test="${book.hasFilter}">
-<input type="hidden" name="filter" value="${book.filter}">
-</c:if>
-<input type="submit" class="export" value="<%=intl._t("Export in hosts.txt format")%>" />
-</p></div></form>
-<% } /* book..getEntries().length() > 0 */ %>
-
 </c:if><% /* book.notEmpty */ %>
 
 <c:if test="${book.isEmpty}">
