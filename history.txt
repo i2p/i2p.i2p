@@ -1,8 +1,26 @@
+2017-01-07 zzz
+ * i2ptunnel: Fix NPE on proxy.i2p/add when no params
+
+2017-01-06 zzz
+ * EepGet: Recognize more status codes
+
+2017-01-04 zzz
+ * Crypto: Enforce correct seed and hash lengths in EdDSAPrivateKeySpec
+ * Data: No longer sort addresses in an RI by SHA256
+ * Router: Replace random tunnel keys when rekeying
+
+2016-12-24 zzz
+ * Utils: Add RKG command line tool
+
+2016-12-23 zzz
+ * Console: Add Referrer-Policy header
+
 2016-12-22 zzz
  * Blocklist:
    - More efficiently check blocklist when receiving new RI
    - Check blocklist when loading RIs
    - Ensure blocklist is initialized before netdb
+ * Clock: Fix duplicate notification of clock shift listeners
  * Console: Limit age of news entries displayed
  * Update: Fix JVM crash and i2p.jar corruption when updating from -1
 

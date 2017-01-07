@@ -127,6 +127,10 @@ public abstract class LocalHTTPServer {
         // Parameters are url, host, dest, nonce, and master | router | private.
         // Do the add and redirect.
         if (targetRequest.equals("/add")) {
+            if (query == null) {
+                out.write(ERR_ADD.getBytes("UTF-8"));
+                return;
+            }
             Map<String, String> opts = new HashMap<String, String>(8);
             // this only works if all keys are followed by =value
             StringTokenizer tok = new StringTokenizer(query, "=&;");
