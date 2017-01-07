@@ -891,7 +891,7 @@ p.book {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea {
+body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea, .help li {
      font-size: 10pt !important;
 }
 
@@ -935,4 +935,9 @@ p.book {
 #messages + p, p.book {
      border: 1px solid #2d295f;
      background: #000 url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
+}
+
+/* hide export button on published addressbook if empty */
+#messages + form[action="export"] {
+     display: none;
 }

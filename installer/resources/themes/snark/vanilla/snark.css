@@ -13,9 +13,32 @@ body {
      background-size: 3px 3px;
 }
 
+/* preload top navigation mouseovers */
+body {
+     background: linear-gradient(-45deg, #2f231a, #1f120c),
+     url(images/button_snark_hover.png) no-repeat,
+     url(images/button_snark_active.png) no-repeat,
+     url(images/button_tracker_hover.png) no-repeat,
+     url(images/button_tracker_active.png) no-repeat,
+     url(images/button_forum_hover.png) no-repeat,
+     url(images/button_forum_active.png) no-repeat !important;
+     background-size: 3px 3px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
+}
+
 body.iframed {
-     background: transparent url(../../console/dark/images/transparent.gif) !important;
+     background: transparent url(/themes/console/images/transparent.gif) !important;
      margin: 6px 0 !important;
+}
+
+body.iframed {
+     background: url(/themes/console/images/transparent.gif),
+     url(images/button_snark_hover.png) no-repeat,
+     url(images/button_snark_active.png) no-repeat,
+     url(images/button_tracker_hover.png) no-repeat,
+     url(images/button_tracker_active.png) no-repeat,
+     url(images/button_forum_hover.png) no-repeat,
+     url(images/button_forum_active.png) no-repeat !important;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
 }
 
 * {
@@ -180,10 +203,16 @@ body.iframed {
      margin-bottom: -6px !important;
 }
 
+.snarkRefresh:first-child {
+     margin: -5px -2px -3px 0 !important;
+     display: inline-block;
+     padding: 5px 10px 2px 12px !important;
+}
+
 .snarkRefresh:last-child[href="/i2psnark/"] {
      margin: -5px 0 -3px !important;
      display: inline-block;
-     padding: 4px 10px 4px 12px !important;
+     padding: 5px 10px 3px 12px !important;
 }
 
 .iframed .snarkRefresh:last-child[href="/i2psnark/"] {
@@ -451,6 +480,11 @@ tfoot tr:nth-child(n+1) {
 .snarkTorrents thead th {
      border-top: 0;
      border-bottom: 1px solid #6f533e;
+}
+
+.snarkTorrents thead th:nth-child(2) {
+     text-align: left;
+     min-width: 50px;
 }
 
 .snarkTorrents tfoot th {
@@ -1596,4 +1630,33 @@ code, tt {
 .toggleview img:active, .toggleview:active img, .snarkConfigTitle a:active img {
      transform: rotate(90deg);
      transition: ease transform 0.3s 0s;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+body, .snarkTorrents td, .snarkAddInfo, th, td {
+     font-size: 9pt !important;
+}
+
+.snarkRefresh:link {
+     font-size: 10pt;
+}
+
+.snarkRefresh:link:first-child {
+     padding-left: 13px !important;
+}
+
+tt, .snarkTorrents tt, code, .snarkMessages, input, input[type="submit"], input[type="reset"], select, button, textarea {
+     font-size: 9pt !important;
+}
+
+select {
+     padding-top: 4px;
+     padding-bottom: 4px;
+}
+
+select:nth-child(2) {
+     margin-left: -14px;
+}
 }

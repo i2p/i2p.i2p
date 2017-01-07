@@ -11,6 +11,20 @@ body {
      font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
 }
 
+/* preload button mouseovers */
+body {
+     background: url(images/bg.png) fixed, 
+     url(/themes/console/images/buttons/clean_hover.png) no-repeat,
+     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
+     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restart_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restore_hover.png) no-repeat,
+     url(/themes/console/images/buttons/search_hover.png) no-repeat,
+     url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
+     url(/themes/console/images/buttons/update_hover.png) no-repeat, #bbf;
+     background-size: 150px 150px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
 .hide, .hideme {
      display: none;
 }
@@ -183,6 +197,7 @@ div.sorry {
      background: #fff url(/themes/console/images/info/errortriangle.png) 10px center no-repeat;
      background: url(/themes/console/images/info/errortriangle.png) 10px center no-repeat, linear-gradient(to bottom, #fff 0%, #ffe 100%);
      margin: -1px 1px 0 200px;
+     min-width: 460px;
      border: 1px solid #89f;
      box-shadow: inset 0 0 0 1px #ff9;
      text-align: justify;
@@ -252,7 +267,6 @@ div.routersummary hr {
 }
 
 .routersummary b {
-     white-space: nowrap;
      text-transform: capitalize;
 }
 
@@ -639,6 +653,7 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
      background-blend-mode: luminosity;
      filter: saturate(100%) drop-shadow(0 0 1px #ccc);
      -webkit-filter: saturate(100%) drop-shadow(0 0 1px #ccc);
+     color: #555;
 }
 
 input.accept, button.accept {
@@ -721,7 +736,7 @@ input.accept[value^="Show"]:hover, button.accept[value^="Show"]:hover,
 input.check[value^="View"]:hover, button.check[value^="View"]:hover,
 input.accept[value^="Show"]:focus, button.accept[value^="Show"]:focus,
 input.check[value^="View"]:focus, button.check[value^="View"]:focus {
-     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
 input.cancel[value^="Hide"], button.cancel[value^="Hide"],
@@ -1280,12 +1295,14 @@ div.confignav {
 
 .tab2::before {
      content: '\1F892\00A0';
+     content: '\25B8\00A0';
      font-size: 10pt;
      line-height: 110%;
 }
 
 .tab2::after {
      content: '\00A0\1F890';
+     content: '\00A0\25C2';
      font-size: 10pt;
      line-height: 110%;
 }
@@ -1831,7 +1848,7 @@ h3.ptitle {
 }
 
 h3.ptitle, h3.tabletitle, th.th_title {
-     font-size: 10pt;
+     font-size: 11pt;
 }
 
 h3.enbeddedtitle, h4.embeddedtitle {
@@ -1920,6 +1937,10 @@ h3#advancedclientconfig, h3#ffconf, h3#advancedconfig {
 
 h3#pluginmanage {
      margin-bottom: -18px !important;
+}
+
+.configure > h3#pluginmanage {
+     margin-top: 15px;
 }
 
 h3#advancedclientconfig, h3#pluginconfig {
@@ -2096,6 +2117,10 @@ h4.app, h4.app2 {
      text-transform: uppercase;
      background: url(images/tinytitle.png) center center repeat-x;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+}
+
+h4.app {
+     margin-top: -5px;
 }
 
 h4.app2 {
@@ -2795,9 +2820,11 @@ tt, code {
      padding: 2px 5px;
 }
 
+/*
 .main[id^="config_"] tr:nth-child(even) {
      background: #f7f8ff;
 }
+*/
 
 #netconfig tr, #externali2cp tr {
      background: #fff; 
@@ -2897,6 +2924,7 @@ p#graphopts {
 
 h3#graphinfo {
      margin: 5px 10px 15px;
+     text-transform: capitalize;
 }
 
 p#graphopts + p {
@@ -2911,6 +2939,64 @@ p#graphopts + p {
 .formaction#graphing {
      margin: -3px -10px -5px;
 }
+
+/* new graphs optionbox */
+
+#graphs form {
+     padding: 0 !important;
+}
+
+#graphs form hr {
+     margin: 0 -1px 8px !important;
+}
+
+#graphs form table {
+     border: none;
+     margin: 0;
+}
+
+.formaction#graphing {
+     margin: -8px 0 0 !important;
+     padding: 5px;
+     border-left: none;
+     border-right: none;
+}
+
+#graphs tr:first-child td {
+     border-top: none;
+}
+
+#graphs td:first-child {
+     text-align: right;
+     width: 85px;
+     white-space: nowrap;
+     padding: 13px 3px 13px 5px;
+}
+
+#graphs td:nth-child(2) {
+     width: 260px;
+     white-space: nowrap;
+}
+
+#graphs td.infohelp {
+     border: none;
+     border-right: none;
+     background-size: 20px 20px !important;
+     padding: 5px 5px 5px 40px !important;
+     background-color: #eff1ff !important;
+     text-align: left;
+}
+
+#graphs form input, #graphs form select {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+#graphs input[type="text"] {
+     min-width: 60px;
+}
+
+/* end new graphs optionbox */
 
 div.footnote {
      text-align: right;
@@ -3031,6 +3117,14 @@ div.themechoice {
      background: #ddf;
      color: #338;
      font-weight: bold;
+}
+
+.themechoice .optbox:focus + object ~ div.themelabel {
+     color: #f60 !important;
+}
+
+.themechoice .optbox:active + object ~ div.themelabel {
+     color: #fff !important;
 }
 
 .themechoice:active .optbox:checked + object ~ .themelabel {
@@ -3165,6 +3259,14 @@ div.langselect { /* containing box for lang selection */
      color: #338 !important;
      box-shadow: none !important;
 } 
+
+.langselect input[name="lang"]:focus + img + .ui_lang {
+     color: #f60 !important;
+}
+
+.langselect input[name="lang"]:active + img + .ui_lang {
+     color: #fff !important;
+}
 
 div.flagradio {
      margin-top: 2px;
@@ -3555,9 +3657,11 @@ div#sybilnav {
 
 #sybilnav ul li::before {
      content: '\00A0\1F441\00A0';
+     content: url(images/eye.png);
+     padding: 0 5px;
      font-size: 16pt;
      line-height: 50%;
-     vertical-align: sub;
+     vertical-align: middle;
 }
 
 p.sybil_floodfill, p.family, p.threatpoints, p.hashdist {
@@ -3651,6 +3755,8 @@ ul.statlist li b, ul.statlist b a:hover, h3.stats a:hover  {
 
 ul.statlist li::before {
      content: "\1F6C8\00A0";
+     content: "\2B26\00A0";
+     margin-left: 5px;
      font-size: 14pt;
      line-height: 60%;
      vertical-align: baseline;
@@ -3716,6 +3822,7 @@ ul.statlist li li:last-child::before {
      margin-top: 2px !important;
 }
 
+/*
 .statlist a[href*="graph"]::before {
      content: "\1F5E0";
      font-size: 16pt;
@@ -3723,6 +3830,7 @@ ul.statlist li li:last-child::before {
      font-weight: normal !important;
      padding-bottom: 2px;
 }
+*/
 
 .statlist li a[href*="graph"]:first-of-type {
      margin-left: -1px;
@@ -4123,8 +4231,6 @@ p#enablefullstats, p#gatherstats {
 }
 /* end informational images */
 
-
-
 /* login inputs */
 
 #consolepass input[name="name"], #externali2cp input[name="user"] {
@@ -4144,7 +4250,7 @@ p#enablefullstats, p#gatherstats {
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
-.netdbentry th, .configtable th {
+.netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages {
      font-size: 10pt !important;
 }
 
@@ -4181,6 +4287,10 @@ div.news {
      margin: 2px 4px 1px;
 }
 
+.routersummary button[value="cancelShutdown"] {
+     padding-left: 20px !important;
+}
+
 div.app {
      width: 154px;
 }
@@ -4214,6 +4324,9 @@ h4#updateplugins {
      margin-top: -16px !important;
 }
 
+h3#webappconfig {
+     margin-bottom: -33px;
+}
 
 #shutdown.formaction, #restart.formaction, #systray.formaction, #runonstart.formaction, #dumpthreads.formaction, #browserstart.formaction,  #updateplugins.formaction {
      margin-top: -15px;
@@ -4237,5 +4350,13 @@ table#leasesetdebug th, table#leasesetsummary th {
 
 div.news {
      padding-bottom: 5px !important;
+}
+
+.sorry {
+     margin-left: 232px !important;
+}
+
+div.joblog h3 {
+     margin-top: 8px;
 }
 }

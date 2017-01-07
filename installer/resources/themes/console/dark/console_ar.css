@@ -40,6 +40,10 @@ h1,h2,h3,h4 {
      text-align: right;
 }
 
+h4.app, h4.app2 {
+     text-align: right;
+}
+
 button.search {
      margin-right: 30px;
 }
@@ -226,6 +230,10 @@ table.netdbentry th:last-child, table#leasesetdebug td:nth-child(2n+1) {
      float: left;
 }
 
+table#enviro td {
+     padding: 5px 10px 5px 5px !important;
+}
+
 table#enviro td:first-child {
      text-align: left;
 }
@@ -291,4 +299,58 @@ td.optionsave {
 
 #tunnelconfig th {
      text-align: right;
+}
+
+#consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus,
+#consolepass input[name="name"], #externali2cp input[name="user"], #consolepass input[name="name"]:focus, #externali2cp input[name="user"]:focus {
+     background-position: right 3px center, center center !important;
+     padding: 4px 20px 4px 4px !important;
+     margin: 5px 3px 5px 15px !important;
+}
+
+#consolepass tr:first-child td, p#clientconf.infohelp, p#webappconfigtext.infohelp, #floodfillconfig .infohelp, 
+#bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
+h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, table#addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
+#config_reseed.main p.infohelp, #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2), 
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
+p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #plugininstall .infohelp, #config_family .infohelp, 
+#joinfamily tr:nth-child(3) td:first-child, #newfamily tr:last-child td:first-child, #config_summarybar .configtable td:not(.optionsave),
+table#bugreports td.infohelp {
+     background-position: right 12px center !important;
+     padding: 15px 50px 15px 15px !important;
+}
+
+div[lang="ar"] ul li {
+     list-style-image: url("images/link.png") !important;
+     list-style-position: inside;
+     margin-left: 0 !important;
+     padding-left: 0 !important;
+     margin-top: 15px !important;]
+}
+
+div[lang="ar"] ul, div[lang="ar"] p {
+     margin: 10px;
+}
+
+@media screen and (min-width: 1500px) {
+.main, .news, h1 {
+     margin-right: 232px !important;
+     margin-left: 0 !important;
+}
+
+div.routersummaryouter {
+     margin-right: 27px !important;
+}
+
+.routersummary h4 {
+     font-size: 11pt !important;
+}
+
+.routersummary td, .routersummary a {
+     font-size: 10pt !important;
+}
+
+div[lang="ar"], div[lang="ar"] code, div[lang="ar"] b {
+     font-size: 11pt !important;
+}
 }

@@ -591,7 +591,7 @@ div.sorry {
      background-repeat:no-repeat;
      box-shadow: inset 0 0 0 1px #d00;
      word-wrap: break-word;
-/*     font-weight: bold;*/
+     min-width: 555px;
      color: #EE9;
      font-size: 10pt;
 }
@@ -778,14 +778,16 @@ div.confignav {
 
 .tab2::before {
      content: '\1F892\00A0';
-     font-size: 12pt;
+     content: '\25B8\00A0';
+     font-size: 11pt;
      line-height: 50%;
      vertical-align: baseline;
 }
 
 .tab2::after {
      content: '\00A0\1F890';
-     font-size: 12pt;
+     content: '\00A0\25C2';
+     font-size: 11pt;
      line-height: 50%;
      vertical-align: baseline;
 }
@@ -830,10 +832,14 @@ div.widepanel h3 {
      border: 1px solid #494;
 }
 
+#graphs .messages {
+     margin-top: 15px;
+}
+
 div.graphspanel {
      padding: 0;
      margin: 15px 0 -15px 0;
-     background: none;/* url(images/camotile.png);*/
+     background: none;
      text-align: center;
      overflow: hidden;
      width: 100%;
@@ -900,6 +906,94 @@ h3#graphinfo {
 div.graphspanel p:last-child {
      display: none;
 }
+
+form[action="graphs"] {
+     border: 1px solid #494;
+     padding: 10px 10px 0 !important;
+     background: #000;
+     margin-top: -11px;
+     margin-bottom: 10px;
+}
+
+.formaction#graphing {
+     margin: -4px -5px 5px !important;
+     border-left: none;
+     border-right: none;
+}
+
+/*
+.main#graphs hr {
+     margin: 10px -10px 8px !important;
+}
+*/
+
+h3#graphinfo {
+     text-transform: capitalize;
+     letter-spacing: normal;
+     word-spacing: normal;
+}
+
+h3#graphdisplay a {
+     text-transform: capitalize;
+     letter-spacing: normal;
+     float: right;
+     font-size: 9pt;
+}
+
+/* new graphs optionbox */
+
+#graphs form {
+     padding: 0 !important;
+}
+
+#graphs form hr {
+     margin: 0 -1px 8px !important;
+}
+
+#graphs form table {
+     border: none;
+     margin: 0;
+}
+
+.formaction#graphing {
+     margin: -4px 3px 5px !important;
+     padding-top: 1px;
+}
+
+#graphs tr:first-child td {
+     border-top: none;
+}
+
+#graphs td:first-child {
+     text-align: right;
+     width: 85px;
+     white-space: nowrap;
+     padding: 13px 3px 13px 5px;
+}
+
+#graphs td:nth-child(2) {
+     width: 260px;
+     white-space: nowrap;
+}
+
+#graphs td.infohelp {
+     border: 1px solid #131;
+     border-right: none;
+     background-size: 20px 20px !important;
+     padding: 5px 5px 5px 40px !important;
+     background-color: #000800 !important;
+     text-align: left;
+}
+
+#graphs form input, #graphs form select {
+     margin: 3px 5px 3px 0;
+}
+
+#graphs input[type="text"] {
+     min-width: 60px;
+}
+
+/* end new graphs optionbox */
 
 table {
      border-collapse: collapse;
@@ -1415,15 +1509,12 @@ select option { /* dropdown menu reverts to normal font-weight */
      font-size: 9.5pt !important;
      box-shadow: inset 0 0 20px 20px #000;
      color: #fff !important;
+     background: #000 !important;
 }
 
 select option:hover, select option:checked {
      box-shadow: inset 0 0 20px 20px #f60;
-}
-
-select option:not(hover) {
-     color: #f00;
-     background: none;
+     background: #000 !important;
 }
 
 select:focus, select:hover {
@@ -1435,8 +1526,18 @@ select:hover {
      box-shadow: inset 0 1px 1px 0 #ee9;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+select {
+     padding: 3px 4px !important;
+}
 
+select option {
+     background: #000 !important;
+     color: #f60 !important;
+}
+}
+
+@-moz-document url-prefix() { /* target firefox and derivatives only */
 select {
      -moz-appearance: none;
      background: #000 url(images/dropdown.png) right center no-repeat !important;
@@ -1769,6 +1870,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover 
 
 ul.statlist li::before {
      content: "\1F6C8\00A0";
+     content: "\2B26\00A0";
      font-size: 14pt;
      line-height: 50%;
      vertical-align: baseline;
@@ -1811,12 +1913,14 @@ ul.statlist li li:last-child::before {
      color: #994
 }
 
+/*
 .statlist a[href*="graph"]::before {
      content: "\1F4CA\00A0";
      font-size: 11pt;
      line-height: 140%;
      font-weight: normal;     
 }
+*/
 
 .main#stats form {
      border: 1px solid #494;
@@ -1834,10 +1938,6 @@ ul.statlist li li:last-child {
      margin-bottom: -20px !important;
 }
 
-ul.statlist:last-of-type {
-     margin-bottom: -5px !important;
-}
-
 li.noevents {
      padding: 0 0 20px !important;
 }
@@ -1848,8 +1948,6 @@ li.noevents {
 }
 
 /* end stats */
-
-
 
 /* /eventlogs */
 
@@ -2128,7 +2226,7 @@ div.themechoice {
 .themechoice:active .themelabel {
      background: #f60 !important;
      color: #ee9 !important;
-     box-shadow: inset 0 0 0 1px #000;
+     box-shadow: inset 0 0 0 1px #000 !important;
 }
 
 .themechoice .optbox:hover + object ~ .themelabel {
@@ -2142,6 +2240,16 @@ div.themechoice {
      box-shadow: none !important
 }
 
+.themechoice .optbox:focus + object ~ .themelabel {
+     color: #f60 !important;
+     box-shadow: inset 0 0 10px 3px #000 !important;
+}
+
+.themechoice .optbox:active + object ~ .themelabel {
+     color: #ee9 !important;
+     box-shadow: inset 0 0 0 1px #000 !important;
+}
+
 .themechoice .optbox {
      min-width: 114px !important;
      min-height: 72px !important;
@@ -2151,12 +2259,6 @@ div.themechoice {
      z-index: 999;
      position: absolute;
 }
-
-/*
-.themechoice .optbox + img {
-     padding: 3px 0 !important;
-}
-*/
 
 .themechoice object {
      padding: 3px 0;
@@ -2225,12 +2327,6 @@ td#themeselect {
      margin: -1px 0;
 }
 
-/*
-#themeselect hr {
-     display: inline !important;
-}
-*/
-
 .langselect { /* containing box for lang selection */
      background: #000;
      background: linear-gradient(to bottom, #010 0%, #000 80%);     
@@ -2289,6 +2385,16 @@ td#themeselect {
      color: #f60;
      border-top: 1px solid #f60;
      background: #000;
+}
+
+.langselect input:focus + img + div.ui_lang {
+     color: #f60 !important;
+     box-shadow: inset 0 0 10px 3px #000 !important;
+}
+
+.langselect input:active + img + div.ui_lang {
+     color: #ee9 !important;
+     box-shadow: inset 0 0 0 1px #000 !important;
 }
 
 .langselect:hover .ui_lang {
@@ -2763,31 +2869,6 @@ table#i2pupdates input[name*="URL"], table#i2pupdates textarea {
 table#i2pupdates tr:last-child td {
      padding-right: 6px;
      background: #000 !important;
-}
-
-form[action="graphs"] {
-     border: 1px solid #494;
-     padding: 10px 10px 0 !important;
-     background: #000;
-     margin-top: -11px;
-     margin-bottom: 10px;
-}
-
-.formaction#graphing {
-     margin: -4px -5px 5px !important;
-     border-left: none;
-     border-right: none;
-}
-
-.main#graphs hr {
-     margin: 10px -10px 8px !important;
-}
-
-h3#graphdisplay a {
-     text-transform: capitalize;
-     letter-spacing: normal;
-     float: right;
-     font-size: 9pt;
 }
 
 /* /configlogging */
@@ -3801,7 +3882,7 @@ td.app {
 div.applabel {
      font-size: 8pt;
      margin: 2px 0 0;
-     padding: 5px 2px;
+     padding: 4px 2px 6px;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
@@ -4276,10 +4357,13 @@ div#sybilnav {
 }
 
 #sybilnav ul li::before {
-     content: '\1F441\00A0';
+/*     content: '\1F441\00A0'; */
+     content: url(/themes/console/images/buttons/show.png);
+     mix-blend-mode: luminosity;
+     margin-right: 5px;
      font-size: 16pt;
      line-height: 50%;
-     vertical-align: sub;
+     vertical-align: middle;
      padding-left: 5px;
 }
 
@@ -4336,6 +4420,7 @@ p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
      font-weight: bold;
      background: url(images/eye.png) 8px center no-repeat;
      background: url(images/eye.png) 8px center no-repeat, linear-gradient(to right, #000 0%, #001000 80%, #002000 100%);
+     background-blend-mode: luminosity;
      box-shadow: inset 0 0 0 1px #300;
 }
 
@@ -4693,6 +4778,7 @@ table#configstats {
      border-top: 1px inset #131;
 }
 
+/*
 #configstats .tablefooter b:not(old) {
      font-size: 0;
 }
@@ -4703,6 +4789,7 @@ table#configstats {
      filter: sepia(100%) hue-rotate(70deg) !important;
      -webkit-filter: sepia(100%) hue-rotate(70deg) !important;     
 }
+*/
 
 #configstats .tablefooter:last-child td {
      background: #000 !important;
@@ -4915,7 +5002,8 @@ form[action="events"] {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre {
+body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre, 
+ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover {
      font-size: 10pt !important;
 }
 
@@ -4940,7 +5028,7 @@ body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre
 }
 
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a,
-#floodfill th, code, tt, .applabel a, #jardump td {
+#floodfill th, .applabel a, #jardump td {
      font-size: 9pt !important;
 }
 
@@ -4952,7 +5040,7 @@ div.app {
      width: 134px !important;
 }
 
-th {
+th, #configinfo th, code, tt {
      font-size: 10pt;
 }
 
@@ -4974,6 +5062,24 @@ h3#pluginmanage {
 }
 
 h4#updateplugins {
+     margin-top: -15px !important;
+}
+
+.sorry {
+     margin-left: 232px !important;
+}
+
+div.joblog h3 {
+     margin-top: 7px !important;
+     padding-top: 7px !important;
+}
+
+ p#gatherstats {
+      margin-bottom: 12px !important; 
+}
+
+
+#certs.main p + p:empty + h4 {
      margin-top: -15px !important;
 }
 }

@@ -406,7 +406,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrents thead th:nth-child(2) {
-     text-align: center;
+     text-align: left;
      min-width: 50px;
 } 
 
@@ -430,6 +430,10 @@ tfoot tr:nth-child(n+1) {
 
 .snarkTorrents thead th:nth-last-child(4), .snarkTorrents thead th:nth-last-child(5), .snarkTorrents tfoot th:nth-last-child(4), .snarkTorrents tfoot th:nth-last-child(5)  {
      text-align: center;
+}
+
+.snarkTorrents thead th:nth-last-child(4), .snarkTorrents tfoot th:nth-last-child(4) {
+     text-align: right;
 }
 
 .snarkTorrents tfoot th:nth-child(n+2) {
@@ -676,7 +680,7 @@ table.snarkTorrents tbody tr:hover .snarkTorrentName, table.snarkDirInfo tbody t
 .snarkFileName {
      padding: 4px 0 !important; 
      text-align: left !important;
-     font-size: 7.5pt !important;
+     font-size: 8pt !important;
      white-space: nowrap;
 }
 
@@ -1061,8 +1065,11 @@ input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
      outline: none;
 }
 
-input[type=submit]:hover, input[type=submit]:focus, a.control:hover, a.control:focus {
+input[type=submit]:hover, input[type=submit]:focus {
      background-blend-mode: luminosity;
+}
+
+input[type=submit]:hover, input[type=submit]:focus, a.control:hover, a.control:focus {
      border: 1px outset #bbb;
      color: #fff;
      filter: drop-shadow(0 0 1px #515) !important;
@@ -1716,4 +1723,33 @@ label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle a:hove
 label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:active img {
      transform: rotate(90deg);
      transition: ease transform 0.3s 0s;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, .snarkFileStatus {
+     font-size: 9pt !important;
+}
+
+.snarkRefresh:link {
+     font-size: 10pt;
+}
+
+.snarkRefresh:link:first-child {
+     padding-left: 13px !important;
+}
+
+tt, .snarkTorrents tt, code, .snarkMessages, input, input[type="submit"], input[type="reset"], select, select option, button, textarea {
+     font-size: 9pt !important;
+}
+
+select {
+     padding-top: 4px;
+     padding-bottom: 4px;
+}
+
+select:nth-child(2) {
+     margin-left: -18px !important;
+}
 }

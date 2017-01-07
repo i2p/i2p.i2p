@@ -446,3 +446,42 @@ table.netdbentry th:last-child {
 #logs table td:first-child {
      text-align: left;
 }
+
+#pluginconfigactions {
+     margin: -6px -32px -6px 32px !important;
+}
+
+
+#pluginupdater.formaction {
+     margin: -16px 0;
+}
+
+#consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus,
+#consolepass input[name="name"], #externali2cp input[name="user"], #consolepass input[name="name"]:focus, #externali2cp input[name="user"]:focus {
+     background-position: right 3px center, center center !important;
+     padding: 4px 20px 4px 4px !important;
+     margin: 5px 3px 5px 15px !important;
+}
+
+#consolepass tr:first-child td, p#clientconf.infohelp, p#webappconfigtext.infohelp, #floodfillconfig .infohelp, 
+#bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
+h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, table#addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
+#config_reseed.main p.infohelp, #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2), 
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
+p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #plugininstall .infohelp, #config_family .infohelp, 
+#joinfamily tr:nth-child(3) td:first-child, #newfamily tr:last-child td:first-child, #config_summarybar .configtable td:not(.optionsave),
+table#bugreports td.infohelp {
+     background-position: right 12px center !important;
+     padding: 15px 50px 15px 15px !important;
+}
+
+@media screen and (min-width: 1500px) {
+.main, .news, h1 {
+     margin-right: 232px !important;
+     margin-left: 0 !important;
+}
+
+html {
+     margin: 0 3px !important;
+}
+}

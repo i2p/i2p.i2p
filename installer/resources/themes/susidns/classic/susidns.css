@@ -748,6 +748,11 @@ p.footer {
      margin-bottom: -4px;
 }
 
+/* hide export button on published page when empty */ 
+#messages + form[action="export"] {
+     display: none;
+}
+
 #filter {
      margin-top: -2px !important;
 }

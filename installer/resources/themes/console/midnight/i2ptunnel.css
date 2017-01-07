@@ -138,7 +138,7 @@ hr {
 }
 
 .iframed #globalTunnelControl {
-     margin: 6px 0 -26px !important; 
+     margin: 6px auto -26px !important; 
 }
 
 #serverTunnels {

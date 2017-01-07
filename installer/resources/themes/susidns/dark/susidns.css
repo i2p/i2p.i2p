@@ -335,6 +335,7 @@ h3 {
      word-spacing: 0.1em;
      text-shadow: 0 0 2px #001100;
      text-transform: uppercase;
+     box-shadow: inset 0 0 0 1px #000;
 }
 
 .headline h3 {
@@ -929,4 +930,9 @@ p.book {
 #messages + p, p.book {
      border: 1px solid #2a5f29;
      background: #000 url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
+}
+
+/* hide export button on published addressbook if empty */
+#messages + form[action="export"] {
+     display: none;
 }

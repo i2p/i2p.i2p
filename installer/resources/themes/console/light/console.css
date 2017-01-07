@@ -15,6 +15,20 @@ body {
      background-size: 32px 32px;
 }
 
+/* preload button mouseovers */
+body {
+     background: url(images/tile2.png) fixed, 
+     url(/themes/console/images/buttons/clean_hover.png) no-repeat,
+     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
+     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restart_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restore_hover.png) no-repeat,
+     url(/themes/console/images/buttons/search_hover.png) no-repeat,
+     url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
+     url(/themes/console/images/buttons/update_hover.png) no-repeat, #a4a4cb;
+     background-size: 32px 32px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
 .hide, .hideme {
      display: none;
 }
@@ -281,10 +295,12 @@ div.routersummary tr {
      border: 0 !important;
 }
 
+/*
 div.routersummary td:first-child {
      max-width: 90px;
      overflow: hidden;
 }
+*/
 
 div.routersummary a:hover {
      color: #f60;
@@ -464,16 +480,13 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 5px 0 10px 207px;
-     padding: 20px 20px 20px 75px;
-     background: #ffe;
+     margin: -11px 0 10px 207px;
+     padding: 20px 25px 20px 80px;
      border: 1px solid #447;
-     border-radius: 2px;
+     border-radius: 0 0 2px 2px;
      text-align: justify;
-     background-image: url(/themes/console/images/info/errortriangle.png);
-     background-position: 15px center;
-     background-repeat: no-repeat;
-     box-shadow: inset 0 0 0 1px #d00;
+     background: #ffe url(/themes/console/images/info/errortriangle.png) 20px center no-repeat;
+     box-shadow: inset 0 0 1px #f00;
      word-wrap: break-word;
      font-weight: bold;
      color: #531;
@@ -485,7 +498,7 @@ div.sorry hr {
      background: #531;
      height: 1px;
      border: 1px solid #531;
-     margin: 10px 0 15px 0;
+     margin: 10px 0 !important;
 }
 
 div.main {
@@ -834,6 +847,12 @@ div.configure h3, div.graphspanel h3 {
      text-align: left;
 }
 
+div.graphspanel h3 {
+     text-transform: capitalize;
+     letter-spacing: normal;
+     word-spacing: normal;
+}
+
 h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, th#upnpconfig a, h3#graphinfo a, h3#graphdisplay a, .h3navlinks {
      float: right;
      font-size: 9pt;
@@ -1027,7 +1046,6 @@ p#enablefullstats {
      padding: 5px !important;
 }
 
-
 #sidebarconf tr:last-child td:last-child {
      text-align: left;
 }
@@ -1046,6 +1064,7 @@ div.graphspanel img {
      padding: 2px;
      margin: 6px;
      text-align: center !important;
+     vertical-align: top !important;
      background: #001;
      box-shadow: inset 0 0 1px 1px #99f;
      max-width: 98%;
@@ -1082,6 +1101,8 @@ h3#graphdisplay {
      border-radius: 0;
      border-width: 1px;
      box-shadow: none;
+     filter: none;
+     -webkit-filter: none;
 }
 
 .main#graphs form {
@@ -1089,6 +1110,65 @@ h3#graphdisplay {
      padding: 10px;
      margin: -16px 0 5px;
 }
+
+/* new graphs optionbox */
+
+#graphs form {
+     padding: 0 !important;
+}
+
+#graphs form hr {
+     margin: 0 -1px 8px !important;
+}
+
+#graphs form table {
+     border: none;
+     margin: 0;
+}
+
+.formaction#graphing {
+     margin: -1px 0 !important;
+     padding: 5px 3px;
+     border-left: none;
+     border-right: none;
+}
+
+#graphs tr:first-child td {
+     border-top: none;
+}
+
+#graphs td:first-child {
+     text-align: right;
+     width: 85px;
+     white-space: nowrap;
+     padding: 13px 3px 13px 5px;
+}
+
+#graphs td:nth-child(2) {
+     width: 260px;
+     white-space: nowrap;
+}
+
+#graphs td.infohelp {
+     border: 1px solid #cfd1ff !important;
+     border-right: none !important;
+     background-size: 20px 20px !important;
+     padding: 5px 5px 5px 40px !important;
+     background-color: #f7f8ff !important;
+     text-align: left;
+}
+
+#graphs form input, #graphs form select {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+#graphs input[type="text"] {
+     min-width: 60px;
+}
+
+/* end new graphs optionbox */
+
 
 div.messages {
      padding: 15px;
@@ -1109,6 +1189,10 @@ div.messages {
      background: url(/themes/console/images/info/newspaper.png) 12px center no-repeat, url(/themes/snark/ubergine/images/hat.png) bottom right no-repeat, linear-gradient(to right, #fff, #eef);
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px, auto 100%, 100% 100% !important;
+}
+
+.main#graphs .messages { /* "graphing not supported" error */
+     margin-bottom: 20px;
 }
 
 div.error {
@@ -1220,6 +1304,10 @@ table[id$="logs"] td {
 
 table[id$="logs"] td:empty {
      display: none;
+}
+
+table[id$="logs"] tr:first-child {
+     border-bottom: 1px solid #7778bf;
 }
 
 table[id$="logs"] ul li:last-child {
@@ -1346,13 +1434,14 @@ h4.app, h4.app2 {
 
 h4.app {
      background: url(/themes/console/images/eepsite.png) 10px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
-     background-size: 16px 16px, 100% 100%;    
+     background-size: 16px 16px, 100% 100%;
+     margin-top: 15px;
 }
 
 h4.app2 {
      clear: left;
      margin-top: 10px !important;
-     background: url(images/application-icon.png) 10px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     background: url(images/globe.png) 10px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
 }
 
 div.ag2 {
@@ -1378,8 +1467,8 @@ div.app:hover {
      border: 1px solid #f60;
      background: #fff;
      box-shadow: none;
-     filter: none;
-     -webkit-filter: none;
+/*     filter: none;
+     -webkit-filter: none;*/
 }
 
 div.app:hover a:link, div.app:hover a:visited {
@@ -1396,6 +1485,7 @@ div.app:hover img.app {
 div.app:hover .applabel {
      border-color: #f60;
      background: #fff !important;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ffe8bf 50%, #efd9b3 100%) !important;
 }
 
 div.app:active .applabel {
@@ -1456,6 +1546,7 @@ table.search td:nth-child(3) {
 table.search input[type="text"] {
      min-width: 40px !important;
      width: 100%;
+     padding-left: 24px;
 }
 
 table.search select {
@@ -1520,7 +1611,7 @@ div.applabel {
 /* end home page */
 
 tt {
-     font: bold 8.5pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: bold 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #050;
 }
 
@@ -1541,7 +1632,6 @@ div.main li {
 div.main li b {
      color: #514 !important;
      color: #003 !important;
-     letter-spacing: 0.01em;
      font-size: 9.5pt;
      line-height: 170%;
 }
@@ -2200,7 +2290,7 @@ input.accept[value^="Show"]:hover, button.accept[value^="Show"]:hover,
 input.check[value^="View"]:hover, button.check[value^="View"]:hover,
 input.accept[value^="Show"]:focus, button.accept[value^="Show"]:focus,
 input.check[value^="View"]:focus, button.check[value^="View"]:focus {
-     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
 input.cancel[value^="Hide"], button.cancel[value^="Hide"],
@@ -2489,6 +2579,10 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background-size: 16px 16px, 100% 100% !important;
      padding: 5px 3px 5px 17px !important;
 /*     margin-top: -4px;*/
+}
+
+.routersummary .cancel {
+     margin-top: 10px;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -2922,6 +3016,7 @@ div.themechoice {
 .themechoice:hover > object ~ .themelabel {
      border-top: 1px solid #f60 !important;
      background: #fff !important;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ffe8bf 50%, #efd9b3 100%) !important;
      color: #f60;
 }
 
@@ -2991,8 +3086,18 @@ div.themelabel {
 
 .themechoice .optbox:checked + object ~ div.themelabel {
      background: #ddf !important;
-     color: #338;
+     color: #338 !important;
      font-weight: bold;
+}
+
+.themechoice .optbox:focus + object ~ div.themelabel {
+     color: #f60 !important;
+     box-shadow: inset 0 0 1px #def;
+}
+
+.themechoice .optbox:active + object ~ div.themelabel {
+     color: #fff !important;
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 div#themesettings {
@@ -3076,7 +3181,7 @@ div.langselect { /* containing box for lang selection */
      color: #f60;
      border-top: 1px solid #f60;
      background: #fff !important;
-     transition: all 0.1s ease 0s;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ffe8bf 50%, #efd9b3 100%) !important;
 }
 
 .langselect:active > input[name="lang"] + img + .ui_lang {
@@ -3090,6 +3195,16 @@ div.langselect { /* containing box for lang selection */
      font-weight: bold;
      margin: -32px -4px 0;
      z-index: 2;
+}
+
+.langselect input[name="lang"]:focus + img + div.ui_lang {
+     color: #f60 !important;
+     box-shadow: inset 0 0 1px #def;
+}
+
+.langselect input[name="lang"]:active + img + div.ui_lang {
+     color: #fff !important;
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 div.flagradio {
@@ -4070,5 +4185,9 @@ h3#pluginconfig, h3#webappconfig, h3#i2pclientconfig, h3#pluginmanage, p#clientc
 
 #jardump tt, #jardump td {
      font-size: 9pt !important;
+}
+
+.sorry {
+     margin-left: 232px !important;
 }
 }

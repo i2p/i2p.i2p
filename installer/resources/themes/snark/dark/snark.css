@@ -1,17 +1,43 @@
-/* I2PSnark theme "Camo" aka Dark by dr|z3d */
+/* I2PSnark theme "Camo" aka Dark */
+/* Author: dr|z3d */
 
 body {
      margin: 9px 8px;
      color: #ee9;
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      background: #000;
-     background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,34,0,0.7)), url(../../console/dark/images/camotile2.png) top left;
+     background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,34,0,0.7)), url(/themes/console/dark/images/camotile2.png) top left;
      background-size: 3px 3px, 175px 175px;
 }
 
+/* preload top navigation mouseovers */
+body {
+     background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,34,0,0.7)),
+     url(/themes/console/dark/images/camotile2.png) top left,
+     url(images/button_snark_hover.png) no-repeat,
+     url(images/button_snark_active.png) no-repeat,
+     url(images/button_tracker_hover.png) no-repeat,
+     url(images/button_tracker_active.png) no-repeat,
+     url(images/button_forum_hover.png) no-repeat,
+     url(images/button_forum_active.png) no-repeat !important;
+     background-size: 3px 3px, 175px 175px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
+}
+
 body.iframed {
-     background: transparent url('../../console/dark/images/transparent.gif') !important;
+     background: transparent url(/themes/console/images/transparent.gif) !important;
      margin: 1px 0 !important;
+}
+
+/* preload top navigation mouseovers */
+body.iframed {
+     background: url(/themes/console/images/transparent.gif),
+     url(images/button_snark_hover.png) no-repeat,
+     url(images/button_snark_active.png) no-repeat,
+     url(images/button_tracker_hover.png) no-repeat,
+     url(images/button_tracker_active.png) no-repeat,
+     url(images/button_forum_hover.png) no-repeat,
+     url(images/button_forum_active.png) no-repeat !important;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
 }
 
 .iframed .page {
@@ -20,7 +46,7 @@ body.iframed {
      padding: 0;
      margin: 5px 0;
      box-shadow: none;
-     background: url("../../console/dark/images/camotile2.png") repeat scroll left top #000;
+     background: url(/themes/console/dark/images/camotile2.png) repeat scroll left top #000;
      background: linear-gradient(to right, #000 0%, #020 50%, #000 100%);
 }
 
@@ -69,7 +95,7 @@ body.iframed {
      font-size: 9pt;
      color: #3f3;
      text-shadow: 0 0 1px #000;
-     background: url(images/button_tracker.png) 7px center no-repeat, url(../../console/dark/images/header.png) center center repeat;
+     background: url(images/button_tracker.png) 7px center no-repeat, url(/themes/console/dark/images/header.png) center center repeat;
      background: url(images/button_tracker.png) 7px center no-repeat, linear-gradient(to bottom, #171 0%, #131 50%, #000 51%, #000 100%) !important;
      border-radius: 0;
      border: 1px solid #494;
@@ -87,18 +113,13 @@ body.iframed {
 .snarkRefresh:link:first-child {
      border-radius: 2px 0 0 2px;
      padding: 5px 7px 5px 15px !important;
-     background:  url(images/button_snark.png) 7px center no-repeat, url(../../console/dark/images/header.png) center center repeat;
+     background:  url(images/button_snark.png) 7px center no-repeat, url(/themes/console/dark/images/header.png) center center repeat;
      background: url(images/button_snark.png) 7px center no-repeat, linear-gradient(to bottom, #171 0%, #131 50%, #000 51%, #000 100%) !important; 
 }
 
 .snarkRefresh:link:nth-child(2) {
-     background: url(images/button_forum.png) 7px center no-repeat, url(../../console/dark/images/header.png) center center repeat;
+     background: url(images/button_forum.png) 7px center no-repeat, url(/themes/console/dark/images/header.png) center center repeat;
      background: url(images/button_forum.png) 7px center no-repeat, linear-gradient(to bottom, #171 0%, #131 50%, #000 51%, #000 100%) !important; 
-}
-
-.snarkRefresh:hover {
-     opacity: 1;
-     box-shadow: inset 0 0 0 1px #000 !important;
 }
 
 .snarkRefresh:active {
@@ -106,15 +127,15 @@ body.iframed {
 	box-shadow: inset 3px 2px 3px #000 !important;
 }
 
-.snarkRefresh:link:first-child:hover {
-     background-image: url(images/button_snark_hover.png), url('../ubergine/images/snarknav_on.png') !important;
+.snarkRefresh:link:first-child:hover, .snarkRefresh:link:first-child:focus {
+     background-image: url(images/button_snark_hover.png), url(../ubergine/images/snarknav_on.png) !important;
      background-image: url(images/button_snark_hover.png), linear-gradient(to bottom, #510 0%, #530 50%, #000 51%, #000 100%) !important; 
      background-position: 7px center, center center !important;
      background-repeat: no-repeat, repeat !important;
 }
 
-.snarkRefresh:link:hover:nth-child(2) {
-     background-image: url(images/button_forum_hover.png), url('../ubergine/images/snarknav_on.png') !important;
+.snarkRefresh:link:hover:nth-child(2), .snarkRefresh:link:focus:nth-child(2) {
+     background-image: url(images/button_forum_hover.png), url(../ubergine/images/snarknav_on.png) !important;
      background-image: url(images/button_forum_hover.png), linear-gradient(to bottom, #510 0%, #530 50%, #000 51%, #000 100%) !important; 
 }
 
@@ -135,7 +156,13 @@ body.iframed {
      background-repeat: no-repeat !important;
 }
 
-.snarkRefresh:hover {
+
+.snarkRefresh:hover, .snarkRefresh:focus {
+     opacity: 1;
+
+}
+
+.snarkRefresh:hover, .snarkRefresh:focus {
      text-decoration: none !important;
      text-transform: uppercase !important;
      font-weight: bold;
@@ -143,10 +170,10 @@ body.iframed {
      color: #f50;
      background: #000 !important;
      border-radius: 0;
-     border: 1px solid #f50;
-     box-shadow: inset 0 0 1px #f50;
+     box-shadow: inset 0 0 0 1px #000 !important;
+     border: 1px solid #f60 !important;
      opacity: 1;
-     background-image: url(images/button_tracker_hover.png), url('../ubergine/images/snarknav_on.png') !important;
+     background-image: url(images/button_tracker_hover.png), url(../ubergine/images/snarknav_on.png) !important;
      background-image: url(images/button_tracker_hover.png), linear-gradient(to bottom, #510 0%, #530 50%, #000 51%, #000 100%) !important; 
      background-position: 7px center, center center !important;
      background-repeat: no-repeat, repeat !important;
@@ -159,7 +186,8 @@ body.iframed {
      text-decoration: none !important;
      color: #fff;
      border: 1px solid #fff;
-     box-shadow: none;
+     box-shadow: inset 3px 3px 3px #000 !important;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
      text-shadow: none;
 }
 
@@ -384,9 +412,11 @@ tfoot tr:nth-child(n+1) {
      padding-right: 0;
 }
 
+/*
 .SnarkTorrents th:nth-child(2) {
      text-align: center;
 }
+*/
 
 .SnarkTorrents th br {
      display: none; /* kill double height button display */
@@ -547,7 +577,7 @@ table.snarkTorrentInfo tr:last-child td {
 
 table.SnarkTorrentInfo {
      margin-bottom: 1px !important;
-     background: url("../../console/dark/images/camotile2.png") repeat scroll center bottom #001100;
+     background: url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom #001100;
      border-bottom: 1px solid #494;
 }
 
@@ -587,6 +617,7 @@ table.SnarkDirInfo {
 
 .snarkDirInfo td:first-child {
      padding-left: 4px;
+     text-align: left;
 } 
 
 .snarkDirInfo td:first-child img {
@@ -1015,7 +1046,7 @@ div.percentBarInner.percentBarComplete {
      border: 1px solid #494;
      border-radius: 0;
      border-top: none;
-     background: #000 url('../../console/dark/images/header.png') repeat-x scroll center center !important;
+     background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
      font-variant: small-caps !important;
      filter: drop-shadow(0 2px 1px #000);
@@ -1174,7 +1205,7 @@ input[type=submit], input[type=submit]:visited {
      color: #494;
      background: #000;
      border: 1px outset #191;
-     padding: 4px 3px !important;
+     padding: 5px !important;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      margin-top: 6px;
      min-width: 95px;
@@ -1437,7 +1468,7 @@ img[src$="magnet.png"] {
 }
 
 #pagenav img {
-     height: 8px;
+     height: 10px;
      border: 1px solid #151 !important;
      margin: 0 0 0 2px !important;     
      padding: 4px 5px !important;
@@ -1445,6 +1476,10 @@ img[src$="magnet.png"] {
      background: linear-gradient(to bottom, #030 0%, #030 50%, #010 50%, #010 100%);
      box-shadow: inset 0 0 0 1px #000;
      border-radius: 2px;
+}
+
+#pagenav img:active {
+     box-shadow: inset 3px 3px 3px #000;
 }
 
 #pagenav {
@@ -1657,8 +1692,8 @@ table.trackerconfig td:first-child {
      color: #ee9;
      box-shadow: inset 0 0 5px 2px #000;
      word-wrap: break-word;
-     background: #000 url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
-     background: url(images/snark_create.png) center right no-repeat, linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url("../../console/dark/images/camotile2.png") top left repeat;
+     background: #000 url(images/snark_create.png) no-repeat scroll right center;
+     background: url(images/snark_create.png) center right no-repeat, linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url(/themes/console/dark/images/camotile2.png) top left repeat;
      background-size: 80px 80px, 100% 100%, 175px 175px;
 }
 
@@ -1670,8 +1705,8 @@ table.trackerconfig td:first-child {
      color: #ee9;
      box-shadow: inset 0 0 5px 2px #000;
      word-wrap: break-word;
-     background: #000 url('/themes/snark/dark/images/snark_add.png') no-repeat scroll right center;
-     background: url(images/snark_add.png) 99% center no-repeat, linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url("../../console/dark/images/camotile2.png") top left repeat;
+     background: #000 url(images/snark_add.png) no-repeat scroll right center;
+     background: url(images/snark_add.png) 99% center no-repeat, linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url(/themes/console/dark/images/camotile2.png) top left repeat;
      background-size: 61px 61px, 100% 100%, 175px 175px;
 }
 
@@ -1685,7 +1720,7 @@ table.trackerconfig td:first-child {
      text-align: center;
      background: #000;
      font-weight: bold;
-     background: url(images/configuration.png) 102% 30% no-repeat, linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url("../../console/dark/images/camotile2.png") top left repeat;
+     background: url(images/configuration.png) 102% 30% no-repeat, linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url(/themes/console/dark/images/camotile2.png) top left repeat;
      background-size: 84px 82px, 100% 100%, 175px 175px;
 }
 
@@ -1697,9 +1732,9 @@ table.trackerconfig td:first-child {
      box-shadow: inset 0 0 5px 2px #000;
      word-wrap: break-word;
      text-align: center;
-     background: #000 url('/themes/snark/dark/images/configuration.png') no-repeat scroll right center;
+     background: #000 url(images/configuration.png) no-repeat scroll right center;
      font-weight: bold;
-     background: linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url("../../console/dark/images/camotile2.png") top left repeat;
+     background: linear-gradient(to bottom, rgba(0,40,0,0.3) 0%, rgba(0,15,0,0.5) 100%), url(/themes/console/dark/images/camotile2.png) top left repeat;
 }
 
 .mainsection + form > .configsectionpanel:first-child {

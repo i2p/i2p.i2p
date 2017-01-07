@@ -144,7 +144,7 @@ hr {
 }
 
 .iframed #globalTunnelControl {
-     margin: 6px 0 -26px !important; 
+     margin: 6px auto -26px !important; 
 }
 
 #serverTunnels {
@@ -170,7 +170,7 @@ h2, h3 {
 
 h3 {
      border-radius: 0;
-     margin-top: -1px;
+     margin-top: 15px;
 }
 
 .iframed #globalTunnelControl h2 {

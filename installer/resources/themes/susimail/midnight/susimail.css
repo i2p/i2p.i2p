@@ -2,6 +2,10 @@
 /* Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
 /* Droid Sans font family and css3 compliant browser recommended for optimal results */
 
+html {
+     min-height: 100%;
+}
+
 body {
      background-color: #000;
      color: #c9ceff;
@@ -10,9 +14,38 @@ body {
      margin: 6px 5px;
 }
 
+/* preload button mouseovers */
+body {
+     background: linear-gradient(to bottom, #000, #000),
+     url(/themes/susimail/images/compose_hover.png) no-repeat,
+     url(/themes/susimail/images/login_hover.png) no-repeat,
+     url(/themes/susimail/images/logout_hover.png) no-repeat,
+     url(/themes/susimail/images/offline_hover.png) no-repeat,
+     url(/themes/susimail/images/save_hover.png) no-repeat,
+     url(/themes/susimail/images/send_hover.png) no-repeat,
+     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
+     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
+     url(/themes/console/images/buttons/update_hover.png) no-repeat, #000 !important;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
+}
+
 body.iframed {
-     background: transparent !important;
+     background: transparent url(/themes/console/images/transparent.gif) !important;
      margin: 1px 0 0;
+}
+
+body.iframed {
+     background: url(/themes/console/images/transparent.gif),
+     url(/themes/susimail/images/compose_hover.png) no-repeat,
+     url(/themes/susimail/images/login_hover.png) no-repeat,
+     url(/themes/susimail/images/logout_hover.png) no-repeat,
+     url(/themes/susimail/images/offline_hover.png) no-repeat,
+     url(/themes/susimail/images/save_hover.png) no-repeat,
+     url(/themes/susimail/images/send_hover.png) no-repeat,
+     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
+     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
+     url(/themes/console/images/buttons/update_hover.png) no-repeat, transparent !important;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
 }
 
 .iframed form {
@@ -179,7 +212,7 @@ table#mailbox {
      background: url(/themes/susimail/images/status.png) center center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
      font-size: 0;
      padding: 0;
-     background-blend-mode: luminosity;
+     background-blend-mode: luminosity, normal;
 }
 
 #mailbox th:nth-child(3) {
@@ -273,6 +306,7 @@ td#deleteattached {
 
 tr.bottombuttons:last-child td {
      padding-bottom: 20px !important;
+     border-bottom: 1px solid #443da0 !important;
 }
 
 a:link {
@@ -559,10 +593,9 @@ input[type=submit], input.cancel {
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
      border-right-color: #14144f; 
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      text-align: center;
      padding: 5px 8px !important;
-/*     min-width: 95px !important;*/
      margin: 4px 5px;
      box-shadow: inset 0 0 0 1px #000;
 }

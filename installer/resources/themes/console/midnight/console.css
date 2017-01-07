@@ -15,8 +15,26 @@ body {
      font: 8.5pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
+/* preload button mouseovers */
+body {
+     background: linear-gradient(to bottom, #001, #000),
+     url(/themes/console/images/buttons/clean_hover.png) no-repeat,
+     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
+     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restart_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restore_hover.png) no-repeat,
+     url(/themes/console/images/buttons/search_hover.png) no-repeat,
+     url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
+     url(/themes/console/images/buttons/update_hover.png) no-repeat, #000;
+     background-size: auto 2px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
 .hide, .hideme {
      display: none;
+}
+
+small {
+     font-size: 9pt;
 }
 
 div.clearer {
@@ -690,6 +708,8 @@ input.stop, button.stop {
 input.stop:hover, button.stop:hover,
 input.stop:focus, button.stop:focus {
      background: #000 url(/themes/console/images/buttons/shutdown_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
 }
 
 input.stop:active, button.stop:active {
@@ -828,7 +848,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 .routersummary .reload, .routersummary .stop {
      text-indent: -99999px;
      background-size: 16px 16px, 100% 100% !important;
-     background-position: center center, center center !important;
+     background-position: center center !important;
      padding: 5px !important;
 }
 
@@ -845,19 +865,19 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .stop {
-     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat;
+     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
 }
 
 .routersummary .stop:hover, .routersummary .stop:focus {
      background: url(/themes/console/images/buttons/shutdown_hover.png) center center no-repeat;
      background-position: center center !important;
+     background-size: 16px 16px, 100% 100% !important;
 }
 
 .routersummary .download {
      background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
      background-size: 16px 16px, 100% 100% !important;
      padding: 5px 3px 5px 17px !important;
-/*     margin-top: -4px;*/
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -1076,7 +1096,7 @@ div.logo hr {
 .routersummary h3 a {
      display: inline-block;
      width: calc(100% - 6px);
-     padding: 0;
+     padding: 1px 0 !important;
      margin: 0;
 }
 
@@ -1286,6 +1306,13 @@ div.routersummary a:hover {
      word-spacing: 0;
 }
 
+div.newsheadings li {
+     list-style: none outside url(images/newsbullet_mini.png);
+     margin: 0 -6px 2px 4px;
+     line-height: 110%;
+     text-transform: capitalize;
+}
+
 div.tunnels {
      padding-top: 3px !important;
      margin-left: -4px;
@@ -1326,7 +1353,7 @@ div.tunnels {
      background-repeat:no-repeat;
      box-shadow: inset 0 0 0 1px #320951;
      word-wrap: break-word;
-/*     font-weight: bold;*/
+     min-width: 555px;
      color: #c9ceff;
      font-size: 10pt;
 }
@@ -1378,6 +1405,12 @@ div.sorry hr {
      font-size: 9.5pt !important;
      letter-spacing: 0.03em;
      color: #c9ceff;
+}
+
+.newsentry font[size="-2"] {
+     letter-spacing: 0.15em;
+     font-style: italic;
+     text-transform: capitalize;
 }
 
 .news h4 {
@@ -1482,14 +1515,16 @@ div.sorry hr {
 
 .tab2::before {
      content: '\1F892\00A0';
-     font-size: 12pt;
+     content: '\25B8\00A0';
+     font-size: 10pt;
      line-height: 50%;
      vertical-align: baseline;
 }
 
 .tab2::after {
      content: '\00A0\1F890';
-     font-size: 12pt;
+     content: '\00A0\25C2';
+     font-size: 10pt;
      line-height: 50%;
      vertical-align: baseline;
 }
@@ -1640,6 +1675,8 @@ div.graphspanel img {
      padding: 2px;
      max-width: 97%;
      max-width: calc(100% - 20px);
+     vertical-align: top;
+/*     filter: sepia(100%) invert(100%);*/
 }
 
 div.graphspanel p {
@@ -1657,11 +1694,93 @@ p#graphopts {
 h3#graphinfo {
      margin-top: 0;
      border-radius: 0 !important;
+     text-transform: capitalize;
+     letter-spacing: normal;
+     word-spacing: normal;
 }
 
 div.graphspanel p:last-child {
      display: none;
 }
+
+form[action="graphs"] {
+     border: 1px solid #443da0;
+     padding: 10px 10px 0 !important;
+     background: #000;
+     margin-top: -11px;
+     margin-bottom: 10px;
+}
+
+h3#graphdisplay a {
+     text-transform: capitalize;
+     letter-spacing: normal;
+     font-size: 9pt;
+     float: right;
+}
+
+/*
+.main#graphs hr {
+     margin: 10px -10px 8px !important;
+}
+*/
+
+/* new graphs optionbox */
+
+#graphs form {
+     padding: 0 !important;
+}
+
+#graphs form hr {
+     margin: 0 -1px 8px !important;
+}
+
+#graphs form table {
+     border: none;
+     margin: 0;
+}
+
+.formaction#graphing {
+     margin: -2px 0 0 !important;
+     padding-top: 1px;
+     border-left: none;
+     border-right: none;
+}
+
+#graphs tr:first-child td {
+     border-top: none;
+}
+
+#graphs td:first-child {
+     text-align: right;
+     width: 85px;
+     white-space: nowrap;
+     padding: 13px 3px 13px 5px;
+}
+
+#graphs td:nth-child(2) {
+     width: 260px;
+     white-space: nowrap;
+}
+
+#graphs td.infohelp {
+     border: 1px solid #120f35;
+     border-right: none;
+     background-size: 20px 20px !important;
+     padding: 5px 5px 5px 40px !important;
+     background-color: #010008 !important;
+     text-align: left;
+}
+
+#graphs form input, #graphs form select {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+#graphs input[type="text"] {
+     min-width: 60px;
+}
+
+/* end new graphs optionbox */
 
 table {
      border-collapse: collapse;
@@ -1915,7 +2034,7 @@ h2 a:hover {
 h3, h3.welcome, div.news h3 {
      border: 1px solid #443da0;
      border-left: 5px solid #443da0;
-     padding: 4px 10px;
+     padding: 5px 10px;
      margin: 10px 0 10px 0;
      border-radius: 0 2px 2px 0;
      background: #000 url(images/header.png) center center ;
@@ -1961,11 +2080,11 @@ h2, h3, h4, .confignav {
 .langbox img {
      opacity: 0.5;
      padding: 1px 2px !important;
-     transition: all 0.3s ease 0s;
 }
 
 .langbox img:hover {
      opacity: 1;
+     transform: scale(1.1);
 }
 
 hr {
@@ -2006,7 +2125,7 @@ div.joblog {
      border-radius: 2px 2px 0 0;
      text-align: justify !important;
      overflow-y: hidden !important;
-     margin-top: 15px !important;
+     margin-top: 10px !important;
  }
 
 div.joblog h3 {
@@ -2446,6 +2565,11 @@ div.themechoice {
      font-weight: bold;
 }
 
+.themechoice .optbox:focus + object ~ div.themelabel {
+     color: #652787;
+     box-shadow: inset 0 0 10px 3px #000; 
+}
+
 #themeoptions {
      clear: both;
      padding-top: 5px;
@@ -2556,6 +2680,16 @@ td#themeselect {
      background: #040033 !important;
      color: #c9ceff;
      font-weight: bold;
+}
+
+.langselect input[name="lang"]:focus + img + div.ui_lang {
+     color: #652787 !important;
+     box-shadow: inset 0 0 10px 3px #000 !important;
+}
+
+.langselect input[name="lang"]:active + img + div.ui_lang {
+     color: #c9ceff !important;
+     box-shadow: inset 0 0 0 1px #000 !important;
 }
 
 .langselect:hover, .langselect:active {
@@ -2991,6 +3125,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover 
 
 ul.statlist li::before {
      content: "\1F6C8\00A0";
+     content: "\2B26\00A0";
      font-size: 14pt;
      line-height: 50%; 
      vertical-align: baseline;
@@ -3023,12 +3158,13 @@ ul.statlist li li:last-child {
      padding-bottom: 5px !important;
 }
 
+/*
 .statlist a[href*="graph"]::before {
      content: "\1F4CA\00A0";
      font-size: 11pt;
      line-height: 140%;
-     
 }
+*/
 
 .main#stats form {
      border: 1px solid #443da0;
@@ -3100,31 +3236,6 @@ table#i2pupdates input[name*="URL"], table#i2pupdates textarea {
 table#i2pupdates tr:last-child td {
      padding-right: 6px;
      background: #000 !important;
-}
-
-form[action="graphs"] {
-     border: 1px solid #443da0;
-     padding: 10px 10px 0 !important;
-     background: #000;
-     margin-top: -11px;
-     margin-bottom: 10px;
-}
-
-.formaction#graphing {
-     margin: -4px -5px 5px !important;
-     border-left: none;
-     border-right: none;
-}
-
-.main#graphs hr {
-     margin: 10px -10px 8px !important;
-}
-
-h3#graphdisplay a {
-     text-transform: capitalize;
-     letter-spacing: normal;
-     font-size: 9pt;
-     float: right;
 }
 
 /* /configlogging */
@@ -3962,7 +4073,7 @@ div.ag2 {
 
 div.app {
      float: left;
-     padding: 2px 0 0 !important;
+     padding: 2px 0 4px;
      min-width: 70px;
      border: 1px solid #443da0;
      background: #000;
@@ -3970,7 +4081,6 @@ div.app {
      border-radius: 2px;
      margin: 2px 3px 5px;
      text-align: center !important;
-     padding-top: 4px;
      opacity: 0.8;
      box-shadow: inset 0 0 0 1px #000;
      transition: border ease 0.3s 0s;
@@ -4005,6 +4115,14 @@ div.app:active .applabel a {
 
 div.app a:link, div.app a:hover, div.app a:active {
      outline: none;
+}
+
+div.app a:focus img {
+     filter: drop-shadow(0 0 3px #c96fff) !important;
+}
+
+div.app a:focus {
+     color: #652787;
 }
 
 div.app:hover a:link, div.app:hover a:visited {
@@ -4120,7 +4238,7 @@ td.app {
 div.applabel {
      font-size: 8pt;
      margin: 2px 0 0;
-     padding: 5px 2px;
+     padding: 5px 2px 2px;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
@@ -4420,8 +4538,12 @@ div#sybilnav {
 
 #sybilnav ul li::before {
      content: '\1F441\00A0\00A0';
+     content: url(/themes/console/images/buttons/show.png);
+     mix-blend-mode: luminosity;
+     vertical-align: middle;
+     margin-right: 5px;
      font-size: 16pt;
-} 
+}
 
 table.sybil_routerinfo {
      margin-bottom: 10px;
@@ -4464,6 +4586,7 @@ p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
      font-weight: bold;
      background: url(/themes/console/images/buttons/show.png) 8px center no-repeat;
      background: url(/themes/console/images/buttons/show.png) 8px center no-repeat, linear-gradient(to right, #000, #001 80%, #002 100%);
+     background-blend-mode: luminosity;
      box-shadow: inset 0 0 0 1px #080077;
 }
 
@@ -4579,7 +4702,7 @@ p#debugmode, p#sybilinfo {
 }
 
 p#gatherstats {
-     margin-top: -5px; 
+     margin-top: 1px; 
 }
 
 td.optionsave {
@@ -5044,5 +5167,9 @@ h4#updateplugins {
 
 #profiles td:first-child, #profiles th:first-child, #floodfills td:first-child, #floodfills th:first-child {
      width: 56px !important;
+}
+
+.sorry {
+     margin-left: 232px !important;
 }
 }

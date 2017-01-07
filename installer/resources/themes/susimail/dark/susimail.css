@@ -189,7 +189,7 @@ table#mailbox {
 
 #mailbox th:nth-child(2) {
      background: url(/themes/susimail/images/status.png) center center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
-     background-blend-mode: luminosity;
+     background-blend-mode: luminosity, normal;
 }
 
 

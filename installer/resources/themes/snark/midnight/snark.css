@@ -8,9 +8,33 @@ body {
      margin: 7px 6px;
 }
 
+/* preload top navigation mouseovers */
+body {
+     background: linear-gradient(to bottom, #000, #000),
+     url(images/button_snark_hover.png) no-repeat,
+     url(images/button_snark_active.png) no-repeat,
+     url(images/button_tracker_hover.png) no-repeat,
+     url(images/button_tracker_active.png) no-repeat,
+     url(images/button_forum_hover.png) no-repeat,
+     url(images/button_forum_active.png) no-repeat, #000;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
 body.iframed {
      margin: 1px 0 !important;
      background: transparent url(/themes/console/images/transparent.gif) !important;
+}
+
+/* preload top navigation mouseovers */
+body.iframed {
+     background: url(/themes/console/images/transparent.gif),
+     url(images/button_snark_hover.png) center 50px no-repeat,
+     url(images/button_snark_active.png) center 50px no-repeat,
+     url(images/button_tracker_hover.png) center 50px no-repeat,
+     url(images/button_tracker_active.png) center 50px no-repeat,
+     url(images/button_forum_hover.png) center 50px no-repeat,
+     url(images/button_forum_active.png) center 50px no-repeat, #000 !important;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
 }
 
 * {
@@ -55,6 +79,7 @@ body.iframed {
 
 .iframed .snarknavbar {
      border: none;
+     border-top: 1px solid #443da0;
      border-bottom: 1px solid #443da0;
      border-radius: 0;
      padding-top: 14px;
@@ -67,8 +92,7 @@ body.iframed {
      border: 0;
 }
 
-tt,
-code {
+tt, code {
      font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
 }
 
@@ -390,7 +414,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrents th:nth-child(2) {
-     text-align: center;
+     text-align: left;
 }
 
 .snarkTorrents th br {
@@ -606,6 +630,7 @@ tfoot tr:nth-child(n+1) {
 
 .snarkDirInfo td:first-child {
      padding-left: 4px;
+     text-align: left;
 }
 
 .snarkDirInfo td:first-child img {
