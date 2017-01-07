@@ -29,7 +29,7 @@
 <form action="" method="POST">
  <table id="floodfillconfig" class="configtable">
   <tr><td class="infohelp">
-<%=intl._t("Floodill participation helps the network, but may use more of your computer's resources.")%>
+<%=intl._t("Floodfill participation helps the network, but may use more of your computer's resources.")%>
   </td></tr>
   <tr><td>
 <%
