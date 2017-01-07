@@ -9,10 +9,22 @@
 
 <tr><th>routerconsole.advanced={true|false}</th></tr>
 <tr><td class="infowarn">Only set this to true if you know what you are doing!</td></tr>
-<tr><td>When set to true, additional functionality will be enabled in the console and the user will be able to edit settings directly on the <a href="/configadvanced">Advanced Configuration page</a>. Extra display options are provided in the <a href="/netdb">Network Database section</a>, including the Sybil Analysis tool, and there are additional configuration options on the <a href="/configclients">Clients Configuration page</a>. You may also wish to enable the "Advanced" sidebar section on the <a href="/configsidebar">Summary Bar Configuration page</a>.</td></tr>
+<tr><td>When set to true, additional functionality will be enabled in the console and the user will be able to edit settings directly on the <a href="/configadvanced">Advanced Configuration page</a>. Extra display options are provided in the <a href="/netdb">Network Database section</a>, including the Sybil Analysis tool, and there are additional configuration options on the <a href="/configclients">Clients Configuration page</a>. This will also enable the installation of unsigned updates, manual configuration of the news URL, and the installation of plugins. You may also wish to enable the "Advanced" sidebar section on the <a href="/configsidebar">Summary Bar Configuration page</a>.</td></tr>
 
 <tr><th>routerconsole.browser={/path/to/browser}</th></tr>
 <tr><td>This setting allows the manual selection of the browser which I2P will launch on startup (if the console is <a href="/configservice#browseronstart">configured</a> to launch a browser on startup), overriding the OS default browser.</td></tr>
+
+<tr><th>router.updateUnsigned={true|false}</th></tr>
+<tr><td>If you wish to install unsigned (.zip) I2P updates, this should be added to your <code>router.config</code> file unless you have already configured <code>routerconsole.advanced=true</code>, in which case this option is already provisioned.</td></tr>
+
+<tr><th>router.updateUnsignedURL={url}</th></tr>
+<tr><td>This setting allows you to configure the update url for the unsigned update feature, if enabled. The url should end with <code>/i2pupdate.zip</code>. Note: do not install unsigned updates unless you trust the source of the update!</td></tr>
+
+<tr><th>routerconsole.enablePluginInstall={true|false}</th></tr>
+<tr><td>When set to true, this enables plugin installation on the <a href="/configplugins">Plugin Configuration page</a>. Setting <code>routerconsole.advanced=true</code> will also enable this feature.</td></tr>
+
+<tr><th>routerconsole.allowUntrustedPlugins={true|false}</th></tr>
+<tr><td>Plugins signed with the cryptographic key of the developer are the recommended format, but if you wish to install unsigned plugins you can set this to true. Note that you may still encounter issues attempting to install an unsigned plugin if the developer has included additional checks in the plugin build process.</td></tr> 
 
 <tr><th>routerconsole.showSearch={true|false}</th></tr>
 <tr><td>When set to true, a configurable search bar will appear on the <a href="/home">console homepage</a>. Additional searches may then be added on the <a href="/confighome">home configuration page</a>.</td></tr>
