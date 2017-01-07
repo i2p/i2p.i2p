@@ -37,7 +37,7 @@ class SummaryRenderer {
     private final I2PAppContext _context;
     private static final Color AREA_COLOR = new Color(100, 160, 200, 240);
     private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
-    private static final Color RESTART_BAR_COLOR = new Color(210, 10, 10, 200);
+    private static final Color RESTART_BAR_COLOR = new Color(223, 13, 13, 255);
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -133,8 +133,11 @@ class SummaryRenderer {
                 small = small.deriveFont(small.getSize2D() + 2.0f);
                 large = large.deriveFont(Font.PLAIN, large.getSize2D() + 3.0f);
             } else {
-                small = small.deriveFont(small.getSize2D() + 1.0f);
-                large = large.deriveFont(large.getSize2D() + 1.0f);
+            //    small = small.deriveFont(small.getSize2D() + 1.0f);
+            // if specified font family is missing, jrobin will use fallback
+                  small = new Font("Droid Sans Mono", Font.PLAIN, 11);
+            //    large = large.deriveFont(large.getSize2D() + 1.0f);
+                  large = new Font("Droid Sans", Font.PLAIN, 13);
             }
             def.setSmallFont(small);
             def.setLargeFont(large);
@@ -186,14 +189,14 @@ class SummaryRenderer {
 
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
             if (descr.length() > 0) {
-                def.area(plotName, AREA_COLOR, descr + "\\r");
+                def.area(plotName, AREA_COLOR, descr + "\\l");
             } else {
                 def.area(plotName, AREA_COLOR);
             }
             if (!hideLegend) {
-                def.gprint(plotName, SummaryListener.CF, _t("avg") + ": %.2f %s");
-                def.gprint(plotName, "MAX", ' ' + _t("max") + ": %.2f %S");
-                def.gprint(plotName, "LAST", ' ' + _t("now") + ": %.2f %S\\r");
+                def.gprint(plotName, SummaryListener.CF, "   " + _t("Avg") + ": %.2f%s");
+                def.gprint(plotName, "MAX", ' ' + _t("Max") + ": %.2f%S");
+                def.gprint(plotName, "LAST", ' ' + _t("Now") + ": %.2f%S\\l");
             }
             String plotName2 = null;
             if (lsnr2 != null) {
@@ -202,25 +205,32 @@ class SummaryRenderer {
                 String path2 = lsnr2.getData().getPath();
                 String descr2 = _t(lsnr2.getRate().getRateStat().getDescription());
                 def.datasource(plotName2, path2, plotName2, SummaryListener.CF, lsnr2.getBackendName());
-                def.line(plotName2, LINE_COLOR, descr2 + "\\r", 3);
+                def.line(plotName2, LINE_COLOR, descr2 + "\\l", 2);
                 if (!hideLegend) {
-                    def.gprint(plotName2, SummaryListener.CF, _t("avg") + ": %.2f %s");
-                    def.gprint(plotName2, "MAX", ' ' + _t("max") + ": %.2f %S");
-                    def.gprint(plotName2, "LAST", ' ' + _t("now") + ": %.2f %S\\r");
+                    def.gprint(plotName2, SummaryListener.CF, "   " + _t("Avg") + ": %.2f%s");
+                    def.gprint(plotName2, "MAX", ' ' + _t("Max") + ": %.2f%S");
+                    def.gprint(plotName2, "LAST", ' ' + _t("Now") + ": %.2f%S\\l");
                 }
             }
             if (!hideLegend) {
-                // '07-Jul 21:09 UTC' with month name in the system locale
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
+                // '07 Jul 21:09' with month name in the system locale
+                // TODO: Fix Arabic time display
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm");
                 Map<Long, String> events = ((RouterContext)_context).router().eventLog().getEvents(EventLog.STARTED, start);
                 for (Map.Entry<Long, String> event : events.entrySet()) {
                     long started = event.getKey().longValue();
                     if (started > start && started < end) {
-                        String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\r";
-                        def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 4.0f);
+                        // String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " UTC " + event.getValue() + "\\l";
+                        if ("ar".equals(lang)) {
+                            String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " - " + event.getValue() + "\\l";
+                            def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
+                        } else {
+                            String legend = _t("Restart") + ' ' + sdf.format(new Date(started)) + " [" + event.getValue() + "]\\l";
+                            def.vrule(started / 1000, RESTART_BAR_COLOR, legend, 2.0f);
+                        }
                     }
                 }
-                def.comment(sdf.format(new Date(start)) + " -- " + sdf.format(new Date(end)) + " UTC\\r");
+                def.comment(sdf.format(new Date(start)) + " — " + sdf.format(new Date(end)) + " UTC\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
