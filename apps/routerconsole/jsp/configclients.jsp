@@ -27,7 +27,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <div class="configure">
- <h3 id="i2pclientconfig"><%=intl._t("Client Configuration")%></h3>
+ <h3 id="i2pclientconfig"><%=intl._t("Client Configuration")%>&nbsp;
+  <span class="h3navlinks">
+   <a href="configi2cp" title="<%=intl._t("Advanced Client Interface Configuration")%>">[I2CP]</a>&nbsp;
+   <a href="configwebapps" title="<%=intl._t("WebApp Configuration")%>">[WebApps]</a>&nbsp;
+   <a href="configplugins" title="<%=intl._t("Plugin Configuration")%>">[Plugins]</a>
+  </span>
+ </h3>
  <p class="infohelp" id="clientconf">
  <%=intl._t("The Java clients listed below are started by the router and run in the same JVM.")%>&nbsp;
  <%=intl._t("To change other client options, edit the file")%></i><tt>
@@ -47,8 +53,5 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <% } %>
  <input type="submit" class="accept" name="action" value="<%=intl._t("Save Client Configuration")%>" />
 </div></form></div>
-</div><hr>
-<p><a href="configi2cp"><%=intl._t("Advanced Client Interface Configuration")%></a></p>
-<p><a href="configwebapps"><%=intl._t("WebApp Configuration")%></a></p>
-<p><a href="configplugins"><%=intl._t("Plugin Configuration")%></a></p>
+</div>
 </div></body></html>
