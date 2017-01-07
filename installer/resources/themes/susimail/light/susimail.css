@@ -399,6 +399,10 @@ input {
      cursor: pointer;
 }
 
+input[type="radio"], input[type="checkbox"] {
+     vertical-align: middle;
+}
+
 input[type="text"], input[type="password"] {
      cursor: text;
 }
@@ -1134,6 +1138,14 @@ p.error {
 
 td p.error {
      padding: 10px;
+}
+
+#attachedfile input[type="checkbox"] {
+     margin: 0 2px 0 0;
+}
+
+#attachedfile {
+border-bottom: 1px dotted #7778bf;
 }
 
 .attached {

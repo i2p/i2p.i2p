@@ -8,7 +8,7 @@ body {
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #333;
-     font-size: 10pt;
+     font-size: 9pt;
      background: #a4a4cb url(images/tile2.png);
      background-size: 32px 32px;
 }
@@ -164,6 +164,11 @@ hr {
      width: 100px;
 }
 
+.control::-moz-focus-inner {
+     outline: none;
+     border: none;
+}
+
 .control, .control:link, .control:visited {
      text-align: center;
      white-space: nowrap;
@@ -184,6 +189,10 @@ hr {
      padding: 4px 8px;
 }
 
+button.control, input.control {
+     padding: 5px 8px !important;
+}
+
 .control:hover, .control:focus {
      text-decoration: none;
      color: #111;
@@ -195,6 +204,7 @@ hr {
 
 .control:active {
      box-shadow: inset 2px 2px 1px #999 !important;
+     color: #333;
 }
 
 a.control {
@@ -208,7 +218,7 @@ a.control {
 
 .panel {
      width: calc(100% - 14px);
-     max-width: 1200px;
+     max-width: 1400px;
      margin: 8px auto;
      min-width: 450px;
      overflow: hidden;
@@ -457,6 +467,10 @@ div[class^="status"] {
      width: 20%;
 }
 
+.tunnelLocation font[color="red"] {
+     margin-left: 2px;
+}
+
 .tunnelStatus {
      text-align: center;
      width: 10%;
@@ -553,12 +567,12 @@ select#profile, select#connectionProfile {
 
 .multiOption#isServer {
      background: url(/themes/console/images/server.png) left center no-repeat;
-     padding-left: 20px;
+     padding-left: 18px;
 }
 
 .multiOption#isClient {
      background: url(/themes/console/images/client.png) left center no-repeat;
-     padding-left: 21px;
+     padding-left: 18px;
 }
 
 td#throttle {
@@ -625,13 +639,11 @@ table#statusMessages textarea, table#statusMessages textarea:active {
 
 input::-moz-placeholder {
      color: #f00;
-     font-weight: bold;
      opacity: 1;
 }
 
 ::-webkit-input-placeholder {
      color: #f00;
-     font-weight: bold;
      opacity: 1;
 }
 
@@ -686,10 +698,6 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 /* wizard specifics */
 
-#wizardPanel {
-    font-size: 10pt;
-}
-
 #wizardTable {
      padding: 0;
 }
@@ -720,16 +728,6 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      margin-top: -1px;
 }
 
-/*
-#wizardPanel tr:nth-child(n+2) {
-     background: #eef;
-}
-
-#wizardPanel tr:nth-child(2n+2) {
-     background: #f7f8ff;
-}
-*/
-
 #wizardTunnelTypes tr:nth-child(even), #wizardSummary tr:nth-child(even) {
      background: #eef;
 }
@@ -747,7 +745,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 }  
 
 #wizardPanel p {
-     padding: 5px;
+     padding: 5px 10px;
      margin: 0;
      text-align: justify;
 }
@@ -858,3 +856,15 @@ td.tunnelDestination, td.tunnelDescription {
      margin-left: 5px;
 }
 /* end more space */
+
+/* responsive layout */
+
+@media screen and (min-width: 1500px) {
+body, select, .control, input, textarea {
+     font-size: 10pt !important;
+}
+
+th {
+     font-size: 10.5pt;
+}
+}

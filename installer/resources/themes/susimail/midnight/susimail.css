@@ -4,7 +4,7 @@
 
 body {
      background-color: #000;
-     color: #C9CEFF;
+     color: #c9ceff;
      font-family: "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
      font-size: 9pt;
      margin: 6px 5px;
@@ -34,7 +34,7 @@ hr {
 }
 
 li {
-     color: #C9CEFF;
+     color: #c9ceff;
      line-height: 12pt;
      font-size: 10pt;
      margin-left: 5mm;
@@ -42,7 +42,7 @@ li {
 }
 
 p {
-     color: #C9CEFF;
+     color: #c9ceff;
      line-height: 12pt;
      margin-left: 5mm;
      margin-right: 5mm;
@@ -62,7 +62,7 @@ p.text {
 }
 
 p.info, p.error {
-     color: #C9CEFF;
+     color: #c9ceff;
      display: block !important;
      border: 1px solid #443da0;
      margin: 20px 20px 0 !important;
@@ -169,6 +169,29 @@ table#mailbox {
      margin-bottom: 0;
 }
 
+#mailbox th:first-child {
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     font-size: 0;
+     padding: 0; 
+}
+
+#mailbox th:nth-child(2) {
+     background: url(/themes/susimail/images/status.png) center center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     font-size: 0;
+     padding: 0;
+     background-blend-mode: luminosity;
+}
+
+#mailbox th:nth-child(3) {
+     text-align: left;
+}
+
+#mailbox th:nth-child(4) {
+     background: url(/susimail/icons/attach.png) center right 5px no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     font-size: 0;
+     padding: 0; 
+}
+
 table#mailbox td[colspan="5"], table#mailbox td[colspan="4"] {
      border-top: 1px solid #443da0 !important;
      padding: 6px 0 2px !important;
@@ -229,12 +252,23 @@ input.optbox:hover {
 
 input[type="checkbox"], .optbox {
      min-width: 16px !important;
+     min-height: 16px !important;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
 
 td#deleteattached {
      padding-top: 5px !important;
+}
+
+#attachedfile input[type="checkbox"] {
+     margin: 0 2px 0 0;
+     vertical-align: middle;
+}
+
+#attachedfile {
+     border-bottom: 1px dotted #322e6b;
+     padding: 5px 5px 5px 8px !important;
 }
 
 tr.bottombuttons:last-child td {
@@ -262,7 +296,7 @@ a:active {
 }
 
 td {
-     color: #C9CEFF;
+     color: #c9ceff;
      margin: 0 5px;
      font-size: 9pt;
      padding: 2px;
@@ -284,7 +318,7 @@ tr.list0 td, tr.list1 td {
 }
 
 tr.list0:hover td, tr.list1:hover td {
-     color: #C9CEFF;
+     color: #c9ceff;
 }
 
 tr.list0:hover, tr.list1:hover, tr.list0:hover a, tr.list1:hover a {
@@ -293,7 +327,7 @@ tr.list0:hover, tr.list1:hover, tr.list0:hover a, tr.list1:hover a {
 }
 
 tr.list0:hover td:nth-child(3) a, tr.list1:hover td:nth-child(3) a {
-     color: #C9CEFF !important;
+     color: #c9ceff !important;
 }
 
 
@@ -393,7 +427,7 @@ pre {
 }
 
 .page {
-     color: #C9CEFF;
+     color: #c9ceff;
      margin: 0;
      padding: 0;
      font-size: 9pt !important;
@@ -429,7 +463,7 @@ form table {
 
 textarea {
      background: #000;
-     color: #C9CEFF;
+     color: #c9ceff;
      border: 1px solid #443da0;
      border-radius: 2px;
      padding: 5px;
@@ -504,30 +538,39 @@ input {
      border: 1px solid #443da0;
      color: #443da0;
      margin: 3px;
-     font: bold 8pt "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
-     min-width: 64px !important;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+/*     min-width: 64px !important;*/
 }
 
 input.optbox {
      min-width: 16px !important;
+     min-height: 16px !important;
+}
+
+input[type=submit]::-moz-focus-inner, input.cancel::-moz-focus-inner {
+     border: none;
+     box-shadow: none;
 }
 
 input[type=submit], input.cancel {
      color: #443da0;
      background: #000;
+     background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
      border-right-color: #14144f; 
-     font: bold 8pt "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      text-align: center;
-     padding: 4px 8px !important;
-     min-width: 95px !important;
+     padding: 5px 8px !important;
+/*     min-width: 95px !important;*/
      margin: 4px 5px;
+     box-shadow: inset 0 0 0 1px #000;
 }
 
-input[type=submit]:hover, input.cancel:hover {
+input[type=submit]:hover, input.cancel:hover,
+input[type=submit]:focus, input.cancel:focus {
      color: #652787;
-     background: #000;
+     background: #000 !important;
      border: 1px solid #652787;
      box-shadow: inset 0 1px 1px 0 #c9ceff; 
 }
@@ -535,8 +578,9 @@ input[type=submit]:hover, input.cancel:hover {
 input[type=submit]:active, input.cancel:active {
      border: 1px inset #652787;
      background: #652787 !important;
-     color: #C9CEFF !important;
-     box-shadow: inset 0px 0px 0px 0px #652787;
+     color: #c9ceff !important;
+     box-shadow: inset 3px 3px 3px #000 !important;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
 }
 
 input[type=text], input[type=password], textarea {
@@ -549,7 +593,7 @@ input[type=text], input[type=password], textarea {
 
 #dologin input:disabled, #dologin input:disabled:hover, #dologin input:disabled:active {
      border: none;
-     color: #652787;
+     color: #9b9ebf;
      margin: 0;
      padding-top: 3px;
      box-shadow: none;
@@ -565,7 +609,7 @@ input[name="user"], input[name="pass"] {
 
 input[name="user"]:focus, input[name="pass"]:focus, input[type="text"]:focus, textarea:focus {
      border: 1px solid #443da0;
-     color: #C9CEFF;
+     color: #c9ceff;
 }
 
 input[name="host"], input[name="pop3"], input[name="smtp"] {
@@ -621,6 +665,7 @@ div#dologin {
      background: #020020 url("/themes/console/images/email.png") 8px center no-repeat;
      background: url("images/mail.png") 8px center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
      text-shadow: 0 1px 1px #000;
+     box-shadow: inset 0 0 0 1px #000;
 }
 
 #dologin table {
@@ -757,10 +802,6 @@ table#pagenav {
      background: linear-gradient(to bottom, #010010 0%, #020019 50%, #060051%, #0100100%) !important;
 }
 
-table#pagenav tr:hover td {
-     color: #C9CEFF;
-}
-
 table#pagenav td {
      white-space: nowrap;
      font-size: 10pt;
@@ -769,7 +810,7 @@ table#pagenav td {
      word-spacing: 0.1em;
      padding: 3px 5px;
      text-align: center;
-     color: #7670c2;
+     color: #c9ceff;
 }
 
 table#pagenav td:first-child {
@@ -902,19 +943,300 @@ div#bottombuttons { /* config page button positioning */
      padding: 10px 10px 20px;
 }
 
+
+/* illustrated buttons inc */
+
+input[type="submit"][class], input[type="cancel"][class], 
+input[type="submit"][class]:hover, input[type="cancel"][class]:hover,
+input[type="submit"][class]:focus, input[type="cancel"][class]:focus {
+     background-size: 14px 14px, 100% 100% !important;
+}
+
+input.cancel {
+     background: #000 url(/themes/console/images/buttons/no.png) no-repeat 6px center !important;
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.cancel:hover, input.cancel:focus {
+     background: #000 url(/themes/console/images/buttons/no.png) no-repeat 6px center !important;
+}
+
+input.clearselection {
+     background: #000 url(/themes/susimail/images/none.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/none.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.clearselection:hover, input.clearselection:focus {
+     background: #000 url(/themes/susimail/images/none.png) no-repeat 6px center !important;
+}
+
+input.delete, input.delete_attachment, input.really_delete {
+     background: #000 url(/themes/console/images/buttons/delete.png) no-repeat 6px center !important;     
+     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.delete:hover, input.delete_attachment:hover, input.really_delete:hover,
+input.delete:focus, input.delete_attachment:focus, input.really_delete:focus {
+     background: #000 url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center !important;
+}
+
+input.download {
+     background: #000 url(/themes/console/images/buttons/download.png) no-repeat 6px center !important;
+     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.download:hover, input.download:focus {
+     background: #000 url(/themes/console/images/buttons/download.png) no-repeat 6px center !important;
+}
+
+input.offline {
+     background: #000 url(/themes/susimail/images/offline.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/offline.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.offline:hover, input.offline:focus {
+     background: #000 url(/themes/susimail/images/offline_hover.png) no-repeat 6px center !important;
+}
+
+input.list {
+     background: #000 url(/themes/susimail/images/folder.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/folder.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.list:hover, input.list:focus {
+     background: #000 url(/themes/susimail/images/folder-open.png) no-repeat 6px center !important;
+}
+
+input.forward {
+     background: #000 url(/themes/susimail/images/forward.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/forward.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.forward:hover, input.forward:focus {
+     background: #000 url(/themes/susimail/images/forward.png) no-repeat 6px center !important;
+}
+
+input.login {
+     background: #000 url(/themes/susimail/images/login.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/login.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.login:hover, input.login:focus {
+     background: #000 url(/themes/susimail/images/login_hover.png) no-repeat 6px center !important;
+}
+
+input.logout {
+     background: #000 url(/themes/susimail/images/logout.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/logout.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.logout:hover, input.logout:focus {
+     background: #000 url(/themes/susimail/images/logout_hover.png) no-repeat 6px center !important;
+}
+
+input.reload, input.refresh {
+     background: #000 url(/themes/console/images/buttons/update.png) no-repeat 6px center !important;     
+     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.reload:hover, input.refresh:hover,
+input.reload:focus, input.refresh:focus {
+     background: #000 url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center !important;     
+}
+
+input.invertselection {
+     background: #000 url(/themes/susimail/images/selection.png) no-repeat 6px center !important;     
+     background: url(/themes/susimail/images/selection.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.invertselection:hover, input.invertselection:focus {
+     background: #000 url(/themes/susimail/images/selection.png) no-repeat 6px center !important;     
+}
+
+input.show {
+     background: #000 url(/themes/console/images/buttons/yes.png) no-repeat 6px center !important;     
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.show:hover, input.show:focus {
+     background: #000 url(/themes/console/images/buttons/yes.png) no-repeat 6px center !important;
+}
+
+input.markall {
+     background: #000 url(/themes/susimail/images/all.png) no-repeat 6px center !important;     
+     background: url(/themes/susimail/images/all.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.markall:hover, input.markall:focus {
+     background: #000 url(/themes/susimail/images/all.png) no-repeat 6px center !important;     
+}
+
+input.new {
+     background: #000 url(/themes/susimail/images/compose.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/compose.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.new:hover, input.new:focus {
+     background: #000 url(/themes/susimail/images/compose_hover.png) no-repeat 6px center !important;
+}
+
+input.reply {
+     background: #000 url(/themes/susimail/images/reply.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/reply.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.reply:hover, input.reply:focus {
+     background: #000 url(/themes/susimail/images/reply.png) no-repeat 6px center !important;
+}
+
+input.replyall {
+     background: #000 url(/themes/susimail/images/reply-all.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/reply-all.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.replyall:hover, input.replyall:focus {
+     background: #000 url(/themes/susimail/images/reply-all.png) no-repeat 6px center !important;
+}
+
+input.setpagesize, input.save {
+     background: #000 url(/themes/console/images/buttons/yes.png) no-repeat 6px center !important;
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.setpagesize:hover, input.save:hover,
+input.setpagesize:focus, input.save:focus {
+     background: #000 url(/themes/console/images/buttons/yes.png) no-repeat 6px center !important;
+}
+
+input.send {
+     background: #000 url(/themes/susimail/images/send.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/send.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.send:hover, input.send:focus {
+     background: #000 url(/themes/susimail/images/send_hover.png) no-repeat 6px center !important;
+}
+
+input.configure {
+     background: #000 url(/themes/console/images/buttons/configure.png) no-repeat 6px center !important;
+     background: url(/themes/console/images/buttons/configure.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.configure:hover, input.configure:focus {
+     background: #000 url(/themes/console/images/buttons/configure_hover.png) no-repeat 6px center !important;
+}
+
+input.saveas {
+     background: #000 url(/themes/susimail/images/save.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/save.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+input.saveas:hover, input.saveas:focus {
+     background: #000 url(/themes/susimail/images/save_hover.png) no-repeat 6px center !important;
+}
+
+input.new_upload {
+     background: #000 url(/themes/susimail/images/attach.png) no-repeat 6px center !important;
+     background: url(/themes/susimail/images/attach.png) no-repeat 6px center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 5px 5px 22px !important;
+}
+
+/* pagenav */
+
+input.firstpage, input[name="firstpage"],
+input.firstpage[disabled]:hover, input[name="firstpage"][disabled]:hover {
+     background: #000 url(/themes/susimail/images/first.png) no-repeat center center;
+     background: url(/themes/susimail/images/first.png) no-repeat center center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 10px !important;
+     text-indent: -99999px;
+     background-size
+}
+
+input.firstpage:hover, input[name="firstpage"]:hover,
+input.firstpage:focus, input[name="firstpage"]:focus {
+     background: #000 url(/themes/susimail/images/first.png) no-repeat center center;
+}
+
+input.lastpage, input[name="lastpage"],
+input.lastpage[disabled]:hover, input[name="lastpage"][disabled]:hover,
+input.lastpage[disabled]:focus, input[name="lastpage"][disabled]:focus {
+     background: #000 url(/themes/susimail/images/last.png) no-repeat center center;
+     background: url(/themes/susimail/images/last.png) no-repeat center center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 10px !important;
+     text-indent: -99999px;
+}
+
+input.lastpage:hover, input[name="lastpage"]:hover,
+input.lastpage:focus, input[name="lastpage"]:focus {
+     background: #000 url(/themes/susimail/images/last.png) no-repeat center center;
+}
+
+input.prevpage, input.prev, input[name="prev"], input[name="prevpage"],
+input.prevpage[disabled]:hover, input.prev[disabled]:hover, input[name="prev"][disabled]:hover, input[name="prevpage"][disabled]:hover,
+input.prevpage[disabled]:focus, input.prev[disabled]:focus, input[name="prev"][disabled]:focus, input[name="prevpage"][disabled]:focus {
+     background: #000 url(/themes/susimail/images/previous.png) no-repeat center center;
+     background: url(/themes/susimail/images/previous.png) no-repeat center center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 10px !important;
+     text-indent: -99999px;
+}
+
+input.prevpage:hover, input.prev, input[name="prev"]:hover, input[name="prevpage"]:hover,
+input.prevpage:focus, input.prev, input[name="prev"]:focus, input[name="prevpage"]:focus {
+     background: #000 url(/themes/susimail/images/previous.png) no-repeat center center;
+}
+
+input.nextpage, input.next, input[name="nextpage"], input[name="next"],
+input.nextpage[disabled]:hover, input.next[disabled]:hover, input[name="nextpage"][disabled]:hover, input[name="next"][disabled]:hover,
+input.nextpage[disabled]:focus, input.next[disabled]:focus, input[name="nextpage"][disabled]:focus, input[name="next"][disabled]:focus {
+     background: #000 url(/themes/susimail/images/next.png) no-repeat center center;
+     background: url(/themes/susimail/images/next.png) no-repeat center center, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     padding: 5px 10px !important;
+     text-indent: -99999px;
+}
+
+input.nextpage:hover, input.next:hover, input[name="nextpage"]:hover,
+input.nextpage:focus, input.next:focus, input[name="nextpage"]:focus {
+     background: #000 url(/themes/susimail/images/next.png) no-repeat center center;
+}
+
+/* end pagenav */
+
+/* end illustrated buttons */
+
+input[type=submit]:active, input.cancel:active {
+     border: 1px solid #652787;
+     background-color: #652787 !important;
+     background-blend-mode: luminosity;
+     color: #c9ceff !important;
+     box-shadow: inset 3px 3px 3px #000 !important;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
+}
+
 /* responsive layout */
 
 @media screen and (min-width: 1024px) {
 body, td, textarea, div, p.mailbody {
      font-size: 10pt !important;
-}
-
-input {
-     font-size: 9pt !important;
-}
-
-#pagenav input {
-     font-size: 0 !important;
 }
 
 .topbuttons input[type="submit"], .topbuttons input[type="reset"] {
@@ -923,8 +1245,13 @@ input {
 }
 
 @media screen and (min-width: 1500px) {
+
 input {
-     font-size: 10pt !important;
+     font-size: 9pt !important;
+}
+
+#pagenav input {
+     font-size: 0 !important;
 }
 }
 

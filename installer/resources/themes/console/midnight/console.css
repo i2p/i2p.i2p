@@ -12,7 +12,7 @@ body {
      background: linear-gradient(to bottom, #001, #000);
      background-size: auto 2px;
      color: #c9ceff;
-     font: 8.5pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: 8.5pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
 .hide, .hideme {
@@ -45,7 +45,7 @@ button, input[type="submit"], input[type="reset"], select {
 }
 
 button, button:visited, input[type="submit"], input[type="reset"] {
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
      border-right-color: #14144f;
@@ -87,7 +87,7 @@ input {
      background: #000;
      color: #443da0;
      margin: 5px;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      padding: 3px 2px;
      text-decoration: none;
      min-width: 110px;
@@ -114,7 +114,7 @@ input[type=text], input[type=password] {
      color: #c9ceff;
      margin: 5px 10px;
      padding: 4px 2px;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      border: 1px solid #443da0 !important;
      text-decoration: none;
      border-radius: 2px;
@@ -222,7 +222,7 @@ select {
      border-right-color: #14144f; 
      border-radius: 2px;
      min-width: 110px;
-     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
      padding: 3px 16px 3px 2px;
      cursor: pointer;
@@ -243,7 +243,7 @@ select option {
 }
 
 select option:hover, select option:focus, select option:checked {
-     box-shadow: inset 0 0 20px 20px #114;
+     box-shadow: inset 0 0 20px 20px #652787;
 }
 
 @-moz-document url-prefix() { /* target firefox and derivatives only */
@@ -3099,6 +3099,7 @@ table#i2pupdates input[name*="URL"], table#i2pupdates textarea {
 
 table#i2pupdates tr:last-child td {
      padding-right: 6px;
+     background: #000 !important;
 }
 
 form[action="graphs"] {
@@ -3625,7 +3626,7 @@ table#profiles td:first-child, table#profiles th:first-child {
 
 table#profiles td:first-child {
      text-align: right !important;
-     padding-left: 1px;
+     padding-left: 4px;
 }
 
 table#profiles td:first-child, table#profiles th:first-child, table#profiles td:nth-last-child(2), table#profiles th:nth-last-child(2) {
@@ -3735,7 +3736,7 @@ table#floodfills th:first-child, table#floodfills td:first-child  {
 
 table#floodfills td:first-child {
      text-align: right !important;
-     padding-left: 1px !important;
+     padding-left: 4px !important;
      padding-right: 5px !important;
 }
 
@@ -4168,6 +4169,7 @@ iframe.iframed {
 .main#dns {
      padding: 0;
      min-width: 650px;
+     background: #000 !important;
 }
 
 #susidnsframe {
@@ -4196,26 +4198,9 @@ body.iframed {
 
 /* Override error log colors */
 
-font[color="#ff00cc"] { /* warning */
-     color: #070088;
-}
-
-font[color="#ff3300"] { /* critical */
-     color: #0b0099;
-}
-
-font[color="#cc0000"] { /* error */
-     color: #0e00cc;
-}
-
-font[color="#000099"] { /* info */
-     color: #060055;
-}
-
 font[color="#006600"] { /* debug */
-     color: #EBDBFF;
+     color: #ebdbff;
 }
-/*--*/
 
 font[color="#ff00cc"] { /* warning */
      color: #0028a0;
@@ -4655,7 +4640,7 @@ h3#webappconfig {
 
 p#webappconfigtext {
      margin: 1px 0 -2px 0;
-     background: url(/themes/console/images/info/java_edit.png) 12px center no-repeat !important;
+     background: #000 url(/themes/console/images/info/java_edit.png) 12px center no-repeat !important;
      background-size: 28px 28px !important;
 }
 
@@ -4723,7 +4708,6 @@ input#hideme {
 
 #pluginupdater {
      border: 1px solid #443da0;
-     padding: 5px;
      margin-top: -11px;
      margin-bottom: 10px !important;
      background: #000;
@@ -4804,6 +4788,7 @@ table#configstats {
 #configstats tr.tablefooter td {
      padding: 4px 10px;
      line-height: 140%;
+     background: #000 !important;
 }
 p#enablefullstats {
      margin-top: 5px;
@@ -4987,7 +4972,7 @@ form[action="events"] {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .statusnotes {
+body, .main, .main td, .news p, #news p, .statusnotes, textarea, pre, tt, code {
      font-size: 10pt !important;
 }
 
@@ -4996,8 +4981,12 @@ h1 {
      padding: 15px;
 }
 
-.main button, .main input, select, textarea {
+.main button, .main input, select {
      font-size: 9pt !important;
+}
+
+button[class^="X"] {
+     font-size: 0 !important;
 }
 
 .main, .news, h1 {
@@ -5021,7 +5010,7 @@ h1 {
      width: 216px !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, .smallhead, .applabel a {
      font-size: 9pt !important;
 }
 
@@ -5041,15 +5030,19 @@ div.app {
      width: 134px !important;
 }
 
-.applabel a {
-     font-size: 9pt !important;
-}
-
 .themelabel {
      padding: 2px;
 }
 
-code, tt {
-     font-size: 9pt !important;
+h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, #clientconf.infohelp, h3#pluginmanage, h3#webappconfig {
+     margin-bottom: -15px !important;
+}
+
+h4#updateplugins {
+     margin-top: -15px !important;
+}
+
+#profiles td:first-child, #profiles th:first-child, #floodfills td:first-child, #floodfills th:first-child {
+     width: 56px !important;
 }
 }

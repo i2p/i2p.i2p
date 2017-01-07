@@ -5,6 +5,7 @@ body {
      font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      background: #eef;
      color: #0c153d;
+     min-width: 700px;
 }
 
 body.iframed {
@@ -78,9 +79,33 @@ table.book td:nth-child(2) {
      white-space: nowrap;
 }
 
-table.book td:nth-child(3), table.book td:nth-child(4) {
-     width: 50px;
+table.book td:nth-child(3) {
+     width: 30px;
      white-space: nowrap;
+     padding-left: 10px;
+}
+
+.book td:nth-child(4) {
+     text-align: center;
+     width: 20px;
+     padding: 2px 25px 2px 0 !important;
+}
+
+.book td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+.book td:nth-child(4) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 0 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+}
+
+.book td:nth-child(4) .addrhlpr:hover {
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 td.destinations {
@@ -219,8 +244,8 @@ h4 {
 }
 
 a {
-     color:#006;
-     text-decoration:none;
+     color: #33a;
+     text-decoration: none;
      font-weight: bold;
 }
 
@@ -298,9 +323,14 @@ p.book, #messages + p {
 }
 
 p.footer {
-     font-size:7pt;
+     font-size: 7pt;
      text-align: center;
-     padding: 10px 0 0;
+     padding: 0;
+     margin: 12px auto -15px;
+     border: 1px solid #89f;
+     border-radius: 0 0 3px 3px;
+     width: 200px;
+     background: #fff;
 }
 
 .iframed #footer {
@@ -331,15 +361,18 @@ div#filter {
      font-size: 10pt;
      box-shadow: inset 0 0 0 1px #fff;
      text-transform: capitalize;
-     color: #006;
+     color: #555;
 }
 
-#filter a:hover {
+#filter a:hover, #filter a:focus {
      text-decoration: none;
-     color: #f60;
-     border: 1px solid #f60;
-     border-radius: 2px;
+     color: #f60 !important;
+     border: 1px solid #f60 !important;
      background: #fff;
+}
+
+#filter a:active {
+     box-shadow: inset 3px 3px 3px #999;
 }
 
 #filter p b {
@@ -411,6 +444,9 @@ td.search:last-child {
 
 #search input[type="text"] {
      width: 200px;
+     margin-left: 10px;
+     background: url(/themes/console/images/buttons/search.png) 5px center no-repeat;
+     padding: 5px 5px 5px 25px;
 }
 
 #messages:empty {
@@ -479,6 +515,11 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      color: #000;
 }
 
+input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
+     border: none;
+     outline: none;
+}
+
 input[type="submit"], input[type="reset"] {
      min-width: 80px;
 }
@@ -510,17 +551,30 @@ button, input[type="submit"], input[type="reset"] {
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      margin: 2px 0 2px 4px;
+     filter: drop-shadow(0 0 1px #ccc);
+     color: #333;
 }
 
-button:hover, input[type="submit"]:hover, input[type="reset"]:hover {
+button:hover, input[type="submit"]:hover, input[type="reset"]:hover,
+button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      background: #fff;
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
-     border: 1px solid #bbb;
+     border: 1px solid #89f;
+     filter: drop-shadow(0 0 1px #89f);
+     -webkit-filter: drop-shadow(0 0 1px #89f);
+     color: #222;
 }
 
 button:active, input[type="submit"]:active, input[type="reset"]:active {
-     background: #ddd;
+     box-shadow: inset 3px 3px 3px #999;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #999;
      border: 1px solid #bbb;
+     color: #333;
+}
+
+input[type="radio"], input[type="checkbox"] {
+     min-width: 16px;
+     min-height: 16px;
 }
 
 form[action="subscriptions"], form[action="config"] {
@@ -537,7 +591,7 @@ form[action="subscriptions"] textarea {
      padding: 3px !important;
 }
 
-#navi a {
+#navi a, #navi a:visited {
      border: 1px solid #6b78bf;
      border-radius: 2px;
      margin: 3px 0 !important;
@@ -545,16 +599,19 @@ form[action="subscriptions"] textarea {
      -webkit-filter: drop-shadow(0 0 1px #ccc);
      display: inline-block;
      outline: none;
+     color: #448 !important;
 }
 
 #navi a:hover, #navi a:focus {
     border: 1px solid #f60;
+    color: #f60 !important;
 }
 
 #navi a:active {
     border: 1px solid #f90;
     box-shadow: inset 2px 2px 2px #555;
     background-blend-mode: luminosity;
+    color: #777 !important;
 }
 
 #navi a.abook {
@@ -638,11 +695,75 @@ form[action="subscriptions"] textarea {
 }
 
 p#filtered {
-     background: #fff url(/themes/susidns/images/filter.png) 18px center no-repeat;
+     background: #fff url(/themes/console/images/buttons/filter.png) 18px center no-repeat;
      padding: 0 10px 0 38px !important;
 }
 
 p.book {
      background: #fff url(/themes/susidns/images/abook.png) 18px center no-repeat;
      padding: 0 10px 0 38px !important;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+body, p, td, textarea, input, button, li, a {
+     font-size: 10pt !important;
+}
+
+code, tt {
+     font-size: 9pt !important;
+}
+
+h4, #navi a {
+     font-size: 11pt;
+}
+
+h3 {
+     font-size: 12pt !important;
+}
+
+p.footer {
+     margin: 12px auto -21px !important;
+}
+
+#export {
+     margin-top: -40px !important;
+}
+
+#filter span, #filter a {
+     font-size: 11pt !important;
+}
+
+}
+
+/* end responsive layout */
+
+
+/* export hosts */
+
+#export {
+     text-align: right;
+     margin-top: -36px;
+     margin-bottom: -4px;
+}
+
+#filter {
+     margin-top: -2px !important;
+}
+
+p#filtered {
+     padding-right: 200px !important;
+	  padding-top: 2px !important;
+     padding: 2px 200px 0 20px !important;
+     background-position: left center !important;
+}
+
+#book p {
+     margin-left: 2px;
+} 
+
+p.book {
+     padding-left: 26px !important;
+     background-position: left center !important;
 }

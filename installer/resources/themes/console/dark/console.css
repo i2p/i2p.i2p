@@ -16,6 +16,16 @@ body {
      display: none;
 }
 
+::selection {
+     background: #030 !important;
+     color: white;
+}
+
+::-moz-selection {
+     background: #030 !important;
+     color: white;
+}
+
 div.clearer {
      clear: left;
      height: 0;
@@ -613,6 +623,7 @@ div.sorry {
 .main#dns {
      padding: 0 0 3px;
      min-width: 650px !important;
+     background: #000;
 }
 
 .main#webmail, .main#torrents {
@@ -1899,7 +1910,7 @@ th.smallhead {
 .tablefooter tr, .tablefooter td {
      background: #000 url(images/header.png) repeat-x center center !important;
      background: linear-gradient(to bottom, #001400, #001000 50%, #000 100%) !important;
-     border-top: 1px solid #494;
+     border-top: 1px solid #494 !important;
      border-bottom: 1px solid #494 !important;
      line-height: 110%;
      padding: 6px 10px;
@@ -3202,6 +3213,10 @@ th > img[src^="/imagegen"] { /* scale down header images */
      margin: -6px -11px !important;
 }
 
+#criticallogs ul:empty {
+     display: none;
+}
+
 table#enviro, table#criticallogs, table#routerlogs, table#eventlogs, table#wrapperlogs {
      margin-top: -11px;
 }
@@ -3224,6 +3239,7 @@ table#enviro td:first-child {
      width: 100px;
      text-align: right;
      padding-right: 0;
+     white-space: nowrap;
 }
 
 table#criticallogs td , table#routerlogs td, table#eventlogs td, table#wrapperlogs td {
@@ -4899,7 +4915,7 @@ form[action="events"] {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p {
+body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre {
      font-size: 10pt !important;
 }
 
@@ -4928,10 +4944,6 @@ body, .main, .main td, .news p, #news p {
      font-size: 9pt !important;
 }
 
-.routersummary h3 a {
-     font-size: 11pt !important;
-}
-
 div.app {
      min-width: 138px;
 }
@@ -4949,7 +4961,19 @@ table#floodfills th:first-child, table#floodfills td:first-child {
      padding-right: 3px !important;
 }
 
-h3 {
-     font-size: 11pt;
+h3, .routersummary h3 a, th.th_title, #leasesetdebug th, #leasesetsummary th, .netdbentry th {
+     font-size: 11pt !important;
+}
+
+select {
+     padding: 3px 16px 3px 2px;
+}
+
+h3#pluginmanage {
+     margin-bottom: -15px !important;
+}
+
+h4#updateplugins {
+     margin-top: -15px !important;
 }
 }

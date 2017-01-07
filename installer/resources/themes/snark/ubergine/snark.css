@@ -1,5 +1,6 @@
-/* I2PSnark theme "Ubergine" by dr|z3d */
+/* I2PSnark theme "Ubergine" */
 /* Guantanamo Commemorative Edition. */
+/* Author: dr|z3d */
 
 html {
      min-height: 100%;
@@ -10,11 +11,11 @@ body {
      background: linear-gradient(to bottom, rgba(64,0,64,0.2), rgba(11,0,11,0.1), rgba(11,0,11,0.2)), url(images/graytile.png) #26092f;
      background-size: 100% 100%, 96px 96px;
      color: #fff;
-     font: 8pt "Bitstream Vera Sans", "Noto Sans", Verdana, Ubuntu, Tahoma, Helvetica, sans-serif;
+     font: 8pt "Bitstream Vera Sans", Verdana, "Noto Sans", Ubuntu, Helvetica, sans-serif;
 }
 
 body.iframed {
-     background: transparent url('../../console/dark/images/transparent.gif') !important;
+     background: transparent url(themes/console/images/transparent.gif) !important;
      margin: 0 !important;
 }
 
@@ -182,7 +183,7 @@ body.iframed {
      width: calc(100% - 12px);
      background: #2a192a url(images/hat.png) no-repeat scroll right center;
      background: url(images/hat.png) no-repeat scroll right center, linear-gradient(to bottom, #2a192a 0%, #202 100%);
-     background-size: 80px 83px;
+     background-size: 80px 83px, 100% 100%;
      box-shadow: inset 0 0 3px 1px rgba(16, 0, 16, 0.6);     
      outline: none;
      filter: drop-shadow(0 0 1px rgba(16, 8, 16, 0.5));
@@ -664,7 +665,12 @@ table.snarkTorrents tbody tr:hover .snarkTorrentName, table.snarkDirInfo tbody t
 .snarkFileIcon {
      width: 16px;
      text-align: center;
-     padding-left: 3px;
+     padding: 4px !important;
+}
+
+.snarkFileIcon img {
+     margin: 1px;
+     padding: 0;
 }
 
 .snarkFileName {
@@ -787,6 +793,12 @@ table.SnarkDirInfo {
      opacity: 1;
 }
 
+.snarkDirInfo .ParentDir a, .snarkDirInfo .snarkFileName a, .snarkTorrents .snarkTorrentName a {
+     display: inline-block;
+     width: 100%;
+     padding: 2px 0;
+}
+
 .snarkDirInfo .headerpriority {
      text-align: right !important;
      vertical-align: middle;
@@ -809,8 +821,14 @@ table.SnarkDirInfo {
 }
 
 .thumb {
-     max-height: 64px;
-     max-width: 96px;
+     max-width: 16px;
+     transition: ease-out all 0.3s 0s;
+}
+
+.thumb:hover {
+     max-width: 80px;
+     max-height: 80px;
+     transition: ease all 0.3s 0s;
 }
 
 div.snarkNewTorrent {
@@ -863,6 +881,12 @@ table#trackerselect {
      display: inline-block;
      margin: 0 0 -3px !important;
      min-width: 200px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.snarkConfigTitle, label.toggleview {
+     font-size: 12pt;	
+}
 }
 
 .snarkConfigTitle img, label.toggleview img {
@@ -943,7 +967,6 @@ a.control, a.controld, a.control:active {
      padding: 4px 6px 4px 4px;	
      text-shadow: 0 0 #410;
      white-space: nowrap;
-     min-height: 22px;
      filter: drop-shadow(0 0 1px #313) !important;
      -webkit-filter: drop-shadow(0 0 1px #313) !important;
 }
@@ -970,9 +993,14 @@ a.controld img {
      display: none;
 }
 
+a.control, input[type="submit"], input[type="reset"] {
+     background-size: 14px 14px, 100% 100% !important;
+}
+
 a.control:active, input[type="submit"]:active, input[type="reset"]:active {
      color: #ce1641 !important;
      border: 1px solid #fff !important;
+     box-shadow: inset 3px 3px 3px #fff;
 }
 
 .snarkDirInfo tr:last-child {
@@ -995,7 +1023,7 @@ th.headerstatus {
 */
 
 input, a.control {
-     font: 8pt "Droid Sans", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 8pt "Droid Sans", "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
      font-weight: bold;
 }
 
@@ -1014,7 +1042,7 @@ input {
 input.r {
      text-align: right;
      background: url(images/graytile.png);
-     font-family: "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
 }
 
 input[type=submit] {
@@ -1151,7 +1179,7 @@ input[type="submit"]:disabled:active, a.control:disabled:active {
 
 input[type="text"], input.r, input[name="nofilter_dataDir"] {
      padding: 4px !important;
-     font-family: "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
      box-shadow: inset 1px 1px 2px 1px #101;
      letter-spacing: 0.03em;
      background: url(images/graytile.png) #212;
@@ -1209,111 +1237,108 @@ input.disabled, input.disabled:hover, input.disabled:active, a.control.disabled:
 }
 
 input.accept, input.accept:active {
-     background: #989 url(images/accept.png) no-repeat 2px center;
-     background: url(images/accept.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/accept.png) no-repeat 4px center;
+     background: url(images/accept.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.accept:hover, input.accept:focus {
-     background: #767 url(images/accept.png) no-repeat 2px center;
-     background: url(images/accept.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/accept.png) no-repeat 4px center;
+     background: url(images/accept.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.add, input.add:active {
-     background: #989 url(images/add.png) no-repeat 2px center;
-     background: url(images/add.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/add.png) no-repeat 4px center;
+     background: url(images/add.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.add:hover, input.add:focus {
-     background: #767 url(images/add.png) no-repeat 2px center;
-     background: url(images/add.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/add.png) no-repeat 4px center;
+     background: url(images/add.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.cancel, input.cancel:active {
-     background: #989 url(images/cancel.png) no-repeat 2px center;
-     background: url(images/cancel.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/cancel.png) no-repeat 4px center;
+     background: url(images/cancel.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.cancel:hover, input.cancel:focus {
-     background: #767 url(images/cancel.png) no-repeat 2px center;
-     background: url(images/cancel.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);    
+     background: #767 url(images/cancel.png) no-repeat 4px center;
+     background: url(images/cancel.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);    
 }
 
 input.create, input.create:active {
-     background: #989 url(images/create.png) no-repeat 2px center;
-     background: url(images/create.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/create.png) no-repeat 4px center;
+     background: url(images/create.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.create:hover, input.create:focus {
-     background: #767 url(images/create.png) no-repeat 2px center;
-     background: url(images/create.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/create.png) no-repeat 4px center;
+     background: url(images/create.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.delete, input.delete:active {
-     background: #989 url(images/nuke.png) no-repeat 2px center;
-     background: url(images/nuke.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/nuke.png) no-repeat 4px center;
+     background: url(images/nuke.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.delete:hover, input.delete:focus {
-     background: #767 url(images/nuke.png) no-repeat 2px center;
-     background: url(images/nuke.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/nuke.png) no-repeat 4px center;
+     background: url(images/nuke.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.reload, input.reload:active {
-     background: #989 url(images/restore.png) no-repeat 2px center;
-     background: url(images/restore.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/restore.png) no-repeat 4px center;
+     background: url(images/restore.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.reload:hover, input.reload:focus {
-     background: #767 url(images/restore.png) no-repeat 2px center;
-     background: url(images/restore.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/restore.png) no-repeat 4px center;
+     background: url(images/restore.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.reload[name="recheck"], input.reload[name="recheck"]:active {
-     background: #989 url(images/recheck.png) no-repeat 2px center;
-     background: url(images/recheck.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/recheck.png) no-repeat 4px center;
+     background: url(images/recheck.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.reload[name="recheck"]:hover, input.reload[name="recheck"]:focus {
-     background: #767 url(images/recheck.png) no-repeat 2px center;
-     background: url(images/recheck.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/recheck.png) no-repeat 4px center;
+     background: url(images/recheck.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.starttorrent, input.starttorrent:active {
-     background: #989 url(images/next.png) no-repeat 2px center;
-     background: url(images/next.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/next.png) no-repeat 4px center;
+     background: url(images/next.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.starttorrent:hover, input.starttorrent:focus {
-     background: #767 url(images/next.png) no-repeat 2px center;
-     background: url(images/next.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/next.png) no-repeat 4px center;
+     background: url(images/next.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
 input.stoptorrent, input.stoptorrent:active {
-     background: #989 url(images/btn_stop.png) no-repeat 2px center;
-     background: url(images/btn_stop.png) no-repeat 2px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     background: #989 url(images/btn_stop.png) no-repeat 4px center;
+     background: url(images/btn_stop.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
      padding: 4px 3px 4px 18px !important;
-     min-height: 22px;
 }
 
 input.stoptorrent:hover, input.stoptorrent:focus {
-     background: #767 url(images/btn_stop.png) no-repeat 2px center;
-     background: url(images/btn_stop.png) no-repeat 2px center, linear-gradient(to bottom, #767 0%, #989 100%);
+     background: #767 url(images/btn_stop.png) no-repeat 4px center;
+     background: url(images/btn_stop.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+input[type="submit"], input[type="reset"], a.control {
+     padding-left: 21px !important;     
+}
 }
 
 .configsectionpanel tr:nth-last-child(2) td {
@@ -1328,7 +1353,7 @@ select {
      background: url(images/dropdown.png) right center no-repeat, url(images/graytile.png) #212 !important;
      background-size: 17px 17px, 96px 96px !important;
      color: #f60;
-     font: 8pt "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 8pt "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
      font-weight: bold;
      padding: 2px 18px 2px 1px;
      border-radius: 2px;
@@ -1371,6 +1396,10 @@ select option:hover {
 select {
      padding: 4px 18px 4px 4px;
 }
+
+select + select {
+     margin-left: -12px !important;
+}
 }
 
 textarea {
@@ -1397,11 +1426,6 @@ img:hover {
      border: none;
      opacity: 1;
      line-height: 100%;
-}
-
-img.thumb { /* consistent size for thumbnail images in file manifest */
-      width: 16px;
-      border-radius: 1px;
 }
 
 img[src$="magnet.png"] {

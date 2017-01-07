@@ -17,6 +17,16 @@ body.iframed {
      overflow: hidden; 
 }
 
+::selection {
+     background: #030 !important;
+     color: white;
+}
+
+::-moz-selection {
+     background: #030 !important;
+     color: white;
+}
+
 div {
      -moz-box-sizing: border-box;
      box-sizing: border-box;
@@ -322,7 +332,9 @@ textarea:focus {
      color: #ee9;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
+     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
+     box-shadow: inset 0 0 1px #880; 
 }
 
 textarea#statusMessages, textarea#statusMessages:active  {
@@ -330,7 +342,7 @@ textarea#statusMessages, textarea#statusMessages:active  {
      border: 0;
      box-shadow: none;
      height: 80px;
-     font-size: 9pt;
+     font-size: 8.5pt;
      width: 100%;
      border-radius: 0;
      padding: 2px 4px;
@@ -386,7 +398,8 @@ input {
      text-decoration: none;
 }
 
-input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
+input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner,
+button::-moz-focus-inner {
      border: none;
      outline: none;
 }
@@ -420,6 +433,10 @@ input[type="text"], input[type="password"], textarea, textarea[readonly="readonl
      box-shadow: inset 0 0 3px 3px #000;
      filter: none;
      color: #bb7;
+}
+
+textarea[readonly="readonly"]:focus {
+     box-shadow: inset 0 0 0 1px #880; 
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
@@ -458,9 +475,10 @@ a.control, input.control {
      border-radius: 2px;
      vertical-align: middle;
      text-decoration: none;
-     padding: 4px 2px !important;
+     padding: 5px 8px !important;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
+     display: inline-block;
 }
 
 .control:link {
@@ -493,7 +511,6 @@ a.control, input.control {
      box-shadow: inset 0 0 0 1px #000;
      box-sizing: border-box;
      min-width: 70px !important;
-     padding: 4px 8px !important;
 }
 
 .control:hover, .control:focus {
@@ -508,23 +525,18 @@ a.control, input.control {
      color: #ee9 !important;
      text-decoration: none;
      box-shadow: inset 0 0 0 1px #000 !important;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
 }
 
 a.control {
      display: inline-block;
 }
 
-button.control {
-     box-sizing: border-box;
-     -moz-box-sizing: border-box;
-     padding: 3px 4px !important;
-}
-
 select {
      color: #494;
      font: 8pt "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
      font-weight: bold;
-     padding: 2px 16px 2px 3px;
+     padding: 3px 16px 3px 3px;
      background: #000;
      border-radius: 2px;
      cursor: pointer;
@@ -538,6 +550,10 @@ select {
 select option { /* dropdown menu reverts to normal font-weight */
      font-weight: normal;
      font-size: 9.5pt;
+}
+
+select option:hover, select option:checked {
+     box-shadow: inset 0 0 20px 20px #f60; 
 }
 
 select:focus, select:hover {
@@ -935,9 +951,21 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
      color: #bb7;
 }
 
-
 td.tunnelDestination, td.tunnelDescription {
      background: linear-gradient(to right, #000 50%, #010);
 }
 
 /* end more space */
+
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+
+body, td, a {
+     font-size: 10pt;
+}
+
+button, input, .control, select, textarea#statusMessages, .freetext, textarea {
+     font-size: 9pt;
+}
+}

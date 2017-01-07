@@ -2,7 +2,7 @@
 /* Author: dr|z3d */
 
 body {
-     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif;
      color: #0c153d;
      background: #eef;
      background: url(/themes/console/classic/images/bg0.png) repeat scroll center bottom #eef;
@@ -37,8 +37,8 @@ body.iframed {
      text-transform: uppercase !important;
      color: #000;
      border: 1px solid #89f;
-     background: none !important;
-     background-image: linear-gradient(to bottom, #eef 0%, #fff 50%, #eef 50%, #fff 100%) !important;
+     background: #eff2ff !important;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) !important;
      box-shadow: 0 0 1px #fff;
 }
 
@@ -573,6 +573,7 @@ table.snarkTorrents {
 
 .snarkTorrentInfo td {
      text-align: left !important;
+     vertical-align: middle !important;
 }
 
 .snarkTorrentInfo td:first-child {
@@ -644,6 +645,12 @@ table.SnarkDirInfo {
 
 .snarkDirInfo td:first-child img {
      padding-right: 6px;
+}
+
+.snarkDirInfo .ParentDir a, .snarkDirInfo .snarkFileName a, .snarkTorrents .snarkTorrentName a {
+     display: inline-block;
+     width: 100%;
+     padding: 2px 0;
 }
 
 .snarkDirInfo .headerpriority {
@@ -738,7 +745,7 @@ td {
      font-size: 9pt;
      padding: 1px;
      opacity: 1;
-     color: #0c153d !important;
+     color: #333 !important;
 }
 
 .mainsection td {
@@ -878,14 +885,15 @@ td.snarkTorrentstatus:nth-child(2) {
      text-align: center !important;
 }
 
-.snarkTorrentDownloaded {
-     color: #0c153d !important;
-}
-
 td.snarkTorrentDownloaded {
      font-weight: bold;
      width: 110px;
      padding: 0 5px;
+}
+
+/*
+.snarkTorrentDownloaded {
+     color: #0c153d !important;
 }
 
 .snarkTorrentUploaded {
@@ -899,6 +907,7 @@ td.snarkTorrentDownloaded {
 .snarkTorrentRateDown {
      color: #0c153d !important;
 }
+*/
 
 .snarkTorrents img {
      padding: 4px 3px !important;
@@ -969,7 +978,7 @@ td[onclick^="document.location"]:hover {
 
 .snarkTorrentOdd td,
 .snarkTorrentEven td {
-     color: #0c153d !important;
+/*     color: #0c153d !important;*/
      border-top: none !important;
 }
 
@@ -1060,8 +1069,13 @@ div.percentBarInner.percentBarComplete {
 }
 
 .thumb {
+     transition: ease all 0.3s 0s;
+}
+
+.thumb:hover {
      max-width: 96px;
      max-height: 64px;
+     transition: ease all 0.3s 0s;
 }
 
 .snarkNewTorrent {
@@ -1069,9 +1083,10 @@ div.percentBarInner.percentBarComplete {
 }
 
 .snarkAddInfo {
-     font-size: 8.5pt;
+     font-size: 9pt;
      line-height: 130% !important;
      margin-left: 10px;
+     font-weight: normal;
 }
 
 .snarkConfigTitle,
@@ -1176,7 +1191,7 @@ a:link {
      text-decoration: none;
      word-wrap: break-word;
      opacity: 1;
-     color: #006;
+     color: #33a;
      border-radius: 0;
 }
 
@@ -1199,7 +1214,7 @@ a:active {
 }
 
 input {
-     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif;
      margin: 2px 4px 2px 0;
      padding: 3px 4px !important;
      cursor: pointer;
@@ -1242,35 +1257,42 @@ a img:focus {
      filter: drop-shadow(0 0 2px #f60) !important;
 }
 
+input::-moz-focus-inner {
+     border: 0;
+     outline: 0;
+}
+
 input[type="submit"],
 input[type="reset"] {
      font-size: 9pt;
      font-weight: normal;
+     color: #333;
      min-width: 90px !important;
-     min-height: 22px;
-     /* opera fix */
-     
-     padding: 3px 2px !important;
+     padding: 5px 3px !important;
      text-align: center;
-     color: #000;
-     border: 1px solid #bbb;
+     border: 1px solid #999;
      border-radius: 2px;
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      box-shadow: inset 0 0 0 1px #fff;
+     
 }
 
-input[type="submit"]:hover,
-input[type="reset"]:hover {
-     color: #000;
+input[type="submit"]:hover, input[type="reset"]:hover,
+input[type="submit"]:focus, input[type="reset"]:focus {
+     color: #111;
      background: #fff;
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     border: 1px solid #89f;
 }
 
 input[type="submit"]:active,
 input[type="reset"]:active {
-     color: #000;
+     color: #333;
      background: #ddd;
+     border: 1px solid #999;
+     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #555;
 }
 
 a.control {
@@ -1318,10 +1340,10 @@ input[type="password"],
 input.r,
 input[name="nofilter_dataDir"],
 textarea[name="i2cpOpts"] {
-     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif !important;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif !important;
      min-width: 160px;
      margin: 2px 2px 2px 0;
-     padding: 3px 2px;
+     padding: 5px !important;
      cursor: text;
      vertical-align: middle;
      color: #333;
@@ -1342,9 +1364,8 @@ textarea[name="i2cpOpts"]:focus {
 textarea[name="i2cpOpts"],
 input[name="nofilter_dataDir"] {
      width: 500px;
-     height: 22px;
      margin: 3px 0;
-     padding: 3px;
+     padding: 5px;
      resize: none;
      cursor: text;
 }
@@ -1374,6 +1395,10 @@ img[src$="status.png"] {
 
 img[src$="status.png"]:hover, img[src$="status.png"]:focus, img[src$="status.png"]:active {
      filter: invert(100%) hue-rotate(180deg) drop-shadow(0 0 2px #f60) !important;
+}
+
+img[src$="magnet.png"] {
+     transform: rotate(-90deg);
 }
 
 input[type=text],
@@ -1409,14 +1434,10 @@ input[size="85"] {
 }
 
 select {
-     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
-}
-
-select {
-     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif;
      min-width: 100px;
      margin: 2px 4px 2px 0;
-     padding: 2px 16px 2px 2px;
+     padding: 4px 16px 4px 2px;
      cursor: pointer;
      vertical-align: middle;
      text-overflow: ellipsis;
@@ -1578,16 +1599,17 @@ table#trackerselect {
 }
 
 #trackerselect tr:first-child td {
-     padding: 2px 5px 2px 20px;
+     padding: 5px 10px;
      border-bottom: 1px solid #89f;
 }
 
 #trackerselect td {
-     padding: 3px 5px 3px 20px;
+     padding: 3px 10px;
 }
 
 #trackerselect td:first-child {
      width: 20%;
+     font-weight: normal;
 }
 
 #trackerselect td:nth-child(4) {
@@ -1851,7 +1873,7 @@ div.configsection a:hover {
 
 code {
      font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
-     font-size: 8pt;
+     font-size: 9pt;
      font-weight: bold;
      padding: 0 2px;
      color: #090;
@@ -1947,4 +1969,12 @@ label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle a:hove
 label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:active img {
      transform: rotate(90deg);
      transition: ease transform 0.3s 0s;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"] {
+     font-size: 10pt !important;
+}
 }

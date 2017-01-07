@@ -2,9 +2,9 @@
 /* Author: dr|z3d */
 
 body {
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      background-color: #000;
-     color:#C9CEFF;
+     color:#c9ceff;
      margin: 0 10px;
      font-size: 9pt;
 }
@@ -20,31 +20,126 @@ body.iframed {
      display: none;
 }
 
+/* topnav */
+
 div#navi  {
      border: 1px solid #2d295f;
-     padding: 5px 0;
+     padding: 2px 0;
      background: #002 url(/themes/console/midnight/images/header.png) repeat-x scroll center center !important;
      background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
-     margin-bottom: 30px;
+     margin: -10px 0 27px;
+     box-shadow: inset 0 0 0 1px #000;
+     position: sticky;
+     top: 0;
+     z-index: 999;
 }
 
-/*
 .iframed #navi {
-     border-left: none;
-     border-right: none;
-     border-radius: 0;
+     padding: 0 !important;
+     border: 1px solid #443da0 !important;
+     margin: 0 0 27px;
 }
-*/
+
+#navi a, #navi a:visited {
+     border: 1px solid #2d295f;
+     border-radius: 2px;
+     padding: 5px;
+     margin: 3px 0 !important;
+     filter: drop-shadow(0 0 1px #000);
+     -webkit-filter: drop-shadow(0 0 1px #000);
+     display: inline-block;
+     outline: none;
+     text-transform: capitalize;
+     color: #928fbf !important;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+#navi a:hover, #navi a:focus {
+    border: 1px solid #652787;
+    color: #652787 !important;
+}
+
+#navi a:active {
+     border: 1px solid #652787;
+     background-blend-mode: luminosity;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
+     color: #c9ceff !important;
+}
+
+#navi a.abook {
+     background: #001 url(/themes/susidns/images/abook.png) 6px center no-repeat;
+     background: url(/themes/susidns/images/abook.png) 6px center no-repeat, linear-gradient(to bottom, #25233f 50%, #000 50%);
+     padding: 5px 8px 5px 25px;
+}
+
+#navi a.abook:hover, #navi a.abook:focus {
+     background: #000 url(/themes/susidns/images/abook.png) 6px center no-repeat !important;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+}
+
+#navi a.abook:active {
+     background: #652787 url(/themes/susidns/images/abook.png) 6px center no-repeat !important;
+}
+
+#navi a#subs {
+     background: #001 url(/themes/susidns/images/subs.png) 6px center no-repeat;
+     background: url(/themes/susidns/images/subs.png) 6px center no-repeat, linear-gradient(to bottom, #25233f 50%, #000 50%);
+     padding: 5px 8px 5px 25px;
+}
+
+#navi a#subs:hover, #navi a#subs:focus  {
+     background: #001 url(/themes/susidns/images/subs.png) 6px center no-repeat;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+}
+
+#navi a#subs:active {
+     background: #652787 url(/themes/susidns/images/subs.png) 6px center no-repeat;
+}
+
+#navi a#config {
+     background: #001 url(/themes/console/images/buttons/configure.png) 6px center no-repeat;
+     background: url(/themes/console/images/buttons/configure.png) 6px center no-repeat, linear-gradient(to bottom, #25233f 50%, #000 50%);
+     padding: 5px 8px 5px 25px;
+}
+
+#navi a#config:hover, #navi a#config:focus {
+     background: #000 url(/themes/console/images/buttons/configure.png) 6px center no-repeat;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+}
+
+#navi a#config:active {
+     background: #652787 url(/themes/console/images/buttons/configure.png) 6px center no-repeat;
+}
+
+#navi a#overview {
+     background: #001 url(/themes/susidns/images/overview.png) 6px center no-repeat;
+     background: url(/themes/susidns/images/overview.png) 6px center no-repeat, linear-gradient(to bottom, #25233f 50%, #000 50%);
+     padding: 5px 8px 5px 25px;
+}
+
+#navi a#overview:hover, #navi a#overview:focus {
+     background: #000 url(/themes/susidns/images/overview.png) 6px center no-repeat;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+}
+
+#navi a#overview:active {
+     background: #652787 url(/themes/susidns/images/overview.png) 6px center no-repeat;
+}
 
 #navi p {
-     text-align: center;
+     text-align: center !important;
+     text-transform: capitalize;
      font-weight: bold;
      font-size: 9pt;
+     padding: 2px 5px !important;
+     margin: 0 !important;
 }
 
-#navi a:link {
-     text-transform: capitalize;
+#navi p > * {
+     vertical-align: middle;
 }
+
+/* end topnav */
 
 hr {
      color: #2d295f;
@@ -66,6 +161,7 @@ div#filter {
 div#filter + div#search {
      border: 1px solid #2d295f;
      margin-top: 13px;
+     margin-bottom: 14px;
 }
 
 div#filter + div#search > form {
@@ -74,12 +170,23 @@ div#filter + div#search > form {
 }
 
 #filter p, #search td {
-     font-size: 10pt !important;
+     font-size: 9pt !important;
      font-weight: bold;
 }
 
-#search input {
+td.search > * {
+     vertical-align: middle;
+}
+
+#search input[type="text"] {
+     background: #000 url(/themes/console/images/buttons/search.png) 5px center no-repeat;
+     background: url(/themes/console/images/buttons/search.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%) !important;
+     padding: 5px 5px 5px 25px !important;
      margin-left: 5px;
+}
+
+#search input[type="text"]:focus {
+     background: #000 url(/themes/console/images/buttons/search.png) 5px center no-repeat !important;
 }
 
 #filter p {
@@ -91,11 +198,10 @@ div#filter + div#search > form {
 }
 
 p#filtered {
-     margin-bottom: 10px !important;
+     margin: -15px 0 10px !important;
 }
 
 #search {
-/*     border: 1px solid #494; */
      padding: 0 10px;
      margin-top: -1px !important;
      padding-bottom: -20px;
@@ -104,18 +210,29 @@ p#filtered {
 
 #filter a:link, #filter a:visited {
      text-transform: capitalize;
+     background: #000;
      border: 1px solid #443da0;
      border-radius: 2px;
-     padding: 2px 5px;
-     min-width: 16px;
+     padding: 3px 8px;
      text-align: center;
      color: #443da0;
      display: inline-block;
-     margin: 0;
+     margin: 2px 0;
+}
+
+#filter a:hover, #filter a:focus  {
+     border: 1px solid #652787;
+     transform: scale(1.1);
+}
+
+#filter a:active {
+     background: #652787;
+     color: #c9ceff !important;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000;
 }
 
 #filter span {
-     display: inline-block;
+     display: inherit;
      text-align: center;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -126,7 +243,10 @@ p#filtered {
      border-radius: 0 0 2px 2px;
      padding: 5px 10px !important;
      min-width: 300px;
-     margin: -1px 10%;
+     max-width: 500px;
+     width: 40%;
+     white-space: nowrap;
+     margin: -1px auto;
      box-shadow: inset 0 0 0 1px #000;
      background: url(/themes/console/midnight/images/header.png) repeat-x scroll center center #000;
      background-image: linear-gradient(to bottom, #010010 0%, #020019 50%, #060051%, #0100100%) !important;
@@ -138,6 +258,13 @@ p#filtered {
      display: inline-block;
      border: none !important;
      background: !important;
+     transform: none;
+}
+
+#filter span a:active {
+     background: none;
+     box-shadow: none;
+     color: #4f0519 !important;
 }
 
 #filter span b {
@@ -157,7 +284,7 @@ p#filtered {
 }
 
 p {
-     color:#C9CEFF;
+     color:#c9ceff;
      margin: 0 0 4px;
      font-size: 9pt;
      text-align: justify;
@@ -170,8 +297,13 @@ p {
      padding: 20px 20px 20px 42px !important; 
 }
 
+#messages {
+     margin-bottom: 24px;
+}
+
 #messages:empty {
-     margin-top: -10px
+     margin-top: -10px;
+     display: none;
 }
 
 span.addrhlpr {
@@ -179,9 +311,9 @@ span.addrhlpr {
 }
 
 h3 {
-     color:#C9CEFF;
-     font-size:10pt;
-     font-weight:bold;
+     color: #c9ceff;
+     font-size: 10pt;
+     font-weight: bold;
      border: 1px solid #2d295f;
      padding: 7px 10px;
      border-radius: 2px; 
@@ -191,6 +323,7 @@ h3 {
      word-spacing: 0.1em;
      text-shadow: 0 0 2px #010011;
      text-transform: uppercase;
+     box-shadow: inset 0 0 0 1px #000;
 }
 
 #content h3 {
@@ -205,16 +338,6 @@ h3 {
 #content p + h3 {
       margin-top: 15px !important;
 }
-
-/*
-.iframed h3, .iframed h4 {
-     border: none;
-     border-bottom: 1px solid #443da0;
-     border-radius: 0;
-     background: none !important;
-     margin: 5px 0 10px;
-}
-*/
 
 .headline h3 {
      border-radius: 2px 2px 0 0;
@@ -257,16 +380,15 @@ h3 {
      margin-top: -16px;
 }
 
-div#messages {
+div#messages p {
 }
 
 div#messages + p {
      padding: 12px 10px 8px 20px;
-     font-size: 10pt;
 }
 
 div#book p {
-     font-size: 10pt;
+     padding: 15px 15px 15px 35px !important;
 }
 
 h4 {
@@ -287,14 +409,6 @@ div#messages > p.messages {
      padding: 15px 15px 15px 40px !important;
      background: url(/themes/console/images/info/infohelp.png) 6px center no-repeat;
 }
-
-/*
-a {
-     color:#f60;
-     text-decoration:none;
-     font-weight: bold;
-}
-*/
 
 a:link {
      color: #443da0;
@@ -318,11 +432,22 @@ a:active {
 }
 
 th {
-     color: #C9CEFF;
+     color: #c9ceff;
      font-size: 9pt;
      padding: 5px 10px;
      font-size: 10pt;
      text-align: left;
+}
+
+.iframed .book tr.head th {
+     border-top: 1px solid #2d295f; 
+     border-bottom: 1px solid #2d295f; 
+} 
+
+.book th:first-child {
+     background: #000 url(/themes/console/images/buttons/delete.png) center center no-repeat !important;
+     font-size: 0;
+     padding: 0 !important;
 }
 
 table.book td:first-child {
@@ -330,7 +455,7 @@ table.book td:first-child {
 }
 
 td {
-     color: #C9CEFF;
+     color: #c9ceff;
      padding: 5px;
      font-size: 9pt;
      vertical-align: center;
@@ -343,26 +468,6 @@ td.checkbox {
 td.names a {
      font-size: 9pt !important;
 }
-
-/*
-div#buttons + div > table {
-     width: 100%;
-     border: 1px solid #2d295f;
-     margin-top: -46px;
-}
-
-div#buttons + div > table > tbody > tr > td {
-     padding-top: 51px !important;
-}
-
-div#buttons + div > table > tbody > tr > td:first-child {
-     text-align: right;
-}
-
-div#buttons + div > table > tbody > tr > td {
-     text-align: left;
-}
-*/
 
 td > img[width="320"], td > img[src^="/imagegen"] {
      border-radius: 2px;
@@ -397,8 +502,7 @@ tr.list0 {
 }
 
 p.messages {
-/*     background-color:#000; */
-     color:#C9CEFF;
+     color:#c9ceff;
      border: 1px solid #2d295f;
      padding: 5px 5px 10px;
      margin: 5px 0 10px;
@@ -439,24 +543,23 @@ p.messages {
 div#content {
 }
 
-/*
-.iframed #content {
-     margin: 0 10px;
-}
-*/
-
 div#content p {
      padding: 0 30px;
-     font-size: 10pt;
-}
-
-#content p a, #helpconfig li, p.help {
-     font-size: 10pt;
 }
 
 p.footer {
-     font-size:7pt;
+     font-size: 8pt;
      text-align: center;
+     border: 1px solid #113;
+     padding: 5px 0 2px;
+}
+
+#footer {
+     position: fixed;
+     bottom: -4px;
+     width: calc(100% - 20px);
+     margin: 0;
+     display: none;
 }
 
 .iframed #footer {
@@ -481,7 +584,7 @@ p.buttons {
 }
 
 div#book + div#buttons {
-     margin: -6px 0 20px !important;
+     margin: 9px 0 20px !important;
 }
 
 #add p.buttons {
@@ -495,24 +598,16 @@ form[action="subscriptions"] {
 
 textarea[name="config"], textarea[name="content"] {
      border-radius: 0;
-     margin-top: -17px;
+     margin-top: -26px;
      resize: none;
      border: 1px solid #2d295f;
+     font-size: 8.5pt;
 }
-/*
-.iframed textarea[name="config"], .iframed textarea[name="content"] {
-     margin: 0 0 20px;
-}
-*/
 
 textarea[name="config"] {
      height: 220px;
      overflow-y: scroll;
      resize: none;
-}
-
-textarea[name="content"] {
-     
 }
 
 div#config + div#buttons, div#content + div#buttons {
@@ -539,12 +634,17 @@ div#config + div#buttons, div#content + div#buttons {
 
 div#book {
      padding: 0;
+     margin: -15px 0 -10px;
 }
 
 #book table {
      width: 100%;
-     border: 1px solid #2d295f;
+     border: 1px solid #2d295f !important;
      margin-top: -10px;
+}
+
+.iframed #book table {
+     border: none !important;
 }
 
 #book table th {
@@ -563,8 +663,40 @@ div#book {
      background: #003;
 }
 
+#book table tr:hover textarea {
+     color: #c9ceff;
+}
+
 #book, #messages, #filter, #search {
      background: #001;
+}
+
+.book td:nth-child(3) {
+     padding: 2px 0 2px 5px !important;
+     width: 30px;
+}
+
+.book td:nth-child(4) {
+     text-align: center;
+     width: 20px;
+     padding: 2px 25px 2px 0 !important;
+}
+
+.book td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+.book td:nth-child(4) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 2px 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+}
+
+.book td:nth-child(4) .addrhlpr:hover {
+     filter: drop-shadow(0 0 1px #b73fff);
+     -webkit-filter: drop-shadow(0 0 1px #b73fff);
 }
 
 .headline + #book > table td {
@@ -594,11 +726,11 @@ div#add {
 }
 
 .page {
-     color:#C9CEFF;
+     color:#c9ceff;
      margin: 10px 0;
      padding: 0;
      font-size: 9pt !important;
-     box-shadow: inset 0px 0px 1px 0px #020022;
+     background: #000;
 }
 
 .iframed .page {
@@ -616,15 +748,8 @@ input {
      background: #000 none !important;      
      color: #443da0;
      margin: 2px 4px 2px 0;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      min-width: 64px !important;
-}
-
-input[type=submit]:hover, input[type=reset]:hover {
-     background: #000;
-     color: #652787;
-     border: 1px solid #652787;
-     box-shadow: inset 0 1px 1px 0 #C9CEFF;
 }
 
 input[type="checkbox"], .optbox {
@@ -632,23 +757,38 @@ input[type="checkbox"], .optbox {
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
 
+input[type=submit]::-moz-focus-inner, input[type=reset]::-moz-focus-inner {
+     border: none;
+     outline: none;
+}
+
 input[type=submit], input[type=reset] {
      color: #443da0;
      background: #000;
+     background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
      border-right-color: #14144f;
-     padding: 4px 2px !important;
-/*     box-shadow: 0 1px 1px 0 #190f9b inset; */
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     padding: 5px !important;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      text-align: center;
-     min-width: 90px;
+     min-width: 90px !important;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+input[type=submit]:hover, input[type=reset]:hover,
+input[type=submit]:focus, input[type=reset]:focus {
+     background: #000 !important;
+     color: #652787;
+     border: 1px solid #652787;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
 }
 
 input[type=submit]:active, input[type=reset]:active {
      background: #652787 !important;
-     color: #C9CEFF !important;
+     color: #c9ceff !important;
      border: 1px solid #652787;
+     box-shadow: inset 3px 3px 3px #000;
 }
 
 textarea {
@@ -656,12 +796,30 @@ textarea {
      background: #000;
      border: 1px solid #443da0;
      padding: 3px 5px;
-     font: bold 8.5pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: bold 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
      border-radius: 2px;
      width: 100%;
      height: 120px;
      line-height: 140%;
      resize: none;
+}
+
+input[type="text"], textarea {
+     background: linear-gradient(to bottom, #000 0%, #000019 100%) !important;
+     box-shadow: inset 0 0 3px 3px #000;
+}
+
+input[type="text"]:focus, textarea:focus {
+     background: #000 !important;
+     color: #c9ceff;
+}
+
+input[type=text]:focus {
+     color: #c9ceff !important;
+     background: #000;
+     filter: drop-shadow(0 0 1px #99f);
+     -webkit-filter: drop-shadow( 0 0 1px #99f);
+     transition: filter ease 0.3s 0s; 
 }
 
 textarea[cols="70"] {
@@ -679,70 +837,8 @@ textarea[cols="70"] {
      border: none;
      border-left: 1px solid #17142f;
      height: 30px;
-}
-
-input:focus, textarea:focus {
-     color: #C9CEFF;
-}
-
-/* topnav */
-
-.iframed #navi {
-     padding: 0 !important;
-     border: 1px solid #443da0 !important;
-}
-
-#navi a {
-     border: 1px solid #2d295f;
-     border-radius: 2px;
-     padding: 5px;
-     margin: 3px 0 !important;
-     filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
-     display: inline-block;
-     outline: none;
-}
-
-#navi a:hover, #navi a:focus {
-    border: 1px solid #652787;
-    color: #652787
-}
-
-#navi a:active {
-     border: 1px solid #4f0519;
-     background-blend-mode: luminosity;
-}
-
-#navi a.abook {
-     background: #001 url(/themes/susidns/images/abook.png) 5px center no-repeat;
-     padding: 5px 5px 5px 24px;
-}
-
-#navi a#subs {
-     background: #001 url(/themes/susidns/images/subs.png) 5px center no-repeat;
-     padding: 5px 5px 5px 24px;
-}
-
-#navi a#config {
-     background: #001 url(/themes/console/images/buttons/configure.png) 5px center no-repeat;
-     padding: 5px 5px 5px 24px;
-}
-
-#navi a#overview {
-     background: #001 url(/themes/susidns/images/overview.png) 5px center no-repeat;
-     padding: 5px 5px 5px 24px;
-}
-
-#navi p {
-     text-align: center !important;
-     text-transform: capitalize;
-     font-weight: bold;
-     padding: 2px 5px !important;
-     margin: 0 !important;
-}
-
-#navi p > * {
-     vertical-align: middle;
+     overflow-x: auto;
+     overflow-y: hidden !important;
 }
 
 .iframed iframe {
@@ -753,7 +849,7 @@ input:focus, textarea:focus {
 
 .iframed #navi, .iframed h3, .iframed h4, .iframed #book, .iframed #add, .iframed #filtered, .iframed #filter, .iframed #search,
 table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .iframed p.book, .iframed #helpsubs, 
-.iframed textarea[name="config"], .iframed textarea[name="content"], .iframed #helpconfig {
+.iframed textarea[name="config"], .iframed textarea[name="content"], .iframed #helpconfig, .iframed p.messages {
      border-right: none !important;
      border-left: none !important;
 }
@@ -784,10 +880,59 @@ table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .ifram
 
 p#filtered {
      background: url(/themes/console/images/buttons/filter.png) 13px center no-repeat;
-     padding: 10px 10px 10px 35px !important;
+     padding: 15px 15px 15px 35px !important;
 }
 
 p.book {
      background: url(/themes/susidns/images/abook.png) 13px center no-repeat;
      padding: 10px 10px 10px 35px !important;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1500px) {
+body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea {
+     font-size: 10pt !important;
+}
+
+textarea, input[type="submit"], input[type="reset"] {
+     font-size: 9pt !important;
+}
+
+h3, #filter a, #navi a {
+     font-size: 11pt;
+}
+
+#filter a:link, #filter a:visited {
+     margin: 3px 2px !important;
+}
+}
+
+/* export hosts button adjustments */
+
+#export {
+     text-align: right;
+     margin-top: -48px;
+     margin-bottom: 23px;
+     padding-right: 4px;
+     float: right;
+     clear: left !important;
+}
+
+#export input[type="submit"] {
+     display: inline-block;
+}
+
+p#filtered {
+     padding-left: 35px !important;
+     padding-right: 250px !important;
+}
+
+p.book {
+     padding-left: 35px !important;
+}
+
+#messages + p, p.book {
+     border: 1px solid #2d295f;
+     background: #000 url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
 }

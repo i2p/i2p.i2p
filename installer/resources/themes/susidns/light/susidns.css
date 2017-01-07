@@ -488,6 +488,7 @@ td.search:first-child {
      background: #f60;
      text-decoration: none;
      box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #333;
 }
 
 #filter span {
@@ -598,6 +599,35 @@ table.book {
      white-space: nowrap;
      font-weight: bold;
 } 
+
+.book td:nth-child(3) {
+     width: 30px;
+     white-space: nowrap;
+     padding-left: 10px;
+}
+
+.book td:nth-child(4) {
+     text-align: center;
+     width: 20px;
+     padding: 2px 25px 2px 0 !important;
+}
+
+.book td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+.book td:nth-child(4) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 0 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+}
+
+.book td:nth-child(4) .addrhlpr:hover {
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
+}
 
 .book th {
      border-bottom: 1px solid #7778bf;
@@ -840,4 +870,19 @@ input.search[type="text"]:focus {
 form[action="addressbook"] table {
      width: 100% !important;
      font-weight: bold;
+}
+
+/* export hosts */
+
+#export {
+     text-align: right;
+     margin-top: -36px;
+}
+
+#filter {
+     margin-top: -2px !important;
+}
+
+p#filtered {
+     padding-right: 200px !important;
 }

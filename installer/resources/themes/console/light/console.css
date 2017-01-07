@@ -9,9 +9,9 @@ html {
 body {
      margin: 8px 6px 8px 8px;
      text-align: center;
-     color: #001;
-     font: 9pt/130% "Droid Sans", Ubuntu, "Noto Sans", "Bitstream Vera Sans", "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
-     background: #a4a4cb url(images/tile2.png);
+     color: #333;
+     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     background: #a4a4cb url(images/tile2.png) fixed;
      background-size: 32px 32px;
 }
 
@@ -73,52 +73,6 @@ pre {
      margin: 10px;
 }
 
-div.logo {
-     float: left;
-     padding: 10px;
-     text-align: center;
-     color: #222;
-     margin: 0 10px;
-     border: 1px solid #447;
-     border-radius: 2px;
-     background: #fff;
-     width: 185px;
-     box-shadow: inset 0 0 0 1px #bbf;
-}
-
-div.toolbar {
-     margin: 0;
-     padding: 10px;
-     font-weight: bold;
-     background: #ffe;
-     border: 1px solid #447;
-     display: none !important;
-}
-
-div.toolbar a:link {
-     border: 1px outset #ddddc0;
-     padding: 0 5px 1px 5px;
-     line-height: 250%;
-     background: #bbf;
-     text-decoration: none;
-     border-radius: 2px;
-     display: none !important;
-}
-
-div.toolbar a:visited {
-     background: #ffe;
-}
-
-div.toolbar a:hover {
-     border: 1px solid #eeffef;
-     background: #003;
-     color: #f60;
-}
-
-a:active {
-     color: #900;
-}
-
 div.routersummaryouter {
      float: left;
      width: 200px;
@@ -137,7 +91,7 @@ div.routersummary {
      margin-bottom: 8px;
      text-align: center !important;
      border: 1px solid #447;
-     color: #000;
+     color: #333;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      border-radius: 2px;
@@ -211,9 +165,6 @@ div.routersummary hr.b {
      margin-bottom: 5px;
 }
 
-div.routersummary hr:last-child {
-}
-
 div.routersummary h3 {
      font-size: 9.5pt;
      letter-spacing: 0.04em;
@@ -228,6 +179,7 @@ div.routersummary h3 {
      border-radius: 0;
      box-shadow: inset 0 0 0 1px #fff;
      filter: none;
+     -webkit-filter: none;
 }
 
 .routersummary h3:hover {
@@ -249,12 +201,13 @@ div.routersummary h3 a {
      display: inline-block;
      width: 100%;
      width: calc(100% - 4px);
+     padding: 2px 0;
 }
 
 div.routersummary h4 {
      border: none;
      font-size: 8.5pt;
-     letter-spacing: 0.02em;
+     letter-spacing: normal;
      text-transform: none;
      margin: -7px;
      padding: 6px 2px !important;
@@ -266,6 +219,12 @@ div.routersummary h4 {
      line-height: 105%; 
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.routersummary h4 {     
+     margin-bottom: -8px !important;
+}
+}
+
 h4.sb_info {
      margin-top: -11px !important;
 }
@@ -273,10 +232,6 @@ h4.sb_info {
 h4.sb_info + hr + form {
      padding-top: 2px !important;
      margin-bottom: -1px;
-}
-
-.routersummary a:link {
-     padding: 2px;
 }
 
 div.routersummary ul {
@@ -313,6 +268,11 @@ div.routersummary table {
      text-align: right !important;
      width: 16px;
      padding-right: 0;
+}
+
+#sb_internals a, #sb_advanced a {
+     padding: 1px 2px;
+     display: inline-block;
 }
 
 div.routersummary tr {
@@ -408,12 +368,30 @@ div.refresh {
 
 /* proxy error messages */
 
+div.logo {
+     float: left;
+     padding: 10px;
+     text-align: center;
+     color: #222;
+     margin: 0 10px;
+     border: 1px solid #447;
+     border-radius: 2px;
+     background: #fff;
+     width: 185px;
+     box-shadow: inset 0 0 0 1px #bbf;
+}
+
+.logo hr {
+     margin: 8px -11px;
+     background: #447;
+}
+
 div.warning {
      margin: 20px 20px 30px 240px;
-     padding: 5px 25px 20px 75px;
+     padding: 10px 25px 20px 75px;
      background: #fff;
      border: 1px solid #447;
-     color: inherit;
+     color: #333;
      border-radius: 2px;
      text-align: justify;
      background-image:url(/themes/console/images/itoopie_sm.png);
@@ -423,6 +401,65 @@ div.warning {
      word-wrap: break-word;
      min-width: 400px;
 }
+
+.warning h3 {
+     text-align: left;
+}
+
+.proxyfooter {
+     margin: 0 20px 10px 240px;
+     padding: 20px 25px 20px 75px;
+     color: #f00;
+     font-size: 7pt;
+     text-align: right !important;
+     border-radius: 2px;
+     border: 1px solid #447;
+     display: none;
+}
+
+@media screen and (max-width: 800px) {
+.warning {
+     margin-left: 20px !important;
+     background: #fff !important;
+     padding-left: 25px !important;
+}
+
+.logo {
+     display: none;
+}
+}
+
+@media screen and (min-height: 700px) {
+.proxyfooter {
+     position: absolute;
+     bottom: 0;
+     right: 0;
+     padding: 0 20px 0 0;
+     text-align: right;
+     background: #030;
+     width: 100%;
+     opacity: 0.7;
+     border-top: 1px solid #000;
+}
+
+.proxyfooter p {
+     text-align: right;
+     line-height: 130% !important;
+     margin: 5px 0;
+}
+
+.warning {
+     margin-bottom: 30px;
+}
+}
+
+@media screen and (max-height: 700px) {
+.proxyfooter {
+     display: none;     
+}
+}
+
+/* end proxy error messages */
 
 /* console error messages */
 
@@ -585,7 +622,7 @@ div.news {
      box-shadow: inset 0 0 0 1px #bbf;
      background: #fff url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom;
      background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, linear-gradient(to right, #fff, #f7f8ff, #fff);
-     min-width: 500px;
+     min-width: 526px;
      filter: drop-shadow(0 1px 1px #999);
      -webkit-filter: drop-shadow(0 1px 1px #999);
 }
@@ -716,8 +753,8 @@ div.newscontent h6 {
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 .tab {
-     margin: -5px -2px -1px -4px;
-     padding: 1px 6px 1px 7px;
+     margin: -5px -2px -1px -3px;
+     padding: 1px 8px 1px 7px;
 }
 
 .tab:first-child {
@@ -726,6 +763,7 @@ div.newscontent h6 {
 
 .tab2 {
      margin-left: -2px !important;
+     margin-right: -1px !important;
 }
 }
 
@@ -764,7 +802,7 @@ div.newscontent h6 {
 }
 
 .tab2 {
-     color: #008;
+     color: #31334f;
      padding: 2px 5px 1px;
      margin: -11px -1px -1px -3px;
      background: #fff;
@@ -913,7 +951,7 @@ h3#advancedclientconfig, p#webappconfigtext, p#pluginconfigtext, p#clientconf.in
 }
 
 h3#pluginconfig, h3#webappconfig, h3#i2pclientconfig, h3#pluginmanage, p#clientconf.infohelp, #config_stats h3 {
-     margin-bottom: -15px;
+     margin-bottom: -13px;
 }
 
 p#enablefullstats {
@@ -1230,7 +1268,7 @@ tr:nth-child(odd) {
 
 td {
      padding: 3px 5px;
-     color: #222;
+     color: #333;
      vertical-align: middle;
      border-top: 1px inset #cfd1ff;
      border-bottom: 1px outset #cfd1ff;
@@ -1415,9 +1453,15 @@ table.search td:nth-child(3) {
      padding-left: 0;
 }
 
-table.search input[type="text"], table.search select {
+table.search input[type="text"] {
      min-width: 40px !important;
      width: 100%;
+}
+
+table.search select {
+     min-width: 80px;
+     width: 100%;
+     text-overflow: ellipsis;
 }
 
 img.app, img.app2p {
@@ -1468,8 +1512,10 @@ div.applabel {
 .applabel a {
      display: inline-block;
      width: 100%;
+     overflow: hidden;     
+     text-overflow: ellipsis;
+     white-space: nowrap;
 }
-
 
 /* end home page */
 
@@ -1838,7 +1884,7 @@ h1 {
      background: #fff;
      border: 1px solid #447;
      border-radius: 2px;
-     min-width: 520px;
+     min-width: 526px;
      filter: drop-shadow(0 0 1px #999);
      -webkit-filter: drop-shadow(0 0 1px #999);
 }
@@ -2052,7 +2098,7 @@ input, input:visited, button, button:visited {
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      color: #333;
      margin: 3px;
-     font: 9pt "Droid Sans", Ubuntu, "Noto Sans", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      padding: 4px 5px;
      text-decoration: none;
      border-radius: 2px;
@@ -2463,7 +2509,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 input[type="text"], input[type="password"] {
      background: #fff;
      box-shadow: inset 1px 1px 1px #999;
-     font-family: "Droid Sans", Ubuntu, "Noto Sans", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
@@ -2479,8 +2525,17 @@ input[type="file"] {
      box-shadow: none;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
      border: 0 !important;
+     box-shadow: none;
+     vertical-align: middle !important;
+     margin-top: 4px !important;
+     margin-bottom: 4px !important;
+}
+
+input[type="checkbox"]:focus, input[type="radio"]:focus {
+     filter: drop-shadow(0 0 2px #89f);
+     -webkit-filter: drop-shadow(0 0 2px #89f);
 }
 
 select {
@@ -2490,7 +2545,7 @@ select {
      padding: 4px;
      border: 1px solid #999;
      min-width: 120px;
-     font: 9pt "Droid Sans", Ubuntu, "Noto Sans", "Bitstream Vera Sans", Verdana, "Lucida Sans Unicode", Helvetica, sans-serif;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      border-radius: 2px;
      text-align: left !important;
      box-shadow: inset 0 0 0 1px #fff;
@@ -2553,17 +2608,6 @@ textarea:focus {
      color: #001 !important;
      box-shadow: none;
      filter: drop-shadow(0 0 1px #89f);
-}
-
-.proxyfooter {
-     margin: 0 20px 10px 240px;
-     padding: 20px 25px 20px 75px;
-     color: #f00;
-     font-size: 7pt;
-     text-align: right !important;
-     border-radius: 2px;
-     border: 1px solid #447;
-     display: none;
 }
 
 .statusnotes {
@@ -3540,6 +3584,11 @@ ul#banlist {
      word-spacing: 0.1em;
 }
 
+#tunnelconfig font[color="red"] {
+     background: url(images/warn.png) left center no-repeat;
+     padding: 4px 5px 4px 20px;
+} 
+
 #tunnelconfig td:nth-child(n+2) {
      text-align: left;
 }
@@ -3707,6 +3756,8 @@ table#floodfills th {
      color: #001 !important;
      filter: none;
      -webkit-filter: none;
+     outline: none;
+     line-height: 140%;
 }
 
 .main#jardump {
@@ -3716,6 +3767,26 @@ table#floodfills th {
 .main#jardump table {
      margin: -1px 0 0;
      border: none;
+}
+
+#jardump tt {
+     letter-spacing: -0.03em;
+}
+
+#jardump a tt {
+     color: #359;
+}
+
+#jardump a:visited tt {
+    color: #218;
+} 
+
+#jardump a:hover tt {
+     color: #f60;
+}
+
+#jardump a:active tt {
+     color: #f90;
 }
 
 /* experimental sidebar navigation for webapps */
@@ -3807,6 +3878,11 @@ table#floodfills th {
 
 .homelinkedit input[type="text"], #sidebarconf select {
      margin-left: 0;
+}
+
+.homelinkedit img {
+     width: auto;
+     height: 20px;
 }
 
 #clientconfig th:first-child, #webappconfig th:first-child, #pluginconfig th:first-child {
@@ -3917,6 +3993,21 @@ a[href^="configpeer?peer"]:hover {
 
 /* responsive layout */
 
+@media screen and (max-width: 800px) {
+div.app {
+     width: 112px !important;
+     min-width: 0;
+}
+
+.applabel {
+     width: 100px !important;
+}
+
+img.app, img.app2p {
+     padding: 10px 35px;
+}
+}
+
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, 
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea {
@@ -3926,6 +4017,10 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a,
 code, tt, div.news {
      font-size: 9pt !important;
+}
+
+button[class^="X"] {
+     font-size: 0 !important;
 }
 
 .main, .news, h1 {
@@ -3967,5 +4062,13 @@ div.app {
 
 .footnote {
      font-size: 8pt !important;
+}
+
+h3#pluginconfig, h3#webappconfig, h3#i2pclientconfig, h3#pluginmanage, p#clientconf.infohelp, #config_stats h3 {
+     margin-bottom: -15px;
+}
+
+#jardump tt, #jardump td {
+     font-size: 9pt !important;
 }
 }

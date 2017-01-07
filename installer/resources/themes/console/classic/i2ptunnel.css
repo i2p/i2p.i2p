@@ -7,9 +7,8 @@ body {
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #333;
-     font-size: 10pt;
-     background: #a4a4cb url('images/tile2.png');
-     background-size: 32px 32px;
+     font-size: 9pt;
+     background: #a4a4cb url(images/bg.png);
 }
 
 body.iframed {
@@ -30,52 +29,6 @@ form {
      margin: 0;
 }
 
-input[type="checkbox"], input[type="radio"] {
-     vertical-align: middle;
-     min-width: 16px;
-     min-height: 16px;
-     margin: 0;
-}
-
-textarea, input, select, button {
-     font-size: 9pt;
-     vertical-align: middle;
-}
-
-button {
-     text-decoration: none;
-}
-
-button, input[type="submit"], input[type="reset"], a.control {
-     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
-     font-size: 9pt;
-}
-
-textarea {
-     color: #333;
-     background: #fff;
-     border: 1px solid #999;
-     border-radius: 2px;
-     resize: none;
-     box-shadow: inset 2px 2px 1px #ccc;
-}
-
-textarea:focus {
-     box-shadow: inset 0 0 0 1px #89f;
-     color: #111;
-}
-
-textarea#statusMessages {
-     width: 99%;
-     width: calc(100% - 8px);
-     border-radius: 0;
-     padding: 2px 4px;
-     color: #070;
-     box-shadow: none;
-     border: none;
-     margin: 0;
-}
-
 br {
      clear: left;
 }
@@ -85,7 +38,7 @@ div.statusNotRunning {
      height: 16px;
      overflow: hidden;
      color: #d00;
-     background: url('images/console_status_stopped.png') center center no-repeat;
+     background: url(images/console_status_stopped.png) center center no-repeat;
      padding-top: 24px;
      filter: drop-shadow(0 0 1px #999);
      -webkit-filter: drop-shadow(0 0 1px #999);
@@ -96,7 +49,7 @@ div.statusRunning {
      height: 16px;
      overflow: hidden;
      color: #0b0;
-     background: url('images/console_status_running.png') center center no-repeat;
+     background: url(images/console_status_running.png) center center no-repeat;
      filter: drop-shadow(0 0 1px #999);
      -webkit-filter: drop-shadow(0 0 1px #999);
 }
@@ -107,7 +60,7 @@ div.statusStarting {
      height: 16px;
      overflow: hidden;
      color: #339933;
-     background: url('images/console_status_starting.png') center center no-repeat;
+     background: url(images/console_status_starting.png) center center no-repeat;
      filter: drop-shadow(0 0 1px #999);
      -webkit-filter: drop-shadow(0 0 1px #999);
 }
@@ -180,8 +133,8 @@ hr {
 
 .control:hover, .control:focus {
      text-decoration: none;
-     color: #111;
-     border: 1px solid #f60 !important;
+     color: #111 !important;
+     border: 1px solid #89f !important;
      background: #ddd;
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      box-shadow: inset 0 0 0 1px #fff !important;
@@ -189,6 +142,8 @@ hr {
 
 .control:active {
      box-shadow: inset 2px 2px 1px #999 !important;
+     border: 1px solid #999 !important;
+     color: #333 !important;
 }
 
 .iframed .panel.iframed {
@@ -198,8 +153,8 @@ hr {
 .panel {
      width: calc(100% - 14px);
      margin: 8px auto;
-     min-width: 450px;
-     max-width: 1400px;
+     min-width: 600px;
+     max-width: 1500px;
      overflow: hidden;
      text-align: left !important;
      border-radius: 2px;
@@ -242,6 +197,10 @@ select:focus {
      box-shadow: 0 0 1px #89f;
 }
 
+select option {
+     background: #fff;
+}
+
 @-moz-document url-prefix() { /* target firefox and derivatives only */
 select {
      -moz-appearance: none;
@@ -260,7 +219,7 @@ select:focus {
 }
 
 a:link {
-     color: #006;
+     color: #33a;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
@@ -324,7 +283,7 @@ h3 {
 }
 
 th {
-     background: #fff url("/themes/console/classic/images/tinytitle.png") repeat right center;
+     background: #fff url(/themes/console/classic/images/tinytitle.png) repeat-x center center;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
      padding: 5px;
      border-top: 1px solid #89f;
@@ -344,7 +303,7 @@ td {
 }
 
 td.infohelp {
-     background: url(images/infohelp.png) 10px center no-repeat;
+     background: url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
      background-size: 24px 24px;
      background-position: 6px center;
      padding: 10px 10px 10px 38px !important;
@@ -444,13 +403,57 @@ th.tunnelControl {
      text-align: center;
 }
 
-/*
-.tunnelControl .control {
-     min-width: 60px !important;
-     display: inline-block;
-     margin: 0 !important;
+
+input[type="checkbox"], input[type="radio"] {
+     vertical-align: middle;
+     min-width: 16px;
+     min-height: 16px;
+     margin: 0;
 }
-*/
+
+textarea, input, select, button {
+     font-size: 9pt;
+     vertical-align: middle;
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+     outline: none;
+     border: none;
+}
+
+button {
+     text-decoration: none;
+}
+
+button, input[type="submit"], input[type="reset"], a.control {
+     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-size: 9pt;
+}
+
+textarea {
+     color: #333;
+     background: #fff;
+     border: 1px solid #999;
+     border-radius: 2px;
+     resize: none;
+     box-shadow: inset 2px 2px 1px #ccc;
+}
+
+textarea:focus {
+     box-shadow: inset 0 0 0 1px #89f;
+     color: #111;
+}
+
+textarea#statusMessages {
+     width: 99%;
+     width: calc(100% - 8px);
+     border-radius: 0;
+     padding: 2px 4px;
+     color: #070;
+     box-shadow: none;
+     border: none;
+     margin: 0;
+}
 
 a.control {
      display: inline-block;
@@ -471,6 +474,10 @@ a.control {
      background: #fff;
      background: linear-gradient(to bottom, #fff, #eff1ff);
      border-top: 1px solid #89f;
+}
+
+button.control, input[type="submit"], input[type="reset"] {
+     padding: 5px 8px !important;
 }
 
 .buttons > * {
@@ -524,7 +531,7 @@ input {
      margin: 3px 0 !important;
 }
 
-#localDestination {
+#localDestination, .authentication {
      height: 30px !important;
 }
 
@@ -612,14 +619,12 @@ table#statusMessages textarea, table#statusMessages textarea:active {
 }
 
 input::-moz-placeholder {
-     color: #f00;
-     font-weight: bold;
+     color: #900;
      opacity: 1;
 }
 
 ::-webkit-input-placeholder {
-     color: #f00;
-     font-weight: bold;
+     color: #900;
      opacity: 1;
 }
 
@@ -732,7 +737,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 }  
 
 #wizardPanel p {
-     padding: 5px;
+     padding: 5px 10px;
      margin: 0;
      text-align: justify;
 }
@@ -799,7 +804,7 @@ input[type="checkbox"] {
      margin: 5px !important;
 }
 
-textarea[name="accessList"], #hostField, #localDestination {
+textarea[name="accessList"], #hostField, #localDestination, .authentication {
      width: calc(100% - 15px) !important;
      margin: 5px !important;
 }
@@ -832,3 +837,19 @@ td.tunnelDestination, td.tunnelDescription {
 }
 
 /* end more space */
+
+/* responsive layout */
+
+@media screen and (min-width: 1200px) {
+body, .control, button, select, textarea, .freetext {
+     font-size: 10pt !important;
+}
+
+th {
+     font-size: 10.5pt;
+}
+
+h2, h3 {
+     font-size: 12pt;
+}
+}

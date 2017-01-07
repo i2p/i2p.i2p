@@ -6,7 +6,7 @@
 body {
      background-color: #000;
      color:#ee9;
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-size: 9pt;
      margin: 8px 5px;
 }
@@ -15,6 +15,16 @@ body.iframed {
      background: transparent !important;
      margin: 0;
      padding-top: 0;
+}
+
+::selection {
+     background: #030 !important;
+     color: white;
+}
+
+::-moz-selection {
+     background: #030 !important;
+     color: white;
 }
 
 div.header {
@@ -172,6 +182,21 @@ table#mailbox {
      margin-bottom: -10px;
 }
 
+#mailbox th:first-child {
+     padding: 0 !important;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+}
+
+#mailbox th:nth-child(2) {
+     background: url(/themes/susimail/images/status.png) center center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+     background-blend-mode: luminosity;
+}
+
+
+#mailbox th:nth-child(4) {
+     background: url(/susimail/icons/attach.png) center right 5px no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+}
+
 table#mailbox td[colspan="5"], table#mailbox td[colspan="4"] {
      border-top: 1px solid #494 !important;
      padding: 6px 0 2px !important;
@@ -234,34 +259,23 @@ input.optbox:hover {
      -webkit-filter: drop-shadow(0 0 2px #f60);
 }
 
+#attachedfile {
+     border-bottom: 1px dotted #151;
+     padding: 5px 5px 5px 8px !important;
+}
+
 td#attachedfile:last-child {
      padding-left: 10px;
 }
 
 td#deleteattached {
-     padding: 5px 10px 0 !important;
+     padding: 5px 5px 0 !important;
      text-align: right;
-     border-top: 1px solid #131;
 }
 
 tr.bottombuttons:last-child td {
      padding-bottom: 20px !important;
 }
-
-/*
-p img {
-     display: none; 
-     height: 0;
-     width: 0;
-     margin: -20px 0;
-}
-*/
-
-/*
-p:first-child {
-     display: none;
-}
-*/
 
 a:link {
      color: #f60;
@@ -464,7 +478,7 @@ textarea[name="new_text"] {
 }
 
 td#addattach {
-     padding: 0 10px 15px !important;
+     padding: 0 10px 10px !important;
      border-bottom: 1px solid #131;
 }
 
@@ -653,10 +667,11 @@ input[type=submit]:hover, input.cancel:hover, input[type=submit]:focus, input.ca
 }
 
 input[type=submit]:active, input.cancel:active {
-     border: 1px inset #f60;
+     border: 1px solid #f60;
      background: #f60 !important;
      color: #EE9 !important;
-     box-shadow: inset 0 0 0 1px #000;
+     box-shadow: inset 3px 3px 3px #000;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000;
 }
 
 #dologin input:disabled, #dologin input:disabled:hover, #dologin input:disabled:active {
@@ -697,6 +712,7 @@ input[type="text"], input[type="password"], textarea {
      border: 1px solid #363;
      background: linear-gradient(to bottom, #000 0%, #010 100%) !important;
      box-shadow: inset 0 0 3px 3px #000;
+     font-size: 9pt;
 }
 
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
@@ -705,6 +721,24 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      filter: drop-shadow(0 0 1px #880);
      -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
+}
+
+input[name="user"] {
+     background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
+     padding: 5px 5px 5px 25px !important;
+}
+
+input[name="user"]:focus {
+     background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat !important;
+}
+
+input[name="pass"] {
+     background: url(/themes/console/images/buttons/password.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #010 100%) !important;
+     padding: 5px 5px 5px 25px !important;
+}
+
+input[name="pass"]:focus {
+     background: #000 url(/themes/console/images/buttons/password.png) 5px center no-repeat !important;
 }
 
 input.delete {
@@ -1086,8 +1120,16 @@ body, td, textarea, div, p.mailbody {
 }
 
 @media screen and (min-width: 1500px) {
-input {
+input, textarea {
      font-size: 10pt !important;
+}
+
+select, button, input[type="submit"], input[type="reset"] {
+     font-size: 9pt;
+}
+
+textarea[name="new_text"] {
+     width: 660px;
 }
 }
 
