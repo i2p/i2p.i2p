@@ -11,28 +11,27 @@
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Keyring Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_keyring">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigKeyringHelper" id="keyringhelper" scope="request" />
  <jsp:setProperty name="keyringhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
-<div class="configure"><h2><%=intl._t("Keyring")%></h2><p>
+<p id="keyringhelp" class="infohelp">
  <%=intl._t("The router keyring is used to decrypt encrypted leaseSets.")%>
  <%=intl._t("The keyring may contain keys for local or remote encrypted destinations.")%></p>
- <div class="wideload">
  <jsp:getProperty name="keyringhelper" property="summary" />
-</div>
-
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- <h3><%=intl._t("Manual Keyring Addition")%></h3><p>
+ <h3 class="tabletitle"><%=intl._t("Manual Keyring Addition")%></h3>
+ <table id="addkeyring">
+        <tr>
+          <td class="infohelp" colspan="2">
  <%=intl._t("Enter keys for encrypted remote destinations here.")%>
  <%=intl._t("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/"><%=intl._t("I2PTunnel page")%></a>.
-</p>
-  <div class="wideload">
-      <table><tr>
+          </td>
+        </tr><tr>
           <td class="mediumtags" align="right"><%=intl._t("Dest. name, hash, or full key")%>:</td>
           <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off" spellcheck="false"></textarea></td>
         </tr><tr>
@@ -43,4 +42,4 @@
 <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
 <input type="submit" name="action" class="delete" value="<%=intl._t("Delete key")%>" >
 <input type="submit" name="action" class="add" value="<%=intl._t("Add key")%>" >
-</td></tr></table></div></form></div></div></body></html>
+</td></tr></table></form></div></body></html>

@@ -40,8 +40,21 @@ h1,h2,h3,h4 {
      text-align: right;
 }
 
-div.routersummary h3 {
+h4.app, h4.app2 {
+     text-align: right;
+}
+
+button.search {
+     margin-right: 30px;
+}
+
+div.routersummary h3, div.routersummary h4, .routersummary a, .routersummary b {
      text-align: center;
+     font-weight: normal;
+}
+
+div.routersummary h3, div.routersummary h4 {
+     font-size: 10pt;
 }
 
 div.routersummary td {
@@ -55,6 +68,14 @@ div.routersummary td:last-child {
 
 div.routersummary td:first-child {
      text-align: right;
+}
+
+#sb_services td, #sb_internals td, #sb_advanced td {
+     text-align: center;
+}
+
+#sb_localtunnels td:last-child {
+     text-align: left;
 }
 
 div.tunnels {
@@ -96,4 +117,240 @@ span.newtab {
      font-size: 8pt;
      float: left;
      letter-spacing: 0;
+}
+
+.tab2::before, .tab2::after {
+     display: none;
+}
+
+/* lang selection */
+
+.langselect img {
+     margin-right: -61px;
+}
+
+.langselect .optbox:checked + img {
+     margin-right: -63px;
+}
+
+/* theme selection */
+
+.themechoice, .langselect {
+     float: right !important;
+} 
+
+.themechoice {
+     padding: 5px;
+}
+
+.themechoice .optbox {
+     opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
+     outline: 1px dotted #f00;
+     position: absolute;
+     padding: 2px;
+     margin-right: -27px;
+     min-height: 78px !important;
+}
+
+.themechoice .optbox + img {
+     border: 1px solid transparent;
+}
+
+.themechoice .optbox + img, .themechoice .optbox:checked + img {
+     margin: 5px;
+     padding: 0 !important;
+}
+
+h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_logging h3 a, h3#graphdisplay a, #logs h3 a, h3#advancedconfig a {
+     float: left;
+}
+
+#sybilnav ul li a {
+     padding-right: 0;
+}
+
+.sybil_routerinfo th:first-child {
+     text-align: right;
+}
+
+.sybil_routerinfo th:nth-last-child(2) {
+     padding-left: 0;
+     text-align: left !important;
+}
+
+.sybil_routerinfo th {
+     padding: 1px 3px 1px 1px !important;
+}
+
+table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
+     text-align: right;
+}
+
+table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+     text-align: left;
+}
+
+table#leasesetdebug th, table#leasesetsummary th {
+      padding: 5px;
+}
+
+table.leaseset th {
+     text-align: right;
+}
+
+table.leaseset th:first-child b {
+     float: right;
+}
+
+table.leaseset th:last-child, table.leaseset td:nth-child(2) {
+     text-align: left;
+}
+
+#netdboverview th, table.netdbentry th, table#leasesetdebug td:nth-child(2n) {
+     text-align: right;
+}
+
+.main#debug {
+     direction: ltr;
+}
+
+#jardump.main th:nth-child(1), #jardump.main th:nth-child(3), #jardump.main th:nth-child(6), #jardump.main th:nth-child(7) {
+     text-align: right;
+}
+
+#schedjobs td {
+     text-align: center;
+}
+
+table.netdbentry th:last-child, table#leasesetdebug td:nth-child(2n+1) {
+     text-align: left;
+}
+
+#tunnels.main h3 a {
+     float: left;
+}
+
+table#enviro td {
+     padding: 5px 10px 5px 5px !important;
+}
+
+table#enviro td:first-child {
+     text-align: left;
+}
+
+#wrapperlogs pre, table[id$="logs"] ul, .logtable ul li {
+     direction: ltr;
+     text-align: left;
+}
+
+#criticallogs ul {
+     border: none;
+}
+
+#eventlog th {
+     text-align: right;
+     padding-right: 10px;
+}
+
+.homelinkedit th:nth-child(3), .homelinkedit th:last-child {
+     text-align: right !important;
+}
+
+table#netconfig th, table#externali2cp th, table#plugininstall th, .configtable th, th.th_title {
+     text-align: right !important;
+}
+
+#sidebarconf th:nth-child(1), #sidebarconf th:nth-child(2) {
+     text-align: right;
+}
+
+#sidebarconf td:nth-child(4) {
+     padding-right: 0;
+}
+
+#sidebarconf td:nth-child(3) {
+     text-align: left !important;
+     padding-left: 0;
+}
+
+.configtable td.infohelp, p.infohelp, td.infohelp, p#debugmode, p#sybilinfo, p.infowarn, td.infowarn, p#keyringhelp, h3#shutdownrouter + p, h3#restartrouter + p, h3#servicedebug + p, h3#browseronstart + p, h3#runonstartup + p, h3#systray + p {
+     background: #000 url(images/infohelp.png) right 8px center no-repeat !important;
+     padding: 15px 45px 15px 15px !important;
+}
+
+p.infowarn, td.infowarn {
+     background: #000 url(images/infowarn.png) right 8px center no-repeat !important;
+}
+
+.main#config_update .messages {
+     background: #000 url(images/infohelp.png) no-repeat right 10px center !important;
+     text-align: right;
+     padding: 15px 55px 15px 15px;
+}
+
+.main#config_update .messages a {
+     float: left;
+     margin: 0 5px
+}
+
+td.optionsave {
+     text-align: left;
+}
+
+#tunnelconfig th {
+     text-align: right;
+}
+
+#consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus,
+#consolepass input[name="name"], #externali2cp input[name="user"], #consolepass input[name="name"]:focus, #externali2cp input[name="user"]:focus {
+     background-position: right 3px center, center center !important;
+     padding: 4px 20px 4px 4px !important;
+     margin: 5px 3px 5px 15px !important;
+}
+
+#consolepass tr:first-child td, p#clientconf.infohelp, p#webappconfigtext.infohelp, #floodfillconfig .infohelp, 
+#bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
+h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, table#addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
+#config_reseed.main p.infohelp, #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2), 
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
+p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #plugininstall .infohelp, #config_family .infohelp, 
+#joinfamily tr:nth-child(3) td:first-child, #newfamily tr:last-child td:first-child, #config_summarybar .configtable td:not(.optionsave),
+table#bugreports td.infohelp {
+     background-position: right 12px center !important;
+     padding: 15px 50px 15px 15px !important;
+}
+
+div[lang="ar"] ul li {
+     list-style-image: url("images/link.png") !important;
+     list-style-position: inside;
+     margin-left: 0 !important;
+     padding-left: 0 !important;
+     margin-top: 15px !important;]
+}
+
+div[lang="ar"] ul, div[lang="ar"] p {
+     margin: 10px;
+}
+
+@media screen and (min-width: 1500px) {
+.main, .news, h1 {
+     margin-right: 232px !important;
+     margin-left: 0 !important;
+}
+
+div.routersummaryouter {
+     margin-right: 27px !important;
+}
+
+.routersummary h4 {
+     font-size: 11pt !important;
+}
+
+.routersummary td, .routersummary a {
+     font-size: 10pt !important;
+}
+
+div[lang="ar"], div[lang="ar"] code, div[lang="ar"] b {
+     font-size: 11pt !important;
+}
 }

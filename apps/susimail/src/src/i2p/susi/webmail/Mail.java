@@ -319,9 +319,9 @@ class Mail {
 								shortSender = shortSender.substring(0, lt).trim();
 							else if (lt < 0 && shortSender.contains("@"))
 								shortSender = '<' + shortSender + '>';  // add missing <> (but thunderbird doesn't...)
-							boolean trim = shortSender.length() > 40;
+							boolean trim = shortSender.length() > 25;
 							if (trim)
-								shortSender = shortSender.substring( 0, 37 ).trim();
+								shortSender = shortSender.substring( 0, 22 ).trim();
 							shortSender = html.encode( shortSender );
 							if (trim)
 								shortSender += "&hellip;";  // must be after html encode
@@ -344,9 +344,9 @@ class Mail {
 							subject = line.substring( 8 ).trim();
 							formattedSubject = subject;
 							shortSubject = formattedSubject;
-							boolean trim = formattedSubject.length() > 60;
+							boolean trim = formattedSubject.length() > 65;
 							if (trim)
-								shortSubject = formattedSubject.substring( 0, 57 ).trim();
+								shortSubject = formattedSubject.substring( 0, 62 ).trim();
 							shortSubject = html.encode( shortSubject );
 							if (trim)
 								shortSubject += "&hellip;";  // must be after html encode

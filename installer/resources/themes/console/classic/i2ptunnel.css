@@ -1,179 +1,855 @@
-/* I2P Tunnel Edit Page
+/* I2PTunnel Manager Theme "Classic" */
+/* Author: dr|z3d */
+
+body {
+     margin: 0;
+     padding: 0;
+     text-align: center;
+     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     color: #333;
+     font-size: 9pt;
+     background: #a4a4cb url(images/bg.png);
+}
+
+body.iframed {
+     background: transparent url(/themes/console/images/transparent.gif) !important;
+}
+
+div {
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+     box-sizing: border-box;
+}
+
+a {
+     text-decoration: none;
+}
+
+form {
+     margin: 0;
+}
+
+br {
+     clear: left;
+}
+
+div.statusNotRunning {
+     width: 100%;
+     height: 16px;
+     overflow: hidden;
+     color: #d00;
+     background: url(images/console_status_stopped.png) center center no-repeat;
+     padding-top: 24px;
+     filter: drop-shadow(0 0 1px #999);
+     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+div.statusRunning {
+     width: 100%;
+     height: 16px;
+     overflow: hidden;
+     color: #0b0;
+     background: url(images/console_status_running.png) center center no-repeat;
+     filter: drop-shadow(0 0 1px #999);
+     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+div.statusStarting {
+     float: left;
+     width: 100%;
+     height: 16px;
+     overflow: hidden;
+     color: #339933;
+     background: url(images/console_status_starting.png) center center no-repeat;
+     filter: drop-shadow(0 0 1px #999);
+     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+div[class^="status"] {
+     float: none;
+     font-size: 0 !important;
+     background-position: center center;
+     text-align: center;
+     margin: 0;
+     padding: 0;
+     width: 100%;
+     background-size: auto 16px;
+     height: 16px;
+}
+
+hr {
+     display: none;
+}
+
+.freetext {
+     width: 150px; 
+     border: 1px solid #999;
+     padding: 4px;
+     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     background: #fff;
+     color: #333;
+     border-radius: 2px;
+     box-shadow: inset 2px 2px 1px #ccc;
+}
+
+.freetext:focus {
+     box-shadow: 0 0 1px #89f;
+     color: #111;
+}
+
+.freetext[readonly], .freetext[readonly]:focus {
+     background: #ddd;
+     box-shadow: inset 2px 2px 1px #ccc;
+     color: #333;
+}
+
+#clientHost {
+     width: 300px;
+}
+
+#clientPort {
+     width: 100px;
+}
+
+.control, .control:link, .control:visited {
+     overflow: hidden;
+     min-width: 60px;
+     margin: 2px 4px !important;
+     padding: 4px 3px;
+     text-align: center;
+     white-space: nowrap;
+     text-decoration: none;
+     font-style: normal;
+     font-weight: normal;
+     color: #333;
+     border: 1px solid #999;
+     border-radius: 2px;
+     background: #eee;
+     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     box-shadow: inset 0 0 0 1px #fff;
+     filter: drop-shadow(0 0 1px #ccc);
+/*     -webkit-filter: drop-shadow(0 0 1px #ccc); */
+}
+
+.control:hover, .control:focus {
+     text-decoration: none;
+     color: #111 !important;
+     border: 1px solid #89f !important;
+     background: #ddd;
+     background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     box-shadow: inset 0 0 0 1px #fff !important;
+}
+
+.control:active {
+     box-shadow: inset 2px 2px 1px #999 !important;
+     border: 1px solid #999 !important;
+     color: #333 !important;
+}
+
+.iframed .panel.iframed {
+     margin: 0 auto -8px auto !important;
+}
+
+.panel {
+     width: calc(100% - 14px);
+     margin: 8px auto;
+     min-width: 600px;
+     max-width: 1500px;
+     overflow: hidden;
+     text-align: left !important;
+     border-radius: 2px;
+     padding: 0 10px 10px;
+     box-shadow: inset 0 0 1px #999;
+     background: #fff;
+     background: linear-gradient(to right, #fff 0%, rgba(247, 248, 255, 0.5), #fff), linear-gradient(to bottom, #eff1ff, #fff, #eff1ff);
+     border: 1px solid #447;
+}
+
+.iframed .panel {
+     border: none;
+     background: none;
+     box-shadow: none;
+     padding: 0;
+     margin: 16px auto -8px auto !important;
+     width: 100%;
+}
+
+select {
+     background: #fff;
+     color: #333;
+     margin: 4px !important;
+     font-family: "Droid Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     border: 1px solid #999;
+     padding: 3px 3px 3px 0;
+     min-width: 140px;
+     font-size: 9pt;
+     border-radius: 2px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     filter: drop-shadow(0 0 1px #ccc);
+}
+
+select:hover {
+     color: #111;
+}
+
+select:focus {
+     box-shadow: 0 0 1px #89f;
+}
+
+select option {
+     background: #fff;
+}
+
+@-moz-document url-prefix() { /* target firefox and derivatives only */
+select {
+     -moz-appearance: none;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     padding: 4px 16px 4px 4px;
+}
+
+select:hover, select:active {
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+}
+
+select:focus {
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     box-shadow: 0 0 1px #89f;
+}
+}
+
+a:link {
+     color: #33a;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+     outline: none;
+}
+
+a:visited {
+     color: #448;
+     text-decoration: none;
+}
+
+a:hover, a:focus {
+     color: #f60;
+     text-decoration: none;
+}
+
+a:active {
+     color: #f30;
+}
+
+input[type="hidden"], input.default {
+     display: none;
+}
+
+h2, h3 {
+     padding: 6px 10px;
+     border: 1px solid #89f;
+     background: #fff url("/themes/console/classic/images/tinytitle.png") repeat right center;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     font-size: 11pt;
+     text-transform: uppercase;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     margin: 10px 0 -1px;
+     color: #0c153d;
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+/*
+h3 {
+     border-radius: 0;
+     margin-top: -1px;
+}
 */
 
-#tunnelEditPage input {
-    width: 458px;
+.iframed #globalTunnelControl h2 {
+     margin-top: 2px;
 }
 
-#tunnelEditPage select {
-    width: 308px;
+.iframed #globalTunnelControl {
+     margin-bottom: -16px !important;
 }
 
-#tunnelEditPage option[selected] {
-    color: green;
+.panel table {
+     width: 100%;
+     border-collapse: collapse;
+     border: 1px solid #89f;
+     margin: 0;
+     background: #fff url(images/bg2.png);
+     background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.5)), url(images/bg2.png);
 }
 
-#tunnelEditPage #targetField,
-#tunnelEditPage #accessField,
-#tunnelEditPage #optionsField {
-    height: 48px;
-    width: 150px;
-}
-#tunnelEditPage #tunnelOptionsField {
-    height: 96px;
-    width: 150px;
-}
-
-#tunnelEditPage #targetField label,
-#tunnelEditPage #accessField label,
-#tunnelEditPage #tunnelOptionsField label,
-#tunnelEditPage #optionsField label{
-    height: 48px;
-    width: 150px;
+th {
+     background: #fff url(/themes/console/classic/images/tinytitle.png) repeat-x center center;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     padding: 5px;
+     border-top: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     font-size: 10pt;
+     color: #0c153d;
 }
 
-#tunnelEditPage #reachField,
-#tunnelEditPage #hostField,
-#tunnelEditPage #depthField,
-#tunnelEditPage #countField,
-#tunnelEditPage #optionsHostField {
-    width: 304px;
-    margin-right: 4px;
+tr {
+     background: rgba(239, 241, 255, 0.5);
 }
 
-#tunnelEditPage #portField,
-#tunnelEditPage #optionsPortField,
-#tunnelEditPage #backupField,
-#tunnelEditPage #varianceField {
-    width: 140px;
+td {
+     border-top: 1px solid #89f;
+     vertical-align: middle;
+     padding: 4px 5px;
 }
 
-#tunnelEditPage #reachField label,
-#tunnelEditPage #hostField label,
-#tunnelEditPage #portField label,
-#tunnelEditPage #optionsHostField label,
-#tunnelEditPage #optionsPortField label,
-#tunnelEditPage #depthField label,
-#tunnelEditPage #countField label,
-#tunnelEditPage #backupField label,
-#tunnelEditPage #varianceField label {
-    text-align: left;
-
+td.infohelp {
+     background: url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
+     background-size: 24px 24px;
+     background-position: 6px center;
+     padding: 10px 10px 10px 38px !important;
 }
 
-#tunnelEditPage #otherField label {
-    width: 300px;
+.tunnelConfig td {
+     width: 50%;
 }
 
-#tunnelEditPage #reachableByOther,
-#tunnelEditPage #tunnelDepth,
-#tunnelEditPage #tunnelQuantity,
-#tunnelEditPage #targetHost,
-#tunnelEditPage #clientHost {
-    width: 306px;
+#clientTunnels tr, #serverTunnels tr {
+     background: #eef;
 }
 
-#tunnelEditPage #port {
-    width: 80px;
+.tunnelProperties {
+     background: #fff !important;
 }
 
-#tunnelEditPage #targetPort,
-#tunnelEditPage #clientPort,
-#tunnelEditPage #tunnelBackupQuantity,
-#tunnelEditPage #tunnelVariance {
-    width: 150px;
+.tunnelProperties:hover {
+     background: #ffd !important;
 }
 
-#tunnelEditPage #shared,
-#tunnelEditPage #connectDelay,
-#tunnelEditPage #startOnLoad {
-    width: 16px;
+/*
+.tunnelProperties td > * {
+     vertical-align: middle;
 }
-
-#tunnelEditPage label {
-    width: 150px;
-    font-weight: bold;
-    text-align: right;
-    float: left;
-}
-
-/* I2P Tunnel List Page
 */
 
-#tunnelListPage .rowItem {
-    width: 150px;
+.newTunnel {
+     text-align: right;
+     border-top: 1px solid #89f !important;
+     padding: 5px !important;
+     background: #fff;
 }
 
-#tunnelListPage select {
-    width: 150px;
+.newTunnel select, .newTunnel input, .newTunnel .control {
+     float: none;
+     margin: 2px !important;
 }
 
-#tunnelListPage textarea {
-    width: 100%;
-    height: 88px;
-    padding: 0 0 0 4px;
-    color: green;
-    margin-bottom: 7px;
+.newtunnel form {
+     width: 100%;
+     text-align: right;
 }
 
-#tunnelListPage .footer .control {
-    margin-left: 2px;
+.tunnelName {
+     width: 25%;
+     min-width: 150px;
 }
 
-#tunnelListPage .footer label {
-    text-align: right;
-    height: 24px;
-    width: 360px;
-    float: left;
-
+.tunnelName a {
+     background: url(/themes/console/images/buttons/configure.png) left center no-repeat;
+     padding: 3px 3px 3px 20px !important;
 }
 
-/* Use Leary and Langridge content replacement methods (LIR)
-** to embed accessibility information into the document.
-** Should allow the lists to be rendered nicely by
-** screen readers. (and lynx!)
+.tunnelName a:hover {
+     background: url(/themes/console/images/buttons/configure_hover.png) left center no-repeat;
+}
+
+.tunnelName a {
+     font-weight: bold;
+}
+
+.tunnelType {
+     width: 25%;
+}
+
+.tunnelPreview {
+     text-align: left;
+}
+
+.tunnelPreview, .tunnelPort {
+     width: 15%;
+}
+
+.tunnelLocation, .tunnelInterface {
+     width: 20%;
+}
+
+.tunnelStatus {
+     text-align: center;
+     width: 10%;
+     float: none;
+     min-width: 48px;
+}
+
+.tunnelControl {
+     width: 5%;
+     text-align: right;
+     white-space: nowrap;
+}
+
+.tunnelControl > * {
+     vertical-align: middle;
+}
+
+th.tunnelControl {
+     text-align: center;
+}
+
+
+input[type="checkbox"], input[type="radio"] {
+     vertical-align: middle;
+     min-width: 16px;
+     min-height: 16px;
+     margin: 0;
+}
+
+textarea, input, select, button {
+     font-size: 9pt;
+     vertical-align: middle;
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+     outline: none;
+     border: none;
+}
+
+button {
+     text-decoration: none;
+}
+
+button, input[type="submit"], input[type="reset"], a.control {
+     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-size: 9pt;
+}
+
+textarea {
+     color: #333;
+     background: #fff;
+     border: 1px solid #999;
+     border-radius: 2px;
+     resize: none;
+     box-shadow: inset 2px 2px 1px #ccc;
+}
+
+textarea:focus {
+     box-shadow: inset 0 0 0 1px #89f;
+     color: #111;
+}
+
+textarea#statusMessages {
+     width: 99%;
+     width: calc(100% - 8px);
+     border-radius: 0;
+     padding: 2px 4px;
+     color: #070;
+     box-shadow: none;
+     border: none;
+     margin: 0;
+}
+
+a.control {
+     display: inline-block;
+     padding: 5px 8px !important;
+}
+
+.control {
+     box-sizing: border-box;
+     margin: 2px 4px !important;
+     min-width: 70px !important;
+     padding: 4px 8px !important;
+     color: #333 !important;
+}
+
+.buttons, .newTunnel {
+     text-align: right;
+     padding: 7px 5px !important;
+     background: #fff;
+     background: linear-gradient(to bottom, #fff, #eff1ff);
+     border-top: 1px solid #89f;
+}
+
+button.control, input[type="submit"], input[type="reset"] {
+     padding: 5px 8px !important;
+}
+
+.buttons > * {
+     vertical-align: middle;
+}
+
+.tunnelConfig tr:last-child td {
+     border-top: 1px solid #89f;
+}
+
+.tunnelDescriptionLabel, .tunnelDestinationLabel {
+     text-align: right;
+     min-width: 150px;
+     display: inline-block;
+     margin-right: 3px;
+     white-space: nowrap;
+}
+
+input {
+     vertical-align: middle;
+}
+
+.tickbox {
+     vertical-align: middle;
+}
+
+#hostField, #leasesetKey, #userAgents {
+     width: 90% !important;
+     margin: 0 !important;
+     text-align: left !important;
+}
+
+#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity,
+#localDestination, #customOptions, #leasesetKey, #name, #description, textarea[name="accessList"] {
+     width: 100% !important;
+     margin: 0 !important;
+     text-align: left !important;
+}
+
+#oldName, #targetDestination, select#profile, select#connectionProfile {
+     min-width: 280px;
+     width: 30%;
+}
+
+#customOptions, #userAgents {
+     width: calc(100% - 10px) !important;
+}
+
+#localDestination, textarea[name="accessList"], #hostField {
+     width: calc(100% - 5px) !important;
+     margin: 3px 0 !important;
+}
+
+#localDestination, .authentication {
+     height: 30px !important;
+}
+
+#leasesetKey {
+     height: 24px !important;
+     vertical-align: middle;
+}
+
+.multiOption {
+     display: inline-block;
+     margin-right: 10px;
+     vertical-align: middle;
+}
+
+.multiOption#isServer {
+     background: url(/themes/console/images/server.png) left center no-repeat;
+     padding-left: 20px;
+}
+
+.multiOption#isClient {
+     background: url(/themes/console/images/client.png) left center no-repeat;
+     padding-left: 21px;
+}
+
+td#throttle {
+     padding: 0;
+}
+
+#throttler {
+     border: none;
+}
+
+#throttler th {
+     padding-left: 20px;
+}
+
+#throttler td {
+     width: 20%;
+}
+
+#throttler td:first-child {
+     text-align: right;
+     width: 20%;
+     white-space: nowrap;
+}
+
+#throttler tr:first-child th {
+     border-top: none;
+}
+
+td.blankColumn {
+     width: 20% !important;
+}
+
+#throttler tr:nth-child(odd) {
+     background: #eff2ff;
+}
+
+#throttler tr:nth-child(even) {
+     background: #e7e7ff;
+}
+
+#throttler input[type="text"] {
+     width: 80px;
+}
+
+table {
+     background: #fff;
+}
+
+table#statusMessages textarea, table#statusMessages textarea:active {
+     margin: 0;
+     border: 0;
+     box-shadow: none;
+     height: 80px;
+     font-size: 9pt;
+}
+
+#tunnelMessages {
+     padding: 0;
+}
+
+.required:not(old) {
+     display: none;
+}
+
+input::-moz-placeholder {
+     color: #900;
+     opacity: 1;
+}
+
+::-webkit-input-placeholder {
+     color: #900;
+     opacity: 1;
+}
+
+input.tunnelName, input.tunnelDescription, #userAgents {
+     width: 80%;
+     min-width: 280px;
+     text-overflow: ellipsis; 
+}
+
+#websiteName, #privKeyFile, #targetHost, .host {
+     width: 30%;
+     min-width: 250px;
+}
+
+.port, .quantity, .period {
+     width: 80px;
+}
+
+.username, .password {
+     width: 200px;
+}
+
+.username {
+     background: url(/themes/console/images/buttons/user.png) 3px center no-repeat;
+     padding-left: 22px; 
+}
+
+.password {
+     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat;
+     padding-left: 22px; 
+}
+
+.proxyList {
+     width: 40%;
+     min-width: 280px;
+}
+
+#notReady {
+     border: 1px solid #900;
+     padding: 30px;
+     background: #ffd;
+     margin: 30px auto;
+     width: 400px;
+     text-align: center;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #fff;
+     filter: drop-shadow(0 0 1px #333);
+     -webkit-filter: drop-shadow(0 0 1px #333);
+     font-size: 11pt;
+     font-weight: bold;
+} 
+
+/* wizard specifics */
+
+#wizardPanel {
+    font-size: 10pt;
+}
+
+#wizardTable {
+     padding: 0;
+}
+
+#wizardTunnelTypes td:first-child, #wizardSummary td:first-child {
+     font-weight: bold;
+     width: 10%;
+     min-width: 150px;
+     text-align: right;
+     white-space: nowrap;
+}
+
+#wizardTunnelTypes td:last-child {
+     text-align: justify;
+     padding: 5px 10px 5px 5px;
+}
+
+#wizardTunnelTypes select {
+     margin-left: 0 !important;
+}
+
+#wizardTunnelTypes, #wizardSummary {
+     border: none;
+     margin-top: -1px;
+}
+
+/*
+#wizardPanel tr:nth-child(n+2) {
+     background: #eef;
+}
+
+#wizardPanel tr:nth-child(2n+2) {
+     background: #f7f8ff;
+}
 */
 
-#tunnelListPage label {
-    height: 0;
-    width: 0;
-    overflow: hidden;
+#wizardTunnelTypes tr:nth-child(even), #wizardSummary tr:nth-child(even) {
+     background: #dde1ff;
 }
 
-#tunnelListPage .nameHeaderField label,
-#tunnelListPage .portHeaderField label,
-#tunnelListPage .typeHeaderField label,
-#tunnelListPage .interfaceHeaderField label,
-#tunnelListPage .targetHeaderField label,
-#tunnelListPage .previewHeaderField label,
-#tunnelListPage .statusHeaderField label {
-    text-align: left;
-    width: 150px;
-    height: 24px;
-    float: left;
+#wizardTunnelTypes tr:nth-child(odd), #wizardSummary tr:nth-child(odd) {
+     background: #eff1ff;
 }
 
-#tunnelListPage .targetField,
-#tunnelListPage .targetField .text,
-#tunnelListPage .targetHeaderField,
-#tunnelListPage .targetHeaderField label {
-    width: 300px;
+#wizardTunnelTypes tr:last-child {
+     background: #fff;
 }
 
-#tunnelListPage .descriptionField,
-#tunnelListPage .destinationField {
-    width: 750px;
+#wizardPanel #name, #wizardPanel #description {
+     width: 300px !important;
+     margin: 5px 0 !important;
+}  
+
+#wizardPanel p {
+     padding: 5px 10px;
+     margin: 0;
+     text-align: justify;
 }
 
-#tunnelListPage .descriptionField .text,
-#tunnelListPage .destinationField .text {
-    width: 450px;
+#wizardPanel input::-moz-placeholder {
+     color: #999;
+     font-weight: normal;
 }
 
-#tunnelListPage .descriptionField label,
-#tunnelListPage .destinationField label {
-    text-align: right;
-    width: 150px;
-    height: 24px;
-    float: left;
+#wizardPanel ::-webkit-input-placeholder {
+     color: #999;
+     font-weight: normal;
+}
+
+#wizardPanel .options {
+     padding: 10px;
+}
+
+#wizardPanel .tag {
+     width: 10%;
+     min-width: 150px;
+     white-space: nowrap;
+     display: inline-block;
+     font-weight: bold;
+     text-align: right;
+     margin-right: 3px;
+}
+
+#wizardPanel select {
+     min-width: 160px;
+     margin-left: 0 !important;
+}
+
+#wizardPanel .infohelp p { /* wizard complete - advanced options info */
+     margin: 0;
+     padding: 0;
+}
+
+/* more space */
+
+.tunnelConfig td, td {
+     border-top: 1px inset #cfd1ff;
+     padding: 5px;
+}
+
+input[type="checkbox"] {
+     margin: 5px 3px 5px 5px;
+}
+
+.freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField  {
+     margin: 5px !important;
+}
+
+.multiOption {
+     margin: 5px 10px 5px 5px;
+}
+
+#tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
+     margin: 5px !important;
+     width: calc(100% - 10px) !important;
+}
+
+.tunnelConfig select, select#profile select#connectionProfile {
+     margin: 5px !important;
+}
+
+textarea[name="accessList"], #hostField, #localDestination, .authentication {
+     width: calc(100% - 15px) !important;
+     margin: 5px !important;
+}
+
+#customOptions, #userAgents, #leasesetKey {
+     width: calc(100% - 20px) !important;
+}
+
+.tunnelConfig td > b {
+     min-width: 30px;
+     display: inline-block;
+     margin-left: 5px;
+}
+
+.tunnelDestination {
+     padding-bottom: 1px !important;
+     border-bottom: 1px solid transparent !important;
+}
+
+#clientTunnels .tunnelDescription {
+     padding-top: 1px !important;
+}
+
+.tunnelDestination b, .tunnelDescription b {
+     color: #444;
+}
+
+td.tunnelDestination, td.tunnelDescription {
+     background: linear-gradient(to right, #fff 50%, #eff2ff);
+}
+
+/* end more space */
+
+/* responsive layout */
+
+@media screen and (min-width: 1200px) {
+body, .control, button, select, textarea, .freetext {
+     font-size: 10pt !important;
+}
+
+th {
+     font-size: 10.5pt;
+}
+
+h2, h3 {
+     font-size: 12pt;
+}
 }

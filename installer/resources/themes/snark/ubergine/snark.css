@@ -1,116 +1,229 @@
-/* I2PSnark theme "Ubergine" by dr|z3d */
+/* I2PSnark theme "Ubergine" */
 /* Guantanamo Commemorative Edition. */
+/* Author: dr|z3d */
+
+html {
+     min-height: 100%;
+}
 
 body {
-     background: #101 url('/themes/snark/ubergine/images/graytile.png');
-     color: #001;
-     font: 7.5pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     background: #101 url(images/graytile.png);
+     background: linear-gradient(to bottom, rgba(64,0,64,0.2), rgba(11,0,11,0.1), rgba(11,0,11,0.2)), url(images/graytile.png) #26092f;
+     background-size: 100% 100%, 96px 96px;
+     color: #fff;
+     font: 8pt "Bitstream Vera Sans", Verdana, "Noto Sans", Ubuntu, Helvetica, sans-serif;
 }
 
 body.iframed {
-     background: transparent url('../../console/dark/images/transparent.gif') !important;
-     margin: 6px 0 !important;
+     background: transparent url(themes/console/images/transparent.gif) !important;
+     margin: 0 !important;
 }
 
+.page {
+     background: #323 url(images/tile2.png);
+     background: linear-gradient(to right, rgba(30,0,30,0.4) 0%, rgba(55,0,55,0.5) 50%, rgba(30,0,30,0.4) 100%), url(images/tile2.png);
+     color: #310;
+     min-width: 900px !important;
+     margin: 5px 0 0 0;
+     padding: 10px 10px 0 10px;
+     border-radius: 4px;
+     border: 1px solid #101;
+     font-size: 8pt !important;
+     line-height: 160% !important;
+     box-shadow: inset 0 0 3px 0 #101;
+     text-align: center;
+     opacity: 1;
+     filter: drop-shadow(0 0 1px #000);
+}
+
+.iframed .page {
+     background: none;
+     border: none;
+     border-radius: 0;
+     box-shadow: none;
+     padding: 0 0;
+     filter: none;
+}
+
+/*
 .snarkTitle {
      font-size: 12pt;
      font-weight: bold;
      text-align: center;
 }
+*/
+
+.snarknavbar {
+     margin: -10px 0 10px 0 !important;
+     padding: 14px 10px;
+     border: 1px solid #101;
+     border-radius: 0 0 4px 4px;
+     box-shadow: inset 0 0 3px 1px #212;
+     filter: drop-shadow(0 1px 4px #212);
+     -webkit-filter: drop-shadow(0 1px 1px #000);
+     background: #101 url(images/snarktopnav.png) repeat-x scroll center center;
+     background: linear-gradient(to bottom, #522852 0%, #4a2449 11%, #321831 33%, #281428 50%, #1c0e1c 51%, #101 52%, #101 100%);
+     text-transform: uppercase !important;
+     font-weight: bold;
+     font-size: 11.5pt;
+     color: #001;
+     min-width: 600px;
+     width: 70%;
+     text-align: center;
+     position: sticky;
+     top: -2px;
+     z-index: 999;
+}
+
+.iframed .snarknavbar {
+     padding-bottom: 15px;
+     margin-top: 0 !important;
+     margin-bottom: -6px !important;
+     width: auto;
+     border-radius: 0;
+     box-shadow: inset 0 0 1px 0 #ffeffd;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+.snarknavbar {
+     padding-top: 13px !important;
+     padding-bottom: 14px;
+}
+
+.iframed .snarknavbar {
+     padding-top: 12px !important;
+     padding-bottom: 13px !important;
+     background: linear-gradient(to bottom, #522852 0%, #4a2449 11%, #321831 33%, #281428 52%, #1c0e1c 52%, #101 52%, #101 100%);
+}
+}
+
+.snarknavbar img {
+     border: 0;
+     margin-right: -8px;
+     margin-left: -2px;
+     padding: 0 !important;
+     vertical-align: middle;
+     filter: none;
+}
 
 .snarkRefresh:link,.snarkRefresh:visited {
      text-decoration: none !important;
      text-transform: uppercase !important;
-     padding: 4px 16px 5px !important;
-     margin: -5px -8px -5px 0 !important;
-     letter-spacing: 0.03em;
+     text-shadow: 0 0 1px #000;
+     padding: 5px 12px 5px !important;
+     margin-right: -4px !important;
+     letter-spacing: 0.11em;
      font-weight: bold;
      font-size: 9pt;
      color: #f70;
-     text-shadow: 1px 1px #420;
-     background: url('/themes/snark/ubergine/images/snarknav_lowlight.png') no-repeat scroll center bottom;
-     background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
-     -moz-border-radius: 0px;
-     -khtml-border-radius: 3px;
-     border-radius: 0px;;
-     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px 0 #f90;
-
+     background: #310 url(images/snarknav_on.png) repeat-x scroll center center;
+     background: linear-gradient(to bottom, #a68058 1%, #7a6045 27%, #5e4730 50%, #2e1700 51%, #241300 75%, #0d0600 100%);
+     border-radius: 0;
+     box-shadow: 0 0 1px 0 #000, inset 0 0 0 1px rgba(16, 0, 16, 0.7);
+     outline: none;
+     border: 1px solid #730;
 }
 
-.snarkRefresh:hover {
-     text-decoration: none !important;
-     text-transform: uppercase !important;
-     padding: 1px 16px;
-     font-weight: bold;
-     color: #f50;
-     background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
-     background: #310 url('/themes/snark/ubergine/images/snarknav_lowlight.png') repeat-x scroll center center;
-     -moz-border-radius: 0;
-     -khtml-border-radius: 0;
-     border-radius: 0;
-     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px  #f90;
+.snarkRefresh:hover, .snarkRefresh:focus {
+     color: #d2baff;
+     background: #310 url(images/snarknav_lowlight.png) repeat-x scroll center center;
+     background: linear-gradient(to bottom, #a15b73 0%, #7e4062 50%, #591c3e 50%, #46133e 100%);
+     border: 1px solid #820b64;
+}
+
+.snarkRefresh img {
+     -webkit-filter: none !important;
+}
+
+.snarkRefresh:hover img, .snarkRefresh:focus img {
+     filter: sepia(100%) hue-rotate(220deg);
+     -webkit-filter: sepia(100%) hue-rotate(220deg) !important;
+}
+
+.snarkRefresh:active img {
+     filter: sepia(100%) invert(100%) hue-rotate(125deg);
+     -webkit-filter: sepia(100%) invert(100%) hue-rotate(125deg) !important;
 }
 
 .snarkRefresh:active {
-     text-decoration: none !important;
-     text-transform: uppercase !important;
-     padding: 0 16px;
-     font-weight: bold;
-     color: #fb0;
-     background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
+     background: #f60;
+     color: #fff;
+     text-shadow: 0 0 1px #000;
+     border: 1px solid #f90;
+     box-shadow: 0 0 1px 0 #000, inset 1px 1px 3px 1px #310;
 }
 
 .snarkRefresh:last-child {
-     -moz-border-radius: 0 3px 3px 0px;
-     -khtml-border-radius: 0 3px 3px 0;
-     border-radius: 0 3px 3px 0;
-     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px 0 #f90;
+     border-radius: 0 2px 2px 0;
 }
 
 .snarkRefresh:first-child {
-     -moz-border-radius: 3px 0 0 3px;
-     -khtml-border-radius: 3px 0 0 3px;
-     border-radius: 3px 0 0 3px;
-     -moz-box-shadow: inset 0 0 1px 0 #f90;
-     -khtml-box-shadow: inset 0 0 1px 0 #f90;
-     box-shadow: 0 0 1px 0  #f90;
+     border-radius: 2px 0 0 2px;
+}
+
+.snarkRefresh:last-child[href="/i2psnark/"] {
+     border-radius: 2px;
+     margin: -3px 0 -4px !important;
+     padding: 4px 12px 3px !important;
+     display: inline-block;
 }
 
 .snarkMessages {
-     font: bold 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
      text-align: left;
      margin: 0 0 10px 0;
      padding: 3px 5px;
-     border-spacing: 0px;
-     -moz-border-radius: 4px 0 0 0;
-     -khtml-border-radius: 4px 0 0 0;
-     border-radius: 4px 0 0 0;
-     border: 1px solid #000;
+     border-spacing: 0;
+     border-radius: 4px;
+     border: 1px solid #101;
      overflow: auto;
      color: #26f;
-     max-height: 76px;
-     min-height: 45px;
+     height: 50px;
      width: auto;
-     background: #2a192a url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
+     width: calc(100% - 12px);
+     background: #2a192a url(images/hat.png) no-repeat scroll right center;
+     background: url(images/hat.png) no-repeat scroll right center, linear-gradient(to bottom, #2a192a 0%, #202 100%);
+     background-size: 80px 83px, 100% 100%;
+     box-shadow: inset 0 0 3px 1px rgba(16, 0, 16, 0.6);     
+     outline: none;
+     filter: drop-shadow(0 0 1px rgba(16, 8, 16, 0.5));
+     -webkit-filter: drop-shadow(0 0 1px rgba(16, 8, 16, 0.5));
+}
+
+.snarkMessages:focus {
+     filter: drop-shadow(0 0 1px #f60) !important;
 }
 
 .snarkMessages a:link, .snarkMessages a:visited {
      color: #69f !important;
+     outline: none;
 }
 
-.snarkMessages a:hover {
+.snarkMessages a:hover, .snarkMessages a:focus {
      color: #f90 !important;
 }
 
+.snarkMessages a:active {
+     color: #f30 !important;
+}
+
 .snarkMessages ul {
-     margin: 0;
-     padding: 0 0 0 16px;
+     margin: -3px 0 2px -2px;
+     padding: 0 0 0 14px;
+     list-style: none;
+}
+
+.snarkMessages li {
+     margin-left: -15px;
+}
+
+.snarkMessages li::before {
+     content: '';
+     display: inline-block;
+     background: url(images/bullet.png) left bottom no-repeat;
+     width: 12px;
+     height: 11px;
+     background-size: 9px 9px;
 }
 
 .snarkMessages p {
@@ -121,8 +234,20 @@ body.iframed {
 
 .snarkMessages img {
      float: right;
-     margin: -3px -4px 4px 4px;
+     margin: -3px -5px 4px 4px;
      opacity: 0.8;
+     position: sticky;
+     top: -3px;
+     filter: sepia(100%) hue-rotate(210deg) drop-shadow(0 0 1px #000) !important;
+     -webkit-filter: sepia(100%) hue-rotate(210deg) drop-shadow(0 0 1px #000);
+     mix-blend-mode: luminosity;
+     width: 12px;
+}
+
+.snarkMessages img:hover {
+     filter: sepia(100%) hue-rotate(250deg) drop-shadow(0 0 1px #f60) !important;
+     -webkit-filter: sepia(100%) hue-rotate(250deg) drop-shadow(0 0 1px #f60) !important;
+     mix-blend-mode: initial;
 }
 
 .logshim {
@@ -140,41 +265,32 @@ pre {
 }
 
 table {
-     margin: 0px 0px 10px 0px;
-     border: 0px;
-     padding: 0px;
-     border-spacing: 0px;
+     margin: 0 0 10px 0;
+     border: 0;
+     padding: 0;
+     border-spacing: 0;
      border-collapse: collapse;
      color: #323;
      width: 100%;
-     opacity: 1 !important;
-}
-
-tr { 
-     opacity: 1;
 }
 
 thead, tfoot {
-     text-shadow:0 2px 5px #333333;
      background: #101;
 }
 
-thead a, tfoot a {
-text-shadow:1px 1px #550000;
-} 
-
-thead {
-     border-bottom: 1px solid #101;
+thead, .snarkTorrentInfo th {
+     background: linear-gradient(to bottom, #202 0%, #101 100%);
+     border-top: 1px solid #101 !important;
+     border-bottom: 1px solid #101 !important;
 }
 
 th {
      padding: 4px 2px 4px 4px;
      font-size: 8pt;
-     border-top: 1px outset #001;
-     border-bottom: 1px inset #101;
+     border-top: 1px solid #101;
+     border-bottom: 1px solid #101;
      color: #ddd;
-     whitespace: nowrap;
-     letter-spacing: 0em;
+     letter-spacing: 0;
 }
 
 th:first-child {
@@ -184,7 +300,7 @@ th:first-child {
 
 tfoot td:first-child {
      text-align: left !important;
-     padding-left: 0px;
+     padding-left: 0;
 }
 
 th:first-child img {
@@ -197,10 +313,11 @@ th:nth-child(2) img {
 
 tfoot th {
      padding-bottom: 4px !important;
+     vertical-align: top;
 }
 
 tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) img, tfoot:nth-child(4) img {
-     margin: 0px 2px 3px 0px !important;
+     margin: 0 2px 3px 0 !important;
      padding-right: 0 !important;
 }
 
@@ -221,23 +338,136 @@ tfoot tr:nth-child(n+1) {
 .ParentDir {
      background: #656;
      background: #351933;
-     font-size: 7.5pt;
-     border: 0px inset #101 !important;
-     border-left: 0 !important;
-     border-right: 0 !important;
+     border: 1px solid #101 !important;
      text-align: left !important;
-     padding: 4px 0;
+     padding: 4px 3px;
+}
+
+.ParentDir img {
+     margin-right: 4px;
+}
+
+.snarkDirInfo th:first-child {
+     border-left: 1px solid #101 !important;
+}
+
+.snarkDirInfo th:last-child {
+     border-right: 1px solid #101 !important;
+}
+
+.snarkDirInfo input[type="submit"], .snarkDirInfo a.control {
+     margin: 2px !important;
+}
+
+.snarkDirInfo input.disabled, .snarkDirInfo a.controld {
+     display: none;
 }
 
 .priority {
      font-size: 7pt;
-     vertical-align: center;
+     vertical-align: middle;
+     text-align: right !important;
+     padding-right: 20px;
 }
 
-.SnarkTorrents {
+.snarkTorrents {
+     background: #212;
      margin: 0;
      border: 1px solid #101;
-     background: #212;
+     border-collapse: separate;
+     border-spacing: 0;
+     border-radius: 4px;
+     filter: drop-shadow(0 0 1px rgba(16, 8, 16, 0.5));
+     -webkit-filter: drop-shadow(0 0 1px rgba(16, 8, 16, 0.5));
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes webkit/blink double border */
+     .snarkTorrents {
+     border-top: 1px solid transparent;     
+}
+}
+
+.snarkTorrents thead th {
+     border-top: 1px solid transparent !important;
+}
+
+.snarkTorrents thead th  {
+     padding: 2px;
+     background-clip: padding-box;
+}
+
+.snarkTorrents thead th:nth-child(-n+3) {
+     max-width: 45px;
+}
+
+.snarkTorrents thead th:first-child {
+     text-align: center !important;
+     width: 16px !important;
+}
+
+.snarkTorrents thead th:nth-child(2) {
+     text-align: left;
+     min-width: 50px;
+} 
+
+.snarkTorrents tfoot {
+     background: #101;
+}
+
+.snarkTorrents tfoot th {
+     padding: 5px 2px;
+     border-bottom: #101;
+     font-weight: normal;
+}
+
+.snarkTorrents tfoot th::first-line {
+     font-weight: bold;
+}
+
+.snarkTorrents tfoot th:nth-child(even) {
+     background: #120012;
+}
+
+.snarkTorrents thead th:nth-last-child(4), .snarkTorrents thead th:nth-last-child(5), .snarkTorrents tfoot th:nth-last-child(4), .snarkTorrents tfoot th:nth-last-child(5)  {
+     text-align: center;
+}
+
+.snarkTorrents thead th:nth-last-child(4), .snarkTorrents tfoot th:nth-last-child(4) {
+     text-align: right;
+}
+
+.snarkTorrents tfoot th:nth-child(n+2) {
+     word-spacing: -0.2em;
+     font-variant: all-small-caps;
+     text-align: right;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.snarkTorrents td:nth-child(n+6), .snarkTorrents tfoot th:nth-child(n+2) {
+     font-variant: normal !important;
+}
+}
+
+.snarkTorrents tfoot th:nth-child(2) {
+     text-align: center;
+}
+
+.snarkTorrents td:nth-child(3), .SnarkTorrents td:nth-child(4) {
+     width: 16px;
+     padding: 2px 0;
+}
+
+.snarkTorrents td:nth-child(3) {
+     text-align: right;
+}
+
+.snarkTorrents td:nth-child(4) {
+     text-align: left;
+}
+
+.snarkTorrents tt {
+     color: #cc0;
+     margin-left: 2px;
 }
 
 td {
@@ -261,9 +491,9 @@ td:first-child {
 }
 
 .snarkTorrentName {
-     line-height: 100%;
-     text-shadow:1px 1px #550000;
-     padding: 2px 0 0;
+     line-height: 110%;
+     padding: 2px 1px 2px 0;
+     min-width: 370px;
 }
 
 .snarkTorrentName img {
@@ -272,12 +502,30 @@ td:first-child {
      vertical-align: middle;
 }
 
+.snarkTorrentName[onclick^="document.location"]:hover, .snarkTorrentName[onclick^="document.location"]:hover a  {
+     cursor: pointer;
+     color: #f90 !important;
+}
+
 .snarkTorrentAction {
-     text-shadow:1px 1px #550000;
      padding: 1px 1px 1px 1px !important;
      margin: 0 !important;
      text-align: center;
-     width: 68px;
+     width: 32px;
+     white-space: nowrap;
+}
+
+.snarkTorrents th:last-child {
+     white-space: nowrap !important;
+}
+
+.snarkTorrents th:last-child input[type="image"] {
+     padding: 0;
+     margin: 0;
+}
+
+.snarkTorrents th:last-child br { /* prevent button wrapping */
+     display: none;
 }
 
 .snarkTorrentAction img {
@@ -286,13 +534,8 @@ td:first-child {
 }
 
 .snarkTorrentAction img:hover {
-     -moz-box-shadow: 0 0 1px 1px #f90;
+     box-shadow: 0 0 1px 1px #f90;
      opacity: 1;
-}
-
-.snarkTorrentEven {
-     font-size: 7.5pt;
-     background: #270027;
 }
 
 .snarkTorrentNoneLoaded {
@@ -305,33 +548,39 @@ td:first-child {
 
 .snarkTorrentStatus {
      padding: 2px 2px 2px 0;
-     line-height: 100%;
-}
-
-.snarkTorrentStatus:first-child {
+     line-height: 110%;
+/*     min-width: 75px;*/
      text-align: left !important;
-     padding-left: 0px;
-     min-width: 48px;
-     font-weight: bold;
-     color: #dd9 !important;
-     font-size: 7.5pt;
-     padding: 1px !important;
+     font-size: 7.5pt !important;
 }
 
-.snarkTorrentStatus:first-child img {
+.snarkTorrentStatus img {
      margin-right: 10px !important;
      margin-left: 6px;
 }
 
-.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+img[src$="details.png"] {
+     mix-blend-mode: luminosity;
+}
+
+a img[src$="details.png"]:hover, a:focus img[src$="details.png"] {
+     mix-blend-mode: initial !important;
+}
+
+.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded, .snarkFileSize {
      font-size: 7.5pt;
      font-weight: bold;
      padding: 0 3px;
      line-height: 100%;
+     font-variant: all-small-caps; /* scale down KB/MB (firefox only) */
+     word-spacing: -0.15em;
+     font-variant-numeric: tabular-nums;
 }
 
 .snarkTorrentDownloaded {
      color: #76a !important;
+     white-space: nowrap;
+     text-align: center !important;
 }
 
 .snarkTorrentUploaded {
@@ -349,31 +598,90 @@ td:first-child {
 .snarkTorrentOdd {
      background: #351933;
      font-size: 7.5pt;
-     border: 0px inset #101 !important;
-     border-left: 0 !important;
-     border-right: 0 !important;
 }
 
-.snarkTorrentOdd td, .snarkTorrentEven td {
-     border-top: 1px dotted #313 !important;
+.snarkTorrentEven {
+     font-size: 7.5pt;
+     background: #270027;
+}
+
+.snarkTorrents tr, .snarkTorrents td {
+     border-top: 1px solid #202 !important;
+}
+
+.snarkTorrentEven + .snarkTorrentEven:nth-child(even), .snarkTorrentOdd + .snarkTorrentOdd:nth-child(even) {
+     background: #303;
+     background: linear-gradient(to right, #404, #404 5px, #313 5px, #404);
+     box-shadow: inset 0 0 1px 0 #212;
+}
+
+.snarkTorrentEven + .snarkTorrentEven:nth-child(odd), .snarkTorrentOdd + .snarkTorrentOdd:nth-child(odd) {
+     background: #404;
+     background: linear-gradient(to right, #505, #505 5px, #313 5px, #505);
+     box-shadow: inset 0 0 1px 0 #212;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* prevents webkit from grad-filling every td */
+.snarkTorrentEven + .snarkTorrentEven:nth-child(even), .snarkTorrentOdd + .snarkTorrentOdd:nth-child(even) {
+     background: #303;
+}
+.snarkTorrentEven + .snarkTorrentEven:nth-child(odd), .snarkTorrentOdd + .snarkTorrentOdd:nth-child(odd) {
+     background: #404;
+}
+}
+
+.snarkTorrentEven + .snarkTorrentEven td:nth-child(2), .snarkTorrentOdd + .snarkTorrentOdd td:nth-child(2) {
+     text-align: left;
+     padding-left: 0;
+     color: #b9b !important;
+}
+
+.snarkTorrentEven + .snarkTorrentEven td:nth-child(2) tt, .snarkTorrentOdd + .snarkTorrentOdd td:nth-child(2) tt {
+     margin-left: -2px;
+     color: #cc0;
+}
+
+.snarkTorrentEven + .snarkTorrentEven td:nth-child(4), .snarkTorrentOdd + .snarkTorrentOdd td:nth-child(4) {
+     text-align: center !important;
+     font-variant: all-small-caps;
+}
+
+.snarkTorrentEven + .snarkTorrentEven td:nth-child(n+5), .snarkTorrentOdd + .snarkTorrentOdd td:nth-child(n+5) {
+     text-align: right !important;
+     font-variant: all-small-caps !important;
 }
 
 table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
-     background: #382010 !important;
+     background: #58165e !important;
+     background: linear-gradient(to bottom, #58165e 0%, #4a0d56 100%) !important;
+     border-top: 1px solid #101 !important;
+     border-bottom: 1px solid #101 !important;
+}
+
+table.snarkTorrents tbody tr:hover {
+     box-shadow: inset 0 1px 1px 0 #939;
+}
+
+table.snarkTorrents tbody tr:hover .snarkTorrentName, table.snarkDirInfo tbody tr:hover td .snarkFileName {
+     color: #fff !important;
 }
 
 .snarkFileIcon {
      width: 16px;
+     text-align: center;
+     padding: 4px !important;
 }
 
-td.snarkFileIcon:first-child {
-     text-align: center;
+.snarkFileIcon img {
+     margin: 1px;
+     padding: 0;
 }
 
 .snarkFileName {
-     padding: 4px 0px !important; 
+     padding: 4px 0 !important; 
      text-align: left !important;
-     font-size: 7.5pt !important;
+     font-size: 8pt !important;
+     white-space: nowrap;
 }
 
 .snarkFileSize {
@@ -383,11 +691,22 @@ td.snarkFileIcon:first-child {
 }
 
 .snarkFileStatus {
-     padding: 4px 5px 4px 15px;
-     text-align: center;
+     padding: 2px 5px 2px 15px;
      font-style: italic;
      font-size: 7.5pt;
-     text-align: left;
+     text-align: left !important;
+     white-space: nowrap;
+     max-width: 250px;     
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+.snarkFileStatus img[src*="clock"] {
+     mix-blend-mode: normal !important;
+}
+
+.snarkFileStatus img, .snarkFileStatus img:hover {
+      opacity: 0.7;
 }
 
 .snarkTorrentETA {
@@ -398,21 +717,64 @@ td.snarkFileIcon:first-child {
 
 .snarkTorrentInfo img {
      max-height: 16px !important;
-     margin: 1px 2px 2px 10px !important;    
+     margin: 1px 2px 2px 4px !important;
+     filter: drop-shadow(0 0 1px #000);
+}
+
+.snarkTorrentInfo img:nth-child(n+2) {
+     margin-left: 8px !important;
+}
+
+.snarkTorrentInfo th {
+     text-align: left;
+     padding: 6px 0;
+}
+
+.snarkTorrentInfo th:first-child:not(old) {
+     background: url(images/file.png) 7px center no-repeat;
+     background-size: 14px 16px;
+}
+
+.snarkTorrentInfo tr:first-child {
+     background: linear-gradient(to bottom, #202 0%, #101 100%) !important;
 }
 
 .snarkTorrentInfo td {
      text-align: left !important;
-     padding: 2px 0 1px 1px !important;
+     padding: 3px 2px !important;
+     vertical-align: middle !important;
 }
 
-table.SnarkTorrentInfo {
-     margin-bottom: 3 !important;
-     background: #000;    
+.snarkTorrentInfo td:first-child {
+     width: 20px;
+}
+
+.snarkTorrentInfo tr:nth-child(odd) {
+     background: #351933;
+}
+
+.snarkTorrentInfo tr:last-child td {
+     padding: 8px 3px !important;
+     text-align: right !important;
+     border-top: 1px solid #101;
+}
+
+.snarkTorrentInfo tr:last-child td b {
+     float: left;
+}
+
+.snarkTorrentInfo tr:last-child input {
+     margin: 0 2px ;
+}
+
+table.SnarkTorrentInfo, table.snarkDirInfo {
+     margin: 0 !important;
+     border: 1px solid #101;
+     background: #270027;
 }
 
 table.SnarkDirInfo {
-     margin-top: -2px !important;     
+     margin-top: -2px !important;
 }
 
 .snarkDirInfo thead img {
@@ -420,16 +782,38 @@ table.SnarkDirInfo {
      padding: 0 3px !important;
 }
 
-.SnarkDirInfo td, .SnarkDirInfo th {
-     min-width: 0px !important;     
+.snarkDirInfo img, .snarkTorrents img {
+     filter: drop-shadow(0 0 1px #000);
+     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
-.SnarkDirInfo td:nth-child(n+1) {
+.snarkDirInfo td, .SnarkDirInfo th {
+     min-width: 0 !important;
+     border-bottom: 1px solid #202;
 }
 
-.SnarkDirInfo .headerpriority {
-     text-align: center !important;
-     vertical-align: middle;    
+.snarkDirInfo .snarkFileStatus img {
+     mix-blend-mode: luminosity;
+     opacity: 1;
+}
+
+.snarkDirInfo .ParentDir a, .snarkDirInfo .snarkFileName a, .snarkTorrents .snarkTorrentName a {
+     display: inline-block;
+     width: 100%;
+     padding: 2px 0;
+}
+
+.snarkDirInfo .headerpriority {
+     text-align: right !important;
+     vertical-align: middle;
+}
+
+.snarkDirInfo img[src$="priority.png"] {
+     margin-left: -110px !important;
+}
+
+.snarkFileicon:hover + .snarkFileName a {
+     color: #f90;
 }
 
 .choked {
@@ -441,12 +825,39 @@ table.SnarkDirInfo {
 }
 
 .thumb {
-     max-height: 64px;
-     max-width: 96px;
+     max-width: 16px;
+     transition: ease-out all 0.3s 0s;
 }
 
-.snarkNewTorrent {
+.thumb:hover {
+     max-width: 80px;
+     max-height: 80px;
+     transition: ease all 0.3s 0s;
+}
+
+div.snarkNewTorrent {
      font-size: 8pt;
+     margin-top: -1px;
+}
+
+.snarkNewTorrent td {
+     white-space: nowrap;
+}
+
+.snarkNewTorrent td:first-child, .snarkNewTorrent tr:first-child {
+     font-weight: bold;
+}
+
+table#trackerselect {
+     width: 100% !important;
+}
+
+#trackerselect td:first-child {
+     font-weight: normal;
+}
+
+#trackerselect td:nth-child(2), #trackerselect td:nth-child(3) {
+     max-width: 50px !important;
 }
 
 .snarkAddInfo {
@@ -454,44 +865,45 @@ table.SnarkDirInfo {
      line-height: 130% !important;
 }
 
-.snarkConfigTitle {
-     font-size: 11pt;
+.snarkConfigTitle, label.toggleview {
+     font-size: 10.5pt;
      font-weight: bold;
-     padding: 0 25px 3px 25px;
+     padding: 1px 18px 2px;
      margin: 5px 0 10px 0 !important;
-     letter-spacing: 0.05em;
-     border: 1px solid #111;
-     -moz-border-radius: 0 0 5px 5px;
-     -khtml-border-radius: 0 0 5px 5px;
-     border-radius: 0 0 5px 5px;
-     border-top: 0;
-     text-shadow: 0px 3px 5px #323;
-     background: #101 url('/themes/snark/ubergine/images/snarknav.png') repeat-x scroll center center !important;
+     border: 1px solid #101;
+     border-top: none;
+     border-radius: 0;
+     background: #101 url(images/snarknav.png) repeat-x scroll center center;
+     background: linear-gradient(to bottom, #4a3d49 0%, #3d303d 50%, #0d000d 50%, #0d000d 100%);
      font-variant: small-caps !important;
+     letter-spacing: 0.15em;
+     filter: drop-shadow(0 1px 1px rgba(16, 0, 16, 0.5));
+     -webkit-filter: drop-shadow(0 1px 1px rgba(16, 0, 16, 0.5));
+     color: #f7e3fc;
+     text-shadow: 0 0 1px #000;
+     box-shadow: inset 0 0 1px 0 #313;
+     display: inline-block;
+     margin: 0 0 -3px !important;
+     min-width: 200px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.snarkConfigTitle, label.toggleview {
+     font-size: 12pt;	
+}
+}
+
+.snarkConfigTitle img, label.toggleview img {
+     margin-right: -3px;
+     margin-bottom: 1px;
+     vertical-align: middle;
+     filter: drop-shadow(0 0 1px #000);
+     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 .snarkConfig {
      font-size: 10pt;
      width: 100%;
-}
-
-.page {
-     background: #323 url('/themes/snark/ubergine/images/tile2.png');
-     color: #310;
-     min-width: 800px !important;
-     margin: 5px 0 0 0;
-     padding: 10px 10px 0px 10px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #101;
-     font-size: 8pt !important;
-     line-height: 160% !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #212;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
-     box-shadow: inset 0px 0px 1px 0px #002;
-     text-align: center;
-     opacity: 1;
 }
 
 form {
@@ -503,13 +915,28 @@ p {
 }
 
 hr {
-     color: #444;
-     background: #444;
+     color: #212;
+     background: #212;
      height: 1px;
-     border: 0px solid #444;
+     border: 0 solid #212;
      width: 0%;
      margin: 5px 0 7px 0;
      text-align: center;
+}
+
+hr.debug {
+     width: 100%;
+}
+
+hr.debug + b {
+     color: #ee9;
+     text-transform: uppercase;
+}
+
+hr.debug:nth-child(n+7) {
+     margin-top: -11px;
+     margin-bottom: 2px;
+     opacity: 0.5;
 }
 
 a:link {
@@ -517,29 +944,35 @@ a:link {
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
+     outline: none;
 }
 
 a:visited {
      color: #f50;
      text-decoration: none;
-     font-weight: bold;
 }
 
-a:hover {
+a:hover, a:focus {
      color: #f90;
-     font-weight: bold;
 }
 
-a.control, a.controld {
+a:active {
+     color: #f30;
+}
+
+a.control, a.controld, a.control:active {
      background: #989;
+     background: linear-gradient(to bottom, #989 0%, #878 100%);
      border: 1px inset #bbb;
-     border-radius: 4px;
-     color: #000;
+     border-radius: 2px;
+     color: #1c081e;
      font-weight: bold;
-     margin: 2px 4px;
-     padding: 3px 4px;	
-     text-shadow: 0px 0px #410;
+     margin: 5px 2px !important;
+     padding: 4px 6px 4px 4px;	
+     text-shadow: 0 0 #410;
      white-space: nowrap;
+     filter: drop-shadow(0 0 1px #313) !important;
+     -webkit-filter: drop-shadow(0 0 1px #313) !important;
 }
 
 a.controld {
@@ -547,21 +980,55 @@ a.controld {
      font-weight: normal;
 }
 
+a.control img {
+     margin: -2px 0 0 -4px !important;
+     padding: 0;
+}
+
+a.control:hover img, a.control:focus img {
+     mix-blend-mode: luminosity;
+}
+
+a.control:active img {
+     mix-blend-mode: soft-light;
+}
+
 a.controld img {
      display: none;
 }
 
-a.control:hover {
-     background-color: #f60;
-     border: 1px outset #bbb;
-     color: #fff;
-     text-shadow: 0px 1px 5px #f00;
+a.control, input[type="submit"], input[type="reset"] {
+     background-size: 14px 14px, 100% 100% !important;
 }
 
-a.control:active {
-     background: #000 !important;
-     color: #f60 !important;
-     text-shadow: 0 !important;
+a.control:active, input[type="submit"]:active, input[type="reset"]:active {
+     color: #ce1641 !important;
+     border: 1px solid #fff !important;
+     box-shadow: inset 3px 3px 3px #fff;
+}
+
+.snarkDirInfo tr:last-child {
+     border-top: 1px solid transparent;
+}
+
+th.headerpriority {
+     padding: 5px !important;
+     text-align: right !important;
+}
+
+th.headerpriority br {
+     display: none;
+}
+
+/*
+th.headerstatus {
+     padding-left: 100px;
+}
+*/
+
+input, a.control {
+     font: 8pt "Droid Sans", "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
+     font-weight: bold;
 }
 
 input {
@@ -569,63 +1036,168 @@ input {
      font-weight: bold;
      text-align: left;
      padding: 3px 4px !important;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px inset #000;
-     background: #212 url('/themes/snark/ubergine/images/graytile.png');	 
+     border-radius: 2px;
+     border: 1px solid #101;
+     background: #212 url(images/graytile.png);	 
      color: #f60;
      margin: 2px 4px;
 }
 
 input.r {
      text-align: right;
-     background: url('/themes/snark/ubergine/images/graytile.png');
+     background: url(images/graytile.png);
+     font-family: "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
 }
 
 input[type=submit] {
-     text-shadow: 0px 0px #410;
-     color: #000;
+     color: #1c081e;
      background: #989;
+     background: linear-gradient(to bottom, #989 0%, #878 100%);     
      border: 1px inset #bbb;
-     padding: 2px;
+     padding: 4px 2px !important;
+     filter: drop-shadow(0 0 1px #313);
+     -webkit-filter: drop-shadow(0 0 1px #313);
 }
 
-input[type=submit]:hover {
+
+input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
+     border: none;
+     outline: none;
+}
+
+input[type=submit]:hover, input[type=submit]:focus {
+     background-blend-mode: luminosity;
+}
+
+input[type=submit]:hover, input[type=submit]:focus, a.control:hover, a.control:focus {
      border: 1px outset #bbb;
-     text-shadow: 0 0;	 
-     background-color: #f60;
      color: #fff;
-     text-shadow: 0px 1px 5px #f00;
+     filter: drop-shadow(0 0 1px #515) !important;
+     -webkit-filter: drop-shadow(0 0 1px #515) !important;
 }
 
-input[type=submit]:active {
-     background: #000 !important;
-     color: #f60 !important;
-     text-shadow: 0 !important;
+input[type=submit]:focus, a.control:focus {
+     filter: drop-shadow(0 0 2px #f60) !important;
+     -webkit-filter: drop-shadow(0 0 2px #f60) !important;
+}
+
+input[type=submit]:active, a.control:active {
+     background-blend-mode: soft-light;
+     color: #2e134c !important;
+     filter: drop-shadow(0 0 1px #f60) sepia(100%) invert(100%) !important;
+     -webkit-filter: drop-shadow(0 0 1px #f60) sepia(100%) invert(100%) !important;
+     mix-blend-mode: hard-light;
 }
 
 input[type=image], thead img {
      padding: 0 !important;
-     -moz-border-radius: 0px;
-     -khtml-border-radius: 0px;
-     border-radius: 0px;
-     border: medium none;
+     border-radius: 3px;
+     border: 1px solid transparent;
      margin: 0 2px;
      opacity: 0.8;
+     background: none;
+     filter: drop-shadow(0 0 1px #000);
+     -webkit-filter: drop-shadow(0 0 1px #000);
+     outline: none;
 }
 
-thead img.disable, img.disable:hover {
-     opacity: 0.2;
-}
-
-input[type=image]:hover, thead img:hover {
+input[type=image]:hover, input[type=image]:focus {
+     border: 1px solid #f60;
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
      opacity: 1;
 }
 
-input[type=text]:active, input[type=text]:hover, input.r:hover {
+a img {
+     filter: drop-shadow(0 0 1px #000);
+     -webkit-filter: drop-shadow(0 0 1px #000);
+     outline: none;
+}
+
+a img:hover, a img:focus, a:focus img {
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
+}
+
+thead img.disable, img.disable:hover {
+     opacity: 0.3;
+}
+
+thead img:hover, thead img:focus, thead a:hover img, thead a:focus img {
+     opacity: 1;
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
+     border: 1px solid transparent;
+}
+
+thead a:active img {
+     filter: drop-shadow(0 0 1px #f90) !important;
+     -webkit-filter: drop-shadow(0 0 1px #f90) !important;
+}
+
+input[type="submit"]:disabled:active, a.control:disabled:active {
+      filter: drop-shadow(0 0 1px #101);
+     -webkit-filter: drop-shadow(0 0 1px #101);    
+} 
+
+#pagenav {
+     letter-spacing: 0.1em;
+}
+
+#pagenav img:not(old) {
+     border: 1px solid #dad !important;
+     background: #fdf;
+     background: linear-gradient(to bottom, #fdf 0%, #fdf 50%, #dbd 51%);
+     border-radius: 3px;
+     box-shadow: inset 0 0 1px 1px #fff;
+     padding: 3px 4px !important;
+     margin: 0;
+     transform: scale(+1, -1);
+     mix-blend-mode: luminosity;
+     opacity: 1;
+     width: 12px;
+}
+
+#pagenav img, #pagenav img.disable:hover:not(old) {
+     filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(140%) drop-shadow(0 0 1px #000);
+     -webkit-filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(140%) drop-shadow(0 0 1px #000);
+     box-shadow: inset 0 0 1px 1px #fff;
+}
+
+#pagenav img:hover, #pagenav a:focus img, #pagenav a img:active {
+     filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(140%) drop-shadow(0 0 1px #f60);
+     -webkit-filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(140%) drop-shadow(0 0 1px #f60);
+     box-shadow: none;
+     opacity: 1;
+     mix-blend-mode: normal;
+}
+
+#pagenav img.disable, #pagenav img.disable:hover, #pagenav img.disable:active {
+     margin: 0 3px 0 2px;
+     opacity: 0.3 !important;
+     mix-blend-mode: luminosity;
+}
+
+#pagenav a img:active, #pagenav img:active {
+     box-shadow: inset 1px -1px 3px 1px #fff !important;
+     filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(140%) drop-shadow(0 0 1px #000) !important;
+     -webkit-filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(140%) drop-shadow(0 0 1px #000) !important;
+}
+
+input[type="text"], input.r, input[name="nofilter_dataDir"] {
+     padding: 4px !important;
+     font-family: "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
+     box-shadow: inset 1px 1px 2px 1px #101;
+     letter-spacing: 0.03em;
+     background: url(images/graytile.png) #212;
+     background-size: 96px 96px;
+}
+
+input[type=text]:active, input[type=text]:focus, input.r:focus, input[name="nofilter_dataDir"]:focus, textarea:focus {
      background: #d60;
+     background: linear-gradient(to bottom, #d60, #c50);
      color: #fff;
+     box-shadow: none;     
 }
 
 input[type=radio] {
@@ -634,92 +1206,219 @@ input[type=radio] {
      vertical-align: bottom;
 }
 
-input.default { width: 1px; height: 1px; visibility: hidden; }
+input[type="radio"], input[type="checkbox"] {
+     filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(80%);
+     -webkit-filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(80%);
+     min-width: 16px !important;
+     min-height: 16px !important;
+     vertical-align: middle;
+}
 
-input.disabled, input.disabled:hover {
-     background-color: #989;
-     border: 1px inset #bbb;
-     color: #444;
+input[type="radio"]:hover, input[type="checkbox"]:hover, input[type="radio"]:focus, input[type="checkbox"]:focus {
+     filter: sepia(100%) invert(100%) hue-rotate(58deg) brightness(80%) drop-shadow(0 0 1px #f60) !important;
+}
+
+input[type="radio"], input[type="checkbox"], select, input[type="submit"] {
+     cursor: pointer;
+}
+
+input[type=text], input.r, select {
+     min-width: 110px;
+}
+
+input[name="upBW"] + i { /* fix Russian wrapping issue */
+     white-space: nowrap;
+}
+
+input.default {
+     width: 1px; 
+     height: 1px; 
+     visibility: hidden;
+}
+
+input.disabled, input.disabled:hover, input.disabled:active, a.control.disabled:hover, a.control.disabled:active {
+     color: #444 !important;
      font-weight: normal;
-     text-shadow: 0px 0px 0px #444;
+     border: 1px inset #bbb !important;
+     cursor: not-allowed;
 }
 
-input.accept {
-     background: #989 url('../../console/images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.accept, input.accept:active {
+     background: #989 url(images/accept.png) no-repeat 4px center;
+     background: url(images/accept.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
 }
 
-input.add {
-     background: #989 url('../../console/images/add.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.accept:hover, input.accept:focus {
+     background: #767 url(images/accept.png) no-repeat 4px center;
+     background: url(images/accept.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
-input.cancel {
-     background: #989 url('../../console/images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.add, input.add:active {
+     background: #989 url(images/add.png) no-repeat 4px center;
+     background: url(images/add.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
 }
 
-input.create {
-     background: #989 url('images/create.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.add:hover, input.add:focus {
+     background: #767 url(images/add.png) no-repeat 4px center;
+     background: url(images/add.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
 }
 
-input.delete {
-     background: #989 url('../../console/images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.cancel, input.cancel:active {
+     background: #989 url(images/cancel.png) no-repeat 4px center;
+     background: url(images/cancel.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
 }
 
-input.reload {
-     background: #989 url('../../console/images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.cancel:hover, input.cancel:focus {
+     background: #767 url(images/cancel.png) no-repeat 4px center;
+     background: url(images/cancel.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);    
 }
 
-input.starttorrent {
-     background: #989 url('images/start.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.create, input.create:active {
+     background: #989 url(images/create.png) no-repeat 4px center;
+     background: url(images/create.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
 }
 
-input.stoptorrent {
-     background: #989 url('images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
+input.create:hover, input.create:focus {
+     background: #767 url(images/create.png) no-repeat 4px center;
+     background: url(images/create.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+input.delete, input.delete:active {
+     background: #989 url(images/nuke.png) no-repeat 4px center;
+     background: url(images/nuke.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
+}
+
+input.delete:hover, input.delete:focus {
+     background: #767 url(images/nuke.png) no-repeat 4px center;
+     background: url(images/nuke.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+input.reload, input.reload:active {
+     background: #989 url(images/restore.png) no-repeat 4px center;
+     background: url(images/restore.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
+}
+
+input.reload:hover, input.reload:focus {
+     background: #767 url(images/restore.png) no-repeat 4px center;
+     background: url(images/restore.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+input.reload[name="recheck"], input.reload[name="recheck"]:active {
+     background: #989 url(images/recheck.png) no-repeat 4px center;
+     background: url(images/recheck.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
+}
+
+input.reload[name="recheck"]:hover, input.reload[name="recheck"]:focus {
+     background: #767 url(images/recheck.png) no-repeat 4px center;
+     background: url(images/recheck.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+input.starttorrent, input.starttorrent:active {
+     background: #989 url(images/next.png) no-repeat 4px center;
+     background: url(images/next.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
+}
+
+input.starttorrent:hover, input.starttorrent:focus {
+     background: #767 url(images/next.png) no-repeat 4px center;
+     background: url(images/next.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+input.stoptorrent, input.stoptorrent:active {
+     background: #989 url(images/btn_stop.png) no-repeat 4px center;
+     background: url(images/btn_stop.png) no-repeat 4px center, linear-gradient(to bottom, #989 0%, #878 100%);
+     padding: 4px 3px 4px 18px !important;
+}
+
+input.stoptorrent:hover, input.stoptorrent:focus {
+     background: #767 url(images/btn_stop.png) no-repeat 4px center;
+     background: url(images/btn_stop.png) no-repeat 4px center, linear-gradient(to bottom, #767 0%, #989 100%);
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+input[type="submit"], input[type="reset"], a.control {
+     padding-left: 21px !important;     
+}
+}
+
+.configsectionpanel tr:nth-last-child(2) td {
+     text-align: right !important;
+     border-top: 1px solid #101;
+     padding-top: 10px;
 }
 
 select {
-     background: #333;
-     background: url('/themes/snark/ubergine/images/graytile.png') !important;
+     background: #212 !important;
+     background: #212 url(images/graytile.png) !important;
+     background: url(images/dropdown.png) right center no-repeat, url(images/graytile.png) #212 !important;
+     background-size: 17px 17px, 96px 96px !important;
      color: #f60;
-     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font: 8pt "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
      font-weight: bold;
-     padding: 2px 2px 2px 3px;
-     -moz-border-radius: 4px 0 0 4px;
-     -khtml-border-radius: 4px 0 0 4px;
-     border-radius: 4px 0 0 4px;
+     padding: 2px 18px 2px 1px;
+     border-radius: 2px;
      border: 1px solid #000;
+     margin: 2px;
+     -webkit-appearance:none;
+     -moz-appearance: none;
+     box-shadow: inset 1px 1px 2px 1px #101;
 }
 
-select:hover, textarea:hover {
+select:hover, select:focus, select:active  {
      background: #f60 !important;
+     background: #f60 url(images/dropdown_hover.png) right center no-repeat !important;
      color: #fff !important;
+     outline: none;
+     box-shadow: none;
+     background-blend-mode: luminosity;
+}
+
+select + select {
+     margin-left: -20px !important;
+}
+
+select option {
+     background: #f50;
+     color: #fff;
+     font-size: 8.5pt;
+     font-weight: normal;
+     box-shadow: inset 0 0 20px 20px #f50;
+     padding: 1px 2px 1px 1px;
+}
+
+select option:hover {
+     box-shadow: inset 0 0 20px 20px #212;
+     filter: drop-shadow(0 0 1px rgba(255,255,255,0.5));
+     filter: drop-shadow(0 0 1px rgba(0,0,0,0.5));
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* adjust dropdown padding in webkit */
+select {
+     padding: 4px 18px 4px 4px;
+}
+
+select + select {
+     margin-left: -12px !important;
+}
 }
 
 textarea {
-     background: #111 url('/themes/snark/ubergine/images/graytile.png');
+     background: #212 url(images/graytile.png);
+     background-size: 96px 96px;
      color: #f60;
      font-weight: bold;
-     padding: 1px 4px 0px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px inset #000;
+     padding: 1px 4px 0;
+     border-radius: 2px;
+     border: 1px solid #000;
      font-size: 8pt;
+     box-shadow: inset 1px 1px 2px 1px #101;
 }
 
 img {
@@ -736,10 +1435,14 @@ img:hover {
      line-height: 100%;
 }
 
+img[src$="magnet.png"] {
+     transform: rotate(-90deg);
+}
+
 .infoz {
      margin: 0 -1px 0 0 !important;
      padding: 0 !important;
-     lineheight: 100%;
+     line-height: 100%;
      float: left;
 }
 
@@ -752,102 +1455,145 @@ img:hover {
      opacity: 1 !important;
 }
 
-
-div.section,div.mainsection {
+.section, .mainsection {
      margin: 0 0 10px 0;
      padding: 10px;
      border: 1px solid #001;
      color: #001;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     box-shadow: inset 0 0 3px 0 #101;
      word-wrap: break-word;
      text-align: center;
      background: #545;
+     background: linear-gradient(to bottom, #545 0%, #434 100%);
      opacity: 1 !important;
+     filter: drop-shadow(0 0 1px #515);
+     -webkit-filter: drop-shadow(0 0 1px #515);
+     overflow: auto;
 }
 
-div.newtorrentsection {
+.newtorrentsection {
      margin: 0 0 10px 0;
-     padding: 0 10px 0px 10px;
+     padding: 0 10px 0 10px;
      border: 1px solid #001;
      text-align: center;
      color: #ddd;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #101;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
-     box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0 0 3px 0 #101;
      word-wrap: break-word;
-     background: #545 url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
+     background: #545 url(images/snark_create.png) no-repeat scroll right center;
+     background: url(images/snark_create.png) no-repeat scroll right center, linear-gradient(to bottom, #545 0%, #434 100%);
+     background-size: 80px 80px, 100% 100%;
      opacity: 1.0;
+     filter: drop-shadow(0 0 1px #515);
+     -webkit-filter: drop-shadow(0 0 1px #515);
 }
 
-div.addtorrentsection {
+.addtorrentsection {
      margin: 0 0 10px 0;
-     padding: 0 10px 0px 10px;
+     padding: 0 10px 0 10px;
      border: 1px solid #001;
      text-align: center;
      color: #ddd;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #101;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
-     box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0 0 3px 0 #101;
      word-wrap: break-word;
-     background: #545 url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
+     background: #545 url(images/snark_add.png) no-repeat scroll right center;
+     background: url(images/snark_add.png) no-repeat scroll 99% center, linear-gradient(to bottom, #545 0%, #434 100%);
+     background-size: 61px 61px, 100% 100%;
      opacity: 1.0;
+     filter: drop-shadow(0 0 1px #515);
+     -webkit-filter: drop-shadow(0 0 1px #515);
 }
 
-div.configsection {
+.configsection {
      margin: 0 0 10px 0;
-     padding: 0 10px 15px 10px;
+     padding: 0 10px 13px 10px;
      border: 1px solid #000;
      color: #ddd;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #101;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
-     box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0 0 3px 0 #101;
      word-wrap: break-word;
      text-align: center;
-     background: #545;
+     background: #545 url(images/configuration.png) no-repeat scroll 101% center;
+     background: url(images/configuration.png) no-repeat scroll 101.5% center, linear-gradient(to bottom, #545 0%, #434 100%);
+     background-size: 84px 82px, 100% 100%;
      font-weight: bold;
+     filter: drop-shadow(0 0 1px #515);
+     -webkit-filter: drop-shadow(0 0 1px #515);
 }
 
-div.configsectionpanel {
+.configsectionpanel {
      margin: 0 0 10px 0;
      padding: 0 10px;
      border: 1px solid #000;
      color: #ddd;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #101;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
-     box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0 0 3px 0 #101;     
      word-wrap: break-word;
      text-align: center;
-     background: #545 url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center;
+     background: #545 url(images/configuration.png) no-repeat scroll right center;
+     background: url(images/configuration.png) no-repeat scroll right center, linear-gradient(to bottom, #545 0%, #434 100%);
+     background-size: 84px 82px, 100% 100%;
      font-weight: bold;
+     filter: drop-shadow(0 0 1px #515);
+     -webkit-filter: drop-shadow(0 0 1px #515);
+}
+
+.iframed .mainsection, .iframed .newtorrentsection, .iframed .addtorrentsection, .iframed .configsection, .iframed .configsectionpanel {
+     border-radius: 0;
+     box-shadow: inset 0 0 1px 0 #ffeffd;
+     filter: none;
+}
+
+.iframed .newtorrentsection, .iframed .addtorrentsection, .iframed .configsection, .iframed .configsectionpanel {
+     margin-top: -11px;
+}
+
+.addtorrentsection td:first-child, .newtorrentsection td:first-child {
+     width: 200px; 
+}
+
+.addtorrentsection input[type="text"], .newtorrentsection input[type="text"] {
+     width: 80%;
+}
+
+.configsectionpanel input[type="text"], .configsectionpanel select, .configsectionpanel input.r, .configsectionpanel input[name="nofilter_dataDir"] {
+     margin-left: 0;
+     font-size: 8pt;
+}
+
+.configsectionpanel input[name="nofilter_dataDir"], .configsectionpanel textarea {
+     width: 550px;
+}
+
+.configsectionpanel textarea {
+     resize: none;
+     height: 24px;
+     padding: 4px 4px 2px;
+}
+
+.configsectionpanel input[type="checkbox"] {
+     margin-left: 0;
+}
+
+.configsectionpanel tr:last-child {
+     display: none;
 }
 
 .newtorrentsection form, .configsection form, .addtorrentsection form {
      color: #ddd !important;
+     margin-top: 1px;
 }
 
-div.configsection table{
+div.configsection table {
      color: #ffb;
      opacity: 1;
 }
 
-div.configsection a {
+div.configsection a, label.toggleview {
      color: #f60;
-     text-shadow: 1px 1px #500;
+     text-shadow: 0 0 1px #000;
 }
 
 div.configsection a:hover {
@@ -856,38 +1602,11 @@ div.configsection a:hover {
 }
 
 code {
-     font-size: 9pt;
+     font-size: 8pt;
      color: #b8b;
      padding: 0 2px;
      font-weight: bold;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-}
-.snarknavbar {
-     margin: -10px 0 5px 0 !important;
-     padding: 11px 10px 12px;
-     border: 1px solid #101;
-     -moz-border-radius: 0 0 8px 8px;
-     -khtml-border-radius: 0 0 8px 8px;
-     border-radius: 0 0 8px 8px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
-     box-shadow: inset 0px 0px 1px 0px #002;
-     background: #101 url('/themes/snark/ubergine/images/snarktopnav.png') repeat-x scroll center center;
-     text-transform: uppercase !important;
-     letter-spacing: 0.065em !important;
-     font-weight: bold;
-     font-size: 11.5pt;
-     color: #001;
-     min-width: 700px;
-     width: 70%;
-     text-align: center;
- }
-
- .snarknavbar img {
-     border: 0;
-     margin: 0 -6px 0 -2px;
-     padding: 1px 0 0px !important;
-     vertical-align: top;
 }
 
 .routerdown {
@@ -896,6 +1615,28 @@ code {
 
 .trackerconfig {
      text-align: left !important;
+     border-collapse: separate;
+     border-spacing: 0;
+}
+
+.trackerconfig th:first-child {
+     border-radius: 2px 0 0 2px;
+}
+
+.trackerconfig th:last-child {
+     border-radius: 0 2px 2px 0;
+}
+
+.trackerconfig th {
+     background: linear-gradient(to bottom, #313 0%, #313 50%, #212 51%, #101 100%);
+}
+
+.trackerconfig th:first-child {
+     border-left: 1px solid #101;
+}
+
+.trackerconfig th:last-child {
+     border-right: 1px solid #101;
 }
 
 .trackerconfig th:nth-child(n+4), .trackerconfig th:nth-child(n+5), .trackerconfig td:nth-child(n+4), .trackerconfig td:nth-child(n+5) {
@@ -920,4 +1661,95 @@ input.trackerhome {
 
 input.trackerannounce {
      width: 230px;
+}
+
+/* toggle create/add panel view */
+
+input.toggle_input { /* hide checkbox and use label as faux panel heading */
+     display: none !important;
+}
+
+label.toggleview:hover {
+     color: #f90;
+     cursor: pointer;
+}
+
+input#toggle_addtorrent:not(checked) + label + hr + table, input#toggle_createtorrent:not(checked) + label + hr + table {
+     display: none;
+}
+
+input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent:checked + label + hr + table {
+     display: table;
+}
+
+/* enable to display panels by default on broken webkit based browsers (midori fix) */
+/* note that midori has other issues c. v5.10, best avoided */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+input#toggle_addtorrent:not(checked) + label + hr + table, input#toggle_createtorrent:not(checked) + label + hr + table {
+     display: table;
+}
+
+input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent:checked + label + hr + table {
+     display: none;
+}
+}
+*/
+
+/* display by default in iframe to avoid overflow issue */
+
+.iframed input#toggle_addtorrent:not(checked) + label + hr + table, .iframed input#toggle_createtorrent:not(checked) + label + hr + table {
+     display: table;
+}
+
+.iframed input#toggle_addtorrent:checked + label + hr + table, .iframed input#toggle_createtorrent:checked + label + hr + table {
+     display: none;
+}
+
+label.toggleview, .snarkConfigTitle a:visited {
+     color: #f60;
+}
+
+label.toggleview:active, .snarkConfigTitle a:active {
+     color: #f30 !important;
+}
+
+label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle a:hover img {
+     color: #f90;
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
+}
+
+label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:active img {
+     transform: rotate(90deg);
+     transition: ease transform 0.3s 0s;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, .snarkFileStatus {
+     font-size: 9pt !important;
+}
+
+.snarkRefresh:link {
+     font-size: 10pt;
+}
+
+.snarkRefresh:link:first-child {
+     padding-left: 13px !important;
+}
+
+tt, .snarkTorrents tt, code, .snarkMessages, input, input[type="submit"], input[type="reset"], select, select option, button, textarea {
+     font-size: 9pt !important;
+}
+
+select {
+     padding-top: 4px;
+     padding-bottom: 4px;
+}
+
+select:nth-child(2) {
+     margin-left: -18px !important;
+}
 }

@@ -21,23 +21,32 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter(\"edit\")%>" />
 <h1><%=intl._t("I2P Client Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_i2cp">
  <%@include file="confignav.jsi" %>
 
  <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <div class="configure">
-<h3><a name="i2cp"></a><%=intl._t("Advanced Client Interface Configuration")%></h3>
+<h3 id="advancedclientconfig"><a name="i2cp"></a><%=intl._t("Advanced Client Interface Configuration")%></h3>
 <form action="configi2cp" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<p>
-<b><%=intl._t("External I2CP (I2P Client Protocol) Interface Configuration")%></b><br>
+<table class="configtable" id="externali2cp">
+<tr><td class="infowarn">
+<b><%=intl._t("The default settings will work for most people.")%></b>
+<%=intl._t("Any changes made here must also be configured in the external client.")%>
+<%=intl._t("Many clients do not support SSL or authorization.")%>
+<i><%=intl._t("All changes require restart to take effect.")%></i>
+</td</tr>
+<tr><th><%=intl._t("External I2CP (I2P Client Protocol) Interface Configuration")%></th></tr>
+<tr><td>
 <input type="radio" class="optbox" name="mode" value="1" <%=clientshelper.i2cpModeChecked(1) %> >
 <%=intl._t("Enabled without SSL")%><br>
 <input type="radio" class="optbox" name="mode" value="2" <%=clientshelper.i2cpModeChecked(2) %> >
 <%=intl._t("Enabled with SSL required")%><br>
 <input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
 <%=intl._t("Disabled - Clients outside this Java process may not connect")%><br>
+</td</tr>
+<tr><td>
 <%=intl._t("I2CP Interface")%>:
 <select name="interface">
 <%
@@ -53,23 +62,26 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
            out.print("</option>\n");
        }
 %>
-</select><br>
+</select>&nbsp;
 <%=intl._t("I2CP Port")%>:
-<input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="clientshelper" property="port" />" ><br>
-<b><%=intl._t("Authorization")%></b><br>
+<input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="clientshelper" property="port" />" >
+</td></tr>
+<tr><th><%=intl._t("Authorization")%></th></tr>
+<tr><td>
 <input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
 <%=intl._t("Require username and password")%><br>
+</td></tr>
+<tr><td>
 <%=intl._t("Username")%>:
-<input name="user" type="text" value="" /><br>
+<input name="user" type="text" value="" />&nbsp;
 <%=intl._t("Password")%>:
-<input name="nofilter_pw" type="password" value="" /><br>
-</p><p><img src="/themes/console/images/itoopie_xsm.png" alt=""><b><%=intl._t("The default settings will work for most people.")%></b>
-<%=intl._t("Any changes made here must also be configured in the external client.")%>
-<%=intl._t("Many clients do not support SSL or authorization.")%>
-<i><%=intl._t("All changes require restart to take effect.")%></i>
-</p><hr><div class="formaction">
+<input name="nofilter_pw" type="password" value="" />
+</td></tr>
+<tr><td class="optionsave" align="right">
 <input type="submit" class="default" name="action" value="<%=intl._t("Save Interface Configuration")%>" />
 <input type="submit" class="cancel" name="foo" value="<%=intl._t("Cancel")%>" />
 <input type="submit" class="accept" name="action" value="<%=intl._t("Save Interface Configuration")%>" />
-</div></form>
+</td></tr>
+</table>
+</form>
 </div></div></body></html>

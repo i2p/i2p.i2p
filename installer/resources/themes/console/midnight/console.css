@@ -1,680 +1,1998 @@
 /* I2P Theme: Midnight */
-/* Description: Minimalist Midnight Blue, based on Classic theme. */
+/* Description: Dark blue with chrome highlights */
+/* Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
+/* Additional thanks to NASA for the planet earth image */
 /* Author: dr|z3d */
 
-
 body {
-     margin: 2px 0 0 5px;
+     margin: 5px 0 0 0;
      padding: 0;
-     text-align: left;
-     background: #000;
-     color: #eef;
-     font: 8pt/137% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     text-align: center;
+     background: #001;
+     background: linear-gradient(to bottom, #001, #000);
+     background-size: auto 2px;
+     color: #c9ceff;
+     font: 8.5pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
-.hide {
+/* preload button mouseovers */
+body {
+     background: linear-gradient(to bottom, #001, #000),
+     url(/themes/console/images/buttons/clean_hover.png) no-repeat,
+     url(/themes/console/images/buttons/configure_hover.png) no-repeat,
+     url(/themes/console/images/buttons/delete_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restart_hover.png) no-repeat,
+     url(/themes/console/images/buttons/restore_hover.png) no-repeat,
+     url(/themes/console/images/buttons/search_hover.png) no-repeat,
+     url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
+     url(/themes/console/images/buttons/update_hover.png) no-repeat, #000;
+     background-size: auto 2px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
+.hide, .hideme {
      display: none;
+}
+
+small {
+     font-size: 9pt;
 }
 
 div.clearer {
      clear: left;
      height: 0;
      line-height: 0;
+     margin-bottom: -16px;
 }
+
+::selection {
+     background: #22296f !important;
+     color: white;
+}
+
+::-moz-selection {
+     background: #22296f !important;
+     color: white;
+}
+
+/* standard buttons and inputs */
+
+button, input[type="submit"], input[type="reset"], select {
+     filter: drop-shadow(0 0 1px #115);
+     -webkit-filter: drop-shadow(0 0 1px #115);
+     box-shadow: inset 0 0 0 1px #000020;
+}
+
+button, button:visited, input[type="submit"], input[type="reset"] {
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     border: 1px solid #3e3f8f;
+     border-bottom-color: #14144f;
+     border-right-color: #14144f;
+     border-radius: 2px;
+     padding: 5px 4px;
+     text-decoration: none;
+     margin: 2px 3px;
+     text-align: center;
+     vertical-align: middle;
+     min-width: 75px;
+     background: #000;
+     background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%);
+     color: #443da0;
+}
+
+button:hover, button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
+     border: 1px solid #652787;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+     background: #000;
+     color: #652787;
+     cursor: pointer;
+}
+
+button:active, input[type="submit"]:active, input[type="reset"]:active {
+     border: 1px solid #652787;
+     background: #652787;
+     color: #c9ceff;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+:focus, :active, :checked {
+     outline: none !important;
+}
+
+input {
+     border: 1px solid #3e3f8f;
+     border-bottom-color: #14144f;
+     border-right-color: #14144f; 
+     background: #000;
+     color: #443da0;
+     margin: 5px;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     padding: 3px 2px;
+     text-decoration: none;
+     min-width: 110px;
+     border-radius: 2px;
+}
+
+input:hover, input:focus {
+     background: #000;
+     color: #652787;
+     border: 1px solid #652787;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+     cursor: pointer;
+}
+
+input:active {
+     background: #000;
+     color: #c9ceff;
+     border: 1px solid #652787;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+input[type=text], input[type=password] {
+     background: #000;
+     color: #c9ceff;
+     margin: 5px 10px;
+     padding: 4px 2px;
+     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     border: 1px solid #443da0 !important;
+     text-decoration: none;
+     border-radius: 2px;
+     box-shadow: inset 1px 1px 1px 0 #000;
+     cursor: text;
+}
+
+textarea {
+     color: #c9ceff;
+     padding: 5px;
+     margin: 10px;
+     border-radius: 2px;
+     font: 8.5pt "Droid Sans Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     min-height: 100px;
+     min-width: 97%;
+     width: calc(100% - 15px);
+     text-align: left;
+}
+
+textarea[cols="70"], textarea[name="levels"] {
+     width: calc(100% - 20px);
+}
+
+button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+     outline: none;
+     border: none;
+}
+
+input[type=text], input[type=password], textarea {
+     color: #7670c2 !important;
+     background: linear-gradient(to bottom, #000 0%, #000019 100%);
+     box-shadow: inset 0 0 3px 3px #000;
+     border: 1px solid #3e3f8f;
+     padding: 4px;
+}
+
+input[type=text]:focus, input[type=password]:focus, textarea:focus {
+     color: #c9ceff !important;
+     background: #000;
+     border: 1px solid #443da0;
+     filter: drop-shadow(0 0 1px #99f);
+     -webkit-filter: drop-shadow( 0 0 1px #99f);
+     transition: filter ease 0.3s 0s; 
+}
+
+input[type=image] {
+     min-width: 0;
+}
+
+input[type="checkbox"] {
+     min-width: 16px !important;
+}
+
+input[type="checkbox"], .optbox {
+     min-width: 16px !important;
+     vertical-align: sub;
+     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
+     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
+}
+
+input[type="checkbox"]:hover, .optbox:hover, input[type="checkbox"]:focus, .optbox:focus {
+     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 3px #99f);
+}
+
+input[type="file"]  {
+     box-shadow: none;
+     border: none;
+     background: none;
+     color: #c9ceff;
+     padding: 0;
+     cursor: pointer;
+     margin: 5px 10px;
+}
+
+input[type="file"]:hover, input[type="file"]:active {
+     color: #652787;
+} 
+
+input[name="refreshInterval"] {
+     margin-right: 3px;
+     margin-left: 0;
+     width: 40px;
+     text-align: right;
+}
+
+input:disabled {
+     cursor: default;
+}
+
+input[type="text"]:disabled, input[readonly], input[readonly]:focus {
+     color: #443da0 !important;
+     filter: none;
+}
+
+input[class="check"] { /* nudge "check for updates" button into alignment on /configupdate */
+     margin-left: 10px !important;
+}
+
+select {
+     background: #000;
+     color: #443da0;
+     margin: 5px 10px;
+     border: 1px solid #3e3f8f;
+     border-bottom-color: #14144f;
+     border-right-color: #14144f; 
+     border-radius: 2px;
+     min-width: 110px;
+     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font-weight: bold;
+     padding: 3px 16px 3px 2px;
+     cursor: pointer;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+select:focus, select:hover {
+     color: #652787;
+     border: 1px solid #652787;
+     box-shadow: inset 0 1px 1px 0 #c9ceff;
+}
+
+select option {
+     font-weight: normal;
+     font-size: 9.5pt !important;
+     box-shadow: inset 0 0 20px 20px #000;
+}
+
+select option:hover, select option:focus, select option:checked {
+     box-shadow: inset 0 0 20px 20px #652787;
+}
+
+@-moz-document url-prefix() { /* target firefox and derivatives only */
+select {
+     -moz-appearance: none;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
+}
+
+img[src="dropdown.png"] {
+     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
+}
+
+select:hover, select:active {
+     background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
+}
+
+select:focus {
+     background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
+}
+}
+
+/* buttons (experimental) */
+
+input[type="submit"], input[type="reset"], button {
+     background-size: 14px 14px, 100% 100%;
+     filter: drop-shadow(0 0 1px #115);
+     -webkit-filter: drop-shadow(0 0 1px #115);
+     box-shadow: inset 0 0 0 1px #000020;
+     min-width: 0 !important;
+}
+
+input[type="submit"]:hover, input[type="reset"]:hover, button:hover {
+     background-blend-mode: normal;
+     box-shadow: inset 0 1px 1px #bbf;
+}
+
+input[type="submit"]:active, input[type="reset"]:active, button:active {
+     background-blend-mode: luminosity !important;
+     box-shadow: inset 0 0 0 1px #000 !important;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
+}
+
+input.accept, button.accept {
+     background: url(/themes/console/images/buttons/yes.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.accept:hover, button.accept:hover, 
+input.accept:focus, button.accept:focus {
+     background: #000 url(/themes/console/images/buttons/yes.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept:active, button.accept:active {
+     background: #652787 url(/themes/console/images/buttons/yes.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Unban"], button.accept[value^="Unban"] {
+     background: url(/themes/console/images/buttons/unban.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover, 
+input.accept[value^="Unban"]:focus, button.accept[value^="Unban"]:focus {
+     background: #000 url(/themes/console/images/buttons/unban.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Unban"]:active, button.accept[value^="Unban"]:active {
+     background: #652787 url(/themes/console/images/buttons/unban.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Create"], button.accept[value^="Create"] {
+     background: url(/themes/console/images/buttons/create.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.accept[value^="Create"]:hover, button.accept[value^="Create"]:hover,
+input.accept[value^="Create"]:focus, button.accept[value^="Create"]:focus {
+     background: #000 url(/themes/console/images/buttons/create.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Create"]:active, button.accept[value^="Create"]:active {
+     background: #652787 url(/themes/console/images/buttons/create.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Filter"], button.accept[value^="Filter"] {
+     background: url(/themes/console/images/buttons/filter.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.accept[value^="Filter"]:hover, button.accept[value^="Filter"]:hover,
+input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
+     background: #000 url(/themes/console/images/buttons/filter.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
+     background: #652787 url(/themes/console/images/buttons/filter.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.add, button.add {
+     background: url(/themes/console/images/buttons/add.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.add:hover, button.add:hover,
+input.add:focus, button.add:focus {
+     background: #000 url(/themes/console/images/buttons/add.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.add:active, button.add:active {
+     background: #652787 url(/themes/console/images/buttons/add.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.add[value^="Adjust"], button.add[value^="Adjust"] {
+     background: url(/themes/console/images/buttons/edit2.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.add[value^="Adjust"]:hover, button.add[value^="Adjust"]:hover,
+input.add[value^="Adjust"]:focus, button.add[value^="Adjust"]:focus {
+     background: #000 url(/themes/console/images/buttons/edit2.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.add[value^="Adjust"]:active, button.add[value^="Adjust"]:active {
+     background: #652787 url(/themes/console/images/buttons/edit2.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.cancel, button.cancel {
+     background: url(/themes/console/images/buttons/no.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.cancel:hover, button.cancel:hover,
+input.cancel:focus, button.cancel:focus {
+     background: #000 url(/themes/console/images/buttons/no.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.cancel:active, button.cancel:active {
+     background: #652787 url(/themes/console/images/buttons/no.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Show"], button.accept[value^="Show"],
+input.check[value^="View"], button.check[value^="View"] {
+     background: url(/themes/console/images/buttons/show.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.accept[value^="Show"]:hover, button.accept[value^="Show"]:hover,
+input.check[value^="View"]:hover, button.check[value^="View"]:hover,
+input.accept[value^="Show"]:focus, button.accept[value^="Show"]:focus,
+input.check[value^="View"]:focus, button.check[value^="View"]:focus {
+     background: #000 url(/themes/console/images/buttons/show.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.accept[value^="Show"]:active, button.accept[value^="Show"]:active,
+input.check[value^="View"]:active, button.check[value^="View"]:active {
+     background: #652787 url(/themes/console/images/buttons/show.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.cancel[value^="Hide"], button.cancel[value^="Hide"],
+input.delete[value^="Do not view"], button.delete[value^="Do not view"] {
+     background: url(/themes/console/images/buttons/hide.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.cancel[value^="Hide"]:hover, button.cancel[value^="Hide"]:hover,
+input.delete[value^="Do not view"]:hover, button.delete[value^="Do not view"]:hover,
+input.cancel[value^="Hide"]:focus, button.cancel[value^="Hide"]:focus,
+input.delete[value^="Do not view"]:focus, button.delete[value^="Do not view"]:focus {
+     background: #000 url(/themes/console/images/buttons/hide.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.cancel[value^="Hide"]:active, button.cancel[value^="Hide"]:active,
+input.delete[value^="Do not view"]:active, button.delete[value^="Do not view"]:active {
+     background: #652787 url(/themes/console/images/buttons/hide.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.check, button.check {
+     background: url(/themes/console/images/buttons/yes.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.check:hover, button.check:hover,
+input.check:focus, button.check:focus {
+     background: #000 url(/themes/console/images/buttons/yes.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.check:active, button.check:active {
+     background: #652787 url(/themes/console/images/buttons/yes.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.check[value$="updates"], button.check[value$="updates"] {
+     background: url(/themes/console/images/buttons/update.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.check[value$="updates"]:hover, button.check[value$="updates"]:hover,
+input.check[value$="updates"]:focus, button.check[value$="updates"]:focus {
+     background: #000 url(/themes/console/images/buttons/update_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.check[value$="updates"]:active, button.check[value$="updates"]:active {
+     background: #652787 url(/themes/console/images/buttons/update_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.delete, button.delete {
+     background: url(/themes/console/images/buttons/delete.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.delete:hover, button.delete:hover,
+input.delete:focus, button.delete:focus {
+     background: #000 url(/themes/console/images/buttons/delete_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.delete:active, button.delete:active {
+     background: #652787 url(/themes/console/images/buttons/delete_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.delete[value^="Ban"], button.delete[value^="Ban"] {
+     background: url(/themes/console/images/buttons/ban.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.delete[value^="Ban"]:hover, button.delete[value^="Ban"]:hover,
+input.delete[value^="Ban"]:focus, button.delete[value^="Ban"]:focus {
+     background: #000 url(/themes/console/images/buttons/ban.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.delete[value^="Ban"]:active, button.delete[value^="Ban"]:active {
+     background: #652787 url(/themes/console/images/buttons/ban.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download, button.download {
+     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.download:hover, button.download:hover,
+input.download:focus, button.download:focus {
+     background: #000 url(/themes/console/images/buttons/download.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download:active, button.download:active {
+     background: #652787 url(/themes/console/images/buttons/download.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download[value^="Join"], button.download[value^="Join"] {
+     background: url(/themes/console/images/buttons/users.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+} 
+
+input.download[value^="Join"]:hover, button.download[value^="Join"]:hover,
+input.download[value^="Join"]:focus, button.download[value^="Join"]:focus {
+     background: #000 url(/themes/console/images/buttons/users.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download[value^="Join"]:active, button.download[value^="Join"]:active {
+     background: #652787 url(/themes/console/images/buttons/users.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download[value$="from File"], button.download[value$="from File"],
+input.download[value$="from file"], button.download[value$="from file"] {
+     background: url(/themes/console/images/buttons/from-file.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.download[value$="from file"]:hover, button.download[value$="from file"]:hover,
+input.download[value$="from file"]:focus, button.download[value$="from file"]:focus {
+     background: #000 url(/themes/console/images/buttons/from-file.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download[value$="from file"]:active, button.download[value$="from file"]:active {
+     background: #652787 url(/themes/console/images/buttons/from-file.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.download[value^="Dump"], button.download[value^="Dump"] {
+     background: url(/themes/console/images/buttons/dump-threads.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.download[value^="Dump"]:hover, button.download[value^="Dump"]:hover,
+input.download[value^="Dump"]:focus, button.download[value^="Dump"]:focus {
+     background: #000 url(/themes/console/images/buttons/dump-threads.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.download[value^="Dump"]:active, button.download[value^="Dump"]:active {
+     background: #652787 url(/themes/console/images/buttons/dump-threads.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.go, button.go, input[value="GO"] {
+     background: url(/themes/console/images/buttons/go.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.go:hover, button.go:hover, input[value="GO"]:hover,
+input.go:focus, button.go:focus, input[value="GO"]:focus {
+     background: #000 url(/themes/console/images/buttons/go.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.go:active, button.go:active, input[value="GO"]:active {
+     background: #652787 url(/themes/console/images/buttons/go.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.go[value^="Create"], button.go[value^="Create"] {
+     background: url(/themes/console/images/buttons/create-file.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.go[value^="Create"]:hover, button.go[value^="Create"]:hover,
+input.go[value^="Create"]:focus, button.go[value^="Create"]:focus {
+     background: #000 url(/themes/console/images/buttons/create-file.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.go[value^="Create"]:active, button.go[value^="Create"]:active {
+     background: #652787 url(/themes/console/images/buttons/create-file.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.reload, button.reload {
+     background: url(/themes/console/images/buttons/restore.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.reload:hover, button.reload:hover,
+input.reload:focus, button.reload:focus {
+     background: #000 url(/themes/console/images/buttons/restore_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.reload:active, button.reload:active {
+     background: #652787 url(/themes/console/images/buttons/restore_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.reload[value$="restart"], button.reload[value$="restart"] {
+     background: url(/themes/console/images/buttons/restart.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+
+}
+
+input.reload[value$="restart"]:hover, button.reload[value$="restart"]:hover,
+input.reload[value$="restart"]:focus, button.reload[value$="restart"]:focus {
+     background: #000 url(/themes/console/images/buttons/restart_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+input.reload[value^="Update"], button.reload[value^="Update"] {
+     background: url(/themes/console/images/buttons/update.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+
+}
+
+input.reload[value^="Update"]:hover, button.reload[value^="Update"]:hover,
+input.reload[value^="Update"]:focus, button.reload[value^="Update"]:focus {
+     background: #000 url(/themes/console/images/buttons/update_hover.png) 6px center no-repeat !important;
+}
+
+input.reload[value^="Update"]:active, button.reload[value^="Update"]:active {
+     background: #652787 url(/themes/console/images/buttons/update_hover.png) 6px center no-repeat !important;
+}
+
+input.reload[value="Force GC"], button.reload[value="Force GC"] {
+     background: url(/themes/console/images/buttons/clean.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.reload[value="Force GC"]:hover, button.reload[value="Force GC"]:hover,
+input.reload[value="Force GC"]:focus, button.reload[value="Force GC"]:focus {
+     background: #000 url(/themes/console/images/buttons/clean_hover.png) 6px center no-repeat !important;
+}
+
+input.reload[value="Force GC"]:active, button.reload[value="Force GC"]:active {
+     background: #652787 url(/themes/console/images/buttons/clean_hover.png) 6px center no-repeat !important;
+}
+
+input.stop, button.stop {
+     background: url(/themes/console/images/buttons/shutdown.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.stop:hover, button.stop:hover,
+input.stop:focus, button.stop:focus {
+     background: #000 url(/themes/console/images/buttons/shutdown_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+input.stop:active, button.stop:active {
+     background: #652787 url(/themes/console/images/buttons/shutdown.png) 6px center no-repeat !important;
+}
+
+button.search {
+     background: url(/themes/console/images/buttons/search.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 5px 5px 21px !important;
+}
+
+button.search:hover, button.search:focus {
+     background: #000 url(/themes/console/images/buttons/search_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+button.search:active {
+     background: #652787 url(/themes/console/images/buttons/search_hover.png) 6px center no-repeat !important;
+     background-size: 14px 14px !important;
+}
+
+/* client/plugin/webapps buttons aka project "X" */
+
+button.Xaccept {
+     font-size: 0;
+     text-indent: -99999px;
+     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 16px 16px, 100% 100% !important;     
+     padding: 12px 11px;
+}
+
+button.Xaccept:hover, button.Xaccept:focus {
+     background: #000 url(/themes/console/images/buttons/Xstart.png) center center no-repeat !important;
+}
+
+button.Xaccept:active {
+     background: #652787 url(/themes/console/images/buttons/Xstart.png) center center no-repeat !important;
+}
+
+button.Xstop {
+     font-size: 0;
+     text-indent: -99999px;
+     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 16px 16px, 100% 100% !important;     
+     padding: 12px 11px;
+}
+
+button.Xstop:hover, button.Xstop:focus {
+     background: #000 url(/themes/console/images/buttons/Xstop.png) center center no-repeat !important;
+}
+
+button.Xstop:active {
+     background: #652787 url(/themes/console/images/buttons/Xstop.png) center center no-repeat !important;
+}
+
+button.Xadd {
+     font-size: 0;
+     text-indent: -99999px;
+     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 16px 16px, 100% 100% !important;     
+     padding: 12px 11px;
+}
+
+button.Xadd:hover, button.Xadd:focus {
+     background: #000 url(/themes/console/images/buttons/edit2.png) center center no-repeat !important;
+}
+
+button.Xadd:active {
+     background: #652787 url(/themes/console/images/buttons/edit2.png) center center no-repeat !important;
+}
+
+button.Xdelete {
+     font-size: 0;
+     text-indent: -99999px;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 16px 16px, 100% 100% !important;     
+     padding: 12px 11px;
+}
+
+button.Xdelete:hover, button.Xdelete:focus {
+     background: #000 url(/themes/console/images/buttons/delete_hover.png) center center no-repeat !important;
+}
+
+button.Xdelete:active {
+     background: #652787 url(/themes/console/images/buttons/delete_hover.png) center center no-repeat !important;
+}
+
+button.Xcheck {
+     font-size: 0;
+     text-indent: -99999px;
+     background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 16px 16px, 100% 100% !important;     
+     padding: 12px 11px;
+}
+
+button.Xcheck:hover, button.Xcheck:focus {
+     background: #000 url(/themes/console/images/buttons/update_hover.png) center center no-repeat !important;
+}
+
+button.Xcheck:active {
+     background: #652787 url(/themes/console/images/buttons/update_hover.png) center center no-repeat !important;
+}
+
+button.Xdownload {
+     font-size: 0;
+     text-indent: -99999px;
+     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 16px 16px, 100% 100% !important;     
+     padding: 12px 11px;
+}
+
+button.Xdownload:hover, button.Xdownload:focus {
+     background: #000 url(/themes/console/images/buttons/download.png) center center no-repeat !important;
+}
+
+button.Xdownload:active {
+     background: #652787 url(/themes/console/images/buttons/download.png) center center no-repeat !important;
+}
+
+button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+     outline: none;
+     border: none;
+}
+
+/* end project "X" */
+
+/* sidebar buttons */
+
+.routersummary button {
+     margin: 2px;
+     min-width: 87px !important;
+     background-blend-mode: normal;
+}
+
+.routersummary .reload, .routersummary .stop {
+     text-indent: -99999px;
+     background-size: 16px 16px, 100% 100% !important;
+     background-position: center center !important;
+     padding: 5px !important;
+}
+
+.routersummary .reload, .routersummary .reload[value$="restart"] {
+     background: url(/themes/console/images/buttons/restart.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+}
+
+.routersummary .reload:hover, .routersummary .reload:focus, .routersummary .reload[value$="restart"]:hover, .routersummary .reload[value$="restart"]:focus {
+     background: #000 url(/themes/console/images/buttons/restart_hover.png) center center no-repeat !important;
+}
+
+.routersummary .reload:active, .routersummary .reload[value$="restart"]:active {
+     background: #652787 url(/themes/console/images/buttons/restart_hover.png) center center no-repeat !important;
+}
+
+.routersummary .stop {
+     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+}
+
+.routersummary .stop:hover, .routersummary .stop:focus {
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center center no-repeat;
+     background-position: center center !important;
+     background-size: 16px 16px, 100% 100% !important;
+}
+
+.routersummary .download {
+     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background-size: 16px 16px, 100% 100% !important;
+     padding: 5px 3px 5px 17px !important;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.routersummary .download, .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
+     padding-left: 19px !important;
+}
+}
+
+.routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
+     background: #000 url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background-size: 16px 16px !important;
+     padding: 5px 3px 5px 17px !important;     
+}
+
+.routersummary .download:focus {
+     background: #652787 url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background-size: 16px 16px !important;
+     padding: 5px 3px 5px 17px !important;     
+}
+/* end sidebar buttons */
+/* end buttons & inputs */
 
 img {
      border: none;
 }
 
 pre {
-     overflow: auto;
-     font-size: 8pt !important;
-     width: 95%;
-     padding-top: 10px;
+     width: 98%;
+     overflow-x: auto;
+     text-align: left;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     color: #c9ceff;
 }
 
-/* http proxy error sidepanel */
+/* proxy error messages */
 
-div.logo {
+div.logo { /* proxy error "fake" sidebar */
      float: left;
-     position-relative: top 15px ;
-     width: 200px;
-     margin: 0 0 0 20px;
-     padding: 10px 5px;
+     padding: 10px;
      text-align: center;
-     border: 1px solid #99f;
-     background-color: #00000A;
-     -moz-box-shadow: inset 0 0 0 2px #00000A;
-     -khtml-box-shadow: inset 0 0 0 2px #00000A;
-     border-radius: 3px;
+     color: #c9ceff;
+     margin: 0 20px 0 20px;
+     border: 1px solid #443da0;
+     background: #000;
+     width: 185px;
+     box-shadow: inset 0 0 0 1px #44175f;
+     font-size: 9pt;
+}
+
+.logo a img {
+     opacity: 0.6;
+     filter: invert(100%) sepia(100%) hue-rotate(175deg);
+     -webkit-filter: invert(100%) sepia(100%) hue-rotate(175deg);
+}
+
+.logo a img:hover {
+     opacity: 1;
+     filter: invert(100%) sepia(100%) hue-rotate(175deg) drop-shadow(0 0 3px #652787);
+     -webkit-filter: invert(100%) sepia(100%) hue-rotate(175deg) drop-shadow(0 0 3px #652787);
 }
 
 div.logo hr {
-     color: #99f;
-     background: #99f;
+     color: #443da0;
+     background: #443da0;
      height: 1px;
-     border: 0 solid #99f;
-     margin: 8px -5px;
+     border: 0 solid #443da0;
+     margin: 9px -10px;
 }
 
-div.logo a:link, div.logo a:visited {
-     text-shadow: 0 0 1px rgba(0, 0, 32, 0.3);
+.logo a:link {
+     display: block;
+     padding: 2px;
 }
 
-div.logo a:active {
-     text-shadow: 0 0 1px rgba(255, 96, 0, 0.5);
-     color: #f60;
-}
-
-div.logo a:hover {
-     text-shadow: 0 0 1px rgba(128, 0, 0, 0.5);
-     color: #f90;
-}
-
-/* http proxy error warning */
-
-div.warning {
-     margin: 25px 25px 15px 260px;
-     padding: 0 20px 20px 75px;
-     background: #001;
-     border: 1px solid #99f;
+.warning { /* proxy error messages */
+     margin: 20px 20px 20px 245px;
+     padding: 14px 25px 20px 75px;
+     background: #000;
+     border: 1px solid #443da0;
      text-align: left;
-     color: inherit;
-     background-image:url("../images/itoopie_sm.png");
-     background-position: 12px center;
-     background-repeat:no-repeat;
-     -moz-box-shadow: inset 0 0 0 1px #f60;
-     -khtml-box-shadow: inset 0 0 0 1px #f60;
-     border-radius: 3px 3px 0 0;
+     color: #c9ceff;
+     text-align: justify;
+     background:url(/themes/console/images/itoopie_sm.png) 10px center no-repeat;
+     box-shadow: inset 0 0 0 1px #44175f;
+     word-wrap: break-word;
+     font-size: 9pt;
+     min-width: 300px;
 }
 
-div.warning a:link {
-     color: #f60;
-     text-shadow: 0 0 1px rgba(255, 96, 0, 0.3);
+.warning p, .warning a {
+     font-size: 10pt
 }
 
-div.warning a:visited {
-     color: #f90;
+.warning a {
+     line-height: 150%;
 }
 
-div.warning a:hover {
-     color: #f90;
-  text-shadow: 0 0 1px rgba(255, 128, 0, 0.5);
-}
-
-div.warning a:active {
-     color: #900;
-}
-
-div.warning hr {
-     color: #99f;
-     background: #99f;
-     height: 1px;
-     border: 0 solid #99f;
-     margin: 10px 0;
-}
-
-div.warning h3 {
-     border: 0;
-     border-bottom: 1px solid #99f;
-     padding-bottom: 10px;
-     padding-left: 0;
-     text-transform: capitalize;
-     font-size: 11pt;
-     background: none !important;
-     border-radius: 0 !important;
-}
-
-.warning p {
-     padding: 0;     
-}
-
-.warning b {
-     font-size: 8.5pt;
+.warning h3 {
+     text-align: left;
+     padding: 5px 10px;
 }
 
 .proxyfooter {
-     border: 1px solid #99f;
-     margin: -16px 25px 20px 260px;
-     border-radius: 0 0 3px 3px;
-     background: #002;  
-}
-
-.proxyfooter p {
+     margin: 0 20px 10px 240px;
+     padding: 20px 25px 20px 75px;
+     color: #652787;
      font-size: 7pt;
-     text-align: right;
-     padding: 0 5px;
-     margin: 3px 3px 5px 3px;
-     line-height: 110%;
-}
-
-.proxyfooter i {
-     font-style: normal !important;     
-}
-/* console error messages */
-
-div.sorry {
-     padding: 20px 20px 20px 70px;
-     background: #003;
-     margin: 0 5px 0 200px;
-     border: 1px solid #99f;
-     border-top: 0;
-     text-align: justify;
-     -moz-box-shadow: inset 0 0 0 1px #d00;
-     word-wrap: break-word;
-     font-weight: bold;
-     color: #eef;
-     background-image: url("../images/errortriangle.png");
-     background-position: 15px center;
-     background-repeat: no-repeat;
-     border-radius: 0 0 3px 3px;
-}
-
-div.sorry hr {
-     color: #99f;
-     background: #99f;
-     height: 1px;
-     border: 0;
-     margin: 10px 0;
-}
-
-div.toolbar {
-     margin: 0em 0em 2em 0em;
-     font-weight: bold;
-     display: none !important;
-}
-
-div.routersummaryouter {
-     float: left;
-     width: 200px;
-     margin: 0 0 5px 0;
-     padding: 0;
-     border: 0;
-     clear: left; /* fixes a bug in Opera */
-     position: absolute;/* so no interference with /home app icons */
-}
-
-div.routersummary {
-     background: #00000A;
-     width: 190px;
-     color: inherit;
-     margin: 0;
-     padding: 6px 1px 8px 1px;
-     text-align: center !important;
-     border: 1px solid #99f;
-     font-size: 8pt;
-     word-wrap: break-word;
-     font: 9pt/125%;
-     -moz-box-shadow: inset 0 0 0 1px #00000A;
-     border-radius: 3px;
-}
-
-div.routersummary input[type=text] {
      text-align: right !important;
-}
-
-div.routersummary hr {
-     color: #99f;
-     background: #99f;
-     height: 1px;
-     border-bottom: 0 solid #99f;
-     margin: 8px -1px 7px -1px;
-}
-
-div.routersummary hr:last-child {
+     border-radius: 2px;
+     border: 1px solid #000;
      display: none;
 }
 
-div.routersummary h3 {
-     border: 0 solid #f00;
-     font-size: 8.5pt;
-     letter-spacing: 0.01em;
-     margin: -6px 0 -6px 0;
-     padding: 3px 0 2px;
-     background: #002;
-     text-transform: uppercase;
-     background: #002 url("images/titles.png") repeat-x !important;
-     background-position: center center !important;
+/* responsive proxy errors */
+
+@media screen and (max-width: 800px) {
+.warning {
+     margin-left: 20px !important;
+     background: #000 !important;
+     padding-left: 25px !important;
 }
 
-div.routersummary h3 a, div.routersummary h4 a {
-     text-decoration: none;
-     line-height: 105%;
+.logo {
+     display: none;
+}
+}
+/* end proxy error messages */
+
+.routersummaryouter {
+     float: left;
+     width: 200px;
+     margin: 0 0 10px 5px;
+     padding: 0;
+     border: 0;
+     clear: left;/* fixes a bug in Opera */
+     text-align: center;
+     display: block;
+     position: absolute;/* so no interference with /home app icons */
 }
 
-div.routersummary h4 {
-     border: 0 solid #f00;
-     border-bottom: 0 !important;
-     font-size: 7.5pt;
-     letter-spacing: 0.05em;
-     margin: -6px 0 -6px 0 !important;
-     padding: 5px 2px;
+.routersummary {
+     width: 173px;
+     padding: 8px 10px 8px;
+     text-align: center;
+     border: 1px solid #443da0;
      background: #000;
-     text-transform: capitalize;
-     text-decoration: none !important;
-     color: #2b2;
-     line-height: 100% !important;
+     color: #c9ceff;
+     font-size: 8pt;
+     clear: left;/* fixes a bug in Opera */
+     border-radius: 2px;
+     float: left;
+     box-shadow: 0 1px 5px #000;
+     margin-bottom: 7px !important;
 }
 
-div.routersummary ul {
+.routersummary img[src*="i2plogo"] {
+     opacity: 0.7;
+     transition: all 0.3s ease 0s;
+     margin-left: -3px;
+     filter: sepia(100%) hue-rotate(180deg);
+     -webkit-filter: sepia(100%) hue-rotate(180deg);
+}
+
+.routersummary img[src*="i2plogo"]:hover {
+     opacity: 1;
+     transition: all 0.3s ease 0s;
+     filter: drop-shadow(0 0 3px #652787) saturate(200%);
+     -webkit-filter: drop-shadow(0 0 3px #652787) saturate(200%);
+}
+
+.routersummary img[src*="i2plogo"]:active {
+     filter: drop-shadow(0 0 5px #450519) saturate(200%) !important;
+     -webkit-filter: drop-shadow(0 0 5px #450519) saturate(200%) !important;
+}
+
+.routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
+     opacity: 1;
+     transition: all 0.3s ease 0s;
+     filter: drop-shadow(0 0 3px #652787) saturate(200%);
+     -webkit-filter: drop-shadow(0 0 3px #652787) saturate(200%);
+}
+
+.routersummary input[type=text] {
+     text-align: right !important;
+     box-shadow: inset 1px 1px 1px 0 #000;
+}
+
+.routersummary hr {
+     color: #443da0;
+     background: #443da0;
+     height: 2px;
+     border-bottom: 1px solid #443da0;
+     margin: 8px -10px 7px -10px;
+     box-shadow: inset 0 1px 1px 1px #000;
+}
+
+.routersummary h3 {
+     border: 0;
+     font-size: 9.5pt;
+     letter-spacing: 0.04em;
+     margin: -7px -10px -8px -10px;
+     padding: 4px 0 !important;
+     text-transform: uppercase;
+     border-radius: 0;
+     background: #000 url(images/header.png) center center;
+}
+
+.routersummary h3:hover {
+     background: linear-gradient(to bottom, #001050 0%, #001030 30%, #001020 50%, #000 50%) !important;
+}
+
+.routersummary h3:active {
+     box-shadow: inset 3px 3px 3px #000;
+}
+
+.routersummary h3 a {
+     display: inline-block;
+     width: calc(100% - 6px);
+     padding: 1px 0 !important;
+     margin: 0;
+}
+
+.routersummary h4 {
+     border: none;
+     font-size: 8pt;
+     letter-spacing: 0.02em;
+     margin: -6px -9px -8px -9px !important;
+     padding: 6px 3px;
+     background: #000;
+     background: linear-gradient(to right, #001 0%, #010005 5%, #010010 15%, #010025 50%, #010010 85%, #010005 95%, #001 100%);
+     text-decoration: none !important;
+     color: #2a1fbe;
+     line-height: 120%;
+     text-shadow: 0 0 1px #000;
+     box-shadow: inset 0 0 0 1px #005;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.routersummary h4 {     
+     box-shadow: none;
+}
+}
+
+.routersummary ul {
      text-align: left !important;
 }
 
-div.routersummary table {
+.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 0 5px 2px;
-     width: 186px !important;
+     margin: -5px -7px -6px -8px !important;
+     width: 189px !important;
      overflow: hidden;
-     padding: 0 -12px;
+     font-size: 8pt;
      background-image: none !important;
      background-color: transparent !important;
 }
 
-div.routersummary a {
-     line-height: 105%;
+#sb_localtunnels {
+     width: 189px !important;
 }
 
-div.routersummary img:first-child {
-     opacity: 0.8;
+#sb_localtunnels img {
+     margin: 0;
+     padding: 0;
 }
 
-div.routersummary img:hover:first-child {
-     opacity: 1;
+#sb_localtunnels td:first-child {
+     width: 16px;
+     text-align: left;
+     padding: 2px 0 0 1px;
 }
 
-div.routersummary table img {
-     opacity: 1 !important;
+#sb_localtunnels td:last-child {
+     text-align: right;
+     padding-right: 0;
 }
 
-div.routersummary tr {
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+     word-break: break-all;
+     max-width: 182px;
+     overflow: hidden;
+     white-space: nowrap; 
+     text-overflow: ellipsis;
+     line-height: 140%;
+}
+
+/* sidebar stacked tables fix */
+#sb_localid + #sb_version {
+     margin-top: 6px !important;
+     margin-bottom: 5px !important;
+}
+
+.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
 }
 
-div.routersummary td:first-child {
-     max-width: 90px;
-     overflow: hidden;
+.routersummary form {
+     margin: -4px -9px -6px;
 }
 
-.routersummary form {
-     margin: 0;
+.routersummary form:first-child {
+     margin: 6px 0 -5px 0 !important;
 }
-     
-     
-     
-div.newsheadings {
-     text-align: right;
-     margin: 0 7px 0 -20px;
-     line-height: 110%;
+
+.routersummary p {
+     padding: 0;
+}
+
+.refresh {
+     margin-top: -10px !important;
+     margin-bottom: -4px !important;
+     padding: 2px 0 0 0 !important;
+}
+
+.routersummary a:link, .routersummary a:visited {
+     padding: 0 2px;
+}
+
+div.routersummary a:hover {
+     color: #652787;
+}
+
+/* "experimental" custom sidebar links for apps
+
+#sb_services {
+     width: 192px !important;
+     margin: 0 !important;
+     margin: -7px -10px -9px !important;
+     border-collapse: collapse;
+
+}
+
+#sb_services td {
+     padding: 0;
+}
+
+#sb_services a, #sb_services a:hover, #sb_services a:active {
+     border-bottom: 1px solid #443da0 !important;
+     outline: none !important;
+}
+
+#sb_services a:hover {
+     background: #002;
+}
+
+#sb_services a:last-child {
+     border-bottom: 1px solid transparent !important;
+}
+
+#sb_services a[href*="mail"], #sb_services a[href*="snark"], #sb_services a[href*="7658"], #sb_services a[href*="bote"] {
+     width: calc(100% - 31px) !important;
+     padding: 5px 5px 5px 26px !important; 
+     border: 1px outset transparent;
+     margin: 0 !important;
+     float: left;
+     text-align: left;
+     background: #000;
+     text-decoration: none;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     white-space: nowrap;
+     text-overflow: ellipsis;
+     overflow: hidden;
+     clear: both;
+}
+
+#sb_services a[href*="mail"] {
+     background: #000 url(images/mail.png) 5px center no-repeat;
+}
+#sb_services a[href*="mail"]:hover {
+     background: #002 url(images/mail.png) 5px center no-repeat;
+}
+
+#sb_services a[href*="bote"] {
+     background: #000 url(images/webmail.png) 5px center no-repeat;
+}
+
+#sb_services a[href*="bote"]:hover {
+     background: #002 url(images/webmail.png) 5px center no-repeat;
+}
+
+#sb_services a[href*="snark"] {
+     background: #000 url(images/magnet.png) 5px center no-repeat;
+}
+
+#sb_services a[href*="snark"]:hover {
+     background: #002 url(images/magnet.png) 5px center no-repeat;
+}
+
+#sb_services a[href*="7658"] {
+     background: #000 url(images/webserver.png) 5px center no-repeat;
+}
+
+#sb_services a[href*="7658"]:hover {
+     background: #002 url(images/webserver.png) 5px center no-repeat;
+}
+
+/* end custom sidebar links */
+
+.routersummary td {
+     padding: 0 2px 0 2px;
+     background-image: none !important;
+     border: 0 !important;
+     word-spacing: -0.1em;
+     max-width: 180px;
+     text-overflow: ellipsis; /* force ellipsis rather than truncate rare, overlong text strings eg. Swedish sidepanel */
+}
+
+.routersummary td:first-child {
+     max-width: 90px;
+     overflow: hidden;
+     text-transform: capitalize;
+}
+
+.routersummary hr:last-child {
+     margin-top: 5px;
+     margin-bottom: -5px !important;
+}
+
+.newsheadings {
+     text-align: center;
+     margin: -3px 0 -5px 10px;
+     word-spacing: 0;
 }
 
 div.newsheadings li {
-     list-style: none outside url('images/newsbullet_mini.png');
-     margin: 0 -4px 2px 8px;
-     line-height: 115%;
-     font-weight: normal !important;
+     list-style: none outside url(images/newsbullet_mini.png);
+     margin: 0 -6px 2px 4px;
+     line-height: 110%;
+     text-transform: capitalize;
 }
 
-div.tunnels table{
-     margin: -2px 0 -4px 2px !important;
-     text-align: center !important;
-     width: 186px;
+div.tunnels {
+     padding-top: 3px !important;
+     margin-left: -4px;
+     text-align: center;
 }
 
-.tunnels tr {
-     padding: 4px 0 !important;
+.tunnels table {
+     margin: -5px 0 -5px -3px !important;
+}
+
+.tunnels td {
+     padding: 1px 0 1px 0;
+     text-transform: capitalize;
 }
 
 .tunnels td:first-child {
      width: 16px;
+     text-align: left;
      padding-right: 2px;
 }
 
 .tunnels td:last-child {
-     width: 16px;
      text-align: right;
-     margin-right: -2px;
-     padding-right: 0;
+     padding-right: 1px;
 }
 
-div.refresh {
-     margin-top: 10px !important;
-     margin-bottom: 10px !important;
-     padding: 2px 0 !important;
-}
+/* console error messages */
 
-div.routersummary p {
-     padding: 0;
-}
-
-div.routersummary a {
-}
-
-div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0 0 1px rgba(0, 0, 32, 0.3);
-}
-
-div.routersummary a:hover {
-     text-shadow: 0 0 1px rgba(255, 96, 0, 0.7);
-     color: #f60;
-}
-
-div.routersummary td {
-     padding: 0 1px;
-     background-image: none !important;
-     border: 0 !important;
-}
-
-div.main {
-     margin: 0 5px 5px 200px;
-     padding: 5px 15px 10px 15px;
-     background: #00000A;
-     border: 1px solid #99f;
-     border-top: 0;
-     text-align: left;
-     color: #eef;
-     min-width: 590px;
-     background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
-     border-radius: 0 0 3px 3px;
-}
-
-div.main ul {
-     margin: 5px 0;
-}
-
-div.main li {
-     padding: 0 0 5px 0;
-     list-style: square;
+.sorry {
+     margin: -1px 5px 10px 205px;
+     padding: 20px 20px 20px 75px;
+     background: #020022;
+     border: 1px solid #443da0;
+     border-radius: 0 0 2px 2px;
+     text-align: justify;
+     background-image:url(/themes/console/images/info/errortriangle.png);
+     background-position:15px center;
+     background-repeat:no-repeat;
+     box-shadow: inset 0 0 0 1px #320951;
      word-wrap: break-word;
-     margin-right: 20px;
+     min-width: 555px;
+     color: #c9ceff;
+     font-size: 10pt;
 }
 
-div.main li:first-child {
-     padding-top: 15px;
+div.sorry hr {
+     color: #c9ceff;
+     background: #c9ceff;
+     height: 1px;
+     border: 1px solid #c9ceff;
+     margin: 10px 0;
 }
 
-div.main hr:last-child {
-     margin: 15px 0 10px 0;
+.main {
+     margin: -1px 5px 5px 205px;
+     padding: 0 10px 1px 10px;
+     text-align: left;
+     color: #c9ceff;
+     width: auto;
+     border: 1px solid #443da0;
+     border-radius: 0 0 2px 2px;
+     background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
+     background-size: auto 120px !important;
+     min-width: 620px;
+     box-shadow: 0 1px 5px #000, inset 0 0 0 1px #000;
+     font-size: 9pt;
 }
 
-div.main textarea {
-     width: 98% !important;
-     margin: 2px 0 2px 5px;
-     min-height: 96px;
-     background: #001;
-     color: #eef;
+.main#news {
+     background: #000 url(images/earth.jpg) no-repeat scroll bottom right !important;
+     padding-bottom: 0;
 }
 
-div.main h2 {
-     margin-bottom: 5px;
-     padding-bottom: 10px !important;
+.news {
+     margin: -1px 5px 0 205px;
+     padding: 6px 20px 5px;
+     border: 1px solid #443da0;
+     background: #000;
+     background: #000 url(images/earth.jpg) no-repeat scroll bottom right;
+     background-size: auto 30%;
+     color: #7670c2;
+     font-size: 8pt;
+     text-align: right;
+     box-shadow: 0 1px 5px #000;
+     min-width: 580px;
 }
 
-/*
-div.main h2:last-child {
-     margin: 20px 0 0 !important;     
-} 
-*/
-
-table h2 {
-     padding-bottom: 15px;
+.news h3, .fixme h3 {
+     text-align: left !important;
+     font-size: 9.5pt !important;
+     letter-spacing: 0.03em;
+     color: #c9ceff;
 }
 
-div.welcome {
+.newsentry font[size="-2"] {
+     letter-spacing: 0.15em;
+     font-style: italic;
+     text-transform: capitalize;
+}
+
+.news h4 {
+     border-bottom: 1px;
+     border-bottom-style: dotted;
+     border-bottom-color: #443da0;
+     padding: 0 0 0 0;
+     margin: 5px 0 10px 0;
+     font-size: 10pt;
+     opacity: 1;
+     text-transform: capitalize;
+}
+
+.news p, .newscontent p {
+     margin-top: -5px;
+     font-size: 9pt;
+     color: #c9ceff;
+     margin-bottom: 0;
+}
+
+.news p:nth-child(n+1), .newscontent p:nth-child(n+1) {
      margin-top: 5px;
 }
 
-div.main h2:first-child, div.main h3:first-child {
-/*     margin: 5px 10px -10px; */
+.news hr {
+     margin: 8px -20px 3px;
 }
 
-div.wideload h2 {
-     margin-bottom: 10px !important;
+.fixme {
+     margin: 18px 5px; /* positional parity with homepage news */
 }
 
-div.wideload h3:first-child {
+.main#jobs .joblog {
+     margin-top: 10px !important;
+}
+
+.main#jobs ol {
+     padding: 10px 10px 5px 10px;
+     -moz-columns: 2;
+     -webkit-columns: 2;
+     columns: 2;
+     text-align: left;
+}
+
+.main#jobs ol:empty {
+     display: none;
+}
+
+.main#jobs ol li:first-child {
      margin-top: 0 !important;
 }
 
-div.wideload h3 {
-     margin-top: 15px !important;
-     margin-bottom: 10px !important;
+.main#jobs ol li {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-break-inside: avoid;
+     display: inline-block;
+     text-align: left !important;
+     min-width: 400px;
 }
 
-div.wideload p {
-     margin-top: 5px;
+.main#config_update input, .main#config_update button, .main#config_update select, .main#config_update textarea {
+     margin-left: 0 !important;
 }
 
-div.wideload table {
-     margin-top: 5px !important;     
+.main#config_update .messages {
+     background: url(/themes/console/images/info/infohelp.png) no-repeat 15px center, url(images/earth.jpg) bottom right no-repeat !important;
+     background-size: auto, 80px !important; 
 }
 
-div.news {
-     margin: -1px 5px 0 200px;
-     background: #001;
-     border: 1px solid #99f;
-     text-align: right;
-     color: #99f;
-     min-width: 600px;
-     padding: 3px 8px 3px;
-     -moz-box-shadow: inset 0 0 4px 2px #00000A;
-     font-size: 8pt;
-     background: #001 url("images/planet.png")no-repeat scroll bottom right;
+.wideload {
+     margin: 0;
 }
 
-/* convert the list entry to our title */
+.widescroll { /* only scroll content, not entire page eg /peers */
+     overflow: auto;
+}
 
-div.news li {
-     text-align: justify;
-     list-style: none;
-     margin: 15px 15px -10px -20px;
-     padding: 0 0 15px 0;
-     border-bottom: 1px dotted #99f;
-     border-top: 0 solid #99f;
-     padding: 3px 5px 5px 0;
+.widescroll table {
+     white-space: nowrap;
+}
+
+.confignav {
+     background: url(images/header.png) repeat-x scroll center center #000;
+     padding: 8px 5px 7px !important;
+     margin: -1px -11px 10px;
+     border: 1px solid #443da0;
+     font-weight: bold !important;
+     line-height: 130% !important;
+     text-align: center;
+}
+
+.confignav a:hover {
+     text-decoration: none;
+}
+
+.tab, .tab2 {
+     padding: 1px 3px;
+     white-space: nowrap;
+     margin: 0;
+}
+
+.tab2::before {
+     content: '\1F892\00A0';
+     content: '\25B8\00A0';
      font-size: 10pt;
-     color: #eef;
+     line-height: 50%;
+     vertical-align: baseline;
+}
+
+.tab2::after {
+     content: '\00A0\1F890';
+     content: '\00A0\25C2';
+     font-size: 10pt;
+     line-height: 50%;
+     vertical-align: baseline;
+}
+
+#bwlimiter a, #advancedconfig a, .tabletitle a, #upnpconfig a, #servicedebug a, .ptitle a, #configstats th a, h3#graphinfo a, .h3navlinks {
+     float: right;
+     letter-spacing: normal;
+     text-transform: capitalize !important;
+     font-size: 9pt;
+}
+
+.h3navlinks a {
      text-transform: capitalize;
-     font-weight: bold;
+     letter-spacing: normal;
+     margin-left: 5px;
 }
 
-div.news h3 {
-     background: none !important;
-     text-align: left;
-     border: none !important;
-     padding-left: 0;
-     padding-top: 0;
-     border-bottom: 1px dotted !important;
-     -moz-box-shadow: none;
-     -hktml-box-shadow: none;
-     box-shadow: none;
-     font-size: 10pt !important;
-     letter-spacing: 0.05em;
-     text-transform: uppercase !important;
-     margin: 15px 10px -5px;
-     padding: 5px 0 5px;
-}
-
-div.news p {
-     color: #eef;
-     font-size: 8pt;
-     margin-bottom: -10px;
+.main#tunnels h3:first-child {
      margin-top: 10px;
 }
 
-div.news p:last-child {
-     margin-bottom: 10px;
+.main#tunnels h3 a:not(old), #criticallogs + h3.tabletitle a:not(old) {
+     font-size: 0;
 }
 
-div.news a:link {
-     color: #aaf;
-     text-shadow: 0 0 1px rgba(128, 128, 48, 0.3);
+.main#tunnels h3 a[href^="/configtunnels#"]::after, #criticallogs + h3.tabletitle a::after {
+     content: url(/themes/console/images/buttons/configure.png);
+     float: right;
+     padding: 0;
 }
 
-div.news a:visited {
-     color: #99f !important;
-     text-shadow: 0 0 1px rgba(128, 128, 48, 0.3);
+#criticallogs tr:first-child {
+     display: none;
 }
 
-div.news hr {
-     color: #99f;
-     background: #99f;
-     height: 1px;
-     border: 0 solid #99f;
-     margin: 10px 0 2px 0;
-}
-
-div.confignav {
-     padding: 14px 0 15px;
-     background: #000018;
-     margin: -6px -16px 5px -16px;
-     border: 1px solid #99f;
-     -moz-box-shadow: inset 0 0 4px 2px #00000A;
-}
-
-div.configure {
-     margin: 15px -20px;
-     padding: 0 20px 0 20px;
-}
-
-div.configure hr {
-     margin: 15px 0;
-}
-
-div.configure table {
-     font-size: 8pt;
+#criticallogs li::first-line, #routerlogs li::first-line {
      font-weight: bold;
-     border: 1px solid #99f;
+     display: inline-block;
+     border: 1px solid #f00;
 }
 
-div.configure tr, div.configure td {
-     padding: 5px;
+#criticallogs li:last-child, #routerlogs li:last-child {
+     padding-bottom: 8px !important;
 }
 
-div.configure tr {
-     -moz-box-shadow: inset 0 0 1px 0 #000;
+img[src$="inbound.png"], img[src$="outbound.png"] {
+     filter: hue-rotate(-47deg);
+     -webkit-filter: hue-rotate(-47deg);
 }
 
-div.configure li:first-child, div.main li:first-child {
-     margin-top: 0;
-     padding-top: 0;
+h3#iptransport a:not(old), h3#advancedconfig a:not(old) {
+     font-size: 0;
 }
 
-div.configure li:last-child {
-     margin-bottom: -5px;
-}
-
-div.configure h2:first-child {
-     margin-top: 15px;
-}
-
-.configure form {
-     margin: 20px 15px;     
-}
-.sidebarconf button {
-     margin: 2px;
-     padding: 1px;
-     min-width: 0;
-     background: none;
-}
-
-.sidebarconf th:nth-child(1) {
-     text-align: center;     
-}
-
-.sidebarconf th:nth-child(2) {
-     text-align: left;     
-}
-
-.sidebarconf td:first-child {
-     width: 60px;
-     text-align: right;
-     padding-right: 50px;
-}
-
-.sidebarconf td {
-     font-weight: bold;
-     font-size: 9pt;  
-}
-
-.sidebarconf td:nth-child(3), .sidebarconf td:nth-child(4) {
-     width: 70px;
-     padding: 0;  
-}
-
-.sidebarconf td:nth-child(3) {
-     text-align: right;
-     padding-left: 50px;
-}
-
-.sidebarconf td:nth-child(4) {
-     text-align: left;
-     padding-right: 50px;
-}
-
-.topshimten {
-     margin-top: 15px;
-     margin-bottom: 15px;
+h3#iptransport a::after, h3#advancedconfig a::after {
+     content: url(images/help.png);
+     padding: 0;
+     margin: 0;
+     vertical-align: text-top;
+     cursor: help;
+     filter: drop-shadow(0 0 1px #555);
 }
 
 div.messages {
-     padding: 10px;
+     padding: 20px 10px;
+     margin: 10px 0;
+     border: 1px solid #443da0;
      background: #000;
-     border: 1px solid #99f;
-     border-right: 0;
-     margin: -6px -15px 10px -16px;
-     text-align: center;
-     font-size: 9pt;
+     background: url(/themes/console/images/info/infohelp.png) no-repeat 15px center, #000;
      font-weight: bold;
-     color: #474;
-     -moz-box-shadow: inset 0 0 4px 2px #00000A;
-     background: url("../images/info_rhombus.png") no-repeat scroll 18px center #000;
+     font-size: 9.5pt;
+     color: #c9ceff !important;
+     box-shadow: none !important;
 }
 
-div.messages li, div.messages ul {
-     padding: 10px 0 0 5px;
-     margin: -10px 0 0 0;
-     list-style: none;
+div.messages i {
+     padding-left: 45px;
+     color: #c9ceff;
 }
 
-div.main li b{
-     color: #bb7 !important;
-     letter-spacing: 0.07em;
-     font-size: 9pt;
+div.messages span.error {
+     color: #D6FFFD;
 }
 
-div.error {
-     color: #d00;
-     background: url("../images/errortriangle.png") no-repeat scroll 5px center #000;
-     padding: 10px 10px 10px 45px;
-     text-align: left;
-}
-
-div.notice {
+div.messages span.notice {
      font-style: italic;
 }
 
-h1,h2,h3 {
-     border-radius: 3px;     
+div.messages li {
+     text-align: justify !important;
+     font-weight: bold;
+     list-style: none !important;
+     margin: 0 5px 0 50px !important;
+     padding: 0 10px 0 0 !important;
+     border: 0 !important;
+}
+
+div.widepanel h3 {
+     text-align: left !important;
+     padding: 6px 10px;
+     text-transform: uppercase;
+     font-size: 10.5pt;
+     text-align: left;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     border-radius: 0;
+     border: 1px solid #443da0;
+}
+
+div.graphspanel {
+     padding: 0;
+     margin: 15px 0 -15px 0;
+     background: none;
+     text-align: center;
+     overflow: auto;
+     width: 100%;
+}
+
+div.graphspanel form {
+     text-align: left;
+     padding: 0 15px 0 15px;
+     margin-bottom: 25px;
+}
+
+div.graphspanel a img {
+     border: 1px solid #443da0;
+     padding: 3px;
+     margin: 5px;
+     text-align: center !important;
+     background: #000;
+     opacity: 0.9;
+     transition: all 0.3s ease 0s;
+}
+
+div.graphspanel a img:hover {
+     border: 1px solid #652787;
+     padding: 3px;
+     margin: 5px;
+     text-align: center !important;
+     background: #000;
+     opacity: 1;
+     transition: all 0.3s ease 0s;
+     cursor: url(/themes/console/images/cursor_zoom.png), auto;
+}
+
+div.graphspanel img {
+     border: 1px solid #2f2e38;
+     padding: 2px;
+     max-width: 97%;
+     max-width: calc(100% - 20px);
+     vertical-align: top;
+/*     filter: sepia(100%) invert(100%);*/
+}
+
+div.graphspanel p {
+     text-align: center;
+     text-transform: capitalize;
+     margin-top: 10px;
+     border-top: 1px solid #443da0;
+     padding: 10px 10px 15px;
+}
+
+p#graphopts {
+     margin-top: 30px !important;
+}
+
+h3#graphinfo {
+     margin-top: 0;
+     border-radius: 0 !important;
+     text-transform: capitalize;
+     letter-spacing: normal;
+     word-spacing: normal;
+}
+
+div.graphspanel p:last-child {
+     display: none;
+}
+
+form[action="graphs"] {
+     border: 1px solid #443da0;
+     padding: 10px 10px 0 !important;
+     background: #000;
+     margin-top: -11px;
+     margin-bottom: 10px;
+}
+
+h3#graphdisplay a {
+     text-transform: capitalize;
+     letter-spacing: normal;
+     font-size: 9pt;
+     float: right;
+}
+
+/*
+.main#graphs hr {
+     margin: 10px -10px 8px !important;
+}
+*/
+
+/* new graphs optionbox */
+
+#graphs form {
+     padding: 0 !important;
+}
+
+#graphs form hr {
+     margin: 0 -1px 8px !important;
+}
+
+#graphs form table {
+     border: none;
+     margin: 0;
+}
+
+.formaction#graphing {
+     margin: -2px 0 0 !important;
+     padding-top: 1px;
+     border-left: none;
+     border-right: none;
+}
+
+#graphs tr:first-child td {
+     border-top: none;
+}
+
+#graphs td:first-child {
+     text-align: right;
+     width: 85px;
+     white-space: nowrap;
+     padding: 13px 3px 13px 5px;
+}
+
+#graphs td:nth-child(2) {
+     width: 260px;
+     white-space: nowrap;
+}
+
+#graphs td.infohelp {
+     border: 1px solid #120f35;
+     border-right: none;
+     background-size: 20px 20px !important;
+     padding: 5px 5px 5px 40px !important;
+     background-color: #010008 !important;
+     text-align: left;
+}
+
+#graphs form input, #graphs form select {
+     margin: 3px 5px 3px 0;
+     vertical-align: middle;
+}
+
+#graphs input[type="text"] {
+     min-width: 60px;
+}
+
+/* end new graphs optionbox */
+
+table {
+     border-collapse: collapse;
+     width: 100%;
+     border: 1px solid #443da0;
+     padding: 1px;
+     font-size: 9pt;
+     background: #040033;
+     margin: 1px 0;
+}
+
+table hr {
+     padding: 0 0;
+     color: #443da0;
+     background: #443da0;
+     border: 0 solid #443da0;
+     margin: 0 0;
+     height: 1px;
+     display: none;
+}
+
+th {
+     padding: 6px 2px;
+     color: #c9ceff;
+     text-align: center;
+     font-size: 9pt;
+     background: #000 url(images/titles.png) center center repeat-x;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     border-top: 1px solid #443da0;
+     border-bottom: 1px solid #443da0 !important;
+     line-height: 110%;
+}
+
+tr {
+     vertical-align: middle;
+}
+
+tr:nth-child(even) {
+     background: #010010;
+     vertical-align: middle;
+}
+
+tr:nth-child(odd) {
+     background: #010008;
+     vertical-align: middle;
+}
+
+td {
+     padding: 4px 6px;
+     color: #c9ceff;
+     vertical-align: middle;
+     border-top: 1px inset #120f35;
+}
+
+td img {
+     padding: 0 1px 0 2px;
+}
+
+td img[src$="c=a1"], td img[src$="c=a2"] {
+     filter: drop-shadow(0 0 1px #337);
+     -webkit-filter: drop-shadow(0 0 1px #337);
+}
+
+tt {
+     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     color: #393;
+}
+
+table tt {
+     color: #393;
+}
+
+a:link tt, a:visited tt {
+     color: #443da0;
+}
+
+a:hover tt {
+     color: #652787;
+}
+
+a:active tt {
+     color: #9FE9F9;
+}
+
+div.main li {
+     text-align: left;
+     list-style: square;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
+     word-wrap: break-word;
+}
+
+div.main li b {
+     color: #EBDBFF !important;
+     letter-spacing: 0.08em;
+     font-size: 9pt;
+}
+
+.tidylist {
+     text-align: justify !important;
+     line-height: 150%;
+}
+
+.tidylist:last-child {
+     padding-bottom: 10px;
+}
+
+.tidylist code {
+     text-align: left;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     color: #D6FFFD;
+     padding: 1px 3px;
+     background: #040033;
+     margin: 0 2px;
+     border-radius: 2px;
+}
+
+ol {
+     display: inline;
+     padding: 1px 0 0 20px;
+}
+
+ol li:first-child {
+     margin-top: 10px !important;
+}
+ul {
+     margin: 0;
+     padding: 0;
+}
+
+code {
+     text-align: left;
+     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     color: #393;
+}
+
+a:link, h2 a:link {
+     color: #443da0;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+     outline: none;
+}
+
+a:visited {
+     color: #7670c2;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:hover, a:focus {
+     color: #652787;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:active {
+     color: #4f0519 !important;
+}
+
+.links {
+/*     padding-bottom: -2px; */
+     text-align: justify;
+     margin-top: 10px;
+     margin-bottom: -10px;
+}
+
+.links li {
+     list-style-image: url(images/link.png) !important;
+}
+
+.links b {
+     color: #ebdbff !important;
+     letter-spacing: 0.08em;
+     font-size: 8.5pt;
+     line-height: 165%;
+}
+
+p {
+     text-align: justify;
+     line-height: 160%;
+}
+
+p img:first-child {
+     display: none !important;
+}
+
+p:empty { /* kills empty paragraphs that are likely erroneous eg. see top of /profiles?f=1, /profiles */
+     display: none;
+     border: 1px dotted #652787; /* display in order to bug hunt */
 }
 
 h1 {
-     font-size: 18pt;
-     text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
      text-align: left;
-     border: 1px solid #99f;
-     padding: 13px;
-     margin: 5px 5px 0 200px;
-     line-height: 93%;
+     color: #c9ceff;
+     padding: 13px 15px;
+     margin: 0 5px 0 205px !important;
+     font-size: 17pt;
+     font-weight: bold;
+     font-style: normal;
      text-transform: uppercase;
-     letter-spacing: 0.3em;
-     background: #000008;
-     min-width: 600px;
-     line-height: 100%;
-     color: #fff;
-     border-radius: 3px 3px 0 0;
+     letter-spacing: 0.15em;
+     text-shadow: 0 0 2px #010011;
+     white-space: normal;
+     background: #000 url(images/header.png) center center;
+     border: 1px solid #443da0;
+     border-radius: 2px 2px 0 0;
+     line-height: 120%;
+     min-width: 620px;
+     box-shadow: 0 1px 5px #000;
 }
 
 span.newtab {
@@ -684,164 +2002,2148 @@ span.newtab {
      letter-spacing: 0;
 }
 
-/* opera targetted hack */
-x:-o-prefocus, span.newtab {
-     margin-top: -25px;
+.newtab:hover {
+     filter: drop-shadow(0 0 3px #652787) !important;
+     -webkit-filter: drop-shadow(0 0 3px #652787) !important;
 }
 
-h2 {
+h2, h2.welcome {
      font-size: 12pt;
-     padding: 10px 10px 10px 10px;
-     border: 1px solid #77f;
-     border-top: 1px solid #99f;
-     border-left: 1px solid #99f;
-     background: #000008;
-     text-transform: uppercase;
-     letter-spacing: 0.07em;
-     
-}
-
-h3 {
-     font-size: 10pt;
-     padding: 7px 10px;
-     border: 1px solid #99f;
-     border-right: 1px solid #77f;
-     border-bottom: 1px solid #77f;
+     color: #c9ceff;
+     text-shadow: 0 0 2px #010011;
      letter-spacing: 0.05em;
-     font-weight: bold !important;
+     background: #000 url(images/header.png) center center ;
+     padding: 10px;
+     border: 1px solid #443da0;
+     border-radius: 2px;
+     vertical-align: middle;
+     margin: 15px 0 12px 0 !important;
      text-transform: uppercase;
+     word-wrap: break-word;
 }
 
-h3 a {
-     font-weight: bold !important;
+h2 a:visited {
+     color: #190f9b;
 }
 
-h2, h3, .confignav {
-     background: #002 url("images/tinytitles.png") center center repeat-x !important;
+h2 a:hover {
+     color: #652787;
+     text-shadow: 0 0 1px #652787;
+}
+
+h3, h3.welcome, div.news h3 {
+     border: 1px solid #443da0;
+     border-left: 5px solid #443da0;
+     padding: 5px 10px;
+     margin: 10px 0 10px 0;
+     border-radius: 0 2px 2px 0;
+     background: #000 url(images/header.png) center center ;
+     text-transform: uppercase;
+     text-shadow: 0 0 2px #010011;
+     letter-spacing: 0.08em;
+}
+
+h4 {
+     border-bottom: 1px;
+     border-bottom-style: solid;
+     border-bottom-color: #443da0;
+     padding: 0 0 10px 0;
+     margin: 5px 0 10px 0;
+     font-size: 11pt;
+}
+
+h1, h2, h3:not([id*="help"]), h4.app, h4.app2, div.routersummary h3, .confignav {
+     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+}
+
+h2, h3, h4, .confignav {
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.underline {
+     border-bottom: 1px solid #efeeff;
+     padding: 5px 0 5px 0;
+     margin: 0 0 10px 0;
+}
+
+.langbox {
+     margin: 3px 4px 2px 5px;
+     padding: 0;
+     color: #c9ceff;
+     font-size: 7pt;
+     width: 350px;
+     text-align: right;
+     float: right;
+     vertical-align: middle;
+}
+
+.langbox img {
+     opacity: 0.5;
+     padding: 1px 2px !important;
+}
+
+.langbox img:hover {
+     opacity: 1;
+     transform: scale(1.1);
+}
+
+hr {
+     color: #443da0;
+     background: #443da0;
+     height: 1px;
+     border: 0 solid #443da0;
+     margin: 20px 0 10px;
+}
+
+hr:last-child {
+     margin-top: 20px;
+     margin-bottom: 20px;
+}
+
+.joblog hr {
+     margin: 10px 0;
+}
+
+fieldset {
+     overflow: hidden;
+     position: relative;
+}
+
+.statusnotes {
+     font-style: italic;
+     font-size: 9pt;
+     color: #c9ceff;
+     text-align: center;
+     border: 1px solid #443da0 !important;
+     margin: -3px 0 5px 0;
+     padding: 7px;
+     background: #000;
+     background: linear-gradient(to bottom, #010014, #010010 50%, #010010 100%);
+}
+
+div.joblog {
+     border-radius: 2px 2px 0 0;
+     text-align: justify !important;
+     overflow-y: hidden !important;
+     margin-top: 10px !important;
+ }
+
+div.joblog h3 {
+     margin-top: 10px !important;
+}
+
+div.joblog br {
+     margin-bottom: -5px;
+}
+
+div.main li:last-child {
+     padding-bottom: 15px;
+}
+
+div.joblog li {
+     word-wrap: break-word !important;
+     text-align: justify !important;
+     line-height: 120% !important;
+     margin: 2px 0 2px 30px;
+     padding: 2px 20px 2px 0;
+}
+
+div.joblog ul {
+     word-wrap: break-word !important;
+     text-align: justify;
+     margin: 5px 0 -10px;
+}
+
+div.joblog li:first-child {
+     margin-top: 0;
+     padding-top: 0;
+}
+
+div.joblog li:last-child {
+     padding-bottom: 5px;
+}
+
+div.joblog ul li li li {
+     margin-bottom: 10px !important;
+}
+
+div.joblog form:first-child {
+     margin-top: 10px;
+}
+
+div.joblog table {
+     margin-top: 15px;
+     margin-left: 0 !important; /* removes hard-coded indentation */
+     margin-bottom: 15px;
+}
+
+div.joblog table td:first-child {
+     font-weight: bold;
+}
+
+div.joblog p {
+     line-height: 140%;
+}
+
+div.joblog th:first-child {
+     text-align: left;
+     padding-left: 6px;
+}
+
+div.joblog th:last-child { /* kludge for broken table in /jobs .. requires additional trailing td per tr to fix */
+      width: 0;
+      height: 0;
+      padding: 0;
+}
+
+/* /jobs */
+
+h2#jobrunners {
+     margin-top: 0 !important;
+}
+
+.main#jobs h2 {
+     border-radius: 0;
+}
+
+#jobrunners ~ ol {
+     display: block;
+     margin-bottom: 5px !important;
+     margin-top: -11px !important;
+     border: 1px solid #443da0;
+     width: 97%;
+     width: calc(100% - 22px);
+     background: #010008;
+     padding: 0 20px 0 0;
+}
+
+#jobrunners ~ ol > li:last-child {
+     margin-bottom: 5px;
+}
+
+h3[id*="jobs"] {
+     clear: both;
+     margin-top: 25px !important;
+}
+
+table#schedjobs {
+     width: 100% !important;
+     margin: -6px 0 0 !important;
+}
+
+#jobstats {
      margin-bottom: 10px;
 }
 
-thead, tfoot, th {
-     background: #002 url("images/titles.png") repeat-x center center !important;
+#jobstats th, #jobstats td {
+     text-align: right;
+     padding-right: 8px !important;
 }
 
-table {
-     border-collapse: collapse;
-     border: 1px solid #99f;
-     margin: 15px 0 5px 0;
-     cell-padding: 1px;
-     font-size: 8pt;
+#schedjobs th:first-child, #schedjobs td:first-child, #jobstats th:first-child, #jobstats td:first-child  {
+     text-align: left;
+     padding-left: 10px;
+     font-weight: bold;
+     margin-bottom: 15px;
+}
+
+table#jobstats + hr {
+     display: none;
+}
+
+h3#totaljobstats {
+     margin-bottom: -2px;
+     margin-top: 10px !important;
+}
+
+h3#finishedjobs + ol li, h3#scheduledjobs + ol li, h3#activejobs + ol li, h3#readyjobs + ol li {
+    list-style: none !important;
+}
+
+h3#activejobs + ol li:before, h3#scheduledjobs + ol li:before, h3#readyjobs + ol li:before, h3#finishedjobs + ol li:before {
+     content: '\2023\00A0 ';
+     margin-left: -20px;
+     font-size: 15pt;
+     font-weight: bold;
+     line-height: 50%;
+     vertical-align: sub;
+     color: #393;
+}
+
+h3#finishedjobs + ol li:before {
+     color: #3D3;
+     content: '\2714\00A0';
+}
+
+h3#readyjobs + ol li:before {
+     color: #dd3;
+}
+
+h3#scheduledjobs + ol li:before {
+     color: #773;
+}
+
+/* end /jobs */
+
+
+/* /eventlogs */
+
+table#eventlog {
+     margin-top: -21px;
+     margin-bottom: 10px;
+}
+
+table#eventlog td {
+     padding: 3px 10px;
+     width: 30%;
+}
+
+table#eventlog td:last-child {
+     width: 40%;
+}
+
+
+form[action="events"] {
      background: #000;
-     width: 100%;
 }
 
-table hr {
-     padding: 0 0;
-     color: #000;
-     background: #000;
-     border: 0 solid #99f;
-     margin: 0 -5px;
-     height: 1px;
+.smallhead {
+     font-size: 8pt
 }
 
-table tt {
-     font-size: 8pt;
+.smallhead a:hover {
+     text-decoration: none;
 }
 
-th {
-     background-color: #000;
-     padding: 8px 2px;
+.smallhead a img:hover {
+     filter: drop-shadow(0 0 1px #652787);
+}
+
+.mediumtags {
+     font-size: 9pt;
+}
+
+.optbox {
+     min-width: 16px !important;
+     max-width: 16px !important;
+     width: 16px !important;
+     min-height: 16px;
+     max-height: 16px;
+     height: 16px;
+     opacity: 1.0;
+     border: 0;
+     margin: 2px 4px;
+     padding: 2px;
+     overflow: hidden;
+     position: relative;
+}
+
+.cells {
+     border: 1px inset #120f35;
+     /*border-left: 1px outset #141;*/
      text-align: center;
-     border-bottom: 1px solid #99f;
+}
+
+.tablefooter tr, .tablefooter td {
+     background: #000 url(images/header.png) repeat-x center center !important;
+     background: linear-gradient(to bottom, #010014, #010010 50%, #010010 100%) !important;
+     border-top: 1px solid #443da0;
+     border-bottom: 1px solid #443da0 !important;
+     line-height: 110%;
+     padding: 10px;
+}
+
+.formaction {
+     text-align: right;
+     margin-bottom: -5px;
+     padding: 7px 5px;
+}
+
+h3[id$="con"] { /* peers h3 + tables */
+     background: #652787;
+     margin-bottom: -2px;
+     border-radius: 0;
+     padding: 6px 10px;
+     font-size: 10pt;
+     word-spacing: 0.1em;
+     letter-spacing: 0.08em;
+     background: #000;
+     background: linear-gradient(to right, #000000, #010010 70%, #010013 90%);
+     border: 1px solid #443da0;
+}
+
+h3[id="udpcon"] {
+     width: auto;
+}
+
+table#udpconnections table {
+     overflow-x: auto !important;
+}
+
+table#udpconnections th {
+      padding: 5px 2px;
+}
+
+table#udpconnections table i {
+     font-weight: bold;
+     line-height: 150%;
+     letter-spacing: 0.1em;
+}
+
+table#udpconnections tr a img {
+      margin-top: 3px !important;
+}
+
+table#udpconnections tr:hover, table#ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #jardump tr:hover {
+     background: #020022;
+}
+
+table#udpconnections td > *, table#ntcpconnections td > * {
+     vertical-align: middle;
+}
+
+table#udpconnections td:first-child, table#udpconnections td:nth-child(2) {
+     width: 50px;
+     padding: 2px 4px;
+     white-space: nowrap;
+}
+
+table#udpconnections tr:hover td, table#ntcpconnections tr:hover td {
+     color: #c9ceff;
+}
+
+table#udpconnections tr.tablefooter td {
+     color: #c9ceff;
+}
+
+table#udpconnections tr.tablefooter:hover td {
+     border-top: 1px solid #443da0;
+}
+
+table#udpconnections tr.tablefooter td:first-child {
+     padding-left: 9px;
+}
+
+table#udpconnections td[class="cells"]:first-child, table#ntcpconnections td[class="cells"]:first-child {
+	  width: 50px;
+	  white-space: nowrap;
+	  text-align: right;
+}
+
+table#ntcpconnections td[class="cells"]:last-child {
+     font-weight: bold !important;
+     width: 100px;
+}
+
+table#ntcpconnections {
+     overflow-x: scroll !important;
+}
+
+pre#transports {
+     border: 1px solid #443da0;
+     padding: 15px 7px 5px 15px;
+     margin: 0 20px 0 0;
+     background: #000;     
+}
+
+a[name="chelp"]:hover, a[name="help"]:hover, a[name="chelp"]:active, a[name="help"]:active { /* hide /help anchorpoints */
+     color: #c9ceff !important;
+     text-decoration: none;
+     text-shadow: none;
+}
+
+.homelinkedit th:nth-child(3), .homelinkedit th:last-child {/* /confighome */
+     text-align: left !important;
+     text-transform: none !important;
+     padding-left: 5px;
+}
+
+.homelinkedit tr:last-child td:first-child {
+     text-align: right;
+}
+
+.homelinkedit input[type="text"] {
+     margin-left: 0;
+}
+
+.formaction#homesites {
+     margin-bottom: -2px !important;
+}
+
+.formaction#homeapps, .formaction#homesites, .formaction#tunnelconfigsave, .formaction#homesearch {
+     border: 1px solid #443da0;
+     background: #000;
+     margin-top: -2px;
+}
+
+.formaction#homesearch {
+     margin-bottom: -2px !important;
+}
+
+.formaction#themeui {
+     padding: 2px 0 12px !important;
+}
+
+#themesettings hr {
+     margin: 5px -7px;
+}
+
+tr#addnew {
+     border-top: 1px solid #443da0;
+}
+
+/* /configui lang selection boxes + theme selection */
+
+div.themechoice {
+     width: 120px;
+     height: 78px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     border: 1px solid #241f69;
+     float: left;
+     text-align: center;
+     padding: 0 4px;
+     margin: 4px;
+     border-radius: 2px;
+     background: linear-gradient(to bottom, #020020, #000);
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.themechoice:hover {
+     border: 1px solid #652787;
+     background: #000;
+}
+
+.themechoice:hover .themelabel {
+     border-top: 1px solid #652787 !important;
+     background: #000 !important;
+     color: #652787;
+}
+
+.themechoice:active .themelabel, .langselect:active .ui_lang {
+     border-top: 1px solid #652787 !important;
+     background: #652787 !important;
+     color: #c9ceff !important;
+     box-shadow: inset 0 0 0 1px #000 !important;
+}
+
+.themechoice:hover object {
+     filter: drop-shadow(0 0 2px #652787);
+} 
+
+.themechoice object, .themechoice img {
+     padding: 3px 3px 4px;
+}
+
+.themechoice object img {
+     padding: 3px 3px 0;
+     margin-bottom: 0;
+}
+
+.themechoice .optbox {
+     min-width: 114px !important;
+     min-height: 74px !important;
+     outline: 1px !important; /* placement guide */ 
+     opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
+     margin-left: -33px;
+     z-index: 999;
+     position: absolute;
+}
+
+.themechoice .optbox + img {
+     padding: 3px 0 !important;
+}
+
+.themechoice .optbox:hover + object ~ div.themelabel {
+     color: #652787;
+}
+
+.themechoice .optbox:checked + object ~ div.themelabel {
+     background: #040033 !important;
+     color: #c9ceff;
+     font-weight: bold;
+}
+
+.themechoice .optbox:focus + object ~ div.themelabel {
+     color: #652787;
+     box-shadow: inset 0 0 10px 3px #000; 
+}
+
+#themeoptions {
+     clear: both;
+     padding-top: 5px;
+}
+
+#themeoptions input {
+     margin-left: 5px;
+}
+
+.themelabel {
+     border-top: 1px solid #241f69 !important;
+     margin-left: -4px;
+     margin-right: -4px;
+     padding: 4px 2px;
+     background: #010010 url(images/titles.png) center center repeat-x;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     color: #7670c2;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+h3#themeheading, h3#langheading, h3#passwordheading {
+     border-radius: 0;
+     border: 1px solid #443da0;
+     padding: 6px 10px;
+     font-size: 10.5pt;
+     word-spacing: 0.1em;
+     letter-spacing: 0.08em;
+     margin-bottom: 0;
+     background: #000;
+     background: linear-gradient(to right, #000000, #010010 70%, #010013 90%);
+}
+
+div#themesettings {
+     clear: both;
+     border: 1px solid #443da0;
+     padding: 8px 7px 0;
+     margin: -1px 0;
+}
+
+td#themeselect {
+     clear: both;
+     border: 1px solid #443da0;
+     padding: 8px 7px 0;
+     margin: -1px 0;
+}
+
+#themeselect hr {
+     display: inline !important;
+}
+
+.langselect { /* containing box for lang selection */
+     width: 120px;
+     float: left;
+     margin: 4px;
+     text-align: center;
+     border: 1px solid #241f69;
+     padding: 8px 4px 0;
+     border-radius: 2px;
+     background: linear-gradient(to bottom, #020020, #000);
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.langselect .optbox {
+     opacity: 0;
+     outline: 1px dotted #652787;
+     margin-left: 0;
+}
+
+.langselect .optbox {
+     opacity: 0;
+     outline: 1px dotted !important;
+     min-height: 60px;
+     min-width: 111px !important;
+     margin: -5px 0 -30px -2px;
+     vertical-align: text-bottom;
+     text-align: center;
+     z-index: 999;
+}
+
+.langselect img {
+     border: 1px solid #241f69;
+     margin-bottom: 0;
+     margin-left: -65px;
+     margin-top: 7px !important;
+     position: absolute;
+}
+
+.langselect input[name="lang"]:checked + img {
+     width: 19px;
+     height: 13px;
+     border: 1px solid #652787;
+     margin-top: 6px !important;
+     margin-left: -67px;
+}
+
+.langselect input[name="lang"]:hover + img {
+     box-shadow: 0 0 1px 1px #652787;
+}
+
+.langselect input[name="lang"]:hover + img + div.ui_lang {
+     color: #652787;
+}
+
+.langselect input[name="lang"]:checked + img + div.ui_lang {
+     background: #040033 !important;
+     color: #c9ceff;
+     font-weight: bold;
+}
+
+.langselect input[name="lang"]:focus + img + div.ui_lang {
+     color: #652787 !important;
+     box-shadow: inset 0 0 10px 3px #000 !important;
+}
+
+.langselect input[name="lang"]:active + img + div.ui_lang {
+     color: #c9ceff !important;
+     box-shadow: inset 0 0 0 1px #000 !important;
+}
+
+.langselect:hover, .langselect:active {
+     border: 1px solid #652787;
+     background: #000;
+}
+
+.langselect:hover .ui_lang {
+     border-top: 1px solid #652787;
+     background: #000;
+     color: #652787;
+}
+
+/* end flag as radio icons */
+
+.ui_lang { /* lang text label */
+     text-align: center;
+     background: #010010;
+     padding: 3px 2px 4px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     width: 124px;
+     margin: 10px -4px 0 !important;
+     border-top: 1px solid #241f69;
+     border-radius: 0 0 2px 2px;
+     text-transform: capitalize;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);     
+     color: #7670c2;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+p#helptranslate {
+     clear: both;
+     padding: 6px 10px 10px;
+     text-align: right;
+}
+
+h3#themeheading {
+}
+
+h3#langheading {
+     margin-bottom: 0;
+}
+
+div#langsettings {
+     border: 1px solid #443da0;
+     padding: 8px 7px 12px;
+     margin-top: -1px;
+     margin-bottom: -12px;
+     background: #000;
+}
+
+#langsettings hr {
+     display: none;
+}
+
+.formaction#langui {
+     margin: -10px -8px -15px;
+     border: 1px solid #443da0;
+     background: #000;
+}
+
+/* console password layout */
+
+h3#passwordheading {
+     margin-top: 25px;
+     margin-bottom: -2px;
+}
+
+table#consolepass th:nth-child(2) {
+     text-align: left;
+}
+
+table#consolepass td:first-child {
+     width: 100px;
+     white-space:nowrap; 
+}
+
+table#consolepass th {
+     padding: 5px;
+}
+
+table#consolepass td {
+     padding: 2px 3px;
+}
+
+table#consolepass td {
+     border-bottom: 1px solid #443da0;
+     padding: 5px 10px;
+}
+
+table#consolepass input {
+     margin: 5px;
+}
+
+table#consolepass td#pw_adduser {
+     padding: 5px 10px;
+     background: #000;
+}
+
+td#pw_adduser input {
+     margin: 5px 20px 5px 5px !important;
+}
+
+table#consolepass input[name="name"] {
+     margin-right: 20px;
+}
+
+table#consolepass input[type="password"] {
+     width: 200px;
+}
+
+.formaction#consolepass {
+     margin-bottom: -2px !important;
+     margin-top: -2px;
+     border: 1px solid #443da0;
+     background: #000;
+}
+
+#consolepass input[name="name"], #externali2cp input[name="user"] {
+     background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat;
+     background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%);
+     padding: 4px 5px 4px 26px !important;
+     background-size: 16px 16px, 100% 100% !important;
+}
+
+#consolepass input[name="name"]:focus, #externali2cp input[name="user"]:focus {
+     background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat !important;
+}
+
+#consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
+     background: #000 url(/themes/console/images/buttons/password.png) 3px center no-repeat;
+     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%);
+     padding: 4px 5px 4px 22px !important;
+     background-size: 16px 16px, 100% 100% !important;
+}
+#consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus {
+     background: #000 url(/themes/console/images/buttons/password.png) 3px center no-repeat !important;
+}
+
+/* end /configui mods */
+
+form[action="/createreseed"] > h3 {
+     border-radius: 0;
+     border: 1px solid #443da0;
+     padding: 10px;
+     font-size: 10.5pt;
+     word-spacing: 0.1em;
+     letter-spacing: 0.08em;
+     background: linear-gradient(to right, #000000, #010010 70%, #010013 90%);
+     margin-bottom: -13px;
+}
+
+table#configclient {
+     margin-top: -11px !important;
+}
+
+/* configfamily */
+
+table#newfamily {
+     margin-bottom: 10px !important;
+}
+
+/* configreseed */
+
+table#reseedconfig input[type="text"], table#reseedconfig input[type="password"] {
+     width: 170px;
+}
+
+#reseednow {
+     margin-top: -16px !important;
+}
+
+.formaction#resetreseed {
+     margin: -4px -5px 0 0;
+}
+
+table#reseedconfig textarea {
+     width: 100%;
+     width: calc(100% - 5px);
+}
+
+/* /configservice */
+
+.formaction#shutdown, .formaction#restart, .formaction#systray, .formaction#runonstart, .formaction#dumpthreads, .formaction#browserstart {
+     border: 1px solid #443da0;
+     background: #000;
+     margin-top: -11px;
+     margin-bottom: 8px;
+}
+
+/* /configpeer */
+
+
+ul#banlist {
+     margin-top: -2px;
+}
+
+ul#banlist tt {
+     color: #c11f5d;
+}
+
+/* /confignet */
+
+h3#iptransport {
+     margin-bottom: 11px;
+}
+
+p#defaultswork {
+     margin-bottom: 11px !important;
+}
+
+p#upnpconfig, p#ipchange, p#ipv6config, p#tcpconfig, p#confignotes, p#defaultswork {
+     padding: 10px;
+     border: 1px solid #443da0;
+     margin-bottom: -13px;
+     margin-top: -12px;
+}
+
+p#defaultswork {
+     padding: 15px 10px 15px 45px !important;
+}
+
+p#confignotes {
+     margin-bottom: -21px;
+     padding: 15px 10px 15px 45px;
+     background: url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+}
+
+p#ipconfig, p#ipv4config, p#udpconfig, p#externaltcp {
+     border: 1px solid #443da0;
+     border-bottom: none;
+     padding: 10px;
+     background: #010010;
+}
+
+table#bandwidthconfig {
+     margin-bottom: 1px;
+}
+
+table#bandwidthconfig td:first-child {
+     width: 200px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+table#bandwidthconfig {
+     padding: 5px 10px !important;
+}
+
+table#bandwidthconfig input, table#bandwidthconfig select {
+     margin-right: 3px;
+}
+
+/* end /confignet */
+
+/* /events */
+
+div.eventspanel {
+     margin-top: -10px;
+}
+
+form[action="events"] {
+     border: 1px solid #443da0;
+     margin-top: -11px;
+     padding: 10px 20px 10px;
+     margin-bottom: 20px;
+}
+
+form[action="events"] > br {
+     display: none;
+}
+
+form[action="events"] > .formaction {
+     margin-bottom: -11px !important;
+     margin-right: -21px;
+     margin-left: -21px;
+}
+
+.eventspanel th {
+     text-align: left;
+     padding-left: 10px;
+     font-size: 10pt;
+     text-transform: uppercase;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+}
+
+.eventspanel table {
+     font-size: 9pt;
+}
+
+.eventspanel table tr:hover {
+     background: #020020;
+}
+
+.eventspanel table td {
+     padding: 5px 10px;
+} 
+
+table#addkeyring td:first-child {
+     width: 170px;
+     white-space: nowrap;
+     font-weight: bold;
+     padding-right: 0;
+}
+
+table#addkeyring tr:last-child {
+     border-top: 1px solid #443da0;
+     background: linear-gradient(to bottom, #010014, #010010 50%, #010010 100%);
+}
+
+table#addkeyring tr:last-child td {
+     padding-right: 6px;
+}
+
+#addkeyring textarea, #addkeyring input[type="text"] {
+     width: 95%;
+     width: calc(100% - 15px);
+}
+
+p#keyringhelp, p#webappconfig, p#availableplugins, p#pluginconfigtext, p#clientdefaultshelp, p#bwshare, p#editclients, p#upnpstatus, p#gatherstats {
+     background: #000 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+     border: 1px solid #443da0;
+     padding: 15px 15px 15px 45px !important;
+}
+
+p#keyringhelp, #config_reseed p.infohelp, #config_family p.infohelp, p#tunnelconfig {
+     margin-top: 0;
+}
+
+p#availableplugins {
+     margin: 12px 0 -1px;
+}
+
+p#upnpstatus {
+     margin-top: 10px;
+}
+
+p#webappconfigtext + p, p#pluginconfigtext {
+     margin-bottom: -1px;
+}
+
+#pluginconfig th:first-child, #pluginconfig td:first-child, #webappconfig th:first-child {
+     text-align: right;
+     width: 100px;
+     white-space: nowrap;
+}
+
+#pluginconfig td:nth-child(2) {
+     border-right: 1px inset #120f35 !important;
+}
+
+#pluginconfig td:last-child table {
+     padding: 5px;
+     margin: 5px 15px 5px 5px !important;
+     width: 99%;
+     width: calc(100% - 8px);
+}
+
+/* /advanced */
+
+.wideload > form > input[type="hidden"] + table  + p + hr + .formaction {
+     border-left: none;
+     border-right: none;
+}
+
+input[type="hidden"] + p {
+     border: 1px solid #443da0;
+     padding: 10px;
+     margin-bottom: -21px;
+     background: #000;
+}
+
+/*
+form[action="configclients"]:first-child > input[type="hidden"] + p {
+     border: 1px solid #443da0;
+     padding: 10px;
+     margin-top: -1px !important;
+     margin-bottom: -21px;
+     background: #000;
+}
+*/
+
+input[type="hidden"] + p + p {
+     border: 1px solid #443da0;
+     padding: 10px;
+     margin-top: 20px;
+     margin-bottom: -21px;
+     background: #010010;
+}
+
+/* /stats */
+
+form#statnav {
+     border: 1px solid #443da0 !important;
+     padding: 10px 10px 10px 15px;
+}
+
+h3.stats {
+     border: 1px solid #443da0;
+     border-radius: 0;
+}
+
+ul.statlist {
+     border: 1px solid #443da0;
+     margin-bottom: -21px !important;
+     margin-top: -11px !important;
+     padding: 10px 0 5px;
+     background: #000;
+}
+
+ul.statlist:last-of-type {
+     margin-bottom: -1px !important;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+ul.statlist {
+     margin-bottom: -25px !important;
+}
+
+ul.statlist:last-of-type {
+     margin-bottom: -6px !important;
+}
+}
+
+ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover {
+     color: #f3e8fc !important;
+     text-decoration: none;
+     letter-spacing: normal;
+}
+
+ul.statlist li::before {
+     content: "\1F6C8\00A0";
+     content: "\2B26\00A0";
+     font-size: 14pt;
+     line-height: 50%; 
+     vertical-align: baseline;
+     color: #f3e8fc;
+}
+
+ul.statlist li {
+     line-height: 120% !important;
+     list-style: none;
+     margin-bottom: -3px;
+}
+
+ul.statlist li li {
+     margin-left: 16px;
+     margin-right: -20px;
+     line-height: 120% !important;
+     list-style: none;
+}
+
+ul.statlist li li::before {
+     content: "\279F\00A0";
+     vertical-align: baseline;
+}
+
+ul.statlist li li:last-child::before {
+     content: "\27A1\00A0";
+}
+
+ul.statlist li li:last-child {
+     padding-bottom: 5px !important;
+}
+
+/*
+.statlist a[href*="graph"]::before {
+     content: "\1F4CA\00A0";
+     font-size: 11pt;
+     line-height: 140%;
+}
+*/
+
+.main#stats form {
+     border: 1px solid #443da0;
+     padding: 10px;
+     margin: -13px 0 -11px;
+}
+
+.statlist li ul {
+     margin-top: 10px;
+}
+
+li.noevents {
+     margin-top: 0 !important;
+     margin-bottom: 10px !important;
+}
+
+/* end stats */
+
+h3#exploratorytunnels {
+     margin-top: 15px;
+}
+
+h3.tabletitle + .statusnotes, table.tunneldisplay {
+     margin-top: -1px;
+}
+
+.statusnotes + .statusnotes {
+     margin-top: -6px;
+}
+
+.statusnotes:last-child {
+     margin-bottom: 10px;
+}
+
+form > table {
+     font-size: 9pt;
+}
+/* configtunnels */
+
+table#tunnelconfig td:first-child {
+     font-weight: bold;
+}
+
+.formaction#tunnelconfigsave {
+     margin-top: -32px !important;
+}
+
+/* end /configtunnels */
+
+/* /configupdate */
+
+table#i2pupdates {
+     margin-top: 11px;
+     margin-bottom: -3px !important;
+}
+
+table#i2pupdates td:first-child {
+     width: 100px;
+     white-space: nowrap;
+     padding-left: 10px;
+}
+
+table#i2pupdates input[name*="URL"], table#i2pupdates textarea {
+     width: 98%;
+     width: calc(100% - 10px);
+     resize: none;
+}
+
+table#i2pupdates tr:last-child td {
+     padding-right: 6px;
+     background: #000 !important;
+}
+
+/* /configlogging */
+
+input[name="logfilename"], input[name="logformat"], input[name="logdateformat"], input[name="logfilesize"], select[name="defaultloglevel"], select[name="newloglevel"] {
+     width: 125px;
+}
+
+table#loggingoptions {
+}
+
+table#loggingoptions td {
+     padding: 6px;
+}
+
+table#loggingoptions td:first-child {
+     width: 110px;
+     white-space: nowrap;
+     padding-right: 3px;
+}
+
+#loggingoptions td:nth-child(2) {
+     width: 170px;
+}
+
+#loggingoptions td:nth-child(4) {
+     width: auto;
+}
+
+#loggingoptions tr:nth-last-child(2) {
+     white-space: nowrap;
+}
+
+#loggingoptions tr:last-child td {
+     padding: 5px 4px 10px;
+}
+
+#loggingoptions input[type="text"], #loggingoptions select, #loggingoptions textarea {
+     min-width: 170px !important;
+     margin: 3px;
+}
+
+#loggingoptions textarea {
+     width: 99%;
+     width: calc(100% - 8px);
+}
+
+#loggingoptions select[name="newlogclass"] {
+     width: calc(100% - 185px);
+}
+
+/* configsidebar */
+
+#config_summarybar .configtable td:not(.optionsave) {
+     padding-left: 50px;
+     background: url(/themes/console/images/info/interval.png) 12px center no-repeat;
+     background-size: 28px 28px;
+}
+
+table#sidebarconf {
+     margin-top: -1px;
+}
+
+#sidebarconf tr:hover {
+     background: #020020;
+}
+
+#sidebarconf + .formaction {
+     margin-bottom: -3px !important;
+}
+
+#sidebarconf button {
+     margin: 2px;
+     padding: 4px 1px;
+     min-width: 0;
+     background: #000;
+     background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%);
+}
+
+#sidebarconf button:active {
+     background: #652787;
+}
+
+#sidebarconf button:hover img {
+     opacity: 1;
+}
+
+#sidebarconf button:active img {
+     mix-blend-mode: luminosity;
+}
+
+#sidebarconf button img {
+     opacity: 0.8;
+     height: 12px;
+     width: auto;
+}
+
+#sidebarconf th:nth-child(1), .homelinkedit th:first-child {
+     text-align: center;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     text-indent: -99999px;
+}
+
+#sidebarconf th:nth-child(2) {
+     text-align: left;     
+}
+
+#sidebarconf td:first-child {
+     width: 60px;
+}
+
+#sidebarconf td:nth-child(2) {
+     font-weight: bold;     
+}
+
+#sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
+     width: 60px;
+     padding: 0;
+     white-space:nowrap;  
+}
+
+#sidebarconf td:nth-child(3) {
+}
+
+#sidebarconf td:nth-child(4) {
+     text-align: left;
+}
+
+#sidebarconf tr:last-child td {
+     background: #000;
+     border-top: 1px solid #443da0;
+}
+
+#sidebarconf select {
+     margin-left: 0;
+     width: 100% !important;
+}
+
+#sidebarconf tr:last-child td:last-child {
+     text-align: left;
+     padding-left: 0;
+}
+
+.formaction#sidebardefaults {
+     margin-top: -2px !important;
+     margin-bottom: -2px !important;
+}
+
+/* end configsidebar */
+
+/* /configservice */
+
+h3#shutdownrouter, h3#restartrouter, h3#servicedebug, h3#browseronstart, h3#rononstartup, h3#systray {
+     margin-bottom: -6px;
+}
+
+
+/* info paragraphs */
+h3#shutdownrouter + p, h3#restartrouter + p, h3#servicedebug + p, h3#browseronstart + p, h3#runonstartup + p, h3#systray + p {
+     background: #010008 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+     padding: 10px 15px 10px 50px;
+     border: 1px solid #443da0;
+     border-bottom: none;
+     margin: 5px 0 -20px !important;
+}
+
+h3#servicedebug + p + p {
+     padding: 10px;
+     border: 1px solid #443da0;
+     border-bottom: none;
+     margin-bottom: -21px;
+     background: #010010;
+     margin-top: 20px;
+}
+/* configclients */
+
+table#clientconfig th:first-child {
+     text-align: right;
+     padding-right: 5px;
+}
+
+table#clientconfig th:last-child {
+     text-align: left;
+     padding-left: 5px;
+}
+
+.formaction#clientsconfig, .formaction#webappconfigactions, .formaction#pluginconfigactions, .formaction#sidebardefaults {
+     border: 1px solid #443da0;
+     background: #000;
+     margin-bottom: 4px;
+}
+
+.formaction#webappconfigactions, .formaction#pluginconfigactions, .formaction#clientsconfig {
+     margin-top: -2px;
+     margin-bottom: -2px;
+}
+
+table#externali2cp {
+     margin-bottom: -2px !important;
+}
+
+.infohelp#clientconf {
+     margin-bottom: -13px;
+}
+
+.infowarn#clientconf {
+     margin-bottom: -2px;
+}
+
+/* end /configclients */
+
+/* /help */
+
+.main#help h3 {
+    padding: 7px 10px;
+    font-size: 10pt;
+}
+
+div#volunteer {
+     border: 1px solid #443da0;
+     padding: 0 20px;
+     margin: 10px 0 !important;
+     background: #000 url(images/scarface.jpg) bottom right no-repeat !important;
+     background-size: auto 60% !important;
+}
+
+#legal, #sidebarhelp, #volunteer, #reachabilityhelp, #configurationhelp {
+     border: 1px solid #443da0;
+     padding: 0 20px;
+     margin: 10px 0;
+     background: #000;
+}
+
+#legal h2, #sidebarhelp h2, #volunteer h2, #reachabilityhelp h2, #configurationhelp h2 {
+     padding: 10px;
+     text-transform: uppercase;
+     font-size: 11pt;
+     text-align: left;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     border-radius: 0;
+     margin: -1px -21px 10px !important;
+     background: linear-gradient(to right, #000000, #010010 70%, #010013 90%);
+}
+
+#legal h2 + p {
+     padding-top: 10px;
+}
+
+#sidebarhelp h3 {
+     padding: 10px;
+     text-transform: uppercase;
+     font-size: 10.5pt;
+     text-align: left;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     border-radius: 0;
+     margin: 0 -21px 10px !important;
+     background: linear-gradient(to right, #000000, #010010 70%, #010013 90%);
+     border: 1px solid #443da0;
+}
+
+#changelog h2, #advancedsettings h2 {
+     padding: 10px;
+     text-transform: uppercase;
+     font-size: 11pt;
+     text-align: left;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     border-radius: 0;
+     margin: 0 0 -11px !important;
+}
+
+#changelog pre {
+     padding: 10px 10px 10px 20px;
+     max-height: 600px;
+     overflow-y: scroll;
+     width: calc(100% - 32px);
+     border-left: 1px solid #443da0;
+     border-right: 1px solid #443da0;
+     background: #000;
+}
+
+#advancedsettings h2 {
+     margin-bottom: -13px !important;
+}
+
+#advancedsettings p.infohelp {
+     margin-bottom: -2px !important;
+}
+
+#configinfo th {
+     text-align: left;
+     padding: 8px 10px;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     color: #393;
+     background: #002;
+     background: linear-gradient(to right, #000, #002);
+}
+
+#configinfo td {
+     text-align: justify;
+     padding: 7px 10px;
+}
+
+p#fullhistory {
+     text-align: right;
+     margin-top: -20px;
+     margin-bottom: 9px;
+     border: 1px solid #443da0;
+     border-top: none;
+     padding: 10px 10px 5px 10px;
+     background: #000;
+}
+
+ul#upnphelp li:last-child, #legal ul li:last-child {
+     padding-bottom: 0;
+}
+
+/* netdb (main section) */
+
+table#netdboverview {
+     margin-bottom: 10px;
+}
+
+#netdboverview td {
+     padding: 0;
+}
+
+#netdbversions, #netdbtransports, #netdbcountrylist {
+     border: 1px solid #120f35 !important;
+     margin-bottom: 0;
+}
+
+#netdbtransports {
+     border-left: 1px solid transparent !important;
+     border-right: 1px solid transparent !important;
+}
+
+#netdbtransports th, #netdbtransports td {
+     padding-left: 10px !important;
+     padding-right: 10px !important;
+}
+
+#netdbversions th, #netdbtransports th, #netdbcountrylist th {
+     border-top: none;
+     padding: 3px 5px;
+     line-height: 150%;
+}
+
+#netdbversions td, #netdbtransports td, #netdbcountrylist td {
+     padding: 5px;
+}
+
+table[cellspacing="30"] > tbody > tr > th[colspan="3"] { /* netdb header */
+     padding: 10px;
+     text-transform: uppercase;
+     font-size: 11pt;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+}
+
+table[cellspacing="30"] > tbody > tr > td {
+     padding: 8px;
+}
+
+table[cellspacing="30"] > tbody > tr > td > table > tbody > tr > th:first-child {
+     text-align: left;
+     padding: 5px;
+}
+
+table[cellspacing="30"] > tbody > tr > td:first-child > table > tbody > tr > th:first-child {
+     text-align: center;
+}
+
+/* /netdb - Sybil */
+
+th > img[src^="/imagegen"] { /* scale down header images */
+     height: 24px;
+     width: 24px;
+     border-radius: 2px;
+     border: 1px solid #000;
+}
+
+/* logs */
+
+a[name="criticallogs"] + p + h3 + p + ul { /* tidy router logs ul */
+     border: 1px solid #443da0;
+     margin-bottom: 15px;
+}
+
+table#enviro, table#criticallogs, table#routerlogs, table#eventlogs, table#wrapperlogs {
+     margin-top: -11px;
+}
+
+table#wrapperlogs {
+     width: 100%;
+     overflow-x: scroll;
+     table-layout: fixed;
+}
+
+table#bugreports {
+     margin-top: 10px;
+}
+
+table#bugreports td {
+     background: url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+     padding: 15px 10px 15px 50px;
+}
+
+table#enviro td {
+     font-weight: normal !important;
+     padding: 5px 10px;
+}
+
+table#enviro td:first-child {
+     width: 100px;
+     text-align: right;
+     padding-right: 0;
+}
+
+table#criticallogs td , table#routerlogs td, table#eventlogs td, table#wrapperlogs td {
+     font-weight: normal !important;
+     padding: 5px 10px;
+     border-top: 1px solid #443da0;
+}
+
+table#criticallogs td:empty {
+     display: none;
+}
+
+table[id$="logs"] tr:nth-child(odd){
+     background: #010011;
+}
+
+table[id$="logs"] tr:nth-child(even){
+     background: #000;
+}
+
+table[id$="logs"] ul {
+     margin: 5px 10px -5px -15px !important;
+}
+
+#wrapperlogs {
+     margin-bottom: 10px;
+}
+
+#wrapperlogs tr:last-child td {
+     padding: 0 0 0 5px;
+}
+
+#wrapperlogs pre {
+     margin-bottom: 0 !important;
+     white-space: pre-wrap !important;
+     word-wrap: break-word;
+     width: 100%;
+     height: 600px;
+}
+
+.logtable ul li:not(old) {
+     list-style: none !important;
+     margin-left: 15px;
+}
+
+.logtable ul li::before {
+     content: "\279C\00A0\00A0";
+     font-size: 12pt;
+     line-height: 50%;
+     vertical-align: baseline;
+     color: #3f5182;
+}
+
+/* /profiles */
+
+table#profiles tr:hover, table#floodfills tr:hover {
+     background: #040033;
+}
+
+table#profiles tr:hover td, table#floodfills tr:hover td {
+     color: #c9ceff;
+}
+
+table#profiles th, table#profiles td {
+     text-align: right;
+}
+
+table#profiles td {
+     color: #7670c2;
+}
+
+table#profiles td:nth-child(2), table#profiles th:nth-child(2) {
+     text-align: left;
+}
+
+table#profiles td:first-child, table#profiles th:first-child {
+     width: 52px;
+     text-align: right;
+}
+
+table#profiles td:first-child {
+     text-align: right !important;
+     padding-left: 4px;
+}
+
+table#profiles td:first-child, table#profiles th:first-child, table#profiles td:nth-last-child(2), table#profiles th:nth-last-child(2) {
+     white-space: nowrap;
+     text-align: center;
+}
+
+table#profiles td:last-child {
+     text-align: right;
+/*     padding-right: 10px;*/
+     width: 60px;
+     white-space: nowrap;
+}
+
+table#profiles td[colspan="7"] { /* profile class separator */
+     background: #050044;
+     padding: 1px;
+     border: 1px inset #000;
+}
+
+a[href^="configpeer?peer"] {
+     font-size: 0;
+     filter: drop-shadow(0 0 1px #777);
+     -webkit-filter: drop-shadow(0 0 1px #777);
+}
+
+a[href^="configpeer?peer"]::after {
+     content: url(/themes/console/images/buttons/edit.png);
+     vertical-align: bottom;
+     margin-left: 4px;
+}
+
+a[href^="configpeer?peer"]:hover {
+     filter: drop-shadow(0 0 1px #99f);
+     -webkit-filter: drop-shadow(0 0 1px #99f);
+}
+
+table#profile_defs, table#thresholds {
+     margin-top: -1px;
+     margin-bottom: 10px;
+}
+
+table#profile_defs td, table#thresholds td {
+     padding: 10px;
+}
+
+table#profile_defs ul {
+     margin-left: -30px;
+}
+
+table#profile_defs ul li:last-child {
+     margin-bottom: -10px;
+}
+
+#profile_defs li {
+     list-style: none !important;
+}
+
+#profile_defs li::first-letter {
+     text-transform: capitalize;
+}
+
+table#profile_defs + hr {
+     display: none;
+}
+
+.main#profiles .widescroll {
+     margin-top: -5px !important;
+}
+
+.main#profiles ul#banlist {
+     margin-top: 5px;
+}
+
+#profiles_overview {
+     margin-top: 10px;
+}
+
+table#floodfills {
+     margin: 5px 0 10px;
+}
+
+table#floodfills + hr {
+     display: none;
+}
+
+table#floodfills th, table#floodfills td  {
+     text-align: right !important;
+}
+
+table#floodfills th {
+     white-space: normal;
+     text-align: center !important;
+}
+
+table#floodfills td  {
+     color: #7670c2;
+     padding: 3px !important;
+}
+
+table#floodfills th:first-child, table#floodfills td:first-child  {
+     text-align: center !important;
+     width: 52px;
+     white-space: nowrap;
+     padding: 0 !important;
+}
+
+table#floodfills td:first-child {
+     text-align: right !important;
+     padding-left: 4px !important;
+     padding-right: 5px !important;
+}
+
+table#profiles td:first-child > *, table#floodfills td:first-child > *,
+table#udpconnections td:first-child > *, table#ntcpconnections td:first-child > * {
+     vertical-align: middle;
+}
+
+table#viewprofile {
+     margin-bottom: 8px;
+}
+
+table#viewprofile td {
+     padding: 10px 15px 0;
+}
+
+#viewprofile pre {
+     margin-bottom: 0;
+     white-space: pre-wrap;
+}
+
+ul#banlist {
+     border: 1px solid #443da0;
+     background: #000;
+     padding: 10px 10px 0 0;
+     margin-bottom: 10px;
+}
+
+ul#banlist li:last-child {
+     margin-bottom: 0;
+}
+
+ul#banlist + hr {
+     display: none;
+}
+
+a[href^="/profiles"] ~ table > tbody > tr > th {
+     text-align: right;
+}
+
+a[href^="/profiles"] ~ table > tbody > tr > th:nth-last-child(2) {
+     text-align: center;
+} 
+
+a[href^="/profiles"] ~ table > tbody > tr > th:nth-child(2) {
+     text-align: center;
+}
+
+a[href^="/profiles"] ~ table > tbody > tr > th:first-child {
+     text-align: center;
+} 
+
+table#jardump { /* /jars */
+     margin-top: -1px;
+     margin-bottom: 0;
      font-size: 8pt !important;
+     border: none;
+}
+
+.main#jardump {
+     padding: 0;
+}
+
+.main#jardump tt {
+     letter-spacing: -0.03em;
+}
+
+.main#certs {
+     padding-top: 3px;
+}
+
+.main#certs h3 {
+     margin-bottom: -16px !important;
+     border: 1px solid #443da0;
+     border-radius: 0;
+     padding: 7px 10px;
+}
+
+.main#certs h4 {
+     padding: 5px 10px;
+     margin: 15px 0 0;
+     border: 1px solid #443da0;
+     letter-spacing: 0.05em;
+     font-size: 10pt;
+     background: linear-gradient(to right, #000 0%, #002 100%);
+}
+
+.main#certs h3 + p {
+     margin-top: 15px;
+}
+
+.main#certs p {
+     margin-top: -1px;
+     padding: 10px;
+     border: 1px solid #443da0;
+     background: #000;
+}
+
+.main#certs p + p:empty + h4 {
+     margin-top: -13px !important;
+}
+
+.main#tunnels th {
+     padding: 5px 2px;
+}
+
+.main#proof textarea, .main#proof textarea:focus {
+     margin-top: 12px !important;
+     background: none;
+     border: 0;
+     color: #c9ceff !important;
+     filter: none;
+     resize: none;
+     box-shadow: none;
+     font-size: 9pt;
+     line-height: 180%;
+}
+
+.main#webmail {
+     padding: 0;
+     background: #000 !important;
+}
+
+.main#torrents, .main#tunnelmgr {
+     padding: 0;
+     background: url(images/scarface.jpg) right bottom no-repeat, linear-gradient(to bottom, #000, #001) !important;
+     background-size: auto 120px, 100% 2px !important;
+     background-blend-mode: screen;
+}
+
+.main#tunnelmgr {
+     padding: 0 5px;
+}
+
+#i2ptunnelframe {
+     margin: -5px 0 -10px;
+}
+
+.main#debug th {
+     text-align: left;
+     padding: 5px;
+}
+
+.main#debug li:last-child {
+     padding-bottom: 0;
+}
+
+.main#debug h2, .main#debug h3 {
+     border-radius: 0;
+}
+
+.main#debug h2 {
+     padding: 5px 10px;
+}
+
+.main#debug h2:first-child {
+     margin-top: 10px !important;
+}
+
+.main#debug h3 {
+     padding: 3px 8px;
+     font-size: 10pt;
+}
+
+.main#debug h2 + table {
+     margin-top: -13px;
+}
+
+div.footnote {
+     text-align: right;
+     color: #443da0;
+     font-size: 7pt;
+     margin-bottom: 5px !important;
+}
+
+div.footnote hr {
+     margin: 10px 0 5px 0 !important;
+     color: #443da0;
+     background: #443da0;
+     height: 1px;
+     border: 0 solid #443da0;
+}
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: -20px !important;
+     margin-bottom: -5px;
+     margin-right: 5px;
 }
 
 /* begin home page */
 
-/*
-#appsummary {
-     clear: none;
-     float: none;
-     left: 10px;
-     margin: 0;
-     position: absolute;
-     top: 10px;
+div.home {
+     margin: 0 -8px;
 }
-
-#homemain {
-     left: 217px;
-     margin: 0 10px 10px 0;
-     position: absolute;
-     text-align: center;
-     top: 10px;
-}
-
-#homenews {
-     margin: 0 10px 5px 0;
-}
-
-h2.app {
-     border-radius: 8px;
-     margin: 1px 10px 15px 0 !important;
-}
-*/
 
 h4.app, h4.app2 {
-     font-size: 11pt;
-     padding: 5px;
-     border: 1px solid #99f;
-     border-right: 1px solid #99f;
-     border-bottom: 1px solid #99f;
-     letter-spacing: 0.04em;
-     font-weight: bold !important;
-     text-transform: uppercase;
-     margin: 5px 10px 5px;
-     color: #fff;
-     background: #022;
-     background: url("images/tinytitles.png") repeat-x scroll center center #000022 !important;
-     border-radius: 3px;
+    background: url(images/header.png) center center repeat-x;
+    border: 1px solid #443da0;
+    font-size: 10.5pt;
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    margin: 11px -8px -9px -8px;
+    padding: 7px 8px 7px;
+    text-transform: uppercase;
+    text-align: left;
+    letter-spacing: 0.08em;
+    word-spacing: 0.1em;
 }
 
 h4.app2 {
      clear: left;
-     margin-top: 0 !important;
+     position: relative;
+     top: -4px;
+     margin-bottom: -13px;
 }
 
 div.ag2 {
-     margin: 5px -15px -10px;
+     margin: 0 5px 12px;
+     padding: 0;
 }
 
 div.app {
      float: left;
-     padding: 0;
-     min-width: 60px;
+     padding: 2px 0 4px;
+     min-width: 70px;
+     border: 1px solid #443da0;
+     background: #000;
+     background: linear-gradient(to bottom, #020020, #000);
+     border-radius: 2px;
+     margin: 2px 3px 5px;
      text-align: center !important;
-     border: 1px solid #55a;
-     border-top: 1px solid #77b;
-     border-left: 1px solid #77b;
-     margin: 3px;
-     border-radius: 3px;
-     background: -moz-linear-gradient(top, #001, #000);
+     opacity: 0.8;
+     box-shadow: inset 0 0 0 1px #000;
+     transition: border ease 0.3s 0s;
+}
+
+.app a:link, .app a:visited {
+     color: #443da0;
+     display: inline-block;
+     width: 100%;
 }
 
 div.app:hover {
-     border: 1px solid #f60;
+     opacity: 1;
+     border: 1px solid #652787;
      background: #000;
+     box-shadow: none;
+     color: #652787 !important;
+}
+
+div.app:hover img {
+     filter: drop-shadow(0 0 2px #652787) !important;
+}
+
+div.app:active .applabel {
+     background: #652787 !important;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+div.app:active .applabel a {
+     color: #c9ceff !important;
+}
+
+div.app a:link, div.app a:hover, div.app a:active {
+     outline: none;
+}
+
+div.app a:focus img {
+     filter: drop-shadow(0 0 3px #c96fff) !important;
+}
+
+div.app a:focus {
+     color: #652787;
+}
+
+div.app:hover a:link, div.app:hover a:visited {
+     color: #652787;
 }
 
 div.app:last-child {
-     margin-bottom: 10px;
+     margin-bottom: 12px;
 }
 
-div.app a:link, div.app a:link:hover, div.app a:link:visited, div.app a:link:active {
-     font-size: 8pt !important;
-     text-transform: lowercase;
-     text-decoration: none;
+h4.app + .appgroup div.app:last-child {
+     margin-bottom: 13px;
+}
+
+h4.app2 + .appgroup div.app:last-child {
+     margin-bottom: 12px;
 }
 
 div.appgroup {
      margin: 0;
-     padding: 0 8px;
+     padding: 16px 0;
      width: auto;
 }
 
@@ -853,21 +4155,64 @@ div.search {
 
 table.search {
      background: none;
-     margin-left:auto;
-     margin-right:auto;
-     padding: 8px;
+     width: 80%;
+     margin-left: auto;
+     margin-right: auto;
+     margin-top: -19px;
+}
+
+.search tr {
+     background: #000 url(images/header.png) center center repeat-x;
+     background: linear-gradient(to bottom, #000010 0%, #000019 50%, #000 51%, #000 100%) !important;
+}
+
+.search td {
+     padding: 4px;
+     text-align: center;
+}
+
+.search td:nth-child(2) {
+     width: 50px;
+     padding: 4px 0 4px 20px;
+}
+
+.search td:last-child {
+     text-align: left !important;
+     width: 50px;
+     padding-right: 10px;
+}
+
+input.search, input.search:hover {
+     background: #000 url(/themes/console/images/buttons/search.png) 4px center no-repeat;
+     background: url(/themes/console/images/buttons/search.png) 4px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%);
+     padding: 4px 3px 4px 24px;
+     vertical-align: middle;
+     width: 100%;
+}
+
+input.search:focus {
+     background: #000 url(/themes/console/images/buttons/search.png) 4px center no-repeat;
+}
+
+.search select {
+     width: 90%;
+}
+
+.appimg {
+     height: 35px;
+}
+
+img.app, img.app2p {
+     height: 32px;
      width: auto;
+     max-height: 32px;
+     max-width: 32px;
+     padding: 3px 21px 0;
+     margin-bottom: 1px;
 }
 
-img.app {
-     height: 32px;
-     width: 32px;
-     padding: 6px 15px 0;
-}
-
-img.app2p {
-     height: 32px;
-     padding: 6px;
+div.app:hover img.app {
+     filter: saturate(200%);
 }
 
 table.app {
@@ -887,546 +4232,944 @@ td.app {
      background: none;
      border: 0;
      margin: 0;
+     padding: 3px 0 0;
 }
 
-.applabel {
-     background: #001;
+div.applabel {
      font-size: 8pt;
-     margin: -5px -3px -3px;
-     padding: 2px 5px;
+     margin: 2px 0 0;
+     padding: 5px 2px 2px;
      text-align: center;
-     min-width: 60px;
-     border-top: 1px solid #000;
+     vertical-align: bottom;
+     line-height: 95%;
+     text-transform: lowercase;
+     border: none;
+     width: 120px; 
+     min-width: 72px;
+     background: #001 url(images/titles.png) center center;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
      border-radius: 0 0 2px 2px;
-     background: -moz-linear-gradient(top, #000, #001);
+     border-top: 1px solid #443da0;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis; /* ellipsize overlong app labels */
+     color: #443da0;
+     box-shadow: inset 0 0 0 1px #000;
 }
 
-.applabel:hover {
-     border-top: 1px solid #000;     
-}
-
-.applabel:hover {
+div.applabel:hover {
      background: #000;
+     border-top: 1px solid #652787;
+     color: #652787;
 }
 
-.appimg {}
+div.applabel a, div.applabel a:hover {
+     text-decoration: none !important;
+     outline: none;
+}
+
+div.app:hover .applabel {
+     border-top: 1px solid #652787 !important;
+     background: #000;
+     color: #652787;
+}
 
 /* end home page */
 
-tt {
-     font-size: 8pt;
+iframe.iframed {
+     margin: 15px 0 0;
 }
 
-tt, pre {
-     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+#i2psnarkframe, #susimailframe {
+     margin-top: -1px;
 }
 
-td {
-     padding: 4px;
+.main#dns {
+     padding: 0;
+     min-width: 650px;
+     background: #000 !important;
 }
 
-tr:nth-child(even) {
-     background-color: #001;
+#susidnsframe {
+     margin-top: -2px;
 }
 
-tr:nth-child(odd) {
-     background-color: #000009;
-}
-
-hr {
-     color: #99f;
-     background: #99f;
-     height: 1px;
-     border: 0 solid #99f;
-     margin: 3px 0;
-}
-
-.statusnotes {
-     font-style: italic;
-     font-size: 8pt;
-     color: #eef;
-     text-align: center;
-     margin: -5px 0 5px 0;
-     background: #000;
-     border: 1px solid #99f;
-     border-top: 0;
-     padding: 3px 0;
-}
-
-div.joblog {
-     margin: 10px 0;
-     line-height: 140% !important;
-}
-
-div.joblog li {
-     word-wrap: break-word !important;
-     text-align: left !important;
-     line-height: 130% !important;
-     margin-right: 10px;
-}
-
-div.joblog li i {
-     color: #bbb;
-     text-transform: capitalize;
-     font-style: normal;
-     font-weight: bold;
-}
-
-div.joblog ul {
-     word-wrap: break-word !important;
-     text-align: justify;
-}
-
-div.joblog li:first-child {
-     margin-top: 0;
-     padding: 10px 0;
-}
-
-div.joblog li:last-child {
-     margin-bottom: -10px;
-}
-
-div.joblog form:first-child {
-     margin-top: 10px;
-}
-
-div.joblog table {
-     margin-top: 15px;
-}
-
-div.joblog p {
-     line-height: 130%;
-}
-
-div.joblog h3 {
-     margin: 10px 0 20px 0;
-}
-
-div.joblog h3:first-child {
-     margin: 5px 0 15px 0;
-}
-
-div.joblog hr {
-     margin: 15px 0 15px;
-}
-
-div.joblog ol {
-     margin-bottom: 0;
-}
-/*
-button, button:visited {
-     font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px outset #66a;
-     padding: 1px 3px;
-     background: #ffe;
-     text-decoration: none;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     font-size: 8pt;
-     font-weight: bold;
-     margin: 2px;
-     text-align: center;
-     min-width: 60px;
-     -moz-box-shadow: inset 0 0 2px 1px #fff;
-     -khtml-box-shadow: inset 0 2px 8px 0 #fff;
-     box-shadow: inset 0 2px 8px 0 #fff;
-     color: #316;
-}
-
-button.accept {
-     background: #ffe url('../images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.add {
-     background: #ffe url('../images/add.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.cancel {
-     background: #ffe url('../images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.check {
-     background: #ffe url('../images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.delete {
-     background: #ffe url('../images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.download {
-     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.go {
-     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.reload {
-     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.search {
-     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button.stop {
-     background: #ffe url('../images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-button:hover {
-     border: 1px solid #f60;
-     background-color: #f60 !important;
-     color: #fff;
-     -moz-box-shadow: inset 0 0 0 1px #fff;
-     -khtml-box-shadow: inset 0 0 0 1px #fff;
-     box-shadow: inset 0 0 0 1px #fff;
-}
-
-button:active {
-     border: 1px solid #f60;
-     background: #202 !important;
-     color: #f60;
-     -moz-box-shadow: inset 0 0 0 1px #f60;
-     box-shadow: inset 0 0 0 1px #f60;
-     -khtml-box-shadow: inset 0 0 0 1px #f60;
-}
-*/
-input {
-     margin: 3px 5px 3px 0;
-     vertical-align: middle;
-}
-
-/*
-input.accept {
-     background: #ffe url('../images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.add {
-     background: #ffe url('../images/add.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.cancel {
-     background: #ffe url('../images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.check {
-     background: #ffe url('../images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.delete {
-     background: #ffe url('../images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.download {
-     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.go {
-     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.reload {
-     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input.search[type="text"] {
-     background: #001 url('../images/magnifier.png') no-repeat 2px center;
-     padding: 2px 3px 2px 24px;
-     min-height: 22px;
-}
-
-input.stop {
-     background: #ffe url('../images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px;
-     min-height: 22px;
-}
-
-input:hover {
-     background-color: #f60;
-     color: #fff;
-     border: 1px solid #f60;
-     opacity: 1.0;
-     -moz-box-shadow: inset 0 0 0 1px #fff;
-
-}
-
-input[type=text], input[type=password] {
-     margin: 3px 5px 3px 5px;
-     vertical-align: middle;
-}
-*/
-
-select {
-     margin: 3px 5px 3px 0;
-     vertical-align: middle;
-     min-width: 90px;
-}
-
-input {
-     border-radius: 3px;
-}
-
-input[type=text], input[type=password] {
-     background: #001;
-     color: #eef;
-     border: 1px solid #99f;
-}
-
-submit {
-     margin: 3px 5px 3px 5px;
-     padding: 2px 0;
-     font: 8pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-}
-
-p {
-     padding: 5px 20px 0 20px;
-     text-align: justify;
-}
-
-p img:first-child {
-     display: none !important;     
-}
-
-.formaction {
-     text-align: right;
-}
-
-.langbox {
-     margin: 5px 3px 0;
-     color: #eef;
-     font-size: 7pt;
-     width: auto;
-     text-align: right;
-     float: right;
-     vertical-align: middle;
-}
-
-.langbox img {
-     padding: 0 2px; /* Ignored by IE8 */
-     opacity: 0.7;
-}
-
-/* opera targetted hack */
-x:-o-prefocus, .langbox img {
-     margin-bottom: 4px;
-}
-
-.langbox img:hover {
-     opacity: 1;
-}
-
-.links {
-     padding-bottom: -2px;
-     text-align: justify;
-     margin-top: 5px !important;
-     margin-left: 5px !important;
-}
-
-.links li {
-     list-style-image: url("images/link.png") !important;
-     padding-right: 15px !important;
-}
-
-.links li:first-child {
-     padding-top: 10px !important;
-}
-
-.links li:last-child {
-     padding-bottom: 10px !important;
-     margin-bottom: 20px;
-}
-
-.links b {
-     line-height: 170%;
-     letter-spacing: 0.12em !important;
-}
-
-a:link {
-     color: #bbf;
-     text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
-}
-
-a:visited {
-     color: #99f;
-     text-decoration: none;
-     font-weight: bold;
-}
-
-a:hover {
-     color: #f60;
-     text-decoration: underline;
-     font-weight: bold;
-}
-
-a:active {
-     color: #f93;
-     text-decoration: underline;
-     font-weight: bold;
-}
-
-pre {
-     font-size: 9pt;
-     margin: 0 20px;
-}
-
-tt {
-     font-size: 9pt;
-     font-weight: bold;
-     color: darkgreen;
-}
-
-.tablefooter {
-     border: 1px solid #99f;
-}
-
-.tablefooter tr, .tablefooter td {
-     background: #000;
-     font-size: 8pt;
-     font-weight: bold;
-     line-height: 150%;
-     word-wrap: nowrap;
-     padding: 8px 1px;
-     border-top: 2px solid #99f;
-}
-
-.tidylist {
-     text-align: justify;
-     padding-right: 20px;
-     margin-right: 10px !important;
-}
-
-div.graphspanel {
-     padding: 10px 0 20px 0;
-     margin: -16px -16px -11px -16px;
-     background: #000012;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #99f;
-     text-align: center !important;
-}
-
-div.graphspanel img {
-     border: 1px solid #99f;
-     padding: 2px;
-     margin: 6px;
-     background: #00000A;
-     opacity: 0.9;
-}
-
-div.graphspanel img:hover {
-     border: 1px solid #f60;
-     padding: 2px;
-     margin: 6px;
-     text-align: center !important;
-     background: #002;
-     opacity: 1;
-}
-
-div.graphspanel hr {
-     margin: 10px 0;
-}
-
-div.graphspanel form:last-child {
-     text-align: left;
-     margin: 0 20px;
-}
-
-div.graphspanel h3 {
-     text-align: left;
-     margin: 10px 20px 10px 20px;
-}
-
-table code {
-     font-size: 8.5pt;
-}
-
-table li:last-child {
-     margin-bottom: 15px;
-}
-
-table ul {
-     font-size: 8.5pt;
-}
-
-
-code {
-     text-align: left;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     color: #0d0;
-/*     padding: 0 2px;*/
-}
-
-div.footnote {
-     text-align: right;
-     color: #99f;
-     font-size: 7pt;
-     margin-bottom: -5px;
-}
-
-div.footnote hr{
-     margin: 15px 0 3px 0 !important;
-     color: #99f;
-     background: #99f;
-     height: 1px;
-     border: 0 solid #99f;
-}
-
-.topness {
-     font-size: 8pt;
-     text-align: right;
-     margin-top: -5px;
-     margin-bottom: -10px;
-     margin-right: 5px;
-}
-
-/* Fixes for when app is not started and console loads inside iframe */
+/* Fixes for when app is not started and console error loads inside iframe */
 
 body.iframed {
-     background: transparent url('../dark/images/transparent.gif') !important;
+     background: transparent url(/themes/console/images/transparent.gif) !important;
 }
 
 .iframed div.routersummaryouter {
      display: none !important;
 }
 
+.iframed h1 {
+     margin: 0 5px 0 5px !important;
+}
+
+.iframed div.sorry {
+     margin: -1px 5px 10px 5px !important;
+}
+
 /* end iframed console fixes */
+
+/* Override error log colors */
+
+font[color="#006600"] { /* debug */
+     color: #ebdbff;
+}
+
+font[color="#ff00cc"] { /* warning */
+     color: #0028a0;
+}
+
+font[color="#ff3300"] { /* critical */
+     color: #002cbd;
+}
+
+font[color="#cc0000"] { /* error */
+     color: #0037eb;
+}
+
+font[color="#000099"] { /* info */
+     color: #001e80;
+}
+
+/* end log color overrides */
+
+/* global overrides */
+
+h3[id*="job"] {
+     border: 1px solid #443da0;
+     padding: 6px;
+     margin: 12px 0 10px 0;
+     border-radius: 0;
+     text-transform: uppercase;
+     text-shadow: 0 0 2px #010011;
+     letter-spacing: 0.08em;
+}
+
+/* netdb */
+
+table.netdbentry, table.leaseset {
+     width: 100% !important;
+     margin-bottom: 10px;
+}
+
+.netdbentry td, .leaseset td, table#leasesetdebug td, .sybil_routerinfo td {
+     color: #7670c2 !important;
+}
+
+.netdbentry td b, .leaseset td b, table#leasesetdebug td b, .sybil_routerinfo td b {
+     color: #c9ceff !important;
+} 
+
+span#distance {
+     color: #D6FFFD !important;
+}
+
+.netdbentry th {
+     font-weight: normal;
+     text-align: left;
+     padding: 4px 6px;
+}
+
+.netdbentry th code, .leaseset th code, .sybil_routerinfo th code {
+     font-size: 9pt;
+     margin-left: 5px;
+}
+
+.netdbentry th:last-child {
+     text-align: right;
+     padding: 5px;
+     white-space: nowrap;
+     width: 50px;
+}
+
+.netdbentry th:first-child  {
+     white-space: nowrap;
+}
+
+.netdbentry td:first-child  {
+     width: 80px;
+}
+
+.netdbentry td:nth-child(2) {
+     word-wrap: break-word;
+}
+
+.netdbentry img {
+     margin: 1px 0 0 0;
+}
+
+.netdbentry tr:last-child code {
+     color: #7670c2;
+}
+
+table#leasesetdebug, table#leasesetsummary {
+     margin-bottom: 10px; 
+}
+
+.leaseset th {
+     font-weight: normal;
+     padding: 5px;
+     text-align: left;
+}
+
+.leaseset th:last-child, .leaseset td:nth-child(2) {
+     text-align: right;
+     padding-right: 5px;
+}
+
+table#leasesetdebug th, table#leasesetsummary th {
+     font-weight: bold;
+     text-transform: uppercase;
+     font-size: 10pt;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     padding: 8px 10px;
+}
+
+table#leasesetdebug th a, table#leasesetsummary a {
+     font-size: 9pt;
+     text-transform: capitalize;
+     letter-spacing: normal;
+     word-spacing: normal;
+}
+
+#leasesetsummary td:first-child {
+     width: 100px;
+     white-space: nowrap;
+     padding-left: 10px;
+}
+
+table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
+     text-align:left;
+     white-space: nowrap;
+}
+
+table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+     text-align:right;
+     white-space: nowrap;
+}
+
+table#leasesetdebug td:nth-child(odd) {
+     width: 200px;
+     white-space: nowrap;
+     text-align: right;
+     border-right: 1px inset #120f35;
+}
+
+table#leasesetdebug td:nth-child(even) {
+     text-align: left;
+     white-space: nowrap;
+}
+
+table#leasesetdebug td:nth-child(2) {
+     width: 10px;
+}
+
+table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
+     font-size: 0;
+}
+
+table#leasesetdebug th a::after, table#leasesetsummary th a::after {
+     content: url(/themes/console/images/buttons/floodfill.png);
+     vertical-align: text-top;
+     padding-right: 0; 
+}
+
+.leaseset tr:nth-child(2) td:last-child a:not(old) {
+     font-size: 0;
+}
+
+.leaseset tr:nth-child(2) td:last-child a::after {
+     content: url(/themes/console/images/buttons/add_address.png);
+}
+
+a.viewfullentry:not(old) {
+     font-size: 0;
+}
+
+a.viewfullentry::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     vertical-align: text-top;
+}
+
+div#noleasesets {
+     background: #000 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px !important;
+     border: 1px solid #443da0;
+     margin-bottom: 10px;
+     text-align: left;
+}
+
+div#sybilnav, div#sybils_summary {
+     border: 1px solid #443da0;
+     padding: 10px;
+     margin-bottom: 10px;
+}
+
+div#sybilnav {
+     -moz-columns: 4 200px; 
+     -webkit-columns: 4 200px;
+     columns: 4 200px;
+     padding: 10px 10px 0 10px;
+}
+
+#sybilnav li {
+     break-inside: avoid;
+     page-break-before: right;
+     -webkit-column-break-inside: avoid;
+}
+
+#sybilnav ul li:last-child {
+     margin-bottom: -10px;
+}
+
+#sybilnav ul li {
+     list-style: none;
+     padding-left: 0;
+     margin-left: 0;
+     width: 50px;
+     white-space: nowrap;
+}
+
+#sybilnav ul li::before {
+     content: '\1F441\00A0\00A0';
+     content: url(/themes/console/images/buttons/show.png);
+     mix-blend-mode: luminosity;
+     vertical-align: middle;
+     margin-right: 5px;
+     font-size: 16pt;
+}
+
+table.sybil_routerinfo {
+     margin-bottom: 10px;
+}
+
+.sybil_routerinfo th {
+     padding: 1px 1px 1px 6px !important;
+}
+
+.sybil_routerinfo th:first-child {
+     text-align: left;
+}
+
+table.sybil_routerinfo:first-of-type th {
+     padding: 6px !important;
+}
+
+.sybil_routerinfo th:first-child {
+     white-space: nowrap;
+}
+
+.sybil_routerinfo th:nth-last-child(2) {
+     text-align: right !important;
+     padding-right: 0 !important;
+}
+
+.sybil_routerinfo th:last-child {
+     width: 20px;
+}
+
+.sybil_routerinfo td:first-child {
+     width: 50px;
+     white-space: nowrap;
+}
+
+p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
+     border: 1px solid #443da0;
+     padding: 5px 5px 5px 30px;
+     margin: 3px 0;
+     font-weight: bold;
+     background: url(/themes/console/images/buttons/show.png) 8px center no-repeat;
+     background: url(/themes/console/images/buttons/show.png) 8px center no-repeat, linear-gradient(to right, #000, #001 80%, #002 100%);
+     background-blend-mode: luminosity;
+     box-shadow: inset 0 0 0 1px #080077;
+}
+
+p.sybil_floodfill, p.hashdist, p.family {
+     margin-top: -1px;
+}
+
+p.sybil_floodfill + p.sybil_floodfill, p.family + p.family {
+     margin-top: -4px;
+}
+
+p.sybil_floodfill + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
+     margin-top: 10px !important;
+}
+
+.threatpoints + ul {
+     border: 1px solid #443da0;
+     padding: 5px 5px 0;
+     margin: -4px 0 10px;
+     background: #000;
+}
+.threatpoints + ul li:last-child {
+     margin-bottom: -5px;
+}
+
+/* end netdb */
+
+/* /confignet, /configadvanced */
+
+
+.configtable + .tabletitle {
+     margin-top: 12px;
+} 
+
+table.configtable {
+     margin-top: -1px;
+     margin-bottom: -2px !important;
+}
+
+table.configtable tr:last-child {
+     border-top: 1px solid #443da0;
+}
+
+table#netconfig th, table#externali2cp th, table#plugininstall th, .configtable th, th.th_title {
+    text-align: left;
+    padding: 5px 10px !important;
+    text-transform: uppercase;
+    font-size: 10pt;
+    letter-spacing: 0.08em;
+    word-spacing: 0.1em;
+}
+
+table.configtable td {
+     padding: 6px 10px;
+     background: #000;
+     line-height: 180%;
+}
+
+.configtable input, .configtable textarea, .configtable select {
+     margin-left: 5px;
+}
+
+#netconfig img[src*="itoo"] {
+     display: none;
+}
+
+.configtable td.tabletextarea {
+     padding: 0 !important;
+}
+
+textarea#advancedsettings {
+     margin: 0 !important;
+     width: 100%;
+     resize: none;
+     overflow-x: hidden;
+     white-space: pre-wrap;
+     border: 0 none transparent;
+     border-radius: 0;
+}
+
+.configtable td.infohelp, p.infohelp, td.infohelp, p#debugmode, p#sybilinfo, p.infowarn, td.infowarn {
+     background: #000 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px !important;
+     text-align: justify;
+     line-height: 130%;
+     border-bottom: 1px solid #443da0;
+     border-top: 1px solid #443da0;
+     white-space: normal !important;
+     font-weight: normal !important;
+}
+
+p.infowarn, td.infowarn, p.infohelp, td.infohelp {
+     line-height: 130% !important;
+     background-size: 28px 28px !important;
+}
+
+p.infowarn, td.infowarn {
+     background: #000 url(/themes/console/images/info/infowarn.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px !important;
+     border: 1px solid #443da0;
+}
+
+table.logtable, table#enviro {
+     margin-top: -1px !important;
+}
+
+p.infohelp, p#debugmode, p#sybilinfo {
+     border: 1px solid #443da0;
+}
+
+p#debugmode, p#sybilinfo {
+     margin-top: 0;
+}
+
+p#gatherstats {
+     margin-top: 1px; 
+}
+
+td.optionsave {
+     text-align: right;
+     border-top: 1px solid #443da0;
+     padding: 7px 5px !important;
+     white-space: nowrap;
+     width: 50px;
+     background: #000;
+}
+
+#floodfillconfig form, #plugininstall form, #updateplugins form, .configtable form {
+     margin-bottom: 0;
+}
+
+h3.h3table, h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils {
+     margin-bottom: 0 !important;
+     border-radius: 0;
+     border: 1px solid #443da0;
+     text-transform: uppercase;
+     letter-spacing: 0.08em;
+     padding: 7px 10px;
+}
+
+h3#pluginmanage {
+     margin-bottom: -13px !important;
+}
+
+h3.tabletitle a {
+     text-transform: lowercase;
+     letter-spacing: normal;
+}
+
+h3.sybils + div, h3.sybils + a[name] + table {
+     margin-top: -1px;
+}
+
+p.notfound {
+     border: 1px solid #443da0;
+     padding: 10px;
+}
+
+h3#transports {
+     margin-bottom: -1px !important;
+}
+
+h3#upnpstatus {
+     margin-bottom: 10px !important;
+}
+
+h3.ptitle {
+     margin-bottom: -6px !important;
+}
+
+h3#webappconfig {
+     margin-bottom: -13px !important;
+}
+
+p#webappconfigtext {
+     margin: 1px 0 -2px 0;
+     background: #000 url(/themes/console/images/info/java_edit.png) 12px center no-repeat !important;
+     background-size: 28px 28px !important;
+}
+
+table#pluginconfig, table#i2pupdates, table.homelinkedit, table#peerdefs {
+     margin-top: -1px;
+}
+
+#i2pupdates select {
+     min-width: 220px;
+}
+
+#i2pupdates .optbox {
+     margin-left: 8px;
+}
+
+h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile {
+     margin-bottom: -13px !important;
+}
+
+table#advconf {
+     margin-bottom: 9px !important;
+}
+
+p#javaclienthelp {
+     border: 1px solid #443da0;
+     background: url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
+     padding: 10px 10px 10px 50px !important;
+}
+
+div#clientsconfig {
+     margin-top: -2px;
+}
+
+table#externali2cp th {
+     text-align: left;
+}
+
+#tunnelconfig th {
+     padding: 6px 10px;
+}
+
+#tunnelconfig th img {
+     margin-bottom: -2px;
+}
+
+th.th_title {
+     padding: 7px 10px !important;
+     text-align: left;
+     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+input#hideme {
+     display: none;
+}
+
+#plugininstall input[type="text"] {
+     width: 50%;     
+     min-width: 400px;
+}
+
+#plugininstall input.cancel {
+     display: none;
+}
+
+#pluginupdater {
+     border: 1px solid #443da0;
+     margin-top: -11px;
+     margin-bottom: 10px !important;
+     background: #000;
+}
+
+#pluginupdater form {
+     margin-bottom: 0;
+}
+
+.formaction#tunnelconfigsave, .formaction#homeapps, .formaction#browserstart {
+     margin-bottom: -2px !important;
+}
+
+h4.embeddedtitle#updateplugins {
+     padding: 5px 10px;
+     font-size: 9pt;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     border: 1px solid #443da0;
+     text-align: left;
+     text-transform: uppercase;
+     font-size: 10pt;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     margin-top: -13px;
+} 
+
+#manualreseed input[type="text"] {
+     width: 50%;
+     width: calc(100% - 300px);
+}
+
+table#permabanned, table#loggingoptions, table#addkeyring {
+     margin-bottom: -3px !important;
+     margin-top: -1px;
+}
+
+table#permabanned {
+     margin-bottom: 9px !important;
+}
+
+#permabanned th, #banneduntilrestart th {
+     padding: 5px 10px !important;
+}
+
+table#configstats {
+     margin-bottom: -2px;
+}
+
+#configstats th {
+     padding: 8px 10px;
+     text-align: left;
+}
+
+#configstats th b {
+     text-transform: uppercase;
+     font-size: 10pt;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+}
+
+#configstats td:first-child {
+     width: 40px;
+     white-space: nowrap;
+}
+
+#configstats td {
+    color: #b2bcf7;
+}
+
+#configstats td b {
+    color: #c9ceff;
+}
+
+#configstats input.optbox {
+     margin: 0;
+     padding: 0;
+}
+#configstats tr.tablefooter td {
+     padding: 4px 10px;
+     line-height: 140%;
+     background: #000 !important;
+}
+p#enablefullstats {
+     margin-top: 5px;
+     padding: 5px 10px;
+     border: 1px solid #443da0;
+}
+
+#enablefullstats .optbox {
+     vertical-align: middle;
+}
+
+#peerdefs td:first-child {
+     width: 40px;
+     white-space: nowrap;
+     border: 1px inset #120f35;
+     text-align: right;
+}
+
+/* infohelp/warn overrides and misc ornamentation */
+
+table#bugreports td.infohelp {
+     background: url(/themes/console/images/info/bugreport.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+p#debugmode {
+     padding: 15px 15px 15px 50px;
+     background: url(/themes/console/images/info/debug.png) 12px center no-repeat !important;
+     background-size: 28px 28px !important;
+}
+
+p#sybilinfo {
+     padding: 15px 15px 15px 50px;
+     background: url(/themes/console/images/info/experimental.png) 12px center no-repeat !important;
+     background-size: 28px 28px !important;
+}
+
+#bandwidthconfig tr:first-child .infohelp {
+     background: url(/themes/console/images/info/bandwidth.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#addkeyring td.infohelp {
+     background: #000 url(/themes/console/images/info/keys.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#joinfamily tr:nth-child(3) td:first-child {
+     background: #000 url(/themes/console/images/info/key.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#newfamily tr:last-child td:first-child {
+     background: #000 url(/themes/console/images/info/label.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#oldhome td:first-child {
+     background: url(/themes/console/images/info/home.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#oldhome input[type="checkbox"], #enablefullstats input[type="checkbox"] {
+     vertical-align: sub;
+}
+
+#floodfillconfig .infohelp {
+     background: #000 url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+p#clientconf.infohelp, p#webappconfig.infohelp {
+     background: #000 url(/themes/console/images/info/java_edit.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+p#pluginconfigtext {
+     background: #000 url(/themes/console/images/info/plugin_edit.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#plugininstall .infohelp {
+     background: #000 url(/themes/console/images/info/plugin_link.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#manualreseed tr:nth-last-child(2) td.infohelp {
+     background: #000 url(/themes/console/images/info/box.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#config_peers tr:nth-child(3) td.infohelp {
+     background: #000 url(/themes/console/images/info/blocked.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+h3#shutdownrouter + p.infohelp {
+     background: #000 url(/themes/console/images/info/power.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+h3#restartrouter + p.infohelp {
+     background: #000 url(/themes/console/images/info/reboot.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+h3#systray + p.infohelp {
+     background: #000 url(/themes/console/images/info/systray.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+h3#servicedebug + p.infohelp {
+     background: #000 url(/themes/console/images/info/debug.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+h3#browseronstart + p.infohelp {
+     background: #000 url(/themes/console/images/info/launch_browser.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+.main#config_reseed p.infohelp {
+     background: #000 url(/themes/console/images/info/connect.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+p#enablefullstats, p#gatherstats {
+     background: #000 url(/themes/console/images/info/statistics.png) 12px center no-repeat !important;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px !important;
+}
+
+#config_family .infohelp {
+      background: #000 url(/themes/console/images/info/family.png) 12px center no-repeat !important;
+      padding: 15px 15px 15px 50px;
+      background-size: 28px 28px !important;
+}
+
+#consolepass tr:first-child td {
+     background: #000 url(/themes/console/images/info/user_add.png) 12px center no-repeat;
+     background-size: 28px 28px;
+     padding: 15px 15px 15px 50px;
+}
+
+form[action="events"] {
+     padding: 10px 10px 10px 50px;
+     background: url(/themes/console/images/info/logs.png) 12px center no-repeat;
+     background-size: 28px 28px;
+}
+
+#plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2) {
+     background: #000 url(/themes/console/images/info/url.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
+}
+
+#manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+     background: #000 url(/themes/console/images/info/from_file.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 1500px) {
+body, .main, .main td, .news p, #news p, .statusnotes, textarea, pre, tt, code {
+     font-size: 10pt !important;
+}
+
+h1 {
+     font-size: 19pt;
+     padding: 15px;
+}
+
+.main button, .main input, select {
+     font-size: 9pt !important;
+}
+
+button[class^="X"] {
+     font-size: 0 !important;
+}
+
+.main, .news, h1 {
+     margin-left: 232px !important;
+}
+
+.routersummary {
+     width: 200px !important;
+}
+
+.routersummary img[src$="i2plogo.png"] {
+     transform: scale(1.1);
+}
+
+.routersummary div[style="height: 36px;"] {
+     height: 40px !important;
+     margin-top: 3px;
+}
+
+.routersummary table[id^="sb_"], #sb_localtunnels {
+     width: 216px !important;
+}
+
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, .smallhead, .applabel a {
+     font-size: 9pt !important;
+}
+
+.routersummary h3 a {
+     font-size: 11pt !important;
+}
+
+.routersummary button {
+     min-width: 100px !important;
+}
+
+div.app {
+     min-width: 138px;
+}
+
+.applabel {
+     width: 134px !important;
+}
+
+.themelabel {
+     padding: 2px;
+}
+
+h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, #clientconf.infohelp, h3#pluginmanage, h3#webappconfig {
+     margin-bottom: -15px !important;
+}
+
+h4#updateplugins {
+     margin-top: -15px !important;
+}
+
+#profiles td:first-child, #profiles th:first-child, #floodfills td:first-child, #floodfills th:first-child {
+     width: 56px !important;
+}
+
+.sorry {
+     margin-left: 232px !important;
+}
+}

@@ -28,7 +28,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
-</div><div class="main" id="main">
+</div><div class="main" id="console">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <div class="welcome">
   <div class="langbox"> <% /* English, then alphabetical by English name please */ %>
