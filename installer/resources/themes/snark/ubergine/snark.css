@@ -773,8 +773,8 @@ table.SnarkTorrentInfo, table.snarkDirInfo {
      background: #270027;
 }
 
-table.SnarkDirInfo {
-     margin-top: -2px !important;
+table.snarkDirInfo {
+     margin-top: 10px !important;
 }
 
 .snarkDirInfo thead img {
