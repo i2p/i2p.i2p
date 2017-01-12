@@ -273,7 +273,7 @@ public class RouterConsoleRunner implements RouterApp {
     private void startTrayApp() {
         // if no permissions, don't even try
         // isLaunchedAsService() always returns true on Linux
-        if (SystemVersion.isLinuxService() ||
+        if (GraphicsEnvironment.isHeadless() || SystemVersion.isLinuxService() ||
             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService())) {
             // required true for jrobin to work
             System.setProperty("java.awt.headless", "true");
@@ -285,8 +285,7 @@ public class RouterConsoleRunner implements RouterApp {
             boolean desktopguiEnabled = Boolean.parseBoolean(sdtg) ||
                                         (sdtg == null && SystemVersion.isWindows());
             if (desktopguiEnabled) {
-                //Check if we are in a headless environment, set properties accordingly
-          	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
+                System.setProperty("java.awt.headless", "false");
                 net.i2p.desktopgui.Main dtg = new net.i2p.desktopgui.Main(_context, _mgr, null);    
                 dtg.startup();
             } else {
