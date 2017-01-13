@@ -68,5 +68,4 @@
  <jsp:getProperty name="profilesHelper" property="banlistSummary" />
  <h3 class="tabletitle"><%=intl._t("Banned IPs")%></h3>
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
-</div></div></div></body></html>
  </div></body></html>

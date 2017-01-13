@@ -60,7 +60,7 @@ or external programs connecting through SAM, BOB, or directly to I2CP.</p>
 <p>The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</p>
 <ul><li class="tidylist"><b>Exploratory:</b>
 Tunnels built by your router and used for communication with the floodfill peers,
-building new tunnels, and testing existing tunnels.</p></li>
+building new tunnels, and testing existing tunnels.</li>
 <li class="tidylist"><b>Client:</b>
 Tunnels built by your router for each client's use.</li>
 <li class="tidylist"><b>Participating:</b>

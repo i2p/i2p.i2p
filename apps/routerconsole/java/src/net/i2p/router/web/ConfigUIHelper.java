@@ -203,7 +203,7 @@ public class ConfigUIHelper extends HelperBase {
                    .append("</td></tr>\n");
             }
         }
-        buf.append("<tr><td id=\"pw_adduser\" align=\"left\" colspan=\"3\"><b>")
+        buf.append("<tr><td id=\"pw_adduser\" align=\"left\" colspan=\"3\">")
            .append("<b>").append(_t("Username")).append(":</b> ")
            .append("<input type=\"text\" name=\"name\">")
            .append("<b>").append(_t("Password")).append(":</b> ")

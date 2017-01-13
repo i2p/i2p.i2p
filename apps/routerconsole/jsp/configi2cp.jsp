@@ -36,7 +36,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%=intl._t("Any changes made here must also be configured in the external client.")%>
 <%=intl._t("Many clients do not support SSL or authorization.")%>
 <i><%=intl._t("All changes require restart to take effect.")%></i>
-</td</tr>
+</td></tr>
 <tr><th><%=intl._t("External I2CP (I2P Client Protocol) Interface Configuration")%></th></tr>
 <tr><td>
 <input type="radio" class="optbox" name="mode" value="1" <%=clientshelper.i2cpModeChecked(1) %> >
@@ -45,7 +45,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%=intl._t("Enabled with SSL required")%><br>
 <input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
 <%=intl._t("Disabled - Clients outside this Java process may not connect")%><br>
-</td</tr>
+</td></tr>
 <tr><td>
 <%=intl._t("I2CP Interface")%>:
 <select name="interface">

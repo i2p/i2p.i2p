@@ -56,7 +56,7 @@
  </table>
 </form>
 
-<h3 id="advancedconfig" class="tabletitle"><%=intl._t("Advanced I2P Configuration")%>&nbsp;<a title="Help with additional configuration settings" href="/help#advancedsettings">[Additional Options]</a></h3><b>
+<h3 id="advancedconfig" class="tabletitle"><%=intl._t("Advanced I2P Configuration")%>&nbsp;<a title="Help with additional configuration settings" href="/help#advancedsettings">[Additional Options]</a></h3>
 <% if (advancedhelper.isAdvanced()) { %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
@@ -65,7 +65,7 @@
 <table class="configtable" id="advconf">
 <% if (advancedhelper.isAdvanced()) { %>
  <tr><td class="infohelp">
-<%=intl._t("NOTE")%>:</b> <%=intl._t("Some changes may require a restart to take effect.")%>
+<b><%=intl._t("NOTE")%>:</b> <%=intl._t("Some changes may require a restart to take effect.")%>
  </td></tr>
 <% } else { %>
  <tr><td>
@@ -73,7 +73,7 @@
  </td></tr>
 <% }  // isAdvanced %>
  <tr><td class="tabletextarea">
- <textarea id="advancedsettings"rows="32" cols="60" name="nofilter_config" wrap="off" spellcheck="false" <% if (!advancedhelper.isAdvanced()) { %>readonly="readonly"<% } %>><jsp:getProperty name="advancedhelper" property="settings" /></textarea>
+ <textarea id="advancedsettings" rows="32" cols="60" name="nofilter_config" wrap="off" spellcheck="false" <% if (!advancedhelper.isAdvanced()) { %>readonly="readonly"<% } %>><jsp:getProperty name="advancedhelper" property="settings" /></textarea>
  </td></tr>
 <% if (advancedhelper.isAdvanced()) { %>
  <tr><td class="optionsave" align="right">
