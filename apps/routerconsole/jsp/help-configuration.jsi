@@ -1,6 +1,6 @@
 <h2><a name="confignet"><%=intl._t("Configuration Help")%></a></h2>
 <p>
-  <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>&nbsp;<a href="/confignet"><%=intl._t("Network Configuration")%></a>.
+  <%=intl._t("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>&nbsp;<a href="/confignet">[<%=intl._t("Network Configuration")%>]</a>.
 </p>
 <p>
   <%=intl._t("If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you.")%>&nbsp;
@@ -21,8 +21,8 @@
   <li class="tidylist"><%=intl._t("UPnP device change, reset, or address change")%></li>
 </ul>
 <p>
-  <a href="peers#upnp"><%=intl._t("Review the UPnP status here.")%></a>&nbsp;
-  <%=intl._t("UPnP may be enabled or disabled on the Network Configuration page, but a change requires a router restart to take effect.")%>
+  <%=intl._t("UPnP may be enabled or disabled on the Network Configuration page, but a change requires a router restart to take effect.")%>&nbsp;
+  <a href="peers#upnp">[<%=intl._t("Review the UPnP status here.")%>]</a>
 </p>
 <p>
   <%=intl._t("Hostnames entered on the Network Configuration page will be published in the network database.")%>&nbsp;
