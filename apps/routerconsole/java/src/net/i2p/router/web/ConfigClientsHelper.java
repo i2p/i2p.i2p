@@ -352,23 +352,23 @@ public class ConfigClientsHelper extends HelperBase {
         // The icons were way too much, so there's an X in each button class,
         // remove if you wnat to put them back
         if (showStartButton && (!ro) && !edit) {
-            buf.append("<button type=\"submit\" class=\"Xaccept\" name=\"action\" value=\"Start ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Start")).append("\" class=\"Xaccept\" name=\"action\" value=\"Start ").append(index).append("\" >")
                .append(_t("Start")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         if (showStopButton && (!edit))
-            buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Stop")).append("\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
                .append(_t("Stop")).append("<span class=hide> ").append(index).append("</span></button>");
         if (isClientChangeEnabled() && showEditButton && (!edit) && !ro)
-            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Edit")).append("\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
                .append(_t("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >")
-               .append(_t("Check for updates")).append("<span class=hide> ").append(index).append("</span></button>");
-            buf.append("<button type=\"submit\" class=\"Xdownload\" name=\"action\" value=\"Update ").append(index).append("\" >")
-                .append(_t("Update")).append("<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" title=\"").append(_t("Check for updates")).append("\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >")
+               .append("<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" title=\"").append(_t("Update")).append("\" class=\"Xdownload\" name=\"action\" value=\"Update ").append(index).append("\" >")
+                .append("<span class=hide> ").append(index).append("</span></button>");
         }
         if (showDeleteButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" class=\"Xdelete\" name=\"action\" value=\"Delete ").append(index)
+            buf.append("<button type=\"submit\" title=\"").append(_t("Delete")).append("\" class=\"Xdelete\" name=\"action\" value=\"Delete ").append(index)
                .append("\" onclick=\"if (!confirm('")
                .append(_t("Are you sure you want to delete {0}?", _t(escapedName)))
                .append("')) { return false; }\">")

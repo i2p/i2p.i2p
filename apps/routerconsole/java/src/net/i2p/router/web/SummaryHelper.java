@@ -842,7 +842,8 @@ public class SummaryHelper extends HelperBase {
                 String uri = getRequestURI();
                 buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
+                buf.append("<button type=\"submit\" title=\"").append(_t("Attempt to download router reference files (if automatic reseed has failed)"));
+                buf.append("\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
             }
         }
         // If a new reseed ain't running, and the last reseed had errors, show error message
