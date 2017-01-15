@@ -1125,8 +1125,16 @@ div.percentBarInner.percentBarComplete {
      font-weight: normal;
 }
 
-.snarkConfigTitle,
-label.toggleview {
+
+.snarkConfigTitle:hover, label.toggleview:hover {
+     background: linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+}
+
+.snarkConfigTitle:active, label.toggleview:active {
+     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #777;
+}
+
+.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 12pt;
      font-weight: bold;
      font-variant: small-caps !important;
@@ -1226,6 +1234,12 @@ hr.debug:nth-child(n+7) {
      margin: -10px 0 3px;
 }
 
+hr.debug:last-child {
+     height: 0;
+     margin-bottom: -5px;
+     margin-top: -15px;
+}
+
 a:link {
      font-weight: normal;
      text-decoration: none;
@@ -1311,6 +1325,7 @@ input[type="submit"], input[type="reset"] {
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px #ccc);
      -webkit-filter: drop-shadow(0 0 1px #ccc);
+     cursor: pointer !important;
 }
 
 input[type="submit"]:hover, input[type="reset"]:hover,
@@ -1332,6 +1347,10 @@ input[type="submit"]:active, input[type="reset"]:active {
      border: 1px solid #999;
      box-shadow: inset 0 0 0 1px #fff;
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #555;
+}
+
+input[type="text"], textarea {
+     cursor: text !important;
 }
 
 a.control {
@@ -1407,6 +1426,7 @@ input[name="nofilter_dataDir"] {
      padding: 5px;
      resize: none;
      cursor: text;
+     overflow: hidden;
 }
 
 thead img,
@@ -1454,6 +1474,7 @@ input[type="checkbox"], input[type="radio"] {
      vertical-align: middle;
      min-width: 16px;
      min-height: 16px;
+     background: none;
 }
 
 input.default {
@@ -1482,7 +1503,9 @@ select {
      color: #333;
      border: 1px solid #bbb;
      border-radius: 2px;
-     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     -moz-appearance: none;
+     -webkit-appearance: none;
      box-shadow: inset 0 0 0 1px #fff;
 }
 
@@ -1492,12 +1515,6 @@ select option {
      background: #fff;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-select {
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     -moz-appearance: none;
-}
-
 select:hover, select:active {
      background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
 }
@@ -1505,15 +1522,17 @@ select:hover, select:active {
 select:focus {
      background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
      box-shadow: 0 0 0 1px #89f;
-}
-}
-
-select:focus {
      color: #000;
 }
 
 select:nth-child(2) {
      margin-left: -18px;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+select {
+     padding: 4px;
+}
 }
 
 textarea {
@@ -1528,6 +1547,10 @@ textarea {
 
 textarea:focus {
      color: #22f !important;
+}
+
+textarea[name="i2cpOpts"] {
+     overflow: hidden;
 }
 
 img {
@@ -1647,6 +1670,10 @@ div.configsectionpanel td:first-child {
      min-width: 50px;
 }
 
+.trackerconfig th:first-child {
+     background: url(/themes/snark/ubergine/images/nuke.png) center right 8px no-repeat, linear-gradient(to bottom, #fff, #eef);
+}
+
 .trackerconfig th:last-child, .trackerconfig td:last-child {
      padding-left: 10px !important;
 }
@@ -1662,8 +1689,6 @@ div.configsectionpanel td:first-child {
 
 .snarkTorrentNoneLoaded td {
      color: #0c153d !important;
-     border-right: 1px solid #040;
-     border-left: 1px solid #040;
      background: #fff;
 }
 
@@ -1982,4 +2007,10 @@ body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_
 .snarkMessages li, .snarkTorrents tt {
      font-size: 9pt;
 }
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
 }

@@ -140,7 +140,7 @@ class DHTTracker {
      * Debug info, HTML formatted
      */
     public void renderStatusHTML(StringBuilder buf) {
-        buf.append("DHT tracker: ").append(_torrentCount).append(" torrents ")
+        buf.append("<b>DHT tracker:</b> ").append(_torrentCount).append(" torrents ")
            .append(_peerCount).append(" peers ")
            .append(DataHelper.formatDuration(_expireTime)).append(" expiration<br>");
     }

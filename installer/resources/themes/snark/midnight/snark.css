@@ -28,12 +28,12 @@ body.iframed {
 /* preload top navigation mouseovers */
 body.iframed {
      background: url(/themes/console/images/transparent.gif),
-     url(images/button_snark_hover.png) center 50px no-repeat,
-     url(images/button_snark_active.png) center 50px no-repeat,
-     url(images/button_tracker_hover.png) center 50px no-repeat,
-     url(images/button_tracker_active.png) center 50px no-repeat,
-     url(images/button_forum_hover.png) center 50px no-repeat,
-     url(images/button_forum_active.png) center 50px no-repeat, #000 !important;
+     url(images/button_snark_hover.png) center center no-repeat,
+     url(images/button_snark_active.png) center center no-repeat,
+     url(images/button_tracker_hover.png) center center no-repeat,
+     url(images/button_tracker_active.png) center center no-repeat,
+     url(images/button_forum_hover.png) center center no-repeat,
+     url(images/button_forum_active.png) center center no-repeat, #000 !important;
      background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
 }
 
@@ -1262,6 +1262,7 @@ a img:hover {
 input[type="checkbox"],
 .optbox,
 input[type="radio"] {
+     background: none;
      min-width: 16px !important;
      min-height: 16px !important;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
@@ -1338,6 +1339,7 @@ input[name="nofilter_dataDir"] {
      padding: 4px !important;
      cursor: text;
      resize: none;
+     overflow: hidden;
 }
 
 thead img,
@@ -1397,7 +1399,9 @@ select {
      border-bottom-color: #14144f;
      border-right-color: #14144f;
      border-radius: 2px;
-     background: #000 !important;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
+     -moz-appearance: none;
+     -webkit-appearance: none;
 }
 
 select:hover,
@@ -1411,10 +1415,8 @@ select:hover {
      box-shadow: inset 0 1px 1px 0 #c9ceff;
 }
 
-
 select option {
      font-size: 9.5pt;
-     /* dropdown menu reverts to normal font-weight */
      font-weight: normal;
 }
 
@@ -1422,16 +1424,8 @@ select option:hover, select option:checked {
      box-shadow: inset 20px 20px #652787;
 }
 
-/* target firefox and derivatives only */
-@-moz-document url-prefix() {
-select {
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-     -moz-appearance: none;
-}
-
 select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
-}
 }
 
 select:nth-child(2) {
@@ -1598,6 +1592,10 @@ img.thumb {
      min-width: 50px;
 }
 
+.trackerconfig th:first-child {
+     background: url(/themes/snark/ubergine/images/nuke.png) center right 8px no-repeat;
+}
+
 .trackerconfig th:last-child,
 .trackerconfig td:last-child {
      padding-left: 10px !important;
@@ -1616,8 +1614,7 @@ img.thumb {
 
 .snarkTorrentNoneLoaded td {
      color: #c9ceff !important;
-     border-right: 1px solid #050044;
-     border-left: 1px solid #050044;
+     padding: 10px;
      background: #001;
 }
 
@@ -1934,7 +1931,7 @@ label.toggleview,
 /* responsive layout */
 
 @media screen and (min-width: 1400px) {
-code, textarea, .snarkMessages li, input {
+code, textarea, .snarkMessages li, input, tt {
      font-size: 9pt !important;
 }
 
@@ -1944,6 +1941,10 @@ thead th, tfoot th, td, select, select option, .snarkAddInfo {
 
 .snarkRefresh {
      font-size: 10.5pt !important;
+}
+
+.snarkRefresh:link:first-child {
+     padding-left: 13px !important;
 }
 
 .snarkConfigTitle, .toggleview {
@@ -1961,5 +1962,9 @@ thead th, tfoot th, td, select, select option, .snarkAddInfo {
 
 select:nth-child(2) {
      margin-left: -14px !important;
+}
+
+.snarkTorrentDownloaded {
+     white-space: nowrap;
 }
 }

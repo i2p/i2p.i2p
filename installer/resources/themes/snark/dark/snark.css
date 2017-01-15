@@ -764,7 +764,11 @@ td:first-child {
      padding: 1px 1px 1px 1px !important;
      margin: 0 !important;
      text-align: center !important;
-     width: 60px; 
+     width: 40px !important;
+}
+
+_:-ms-lang(x), .snarkTorrentAction { /* MS Edge 14+ wrap fix */
+     width: 72px !important;
 }
 
 .snarkTorrentAction img {
@@ -775,11 +779,6 @@ td:first-child {
 .snarkTorrentAction img:hover {
      box-shadow: 0 0 1px 1px #f90;
      opacity: 1;
-}
-
-td.snarkTorrentAction {
-     min-width: 66px;
-     width: 66px;
 }
 
 .snarkTorrentNoneLoaded {
@@ -1318,6 +1317,7 @@ textarea[name="i2cpOpts"], input[name="nofilter_dataDir"] {
      padding: 3px;
      width: 500px;
      resize: none;
+     overflow: hidden;
 }
 
 thead img, thead img:hover {
@@ -1345,9 +1345,11 @@ input[type=radio] {
      padding: 2px;
      margin: 0 3px 0 8px;
      vertical-align: bottom;
+     background: none;
 }
 
 input[type="checkbox"], input[type="radio"], input[type="checkbox"]:disabled:hover, input[type="radio"]:disabled:hover {
+     background: none;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
 }
@@ -1373,7 +1375,10 @@ input[size="85"] {
 }
 
 select {
-     background: #000 !important;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
+     -moz-appearance: none;
+     -webkit-appearance: none;
      color: #494;
      font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
@@ -1405,21 +1410,18 @@ select:hover {
      box-shadow: inset 0 1px 1px 0 #ee9;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-
-select {
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
-     -moz-appearance: none;
-}
-
 select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
-}
 }
 
 select:nth-child(2) {
      margin-left: -18px;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+select {
+     padding: 4px;
+}
 }
 
 textarea {
@@ -1548,6 +1550,10 @@ table#trackerselect {
 
 .trackerconfig th {
      min-width: 50px;
+}
+
+.trackerconfig th:first-child {
+     background: url(/themes/snark/ubergine/images/nuke.png) center right 8px no-repeat, linear-gradient(to bottom, #010, #000);
 }
 
 .trackerconfig th:last-child, .trackerconfig td:last-child {
