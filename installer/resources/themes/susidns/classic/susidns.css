@@ -575,6 +575,7 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
 input[type="radio"], input[type="checkbox"] {
      min-width: 16px;
      min-height: 16px;
+     background: none;
 }
 
 form[action="subscriptions"], form[action="config"] {

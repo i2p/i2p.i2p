@@ -251,6 +251,7 @@ table#mailbox tr[class^="list"]:hover {
 
 input.optbox {
      opacity: 0.8;
+     background: none;
 }
 
 input.optbox:hover {

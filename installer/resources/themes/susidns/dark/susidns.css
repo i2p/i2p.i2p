@@ -495,6 +495,7 @@ input[type="checkbox"], input[type="radio"] {
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
      min-width: 16px;
      min-height: 16px;
+     background: none;
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {

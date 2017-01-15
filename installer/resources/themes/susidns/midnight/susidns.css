@@ -755,6 +755,7 @@ input {
 input[type="checkbox"], .optbox {
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
+     background: none;
 }
 
 input[type=submit]::-moz-focus-inner, input[type=reset]::-moz-focus-inner {
