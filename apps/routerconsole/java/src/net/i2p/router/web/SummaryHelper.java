@@ -832,7 +832,7 @@ public class SummaryHelper extends HelperBase {
         if (allowReseed()) {
             if (reseedInProgress) {
                 // While reseed occurring, show status message instead
-                buf.append("<i>").append(_context.netDb().reseedChecker().getStatus()).append("</i><br>");
+                buf.append("<div class=\"sb_notice\"><i>").append(_context.netDb().reseedChecker().getStatus()).append("</i></div>");
             } else {
                 // While no reseed occurring, show reseed link
                 long nonce = _context.random().nextLong();
@@ -849,7 +849,7 @@ public class SummaryHelper extends HelperBase {
         if (!reseedInProgress) {
             String reseedErrorMessage = _context.netDb().reseedChecker().getError();
             if (reseedErrorMessage.length() > 0) {
-                buf.append("<i>").append(reseedErrorMessage).append("</i><br>");
+                buf.append("<div class=\"sb_notice\"><i>").append(reseedErrorMessage).append("</i></div>");
             }
         }
         if (buf.length() <= 0)

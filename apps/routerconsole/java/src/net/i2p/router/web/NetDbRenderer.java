@@ -521,8 +521,9 @@ class NetDbRenderer {
             buf.append("<tr><th align=\"left\">" + _t("Country") + "</th><th>" + _t("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
-                buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append("\"");
-                buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> <a href=\"/netdb?c=").append(country).append("\">");
+                buf.append("<tr><td><a href=\"/netdb?c=").append(country).append("\">");
+                buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append("\"");
+                buf.append(" src=\"/flags.jsp?c=").append(country).append("\">");
                 buf.append(getTranslatedCountry(country));
                 buf.append("</a></td><td align=\"center\">").append(num).append("</td></tr>\n");
             }
@@ -616,9 +617,10 @@ class NetDbRenderer {
            .append("<td colspan=\"2\">");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
+            buf.append("<a href=\"/netdb?c=").append(country).append("\">");
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
             buf.append(" title=\"").append(getTranslatedCountry(country)).append('\"');
-            buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
+            buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ").append("</a>");
         }
         for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();

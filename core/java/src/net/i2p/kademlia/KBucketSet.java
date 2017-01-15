@@ -765,7 +765,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<b>Bucket set rooted on:</b> ").append(_us.toString())
+        buf.append("<hr><b>Bucket set rooted on:</b> ").append(_us.toString())
            .append(" K=").append(BUCKET_SIZE)
            .append(" B=").append(B_VALUE)
            .append(" with ").append(size())
@@ -775,7 +775,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
             int len = _buckets.size();
             for (int i = 0; i < len; i++) {
                 KBucket<T> b = _buckets.get(i);
-                buf.append("<b>* Bucket ").append(i).append("/").append(len).append(":</b> ");
+                buf.append("<b>Bucket ").append(i).append("/").append(len).append(":</b> ");
                 buf.append(b.toString()).append("<br>\n");
             }
         } finally { releaseReadLock(); }

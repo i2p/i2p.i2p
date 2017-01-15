@@ -191,6 +191,7 @@ input[type="checkbox"], .optbox {
      vertical-align: sub;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
+     background: none;
 }
 
 input[type="checkbox"]:hover, .optbox:hover, input[type="checkbox"]:focus, .optbox:focus {
@@ -845,6 +846,12 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background-blend-mode: normal;
 }
 
+.routersummary .download {
+     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background-size: 16px 16px, 100% 100% !important;
+     padding: 5px 3px 5px 17px !important;
+}
+
 .routersummary .reload, .routersummary .stop {
      text-indent: -99999px;
      background-size: 16px 16px, 100% 100% !important;
@@ -874,10 +881,49 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background-size: 16px 16px, 100% 100% !important;
 }
 
-.routersummary .download {
-     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 5px 3px 5px 17px !important;
+/* Show text on context specific buttons (eg deferred shutdown) */
+
+.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"] {
+     text-indent: 0;
+     text-align: left;
+     min-width: 0 !important;
+     padding-left: 21px !important;
+}
+
+.routersummary .reload[value="restartImmediate"] {
+     background: url(/themes/console/images/buttons/restart.png) center left 4px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+}
+
+.routersummary .reload[value="restartImmediate"]:hover {
+     background: #000 url(/themes/console/images/buttons/restart.png) center left 4px no-repeat !important;
+}
+
+.routersummary .reload[value="restartImmediate"]:focus, .routersummary .reload[value="restartImmediate"]:active {
+     background: url(/themes/console/images/buttons/restart_hover.png) center left 4px no-repeat;
+}
+
+.routersummary .stop[value="shutdownImmediate"] {
+     background: url(/themes/console/images/buttons/shutdown.png) center left 4px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+}
+
+.routersummary .stop[value="shutdownImmediate"]:hover {
+     background: #000 url(/themes/console/images/buttons/shutdown_hover.png) center left 4px no-repeat !important;
+}
+
+.routersummary .stop[value="shutdownImmediate"]:focus, .routersummary .stop[value="shutdownImmediate"]:active {
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 4px no-repeat;
+}
+
+.routersummary .reload[value="Reseed"] {
+     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+}
+
+.routersummary .reload[value="Reseed"]:hover {
+     background: #000 url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important;
+}
+
+.routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
+     background: #652787 url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -1165,7 +1211,21 @@ div.logo hr {
      line-height: 140%;
 }
 
+.sb_notice {
+     background: #001;
+     border: 1px solid #241f69;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #000;
+     margin: 10px -4px -2px;
+     padding: 5px 3px;
+}
+
+hr + .sb_notice {
+     margin-top: 6px;
+}
+
 /* sidebar stacked tables fix */
+
 #sb_localid + #sb_version {
      margin-top: 6px !important;
      margin-bottom: 5px !important;
@@ -2028,7 +2088,10 @@ h2 a:visited {
 
 h2 a:hover {
      color: #652787;
-     text-shadow: 0 0 1px #652787;
+}
+
+h2 a[name]:hover, h2 a[name]:active {
+     color: #c9ceff !important;
 }
 
 h3, h3.welcome, div.news h3 {
@@ -2067,11 +2130,11 @@ h2, h3, h4, .confignav {
 }
 
 .langbox {
-     margin: 3px 4px 2px 5px;
+     margin: 5px 4px 2px 5px;
      padding: 0;
      color: #c9ceff;
      font-size: 7pt;
-     width: 350px;
+     width: 360px;
      text-align: right;
      float: right;
      vertical-align: middle;
@@ -2079,7 +2142,8 @@ h2, h3, h4, .confignav {
 
 .langbox img {
      opacity: 0.5;
-     padding: 1px 2px !important;
+     margin: 0 !important;
+     padding: 0;
 }
 
 .langbox img:hover {
@@ -3510,6 +3574,7 @@ div#volunteer {
 }
 
 #changelog pre {
+     margin-top: 11px;
      padding: 10px 10px 10px 20px;
      max-height: 600px;
      overflow-y: scroll;
@@ -3570,6 +3635,11 @@ table#netdboverview {
      margin-bottom: 0;
 }
 
+#netdbcountrylist img {
+     margin-right: 5px;
+     text-align: right;
+}
+
 #netdbtransports {
      border-left: 1px solid transparent !important;
      border-right: 1px solid transparent !important;
@@ -3619,6 +3689,75 @@ th > img[src^="/imagegen"] { /* scale down header images */
      border-radius: 2px;
      border: 1px solid #000;
 }
+
+/* Advanced lookup */
+
+#netdblookup {
+     margin-bottom: -4px;
+}
+
+#netdblookup th {
+     text-align: left;
+     font-size: 11pt;
+     letter-spacing: 0.08em;
+     padding: 10px;
+     text-transform: uppercase;
+}
+
+#netdblookup td:first-child {
+     text-align: right;
+     width: 100px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+#netdblookup td:nth-child(2) {
+     width: 100px;
+     padding-left: 0;
+}
+
+.subheading {
+     text-align: left !important;
+     background: #000;
+     padding: 10px;
+     border: 1px solid #443da0;
+}
+
+.subheading b {
+     font-size: 10pt !important;
+}
+
+#netdblookup .optbox {
+     margin: 10px ;
+}
+
+#netdblookup .optionsave {
+     padding: 10px !important;
+}
+
+#netdb .tabletitle {
+     margin-bottom: -2px !important;
+}
+
+.sybil_distance th {
+     text-align: left;
+     padding: 5px;
+}
+
+.sybil_distance th:last-child, .sybil_distance td:last-child {
+     text-align: right;
+}
+
+.sybil_distance tr:nth-child(n+2):hover {
+     background: #002;
+     font-weight: bold;
+}
+
+.sybil_distance:last-child {
+     margin-bottom: 9px;
+}
+
+/* end netdb */
 
 /* logs */
 
@@ -4016,6 +4155,10 @@ table#jardump { /* /jars */
      margin-top: -13px;
 }
 
+.main#debug h2 + hr {
+     display: none;
+}
+
 div.footnote {
      text-align: right;
      color: #443da0;
@@ -4046,17 +4189,17 @@ div.home {
 }
 
 h4.app, h4.app2 {
-    background: url(images/header.png) center center repeat-x;
-    border: 1px solid #443da0;
-    font-size: 10.5pt;
-    font-variant: small-caps;
-    letter-spacing: 2px;
-    margin: 11px -8px -9px -8px;
-    padding: 7px 8px 7px;
-    text-transform: uppercase;
-    text-align: left;
-    letter-spacing: 0.08em;
-    word-spacing: 0.1em;
+     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     border: 1px solid #443da0;
+     font-size: 10.5pt;
+     font-variant: small-caps;
+     letter-spacing: 2px;
+     margin: 11px -8px -9px -8px;
+     padding: 7px 8px 7px;
+     text-transform: uppercase;
+     text-align: left;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
 }
 
 h4.app2 {
@@ -4073,7 +4216,7 @@ div.ag2 {
 
 div.app {
      float: left;
-     padding: 2px 0 4px;
+     padding: 2px 0 0;
      min-width: 70px;
      border: 1px solid #443da0;
      background: #000;
@@ -4238,7 +4381,7 @@ td.app {
 div.applabel {
      font-size: 8pt;
      margin: 2px 0 0;
-     padding: 5px 2px 2px;
+     padding: 5px 2px 6px;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
@@ -4579,7 +4722,7 @@ table.sybil_routerinfo:first-of-type th {
      white-space: nowrap;
 }
 
-p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
+p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
      border: 1px solid #443da0;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
@@ -4590,15 +4733,15 @@ p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
      box-shadow: inset 0 0 0 1px #080077;
 }
 
-p.sybil_floodfill, p.hashdist, p.family {
+p.sybil_info, p.hashdist, p.family {
      margin-top: -1px;
 }
 
-p.sybil_floodfill + p.sybil_floodfill, p.family + p.family {
+p.sybil_info + p.sybil_info, p.family + p.family {
      margin-top: -4px;
 }
 
-p.sybil_floodfill + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
+p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
      margin-top: 10px !important;
 }
 
@@ -5171,5 +5314,9 @@ h4#updateplugins {
 
 .sorry {
      margin-left: 232px !important;
+}
+
+.subheading b {
+     font-size: 10.5pt !important;
 }
 }

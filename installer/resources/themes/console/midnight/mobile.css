@@ -23,6 +23,16 @@ div.routersummary {
      margin: 0 auto;
 }
 
+@media screen and (min-width: 1500px) {
+div.routersummary {
+     width: 600px !important;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 600px !important;
+}
+}
+
 div[style^='height'] + a {
      display: inline-block;
      padding-top: 8px !important;
@@ -110,4 +120,22 @@ div.news {
 div.main {
      min-width: 580px;
      margin: -1px 0 !important;
+}
+
+.sorry {
+     margin: -1px 0 0;
+}
+
+@media screen and (min-width: 1500px) {
+div.news {
+     margin: -1px 0 0 !important;
+}
+
+div.main {
+     margin: -1px 0 !important;
+}
+
+.sorry {
+     margin: -1px 0 0 !important;
+}
 }

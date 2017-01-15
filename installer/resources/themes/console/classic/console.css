@@ -251,7 +251,7 @@ div.routersummary input[type=text] {
 .routersummary button[type="submit"] {
      min-width: 87px;
      margin: 2px 2px 1px;
-     padding: 5px 2px !important;
+/*     padding: 5px 2px !important;*/
 }
 
 #xhr {
@@ -378,6 +378,15 @@ div.routersummary td {
 #sb_internals a, #sb_services a, #sb_advanced a {
      display: inline-block;
      padding: 2px 2px 1px;
+}
+
+.sb_notice {
+     background: #fff;
+     border: 1px solid #89f;
+     border-radius: 2px;
+     box-shadow: 0 0 1px #bbb;
+     margin: 7px 5px -2px;
+     padding: 5px 3px;
 }
 
 div.routersummary form {
@@ -546,6 +555,7 @@ input[type="radio"], input[type="checkbox"] {
      min-width: 16px !important;
      min-height: 16px !important;
      vertical-align: middle;
+     background: none;
 }
 
 input[type="file"] {
@@ -1035,22 +1045,56 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 .routersummary .download {
      background: url(/themes/console/images/buttons/download.png) 3px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      background-size: 16px 16px, 100% 100% !important;
-     padding: 5px 3px 5px 17px !important;
+     padding: 5px 3px 5px 21px !important;
 /*     margin-top: -4px;*/
 }
 
+/* Show text on context specific buttons (eg deferred shutdown) */
+
+.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"] {
+     text-indent: 0;
+     text-align: left;
+     min-width: 0 !important;
+     padding-left: 21px !important;
+}
+
+.routersummary .reload[value="restartImmediate"] {
+     background: url(/themes/console/images/buttons/restart.png) center left 4px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+}
+
+.routersummary .reload[value="restartImmediate"]:hover, .routersummary .reload[value="restartImmediate"]:focus, .routersummary .reload[value="restartImmediate"]:active {
+     background: url(/themes/console/images/buttons/restart_hover.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+}
+
+.routersummary .stop[value="shutdownImmediate"] {
+     background: url(/themes/console/images/buttons/shutdown.png) center left 4px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+}
+
+.routersummary .stop[value="shutdownImmediate"]:hover, .routersummary .stop[value="shutdownImmediate"]:focus, .routersummary .stop[value="shutdownImmediate"]:active {
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+}
+
+.routersummary .reload[value="Reseed"] {
+     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+}
+
+.routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
+     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+}
+
+.routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
+     background: url(/themes/console/images/buttons/download.png) 4px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background-size: 16px 16px, 100% 100% !important;
+     padding: 5px 3px 5px 21px !important;
+}
+
+/*
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 .routersummary .download, .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
      padding-left: 19px !important;
 }
 }
-
-.routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
-     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 5px 3px 5px 17px !important;     
-     border: 1px solid #f60;
-}
+*/
 
 /* end sidebar buttons */
 /* end buttons & inputs */
@@ -1193,7 +1237,7 @@ div.news {
      border-right: 1px solid #89f;
      text-align: right;
      color: #331e0c;
-     min-width: 500px;
+     min-width: 520px;
      padding: 3px 10px 3px 10px;
      font-size: 8pt;
 }
@@ -2701,10 +2745,10 @@ p#enablefullstats {
 }
 
 .langbox {
-     margin: 5px 5px 0 5px;
+     margin: 4px 4px 0;
      color: #001;
      font-size: 7pt;
-     width: 312px;
+     width: 360px;
      text-align: right;
      float: right;
      padding: 1px;
@@ -3664,7 +3708,7 @@ div#sybilnav {
      vertical-align: middle;
 }
 
-p.sybil_floodfill, p.family, p.threatpoints, p.hashdist {
+p.sybil_info, p.family, p.threatpoints, p.hashdist {
      border: 1px solid #89f;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
@@ -3674,11 +3718,11 @@ p.sybil_floodfill, p.family, p.threatpoints, p.hashdist {
      background: url(images/eye.png) 8px center no-repeat, linear-gradient(to right, #fff 0%, #dde1ff 70%);
 }
 
-p.family + p.family, p.sybil_floodfill + p.sybil_floodfill {
+p.family + p.family, p.sybil_info + p.sybil_info {
      margin-top: -4px;
 }
 
-p.sybil_floodfill + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
+p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
      margin-top: 10px !important;
 }
 
@@ -3710,6 +3754,40 @@ p.notfound, p#sybil_totals {
 
 p:empty { /* empty paragraph nuke */
      display: none;
+}
+
+/* Advanced lookup */
+
+#netdblookup {
+     margin-bottom: -8px;
+}
+
+#netdblookup th {
+     font-size: 11pt;
+     text-align: left;
+     padding: 10px;
+}
+
+#netdblookup td:first-child {
+     text-align: right;
+     width: 100px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+#netdblookup td:nth-child(2) {
+     width: 100px;
+}
+
+.subheading {
+     text-align: left !important;
+     background: #fff;
+     padding: 10px;
+     border: 1px solid #89f;
+}
+
+.subheading b {
+     font-size: 10pt !important;
 }
 
 /* end netdb */
@@ -3877,6 +3955,25 @@ table#netdboverview {
 
 #netdbversions td, #netdbtransports td, #netdbcountrylist td {
      padding: 5px;
+}
+
+#netdbcountrylist img {
+     margin-right: 5px;
+     text-align: right;
+}
+
+.sybil_distance th {
+     text-align: left;
+     padding: 5px;
+}
+
+.sybil_distance th:last-child, .sybil_distance td:last-child {
+     text-align: right;
+}
+
+.sybil_distance tr:nth-child(n+2):hover {
+     background: #ffe;
+     font-weight: bold;
 }
 
 /* /help */
@@ -4288,7 +4385,7 @@ div.news {
 }
 
 .routersummary button[value="cancelShutdown"] {
-     padding-left: 20px !important;
+     padding-left: 21px !important;
 }
 
 div.app {
@@ -4358,5 +4455,9 @@ div.news {
 
 div.joblog h3 {
      margin-top: 8px;
+}
+
+.subheading b {
+     font-size: 10.5pt !important;
 }
 }

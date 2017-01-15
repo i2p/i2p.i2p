@@ -397,6 +397,19 @@ div.routersummary table {
      line-height: 140%;
 }
 
+.sb_notice {
+     background: #010;
+     border: 1px solid #262;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #000;
+     margin: 10px -4px -2px;
+     padding: 5px 3px;
+}
+
+hr + .sb_notice {
+     margin-top: 7px;
+}
+
 div.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
@@ -1440,6 +1453,7 @@ input[type="checkbox"], .optbox {
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
      vertical-align: middle;
+     background: none;
 }
 
 input[type="checkbox"]:hover, .optbox:hover, input[type="checkbox"]:focus, .optbox:focus {
@@ -3237,6 +3251,11 @@ table#netdboverview {
      margin-bottom: 0;
 }
 
+#netdbcountrylist img {
+     margin-right: 5px;
+     text-align: right;
+}
+
 #netdbtransports {
      border-left: 1px solid transparent !important;
      border-right: 1px solid transparent !important;
@@ -3286,6 +3305,74 @@ th > img[src^="/imagegen"] { /* scale down header images */
      border-radius: 2px;
      border: 1px solid #000;
 }
+
+/* Advanced lookup */
+
+#netdblookup {
+     margin-bottom: -4px;
+}
+
+#netdblookup th {
+     text-align: left;
+     font-size: 11pt;
+     letter-spacing: 0.08em;
+     padding: 10px;
+     text-transform: uppercase;
+}
+
+#netdblookup td:first-child {
+     text-align: right;
+     width: 100px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+#netdblookup td:nth-child(2) {
+     width: 100px;
+     padding-left: 0;
+}
+
+.subheading {
+     text-align: left !important;
+     background: #000;
+     padding: 10px;
+     border: 1px solid #494;
+}
+
+.subheading b {
+     font-size: 10pt !important;
+}
+
+#netdblookup .optbox {
+     margin: 10px ;
+}
+
+#netdblookup .optionsave {
+     padding: 10px !important;
+}
+
+#netdb .tabletitle {
+     margin-bottom: -2px !important;
+}
+
+.sybil_distance th {
+     text-align: left;
+     padding: 5px;
+}
+
+.sybil_distance th:last-child, .sybil_distance td:last-child {
+     text-align: right;
+}
+
+.sybil_distance tr:nth-child(n+2):hover {
+     background: #000;
+}
+
+.sybil_distance:last-child {
+     margin-bottom: 8px;
+}
+
+/* end netdb */
 
 /* logs */
 
@@ -4117,6 +4204,10 @@ table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
      font-size: 10pt;
 }
 
+.main#debug h2 + hr {
+     display: none;
+}
+
 div.debugcontainer {
      border: 1px solid #f00;
 }
@@ -4412,7 +4503,7 @@ table.sybil_routerinfo:first-of-type th {
      font-size: 9pt;
 }
 
-p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
+p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
      border: 1px solid #494;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
@@ -4424,7 +4515,7 @@ p.sybil_floodfill, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
      box-shadow: inset 0 0 0 1px #300;
 }
 
-p.family + p.family, p.sybil_floodfill + p.sybil_floodfill {
+p.family + p.family, p.sybil_info + p.sybil_info {
      margin-top: -4px;
 }
 
@@ -4432,7 +4523,7 @@ p#sybilinfo {
      line-height: 140%;
 }
 
-p.sybil_floodfill + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
+p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
      margin-top: 10px !important;
 }
 
@@ -5028,7 +5119,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover 
 }
 
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a,
-#floodfill th, .applabel a, #jardump td {
+#floodfill th, .applabel a, #jardump td, .statusnotes {
      font-size: 9pt !important;
 }
 
@@ -5078,8 +5169,15 @@ div.joblog h3 {
       margin-bottom: 12px !important; 
 }
 
-
 #certs.main p + p:empty + h4 {
      margin-top: -15px !important;
+}
+
+button.reload, button.stop {
+    min-width: 101px;
+}
+
+.subheading b {
+     font-size: 10.5pt !important;
 }
 }

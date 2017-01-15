@@ -14,6 +14,16 @@ div.routersummary {
      margin: 0 auto -6px;
 }
 
+@media screen and (min-width: 1500px) {
+div.routersummary {
+     width: 600px !important;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 600px !important;
+}
+}
+
 #xhr {
      margin-top: 9px !important;
 }
@@ -105,7 +115,7 @@ h1 {
 }
 
 div.news {
-     margin: 0 0 -10px;
+     margin: 0 0 -1px;
      min-width: 500px;
 }
 
@@ -114,5 +124,25 @@ div.main {
      min-width: 500px;
 }
 
-.confignav {
+.sorry {
+     margin: -1px 0 0 !important;
+}
+
+@media screen and (min-width: 1500px) {
+
+h1 {
+          margin: 9px 0 -1px !important;
+}
+
+div.news {
+     margin: -1px 0 0 !important;
+}
+
+div.main {
+     margin: -1px 0 !important;
+}
+
+.sorry {
+     margin: -1px 0 0 !important;
+}
 }
