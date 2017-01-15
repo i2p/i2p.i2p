@@ -192,7 +192,7 @@ public class SummaryHelper extends HelperBase {
                 return _t(status.toStatusString());
 
             case DISCONNECTED:
-                return _t("Disconnected - check network cable");
+                return _t("Disconnected - check network connection");
 
             case HOSED:
                 return _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
