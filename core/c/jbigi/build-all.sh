@@ -1,4 +1,8 @@
 #!/bin/sh
+#
+#  NOTE:
+#  This script is not supported - see mbuild-all.sh
+#
 
 case `uname -sr` in
 MINGW*)
@@ -14,21 +18,24 @@ FreeBSD*)
 	exit;;
 esac
 
-VER=4.2.4
-echo "Extracting GMP Version $VER ..."
-tar -xjf gmp-$VER.tar.bz2
-echo "Building..."
-mkdir bin
-mkdir lib
-mkdir lib/net
-mkdir lib/net/i2p
-mkdir lib/net/i2p/util
+# Import gmp version variables and download gmp.
+. ./download_gmp.sh
 
-for x in none pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon geode pentiumm core2
+echo "Building..."
+mkdir -p lib/net/i2p/util
+
+#
+# look in configure file in gmp source for supported host CPUs, at about line 5000
+#
+#
+for x in \
+  none pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon geode pentiumm core2 \
+  athlon64 k10 bobcat jaguar bulldozer piledriver steamroller excavator corei atom nano
 do
-	mkdir bin/$x
+	mkdir -p bin/$x
 	cd bin/$x
-	../../gmp-$VER/configure --build=$x
+	../../gmp-$GMP_VER/configure --with-pic --build=$x
+	make clean
 	make
 	sh ../../build_jbigi.sh static
 	case `uname -sr` in

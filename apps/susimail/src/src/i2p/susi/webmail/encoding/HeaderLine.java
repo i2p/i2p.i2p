@@ -233,7 +233,9 @@ public class HeaderLine implements Encoding {
 												length -= distance;
 												lastCharWasQuoted = true;
 												continue;
-											} catch (Exception e1) {
+											} catch (IOException e1) {
+												Debug.debug(Debug.ERROR, e1.toString());
+											} catch (RuntimeException e1) {
 												Debug.debug(Debug.ERROR, e1.toString());
 											}
 										}

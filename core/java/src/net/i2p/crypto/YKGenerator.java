@@ -35,7 +35,7 @@ import net.i2p.util.SystemVersion;
  *
  * @author jrandom
  */
-class YKGenerator {
+final class YKGenerator {
     //private final static Log _log = new Log(YKGenerator.class);
     private final int MIN_NUM_BUILDERS;
     private final int MAX_NUM_BUILDERS;

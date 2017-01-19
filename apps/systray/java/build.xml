@@ -5,11 +5,25 @@
     <target name="builddep">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../../build"
+            srcdir="./src:./test/junit"
+            destdir="./build/obj" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../../core/java/build/obj" />
+            </classpath>
+        </depend>
+    </target>
 
     <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.6" />
+    <property name="javac.version" value="1.7" />
 
-    <target name="compile">
+    <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac
@@ -21,7 +35,7 @@
             destdir="./build/obj"
             includeAntRuntime="false"
             includes="**/*.java"
-            classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" >
+            classpath="../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -46,12 +60,13 @@
         <jar destfile="./build/systray.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.apps.systray.SysTray" />
-                <attribute name="Class-Path" value="systray4j.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
         </jar>
     </target>
@@ -75,7 +90,7 @@
         <mkdir dir="./build/javadoc" />
         <javadoc
             sourcepath="./src"
-            classpath="./src:./lib/systray4j.jar"
+            classpath="./src"
             destdir="./build/javadoc"
             packagenames="*"
             use="true"

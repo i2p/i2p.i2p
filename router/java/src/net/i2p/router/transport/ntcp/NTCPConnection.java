@@ -1,5 +1,6 @@
 package net.i2p.router.transport.ntcp;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.nio.ByteBuffer;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.Adler32;
 
@@ -64,7 +66,7 @@ import net.i2p.util.VersionComparator;
  *</pre>
  *
  */
-class NTCPConnection {
+class NTCPConnection implements Closeable {
     private final RouterContext _context;
     private final Log _log;
     private SocketChannel _chan;
@@ -114,8 +116,8 @@ class NTCPConnection {
     private byte _prevWriteEnd[];
     /** current partially read I2NP message */
     private final ReadState _curReadState;
-    private final AtomicLong _messagesRead = new AtomicLong();
-    private final AtomicLong _messagesWritten = new AtomicLong();
+    private final AtomicInteger _messagesRead = new AtomicInteger();
+    private final AtomicInteger _messagesWritten = new AtomicInteger();
     private long _lastSendTime;
     private long _lastReceiveTime;
     private long _lastRateUpdated;
@@ -133,6 +135,7 @@ class NTCPConnection {
     /** how many consecutive sends were failed due to (estimated) send queue time */
     //private int _consecutiveBacklog;
     private long _nextInfoTime;
+    private boolean _mayDisconnect;
     
     /*
      *  Update frequency for send/recv rates in console peers page
@@ -324,11 +327,11 @@ class NTCPConnection {
             return _context.clock().now() -_establishedOn; 
     }
 
-    public long getMessagesSent() { return _messagesWritten.get(); }
+    public int getMessagesSent() { return _messagesWritten.get(); }
 
-    public long getMessagesReceived() { return _messagesRead.get(); }
+    public int getMessagesReceived() { return _messagesRead.get(); }
 
-    public long getOutboundQueueSize() {
+    public int getOutboundQueueSize() {
             int queued;
             synchronized(_outbound) {
                 queued = _outbound.size();
@@ -358,6 +361,17 @@ class NTCPConnection {
      *  @since 0.9.20
      */
     public long getCreated() { return _created; }
+
+    /**
+     * Sets to true.
+     * @since 0.9.24
+     */
+    public void setMayDisconnect() { _mayDisconnect = true; }
+
+    /**
+     * @since 0.9.24
+     */
+    public boolean getMayDisconnect() { return _mayDisconnect; }
 
     /**
      *  workaround for EventPumper
@@ -462,7 +476,7 @@ class NTCPConnection {
             _transport.afterSend(msg, successful, allowRequeue, msg.getLifetime());
             if (_consecutiveBacklog > 10) { // waaay too backlogged
                 boolean wantsWrite = false;
-                try { wantsWrite = ( (_conKey.interestOps() & SelectionKey.OP_WRITE) != 0); } catch (Exception e) {}
+                try { wantsWrite = ( (_conKey.interestOps() & SelectionKey.OP_WRITE) != 0); } catch (RuntimeException e) {}
                 if (_log.shouldLog(Log.WARN)) {
 		    int blocks = _writeBufs.size();
                     _log.warn("Too backlogged for too long (" + _consecutiveBacklog + " messages for " + DataHelper.formatDuration(queueTime()) + ", sched? " + wantsWrite + ", blocks: " + blocks + ") sending to " + _remotePeer.calculateHash());
@@ -520,7 +534,7 @@ class NTCPConnection {
                           + ", wantsWrite? " + (0 != (_conKey.interestOps()&SelectionKey.OP_WRITE))
                           + ", currentOut set? " + currentOutboundSet
 			  + ", writeBufs: " + writeBufs + " on " + toString());
-                } catch (Exception e) {}  // java.nio.channels.CancelledKeyException
+                } catch (RuntimeException e) {}  // java.nio.channels.CancelledKeyException
             }
             //_context.statManager().addRateData("ntcp.sendBacklogTime", queueTime);
             return true;

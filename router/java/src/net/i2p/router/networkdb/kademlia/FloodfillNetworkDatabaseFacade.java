@@ -343,7 +343,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         //if (true) return super.search(key, onFindJob, onFailedLookupJob, timeoutMs, isLease);
         if (key == null) throw new IllegalArgumentException("searchin for nothin, eh?");
         boolean isNew = false;
-        FloodSearchJob searchJob = null;
+        FloodSearchJob searchJob;
         synchronized (_activeFloodQueries) {
             searchJob = _activeFloodQueries.get(key);
             if (searchJob == null) {
@@ -479,7 +479,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         // drop the peer in these cases
         // yikes don't do this - stack overflow //  getFloodfillPeers().size() == 0 ||
         // yikes2 don't do this either - deadlock! // getKnownRouters() < MIN_REMAINING_ROUTERS ||
-        if (info.getNetworkId() == Router.NETWORK_ID &&
+        if (info.getNetworkId() == _networkID &&
             (getKBucketSetSize() < MIN_REMAINING_ROUTERS ||
              _context.router().getUptime() < DONT_FAIL_PERIOD ||
              _context.commSystem().countActivePeers() <= MIN_ACTIVE_PEERS)) {

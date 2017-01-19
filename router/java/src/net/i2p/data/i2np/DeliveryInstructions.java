@@ -52,6 +52,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     private final static int FLAG_MODE_TUNNEL = 3;
     
     /** @deprecated unused */
+    @Deprecated
     private final static long FLAG_ENCRYPTED = 128;
     private final static long FLAG_MODE = 96;
     private final static long FLAG_DELAY = 16;
@@ -84,24 +85,28 @@ public class DeliveryInstructions extends DataStructureImpl {
      * For cloves only (not tunnels), default false, unused
      * @deprecated unused
      */
+    @Deprecated
     public boolean getEncrypted() { return /* _encrypted */ false; }
     
     /**
      * For cloves only (not tunnels), default false, unused
      * @deprecated unused
      */
+    @Deprecated
     public void setEncrypted(boolean encrypted) { /* _encrypted = encrypted; */ }
 
     /**
      * For cloves only (not tunnels), default null, unused
      * @deprecated unused
      */
+    @Deprecated
     public SessionKey getEncryptionKey() { return /* _encryptionKey */ null; }
 
     /**
      * For cloves only (not tunnels), default null, unused
      * @deprecated unused
      */
+    @Deprecated
     public void setEncryptionKey(SessionKey key) { /* _encryptionKey = key; */ }
 
     /** default -1 */
@@ -132,29 +137,34 @@ public class DeliveryInstructions extends DataStructureImpl {
      * default false, unused
      * @deprecated unused
      */
+    @Deprecated
     public boolean getDelayRequested() { return _delayRequested; }
     
     /**
      * default false, unused
      * @deprecated unused
      */
+    @Deprecated
     public void setDelayRequested(boolean req) { _delayRequested = req; }
     
     /**
      * default 0, unused
      * @deprecated unused
      */
+    @Deprecated
     public long getDelaySeconds() { return _delaySeconds; }
     
     /**
      * default 0, unused
      * @deprecated unused
      */
+    @Deprecated
     public void setDelaySeconds(long seconds) { _delaySeconds = seconds; }
     
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         long flags = DataHelper.readLong(in, 1);
         //if (_log.shouldLog(Log.DEBUG))
@@ -209,7 +219,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     
     public int readBytes(byte data[], int offset) throws DataFormatException {
         int cur = offset;
-        long flags = DataHelper.fromLong(data, cur, 1);
+        int flags = data[cur] & 0xff;
         cur++;
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read flags: " + flags + " mode: " +  flagMode(flags));
@@ -423,6 +433,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ( (_deliveryMode < 0) || (_deliveryMode > FLAG_MODE_TUNNEL) ) throw new DataFormatException("Invalid data: mode = " + _deliveryMode);
         long flags = getFlags();
@@ -430,7 +441,7 @@ public class DeliveryInstructions extends DataStructureImpl {
         //    _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
         //               + " =?= " + flagMode(flags));
         byte additionalInfo[] = getAdditionalInfo();
-        DataHelper.writeLong(out, 1, flags);
+        out.write((byte) flags);
         if (additionalInfo != null) {
             out.write(additionalInfo);
             out.flush();

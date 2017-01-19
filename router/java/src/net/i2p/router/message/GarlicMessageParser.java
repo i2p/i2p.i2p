@@ -75,7 +75,7 @@ public class GarlicMessageParser {
     private CloveSet readCloveSet(byte data[]) throws DataFormatException {
         int offset = 0;
         
-        int numCloves = (int)DataHelper.fromLong(data, offset, 1);
+        int numCloves = data[offset] & 0xff;
         offset++;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("# cloves to read: " + numCloves);

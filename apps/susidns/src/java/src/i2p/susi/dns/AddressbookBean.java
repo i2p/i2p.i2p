@@ -111,6 +111,9 @@ public class AddressbookBean extends BaseBean
 		return entries;
 	}
 
+	/**
+	 * This always returns a valid book, non-null.
+	 */
 	public String getBook()
 	{
 		if( book == null || ( !book.equalsIgnoreCase( "master" ) &&
@@ -164,7 +167,7 @@ public class AddressbookBean extends BaseBean
 
 			message = generateLoadMessage();
 		}
-		catch (Exception e) {
+		catch (IOException e) {
 			warn(e);
 		} finally {
 			if (fis != null)
@@ -200,7 +203,7 @@ public class AddressbookBean extends BaseBean
 		} else {
 			if (resultCount <= 0)
 				// covered in jsp
-				//message = _("This addressbook is empty.");
+				//message = _t("This addressbook is empty.");
 				message = "";
 			else
 				message = ngettext("Address book contains 1 entry.",
@@ -219,7 +222,7 @@ public class AddressbookBean extends BaseBean
 				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + (newBegin+1) +
 				           '-' + (newEnd+1) + "</a> | ";
 	       		}
-			message += ' ' + _("Showing {0} of {1}", "" + (getBeginInt()+1) + '-' + (getEndInt()+1), Integer.valueOf(resultCount));
+			message += ' ' + _t("Showing {0} of {1}", "" + (getBeginInt()+1) + '-' + (getEndInt()+1), Integer.valueOf(resultCount));
 			if (getEndInt() < resultCount - 1) {
 				int newBegin = Math.min(resultCount - 1, getEndInt() + 1);
 				int newEnd = Math.min(resultCount, getEndInt() + DISPLAY_SIZE);
@@ -241,7 +244,7 @@ public class AddressbookBean extends BaseBean
                         if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
 			    (serial != null && serial.equals(lastSerial))) {
 				boolean changed = false;
-				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
+				if (action.equals(_t("Add")) || action.equals(_t("Replace"))) {
 					if( addressbook != null && hostname != null && destination != null ) {
 						try {
 							// throws IAE with translated message
@@ -251,9 +254,9 @@ public class AddressbookBean extends BaseBean
 
 							String oldDest = (String) addressbook.get(host);
 							if (destination.equals(oldDest)) {
-								message = _("Host name {0} is already in address book, unchanged.", displayHost);
-							} else if (oldDest != null && !action.equals(_("Replace"))) {
-								message = _("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
+								message = _t("Host name {0} is already in address book, unchanged.", displayHost);
+							} else if (oldDest != null && !action.equals(_t("Replace"))) {
+								message = _t("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
 								boolean valid = true;
 								try {
@@ -266,29 +269,29 @@ public class AddressbookBean extends BaseBean
 									addressbook.put( host, destination );
 									changed = true;
 									if (oldDest == null)
-										message = _("Destination added for {0}.", displayHost);
+										message = _t("Destination added for {0}.", displayHost);
 									else
-										message = _("Destination changed for {0}.", displayHost);
+										message = _t("Destination changed for {0}.", displayHost);
 									if (!host.endsWith(".i2p"))
-										message += "<br>" + _("Warning - host name does not end with \".i2p\"");
+										message += "<br>" + _t("Warning - host name does not end with \".i2p\"");
 									// clear form
 									hostname = null;
 									destination = null;
 								} else {
-									message = _("Invalid Base 64 destination.");
+									message = _t("Invalid Base 64 destination.");
 								}
 							}
 						} catch (IllegalArgumentException iae) {
 							message = iae.getMessage();
 							if (message == null)
-								message = _("Invalid host name \"{0}\".", hostname);
+								message = _t("Invalid host name \"{0}\".", hostname);
 						}
 					} else {
-						message = _("Please enter a host name and destination");
+						message = _t("Please enter a host name and destination");
 					}
 					// clear search when adding
 					search = null;
-				} else if (action.equals(_("Delete Selected")) || action.equals(_("Delete Entry"))) {
+				} else if (action.equals(_t("Delete Selected")) || action.equals(_t("Delete Entry"))) {
 					String name = null;
 					int deleted = 0;
 					for (String n : deletionMarks) {
@@ -302,30 +305,30 @@ public class AddressbookBean extends BaseBean
 					}
 					if( changed ) {
 						if (deleted == 1)
-							message = _("Destination {0} deleted.", name);
+							message = _t("Destination {0} deleted.", name);
 						else
 							// parameter will always be >= 2
 							message = ngettext("1 destination deleted.", "{0} destinations deleted.", deleted);
 					} else {
-						message = _("No entries selected to delete.");
+						message = _t("No entries selected to delete.");
 					}
-					if (action.equals(_("Delete Entry")))
+					if (action.equals(_t("Delete Entry")))
 						search = null;
 				}
 				if( changed ) {
 					try {
 						save();
-						message += "<br>" + _("Address book saved.");
-					} catch (Exception e) {
+						message += "<br>" + _t("Address book saved.");
+					} catch (IOException e) {
 						warn(e);
-						message += "<br>" + _("ERROR: Could not write addressbook file.");
+						message += "<br>" + _t("ERROR: Could not write addressbook file.");
 					}
 				}
 			}			
 			else {
-				message = _("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
+				message = _t("Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit.")
                                           + ' ' +
-                                          _("If the problem persists, verify that you have cookies enabled in your browser.");
+                                          _t("If the problem persists, verify that you have cookies enabled in your browser.");
 			}
 		}
 		
@@ -357,6 +360,7 @@ public class AddressbookBean extends BaseBean
 		return filter;
 	}
 
+/****
 	public boolean isMaster()
 	{
 		return getBook().equalsIgnoreCase("master");
@@ -373,6 +377,28 @@ public class AddressbookBean extends BaseBean
 	{
 		return getBook().equalsIgnoreCase("private");
 	}
+****/
+
+	/**
+	 * Because the following from addressbook.jsp fails parsing in the new EL:
+	 * javax.el.ELException: Failed to parse the expression
+	 * Can't figure out why, so just replace it with book.validBook:
+	 * &lt;c:if test="${book.master || book.router || book.published || book.private}"&gt;
+	 *
+	 * This always returns true anyway, because getBook() always
+	 * returns a valid book.
+	 *
+	 * @return true
+	 * @since 0.9.28
+	 */
+	public boolean isValidBook() {
+		String s = getBook().toLowerCase(Locale.US);
+		return s.equals("router") ||
+		       s.equals("master") ||
+		       s.equals("published") ||
+		       s.equals("private");
+	}
+
 	public void setFilter(String filter) {
 		if( filter != null && ( filter.length() == 0 || filter.equalsIgnoreCase("none"))) {
 			filter = null;

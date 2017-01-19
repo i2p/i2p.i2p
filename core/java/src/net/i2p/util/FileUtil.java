@@ -18,6 +18,8 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.i2p.data.DataHelper;
+
 // Pack200 now loaded dynamically in unpack() below
 //
 // For Sun, OpenJDK, IcedTea, etc, use this
@@ -96,6 +98,9 @@ public class FileUtil {
     }
 
     /**
+      * Warning - do not call any new classes from here, or
+      * update will crash the JVM.
+      *
       * @param logLevel Log.WARN, etc.
       * @return true if it was copied successfully
       * @since 0.9.7
@@ -104,7 +109,7 @@ public class FileUtil {
         int files = 0;
         ZipFile zip = null;
         try {
-            byte buf[] = new byte[16*1024];
+            final byte buf[] = new byte[8192];
             zip = new ZipFile(zipfile);
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
@@ -152,10 +157,13 @@ public class FileUtil {
                                 System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
                         } else {
                             fos = new FileOutputStream(target);
-                            int read = 0;
-                            while ( (read = in.read(buf)) != -1) {
-                                fos.write(buf, 0, read);
-                            }
+                            // We do NOT use DataHelper.copy() because it loads new classes
+                            // and causes the update to crash.
+                            //DataHelper.copy(in, fos);
+                            int read;
+                            while ((read = in.read(buf)) != -1) {
+                                   fos.write(buf, 0, read);
+                            }   
                             if (logLevel <= Log.INFO)
                                 System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
@@ -300,9 +308,9 @@ public class FileUtil {
         if (!_failedOracle) {
             try {
                 Class<?> p200 = Class.forName("java.util.jar.Pack200", true, ClassLoader.getSystemClassLoader());
-                Method newUnpacker = p200.getMethod("newUnpacker", (Class[]) null);
+                Method newUnpacker = p200.getMethod("newUnpacker");
                 Object unpacker = newUnpacker.invoke(null,(Object[])  null);
-                Method unpack = unpacker.getClass().getMethod("unpack", new Class[] {InputStream.class, JarOutputStream.class});
+                Method unpack = unpacker.getClass().getMethod("unpack", InputStream.class, JarOutputStream.class);
                 // throws IOException
                 unpack.invoke(unpacker, new Object[] {in, out});
                 return;
@@ -321,9 +329,9 @@ public class FileUtil {
         if (!_failedApache) {
             try {
                 Class<?> p200 = Class.forName("org.apache.harmony.unpack200.Archive", true, ClassLoader.getSystemClassLoader());
-                Constructor<?> newUnpacker = p200.getConstructor(new Class[] {InputStream.class, JarOutputStream.class});
-                Object unpacker = newUnpacker.newInstance(new Object[] {in, out});
-                Method unpack = unpacker.getClass().getMethod("unpack", (Class[]) null);
+                Constructor<?> newUnpacker = p200.getConstructor(InputStream.class, JarOutputStream.class);
+                Object unpacker = newUnpacker.newInstance(in, out);
+                Method unpack = unpacker.getClass().getMethod("unpack");
                 // throws IOException or Pack200Exception
                 unpack.invoke(unpacker, (Object[]) null);
                 return;
@@ -405,13 +413,10 @@ public class FileUtil {
         String rootDirStr = rootDir.getCanonicalPath();
         if (!targetStr.startsWith(rootDirStr)) throw new FileNotFoundException("Requested file is outside the root dir: " + path);
 
-        byte buf[] = new byte[4*1024];
         FileInputStream in = null;
         try {
             in = new FileInputStream(target);
-            int read = 0;
-            while ( (read = in.read(buf)) != -1) 
-                out.write(buf, 0, read);
+            DataHelper.copy(in, out);
             try { out.close(); } catch (IOException ioe) {}
         } finally {
             if (in != null) 
@@ -448,17 +453,12 @@ public class FileUtil {
         if (!src.exists()) return false;
         if (dst.exists() && !overwriteExisting) return false;
         
-        byte buf[] = new byte[4096];
         InputStream in = null;
         OutputStream out = null;
         try {
             in = new FileInputStream(src);
             out = new FileOutputStream(dst);
-            
-            int read = 0;
-            while ( (read = in.read(buf)) != -1)
-                out.write(buf, 0, read);
-            
+            DataHelper.copy(in, out);
             return true;
         } catch (IOException ioe) {
             if (!quiet)

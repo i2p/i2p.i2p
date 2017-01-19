@@ -45,8 +45,8 @@ class LookupThrottler {
 
     /** yes, we could have a two-level lookup, or just do h.tostring() + id.tostring() */
     private static class ReplyTunnel {
-        public Hash h;
-        public TunnelId id;
+        public final Hash h;
+        public final TunnelId id;
 
         ReplyTunnel(Hash h, TunnelId id) {
             this.h = h;

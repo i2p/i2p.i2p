@@ -75,6 +75,7 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     
 
     /** @deprecated unused, which makes _testJob unused - why is it here */
+    @Deprecated
     void setTestJob(TestJob job) { _testJob = job; }
     /** does nothing, to be deprecated */
     public void setExpireJob(Job job) { /* _expireJob = job; */ }
@@ -82,6 +83,7 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     /**
      * @deprecated Fix memory leaks caused by references if you need to use pairedTunnel
      */
+    @Deprecated
     public void setPairedTunnel(TunnelInfo tunnel) { /* _pairedTunnel = tunnel; */}
     // public TunnelInfo getPairedTunnel() { return _pairedTunnel; }
 }

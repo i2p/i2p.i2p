@@ -48,6 +48,7 @@ public interface I2NPMessage extends DataStructure {
      * @throws IOException if there is a problem reading from the stream
      * @deprecated unused
      */
+    @Deprecated
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException;
 
     /**

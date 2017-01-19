@@ -62,7 +62,7 @@ public class Peer implements Comparable<Peer>
 
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
-  PeerState state;
+  volatile PeerState state;
 
   /** shared across all peers on this torrent */
   MagnetState magnetState;
@@ -194,6 +194,7 @@ public class Peer implements Comparable<Peer>
    * Compares the PeerIDs.
    * @deprecated unused?
    */
+  @Deprecated
   public int compareTo(Peer p)
   {
     int rv = peerID.compareTo(p.peerID);
@@ -217,9 +218,11 @@ public class Peer implements Comparable<Peer>
    *
    * If the given BitField is non-null it is send to the peer as first
    * message.
+   *
+   * @param uploadOnly if we are complete with skipped files, i.e. a partial seed
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield, MagnetState mState)
-  {
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield,
+                            MagnetState mState, boolean uploadOnly) {
     if (state != null)
       throw new IllegalStateException("Peer already started");
 
@@ -275,16 +278,8 @@ public class Peer implements Comparable<Peer>
             int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht));
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly));
         }
-
-        // Old DHT PORT message
-        //if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
-        //    if (_log.shouldLog(Log.DEBUG))
-        //        _log.debug("Peer supports DHT, sending PORT message");
-        //    int port = util.getDHT().getPort();
-        //    out.sendPort(port);
-        //}
 
         // Send our bitmap
         if (bitfield != null)
@@ -537,6 +532,7 @@ public class Peer implements Comparable<Peer>
    * @deprecated deadlocks
    * @since 0.8.1
    */
+  @Deprecated
   boolean isRequesting(int p) {
     PeerState s = state;
     return s != null && s.isRequesting(p);
@@ -569,6 +565,7 @@ public class Peer implements Comparable<Peer>
    * us then we start downloading from it. Has no effect when not connected.
    * @deprecated unused
    */
+  @Deprecated
   public void setInteresting(boolean interest)
   {
     PeerState s = state;

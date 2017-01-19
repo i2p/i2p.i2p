@@ -15,7 +15,8 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gnu.getopt.Getopt;
 
@@ -270,7 +273,7 @@ public class EepGet {
                     break;
               }  // switch
             } // while
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             error = true;
         }
@@ -312,22 +315,52 @@ public class EepGet {
             System.exit(1);
     }
 
+    /**
+     * Parse URL for a viable filename.
+     * 
+     * @param   url  a URL giving the location of an online resource
+     * @return       a filename to save the resource as on local filesystem
+     */
     public static String suggestName(String url) {
-        int last = url.lastIndexOf('/');
-        if ((last < 0) || (url.lastIndexOf('#') > last))
-            last = url.lastIndexOf('#');
-        if ((last < 0) || (url.lastIndexOf('?') > last))
-            last = url.lastIndexOf('?');
-        if ((last < 0) || (url.lastIndexOf('=') > last))
-            last = url.lastIndexOf('=');
+        URI nameURL = null;
+        String name;         // suggested name
 
-        String name = null;
-        if (last >= 0)
-            name = sanitize(url.substring(last+1));
-        if ( (name != null) && (name.length() > 0) )
-            return name;
-        else
-            return sanitize(url);
+        try {
+            nameURL = new URI(url);
+        } catch (URISyntaxException e) {
+            System.err.println("Please enter a properly formed URL.");
+            System.exit(1);
+        }
+
+        String path = nameURL.getRawPath();  // discard any URI queries
+
+        // if no file specified, eepget scrapes webpage - use domain as name
+        Pattern slashes = Pattern.compile("/+");
+        Matcher matcher = slashes.matcher(path);
+        // if empty path or just /'s - nameURL lets multiple /'s through
+        if (path.equals("") || matcher.matches()) {
+            name = sanitize(nameURL.getAuthority());
+        // if path specified
+        } else {
+            int last = path.lastIndexOf('/');
+            // if last / not at end of string, use following string as filename
+            if (last != path.length() - 1) {
+                name = sanitize(path.substring(last + 1));
+            // if there's a trailing / group look for previous / as trim point
+            } else {
+                int i = 1;
+                int slash;
+                while (true) {
+                    slash = path.lastIndexOf('/', last - i);
+                    if (slash != last - i) {
+                        break;
+                    }
+                    i += 1;
+                }
+                name = sanitize(path.substring(slash + 1, path.length() - i));
+            }
+        }
+        return name;
     }
 
 
@@ -690,24 +723,31 @@ public class EepGet {
         
         if (_redirectLocation != null) {
             // we also are here after a 407
-            //try {
+            try {
                 if (_redirectLocation.startsWith("http://")) {
                     _actualURL = _redirectLocation;
                 } else { 
                     // the Location: field has been required to be an absolute URI at least since
                     // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
                     // This oddly adds a ":" even if no port, but that seems to work.
-                    URL url = new URL(_actualURL);
-		    if (_redirectLocation.startsWith("/"))
-                        _actualURL = "http://" + url.getHost() + ":" + url.getPort() + _redirectLocation;
+                    URI url = new URI(_actualURL);
+                    String host = url.getHost();
+                    if (host == null)
+                        throw new MalformedURLException("Redirected to invalid URL");
+                    int port = url.getPort();
+                    if (port < 0)
+                        port = 80;
+                    if (_redirectLocation.startsWith("/"))
+                        _actualURL = "http://" + host + ":" + port + _redirectLocation;
                     else
                         // this blows up completely on a redirect to https://, for example
-                        _actualURL = "http://" + url.getHost() + ":" + url.getPort() + "/" + _redirectLocation;
+                        _actualURL = "http://" + host+ ":" + port + "/" + _redirectLocation;
                 }
-            // an MUE is an IOE
-            //} catch (MalformedURLException mue) {
-            //    throw new IOException("Redirected from an invalid URL");
-            //}
+            } catch (URISyntaxException use) {
+                IOException ioe = new MalformedURLException("Redirected to invalid URL");
+                ioe.initCause(use);
+                throw ioe;
+            }
 
             AuthState as = _authState;
             if (_responseCode == 407) {
@@ -755,6 +795,8 @@ public class EepGet {
         Thread pusher = null;
         _decompressException = null;
         if (_isGzippedResponse) {
+            if (_log.shouldInfo())
+                _log.info("Gzipped response, starting decompressor");
             PipedInputStream pi = BigPipedInputStream.getInstance();
             PipedOutputStream po = new PipedOutputStream(pi);
             pusher = new I2PAppThread(new Gunzipper(pi, _out), "EepGet Decompressor");
@@ -885,8 +927,17 @@ public class EepGet {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("rc: " + _responseCode + " for " + _actualURL);
         boolean rcOk = false;
+        // https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         switch (_responseCode) {
             case 200: // full
+            case 201: // various other success codes follow
+            case 202:
+            case 203:
+            case 204: // no content, TODO separate case?
+            case 205: // no content, TODO separate case?
+            case 207:
+            case 208:
+            case 226:
                 if (_outputStream != null)
                     _out = _outputStream;
 		else
@@ -919,15 +970,35 @@ public class EepGet {
             case 402: // payment required
             case 403: // bad req
             case 404: // not found
+            case 405: // method
+            case 406: // not acceptable
             case 408: // req timeout
             case 409: // bad addr helper
             case 410: // gone
+            case 411: // length
+            case 413: // payload
             case 414: // URI too long
+            case 415: // unsupported
             case 418: // backoff
             case 420: // backoff
+            case 421: // misdirected
+            case 423: // locked
+            case 424: // dependency
+            case 426: // upgrade
+            case 428: // precondition
             case 429: // too many requests
             case 431: // headers too long
+            case 451: // legal
+            case 500: // internal
+            case 501: // not implemented
+            case 502: // bad gateway
             case 503: // no outproxy
+            case 505: // version
+            case 506: // variant
+            case 507: // insufficient
+            case 508: // loop
+            case 510: // not extended
+            case 511: // network auth
                 _transferFailed = true;
                 if (_alreadyTransferred > 0 || !_shouldWriteErrorToOutput) {
                     _keepFetching = false;
@@ -1096,8 +1167,8 @@ public class EepGet {
      */
     private int handleStatus(String line) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Status line: [" + line + "]");
-        String[] toks = line.split(" ", 3);
+            _log.debug("Status line: [" + line.trim() + "]");
+        String[] toks = DataHelper.split(line, " ", 3);
         if (toks.length < 2) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("ERR: status "+  line);
@@ -1160,17 +1231,13 @@ public class EepGet {
         lookahead[1] = lookahead[2];
         lookahead[2] = (byte)cur;
     }
+
     private static boolean isEndOfHeaders(byte lookahead[]) {
-        byte first = lookahead[0];
-        byte second = lookahead[1];
-        byte third = lookahead[2];
-        return (isNL(second) && isNL(third)) || //   \n\n
-               (isNL(first) && isNL(third));    // \n\r\n
+        return lookahead[2] == NL &&
+               (lookahead[0] == NL || lookahead[1] == NL);    // \n\n or \n\r\n
     }
 
-    /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
-    private static boolean isNL(byte b) { return (b == NL); }
 
     /**
      *  @param timeout may be null
@@ -1196,10 +1263,12 @@ public class EepGet {
         if (_shouldProxy) {
             _proxy = InternalSocket.getSocket(_proxyHost, _proxyPort);
         } else {
-            //try {
-                URL url = new URL(_actualURL);
-                if ("http".equals(url.getProtocol())) {
+            try {
+                URI url = new URI(_actualURL);
+                if ("http".equals(url.getScheme())) {
                     String host = url.getHost();
+                    if (host == null)
+                        throw new MalformedURLException("URL is not supported:" + _actualURL);
                     String hostlc = host.toLowerCase(Locale.US);
                     if (hostlc.endsWith(".i2p"))
                         throw new UnknownHostException("I2P addresses must be proxied");
@@ -1218,10 +1287,11 @@ public class EepGet {
                 } else {
                     throw new MalformedURLException("URL is not supported:" + _actualURL);
                 }
-            // an MUE is an IOE
-            //} catch (MalformedURLException mue) {
-            //    throw new IOException("Request URL is invalid");
-            //}
+            } catch (URISyntaxException use) {
+                IOException ioe = new MalformedURLException("Request URL is invalid");
+                ioe.initCause(use);
+                throw ioe;
+            }
         }
         _proxyIn = _proxy.getInputStream();
         if (!(_proxy instanceof InternalSocket))
@@ -1243,13 +1313,20 @@ public class EepGet {
         boolean post = false;
         if ( (_postData != null) && (_postData.length() > 0) )
             post = true;
-        URL url = new URL(_actualURL);
+        URI url;
+        try {
+            url = new URI(_actualURL);
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Bad URL");
+            ioe.initCause(use);
+            throw ioe;
+        }
         String host = url.getHost();
         if (host == null || host.length() <= 0)
             throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting " + _actualURL);
         // RFC 2616 sec 5.1.2 - full URL if proxied, absolute path only if not proxied
@@ -1315,7 +1392,8 @@ public class EepGet {
             buf.append("Content-length: ").append(_postData.length()).append("\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("Accept-Encoding: ");
-        if ((!_shouldProxy) &&
+        // as of 0.9.23, the proxy passes the Accept-Encoding header through
+        if (  /* (!_shouldProxy) && */
             // This is kindof a hack, but if we are downloading a gzip file
             // we don't want to transparently gunzip it and save it as a .gz file.
             (!path.endsWith(".gz")) && (!path.endsWith(".tgz")))
@@ -1471,7 +1549,7 @@ public class EepGet {
         String key = null;
         for (int i = 0; i < data.length; i++) {
             switch (data[i]) {
-                case '\"':
+                case '"':
                     if (isQuoted) {
                         // keys never quoted
                         if (key != null) {
@@ -1686,8 +1764,6 @@ public class EepGet {
     protected class Gunzipper implements Runnable {
         private final InputStream _inRaw;
         private final OutputStream _out;
-        private static final int CACHE_SIZE = 8*1024;
-        private final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
 
         public Gunzipper(InputStream in, OutputStream out) {
             _inRaw = in;
@@ -1701,12 +1777,7 @@ public class EepGet {
             try {
                 // blocking
                 in.initialize(_inRaw);
-                ba = _cache.acquire();
-                byte buf[] = ba.getData();
-                int read = -1;
-                while ( (read = in.read(buf)) != -1) {
-                    _out.write(buf, 0, read);
-                }
+                DataHelper.copy(in, _out);
             } catch (IOException ioe) {
                 _decompressException = ioe;
                 if (_log.shouldLog(Log.WARN))
@@ -1719,8 +1790,6 @@ public class EepGet {
                     _out.close(); 
                 } catch (IOException ioe) {}
                 ReusableGZIPInputStream.release(in);
-                if (ba != null)
-                    _cache.release(ba);
             }
         }
     }

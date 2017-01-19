@@ -74,10 +74,11 @@ public class MetaInfo
    *  @param files null for single-file torrent
    *  @param lengths null for single-file torrent
    *  @param announce_list may be null
+   *  @param created_by may be null
    */
   MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length, boolean privateTorrent,
-           List<List<String>> announce_list)
+           List<List<String>> announce_list, String created_by)
   {
     this.announce = announce;
     this.name = name;
@@ -91,7 +92,7 @@ public class MetaInfo
     this.privateTorrent = privateTorrent;
     this.announce_list = announce_list;
     this.comment = null;
-    this.created_by = null;
+    this.created_by = created_by;
     this.creation_date = I2PAppContext.getGlobalContext().clock().now();
 
     // TODO if we add a parameter for other keys

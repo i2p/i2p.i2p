@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Shpetim <shpetim@privacysolutions.no>, 2014
 msgid ""
@@ -11,11 +11,12 @@ msgstr ""
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
 "PO-Revision-Date: 2015-03-29 14:31+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Albanian (http://www.transifex.com/projects/p/I2P/language/sq/)\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/I2P/language/"
+"sq/)\n"
+"Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Type: boolean
@@ -30,7 +31,9 @@ msgstr "Duhet router'i i I2P'së të startojë në boot? "
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "Router'i i I2P'së mund të punojë edhe si një daemon, që starton automatikisht kur kompjuteri boot'et. Ky është konfikurimi rekomandues. "
+msgstr ""
+"Router'i i I2P'së mund të punojë edhe si një daemon, që starton "
+"automatikisht kur kompjuteri boot'et. Ky është konfikurimi rekomandues. "
 
 #. Type: string
 #. Description
@@ -42,11 +45,16 @@ msgstr "I2P përdorues i daemon'it:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "Zakonisht I2P është konfiguruar të punojë ndër llogarinë i2psvc kur është duke punuar si një deamon. Për të përdorur një profil **ekzistues** të I2P'së mund ta shtypni një emër tjetër llogarie këtu. Për shembull, nëse instalimi i kaluar është në shtëpi/përdorues/i2p, mund të hyni si \"përdorues\" këtu. "
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Zakonisht I2P është konfiguruar të punojë ndër llogarinë i2psvc kur është "
+"duke punuar si një deamon. Për të përdorur një profil **ekzistues** të "
+"I2P'së mund ta shtypni një emër tjetër llogarie këtu. Për shembull, nëse "
+"instalimi i kaluar është në shtëpi/përdorues/i2p, mund të hyni si \"përdorues"
+"\" këtu. "
 
 #. Type: string
 #. Description
@@ -54,7 +62,9 @@ msgstr "Zakonisht I2P është konfiguruar të punojë ndër llogarinë i2psvc ku
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Shumë e rëndësishme: Nëse një përdorues përveq default'i i 'i2psvc' është entruar këtu, emri i zgjedhur *DUHET* tashmë të ekzistojë. "
+msgstr ""
+"Shumë e rëndësishme: Nëse një përdorues përveq default'i i 'i2psvc' është "
+"entruar këtu, emri i zgjedhur *DUHET* tashmë të ekzistojë. "
 
 #. Type: string
 #. Description
@@ -66,7 +76,8 @@ msgstr "Kujtesat që mund të ndahen te  I2P:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Normalisht, I2P do ti lejohet të përdorë vetëm deri në 128Mb të RAM'it."
+msgstr ""
+"Normalisht, I2P do ti lejohet të përdorë vetëm deri në 128Mb të RAM'it."
 
 #. Type: string
 #. Description

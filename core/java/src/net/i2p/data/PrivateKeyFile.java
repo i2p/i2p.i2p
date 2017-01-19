@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException; 
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -73,10 +74,14 @@ public class PrivateKeyFile {
         String stype = null;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
+            case 'c':
+                stype = g.getOptarg();
+                break;
+
             case 't':
                 stype = g.getOptarg();
                 // fall thru...
@@ -116,9 +121,21 @@ public class PrivateKeyFile {
 
         try {
             File f = new File(filearg);
+            boolean exists = f.exists();
             PrivateKeyFile pkf = new PrivateKeyFile(f, client);
-            Destination d = pkf.createIfAbsent();
-            System.out.println("Original Destination:");
+            Destination d;
+            if (stype != null) {
+                SigType type = SigType.parseSigType(stype);
+                if (type == null)
+                    throw new IllegalArgumentException("Signature type " + stype + " is not supported");
+                d = pkf.createIfAbsent(type);
+            } else {
+                d = pkf.createIfAbsent();
+            }
+            if (exists)
+                System.out.println("Original Destination:");
+            else
+                System.out.println("Created Destination:");
             System.out.println(pkf);
             verifySignature(d);
             switch (mode) {
@@ -174,19 +191,22 @@ public class PrivateKeyFile {
                 pkf.write();
                 verifySignature(pkf.getDestination());
             }
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            e.printStackTrace();
+            System.exit(1);
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
     private static void usage() {
-        System.err.println("Usage: PrivateKeyFile filename (generates if nonexistent, then prints)\n" +
+        System.err.println("Usage: PrivateKeyFile [-c sigtype] filename (generates if nonexistent, then prints)\n" +
                            "       PrivateKeyFile -h filename (generates if nonexistent, adds hashcash cert)\n" +
                            "       PrivateKeyFile -h -e effort filename (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
                            "       PrivateKeyFile -n filename (changes to null cert)\n" +
                            "       PrivateKeyFile -s filename signwithdestfile (generates if nonexistent, adds cert signed by 2nd dest)\n" +
-                           "       PrivateKeyFile -t sigtype filename (changes to KeyCertificate of the given sig type\n" +
+                           "       PrivateKeyFile -t sigtype filename (changes to KeyCertificate of the given sig type)\n" +
                            "       PrivateKeyFile -u filename (changes to unknown cert)\n" +
                            "       PrivateKeyFile -x filename (changes to hidden cert)\n");
     }
@@ -253,16 +273,43 @@ public class PrivateKeyFile {
         this.signingPrivKey = spk;
     }
     
-    /** Also reads in the file to get the privKey and signingPrivKey, 
+    /**
+     *  Can't be used for writing
+     *  @since 0.9.26
+     */
+    public PrivateKeyFile(InputStream in) throws I2PSessionException {
+        this("/dev/null");
+        I2PSession s = this.client.createSession(in, new Properties());
+        this.dest = s.getMyDestination();
+        this.privKey = s.getDecryptionKey();
+        this.signingPrivKey = s.getPrivateKey();
+    }
+    
+    /**
+     *  Create with the default signature type if nonexistent.
+     *
+     *  Also reads in the file to get the privKey and signingPrivKey, 
      *  which aren't available from I2PClient.
      */
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
+        return createIfAbsent(I2PClient.DEFAULT_SIGTYPE);
+    }
+    
+    /**
+     *  Create with the specified signature type if nonexistent.
+     *
+     *  Also reads in the file to get the privKey and signingPrivKey, 
+     *  which aren't available from I2PClient.
+     *
+     *  @since 0.9.26
+     */
+    public Destination createIfAbsent(SigType type) throws I2PException, IOException, DataFormatException {
         if(!this.file.exists()) {
             OutputStream out = null;
             try {
                 out = new SecureFileOutputStream(this.file);
                 if (this.client != null)
-                    this.client.createDestination(out);
+                    this.client.createDestination(out, type);
                 else
                     write();
             } finally {
@@ -358,7 +405,7 @@ public class PrivateKeyFile {
         HashCash hc;
         try {
             hc = HashCash.mintCash(resource, effort);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             return null;
         }
         System.out.println("Generation took: " + DataHelper.formatDuration(System.currentTimeMillis() - begin));
@@ -381,7 +428,7 @@ public class PrivateKeyFile {
         hcs = hcs.substring(0, end1) + hcs.substring(start2);
         System.out.println("Short Hashcash is: " + hcs);
 
-        c.setPayload(hcs.getBytes());
+        c.setPayload(DataHelper.getUTF8(hcs));
         return c;
     }
     
@@ -391,7 +438,9 @@ public class PrivateKeyFile {
         Destination d2;
         try {
             d2 = pkf2.getDestination();
-        } catch (Exception e) {
+        } catch (I2PException e) {
+            return null;
+        } catch (IOException e) {
             return null;
         }
         if (d2 == null)
@@ -418,11 +467,29 @@ public class PrivateKeyFile {
         return c;
     }
     
+    /**
+     *  @return null on error or if not initialized
+     */
     public PrivateKey getPrivKey() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return null;
+        }
         return this.privKey;
     }
 
+    /**
+     *  @return null on error or if not initialized
+     */
     public SigningPrivateKey getSigningPrivKey() {
+        try {
+            // call this to force initialization
+            getDestination();
+        } catch (Exception e) {
+            return null;
+        }
         return this.signingPrivKey;
     }
     
@@ -500,7 +567,7 @@ public class PrivateKeyFile {
         long low = Long.MAX_VALUE;
         try {
             low = HashCash.estimateTime(hashEffort);
-        } catch (Exception e) {}
+        } catch (NoSuchAlgorithmException e) {}
         // takes a lot longer than the estimate usually...
         // maybe because the resource string is much longer than used in the estimate?
         return "It is estimated that generating a HashCash Certificate with value " + hashEffort +

@@ -53,6 +53,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  @deprecated unused
      *  @throws UnsupportedOperationException
      */
+    @Deprecated
     @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();
@@ -62,6 +63,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  @deprecated unused
      *  @throws UnsupportedOperationException
      */
+    @Deprecated
     @Override
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         throw new UnsupportedOperationException();
@@ -85,7 +87,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
             throw new I2NPMessageException("Payload is too short " + maxLen);
         int cur = offset;
         if (type < 0) {
-            type = (int)DataHelper.fromLong(data, cur, 1);
+            type = data[cur] & 0xff;
             cur++;
         }
         _uniqueId = DataHelper.fromLong(data, cur, 4);
@@ -118,6 +120,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  @deprecated unused
      *  @throws UnsupportedOperationException
      */
+    @Deprecated
     @Override
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();

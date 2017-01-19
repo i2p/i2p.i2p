@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.util.FileUtil;
@@ -126,6 +127,10 @@ public abstract class LocalHTTPServer {
         // Parameters are url, host, dest, nonce, and master | router | private.
         // Do the add and redirect.
         if (targetRequest.equals("/add")) {
+            if (query == null) {
+                out.write(ERR_ADD.getBytes("UTF-8"));
+                return;
+            }
             Map<String, String> opts = new HashMap<String, String>(8);
             // this only works if all keys are followed by =value
             StringTokenizer tok = new StringTokenizer(query, "=&;");
@@ -165,10 +170,11 @@ public abstract class LocalHTTPServer {
                 Properties nsOptions = new Properties();
                 nsOptions.setProperty("list", book);
                 if (referer != null && referer.startsWith("http")) {
-                    String from = "<a href=\"" + referer + "\">" + referer + "</a>";
-                    nsOptions.setProperty("s", _("Added via address helper from {0}", from));
+                    String ref = DataHelper.escapeHTML(referer);
+                    String from = "<a href=\"" + ref + "\">" + ref + "</a>";
+                    nsOptions.setProperty("s", _t("Added via address helper from {0}", from));
                 } else {
-                    nsOptions.setProperty("s", _("Added via address helper"));
+                    nsOptions.setProperty("s", _t("Added via address helper"));
                 }
                 boolean success = ns.put(host, dest, nsOptions);
                 writeRedirectPage(out, success, host, book, url);
@@ -185,35 +191,36 @@ public abstract class LocalHTTPServer {
     private static void writeRedirectPage(OutputStream out, boolean success, String host, String book, String url) throws IOException {
         String tbook;
         if ("hosts.txt".equals(book))
-            tbook = _("router");
+            tbook = _t("router");
         else if ("userhosts.txt".equals(book))
-            tbook = _("master");
+            tbook = _t("master");
         else if ("privatehosts.txt".equals(book))
-            tbook = _("private");
+            tbook = _t("private");
         else
             tbook = book;
         out.write(("HTTP/1.1 200 OK\r\n"+
                   "Content-Type: text/html; charset=UTF-8\r\n"+
+                  "Referrer-Policy: no-referrer\r\n"+
                   "Connection: close\r\n"+
                   "Proxy-Connection: close\r\n"+
                   "\r\n"+
                   "<html><head>"+
-                  "<title>" + _("Redirecting to {0}", host) + "</title>\n" +
+                  "<title>" + _t("Redirecting to {0}", host) + "</title>\n" +
                   "<link rel=\"shortcut icon\" href=\"http://proxy.i2p/themes/console/images/favicon.ico\" >\n" +
                   "<link href=\"http://proxy.i2p/themes/console/default/console.css\" rel=\"stylesheet\" type=\"text/css\" >\n" +
                   "<meta http-equiv=\"Refresh\" content=\"1; url=" + url + "\">\n" +
                   "</head><body>\n" +
                   "<div class=logo>\n" +
-                  "<a href=\"http://127.0.0.1:7657/\" title=\"" + _("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
-                  "<a href=\"http://127.0.0.1:7657/config\">" + _("Configuration") + "</a> <a href=\"http://127.0.0.1:7657/help.jsp\">" + _("Help") + "</a> <a href=\"http://127.0.0.1:7657/susidns/index\">" + _("Addressbook") + "</a>\n" +
+                  "<a href=\"http://127.0.0.1:7657/\" title=\"" + _t("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
+                  "<a href=\"http://127.0.0.1:7657/config\">" + _t("Configuration") + "</a> <a href=\"http://127.0.0.1:7657/help.jsp\">" + _t("Help") + "</a> <a href=\"http://127.0.0.1:7657/susidns/index\">" + _t("Addressbook") + "</a>\n" +
                   "</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +
                   (success ?
-                           _("Saved {0} to the {1} addressbook, redirecting now.", host, tbook) :
-                           _("Failed to save {0} to the {1} addressbook, redirecting now.", host, tbook)) +
+                           _t("Saved {0} to the {1} addressbook, redirecting now.", host, tbook) :
+                           _t("Failed to save {0} to the {1} addressbook, redirecting now.", host, tbook)) +
                   "</h3>\n<p><a href=\"" + url + "\">" +
-                  _("Click here if you are not redirected automatically.") +
+                  _t("Click here if you are not redirected automatically.") +
                   "</a></p></div>").getBytes("UTF-8"));
         I2PTunnelHTTPClient.writeFooter(out);
         out.flush();
@@ -248,17 +255,17 @@ public abstract class LocalHTTPServer {
     private static final String BUNDLE_NAME = "net.i2p.i2ptunnel.proxy.messages";
 
     /** lang in routerconsole.lang property, else current locale */
-    protected static String _(String key) {
+    protected static String _t(String key) {
         return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
     /** {0} */
-    protected static String _(String key, Object o) {
+    protected static String _t(String key, Object o) {
         return Translate.getString(key, o, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
     /** {0} and {1} */
-    protected static String _(String key, Object o, Object o2) {
+    protected static String _t(String key, Object o, Object o2) {
         return Translate.getString(key, o, o2, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 

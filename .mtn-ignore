@@ -28,18 +28,23 @@ web-fragment.xml
 web-out.xml
 
 # Temporary/build dirs
-^build
+^build$
 ^pkg-temp
-/build
+/build$
 /classes
 /dist
 ^installer/resources/locale/mo
 /tmp
 ^apps/jetty/jettylib
 
+# MSVC files
+core/c/jcpuid/msvc/*.opendb
+core/c/jcpuid/msvc/*.pdb
+core/c/jcpuid/msvc/*.sdf
+core/c/jcpuid/msvc/*.user
+
 # Debian-related
 ^debian/copyright
-^debian/changelog
 ^.pc/
 
 # Build property overrides

@@ -12,12 +12,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 
 /**
  * Factory class for creating SOCKS forwarders through I2P
  */
-public class SOCKSServerFactory {
+class SOCKSServerFactory {
 
     private final static String ERR_REQUEST_DENIED =
         "HTTP/1.1 403 Access Denied - This is a SOCKS proxy, not a HTTP proxy\r\n" +
@@ -37,7 +39,7 @@ public class SOCKSServerFactory {
      * @param s a Socket used to choose the SOCKS server type
      * @param props non-null
      */
-    public static SOCKSServer createSOCKSServer(Socket s, Properties props) throws SOCKSException {
+    public static SOCKSServer createSOCKSServer(I2PAppContext ctx, Socket s, Properties props) throws SOCKSException {
         SOCKSServer serv;
 
         try {
@@ -52,18 +54,18 @@ public class SOCKSServerFactory {
                     props.containsKey(I2PTunnelHTTPClientBase.PROP_PW)) {
                     throw new SOCKSException("SOCKS 4/4a not supported when authorization is required");
                 }
-                serv = new SOCKS4aServer(s, props);
+                serv = new SOCKS4aServer(ctx, s, props);
                 break;
             case 0x05:
                 // SOCKS version 5
-                serv = new SOCKS5Server(s, props);
+                serv = new SOCKS5Server(ctx, s, props);
                 break;
             case 'C':
             case 'G':
             case 'H':
             case 'P':
                 DataOutputStream out = new DataOutputStream(s.getOutputStream());
-                out.write(ERR_REQUEST_DENIED.getBytes());
+                out.write(DataHelper.getASCII(ERR_REQUEST_DENIED));
                 throw new SOCKSException("HTTP request to socks");
             default:
                 throw new SOCKSException("SOCKS protocol version not supported (" + Integer.toHexString(socksVer) + ")");

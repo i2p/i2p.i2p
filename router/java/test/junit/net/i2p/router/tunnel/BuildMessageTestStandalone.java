@@ -75,7 +75,7 @@ public class BuildMessageTestStandalone extends TestCase {
         for (int i = 0; i < cfg.getLength(); i++) {
             // this not only decrypts the current hop's record, but encrypts the other records
             // with the reply key
-            BuildRequestRecord req = proc.decrypt(ctx, msg, _peers[i], _privKeys[i]);
+            BuildRequestRecord req = proc.decrypt(msg, _peers[i], _privKeys[i]);
             // If false, no records matched the _peers[i], or the decryption failed
             assertTrue("foo @ " + i, req != null);
             long ourId = req.readReceiveTunnelId();

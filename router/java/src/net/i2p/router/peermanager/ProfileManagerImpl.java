@@ -222,8 +222,8 @@ public class ProfileManagerImpl implements ProfileManager {
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
-        DBHistory hist = data.getDBHistory();
-        hist.lookupReceived();
+        //DBHistory hist = data.getDBHistory();
+        //hist.lookupReceived();
     }
     
     /**
@@ -313,8 +313,7 @@ public class ProfileManagerImpl implements ProfileManager {
     public void heardAbout(Hash peer, long when) {
         PeerProfile data = getProfile(peer);
         //if (data == null) return;
-        if (when > data.getLastHeardAbout())
-            data.setLastHeardAbout(when);
+        data.setLastHeardAbout(when);
     }
     
     /**
@@ -340,7 +339,6 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         if (prof == null) {
             prof = new PeerProfile(_context, peer);
-            prof.setFirstHeardAbout(_context.clock().now());
             _context.profileOrganizer().addProfile(prof);
         }
         return prof;
@@ -359,6 +357,7 @@ public class ProfileManagerImpl implements ProfileManager {
      *  provide a simple summary of a number of peers, suitable for publication in the netDb
      *  @deprecated unused
      */
+    @Deprecated
     public Properties summarizePeers(int numPeers) {
 /****
         Set peers = new HashSet(numPeers);

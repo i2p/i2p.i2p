@@ -75,6 +75,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private boolean _logLatency = false;
     private boolean _logCookies = false;
     private boolean _logServer = false;
+    private boolean _b64;
     
     private transient OutputStream _out;
     private transient OutputStream _fileOut;
@@ -241,6 +242,15 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         _preferProxiedForAddress = preferProxiedForAddress;
     }
 
+    /**
+     * @param b64 true to enable base 64 logging. False for base 32 logging. Default false.
+     * @since 0.9.24
+     */
+    public void setB64(boolean b64) 
+    {
+        _b64 = b64;
+    }
+
     /* ------------------------------------------------------------ */
     public void log(Request request, Response response)
     {
@@ -279,11 +289,15 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 }
 
                 if (addr == null) {
-                    // TODO offer B32 option
-                    addr = request.getHeader("X-I2P-DestHash");
-                    if(addr != null)
-                        addr += ".i2p";
-                    else
+                    if (_b64) {
+                        addr = request.getHeader("X-I2P-DestHash");
+                        if (addr != null)
+                            addr += ".i2p";
+                    } else {
+                        // 52chars.b32.i2p
+                        addr = request.getHeader("X-I2P-DestB32");
+                    }
+                    if (addr == null)
                         addr = request.getRemoteAddr();
                 }
 

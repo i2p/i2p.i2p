@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.TimeZone;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
@@ -40,7 +41,7 @@ public class MessageHistory {
     //private SubmitMessageHistoryJob _submitMessageHistoryJob;
     private volatile boolean _firstPass;
     
-    private final static byte[] NL = System.getProperty("line.separator").getBytes();
+    private final static byte[] NL = DataHelper.getUTF8(System.getProperty("line.separator"));
     private final static int FLUSH_SIZE = 1000; // write out at least once every 1000 entries
         
     /** config property determining whether we want to debug with the message history - default false */
@@ -76,6 +77,7 @@ public class MessageHistory {
     public boolean getDoLog() { return _doLog; }
     
     /** @deprecated unused */
+    @Deprecated
     void setPauseFlushes(boolean doPause) { _doPause = doPause; }
     String getFilename() { return _historyFile; }
     
@@ -636,7 +638,7 @@ public class MessageHistory {
             fos = new SecureFileOutputStream(f, true);
             String entry;
             while ((entry = _unwrittenEntries.poll()) != null) {
-                fos.write(entry.getBytes());
+                fos.write(DataHelper.getUTF8(entry));
                 fos.write(NL);
             }
         } catch (IOException ioe) {

@@ -243,7 +243,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 String portNum = getTunnel().port;
                 if (portNum == null)
                     portNum = "7654";
-                String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
+                String msg;
+                if (getTunnel().getContext().isRouterContext())
+                    msg = "Unable to build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
+                else
+                    msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the server at " + remoteHost.getHostAddress() + ':' + remotePort;
                 if (++retries < MAX_RETRIES) {
                     msg += ", retrying in " + (RETRY_DELAY / 1000) + " seconds";
@@ -426,7 +430,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 try {
                     int myPort = Integer.parseInt(key);
                     String host = (String) e.getValue();
-                    int colon = host.indexOf(":");
+                    int colon = host.indexOf(':');
                     int port = Integer.parseInt(host.substring(colon + 1));
                     host = host.substring(0, colon);
                     InetSocketAddress isa = new InetSocketAddress(host, port);
@@ -517,7 +521,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 break;
             } catch(SocketTimeoutException ste) {
                 // ignored, we never set the timeout
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 // streaming borkage
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Uncaught exception accepting", e);

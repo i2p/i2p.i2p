@@ -72,6 +72,7 @@ public class AESEngine {
      * @return null on error
      * @deprecated unused
      */
+    @Deprecated
     public byte[] safeEncrypt(byte payload[], SessionKey sessionKey, byte iv[], int paddedSize) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
@@ -103,6 +104,7 @@ public class AESEngine {
      * @return null on error
      * @deprecated unused
      */
+    @Deprecated
     public byte[] safeDecrypt(byte payload[], SessionKey sessionKey, byte iv[]) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 

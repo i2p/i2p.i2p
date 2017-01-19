@@ -25,6 +25,7 @@ import net.i2p.kademlia.SelectionCollector;
 import net.i2p.kademlia.XORComparator;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.util.MaskedIPSet;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -170,6 +171,11 @@ class FloodfillPeerSelector extends PeerSelector {
     private static final int NO_FAIL_LOOKUP_OK = 75*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
     private static final int MAX_GOOD_RESP_TIME = 5*1000;
+    // TODO we need better tracking of floodfill first-heard-about times
+    // before we can do this. Old profiles get deleted.
+    //private static final long HEARD_AGE = 48*60*60*1000L;
+    private static final long HEARD_AGE = 60*60*1000L;
+    private static final long INSTALL_AGE = HEARD_AGE + (60*60*1000L);
 
     /**
      *  See above for description
@@ -206,6 +212,8 @@ class FloodfillPeerSelector extends PeerSelector {
         List<Hash> badff = new ArrayList<Hash>(ffs.size());
         int found = 0;
         long now = _context.clock().now();
+        long installed = _context.getProperty("router.firstInstalled", 0L);
+        boolean enforceHeard = installed > 0 && (now - installed) > INSTALL_AGE;
 
         double maxFailRate = 100;
         if (_context.router().getUptime() > 60*60*1000) {
@@ -222,7 +230,7 @@ class FloodfillPeerSelector extends PeerSelector {
         // 5 == FNDF.MAX_TO_FLOOD + 1
         int limit = Math.max(5, howMany);
         limit = Math.min(limit, ffs.size());
-        Set<Integer> maskedIPs = new HashSet<Integer>(limit + 4);
+        MaskedIPSet maskedIPs = new MaskedIPSet(limit * 3);
         // split sorted list into 3 sorted lists
         for (int i = 0; found < howMany && i < limit; i++) {
             Hash entry = sorted.first();
@@ -231,16 +239,16 @@ class FloodfillPeerSelector extends PeerSelector {
             sorted.remove(entry);
             // put anybody in the same /16 at the end
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
-            Set<Integer> entryIPs = maskedIPSet(entry, info, 2);
+            MaskedIPSet entryIPs = new MaskedIPSet(_context, entry, info, 2);
             boolean sameIP = false;
-            for (Integer ip : entryIPs) {
+            for (String ip : entryIPs) {
                 if (!maskedIPs.add(ip))
                     sameIP = true;
             }
             if (sameIP) {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Same /16: " + entry);
+                    _log.debug("Same /16, family, or port: " + entry);
             } else if (info != null && now - info.getPublished() > 3*60*60*1000) {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
@@ -249,6 +257,10 @@ class FloodfillPeerSelector extends PeerSelector {
                 badff.add(entry);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Bad country: " + entry);
+            } else if (info != null && info.getBandwidthTier().equals("L")) {
+                badff.add(entry);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Slow: " + entry);
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 double maxGoodRespTime = MAX_GOOD_RESP_TIME;
@@ -258,27 +270,43 @@ class FloodfillPeerSelector extends PeerSelector {
                     if (tunnelTestTime != null && tunnelTestTime.getAverageValue() > 500)
                         maxGoodRespTime = 2 * tunnelTestTime.getAverageValue();
                 }
-                if (prof != null && prof.getDBHistory() != null
-                    && prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
-                    && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
-                    && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD
-                    && prof.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getAverageValue() < maxFailRate) {
-                    // good
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Good: " + entry);
-                    rv.add(entry);
-                    found++;
-                } else if (prof != null && prof.getDBHistory() != null
-                           && (prof.getDBHistory().getLastStoreFailed() <= prof.getDBHistory().getLastStoreSuccessful()
-                               || prof.getDBHistory().getLastLookupFailed() <= prof.getDBHistory().getLastLookupSuccessful()
-                               || (prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
-                                   && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK))) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("OK: " + entry);
-                    okff.add(entry);
+                if (prof != null) {
+                    if (enforceHeard && prof.getFirstHeardAbout() > now - HEARD_AGE) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Bad (new): " + entry);
+                        badff.add(entry);
+                    } else if (prof.getDBHistory() != null) {
+                        if (prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
+                            && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
+                            && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_GOOD
+                            && prof.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getAverageValue() < maxFailRate) {
+                            // good
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Good: " + entry);
+                            rv.add(entry);
+                            found++;
+                        } else if (prof.getDBHistory().getLastStoreFailed() <= prof.getDBHistory().getLastStoreSuccessful()
+                                   || prof.getDBHistory().getLastLookupFailed() <= prof.getDBHistory().getLastLookupSuccessful()
+                                   || (prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_OK
+                                       && prof.getDBHistory().getLastLookupFailed() < now - NO_FAIL_LOOKUP_OK)) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("OK: " + entry);
+                            okff.add(entry);
+                        } else {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Bad (DB): " + entry);
+                            badff.add(entry);
+                        }
+                    } else {
+                        // no DBHistory
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Bad (no hist): " + entry);
+                        badff.add(entry);
+                    }
                 } else {
+                    // no profile
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Bad: " + entry);
+                        _log.debug("Bad (no prof): " + entry);
                     badff.add(entry);
                 }
             }
@@ -300,52 +328,6 @@ class FloodfillPeerSelector extends PeerSelector {
         return rv;
     }
     
-
-    /**
-      * The Set of IPs for this peer, with a given mask.
-      * Includes the comm system's record of the IP, and all netDb addresses.
-      *
-      * @param pinfo may be null
-      * @return an opaque set of masked IPs for this peer
-      * @since 0.9.5 modified from ProfileOrganizer
-      */
-    private Set<Integer> maskedIPSet(Hash peer, RouterInfo pinfo, int mask) {
-        Set<Integer> rv = new HashSet<Integer>(4);
-        byte[] commIP = _context.commSystem().getIP(peer);
-        if (commIP != null)
-            rv.add(maskedIP(commIP, mask));
-        if (pinfo == null)
-            return rv;
-        Collection<RouterAddress> paddr = pinfo.getAddresses();
-        for (RouterAddress pa : paddr) {
-            byte[] pib = pa.getIP();
-            if (pib == null) continue;
-            rv.add(maskedIP(pib, mask));
-        }
-        return rv;
-    }
-
-    /**
-     * generate an arbitrary unique value for this ip/mask (mask = 1-4)
-     * If IPv6, force mask = 8.
-     * @since 0.9.5 copied from ProfileOrganizer
-     */
-    private static Integer maskedIP(byte[] ip, int mask) {
-        int rv = ip[0];
-        if (ip.length == 16) {
-            for (int i = 1; i < 8; i++) {
-                rv <<= i * 4;
-                rv ^= ip[i];
-            }
-        } else {
-            for (int i = 1; i < mask; i++) {
-                rv <<= 8;
-                rv ^= ip[i];
-            }
-        }
-        return Integer.valueOf(rv);
-    }
-
     private class FloodfillSelectionCollector implements SelectionCollector<Hash> {
         private final TreeSet<Hash> _sorted;
         private final List<Hash>  _floodfillMatches;

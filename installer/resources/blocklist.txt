@@ -1,9 +1,12 @@
 #
 # If you have a 'split' directory installation, with configuration
-# files in ~/.i2p (Linux) or %APPDATA%\I2P (Windows), be sure to
+# files in ~/.i2p (Linux), %APPDATA%\I2P (Windows),
+# or /Users/(user)/Library/Application Support/i2p (Mac), be sure to
 # edit the file in the configuration directory, NOT the install directory.
 # When running as a Linux daemon, the configuration directory is /var/lib/i2p
 # and the install directory is /usr/share/i2p .
+# When running as a Windows service, the configuration directory is \ProgramData\i2p
+# and the install directory is \Program Files\i2p .
 #
 # The file in the install directory will be overwritten when you update I2P.
 # As of release 0.9.18, the router reads and merges the files in the install directory
@@ -42,6 +45,10 @@
 #   *   hostname (DNS looked up at list readin time, not dynamically, so may not be much use)
 #   *   44-byte Base64 router hash
 #   *
+#   * Acceptable formats (IPV6 only):
+#   *   comment:IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+#   *   IPv6 (must replace : with ; e.g. abcd;1234;0;12;;ff)
+#   *
 #   * No whitespace allowed after the last ':'.
 #   *
 #   * For further information and downloads:
@@ -53,6 +60,7 @@ Chinese Floodfill Flooder:159.226.40.7
 Friend of the Chinese Floodfill Flooder:159.226.40.3
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:0.0.0.0/8
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:10.0.0.0/8
+<a href="http://tools.ietf.org/html/rfc6598">Shared Address Space</a>:100.64.0.0/10
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:127.0.0.0/8
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:169.254.0.0/16
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:172.16.0.0/12
@@ -64,3 +72,17 @@ Friend of the Chinese Floodfill Flooder:159.226.40.3
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.51.100.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:203.0.113.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:224.0.0.0/3
+Sybil:45.32.60.71
+Sybil:45.76.129.193
+Sybil:47.88.6.66
+Sybil:47.88.7.8
+Sybil:47.88.136.46
+Sybil:47.88.136.86
+Sybil:47.88.138.200
+Sybil:47.89.38.177
+Sybil:47.90.1.15
+Sybil:47.90.1.26
+Sybil:150.95.128.165
+Sybil:2001;19f0;7001;d99;5400;ff;fe41;829c
+Sybil:2001;19f0;7402;24d;5400;ff;fe41;9153
+Sybil:2400;8500;1302;816;a150;95;128;165b

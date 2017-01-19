@@ -31,7 +31,7 @@ public class I2PSocketAddress extends SocketAddress {
      */
     public I2PSocketAddress(String host) {
         int port = 0;
-        int colon = host.indexOf(":");
+        int colon = host.indexOf(':');
         if (colon > 0) {
             try {
                 port = Integer.parseInt(host.substring(colon + 1));

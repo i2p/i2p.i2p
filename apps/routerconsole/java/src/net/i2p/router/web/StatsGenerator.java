@@ -40,7 +40,7 @@ public class StatsGenerator {
         groups.putAll(unsorted);
         for (String group : groups.keySet()) {
             buf.append("<option value=\"#").append(group).append("\">");
-            buf.append(_(group)).append("</option>\n");
+            buf.append(_t(group)).append("</option>\n");
             // let's just do the groups
             //Set stats = (Set)entry.getValue();
             //for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
@@ -54,14 +54,14 @@ public class StatsGenerator {
             //out.write(buf.toString());
             //buf.setLength(0);
         }
-        buf.append("</select> <input type=\"submit\" value=\"").append(_("GO")).append("\" />");
+        buf.append("</select> <input type=\"submit\" value=\"").append(_t("GO")).append("\" />");
         buf.append("</form>");
         
-        buf.append(_("Statistics gathered during this router's uptime")).append(" (");
+        buf.append(_t("Statistics gathered during this router's uptime")).append(" (");
         long uptime = _context.router().getUptime();
         buf.append(DataHelper.formatDuration2(uptime));
-        buf.append(").  ").append( _("The data gathered is quantized over a 1 minute period, so should just be used as an estimate."));
-        buf.append(' ').append( _("These statistics are primarily used for development and debugging."));
+        buf.append(").  ").append( _t("The data gathered is quantized over a 1 minute period, so should just be used as an estimate."));
+        buf.append(' ').append( _t("These statistics are primarily used for development and debugging."));
 
         out.write(buf.toString());
         buf.setLength(0);
@@ -72,7 +72,7 @@ public class StatsGenerator {
             buf.append("<h3><a name=\"");
             buf.append(group);
             buf.append("\">");
-            buf.append(_(group));
+            buf.append(_t(group));
             buf.append("</a></h3>");
             buf.append("<ul>");
             out.write(buf.toString());
@@ -102,7 +102,7 @@ public class StatsGenerator {
         buf.append(freq.getDescription());
         buf.append("</i><br>");
         if (freq.getEventCount() <= 0) {
-            buf.append(_("No lifetime events")).append("<br>\n");
+            buf.append(_t("No lifetime events")).append("<br>\n");
             return;
         }
         long uptime = _context.router().getUptime();
@@ -113,15 +113,15 @@ public class StatsGenerator {
             if (periods[i] > uptime)
                 break;
             buf.append("<li>");
-            renderPeriod(buf, periods[i], _("frequency"));
+            renderPeriod(buf, periods[i], _t("frequency"));
             Frequency curFreq = freq.getFrequency(periods[i]);
             buf.append(DataHelper.formatDuration2(Math.round(curFreq.getAverageInterval())));
             buf.append("; ");
-            buf.append(_("Rolling average events per period"));
+            buf.append(_t("Rolling average events per period"));
             buf.append(": ");
             buf.append(num(curFreq.getAverageEventsPerPeriod()));
             buf.append("; ");
-            buf.append(_("Highest events per period"));
+            buf.append(_t("Highest events per period"));
             buf.append(": ");
             buf.append(num(curFreq.getMaxAverageEventsPerPeriod()));
             buf.append("; ");
@@ -132,12 +132,12 @@ public class StatsGenerator {
             //}
             //buf.append(" <i>avg interval between updates:</i> (").append(num(curFreq.getAverageInterval())).append("ms, min ");
             //buf.append(num(curFreq.getMinAverageInterval())).append("ms)");
-            buf.append(_("Lifetime average events per period")).append(": ");
+            buf.append(_t("Lifetime average events per period")).append(": ");
             buf.append(num(curFreq.getStrictAverageEventsPerPeriod()));
             buf.append("</li>\n");
         }
         // Display the strict average
-        buf.append("<li><b>").append(_("Lifetime average frequency")).append(":</b> ");
+        buf.append("<li><b>").append(_t("Lifetime average frequency")).append(":</b> ");
         buf.append(DataHelper.formatDuration2(freq.getFrequency()));
         buf.append(" (");
         buf.append(ngettext("1 event", "{0} events", (int) freq.getEventCount()));
@@ -153,7 +153,7 @@ public class StatsGenerator {
             buf.append("</i><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
-            buf.append(_("No lifetime events")).append("<br>\n");
+            buf.append(_t("No lifetime events")).append("<br>\n");
             return;
         }
         long now = _context.clock().now();
@@ -165,12 +165,12 @@ public class StatsGenerator {
             if (curRate.getLastCoalesceDate() <= curRate.getCreationDate())
                 break;
             buf.append("<li>");
-            renderPeriod(buf, periods[i], _("rate"));
+            renderPeriod(buf, periods[i], _t("rate"));
             if (curRate.getLastEventCount() > 0) {
-                buf.append(_("Average")).append(": ");
+                buf.append(_t("Average")).append(": ");
                 buf.append(num(curRate.getAverageValue()));
                 buf.append("; ");
-                buf.append(_("Highest average"));
+                buf.append(_t("Highest average"));
                 buf.append(": ");
                 buf.append(num(curRate.getExtremeAverageValue()));
                 buf.append("; ");
@@ -199,16 +199,16 @@ public class StatsGenerator {
 
                 buf.append(ngettext("There was 1 event in this period.", "There were {0} events in this period.", (int)curRate.getLastEventCount()));
                 buf.append(' ');
-                buf.append(_("The period ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
+                buf.append(_t("The period ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
             } else {
-                buf.append(" <i>").append(_("No events")).append("</i> ");
+                buf.append(" <i>").append(_t("No events")).append("</i> ");
             }
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
-                buf.append(" (").append(_("Average event count")).append(": ");
+                buf.append(" (").append(_t("Average event count")).append(": ");
                 buf.append(num(avgFrequency));
-                buf.append("; ").append(_("Events in peak period")).append(": ");
+                buf.append("; ").append(_t("Events in peak period")).append(": ");
                 // This isn't really the highest event count, but the event count during the period with the highest total value.
                 buf.append(curRate.getExtremeEventCount());
                 buf.append(")");
@@ -216,19 +216,19 @@ public class StatsGenerator {
             if (curRate.getSummaryListener() != null) {
                 buf.append(" <a href=\"graph?stat=").append(name)
                    .append('.').append(periods[i]);
-                buf.append("\">").append(_("Graph Data")).append("</a> - ");
+                buf.append("\">").append(_t("Graph Data")).append("</a> - ");
                 buf.append(" <a href=\"graph?stat=").append(name)
                    .append('.').append(periods[i]);
-                buf.append("&amp;showEvents=true\">").append(_("Graph Event Count")).append("</a>");
+                buf.append("&amp;showEvents=true\">").append(_t("Graph Event Count")).append("</a>");
                 // This can really blow up your browser if you click on it
                 //buf.append(" - <a href=\"viewstat.jsp?stat=").append(name);
                 //buf.append("&amp;period=").append(periods[i]);
-                //buf.append("&amp;format=xml\">").append(_("Export Data as XML")).append("</a>");
+                //buf.append("&amp;format=xml\">").append(_t("Export Data as XML")).append("</a>");
             }
             buf.append("</li>\n");
         }
         // Display the strict average
-        buf.append("<li><b>").append(_("Lifetime average value")).append(":</b> ");
+        buf.append("<li><b>").append(_t("Lifetime average value")).append(":</b> ");
         buf.append(num(rate.getLifetimeAverageValue()));
         buf.append(" (");
         buf.append(ngettext("1 event", "{0} events", (int) rate.getLifetimeEventCount()));
@@ -258,19 +258,19 @@ public class StatsGenerator {
      */
     private class AlphaComparator implements Comparator<String> {
         public int compare(String lhs, String rhs) {
-            String lname = _(lhs);
-            String rname = _(rhs);
+            String lname = _t(lhs);
+            String rname = _t(rhs);
             return Collator.getInstance().compare(lname, rname);
         }
     }
 
     /** translate a string */
-    private String _(String s) {
+    private String _t(String s) {
         return Messages.getString(s, _context);
     }
 
     /** translate a string */
-    private String _(String s, Object o) {
+    private String _t(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
 

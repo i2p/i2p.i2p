@@ -15,12 +15,12 @@ public class ConfigKeyringHandler extends FormHandler {
     @Override
     protected void processForm() {
         if (_action == null) return;
-        boolean adding = _action.equals(_("Add key"));
-        if (adding || _action.equals(_("Delete key"))) {
+        boolean adding = _action.equals(_t("Add key"));
+        if (adding || _action.equals(_t("Delete key"))) {
             if (_peer == null)
-                addFormError(_("You must enter a destination"));
+                addFormError(_t("You must enter a destination"));
             if (_key == null && adding)
-                addFormError(_("You must enter a key"));
+                addFormError(_t("You must enter a key"));
             if (_peer == null || (_key == null && adding))
                 return;
             Hash h = ConvertToHash.getHash(_peer);
@@ -31,22 +31,22 @@ public class ConfigKeyringHandler extends FormHandler {
                 } catch (DataFormatException dfe) {}
                 if (h != null && h.getData() != null && sk.getData() != null) {
                     _context.keyRing().put(h, sk);
-                    addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("added to keyring"));
+                    addFormNotice(_t("Key for") + " " + h.toBase64() + " " + _t("added to keyring"));
                 } else {
-                    addFormError(_("Invalid destination or key"));
+                    addFormError(_t("Invalid destination or key"));
                 }
             } else {  // Delete
                 if (h != null && h.getData() != null) {
                     if (_context.keyRing().remove(h) != null)
-                        addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("removed from keyring"));
+                        addFormNotice(_t("Key for") + " " + h.toBase64() + " " + _t("removed from keyring"));
                     else
-                        addFormNotice(_("Key for") + " " + h.toBase64() + " " + _("not found in keyring"));
+                        addFormNotice(_t("Key for") + " " + h.toBase64() + " " + _t("not found in keyring"));
                 } else {
-                    addFormError(_("Invalid destination"));
+                    addFormError(_t("Invalid destination"));
                 }
             }
         } else {
-            //addFormError(_("Unsupported"));
+            //addFormError(_t("Unsupported"));
         }
     }
 

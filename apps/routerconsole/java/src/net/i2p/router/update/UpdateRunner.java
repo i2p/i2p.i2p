@@ -152,7 +152,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
                 if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
                     proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
                     _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
-                    String msg = _("HTTP client proxy tunnel must be running");
+                    String msg = _t("HTTP client proxy tunnel must be running");
                     if (_log.shouldWarn())
                         _log.warn(msg);
                     updateStatus("<b>" + msg + "</b>");
@@ -199,7 +199,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
                 continue;
             }
 
-            updateStatus("<b>" + _("Updating from {0}", linkify(updateURL)) + "</b>");
+            updateStatus("<b>" + _t("Updating from {0}", linkify(updateURL)) + "</b>");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Selected update URL: " + updateURL);
 
@@ -259,7 +259,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_isPartial)
             return;
         long d = currentWrite + bytesTransferred;
-        String status = "<b>" + _("Updating") + "</b>";
+        String status = "<b>" + _t("Updating") + "</b>";
         _mgr.notifyProgress(this, status, d, d + bytesRemaining);
     }
 
@@ -272,7 +272,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
             if (newer) {
                 _newVersion = newVersion;
             } else {
-                updateStatus("<b>" + _("No new version found at {0}", linkify(url)) + "</b>");
+                updateStatus("<b>" + _t("No new version found at {0}", linkify(url)) + "</b>");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Found old version \"" + newVersion + "\" at " + url);
             }
@@ -295,7 +295,7 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
         if (_log.shouldLog(Log.WARN))
             _log.warn("Update from " + url + " did not download completely (" +
                            bytesRemaining + " remaining after " + currentAttempt + " tries)");
-        updateStatus("<b>" + _("Transfer failed from {0}", linkify(url)) + "</b>");
+        updateStatus("<b>" + _t("Transfer failed from {0}", linkify(url)) + "</b>");
         _mgr.notifyAttemptFailed(this, url, null);
         // update() will call notifyTaskFailed() after last URL
     }
@@ -313,15 +313,15 @@ class UpdateRunner extends I2PAppThread implements UpdateTask, EepGet.StatusList
     }
 
     /** translate a string */
-    protected String _(String s) {
-        return _mgr._(s);
+    protected String _t(String s) {
+        return _mgr._t(s);
     }
 
     /**
      *  translate a string with a parameter
      */
-    protected String _(String s, Object o) {
-        return _mgr._(s, o);
+    protected String _t(String s, Object o) {
+        return _mgr._t(s, o);
     }
 
     @Override

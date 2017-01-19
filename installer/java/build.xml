@@ -19,7 +19,7 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
-    <property name="javac.version" value="1.6" />
+    <property name="javac.version" value="1.7" />
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
@@ -57,6 +57,8 @@
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
         </jar>
     </target>

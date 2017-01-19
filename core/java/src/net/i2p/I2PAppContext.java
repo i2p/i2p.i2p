@@ -84,6 +84,7 @@ public class I2PAppContext {
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
+    @SuppressWarnings("deprecation")
     private SimpleScheduler _simpleScheduler;
     private SimpleTimer _simpleTimer;
     private SimpleTimer2 _simpleTimer2;
@@ -435,8 +436,9 @@ public class I2PAppContext {
      */
     public String getProperty(String propName) {
         if (_overrideProps != null) {
-            if (_overrideProps.containsKey(propName))
-                return _overrideProps.getProperty(propName);
+            String rv = _overrideProps.getProperty(propName);
+            if (rv != null)
+                return rv;
         }
         return System.getProperty(propName);
     }
@@ -532,7 +534,7 @@ public class I2PAppContext {
      * @return set of Strings containing the names of defined system properties
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public Set<String> getPropertyNames() { 
+    public Set<String> getPropertyNames() { 
         // clone to avoid ConcurrentModificationException
         Set<String> names = new HashSet<String>((Set<String>) (Set) ((Properties) System.getProperties().clone()).keySet()); // TODO-Java6: s/keySet()/stringPropertyNames()/
         if (_overrideProps != null)
@@ -743,6 +745,7 @@ public class I2PAppContext {
     }
 
     /** @deprecated used only by syndie */
+    @Deprecated
     public HMAC256Generator hmac256() {
         if (!_hmac256Initialized)
             initializeHMAC256();
@@ -750,6 +753,7 @@ public class I2PAppContext {
     }
 
     /** @deprecated used only by syndie */
+    @Deprecated
     private void initializeHMAC256() {
         synchronized (_lock10) {
             if (_hmac256 == null) {
@@ -940,6 +944,8 @@ public class I2PAppContext {
      * @since 0.9 to replace static instance in the class
      * @deprecated in 0.9.20, use simpleTimer2()
      */
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public SimpleScheduler simpleScheduler() {
         if (!_simpleSchedulerInitialized)
             initializeSimpleScheduler();
@@ -949,6 +955,7 @@ public class I2PAppContext {
     /**
      * @deprecated in 0.9.20
      */
+    @Deprecated
     private void initializeSimpleScheduler() {
         synchronized (_lock18) {
             if (_simpleScheduler == null)
@@ -962,6 +969,7 @@ public class I2PAppContext {
      * @since 0.9 to replace static instance in the class
      * @deprecated use SimpleTimer2
      */
+    @Deprecated
     public SimpleTimer simpleTimer() {
         if (!_simpleTimerInitialized)
             initializeSimpleTimer();
@@ -971,6 +979,7 @@ public class I2PAppContext {
     /**
      * @deprecated use SimpleTimer2
      */
+    @Deprecated
     private void initializeSimpleTimer() {
         synchronized (_lock19) {
             if (_simpleTimer == null)

@@ -97,7 +97,7 @@ public class TestSwarm {
                 flooder.closed();
                 _log.debug("Connection " + flooder.getConnectionId() + " closed to " + flooder.getDestination());
             } else {
-                _log.error("wtf, not connected to " + id + " but we were just closed?");
+                _log.error("not connected to " + id + " but we were just closed?");
             }
         }
         public void streamDataReceived(int id, byte data[], int offset, int length) {
@@ -109,7 +109,7 @@ public class TestSwarm {
             if (flooder != null) {
                 flooder.received(length, value);
             } else {
-                _log.error("wtf, not connected to " + id + " but we received " + value + "?");
+                _log.error("not connected to " + id + " but we received " + value + "?");
             }
         }
         public void streamConnectedReceived(String dest, int id) {  
@@ -140,22 +140,22 @@ public class TestSwarm {
     private String handshake() {
         synchronized (_samOut) {
             try {
-                _samOut.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+                _samOut.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
                 _samOut.flush();
                 _log.debug("Hello sent");
-                boolean ok = _eventHandler.waitForHelloReply();
-                _log.debug("Hello reply found: " + ok);
-                if (!ok) 
-                    throw new IOException("wtf, hello failed?");
+                String serverVersion = _eventHandler.waitForHelloReply();
+                _log.debug("Hello reply found: " + serverVersion);
+                if (serverVersion == null)
+                    throw new IOException("hello failed?");
                 String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + _destFile + " " + _conOptions + "\n";
-                _samOut.write(req.getBytes());
+                _samOut.write(DataHelper.getUTF8(req));
                 _samOut.flush();
                 _log.debug("Session create sent");
-                ok = _eventHandler.waitForSessionCreateReply();
+                boolean ok = _eventHandler.waitForSessionCreateReply();
                 _log.debug("Session create reply found: " + ok);
 
                 req = "NAMING LOOKUP NAME=ME\n";
-                _samOut.write(req.getBytes());
+                _samOut.write(DataHelper.getASCII(req));
                 _samOut.flush();
                 _log.debug("Naming lookup sent");
                 String destination = _eventHandler.waitForNamingReply("ME");
@@ -177,7 +177,7 @@ public class TestSwarm {
     private boolean writeDest(String dest) {
         try {
             FileOutputStream fos = new FileOutputStream(_destFile);
-            fos.write(dest.getBytes());
+            fos.write(DataHelper.getASCII(dest));
             fos.close();
             return true;
         } catch (Exception e) {
@@ -203,7 +203,7 @@ public class TestSwarm {
                         _remotePeers.put(new Integer(con), flooder);
                     }
                     
-                    byte msg[] = ("STREAM CONNECT ID=" + con + " DESTINATION=" + remDest + "\n").getBytes();
+                    byte msg[] = (DataHelper.getUTF8("STREAM CONNECT ID=" + con + " DESTINATION=" + remDest + "\n"));
                     synchronized (_samOut) {
                         _samOut.write(msg);
                         _samOut.flush();
@@ -257,7 +257,7 @@ public class TestSwarm {
             long value = 0;
             long lastSend = _context.clock().now();
             while (!_closed) {
-                byte msg[] = ("STREAM SEND ID=" + _connectionId + " SIZE=" + data.length + "\n").getBytes();
+                byte msg[] = (DataHelper.getASCII("STREAM SEND ID=" + _connectionId + " SIZE=" + data.length + "\n"));
                 DataHelper.toLong(data, 0, 4, value);
                 try {
                     synchronized (_samOut) {

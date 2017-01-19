@@ -196,6 +196,7 @@ public class PeerID implements Comparable<PeerID>
    * Compares port, address and id.
    * @deprecated unused? and will NPE now that address can be null?
    */
+  @Deprecated
   public int compareTo(PeerID pid)
   {
     int result = port - pid.port;

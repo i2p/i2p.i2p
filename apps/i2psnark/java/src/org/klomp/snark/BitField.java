@@ -108,6 +108,27 @@ public class BitField
   }
 
   /**
+   * Sets the given bit to false.
+   *
+   * @exception IndexOutOfBoundsException if bit is smaller then zero
+   * bigger then size (inclusive).
+   * @since 0.9.22
+   */
+  public void clear(int bit)
+  {
+    if (bit < 0 || bit >= size)
+      throw new IndexOutOfBoundsException(Integer.toString(bit));
+    int index = bit/8;
+    int mask = 128 >> (bit % 8);
+    synchronized(this) {
+        if ((bitfield[index] & mask) != 0) {
+            count--;
+            bitfield[index] &= ~mask;
+        }
+    }
+  }
+
+  /**
    * Sets all bits to true.
    *
    * @since 0.9.21

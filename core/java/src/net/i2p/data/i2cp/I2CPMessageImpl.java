@@ -105,7 +105,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
         byte[] data = doWriteMessage();
         try {
             DataHelper.writeLong(out, 4, data.length);
-            DataHelper.writeLong(out, 1, getType());
+            out.write((byte) getType());
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to write the message length or type", dfe);
         }

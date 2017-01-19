@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 /**
  *
+ * Note: concrete subclasses must implement hashCode() and equals()
+ *
  * @since 0.9.15
  *
  */
@@ -60,4 +62,6 @@ public abstract class FieldElement implements Serializable {
     public abstract FieldElement invert();
 
     public abstract FieldElement pow22523();
+
+    // Note: concrete subclasses must implement hashCode() and equals()
 }

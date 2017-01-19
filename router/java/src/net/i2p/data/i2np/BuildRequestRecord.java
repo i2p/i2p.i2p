@@ -1,6 +1,9 @@
 package net.i2p.data.i2np;
 
+import java.util.Date;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -68,7 +71,7 @@ public class BuildRequestRecord {
     private static final int OFF_SEND_IDENT = OFF_SEND_TUNNEL + 4;
     private static final int OFF_LAYER_KEY = OFF_SEND_IDENT + Hash.HASH_LENGTH;
     private static final int OFF_IV_KEY = OFF_LAYER_KEY + SessionKey.KEYSIZE_BYTES;
-    private static final int OFF_REPLY_KEY = OFF_IV_KEY + SessionKey.KEYSIZE_BYTES;
+    public static final int OFF_REPLY_KEY = OFF_IV_KEY + SessionKey.KEYSIZE_BYTES;
     private static final int OFF_REPLY_IV = OFF_REPLY_KEY + SessionKey.KEYSIZE_BYTES;
     private static final int OFF_FLAG = OFF_REPLY_IV + IV_SIZE;
     private static final int OFF_REQ_TIME = OFF_FLAG + 1;
@@ -156,7 +159,8 @@ public class BuildRequestRecord {
     }
 
     /**
-     * Time that the request was sent (ms), truncated to the nearest hour
+     * Time that the request was sent (ms), truncated to the nearest hour.
+     * This ignores leap seconds.
      */
     public long readRequestTime() {
         return DataHelper.fromLong(_data, OFF_REQ_TIME, 4) * (60 * 60 * 1000L);
@@ -263,6 +267,7 @@ public class BuildRequestRecord {
         long truncatedHour = ctx.clock().now();
         // prevent hop identification at top of the hour
         truncatedHour -= ctx.random().nextInt(90*1000);
+        // this ignores leap seconds
         truncatedHour /= (60l*60l*1000l);
         DataHelper.toLong(buf, OFF_REQ_TIME, 4, truncatedHour);
         DataHelper.toLong(buf, OFF_SEND_MSG_ID, 4, nextMsgId);
@@ -271,5 +276,35 @@ public class BuildRequestRecord {
         byte wroteIV[] = readReplyIV();
         if (!DataHelper.eq(iv, wroteIV))
             throw new RuntimeException("foo");
+    }
+
+    /**
+     *  @since 0.9.24
+     */
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("BRR ");
+        boolean isIBGW = readIsInboundGateway();
+        boolean isOBEP = readIsOutboundEndpoint();
+        if (isIBGW) {
+            buf.append("IBGW in: ").append(readReceiveTunnelId())
+               .append(" out ").append(readNextTunnelId());
+        } else if (isOBEP) {
+            buf.append("OBEP in: ").append(readReceiveTunnelId());
+        } else {
+            buf.append("part. in: ").append(readReceiveTunnelId())
+               .append(" out: ").append(readNextTunnelId());
+        }
+        buf.append(" to: ").append(readNextIdentity())
+           .append(" layer key: ").append(readLayerKey())
+           .append(" IV key: ").append(readIVKey())
+           .append(" reply key: ").append(readReplyKey())
+           .append(" reply IV: ").append(Base64.encode(readReplyIV()))
+           .append(" hour: ").append(new Date(readRequestTime()))
+           .append(" reply msg id: ").append(readReplyMessageId());
+        // to chase i2pd bug
+        //buf.append('\n').append(net.i2p.util.HexDump.dump(readReplyKey().getData()));
+        return buf.toString();
     }
 }   

@@ -26,6 +26,7 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.app.*;
 import static net.i2p.app.ClientAppState.*;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 
 import org.eclipse.jetty.server.Connector;
@@ -38,6 +39,7 @@ import org.eclipse.jetty.xml.XmlConfiguration;
 /**
  *  Start Jetty where the args are one or more XML files.
  *  Save a reference to the Server so it can be cleanly stopped later.
+ *  Caller must call startup()
  *
  *  This is like XmlConfiguration.main(), which is essentially what
  *  org.mortbay.start.Main does.
@@ -73,6 +75,7 @@ public class JettyStart implements ClientApp {
     /**
      *  Modified from XmlConfiguration.main()
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void parseArgs(String[] args) throws Exception {
         Properties properties=new Properties();
         XmlConfiguration last=null;
@@ -99,7 +102,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    public void startup() {
+    public synchronized void startup() {
         if (_state != INITIALIZED)
             return;
         if (_jettys.isEmpty()) {
@@ -109,7 +112,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    private class Starter extends Thread {
+    private class Starter extends I2PAppThread {
         public Starter() {
             super("JettyStarter");
             changeState(STARTING);
@@ -165,7 +168,7 @@ public class JettyStart implements ClientApp {
         }
     }
 
-    private class Stopper extends Thread {
+    private class Stopper extends I2PAppThread {
         public Stopper() {
             super("JettyStopper");
             changeState(STOPPING);
@@ -218,7 +221,8 @@ public class JettyStart implements ClientApp {
      */
     public static void main(String[] args) {
         try {
-            new JettyStart(null, null, args);
+            JettyStart js = new JettyStart(null, null, args);
+            js.startup();
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

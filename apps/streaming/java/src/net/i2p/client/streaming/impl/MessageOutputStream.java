@@ -177,7 +177,7 @@ class MessageOutputStream extends OutputStream {
         }
         long elapsed = _context.clock().now() - begin;
         if ( (elapsed > 10*1000) && (_log.shouldLog(Log.INFO)) )
-            _log.info("wtf, took " + elapsed + "ms to write to the stream?", new Exception("foo"));
+            _log.info("took " + elapsed + "ms to write to the stream?", new Exception("foo"));
         throwAnyError();
         //updateBps(len);
     }
@@ -374,7 +374,7 @@ class MessageOutputStream extends OutputStream {
         
         long elapsed = _context.clock().now() - begin;
         if ( (elapsed > 10*1000) && (_log.shouldLog(Log.DEBUG)) )
-            _log.debug("wtf, took " + elapsed + "ms to flush the stream?\n" + ws, new Exception("bar"));
+            _log.debug("took " + elapsed + "ms to flush the stream?\n" + ws, new Exception("bar"));
         throwAnyError();
     }
     

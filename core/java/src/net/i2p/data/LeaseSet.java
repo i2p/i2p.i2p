@@ -72,6 +72,8 @@ public class LeaseSet extends DatabaseEntry {
     private List<Lease> _decryptedLeases;
     private boolean _decrypted;
     private boolean _checked;
+    // cached byte version
+    private volatile byte _byteified[];
 
     /**
      *  Unlimited before 0.6.3;
@@ -92,7 +94,7 @@ public class LeaseSet extends DatabaseEntry {
     private static final int OLD_MAX_LEASES = 6;
 
     public LeaseSet() {
-        _leases = new ArrayList<Lease>(OLD_MAX_LEASES);
+        _leases = new ArrayList<Lease>(2);
         _firstExpiration = Long.MAX_VALUE;
     }
 
@@ -141,6 +143,7 @@ public class LeaseSet extends DatabaseEntry {
      *  The revocation key.
      *  @deprecated unused
      */
+    @Deprecated
     public SigningPublicKey getSigningKey() {
         return _signingKey;
     }
@@ -262,6 +265,7 @@ public class LeaseSet extends DatabaseEntry {
      * @deprecated revocation unused
      * @return true only if the signature matches
      */
+    @Deprecated
     public boolean verifySignature(SigningPublicKey signingKey) {
         if (super.verifySignature())
             return true;
@@ -284,6 +288,7 @@ public class LeaseSet extends DatabaseEntry {
     }
 
     protected byte[] getBytes() {
+        if (_byteified != null) return _byteified;
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
         int len = _destination.size()
@@ -296,8 +301,7 @@ public class LeaseSet extends DatabaseEntry {
             _destination.writeBytes(out);
             _encryptionKey.writeBytes(out);
             _signingKey.writeBytes(out);
-            DataHelper.writeLong(out, 1, _leases.size());
-            //DataHelper.writeLong(out, 4, _version);
+            out.write((byte) _leases.size());
             for (Lease lease : _leases)
                 lease.writeBytes(out);
         } catch (IOException ioe) {
@@ -306,6 +310,9 @@ public class LeaseSet extends DatabaseEntry {
             return null;
         }
         byte rv[] = out.toByteArray();
+        // if we are floodfill and this was published to us
+        if (_receivedAsPublished)
+            _byteified = rv;
         return rv;
     }
     
@@ -346,8 +353,7 @@ public class LeaseSet extends DatabaseEntry {
         _destination.writeBytes(out);
         _encryptionKey.writeBytes(out);
         _signingKey.writeBytes(out);
-        DataHelper.writeLong(out, 1, _leases.size());
-        //DataHelper.writeLong(out, 4, _version);
+        out.write((byte) _leases.size());
         for (Lease lease : _leases)
             lease.writeBytes(out);
         _signature.writeBytes(out);

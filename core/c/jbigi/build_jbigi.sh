@@ -4,42 +4,71 @@
 # When executed in OSX: Produces a libjbigi.jnilib
 [ -z "$CC" ] && CC="gcc"
 
+UNAME="$(uname -m)"
+if [ -z $BITS ]; then
+  if test "${UNAME#*x86_64}" != "$UNAME"; then
+    BITS=64
+  elif test "${UNAME#*i386}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*i686}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*armv6}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*armv7}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*aarch32}" != "$UNAME"; then
+    BITS=32
+  elif test "${UNAME#*aarch64}" != "$UNAME"; then
+    BITS=64
+  else
+ 
+    echo "Unable to detect default setting for BITS variable"
+    exit 1
+  fi
+
+  printf "BITS variable not set, $BITS bit system detected\n" >&2
+fi
+
 # If JAVA_HOME isn't set we'll try to figure it out
-[ -z $JAVA_HOME ] && . ../find-java-home
+[ -z $JAVA_HOME ] && . `dirname $0`/../find-java-home
 if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
     echo "Cannot find jni.h! Looked in '$JAVA_HOME/include/jni.h'"
     echo "Please set JAVA_HOME to a java home that has the JNI"
     exit 1
 fi
 
-case `uname -s` in
-MINGW*)
-        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+
+# Allow TARGET to be overridden (e.g. for use with cross compilers)
+[ -z $TARGET ] && TARGET=$(uname -s | tr "[A-Z]" "[a-z]")
+
+# Note, this line does not support windows (and needs to generate a win32/win64 string for that to work)
+BUILD_OS=$(uname -s | tr "[A-Z]" "[a-z]")
+echo "TARGET=$TARGET"
+
+case "$TARGET" in
+mingw*|windows*)
         COMPILEFLAGS="-Wall"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-shared -Wl,--kill-at"
         LIBFILE="jbigi.dll";;
-CYGWIN*)
-        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+cygwin*)
         COMPILEFLAGS="-Wall -mno-cygwin"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/$BUILD_OS/ -I$JAVA_HOME/include/"
         LINKFLAGS="-shared -Wl,--kill-at"
         LIBFILE="jbigi.dll";;
-Darwin*)
-        JAVA_HOME=$(/usr/libexec/java_home)
+darwin*|osx)
         COMPILEFLAGS="-fPIC -Wall"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
-SunOS*|OpenBSD*|NetBSD*|*FreeBSD*|Linux*)
-        UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
-        if [ $UNIXTYPE = "sunos" ]; then
-            UNIXTYPE="solaris"
-        elif [ $UNIXTYPE = "gnu/kfreebsd" ]; then
-            UNIXTYPE="linux"
+sunos*|openbsd*|netbsd*|*freebsd*|linux*)
+        if [ $BUILD_OS = "sunos" ]; then
+            BUILD_OS="solaris"
+        elif [ $BUILD_OS = "gnu/kfreebsd" ]; then
+            BUILD_OS="linux"
         fi
         COMPILEFLAGS="-fPIC -Wall $CFLAGS"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE} -I/usr/local/include"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/$BUILD_OS -I/usr/local/include"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
 *)
@@ -56,9 +85,13 @@ else
         STATICLIBS=".libs/libgmp.a"
 fi
 
+[ $BITS -eq 32 -a "${UNAME#*86}" != "$UNAME" ] && COMPILEFLAGS="-m32 $COMPILEFLAGS" && LINKFLAGS="-m32 $LINKFLAGS"
+[ $BITS -eq 64 -a "${UNAME#*86}" != "$UNAME" ] && COMPILEFLAGS="-m64 $COMPILEFLAGS" && LINKFLAGS="-m64 $LINKFLAGS"
+
 echo "Compiling C code..."
-rm -f jbigi.o $LIBFILE
+echo "Compile: \"$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c\""
 $CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
+echo "Link: \"$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH\""
 $CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS $LIBPATH || exit 1
 
 exit 0

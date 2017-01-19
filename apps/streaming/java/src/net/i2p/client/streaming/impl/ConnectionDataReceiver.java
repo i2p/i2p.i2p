@@ -140,9 +140,9 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         //long sent = System.currentTimeMillis();
         
         //if ( (built-before > 5*1000) && (_log.shouldLog(Log.WARN)) )
-        //    _log.warn("wtf, took " + (built-before) + "ms to build a packet: " + packet);
+        //    _log.warn(took " + (built-before) + "ms to build a packet: " + packet);
         //if ( (sent-built> 5*1000) && (_log.shouldLog(Log.WARN)) )
-        //    _log.warn("wtf, took " + (sent-built) + "ms to send a packet: " + packet);
+        //    _log.warn(took " + (sent-built) + "ms to send a packet: " + packet);
         return packet;
     }
     

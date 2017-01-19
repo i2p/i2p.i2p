@@ -32,6 +32,8 @@ public class NewsXMLParser {
     private final I2PAppContext _context;
     private final Log _log;
     private List<NewsEntry> _entries;
+    private List<CRLEntry> _crlEntries;
+    private BlocklistEntries _blocklistEntries;
     private NewsMetadata _metadata;
     private XHTMLMode _mode;
 
@@ -97,10 +99,11 @@ public class NewsXMLParser {
      *
      *  @param file XML content only. Any su3 or gunzip handling must have
      *              already happened.
+     *  @return the root node
      *  @throws IOException on any parse error
      */
-    public void parse(File file) throws IOException {
-        parse(new BufferedInputStream(new FileInputStream(file)));
+    public Node parse(File file) throws IOException {
+        return parse(new BufferedInputStream(new FileInputStream(file)));
     }
 
     /**
@@ -108,15 +111,17 @@ public class NewsXMLParser {
      *
      *  @param in XML content only. Any su3 or gunzip handling must have
      *            already happened.
+     *  @return the root node
      *  @throws IOException on any parse error
      */
-    public void parse(InputStream in) throws IOException {
+    public Node parse(InputStream in) throws IOException {
         _entries = null;
         _metadata = null;
         XMLParser parser = new XMLParser(_context);
         try {
             Node root = parser.parse(in);
             extract(root);
+            return root;
         } catch (ParserException pe) {
             throw new I2PParserException(pe);
         }
@@ -142,11 +147,35 @@ public class NewsXMLParser {
         return _metadata;
     }
 
+    /**
+     *  The news CRL entries.
+     *  Must call parse() first.
+     *
+     *  @return unsorted, null if none
+     *  @since 0.9.26
+     */
+    public List<CRLEntry> getCRLEntries() {
+        return _crlEntries;
+    }
+
+    /**
+     *  The blocklist entries.
+     *  Must call parse() first.
+     *
+     *  @return null if none
+     *  @since 0.9.28
+     */
+    public BlocklistEntries getBlocklistEntries() {
+        return _blocklistEntries;
+    }
+
     private void extract(Node root) throws I2PParserException {
         if (!root.getName().equals("feed"))
             throw new I2PParserException("no feed in XML");
         _metadata = extractNewsMetadata(root);
         _entries = extractNewsEntries(root);
+        _crlEntries = extractCRLEntries(root);
+        _blocklistEntries = extractBlocklistEntries(root);
     }
 
     private static NewsMetadata extractNewsMetadata(Node feed) throws I2PParserException {
@@ -247,6 +276,10 @@ public class NewsXMLParser {
         return rv;
     }
 
+    /**
+     *  This does not check for any missing values.
+     *  Any field in any NewsEntry may be null.
+     */
     private List<NewsEntry> extractNewsEntries(Node feed) throws I2PParserException {
         List<NewsEntry> rv = new ArrayList<NewsEntry>();
         List<Node> entries = getNodes(feed, "entry");
@@ -260,9 +293,9 @@ public class NewsXMLParser {
             }
             n = entry.getNode("link");
             if (n != null) {
-                e.link = n.getValue();
-                if (e.link != null)
-                    e.link = e.link.trim();
+                String a = n.getAttributeValue("href");
+                if (a.length() > 0)
+                    e.link = a.trim();
             }
             n = entry.getNode("id");
             if (n != null) {
@@ -344,9 +377,95 @@ public class NewsXMLParser {
     }
 
     /**
-     *  Helper to get all Nodes matching the name
+     *  This does not check for any missing values.
+     *  Any field in any CRLEntry may be null.
+     *
+     *  @return null if none
+     *  @since 0.9.26
      */
-    private static List<Node> getNodes(Node node, String name) {
+    private static List<CRLEntry> extractCRLEntries(Node feed) throws I2PParserException {
+        Node rev = feed.getNode("i2p:revocations");
+        if (rev == null)
+            return null;
+        List<Node> entries = getNodes(rev, "i2p:crl");
+        if (entries.isEmpty())
+            return null;
+        List<CRLEntry> rv = new ArrayList<CRLEntry>(entries.size());
+        for (Node entry : entries) {
+            CRLEntry e = new CRLEntry();
+            String a = entry.getAttributeValue("id");
+            if (a.length() > 0)
+                e.id = a;
+            a = entry.getAttributeValue("updated");
+            if (a.length() > 0) {
+                long time = RFC3339Date.parse3339Date(a.trim());
+                if (time > 0)
+                    e.updated = time;
+            }
+            a = entry.getValue();
+            if (a != null)
+                e.data = a.trim();
+            rv.add(e);
+        }
+        return rv;
+    }
+
+    /**
+     *  This does not check for any missing values.
+     *  Any field in a BlocklistEntry may be null.
+     *  Signature is verified here.
+     *
+     *  @return null if none
+     *  @since 0.9.28
+     */
+    private BlocklistEntries extractBlocklistEntries(Node feed) throws I2PParserException {
+        Node bl = feed.getNode("i2p:blocklist");
+        if (bl == null)
+            return null;
+        List<Node> entries = getNodes(bl, "i2p:block");
+        BlocklistEntries rv = new BlocklistEntries(entries.size());
+        String a = bl.getAttributeValue("signer");
+        if (a.length() > 0)
+            rv.signer = a;
+        a = bl.getAttributeValue("sig");
+        if (a.length() > 0) {
+            rv.sig = a;
+        }
+        Node n =  bl.getNode("updated");
+        if (n == null)
+            return null;
+        a = n.getValue();
+        if (a != null) {
+            rv.supdated = a;
+            long time = RFC3339Date.parse3339Date(a.trim());
+            if (time > 0)
+                rv.updated = time;
+        }
+        for (Node entry : entries) {
+            a = entry.getValue();
+            if (a != null) {
+                rv.entries.add(a.trim());
+            }
+        }
+        List<Node> rentries = getNodes(bl, "i2p:unblock");
+        if (entries.isEmpty() && rentries.isEmpty())
+            return null;
+        for (Node entry : rentries) {
+            a = entry.getValue();
+            if (a != null) {
+                rv.removes.add(a.trim());
+            }
+        }
+        rv.verify(_context);
+        return rv;
+    }
+
+    /**
+     *  Helper to get all Nodes matching the name
+     *
+     *  @return non-null
+     */
+    public static List<Node> getNodes(Node node, String name) {
         List<Node> rv = new ArrayList<Node>();
         int count = node.getNNodes();
         for (int i = 0; i < count; i++) {
@@ -432,6 +551,10 @@ public class NewsXMLParser {
     }
 
     public static void main(String[] args) {
+        if (args.length <= 0 || args.length > 2) {
+            System.err.println("Usage: NewsXMLParser file.xml [parserMode]");
+            System.exit(1);
+        }
         try {
             I2PAppContext ctx = new I2PAppContext();
             Debug.initialize(ctx);
@@ -450,9 +573,22 @@ public class NewsXMLParser {
             System.out.println("Release timestamp: " + latestRelease.date);
             System.out.println("Feed timestamp: " + ud.feedUpdated);
             System.out.println("Found " + entries.size() + " news entries");
+            Set<String> uuids = new HashSet<String>(entries.size());
             for (int i = 0; i < entries.size(); i++) {
                 NewsEntry e = entries.get(i);
-                System.out.println("News #" + (i+1) + ": " + e.title + '\n' + e.content);
+                System.out.println("\n****** News #" + (i+1) + ": " + e.title + '\n' + e.content);
+                if (e.id == null)
+                    throw new IOException("missing ID");
+                if (e.title == null)
+                    throw new IOException("missing title");
+                if (e.content == null)
+                    throw new IOException("missing content");
+                if (e.authorName == null)
+                    throw new IOException("missing author");
+                if (e.updated == 0)
+                    throw new IOException("missing updated");
+                if (!uuids.add(e.id))
+                    throw new IOException("duplicate ID");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();

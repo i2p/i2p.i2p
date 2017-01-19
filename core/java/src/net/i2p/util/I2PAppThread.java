@@ -14,10 +14,13 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Like I2PThread but with per-thread OOM listeners,
+ * Like {@link I2PThread} but with per-thread OOM listeners,
  * rather than a static router-wide listener list,
  * so that an OOM in an app won't call the router listener
  * to shutdown the whole router.
+ *
+ * This is preferred for application use.
+ * See {@link I2PThread} for features.
  */
 public class I2PAppThread extends I2PThread {
 
@@ -38,8 +41,16 @@ public class I2PAppThread extends I2PThread {
     public I2PAppThread(Runnable r, String name) {
         super(r, name);
     }
+
     public I2PAppThread(Runnable r, String name, boolean isDaemon) {
         super(r, name, isDaemon);
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    public I2PAppThread(ThreadGroup group, Runnable r, String name) {
+        super(group, r, name);
     }
     
     @Override

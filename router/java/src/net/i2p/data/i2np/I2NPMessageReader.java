@@ -34,6 +34,7 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
+@Deprecated
 public class I2NPMessageReader {
     private Log _log;
     private RouterContext _context;
@@ -70,12 +71,14 @@ public class I2NPMessageReader {
      * Have the already started reader pause its reading indefinitely
      * @deprecated unused
      */
+    @Deprecated
     public void pauseReading() { _reader.pauseRunner(); }
 
     /**
      * Resume reading after a pause
      * @deprecated unused
      */
+    @Deprecated
     public void resumeReading() { _reader.resumeRunner(); }
 
     /**
@@ -163,7 +166,7 @@ public class I2NPMessageReader {
                             _log.warn("IO Error handling message", ioe);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         _log.log(Log.CRIT, "error reading msg!", e);
                         _listener.readError(I2NPMessageReader.this, e);
                         _listener.disconnected(I2NPMessageReader.this);

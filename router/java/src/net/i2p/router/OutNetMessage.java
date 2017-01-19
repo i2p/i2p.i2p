@@ -146,6 +146,7 @@ public class OutNetMessage implements CDPQEntry {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public Map<String, Long> getTimestamps() {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
@@ -157,6 +158,7 @@ public class OutNetMessage implements CDPQEntry {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public Long getTimestamp(String eventName) {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
@@ -178,6 +180,7 @@ public class OutNetMessage implements CDPQEntry {
      * @deprecated
      * @return null always
      */
+    @Deprecated
     public Exception getCreatedBy() { return null; }
     
     /**

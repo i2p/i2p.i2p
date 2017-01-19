@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="tomcat-lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/apps/jetty/apache-tomcat-deployer/lib/tomcat-juli.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/apache-tomcat-deployer/lib/el-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/apache-tomcat-deployer/lib/jasper.jar!/" />
+      <root url="jar://$PROJECT_DIR$/apps/jetty/apache-tomcat-deployer/lib/jasper-el.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

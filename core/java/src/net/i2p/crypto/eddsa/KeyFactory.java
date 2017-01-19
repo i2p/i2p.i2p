@@ -7,6 +7,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 import net.i2p.crypto.eddsa.spec.EdDSAPrivateKeySpec;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
@@ -16,22 +18,34 @@ import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
  * @author str4d
  *
  */
-public class KeyFactory extends KeyFactorySpi {
+public final class KeyFactory extends KeyFactorySpi {
 
+    /**
+     *  As of 0.9.25, supports PKCS8EncodedKeySpec
+     */
     protected PrivateKey engineGeneratePrivate(KeySpec keySpec)
             throws InvalidKeySpecException {
         if (keySpec instanceof EdDSAPrivateKeySpec) {
             return new EdDSAPrivateKey((EdDSAPrivateKeySpec) keySpec);
         }
-        throw new InvalidKeySpecException("key spec not recognised");
+        if (keySpec instanceof PKCS8EncodedKeySpec) {
+            return new EdDSAPrivateKey((PKCS8EncodedKeySpec) keySpec);
+        }
+        throw new InvalidKeySpecException("key spec not recognised: " + keySpec.getClass());
     }
 
+    /**
+     *  As of 0.9.25, supports X509EncodedKeySpec
+     */
     protected PublicKey engineGeneratePublic(KeySpec keySpec)
             throws InvalidKeySpecException {
         if (keySpec instanceof EdDSAPublicKeySpec) {
             return new EdDSAPublicKey((EdDSAPublicKeySpec) keySpec);
         }
-        throw new InvalidKeySpecException("key spec not recognised");
+        if (keySpec instanceof X509EncodedKeySpec) {
+            return new EdDSAPublicKey((X509EncodedKeySpec) keySpec);
+        }
+        throw new InvalidKeySpecException("key spec not recognised: " + keySpec.getClass());
     }
 
     @SuppressWarnings("unchecked")

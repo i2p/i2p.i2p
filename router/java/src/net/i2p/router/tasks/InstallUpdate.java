@@ -135,36 +135,39 @@ public class InstallUpdate {
         boolean goodOS = isWin || isMac ||
                          osName.contains("linux") || osName.contains("freebsd");
 
-        // only do this on these x86
         File jbigiJar = new File(context.getBaseDir(), "lib/jbigi.jar");
-        if (isX86 && goodOS && jbigiJar.exists()) {
+        if (goodOS && jbigiJar.exists()) {
             String libPrefix = (isWin ? "" : "lib");
             String libSuffix = (isWin ? ".dll" : isMac ? ".jnilib" : ".so");
 
-            File jcpuidLib = new File(context.getBaseDir(), libPrefix + "jcpuid" + libSuffix);
-            if (jcpuidLib.canWrite() && jbigiJar.lastModified() > jcpuidLib.lastModified()) {
-                String path = jcpuidLib.getAbsolutePath();
-                boolean success = FileUtil.copy(path, path + ".bak", true, true);
-                if (success) {
-                    boolean success2 = jcpuidLib.delete();
-                    if (success2) {
-                        System.out.println("New jbigi.jar detected, moved jcpuid library to " +
-                                           path + ".bak");
-                        System.out.println("Check logs for successful installation of new library");
+            if (isX86) {
+                File jcpuidLib = new File(context.getBaseDir(), libPrefix + "jcpuid" + libSuffix);
+                if (jcpuidLib.canWrite() && jbigiJar.lastModified() > jcpuidLib.lastModified()) {
+                    String path = jcpuidLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jcpuidLib.delete();
+                        if (success2) {
+                            System.out.println("New jbigi.jar detected, moved jcpuid library to " +
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
                     }
                 }
             }
 
-            File jbigiLib = new File(context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
-            if (jbigiLib.canWrite() && jbigiJar.lastModified() > jbigiLib.lastModified()) {
-                String path = jbigiLib.getAbsolutePath();
-                boolean success = FileUtil.copy(path, path + ".bak", true, true);
-                if (success) {
-                    boolean success2 = jbigiLib.delete();
-                    if (success2) {
-                        System.out.println("New jbigi.jar detected, moved jbigi library to " +
-                                           path + ".bak");
-                        System.out.println("Check logs for successful installation of new library");
+            if (isX86 || SystemVersion.isARM()) {
+                File jbigiLib = new File(context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
+                if (jbigiLib.canWrite() && jbigiJar.lastModified() > jbigiLib.lastModified()) {
+                    String path = jbigiLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jbigiLib.delete();
+                        if (success2) {
+                            System.out.println("New jbigi.jar detected, moved jbigi library to " +
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
                     }
                 }
             }

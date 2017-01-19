@@ -27,9 +27,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TCPio implements Runnable {
 
-	private InputStream Ain;
-	private OutputStream Aout;
-	private AtomicBoolean lives;
+	private final InputStream Ain;
+	private final OutputStream Aout;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor

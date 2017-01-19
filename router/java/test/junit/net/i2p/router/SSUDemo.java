@@ -64,8 +64,7 @@ public class SSUDemo {
         envProps.setProperty("time.disabled", "false");
         // allow 127.0.0.1/10.0.0.1/etc (useful for testing).  If this is false,
         // peers who say they're on an invalid IP are banlisted
-        envProps.setProperty("i2np.udp.allowLocal", "true");
-        envProps.setProperty("i2np.ntcp.allowLocal", "true");
+        envProps.setProperty("i2np.allowLocal", "true");
         // IPv6
         envProps.setProperty("i2np.udp.ipv6", "enable");
         envProps.setProperty("i2np.ntcp.ipv6", "enable");

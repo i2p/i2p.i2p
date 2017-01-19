@@ -1,0 +1,777 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the routerconsole package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Yeon-Ung Choi <kqwe1859@gmail.com>, 2016
+# SEPT____ <xpressengine3@mail.beo.kr>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2016-12-05 15:35+0000\n"
+"Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>\n"
+"Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Anonymous Proxy"
+msgstr "익명 프록시"
+
+msgid "Satellite Provider"
+msgstr "위성 제공자"
+
+msgid "Andorra"
+msgstr "안도라"
+
+msgid "United Arab Emirates"
+msgstr "아랍에미레이트"
+
+msgid "Afghanistan"
+msgstr "아프가니스탄"
+
+msgid "Antigua and Barbuda"
+msgstr "안티가/바브다"
+
+msgid "Anguilla"
+msgstr "앙귈라"
+
+msgid "Albania"
+msgstr "아랍니아"
+
+msgid "Armenia"
+msgstr "아르메니아"
+
+msgid "Netherlands Antilles"
+msgstr "네덜란드령 앤틸레스"
+
+msgid "Angola"
+msgstr "앙골라"
+
+msgid "Asia/Pacific Region"
+msgstr "아시아/태평양 지역"
+
+msgid "Antarctica"
+msgstr "남극"
+
+msgid "Argentina"
+msgstr "아르헨티나"
+
+msgid "American Samoa"
+msgstr "사모아"
+
+msgid "Austria"
+msgstr "오스트리아"
+
+msgid "Australia"
+msgstr "오스트레일리아"
+
+msgid "Aruba"
+msgstr "아루바"
+
+msgid "Åland Islands"
+msgstr "올란드 제도"
+
+msgid "Azerbaijan"
+msgstr "아제르바이잔"
+
+msgid "Bosnia and Herzegovina"
+msgstr "보스니아/헤르체고비나"
+
+msgid "Barbados"
+msgstr "바베이도스"
+
+msgid "Bangladesh"
+msgstr "방글라데시"
+
+msgid "Belgium"
+msgstr "벨기에"
+
+msgid "Burkina Faso"
+msgstr "부르키나 파소"
+
+msgid "Bulgaria"
+msgstr "불가리아"
+
+msgid "Bahrain"
+msgstr "바레인"
+
+msgid "Burundi"
+msgstr "부룬디"
+
+msgid "Benin"
+msgstr "베냉"
+
+msgid "Saint Barthélemy"
+msgstr "생바르텔레미"
+
+msgid "Bermuda"
+msgstr "버뮤다"
+
+msgid "Brunei Darussalam"
+msgstr "브루나이"
+
+msgid "Bolivia"
+msgstr "볼리비아"
+
+msgid "Bonaire"
+msgstr "보네르"
+
+msgid "Brazil"
+msgstr "브라질"
+
+msgid "Bahamas"
+msgstr "바하마"
+
+msgid "Bhutan"
+msgstr "부탄"
+
+msgid "Bouvet Island"
+msgstr "부베 섬"
+
+msgid "Botswana"
+msgstr "보츠와나"
+
+msgid "Belarus"
+msgstr "벨라루스"
+
+msgid "Belize"
+msgstr "벨리즈"
+
+msgid "Canada"
+msgstr "캐나다"
+
+msgid "Cocos (Keeling) Islands"
+msgstr "코코스 (킬링) 섬"
+
+msgid "Congo"
+msgstr "콩고"
+
+msgid "Central African Republic"
+msgstr "중앙아시아공화국"
+
+msgid "Switzerland"
+msgstr "스위스"
+
+msgid "Cote D'Ivoire"
+msgstr "코르티부아르"
+
+msgid "Cook Islands"
+msgstr "쿡 아일랜드"
+
+msgid "Chile"
+msgstr "칠레"
+
+msgid "Cameroon"
+msgstr "카메룬"
+
+msgid "China"
+msgstr "중국"
+
+msgid "Colombia"
+msgstr "콜롬비아"
+
+msgid "Costa Rica"
+msgstr "코스타리카"
+
+msgid "Serbia and Montenegro"
+msgstr "세르비아와 몬테네그로"
+
+msgid "Cuba"
+msgstr "쿠바"
+
+msgid "Cape Verde"
+msgstr "카보베르데"
+
+msgid "Curaçao"
+msgstr "퀴라소"
+
+msgid "Christmas Island"
+msgstr "크리스마스 아일랜드"
+
+msgid "Cyprus"
+msgstr "키프로스"
+
+msgid "Czech Republic"
+msgstr "체코"
+
+msgid "Germany"
+msgstr "독일"
+
+msgid "Djibouti"
+msgstr "지부티"
+
+msgid "Denmark"
+msgstr "덴마크"
+
+msgid "Dominica"
+msgstr "도미니카 공화국"
+
+msgid "Dominican Republic"
+msgstr "도미니크 공화국"
+
+msgid "Algeria"
+msgstr "알제리"
+
+msgid "Ecuador"
+msgstr "에콰도르"
+
+msgid "Estonia"
+msgstr "에스토니아"
+
+msgid "Egypt"
+msgstr "이집트"
+
+msgid "Western Sahara"
+msgstr "서 사하라"
+
+msgid "Eritrea"
+msgstr "에리트레아"
+
+msgid "Spain"
+msgstr "스페인"
+
+msgid "Ethiopia"
+msgstr "에티오피아"
+
+msgid "European Union"
+msgstr "유럽 연합"
+
+msgid "Finland"
+msgstr "핀란드"
+
+msgid "Fiji"
+msgstr "피지"
+
+msgid "Falkland Islands (Malvinas)"
+msgstr "폴크랜드 아일랜드 (말비나스 제도)"
+
+msgid "Micronesia"
+msgstr "마이크로네시아"
+
+msgid "Faroe Islands"
+msgstr "파로 아일랜드"
+
+msgid "France"
+msgstr "프랑스"
+
+msgid "Gabon"
+msgstr "가봉"
+
+msgid "United Kingdom"
+msgstr "영국"
+
+msgid "Grenada"
+msgstr "그레나다"
+
+msgid "Georgia"
+msgstr "조지아"
+
+msgid "French Guiana"
+msgstr "프랑스령 기아나"
+
+msgid "Guernsey"
+msgstr "건지 섬"
+
+msgid "Ghana"
+msgstr "가나"
+
+msgid "Gibraltar"
+msgstr "지브롤터"
+
+msgid "Greenland"
+msgstr "그린란드"
+
+msgid "Gambia"
+msgstr "감비아"
+
+msgid "Guinea"
+msgstr "기니"
+
+msgid "Guadeloupe"
+msgstr "과들루프"
+
+msgid "Equatorial Guinea"
+msgstr "적도 기니"
+
+msgid "Greece"
+msgstr "그리스"
+
+msgid "South Georgia and the South Sandwich Islands"
+msgstr "남 조지아와 남 샌드위치 아일랜드"
+
+msgid "Guatemala"
+msgstr "과테말라"
+
+msgid "Guam"
+msgstr "괌"
+
+msgid "Guinea-Bissau"
+msgstr "기니-비사우"
+
+msgid "Guyana"
+msgstr "가이아나"
+
+msgid "Hong Kong"
+msgstr "홍콩"
+
+msgid "Honduras"
+msgstr "온두라스"
+
+msgid "Croatia"
+msgstr "크로아티아"
+
+msgid "Haiti"
+msgstr "아이티"
+
+msgid "Hungary"
+msgstr "헝가리"
+
+msgid "Indonesia"
+msgstr "인도네시아"
+
+msgid "Ireland"
+msgstr "아일랜드"
+
+msgid "Israel"
+msgstr "이스라엘"
+
+msgid "Isle of Man"
+msgstr "맨 섬"
+
+msgid "India"
+msgstr "인도"
+
+msgid "British Indian Ocean Territory"
+msgstr "영국령 인도양 지역"
+
+msgid "Iraq"
+msgstr "이라크"
+
+msgid "Iran"
+msgstr "이란"
+
+msgid "Iceland"
+msgstr "아이슬랜드"
+
+msgid "Italy"
+msgstr "이탈리아"
+
+msgid "Jersey"
+msgstr "저지 섬"
+
+msgid "Jamaica"
+msgstr "자메이카"
+
+msgid "Jordan"
+msgstr "요르단"
+
+msgid "Japan"
+msgstr "일본"
+
+msgid "Kenya"
+msgstr "케냐"
+
+msgid "Kyrgyzstan"
+msgstr "키르기스스탄"
+
+msgid "Cambodia"
+msgstr "캄보디아"
+
+msgid "Kiribati"
+msgstr "키리바시"
+
+msgid "Comoros"
+msgstr "코모로"
+
+msgid "Saint Kitts and Nevis"
+msgstr "세인트키츠 네비스"
+
+msgid "North Korea"
+msgstr "북한"
+
+msgid "Republic of Korea"
+msgstr "대한민국"
+
+msgid "Kuwait"
+msgstr "쿠웨이트"
+
+msgid "Cayman Islands"
+msgstr "케이맨 제도"
+
+msgid "Kazakhstan"
+msgstr "카자흐스탄"
+
+msgid "Lao People's Democratic Republic"
+msgstr "라오스"
+
+msgid "Lebanon"
+msgstr "레바논"
+
+msgid "Saint Lucia"
+msgstr "성 루시아"
+
+msgid "Liechtenstein"
+msgstr "리히텐슈타인"
+
+msgid "Sri Lanka"
+msgstr "스리랑카"
+
+msgid "Liberia"
+msgstr "라이베리아"
+
+msgid "Lesotho"
+msgstr "레소토"
+
+msgid "Lithuania"
+msgstr "리투아니아"
+
+msgid "Luxembourg"
+msgstr "룩셈부르크"
+
+msgid "Latvia"
+msgstr "라트비아"
+
+msgid "Libya"
+msgstr "리비아"
+
+msgid "Morocco"
+msgstr "모로코"
+
+msgid "Monaco"
+msgstr "모나코"
+
+msgid "Moldova"
+msgstr "몰도바"
+
+msgid "Montenegro"
+msgstr "몬테네그로"
+
+msgid "Saint Martin"
+msgstr "세인트 마틴 섬"
+
+msgid "Madagascar"
+msgstr "마다가스카르"
+
+msgid "Marshall Islands"
+msgstr "마셜 제도"
+
+msgid "Macedonia"
+msgstr "마케도니아 공화국"
+
+msgid "Mali"
+msgstr "말리"
+
+msgid "Myanmar"
+msgstr "미얀마"
+
+msgid "Mongolia"
+msgstr "몽골"
+
+msgid "Macau"
+msgstr "마카오"
+
+msgid "Northern Mariana Islands"
+msgstr "북마리아나 제도"
+
+msgid "Martinique"
+msgstr "마르티니크"
+
+msgid "Mauritania"
+msgstr "모리타니"
+
+msgid "Montserrat"
+msgstr "몬세트라"
+
+msgid "Malta"
+msgstr "몰타"
+
+msgid "Mauritius"
+msgstr "모리셔스"
+
+msgid "Maldives"
+msgstr "몰디브"
+
+msgid "Malawi"
+msgstr "말라우"
+
+msgid "Mexico"
+msgstr "멕시코"
+
+msgid "Malaysia"
+msgstr "말레이시아"
+
+msgid "Mozambique"
+msgstr "모잠비크"
+
+msgid "Namibia"
+msgstr "나미비아"
+
+msgid "New Caledonia"
+msgstr "뉴칼레도니아"
+
+msgid "Niger"
+msgstr "니제르"
+
+msgid "Norfolk Island"
+msgstr "노퍽 아일랜드"
+
+msgid "Nigeria"
+msgstr "나이지리아"
+
+msgid "Nicaragua"
+msgstr "니카라과"
+
+msgid "Netherlands"
+msgstr "네덜란드"
+
+msgid "Norway"
+msgstr "노르웨이"
+
+msgid "Nepal"
+msgstr "네팔"
+
+msgid "Nauru"
+msgstr "나울루"
+
+msgid "Niue"
+msgstr "니우에"
+
+msgid "New Zealand"
+msgstr "뉴질랜드"
+
+msgid "Oman"
+msgstr "오만"
+
+msgid "Panama"
+msgstr "파나마"
+
+msgid "Peru"
+msgstr "페루"
+
+msgid "French Polynesia"
+msgstr "프랑스령 폴리네시아"
+
+msgid "Papua New Guinea"
+msgstr "파푸아 뉴기니"
+
+msgid "Philippines"
+msgstr "필리핀"
+
+msgid "Pakistan"
+msgstr "파키스탄"
+
+msgid "Poland"
+msgstr "폴란드"
+
+msgid "Saint Pierre and Miquelon"
+msgstr "세인트 피어 & 미클롱"
+
+msgid "Pitcairn Islands"
+msgstr "핏케언 아일랜드"
+
+msgid "Puerto Rico"
+msgstr "푸에르토 리코"
+
+msgid "Palestinian Territory"
+msgstr "팔레스타인"
+
+msgid "Portugal"
+msgstr "포르투갈"
+
+msgid "Palau"
+msgstr "팔라우"
+
+msgid "Paraguay"
+msgstr "파라과이"
+
+msgid "Qatar"
+msgstr "카타르"
+
+msgid "Réunion"
+msgstr "레위니옹"
+
+msgid "Romania"
+msgstr "로마니아"
+
+msgid "Serbia"
+msgstr "세르비아"
+
+msgid "Russian Federation"
+msgstr "러시아"
+
+msgid "Rwanda"
+msgstr "르완다"
+
+msgid "Saudi Arabia"
+msgstr "사우디아라비아"
+
+msgid "Solomon Islands"
+msgstr "솔로몬 제도"
+
+msgid "Seychelles"
+msgstr "세이셸"
+
+msgid "Sudan"
+msgstr "수단"
+
+msgid "Sweden"
+msgstr "스웨덴"
+
+msgid "Singapore"
+msgstr "싱가포르"
+
+msgid "Saint Helena"
+msgstr "성 헤레나"
+
+msgid "Slovenia"
+msgstr "슬로베니아"
+
+msgid "Svalbard and Jan Mayen"
+msgstr "스발바르 얀마옌 제도"
+
+msgid "Slovakia"
+msgstr "슬로바키아"
+
+msgid "Sierra Leone"
+msgstr "시에라리온"
+
+msgid "San Marino"
+msgstr "산마리노"
+
+msgid "Senegal"
+msgstr "세네갈"
+
+msgid "Somalia"
+msgstr "소말리아"
+
+msgid "Suriname"
+msgstr "수리남"
+
+msgid "South Sudan"
+msgstr "남수단"
+
+msgid "Sao Tome and Principe"
+msgstr "상투메 프린시페"
+
+msgid "El Salvador"
+msgstr "엘살바도르"
+
+msgid "Sint Maarten"
+msgstr "신트마르턴"
+
+msgid "Syria"
+msgstr "시리아"
+
+msgid "Swaziland"
+msgstr "스와질랜드"
+
+msgid "Turks and Caicos Islands"
+msgstr "터크스 케이커스 제도"
+
+msgid "Chad"
+msgstr "차드"
+
+msgid "French Southern Territories"
+msgstr "프랑스령 남방 및 남극"
+
+msgid "Togo"
+msgstr "토고"
+
+msgid "Thailand"
+msgstr "태국"
+
+msgid "Tajikistan"
+msgstr "타지키스탄"
+
+msgid "Tokelau"
+msgstr "토켈라우"
+
+msgid "Timor-Leste"
+msgstr "동티모르"
+
+msgid "Turkmenistan"
+msgstr "투르크메니스탄"
+
+msgid "Tunisia"
+msgstr "튀니ㅣ"
+
+msgid "Tonga"
+msgstr "통가"
+
+msgid "Turkey"
+msgstr "터키"
+
+msgid "Trinidad and Tobago"
+msgstr "트리니다드 토바고"
+
+msgid "Tuvalu"
+msgstr "투발루"
+
+msgid "Taiwan"
+msgstr "타이완"
+
+msgid "Tanzania"
+msgstr "탄자니아"
+
+msgid "Ukraine"
+msgstr "우크라이나"
+
+msgid "Uganda"
+msgstr "우간다"
+
+msgid "United States Minor Outlying Islands"
+msgstr "미국령 군소 제도"
+
+msgid "United States"
+msgstr "미국"
+
+msgid "Uruguay"
+msgstr "우루과이"
+
+msgid "Uzbekistan"
+msgstr "우즈베키스탄"
+
+msgid "Vatican"
+msgstr "바티칸"
+
+msgid "Saint Vincent and the Grenadines"
+msgstr "세인트빈센트 그레나딘"
+
+msgid "Venezuela"
+msgstr "베네수엘라"
+
+msgid "Virgin Islands"
+msgstr "버진 아일랜드"
+
+msgid "Vietnam"
+msgstr "베트남"
+
+msgid "Vanuatu"
+msgstr "바누아투"
+
+msgid "Wallis and Futuna"
+msgstr "왈리스 퓌튀나"
+
+msgid "Samoa"
+msgstr "사모아"
+
+msgid "Yemen"
+msgstr "예맨"
+
+msgid "Mayotte"
+msgstr "마요트"
+
+msgid "South Africa"
+msgstr "남아프리카"
+
+msgid "Zambia"
+msgstr "잠빙"
+
+msgid "Zimbabwe"
+msgstr "짐바브웨"

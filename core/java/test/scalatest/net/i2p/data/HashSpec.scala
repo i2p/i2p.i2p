@@ -1,12 +1,12 @@
 package net.i2p.data
 
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 /**
  * @author str4d
  */
-class HashSpec extends FunSpec with ShouldMatchers {
+class HashSpec extends FunSpec with Matchers {
     val hash = new Hash
 
     describe("A Hash") {

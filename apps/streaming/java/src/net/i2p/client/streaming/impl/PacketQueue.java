@@ -1,5 +1,6 @@
 package net.i2p.client.streaming.impl;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,7 +26,7 @@ import net.i2p.util.SimpleTimer2;
  *<p>
  * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
  */
-class PacketQueue implements SendMessageStatusListener {
+class PacketQueue implements SendMessageStatusListener, Closeable {
     private final I2PAppContext _context;
     private final Log _log;
     private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
@@ -44,11 +45,11 @@ class PacketQueue implements SendMessageStatusListener {
     private static final long REMOVE_EXPIRED_TIME = 67*1000;
     private static final boolean ENABLE_STATUS_LISTEN = true;
 
-    public PacketQueue(I2PAppContext context) {
+    public PacketQueue(I2PAppContext context, SimpleTimer2 timer) {
         _context = context;
         _log = context.logManager().getLog(PacketQueue.class);
         _messageStatusMap = new ConcurrentHashMap<Long, Connection>(16);
-        new RemoveExpired();
+        new RemoveExpired(timer);
         // all createRateStats in ConnectionManager
     }
 
@@ -327,8 +328,8 @@ class PacketQueue implements SendMessageStatusListener {
      */
     private class RemoveExpired extends SimpleTimer2.TimedEvent {
         
-        public RemoveExpired() {
-             super(_context.simpleTimer2(), REMOVE_EXPIRED_TIME);
+        public RemoveExpired(SimpleTimer2 timer) {
+             super(timer, REMOVE_EXPIRED_TIME);
         }
 
         public void timeReached() {

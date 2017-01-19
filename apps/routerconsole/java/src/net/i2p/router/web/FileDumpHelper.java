@@ -33,22 +33,26 @@ public class FileDumpHelper extends HelperBase {
                    "<th>JDK</th><th>Built</th><th>By</th><th>Mods</th></tr>");
 
         // jars added in wrapper.config
-        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        URL[] urls = urlClassLoader.getURLs();
-        List<File> flist = new ArrayList<File>();
-        for (int i = 0; i < urls.length; i++) {
-            String p = urls[i].toString();
-            if (p.startsWith("file:") && p.endsWith(".jar")) {
-                p = p.substring(5);
-                if (!(p.startsWith(_context.getBaseDir().getAbsolutePath()) ||
-                      p.startsWith(_context.getConfigDir().getAbsolutePath()))) {
-                    flist.add(new File(p));
+        ClassLoader loader = ClassLoader.getSystemClassLoader();
+        if (loader instanceof URLClassLoader) {
+            // through Java 8, not available in Java 9
+            URLClassLoader urlClassLoader = (URLClassLoader) loader;
+            URL[] urls = urlClassLoader.getURLs();
+            List<File> flist = new ArrayList<File>();
+            for (int i = 0; i < urls.length; i++) {
+                String p = urls[i].toString();
+                if (p.startsWith("file:") && p.endsWith(".jar")) {
+                    p = p.substring(5);
+                    if (!(p.startsWith(_context.getBaseDir().getAbsolutePath()) ||
+                          p.startsWith(_context.getConfigDir().getAbsolutePath()))) {
+                        flist.add(new File(p));
+                    }
                 }
             }
-        }
-        Collections.sort(flist);
-        for (File f : flist) {
-            dumpFile(buf, f);
+            Collections.sort(flist);
+            for (File f : flist) {
+                dumpFile(buf, f);
+            }
         }
 
         // our jars
@@ -123,11 +127,13 @@ public class FileDumpHelper extends HelperBase {
         if (s != null && s.length() > 20) {
             if (iv != null)
                 buf.append("<br>");
-            buf.append("<a href=\"http://killyourtv.i2p/viewmtn/revision/info/").append(s)
-               .append("\">" +
-                       "<tt>").append(s.substring(0, 20)).append("</tt>" +
+            // fix and uncomment if a reliable viewmtn host appears
+            //buf.append("<a href=\"http://killyourtv.i2p/viewmtn/revision/info/").append(s)
+            //   .append("\">");
+            buf.append("<tt>").append(s.substring(0, 20)).append("</tt>" +
                        "<br>" +
-                       "<tt>").append(s.substring(20)).append("</tt></a>");
+                       "<tt>").append(s.substring(20)).append("</tt>");
+            //buf.append("</tt>");
         }
         buf.append("</td><td>");
         s = getAtt(att, "Created-By");

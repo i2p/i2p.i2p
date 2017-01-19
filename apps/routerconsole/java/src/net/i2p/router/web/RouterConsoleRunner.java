@@ -1,14 +1,18 @@
 package net.i2p.router.web;
 
-import java.util.ArrayList;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +25,13 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.ClientAppState;
 import static net.i2p.app.ClientAppState.*;
-import net.i2p.apps.systray.SysTray;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
-import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.router.app.RouterApp;
+import net.i2p.router.news.NewsManager;
+import net.i2p.router.update.ConsoleUpdateManager;
 import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -35,6 +39,7 @@ import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
+
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -47,6 +52,7 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -66,6 +72,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
+
+import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
  *  Start the router console.
@@ -126,6 +134,7 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_THREADS = 24;
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
+    public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
     
     /**
      *  <pre>
@@ -211,7 +220,7 @@ public class RouterConsoleRunner implements RouterApp {
     public synchronized void startup() {
         changeState(STARTING);
         checkJavaVersion();
-        startTrayApp(_context);
+        startTrayApp();
         startConsole();
     }
 
@@ -263,24 +272,30 @@ public class RouterConsoleRunner implements RouterApp {
         return _server;
     }
 
-    private static void startTrayApp(I2PAppContext ctx) {
+    private void startTrayApp() {
+        // if no permissions, don't even try
+        // isLaunchedAsService() always returns true on Linux
+        if (GraphicsEnvironment.isHeadless() || SystemVersion.isLinuxService() ||
+            (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService())) {
+            // required true for jrobin to work
+            System.setProperty("java.awt.headless", "true");
+            return;
+        }
         try {
-            //TODO: move away from routerconsole into a separate application.
-            //ApplicationManager?
-            boolean recentJava = SystemVersion.isJava6();
-            // default false for now
-            boolean desktopguiEnabled = ctx.getBooleanProperty("desktopgui.enabled");
-            if (recentJava && desktopguiEnabled) {
-                //Check if we are in a headless environment, set properties accordingly
-          	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
-                String[] args = new String[0];
-                net.i2p.desktopgui.Main.beginStartup(args);    
+            // default false for now, except on non-service windows
+            String sdtg = _context.getProperty(PROP_DTG_ENABLED);
+            boolean desktopguiEnabled = Boolean.parseBoolean(sdtg) ||
+                                        (sdtg == null && SystemVersion.isWindows());
+            if (desktopguiEnabled) {
+                System.setProperty("java.awt.headless", "false");
+                net.i2p.desktopgui.Main dtg = new net.i2p.desktopgui.Main(_context, _mgr, null);    
+                dtg.startup();
             } else {
                 // required true for jrobin to work
           	System.setProperty("java.awt.headless", "true");
                 // this check is in SysTray but do it here too
-                if (SystemVersion.isWindows() && (!Boolean.getBoolean("systray.disable")) && (!SystemVersion.is64Bit()))
-                    SysTray.getInstance();
+                //if (SystemVersion.isWindows() && (!Boolean.getBoolean("systray.disable")) && (!SystemVersion.is64Bit()))
+                //    SysTray.getInstance();
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -290,8 +305,11 @@ public class RouterConsoleRunner implements RouterApp {
     /** @since 0.9.17 */
     private void checkJavaVersion() {
         boolean noJava7 = !SystemVersion.isJava7();
-        boolean noPack200 = !FileUtil.isPack200Supported();
-        if (noJava7 || noPack200) {
+        boolean noPack200 = (PluginStarter.pluginsEnabled(_context) || !NewsHelper.isUpdateDisabled(_context)) &&
+                            !FileUtil.isPack200Supported();
+        boolean openARM = SystemVersion.isARM() && SystemVersion.isOpenJDK();
+        boolean isJava9 = SystemVersion.isJava9();
+        if (noJava7 || noPack200 || openARM || isJava9) {
             String s = "Java version: " + System.getProperty("java.version") +
                        " OS: " + System.getProperty("os.name") + ' ' +
                        System.getProperty("os.arch") + ' ' +
@@ -300,12 +318,22 @@ public class RouterConsoleRunner implements RouterApp {
             log.logAlways(net.i2p.util.Log.WARN, s);
             System.out.println("Warning: " + s);
             if (noJava7) {
-                s = "Java 7 will be required by mid-2015, please upgrade soon";
+                s = "Java 7 is now required, please upgrade";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
             if (noPack200) {
-                s = "Pack200 will be required by mid-2015, please upgrade Java soon";
+                s = "Pack200 is required for plugins and automatic updates, please upgrade Java";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+            if (openARM) {
+                s = "OpenJDK is not recommended for ARM. Use Oracle Java 8";
+                log.logAlways(net.i2p.util.Log.WARN, s);
+                System.out.println("Warning: " + s);
+            }
+            if (isJava9) {
+                s = "Java 9 support is beta, and not recommended for general use";
                 log.logAlways(net.i2p.util.Log.WARN, s);
                 System.out.println("Warning: " + s);
             }
@@ -457,6 +485,7 @@ public class RouterConsoleRunner implements RouterApp {
                     System.err.println("Bad routerconsole port " + _listenPort);
             }
             if (lport > 0) {
+                List<String> hosts = new ArrayList<String>(2);
                 StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
@@ -493,13 +522,20 @@ public class RouterConsoleRunner implements RouterApp {
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
                         boundAddresses++;
+                        hosts.add(host);
                     } catch (Exception ioe) {
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ": " + ioe);
                         System.err.println("You may ignore this warning if the console is still available at http://localhost:" + _listenPort);
                     }
                 }
-                // XXX: what if listenhosts do not include 127.0.0.1? (Should that ever even happen?)
-                _context.portMapper().register(PortMapper.SVC_CONSOLE,lport);
+                if (hosts.isEmpty()) {
+                    _context.portMapper().register(PortMapper.SVC_CONSOLE, lport);
+                } else {
+                    // put IPv4 first
+                    Collections.sort(hosts, new HostComparator());
+                    _context.portMapper().register(PortMapper.SVC_CONSOLE, hosts.get(0), lport);
+                    // note that we could still fail in connector.start() below
+                }
             }
 
             // add SSL listeners
@@ -523,6 +559,7 @@ public class RouterConsoleRunner implements RouterApp {
                                                    new String[I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.size()]));
                     sslFactory.addExcludeCipherSuites(I2PSSLSocketFactory.EXCLUDE_CIPHERS.toArray(
                                                       new String[I2PSSLSocketFactory.EXCLUDE_CIPHERS.size()]));
+                    List<String> hosts = new ArrayList<String>(2);
                     StringTokenizer tok = new StringTokenizer(_sslListenHost, " ,");
                     while (tok.hasMoreTokens()) {
                         String host = tok.nextToken().trim();
@@ -561,6 +598,7 @@ public class RouterConsoleRunner implements RouterApp {
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
                             boundAddresses++;
+                            hosts.add(host);
                         } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
                             if (SystemVersion.isGNU())
@@ -568,7 +606,14 @@ public class RouterConsoleRunner implements RouterApp {
                             System.err.println("You may ignore this warning if the console is still available at https://localhost:" + sslPort);
                         }
                     }
-                    _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);
+                    if (hosts.isEmpty()) {
+                        _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, sslPort);
+                    } else {
+                        // put IPv4 first
+                        Collections.sort(hosts, new HostComparator());
+                        _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, hosts.get(0), sslPort);
+                        // note that we could still fail in connector.start() below
+                    }
                 } else {
                     System.err.println("Unable to create or access keystore for SSL: " + keyStore.getAbsolutePath());
                 }
@@ -586,6 +631,12 @@ public class RouterConsoleRunner implements RouterApp {
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
+            if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
+                _context.getBaseDir().getAbsolutePath().equals("/usr/share/i2p")) {
+               // We are using Tomcat 6, so the Debian patch doesn't apply.
+               // Remove when we switch to Tomcat 8
+               _context.logManager().getLog(Server.class).logAlways(net.i2p.util.Log.INFO, "Please ignore any InstanceManager warnings");
+            }
             rootServletHandler = new ServletHandler();
             rootWebApp = new LocaleWebAppHandler(_context,
                                                   "/", _webAppsDir + ROUTERCONSOLE + ".war",
@@ -630,8 +681,9 @@ public class RouterConsoleRunner implements RouterApp {
                 }
             }
             if (error) {
+                String port = (_listenPort != null) ? _listenPort : ((_sslListenPort != null) ? _sslListenPort : "7657");
                 System.err.println("WARNING: Error starting one or more listeners of the Router Console server.\n" +
-                               "If your console is still accessible at http://127.0.0.1:" + _listenPort + "/,\n" +
+                               "If your console is still accessible at http://127.0.0.1:" + port + "/,\n" +
                                "this may be a problem only with binding to the IPV6 address ::1.\n" +
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.");
@@ -707,6 +759,8 @@ public class RouterConsoleRunner implements RouterApp {
         
             ConsoleUpdateManager um = new ConsoleUpdateManager(_context, _mgr, null);
             um.start();
+            NewsManager nm = new NewsManager(_context, _mgr, null);
+            nm.startup();
         
             if (PluginStarter.pluginsEnabled(_context)) {
                 t = new I2PAppThread(new PluginStarter(_context), "PluginStarter", true);
@@ -758,6 +812,13 @@ public class RouterConsoleRunner implements RouterApp {
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
+                // export cert, fails silently
+                File dir = new SecureDirectory(_context.getConfigDir(), "certificates");
+                dir.mkdir();
+                dir = new SecureDirectory(dir, "console");
+                dir.mkdir();
+                File certFile = new File(dir, "console.local.crt");
+                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {
@@ -788,19 +849,55 @@ public class RouterConsoleRunner implements RouterApp {
                 enable = false;
                 ctx.router().saveConfig(PROP_CONSOLE_PW, "false");
             } else {
-                HashLoginService realm = new HashLoginService(JETTY_REALM);
+                HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
+                                                                    ctx.logManager().getLog(RouterConsoleRunner.class));
                 sec.setLoginService(realm);
                 sec.setAuthenticator(authenticator);
+                String[] role = new String[] {JETTY_ROLE};
                 for (Map.Entry<String, String> e : userpw.entrySet()) {
                     String user = e.getKey();
                     String pw = e.getValue();
-                    realm.putUser(user, Credential.getCredential(MD5.__TYPE + pw), new String[] {JETTY_ROLE});
+                    Credential cred = Credential.getCredential(MD5.__TYPE + pw);
+                    realm.putUser(user, cred, role);
                     Constraint constraint = new Constraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);
                     ConstraintMapping cm = new ConstraintMapping();
                     cm.setConstraint(constraint);
                     cm.setPathSpec("/");
                     constraints.add(cm);
+                    // Jetty does auth checking only with ISO-8859-1,
+                    // so register a 2nd and 3rd user with different encodings if necessary.
+                    // Might work, might not...
+                    // There's no standard and browser behavior varies.
+                    // Chrome sends UTF-8. Firefox doesn't send anything.
+                    // https://bugzilla.mozilla.org/show_bug.cgi?id=41489
+                    // see also RFC 7616/7617 (late 2015) and PasswordManager.md5Hex()
+                    byte[] b1 = DataHelper.getUTF8(user);
+                    byte[] b2 = DataHelper.getASCII(user);
+                    if (!DataHelper.eq(b1, b2)) {
+                        try {
+                            // each char truncated to 8 bytes
+                            String user2 = new String(b2, "ISO-8859-1");
+                            realm.putUser(user2, cred, role);
+                            constraint = new Constraint(user2, JETTY_ROLE);
+                            constraint.setAuthenticate(true);
+                            cm = new ConstraintMapping();
+                            cm.setConstraint(constraint);
+                            cm.setPathSpec("/");
+                            constraints.add(cm);
+
+                            // each UTF-8 byte as a char
+                            // this is what chrome does
+                            String user3 = new String(b1, "ISO-8859-1");
+                            realm.putUser(user3, cred, role);
+                            constraint = new Constraint(user3, JETTY_ROLE);
+                            constraint.setAuthenticate(true);
+                            cm = new ConstraintMapping();
+                            cm.setConstraint(constraint);
+                            cm.setPathSpec("/");
+                            constraints.add(cm);
+                        } catch (UnsupportedEncodingException uee) {}
+                    }
                 }
             }
         }
@@ -835,6 +932,30 @@ public class RouterConsoleRunner implements RouterApp {
         sec.setConstraintMappings(cmarr);
 
         context.setSecurityHandler(sec);
+    }
+    
+    /**
+     * For logging authentication failures
+     * @since 0.9.28
+     */
+    private static class CustomHashLoginService extends HashLoginService {
+        private final String _webapp;
+        private final net.i2p.util.Log _log;
+
+        public CustomHashLoginService(String realm, String webapp, net.i2p.util.Log log) {
+            super(realm);
+            _webapp = webapp;
+            _log = log;
+        }
+
+        @Override
+        public UserIdentity login(String username, Object credentials) {
+            UserIdentity rv = super.login(username, credentials);
+            if (rv == null)
+                //_log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, webapp: " + _webapp + ", user: " + username);
+                _log.logAlways(net.i2p.util.Log.WARN, "Console authentication failed, user: " + username);
+            return rv;
+        }
     }
     
     /** @since 0.8.8 */
@@ -888,6 +1009,21 @@ public class RouterConsoleRunner implements RouterApp {
         }
     }
 
+    /**
+     * Put IPv4 first
+     * @since 0.9.24
+     */
+    private static class HostComparator implements Comparator<String>, Serializable {
+         public int compare(String l, String r) {
+             boolean l4 = l.contains(".");
+             boolean r4 = r.contains(".");
+             if (l4 && !r4)
+                 return -1;
+             if (r4 && !l4)
+                 return 1;
+             return l.compareTo(r);
+        }
+    }
     
     /**
      * Just to set the name and set Daemon

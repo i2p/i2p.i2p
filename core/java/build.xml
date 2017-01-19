@@ -19,16 +19,58 @@
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
     <property name="javac.classpath" value="" />
-    <property name="javac.version" value="1.6" />
+    <property name="javac.version" value="1.7" />
+
+    <!-- fixups if we're using libintl.jar for GettextResource.java -->
+    <condition property="source.exclude1" value="gnu/gettext/GettextResource.java" else="NOTHING" >
+        <istrue value="${with-gettext-base}" />
+    </condition>
+    <condition property="javac.classpath.mod1" value="build/libintl.jar:" else="" >
+        <istrue value="${with-gettext-base}" />
+    </condition>
+    <!-- fixups if we're using gnu-getopt.jar for gnu/getopt/* -->
+    <condition property="source.exclude2" value="gnu/getopt/**" else="NOTHING" >
+        <istrue value="${with-libgetopt-java}" />
+    </condition>
+    <condition property="javac.classpath.mod2" value="build/gnu-getopt.jar:" else="" >
+        <istrue value="${with-libgetopt-java}" />
+    </condition>
+    <condition property="translation.includes" value="NOTHING" else="gnu/getopt/*.properties" >
+        <istrue value="${with-libgetopt-java}" />
+    </condition>
+    <!-- fixups if we're using httpclient.jar and httpcore.jar for org.apache.http classes -->
+    <condition property="source.exclude3" value="org/apache/http/**" else="NOTHING" >
+        <istrue value="${with-libhttpclient-java}" />
+    </condition>
+    <condition property="javac.classpath.mod3" value="build/httpclient.jar:build/httpcore.jar:" else="" >
+        <istrue value="${with-libhttpclient-java}" />
+    </condition>
+    <property name="javac.classpath.mod" value="${javac.classpath.mod1}${javac.classpath.mod2}${javac.classpath.mod3}${javac.classpath}" />
+
+    <!-- jar classpath fixups -->
+    <condition property="gettext.jar" value="/usr/share/java/libintl.jar" else="" >
+        <istrue value="${with-gettext-base}" />
+    </condition>
+    <condition property="getopt.jar" value="/usr/share/java/gnu-getopt.jar" else="" >
+        <istrue value="${with-libgetopt-java}" />
+    </condition>
+    <condition property="httpclient.jar" value="/usr/share/java/httpclient.jar /usr/share/java/httpcore.jar" else="" >
+        <istrue value="${with-libhttpclient-java}" />
+    </condition>
 
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+        <!-- sourcepath="" necessary for excludes to work, see ant manual for javac -->
+        <javac sourcepath="" srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="false"
-               destdir="./build/obj" classpath="${javac.classpath}" >
+               destdir="./build/obj" classpath="${javac.classpath.mod}" >
             <compilerarg line="${javac.compilerargs}" />
+            <include name="**/*.java" />
+            <exclude name="${source.exclude1}" />
+            <exclude name="${source.exclude2}" />
+            <exclude name="${source.exclude3}" />
         </javac>
     </target>
 
@@ -52,13 +94,22 @@
         <jar destfile="./build/i2p.jar" >
             <fileset dir="./build/obj" includes="**/*.class" />
             <!-- the getopt translation files -->
-            <fileset dir="src" includes="gnu/getopt/*.properties" />
+            <fileset dir="src" includes="${translation.includes}" />
             <manifest>
+                <attribute name="Class-Path" value="${gettext.jar} ${getopt.jar} ${httpclient.jar}" />
+                <attribute name="Specification-Title" value="I2P Core API" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Core API" />
                 <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Main-Class" value="net.i2p.util.CommandLine" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
         </jar>
     </target>
@@ -75,13 +126,28 @@
         <javadoc sourcepath="./src:./test/junit" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
     </target>
 
+    <!-- for Maven Central -->
+    <target name="javadocJar" depends="javadoc">
+        <jar jarfile="./build/i2p-${release.number}-javadoc.jar">
+            <fileset dir="./build/javadoc" />
+        </jar>
+    </target>
+    <target name="sourcesJar">
+        <jar jarfile="./build/i2p-${release.number}-sources.jar">
+            <fileset dir="./src" />
+        </jar>
+    </target>
+
     <!-- scala paths -->
     <target name="scala.init">
         <property name="scala-library.jar" value="${scalatest.libs}/scala-library.jar" />
+        <property name="scala-xml.jar" value="${scalatest.libs}/scala-xml.jar" />
+        <property name="scalactic.jar" value="${scalatest.libs}/scalactic.jar" />
         <property name="scalatest.jar" value="${scalatest.libs}/scalatest.jar" />
         <taskdef resource="scala/tools/ant/antlib.xml">
             <classpath>
                 <pathelement location="${scalatest.libs}/scala-compiler.jar" />
+                <pathelement location="${scalatest.libs}/scala-reflect.jar" />
                 <pathelement location="${scala-library.jar}" />
             </classpath>
         </taskdef>
@@ -93,8 +159,9 @@
         <mkdir dir="./build/obj_scala" />
         <scalac srcdir="./test/scalatest" destdir="./build/obj_scala" deprecation="on" >
             <classpath>
-                <pathelement location="${javac.classpath}" />
+                <pathelement location="${javac.classpath.mod}" />
                 <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj" />
             </classpath>
@@ -114,9 +181,10 @@
         <javac srcdir="./test/junit" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
                debuglevel="lines,vars,source"
                includeAntRuntime="true"
+               excludes="${source.exclude}"
                destdir="./build/obj" >
             <classpath>
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />
@@ -200,6 +268,8 @@
         <taskdef name="scalatest" classname="org.scalatest.tools.ScalaTestAntTask">
             <classpath>
                 <pathelement location="${scala-library.jar}" />
+                <pathelement location="${scala-xml.jar}" />
+                <pathelement location="${scalactic.jar}" />
                 <pathelement location="${scalatest.jar}" />
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
@@ -237,7 +307,7 @@
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement location="../../installer/resources/" />
-                <pathelement path="${javac.classpath}" />
+                <pathelement path="${javac.classpath.mod}" />
                 <pathelement location="${hamcrest.home}/hamcrest-core.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-library.jar" />
                 <pathelement location="${hamcrest.home}/hamcrest-integration.jar" />

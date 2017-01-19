@@ -74,11 +74,11 @@ class ConnectionManager {
         _pendingPings = new ConcurrentHashMap<Long,PingRequest>(4);
         _messageHandler = new MessageHandler(_context, this);
         _packetHandler = new PacketHandler(_context, this);
-        _connectionHandler = new ConnectionHandler(_context, this);
         _schedulerChooser = new SchedulerChooser(_context);
         _conPacketHandler = new ConnectionPacketHandler(_context);
         _timer = new RetransmissionTimer(_context, "Streaming Timer " +
                                          session.getMyDestination().calculateHash().toBase64().substring(0, 4));
+        _connectionHandler = new ConnectionHandler(_context, this, _timer);
         _tcbShare = new TCBShare(_context, _timer);
         // PROTO_ANY is for backward compatibility (pre-0.7.1)
         // TODO change proto to PROTO_STREAMING someday.
@@ -88,7 +88,7 @@ class ConnectionManager {
         // As of 0.9.1, listen on configured port (default 0 = all)
         int protocol = defaultOptions.getEnforceProtocol() ? I2PSession.PROTO_STREAMING : I2PSession.PROTO_ANY;
         _session.addMuxedSessionListener(_messageHandler, protocol, defaultOptions.getLocalPort());
-        _outboundQueue = new PacketQueue(_context);
+        _outboundQueue = new PacketQueue(_context, _timer);
         _recentlyClosed = new LHMCache<Long, Object>(32);
         /** Socket timeout for accept() */
         _soTimeout = -1;
@@ -178,21 +178,24 @@ class ConnectionManager {
             if ((_defaultOptions.getMaxConnsPerMinute() > 0 || _defaultOptions.getMaxTotalConnsPerMinute() > 0) &&
                 _minuteThrottler == null) {
                _context.statManager().createRateStat("stream.con.throttledMinute", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
-               _minuteThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute(), 60*1000);
+               _minuteThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute(),
+                                                    60*1000, _timer);
             } else if (_minuteThrottler != null) {
                _minuteThrottler.updateLimits(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute());
             }
             if ((_defaultOptions.getMaxConnsPerHour() > 0 || _defaultOptions.getMaxTotalConnsPerHour() > 0) &&
                 _hourThrottler == null) {
                _context.statManager().createRateStat("stream.con.throttledHour", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
-               _hourThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour(), 60*60*1000);
+               _hourThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour(),
+                                                  60*60*1000, _timer);
             } else if (_hourThrottler != null) {
                _hourThrottler.updateLimits(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour());
             }
             if ((_defaultOptions.getMaxConnsPerDay() > 0 || _defaultOptions.getMaxTotalConnsPerDay() > 0) &&
                 _dayThrottler == null) {
                _context.statManager().createRateStat("stream.con.throttledDay", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
-               _dayThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay(), 24*60*60*1000);
+               _dayThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay(),
+                                                 24*60*60*1000, _timer);
             } else if (_dayThrottler != null) {
                _dayThrottler.updateLimits(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay());
             }
@@ -238,7 +241,7 @@ class ConnectionManager {
                 if (why != null) {
                     if ((!_defaultOptions.getDisableRejectLogging()) || _log.shouldLog(Log.WARN))
                         _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
-                           (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().calculateHash().toBase64()));
+                           (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().toBase32()));
                     reject = true;
                 } else { 
                     assignReceiveStreamId(con);
@@ -392,12 +395,14 @@ class ConnectionManager {
      * Build a new connection to the given peer.  This blocks if there is no
      * connection delay, otherwise it returns immediately.
      *
-     * @param peer Destination to contact
+     * @param peer Destination to contact, non-null
      * @param opts Connection's options
      * @param session generally the session from the constructor, but could be a subsession
      * @return new connection, or null if we have exceeded our limit
      */
     public Connection connect(Destination peer, ConnectionOptions opts, I2PSession session) {
+        if (peer == null)
+            throw new NullPointerException();
         Connection con = null;
         long expiration = _context.clock().now();
         long tmout = opts.getConnectTimeout();
@@ -839,7 +844,7 @@ class ConnectionManager {
         private final PingNotifier _notifier;
 
         public PingFailed(Long id, PingNotifier notifier) { 
-            super(_context.simpleTimer2());
+            super(_timer);
             _id = id;
             _notifier = notifier;
         }

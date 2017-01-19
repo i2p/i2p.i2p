@@ -32,9 +32,12 @@ import net.i2p.util.Log;
  *  Generate compressed geoipv6.dat.gz file, and
  *  lookup entries in it.
  *
+ *  Public only for command line use,
+ *  not a public API, not for external use.
+ *
  *  @since IPv6
  */
-class GeoIPv6 {
+public class GeoIPv6 {
 
     private static final String GEOIP_DIR_DEFAULT = "geoip";
     private static final String GEOIP_FILE_DEFAULT = "geoipv6.dat.gz";
@@ -170,7 +173,7 @@ class GeoIPv6 {
                         if (buf.charAt(0) == '#') {
                             continue;
                         }
-                        String[] s = buf.split(",");
+                        String[] s = DataHelper.split(buf, ",");
                         String ips1 = s[0].replace("\"", "").trim();
                         String ips2 = s[1].replace("\"", "").trim();
                         byte[] ip1 = InetAddress.getByName(ips1).getAddress();

@@ -46,7 +46,7 @@ public class SessionEncryptionTest extends TestCase{
         SessionKeyManager skm = new TransientSessionKeyManager(_context);
         SessionKey curKey = skm.createSession(pubKey);
         
-        byte[] msg = "msg 1".getBytes();
+        byte[] msg = DataHelper.getASCII("msg 1");
         
         byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64);
         byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
@@ -60,7 +60,7 @@ public class SessionEncryptionTest extends TestCase{
         SessionKeyManager skm = new TransientSessionKeyManager(_context);
         SessionKey curKey = skm.createSession(pubKey);
         
-        byte[] msg = "msg 2".getBytes();
+        byte[] msg = DataHelper.getASCII("msg 2");
         
         byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64);
         byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
@@ -95,11 +95,11 @@ public class SessionEncryptionTest extends TestCase{
         secondTags.add(tag3);
         secondTags.add(tag4);
         
-        byte[] msg1 = "msg 1".getBytes();
-        byte[] msg2 = "msg 2".getBytes();
-        byte[] msg3 = "msg 3".getBytes();
-        byte[] msg4 = "msg 4".getBytes();
-        byte[] msg5 = "msg 5".getBytes();
+        byte[] msg1 = DataHelper.getASCII("msg 1");
+        byte[] msg2 = DataHelper.getASCII("msg 2");
+        byte[] msg3 = DataHelper.getASCII("msg 3");
+        byte[] msg4 = DataHelper.getASCII("msg 4");
+        byte[] msg5 = DataHelper.getASCII("msg 5");
         
         byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64);
         
@@ -195,11 +195,11 @@ public class SessionEncryptionTest extends TestCase{
         secondTags.add(tag3);
         secondTags.add(tag4);
         
-        byte[] msg1 = "msg 1".getBytes();
-        byte[] msg2 = "msg 2".getBytes();
-        byte[] msg3 = "msg 3".getBytes();
-        byte[] msg4 = "msg 4".getBytes();
-        byte[] msg5 = "msg 5".getBytes();
+        byte[] msg1 = DataHelper.getASCII("msg 1");
+        byte[] msg2 = DataHelper.getASCII("msg 2");
+        byte[] msg3 = DataHelper.getASCII("msg 3");
+        byte[] msg4 = DataHelper.getASCII("msg 4");
+        byte[] msg5 = DataHelper.getASCII("msg 5");
         
         byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64);
         
@@ -291,7 +291,7 @@ public class SessionEncryptionTest extends TestCase{
             if (i % 50 == 0)
                 nextKey = KeyGenerator.getInstance().generateSessionKey();
             
-            byte[] msg = ("msg " + i).getBytes();
+            byte[] msg = DataHelper.getASCII("msg " + i);
             
             byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, tags, curTag, nextKey, 64);
             

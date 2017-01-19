@@ -5,6 +5,9 @@ package net.i2p.util;
  */
 
 import java.lang.reflect.Field;
+import java.util.TimeZone;
+
+import net.i2p.I2PAppContext;
 
 /**
  * Methods to find out what system we are running on
@@ -13,20 +16,30 @@ import java.lang.reflect.Field;
  */
 public abstract class SystemVersion {
 
+    /*
+     *  @since 0.9.28
+     */
+    public static final String DAEMON_USER = "i2psvc";
+
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
     private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
                                           System.getProperty("os.arch").equals("amd64");
+    private static final boolean _isGentoo = System.getProperty("os.version").contains("gentoo") ||
+                                             System.getProperty("os.version").contains("hardened");  // Funtoo
     private static final boolean _isAndroid;
     private static final boolean _isApache;
     private static final boolean _isGNU;
+    private static final boolean _isOpenJDK;
     private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
+    private static final boolean _isLinuxService;
 
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
     private static final boolean _oneDotEight;
+    private static final boolean _oneDotNine;
     private static final int _androidSDK;
 
     static {
@@ -47,6 +60,10 @@ public abstract class SystemVersion {
         _isApache = vendor.startsWith("Apache");
         _isGNU = vendor.startsWith("GNU Classpath") ||               // JamVM
                  vendor.startsWith("Free Software Foundation");      // gij
+        String runtime = System.getProperty("java.runtime.name");
+        _isOpenJDK = runtime != null && runtime.contains("OpenJDK");
+        _isLinuxService = !_isWin && !_isMac && !_isAndroid &&
+                          DAEMON_USER.equals(System.getProperty("user.name"));
 
         int sdk = 0;
         if (_isAndroid) {
@@ -61,11 +78,19 @@ public abstract class SystemVersion {
         if (_isAndroid) {
             _oneDotSix = _androidSDK >= 9;
             _oneDotSeven = _androidSDK >= 19;
+            // https://developer.android.com/guide/platform/j8-jack.html
+            // some stuff in 23, some in 24
             _oneDotEight = false;
+            _oneDotNine = false;
         } else {
-            _oneDotSix = VersionComparator.comp(System.getProperty("java.version"), "1.6") >= 0;
-            _oneDotSeven = _oneDotSix && VersionComparator.comp(System.getProperty("java.version"), "1.7") >= 0;
-            _oneDotEight = _oneDotSeven && VersionComparator.comp(System.getProperty("java.version"), "1.8") >= 0;
+            String version = System.getProperty("java.version");
+            // handle versions like "8-ea" or "9-internal"
+            if (!version.startsWith("1."))
+                version = "1." + version;
+            _oneDotSix = VersionComparator.comp(version, "1.6") >= 0;
+            _oneDotSeven = _oneDotSix && VersionComparator.comp(version, "1.7") >= 0;
+            _oneDotEight = _oneDotSeven && VersionComparator.comp(version, "1.8") >= 0;
+            _oneDotNine = _oneDotEight && VersionComparator.comp(version, "1.9") >= 0;
         }
     }
 
@@ -93,6 +118,20 @@ public abstract class SystemVersion {
      */
     public static boolean isGNU() {
         return _isGNU;
+    }
+
+    /**
+     *  @since 0.9.23
+     */
+    public static boolean isGentoo() {
+        return _isGentoo;
+    }
+
+    /**
+     *  @since 0.9.26
+     */
+    public static boolean isOpenJDK() {
+        return _isOpenJDK;
     }
 
     /**
@@ -140,6 +179,15 @@ public abstract class SystemVersion {
     }
 
     /**
+     *
+     *  @return true if Java 1.9 or higher, false for Android.
+     *  @since 0.9.23
+     */
+    public static boolean isJava9() {
+        return _oneDotNine;
+    }
+
+    /**
      * This isn't always correct.
      * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
      * http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html
@@ -151,6 +199,13 @@ public abstract class SystemVersion {
      */
     public static boolean is64Bit() {
         return _is64;
+    }
+
+    /*
+     *  @since 0.9.28
+     */
+    public static boolean isLinuxService() {
+        return _isLinuxService;
     }
 
     /**
@@ -180,5 +235,60 @@ public abstract class SystemVersion {
         if (maxMemory >= Long.MAX_VALUE / 2)
             maxMemory = 96*1024*1024l;
         return maxMemory;
+    }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone() {
+        return getSystemTimeZone(I2PAppContext.getGlobalContext());
+    }
+
+    /**
+     *  The system's time zone, which is probably different from the
+     *  JVM time zone, because Router changes the JVM default to GMT.
+     *  It saves the old default in the context properties where we can get it.
+     *  Use this to format a time in local time zone with DateFormat.setTimeZone().
+     *
+     *  @return non-null
+     *  @since 0.9.24
+     */
+    public static TimeZone getSystemTimeZone(I2PAppContext ctx) {
+        String systemTimeZone = ctx.getProperty("i2p.systemTimeZone");
+        if (systemTimeZone != null)
+            return TimeZone.getTimeZone(systemTimeZone);
+        return TimeZone.getDefault();
+    }
+
+    /**
+     *  @since 0.9.24
+     */
+    public static void main(String[] args) {
+        System.out.println("64 bit   : " + is64Bit());
+        System.out.println("Java 6   : " + isJava6());
+        System.out.println("Java 7   : " + isJava7());
+        System.out.println("Java 8   : " + isJava8());
+        System.out.println("Java 9   : " + isJava9());
+        System.out.println("Android  : " + isAndroid());
+        if (isAndroid())
+            System.out.println("  Version: " + getAndroidVersion());
+        System.out.println("Apache   : " + isApache());
+        System.out.println("ARM      : " + isARM());
+        System.out.println("Gentoo   : " + isGentoo());
+        System.out.println("GNU      : " + isGNU());
+        System.out.println("Linux Svc: " + isLinuxService());
+        System.out.println("Mac      : " + isMac());
+        System.out.println("OpenJDK  : " + isOpenJDK());
+        System.out.println("Windows  : " + isWindows());
+        System.out.println("Wrapper  : " + hasWrapper());
+        System.out.println("x86      : " + isX86());
+        System.out.println("Max mem  : " + getMaxMemory());
+
     }
 }

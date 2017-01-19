@@ -195,7 +195,7 @@ public class AESInputStream extends FilterInputStream {
             throw new IOException("Error decrypting - no data to decrypt");
         
         if (_decryptedSize != 0)
-            throw new IOException("wtf, decrypted size is not 0? " + _decryptedSize);
+            throw new IOException("decrypted size is not 0? " + _decryptedSize);
         
         _context.aes().decrypt(_encryptedBuf, 0, _encryptedBuf, 0, _key, _lastBlock, BLOCK_SIZE);
         DataHelper.xor(_encryptedBuf, 0, _lastBlock, 0, _encryptedBuf, 0, BLOCK_SIZE);
@@ -287,9 +287,9 @@ public class AESInputStream extends FilterInputStream {
         log.setMinimumPriority(Log.DEBUG);
         byte orig[] = new byte[1024 * 32];
         RandomSource.getInstance().nextBytes(orig);
-        //byte orig[] = "you are my sunshine, my only sunshine".getBytes();
+        //byte orig[] = DataHelper.getASCII("you are my sunshine, my only sunshine");
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();
-        byte iv[] = "there once was a".getBytes();
+        byte iv[] = DataHelper.getASCII("there once was a");
 
         for (int i = 0; i < 20; i++) {
             runTest(ctx, orig, key, iv);

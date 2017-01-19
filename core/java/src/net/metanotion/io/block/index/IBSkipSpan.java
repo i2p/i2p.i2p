@@ -54,21 +54,22 @@ import net.i2p.util.Log;
  *
  * @author zzz
  */
-public class IBSkipSpan extends BSkipSpan {
+public class IBSkipSpan<K extends Comparable<? super K>, V> extends BSkipSpan<K, V> {
 
-	private Comparable firstKey;
+	private K firstKey;
 
 	@Override
-	public SkipSpan newInstance(SkipList sl) {
+	@SuppressWarnings("unchecked")
+	public SkipSpan<K, V> newInstance(SkipList<K, V> sl) {
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("Splitting page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
 		try {
 			int newPage = bf.allocPage();
 			init(bf, newPage, bf.spanSize);
-			SkipSpan rv = new IBSkipSpan(bf, (BSkipList) sl, newPage, keySer, valSer);
+			SkipSpan<K, V> rv = new IBSkipSpan<K, V>(bf, (BSkipList<K, V>) sl, newPage, keySer, valSer);
 			// this is called after a split, so we need the data arrays initialized
-			rv.keys = new Comparable[bf.spanSize];
-			rv.vals = new Object[bf.spanSize];
+			rv.keys = (K[]) new Comparable[bf.spanSize];
+			rv.vals = (V[]) new Object[bf.spanSize];
 			return rv;
 		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
@@ -125,7 +126,7 @@ public class IBSkipSpan extends BSkipSpan {
 		pageCounter[0] +=4;
 		byte[] k = new byte[ksz];
 		curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
-		this.firstKey = (Comparable) this.keySer.construct(k);
+		this.firstKey = this.keySer.construct(k);
 		if (this.firstKey == null) {
 			bf.log.error("Null deserialized first key in page " + curPage);
 			repair(1);
@@ -160,7 +161,7 @@ public class IBSkipSpan extends BSkipSpan {
 	/**
 	 * Linear search through the span in the file for the value.
 	 */
-	private Object getData(Comparable key) throws IOException {
+	private V getData(K key) throws IOException {
 		seekData();
 		int curPage = this.page;
 		int[] curNextPage = new int[1];
@@ -194,7 +195,7 @@ public class IBSkipSpan extends BSkipSpan {
 				break;
 			}
 			//System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
-			Comparable ckey = (Comparable) this.keySer.construct(k);
+			K ckey = this.keySer.construct(k);
 			if (ckey == null) {
 				// skip the value and keep going
 				curPage = this.bf.skipMultiPageBytes(vsz, curPage, pageCounter, curNextPage);
@@ -213,7 +214,7 @@ public class IBSkipSpan extends BSkipSpan {
 					lostEntries(i, curPage);
 					break;
 				}
-				Object rv = this.valSer.construct(v);
+				V rv = this.valSer.construct(v);
 				if (rv == null) {
 					bf.log.error("Null deserialized value in entry " + i + " page " + curPage +
 					                    " key=" + ckey);
@@ -252,11 +253,11 @@ public class IBSkipSpan extends BSkipSpan {
 	*****/
 	}
 
-	private IBSkipSpan(BlockFile bf, BSkipList bsl) {
+	private IBSkipSpan(BlockFile bf, BSkipList<K, V> bsl) {
 		super(bf, bsl);
 	}
 
-	public IBSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+	public IBSkipSpan(BlockFile bf, BSkipList<K, V> bsl, int spanPage, Serializer<K> key, Serializer<V> val) throws IOException {
 		super(bf, bsl);
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("New ibss page " + spanPage);
@@ -265,24 +266,24 @@ public class IBSkipSpan extends BSkipSpan {
 		this.next = null;
 		this.prev = null;
 
-		IBSkipSpan bss = this;
-		IBSkipSpan temp;
+		IBSkipSpan<K, V> bss = this;
+		IBSkipSpan<K, V> temp;
 		int np = nextPage;
 		while(np != 0) {
-			temp = (IBSkipSpan) bsl.spanHash.get(Integer.valueOf(np));
+			temp = (IBSkipSpan<K, V>) bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.next = temp;
 				break;
 			}
-			bss.next = new IBSkipSpan(bf, bsl);
+			bss.next = new IBSkipSpan<K, V>(bf, bsl);
 			bss.next.next = null;
 			bss.next.prev = bss;
-			Comparable previousFirstKey = bss.firstKey;
-			bss = (IBSkipSpan) bss.next;
+			K previousFirstKey = bss.firstKey;
+			bss = (IBSkipSpan<K, V>) bss.next;
 			
 			BSkipSpan.loadInit(bss, bf, bsl, np, key, val);
 			bss.loadFirstKey();
-			Comparable nextFirstKey = bss.firstKey;
+			K nextFirstKey = bss.firstKey;
 			if (previousFirstKey == null || nextFirstKey == null ||
 			    previousFirstKey.compareTo(nextFirstKey) >= 0) {
 				// TODO remove, but if we are at the bottom of a level
@@ -299,20 +300,20 @@ public class IBSkipSpan extends BSkipSpan {
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
-			temp = (IBSkipSpan) bsl.spanHash.get(Integer.valueOf(np));
+			temp = (IBSkipSpan<K, V>) bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.prev = temp;
 				break;
 			}
-			bss.prev = new IBSkipSpan(bf, bsl);
+			bss.prev = new IBSkipSpan<K, V>(bf, bsl);
 			bss.prev.next = bss;
 			bss.prev.prev = null;
-			Comparable nextFirstKey = bss.firstKey;
-			bss = (IBSkipSpan) bss.prev;
+			K nextFirstKey = bss.firstKey;
+			bss = (IBSkipSpan<K, V>) bss.prev;
 			
 			BSkipSpan.loadInit(bss, bf, bsl, np, key, val);
 			bss.loadFirstKey();
-			Comparable previousFirstKey = bss.firstKey;
+			K previousFirstKey = bss.firstKey;
 			if (previousFirstKey == null || nextFirstKey == null ||
 			    previousFirstKey.compareTo(nextFirstKey) >= 0) {
 				// TODO remove, but if we are at the bottom of a level
@@ -330,7 +331,7 @@ public class IBSkipSpan extends BSkipSpan {
          * Does not call super, we always store first key here
 	 */
 	@Override
-	public Comparable firstKey() {
+	public K firstKey() {
 		return this.firstKey;
 	}
 
@@ -339,13 +340,13 @@ public class IBSkipSpan extends BSkipSpan {
 	 * This is called only via SkipList.find()
 	 */
 	@Override
-	public SkipSpan getSpan(Comparable key, int[] search) {
+	public SkipSpan<K, V> getSpan(K key, int[] search) {
 		try {
 			seekAndLoadData();
 		} catch (IOException ioe) {
 			throw new RuntimeException("Error reading database", ioe);
 		}
-		SkipSpan rv = super.getSpan(key, search);
+		SkipSpan<K, V> rv = super.getSpan(key, search);
 		this.keys = null;
 		this.vals = null;
 		return rv;
@@ -355,7 +356,7 @@ public class IBSkipSpan extends BSkipSpan {
 	 * Linear search if in file, Binary search if in memory
 	 */
 	@Override
-	public Object get(Comparable key) {
+	public V get(K key) {
 		try {
 			if (nKeys == 0) { return null; }
 			if (this.next != null && this.next.firstKey().compareTo(key) <= 0)
@@ -370,13 +371,13 @@ public class IBSkipSpan extends BSkipSpan {
 	 * Load whole span from file, do the operation, flush out, then null out in-memory data again.
 	 */
 	@Override
-	public SkipSpan put(Comparable key, Object val, SkipList sl)	{
+	public SkipSpan<K, V> put(K key, V val, SkipList<K, V> sl)	{
 		try {
 			seekAndLoadData();
 		} catch (IOException ioe) {
 			throw new RuntimeException("Error reading database", ioe);
 		}
-		SkipSpan rv = super.put(key, val, sl);
+		SkipSpan<K, V> rv = super.put(key, val, sl);
 		// flush() nulls out the data
 		return rv;
 	}
@@ -385,7 +386,7 @@ public class IBSkipSpan extends BSkipSpan {
 	 * Load whole span from file, do the operation, flush out, then null out in-memory data again.
 	 */
 	@Override
-	public Object[] remove(Comparable key, SkipList sl) {
+	public Object[] remove(K key, SkipList<K, V> sl) {
 		if (bf.log.shouldLog(Log.DEBUG))
 			bf.log.debug("Remove " + key + " in " + this);
 		if (nKeys <= 0)

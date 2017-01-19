@@ -141,9 +141,10 @@ public abstract class TransportImpl implements Transport {
         else // shouldn't happen
             maxProp = "i2np." + style.toLowerCase(Locale.US) + ".maxConnections";
         int def = MAX_CONNECTION_FACTOR;
-        RouterInfo ri = _context.router().getRouterInfo();
-        if (ri != null) {
-            char bw = ri.getBandwidthTier().charAt(0);
+        // get it from here, not the RI, to avoid deadlock
+        String caps = _context.router().getCapabilities();
+
+            char bw = caps.charAt(0);
             switch (bw) {
                 case Router.CAPABILITY_BW12:
                 case 'u':  // unknown
@@ -156,22 +157,22 @@ public abstract class TransportImpl implements Transport {
                     def *= 3;
                     break;
                 case Router.CAPABILITY_BW128:
-                    def *= 4;
+                    def *= 5;
                     break;
                 case Router.CAPABILITY_BW256:
-                    def *= 7;
-                    break;
-                case Router.CAPABILITY_BW512:
                     def *= 9;
                     break;
+                case Router.CAPABILITY_BW512:
+                    def *= 11;
+                    break;
                 case Router.CAPABILITY_BW_UNLIMITED:
-                    def *= 12;
+                    def *= 14;
                     break;
             }
-        }
+
         if (_context.netDb().floodfillEnabled()) {
             // && !SystemVersion.isWindows()) {
-            def *= 17; def /= 10;  // 425 for Class O ff
+            def *= 17; def /= 10;
         }
         // increase limit for SSU, for now
         if (style.equals("SSU"))
@@ -747,13 +748,11 @@ public abstract class TransportImpl implements Transport {
      *  This can be called before startListening() to set an initial address,
      *  or after the transport is running.
      *
-     *  This implementation does nothing. Transports should override if they want notification.
-     *
      *  @param source defined in Transport.java
      *  @param ip typ. IPv4 or IPv6 non-local; may be null to indicate IPv4 failure or port info only
      *  @param port 0 for unknown or unchanged
      */
-    public void externalAddressReceived(AddressSource source, byte[] ip, int port) {}
+    public abstract void externalAddressReceived(AddressSource source, byte[] ip, int port);
 
     /**
      *  Notify a transport of an external address change.
@@ -810,17 +809,37 @@ public abstract class TransportImpl implements Transport {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability() {}
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
      *  @since 0.9.20
      */
     protected boolean isIPv4Firewalled() {
         return TransportUtil.isIPv4Firewalled(_context, getStyle());
     }
 
-    public boolean isBacklogged(Hash dest) { return false; }
-    public boolean isEstablished(Hash dest) { return false; }
+    /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
+     *  @since 0.9.27
+     */
+    protected boolean isIPv6Firewalled() {
+        return TransportUtil.isIPv6Firewalled(_context, getStyle());
+    }
+
+    public boolean isBacklogged(Hash peer) { return false; }
+    public boolean isEstablished(Hash peer) { return false; }
+
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    public void mayDisconnect(Hash peer) {}
 
     public boolean isUnreachable(Hash peer) {
         long now = _context.clock().now();
@@ -925,6 +944,15 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
+     * Are we allowed to connect to local addresses?
+     *
+     * @since 0.9.28 moved from UDPTransport
+     */
+    public boolean allowLocal() {
+        return _context.getBooleanProperty("i2np.allowLocal");
+    }
+
+    /**
      * IP of the peer from the last connection (in or out, any transport).
      *
      * @param ip IPv4 or IPv6, non-null
@@ -983,7 +1011,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s) {
+    protected String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
@@ -991,7 +1019,7 @@ public abstract class TransportImpl implements Transport {
      *  Translate
      *  @since 0.9.8 moved from transports
      */
-    protected String _(String s, Object o) {
+    protected String _t(String s, Object o) {
         return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 

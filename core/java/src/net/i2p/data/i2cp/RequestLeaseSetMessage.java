@@ -74,6 +74,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     }
 
     /** @deprecated unused - presumably he meant remove? */
+    @Deprecated
     public void remoteEndpoint(int endpoint) {
         if ((endpoint >= 0) && (endpoint < _endpoints.size())) _endpoints.remove(endpoint);
     }

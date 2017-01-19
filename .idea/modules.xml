@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/apps/BOB/BOB.iml" filepath="$PROJECT_DIR$/apps/BOB/BOB.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/addressbook/addressbook.iml" filepath="$PROJECT_DIR$/apps/addressbook/addressbook.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/admin/admin.iml" filepath="$PROJECT_DIR$/apps/admin/admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/desktopgui/desktopgui.iml" filepath="$PROJECT_DIR$/apps/desktopgui/desktopgui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/i2psnark/i2psnark.iml" filepath="$PROJECT_DIR$/apps/i2psnark/i2psnark.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/i2ptunnel/i2ptunnel.iml" filepath="$PROJECT_DIR$/apps/i2ptunnel/i2ptunnel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/imagegen/identicon/identicon.iml" filepath="$PROJECT_DIR$/apps/imagegen/identicon/identicon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/imagegen/imagegen/imagegen.iml" filepath="$PROJECT_DIR$/apps/imagegen/imagegen/imagegen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/installer/installer.iml" filepath="$PROJECT_DIR$/installer/installer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/jetty/jetty.iml" filepath="$PROJECT_DIR$/apps/jetty/jetty.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/ministreaming/ministreaming.iml" filepath="$PROJECT_DIR$/apps/ministreaming/ministreaming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/router/router.iml" filepath="$PROJECT_DIR$/router/router.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/routerconsole/routerconsole.iml" filepath="$PROJECT_DIR$/apps/routerconsole/routerconsole.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/sam/sam.iml" filepath="$PROJECT_DIR$/apps/sam/sam.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/streaming/streaming.iml" filepath="$PROJECT_DIR$/apps/streaming/streaming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/susidns/susidns.iml" filepath="$PROJECT_DIR$/apps/susidns/susidns.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/susimail/susimail.iml" filepath="$PROJECT_DIR$/apps/susimail/susimail.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/systray/systray.iml" filepath="$PROJECT_DIR$/apps/systray/systray.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps/imagegen/zxing/zxing.iml" filepath="$PROJECT_DIR$/apps/imagegen/zxing/zxing.iml" />
+    </modules>
+  </component>
+</project>

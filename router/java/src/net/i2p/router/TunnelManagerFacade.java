@@ -29,6 +29,7 @@ public interface TunnelManagerFacade extends Service {
      * @param id the tunnelId as seen at the gateway
      * @deprecated unused
      */
+    @Deprecated
     TunnelInfo getTunnelInfo(TunnelId id);
 
     /**

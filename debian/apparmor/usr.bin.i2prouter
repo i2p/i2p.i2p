@@ -1,4 +1,4 @@
-# Last Modified: Thu May 21 18:30:32 2015
+# Last Modified: Sun Dec 06 12:30:32 2015
 # vim:syntax=apparmor et ts=8 sw=4
 
 #include <tunables/global>
@@ -40,7 +40,7 @@
 
   @{HOME}/.java/fonts/**                r,
   owner  @{HOME}/.i2p/                  rw,
-  owner  @{HOME}/.i2p/**                rwkl,
+  owner  @{HOME}/.i2p/**                rwk,
   owner  @{HOME}/.i2p/eepsite/cgi-bin/** rix,
 
   # Prevent spamming the logs

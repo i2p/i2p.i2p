@@ -217,7 +217,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
             int ackCount = data.readACKCount();
             if (ackCount > 0) {
                 rv += ackCount;
-                _context.statManager().addRateData("udp.receivedACKs", ackCount, 0);
+                _context.statManager().addRateData("udp.receivedACKs", ackCount);
                 //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receiveACKCount", acks.length, 0);
 
                 for (int i = 0; i < ackCount; i++) {

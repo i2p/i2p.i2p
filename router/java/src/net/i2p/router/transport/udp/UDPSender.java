@@ -124,6 +124,7 @@ class UDPSender {
      * @param blockTime how long to block IGNORED
      * @deprecated use add(packet)
      */
+    @Deprecated
     public void add(UDPPacket packet, int blockTime) {
      /********
         //long expiration = _context.clock().now() + blockTime;
@@ -188,7 +189,7 @@ class UDPSender {
     public void add(UDPPacket packet) {
         if (packet == null || !_keepRunning) return;
         int psz = packet.getPacket().getLength();
-        if (psz > PeerState.LARGE_MTU) {
+        if (psz > PeerState.MAX_MTU) {
             _log.error("Dropping large UDP packet " + psz + " bytes: " + packet);
             return;
         }
@@ -311,7 +312,7 @@ class UDPSender {
             UDPPacket packet = null;
             while ( (_keepRunning) && (packet == null || packet.getLifetime() > MAX_HEAD_LIFETIME) ) {
                 if (packet != null) {
-                    _context.statManager().addRateData("udp.sendQueueTrimmed", 1, 0);
+                    _context.statManager().addRateData("udp.sendQueueTrimmed", 1);
                     packet.release();
                 }
                 try {

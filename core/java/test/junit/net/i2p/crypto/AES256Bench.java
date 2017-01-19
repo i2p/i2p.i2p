@@ -86,7 +86,7 @@ public class AES256Bench {
         System.out.println("Standard test D(E(value)) == value? " + same);
         if (!same) throw new RuntimeException("moo");
         
-        plain = "1234567890123456".getBytes();
+        plain = DataHelper.getASCII("1234567890123456");
         e = new byte[plain.length];
         _context.aes().encrypt(plain, 0, e, 0, key, iv, plain.length);
         d = new byte[e.length];

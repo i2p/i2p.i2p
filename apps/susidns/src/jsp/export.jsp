@@ -23,6 +23,7 @@
     // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
+    response.setHeader("X-Content-Type-Options", "nosniff");
 %>
 <%@page pageEncoding="UTF-8"%>
 <%@page trimDirectiveWhitespaces="true"%>

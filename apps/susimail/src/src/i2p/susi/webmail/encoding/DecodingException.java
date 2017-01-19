@@ -23,10 +23,12 @@
  */
 package i2p.susi.webmail.encoding;
 
+import java.io.IOException;
+
 /**
  * @author susi
  */
-public class DecodingException extends Exception {
+public class DecodingException extends IOException {
 	private static final long serialVersionUID = 1L;
 
 	public DecodingException( String msg ) {

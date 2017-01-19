@@ -125,7 +125,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     public void startRunning() {
         super.startRunning();
         if (open)
-            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getLocalPort());
+            _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getTunnel().listenHost, getLocalPort());
     }
 
     @Override
@@ -166,14 +166,14 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     _log.debug(getPrefix(requestId) + "Line=[" + line + "]");
                 
                 if (method == null) { // first line CONNECT blah.i2p:80 HTTP/1.1
-                    int pos = line.indexOf(" ");
+                    int pos = line.indexOf(' ');
                     if (pos == -1) break;    // empty first line
                     method = line.substring(0, pos);
                     String request = line.substring(pos + 1);
 
-                    pos = request.indexOf(":");
+                    pos = request.indexOf(':');
                     if (pos == -1)
-                       pos = request.indexOf(" ");
+                       pos = request.indexOf(' ');
                     if (pos == -1) {
                         host = request;
                         restofline = "";
@@ -185,7 +185,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     if (host.toLowerCase(Locale.US).endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
-                    } else if (host.indexOf(".") != -1) {
+                    } else if (host.indexOf('.') != -1) {
                         // The request must be forwarded to a outproxy
                         currentProxy = selectProxy();
                         if (currentProxy == null) {
@@ -240,7 +240,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         }
                         if (user != null && pw != null) {
                             newRequest.append("Proxy-Authorization: Basic ")
-                                      .append(Base64.encode((user + ':' + pw).getBytes(), true))    // true = use standard alphabet
+                                      .append(Base64.encode(DataHelper.getUTF8(user + ':' + pw), true))    // true = use standard alphabet
                                       .append("\r\n");
                         }
                     }
@@ -265,7 +265,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     else
                         _log.warn(getPrefix(requestId) + "Auth required, sending 407");
                 }
-                out.write(getAuthError(result == AuthResult.AUTH_STALE).getBytes());
+                out.write(DataHelper.getASCII(getAuthError(result == AuthResult.AUTH_STALE)));
                 s.close();
                 return;
             }

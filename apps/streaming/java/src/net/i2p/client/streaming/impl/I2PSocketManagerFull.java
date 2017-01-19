@@ -9,6 +9,7 @@ import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.crypto.SigAlgo;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
@@ -62,9 +64,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private final ConnectionManager _connectionManager;
     private final AtomicBoolean _isDestroyed = new AtomicBoolean();
 
-    /** @since 0.9.21 */
-    private static final Set<Hash> _dsaOnly = new HashSet<Hash>(16);
-    private static final String[] DSA_ONLY_HASHES = {
+    /**
+     *  Does not support EC
+     *  @since 0.9.21
+     */
+    private static final Set<Hash> _ecUnsupported = new HashSet<Hash>(16);
+    private static final String[] EC_UNSUPPORTED_HASHES = {
         // list from http://zzz.i2p/topics/1682?page=1#p8414
         // bzr.welterde.i2p
         "Cvs1gCZTTkgD2Z2byh2J9atPmh5~I8~L7BNQnQl0hUE=",
@@ -86,7 +91,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         "VXwmNIwMy1BcUVmut0oZ72jbWoqFzvxJukmS-G8kAAE=",
         // paste.i2p2.i2p
         "DoyMyUUgOSTddvRpqYfKHFPPjkkX~iQmResyfjjBYWs=",
-        // syndie.wetlerde.i2p
+        // syndie.welterde.i2p
         "xMxC54BFgyp-~zzrQI3F8m2CK--9XMcNmSAep6RH4Kk=",
         // ugha.i2p
         "zsu3WF~QLBxZXH-gHq9MuZE6y8ROZmMF7dA2MbMMKkY=",
@@ -95,13 +100,54 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         // www.i2p2.i2p
         "im9gytzKT15mT1sB5LC9bHXCcwytQ4EPcrGQhoam-4w="
     };
+
+    /**
+     *  Does not support Ed
+     *  @since 0.9.23
+     */
+    private static final Set<Hash> _edUnsupported = new HashSet<Hash>(16);
+    private static final String[] ED_UNSUPPORTED_HASHES = {
+        // list from http://zzz.i2p/topics/1682?page=1#p8414
+        // minus those tested to support Ed
+        // last tested 2015-11-04
+        // bzr.welterde.i2p
+        "Cvs1gCZTTkgD2Z2byh2J9atPmh5~I8~L7BNQnQl0hUE=",
+        // docs.i2p2.i2p
+        "WCXV87RdrF6j-mnn6qt7kVSBifHTlPL0PmVMFWwaolo=",
+        // i2jump.i2p
+        "9vaoGZbOaeqdRK2qEunlwRM9mUSW-I9R4OON35TDKK4=",
+        // irc.welterde.i2p
+        "5rjezx4McFk3bNhoJV-NTLlQW1AR~jiUcN6DOWMCCVc=",
+        // lists.i2p2.i2p
+        "qwtgoFoMSK0TOtbT4ovBX1jHUzCoZCPzrJVxjKD7RCg=",
+        // mtn.i2p2.i2p
+        "X5VDzYaoX9-P6bAWnrVSR5seGLkOeORP2l3Mh4drXPo=",
+        // nntp.welterde.i2p
+        "VXwmNIwMy1BcUVmut0oZ72jbWoqFzvxJukmS-G8kAAE=",
+        // paste.i2p2.i2p
+        "DoyMyUUgOSTddvRpqYfKHFPPjkkX~iQmResyfjjBYWs=",
+        // syndie.welterde.i2p
+        "xMxC54BFgyp-~zzrQI3F8m2CK--9XMcNmSAep6RH4Kk=",
+        // tracker.welterde.i2p
+        "EVkFgKkrDKyGfI7TIuDmlHoAmvHC~FbnY946DfujR0A=",
+        // www.i2p2.i2p
+        "im9gytzKT15mT1sB5LC9bHXCcwytQ4EPcrGQhoam-4w="
+    };
     
     static {
-        for (int i = 0; i < DSA_ONLY_HASHES.length; i++) {
-            String s = DSA_ONLY_HASHES[i];
+        for (int i = 0; i < EC_UNSUPPORTED_HASHES.length; i++) {
+            String s = EC_UNSUPPORTED_HASHES[i];
             Hash h = ConvertToHash.getHash(s);
             if (h != null)
-                _dsaOnly.add(h);
+                _ecUnsupported.add(h);
+            else
+                System.out.println("Bad hash " + s);
+        }
+        for (int i = 0; i < ED_UNSUPPORTED_HASHES.length; i++) {
+            String s = ED_UNSUPPORTED_HASHES[i];
+            Hash h = ConvertToHash.getHash(s);
+            if (h != null)
+                _edUnsupported.add(h);
             else
                 System.out.println("Bad hash " + s);
         }
@@ -122,6 +168,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @deprecated use 4-arg constructor
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public I2PSocketManagerFull() {
         throw new UnsupportedOperationException();
     }
@@ -130,6 +177,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * @deprecated use 4-arg constructor
      * @throws UnsupportedOperationException always
      */
+    @Deprecated
     public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
         throw new UnsupportedOperationException();
     }
@@ -214,7 +262,13 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                 Certificate.NULL_CERT.writeBytes(keyStream);
                 priv.writeBytes(keyStream);
                 keys[1].writeBytes(keyStream); // signing priv
-            } catch (Exception e) {
+            } catch (GeneralSecurityException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (I2PException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (IOException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (RuntimeException e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
             privateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
@@ -470,6 +524,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket connect(Destination peer, I2PSocketOptions options) 
                              throws I2PException, NoRouteToHostException {
+        if (peer == null)
+            throw new NullPointerException();
         if (options == null)
             options = _defaultOptions;
         ConnectionOptions opts = null;
@@ -486,7 +542,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (!_subsessions.isEmpty()) {
             updateUserDsaList();
             Hash h = peer.calculateHash();
-            if (_dsaOnly.contains(h) || (!_userDsaOnly.isEmpty() && _userDsaOnly.contains(h))) {
+            SigAlgo myAlgo = session.getMyDestination().getSigType().getBaseAlgorithm();
+            if ((myAlgo == SigAlgo.EC && _ecUnsupported.contains(h)) ||
+                (myAlgo == SigAlgo.EdDSA && _edUnsupported.contains(h)) ||
+                (!_userDsaOnly.isEmpty() && _userDsaOnly.contains(h))) {
                 // FIXME just taking the first one for now
                 for (I2PSession sess : _subsessions) {
                     if (sess.getMyDestination().getSigType() == SigType.DSA_SHA1) {
@@ -512,7 +571,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      * Update the global user DSA-only list.
-     * This does not affect the hardcoded DSA_ONLY_HASHES list above,
+     * This does not affect the hardcoded Ex_UNSUPPORTED_HASHES lists above,
      * the user can only add, not remove.
      *
      * @since 0.9.21

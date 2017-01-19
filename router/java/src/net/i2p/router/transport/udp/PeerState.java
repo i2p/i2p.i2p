@@ -17,9 +17,9 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.CachedIteratorArrayList;
 import net.i2p.router.util.CoDelPriorityBlockingQueue;
 import net.i2p.router.util.PriBlockingQueue;
-import net.i2p.util.CachedIteratorArrayList;
 import net.i2p.util.Log;
 import net.i2p.util.ConcurrentHashSet;
 
@@ -198,6 +198,7 @@ class PeerState {
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private int _packetsReceivedDuplicate;
     private int _packetsReceived;
+    private boolean _mayDisconnect;
     
     /** list of InboundMessageState for active message */
     private final Map<Long, InboundMessageState> _inboundMessages;
@@ -252,7 +253,9 @@ class PeerState {
      */
     private static final int MAX_SEND_MSGS_PENDING = 128;
 
-    /*
+    /**
+     * IPv4 Min MTU
+     *
      * 596 gives us 588 IP byes, 568 UDP bytes, and with an SSU data message, 
      * 522 fragment bytes, which is enough to send a tunnel data message in 2 
      * packets. A tunnel data message sent over the wire is 1044 bytes, meaning 
@@ -276,10 +279,12 @@ class PeerState {
      * IPv6/UDP header is 48 bytes, so we want MTU % 16 == 0.
      */
     public static final int MIN_IPV6_MTU = 1280;
-    public static final int MAX_IPV6_MTU = 1472;  // TODO 1488
+    public static final int MAX_IPV6_MTU = 1488;
     private static final int DEFAULT_MTU = MIN_MTU;
 
-    /* 
+    /**
+     * IPv4 Max MTU
+     *
      * based on measurements, 1350 fits nearly all reasonably small I2NP messages
      * (larger I2NP messages may be up to 1900B-4500B, which isn't going to fit
      * into a live network MTU anyway)
@@ -299,6 +304,12 @@ class PeerState {
      * and so PacketBuilder.buildPacket() works correctly.
      */
     public static final int LARGE_MTU = 1484;
+    
+    /**
+     *  Max of IPv4 and IPv6 max MTUs
+     *  @since 0.9.28
+     */
+    public static final int MAX_MTU = Math.max(LARGE_MTU, MAX_IPV6_MTU);
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int INIT_RTO = 3*1000;
@@ -447,6 +458,7 @@ class PeerState {
      *  @return false always
      *  @deprecated unused, ECNs are never sent, always returns false
      */
+    @Deprecated
     public boolean getCurrentSecondECNReceived() { return _currentSecondECNReceived; }
 
     /** 
@@ -542,6 +554,7 @@ class PeerState {
      * connection, or null if we are not in the process of rekeying.
      * @deprecated unused
      */
+    @Deprecated
     public void setNextMACKey(SessionKey key) { _nextMACKey = key; }
 
     /** 
@@ -550,6 +563,7 @@ class PeerState {
      * of rekeying.
      * @deprecated unused
      */
+    @Deprecated
     public void setNextCipherKey(SessionKey key) { _nextCipherKey = key; }
 
     /**
@@ -569,6 +583,7 @@ class PeerState {
      * when were the current cipher and MAC keys established/rekeyed?
      * @deprecated unused
      */
+    @Deprecated
     public void setKeyEstablishedTime(long when) { _keyEstablishedTime = when; }
 
     /**
@@ -768,17 +783,29 @@ class PeerState {
         return _remoteIP.length == 16;
     }
 
+    /** the last time we used them as an introducer, or 0 */
     public long getIntroducerTime() { return _lastIntroducerTime; }
+
+    /** set the last time we used them as an introducer to now */
     public void setIntroducerTime() { _lastIntroducerTime = _context.clock().now(); }
     
-    /** we received the message specified completely */
+    /** 
+     *  We received the message specified completely.
+     *  @param bytes if less than or equal to zero, message is a duplicate.
+     */
     public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }
 
-    public synchronized void messageFullyReceived(Long messageId, int bytes, boolean isForACK) {
+    /** 
+     *  We received the message specified completely.
+     *  @param isForACK unused
+     *  @param bytes if less than or equal to zero, message is a duplicate.
+     */
+    private synchronized void messageFullyReceived(Long messageId, int bytes, boolean isForACK) {
         if (bytes > 0) {
             _receiveBytes += bytes;
             //if (isForACK)
             //    _receiveACKBytes += bytes;
+            _messagesReceived++;
         } else {
             //if (true || _retransmissionPeriodStart + 1000 < _context.clock().now()) {
                 _packetsReceivedDuplicate++;
@@ -803,7 +830,6 @@ class PeerState {
         if (_wantACKSendSince <= 0)
             _wantACKSendSince = now;
         _currentACKs.add(messageId);
-        _messagesReceived++;
     }
     
     public void messagePartiallyReceived() {
@@ -958,6 +984,7 @@ class PeerState {
      * @return non-null, possibly empty
      * @deprecated unused
      */
+    @Deprecated
     public List<ACKBitfield> retrieveACKBitfields() { return retrieveACKBitfields(true); }
 
     /**
@@ -1026,10 +1053,6 @@ class PeerState {
                     // trim happens in getCurrentResendACKs above
                 }
             }
-
-
-
-
 
         int partialIncluded = 0;
         if (bytesRemaining > 4) {
@@ -1170,7 +1193,6 @@ class PeerState {
                 _sendWindowBytesRemaining = _sendWindowBytes;
         //}
         
-        _messagesSent++;
         if (numSends < 2) {
             // caller synchs
             //synchronized (this) {
@@ -1274,8 +1296,23 @@ class PeerState {
     /** how skewed are the measured RTTs? */
     public synchronized int getRTTDeviation() { return _rttDeviation; }
     
-    public synchronized int getMessagesSent() { return _messagesSent; }
+    /**
+     *  I2NP messages sent.
+     *  Does not include duplicates.
+     *  As of 0.9.24, incremented when bandwidth is allocated just before sending, not when acked.
+     */
+    public int getMessagesSent() {
+        synchronized (_outboundMessages) {
+            return _messagesSent;
+        }
+    }
+    
+    /**
+     *  I2NP messages received.
+     *  As of 0.9.24, does not include duplicates.
+     */
     public synchronized int getMessagesReceived() { return _messagesReceived; }
+
     public synchronized int getPacketsTransmitted() { return _packetsTransmitted; }
     public synchronized int getPacketsRetransmitted() { return _packetsRetransmitted; }
     //public long getPacketsPeriodTransmitted() { return _packetsPeriodTransmitted; }
@@ -1339,6 +1376,7 @@ class PeerState {
     public long getLastACKSend() { return _lastACKSend; }
 
     /** @deprecated unused */
+    @Deprecated
     public void setLastACKSend(long when) { _lastACKSend = when; }
 
     public long getWantedACKSendSince() { return _wantACKSendSince; }
@@ -1498,6 +1536,18 @@ class PeerState {
         if (_dead) return 0;
         return _outboundMessages.size() + _outboundQueue.size();
     }
+
+    /**
+     * Sets to true.
+     * @since 0.9.24
+     */
+    public void setMayDisconnect() { _mayDisconnect = true; }
+
+    /**
+     * @since 0.9.24
+     */
+    public boolean getMayDisconnect() { return _mayDisconnect; }
+
     
     /**
      * Expire / complete any outbound messages
@@ -1771,7 +1821,8 @@ class PeerState {
                 if (state.getPushCount() > 0)
                     _retransmitter = state;
 
-                state.push();
+                if (state.push())
+                    _messagesSent++;
             
                 int rto = getRTO();
                 state.setNextSendTime(now + rto);
@@ -2062,8 +2113,10 @@ class PeerState {
         buf.append(" cwin: ").append(_sendWindowBytes);
         buf.append(" acwin: ").append(_sendWindowBytesRemaining);
         buf.append(" consecFail: ").append(_consecutiveFailedSends);
-        buf.append(" recv OK/Dup: ").append(_packetsReceived).append('/').append(_packetsReceivedDuplicate);
-        buf.append(" send OK/Dup: ").append(_packetsTransmitted).append('/').append(_packetsRetransmitted);
+        buf.append(" msgs rcvd: ").append(_messagesReceived);
+        buf.append(" msgs sent: ").append(_messagesSent);
+        buf.append(" pkts rcvd OK/Dup: ").append(_packetsReceived).append('/').append(_packetsReceivedDuplicate);
+        buf.append(" pkts sent OK/Dup: ").append(_packetsTransmitted).append('/').append(_packetsRetransmitted);
         buf.append(" IBM: ").append(_inboundMessages.size());
         buf.append(" OBQ: ").append(_outboundQueue.size());
         buf.append(" OBL: ").append(_outboundMessages.size());

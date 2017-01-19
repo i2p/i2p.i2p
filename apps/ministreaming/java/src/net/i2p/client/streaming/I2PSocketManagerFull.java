@@ -10,4 +10,5 @@ package net.i2p.client.streaming;
  *  @since 0.9.12
  *  @deprecated
  */
+@Deprecated
 public class I2PSocketManagerFull {}

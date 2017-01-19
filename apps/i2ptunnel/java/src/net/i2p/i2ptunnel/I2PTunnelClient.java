@@ -3,6 +3,7 @@
  */
 package net.i2p.i2ptunnel;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -10,11 +11,13 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketAddress;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 public class I2PTunnelClient extends I2PTunnelClientBase {
 
@@ -22,6 +25,7 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
      * list of Destination objects that we point at
      * @deprecated why protected? Is anybody using out-of-tree? Protected from the beginning (2004)
      */
+    @Deprecated
     protected List<Destination> dests;
 
     /**
@@ -122,7 +126,17 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             // we are called from an unlimited thread pool, so run inline
             //t.start();
             t.run();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Error connecting", ex);
+            //l.log("Error connecting: " + ex.getMessage());
+            closeSocket(s);
+            if (i2ps != null) {
+                synchronized (sockLock) {
+                    mySockets.remove(sockLock);
+                }
+            }
+        } catch (I2PException ex) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Error connecting", ex);
             //l.log("Error connecting: " + ex.getMessage());
@@ -164,5 +178,51 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         String targets = props.getProperty("targetDestination");
         buildAddresses(targets);
         super.optionsUpdated(tunnel);
+    }
+
+    /**
+     * Actually start working on incoming connections.
+     * Overridden to register with port mapper.
+     *
+     * @since 0.9.27
+     */
+    @Override
+    public void startRunning() {
+        super.startRunning();
+        if (open) {
+            I2PSocketAddress addr = pickDestination();
+            if (addr != null) {
+                String svc = null;
+                String hostname = addr.getHostName();
+                if ("smtp.postman.i2p".equals(hostname)) {
+                    svc = PortMapper.SVC_SMTP;
+                } else if ("pop.postman.i2p".equals(hostname)) {
+                    svc = PortMapper.SVC_POP;
+                }
+                if (svc != null) {
+                    _context.portMapper().register(svc, getTunnel().listenHost, getLocalPort());
+                }
+            }
+        }
+    }
+
+    /**
+     * Overridden to unregister with port mapper
+     *
+     * @since 0.9.27
+     */
+    @Override
+    public boolean close(boolean forced) {
+        int port = getLocalPort();
+        int reg = _context.portMapper().getPort(PortMapper.SVC_SMTP);
+        if (reg == port) {
+            _context.portMapper().unregister(PortMapper.SVC_SMTP);
+        }
+        reg = _context.portMapper().getPort(PortMapper.SVC_POP);
+        if (reg == port) {
+            _context.portMapper().unregister(PortMapper.SVC_POP);
+        }
+        boolean rv = super.close(forced);
+        return rv;
     }
 }

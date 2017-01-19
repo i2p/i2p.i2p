@@ -76,8 +76,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
         // If we are hidden we should not get queries, log and return
         if (getContext().router().isHidden()) {
-            if (_log.shouldLog(Log.ERROR)) {
-                _log.error("Uninvited dbLookup received with replies going to " + fromKey
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Uninvited dbLookup received with replies going to " + fromKey
                            + " (tunnel " + _message.getReplyTunnel() + ")");
             }
             return;

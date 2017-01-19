@@ -120,7 +120,8 @@ public class RouterContext extends I2PAppContext {
             // or about 2 seconds per buffer - so about 200x faster
             // to fill than to drain - so we don't need too many
             long maxMemory = SystemVersion.getMaxMemory();
-            long buffs = Math.min(16, Math.max(2, maxMemory / (14 * 1024 * 1024)));
+            long maxBuffs = (SystemVersion.isAndroid() || SystemVersion.isARM()) ? 4 : 8;
+            long buffs = Math.min(maxBuffs, Math.max(2, maxMemory / (21 * 1024 * 1024)));
             envProps.setProperty("prng.buffers", "" + buffs);
         }
         return envProps;
@@ -135,6 +136,7 @@ public class RouterContext extends I2PAppContext {
      * @since 0.8.4
      * @deprecated Use Router.saveConfig()
      */
+    @Deprecated
     public void setProperty(String propName, String value) {
     		_overrideProps.setProperty(propName, value);
     }
@@ -261,6 +263,9 @@ public class RouterContext extends I2PAppContext {
     /**
      *  Convenience method for getting the router hash.
      *  Equivalent to context.router().getRouterInfo().getIdentity().getHash()
+     *
+     *  Warning - risk of deadlock - do not call while holding locks
+     *
      *  @return may be null if called very early
      */
     public Hash routerHash() {

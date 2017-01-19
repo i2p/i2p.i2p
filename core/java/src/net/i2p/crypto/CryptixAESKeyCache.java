@@ -26,6 +26,7 @@ public final class CryptixAESKeyCache {
     /*
      * @deprecated unused, keys are now cached in the SessionKey objects
      */
+    @Deprecated
     public CryptixAESKeyCache() {
         _availableKeys = new LinkedBlockingQueue<KeyCacheEntry>(MAX_KEYS);
     }
@@ -35,6 +36,7 @@ public final class CryptixAESKeyCache {
      *
      * @deprecated unused, keys are now cached in the SessionKey objects
      */
+    @Deprecated
     public final KeyCacheEntry acquireKey() {
         KeyCacheEntry rv = _availableKeys.poll();
         if (rv != null)
@@ -47,6 +49,7 @@ public final class CryptixAESKeyCache {
      *
      * @deprecated unused, keys are now cached in the SessionKey objects
      */
+    @Deprecated
     public final void releaseKey(KeyCacheEntry key) {
         _availableKeys.offer(key);
     }

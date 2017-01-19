@@ -48,7 +48,7 @@ public abstract class CommSystemFacade implements Service {
     public boolean haveInboundCapacity(int pct) { return true; }
     public boolean haveOutboundCapacity(int pct) { return true; }
     public boolean haveHighOutboundCapacity() { return true; }
-    public List getMostRecentErrorMessages() { return Collections.emptyList(); }
+    public List<String> getMostRecentErrorMessages() { return Collections.emptyList(); }
     
     /**
      * Median clock skew of connected peers in seconds, or null if we cannot answer.
@@ -70,6 +70,7 @@ public abstract class CommSystemFacade implements Service {
      *
      * @deprecated use getStatus()
      */
+    @Deprecated
     public short getReachabilityStatus() { return (short) getStatus().getCode(); }
     
     /**
@@ -81,13 +82,22 @@ public abstract class CommSystemFacade implements Service {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability() {}
 
-    public boolean isBacklogged(Hash dest) { return false; }
-    public boolean wasUnreachable(Hash dest) { return false; }
-    public boolean isEstablished(Hash dest) { return false; }
+    public boolean isBacklogged(Hash peer) { return false; }
+    public boolean wasUnreachable(Hash peer) { return false; }
+    public boolean isEstablished(Hash peer) { return false; }
     public byte[] getIP(Hash dest) { return null; }
     public void queueLookup(byte[] ip) {}
+    
+    /**
+     * Tell the comm system that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    public void mayDisconnect(Hash peer) {}
 
     /** @since 0.8.11 */
     public String getOurCountry() { return null; }

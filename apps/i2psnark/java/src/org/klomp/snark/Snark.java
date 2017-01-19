@@ -746,6 +746,18 @@ public class Snark
     }
 
     /**
+     *  If checking is in progress, return completion 0.0 ... 1.0,
+     *  else return 1.0.
+     *  @since 0.9.23
+     */
+    public double getCheckingProgress() {
+        if (storage != null && storage.isChecking())
+            return storage.getCheckingProgress();
+        else
+            return 1.0d;
+    }
+
+    /**
      *  Disk allocation (ballooning) in progress.
      *  @since 0.9.3
      */
@@ -897,6 +909,30 @@ public class Snark
         if (coord != null)
             return coord.getNeededLength();
         return -1;
+    }
+
+    /**
+     *  Bytes not received and set to skipped.
+     *  This is not the same as the total of all skipped files,
+     *  since pieces may span multiple files.
+     *
+     *  @return exact value. or 0 if no storage yet.
+     *  @since 0.9.24
+     */
+    public long getSkippedLength() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null) {
+            // fast way
+            long r = getRemainingLength();
+            if (r <= 0)
+                return 0;
+            long n = coord.getNeededLength();
+            return r - n;
+        } else if (storage != null) {
+            // slow way
+            return storage.getSkippedLength();
+        }
+        return 0;
     }
 
     /**
@@ -1264,7 +1300,8 @@ public class Snark
 
   public void setWantedPieces(Storage storage)
   {
-    coordinator.setWantedPieces();
+    if (coordinator != null)
+        coordinator.setWantedPieces();
   }
 
   ///////////// End StorageListener methods
@@ -1273,7 +1310,7 @@ public class Snark
   /** SnarkSnutdown callback unused */
   public void shutdown()
   {
-    // Should not be necessary since all non-deamon threads should
+    // Should not be necessary since all non-daemon threads should
     // have died. But in reality this does not always happen.
     //System.exit(0);
   }
@@ -1292,7 +1329,7 @@ public class Snark
    * coordinatorListener
    */
   final static int MIN_TOTAL_UPLOADERS = 4;
-  final static int MAX_TOTAL_UPLOADERS = 10;
+  final static int MAX_TOTAL_UPLOADERS = 20;
 
   public boolean overUploadLimit(int uploaders) {
     if (_peerCoordinatorSet == null || uploaders <= 0)
@@ -1300,7 +1337,7 @@ public class Snark
     int totalUploaders = 0;
     for (PeerCoordinator c : _peerCoordinatorSet) {
       if (!c.halted())
-        totalUploaders += c.uploaders;
+        totalUploaders += c.getInterestedUploaders();
     }
     int limit = _util.getMaxUploaders();
     if (_log.shouldLog(Log.DEBUG))

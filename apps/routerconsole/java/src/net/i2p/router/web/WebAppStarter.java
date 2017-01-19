@@ -48,7 +48,9 @@ public class WebAppStarter {
 
 
     /**
-     *  adds and starts
+     *  Adds and starts.
+     *  Prior to 0.9.28, was not guaranteed to throw on failure.
+     *
      *  @throws just about anything, caller would be wise to catch Throwable
      */
     static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
@@ -57,6 +59,9 @@ public class WebAppStarter {
          WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
          //_log.debug("Loading war from: " + warPath);
          LocaleWebAppHandler.setInitParams(wac, INIT_PARAMS);
+         // default false, set to true so we get good logging,
+         // and the caller will know it failed
+         wac.setThrowUnavailableOnStartupException(true);
          wac.start();
     }
 

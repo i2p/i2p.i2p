@@ -82,6 +82,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *                               Will synchronize on slock when removing.
      *  @deprecated use FailCallback constructor
      */
+    @Deprecated
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            List<I2PSocket> sockList) {
         this(s, i2ps, slock, initialI2PData, null, sockList, null, null, true);
@@ -97,6 +98,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *                               Will synchronize on slock when removing.
      *  @deprecated use FailCallback constructor
      */
+    @Deprecated
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList) {
         this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null, null, true);
@@ -113,6 +115,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *                   it will be run before closing s.
      *  @deprecated use FailCallback constructor
      */
+    @Deprecated
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            List<I2PSocket> sockList, Runnable onTimeout) {
         this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout, null, true);
@@ -130,6 +133,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *                   it will be run before closing s.
      *  @deprecated use FailCallback constructor
      */
+    @Deprecated
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout) {
         this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, onTimeout, null, true);
@@ -192,6 +196,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *
      * @deprecated unused
      */
+    @Deprecated
     public boolean isFinished() {
         return finished;
     }
@@ -203,6 +208,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      * @return date (ms since the epoch), or -1 if no data has been transferred yet
      * @deprecated unused
      */
+    @Deprecated
     public long getLastActivityOn() {
         return lastActivityOn;
     }
@@ -326,7 +332,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
 		//   at net.i2p.i2ptunnel.I2PTunnelRunner.run(I2PTunnelRunner.java:167)
             if (_log.shouldLog(Log.WARN))
                 _log.warn("gnu?", ise);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Internal error", e);
         } finally {

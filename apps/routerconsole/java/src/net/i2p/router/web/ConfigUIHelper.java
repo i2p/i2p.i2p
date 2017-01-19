@@ -14,15 +14,15 @@ public class ConfigUIHelper extends HelperBase {
         for (String theme : themes) {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
-                buf.append("checked=\"checked\" ");
-            buf.append("value=\"").append(theme).append("\">").append(_(theme)).append("<br>\n");
+                buf.append(CHECKED);
+            buf.append("value=\"").append(theme).append("\">").append(_t(theme)).append("<br>\n");
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
         buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
-            buf.append("checked=\"checked\" ");
+            buf.append(CHECKED);
         buf.append("value=\"1\">")
-           .append(_("Set theme universally across all apps"))
+           .append(_t("Set theme universally across all apps"))
            .append("<br>\n");
         return buf.toString();
     }
@@ -32,9 +32,9 @@ public class ConfigUIHelper extends HelperBase {
         boolean forceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
         buf.append("<input type=\"checkbox\" name=\"forceMobileConsole\" ");
         if (forceMobileConsole)
-            buf.append("checked=\"checked\" ");
+            buf.append(CHECKED);
         buf.append("value=\"1\">")
-           .append(_("Force the mobile console to be used"))
+           .append(_t("Force the mobile console to be used"))
            .append("<br>\n");
         return buf.toString();
     }
@@ -73,6 +73,14 @@ public class ConfigUIHelper extends HelperBase {
      *  As of 0.9.12, ISO 639-2 three-letter codes are supported also.
      */
     private static final String langs[][] = {
+        //
+        // Note: any additions, also add to:
+        // apps/i2psnark/java/src/org/klomp/snark/standalone/ConfigUIHelper.java
+        // apps/routerconsole/jsp/console.jsp
+        // apps/routerconsole/jsp/home.jsp
+        // .tx/config
+        // New lang_xx flags: Add to top-level build.xml
+        //
         { "ar", "lang_ar", _x("Arabic"), null },
         { "cs", "cz", _x("Czech"), null },
         { "da", "dk", _x("Danish"), null },
@@ -83,9 +91,11 @@ public class ConfigUIHelper extends HelperBase {
         { "es", "es", _x("Spanish"), null },
         { "fi", "fi", _x("Finnish"), null },
         { "fr", "fr", _x("French"), null },
+        { "gl", "lang_gl", _x("Galician"), null },
         { "hu", "hu", _x("Hungarian"), null },
         { "it", "it", _x("Italian"), null },
         { "ja", "jp", _x("Japanese"), null },
+        { "ko", "kr", _x("Korean"), null },
         { "mg", "mg", _x("Malagasy"), null },
         { "nl", "nl", _x("Dutch"), null },
         { "nb", "no", _x("Norwegian Bokmaal"), null },
@@ -99,7 +109,9 @@ public class ConfigUIHelper extends HelperBase {
         { "tr", "tr", _x("Turkish"), null },
         { "uk", "ua", _x("Ukrainian"), null },
         { "vi", "vn", _x("Vietnamese"), null },
-        { "zh", "cn", _x("Chinese"), null }
+        { "zh", "cn", _x("Chinese"), null },
+        { "zh_TW", "tw", _x("Chinese"), "Taiwan" },
+        { "xx", "a1", "Debug: Find untagged strings", null },
     };
 
 
@@ -134,11 +146,13 @@ public class ConfigUIHelper extends HelperBase {
         }
         StringBuilder buf = new StringBuilder(512);
         for (int i = 0; i < langs.length; i++) {
+            String lang = langs[i][0];
+            if (lang.equals("xx") && !isAdvanced())
+                continue;
             // we use "lang" so it is set automagically in CSSHelper
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
-            String lang = langs[i][0];
             if (lang.equals(current))
-                buf.append("checked=\"checked\" ");
+                buf.append(CHECKED);
             buf.append("value=\"").append(lang).append("\">")
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\"> ");
             int under = lang.indexOf('_');
@@ -163,13 +177,13 @@ public class ConfigUIHelper extends HelperBase {
         buf.append("<table>");
         if (userpw.isEmpty()) {
             buf.append("<tr><td colspan=\"3\">");
-            buf.append(_("Add a user and password to enable."));
+            buf.append(_t("Add a user and password to enable."));
             buf.append("</td></tr>");
         } else {
             buf.append("<tr><th>")
-               .append(_("Remove"))
+               .append(_t("Remove"))
                .append("</th><th>")
-               .append(_("User Name"))
+               .append(_t("User Name"))
                .append("</th><th>&nbsp;</th></tr>\n");
             for (String name : userpw.keySet()) {
                 buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
@@ -180,10 +194,10 @@ public class ConfigUIHelper extends HelperBase {
             }
         }
         buf.append("<tr><td align=\"center\"><b>")
-           .append(_("Add")).append(":</b>" +
+           .append(_t("Add")).append(":</b>" +
                    "</td><td align=\"left\"><input type=\"text\" name=\"name\">" +
                    "</td><td align=\"left\"><b>");
-        buf.append(_("Password")).append(":</b> " +
+        buf.append(_t("Password")).append(":</b> " +
                    "<input type=\"password\" size=\"40\" name=\"nofilter_pw\"></td></tr>" +
                    "</table>\n");
         return buf.toString();

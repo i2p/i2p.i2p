@@ -160,7 +160,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (wasNew) {
                     if (prevNetDb == null) {
                         if ((!getContext().banlist().isBanlistedForever(key)) &&
-                            getContext().blocklist().isBlocklisted(key) &&
+                            getContext().blocklist().isBlocklisted(ri) &&
                             _log.shouldLog(Log.WARN))
                                 _log.warn("Blocklisting new peer " + key + ' ' + ri);
                     } else {
@@ -168,7 +168,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         Collection<RouterAddress> newAddr = ri.getAddresses();
                         if ((!newAddr.equals(oldAddr)) &&
                             (!getContext().banlist().isBanlistedForever(key)) &&
-                            getContext().blocklist().isBlocklisted(key) &&
+                            getContext().blocklist().isBlocklisted(ri) &&
                             _log.shouldLog(Log.WARN))
                                 _log.warn("New address received, Blocklisting old peer " + key + ' ' + ri);
                     }

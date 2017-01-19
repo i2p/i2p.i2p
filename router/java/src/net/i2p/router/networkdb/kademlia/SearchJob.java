@@ -781,10 +781,10 @@ class SearchJob extends JobImpl {
     }
     
     private static class Search {
-        private Job _onFind;
-        private Job _onFail;
-        private long _expiration;
-        private boolean _isLease;
+        private final Job _onFind;
+        private final Job _onFail;
+        private final long _expiration;
+        private final boolean _isLease;
         
         public Search(Job onFind, Job onFail, long expiration, boolean isLease) {
             _onFind = onFind;

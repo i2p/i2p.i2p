@@ -8,7 +8,9 @@ import net.i2p.router.util.RFC822Date;
 import net.i2p.router.web.ConfigUpdateHandler;
 import net.i2p.update.*;
 import net.i2p.util.EepHead;
+import net.i2p.util.Log;
 import net.i2p.util.PortMapper;
+import net.i2p.util.SystemVersion;
 
 /**
  *  Does a simple EepHead to get the last-modified header.
@@ -59,14 +61,14 @@ class UnsignedUpdateChecker extends UpdateRunner {
         if (proxyPort == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT &&
             proxyHost.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST) &&
             _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) < 0) {
-            String msg = _("HTTP client proxy tunnel must be running");
+            String msg = _t("HTTP client proxy tunnel must be running");
             if (_log.shouldWarn())
                 _log.warn(msg);
             updateStatus("<b>" + msg + "</b>");
             return false;
         }
 
-        //updateStatus("<b>" + _("Checking for development build update") + "</b>");
+        //updateStatus("<b>" + _t("Checking for development build update") + "</b>");
         try {
             EepHead get = new EepHead(_context, proxyHost, proxyPort, 0, url);
             if (get.fetch()) {
@@ -76,9 +78,17 @@ class UnsignedUpdateChecker extends UpdateRunner {
                     if (modtime <= 0) return false;
                     if (_ms <= 0) return false;
                     if (modtime > _ms) {
-                        _unsignedUpdateAvailable = true;
-                        _mgr.notifyVersionAvailable(this, _urls.get(0), getType(), "", getMethod(), _urls,
-                                                    Long.toString(modtime), "");
+                        String newVersion = Long.toString(modtime);
+                        if (SystemVersion.isJava7()) {
+                            _unsignedUpdateAvailable = true;
+                            _mgr.notifyVersionAvailable(this, _urls.get(0), getType(), "", getMethod(), _urls,
+                                                        newVersion, "");
+                        } else {
+                            String ourJava = System.getProperty("java.version");
+                            String msg = _mgr._t("Requires Java version {0} but installed Java version is {1}", "1.7", ourJava);
+                            _log.logAlways(Log.WARN, "Cannot update to version " + newVersion + ": " + msg);
+                            _mgr.notifyVersionConstraint(this, _urls.get(0), getType(), "", newVersion, msg);
+                        }
                     }
                 }
                 return true;

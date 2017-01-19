@@ -207,7 +207,7 @@ class ConnectionPacketHandler {
                     final long delay = nextSendTime - now;
                     if (_log.shouldLog(Log.INFO)) 
                         _log.info("scheduling ack in " + delay);
-                    _context.simpleTimer2().addEvent(new AckDup(con), delay);
+                    con.schedule(new AckDup(con), delay);
                 }
 
             } else {
@@ -479,7 +479,13 @@ class ConnectionPacketHandler {
             if (con.getSendStreamId() <= 0) {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     con.setSendStreamId(packet.getReceiveStreamId());
-                    con.setRemotePeer(packet.getOptionalFrom());
+                    Destination dest = packet.getOptionalFrom();
+                    if (dest == null) {
+                        if (_log.shouldWarn())
+                            _log.warn("SYN Packet without FROM");
+                        return false;
+                    }
+                    con.setRemotePeer(dest);
                     return true;
                 } else {
                     // neither RST nor SYN and we dont have the stream id yet?
@@ -536,7 +542,7 @@ class ConnectionPacketHandler {
             }
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Received a packet for the wrong connection?  wtf: " 
+                _log.warn("Received a packet for the wrong connection? " 
                           + con + " / " + packet);
             return;
         }

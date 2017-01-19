@@ -24,6 +24,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 
 /**
  * Coordinate the runtime operation and configuration of a single I2PTunnel.
@@ -78,7 +79,7 @@ public class TunnelController implements Logging {
     public static final String PFX_OPTION = "option.";
 
     private static final String OPT_PERSISTENT = PFX_OPTION + "persistentClientKey";
-    private static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
+    public static final String OPT_BUNDLE_REPLY = PFX_OPTION + "shouldBundleReplyInfo";
     private static final String OPT_TAGS_SEND = PFX_OPTION + "crypto.tagsToSend";
     private static final String OPT_LOW_TAGS = PFX_OPTION + "crypto.lowTagThreshold";
     private static final String OPT_SIG_TYPE = PFX_OPTION + I2PClient.PROP_SIGTYPE;
@@ -103,10 +104,17 @@ public class TunnelController implements Logging {
      *  This is guaranteed to be available.
      *  @since 0.9.17
      */
-    public static final SigType PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256.isAvailable() ?
-                                                    SigType.ECDSA_SHA256_P256 :
-                                                    SigType.DSA_SHA1;
-
+    public static final SigType PREFERRED_SIGTYPE;
+    static {
+        if (SystemVersion.isARM() || SystemVersion.isGNU() || SystemVersion.isAndroid()) {
+            if (SigType.ECDSA_SHA256_P256.isAvailable())
+                PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256;
+            else
+                PREFERRED_SIGTYPE = SigType.DSA_SHA1;
+        } else {
+            PREFERRED_SIGTYPE = SigType.EdDSA_SHA512_Ed25519;
+        }
+    }
 
     /**
      * Create a new controller for a tunnel out of the specific config options.
@@ -185,8 +193,10 @@ public class TunnelController implements Logging {
             if (backupDir.isDirectory() || backupDir.mkdir()) {
                 String name = b32 + '-' + I2PAppContext.getGlobalContext().clock().now() + ".dat";
                 File backup = new File(backupDir, name);
-                if (FileUtil.copy(keyFile, backup, false, true))
+                if (FileUtil.copy(keyFile, backup, false, true)) {
+                    SecureFileOutputStream.setPerms(backup);
                     log("Private key backup saved to " + backup.getAbsolutePath());
+                }
             }
         } catch (I2PException ie) {
             if (_log.shouldLog(Log.ERROR))
@@ -230,7 +240,7 @@ public class TunnelController implements Logging {
         }
         try {
             doStartTunnel();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             _log.error("Error starting the tunnel " + getName(), e);
             log("Error starting the tunnel " + getName() + ": " + e.getMessage());
             // if we don't acquire() then the release() in stopTunnel() won't work
@@ -642,7 +652,11 @@ public class TunnelController implements Logging {
             if (type.equals(TYPE_HTTP_SERVER) || type.equals(TYPE_STREAMR_SERVER)) {
                 if (!_config.containsKey(OPT_BUNDLE_REPLY))
                     _config.setProperty(OPT_BUNDLE_REPLY, "false");
-            } else if (type.contains("irc") || type.equals(TYPE_STREAMR_CLIENT)) {
+            } else if (!isClient(type)) {
+                // override UI that sets it to false
+                _config.setProperty(OPT_BUNDLE_REPLY, "true");
+            }
+            if (type.contains("irc") || type.equals(TYPE_STREAMR_CLIENT)) {
                 // maybe a bad idea for ircclient if DCC is enabled
                 if (!_config.containsKey(OPT_TAGS_SEND))
                     _config.setProperty(OPT_TAGS_SEND, "20");
@@ -652,6 +666,7 @@ public class TunnelController implements Logging {
             // same default logic as in EditBean.getSigType()
             if (!isClient(type) ||
                 type.equals(TYPE_IRC_CLIENT) || type.equals(TYPE_STD_CLIENT) ||
+                type.equals(TYPE_SOCKS) ||
                 type.equals(TYPE_SOCKS_IRC) || type.equals(TYPE_STREAMR_CLIENT) ||
                 (type.equals(TYPE_HTTP_CLIENT) && Boolean.valueOf(getSharedClient()))) {
                 if (!_config.containsKey(OPT_SIG_TYPE))
@@ -742,6 +757,7 @@ public class TunnelController implements Logging {
      *  @return one big string of "key=val key=val ..."
      *  @deprecated why would you want this? Use getClientOptionProps() instead
      */
+    @Deprecated
     public String getClientOptions() {
         StringBuilder opts = new StringBuilder(64);
         for (Map.Entry<Object, Object> e : _config.entrySet()) {
@@ -859,6 +875,7 @@ public class TunnelController implements Logging {
      *  A text description of the tunnel.
      *  @deprecated unused
      */
+    @Deprecated
     public void getSummary(StringBuilder buf) {
         String type = getType();
         buf.append(type);

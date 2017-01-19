@@ -32,7 +32,7 @@ import net.i2p.util.SimpleByteCache;
  *
  * No, this does not extend AESEngine or CryptixAESEngine.
  */
-public class ElGamalAESEngine {
+public final class ElGamalAESEngine {
     private final Log _log;
     private final static int MIN_ENCRYPTED_SIZE = 80; // smallest possible resulting size
     private final I2PAppContext _context;
@@ -327,12 +327,12 @@ public class ElGamalAESEngine {
             //ByteArrayInputStream bais = new ByteArrayInputStream(decrypted);
             int cur = 0;
             long numTags = DataHelper.fromLong(decrypted, cur, 2);
-            if ((numTags < 0) || (numTags > MAX_TAGS_RECEIVED)) throw new Exception("Invalid number of session tags");
+            if ((numTags < 0) || (numTags > MAX_TAGS_RECEIVED)) throw new IllegalArgumentException("Invalid number of session tags");
             if (numTags > 0) tags = new ArrayList<SessionTag>((int)numTags);
             cur += 2;
             //_log.debug("# tags: " + numTags);
             if (numTags * SessionTag.BYTE_LENGTH > decrypted.length - 2) {
-                throw new Exception("# tags: " + numTags + " is too many for " + (decrypted.length - 2));
+                throw new IllegalArgumentException("# tags: " + numTags + " is too many for " + (decrypted.length - 2));
             }
             for (int i = 0; i < numTags; i++) {
                 byte tag[] = new byte[SessionTag.BYTE_LENGTH];
@@ -344,7 +344,7 @@ public class ElGamalAESEngine {
             cur += 4;
             //_log.debug("len: " + len);
             if ((len < 0) || (len > decrypted.length - cur - Hash.HASH_LENGTH - 1)) 
-                throw new Exception("Invalid size of payload (" + len + ", remaining " + (decrypted.length-cur) +")");
+                throw new IllegalArgumentException("Invalid size of payload (" + len + ", remaining " + (decrypted.length-cur) +")");
             //byte hashval[] = new byte[Hash.HASH_LENGTH];
             //System.arraycopy(decrypted, cur, hashval, 0, Hash.HASH_LENGTH);
             //readHash = new Hash();
@@ -379,8 +379,8 @@ public class ElGamalAESEngine {
                 return unencrData;
             }
 
-            throw new Exception("Hash does not match");
-        } catch (Exception e) {
+            throw new RuntimeException("Hash does not match");
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Unable to decrypt AES block", e);
             return null;
         }

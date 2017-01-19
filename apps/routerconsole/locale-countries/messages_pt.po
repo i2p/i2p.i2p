@@ -6,6 +6,7 @@
 # Translators:
 # alfalb.as, 2015
 # hxdcmls, 2013
+# wtfisthis <low_fps11@yahoo.com>, 2015
 # rafaelbf, 2013
 # Ruthein Alex <rutweiller@hotmail.com>, 2012
 # tuliouel, 2013
@@ -15,9 +16,9 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:08+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/I2P/language/pt/)\n"
+"PO-Revision-Date: 2015-07-30 11:57+0000\n"
+"Last-Translator: wtfisthis <low_fps11@yahoo.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -58,7 +59,7 @@ msgid "Angola"
 msgstr "Angola"
 
 msgid "Asia/Pacific Region"
-msgstr ""
+msgstr "Ásia/Região do Pacifico"
 
 msgid "Antarctica"
 msgstr "Antártica"
@@ -112,7 +113,7 @@ msgid "Benin"
 msgstr "Benin"
 
 msgid "Saint Barthélemy"
-msgstr ""
+msgstr "Coletividade de São Bartolomeu"
 
 msgid "Bermuda"
 msgstr "Bermudas"
@@ -124,7 +125,7 @@ msgid "Bolivia"
 msgstr "Bolívia"
 
 msgid "Bonaire"
-msgstr ""
+msgstr "Bonaire"
 
 msgid "Brazil"
 msgstr "Brasil"
@@ -256,7 +257,7 @@ msgid "Falkland Islands (Malvinas)"
 msgstr "Ilhas Falkland (Malvinas)"
 
 msgid "Micronesia"
-msgstr ""
+msgstr "Micronésia"
 
 msgid "Faroe Islands"
 msgstr "Ilhas Faroe"
@@ -358,7 +359,7 @@ msgid "Iraq"
 msgstr "Iraque"
 
 msgid "Iran"
-msgstr ""
+msgstr "Irão"
 
 msgid "Iceland"
 msgstr "Islândia"
@@ -397,7 +398,7 @@ msgid "Saint Kitts and Nevis"
 msgstr "São Cristóvão e Nevis"
 
 msgid "North Korea"
-msgstr ""
+msgstr "Correia do Norte"
 
 msgid "Republic of Korea"
 msgstr "República da Koreia"
@@ -442,7 +443,7 @@ msgid "Latvia"
 msgstr "Látvia"
 
 msgid "Libya"
-msgstr ""
+msgstr "Líbia"
 
 msgid "Morocco"
 msgstr "Marrocos"
@@ -451,7 +452,7 @@ msgid "Monaco"
 msgstr "Mónaco"
 
 msgid "Moldova"
-msgstr ""
+msgstr "Moldávia"
 
 msgid "Montenegro"
 msgstr "Montenegro"
@@ -466,7 +467,7 @@ msgid "Marshall Islands"
 msgstr "Ilhas Marshall"
 
 msgid "Macedonia"
-msgstr ""
+msgstr "Macedónia"
 
 msgid "Mali"
 msgstr "Mali"
@@ -478,7 +479,7 @@ msgid "Mongolia"
 msgstr "Mongolia"
 
 msgid "Macau"
-msgstr ""
+msgstr "Macau"
 
 msgid "Northern Mariana Islands"
 msgstr "Ilhas Marianas do Norte"
@@ -658,7 +659,7 @@ msgid "Suriname"
 msgstr "Suriname"
 
 msgid "South Sudan"
-msgstr ""
+msgstr "Sudão do Sul"
 
 msgid "Sao Tome and Principe"
 msgstr "São Tomé e Princípe"
@@ -667,10 +668,10 @@ msgid "El Salvador"
 msgstr "São Salvador"
 
 msgid "Sint Maarten"
-msgstr ""
+msgstr "São Martinho"
 
 msgid "Syria"
-msgstr ""
+msgstr "Síria"
 
 msgid "Swaziland"
 msgstr "Suazilândia"
@@ -721,7 +722,7 @@ msgid "Taiwan"
 msgstr "Taiwan"
 
 msgid "Tanzania"
-msgstr ""
+msgstr "Tanzânia"
 
 msgid "Ukraine"
 msgstr "Ucrânia"
@@ -742,7 +743,7 @@ msgid "Uzbekistan"
 msgstr "Uzbequistão"
 
 msgid "Vatican"
-msgstr ""
+msgstr "Vaticano"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "São Vicente e Granadinas"
@@ -754,7 +755,7 @@ msgid "Virgin Islands"
 msgstr "Ilhas Virgens"
 
 msgid "Vietnam"
-msgstr ""
+msgstr "Vietname"
 
 msgid "Vanuatu"
 msgstr "Vanuatu"

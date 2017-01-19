@@ -33,7 +33,7 @@ abstract class IRCFilter {
      */
     public static String inboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
         
-        String field[]=s.split(" ",4);
+        String field[] = DataHelper.split(s, " ", 4);
         String command;
         int idx=0;
         final String[] allowedCommands =
@@ -54,7 +54,8 @@ abstract class IRCFilter {
                 "AUTHENTICATE", // SASL, also requires CAP below
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CAP",
-                "PROTOCTL"
+                "PROTOCTL",
+                "AWAY"
         };
         
 
@@ -63,7 +64,7 @@ abstract class IRCFilter {
                 idx++;
             command = field[idx++].toUpperCase(Locale.US);
         } catch (IndexOutOfBoundsException ioobe) {
-            // wtf, server sent borked command?
+            // server sent borked command?
            //_log.warn("Dropping defective message: index out of bounds while extracting command.");
            return null;
         }
@@ -274,14 +275,14 @@ abstract class IRCFilter {
      */
     public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
 
-        String field[]=s.split(" ",3);
+        String field[] = DataHelper.split(s, " ",3);
 
         if(field[0].length()==0)
             return null; // W T F?
         
         
         if(field[0].charAt(0)==':')
-            return null; // wtf
+            return null; // ???
         
         String command = field[0].toUpperCase(Locale.US);
 
@@ -379,7 +380,7 @@ abstract class IRCFilter {
         if("USER".equals(command)) {
             if (field.length < 3)
                 return s;  // invalid, allow server response
-            int idx = field[2].lastIndexOf(":");
+            int idx = field[2].lastIndexOf(':');
             if(idx<0)
                 return "USER user hostname localhost :realname";
             String realname = field[2].substring(idx+1);
@@ -420,7 +421,7 @@ abstract class IRCFilter {
         int ctcp = msg.indexOf(0x01);
         if (ctcp > 0)
             msg = msg.substring(0, ctcp);
-        String[] args = msg.split(" ", 5);
+        String[] args = DataHelper.split(msg, " ", 5);
         if (args.length <= 0)
             return null;
         String type = args[0];
@@ -512,7 +513,7 @@ abstract class IRCFilter {
         int ctcp = msg.indexOf(0x01);
         if (ctcp > 0)
             msg = msg.substring(0, ctcp);
-        String[] args = msg.split(" ", 5);
+        String[] args = DataHelper.split(msg, " ", 5);
         if (args.length <= 0)
             return null;
         String type = args[0];

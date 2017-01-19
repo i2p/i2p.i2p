@@ -44,16 +44,17 @@ class ProfilePersistenceHelper {
     private static final String SUFFIX = ".txt.gz";
     private static final String UNCOMPRESSED_SUFFIX = ".txt";
     private static final String OLD_SUFFIX = ".dat";
+    private static final int MIN_NAME_LENGTH = PREFIX.length() + 44 + OLD_SUFFIX.length();
     private static final String DIR_PREFIX = "p";
-    private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+    private static final String B64 = Base64.ALPHABET_I2P;
     
     /**
-     * If we haven't been able to get a message through to the peer in 3 days,
+     * If we haven't been able to get a message through to the peer in this much time,
      * drop the profile.  They may reappear, but if they do, their config may
      * have changed (etc).
      *
      */
-    private static final long EXPIRE_AGE = 3*24*60*60*1000;
+    private static final long EXPIRE_AGE = 15*24*60*60*1000;
     
     private final File _profileDir;
     private Hash _us;
@@ -170,7 +171,7 @@ class ProfilePersistenceHelper {
     }
     
     /** @since 0.8.5 */
-    private static void add(StringBuilder buf, String name, double val, String description) {
+    private static void add(StringBuilder buf, String name, float val, String description) {
         buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
         buf.append(name).append('=').append(val).append(NL).append(NL);
     }
@@ -193,6 +194,7 @@ class ProfilePersistenceHelper {
     private static class ProfileFilter implements FilenameFilter {
         public boolean accept(File dir, String filename) {
             return (filename.startsWith(PREFIX) &&
+                    filename.length() >= MIN_NAME_LENGTH &&
                     (filename.endsWith(SUFFIX) || filename.endsWith(OLD_SUFFIX) || filename.endsWith(UNCOMPRESSED_SUFFIX)));
         }
     }
@@ -229,6 +231,26 @@ class ProfilePersistenceHelper {
         }
     }
     
+    /**
+     *  Delete profile files with timestamps older than 'age' ago
+     *  @since 0.9.28
+     */
+    public void deleteOldProfiles(long age) {
+        long cutoff = System.currentTimeMillis() - age;
+        List<File> files = selectFiles();
+        int i = 0;
+        for (File f :  files) {
+            if (!f.isFile())
+                continue;
+            if (f.lastModified() < cutoff) {
+                i++;
+                f.delete();
+            }
+        }
+        if (_log.shouldWarn())
+            _log.warn("Deleted " + i + " old profiles");
+    }
+
     private boolean isExpired(long lastSentToSuccessfully) {
         long timeSince = _context.clock().now() - lastSentToSuccessfully;
         return (timeSince > EXPIRE_AGE);
@@ -263,29 +285,29 @@ class ProfilePersistenceHelper {
                     file.delete();
             }
             
-            profile.setCapacityBonus(getLong(props, "capacityBonus"));
-            profile.setIntegrationBonus(getLong(props, "integrationBonus"));
-            profile.setSpeedBonus(getLong(props, "speedBonus"));
+            profile.setCapacityBonus((int) getLong(props, "capacityBonus"));
+            profile.setIntegrationBonus((int) getLong(props, "integrationBonus"));
+            profile.setSpeedBonus((int) getLong(props, "speedBonus"));
             
             profile.setLastHeardAbout(getLong(props, "lastHeardAbout"));
             profile.setFirstHeardAbout(getLong(props, "firstHeardAbout"));
             profile.setLastSendSuccessful(getLong(props, "lastSentToSuccessfully"));
             profile.setLastSendFailed(getLong(props, "lastFailedSend"));
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));
-            profile.setTunnelTestTimeAverage(getDouble(props, "tunnelTestTimeAverage"));
-            profile.setPeakThroughputKBps(getDouble(props, "tunnelPeakThroughput"));
-            profile.setPeakTunnelThroughputKBps(getDouble(props, "tunnelPeakTunnelThroughput"));
-            profile.setPeakTunnel1mThroughputKBps(getDouble(props, "tunnelPeakTunnel1mThroughput"));
+            profile.setTunnelTestTimeAverage(getFloat(props, "tunnelTestTimeAverage"));
+            profile.setPeakThroughputKBps(getFloat(props, "tunnelPeakThroughput"));
+            profile.setPeakTunnelThroughputKBps(getFloat(props, "tunnelPeakTunnelThroughput"));
+            profile.setPeakTunnel1mThroughputKBps(getFloat(props, "tunnelPeakTunnel1mThroughput"));
             
             profile.getTunnelHistory().load(props);
 
             // In the interest of keeping the in-memory profiles small,
             // don't load the DB info at all unless there is something interesting there
             // (i.e. floodfills)
-            // It seems like we do one or two lookups as a part of handshaking?
-            // Not sure, to be researched.
-            if (getLong(props, "dbHistory.successfulLookups") > 1 ||
-                getLong(props, "dbHistory.failedlLokups") > 1) {
+            if (getLong(props, "dbHistory.lastLookupSuccessful") > 0 ||
+                getLong(props, "dbHistory.lastLookupFailed") > 0 ||
+                getLong(props, "dbHistory.lastStoreSuccessful") > 0 ||
+                getLong(props, "dbHistory.lastStoreFailed") > 0) {
                 profile.expandDBProfile();
                 profile.getDBHistory().load(props);
                 profile.getDbIntroduction().load(props, "dbIntroduction", true);
@@ -300,37 +322,87 @@ class ProfilePersistenceHelper {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());
             
+            fixupFirstHeardAbout(profile);
             return profile;
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error loading properties from " + file.getAbsolutePath(), e);
             file.delete();
             return null;
         }
     }
+
+    /**
+     *  First heard about wasn't always set correctly before,
+     *  set it to the minimum of all recorded timestamps.
+     *
+     *  @since 0.9.24
+     */
+    private void fixupFirstHeardAbout(PeerProfile p) {
+        long min = Long.MAX_VALUE;
+        long t = p.getLastHeardAbout();
+        if (t > 0 && t < min) min = t;
+        t = p.getLastSendSuccessful();
+        if (t > 0 && t < min) min = t;
+        t = p.getLastSendFailed();
+        if (t > 0 && t < min) min = t;
+        t = p.getLastHeardFrom();
+        if (t > 0 && t < min) min = t;
+        // the first was never used and the last 4 were never persisted
+        //DBHistory dh = p.getDBHistory();
+        //if (dh != null) {
+        //    t = dh.getLastLookupReceived();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastLookupSuccessful();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastLookupFailed();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastStoreSuccessful();
+        //    if (t > 0 && t < min) min = t;
+        //    t = dh.getLastStoreFailed();
+        //    if (t > 0 && t < min) min = t;
+        //}
+        TunnelHistory th = p.getTunnelHistory();
+        if (th != null) {
+            t = th.getLastAgreedTo();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedCritical();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedBandwidth();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedTransient();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastRejectedProbabalistic();
+            if (t > 0 && t < min) min = t;
+            t = th.getLastFailed();
+            if (t > 0 && t < min) min = t;
+        }
+        long fha = p.getFirstHeardAbout();
+        if (min > 0 && min < Long.MAX_VALUE && (fha <= 0 || min < fha)) {
+            p.setFirstHeardAbout(min);
+            if (_log.shouldDebug())
+                _log.debug("Fixed up the FHA time for " + p.getPeer().toBase64() + " to " + (new Date(min)));
+        }
+    }
     
-    private final static long getLong(Properties props, String key) {
+    static long getLong(Properties props, String key) {
         String val = props.getProperty(key);
         if (val != null) {
             try {
                 return Long.parseLong(val);
-            } catch (NumberFormatException nfe) {
-                return 0;
-            }
+            } catch (NumberFormatException nfe) {}
         }
         return 0;
     }
 
-    private final static double getDouble(Properties props, String key) {
+    private final static float getFloat(Properties props, String key) {
         String val = props.getProperty(key);
         if (val != null) {
             try {
-                return Double.parseDouble(val);
-            } catch (NumberFormatException nfe) {
-                return 0.0;
-            }
+                return Float.parseFloat(val);
+            } catch (NumberFormatException nfe) {}
         }
-        return 0.0;
+        return 0.0f;
     }
     
     private void loadProps(Properties props, File file) throws IOException {
@@ -369,7 +441,7 @@ class ProfilePersistenceHelper {
                 return null;
             Hash h = Hash.create(b);
             return h;
-        } catch (Exception dfe) {
+        } catch (RuntimeException dfe) {
             _log.warn("Invalid base64 [" + key + "]", dfe);
             return null;
         }

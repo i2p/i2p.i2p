@@ -656,12 +656,6 @@ input.add {
      min-height: 22px;
 }
 
-input.create {
-     background: #989 url('images/create.png') no-repeat 2px center;
-     padding: 2px 3px 2px 20px !important;
-     min-height: 22px;
-}
-
 input.cancel {
      background: #989 url('../../console/images/cancel.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
@@ -682,6 +676,18 @@ input.delete {
 
 input.reload {
      background: #989 url('../../console/images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.starttorrent {
+     background: #989 url('images/start.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.stoptorrent {
+     background: #989 url('images/stop.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
      min-height: 22px;
 }

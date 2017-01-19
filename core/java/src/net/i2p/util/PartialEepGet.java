@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
 import gnu.getopt.Getopt;
@@ -106,7 +107,7 @@ public class PartialEepGet extends EepGet {
                     break;
               }  // switch
             } // while
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             error = true;
         }
@@ -167,13 +168,20 @@ public class PartialEepGet extends EepGet {
     @Override
     protected String getRequest() throws IOException {
         StringBuilder buf = new StringBuilder(2048);
-        URL url = new URL(_actualURL);
+        URI url;
+        try {
+            url = new URI(_actualURL);
+        } catch (URISyntaxException use) {
+            IOException ioe = new MalformedURLException("Bad URL");
+            ioe.initCause(use);
+            throw ioe;
+        }
         String host = url.getHost();
         if (host == null || host.length() <= 0)
             throw new MalformedURLException("Bad URL, no host");
         int port = url.getPort();
-        String path = url.getPath();
-        String query = url.getQuery();
+        String path = url.getRawPath();
+        String query = url.getRawQuery();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting " + _actualURL);
         // RFC 2616 sec 5.1.2 - full URL if proxied, absolute path only if not proxied

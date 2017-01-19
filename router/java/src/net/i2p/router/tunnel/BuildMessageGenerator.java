@@ -54,6 +54,9 @@ public abstract class BuildMessageGenerator {
      * containing the hop's configuration (as well as the reply info, if it is an outbound endpoint)
      *
      * @param msg out parameter
+     * @param peerKey Encrypt using this key.
+     *                If null, replyRouter and replyTunnel are ignored,
+     *                and the entire record is filled with random data
      * @throws IllegalArgumentException if hop bigger than config
      */
     public static void createRecord(int recordNum, int hop, TunnelBuildMessage msg,

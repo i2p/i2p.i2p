@@ -66,11 +66,13 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /**
      * @deprecated should always return null
      */
+    @Deprecated
     public SessionKey getKeyUsed() { return _keyUsed; }
 
     /**
      * @deprecated I2PSession throws out the tags
      */
+    @Deprecated
     public void setKeyUsed(SessionKey key) {
         if (key != null)
             _log.error("Who is sending tags thru the streaming lib?");
@@ -80,11 +82,13 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     /**
      * @deprecated should always return null or an empty set
      */
+    @Deprecated
     public Set<SessionTag> getTagsSent() { return Collections.emptySet(); }
 
     /**
      * @deprecated I2PSession throws out the tags
      */
+    @Deprecated
     public void setTagsSent(Set<SessionTag> tags) { 
         if (tags != null && !tags.isEmpty())
             _log.error("Who is sending tags thru the streaming lib? " + tags.size());

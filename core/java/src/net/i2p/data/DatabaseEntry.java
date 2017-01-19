@@ -13,6 +13,8 @@ import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.SigAlgo;
+import net.i2p.crypto.SigType;
 
 /**
  *<p>
@@ -98,6 +100,9 @@ public abstract class DatabaseEntry extends DataStructureImpl {
 
     /**
      * Returns the raw payload data, excluding the signature, to be signed by sign().
+     *
+     * Most callers should use writeBytes() or toByteArray() instead.
+     *
      * FIXME RouterInfo throws DFE and LeaseSet returns null
      * @return null on error ???????????????????????
      */
@@ -120,13 +125,6 @@ public abstract class DatabaseEntry extends DataStructureImpl {
             _routingKeyGenMod = mod;
         }
         return _currentRoutingKey;
-    }
-
-    /**
-     * @deprecated unused
-     */
-    public void setRoutingKey(Hash key) {
-        _currentRoutingKey = key;
     }
 
     /**
@@ -210,6 +208,12 @@ public abstract class DatabaseEntry extends DataStructureImpl {
         if (data == null)
             return false;
         // if the data is non-null the SPK will be non-null
-        return DSAEngine.getInstance().verifySignature(_signature, data, getSigningPublicKey());
+        SigningPublicKey spk = getSigningPublicKey();
+        SigType type = spk.getType();
+        // As of 0.9.28, disallow RSA as it's so slow it could be
+        // used as a DoS
+        if (type == null || type.getBaseAlgorithm() == SigAlgo.RSA)
+            return false;
+        return DSAEngine.getInstance().verifySignature(_signature, data, spk);
     }
 }

@@ -340,7 +340,7 @@ class FragmentHandler {
             offset += 4;
         }
         if (extended) {
-            int extendedSize = (int)DataHelper.fromLong(preprocessed, offset, 1);
+            int extendedSize = preprocessed[offset] & 0xff;
             offset++;
             offset += extendedSize; // we don't interpret these yet, but skip them for now
         }

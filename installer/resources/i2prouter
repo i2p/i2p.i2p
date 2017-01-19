@@ -206,13 +206,15 @@ unsupported() {
 
 freebsd10() {
     echo
-    echo "The current version of the Tanuki wrapper does not"
-    echo "support FreeBSD 10."
+    echo "The current version of the Tanuki wrapper that is bundled"
+    echo "with I2P does not support FreeBSD 10."
     echo
-    echo "See https://trac.i2p2.de/ticket/1118 for more information"
-    echo "and a workaround for this issue."
+    echo "See http://trac.i2p2.de/ticket/1118#comment:13 for a work-around."
+    echo "After applying the work-around, as a normal user or a dedicated"
+    echo "i2p user, you can then run:"
+    echo "$ ./i2prouter start"
     echo
-    echo "In the meantime, you may start I2P by running the script"
+    echo "Or, you may also start I2P by running the script:"
     echo "${I2P}/runplain.sh"
     echo
 }
@@ -227,11 +229,11 @@ failed() {
                     ;;
                 *)
                     # We should never get here on recent versions of FreeBSD
-                    if ! $(pkg_info -E 'libiconv*' > /dev/null 2>&1); then
+                    if ! $(pkg info -E 'libiconv*' > /dev/null 2>&1); then
                         echo
                         echo "The wrapper requires libiconv."
                         echo
-                        echo "It can be installed with pkg_add -r libiconv"
+                        echo "It can be installed with pkg install libiconv"
                         echo
                     fi
                     ;;
@@ -486,11 +488,19 @@ else
     esac
 fi
 
-# OSX always places Java in the same location so we can reliably set JAVA_HOME
+# Through Java 6, OSX always places Java in the same location so we can reliably set JAVA_HOME
+# As of OSX 10.5 / Java 7, call /usr/libexec/java_home to find it
+# https://developer.apple.com/library/mac/qa/qa1170/_index.html
 if [ "$DIST_OS" = "macosx" ]
 then
     if [ -z "$JAVA_HOME" ]; then
-        JAVA_HOME="/Library/Java/Home"; export JAVA_HOME
+        if [ -x "/usr/libexec/java_home" ]; then
+            JAVA_HOME=`/usr/libexec/java_home`
+        fi
+        if [ -z "$JAVA_HOME" ]; then
+            JAVA_HOME="/Library/Java/Home"
+        fi
+        export JAVA_HOME
     fi
 fi
 
@@ -556,7 +566,7 @@ setup_openbsd() {
     set +e
 }
 
-if [ "$DIST_OS"="openbsd" -a ! -f "$WRAPPER_CMD" ]; then
+if [ "$DIST_OS" = "openbsd" -a ! -f "$WRAPPER_CMD" ]; then
     # We handle it here because Tanuki doesn't ship OpenBSD binaries.
     # We don't either, but they are (finally!) in OpenBSD itself.
     setup_openbsd
@@ -1287,7 +1297,7 @@ installsystemd() {
         cat << EOF >> "$SYSTEMD_SERVICE"
 [Unit]
 Description=$APP_LONG_NAME
-After= local-fs.target network.target
+After= local-fs.target network.target time-sync.target
 
 [Service]
 Type=forking

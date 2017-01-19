@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test/junit"/>
+	<classpathentry kind="src" path="demo"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/i2p_sdk"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/obj"/>

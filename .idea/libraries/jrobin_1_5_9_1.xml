@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jrobin-1.5.9.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/apps/jrobin/jrobin-1.5.9.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

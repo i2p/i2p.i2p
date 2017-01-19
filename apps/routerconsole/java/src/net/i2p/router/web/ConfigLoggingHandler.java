@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
+import net.i2p.util.LogManager;
+
 /**
  * Handler to deal with form submissions from the logging config form and act
  * upon the values.
@@ -74,12 +77,12 @@ public class ConfigLoggingHandler extends FormHandler {
             try {
                 Properties props = new Properties();
                 if (_levels != null)
-                    props.load(new ByteArrayInputStream(_levels.getBytes()));
+                    props.load(new ByteArrayInputStream(DataHelper.getUTF8(_levels)));
                 if (_newLogClass != null)
                     props.setProperty(_newLogClass, _newLogLevel);
                 _context.logManager().setLimits(props);
                 shouldSave = true;
-                addFormNotice(_("Log overrides updated"));
+                addFormNotice(_t("Log overrides updated"));
             } catch (IOException ioe) {
                 // shouldn't ever happen (BAIS shouldnt cause an IOE)
                 _context.logManager().getLog(ConfigLoggingHandler.class).error("Error reading from the props?", ioe);
@@ -113,7 +116,7 @@ public class ConfigLoggingHandler extends FormHandler {
         }
         
         if (_fileSize != null) {
-            int newBytes = _context.logManager().getFileSize(_fileSize);
+            int newBytes = LogManager.getFileSize(_fileSize);
             int oldBytes = _context.logManager().getFileSize();
             if (newBytes > 0) {
                 if (oldBytes != newBytes) {
@@ -160,7 +163,7 @@ public class ConfigLoggingHandler extends FormHandler {
             boolean saved = _context.logManager().saveConfig();
 
             if (saved) 
-                addFormNotice(_("Log configuration saved"));
+                addFormNotice(_t("Log configuration saved"));
             else
                 addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
         }

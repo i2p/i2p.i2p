@@ -104,12 +104,12 @@ public class ProfilesHelper extends HelperBase {
                 // we are there
                 if (span)
                     buf.append("<span class=\"tab2\">");
-                buf.append(_(titles[i]));
+                buf.append(_t(titles[i]));
             } else {
                 // we are not there, make a link
                 if (span)
                     buf.append("<span class=\"tab\">");
-                buf.append("<a href=\"profiles").append(links[i]).append("\">").append(_(titles[i])).append("</a>");
+                buf.append("<a href=\"profiles").append(links[i]).append("\">").append(_t(titles[i])).append("</a>");
             }
             if (span)
                 buf.append(" </span>\n");

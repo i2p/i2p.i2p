@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # benewfy <benewfy@gmail.com>, 2015
 msgid ""
@@ -11,11 +11,12 @@ msgstr ""
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
 "PO-Revision-Date: 2015-06-29 12:34+0000\n"
 "Last-Translator: benewfy <benewfy@gmail.com>\n"
-"Language-Team: Hungarian (http://www.transifex.com/projects/p/I2P/language/hu/)\n"
+"Language-Team: Hungarian (http://www.transifex.com/projects/p/I2P/language/"
+"hu/)\n"
+"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Type: boolean
@@ -30,7 +31,9 @@ msgstr "Az I2P router elinduljon a rendszer betöltésekor?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "Az I2P router képes háttérszolgáltatásként futni, mely automatikusan elindul a számítógép indításakor. Ez a javasolt beállítás."
+msgstr ""
+"Az I2P router képes háttérszolgáltatásként futni, mely automatikusan elindul "
+"a számítógép indításakor. Ez a javasolt beállítás."
 
 #. Type: string
 #. Description
@@ -42,11 +45,15 @@ msgstr "Az I2P háttérszolgáltatás felhasználója:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "Alapértelmezésben az I2P arra van beállítva, hogy az i2psvc fiók alatt fusson, mint háttérszolgáltatás. **Létező** I2P profil használatához írj egy másik fióknevet ide. Például, ha az előzőleg installált I2P-d a /home/felhasznalo/i2p alatt található, ide a következőt írhatod: 'felhasznalo'."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Alapértelmezésben az I2P arra van beállítva, hogy az i2psvc fiók alatt "
+"fusson, mint háttérszolgáltatás. **Létező** I2P profil használatához írj egy "
+"másik fióknevet ide. Például, ha az előzőleg installált I2P-d a /home/"
+"felhasznalo/i2p alatt található, ide a következőt írhatod: 'felhasznalo'."
 
 #. Type: string
 #. Description
@@ -54,7 +61,9 @@ msgstr "Alapértelmezésben az I2P arra van beállítva, hogy az i2psvc fiók al
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Nagyon fontos: Ha az alapértelmezett 'i2psvc' helyett más felhasználó kerül megadásra, a választott felhasználónévnek már léteznie *KELL*."
+msgstr ""
+"Nagyon fontos: Ha az alapértelmezett 'i2psvc' helyett más felhasználó kerül "
+"megadásra, a választott felhasználónévnek már léteznie *KELL*."
 
 #. Type: string
 #. Description
@@ -74,7 +83,10 @@ msgstr "Alapeseten az I2P számára csak maximum 128MB memória engedélyezett."
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Lehetséges, hogy nagy szávszélességű routerek, úgyis mint sok aktív torrenttel vagy kiegészítővel rendelkező routerek számára ezt az értéket növelni szükséges."
+msgstr ""
+"Lehetséges, hogy nagy szávszélességű routerek, úgyis mint sok aktív "
+"torrenttel vagy kiegészítővel rendelkező routerek számára ezt az értéket "
+"növelni szükséges."
 
 #. Type: boolean
 #. Description
@@ -88,4 +100,6 @@ msgstr "I2P kiszolgáló futtatása korlátozva az AppArmor-ral"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Ezzel az opcióval engedélyezed, hogy az I2P sandboxolva legyen az AppArmor-ral, korlátozva, hogy melyik fájlokat és könyvtárakat érheti el az I2P."
+msgstr ""
+"Ezzel az opcióval engedélyezed, hogy az I2P sandboxolva legyen az AppArmor-"
+"ral, korlátozva, hogy melyik fájlokat és könyvtárakat érheti el az I2P."

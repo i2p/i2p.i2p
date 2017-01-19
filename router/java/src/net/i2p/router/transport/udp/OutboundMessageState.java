@@ -177,11 +177,14 @@ class OutboundMessageState implements CDPQEntry {
     /**
      * Note that we have pushed the message fragments.
      * Increments push count (and max sends... why?)
+     * @return true if this is the first push
      */
-    public synchronized void push() { 
+    public synchronized boolean push() { 
+        boolean rv = _pushCount == 0;
         // these will never be different...
         _pushCount++; 
         _maxSends = _pushCount;
+        return rv;
     }
 
     /**
@@ -290,6 +293,7 @@ class OutboundMessageState implements CDPQEntry {
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
         buf.append("OB Message ").append(_i2npMessage.getUniqueId());
+        buf.append(" type ").append(_i2npMessage.getType());
         buf.append(" with ").append(_numFragments).append(" fragments");
         buf.append(" of size ").append(_messageBuf.length);
         buf.append(" volleys: ").append(_maxSends);
@@ -301,6 +305,7 @@ class OutboundMessageState implements CDPQEntry {
                     buf.append(i).append(' ');
             }
         }
+        //buf.append(" to: ").append(_peer.toString());
         return buf.toString();
     }
 }

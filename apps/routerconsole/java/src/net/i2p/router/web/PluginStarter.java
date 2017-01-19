@@ -22,6 +22,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppState;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Base64;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.startup.ClientAppConfig;
@@ -157,6 +158,12 @@ public class PluginStarter implements Runnable {
                                      Messages.getString("HTTP client proxy tunnel must be running", ctx));
             return;
         }
+        if (ctx.commSystem().isDummy()) {
+            mgr.notifyComplete(null, Messages.getString("Plugin update check failed", ctx) +
+                                     " - " +
+                                     "VM Comm System");
+            return;
+        }
 
         Log log = ctx.logManager().getLog(PluginStarter.class);
         int updated = 0;
@@ -258,6 +265,7 @@ public class PluginStarter implements Runnable {
      *  @return true on success
      *  @throws just about anything, caller would be wise to catch Throwable
      */
+    @SuppressWarnings("deprecation")
     public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
@@ -338,9 +346,23 @@ public class PluginStarter implements Runnable {
         if (tfiles != null) {
             for (int i = 0; i < tfiles.length; i++) {
                 String name = tfiles[i].getName();
-                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i])))
+                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i]))) {
+                    // deprecated
                     ctx.router().setConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name, tfiles[i].getAbsolutePath());
                     // we don't need to save
+                }
+            }
+        }
+
+        //handle console icons for plugins without web-resources through prop icon-code
+        String fullprop = props.getProperty("icon-code");
+        if(fullprop != null && fullprop.length() > 1){
+            byte[] decoded = Base64.decode(fullprop);
+            if(decoded != null) {
+                NavHelper.setBinary(appName, decoded);
+                iconfile = "/Plugins/pluginicon?plugin=" + appName;
+            } else {
+                iconfile = "/themes/console/images/plugin.png";
             }
         }
 
@@ -412,9 +434,13 @@ public class PluginStarter implements Runnable {
                     if (f.getName().endsWith(".jar")) {
                         try {
                             addPath(f.toURI().toURL());
-                            log.error("INFO: Adding translation plugin to classpath: " + f);
+                            log.info("INFO: Adding translation plugin to classpath: " + f);
                             added = true;
-                        } catch (Exception e) {
+                        } catch (ClassCastException e) {
+                            log.logAlways(Log.WARN, "Java version: " + System.getProperty("java.version") +
+                                                    " does not support adding classpath element: " + f +
+                                                    " for plugin " + appName);
+                        } catch (RuntimeException e) {
                             log.error("Plugin " + appName + " bad classpath element: " + f, e);
                         }
                     }
@@ -537,7 +563,7 @@ public class PluginStarter implements Runnable {
 
         boolean deleted = FileUtil.rmdir(pluginDir, false);
         Properties props = pluginProperties();
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator<?> iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             if (name.startsWith(PREFIX + appName + '.'))
                 iter.remove();
@@ -699,7 +725,7 @@ public class PluginStarter implements Runnable {
                 // argument array comparison in getClientApp() works.
                 // Do this after parsing so we don't need to worry about quoting
                 for (int i = 0; i < argVal.length; i++) {
-                    if (argVal[i].indexOf("$") >= 0) {
+                    if (argVal[i].indexOf('$') >= 0) {
                         argVal[i] = argVal[i].replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                         argVal[i] = argVal[i].replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                         argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
@@ -738,7 +764,7 @@ public class PluginStarter implements Runnable {
             }
             // do this after parsing so we don't need to worry about quoting
             for (int i = 0; i < argVal.length; i++) {
-                if (argVal[i].indexOf("$") >= 0) {
+                if (argVal[i].indexOf('$') >= 0) {
                     argVal[i] = argVal[i].replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                     argVal[i] = argVal[i].replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                     argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
@@ -748,7 +774,7 @@ public class PluginStarter implements Runnable {
             ClassLoader cl = null;
             if (app.classpath != null) {
                 String cp = app.classpath;
-                if (cp.indexOf("$") >= 0) {
+                if (cp.indexOf('$') >= 0) {
                     cp = cp.replace("$I2P", ctx.getBaseDir().getAbsolutePath());
                     cp = cp.replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                     cp = cp.replace("$PLUGIN", pluginDir.getAbsolutePath());
@@ -889,6 +915,7 @@ public class PluginStarter implements Runnable {
         
         // Plugins start before the eepsite, and will create the static Timer thread
         // in RolloverFileOutputStream, which never stops. Don't count it.
+        // Ditto HSQLDB Timer (jwebcache)
         if (rv) {
             Log log = ctx.logManager().getLog(PluginStarter.class);
             Thread[] activeThreads = new Thread[128];
@@ -897,10 +924,11 @@ public class PluginStarter implements Runnable {
             for (int i = 0; i < count; i++) {
                 if (activeThreads[i] != null) {
                     String name = activeThreads[i].getName();
-                    if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name))
+                    if (!"org.eclipse.jetty.util.RolloverFileOutputStream".equals(name) &&
+                        !name.startsWith("HSQLDB Timer"))
                         notRollover = true;
                     if (log.shouldLog(Log.DEBUG))
-                        log.debug("Found " + activeThreads[i].getState() + " thread for " + pluginName + ": " + name);
+                        log.debug("Found " + activeThreads[i].getState() + " thread " + name + " for " + pluginName + ": " + name);
                 }
             }
             rv = notRollover;
@@ -952,7 +980,7 @@ public class PluginStarter implements Runnable {
                 urls.add(f.toURI().toURL());
                 if (log.shouldLog(Log.WARN))
                     log.warn("INFO: Adding plugin to classpath: " + f);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
             }
         }
@@ -963,11 +991,13 @@ public class PluginStarter implements Runnable {
 
     /**
      *  http://jimlife.wordpress.com/2007/12/19/java-adding-new-classpath-at-runtime/
+     *
+     *  @throws ClassCastException in Java 9
      */
     private static void addPath(URL u) throws Exception {
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> urlClass = URLClassLoader.class;
-        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        Method method = urlClass.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(urlClassLoader, new Object[]{u});
     }

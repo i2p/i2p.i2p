@@ -9,76 +9,76 @@ package dummy;
 class Dummy {
     void dummy {
         // wars for ConfigClientsHelper
-        _("addressbook");
-        _("i2psnark");
-        _("i2ptunnel");
-        _("susimail");
-        _("susidns");
-        _("routerconsole");
+        _t("addressbook");
+        _t("i2psnark");
+        _t("i2ptunnel");
+        _t("susimail");
+        _t("susidns");
+        _t("routerconsole");
 
         // clients, taken from clients.config, for ConfigClientsHelper
         // note that if the wording changes in clients.config, we have to
         // keep the old string here as well for existing installs
-        _("Web console");
-        _("SAM application bridge");
-        _("Application tunnels");
-        _("My eepsite web server");
-        _("I2P webserver (eepsite)");        
-        _("Browser launch at startup");
-        _("BOB application bridge");
-        _("I2P Router Console");
-        _("Open Router Console in web browser at startup");        
+        _t("Web console");
+        _t("SAM application bridge");
+        _t("Application tunnels");
+        _t("My eepsite web server");
+        _t("I2P webserver (eepsite)");        
+        _t("Browser launch at startup");
+        _t("BOB application bridge");
+        _t("I2P Router Console");
+        _t("Open Router Console in web browser at startup");        
         
         // tunnel nicknames, taken from i2ptunnel.config so they will display
         // nicely under 'local destinations' in the summary bar
         // note that if the wording changes in i2ptunnel.config, we have to
         // keep the old string here as well for existing installs
-        _("shared clients");
-        _("shared clients (DSA)");
-        _("IRC proxy");
-        _("eepsite");
-        _("I2P webserver");
-        _("HTTP Proxy");        
+        _t("shared clients");
+        _t("shared clients (DSA)");
+        _t("IRC proxy");
+        _t("eepsite");
+        _t("I2P webserver");
+        _t("HTTP Proxy");        
         // older names for pre-0.7.4 installs
-        _("eepProxy");
-        _("ircProxy");
+        _t("eepProxy");
+        _t("ircProxy");
         // hardcoded in i2psnark
-        _("I2PSnark");
+        _t("I2PSnark");
         // hardcoded in iMule?
-        _("iMule");
+        _t("iMule");
 
 
         // standard themes for ConfigUIHelper
-        _("classic");
-        _("dark");
-        _("light");
-        _("midnight");        
+        _t("classic");
+        _t("dark");
+        _t("light");
+        _t("midnight");        
 
         // stat groups for stats.jsp
-        _("Bandwidth");
-        _("BandwidthLimiter");
-        _("ClientMessages");
-        _("Encryption");
-        _("i2cp");
-        _("I2PTunnel");
-        _("InNetPool");
-        _("JobQueue");
-        _("NetworkDatabase");
-        _("ntcp");
-        _("Peers");
-        _("Router");
-        _("Stream");
-        _("Throttle");
-        _("Transport");
-        _("Tunnels");
-        _("udp");
+        _t("Bandwidth");
+        _t("BandwidthLimiter");
+        _t("ClientMessages");
+        _t("Encryption");
+        _t("i2cp");
+        _t("I2PTunnel");
+        _t("InNetPool");
+        _t("JobQueue");
+        _t("NetworkDatabase");
+        _t("ntcp");
+        _t("Peers");
+        _t("Router");
+        _t("Stream");
+        _t("Throttle");
+        _t("Transport");
+        _t("Tunnels");
+        _t("udp");
 
         // parameters in transport addresses (netdb.jsp)
         // may or may not be worth translating
-        _("host");
-        _("key");
-        _("port");
+        _t("host");
+        _t("key");
+        _t("port");
         // capabilities
-        _("caps");
+        _t("caps");
     }
 }

@@ -18,15 +18,15 @@ public class ConfigHomeHandler extends FormHandler {
     protected void processForm() {
         if (_action == null) return;
         String group = getJettyString("group");
-        boolean deleting = _action.equals(_("Delete selected"));
-        boolean adding = _action.equals(_("Add item"));
-        boolean restoring = _action.equals(_("Restore defaults"));
-        if (_action.equals(_("Save")) && "0".equals(group)) {
+        boolean deleting = _action.equals(_t("Delete selected"));
+        boolean adding = _action.equals(_t("Add item"));
+        boolean restoring = _action.equals(_t("Restore defaults"));
+        if (_action.equals(_t("Save")) && "0".equals(group)) {
             boolean old = _context.getBooleanProperty(HomeHelper.PROP_OLDHOME);
             boolean nnew = getJettyString("oldHome") != null;
             if (old != nnew) {
                 _context.router().saveConfig(HomeHelper.PROP_OLDHOME, "" + nnew);
-                addFormNotice(_("Home page changed"));
+                addFormNotice(_t("Home page changed"));
             }
         } else if (adding || deleting || restoring) {
             String prop;
@@ -48,7 +48,7 @@ public class ConfigHomeHandler extends FormHandler {
                 //_context.router().saveConfig(prop, dflt);
                 // remove config so user will see updates
                 _context.router().saveConfig(prop, null);
-                addFormNotice(_("Restored default settings"));
+                addFormNotice(_t("Restored default settings"));
                 return;
             }
             String config = _context.getProperty(prop, dflt);
@@ -60,12 +60,12 @@ public class ConfigHomeHandler extends FormHandler {
             if (adding) {
                 String name = getJettyString("nofilter_name");
                 if (name == null || name.length() <= 0) {
-                    addFormError(_("No name entered"));
+                    addFormError(_t("No name entered"));
                     return;
                 }
                 String url = getJettyString("nofilter_url");
                 if (url == null || url.length() <= 0) {
-                    addFormError(_("No URL entered"));
+                    addFormError(_t("No URL entered"));
                     return;
                 }
                 // these would get double-escaped so we can't do it this way...
@@ -81,7 +81,7 @@ public class ConfigHomeHandler extends FormHandler {
                 else
                     app = new HomeHelper.App(name, "", url, "/themes/console/images/question.png");
                 apps.add(app);
-                addFormNotice(_("Added") + ": " + app.name);
+                addFormNotice(_t("Added") + ": " + app.name);
             } else {
                 // deleting
                 Set<String> toDelete = new HashSet<String>();
@@ -98,13 +98,13 @@ public class ConfigHomeHandler extends FormHandler {
                     HomeHelper.App app = iter.next();
                     if (toDelete.contains(app.name)) {
                         iter.remove();
-                        addFormNotice(_("Removed") + ": " + app.name);
+                        addFormNotice(_t("Removed") + ": " + app.name);
                     }
                 }
             }
             HomeHelper.saveApps(_context, prop, apps, !("3".equals(group)));
         } else {
-            //addFormError(_("Unsupported"));
+            //addFormError(_t("Unsupported"));
         }
     }
 }

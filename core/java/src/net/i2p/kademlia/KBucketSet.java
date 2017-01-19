@@ -432,12 +432,12 @@ public class KBucketSet<T extends SimpleDataStructure> {
         if (rv >= 0) {
              return rv;
         }
-        _log.error("Key does not fit in any bucket?! WTF!\nKey  : [" 
+        _log.error("Key does not fit in any bucket?!\nKey  : [" 
                    + DataHelper.toHexString(key.getData()) + "]" 
                    + "\nUs   : " + _us
                    + "\nDelta: ["
                    + DataHelper.toHexString(DataHelper.xor(_us.getData(), key.getData()))
-                   + "]", new Exception("WTF"));
+                   + "]", new Exception("???"));
         _log.error(toString());
         throw new IllegalStateException("pickBucket returned " + rv);
         //return -1;
@@ -588,7 +588,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
         } else {
             // dont span main bucket boundaries with depth > 1
             if (fixed > 0)
-                throw new IllegalStateException("WTF " + bucket);
+                throw new IllegalStateException("??? " + bucket);
             BigInteger nonz;
             if (numNonZero <= 62) {
                 // add one to ensure nonzero
@@ -628,6 +628,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
      *  @param data size <= SDS length, else throws IAE
      *              Can be 1 bigger if top byte is zero
      */
+    @SuppressWarnings("unchecked")
     private T makeKey(byte[] data) {
         int len = _us.length();
         int dlen = data.length;

@@ -14,6 +14,18 @@
     </filter-mapping>
 
     <!-- precompiled servlets -->
+
+    <servlet>
+      <servlet-name>net.i2p.router.web.CodedIconRendererServlet</servlet-name>
+      <servlet-class>net.i2p.router.web.CodedIconRendererServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+      <servlet-name>net.i2p.router.web.CodedIconRendererServlet</servlet-name>
+      <url-pattern>/Plugins/*</url-pattern>
+    </servlet-mapping>
+
+
     
     <!-- yeah, i'm lazy, using a jsp instead of a servlet.. -->
     <servlet-mapping> 
@@ -29,6 +41,16 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.router.web.jsp.viewhistory_jsp</servlet-name>
       <url-pattern>/history.txt</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewrouterlog_jsp</servlet-name>
+      <url-pattern>/router.log</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewwrapperlog_jsp</servlet-name>
+      <url-pattern>/wrapper.log</url-pattern>
     </servlet-mapping>
     
     <session-config>

@@ -68,7 +68,7 @@ public class InternalSocket extends Socket {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         try {
             if (_is != null) {
                 _is.close();
@@ -84,7 +84,7 @@ public class InternalSocket extends Socket {
     }
 
     @Override
-    public boolean isClosed() {
+    public synchronized boolean isClosed() {
         return _is == null || _os == null;
     }
 
@@ -105,166 +105,199 @@ public class InternalSocket extends Socket {
 
     // everything below here unsupported
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void bind(SocketAddress endpoint) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void connect(SocketAddress endpoint) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void connect(SocketAddress endpoint, int timeout) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public SocketChannel getChannel() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public InetAddress getInetAddress() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean getKeepAlive() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public InetAddress getLocalAddress() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getLocalPort() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public SocketAddress getLocalSocketAddress() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean getOOBInline() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getPort() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getReceiveBufferSize() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public SocketAddress getRemoteSocketAddress() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean getReuseAddress() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getSendBufferSize() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getSoLinger() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean getTcpNoDelay() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getTrafficClass() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean isBound() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean isConnected() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean isInputShutdown() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean isOutputShutdown() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void sendUrgentData(int data) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setKeepAlive(boolean on) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setOOBInline(boolean on) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setReceiveBufferSize(int size) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setReuseAddress(boolean on) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setSendBufferSize(int size) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setSoLinger(boolean on, int linger) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setTcpNoDelay(boolean on) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setTrafficClass(int cize) {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void shutdownInput() {
         throw new UnsupportedOperationException();
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void shutdownOutput() {
         throw new UnsupportedOperationException();

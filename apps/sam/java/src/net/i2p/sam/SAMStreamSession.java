@@ -28,6 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -47,16 +49,12 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-class SAMStreamSession {
+class SAMStreamSession implements SAMMessageSess {
 
     protected final Log _log;
-
     protected final static int SOCKET_HANDLER_BUF_SIZE = 32768;
-
     protected final SAMStreamReceiver recv;
-
     protected final SAMStreamSessionServer server;
-
     protected final I2PSocketManager socketMgr;
 
     /** stream id (Long) to SAMStreamSessionSocketReader */
@@ -68,6 +66,9 @@ class SAMStreamSession {
 
     // Can we create outgoing connections?
     protected final boolean canCreate;
+    private final int listenProtocol;
+    private final int listenPort;
+    protected final boolean _isOwnSession;
 
     /** 
      * should we flush every time we get a STREAM SEND, or leave that up to
@@ -80,6 +81,8 @@ class SAMStreamSession {
     
     /**
      * Create a new SAM STREAM session.
+     *
+     * Caller MUST call start().
      *
      * @param dest Base64-encoded destination and private keys (same format as PrivateKeyFile)
      * @param dir Session direction ("RECEIVE", "CREATE" or "BOTH") or "__v3__" if extended by SAMv3StreamSession
@@ -105,8 +108,8 @@ class SAMStreamSession {
      * @throws DataFormatException
      * @throws SAMException 
      */
-    public SAMStreamSession(InputStream destStream, String dir,
-                            Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
+    protected SAMStreamSession(InputStream destStream, String dir,
+                               Properties props,  SAMStreamReceiver recv) throws IOException, DataFormatException, SAMException {
         this.recv = recv;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
 
@@ -156,29 +159,87 @@ class SAMStreamSession {
             allprops.setProperty("outbound.nickname", "SAM TCP Client");
         }
 
+        _isOwnSession = true;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Creating I2PSocketManager...");
-        socketMgr = I2PSocketManagerFactory.createManager(destStream,
-                                                          i2cpHost,
-                                                          i2cpPort, 
-                                                          allprops);
-        if (socketMgr == null) {
-            throw new SAMException("Error creating I2PSocketManager");
+        try {
+            // we do it this way so we get exceptions
+            socketMgr = I2PSocketManagerFactory.createDisconnectedManager(destStream,
+                                                            i2cpHost, i2cpPort, allprops);
+            socketMgr.getSession().connect();
+        } catch (I2PSessionException ise) {
+            throw new SAMException("Error creating I2PSocketManager: " + ise.getMessage(), ise);
         }
         
         socketMgr.addDisconnectListener(new DisconnectListener());
 
         forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
         
+        if (Boolean.parseBoolean(props.getProperty("i2p.streaming.enforceProtocol")))
+            listenProtocol = I2PSession.PROTO_STREAMING;
+        else
+            listenProtocol = I2PSession.PROTO_ANY;
+        listenPort = I2PSession.PORT_ANY;
+
 
         if (startAcceptor) {
             server = new SAMStreamSessionServer();
-            Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
-
-            t.start();
         } else {
             server = null;
         }
+    }
+
+    /**
+     * Create a new SAM STREAM session on an existing socket manager.
+     * v3 only.
+     *
+     * @param props Properties to setup the I2P session
+     * @param recv Object that will receive incoming data
+     * @throws IOException
+     * @throws DataFormatException
+     * @throws SAMException 
+     * @since 0.9.25
+     */
+    protected SAMStreamSession(I2PSocketManager mgr, Properties props, SAMStreamReceiver recv, int listenport)
+                               throws IOException, DataFormatException, SAMException {
+        this.recv = recv;
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("SAM STREAM session instantiated");
+        canCreate = true;
+        Properties allprops = (Properties) System.getProperties().clone();
+        allprops.putAll(props);
+        _isOwnSession = false;
+        socketMgr = mgr;
+        socketMgr.addDisconnectListener(new DisconnectListener());
+        forceFlush = Boolean.parseBoolean(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH));
+        listenProtocol = I2PSession.PROTO_STREAMING;
+        listenPort = listenport;
+        server = null;
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public void start() {
+        if (server != null) {
+            Thread t = new I2PAppThread(server, "SAMStreamSessionServer");
+            t.start();
+        }
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public int getListenProtocol() {
+        return listenProtocol;
+    }
+
+    /*
+     * @since 0.9.25
+     */
+    public int getListenPort() {
+        return listenPort;
     }
     
     protected class DisconnectListener implements I2PSocketManager.DisconnectListener {
@@ -226,8 +287,7 @@ class SAMStreamSession {
             return false;
         }
 
-        Destination d = new Destination();
-        d.fromBase64(dest);
+        Destination d = SAMUtils.getDest(dest);
 
         I2PSocketOptions opts = socketMgr.buildOptions(props);
         if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
@@ -285,7 +345,8 @@ class SAMStreamSession {
         }
         removeAllSocketHandlers();
         recv.stopStreamReceiving();
-        socketMgr.destroySocketManager();
+        if (_isOwnSession)
+            socketMgr.destroySocketManager();
     }
 
     /**
@@ -303,6 +364,27 @@ class SAMStreamSession {
         removeSocketHandler(id);
 
         return true;
+    }
+
+    /**
+     *  Unsupported
+     *  @throws I2PSessionException always
+     *  @since 0.9.25 moved from subclass SAMv3StreamSession to implement SAMMessageSess
+     */
+    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp) throws I2PSessionException {
+        throw new I2PSessionException("Unsupported in STREAM or MASTER session");
+    }
+
+    /**
+     *  Unsupported
+     *  @throws I2PSessionException always
+     *  @since 0.9.25
+     */
+    public boolean sendBytes(String s, byte[] b, int pr, int fp, int tp,
+                             boolean sendLeaseSet, int sendTags,
+                             int tagThreshold, int expiration)
+                                 throws I2PSessionException {
+        throw new I2PSessionException("Unsupported in STREAM or MASTER session");
     }
 
     /** 

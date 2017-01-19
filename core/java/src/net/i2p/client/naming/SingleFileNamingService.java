@@ -77,6 +77,8 @@ public class SingleFileNamingService extends NamingService {
     }
 
     /** 
+     *  Will strip a "www." prefix and retry if lookup fails
+     *
      *  @param hostname case-sensitive; caller should convert to lower case
      *  @param lookupOptions ignored
      *  @param storedOptions ignored
@@ -85,9 +87,11 @@ public class SingleFileNamingService extends NamingService {
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
         try {
             String key = getKey(hostname);
+            if (key == null && hostname.startsWith("www.") && hostname.length() > 7)
+                key = getKey(hostname.substring(4));
             if (key != null)
                 return lookupBase64(key);
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))
@@ -119,7 +123,7 @@ public class SingleFileNamingService extends NamingService {
                     return line.substring(0, split);
             }
             return null;
-        } catch (Exception ioe) {
+        } catch (IOException ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
             else if (_log.shouldLog(Log.WARN))
@@ -161,7 +165,8 @@ public class SingleFileNamingService extends NamingService {
 
     /** 
      *  @param hostname case-sensitive; caller should convert to lower case
-     *  @param options ignored
+     *  @param options if non-null, any prefixed with '=' will be appended
+     *                 in subscription format
      */
     @Override
     public boolean put(String hostname, Destination d, Properties options) {
@@ -192,6 +197,9 @@ public class SingleFileNamingService extends NamingService {
             out.write(hostname);
             out.write('=');
             out.write(d.toBase64());
+            // subscription options
+            if (options != null)
+                writeOptions(options, out);
             out.newLine();
             out.close();
             boolean success = FileUtil.rename(tmp, _file);
@@ -211,11 +219,12 @@ public class SingleFileNamingService extends NamingService {
 
     /** 
      *  @param hostname case-sensitive; caller should convert to lower case
-     *  @param options ignored
+     *  @param options if non-null, any prefixed with '=' will be appended
+     *                 in subscription format
      */
     @Override
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
-        OutputStream out = null;
+        BufferedWriter out = null;
         if (!getWriteLock())
             return false;
         try {
@@ -232,11 +241,14 @@ public class SingleFileNamingService extends NamingService {
                 }
                 // else new file
             }
-            out = new SecureFileOutputStream(_file, true);
+            out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(_file, true), "UTF-8"));
             // FIXME fails if previous last line didn't have a trailing \n
-            out.write(hostname.getBytes("UTF-8"));
+            out.write(hostname);
             out.write('=');
-            out.write(DataHelper.getASCII(d.toBase64()));
+            out.write(d.toBase64());
+            // subscription options
+            if (options != null)
+                writeOptions(options, out);
             out.write('\n');
             out.close();
             for (NamingServiceListener nsl : _listeners) { 
@@ -248,6 +260,34 @@ public class SingleFileNamingService extends NamingService {
             _log.error("Error adding " + hostname, ioe);
             return false;
         } finally { releaseWriteLock(); }
+    }
+
+    /** 
+     *  Write the subscription options part of the line (including the #!).
+     *  Only options starting with '=' (if any) are written (with the '=' stripped).
+     *  Does not write a newline.
+     *
+     *  @param options non-null
+     *  @since 0.9.26
+     */
+    private static void writeOptions(Properties options, Writer out) throws IOException {
+        boolean started = false;
+        for (Map.Entry<Object, Object> e : options.entrySet()) {
+            String k = (String) e.getKey();
+            if (!k.startsWith("="))
+                continue;
+            k = k.substring(1);
+            String v = (String) e.getValue();
+            if (started) {
+                out.write(HostTxtEntry.PROP_SEPARATOR);
+            } else {
+                started = true;
+                out.write(HostTxtEntry.PROPS_SEPARATOR);
+            }
+            out.write(k);
+            out.write('=');
+            out.write(v);
+        }
     }
 
     /** 

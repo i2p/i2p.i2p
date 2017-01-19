@@ -100,6 +100,28 @@ public class NewsHelper extends ContentHelper {
     }
 
     /**
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.23
+     */
+    public static String unsignedUpdateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_UNSIGNED, "");
+    }
+
+    /**
+     *  Translated message about new version available but constrained
+     *  @return null if none
+     *  @since 0.9.23
+     */
+    public static String devSU3UpdateConstraint() {
+        ConsoleUpdateManager mgr = ConsoleUpdateManager.getInstance();
+        if (mgr == null) return null;
+        return mgr.getUpdateConstraint(ROUTER_DEV_SU3, "");
+    }
+
+    /**
      *  Release update only.
      *  Already downloaded but not installed version.
      *  @return null if none
@@ -204,37 +226,13 @@ public class NewsHelper extends ContentHelper {
         return mgr.getStatus();
     }
 
-    private static final String BUNDLE_NAME = "net.i2p.router.news.messages";
-
     /**
      *  If we haven't downloaded news yet, use the translated initial news file
      */
     @Override
     public String getContent() {
-        File news = new File(_page);
-        if (!news.exists()) {
-            _page = (new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml")).getAbsolutePath();
-            // don't use super, translate on-the-fly
-            Reader reader = null;
-            try {
-                char[] buf = new char[512];
-                StringBuilder out = new StringBuilder(2048);
-                reader = new TranslateReader(_context, BUNDLE_NAME, new FileInputStream(_page));
-                int len;
-                while((len = reader.read(buf)) > 0) {
-                    out.append(buf, 0, len);
-                }
-                return out.toString();
-            } catch (IOException ioe) {
-                return "";
-            } finally {
-                try {
-                    if (reader != null)
-                        reader.close();
-                } catch (IOException foo) {}
-            }
-        }
-        return super.getContent();
+        // show a min of 1, max of 3, none older than 60 days over min
+        return NewsFeedHelper.getEntries(_context, 0, 3, 60*24*60*60*1000L);
     }
 
     /**
@@ -312,7 +310,10 @@ public class NewsHelper extends ContentHelper {
                  buf.append(" <a href=\"/?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
                     .append(Messages.getString("Show news", ctx));
              }
-             buf.append("</a>");
+             buf.append("</a>" +
+                        " - <a href=\"/news\">")
+                .append(Messages.getString("Show all news", ctx))
+                .append("</a>");
          }
          return buf.toString();
     }

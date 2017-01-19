@@ -24,13 +24,14 @@ import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-//import net.i2p.i2ptunnel.I2PTunnel;
-import net.i2p.I2PAppContext;
+import net.i2p.util.I2PAppThread;
 
 /**
  *
@@ -41,22 +42,19 @@ import net.i2p.I2PAppContext;
 public class TCPtoI2P implements Runnable {
 
 	private I2PSocket I2P;
-	private NamedDB info,  database;
-	private Socket sock;
-	private I2PSocketManager socketManager;
-	private AtomicBoolean lives;
+	private final Socket sock;
+	private final I2PSocketManager socketManager;
+	private final AtomicBoolean lives;
 
 	/**
 	 * Constructor
 	 * @param i2p
 	 * @param socket
-	 * param info
-	 * param database
+	 * @param info unused
+	 * @param database unused
 	 */
 	TCPtoI2P(I2PSocketManager i2p, Socket socket, NamedDB info, NamedDB database, AtomicBoolean lives) {
 		this.sock = socket;
-		this.info = info;
-		this.database = database;
 		this.socketManager = i2p;
 		this.lives = lives;
 	}
@@ -105,16 +103,6 @@ public class TCPtoI2P implements Runnable {
 		out.flush();
 	}
 
-	private void rlock() {
-		database.getReadLock();
-		info.getReadLock();
-	}
-
-	private void runlock() {
-		info.releaseReadLock();
-		database.releaseReadLock();
-	}
-
 	/**
 	 * TCP stream to I2P stream thread starter
 	 *
@@ -158,8 +146,8 @@ public class TCPtoI2P implements Runnable {
 					// setup to cross the streams
 					TCPio conn_c = new TCPio(in, Iout, lives); // app -> I2P
 					TCPio conn_a = new TCPio(Iin, out, lives); // I2P -> app
-					t = new Thread(conn_c, Thread.currentThread().getName() + " TCPioA");
-					q = new Thread(conn_a, Thread.currentThread().getName() + " TCPioB");
+					t = new I2PAppThread(conn_c, Thread.currentThread().getName() + " TCPioA");
+					q = new I2PAppThread(conn_a, Thread.currentThread().getName() + " TCPioB");
 					// Fire!
 					t.start();
 					q.start();

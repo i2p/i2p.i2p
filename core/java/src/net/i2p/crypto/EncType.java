@@ -27,7 +27,7 @@ public enum EncType {
      *  This is the default.
      *  Pubkey 256 bytes, privkey 256 bytes.
      */
-    ELGAMAL_2048(0, 256, 256, EncAlgo.ELGAMAL, "ElGamal/None/NoPadding", CryptoConstants.ELGAMAL_2048_SPEC, "0"),
+    ELGAMAL_2048(0, 256, 256, EncAlgo.ELGAMAL, "ElGamal/None/NoPadding", CryptoConstants.I2P_ELGAMAL_2048_SPEC, "0"),
 
     /**  Pubkey 64 bytes; privkey 32 bytes; */
     EC_P256(1, 64, 32, EncAlgo.EC, "EC/None/NoPadding", ECConstants.P256_SPEC, "0.9.20"),
@@ -108,7 +108,7 @@ public enum EncType {
             return true;
         try {
             getParams();
-        } catch (Exception e) {
+        } catch (InvalidParameterSpecException e) {
             return false;
         }
         return true;

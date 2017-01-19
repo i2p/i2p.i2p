@@ -227,6 +227,7 @@ public class Action
 	 *  - {@link #setInArgumentValues(ArgumentList)} <br/>
 	 *  - {@link #setOutArgumentValues(ArgumentList)} 
 	 */
+	@Deprecated
 	public void setArgumentValues(ArgumentList argList)
 	{
 		getArgumentList().set(argList);

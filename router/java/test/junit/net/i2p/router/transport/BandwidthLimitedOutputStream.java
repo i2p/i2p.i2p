@@ -61,7 +61,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         if (src == null) return;
         if (len <= 0) return;
         if (len + off > src.length)
-            throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
+            throw new IllegalArgumentException("what are you thinking?  len=" + len 
                                                + ", off=" + off + ", data=" + src.length);
         _currentRequest = _context.bandwidthLimiter().requestOutbound(len, 0, _peerTarget);
         

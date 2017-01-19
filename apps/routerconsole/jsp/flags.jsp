@@ -31,7 +31,8 @@ if (c != null &&
         response.setDateHeader("Last-Modified", lastmod);
         // cache for a day
         response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + 86400000l);
-        response.setHeader("Cache-Control", "public, max-age=86400");
+        response.setHeader("Cache-Control", "public, max-age=604800");
+        response.setHeader("X-Content-Type-Options", "nosniff");
     }
     long length = ffile.length();
     if (length > 0)

@@ -17,7 +17,7 @@ input.default {
 </head><body onload="initAjax()">
 
 <%@include file="summary.jsi" %>
-<h1><%=intl._("I2P Home Page Configuration")%></h1>
+<h1><%=intl._t("I2P Home Page Configuration")%></h1>
 <div class="main" id="main">
 <%@include file="confignav.jsi" %>
 
@@ -26,60 +26,60 @@ input.default {
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
-<h3><%=intl._("Default Home Page")%></h3>
+<h3><%=intl._t("Default Home Page")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="0">
  <input type="checkbox" name="oldHome" <jsp:getProperty name="homehelper" property="configHome" /> >
- <%=intl._("Use old home page")%>
- <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
+ <%=intl._t("Use old home page")%>
+ <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >
 </form>
 
 <%
    if (homehelper.shouldShowSearch()) {
 %>
-<h3><%=intl._("Search Engines")%></h3>
+<h3><%=intl._t("Search Engines")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="3">
  <jsp:getProperty name="homehelper" property="configSearch" />
  <div class="formaction">
-  <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
-  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
-  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
+  <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
 <%
    }  // shouldShowSearch()
 %>
 
-<h3><%=intl._("Hidden Services of Interest")%></h3>
+<h3><%=intl._t("Hidden Services of Interest")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="1">
  <jsp:getProperty name="homehelper" property="configFavorites" />
  <div class="formaction">
-  <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
-  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
-  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
+  <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
 
-<h3><%=intl._("Applications and Configuration")%></h3>
+<h3><%=intl._t("Applications and Configuration")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
  <jsp:getProperty name="homehelper" property="configServices" />
  <div class="formaction">
-  <input type="submit" name="action" class="default" value="<%=intl._("Add item")%>" >
-  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
-  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
-  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
-  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
+  <input type="submit" name="action" class="default" value="<%=intl._t("Add item")%>" >
+  <input type="submit" name="action" class="delete" value="<%=intl._t("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._t("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._t("Restore defaults")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._t("Add item")%>" >
  </div>
 </form>
 </div></body></html>

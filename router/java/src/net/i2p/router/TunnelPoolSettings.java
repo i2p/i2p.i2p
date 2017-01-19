@@ -76,11 +76,11 @@ public class TunnelPoolSettings {
     private static final int    DEFAULT_LENGTH_VARIANCE = 0;
     /** expl only */
     private static final int    DEFAULT_IB_EXPL_LENGTH = 2;
-    //private static final int    DEFAULT_OB_EXPL_LENGTH = isSlow ? 2 : 3;
-    private static final int    DEFAULT_OB_EXPL_LENGTH = 2;
+    private static final int    DEFAULT_OB_EXPL_LENGTH = isSlow ? 2 : 3;
+    //private static final int    DEFAULT_OB_EXPL_LENGTH = 2;
     private static final int    DEFAULT_IB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
-    //private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = 0;
-    private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
+    private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = 0;
+    //private static final int    DEFAULT_OB_EXPL_LENGTH_VARIANCE = isSlow ? 0 : 1;
 
     public static final boolean DEFAULT_ALLOW_ZERO_HOP = true;
     public static final int     DEFAULT_IP_RESTRICTION = 2;    // class B (/16)

@@ -16,13 +16,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.maxmind.geoip.InvalidDatabaseException;
+import com.maxmind.geoip.LookupService;
+
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.SystemVersion;
 
 /**
  * Manage geoip lookup in a file with the Tor geoip format.
@@ -55,6 +60,20 @@ public class GeoIP {
     private final AtomicBoolean _lock;
     private int _lookupRunCount;
     
+    static final String PROP_GEOIP_ENABLED = "routerconsole.geoip.enable";
+    public static final String PROP_GEOIP_DIR = "geoip.dir";
+    public static final String GEOIP_DIR_DEFAULT = "geoip";
+    static final String GEOIP_FILE_DEFAULT = "geoip.txt";
+    static final String COUNTRY_FILE_DEFAULT = "countries.txt";
+    public static final String PROP_IP_COUNTRY = "i2np.lastCountry";
+    public static final String PROP_DEBIAN_GEOIP = "geoip.dat";
+    public static final String PROP_DEBIAN_GEOIPV6 = "geoip.v6.dat";
+    private static final String DEBIAN_GEOIP_FILE = "/usr/share/GeoIP/GeoIP.dat";
+    private static final String DEBIAN_GEOIPV6_FILE = "/usr/share/GeoIP/GeoIPv6.dat";
+    private static final boolean ENABLE_DEBIAN = !(SystemVersion.isWindows() || SystemVersion.isAndroid());
+    /** maxmind API */
+    private static final String UNKNOWN_COUNTRY_CODE = "--";
+
     /**
      *  @param context RouterContext in production, I2PAppContext for testing only
      */
@@ -70,13 +89,6 @@ public class GeoIP {
         _lock = new AtomicBoolean();
         readCountryFile();
     }
-    
-    static final String PROP_GEOIP_ENABLED = "routerconsole.geoip.enable";
-    public static final String PROP_GEOIP_DIR = "geoip.dir";
-    public static final String GEOIP_DIR_DEFAULT = "geoip";
-    static final String GEOIP_FILE_DEFAULT = "geoip.txt";
-    static final String COUNTRY_FILE_DEFAULT = "countries.txt";
-    public static final String PROP_IP_COUNTRY = "i2np.lastCountry";
 
     /**
      *  @since 0.9.3
@@ -144,12 +156,39 @@ public class GeoIP {
                 _pendingSearch.clear();
                 if (search.length > 0) {
                     Arrays.sort(search);
-                    String[] countries = readGeoIPFile(search);
-                    for (int i = 0; i < countries.length; i++) {
-                        if (countries[i] != null)
-                            _IPToCountry.put(search[i], countries[i]);
-                        else
-                            _notFound.add(search[i]);
+                    File f = new File(_context.getProperty(PROP_DEBIAN_GEOIP, DEBIAN_GEOIP_FILE));
+                    if (ENABLE_DEBIAN && f.exists()) {
+                        // Maxmind database
+                        LookupService ls = null;
+                        try {
+                            ls = new LookupService(f, LookupService.GEOIP_STANDARD);
+                            for (int i = 0; i < search.length; i++) {
+                                long ip = search[i].longValue();
+                                // returns upper case or "--"
+                                String uc = ls.getCountry(ip).getCode();
+                                if (!uc.equals(UNKNOWN_COUNTRY_CODE)) {
+                                    String cached = _codeCache.get(uc.toLowerCase(Locale.US));
+                                    _IPToCountry.put(search[i], cached);
+                                } else {
+                                    _notFound.add(search[i]);
+                                }
+                            }
+                        } catch (IOException ioe) {
+                            _log.error("GeoIP failure", ioe);
+                        } catch (InvalidDatabaseException ide) {
+                            _log.error("GeoIP failure", ide);
+                        } finally {
+                            if (ls != null) ls.close();
+                        }
+                    } else {
+                        // Tor-style database
+                        String[] countries = readGeoIPFile(search);
+                        for (int i = 0; i < countries.length; i++) {
+                            if (countries[i] != null)
+                                _IPToCountry.put(search[i], countries[i]);
+                            else
+                                _notFound.add(search[i]);
+                        }
                     }
                 }
                 // IPv6
@@ -157,12 +196,40 @@ public class GeoIP {
                 _pendingIPv6Search.clear();
                 if (search.length > 0) {
                     Arrays.sort(search);
-                    String[] countries = GeoIPv6.readGeoIPFile(_context, search, _codeCache);
-                    for (int i = 0; i < countries.length; i++) {
-                        if (countries[i] != null)
-                            _IPToCountry.put(search[i], countries[i]);
-                        else
-                            _notFound.add(search[i]);
+                    File f = new File(_context.getProperty(PROP_DEBIAN_GEOIPV6, DEBIAN_GEOIPV6_FILE));
+                    if (ENABLE_DEBIAN && f.exists()) {
+                        // Maxmind database
+                        LookupService ls = null;
+                        try {
+                            ls = new LookupService(f, LookupService.GEOIP_STANDARD);
+                            for (int i = 0; i < search.length; i++) {
+                                long ip = search[i].longValue();
+                                String ipv6 = toV6(ip);
+                                // returns upper case or "--"
+                                String uc = ls.getCountryV6(ipv6).getCode();
+                                if (!uc.equals(UNKNOWN_COUNTRY_CODE)) {
+                                    String cached = _codeCache.get(uc.toLowerCase(Locale.US));
+                                    _IPToCountry.put(search[i], cached);
+                                } else {
+                                    _notFound.add(search[i]);
+                                }
+                            }
+                        } catch (IOException ioe) {
+                            _log.error("GeoIP failure", ioe);
+                        } catch (InvalidDatabaseException ide) {
+                            _log.error("GeoIP failure", ide);
+                        } finally {
+                            if (ls != null) ls.close();
+                        }
+                    } else {
+                        // Tor-style database
+                        String[] countries = GeoIPv6.readGeoIPFile(_context, search, _codeCache);
+                        for (int i = 0; i < countries.length; i++) {
+                            if (countries[i] != null)
+                                _IPToCountry.put(search[i], countries[i]);
+                            else
+                                _notFound.add(search[i]);
+                        }
                     }
                 }
             } finally {
@@ -209,7 +276,7 @@ public class GeoIP {
                     if (line.charAt(0) == '#') {
                         continue;
                     }
-                    String[] s = line.split(",");
+                    String[] s = DataHelper.split(line, ",");
                     String lc = s[0].toLowerCase(Locale.US);
                     _codeToName.put(lc, s[1]);
                     _codeCache.put(lc, lc);
@@ -274,7 +341,7 @@ public class GeoIP {
                     if (buf.charAt(0) == '#') {
                         continue;
                     }
-                    String[] s = buf.split(",");
+                    String[] s = DataHelper.split(buf, ",");
                     long ip1 = Long.parseLong(s[0]);
                     long ip2 = Long.parseLong(s[1]);
                     while (idx < search.length && search[idx].longValue() < ip1) {
@@ -401,6 +468,20 @@ public class GeoIP {
                 rv |= (ip[i] & 0xff) << ((3-i)*8);
             return rv & 0xffffffffl;
         }
+    }
+
+    /**
+     * @return e.g. aabb:ccdd:eeff:1122::
+     * @since 0.9.26 for maxmind
+     */
+    private static String toV6(long ip) {
+        StringBuilder buf = new StringBuilder(21);
+        for (int i = 0; i < 4; i++) {
+            buf.append(Long.toHexString((ip >> ((3-i)*16)) & 0xffff));
+            buf.append(':');
+        }
+        buf.append(':');
+        return buf.toString();
     }
 
     /**

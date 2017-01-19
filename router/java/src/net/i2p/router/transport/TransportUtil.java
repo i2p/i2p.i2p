@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.router.RouterContext;
 
@@ -24,6 +25,8 @@ public abstract class TransportUtil {
     public static final String NTCP_IPV6_CONFIG = "i2np.ntcp.ipv6";
     public static final String SSU_IPV6_CONFIG = "i2np.udp.ipv6";
     public static final String PROP_IPV4_FIREWALLED = "i2np.ipv4.firewalled";
+    /** @since 0.9.28 */
+    public static final String PROP_IPV6_FIREWALLED = "i2np.ipv6.firewalled";
 
     public enum IPv6Config {
         /** IPv6 disabled */
@@ -85,6 +88,8 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
      *  @param transportStyle ignored
      *  @since 0.9.20
      */
@@ -93,12 +98,22 @@ public abstract class TransportUtil {
     }
 
     /**
+     *  This returns true if the force-firewalled setting is configured, false otherwise.
+     *
+     *  @param transportStyle ignored
+     *  @since 0.9.27, implemented in 0.9.28
+     */
+    public static boolean isIPv6Firewalled(RouterContext ctx, String transportStyle) {
+        return ctx.getBooleanProperty(PROP_IPV6_FIREWALLED);
+    }
+
+    /**
      *  Addresses without a host (i.e. w/introducers)
      *  are assumed to be IPv4
      */
     public static boolean isIPv6(RouterAddress addr) {
         // do this the fast way, without calling getIP() to parse the host string
-        String host = addr.getOption(RouterAddress.PROP_HOST);
+        String host = addr.getHost();
         return host != null && host.contains(":");
     }
 
@@ -117,6 +132,8 @@ public abstract class TransportUtil {
      *  @since IPv6
      */
     public static boolean isPubliclyRoutable(byte addr[], boolean allowIPv4, boolean allowIPv6) {
+        if (I2PAppContext.getGlobalContext().getBooleanProperty("i2np.allowLocal"))
+            return true;
         if (addr.length == 4) {
             if (!allowIPv4)
                 return false;

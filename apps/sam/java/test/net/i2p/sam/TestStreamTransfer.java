@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -62,22 +63,19 @@ public class TestStreamTransfer {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.debug("line read for valid version: " + line);
             String req = "SESSION CREATE STYLE=STREAM DESTINATION=Alice " + conOptions + "\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.info("Response to creating the session with destination Alice: " + line);
             
             req = "NAMING LOOKUP NAME=ME\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+            Properties props = SAMUtils.parseParams(line);
             String value = props.getProperty("VALUE");
             if (value == null) {
                 _log.error("No value for ME found!  [" + line + "]");
@@ -123,10 +121,9 @@ public class TestStreamTransfer {
         private void doRun() throws IOException, SAMException {
             String line = _reader.readLine();
             _log.debug("Read: " + line);
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+            Properties props = SAMUtils.parseParams(line);
+            String maj = props.getProperty(SAMUtils.COMMAND);
+            String min = props.getProperty(SAMUtils.OPCODE);
             if ( ("STREAM".equals(maj)) && ("CONNECTED".equals(min)) ) {
                 String dest = props.getProperty("DESTINATION");
                 String id = props.getProperty("ID");
@@ -212,22 +209,19 @@ public class TestStreamTransfer {
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
-            out.write("HELLO VERSION MIN=1.0 MAX=1.0\n".getBytes());
+            out.write(DataHelper.getASCII("HELLO VERSION MIN=1.0 MAX=1.0\n"));
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.debug("line read for valid version: " + line);
             String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + sessionName + " " + conOptions + "\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.info("Response to creating the session with destination "+ sessionName+": " + line);
             req = "STREAM CONNECT ID=42 DESTINATION=" + _alice + "\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             line = reader.readLine();
             _log.info("Response to the stream connect from "+sessionName+" to Alice: " + line);
-            StringTokenizer tok = new StringTokenizer(line);
-            String maj = tok.nextToken();
-            String min = tok.nextToken();
-            Properties props = SAMUtils.parseParams(tok);
+            Properties props = SAMUtils.parseParams(line);
             _log.info("props = " + props);
             String result = props.getProperty("RESULT");
             if (!("OK".equals(result))) {
@@ -238,18 +232,18 @@ public class TestStreamTransfer {
             try { Thread.sleep(5*1000) ; } catch (InterruptedException ie) {}
             req = "STREAM SEND ID=42 SIZE=10\nBlahBlah!!";
             _log.info("\n** Sending BlahBlah!!");
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             out.flush();
             try { Thread.sleep(5*1000) ; } catch (InterruptedException ie) {}
             req = "STREAM SEND ID=42 SIZE=10\nFooBarBaz!";
             _log.info("\n** Sending FooBarBaz!");
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             out.flush();
             /* Don't delay here, so we can test whether all data is
                sent even if we do a STREAM CLOSE immediately. */
             _log.info("Sending close");
             req = "STREAM CLOSE ID=42\n";
-            out.write(req.getBytes());
+            out.write(DataHelper.getASCII(req));
             out.flush();
             synchronized (_counterLock) {
                 _closeCounter++;

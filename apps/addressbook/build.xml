@@ -7,7 +7,7 @@
 	<property name="jar" value="addressbook.jar"/>
 	<property name="war" value="addressbook.war"/>
 	<property name="javac.compilerargs" value="" />
-	<property name="javac.version" value="1.6" />
+	<property name="javac.version" value="1.7" />
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
@@ -77,15 +77,17 @@
         <!-- unused for now (except for Android), as we oddly ship addressbook as a .war -->
 	<target name="jar" depends="compile, changes">
 		<!-- set if unset -->
-		<property name="workspace.changes" value="" />
+		<property name="workspace.changes.tr" value="" />
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
-				<attribute name="Main-Class" value="addressbook.Daemon"/>
+				<attribute name="Main-Class" value="net.i2p.addressbook.Daemon"/>
 				<attribute name="Implementation-Version" value="${full.version}" />
 				<attribute name="Built-By" value="${build.built-by}" />
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
-		                <attribute name="Workspace-Changes" value="${workspace.changes}" />
+		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+				<attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+				<attribute name="X-Compile-Target-JDK" value="${javac.version}" />
 			</manifest>
 		</jar>
 	</target>
@@ -106,6 +108,8 @@
 		                <attribute name="Build-Date" value="${build.timestamp}" />
 		                <attribute name="Base-Revision" value="${workspace.version}" />
 		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+				<attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+				<attribute name="X-Compile-Target-JDK" value="${javac.version}" />
 			</manifest>
 		</war>
 		<delete dir="${dist}/tmp"/>

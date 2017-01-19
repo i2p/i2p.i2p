@@ -793,7 +793,7 @@ class Connection {
     private boolean scheduleDisconnectEvent() {
         if (!_disconnectScheduledOn.compareAndSet(0, _context.clock().now()))
             return false;
-        _context.simpleTimer2().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        schedule(new DisconnectEvent(), DISCONNECT_TIMEOUT);
         return true;
     }
 
@@ -808,15 +808,40 @@ class Connection {
         }
     }
     
-    private boolean _remotePeerSet = false;
-    /** who are we talking with
-     * @return peer Destination
+    /**
+     *  Called from SchedulerImpl
+     *
+     *  @since 0.9.23 moved here so we can use our timer
      */
-    public Destination getRemotePeer() { return _remotePeer; }
+    public void scheduleConnectionEvent(long msToWait) {
+        schedule(_connectionEvent, msToWait);
+    }
+    
+    /**
+     *  Schedule something on our timer.
+     *
+     *  @since 0.9.23
+     */
+    public void schedule(SimpleTimer.TimedEvent event, long msToWait) {
+        _timer.addEvent(event, msToWait);
+    }
+
+    /** who are we talking with
+     * @return peer Destination or null if unset
+     */
+    public synchronized Destination getRemotePeer() { return _remotePeer; }
+
+    /**
+     *  @param peer non-null
+     */
     public void setRemotePeer(Destination peer) { 
-        if (_remotePeerSet) throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
-        _remotePeerSet = true;
-        _remotePeer = peer; 
+        if (peer == null)
+            throw new NullPointerException();
+        synchronized(this) {
+            if (_remotePeer != null)
+                throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
+            _remotePeer = peer; 
+        }
         // now that we know who the other end is, get the rtt etc. from the cache
         _connectionManager.updateOptsFromShare(this);
     }
@@ -1111,7 +1136,7 @@ class Connection {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there are unacked packets");
                 return;
             }
-            // wtf, this shouldn't have been scheduled
+            // this shouldn't have been scheduled
             if (_options.getInactivityTimeout() <= 0) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is no timer...");
                 return;
@@ -1202,7 +1227,7 @@ class Connection {
             buf.append(" from ");
         else
             buf.append(" to ");
-        if (_remotePeerSet)
+        if (_remotePeer != null)
             buf.append(_remotePeer.calculateHash().toBase64().substring(0,4));
         else
             buf.append("unknown");
@@ -1254,8 +1279,6 @@ class Connection {
         return buf.toString();
     }
 
-    public SimpleTimer.TimedEvent getConnectionEvent() { return _connectionEvent; }
-    
     /**
      * fired to reschedule event notification
      */
@@ -1295,7 +1318,9 @@ class Connection {
         }
         
         public long getNextSendTime() { return _nextSend; }
+
         public void timeReached() { retransmit(); }
+
         /**
          * Retransmit the packet if we need to.  
          *
@@ -1307,7 +1332,7 @@ class Connection {
          *
          * @return true if the packet was sent, false if it was not
          */
-        public boolean retransmit() {
+        private boolean retransmit() {
             if (_packet.getAckTime() > 0) 
                 return false;
             

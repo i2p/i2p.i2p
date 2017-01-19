@@ -66,7 +66,7 @@ class PersistentMailCache {
 	private static final String FILE_PREFIX = "mail-";
 	private static final String HDR_SUFFIX = ".hdr.txt.gz";
 	private static final String FULL_SUFFIX = ".full.txt.gz";
-	private static final String B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~";
+	private static final String B64 = Base64.ALPHABET_I2P;
 
 	/**
 	 *  Use the params to generate a unique directory name.
@@ -272,11 +272,7 @@ class PersistentMailCache {
 			}
 			in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(f)));
 			ByteArrayOutputStream out = new ByteArrayOutputStream((int) len);
-			int read = 0;
-			byte buf[] = new byte[4*1024];
-			while ( (read = in.read(buf)) != -1)  {
-				out.write(buf, 0, read);
-			}
+			DataHelper.copy(in, out);
 			ReadBuffer rb = new ReadBuffer(out.toByteArray(), 0, out.size());
 			return rb;
 		} catch (IOException ioe) {

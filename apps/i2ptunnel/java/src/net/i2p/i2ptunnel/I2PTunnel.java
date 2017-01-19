@@ -380,8 +380,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     }
 
     public void runCommand(String cmd, Logging l) {
-        if (cmd.indexOf(" ") == -1) cmd += " ";
-        int iii = cmd.indexOf(" ");
+        if (cmd.indexOf(' ') == -1) cmd += ' ';
+        int iii = cmd.indexOf(' ');
         String cmdname = cmd.substring(0, iii).toLowerCase(Locale.US);
         String allargs = cmd.substring(iii + 1);
         String[] args = split(allargs, " "); // .split(" "); // java 1.4
@@ -1338,7 +1338,6 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
             if (i < args.length) {
                 host = args[i++];
-                listenHost = host;
             }
             if (i < args.length)
                 port = args[i];
@@ -1831,6 +1830,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * just call context.namingService.lookup() directly.
      * @deprecated Don't use i2ptunnel for lookup! Use I2PAppContext.getGlobalContext().namingService().lookup(name) from i2p.jar
      */
+    @Deprecated
     public static Destination destFromName(String name) throws DataFormatException {
         return destFromName(name, null, null, false, null, null);
     }
@@ -1873,7 +1873,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             try {
                 result.fromByteArray(content);
                 return result;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 if (log.shouldLog(Log.INFO)) 
                     log.info("File is not a binary destination - trying base64");
                 try {

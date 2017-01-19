@@ -79,7 +79,7 @@ class MailPart {
 		beginBody = bb;
 			
 		ReadBuffer decodedHeaders = EncodingFactory.getEncoding( "HEADERLINE" ).decode( buffer.content, begin, beginBody - begin );
-		headerLines = new String( decodedHeaders.content, decodedHeaders.offset, decodedHeaders.length ).split( "\r\n" );
+		headerLines = DataHelper.split(new String(decodedHeaders.content, decodedHeaders.offset, decodedHeaders.length), "\r\n");
 
 		String boundary = null;
 		String x_encoding = null;
@@ -204,7 +204,7 @@ class MailPart {
 		}
 		Encoding enc = EncodingFactory.getEncoding(encg);
 		if(enc == null)
-			throw new DecodingException(_("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encg)));
+			throw new DecodingException(_t("No encoder found for encoding \\''{0}\\''.", WebMail.quoteHTML(encg)));
 		return enc.decode(buffer.content, beginBody + offset, end - beginBody - offset);
 	}
 
@@ -213,7 +213,7 @@ class MailPart {
 		String result = null;
 		int i = line.indexOf( ": " );
 		if( i != - 1 ) {
-			int j = line.indexOf( ";", i + 2 );
+			int j = line.indexOf(';', i + 2 );
 			if( j == -1 )
 				result = line.substring( i + 2 );
 			else
@@ -234,11 +234,11 @@ class MailPart {
 			if( i == -1 )
 				break;
 			h = i + l;
-			int j = line.indexOf( "=", i + l );
+			int j = line.indexOf('=', i + l );
 			// System.err.println( "j=" + j );
 			if( j != -1 ) {
-				int k = line.indexOf( "\"", j + 1 );
-				int m = line.indexOf( ";", j + 1 );
+				int k = line.indexOf('"', j + 1 );
+				int m = line.indexOf(';', j + 1 );
 				// System.err.println( "k=" + k );
 				if( k != -1 && ( m == -1 || k < m ) ) {
 					/*
@@ -249,7 +249,7 @@ class MailPart {
 					m = -1;
 					int k2 = k + 1;
 					while( true ) {
-						m = line.indexOf( "\"", k2 );
+						m = line.indexOf('"', k2 );
 						// System.err.println( "m=" + m + " '" + line.substring( m ) + "'" );
 						if( m == -1 ) {
 							break;
@@ -294,7 +294,7 @@ class MailPart {
 	}
 
 	/** translate */
-	private static String _(String s, Object o) {
+	private static String _t(String s, Object o) {
 		return Messages.getString(s, o);
 	}
 }

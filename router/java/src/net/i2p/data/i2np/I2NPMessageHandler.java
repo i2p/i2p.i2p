@@ -46,6 +46,7 @@ public class I2NPMessageHandler {
      * @throws I2NPMessageException if there is a problem handling the particular
      *          message - if it is an unknown type or has improper formatting, etc.
      */
+    @Deprecated
     public I2NPMessage readMessage(InputStream in) throws IOException, I2NPMessageException {
         if (_messageBuffer == null) _messageBuffer = new byte[38*1024]; // more than necessary
         try {
@@ -59,7 +60,7 @@ public class I2NPMessageHandler {
                 _lastSize = msg.readBytes(in, type, _messageBuffer);
             } catch (I2NPMessageException ime) {
                 throw ime;
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error reading the stream", e);
                 throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 
@@ -109,7 +110,7 @@ public class I2NPMessageHandler {
     public int readMessage(byte data[], int offset, int maxLen) throws I2NPMessageException {
         int cur = offset;
         // we will assume that maxLen is >= 1 here. It's checked to be >= 16 in readBytes()
-        int type = (int)DataHelper.fromLong(data, cur, 1);
+        int type = data[cur] & 0xff;
         cur++;
         _lastReadBegin = System.currentTimeMillis();
         I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
@@ -131,7 +132,7 @@ public class I2NPMessageHandler {
             cur += _lastSize;
         } catch (I2NPMessageException ime) {
             throw ime;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error reading the stream", e);
             throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 

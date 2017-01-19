@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.data.DataHelper;
 import net.i2p.router.message.HandleGarlicMessageJob;
 import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
+import net.i2p.router.RouterClock;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -85,30 +86,35 @@ public class JobQueue {
     private long _lagWarning = DEFAULT_LAG_WARNING;
     private final static long DEFAULT_LAG_WARNING = 5*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_LAG_WARNING = "router.jobLagWarning";
     
     /** if a job is this lagged, the router is hosed, so spit out a warning (dont shut it down) */
     private long _lagFatal = DEFAULT_LAG_FATAL;
     private final static long DEFAULT_LAG_FATAL = 30*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_LAG_FATAL = "router.jobLagFatal";
     
     /** if a job takes this long to run, spit out a warning, but keep going */
     private long _runWarning = DEFAULT_RUN_WARNING;
     private final static long DEFAULT_RUN_WARNING = 5*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_RUN_WARNING = "router.jobRunWarning";
     
     /** if a job takes this long to run, the router is hosed, so spit out a warning (dont shut it down) */
     private long _runFatal = DEFAULT_RUN_FATAL;
     private final static long DEFAULT_RUN_FATAL = 30*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_RUN_FATAL = "router.jobRunFatal";
     
     /** don't enforce fatal limits until the router has been up for this long */
     private long _warmupTime = DEFAULT_WARMUP_TIME;
     private final static long DEFAULT_WARMUP_TIME = 10*60*1000;
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_WARMUP_TIME = "router.jobWarmupTime";
     
     /** max ready and waiting jobs before we start dropping 'em */
@@ -117,6 +123,7 @@ public class JobQueue {
     private final static long MIN_LAG_TO_DROP = 500;
 
     /** @deprecated unimplemented */
+    @Deprecated
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
 
     /** 
@@ -248,6 +255,7 @@ public class JobQueue {
      *
      * @deprecated unused
      */
+    @Deprecated
     public boolean isJobActive(Job job) {
         synchronized (_jobLock) {
             if (_readyJobs.contains(job) || _timedJobs.contains(job))
@@ -262,6 +270,7 @@ public class JobQueue {
     /**
      *  @deprecated contention - see JobTiming.setStartAfter() comments
      */
+    @Deprecated
     public void timingUpdated() {
         synchronized (_jobLock) {
             _jobLock.notifyAll();
@@ -340,11 +349,12 @@ public class JobQueue {
     public void startup() {
         _alive = true;
         I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
-        //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
+        pumperThread.setPriority(Thread.NORM_PRIORITY + 1);
         pumperThread.start();
     }
 
     /** @deprecated do you really want to do this? */
+    @Deprecated
     public void restart() {
         synchronized (_jobLock) {
             _timedJobs.clear();
@@ -516,10 +526,12 @@ public class JobQueue {
      * max number of runners.
      *
      */
-    private final class QueuePumper implements Runnable, Clock.ClockUpdateListener {
+    private final class QueuePumper implements Runnable, Clock.ClockUpdateListener, RouterClock.ClockShiftListener {
         public QueuePumper() { 
             _context.clock().addUpdateListener(this);
+            ((RouterClock) _context.clock()).addShiftListener(this);
         }
+
         public void run() {
             try {
                 while (_alive) {
@@ -589,9 +601,11 @@ public class JobQueue {
                     } catch (InterruptedException ie) {}
                 } // while (_alive)
             } catch (Throwable t) {
-                _context.clock().removeUpdateListener(this);
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("pumper killed?!", t);
+            } finally {
+                _context.clock().removeUpdateListener(this);
+                ((RouterClock) _context.clock()).removeShiftListener(this);
             }
         }
 
@@ -599,6 +613,22 @@ public class JobQueue {
             updateJobTimings(delta);
             synchronized (_jobLock) {
                 _jobLock.notifyAll();
+            }
+        }
+
+        /**
+         *  Clock shift listener.
+         *  Only adjust timings for negative shifts.
+         *  For positive shifts, just wake up the pumper.
+         *  @since 0.9.23
+         */
+        public void clockShift(long delta) {
+            if (delta < 0) {
+                offsetChanged(delta);
+            } else {
+                synchronized (_jobLock) {
+                    _jobLock.notifyAll();
+                }
             }
         }
 
@@ -766,6 +796,7 @@ public class JobQueue {
     }
 
     /** @deprecated moved to router console */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
     }
 }

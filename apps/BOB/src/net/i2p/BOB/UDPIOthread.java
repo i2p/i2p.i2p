@@ -36,6 +36,7 @@ import net.i2p.util.Log;
  * @author sponge
  * @deprecated incomplete, unused
  */
+@Deprecated
 public class UDPIOthread implements I2PSessionListener, Runnable {
 
 	private final NamedDB info;

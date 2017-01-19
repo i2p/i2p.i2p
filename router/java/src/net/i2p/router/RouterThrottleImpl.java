@@ -14,7 +14,7 @@ import net.i2p.util.SimpleTimer;
  * requests if the jobQueue lag is too large.  
  *
  */
-class RouterThrottleImpl implements RouterThrottle {
+public class RouterThrottleImpl implements RouterThrottle {
     protected final RouterContext _context;
     private final Log _log;
     private volatile String _tunnelStatus;
@@ -28,8 +28,8 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final long JOB_LAG_LIMIT_NETDB = 2*1000;
     // TODO reduce
     private static final long JOB_LAG_LIMIT_TUNNEL = 500;
-    private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final int DEFAULT_MAX_TUNNELS = 10*1000;
+    public static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
+    public static final int DEFAULT_MAX_TUNNELS = 10*1000;
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
     private static final long DEFAULT_REJECT_STARTUP_TIME = 10*60*1000;
     private static final String PROP_REJECT_STARTUP_TIME = "router.rejectStartupTime";
@@ -102,6 +102,7 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     
     /** @deprecated unused, function moved to netdb */
+    @Deprecated
     public boolean acceptNetDbLookupRequest(Hash key) { 
         long lag = _context.jobQueue().getMaxLag();
         if (lag > JOB_LAG_LIMIT_NETDB) {
@@ -276,7 +277,7 @@ class RouterThrottleImpl implements RouterThrottle {
         
         // ok, we're not hosed, but can we handle the bandwidth requirements 
         // of another tunnel?
-        rs = _context.statManager().getRate("tunnel.participatingMessageCount");
+        rs = _context.statManager().getRate("tunnel.participatingMessageCountAvgPerTunnel");
         r = null;
         double messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
         if (rs != null) {

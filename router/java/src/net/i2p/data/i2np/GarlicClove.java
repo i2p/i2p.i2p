@@ -60,6 +60,7 @@ public class GarlicClove extends DataStructureImpl {
      *  @deprecated unused, use byte array method to avoid copying
      *  @throws UnsupportedOperationException always
      */
+    @Deprecated
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();
 /****
@@ -119,6 +120,7 @@ public class GarlicClove extends DataStructureImpl {
      *  @deprecated unused, use byte array method to avoid copying
      *  @throws UnsupportedOperationException always
      */
+    @Deprecated
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         throw new UnsupportedOperationException();
 /****
@@ -158,7 +160,7 @@ public class GarlicClove extends DataStructureImpl {
             if (m.length <= 0)
                 throw new RuntimeException("foo, returned 0 length");
             out.write(m);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new DataFormatException("Unable to write the clove: " + _msg + " to " + out, e);
         }
         DataHelper.writeLong(out, 4, _cloveId);
@@ -187,7 +189,7 @@ public class GarlicClove extends DataStructureImpl {
             byte m[] = _msg.toByteArray();
             System.arraycopy(m, 0, rv, offset, m.length);
             offset += m.length;
-        } catch (Exception e) { throw new RuntimeException("Unable to write: " + _msg + ": " + e.getMessage()); }
+        } catch (RuntimeException e) { throw new RuntimeException("Unable to write: " + _msg + ": " + e.getMessage()); }
         DataHelper.toLong(rv, offset, 4, _cloveId);
         offset += 4;
         DataHelper.toDate(rv, offset, _expiration.getTime());

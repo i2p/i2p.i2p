@@ -58,6 +58,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     private static final Map<Integer, Builder> _builders = new ConcurrentHashMap<Integer, Builder>(1);
 
     /** @deprecated unused */
+    @Deprecated
     public static final void registerBuilder(Builder builder, int type) { _builders.put(Integer.valueOf(type), builder); }
 
     /** interface for extending the types of messages handled - unused */
@@ -80,6 +81,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *
      *  @deprecated unused
      */
+    @Deprecated
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         try {
             readBytes(in, -1, new byte[1024]);
@@ -112,6 +114,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  @return total length of the message
      *  @deprecated unused
      */
+    @Deprecated
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         try {
             if (type < 0)
@@ -197,7 +200,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             throw new I2NPMessageException("Payload is too short " + maxLen);
         int cur = offset;
         if (type < 0) {
-            type = (int)DataHelper.fromLong(data, cur, 1);
+            type = data[cur] & 0xff;
             cur++;
         }
         _uniqueId = DataHelper.fromLong(data, cur, 4);
@@ -243,6 +246,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *
      *  @deprecated unused
      */
+    @Deprecated
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         int size = getMessageSize();
         if (size < 15 + CHECKSUM_LENGTH) throw new DataFormatException("Unable to build the message");
@@ -413,7 +417,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      */
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset,
                                                int len, I2NPMessageHandler handler) throws I2NPMessageException {
-        int type = (int)DataHelper.fromLong(buffer, offset, 1);
+        int type = buffer[offset] & 0xff;
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
         if (msg == null)

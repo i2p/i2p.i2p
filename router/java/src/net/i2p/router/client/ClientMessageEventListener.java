@@ -196,7 +196,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     private void handleSetDate(SetDateMessage message) {
         //_context.clock().setNow(message.getDate().getTime());
     }
-	
     
     /** 
      * Handle a CreateSessionMessage.
@@ -330,14 +329,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 pw = props.getProperty("i2cp.password");
             }
             if (user == null || user.length() == 0 || pw == null || pw.length() == 0) {
-                _log.error("I2CP auth failed");
+                _log.logAlways(Log.WARN, "I2CP authentication failed");
                 _runner.disconnectClient("Authorization required, specify i2cp.username and i2cp.password in options");
                 _authorized = false;
                 return false;
             }
             PasswordManager mgr = new PasswordManager(_context);
             if (!mgr.checkHash(PROP_AUTH, user, pw)) {
-                _log.error("I2CP auth failed user: " + user);
+                _log.logAlways(Log.WARN, "I2CP authentication failed, user: " + user);
                 _runner.disconnectClient("Authorization failed, user = " + user);
                 _authorized = false;
                 return false;
@@ -378,6 +377,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             // do this instead:
             if (sid != null && message.getNonce() > 0) {
                 MessageStatusMessage status = new MessageStatusMessage();
+                status.setMessageId(_runner.getNextMessageId());
                 status.setSessionId(sid.getSessionId());
                 status.setSize(0);
                 status.setNonce(message.getNonce()); 
@@ -407,6 +407,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     /**
      * The client asked for a message, so we send it to them.  
      *
+     * This is only when not in fast receive mode.
+     * In the default fast receive mode, data is sent in MessageReceivedJob.
      */
     private void handleReceiveBegin(ReceiveMessageBeginMessage message) {
         if (_runner.isDead()) return;
@@ -427,8 +429,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error delivering the payload", ime);
+            String emsg = "Error sending data to client " + _runner.getDestHash();
+            if (_log.shouldWarn())
+                _log.warn(emsg, ime);
+            else
+                _log.logAlways(Log.WARN, emsg);
             _runner.removePayload(new MessageId(message.getMessageId()));
         }
     }
@@ -461,7 +466,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
     
     /** override for testing */
-    protected void handleCreateLeaseSet(CreateLeaseSetMessage message) {	
+    protected void handleCreateLeaseSet(CreateLeaseSetMessage message) {
         if ( (message.getLeaseSet() == null) || (message.getPrivateKey() == null) || (message.getSigningPrivateKey() == null) ) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null lease set granted: " + message);

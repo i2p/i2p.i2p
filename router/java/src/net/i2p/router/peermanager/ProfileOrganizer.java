@@ -17,13 +17,14 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import net.i2p.crypto.SHA256Generator;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.pool.TunnelPeerSelector;
+import net.i2p.router.util.MaskedIPSet;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -156,6 +157,11 @@ public class ProfileOrganizer {
      * Blocking if a reorganize is happening.
      */
     public PeerProfile getProfile(Hash peer) {
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who wanted our own profile?", new Exception("I did"));
+            return null;
+        }
         getReadLock();
         try {
             return locked_getProfile(peer);
@@ -168,6 +174,11 @@ public class ProfileOrganizer {
      * @since 0.8.12
      */
     public PeerProfile getProfileNonblocking(Hash peer) {
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who wanted our own profile?", new Exception("I did"));
+            return null;
+        }
         if (tryReadLock()) {
             try {
                 return locked_getProfile(peer);
@@ -184,6 +195,11 @@ public class ProfileOrganizer {
         if (profile == null) return null;
 
         Hash peer = profile.getPeer();
+        if (peer.equals(_us)) {
+            if (_log.shouldWarn())
+                _log.warn("Who added our own profile?", new Exception("I did"));
+            return null;
+        }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New profile created for " + peer);
@@ -225,6 +241,7 @@ public class ProfileOrganizer {
     public int countFastPeers() { return count(_fastPeers); }
     public int countHighCapacityPeers() { return count(_highCapacityPeers); }
     /** @deprecated use ProfileManager.getPeersByCapability('f').size() */
+    @Deprecated
     public int countWellIntegratedPeers() { return count(_wellIntegratedPeers); }
     public int countNotFailingPeers() { return count(_notFailingPeers); }
     public int countFailingPeers() { return count(_failingPeers); }
@@ -477,6 +494,7 @@ public class ProfileOrganizer {
      *
      * @deprecated unused
      */
+    @Deprecated
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
     }
@@ -488,6 +506,7 @@ public class ProfileOrganizer {
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      * @deprecated unused
      */
+    @Deprecated
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
@@ -1219,12 +1238,15 @@ public class ProfileOrganizer {
     }
 
     /**
+      *
+      * As of 0.9.24, checks for a netdb family match as well, unless mask == 0.
+      *
      * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
         List<Hash> all = new ArrayList<Hash>(peers.keySet());
-        Set<Integer> IPSet = new HashSet<Integer>(8);
+        MaskedIPSet IPSet = new MaskedIPSet(16);
         // use RandomIterator to avoid shuffling the whole thing
         for (Iterator<Hash> iter = new RandomIterator<Hash>(all); (matches.size() < howMany) && iter.hasNext(); ) {
             Hash peer = iter.next();
@@ -1250,67 +1272,18 @@ public class ProfileOrganizer {
     /**
      * Does the peer's IP address NOT match the IP address of any peer already in the set,
      * on any transport, within a given mask?
+     *
+     * As of 0.9.24, checks for a netdb family match as well.
+     *
      * @param mask is 1-4 (number of bytes to match)
      * @param IPMatches all IPs so far, modified by this routine
      */
-    private boolean notRestricted(Hash peer, Set<Integer> IPSet, int mask) {
-        Set<Integer> peerIPs = maskedIPSet(peer, mask);
-        if (containsAny(IPSet, peerIPs))
+    private boolean notRestricted(Hash peer, MaskedIPSet IPSet, int mask) {
+        Set<String> peerIPs = new MaskedIPSet(_context, peer, mask);
+        if (IPSet.containsAny(peerIPs))
             return false;
         IPSet.addAll(peerIPs);
         return true;
-    }
-
-    /**
-      * The Set of IPs for this peer, with a given mask.
-      * Includes the comm system's record of the IP, and all netDb addresses.
-      *
-      * @return an opaque set of masked IPs for this peer
-      */
-    private Set<Integer> maskedIPSet(Hash peer, int mask) {
-        Set<Integer> rv = new HashSet<Integer>(4);
-        byte[] commIP = _context.commSystem().getIP(peer);
-        if (commIP != null)
-            rv.add(maskedIP(commIP, mask));
-        RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
-        if (pinfo == null)
-            return rv;
-        Collection<RouterAddress> paddr = pinfo.getAddresses();
-        for (RouterAddress pa : paddr) {
-            byte[] pib = pa.getIP();
-            if (pib == null) continue;
-            rv.add(maskedIP(pib, mask));
-        }
-        return rv;
-    }
-
-    /**
-     * generate an arbitrary unique value for this ip/mask (mask = 1-4)
-     * If IPv6, force mask = 8.
-     */
-    private static Integer maskedIP(byte[] ip, int mask) {
-        int rv = ip[0];
-        if (ip.length == 16) {
-            for (int i = 1; i < 8; i++) {
-                rv <<= i * 4;
-                rv ^= ip[i];
-            }
-        } else {
-            for (int i = 1; i < mask; i++) {
-                rv <<= 8;
-                rv ^= ip[i];
-            }
-        }
-        return Integer.valueOf(rv);
-    }
-
-    /** does a contain any of the elements in b? */
-    private static <T> boolean  containsAny(Set<T> a, Set<T> b) {
-        for (T o : b) {
-            if (a.contains(o))
-                return true;
-        }
-        return false;
     }
 
     /**
@@ -1354,12 +1327,12 @@ public class ProfileOrganizer {
      *  @return 0-3
      */
     private int getSubTier(Hash peer, Hash randomKey) {
-        // input is first 36 bytes; output is last 32 bytes
-        byte[] data = new byte[Hash.HASH_LENGTH + 4 + Hash.HASH_LENGTH];
-        System.arraycopy(peer.getData(), 0, data, 0, Hash.HASH_LENGTH);
-        System.arraycopy(randomKey.getData(), 0, data, Hash.HASH_LENGTH, 4);
-        _context.sha().calculateHash(data, 0, Hash.HASH_LENGTH + 4, data, Hash.HASH_LENGTH + 4);
-        return data[Hash.HASH_LENGTH + 4] & 0x03;
+        // input is first 64 bytes; output is last 32 bytes
+        byte[] data = new byte[96];
+        System.arraycopy(peer.getData(), 0, data, 0, 32);
+        System.arraycopy(randomKey.getData(), 0, data, 32, 32);
+        _context.sha().calculateHash(data, 0, 64, data, 64);
+        return data[64] & 0x03;
     }
 
     public boolean isSelectable(Hash peer) {

@@ -139,7 +139,7 @@ public class RequestWrapper {
 				String key = e.getKey();
 				if( key.toLowerCase(Locale.US).compareToIgnoreCase( "content-type") == 0 ) {
 					String value = e.getValue();
-					int i = value.indexOf( ";" );
+					int i = value.indexOf( ';' );
 					if( i != -1 )
 						result = value.substring( 0, i );
 					else

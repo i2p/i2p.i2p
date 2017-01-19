@@ -16,13 +16,14 @@
             <!-- Depend on classes instead of jars where available -->
             <classpath>
                 <pathelement location="../../../core/java/build/obj" />
+                <pathelement location="../../../core/java/build/gnu-getopt.jar" />
                 <pathelement location="../../ministreaming/java/build/obj" />
             </classpath>
         </depend>
     </target>
 
-    <property name="javac.compilerargs" value="" />
-    <property name="javac.version" value="1.6" />
+    <property name="javac.compilerargs7" value="" />
+    <property name="javac.version" value="1.7" />
 
     <!-- compile everything including client classes -->
     <target name="compile" depends="depend">
@@ -33,19 +34,19 @@
             debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
             includeAntRuntime="false"
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs}" />
+            classpath="../../../core/java/build/i2p.jar:../../../core/java/build/gnu-getopt.jar:../../ministreaming/java/build/mstreaming.jar" >
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>
 
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
-            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            debug="true" deprecation="on" source="1.7" target="1.7" 
             includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
-            <compilerarg line="${javac.compilerargs}" />
+            <compilerarg line="${javac.compilerargs7}" />
         </javac>
     </target>
 
@@ -76,6 +77,8 @@
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
         </jar>
     </target>

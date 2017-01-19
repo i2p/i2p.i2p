@@ -85,18 +85,38 @@ class UDPPacket implements CDQEntry {
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
     public static final int PAYLOAD_TYPE_TEST = 7;
-    public static final int MAX_PAYLOAD_TYPE = PAYLOAD_TYPE_TEST;
     /** @since 0.8.1 */
     public static final int PAYLOAD_TYPE_SESSION_DESTROY = 8;
+    public static final int MAX_PAYLOAD_TYPE = PAYLOAD_TYPE_SESSION_DESTROY;
     
+    // various flag fields for use in the header
+    /**
+     *  Defined in the spec from the beginning, Unused
+     *  @since 0.9.24
+     */
+    public static final byte HEADER_FLAG_REKEY = (1 << 3);
+    /**
+     *  Defined in the spec from the beginning, Used starting in 0.9.24
+     *  @since 0.9.24
+     */
+    public static final byte HEADER_FLAG_EXTENDED_OPTIONS = (1 << 2);
+
+    // Extended options for session request
+    public static final int SESS_REQ_MIN_EXT_OPTIONS_LENGTH = 2;
+    // bytes 0-1 are flags
+    /**
+     * set to 1 to request a session tag, i.e. we want him to be an introducer for us
+     */
+    public static final int SESS_REQ_EXT_FLAG_REQUEST_RELAY_TAG = 0x01;
+
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);
     public static final byte DATA_FLAG_ACK_BITFIELDS = (1 << 6);
-    // unused
+    /** unused */
     public static final byte DATA_FLAG_ECN = (1 << 4);
     public static final byte DATA_FLAG_WANT_ACKS = (1 << 3);
     public static final byte DATA_FLAG_WANT_REPLY = (1 << 2);
-    // unused
+    /** unused */
     public static final byte DATA_FLAG_EXTENDED = (1 << 1);
     
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);
@@ -308,6 +328,7 @@ class UDPPacket implements CDQEntry {
      *  @since 0.9.21
      *  @deprecated unused
      */
+    @Deprecated
     public synchronized void requestInboundBandwidth() {
         verifyNotReleased();
         _bandwidthRequest = _context.bandwidthLimiter().requestInbound(_packet.getLength(), "UDP receiver");

@@ -174,6 +174,8 @@ class SummaryListener implements RateSummaryListener {
                 rrdFile.delete();
         } catch (IOException ioe) {
             _log.error("Error starting RRD for stat " + baseName, ioe);
+        } catch (Throwable t) {
+            _log.error("Error starting RRD for stat " + baseName, t);
         }
         return false;
     }

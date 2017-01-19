@@ -82,4 +82,18 @@ public class ConvertToHash {
 
         return null;
     }
+
+    /**
+     * @since 0.9.28
+     */
+    public static void main(String args[]) {
+        if (args.length == 0) {
+            System.err.println("Usage: converttohash [hostname|b32|destination]...");
+            return;
+        }
+        for (int i = 0; i < args.length; i++) {
+            Hash h = getHash(args[i]);
+            System.out.println(h != null ? h.toBase64() : "conversion failed");
+        }
+    }
 }

@@ -254,6 +254,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      *  Expensive (iterates through all tunnels of all pools) and unnecessary.
      *  @deprecated unused
      */
+    @Deprecated
     public TunnelInfo getTunnelInfo(TunnelId id) {
         TunnelInfo info = null;
         for (TunnelPool pool : _clientInboundPools.values()) {
@@ -555,8 +556,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         if (cfg.getLength() > 1 &&
-            (!_context.router().gracefulShutdownInProgress()) &&
-            !_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
+            !_context.router().gracefulShutdownInProgress() &&
+            (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting") ||
+             _context.router().isHidden() ||
+             _context.router().getRouterInfo().getAddressCount() <= 0)) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
                 // never seen this before, do we reallly need to bother
@@ -646,6 +649,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
     
     /** @deprecated moved to routerconsole */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
     }
 

@@ -34,32 +34,37 @@
       response.setHeader("X-Frame-Options", "SAMEORIGIN");
       response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
       response.setHeader("X-XSS-Protection", "1; mode=block");
+      response.setHeader("X-Content-Type-Options", "nosniff");
    }
+   // https://www.w3.org/TR/referrer-policy/
+   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+   // As of Chrome 56, Firefox 50, Opera 43. "same-origin" not widely supported.
+   response.setHeader("Referrer-Policy", "no-referrer");
 
    String conNonceParam = request.getParameter("consoleNonce");
-   if (intl.getNonce().equals(conNonceParam)) {
+   if (net.i2p.router.web.CSSHelper.getNonce().equals(conNonceParam)) {
        intl.setLang(request.getParameter("lang"));
        intl.setNews(request.getParameter("news"));
    }
 %>
-<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    if (intl.getLang().equals("zh")) {
        // make the fonts bigger for chinese
 %>
-<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_big.css" rel="stylesheet" type="text/css">
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_big.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    } else if (intl.getLang().equals("ar")) {
        // Use RTL theme for Arabic
 %>
-<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_ar.css" rel="stylesheet" type="text/css">
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_ar.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    }
    if (!intl.allowIFrame(request.getHeader("User-Agent"))) {
 %>
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>mobile.css" rel="stylesheet" type="text/css">
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>mobile.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css">
 <%
    }
 %>
-<!--[if IE]><link href="/themes/console/classic/ieshim.css" rel="stylesheet" type="text/css" /><![endif]-->
+<!--[if IE]><link href="/themes/console/classic/ieshim.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /><![endif]-->

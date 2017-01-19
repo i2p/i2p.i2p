@@ -10,7 +10,10 @@ package net.i2p.util;
  */
 
 import java.io.File;
+import java.io.Flushable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -21,7 +24,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,7 +39,7 @@ import net.i2p.data.DataHelper;
  * writes them where appropriate.
  * 
  */
-public class LogManager {
+public class LogManager implements Flushable {
     public final static String CONFIG_LOCATION_PROP = "loggerConfigLocation";
     public final static String FILENAME_OVERRIDE_PROP = "loggerFilenameOverride";
     public final static String CONFIG_LOCATION_DEFAULT = "logger.config";
@@ -163,7 +165,23 @@ public class LogManager {
         // yeah, this doesn't always work, _writer should be volatile
         if (_writer != null)
             return;
-        _writer = new LogWriter(this);
+        if (SystemVersion.isAndroid()) {
+            try {
+                Class<? extends LogWriter> clazz = Class.forName(
+                        "net.i2p.util.AndroidLogWriter"
+                    ).asSubclass(LogWriter.class);
+                Constructor<? extends LogWriter> ctor = clazz.getDeclaredConstructor(LogManager.class);
+                _writer = ctor.newInstance(this);
+            } catch (ClassNotFoundException e) {
+            } catch (InstantiationException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            } catch (NoSuchMethodException e) {
+            }
+        }
+        // Default writer
+        if (_writer == null)
+            _writer = new FileLogWriter(this);
         _writer.setFlushInterval(_flushInterval * 1000);
         // if you enable logging in I2PThread again, you MUST change this back to Thread
         Thread t = new I2PThread(_writer, "LogWriter");
@@ -210,6 +228,7 @@ public class LogManager {
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }
         
     /** @deprecated unused */
+    @Deprecated
     public void setDisplayOnScreen(boolean yes) {
         _displayOnScreen = yes;
     }
@@ -223,6 +242,7 @@ public class LogManager {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public void setDisplayOnScreenLevel(int level) {
         _onScreenLimit = level;
     }
@@ -232,6 +252,7 @@ public class LogManager {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public void setConsoleBufferSize(int numRecords) {
         _consoleBufferSize = numRecords;
     }
@@ -243,6 +264,10 @@ public class LogManager {
         loadConfig();
     }
 
+    /**
+     *  File may not exist or have old logs in it if not opened yet
+     *  @return non-null
+     */
     public String currentFile() {
         if (_writer == null)
             return ("No log file created yet");
@@ -478,9 +503,7 @@ public class LogManager {
             if (!format.equals(""))
                 fmt.applyPattern(format);
             // the router sets the JVM time zone to UTC but saves the original here so we can get it
-            String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
-            if (systemTimeZone != null)
-                fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
+            fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
             _dateFormatPattern = format;
             _dateFormat = fmt;
             return true;
@@ -762,7 +785,7 @@ public class LogManager {
 
     private static final AtomicInteger __id = new AtomicInteger();
 
-    private class ShutdownHook extends Thread {
+    private class ShutdownHook extends I2PAppThread {
         private final int _id;
         public ShutdownHook() {
             _id = __id.incrementAndGet();

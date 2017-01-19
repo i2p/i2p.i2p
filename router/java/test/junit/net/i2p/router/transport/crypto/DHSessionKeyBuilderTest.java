@@ -13,6 +13,7 @@ import java.math.BigInteger;
 
 import junit.framework.TestCase;
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.util.RandomSource;
 
@@ -40,7 +41,7 @@ public class DHSessionKeyBuilderTest extends TestCase {
             String origVal = "1234567890123456"; // 16 bytes max using AESEngine
             byte enc[] = new byte[16];
             byte dec[] = new byte[16];
-            ctx.aes().encrypt(origVal.getBytes(), 0, enc, 0, key1, iv, 16);
+            ctx.aes().encrypt(DataHelper.getASCII(origVal), 0, enc, 0, key1, iv, 16);
             ctx.aes().decrypt(enc, 0, dec, 0, key2, iv, 16);
             String tranVal = new String(dec);
             assertEquals(origVal, tranVal);

@@ -150,6 +150,7 @@ class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      *  are there follow up headers?
      *  @deprecated unimplemented
      */
+    @Deprecated
     private static final byte MASK_EXTENDED = FragmentHandler.MASK_EXTENDED;
     private static final byte MASK_TUNNEL = (byte)(FragmentHandler.TYPE_TUNNEL << 5);
     private static final byte MASK_ROUTER = (byte)(FragmentHandler.TYPE_ROUTER << 5);

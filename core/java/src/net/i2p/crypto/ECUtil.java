@@ -19,7 +19,7 @@ import net.i2p.util.NativeBigInteger;
  *
  *  @since 0.9.16
  */
-class ECUtil {
+final class ECUtil {
 
     private static final BigInteger TWO = new BigInteger("2");
     private static final BigInteger THREE = new BigInteger("3");
@@ -52,7 +52,10 @@ class ECUtil {
         else if (s.equals(ECPoint.POINT_INFINITY))
             return r;
         BigInteger prime = ((ECFieldFp) curve.getField()).getP();
-        BigInteger slope = (r.getAffineY().subtract(s.getAffineY())).multiply(r.getAffineX().subtract(s.getAffineX()).modInverse(prime)).mod(prime);
+        // use NBI modInverse();
+        BigInteger tmp = r.getAffineX().subtract(s.getAffineX());
+        tmp = new NativeBigInteger(tmp);
+        BigInteger slope = (r.getAffineY().subtract(s.getAffineY())).multiply(tmp.modInverse(prime)).mod(prime);
         slope = new NativeBigInteger(slope);
         BigInteger xOut = (slope.modPow(TWO, prime).subtract(r.getAffineX())).subtract(s.getAffineX()).mod(prime);
         BigInteger yOut = s.getAffineY().negate().mod(prime);
@@ -67,7 +70,10 @@ class ECUtil {
         BigInteger slope = (r.getAffineX().pow(2)).multiply(THREE);
         slope = slope.add(curve.getA());
         BigInteger prime = ((ECFieldFp) curve.getField()).getP();
-        slope = slope.multiply((r.getAffineY().multiply(TWO)).modInverse(prime));
+        // use NBI modInverse();
+        BigInteger tmp = r.getAffineY().multiply(TWO);
+        tmp = new NativeBigInteger(tmp);
+        slope = slope.multiply(tmp.modInverse(prime));
         BigInteger xOut = slope.pow(2).subtract(r.getAffineX().multiply(TWO)).mod(prime);
         BigInteger yOut = (r.getAffineY().negate()).add(slope.multiply(r.getAffineX().subtract(xOut))).mod(prime);
         ECPoint out = new ECPoint(xOut, yOut);

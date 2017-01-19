@@ -29,12 +29,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
@@ -43,8 +44,7 @@ import net.i2p.util.SystemVersion;
  * Utility class providing methods to parse and write files in config file
  * format, and subscription file format.
  * 
- * TODO: Change file encoding from default to UTF-8?
- *       Or switch to the DataHelper loadProps/storeProps methods?
+ * TODO: switch to the DataHelper loadProps/storeProps methods?
  * 
  * @author Ragnarok
  */
@@ -87,20 +87,23 @@ class ConfigParser {
      *             if the BufferedReader cannot be read.
      *  
      */
-    public static Map<String, String>  parse(BufferedReader input) throws IOException {
-        Map<String, String>  result = new HashMap<String, String>();
-        String inputLine;
-        inputLine = input.readLine();
-        while (inputLine != null) {
-            inputLine = stripComments(inputLine);
-            String[] splitLine = inputLine.split("=");
-            if (splitLine.length == 2) {
-                result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
+    private static Map<String, String> parse(BufferedReader input) throws IOException {
+        try {
+            Map<String, String> result = new HashMap<String, String>();
+            String inputLine;
+            while ((inputLine = input.readLine()) != null) {
+                inputLine = stripComments(inputLine);
+                if (inputLine.length() == 0)
+                    continue;
+                String[] splitLine = DataHelper.split(inputLine, "=", 2);
+                if (splitLine.length == 2) {
+                    result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
+                }
             }
-            inputLine = input.readLine();
+            return result;
+        } finally {
+            try { input.close(); } catch (IOException ioe) {}
         }
-        input.close();
-        return result;
     }
 
     /**
@@ -113,15 +116,21 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be read.
      */
-    public static Map<String, String>  parse(File file) throws IOException {
-        FileInputStream fileStream = new FileInputStream(file);
-        BufferedReader input = new BufferedReader(new InputStreamReader(
-                fileStream, "UTF-8"));
-        Map<String, String>  rv = parse(input);
+    public static Map<String, String> parse(File file) throws IOException {
+        FileInputStream fileStream = null;
         try {
-            fileStream.close();
-        } catch (IOException ioe) {}
-        return rv;
+            fileStream = new FileInputStream(file);
+            BufferedReader input = new BufferedReader(new InputStreamReader(
+                    fileStream, "UTF-8"));
+            Map<String, String> rv = parse(input);
+            return rv;
+        } finally {
+            if (fileStream != null) {
+                try {
+                    fileStream.close();
+                } catch (IOException ioe) {}
+            }
+        }
     }
 
     /**
@@ -134,11 +143,13 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be read.
      */
-    public static Map<String, String>  parse(String string) throws IOException {
+/****
+    public static Map<String, String> parse(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
         return parse(input);
     }
+****/
     
     /**
      * Return a Map using the contents of the File file. If file cannot be read,
@@ -151,8 +162,8 @@ class ConfigParser {
      * @return A Map containing the key, value pairs from file, or if file
      *         cannot be read, map.
      */
-    public static Map<String, String>  parse(File file, Map<String, String>  map) {
-        Map<String, String>  result;
+    public static Map<String, String> parse(File file, Map<String, String> map) {
+        Map<String, String> result;
         try {
             result = parse(file);
             for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -178,19 +189,21 @@ class ConfigParser {
      * @throws IOException
      *             if input cannot be read.
      */
-    public static List<String> parseSubscriptions(BufferedReader input)
+    private static List<String> parseSubscriptions(BufferedReader input)
             throws IOException {
-        List<String> result = new LinkedList<String>();
-        String inputLine = input.readLine();
-        while (inputLine != null) {
-            inputLine = stripComments(inputLine).trim();
-            if (inputLine.length() > 0) {
-                result.add(inputLine);
+        try {
+            List<String> result = new ArrayList<String>(4);
+            String inputLine;
+            while ((inputLine = input.readLine()) != null) {
+                inputLine = stripComments(inputLine).trim();
+                if (inputLine.length() > 0) {
+                    result.add(inputLine);
+                }
             }
-            inputLine = input.readLine();
+            return result;
+        } finally {
+            try { input.close(); } catch (IOException ioe) {}
         }
-        input.close();
-        return result;
     }
 
     /**
@@ -202,15 +215,21 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be read.
      */
-    public static List<String> parseSubscriptions(File file) throws IOException {
-        FileInputStream fileStream = new FileInputStream(file);
-        BufferedReader input = new BufferedReader(new InputStreamReader(
-                fileStream, "UTF-8"));
-        List<String> rv = parseSubscriptions(input);
+    private static List<String> parseSubscriptions(File file) throws IOException {
+        FileInputStream fileStream = null;
         try {
-            fileStream.close();
-        } catch (IOException ioe) {}
-        return rv;
+            fileStream = new FileInputStream(file);
+            BufferedReader input = new BufferedReader(new InputStreamReader(
+                    fileStream, "UTF-8"));
+            List<String> rv = parseSubscriptions(input);
+            return rv;
+        } finally {
+            if (fileStream != null) {
+                try {
+                    fileStream.close();
+                } catch (IOException ioe) {}
+            }
+        }
     }
 
     /**
@@ -222,11 +241,13 @@ class ConfigParser {
      * @throws IOException
      *             if string cannot be read.
      */
+/****
     public static List<String> parseSubscriptions(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
         return parseSubscriptions(input);
     }
+****/
     
     /**
      * Return a List using the contents of the File file. If file cannot be
@@ -276,12 +297,15 @@ class ConfigParser {
      * @throws IOException
      *             if the BufferedWriter cannot be written to.
      */
-    public static void write(Map<String, String>  map, BufferedWriter output) throws IOException {
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            output.write(entry.getKey() + '=' + entry.getValue());
-            output.newLine();
+    private static void write(Map<String, String> map, BufferedWriter output) throws IOException {
+        try {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                output.write(entry.getKey() + '=' + entry.getValue());
+                output.newLine();
+            }
+        } finally {
+            try { output.close(); } catch (IOException ioe) {}
         }
-        output.close();
     }
 
     /**
@@ -298,7 +322,7 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be written to.
      */
-    public static void write(Map<String, String>  map, File file) throws IOException {
+    public static void write(Map<String, String> map, File file) throws IOException {
         boolean success = false;
         if (!isWindows) {
             File tmp = SecureFile.createTempFile("temp-", ".tmp", file.getAbsoluteFile().getParentFile());
@@ -326,13 +350,16 @@ class ConfigParser {
      * @throws IOException
      *             if output cannot be written to.
      */
-    public static void writeSubscriptions(List<String> list, BufferedWriter output)
+    private static void writeSubscriptions(List<String> list, BufferedWriter output)
             throws IOException {
-        for (String s : list) {
-            output.write(s);
-            output.newLine();
+        try {
+            for (String s : list) {
+                output.write(s);
+                output.newLine();
+            }
+        } finally {
+            try { output.close(); } catch (IOException ioe) {}
         }
-        output.close();
     }
     
     /**
@@ -346,7 +373,7 @@ class ConfigParser {
      * @throws IOException
      *             if output cannot be written to.
      */
-    public static void writeSubscriptions(List<String> list, File file)
+    private static void writeSubscriptions(List<String> list, File file)
             throws IOException {
         writeSubscriptions(list, new BufferedWriter(
                 new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));

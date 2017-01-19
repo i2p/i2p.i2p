@@ -47,7 +47,7 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
     protected void clientConnectionRun(Socket s) {
         try {
             //_log.error("SOCKS IRC Tunnel Start");
-            SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(s, getTunnel().getClientOptions());
+            SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(_context, s, getTunnel().getClientOptions());
             Socket clientSock = serv.getClientSocket();
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             StringBuffer expectedPong = new StringBuffer();

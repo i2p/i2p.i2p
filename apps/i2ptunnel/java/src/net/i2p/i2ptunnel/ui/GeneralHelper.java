@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -146,11 +147,11 @@ public class GeneralHelper {
         List<String> rv = tcg.clearAllMessages();
         try {
             tcg.saveConfig();
-            rv.add(0, _("Configuration changes saved", context));
+            rv.add(0, _t("Configuration changes saved", context));
         } catch (IOException ioe) {
             Log log = context.logManager().getLog(GeneralHelper.class);
             log.error("Failed to save config file", ioe);
-            rv.add(0, _("Failed to save configuration", context) + ": " + ioe.toString());
+            rv.add(0, _t("Failed to save configuration", context) + ": " + ioe.toString());
         }
         return rv;
     }
@@ -266,13 +267,21 @@ public class GeneralHelper {
     public String getPrivateKeyFile(int tunnel) {
         return getPrivateKeyFile(_group, tunnel);
     }
-    public static String getPrivateKeyFile(TunnelControllerGroup tcg, int tunnel) {
+
+    public String getPrivateKeyFile(TunnelControllerGroup tcg, int tunnel) {
         TunnelController tun = getController(tcg, tunnel);
         if (tun != null && tun.getPrivKeyFile() != null)
             return tun.getPrivKeyFile();
         if (tunnel < 0)
             tunnel = tcg == null ? 999 : tcg.getControllers().size();
-        return "i2ptunnel" + tunnel + "-privKeys.dat";
+        String rv = "i2ptunnel" + tunnel + "-privKeys.dat";
+        // Don't default to a file that already exists,
+        // which could happen after other tunnels are deleted.
+        int i = 0;
+        while ((new File(_context.getConfigDir(), rv)).exists()) {
+            rv = "i2ptunnel" + tunnel + '.' + (++i) + "-privKeys.dat";
+        }
+        return rv;
     }
 
     public String getClientInterface(int tunnel) {
@@ -341,7 +350,8 @@ public class GeneralHelper {
                     rv = pkf.getDestination();
                     if (rv != null)
                         return rv;
-                } catch (Exception e) {}
+                } catch (I2PException e) {
+                } catch (IOException e) {}
             }
         }
         return null;
@@ -442,6 +452,7 @@ public class GeneralHelper {
             if (!TunnelController.isClient(ttype) ||
                 TunnelController.TYPE_IRC_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_SOCKS_IRC.equals(ttype) ||
+                TunnelController.TYPE_SOCKS.equals(ttype) ||
                 TunnelController.TYPE_STREAMR_CLIENT.equals(ttype) ||
                 TunnelController.TYPE_STD_CLIENT.equals(ttype) ||
                 (TunnelController.TYPE_HTTP_CLIENT.equals(ttype) && isShared))
@@ -628,6 +639,21 @@ public class GeneralHelper {
         return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
     }
 
+    /** @since 0.9.25 */
+    public boolean getRejectReferer(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_REFERER);
+    }
+
+    /** @since 0.9.25 */
+    public boolean getRejectUserAgents(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPServer.OPT_REJECT_USER_AGENTS);
+    }
+
+    /** @since 0.9.25 */
+    public String getUserAgents(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPServer.OPT_USER_AGENTS, "");
+    }
+
     public boolean getUniqueLocal(int tunnel) {
         return getBooleanProperty(tunnel, I2PTunnelServer.PROP_UNIQUE_LOCAL);
     }
@@ -714,7 +740,7 @@ public class GeneralHelper {
         return def;
     }
 
-    protected static String _(String key, I2PAppContext context) {
-        return Messages._(key, context);
+    protected static String _t(String key, I2PAppContext context) {
+        return Messages._t(key, context);
     }
 }

@@ -10,9 +10,12 @@ package net.i2p.router.client;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -122,10 +125,30 @@ class ClientManager {
     protected void startListeners() {
         ClientListenerRunner listener;
         if (SystemVersion.isAndroid()) {
-            listener = new DomainClientListenerRunner(_ctx, this);
-            Thread t = new I2PThread(listener, "DomainClientListener", true);
-            t.start();
-            _listeners.add(listener);
+            try {
+                Class<? extends ClientListenerRunner> clazz = Class.forName(
+                        "net.i2p.router.client.DomainClientListenerRunner"
+                    ).asSubclass(ClientListenerRunner.class);
+                Constructor<? extends ClientListenerRunner> ctor =
+                    clazz.getDeclaredConstructor(RouterContext.class,
+                                                 ClientManager.class);
+                listener = ctor.newInstance(_ctx, this);
+                Thread t = new I2PThread(listener, "DomainClientListener", true);
+                t.start();
+                _listeners.add(listener);
+            } catch (ClassNotFoundException e) {
+                _log.warn("Could not find DomainClientListenerRunner class", e);
+            } catch (ClassCastException e) {
+                _log.error("Error creating DomainClientListenerRunner", e);
+            } catch (NoSuchMethodException e) {
+                _log.error("Error creating DomainClientListenerRunner", e);
+            } catch (InstantiationException e) {
+                _log.error("Error creating DomainClientListenerRunner", e);
+            } catch (IllegalAccessException e) {
+                _log.error("Error creating DomainClientListenerRunner", e);
+            } catch (InvocationTargetException e) {
+                _log.error("Error creating DomainClientListenerRunner", e);
+            }
         }
         if (!_ctx.getBooleanProperty(PROP_DISABLE_EXTERNAL)) {
             // there's no option to start both an SSL and non-SSL listener
@@ -235,6 +258,17 @@ class ClientManager {
             for (Destination dest : dests) {
                 _runners.remove(dest);
                 _runnersByHash.remove(dest.calculateHash());
+            }
+            // just in case
+            for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext(); ) {
+                ClientConnectionRunner r = iter.next();
+                if (r.equals(runner))
+                    iter.remove();
+            }
+            for (Iterator<ClientConnectionRunner> iter = _runnersByHash.values().iterator(); iter.hasNext(); ) {
+                ClientConnectionRunner r = iter.next();
+                if (r.equals(runner))
+                    iter.remove();
             }
         }
     }
@@ -565,6 +599,7 @@ class ClientManager {
     }
     
     /** @deprecated unused */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException {
 /******
         StringBuilder buf = new StringBuilder(8*1024);

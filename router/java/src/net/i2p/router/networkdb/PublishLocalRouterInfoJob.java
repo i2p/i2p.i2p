@@ -82,14 +82,12 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             List<RouterAddress> newAddrs = getContext().commSystem().createAddresses();
             int count = _runCount.incrementAndGet();
             RouterInfo ri = new RouterInfo(oldRI);
-            // this will get overwritten by setOptions() below, must restore it below
-            getContext().router().addCapabilities(ri);
-            String caps = ri.getCapabilities();
             if (_notFirstTime && (count % 4) != 0 && oldAddrs.size() == newAddrs.size()) {
                 // 3 times out of 4, we don't republish if everything is the same...
                 // If something changed, including the cost, then publish,
                 // otherwise don't.
-                boolean different = !oldRI.getCapabilities().equals(ri.getCapabilities());
+                String newcaps = getContext().router().getCapabilities();
+                boolean different = !oldRI.getCapabilities().equals(newcaps);
                 if (!different) {
                     Comparator<RouterAddress> comp = new AddrComparator();
                     Collections.sort(oldAddrs, comp);
@@ -110,15 +108,12 @@ public class PublishLocalRouterInfoJob extends JobImpl {
                 }
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Republishing early because addresses or costs or caps have changed -" +
-                              " oldCaps: " + oldRI.getCapabilities() + " newCaps: " + ri.getCapabilities() +
+                              " oldCaps: " + oldRI.getCapabilities() + " newCaps: " + newcaps +
                               " old:\n" +
                               oldAddrs + "\nnew:\n" + newAddrs);
             }
             ri.setPublished(getContext().clock().now());
             Properties stats = getContext().statPublisher().publishStatistics();
-            stats.setProperty(RouterInfo.PROP_NETWORK_ID, String.valueOf(Router.NETWORK_ID));
-            // restore caps generated above
-            stats.setProperty(RouterInfo.PROP_CAPABILITIES, caps);
             ri.setOptions(stats);
             ri.setAddresses(newAddrs);
 

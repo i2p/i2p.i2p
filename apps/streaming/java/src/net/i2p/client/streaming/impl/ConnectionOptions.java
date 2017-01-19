@@ -227,7 +227,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * clearly from the math above that was not correct.
      * (Before 0.6.2, the reply leaseSet was bundled with every message, so it didn't even
      * fit in TWO tunnel messages - more like 2 1/3)
-     *
+     * <p/>
      * Now, it's not clear how often we will get the ideal situation (no reply leaseSet bundling,
      * no key bundling, and especially not having a small message ahead of you, which will then cause
      * fragmentation for all subsequent messages until the queue is emptied - BatchedPreprocessor
@@ -235,7 +235,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * messages in a new stream are much larger due to the leaseSet and key bundling.
      * But for long-lived streams (like with i2psnark) this should pay dividends.
      * The tunnel.batch* stats should provide some data for test comparisons.
-     *
+     * <p/>
      * As MTU and MRU are identical and are negotiated to the lowest value
      * for the two ends, you can't do widespread testing of a higher value.
      * Unless we change to allow MTU and MRU to be different,
@@ -244,7 +244,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * So let's try 1730 for release 0.6.5. This will allow for 738 testing as well,
      * with i2p.streaming.maxMessageSize=738 (in configadvanced.jsp, or in i2ptunnel, or
      * i2psnark, for example).
-     *
+     * <p/>
      * Not that an isolated single packet is very common, but
      * in this case, 960 was 113.3% total overhead.
      * Compared to 738 (38.8% overhead) and 1730 (18.4%).
@@ -538,6 +538,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * @deprecated This doesn't appear to be used.
      * @return receive window size.
      */
+    @Deprecated
     public int getReceiveWindow() { return _receiveWindow; } 
     public void setReceiveWindow(int numMsgs) { _receiveWindow = numMsgs; }
     

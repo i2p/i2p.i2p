@@ -30,7 +30,7 @@ if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-# set LG2 to the language you need in envrionment varibales to enable this
+# set LG2 to the language you need in environment variables to enable this
 
 # add ../src/ so the refs will work in the po file
 JPATHS="../src/java/ ../src/tmp/"
@@ -63,15 +63,15 @@ do
 	 	echo "Updating the $i file from the tags..."
 		# extract strings from java and jsp files, and update messages.po files
 		# translate calls must be one of the forms:
-		# _("foo")
+		# _t("foo")
 		# _x("foo")
-		# intl._("foo")
+		# intl._t("foo")
 		# In a jsp, you must use a helper or handler that has the context set.
 		# To start a new translation, copy the header from an old translation to the new .po file,
 		# then ant distclean updater.
 		find $JPATHS -name *.java > $TMPFILE
 		xgettext -f $TMPFILE -F -L java --from-code=UTF-8 --add-comments\
-	                 --keyword=_ --keyword=_x --keyword=intl._ --keyword=intl.title \
+	                 --keyword=_t --keyword=_x --keyword=intl._ --keyword=intl.title \
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then
@@ -98,15 +98,40 @@ do
         # only generate for non-source language
         echo "Generating ${CLASS}_$LG ResourceBundle..."
 
-        # convert to class files in build/obj
-        msgfmt --java --statistics -r $CLASS -l $LG -d WEB-INF/classes $i
+        msgfmt -V | grep -q '0\.19'
         if [ $? -ne 0 ]
         then
-            echo "ERROR - msgfmt failed on ${i}, not updating translations"
-            # msgfmt leaves the class file there so the build would work the next time
-            find WEB-INF/classes -name messages_${LG}.class -exec rm -f {} \;
-            RC=1
-            break
+            # slow way
+            # convert to class files in WEB-INF/classes
+            msgfmt --java --statistics -r $CLASS -l $LG -d WEB-INF/classes $i
+            if [ $? -ne 0 ]
+            then
+                echo "ERROR - msgfmt failed on ${i}, not updating translations"
+                # msgfmt leaves the class file there so the build would work the next time
+                find src/WEB-INF/classes -name messages_${LG}.class -exec rm -f {} \;
+                RC=1
+                break
+            fi
+        else
+            # fast way
+            # convert to java files in build/messages-src
+            TD=build/messages-src-tmp
+            TDX=$TD/i2p/susi/dns
+            TD2=build/messages-src
+            TDY=$TD2/i2p/susi/dns
+            rm -rf $TD
+            mkdir -p $TD $TDY
+            msgfmt --java --statistics --source -r $CLASS -l $LG -d $TD $i
+            if [ $? -ne 0 ]
+            then
+                echo "ERROR - msgfmt failed on ${i}, not updating translations"
+                # msgfmt leaves the class file there so the build would work the next time
+                find WEB-INF/classes -name messages_${LG}.class -exec rm -f {} \;
+                RC=1
+                break
+            fi
+            mv $TDX/messages_$LG.java $TDY
+            rm -rf $TD
         fi
     fi
 done

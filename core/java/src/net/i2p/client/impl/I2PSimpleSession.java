@@ -30,6 +30,7 @@ import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SystemVersion;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -122,11 +123,11 @@ public class I2PSimpleSession extends I2PSessionImpl2 {
                     Properties auth = new OrderedProperties();
                     auth.setProperty(PROP_USER, opts.getProperty(PROP_USER));
                     auth.setProperty(PROP_PW, opts.getProperty(PROP_PW));
-                    sendMessage(new GetDateMessage(CoreVersion.VERSION, auth));
+                    sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION, auth));
                 } else {
                     // we must now send a GetDate even in SimpleSession, or we won't know
                     // what version we are talking with and cannot use HostLookup
-                    sendMessage(new GetDateMessage(CoreVersion.VERSION));
+                    sendMessage_unchecked(new GetDateMessage(CoreVersion.VERSION));
                 }
                 waitForDate();
             }
@@ -140,7 +141,16 @@ public class I2PSimpleSession extends I2PSessionImpl2 {
         } catch (UnknownHostException uhe) {
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
-            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
+            // Generate the best error message as this will be logged
+            String msg;
+            if (_context.isRouterContext())
+                msg = "Failed internal router binding";
+            else if (SystemVersion.isAndroid() &&
+                    Boolean.parseBoolean(getOptions().getProperty(PROP_DOMAIN_SOCKET)))
+                msg = "Failed to bind to the router";
+            else
+                msg = "Cannot connect to the router on " + _hostname + ':' + _portNum;
+            throw new I2PSessionException(getPrefix() + msg, ioe);
         } finally {
             changeState(success ? State.OPEN : State.CLOSED);
         }

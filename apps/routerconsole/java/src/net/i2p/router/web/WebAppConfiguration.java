@@ -110,7 +110,7 @@ public class WebAppConfiguration implements Configuration {
             return;
         StringTokenizer tok = new StringTokenizer(cp, " ,");
         StringBuilder buf = new StringBuilder();
-        Set<URI> systemCP = getSystemClassPath();
+        Set<URI> systemCP = getSystemClassPath(i2pContext);
         while (tok.hasMoreTokens()) {
             if (buf.length() > 0)
                 buf.append(',');
@@ -136,7 +136,7 @@ public class WebAppConfiguration implements Configuration {
                 if (!ctxPath.equals("/susimail"))
                     continue;
             }
-            System.err.println("Adding " + path + " to classpath for " + appName);
+            //System.err.println("Adding " + path + " to classpath for " + appName);
             buf.append(path);
         }
         if (buf.length() <= 0)
@@ -159,14 +159,28 @@ public class WebAppConfiguration implements Configuration {
      * but keep findbugs happy.
      * @since 0.9
      */
-    private static Set<URI> getSystemClassPath() {
-        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        URL urls[] = urlClassLoader.getURLs();
+    private static Set<URI> getSystemClassPath(I2PAppContext ctx) {
         Set<URI> rv = new HashSet<URI>(32);
-        for (int i = 0; i < urls.length; i++) {
-            try {
-                rv.add(urls[i].toURI());
-            } catch (URISyntaxException use) {}
+        ClassLoader loader = ClassLoader.getSystemClassLoader();
+        if (loader instanceof URLClassLoader) {
+            // through Java 8, not available in Java 9
+            URLClassLoader urlClassLoader = (URLClassLoader) loader;
+            URL urls[] = urlClassLoader.getURLs();
+            for (int i = 0; i < urls.length; i++) {
+                try {
+                    rv.add(urls[i].toURI());
+                } catch (URISyntaxException use) {}
+            }
+        } else {
+            // Java 9 - assume everything in lib/ is in the classpath
+            File libDir = new File(ctx.getBaseDir(), "lib");
+            File[] files = libDir.listFiles();
+            if (files != null) {
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].getName().endsWith(".jar"))
+                        rv.add(files[i].toURI());
+                }
+            }
         }
         return rv;
     }

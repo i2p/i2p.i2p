@@ -344,7 +344,11 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             System.out.println("\r\nPrivate key written to: " + privateKeyFile);
             System.out.println("Public key written to: " + publicKeyFile);
             System.out.println("\r\nPublic key: " + signingPublicKey.toBase64() + "\r\n");
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.err.println("Error writing keys:");
+            e.printStackTrace();
+            return false;
+        } catch (DataFormatException e) {
             System.err.println("Error writing keys:");
             e.printStackTrace();
             return false;
@@ -489,7 +493,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + uee.getMessage());
+            throw new RuntimeException("your JVM doesnt support utf-8? " + uee.getMessage());
         } catch (IOException ioe) {
             return "";
         } finally {
@@ -528,7 +532,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + uee.getMessage());
+            throw new RuntimeException("your JVM doesnt support utf-8? " + uee.getMessage());
         } catch (IOException ioe) {
             return "";
         } finally {
@@ -638,12 +642,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             fileOutputStream = new FileOutputStream(outputFile);
 
             DataHelper.skip(fileInputStream, HEADER_BYTES);
-
-            byte[] buffer = new byte[16*1024];
-            int bytesRead = 0;
-
-            while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
-                fileOutputStream.write(buffer, 0, bytesRead);
+            DataHelper.copy(fileInputStream, fileOutputStream);
         } catch (IOException ioe) {
             // probably permissions or disk full, so bring the message out to the console
             return "Error copying update: " + ioe;
@@ -742,7 +741,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
         try {
             versionRawBytes = version.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + e.getMessage());
+            throw new RuntimeException("your JVM doesnt support utf-8? " + e.getMessage());
         }
 
         System.arraycopy(versionRawBytes, 0, versionHeader, 0, versionRawBytes.length);
@@ -758,7 +757,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             bytesToSignInputStream = new SequenceInputStream(versionHeaderInputStream, fileInputStream);
             signature = _context.dsa().sign(bytesToSignInputStream, signingPrivateKey);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error signing", e);
 
@@ -780,10 +779,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             fileOutputStream.write(signature.getData());
             fileOutputStream.write(versionHeader);
             fileInputStream = new FileInputStream(inputFile);
-            byte[] buffer = new byte[1024];
-            int bytesRead = 0;
-            while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
-                fileOutputStream.write(buffer, 0, bytesRead);
+            DataHelper.copy(fileInputStream, fileOutputStream);
             fileOutputStream.close();
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))

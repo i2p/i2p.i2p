@@ -19,8 +19,10 @@ import java.util.TimeZone;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RoutingKeyGenerator;
+import net.i2p.util.ConvertToHash;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
@@ -130,9 +132,7 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
         String modVal = _fmt.format(today);
         if (modVal.length() != LENGTH)
             throw new IllegalStateException();
-        byte[] mod = new byte[LENGTH];
-        for (int i = 0; i < LENGTH; i++)
-            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
+        byte[] mod = DataHelper.getASCII(modVal);
         return mod;
     }
 
@@ -187,6 +187,23 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
     }
     
     /**
+     * Get the routing key for the specified date, not today's
+     *
+     * @param time Java time
+     * @since 0.9.28
+     */
+    public Hash getRoutingKey(Hash origKey, long time) {
+        String modVal;
+        synchronized(this) {
+            modVal = _fmt.format(time);
+        }
+        if (modVal.length() != LENGTH)
+            throw new IllegalStateException();
+        byte[] mod = DataHelper.getASCII(modVal);
+        return getKey(origKey, mod);
+    }
+    
+    /**
      * Generate a modified (yet consistent) hash from the origKey by generating the
      * SHA256 of the targetKey with the specified modData appended to it
      *
@@ -200,23 +217,36 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
         return SHA256Generator.getInstance().calculateHash(modVal);
     }
 
-/****
+    /**
+     * @since 0.9.29
+     */
     public static void main(String args[]) {
-        Hash k1 = new Hash();
-        byte k1d[] = new byte[Hash.HASH_LENGTH];
-        RandomSource.getInstance().nextBytes(k1d);
-        k1.setData(k1d);
-
-        for (int i = 0; i < 10; i++) {
-            System.out.println("K1:  " + k1);
-            Hash k1m = RoutingKeyGenerator.getInstance().getRoutingKey(k1);
-            System.out.println("MOD: " + new String(RoutingKeyGenerator.getInstance().getModData()));
-            System.out.println("K1M: " + k1m);
+        if (args.length <= 0) {
+            System.err.println("Usage: RouterKeyGenerator [-days] [+days] hash|hostname|destination...");
+            System.exit(1);
         }
-        try {
-            Thread.sleep(2000);
-        } catch (Throwable t) { // nop
+        long now = System.currentTimeMillis();
+        int st = 0;
+        if (args.length > 1 && (args[0].startsWith("+") || args[0].startsWith("-"))) {
+            now += Integer.parseInt(args[0]) * 24*60*60*1000L;
+            st++;
+        }
+        RouterKeyGenerator rkg = new RouterKeyGenerator(I2PAppContext.getGlobalContext());
+        System.out.println("Date: " + rkg._fmt.format(now) + '\n' +
+                           "Hash                                         Routing Key\n" +
+                           "----                                         -----------");
+        for (int i = st; i < args.length; i++) {
+            String s = args[i];
+            String sp = " ";
+            if (s.length() < 44)
+                sp = "                                            ".substring(0, 45 - s.length());
+            Hash h = ConvertToHash.getHash(s);
+            if (h == null) {
+                System.out.println(s + sp + "Bad hash");
+                continue;
+            }
+            Hash rkey = rkg.getRoutingKey(h, now);
+            System.out.println(s + sp + rkey.toBase64());
         }
     }
-****/
 }

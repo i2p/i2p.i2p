@@ -3,6 +3,7 @@ package net.i2p.router.transport.udp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -164,6 +165,9 @@ class IntroductionManager {
      * Also, ping all idle peers that were introducers in the last 2 hours,
      * to keep the connection up, since the netDb can have quite stale information,
      * and we want to keep our introducers valid.
+     *
+     * @param ssuOptions out parameter, options are added
+     * @return number of introducers added
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
         int start = _context.random().nextInt(Integer.MAX_VALUE);
@@ -440,12 +444,33 @@ class IntroductionManager {
         // and we don't read it here.
         // FIXME implement for getting Alice's IPv4 in RelayRequest sent over IPv6?
         // or is that just too easy to spoof?
-        if (!isValid(alice.getIP(), alice.getPort()) || ipSize != 0 || port != 0) {
-            if (_log.shouldLog(Log.WARN)) {
-                byte ip[] = new byte[ipSize];
-                rrReader.readIP(ip, 0);
-                _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(ip, port));
+        byte[] aliceIP = alice.getIP();
+        int alicePort = alice.getPort();
+        if (!isValid(alice.getIP(), alice.getPort())) {
+            if (_log.shouldWarn())
+                _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, alicePort));
+            _context.statManager().addRateData("udp.relayBadIP", 1);
+            return;
+        }
+        // prior to 0.9.24 we rejected any non-zero-length ip
+        // here we reject anything different
+        // TODO relay request over IPv6
+        if (ipSize != 0) {
+            byte ip[] = new byte[ipSize];
+            rrReader.readIP(ip, 0);
+            if (!Arrays.equals(aliceIP, ip)) {
+                if (_log.shouldWarn())
+                    _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(ip, port));
+                _context.statManager().addRateData("udp.relayBadIP", 1);
+                return;
             }
+        }
+        // prior to 0.9.24 we rejected any nonzero port
+        // here we reject anything different
+        // TODO relay request over IPv6
+        if (port != 0 && port != alicePort) {
+            if (_log.shouldWarn())
+                _log.warn("Bad relay req from " + alice + " for " + Addresses.toString(aliceIP, port));
             _context.statManager().addRateData("udp.relayBadIP", 1);
             return;
         }

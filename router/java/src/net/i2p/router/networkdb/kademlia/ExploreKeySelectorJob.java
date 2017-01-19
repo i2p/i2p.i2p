@@ -26,6 +26,7 @@ import net.i2p.util.Log;
  *
  * @deprecated unused, see comments in KNDF
  */
+@Deprecated
 class ExploreKeySelectorJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;

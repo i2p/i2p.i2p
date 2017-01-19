@@ -1,8 +1,10 @@
 package net.i2p.client.streaming.impl;
 
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -41,7 +43,7 @@ import net.i2p.data.DataHelper;
  *
  *  @since 0.9.4
  */
-public class PcapWriter {
+public class PcapWriter implements Closeable, Flushable {
 
     /** big-endian, see file format ref - 24 bytes */
     private static final byte[] FILE_HEADER = { (byte) 0xa1, (byte) 0xb2, (byte) 0xc3, (byte) 0xd4,

@@ -36,7 +36,9 @@ abstract class ThreadDump {
             success = true;
         if (success) {
             Log log = context.logManager().getLog(ThreadDump.class);
-            log.log(Log.CRIT, "Threads dumped to wrapper log");
+            File f = new File(context.getConfigDir(), "wrapper.log");
+            String loc = f.exists() ? f.getAbsolutePath() : "wrapper.log";
+            log.log(Log.CRIT, "Threads dumped to " + loc);
         }
         return success;
     }

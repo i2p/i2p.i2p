@@ -41,6 +41,7 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 import net.i2p.util.PasswordManager;
+import net.i2p.util.PortMapper;
 import net.i2p.util.Translate;
 import net.i2p.util.TranslateReader;
 
@@ -285,7 +286,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 // We send Accept-Charset: UTF-8 in the 407 so hopefully it comes back that way inside the B64 ?
                 try {
                     String dec = new String(decoded, "UTF-8");
-                    String[] parts = dec.split(":");
+                    String[] parts = DataHelper.split(dec, ":");
                     String user = parts[0];
                     String pw = parts[1];
                     // first try pw for that user
@@ -303,7 +304,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                             return AuthResult.AUTH_GOOD;
                         }
                     }
-                    _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+                    _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
                 } catch (UnsupportedEncodingException uee) {
                     _log.error(getPrefix(requestId) + "No UTF-8 support? B64: " + authorization, uee);
                 } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -362,7 +363,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String ha1 = getTunnel().getClientOptions().getProperty(PROP_PROXY_DIGEST_PREFIX + user +
                                                                 PROP_PROXY_DIGEST_SUFFIX);
         if (ha1 == null) {
-            _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
             return AuthResult.AUTH_BAD;
         }
         // get H(A2)
@@ -372,7 +373,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         String kd = ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2;
         String hkd = PasswordManager.md5Hex(kd);
         if (!response.equals(hkd)) {
-            _log.logAlways(Log.WARN, "PROXY AUTH FAILURE: user " + user);
+            _log.logAlways(Log.WARN, "HTTP proxy authentication failed, user: " + user);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Bad digest auth: " + DataHelper.toString(args));
             return AuthResult.AUTH_BAD;
@@ -462,6 +463,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             " realm=\"" + getRealm() + '"' +
             (isDigest ? ", nonce=\"" + getNonce() + "\"," +
                         " algorithm=MD5," +
+                        " charset=UTF-8," +     // RFC 7616/7617
                         " qop=\"auth\"" +
                         (isStale ? ", stale=true" : "")
                       : "") +
@@ -535,7 +537,24 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             while((len = reader.read(buf)) > 0) {
                 out.append(buf, 0, len);
             }
-            return out.toString();
+            String rv = out.toString();
+            // Do we need to replace http://127.0.0.1:7657 console links in the error page?
+            // Get the registered host and port from the PortMapper.
+            final String unset = "*unset*";
+            final String httpHost = ctx.portMapper().getActualHost(PortMapper.SVC_CONSOLE, unset);
+            final String httpsHost = ctx.portMapper().getActualHost(PortMapper.SVC_HTTPS_CONSOLE, unset);
+            final int httpPort = ctx.portMapper().getPort(PortMapper.SVC_CONSOLE, 7657);
+            final int httpsPort = ctx.portMapper().getPort(PortMapper.SVC_HTTPS_CONSOLE, -1);
+            final boolean httpsOnly = httpsPort > 0 && httpHost.equals(unset) && !httpsHost.equals(unset);
+            final int port = httpsOnly ? httpsPort : httpPort;
+            String host = httpsOnly ? httpsHost : httpHost;
+            if (host.equals(unset))
+                host = "127.0.0.1";
+            if (httpsOnly || port != 7657 || !host.equals("127.0.0.1")) {
+                String url = (httpsOnly ? "https://" : "http://") + host + ':' + port;
+                rv = rv.replace("http://127.0.0.1:7657", url);
+            }
+            return rv;
         } finally {
             try {
                 if(reader != null)
@@ -684,7 +703,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             out.write("</a>");
             if (usingWWWProxy) {
                 out.write("<br><br><b>");
-                out.write(_("HTTP Outproxy"));
+                out.write(_t("HTTP Outproxy"));
                 out.write(":</b> " + wwwProxy);
             }
             if (extraMessage != null) {
@@ -723,7 +742,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     if (first) {
                         first = false;
                         out.write("<br><br><h3>");
-                        out.write(_("Click a link below for an address helper from a jump service"));
+                        out.write(_t("Click a link below for an address helper from a jump service"));
                         out.write("</h3>\n");
                     } else {
                         out.write("<br>");
@@ -733,7 +752,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     out.write(uri);
                     out.write("\">");
                     // Translators: parameter is a host name
-                    out.write(_("{0} jump service", jumphost));
+                    out.write(_t("{0} jump service", jumphost));
                     out.write("</a>\n");
                 }
             }
@@ -778,7 +797,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  Translate
      *  @since 0.9.14 moved from I2PTunnelHTTPClient
      */
-    protected String _(String key) {
+    protected String _t(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
@@ -787,7 +806,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  {0}
      *  @since 0.9.14 moved from I2PTunnelHTTPClient
      */
-    protected String _(String key, Object o) {
+    protected String _t(String key, Object o) {
         return Translate.getString(key, o, _context, BUNDLE_NAME);
     }
 
@@ -796,7 +815,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
      *  {0} and {1}
      *  @since 0.9.14 moved from I2PTunnelHTTPClient
      */
-    protected String _(String key, Object o, Object o2) {
+    protected String _t(String key, Object o, Object o2) {
         return Translate.getString(key, o, o2, _context, BUNDLE_NAME);
     }
 }

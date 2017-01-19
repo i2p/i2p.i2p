@@ -53,7 +53,6 @@ public class WorkingDir {
     private final static String WORKING_DIR_DEFAULT = ".i2p";
     private final static String WORKING_DIR_DEFAULT_DAEMON = "i2p-config";
     /** we do a couple of things differently if this is the username */
-    private final static String DAEMON_USER = "i2psvc";
     private static final String PROP_WRAPPER_LOG = "wrapper.logfile";
     private static final String DEFAULT_WRAPPER_LOG = "wrapper.log";
     /** Feb 16 2006 */
@@ -93,7 +92,7 @@ public class WorkingDir {
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_MAC);
                 }
             } else {
-                if (DAEMON_USER.equals(System.getProperty("user.name")))
+                if (SystemVersion.isLinuxService())
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_DAEMON);
                 else
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
@@ -211,7 +210,7 @@ public class WorkingDir {
             String[] files = dir.list();
             if (files == null)
                 return false;
-            String migrated[] = MIGRATE_BASE.split(",");
+            String migrated[] = DataHelper.split(MIGRATE_BASE, ",");
             for (String file: files) {
                 for (int i = 0; i < migrated.length; i++) {
                     if (file.equals(migrated[i]))
@@ -282,7 +281,7 @@ public class WorkingDir {
 
     private static boolean migrate(String list, File olddir, File todir) {
         boolean rv = true;
-        String files[] = list.split(",");
+        String files[] = DataHelper.split(list, ",");
         for (int i = 0; i < files.length; i++) {
             File from = new File(olddir, files[i]);
             if (!copy(from, todir)) {
@@ -306,7 +305,7 @@ public class WorkingDir {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
             out.println("# Modified by I2P User dir migration script");
             String s = null;
-            boolean isDaemon = DAEMON_USER.equals(System.getProperty("user.name"));
+            boolean isDaemon = SystemVersion.isLinuxService();
             while ((s = DataHelper.readLine(in)) != null) {
                 // readLine() doesn't strip \r
                 if (s.endsWith("\r"))
@@ -431,11 +430,7 @@ public class WorkingDir {
         try {
             in = new FileInputStream(src);
             out = new SecureFileOutputStream(dst);
-            
-            int read = 0;
-            while ( (read = in.read(buf)) != -1)
-                out.write(buf, 0, read);
-            
+            DataHelper.copy(in, out);
             System.err.println("Copied " + src.getPath());
         } catch (IOException ioe) {
             System.err.println("FAILED copy " + src.getPath() + ": " + ioe);

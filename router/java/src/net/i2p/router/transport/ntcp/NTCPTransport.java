@@ -150,6 +150,8 @@ public class NTCPTransport extends TransportImpl {
         //_context.statManager().createRateStat("ntcp.inboundCheckConnection", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablished", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.inboundEstablishedDuplicate", "", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.inboundIPv4Conn", "Inbound IPv4 NTCP Connection", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.inboundIPv6Conn", "Inbound IPv6 NTCP Connection", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.infoMessageEnqueued", "", "ntcp", RATES);
         //_context.statManager().createRateStat("ntcp.floodInfoMessageEnqueued", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.invalidDH", "", "ntcp", RATES);
@@ -213,10 +215,13 @@ public class NTCPTransport extends TransportImpl {
         synchronized (_conLock) {
             old = _conByIdent.put(peer, con);
         }
-        if (con.isIPv6())
+        if (con.isIPv6()) {
             _lastInboundIPv6 = con.getCreated();
-        else
+            _context.statManager().addRateData("ntcp.inboundIPv6Conn", 1);
+        } else {
             _lastInboundIPv4 = con.getCreated();
+            _context.statManager().addRateData("ntcp.inboundIPv4Conn", 1);
+        }
         return old;
     }
 
@@ -436,7 +441,7 @@ public class NTCPTransport extends TransportImpl {
                 continue;
             }
             if (!isValid(ip)) {
-                if (! _context.getBooleanProperty("i2np.ntcp.allowLocal")) {
+                if (! allowLocal()) {
                     //_context.statManager().addRateData("ntcp.bidRejectedLocalAddress", 1);
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug("no bid when trying to send to " + peer + " as they have a private ntcp address");
@@ -484,6 +489,21 @@ public class NTCPTransport extends TransportImpl {
     public boolean isBacklogged(Hash dest) {
             NTCPConnection con = _conByIdent.get(dest);
             return (con != null) && con.isEstablished() && con.tooBacklogged();
+    }
+
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    @Override
+    public void mayDisconnect(final Hash peer) {
+        final NTCPConnection con = _conByIdent.get(peer);
+        if (con != null && con.isEstablished() &&
+            con.getMessagesReceived() <= 2 && con.getMessagesSent() <= 1) {
+            con.setMayDisconnect();
+        }
     }
 
     /**
@@ -1341,26 +1361,26 @@ public class NTCPTransport extends TransportImpl {
         }
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
-        buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
-        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
+        buf.append("<h3 id=\"ntcpcon\">").append(_t("NTCP connections")).append(": ").append(peers.size());
+        buf.append(". ").append(_t("Limit")).append(": ").append(getMaxConnections());
+        buf.append(". ").append(_t("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
         if (_context.getBooleanProperty(PROP_ADVANCED)) {
-            buf.append(". ").append(_("Status")).append(": ").append(_(getReachabilityStatus().toStatusString()));
+            buf.append(". ").append(_t("Status")).append(": ").append(_t(getReachabilityStatus().toStatusString()));
         }
         buf.append(".</h3>\n" +
                    "<table>\n" +
-                   "<tr><th><a href=\"#def.peer\">").append(_("Peer")).append("</a></th>" +
-                   "<th>").append(_("Dir")).append("</th>" +
-                   "<th>").append(_("IPv6")).append("</th>" +
-                   "<th align=\"right\"><a href=\"#def.idle\">").append(_("Idle")).append("</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.rate\">").append(_("In/Out")).append("</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.up\">").append(_("Up")).append("</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.skew\">").append(_("Skew")).append("</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.send\">").append(_("TX")).append("</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.recv\">").append(_("RX")).append("</a></th>" +
-                   "<th>").append(_("Out Queue")).append("</th>" +
-                   "<th>").append(_("Backlogged?")).append("</th>" +
-                   //"<th>").append(_("Reading?")).append("</th>" +
+                   "<tr><th><a href=\"#def.peer\">").append(_t("Peer")).append("</a></th>" +
+                   "<th>").append(_t("Dir")).append("</th>" +
+                   "<th>").append(_t("IPv6")).append("</th>" +
+                   "<th align=\"right\"><a href=\"#def.idle\">").append(_t("Idle")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.rate\">").append(_t("In/Out")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.up\">").append(_t("Up")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.skew\">").append(_t("Skew")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.send\">").append(_t("TX")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.recv\">").append(_t("RX")).append("</a></th>" +
+                   "<th>").append(_t("Out Queue")).append("</th>" +
+                   "<th>").append(_t("Backlogged?")).append("</th>" +
+                   //"<th>").append(_t("Reading?")).append("</th>" +
                    " </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -1372,9 +1392,9 @@ public class NTCPTransport extends TransportImpl {
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td><td class=\"cells\" align=\"center\">");
             if (con.isInbound())
-                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_("Inbound")).append("\"/>");
+                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_t("Inbound")).append("\"/>");
             else
-                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\"/>");
+                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\"/>");
             buf.append("</td><td class=\"cells\" align=\"center\">");
             if (con.isIPv6())
                 buf.append("&#x2713;");

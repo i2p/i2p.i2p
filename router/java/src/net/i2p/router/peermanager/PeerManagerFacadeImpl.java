@@ -78,6 +78,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public Hash selectRandomByCapability(char capability) { 
         //if (_manager == null) return null;
         //return _manager.selectRandomByCapability(capability); 
@@ -94,6 +95,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
     }
 
     /** @deprecated moved to routerconsole */
+    @Deprecated
     public void renderStatusHTML(Writer out) throws IOException { 
     }
     

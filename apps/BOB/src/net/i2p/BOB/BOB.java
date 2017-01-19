@@ -143,6 +143,7 @@ public class BOB implements Runnable, ClientApp {
 	 * Stop BOB gracefully
 	 * @deprecated unused
 	 */
+	@Deprecated
 	public synchronized static void stop() {
 		if (_bob != null)
 			_bob.shutdown(null);
@@ -164,7 +165,7 @@ public class BOB implements Runnable, ClientApp {
 		if (classResource != null) {
 		    String classPath = classResource.toString();
 		    if (classPath.startsWith("jar")) {
-		        String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) +
+		        String manifestPath = classPath.substring(0, classPath.lastIndexOf('!') + 1) +
 		                "/META-INF/MANIFEST.MF";
 		        try {
 		            Manifest manifest = new Manifest(new URL(manifestPath).openStream());
@@ -247,11 +248,11 @@ public class BOB implements Runnable, ClientApp {
 			save = true;
 		}
 		if (!props.containsKey("inbound.length")) {
-			props.setProperty("inbound.length", "1");
+			props.setProperty("inbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("outbound.length")) {
-			props.setProperty("outbound.length", "1");
+			props.setProperty("outbound.length", "3");
 			save = true;
 		}
 		if (!props.containsKey("inbound.lengthVariance")) {
@@ -338,7 +339,7 @@ public class BOB implements Runnable, ClientApp {
 
 				if (g) {
 					DoCMDS conn_c = new DoCMDS(spin, lock, server, props, database, _log);
-					Thread t = new Thread(conn_c);
+					Thread t = new I2PAppThread(conn_c);
 					t.setName("BOB.DoCMDS " + i);
 					t.start();
 					i++;
@@ -363,25 +364,30 @@ public class BOB implements Runnable, ClientApp {
 			// We could order them to stop, but that could cause nasty issues in the locks.
 			visitAllThreads();
 			database.getReadLock();
-			int all = database.getcount();
-			database.releaseReadLock();
 			NamedDB nickinfo;
-			for (i = 0; i < all; i++) {
-				database.getReadLock();
-				nickinfo = (NamedDB) database.getnext(i);
-				nickinfo.getReadLock();
-				if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
-					nickinfo.releaseReadLock();
-					database.releaseReadLock();
-					database.getWriteLock();
-					nickinfo.getWriteLock();
-					nickinfo.add(P_STOPPING, Boolean.valueOf(true));
-					nickinfo.releaseWriteLock();
-					database.releaseWriteLock();
-				} else {
-					nickinfo.releaseReadLock();
-					database.releaseReadLock();
+			try {
+				for (Object ndb : database.values()) {
+					nickinfo = (NamedDB) ndb;
+					nickinfo.getReadLock();
+					boolean released = false;
+					try {
+						if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
+							nickinfo.releaseReadLock();
+							released = true;
+							nickinfo.getWriteLock();
+							try {
+								nickinfo.add(P_STOPPING, Boolean.TRUE);
+							} finally {
+								nickinfo.releaseWriteLock();
+							}
+						}
+					} finally {
+						if (!released)
+							nickinfo.releaseReadLock();
+					}
 				}
+			} finally {
+				database.releaseReadLock();
 			}
 			changeState(STOPPED);
 			_log.info("BOB is now stopped.");

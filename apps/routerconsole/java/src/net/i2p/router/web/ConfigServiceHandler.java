@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -155,13 +158,12 @@ public class ConfigServiceHandler extends FormHandler {
 
     /**
      *  Register a handler for signals,
-     *  so we can handle HUP from the wrapper (non-Windows only, wrapper 3.2.0 or higher)
+     *  so we can handle HUP from the wrapper (wrapper 3.2.0 or higher)
      *
      *  @since 0.8.13
      */
     synchronized static void registerSignalHandler(RouterContext ctx) {
-        if (ctx.hasWrapper() && _wrapperListener == null &&
-            !SystemVersion.isWindows()) {
+        if (ctx.hasWrapper() && _wrapperListener == null) {
             String wv = System.getProperty("wrapper.version");
             if (wv != null && VersionComparator.comp(wv, LISTENER_AVAILABLE) >= 0) {
                 try {
@@ -192,64 +194,94 @@ public class ConfigServiceHandler extends FormHandler {
         return _context.router().gracefulShutdownInProgress();
     }
 
+    /**
+     *  Should we show the systray controls?
+     *
+     *  @since 0.9.26
+     */
+    public boolean shouldShowSystray() {
+        return !
+            (SystemVersion.isLinuxService() ||
+             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()) ||
+             // headless=true is forced in i2prouter script to prevent useless dock icon;
+             // must fix this first
+             SystemVersion.isMac());
+    }
+
+    /**
+     *  Is the systray enabled?
+     *
+     *  @since 0.9.26
+     */
+    public boolean isSystrayEnabled() {
+        // default false for now, except on non-service windows
+        String sdtg = _context.getProperty(RouterConsoleRunner.PROP_DTG_ENABLED);
+        return Boolean.parseBoolean(sdtg) ||
+               (sdtg == null && SystemVersion.isWindows());
+    }
+
     @Override
     protected void processForm() {
         if (_action == null) return;
         
-        if (_("Shutdown gracefully").equals(_action)) {
+        if (_t("Shutdown gracefully").equals(_action)) {
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_GRACEFUL, false);
             _context.router().shutdownGracefully();
-            addFormNotice(_("Graceful shutdown initiated"));
-        } else if (_("Shutdown immediately").equals(_action)) {
+            addFormNotice(_t("Graceful shutdown initiated"));
+        } else if (_t("Shutdown immediately").equals(_action)) {
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_HARD, false);
             _context.router().shutdown(Router.EXIT_HARD);
-            addFormNotice(_("Shutdown immediately"));
-        } else if (_("Cancel graceful shutdown").equals(_action)) {
+            addFormNotice(_t("Shutdown immediately"));
+        } else if (_t("Cancel graceful shutdown").equals(_action)) {
             _context.router().cancelGracefulShutdown();
-            addFormNotice(_("Graceful shutdown cancelled"));
-        } else if (_("Graceful restart").equals(_action)) {
+            addFormNotice(_t("Graceful shutdown cancelled"));
+        } else if (_t("Graceful restart").equals(_action)) {
             // should have wrapper if restart button is visible
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_GRACEFUL_RESTART, false);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            addFormNotice(_("Graceful restart requested"));
-        } else if (_("Hard restart").equals(_action)) {
+            addFormNotice(_t("Graceful restart requested"));
+        } else if (_t("Hard restart").equals(_action)) {
             // should have wrapper if restart button is visible
             if (_context.hasWrapper())
                 registerWrapperNotifier(Router.EXIT_HARD_RESTART, false);
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
-            addFormNotice(_("Hard restart requested"));
-        } else if (_("Rekey and Restart").equals(_action)) {
-            addFormNotice(_("Rekeying after graceful restart"));
+            addFormNotice(_t("Hard restart requested"));
+        } else if (_t("Rekey and Restart").equals(_action)) {
+            addFormNotice(_t("Rekeying after graceful restart"));
             registerWrapperNotifier(Router.EXIT_GRACEFUL_RESTART, true);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-        } else if (_("Rekey and Shutdown").equals(_action)) {
-            addFormNotice(_("Rekeying after graceful shutdown"));
+        } else if (_t("Rekey and Shutdown").equals(_action)) {
+            addFormNotice(_t("Rekeying after graceful shutdown"));
             registerWrapperNotifier(Router.EXIT_GRACEFUL, true);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
-        } else if (_("Run I2P on startup").equals(_action)) {
+        } else if (_t("Run I2P on startup").equals(_action)) {
             installService();
-        } else if (_("Don't run I2P on startup").equals(_action)) {
+        } else if (_t("Don't run I2P on startup").equals(_action)) {
             uninstallService();
-        } else if (_("Dump threads").equals(_action)) {
+        } else if (_t("Dump threads").equals(_action)) {
             try {
                 WrapperManager.requestThreadDump();
             } catch (Throwable t) {
                 addFormError("Warning: unable to contact the service manager - " + t.getMessage());
             }
             File wlog = LogsHelper.wrapperLogFile(_context);
-            addFormNotice(_("Threads dumped to {0}", wlog.getAbsolutePath()));
-        } else if (_("View console on startup").equals(_action)) {
+            addFormNotice(_t("Threads dumped to {0}", wlog.getAbsolutePath()));
+        } else if (_t("View console on startup").equals(_action)) {
             browseOnStartup(true);
-            addFormNotice(_("Console is to be shown on startup"));
-        } else if (_("Do not view console on startup").equals(_action)) {
+            addFormNotice(_t("Console is to be shown on startup"));
+        } else if (_t("Do not view console on startup").equals(_action)) {
             browseOnStartup(false);
-            addFormNotice(_("Console is not to be shown on startup"));
-        } else if (_("Force GC").equals(_action)) {
+            addFormNotice(_t("Console is not to be shown on startup"));
+        } else if (_t("Force GC").equals(_action)) {
             Runtime.getRuntime().gc();
-            addFormNotice(_("Full garbage collection requested"));
+            addFormNotice(_t("Full garbage collection requested"));
+        } else if (_t("Show systray icon").equals(_action)) {
+            changeSystray(true);
+        } else if (_t("Hide systray icon").equals(_action)) {
+            changeSystray(false);
         } else {
             //addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }
@@ -258,18 +290,18 @@ public class ConfigServiceHandler extends FormHandler {
     private void installService() {
         try { 
             Runtime.getRuntime().exec("install_i2p_service_winnt.bat");
-            addFormNotice(_("Service installed"));
+            addFormNotice(_t("Service installed"));
         } catch (IOException ioe) {
-            addFormError(_("Warning: unable to install the service") + " - " + ioe.getMessage());
+            addFormError(_t("Warning: unable to install the service") + " - " + ioe.getMessage());
         }
     }
 
     private void uninstallService() {
         try { 
             Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");
-            addFormNotice(_("Service removed"));
+            addFormNotice(_t("Service removed"));
         } catch (IOException ioe) {
-            addFormError(_("Warning: unable to remove the service") + " - " + ioe.getMessage());
+            addFormError(_t("Warning: unable to remove the service") + " - " + ioe.getMessage());
         }
     }
 
@@ -292,5 +324,52 @@ public class ConfigServiceHandler extends FormHandler {
             clients.add(ca);
         }
         ClientAppConfig.writeClientAppConfig(_context, clients);
+    }
+
+    /**
+     *  Enable/disable and start/stop systray
+     *
+     *  @since 0.9.26
+     */
+    private void changeSystray(boolean enable) {
+        ClientAppManager mgr = _context.clientAppManager();
+        if (mgr != null) {
+            try {
+                ClientApp dtg = mgr.getRegisteredApp("desktopgui");
+                if (dtg != null) {
+                    if (enable) {
+                        if (dtg.getState() == ClientAppState.STOPPED) {
+                            dtg.startup();
+                            addFormNotice(_t("Enabled system tray"));
+                        }
+                    } else {
+                        if (dtg.getState() == ClientAppState.RUNNING) {
+                            dtg.shutdown(null);
+                            addFormNotice(_t("Disabled system tray"));
+                        }
+                    }
+                } else if (enable) {
+                    // already set to true, GraphicsEnvironment initialized, can't change it now
+                    if (Boolean.valueOf(System.getProperty("java.awt.headless"))) {
+                        addFormError(_t("Restart required to take effect"));
+                    } else {
+                        dtg = new net.i2p.desktopgui.Main(_context, mgr, null);    
+                        dtg.startup();
+                        addFormNotice(_t("Enabled system tray"));
+                    }
+                }
+            } catch (Throwable t) {
+                if (enable)
+                    addFormError(_t("Failed to start systray") + ": " + t);
+                else
+                    addFormError(_t("Failed to stop systray") + ": " + t);
+            }
+        }
+
+        boolean saved = _context.router().saveConfig(RouterConsoleRunner.PROP_DTG_ENABLED, Boolean.toString(enable));
+        if (saved) 
+            addFormNotice(_t("Configuration saved successfully"));
+        else
+            addFormError(_t("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

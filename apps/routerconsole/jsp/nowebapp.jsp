@@ -2,7 +2,7 @@
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
-    response.setStatus(404, "Not Found");
+    response.setStatus(404);
 %>
 <html><head>
 <%@include file="css.jsi" %>
@@ -11,8 +11,8 @@
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
-<h1><%=intl._("Web Application Not Running")%></h1>
+<h1><%=intl._t("Web Application Not Running")%></h1>
 <div class="sorry" id="warning">
-<%=intl._("The requested web application is not running.")%>
-<%=intl._("Please visit the {0}config clients page{1} to start it.", "<a href=\"/configclients.jsp#webapp\" target=\"_top\">", "</a>")%>
+<%=intl._t("The requested web application is not running.")%>
+<%=intl._t("Please visit the {0}config clients page{1} to start it.", "<a href=\"/configwebapps.jsp#webapp\" target=\"_top\">", "</a>")%>
 </div></body></html>

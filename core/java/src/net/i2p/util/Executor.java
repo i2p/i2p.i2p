@@ -39,7 +39,7 @@ class Executor implements Runnable {
                 }
                 long time = _context.clock().now() - before;
                 if ( (time > 1000) && (_log.shouldLog(Log.WARN)) )
-                    _log.warn("wtf, event execution took " + time + ": " + evt);
+                    _log.warn("event execution took " + time + ": " + evt);
             }
         }
     }

@@ -25,12 +25,13 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
-//import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-//import net.i2p.i2ptunnel.I2PTunnel;
+import net.i2p.util.I2PAppThread;
+
 // needed only for debugging.
 // import java.util.logging.Level;
 // import java.util.logging.Logger;
@@ -47,17 +48,17 @@ public class DoCMDS implements Runnable {
 	// I need a better way to do versioning, but this will do for now.
 	public static final String BMAJ = "00",  BMIN = "00",  BREV = "10",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
-	private Socket server;
-	private Properties props;
-	private NamedDB database;
+	private final Socket server;
+	private final Properties props;
+	private final NamedDB database;
 	private String line;
 	private Destination d;
 	private ByteArrayOutputStream prikey;
 	private boolean dk,  ns,  ip,  op;
 	private NamedDB nickinfo;
-	private Logger _log;
-	private AtomicBoolean LIVE;
-	private AtomicBoolean lock;
+	private final Logger _log;
+	private final AtomicBoolean LIVE;
+	private final AtomicBoolean lock;
 	/* database strings */
 	private static final String P_DEST = "DESTINATION";
 	private static final String P_INHOST = "INHOST";
@@ -173,38 +174,38 @@ public class DoCMDS implements Runnable {
 		Lifted.copyProperties(props, this.props);
 	}
 
-	private void rlock() throws Exception {
+	private void rlock() {
 		rlock(nickinfo);
 	}
 
-	private void rlock(NamedDB Arg) throws Exception {
+	private void rlock(NamedDB Arg) {
 		database.getReadLock();
 		Arg.getReadLock();
 	}
 
-	private void runlock() throws Exception {
+	private void runlock() {
 		runlock(nickinfo);
 	}
 
-	private void runlock(NamedDB Arg) throws Exception {
+	private void runlock(NamedDB Arg) {
 		Arg.releaseReadLock();
 		database.releaseReadLock();
 	}
 
-	private void wlock() throws Exception {
+	private void wlock() {
 		wlock(nickinfo);
 	}
 
-	private void wlock(NamedDB Arg) throws Exception {
+	private void wlock(NamedDB Arg) {
 		database.getWriteLock();
 		Arg.getWriteLock();
 	}
 
-	private void wunlock() throws Exception {
+	private void wunlock() {
 		wunlock(nickinfo);
 	}
 
-	private void wunlock(NamedDB Arg) throws Exception {
+	private void wunlock(NamedDB Arg) {
 		Arg.releaseWriteLock();
 		database.releaseWriteLock();
 	}
@@ -215,14 +216,9 @@ public class DoCMDS implements Runnable {
 	 * @param out
 	 * @param info
 	 * @param key
-	 * @throws Exception
 	 */
-	private void trypnt(PrintStream out, NamedDB info, Object key) throws Exception {
-		try {
-			rlock(info);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
+	private void trypnt(PrintStream out, NamedDB info, String key) {
+		rlock(info);
 		try {
 			out.print(" " + key + ": ");
 			if (info.exists(key)) {
@@ -230,11 +226,9 @@ public class DoCMDS implements Runnable {
 			} else {
 				out.print("not_set");
 			}
-		} catch (Exception e) {
+		} finally {
 			runlock(info);
-			throw new Exception(e);
 		}
-		runlock(info);
 	}
 
 	/**
@@ -243,22 +237,15 @@ public class DoCMDS implements Runnable {
 	 * @param out
 	 * @param info
 	 * @param key
-	 * @throws Exception
 	 */
-	private void tfpnt(PrintStream out, NamedDB info, Object key) throws Exception {
-		try {
-			rlock(info);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
+	private void tfpnt(PrintStream out, NamedDB info, String key) {
+		rlock(info);
 		try {
 			out.print(" " + key + ": ");
 			out.print(info.exists(key));
-		} catch (Exception e) {
+		} finally {
 			runlock(info);
-			throw new Exception(e);
 		}
-		runlock(info);
 	}
 
 	/**
@@ -266,7 +253,7 @@ public class DoCMDS implements Runnable {
 	 *
 	 * @param out
 	 */
-	private void nns(PrintStream out) throws IOException {
+	private static void nns(PrintStream out) {
 		out.println("ERROR no nickname has been set");
 	}
 
@@ -275,33 +262,19 @@ public class DoCMDS implements Runnable {
 	 *
 	 * @param out
 	 * @param info
-	 * @throws Exception
 	 */
-	private void nickprint(PrintStream out, NamedDB info) throws Exception {
-		try {
-			rlock(info);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
-		try {
-
-			trypnt(out, info, P_NICKNAME);
-			trypnt(out, info, P_STARTING);
-			trypnt(out, info, P_RUNNING);
-			trypnt(out, info, P_STOPPING);
-			tfpnt(out, info, P_KEYS);
-			trypnt(out, info, P_QUIET);
-			trypnt(out, info, P_INPORT);
-			trypnt(out, info, P_INHOST);
-			trypnt(out, info, P_OUTPORT);
-			trypnt(out, info, P_OUTHOST);
-			out.println();
-		} catch (Exception e) {
-			runlock(info);
-			throw new Exception(e);
-		}
-
-		runlock(info);
+	private void nickprint(PrintStream out, NamedDB info) {
+		trypnt(out, info, P_NICKNAME);
+		trypnt(out, info, P_STARTING);
+		trypnt(out, info, P_RUNNING);
+		trypnt(out, info, P_STOPPING);
+		tfpnt(out, info, P_KEYS);
+		trypnt(out, info, P_QUIET);
+		trypnt(out, info, P_INPORT);
+		trypnt(out, info, P_INHOST);
+		trypnt(out, info, P_OUTPORT);
+		trypnt(out, info, P_OUTHOST);
+		out.println();
 	}
 
 	/**
@@ -309,51 +282,26 @@ public class DoCMDS implements Runnable {
 	 *
 	 * @param out
 	 * @param info
-	 * @throws Exception
 	 */
-	private void propprint(PrintStream out, NamedDB info) throws Exception {
-		try {
-			rlock(info);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
-		try {
-
-			trypnt(out, info, P_PROPERTIES);
-			out.println();
-		} catch (Exception e) {
-			runlock(info);
-			throw new Exception(e);
-		}
-
-		runlock(info);
+	private void propprint(PrintStream out, NamedDB info) {
+		trypnt(out, info, P_PROPERTIES);
 	}
 
 	/**
 	 * Print information on a specific record, indicated by NamedDB
 	 * @param out
 	 * @param Arg
-	 * @throws Exception
 	 */
-	private void ttlpnt(PrintStream out, Object Arg) throws Exception {
-		try {
-			database.getReadLock();
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
-
+	private void ttlpnt(PrintStream out, String Arg) {
+		database.getReadLock();
 		try {
 			if (database.exists(Arg)) {
 				out.print("DATA");
 				nickprint(out, (NamedDB) database.get(Arg));
 			}
-		} catch (Exception e) {
+		} finally {
 			database.releaseReadLock();
-			throw new Exception(e);
 		}
-
-
-		database.releaseReadLock();
 	}
 
 	/**
@@ -362,24 +310,16 @@ public class DoCMDS implements Runnable {
 	 * @param Arg
 	 * @return true if the tunnel is active
 	 */
-	private boolean tunnelactive(NamedDB Arg) throws Exception {
+	private boolean tunnelactive(NamedDB Arg) {
 		boolean retval;
-		try {
-			rlock(Arg);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
-
+		rlock(Arg);
 		try {
 			retval = (Arg.get(P_STARTING).equals(Boolean.TRUE) ||
 				Arg.get(P_STOPPING).equals(Boolean.TRUE) ||
 				Arg.get(P_RUNNING).equals(Boolean.TRUE));
-		} catch (Exception e) {
+		} finally {
 			runlock();
-			throw new Exception(e);
 		}
-
-		runlock(Arg);
 		return retval;
 	}
 
@@ -389,7 +329,7 @@ public class DoCMDS implements Runnable {
 	 * @param data
 	 * @return OK
 	 */
-	private boolean is64ok(String data) {
+	private static boolean is64ok(String data) {
 		try {
 			new Destination(data);
 			return true;
@@ -439,7 +379,6 @@ public class DoCMDS implements Runnable {
 										if (C_ALL[i][0].equalsIgnoreCase(Arg)) {
 											out.println("OK " + C_ALL[i][1]);
 										}
-
 									}
 								} else if (Command.equals(C_visit)) {
 									visitAllThreads();
@@ -469,33 +408,17 @@ public class DoCMDS implements Runnable {
 								} else if (Command.equals(C_getdest)) {
 									if (ns) {
 										if (dk) {
-											try {
-												rlock();
-											} catch (Exception ex) {
-												break die;
-											}
-
+											rlock();
 											try {
 												out.println("OK " + nickinfo.get(P_DEST));
 											} catch (Exception e) {
-												try {
-													runlock();
-												} catch (Exception ex) {
-													break die;
-												}
 												break die;
-											}
-
-											try {
+											} finally {
 												runlock();
-											} catch (Exception ex) {
-												break die;
 											}
-
 										} else {
 											out.println("ERROR keys not set.");
 										}
-
 									} else {
 										nns(out);
 									}
@@ -503,44 +426,18 @@ public class DoCMDS implements Runnable {
 								} else if (Command.equals(C_list)) {
 									// Produce a formatted list of all nicknames
 									database.getReadLock();
-									for (int i = 0; i <
-										database.getcount(); i++) {
-										try {
-											info = (NamedDB) database.getnext(i);
-											out.print("DATA");
-										} catch (Exception e) {
-											database.releaseReadLock();
-											break die;
-										}
-
-										try {
-											info.getReadLock();
-										} catch (Exception ex) {
-											break die;
-										}
-										try {
-											nickprint(out, info);
-										} catch (Exception e) {
+									try {
+										for (Object ndb : database.values()) {
 											try {
-												info.releaseReadLock();
-												database.releaseReadLock();
-											} catch (Exception ex) {
+												info = (NamedDB) ndb;
+												out.print("DATA");
+											} catch (Exception e) {
 												break die;
 											}
-											break die;
+											nickprint(out, info);
 										}
-
-										try {
-											info.releaseReadLock();
-										} catch (Exception ex) {
-											break die;
-										}
-									}
-
-									try {
+									} finally {
 										database.releaseReadLock();
-									} catch (Exception ex) {
-										break die;
 									}
 									out.println("OK Listing done");
 								} else if (Command.equals(C_quit)) {
@@ -561,92 +458,41 @@ public class DoCMDS implements Runnable {
 													// Make a new PublicKey and PrivateKey
 													prikey = new ByteArrayOutputStream();
 													d = I2PClientFactory.createClient().createDestination(prikey);
-													try {
-														wlock();
-													} catch (Exception e) {
-														break die;
-													}
-
+													wlock();
 													try {
 														nickinfo.add(P_KEYS, prikey.toByteArray());
 														nickinfo.add(P_DEST, d.toBase64());
-													} catch (Exception e) {
-														try {
-															wunlock();
-														} catch (Exception ex) {
-															break die;
-														}
-														break die;
-													}
-
-													dk = true;
-													try {
-														wunlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													try {
-														rlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													try {
 														out.println("OK " + nickinfo.get(P_DEST));
 													} catch (Exception e) {
-														runlock();
 														break die;
+													} finally {
+														wunlock();
 													}
-
-													try {
-														runlock();
-													} catch (Exception ex) {
-														break die;
-													}
+													dk = true;
 												} catch (I2PException ipe) {
 													_log.error("Error generating keys", ipe);
 													out.println("ERROR generating keys");
 												}
-
 											}
 										} catch (Exception e) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_getkeys)) {
 									// Return public key
 									if (dk) {
 										prikey = new ByteArrayOutputStream();
-										try {
-											rlock();
-										} catch (Exception e) {
-											break die;
-										}
+										rlock();
 										try {
 											prikey.write(((byte[]) nickinfo.get(P_KEYS)));
 										} catch (Exception ex) {
-											try {
-												runlock();
-											} catch (Exception ee) {
-												break die;
-											}
 											break die;
-										}
-										try {
+										} finally {
 											runlock();
-										} catch (Exception e) {
-											break die;
 										}
-
 										out.println("OK " + net.i2p.data.Base64.encode(prikey.toByteArray()));
 									} else {
 										out.println("ERROR no public key has been set");
@@ -658,41 +504,21 @@ public class DoCMDS implements Runnable {
 											if (tunnelactive(nickinfo)) {
 												out.println("ERROR tunnel is active");
 											} else {
-												try {
-													wlock();
-												} catch (Exception ex) {
-													break die;
-												}
+												wlock();
 												try {
 													nickinfo.add(P_QUIET, Boolean.valueOf(Arg));
 												} catch (Exception ex) {
-													try {
-														wunlock();
-													} catch (Exception ee) {
-														break die;
-													}
 													break die;
-												}
-
-												try {
+												} finally {
 													wunlock();
-												} catch (Exception ex) {
-													break die;
 												}
-
 												out.println("OK Quiet set");
 											}
-
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_verify)) {
@@ -718,75 +544,31 @@ public class DoCMDS implements Runnable {
 												}
 
 												if ((Arg.length() == 884) && is64ok(Arg)) {
-													try {
-														wlock();
-													} catch (Exception ex) {
-														break die;
-													}
+													wlock();
 													try {
 														nickinfo.add(P_KEYS, prikey.toByteArray());
 														nickinfo.add(P_DEST, d.toBase64());
+														out.println("OK " + nickinfo.get(P_DEST));
 													} catch (Exception ex) {
-														try {
-															wunlock();
-														} catch (Exception ee) {
-															break die;
-														}
 														break die;
+													} finally {
+														wunlock();
 													}
 													dk = true;
-													try {
-														wunlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													try {
-														rlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													try {
-														out.println("OK " + nickinfo.get(P_DEST));
-													} catch (Exception e) {
-														try {
-															runlock();
-														} catch (Exception ex) {
-															break die;
-														}
-														break die;
-													}
-
-													try {
-														runlock();
-													} catch (Exception ex) {
-														break die;
-													}
 												} else {
 													out.println("ERROR not in BASE64 format");
 												}
-
 											}
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_setnick)) {
 									ns = dk = ip = op = false;
-									try {
-										database.getReadLock();
-									} catch (Exception ex) {
-										break die;
-									}
+									database.getReadLock();
 									try {
 										nickinfo = (NamedDB) database.get(Arg);
 										if (!tunnelactive(nickinfo)) {
@@ -797,29 +579,20 @@ public class DoCMDS implements Runnable {
 									} catch (Exception b) {
 										nickinfo = null;
 										ns = true;
-									}
-
-									try {
+									} finally {
 										database.releaseReadLock();
-									} catch (Exception ex) {
-										break die;
 									}
 									// Clears and Sets the initial NamedDB structure to work with
 									if (ns) {
 										nickinfo = new NamedDB();
-										try {
-											wlock();
-										} catch (Exception e) {
-											break die;
-										}
-
+										wlock();
 										try {
 											database.add(Arg, nickinfo);
 											nickinfo.add(P_NICKNAME, Arg);
-											nickinfo.add(P_STARTING, Boolean.valueOf(false));
-											nickinfo.add(P_RUNNING, Boolean.valueOf(false));
-											nickinfo.add(P_STOPPING, Boolean.valueOf(false));
-											nickinfo.add(P_QUIET, Boolean.valueOf(false));
+											nickinfo.add(P_STARTING, Boolean.FALSE);
+											nickinfo.add(P_RUNNING, Boolean.FALSE);
+											nickinfo.add(P_STOPPING, Boolean.FALSE);
+											nickinfo.add(P_QUIET, Boolean.FALSE);
 											nickinfo.add(P_INHOST, "localhost");
 											nickinfo.add(P_OUTHOST, "localhost");
 											Properties Q = new Properties();
@@ -828,20 +601,10 @@ public class DoCMDS implements Runnable {
 											Q.setProperty("outbound.nickname", Arg);
 											nickinfo.add(P_PROPERTIES, Q);
 										} catch (Exception e) {
-											try {
-												wunlock();
-												break die;
-											} catch (Exception ee) {
-												break die;
-											}
-
-										}
-										try {
-											wunlock();
-										} catch (Exception e) {
 											break die;
+										} finally {
+											wunlock();
 										}
-
 										out.println("OK Nickname set to " + Arg);
 									} else {
 										out.println("ERROR tunnel is active");
@@ -855,104 +618,53 @@ public class DoCMDS implements Runnable {
 											} else {
 												StringTokenizer otoken = new StringTokenizer(Arg, "="); // use an equal sign as a delimiter
 												if (otoken.countTokens() != 2) {
-													out.println("ERROR to many or no options.");
+													out.println("ERROR too many or no options.");
 												} else {
 													String pname = otoken.nextToken();
 													String pval = otoken.nextToken();
+													wlock();
 													try {
-														rlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													Properties Q = (Properties) nickinfo.get(P_PROPERTIES);
-													try {
-														runlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													Q.setProperty(pname, pval);
-													try {
-														wlock();
-													} catch (Exception ex) {
-														break die;
-													}
-
-													try {
+														Properties Q = (Properties) nickinfo.get(P_PROPERTIES);
+														Q.setProperty(pname, pval);
 														nickinfo.add(P_PROPERTIES, Q);
 													} catch (Exception ex) {
-														try {
-															wunlock();
-														} catch (Exception ee) {
-															break die;
-														}
 														break die;
-													}
-													try {
+													} finally {
 														wunlock();
-													} catch (Exception ex) {
-														break die;
 													}
-
 													out.println("OK " + pname + " set to " + pval);
 												}
-
 											}
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
 										nns(out);
 									}
 
 								} else if (Command.equals(C_getnick)) {
 									// Get the NamedDB to work with...
-									try {
-										database.getReadLock();
-									} catch (Exception ex) {
-										break die;
-									}
+									boolean nsfail = false;
+									database.getReadLock();
 									try {
 										nickinfo = (NamedDB) database.get(Arg);
 										ns = true;
 									} catch (RuntimeException b) {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											try {
-												database.releaseReadLock();
-											} catch (Exception ee) {
-												break die;
-											}
-											break die;
-										}
+										nsfail = true;
+										nns(out);
+									} finally {
+										database.releaseReadLock();
 									}
-
-									database.releaseReadLock();
-									if (ns) {
-										try {
-											rlock();
-										} catch (Exception e) {
-											break die;
-										}
+									if (ns && !nsfail) {
+										rlock();
 										try {
 											dk = nickinfo.exists(P_KEYS);
 											ip = nickinfo.exists(P_INPORT);
 											op = nickinfo.exists(P_OUTPORT);
 										} catch (Exception ex) {
-											try {
-												runlock();
-											} catch (Exception ee) {
-												break die;
-											}
 											break die;
-										}
-										try {
+										} finally {
 											runlock();
-										} catch (Exception e) {
-											break die;
 										}
 										// Finally say OK.
 										out.println("OK Nickname set to " + Arg);
@@ -967,81 +679,32 @@ public class DoCMDS implements Runnable {
 												out.println("ERROR tunnel is active");
 											} else {
 												int prt;
-												try {
-													wlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
+												wlock();
 												try {
 													nickinfo.kill(P_INPORT);
-												} catch (Exception ex) {
-													try {
-														wunlock();
-													} catch (Exception ee) {
-														break die;
-													}
-
-													break die;
-												}
-												try {
 													prt = Integer.parseInt(Arg);
 													if (prt > 1 && prt < 65536) {
 														try {
 															nickinfo.add(P_INPORT, Integer.valueOf(prt));
 														} catch (Exception ex) {
-															try {
-																wunlock();
-															} catch (Exception ee) {
-																break die;
-															}
-
 															break die;
 														}
 													}
-
+													ip = nickinfo.exists(P_INPORT);
 												} catch (NumberFormatException nfe) {
 													out.println("ERROR not a number");
-												}
-
-												try {
+												} finally {
 													wunlock();
-												} catch (Exception ex) {
-													break die;
 												}
-												try {
-													rlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
-												try {
-													ip = nickinfo.exists(P_INPORT);
-												} catch (Exception ex) {
-													try {
-														runlock();
-													} catch (Exception ee) {
-														break die;
-													}
-													break die;
-												}
-												try {
-													runlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
 												if (ip) {
 													out.println("OK inbound port set");
 												} else {
 													out.println("ERROR port out of range");
 												}
-
 											}
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
 										nns(out);
 									}
@@ -1055,85 +718,32 @@ public class DoCMDS implements Runnable {
 												out.println("ERROR tunnel is active");
 											} else {
 												int prt;
-												try {
-													wlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
+												wlock();
 												try {
 													nickinfo.kill(P_OUTPORT);
-												} catch (Exception ex) {
-													try {
-														wunlock();
-													} catch (Exception ee) {
-														break die;
-													}
-													break die;
-												}
-												try {
 													prt = Integer.parseInt(Arg);
 													if (prt > 1 && prt < 65536) {
-														try {
-															nickinfo.add(P_OUTPORT, Integer.valueOf(prt));
-														} catch (Exception ex) {
-															try {
-																wunlock();
-															} catch (Exception ee) {
-																break die;
-															}
-															break die;
-														}
+														nickinfo.add(P_OUTPORT, Integer.valueOf(prt));
 													}
-
+													ip = nickinfo.exists(P_OUTPORT);
 												} catch (NumberFormatException nfe) {
 													out.println("ERROR not a number");
-												}
-
-												try {
+												} catch (Exception ex) {
+													break die;
+												} finally {
 													wunlock();
-												} catch (Exception ex) {
-													break die;
 												}
-												try {
-													rlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
-												try {
-													ip = nickinfo.exists(P_OUTPORT);
-												} catch (Exception ex) {
-													try {
-														runlock();
-													} catch (Exception ee) {
-														break die;
-													}
-													break die;
-												}
-												try {
-													runlock();
-												} catch (Exception ex) {
-													break die;
-												}
-
 												if (ip) {
 													out.println("OK outbound port set");
 												} else {
 													out.println("ERROR port out of range");
 												}
-
 											}
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_inhost)) {
@@ -1142,40 +752,21 @@ public class DoCMDS implements Runnable {
 											if (tunnelactive(nickinfo)) {
 												out.println("ERROR tunnel is active");
 											} else {
-												try {
-													wlock();
-												} catch (Exception ex) {
-													break die;
-												}
+												wlock();
 												try {
 													nickinfo.add(P_INHOST, Arg);
 												} catch (Exception ex) {
-													try {
-														wunlock();
-													} catch (Exception ee) {
-														break die;
-													}
 													break die;
-												}
-												try {
+												} finally {
 													wunlock();
-												} catch (Exception ex) {
-													break die;
 												}
-
 												out.println("OK inhost set");
 											}
-
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_outhost)) {
@@ -1184,114 +775,39 @@ public class DoCMDS implements Runnable {
 											if (tunnelactive(nickinfo)) {
 												out.println("ERROR tunnel is active");
 											} else {
-												try {
-													wlock();
-												} catch (Exception ex) {
-													break die;
-												}
+												wlock();
 												try {
 													nickinfo.add(P_OUTHOST, Arg);
 												} catch (Exception ex) {
-													try {
-														wunlock();
-													} catch (Exception ee) {
-														break die;
-													}
 													break die;
-												}
-												try {
+												} finally {
 													wunlock();
-												} catch (Exception ex) {
-													break die;
 												}
-
 												out.println("OK outhost set");
 											}
-
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception ex) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_show)) {
 									// Get the current NamedDB properties
 									if (ns) {
 										out.print("OK");
-										try {
-											rlock();
-										} catch (Exception e) {
-											break die;
-										}
-
-										try {
-											nickprint(out, nickinfo);
-										} catch (Exception e) {
-											try {
-												runlock();
-											} catch (Exception ee) {
-												break die;
-											}
-
-											out.println(); // this will cause an IOE if IOE
-											break die;
-										}
-
-										try {
-											runlock();
-										} catch (Exception e) {
-											break die;
-										}
-
+										nickprint(out, nickinfo);
 									} else {
-										try {
-											nns(out);
-										} catch (Exception e) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_show_props)) {
 									// Get the current options properties
 									if (ns) {
 										out.print("OK");
-										try {
-											rlock();
-										} catch (Exception e) {
-											break die;
-										}
-
-										try {
-											propprint(out, nickinfo);
-										} catch (Exception e) {
-											try {
-												runlock();
-											} catch (Exception ee) {
-												break die;
-											}
-
-											out.println(); // this will cause an IOE if IOE
-											break die;
-										}
-
-										try {
-											runlock();
-										} catch (Exception e) {
-											break die;
-										}
-
+										propprint(out, nickinfo);
 									} else {
-										try {
-											nns(out);
-										} catch (Exception e) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_start)) {
@@ -1307,7 +823,7 @@ public class DoCMDS implements Runnable {
 														// wait
 													}
 													tunnel = new MUXlisten(lock, database, nickinfo, _log);
-													Thread t = new Thread(tunnel);
+													Thread t = new I2PAppThread(tunnel);
 													t.start();
 													// try {
 													//	Thread.sleep(1000 * 10); // Slow down the startup.
@@ -1334,59 +850,32 @@ public class DoCMDS implements Runnable {
 								} else if (Command.equals(C_stop)) {
 									// Stop the tunnel, if it is running
 									if (ns) {
-										try {
-											rlock();
-										} catch (Exception e) {
-											break die;
-										}
-
+										rlock();
+										boolean released = false;
 										try {
 											if (nickinfo.get(P_RUNNING).equals(Boolean.TRUE) && nickinfo.get(P_STOPPING).equals(Boolean.FALSE) && nickinfo.get(P_STARTING).equals(Boolean.FALSE)) {
+												runlock();
+												released = true;
+												wlock();
 												try {
-													runlock();
+													nickinfo.add(P_STOPPING, Boolean.TRUE);
 												} catch (Exception e) {
 													break die;
-												}
-
-												try {
-													wlock();
-												} catch (Exception e) {
-													break die;
-												}
-
-												nickinfo.add(P_STOPPING, Boolean.valueOf(true));
-												try {
+												} finally {
 													wunlock();
-
-												} catch (Exception e) {
-													break die;
 												}
-
 												out.println("OK tunnel stopping");
 											} else {
-												try {
-													runlock();
-												} catch (Exception e) {
-													break die;
-												}
-
 												out.println("ERROR tunnel is inactive");
 											}
 										} catch (Exception e) {
-											try {
+											break die;
+										} finally {
+											if (!released)
 												runlock();
-											} catch (Exception ee) {
-												break die;
-											}
-											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception e) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_clear)) {
@@ -1396,25 +885,12 @@ public class DoCMDS implements Runnable {
 											if (tunnelactive(nickinfo)) {
 												out.println("ERROR tunnel is active");
 											} else {
+												database.getWriteLock();
 												try {
-													database.getWriteLock();
+													database.kill((String) nickinfo.get(P_NICKNAME));
 												} catch (Exception e) {
-													break die;
-												}
-												try {
-													database.kill(nickinfo.get(P_NICKNAME));
-												} catch (Exception e) {
-													try {
-														database.releaseWriteLock();
-													} catch (Exception ee) {
-														break die;
-													}
-													break die;
-												}
-												try {
+												} finally {
 													database.releaseWriteLock();
-												} catch (Exception e) {
-													break die;
 												}
 												dk = ns = ip = op = false;
 												out.println("OK cleared");
@@ -1423,16 +899,12 @@ public class DoCMDS implements Runnable {
 										} catch (Exception ex) {
 											break die;
 										}
-
 									} else {
-										try {
-											nns(out);
-										} catch (Exception e) {
-											break die;
-										}
+										nns(out);
 									}
 
 								} else if (Command.equals(C_status)) {
+									database.getReadLock();
 									try {
 										if (database.exists(Arg)) {
 											// Show status of a NamedDB
@@ -1443,18 +915,14 @@ public class DoCMDS implements Runnable {
 												out.println(); // this will cause an IOE if IOE
 												break die;
 											}
-
 										} else {
-											try {
-												nns(out);
-											} catch (Exception e) {
-												break die;
-											}
+											nns(out);
 										}
 									} catch (Exception e) {
 										break die;
+									} finally {
+										database.releaseReadLock();
 									}
-
 								} else {
 									out.println("ERROR UNKNOWN COMMAND! Try help");
 								}

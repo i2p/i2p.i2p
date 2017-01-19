@@ -29,6 +29,7 @@ import net.i2p.client.SendMessageStatusListener;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.util.Log;
@@ -210,17 +211,17 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         throw new UnsupportedOperationException("Use MuxedImpl");
     }
     /** @throws UnsupportedOperationException always, use MuxedImpl */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent,
                                int proto, int fromport, int toport) throws I2PSessionException {
         throw new UnsupportedOperationException("Use MuxedImpl");
     }
     /** @throws UnsupportedOperationException always, use MuxedImpl */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expire,
                                int proto, int fromport, int toport) throws I2PSessionException {
         throw new UnsupportedOperationException("Use MuxedImpl");
     }
     /** @throws UnsupportedOperationException always, use MuxedImpl */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expire,
                                int proto, int fromport, int toport, int flags) throws I2PSessionException {
         throw new UnsupportedOperationException("Use MuxedImpl");
     }
@@ -253,7 +254,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * @param tagsSent unused - no end-to-end crypto
      */
     @Override
-    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException {
+    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set<SessionTag> tagsSent) throws I2PSessionException {
         return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent, 0);
     }
 
@@ -261,7 +262,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent)
                    throws I2PSessionException {
         return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0);
     }
@@ -272,17 +273,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto
      */
-    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expires)
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set<SessionTag> tagsSent, long expires)
                    throws I2PSessionException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
-        synchronized (_stateLock) {
-            if (_state == State.CLOSED)
-                throw new I2PSessionException("Already closed");
-            if (_state == State.INIT)
-                throw new I2PSessionException("Not open, must call connect() first");
-            if (_state == State.OPENING || _state == State.GOTDATE) // not before GOTDATE or session
-                throw new I2PSessionException("Session not open yet");
-        }
+        verifyOpen();
         updateActivity();
 
         // Sadly there is no way to send something completely uncompressed in a backward-compatible way,
@@ -339,7 +333,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto
      */
-    protected boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent, long expires)
+    protected boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set<SessionTag> tagsSent, long expires)
                     throws I2PSessionException {
         return sendBestEffort(dest, payload, expires, 0);
     }

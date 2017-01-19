@@ -14,7 +14,6 @@ public enum UpdateType {
     PLUGIN,
     /** unused */
     GEOIP,
-    /** unused */
     BLOCKLIST,
     /** unused */
     RESEED,

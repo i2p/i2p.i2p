@@ -56,7 +56,35 @@ public class EdDSAParameterSpec implements AlgorithmParameterSpec, Serializable 
         return sc;
     }
 
+    /**
+     *  @return the base (generator)
+     */
     public GroupElement getB() {
         return B;
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    @Override
+    public int hashCode() {
+        return hashAlgo.hashCode() ^
+               curve.hashCode() ^
+               B.hashCode();
+    }
+
+    /**
+     *  @since 0.9.25
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof EdDSAParameterSpec))
+            return false;
+        EdDSAParameterSpec s = (EdDSAParameterSpec) o;
+        return hashAlgo.equals(s.getHashAlgorithm()) &&
+               curve.equals(s.getCurve()) &&
+               B.equals(s.getB());
     }
 }

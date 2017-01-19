@@ -15,8 +15,8 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.cert.X509CRL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -35,6 +35,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
 import net.i2p.data.SimpleDataStructure;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  *  Succesor to the ".sud" format used in TrustedUpdate.
@@ -78,6 +79,8 @@ public class SU3File {
     public static final int TYPE_HTML = 2;
     /** @since 0.9.17 */
     public static final int TYPE_XML_GZ = 3;
+    /** @since 0.9.28 */
+    public static final int TYPE_TXT_GZ = 4;
 
     public static final int CONTENT_UNKNOWN = 0;
     public static final int CONTENT_ROUTER = 1;
@@ -85,6 +88,8 @@ public class SU3File {
     public static final int CONTENT_RESEED = 3;
     /** @since 0.9.15 */
     public static final int CONTENT_NEWS = 4;
+    /** @since 0.9.28 */
+    public static final int CONTENT_BLOCKLIST = 5;
 
     /**
      *  The ContentType is the trust domain for the content.
@@ -96,7 +101,8 @@ public class SU3File {
         ROUTER(CONTENT_ROUTER, "router"),
         PLUGIN(CONTENT_PLUGIN, "plugin"),
         RESEED(CONTENT_RESEED, "reseed"),
-        NEWS(CONTENT_NEWS, "news")
+        NEWS(CONTENT_NEWS, "news"),
+        BLOCKLIST(CONTENT_BLOCKLIST, "blocklist")
         ;
 
         private final int code;
@@ -313,6 +319,7 @@ public class SU3File {
             if (_certFile != null) {
                 _signerPubkey = loadKey(_certFile);
             } else {
+                // look in both install dir and config dir for the signer cert
                 KeyRing ring = new DirKeyRing(new File(_context.getBaseDir(), "certificates"));
                 try {
                     _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
@@ -321,8 +328,24 @@ public class SU3File {
                     ioe.initCause(gse);
                     throw ioe;
                 }
-                if (_signerPubkey == null)
-                    throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+                if (_signerPubkey == null) {
+                    boolean diff = true;
+                    try {
+                        diff = !_context.getBaseDir().getCanonicalPath().equals(_context.getConfigDir().getCanonicalPath());
+                    } catch (IOException ioe) {}
+                    if (diff) {
+                        ring = new DirKeyRing(new File(_context.getConfigDir(), "certificates"));
+                        try {
+                            _signerPubkey = ring.getKey(_signer, _contentType.getName(), _sigType);
+                        } catch (GeneralSecurityException gse) {
+                            IOException ioe = new IOException("keystore error");
+                            ioe.initCause(gse);
+                            throw ioe;
+                        }
+                    }
+                    if (_signerPubkey == null)
+                        throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
+                }
             }
         }
         _headerVerified = true;
@@ -540,10 +563,11 @@ public class SU3File {
             String ctype = null;
             String ftype = null;
             String kfile = null;
+            String crlfile = null;
             String kspass = KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD;
             boolean error = false;
             boolean shouldVerify = true;
-            Getopt g = new Getopt("SU3File", args, "t:c:f:k:xp:");
+            Getopt g = new Getopt("SU3File", args, "t:c:f:k:xp:r:");
             int c;
             while ((c = g.getopt()) != -1) {
               switch (c) {
@@ -561,6 +585,10 @@ public class SU3File {
 
                 case 'k':
                     kfile = g.getOptarg();
+                    break;
+
+                case 'r':
+                    crlfile = g.getOptarg();
                     break;
 
                 case 'x':
@@ -600,7 +628,10 @@ public class SU3File {
             } else if ("verifysig".equals(cmd)) {
                 ok = verifySigCLI(a.get(0), kfile);
             } else if ("keygen".equals(cmd)) {
-                ok = genKeysCLI(stype, a.get(0), a.get(1), a.get(2), kspass);
+                Properties props = new Properties();
+                props.setProperty("prng.bufferSize", "16384");
+                new I2PAppContext(props);
+                ok = genKeysCLI(stype, a.get(0), a.get(1), crlfile, a.get(2), kspass);
             } else if ("extract".equals(cmd)) {
                 ok = extractCLI(a.get(0), a.get(1), shouldVerify, kfile);
             } else {
@@ -616,9 +647,10 @@ public class SU3File {
     }
 
     private static final void showUsageCLI() {
-        System.err.println("Usage: SU3File keygen       [-t type|code] [-p keystorepw] publicKeyFile keystore.ks you@mail.i2p\n" +
+        System.err.println("Usage: SU3File keygen       [-t type|code] [-p keystorepw] [-r crlFile.crl] publicKeyFile.crt keystore.ks you@mail.i2p\n" +
                            "       SU3File sign         [-t type|code] [-c type|code] [-f type|code] [-p keystorepw] inputFile.zip signedFile.su3 keystore.ks version you@mail.i2p\n" +
                            "       SU3File bulksign     [-t type|code] [-c type|code] [-p keystorepw] directory keystore.ks version you@mail.i2p\n" +
+                           "                            (signs all .zip, .xml, and .xml.gz files in the directory)\n" +
                            "       SU3File showversion  signedFile.su3\n" +
                            "       SU3File verifysig    [-k file.crt] signedFile.su3  ## -k use this pubkey cert for verification\n" +
                            "       SU3File extract      [-x] [-k file.crt] signedFile.su3 outFile   ## -x don't check sig");
@@ -649,12 +681,13 @@ public class SU3File {
                 buf.append(" DEFAULT");
             buf.append('\n');
         }
-        buf.append("Available file types (-f):\n");
-        buf.append("      ZIP\t(code: 0) DEFAULT\n");
-        buf.append("      XML\t(code: 1)\n");
-        buf.append("      HTML\t(code: 2)\n");
-        buf.append("      XML_GZ\t(code: 3)\n");
-        buf.append("      (user defined)\t(code: 4-255)\n");
+        buf.append("Available file types (-f):\n" +
+                   "      ZIP\t(code: 0) DEFAULT\n" +
+                   "      XML\t(code: 1)\n" +
+                   "      HTML\t(code: 2)\n" +
+                   "      XML_GZ\t(code: 3)\n" +
+                   "      TXT_GZ\t(code: 4)\n" +
+                   "      (user defined)\t(code: 5-255)\n");
         return buf.toString();
     }
 
@@ -715,7 +748,7 @@ public class SU3File {
     }
 
     /**
-     *  Zip only
+     *  Zip, xml, and xml.gz only
      *  @return success
      *  @since 0.9.9
      */
@@ -752,10 +785,22 @@ public class SU3File {
         int success = 0;
         for (File in : files) {
             String inputFile = in.getPath();
-            if (!inputFile.endsWith(".zip"))
+            int len;
+            String ftype;
+            if (inputFile.endsWith(".zip")) {
+                len = 4;
+                ftype = "ZIP";
+            } else if (inputFile.endsWith(".xml")) {
+                len = 4;
+                ftype = "XML";
+            } else if (inputFile.endsWith(".xml.gz")) {
+                len = 7;
+                ftype = "XML_GZ";
+            } else {
                 continue;
-            String signedFile = inputFile.substring(0, inputFile.length() - 4) + ".su3";
-            boolean rv = signCLI(stype, ctype, null, inputFile, signedFile,
+            }
+            String signedFile = inputFile.substring(0, inputFile.length() - len) + ".su3";
+            boolean rv = signCLI(stype, ctype, ftype, inputFile, signedFile,
                                  privateKeyFile, version, signerName, keypw, kspass);
             if (!rv)
                 return false;
@@ -899,26 +944,29 @@ public class SU3File {
     }
 
     /**
+     *  @param crlFile may be null; non-null to save
      *  @return success
      *  @since 0.9.9
      */
     private static final boolean genKeysCLI(String stype, String publicKeyFile, String privateKeyFile,
-                                            String alias, String kspass) {
+                                            String crlFile, String alias, String kspass) {
         SigType type = stype == null ? SigType.getByCode(Integer.valueOf(DEFAULT_SIG_CODE)) : SigType.parseSigType(stype);
         if (type == null) {
             System.out.println("Signature type " + stype + " is not supported");
             return false;
         }
-        return genKeysCLI(type, publicKeyFile, privateKeyFile, alias, kspass);
+        return genKeysCLI(type, publicKeyFile, privateKeyFile, crlFile, alias, kspass);
     }
 
     /**
      *  Writes Java-encoded keys (X.509 for public and PKCS#8 for private)
+     *
+     *  @param crlFile may be null; non-null to save
      *  @return success
      *  @since 0.9.9
      */
     private static final boolean genKeysCLI(SigType type, String publicKeyFile, String privateKeyFile,
-                                            String alias, String kspass) {
+                                            String crlFile, String alias, String kspass) {
         File pubFile = new File(publicKeyFile);
         if (pubFile.exists()) {
             System.out.println("Error: Not overwriting file " + publicKeyFile);
@@ -950,24 +998,29 @@ public class SU3File {
         } catch (IOException ioe) {
             return false;
         }
-        int keylen = type.getPubkeyLen() * 8;
-        if (type.getBaseAlgorithm() == SigAlgo.EC) {
-            keylen /= 2;
-            if (keylen == 528)
-                keylen = 521;
-        }
-        boolean success = KeyStoreUtil.createKeys(ksFile, kspass, alias,
-                                                  alias, "I2P", 3652, type.getBaseAlgorithm().getName(),
-                                                  keylen, keypw);
-        if (!success) {
+        OutputStream out = null;
+        try {
+            Object[] rv =  KeyStoreUtil.createKeysAndCRL(ksFile, kspass, alias,
+                                                         alias, "I2P", 3652, type, keypw);
+            X509Certificate cert = (X509Certificate) rv[2];
+            out = new SecureFileOutputStream(publicKeyFile);
+            CertUtil.exportCert(cert, out);
+            if (crlFile != null) {
+                out.close();
+                X509CRL crl = (X509CRL) rv[3];
+                out = new SecureFileOutputStream(crlFile);
+                CertUtil.exportCRL(crl, out);
+            }
+        } catch (GeneralSecurityException gse) {
             System.err.println("Error creating keys for " + alias);
+            gse.printStackTrace();
             return false;
-        }
-        File outfile = new File(publicKeyFile);
-        success = KeyStoreUtil.exportCert(ksFile, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, alias, outfile);
-        if (!success) {
-            System.err.println("Error writing public key for " + alias + " to " + outfile);
+        } catch (IOException ioe) {
+            System.err.println("Error creating keys for " + alias);
+            ioe.printStackTrace();
             return false;
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
         }
         return true;
     }
@@ -978,24 +1031,12 @@ public class SU3File {
      *  @since 0.9.15
      */
     private static PublicKey loadKey(File kd) throws IOException {
-        InputStream fis = null;
         try {
-            fis = new FileInputStream(kd);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf.generateCertificate(fis);
-            cert.checkValidity();
-            return cert.getPublicKey();
+            return CertUtil.loadKey(kd);
         } catch (GeneralSecurityException gse) {
             IOException ioe = new IOException("cert error");
             ioe.initCause(gse);
             throw ioe;
-        } catch (IllegalArgumentException iae) {
-            // java 1.8.0_40-b10, openSUSE
-            IOException ioe = new IOException("cert error");
-            ioe.initCause(iae);
-            throw ioe;
-        } finally {
-            try { if (fis != null) fis.close(); } catch (IOException foo) {}
         }
     }
 }

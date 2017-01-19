@@ -25,9 +25,23 @@ import net.i2p.util.VersionComparator;
  */
 abstract class BuildRequestor {
     private static final List<Integer> ORDER = new ArrayList<Integer>(TunnelBuildMessage.MAX_RECORD_COUNT);
+    private static final String MIN_VARIABLE_VERSION = "0.7.12";
+    private static final boolean SEND_VARIABLE = true;
+    private static final int SHORT_RECORDS = 4;
+    private static final List<Integer> SHORT_ORDER = new ArrayList<Integer>(SHORT_RECORDS);
+    /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
+    private static final int MEDIUM_RECORDS = 5;
+    private static final List<Integer> MEDIUM_ORDER = new ArrayList<Integer>(MEDIUM_RECORDS);
     static {
-        for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
+        for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++) {
             ORDER.add(Integer.valueOf(i));
+        }
+        for (int i = 0; i < SHORT_RECORDS; i++) {
+            SHORT_ORDER.add(Integer.valueOf(i));
+        }
+        for (int i = 0; i < MEDIUM_RECORDS; i++) {
+            MEDIUM_ORDER.add(Integer.valueOf(i));
+        }
     }
 
     private static final int PRIORITY = OutNetMessage.PRIORITY_MY_BUILD_REQUEST;
@@ -223,17 +237,6 @@ abstract class BuildRequestor {
         //              + "ms and dispatched in " + (System.currentTimeMillis()-beforeDispatch));
         return true;
     }
-    
-    private static final String MIN_VARIABLE_VERSION = "0.7.12";
-    /** change this to true in 0.7.13 if testing goes well */
-    private static final boolean SEND_VARIABLE = true;
-    /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
-    private static final int SHORT_RECORDS = 5;
-    private static final List<Integer> SHORT_ORDER = new ArrayList<Integer>(SHORT_RECORDS);
-    static {
-        for (int i = 0; i < SHORT_RECORDS; i++)
-            SHORT_ORDER.add(Integer.valueOf(i));
-    }
 
     /** @since 0.7.12 */
     private static boolean supportsVariable(RouterContext ctx, Hash h) {
@@ -256,7 +259,7 @@ abstract class BuildRequestor {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
         long replyTunnel = 0;
         Hash replyRouter = null;
-        boolean useVariable = SEND_VARIABLE && cfg.getLength() <= SHORT_RECORDS;
+        boolean useVariable = SEND_VARIABLE && cfg.getLength() <= MEDIUM_RECORDS;
         if (cfg.isInbound()) {
             //replyTunnel = 0; // as above
             replyRouter = ctx.routerHash();
@@ -295,10 +298,13 @@ abstract class BuildRequestor {
         TunnelBuildMessage msg;
         List<Integer> order;
         if (useVariable) {
-            msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
-            order = new ArrayList<Integer>(SHORT_ORDER);
-            //if (log.shouldLog(Log.INFO))
-            //    log.info("Using new VTBM");
+            if (cfg.getLength() <= SHORT_RECORDS) {
+                msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
+                order = new ArrayList<Integer>(SHORT_ORDER);
+            } else {
+                msg = new VariableTunnelBuildMessage(ctx, MEDIUM_RECORDS);
+                order = new ArrayList<Integer>(MEDIUM_ORDER);
+            }
         } else {
             msg = new TunnelBuildMessage(ctx);
             order = new ArrayList<Integer>(ORDER);

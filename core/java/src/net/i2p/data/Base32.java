@@ -72,7 +72,7 @@ public class Base32 {
     private static void runApp(String args[]) {
         String cmd = args[0].toLowerCase(Locale.US);
         if ("encodestring".equals(cmd)) {
-            System.out.println(encode(args[1].getBytes()));
+            System.out.println(encode(DataHelper.getUTF8(args[1])));
             return;
         }
         InputStream in = System.in;
@@ -102,12 +102,7 @@ public class Base32 {
 
     private static byte[] read(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
-        byte buf[] = new byte[64];
-        while (true) {
-            int read = in.read(buf);
-            if (read < 0) break;
-            baos.write(buf, 0, read);
-        }
+        DataHelper.copy(in, baos);
         return baos.toByteArray();
     }
 
@@ -143,7 +138,7 @@ public class Base32 {
      *  @param source if null will return ""
      */
     public static String encode(String source) {
-        return (source != null ? encode(source.getBytes()) : "");
+        return (source != null ? encode(DataHelper.getUTF8(source)) : "");
     }
 
     /**
@@ -210,7 +205,7 @@ public class Base32 {
      * @return decoded data, null on error
      */
     public static byte[] decode(String s) {
-        return decode(s.getBytes());
+        return decode(DataHelper.getASCII(s));
     }
 
     private final static byte[] dmask = { (byte) 0xf8, (byte) 0x7c, (byte) 0x3e, (byte) 0x1f,

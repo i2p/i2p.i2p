@@ -186,10 +186,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     private void initStats() {
-        _context.statManager().createRateStat("i2ptunnel.client.closeBacklog", "How many pending sockets remain when we close one due to backlog?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("i2ptunnel.client.closeBacklog", "How many pending sockets remain when we close one due to backlog?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
 
     /**
@@ -471,10 +471,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     portNum = "7654";
                 String msg;
                 if (getTunnel().getContext().isRouterContext())
+                    msg = "Unable to build tunnels for the client";
+                else
                     msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
                              " and build tunnels for the client";
-                else
-                    msg = "Unable to build tunnels for the client";
                 if (++retries < MAX_RETRIES) {
                     if (log != null)
                         log.log(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
@@ -626,7 +626,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * adding it to the list of connections actually managed by this
      * tunnel.
      *
-     * @param dest The destination to connect to
+     * @param dest The destination to connect to, non-null
      * @return a new I2PSocket
      */
     public I2PSocket createI2PSocket(Destination dest) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
@@ -638,7 +638,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * adding it to the list of connections actually managed by this
      * tunnel.
      *
-     * @param dest The destination to connect to
+     * @param dest The destination to connect to, non-null
      * @param port The destination port to connect to 0 - 65535
      * @return a new I2PSocket
      * @since 0.9.9
@@ -656,7 +656,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * adding it to the list of connections actually managed by this
      * tunnel.
      *
-     * @param dest The destination to connect to
+     * @param dest The destination to connect to, non-null
      * @param opt Option to be used to open when opening the socket
      * @return a new I2PSocket
      *
@@ -666,6 +666,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @throws I2PException if there is some other I2P-related problem
      */
     public I2PSocket createI2PSocket(Destination dest, I2PSocketOptions opt) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
+        if (dest == null)
+            throw new NullPointerException();
         I2PSocket i2ps;
 
         verifySocketManager();

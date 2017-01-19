@@ -65,8 +65,10 @@ class RequestLeaseSetJob extends JobImpl {
         endTime += fudge;
 
         SessionId id = _runner.getSessionId(requested.getDestination().calculateHash());
-        if (id == null)
+        if (id == null) {
+            _runner.failLeaseRequest(_requestState);
             return;
+        }
         I2CPMessage msg;
         if (getContext().getProperty(PROP_VARIABLE, DFLT_VARIABLE) &&
             (_runner instanceof QueuedClientConnectionRunner ||

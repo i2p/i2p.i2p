@@ -49,7 +49,7 @@ config /etc/rc.d/rc.i2p.new
 config $INST_DIR/wrapper.config.new
 
 if [ -e /var/log/packages/i2p-base* ]; then
-    echo "Warning: This package supercedes the 'i2p-base' package." >&2
+    echo "Warning: This package supersedes the 'i2p-base' package." >&2
     echo
     echo "You may want to 'removepkg i2p-base'" >&2
     echo "and check the contents of /etc/rc.d/rc.local*" >&2

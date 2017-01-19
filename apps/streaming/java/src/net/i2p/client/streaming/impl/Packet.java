@@ -585,7 +585,7 @@ class Packet {
         cur += 4;
         setAckThrough(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        int numNacks = (int)DataHelper.fromLong(buffer, cur, 1);
+        int numNacks = buffer[cur] & 0xff;
         cur++;
         if (length < 22 + numNacks*4)
             throw new IllegalArgumentException("Too small with " + numNacks + " nacks: " + length);
@@ -599,7 +599,7 @@ class Packet {
         } else {
             setNacks(null);
         }
-        setResendDelay((int)DataHelper.fromLong(buffer, cur, 1));
+        setResendDelay(buffer[cur] & 0xff);
         cur++;
         setFlags((int)DataHelper.fromLong(buffer, cur, 2));
         cur += 2;
@@ -780,7 +780,12 @@ class Packet {
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
-        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG ").append(_optionSignature.length());
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
+            if (_optionSignature != null)
+                buf.append(" SIG ").append(_optionSignature.length());
+            else
+                buf.append(" (to be signed)");
+        }
         if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
         if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
     }

@@ -37,6 +37,7 @@ public class I2PSocketManagerFactory {
      *  Ignored since 0.9.12, cannot be changed via properties.
      *  @deprecated
      */
+    @Deprecated
     public static final String PROP_MANAGER = "i2p.streaming.manager";
 
     /**
@@ -195,7 +196,9 @@ public class I2PSocketManagerFactory {
             ByteArrayOutputStream keyStream = new ByteArrayOutputStream(1024);
             try {
                 client.createDestination(keyStream, getSigType(opts));
-            } catch (Exception e) {
+            } catch (I2PException e) {
+                throw new I2PSessionException("Error creating keys", e);
+            } catch (IOException e) {
                 throw new I2PSessionException("Error creating keys", e);
             }
             myPrivateKeyStream = new ByteArrayInputStream(keyStream.toByteArray());
@@ -256,9 +259,9 @@ public class I2PSocketManagerFactory {
             Class<?> cls = Class.forName(classname);
             if (!I2PSocketManager.class.isAssignableFrom(cls))
                 throw new IllegalArgumentException(classname + " is not an I2PSocketManager");
-            Constructor<I2PSocketManager> con = (Constructor<I2PSocketManager>)
-                  cls.getConstructor(new Class[] {I2PAppContext.class, I2PSession.class, Properties.class, String.class});
-            I2PSocketManager mgr = con.newInstance(new Object[] {context, session, opts, name});
+            Constructor<?> con =
+                  cls.getConstructor(I2PAppContext.class, I2PSession.class, Properties.class, String.class);
+            I2PSocketManager mgr = (I2PSocketManager) con.newInstance(new Object[] {context, session, opts, name});
             return mgr;
         } catch (Throwable t) {
             getLog().log(Log.CRIT, "Error loading " + classname, t);

@@ -9,6 +9,7 @@ import net.i2p.router.RouterContext;
  *
  * @deprecated unused
  */
+@Deprecated
 class TrivialRouterPreprocessor extends TrivialPreprocessor {
     
     public TrivialRouterPreprocessor(RouterContext ctx) {

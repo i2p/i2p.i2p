@@ -13,6 +13,7 @@ public class NavHelper {
     private static final Map<String, String> _apps = new ConcurrentHashMap<String, String>(4);
     private static final Map<String, String> _tooltips = new ConcurrentHashMap<String, String>(4);
     private static final Map<String, String> _icons = new ConcurrentHashMap<String, String>(4);
+    private static final Map<String, byte[]> _binary = new ConcurrentHashMap<String, byte[]>(4);
     
     /**
      * To register a new client application so that it shows up on the router
@@ -40,6 +41,29 @@ public class NavHelper {
         _icons.remove(name);
     }
     
+    /**
+     *  Retrieve binary icon for a plugin
+     *  @param name plugin name
+     *  @return null if not found
+     *  @since 0.9.25
+     */
+    public static byte[] getBinary(String name){
+        if(name != null)
+            return _binary.get(name);
+        else
+            return null;
+    }
+
+    /**
+     *  Store binary icon for a plugin
+     *  @param name plugin name
+     *  @since 0.9.25
+     */
+    public static void setBinary(String name, byte[] arr){
+        _binary.put(name, arr);
+    }
+
+
     /**
      *  Translated string is loaded by PluginStarter
      *  @param ctx unused

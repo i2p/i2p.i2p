@@ -19,8 +19,9 @@ Debian wrapper.config to try to prevent confusion.
 @@ -1,3 +1,3 @@
  #!/bin/sh
 -I2P="%INSTALL_PATH"
+-java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
 +I2P="/usr/share/i2p"
- java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
++java -cp "$I2P/lib/i2p.jar:/usr/share/java/gnu-getopt.jar" net.i2p.util.EepGet "$@"
 --- a/installer/resources/i2prouter
 +++ b/installer/resources/i2prouter
 @@ -10,7 +10,7 @@
@@ -71,7 +72,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -177,75 +168,8 @@
+@@ -177,77 +168,8 @@
         exit 1
  fi
  
@@ -104,13 +105,15 @@ Debian wrapper.config to try to prevent confusion.
 -
 -freebsd10() {
 -    echo
--    echo "The current version of the Tanuki wrapper does not"
--    echo "support FreeBSD 10."
+-    echo "The current version of the Tanuki wrapper that is bundled"
+-    echo "with I2P does not support FreeBSD 10."
 -    echo
--    echo "See https://trac.i2p2.de/ticket/1118 for more information"
--    echo "and a workaround for this issue."
+-    echo "See http://trac.i2p2.de/ticket/1118#comment:13 for a work-around."
+-    echo "After applying the work-around, as a normal user or a dedicated"
+-    echo "i2p user, you can then run:"
+-    echo "$ ./i2prouter start"
 -    echo
--    echo "In the meantime, you may start I2P by running the script"
+-    echo "Or, you may also start I2P by running the script:"
 -    echo "${I2P}/runplain.sh"
 -    echo
 -}
@@ -125,11 +128,11 @@ Debian wrapper.config to try to prevent confusion.
 -                    ;;
 -                *)
 -                    # We should never get here on recent versions of FreeBSD
--                    if ! $(pkg_info -E 'libiconv*' > /dev/null 2>&1); then
+-                    if ! $(pkg info -E 'libiconv*' > /dev/null 2>&1); then
 -                        echo
 -                        echo "The wrapper requires libiconv."
 -                        echo
--                        echo "It can be installed with pkg_add -r libiconv"
+-                        echo "It can be installed with pkg install libiconv"
 -                        echo
 -                    fi
 -                    ;;
@@ -147,7 +150,7 @@ Debian wrapper.config to try to prevent confusion.
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -1058,7 +982,6 @@
+@@ -1068,7 +982,6 @@
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -155,7 +158,7 @@ Debian wrapper.config to try to prevent confusion.
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1861,7 +1784,7 @@
+@@ -1871,7 +1784,7 @@
  }
  
  showsetusermesg()  {
@@ -164,7 +167,7 @@ Debian wrapper.config to try to prevent confusion.
  }
  
  checkifstartingasroot() {
-@@ -1869,7 +1792,7 @@
+@@ -1879,7 +1792,7 @@
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -173,7 +176,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1934,24 +1857,10 @@
+@@ -1944,24 +1857,10 @@
              status
              ;;
  
@@ -309,11 +312,10 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -258,30 +239,3 @@
- wrapper.umask=0022
+@@ -259,32 +240,6 @@
  wrapper.java.umask=0022
  wrapper.logfile.umask=0077
--
+ 
 -#********************************************************************
 -# Wrapper NT Service Properties
 -#********************************************************************
@@ -340,6 +342,9 @@ Debian wrapper.config to try to prevent confusion.
 -# Allow the service to interact with the desktop.
 -wrapper.ntservice.interactive=false
 -
+ # http://wrapper.tanukisoftware.com/doc/english/prop-check-deadlock.html
+ # requires wrapper 3.5.0 or higher
+ # interval is seconds
 --- a/installer/resources/locale/po/messages_de.po
 +++ b/installer/resources/locale/po/messages_de.po
 @@ -195,15 +195,15 @@
@@ -367,16 +372,16 @@ Debian wrapper.config to try to prevent confusion.
 @@ -185,7 +185,7 @@
  msgstr ""
  
- #: ../i2prouter:1864
+ #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
  msgstr ""
  
- #: ../i2prouter:1869
+ #: ../i2prouter:1879
 @@ -193,5 +193,5 @@
  msgstr ""
  
- #: ../i2prouter:1872
+ #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
  msgstr ""
@@ -575,7 +580,7 @@ Debian wrapper.config to try to prevent confusion.
  "true."
 --- a/installer/resources/locale/po/messages_pt_BR.po
 +++ b/installer/resources/locale/po/messages_pt_BR.po
-@@ -190,15 +190,15 @@
+@@ -189,13 +189,13 @@
  msgstr "Solicitar um despejo de thread se está sendo executado."
  
  #: ../i2prouter:1864
@@ -590,11 +595,9 @@ Debian wrapper.config to try to prevent confusion.
  
  #: ../i2prouter:1872
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite i2prouter e ponha ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
- msgstr ""
- "De qualquer forma, se quiser mesmo executar o roteador como root, edite "
--"i2prouter e ponha ALLOW_ROOT=true."
-+"/etc/default/i2p e ponha ALLOW_ROOT=true."
++msgstr "De qualquer forma, se quiser mesmo executar o roteador como root, edite /etc/default/i2p e ponha ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_pl.po
 +++ b/installer/resources/locale/po/messages_pl.po
 @@ -191,13 +191,13 @@

@@ -1,25 +1,25 @@
 Source: i2p
-Maintainer: Kill Your TV <killyourtv@i2pmail.org>
+Maintainer: zzz <zzz@i2pmail.org>
 Section: net
 Standards-Version: 3.9.6
 Priority: optional
-Bugs: mailto:killyourtv@i2pmail.org
-Homepage: https://geti2p.net
+Bugs: mailto:zzz@i2pmail.org
+Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
  ,ant-optional
  ,debconf
- ,default-jdk | openjdk-7-jdk | openjdk-6-jdk
+ ,openjdk-7-jdk
+ ,libjetty8-java, libservlet3.0-java
+ ,glassfish-javaee
  ,dh-apparmor
  ,gettext
+ ,libgetopt-java
  ,libgmp-dev (>= 2:5.0.5)
-# uncomment the next line for official builds
-# ,libservice-wrapper-java
- ,libcommons-logging-java
+ ,libservice-wrapper-java
  ,hardening-wrapper
  ,po-debconf
-# Uncomment the next line for Debian unstable or Ubuntu Saucy (and newer)
-# ,dh-systemd
+ ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -27,11 +27,12 @@ Section: net
 Priority: optional
 Depends: ${java:Depends}, ${shlibs:Depends},
  adduser,
+ debconf,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
  lsb-base,
  service-wrapper
-Description: Load-balanced unspoofable packet switching network
+Description: I2P anonymous network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -45,8 +46,8 @@ Architecture: any
 Section: java
 Priority: optional
 Depends: ${shlibs:Depends}, i2p-router
-Homepage: http://www.i2p2.de/jbigi
-Description: Java Big Integer library
+Homepage: https://geti2p.net/
+Description: I2P libjbigi library
  This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .
  libjbigi is a math library that is part of the I2P installation.  Use of this
@@ -57,9 +58,10 @@ Description: Java Big Integer library
 Package: i2p-doc
 Architecture: all
 Section: doc
+Priority: extra
 Depends: ${misc:Depends}
 Suggests: i2p, default-jdk-doc
-Description: Documentation for I2P
+Description: I2P developer documentation
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -72,11 +74,18 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-8-jre-headless | openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless | java8-runtime-headless | java7-runtime-headless | java6-runtime-headless, libecj-java
+ openjdk-9-jre-headless | openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java9-runtime-headless | java8-runtime-headless | java7-runtime-headless,
+ libecj-java,
+ geoip-database,
+ gettext-base,
+ libgetopt-java,
+ libjetty8-java, libservlet3.0-java,
+ glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
 Suggests: tor
+ ,apparmor
  ,i2p-messenger
  ,i2phex
  ,i2p-tahoe-lafs
@@ -92,7 +101,7 @@ Suggests: tor
  ,syndie
  ,www-browser
  ,xul-ext-torbutton
-Description: Load-balanced unspoofable packet switching network
+Description: I2P router
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no

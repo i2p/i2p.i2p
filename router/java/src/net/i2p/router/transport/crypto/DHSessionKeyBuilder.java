@@ -505,9 +505,10 @@ public class DHSessionKeyBuilder {
                             break;
                         long curCalc = System.currentTimeMillis() - curStart;
                         // for some relief...
-                        try {
-                            Thread.sleep(Math.min(200, Math.max(10, _calcDelay + (curCalc * 3))));
-                        } catch (InterruptedException ie) { // nop
+                        if (!interrupted()) {
+                            try {
+                                Thread.sleep(Math.min(200, Math.max(10, _calcDelay + (curCalc * 3))));
+                            } catch (InterruptedException ie) {}
                         }
                     }
                 }
@@ -541,6 +542,8 @@ public class DHSessionKeyBuilder {
                 if (_log.shouldLog(Log.INFO)) _log.info("No more builders, creating one now");
                 _context.statManager().addRateData("crypto.DHEmpty", 1);
                 builder = precalc();
+                // stop sleeping, wake up, make some more
+                this.interrupt();
             }
             return builder;
         }

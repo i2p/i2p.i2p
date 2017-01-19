@@ -28,12 +28,14 @@ import net.i2p.I2PAppContext;
  *
  * @author zzz
  */
+@Deprecated
 public class SimpleScheduler {
 
     /**
      *  If you have a context, use context.simpleScheduler() instead
      *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
+    @Deprecated
     public static SimpleScheduler getInstance() {
         return I2PAppContext.getGlobalContext().simpleScheduler();
     }
@@ -51,6 +53,7 @@ public class SimpleScheduler {
      *  Others should use context.simpleTimer() instead
      *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
+    @Deprecated
     public SimpleScheduler(I2PAppContext context) {
         this(context, "SimpleScheduler");
     }
@@ -60,6 +63,7 @@ public class SimpleScheduler {
      *  Others should use context.simpleTimer() instead
      *  @deprecated in 0.9.20, replaced by SimpleTimer2
      */
+    @Deprecated
     private SimpleScheduler(I2PAppContext context, String name) {
         _log = context.logManager().getLog(SimpleScheduler.class);
         _name = name;
@@ -166,9 +170,9 @@ public class SimpleScheduler {
                 _log.debug("Running: " + _timedEvent);
             long before = System.currentTimeMillis();
             if (_log.shouldLog(Log.WARN) && before < _scheduled - 100)
-                _log.warn(_name + " wtf, early execution " + (_scheduled - before) + ": " + _timedEvent);
+                _log.warn(_name + " early execution " + (_scheduled - before) + ": " + _timedEvent);
             else if (_log.shouldLog(Log.WARN) && before > _scheduled + 1000)
-                _log.warn(" wtf, late execution " + (before - _scheduled) + ": " + _timedEvent + debug());
+                _log.warn("late execution " + (before - _scheduled) + ": " + _timedEvent + debug());
             try {
                 _timedEvent.timeReached();
             } catch (Throwable t) {
@@ -176,7 +180,7 @@ public class SimpleScheduler {
             }
             long time = System.currentTimeMillis() - before;
             if (time > 1000 && _log.shouldLog(Log.WARN))
-                _log.warn(_name + " wtf, event execution took " + time + ": " + _timedEvent);
+                _log.warn(_name + " event execution took " + time + ": " + _timedEvent);
             if (_log.shouldLog(Log.INFO)) {
                  // this call is slow - iterates through a HashMap -
                  // would be better to have a local AtomicLong if we care

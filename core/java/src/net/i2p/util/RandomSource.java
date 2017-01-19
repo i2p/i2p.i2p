@@ -58,7 +58,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
      * According to the java docs (http://java.sun.com/j2se/1.4.1/docs/api/java/util/Random.html#nextInt(int))
      * nextInt(n) should return a number between 0 and n (including 0 and excluding n).  However, their pseudocode,
      * as well as sun's, kaffe's, and classpath's implementation INCLUDES NEGATIVE VALUES.
-     * WTF.  Ok, so we're going to have it return between 0 and n (including 0, excluding n), since 
+     * Ok, so we're going to have it return between 0 and n (including 0, excluding n), since 
      * thats what it has been used for.
      *
      * This code unused, see FortunaRandomSource override
@@ -195,13 +195,15 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
                 }
                 if (ok)
                     System.arraycopy(tbuf, 0, buf, 0, buf.length);
-                else
-                    System.out.println("INFO: SecureRandom init failed or took too long");
+                // See FortunaRandomSource constructor for fallback
+                //else
+                //    System.out.println("INFO: SecureRandom init failed or took too long");
             }
         } catch (InterruptedException ie) {}
 
         // why urandom?  because /dev/random blocks
-        ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
+        if (!SystemVersion.isWindows())
+            ok = seedFromFile(new File("/dev/urandom"), buf) || ok;
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
         File localFile = new File(_context.getConfigDir(), SEEDFILE);
         ok = seedFromFile(localFile, buf) || ok;
@@ -217,17 +219,23 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
      */
     private static class SecureRandomInit implements Runnable {
         private final byte[] buf;
+        private static final int SZ = 64;
 
         public SecureRandomInit(byte[] buf) {
             this.buf = buf;
         }
 
         public void run() {
-            byte[] buf2 = new byte[buf.length];
+            byte[] buf2 = new byte[SZ];
+            // do this 64 bytes at a time, so if system is low on entropy we will
+            // hopefully get something before the timeout
             try {
-                SecureRandom.getInstance("SHA1PRNG").nextBytes(buf2);
-                synchronized(buf) {
-                    System.arraycopy(buf2, 0, buf, 0, buf.length);
+                SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+                for (int i = 0; i < buf.length; i += SZ) {
+                    sr.nextBytes(buf2);
+                    synchronized(buf) {
+                        System.arraycopy(buf2, 0, buf, i, Math.min(SZ, buf.length - i));
+                    }
                 }
             } catch (NoSuchAlgorithmException e) {}
         }

@@ -4,15 +4,17 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# asteryx <asteryx82@gmail.com>, 2015
 # LinuxChata, 2014
+# Maus <ru-ko@ukr.net>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:08+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/projects/p/I2P/language/uk_UA/)\n"
+"PO-Revision-Date: 2015-08-07 16:31+0000\n"
+"Last-Translator: Denis Lysenko <gribua@gmail.com>\n"
+"Language-Team: Ukrainian (Ukraine) (http://www.transifex.com/otf/I2P/language/uk_UA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -53,7 +55,7 @@ msgid "Angola"
 msgstr "Ангола"
 
 msgid "Asia/Pacific Region"
-msgstr ""
+msgstr "Азія / Тихоокеанський регіон"
 
 msgid "Antarctica"
 msgstr "Антарктика"
@@ -107,7 +109,7 @@ msgid "Benin"
 msgstr "Бенін"
 
 msgid "Saint Barthélemy"
-msgstr ""
+msgstr "сен- Бартельмі"
 
 msgid "Bermuda"
 msgstr "Бермуда"
@@ -119,7 +121,7 @@ msgid "Bolivia"
 msgstr "Болівія"
 
 msgid "Bonaire"
-msgstr ""
+msgstr "Бонайре"
 
 msgid "Brazil"
 msgstr "Бразилія"
@@ -251,7 +253,7 @@ msgid "Falkland Islands (Malvinas)"
 msgstr "Фолклендські острови (Мальвінські)"
 
 msgid "Micronesia"
-msgstr ""
+msgstr "Мікронезія"
 
 msgid "Faroe Islands"
 msgstr "Фарерські острови"
@@ -353,7 +355,7 @@ msgid "Iraq"
 msgstr "Ірак"
 
 msgid "Iran"
-msgstr ""
+msgstr "Іран"
 
 msgid "Iceland"
 msgstr "Ісландія"
@@ -392,7 +394,7 @@ msgid "Saint Kitts and Nevis"
 msgstr "Федерація Сент-Кіттс і Невіс"
 
 msgid "North Korea"
-msgstr ""
+msgstr "КНДР"
 
 msgid "Republic of Korea"
 msgstr "Республіка Корея"
@@ -437,7 +439,7 @@ msgid "Latvia"
 msgstr "Латвія"
 
 msgid "Libya"
-msgstr ""
+msgstr "Лівія"
 
 msgid "Morocco"
 msgstr "Марокко"
@@ -446,7 +448,7 @@ msgid "Monaco"
 msgstr "Монако"
 
 msgid "Moldova"
-msgstr ""
+msgstr "Молдова"
 
 msgid "Montenegro"
 msgstr "Чорногорія "
@@ -461,7 +463,7 @@ msgid "Marshall Islands"
 msgstr "Маршаллові острови"
 
 msgid "Macedonia"
-msgstr ""
+msgstr "Македонія"
 
 msgid "Mali"
 msgstr "Малі"
@@ -473,7 +475,7 @@ msgid "Mongolia"
 msgstr "Монголія"
 
 msgid "Macau"
-msgstr ""
+msgstr "Аоминь або Макао"
 
 msgid "Northern Mariana Islands"
 msgstr "Північні Маріанські острови"
@@ -653,7 +655,7 @@ msgid "Suriname"
 msgstr "Сурінам"
 
 msgid "South Sudan"
-msgstr ""
+msgstr "Південний Судан"
 
 msgid "Sao Tome and Principe"
 msgstr "Сан-Томе і Принсіпі"
@@ -662,10 +664,10 @@ msgid "El Salvador"
 msgstr "Ель Сальвадор"
 
 msgid "Sint Maarten"
-msgstr ""
+msgstr "Сінт-Мартен"
 
 msgid "Syria"
-msgstr ""
+msgstr "Сірія"
 
 msgid "Swaziland"
 msgstr "Свазиленд"
@@ -716,7 +718,7 @@ msgid "Taiwan"
 msgstr "Тайвань"
 
 msgid "Tanzania"
-msgstr ""
+msgstr "Танзанія"
 
 msgid "Ukraine"
 msgstr "Україна"
@@ -737,7 +739,7 @@ msgid "Uzbekistan"
 msgstr "Узбекістан"
 
 msgid "Vatican"
-msgstr ""
+msgstr "Ватикан"
 
 msgid "Saint Vincent and the Grenadines"
 msgstr "Сент Вінсент і Ґренадіни"
@@ -749,7 +751,7 @@ msgid "Virgin Islands"
 msgstr "Віргінські острови"
 
 msgid "Vietnam"
-msgstr ""
+msgstr "В'єтнам"
 
 msgid "Vanuatu"
 msgstr "Вануату"

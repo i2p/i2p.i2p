@@ -39,12 +39,13 @@ import java.util.NoSuchElementException;
 	To be clear, this is an iterator through the values.
 	To get the key, call nextKey() BEFORE calling next().
 */
-public class SkipIterator implements ListIterator {
-	protected SkipSpan ss;
+public class SkipIterator<K extends Comparable<? super K>, V> implements ListIterator<V> {
+	protected SkipSpan<K, V> ss;
 	protected int index;
 
 	protected SkipIterator() { }
-	public SkipIterator(SkipSpan ss, int index) {
+
+	public SkipIterator(SkipSpan<K, V> ss, int index) {
 		if(ss==null) { throw new NullPointerException(); }
 		this.ss = ss;
 		this.index = index;
@@ -59,8 +60,8 @@ public class SkipIterator implements ListIterator {
 	 * @return the next value, and advances the index
 	 * @throws NoSuchElementException
 	 */
-	public Object next() {
-		Object o;
+	public V next() {
+		V o;
 		if(index < ss.nKeys) {
 			o = ss.vals[index];
 		} else {
@@ -83,7 +84,7 @@ public class SkipIterator implements ListIterator {
 	 * @return the key for which the value will be returned in the subsequent call to next()
 	 * @throws NoSuchElementException
 	 */
-	public Comparable nextKey() {
+	public K nextKey() {
 		if(index < ss.nKeys) { return ss.keys[index]; }
 		throw new NoSuchElementException();
 	}
@@ -98,7 +99,7 @@ public class SkipIterator implements ListIterator {
 	 * @return the previous value, and decrements the index
 	 * @throws NoSuchElementException
 	 */
-	public Object previous() {
+	public V previous() {
 		if(index > 0) {
 			index--;
 		} else if(ss.prev != null) {
@@ -111,9 +112,9 @@ public class SkipIterator implements ListIterator {
 
 
 	// Optional methods
-	public void add(Object o)	{ throw new UnsupportedOperationException(); }
+	public void add(V o)	{ throw new UnsupportedOperationException(); }
 	public void remove()		{ throw new UnsupportedOperationException(); }
-	public void set(Object o)	{ throw new UnsupportedOperationException(); }
+	public void set(V o)	{ throw new UnsupportedOperationException(); }
 	public int nextIndex()		{ throw new UnsupportedOperationException(); }
 	public int previousIndex()	{ throw new UnsupportedOperationException(); }
 

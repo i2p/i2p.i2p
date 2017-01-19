@@ -30,21 +30,27 @@ class HopProcessor {
      */
     //static final boolean USE_DOUBLE_IV_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
-    
-    /** @deprecated unused */
-    public HopProcessor(I2PAppContext ctx, HopConfig config) {
+
+    /**
+     *  @deprecated used only by unit tests
+     */
+    @Deprecated
+    HopProcessor(I2PAppContext ctx, HopConfig config) {
         this(ctx, config, createValidator());
     }
-
+    
     public HopProcessor(I2PAppContext ctx, HopConfig config, IVValidator validator) {
         _context = ctx;
         _log = ctx.logManager().getLog(HopProcessor.class);
         _config = config;
         _validator = validator;
     }
-    
-    /** @deprecated unused */
-    protected static IVValidator createValidator() { 
+
+    /**
+     *  @deprecated used only by unit test constructor
+     */
+    @Deprecated
+    private static IVValidator createValidator() { 
         // yeah, we'll use an O(1) validator later (e.g. bloom filter)
         return new HashSetIVValidator();
     }

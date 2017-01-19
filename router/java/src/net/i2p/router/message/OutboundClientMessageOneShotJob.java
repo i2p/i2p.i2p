@@ -38,9 +38,66 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**
- * Send a client message out a random outbound tunnel and into a random inbound
+ * Send a client message out an outbound tunnel and into an inbound
  * tunnel on the target leaseSet.  This also (sometimes) bundles the sender's leaseSet and
  * a DeliveryStatusMessage (for ACKing any sessionTags used in the garlic).
+ *
+ * <p>
+ * This class is where we make several important decisions about
+ * what to send and what path to send it over. These decisions
+ * will dramatically affect:
+ * <ul>
+ * <li>Local performance and outbound bandwidth usage
+ * <li>Streaming performance and reliability
+ * <li>Overall network performace and connection congestion
+ * </ul>
+ *
+ * <p>
+ * For the outbound message, we build and encrypt a garlic message,
+ * after making the following decisions:
+ * <ul>
+ * <li>Whether to bundle our leaseset
+ * <li>Whether to bundle session tags, and if so, how many
+ * <li>Whether to bundle an encrypted DeliveryStatusMessage to be returned
+ *     to us as an acknowledgement
+ * </ul>
+ *
+ * <p>
+ * Also, we make the following path selection decisions:
+ * <ul>
+ * <li>What outbound client tunnel of ours to use send the message out
+ * <li>What inbound client tunnel of his (i.e. lease, chosen from his leaseset)
+ *     to use to send the message in
+ * <li>If a DeliveryStatusMessage is bundled, What inbound client tunnel of ours
+ *     do we specify to receive it
+ * </ul>
+ *
+ * <p>
+ * Note that the 4th tunnel in the DeliveryStatusMessage's round trip (his outbound tunnel)
+ * is not selected by us, it is chosen by the recipient.
+ *
+ * <p>
+ * If a DeliveryStatusMessage is sent, a listener is registered to wait for its reply.
+ * When a reply is received, or the timeout is reached, this is noted
+ * and will influence subsequent bundling and path selection decisions.
+ *
+ * <p>
+ * Path selection decisions are cached and reused if still valid and if
+ * previous deliveries were apparently successful. This significantly
+ * reduces out-of-order delivery and network connection congestion.
+ * Caching is based on the local/remote destination pair.
+ *
+ * <p>
+ * Bundling decisions, and both messaging and reply expiration times, are generally
+ * set here but may be overridden by the client on a per-message basis.
+ * Within clients, there may be overall settings or per-message settings.
+ * The streaming lib also overrides defaults for some messages.
+ * A datagram-based DHT application may need significantly different
+ * settings than a streaming application. For an application such as
+ * a bittorrent client that sends both types of traffic on the same tunnels,
+ * it is important to tune the settings for efficiency and performance.
+ * The per-session and per-message overrides are set via I2CP.
+ *
  *
  */
 public class OutboundClientMessageOneShotJob extends JobImpl {
@@ -224,6 +281,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             //getContext().statManager().addRateData("client.leaseSetFoundLocally", 1);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
+
+            if (!_leaseSet.isCurrent(Router.CLOCK_FUDGE_FACTOR / 4)) {
+                // If it's about to expire, refetch in the background, we'll
+                // probably need it again. This will prevent stalls later.
+                // We don't know if the other end is actually publishing his LS, so this could be a waste of time.
+                // When we move to LS2, we will have a bit that tells us if it is published.
+                if (_log.shouldWarn()) {
+                    long exp = now - _leaseSet.getLatestLeaseDate();
+                    _log.warn(getJobId() + ": leaseSet expired " + DataHelper.formatDuration(exp) + " ago, firing search: " + _leaseSet.getHash().toBase32());
+                }
+                getContext().netDb().lookupLeaseSetRemotely(_leaseSet.getHash(), _from.calculateHash());
+            }
+
             success.runJob();
         } else {
             _leaseSetLookupBegin = getContext().clock().now();
@@ -316,7 +386,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _lease = _cache.leaseCache.get(_hashPair);
             if (_lease != null) {
                 // if outbound tunnel length == 0 && lease.firsthop.isBacklogged() don't use it ??
-                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
+                if (!_lease.isExpired(Router.CLOCK_FUDGE_FACTOR / 4)) {
                     // see if the current leaseSet contains the old lease, so that if the dest removes
                     // it (due to failure for example) we won't continue to use it.
                     for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
@@ -340,14 +410,21 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
         // get the possible leases
         List<Lease> leases = new ArrayList<Lease>(_leaseSet.getLeaseCount());
+        // first try to get ones that really haven't expired
         for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
             Lease lease = _leaseSet.getLease(i);
-            if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": getNextLease() - expired lease! - " + lease + " for " + _toString);
-                continue;
-            } else {
+            if (!lease.isExpired(Router.CLOCK_FUDGE_FACTOR / 4))
                 leases.add(lease);
+        }
+
+        if (leases.isEmpty()) {
+            // TODO if _lease != null, fire off
+            // a lookup ? KNDF will keep giving us the current ls until CLOCK_FUDGE_FACTOR
+            // try again with a fudge factor
+            for (int i = 0; i < _leaseSet.getLeaseCount(); i++) {
+                Lease lease = _leaseSet.getLease(i);
+                if (!lease.isExpired(Router.CLOCK_FUDGE_FACTOR))
+                    leases.add(lease);
             }
         }
         
@@ -949,15 +1026,19 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 if (_outTunnel.getLength() > 0)
                     size = ((size + 1023) / 1024) * 1024; // messages are in ~1KB blocks
                 
-                for (int i = 0; i < _outTunnel.getLength(); i++) {
+                // skip ourselves at first hop
+                for (int i = 1; i < _outTunnel.getLength(); i++) {
                     getContext().profileManager().tunnelTestSucceeded(_outTunnel.getPeer(i), sendTime);
                     getContext().profileManager().tunnelDataPushed(_outTunnel.getPeer(i), sendTime, size);
                 }
                 _outTunnel.incrementVerifiedBytesTransferred(size);
             }
-            if (_inTunnel != null)
-                for (int i = 0; i < _inTunnel.getLength(); i++)
+            if (_inTunnel != null) {
+                // skip ourselves at last hop
+                for (int i = 0; i < _inTunnel.getLength() - 1; i++) {
                     getContext().profileManager().tunnelTestSucceeded(_inTunnel.getPeer(i), sendTime);
+                }
+            }
         }
 
         public void setMessage(I2NPMessage msg) {}

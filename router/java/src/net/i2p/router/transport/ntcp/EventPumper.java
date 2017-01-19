@@ -85,6 +85,7 @@ class EventPumper implements Runnable {
     /** tunnel test now disabled, but this should be long enough to allow an active tunnel to get started */
     private static final long MIN_EXPIRE_IDLE_TIME = 120*1000l;
     private static final long MAX_EXPIRE_IDLE_TIME = 11*60*1000l;
+    private static final long MAY_DISCON_TIMEOUT = 10*1000;
 
     /**
      *  Do we use direct buffers for reading? Default false.
@@ -221,7 +222,8 @@ class EventPumper implements Runnable {
                         int failsafeInvalid = 0;
 
                         // Increase allowed idle time if we are well under allowed connections, otherwise decrease
-                        if (_transport.haveCapacity(33))
+                        boolean haveCap = _transport.haveCapacity(33);
+                        if (haveCap)
                             _expireIdleWriteTime = Math.min(_expireIdleWriteTime + 1000, MAX_EXPIRE_IDLE_TIME);
                         else
                             _expireIdleWriteTime = Math.max(_expireIdleWriteTime - 3000, MIN_EXPIRE_IDLE_TIME);
@@ -270,8 +272,19 @@ class EventPumper implements Runnable {
                                     failsafeWrites++;
                                 }
                                 
-                                if ( con.getTimeSinceSend() > _expireIdleWriteTime &&
-                                     con.getTimeSinceReceive() > _expireIdleWriteTime) {
+                                final long expire;
+                                if ((!haveCap || !con.isInbound()) &&
+                                    con.getMayDisconnect() &&
+                                    con.getMessagesReceived() <= 2 && con.getMessagesSent() <= 1) {
+                                    expire = MAY_DISCON_TIMEOUT;
+                                    if (_log.shouldInfo())
+                                        _log.info("Possible early disconnect for " + con);
+                                } else {
+                                    expire = _expireIdleWriteTime;
+                                }
+
+                                if ( con.getTimeSinceSend() > expire &&
+                                     con.getTimeSinceReceive() > expire) {
                                     // we haven't sent or received anything in a really long time, so lets just close 'er up
                                     con.close();
                                     failsafeCloses++;
@@ -335,7 +348,7 @@ class EventPumper implements Runnable {
                             con.close();
                             key.cancel();
                         }
-                    } catch (Exception ke) {
+                    } catch (IOException ke) {
                         _log.error("Error closing key " + key + " on pumper shutdown", ke);
                     }
                 }
@@ -344,7 +357,7 @@ class EventPumper implements Runnable {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Closing down the event pumper with no selection keys remaining");
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             _log.error("Error closing keys on pumper shutdown", e);
         }
         _wantsConRegister.clear();

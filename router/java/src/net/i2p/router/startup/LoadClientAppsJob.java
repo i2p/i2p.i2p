@@ -123,7 +123,7 @@ public class LoadClientAppsJob extends JobImpl {
             for (int i = 0; i < data.length; i++) {
                 switch (data[i]) {
                     case '\'':
-                    case '\"':
+                    case '"':
                         if (isQuoted) {
                             String str = buf.toString().trim();
                             if (str.length() > 0)
@@ -207,7 +207,7 @@ public class LoadClientAppsJob extends JobImpl {
         if (args == null)
             args = new String[0];
         Class<?> cls = Class.forName(className, true, cl);
-        Method method = cls.getMethod("main", new Class[] { String[].class });
+        Method method = cls.getMethod("main", String[].class);
         method.invoke(cls, new Object[] { args });
     }
 
@@ -287,7 +287,7 @@ public class LoadClientAppsJob extends JobImpl {
                     ClientApp app = (ClientApp) con.newInstance(conArgs);
                     mgr.addAndStart(app, _args);
                 } else {
-                    Method method = cls.getMethod("main", new Class[] { String[].class });
+                    Method method = cls.getMethod("main", String[].class);
                     method.invoke(cls, new Object[] { _args });
                 }
             } catch (Throwable t) {

@@ -130,56 +130,67 @@ public class InternalServerSocket extends ServerSocket {
 
     // everything below here unsupported
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void bind(SocketAddress endpoint) {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void bind(SocketAddress endpoint, int backlog) {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public ServerSocketChannel getChannel() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public InetAddress getInetAddress() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public SocketAddress getLocalSocketAddress() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public int getReceiveBufferSize() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean getReuseAddress() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean isBound() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public boolean isClosed() {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setReceiveBufferSize(int size) {
         throw new IllegalArgumentException("unsupported");
     }
     /** @deprecated unsupported */
+    @Deprecated
     @Override
     public void setReuseAddress(boolean on) {
         throw new IllegalArgumentException("unsupported");

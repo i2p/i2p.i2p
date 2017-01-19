@@ -1,10 +1,10 @@
 package net.i2p.util
 
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 
-class VersionComparatorSpec extends FunSpec with ShouldMatchers {
+class VersionComparatorSpec extends FunSpec with Matchers {
   
     private val vc = new VersionComparator
     

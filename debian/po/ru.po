@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Hidden Z <hiddenz@mail.i2p>, 2011
 # Maxym Mykhalchuk, 2015
@@ -13,12 +13,15 @@ msgstr ""
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
 "PO-Revision-Date: 2015-05-15 12:40+0000\n"
 "Last-Translator: Maxym Mykhalchuk\n"
-"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/language/ru_RU/)\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/I2P/"
+"language/ru_RU/)\n"
+"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru_RU\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #. Type: boolean
 #. Description
@@ -32,7 +35,9 @@ msgstr "Должен ли I2P-роутер запускаться во врем�
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "I2P-роутер может работать в качестве демона, который запускается автоматически во время загрузки компьютера. Это рекомендуемая конфигурация."
+msgstr ""
+"I2P-роутер может работать в качестве демона, который запускается "
+"автоматически во время загрузки компьютера. Это рекомендуемая конфигурация."
 
 #. Type: string
 #. Description
@@ -44,11 +49,15 @@ msgstr "Псевдопользователь для I2P-демона:"
 #. Description
 #: ../i2p.templates:3001
 msgid ""
-"By default I2P is configured to run under the account i2psvc when running as"
-" a daemon. To use an **existing** I2P profile you may enter a different "
-"account name here. For example, if your previous I2P installation is at "
-"/home/user/i2p, you may enter 'user' here."
-msgstr "При работе в качестве демона, I2P по умолчанию использует аккаунт i2psvc для работы. Для использования **существующего** профиля I2P вы можете ввести здесь другое имя пользователя. Например, если ваша предыдущая установка I2P находится в /home/user/i2p, вы можете ввести здесь 'user'."
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"При работе в качестве демона, I2P по умолчанию использует аккаунт i2psvc для "
+"работы. Для использования **существующего** профиля I2P вы можете ввести "
+"здесь другое имя пользователя. Например, если ваша предыдущая установка I2P "
+"находится в /home/user/i2p, вы можете ввести здесь 'user'."
 
 #. Type: string
 #. Description
@@ -56,7 +65,9 @@ msgstr "При работе в качестве демона, I2P по умол�
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Важно: если здесь введено имя пользователя, отличное от имени пользователя по умолчанию 'i2psvc', оно уже *ДОЛЖНО* существовать."
+msgstr ""
+"Важно: если здесь введено имя пользователя, отличное от имени пользователя "
+"по умолчанию 'i2psvc', оно уже *ДОЛЖНО* существовать."
 
 #. Type: string
 #. Description
@@ -68,7 +79,8 @@ msgstr "Обьем памяти, который может быть выделе
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "По умолчанию, I2P будет разрешено использовать до 128 МБ оперативной памяти."
+msgstr ""
+"По умолчанию, I2P будет разрешено использовать до 128 МБ оперативной памяти."
 
 #. Type: string
 #. Description
@@ -76,7 +88,10 @@ msgstr "По умолчанию, I2P будет разрешено исполь�
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Для роутеров с высокой пропускнй способностью, а также для роутеров с большим количеством активных торрентов/плагинов, возможно, потребуется увеличить это значение."
+msgstr ""
+"Для роутеров с высокой пропускнй способностью, а также для роутеров с "
+"большим количеством активных торрентов/плагинов, возможно, потребуется "
+"увеличить это значение."
 
 #. Type: boolean
 #. Description
@@ -90,4 +105,6 @@ msgstr "Выполнять I2P-демон в ограниченной среде
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Если включить эту опцию, то I2P будет выполняться в песочнице AppArmor, которая ограничит доступ I2P к файлам и каталогам вашего компьютера."
+msgstr ""
+"Если включить эту опцию, то I2P будет выполняться в песочнице AppArmor, "
+"которая ограничит доступ I2P к файлам и каталогам вашего компьютера."

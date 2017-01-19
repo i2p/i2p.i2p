@@ -21,8 +21,11 @@ class InboundEndpointProcessor {
     
     //static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     
-    /** @deprecated unused */
-    public InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg) {
+    /**
+     *  @deprecated used only by unit tests
+     */
+    @Deprecated
+    InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         this(ctx, cfg, DummyValidator.getInstance());
     }
 

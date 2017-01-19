@@ -40,7 +40,7 @@ public class SOCKSHeader {
             throw new IllegalArgumentException("Header too short: " + data.length);
 
         this.header = new byte[headerlen];
-        System.arraycopy(this.header, 0, data, 0, headerlen);
+        System.arraycopy(data, 0, this.header, 0, headerlen);
     }
     
     private static final byte[] beg = {0,0,0,3,60};
@@ -53,10 +53,10 @@ public class SOCKSHeader {
      */
     public SOCKSHeader(Destination dest) {
         this.header = new byte[beg.length + 60 + end.length];
-        System.arraycopy(this.header, 0, beg, 0, beg.length);
+        System.arraycopy(beg, 0, this.header, 0, beg.length);
         String b32 = dest.toBase32();
-        System.arraycopy(this.header, beg.length, b32.getBytes(), 0, 60);
-        System.arraycopy(this.header, beg.length + 60, end, 0, end.length);
+        System.arraycopy(DataHelper.getASCII(b32), 0, this.header, beg.length, 60);
+        System.arraycopy(end, 0, this.header, beg.length + 60, end.length);
     }
     
     public String getHost() {
@@ -65,7 +65,7 @@ public class SOCKSHeader {
             return null;
         int namelen = (this.header[4] & 0xff);
         byte[] nameBytes = new byte[namelen];
-        System.arraycopy(nameBytes, 0, this.header, 5, namelen);
+        System.arraycopy(this.header, 5, nameBytes, 0, namelen);
         return DataHelper.getUTF8(nameBytes);
     }
 

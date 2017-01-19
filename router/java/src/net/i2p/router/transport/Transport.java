@@ -159,6 +159,7 @@ public interface Transport {
     /**
      * @deprecated unused
      */
+    @Deprecated
     public void recheckReachability();
 
     public boolean isBacklogged(Hash peer);
@@ -171,4 +172,12 @@ public interface Transport {
     
     public boolean isUnreachable(Hash peer);
     public boolean isEstablished(Hash peer);
+
+    /**
+     * Tell the transport that we may disconnect from this peer.
+     * This is advisory only.
+     *
+     * @since 0.9.24
+     */
+    public void mayDisconnect(Hash peer);
 }

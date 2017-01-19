@@ -23,8 +23,8 @@ package org.klomp.snark;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -585,12 +585,12 @@ public class TrackerClient implements Runnable {
                   {
                     // Probably not fatal (if it doesn't last to long...)
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn
-                      ("WARNING: Could not contact tracker at '"
-                       + tr.announce + "': " + ioe);
+                        _log.warn("Could not contact tracker at '" + tr.announce + "': " + ioe);
                     tr.trackerProblems = ioe.getMessage();
                     // don't show secondary tracker problems to the user
-                    if (tr.isPrimary)
+                    // ... and only if we don't have any peers at all. Otherwise, PEX/DHT will save us.
+                    if (tr.isPrimary && coordinator.getPeers() <= 0 &&
+                        (!completed || _util.getDHT() == null || _util.getDHT().size() <= 0))
                       snark.setTrackerProblems(tr.trackerProblems);
                     String tplc = tr.trackerProblems.toLowerCase(Locale.US);
                     if (tplc.startsWith(NOT_REGISTERED) || tplc.startsWith(NOT_REGISTERED_2) ||
@@ -780,6 +780,11 @@ public class TrackerClient implements Runnable {
      }
   }
   
+  /**
+   *
+   *  Note: IOException message text gets displayed in the UI
+   *
+   */
   private TrackerInfo doRequest(TCTracker tr, String infoHash,
                                 String peerID, long uploaded,
                                 long downloaded, long left, String event)
@@ -821,24 +826,24 @@ public class TrackerClient implements Runnable {
     boolean fast = _fastUnannounce && event.equals(STOPPED_EVENT);
     byte[] fetched = _util.get(s, true, fast ? -1 : 0, small ? 128 : 1024, small ? 1024 : 32*1024);
     if (fetched == null)
-        throw new IOException("Error fetching");
+        throw new IOException("No response from " + tr.host);
     if (fetched.length == 0)
-        throw new IOException("No data");
+        throw new IOException("No data from " + tr.host);
     // The HTML check only works if we didn't exceed the maxium fetch size specified in get(),
     // otherwise we already threw an IOE.
     if (fetched[0] == '<')
-        throw new IOException(ERROR_GOT_HTML);
+        throw new IOException(ERROR_GOT_HTML + " from " + tr.host);
     
         InputStream in = new ByteArrayInputStream(fetched);
 
         TrackerInfo info = new TrackerInfo(in, snark.getID(),
                                            snark.getInfoHash(), snark.getMetaInfo(), _util);
         if (_log.shouldLog(Log.INFO))
-            _log.info("TrackerClient response: " + info);
+            _log.info("TrackerClient " + tr.host + " response: " + info);
 
         String failure = info.getFailureReason();
         if (failure != null)
-          throw new IOException(failure);
+            throw new IOException("Tracker " + tr.host + " responded with: " + failure);
 
         tr.interval = Math.max(MIN_TRACKER_ANNOUNCE_INTERVAL, info.getInterval() * 1000l);
         return info;
@@ -875,44 +880,57 @@ public class TrackerClient implements Runnable {
   }
 
   /**
-   *  @param ann an announce URL
+   *  @param ann an announce URL, may be null, returns false if null
    *  @return true for i2p hosts only
    *  @since 0.7.12
    */
   public static boolean isValidAnnounce(String ann) {
-    URL url;
+    if (ann == null)
+        return false;
+    URI url;
     try {
-       url = new URL(ann);
-    } catch (MalformedURLException mue) {
-       return false;
+        url = new URI(ann);
+    } catch (URISyntaxException use) {
+        return false;
     }
-    return url.getProtocol().equals("http") &&
+    String path = url.getPath();
+    if (path == null || !path.startsWith("/"))
+        return false;
+    return "http".equals(url.getScheme()) && url.getHost() != null &&
            (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p"));
   }
 
   /**
+   *  This also validates the URL.
+   *
    *  @param ann an announce URL non-null
    *  @return a Hash for i2p hosts only, null otherwise
    *  @since 0.9.5
    */
   private static Hash getHostHash(String ann) {
-    URL url;
+    URI url;
     try {
-        url = new URL(ann);
-    } catch (MalformedURLException mue) {
+        url = new URI(ann);
+    } catch (URISyntaxException use) {
         return null;
     }
-    if (!url.getProtocol().equals("http"))
+    if (!"http".equals(url.getScheme()))
         return null;
     String host = url.getHost();
-    if (host.endsWith(".i2p"))
+    if (host == null)
+        return null;
+    if (host.endsWith(".i2p")) {
+        String path = url.getPath();
+        if (path == null || !path.startsWith("/"))
+            return null;
         return ConvertToHash.getHash(host);
+    }
     if (host.equals("i2p")) {
         String path = url.getPath();
         if (path == null || path.length() < 517 ||
             !path.startsWith("/"))
             return null;
-        String[] parts = path.substring(1).split("[/\\?&;]", 2);
+        String[] parts = DataHelper.split(path.substring(1), "[/\\?&;]", 2);
         return ConvertToHash.getHash(parts[0]);
     }
     return null;
@@ -921,6 +939,7 @@ public class TrackerClient implements Runnable {
   private static class TCTracker
   {
       final String announce;
+      final String host;
       final boolean isPrimary;
       long interval;
       long lastRequestTime;
@@ -931,9 +950,15 @@ public class TrackerClient implements Runnable {
       int consecutiveFails;
       int seenPeers;
 
+      /**
+       *  @param a must be a valid http URL with a path
+       *  @param p true if primary
+       */
       public TCTracker(String a, boolean p)
       {
           announce = a;
+          String s = a.substring(7);
+          host = s.substring(0, s.indexOf('/'));
           isPrimary = p;
           interval = INITIAL_SLEEP;
       }

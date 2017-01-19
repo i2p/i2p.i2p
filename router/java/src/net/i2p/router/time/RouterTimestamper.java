@@ -45,6 +45,7 @@ public class RouterTimestamper extends Timestamper {
     private static final int MAX_CONSECUTIVE_FAILS = 10;
     private static final int DEFAULT_TIMEOUT = 10*1000;
     private static final int SHORT_TIMEOUT = 5*1000;
+    private static final long MAX_WAIT_INITIALIZATION = 45*1000;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";
@@ -141,7 +142,7 @@ public class RouterTimestamper extends Timestamper {
         try { 
             synchronized (this) {
                 if (!_initialized)
-                    wait();
+                    wait(MAX_WAIT_INITIALIZATION);
             }
         } catch (InterruptedException ie) {}
     }
@@ -272,7 +273,8 @@ public class RouterTimestamper extends Timestamper {
             //    // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
             //    try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
             //}
-            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout);
+            // IPv6 arg TODO
+            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout, false, _log);
             now = timeAndStratum[0];
             stratum = (int) timeAndStratum[1];
             long delta = now - _context.clock().now();

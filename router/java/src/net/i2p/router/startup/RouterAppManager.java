@@ -185,6 +185,8 @@ public class RouterAppManager implements ClientAppManager {
             ClientAppState state = app.getState();
             if (state == RUNNING || state == STARTING) {
                 try {
+                   if (_log.shouldWarn())
+                       _log.warn("Shutting down client " + app.getDisplayName());
                     app.shutdown(null);
                 } catch (Throwable t) {}
             }

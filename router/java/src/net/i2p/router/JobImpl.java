@@ -48,6 +48,7 @@ public abstract class JobImpl implements Job {
      *  class list for no good reason. Logging in jobs is almost always
      *  set explicitly rather than by class name.
      */
+    @Deprecated
     void addedToQueue() {
         //if (_context.logManager().getLog(getClass()).shouldLog(Log.DEBUG))
         //    _addedBy = new Exception();
@@ -57,6 +58,7 @@ public abstract class JobImpl implements Job {
      *  @deprecated
      *  @return null always
      */
+    @Deprecated
     public Exception getAddedBy() { return null; }
     public long getMadeReadyOn() { return _madeReadyOn; }
     public void madeReady() { _madeReadyOn = _context.clock().now(); }

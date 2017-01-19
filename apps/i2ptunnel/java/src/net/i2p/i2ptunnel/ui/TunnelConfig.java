@@ -214,6 +214,29 @@ public class TunnelConfig {
         else
             _booleanOptions.remove(I2PTunnelHTTPServer.OPT_REJECT_INPROXY);
     }
+
+    /** @since 0.9.25 */
+    public void setRejectReferer(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPServer.OPT_REJECT_REFERER);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPServer.OPT_REJECT_REFERER);
+    }
+
+    /** @since 0.9.25 */
+    public void setRejectUserAgents(boolean val) {
+        if (val)
+            _booleanOptions.add(I2PTunnelHTTPServer.OPT_REJECT_USER_AGENTS);
+        else
+            _booleanOptions.remove(I2PTunnelHTTPServer.OPT_REJECT_USER_AGENTS);
+    }
+
+    /** @since 0.9.25 */
+    public void setUserAgents(String val) {
+        if (val != null)
+            _otherOptions.put(I2PTunnelHTTPServer.OPT_USER_AGENTS, val.trim());
+    }
+
     public void setUniqueLocal(boolean val) {
         if (val)
             _booleanOptions.add(I2PTunnelServer.PROP_UNIQUE_LOCAL);
@@ -537,6 +560,13 @@ public class TunnelConfig {
             }
         }
 
+        // override bundle setting set above
+        if (!TunnelController.isClient(_type) &&
+            !TunnelController.TYPE_HTTP_SERVER.equals(_type) &&
+            !TunnelController.TYPE_STREAMR_SERVER.equals(_type)) {
+            config.setProperty(TunnelController.OPT_BUNDLE_REPLY, "true");
+        }
+
         // generic proxy stuff
         if (TunnelController.TYPE_HTTP_CLIENT.equals(_type) || TunnelController.TYPE_CONNECT.equals(_type) || 
             TunnelController.TYPE_SOCKS.equals(_type) ||TunnelController.TYPE_SOCKS_IRC.equals(_type)) {
@@ -675,6 +705,8 @@ public class TunnelConfig {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST,
         I2PTunnelServer.PROP_USE_SSL,
         I2PTunnelHTTPServer.OPT_REJECT_INPROXY,
+        I2PTunnelHTTPServer.OPT_REJECT_REFERER,
+        I2PTunnelHTTPServer.OPT_REJECT_USER_AGENTS,
         I2PTunnelServer.PROP_UNIQUE_LOCAL,
         "shouldBundleReplyInfo"
         };
@@ -700,7 +732,8 @@ public class TunnelConfig {
         I2PTunnelHTTPServer.OPT_POST_BAN_TIME,
         I2PTunnelHTTPServer.OPT_POST_TOTAL_BAN_TIME,
         I2PTunnelHTTPServer.OPT_POST_MAX,
-        I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX
+        I2PTunnelHTTPServer.OPT_POST_TOTAL_MAX,
+        I2PTunnelHTTPServer.OPT_USER_AGENTS
         };
 
     /**

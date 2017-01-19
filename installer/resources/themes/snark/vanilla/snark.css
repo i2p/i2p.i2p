@@ -166,7 +166,7 @@ tr {
 }
 
 thead, tfoot {
-     background: url("images/bling2.png") repeat-x scroll center center #867;
+     background: url('images/bling2.png') repeat-x scroll center center #867;
      font-weight: bold;
      color: #503;
 }
@@ -690,6 +690,18 @@ input.delete {
 
 input.reload {
      background: #f3efc7 url('../../console/images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.starttorrent {
+     background: #f3efc7 url('images/start.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px !important;
+     min-height: 22px;
+}
+
+input.stoptorrent {
+     background: #f3efc7 url('images/stop.png') no-repeat 2px center;
      padding: 2px 3px 2px 20px !important;
      min-height: 22px;
 }
