@@ -63,18 +63,18 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
     private static void test() {
         byte b[] = "hi, how are you today?".getBytes();
         try { 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
-            GZIPOutputStream o = new GZIPOutputStream(baos);
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(64);
+            ResettableGZIPOutputStream o = new ResettableGZIPOutputStream(baos);
             o.write(b);
             o.finish();
             o.flush();
             byte compressed[] = baos.toByteArray();
             
             ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
-            in.initialize(new ByteArrayInputStream(compressed));
+            in.initialize(new java.io.ByteArrayInputStream(compressed));
             byte rv[] = new byte[128];
             int read = in.read(rv);
-            if (!DataHelper.eq(rv, 0, b, 0, b.length))
+            if (!net.i2p.data.DataHelper.eq(rv, 0, b, 0, b.length))
                 throw new RuntimeException("foo, read=" + read);
             else
                 System.out.println("match, w00t");
@@ -84,18 +84,18 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
     
     private static boolean test(int size) {
         byte b[] = new byte[size];
-        new java.util.Random().nextBytes(b);
+        RandomSource.getInstance().nextBytes(b);
         try { 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
-            GZIPOutputStream o = new GZIPOutputStream(baos);
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(size);
+            ResettableGZIPOutputStream o = new ResettableGZIPOutputStream(baos);
             o.write(b);
             o.finish();
             o.flush();
             byte compressed[] = baos.toByteArray();
             
             ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
-            in.initialize(new ByteArrayInputStream(compressed));
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream(size);
+            in.initialize(new java.io.ByteArrayInputStream(compressed));
+            java.io.ByteArrayOutputStream baos2 = new java.io.ByteArrayOutputStream(size);
             byte rbuf[] = new byte[128];
             try {
                 while (true) {
@@ -104,9 +104,9 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
                         break;
                     baos2.write(rbuf, 0, read);
                 }
-            } catch (IOException ioe) {
+            } catch (java.io.IOException ioe) {
                 ioe.printStackTrace();
-                long crcVal = in.getCurrentCRCVal();
+                //long crcVal = in.getCurrentCRCVal();
                 //try { in.verifyFooter(); } catch (IOException ioee) {
                 //    ioee.printStackTrace();
                 //}
@@ -120,10 +120,10 @@ public class ReusableGZIPInputStream extends ResettableGZIPInputStream {
             if (rv.length != b.length)
                 throw new RuntimeException("read length: " + rv.length + " expected: " + b.length);
             
-            if (!DataHelper.eq(rv, 0, b, 0, b.length)) {
+            if (!net.i2p.data.DataHelper.eq(rv, 0, b, 0, b.length)) {
                 throw new RuntimeException("foo, read=" + rv.length);
             } else {
-                System.out.println("match, w00t");
+                System.out.println("match, w00t @ " + size);
                 return true;
             }
         } catch (Exception e) { 
