@@ -1627,7 +1627,7 @@ public class DataHelper {
 
     /**
      *  Compress the data and return a new GZIP compressed byte array.
-     *  @throws IllegalArgumentException if size is over 40KB
+     *  @throws IllegalArgumentException if input size is over 40KB
      */
     public static byte[] compress(byte orig[]) {
         return compress(orig, 0, orig.length);
