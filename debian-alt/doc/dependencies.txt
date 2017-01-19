@@ -46,8 +46,10 @@ Current Runtime Dependencies
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
   For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
   which is 8.1.21, but there's no particular version that we need.
-  Jetty 8 is now EOL and we plan to migrate to Jetty 9.x in late 2017.
-  Jetty 9.2.x is in recent Ubuntu, but not Debian?
+  Jetty 8 is now EOL and we plan to migrate to Jetty 9.2 in late 2017.
+  Jetty 8 is NOT in Debian stretch.
+  Jetty 9 is NOT in Debian wheezy and is only in jessie backports and stretch.
+  Jetty 9.2.x is in recent Ubuntu and Debian.
   Jetty 9 ticket is https://trac.i2p2.de/ticket/1512
   Updating Jetty may break external plugins. Extensive testing is required.
   Note that the libjetty8-java dependency brings in libservlet3.0-java which we require.
@@ -92,6 +94,7 @@ the binaries or sources.
   Java interface to access geoip data.
   We bundle source from https://github.com/maxmind/geoip-api-java
   No package or not widely available.
+  There is a Maven geoip-api package at http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.maxmind.geoip%22
 
 * hashcash
   One Java source file.
@@ -108,6 +111,7 @@ the binaries or sources.
   This is the Java graphing package.
   We bundle a large portion of the 1.6.0 source from https://github.com/OpenNMS/jrobin
   No package or not widely available.
+  There is an old 1.5.9 Maven jrobin package at http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.jrobin%22
 
 * libtomcat6-java
   We currently require Tomcat 6, which is EOL and not available in newer Debian/Ubuntu releases.
@@ -140,6 +144,7 @@ the binaries or sources.
   This is the QR/barcode library from Google.
   We bundle a portion of the source from https://github.com/zxing/zxing
   No package or not widely available.
+  There are Maven zxing packages at http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.google.zxing%22
 
 
 Other Issues and TODO
