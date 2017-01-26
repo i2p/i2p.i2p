@@ -371,7 +371,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * session key, assuming Rijndael's default block size (128-bit).
      *
      * @param k The 128/192/256-bit user-key to use.
-     * @exception  InvalidKeyException  If the key is invalid.
+     * @throws  InvalidKeyException  If the key is invalid.
      */
     public static final Object makeKey(byte[] k) throws InvalidKeyException {
         return makeKey(k, _BLOCK_SIZE);
@@ -550,7 +550,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      *
      * @param k          The 128/192/256-bit user-key to use.
      * @param blockSize  The block size in bytes of this Rijndael.
-     * @exception  InvalidKeyException  If the key is invalid.
+     * @throws  InvalidKeyException  If the key is invalid.
      */
     public static final/* synchronized */Object makeKey(byte[] k, int blockSize) throws InvalidKeyException {
         return makeKey(k, blockSize, null);

@@ -71,7 +71,7 @@ public class MultiPartRequest
     /** Constructor. 
      * @param request The request containing a multipart/form-data
      * request
-     * @exception IOException IOException
+     * @throws IOException IOException
      */
     public MultiPartRequest(HttpServletRequest request)
         throws IOException

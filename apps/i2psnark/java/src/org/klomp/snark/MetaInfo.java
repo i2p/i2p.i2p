@@ -464,7 +464,7 @@ public class MetaInfo
    * Return the length of a piece. All pieces are of equal length
    * except for the last one (<code>getPieces()-1</code>).
    *
-   * @exception IndexOutOfBoundsException when piece is equal to or
+   * @throws IndexOutOfBoundsException when piece is equal to or
    * greater then the number of pieces in the torrent.
    */
   public int getPieceLength(int piece)

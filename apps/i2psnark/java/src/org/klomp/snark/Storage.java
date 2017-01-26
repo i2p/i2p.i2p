@@ -1111,7 +1111,7 @@ public class Storage implements Closeable
    *
    * @return true if the piece was correct (sha metainfo hash
    * matches), otherwise false.
-   * @exception IOException when some storage related error occurs.
+   * @throws IOException when some storage related error occurs.
    */
   public boolean putPiece(PartialPiece pp) throws IOException
   {

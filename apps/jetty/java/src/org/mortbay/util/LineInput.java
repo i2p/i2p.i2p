@@ -113,7 +113,7 @@ public class LineInput extends FilterInputStream
      * @param in The underlying input stream.
      * @param bufferSize The buffer size and maximum line length.
      * @param encoding the character encoding to use for readLine methods.
-     * @exception UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException 
      */
     public LineInput(InputStream in, int bufferSize, String encoding)
         throws UnsupportedEncodingException
@@ -180,7 +180,7 @@ public class LineInput extends FilterInputStream
      * The default or supplied encoding is used to convert bytes to
      * characters.
      * @return The line as a String or null for EOF.
-     * @exception IOException 
+     * @throws IOException 
      */
     public synchronized String readLine()
         throws IOException
@@ -217,7 +217,7 @@ public class LineInput extends FilterInputStream
      * @param off Offset into the buffer.
      * @param len Maximum length of line.
      * @return The length of the line or -1 for EOF.
-     * @exception IOException 
+     * @throws IOException 
      */
     public int readLine(char[] c,int off,int len)
         throws IOException
@@ -251,7 +251,7 @@ public class LineInput extends FilterInputStream
      * @param off Offset into the buffer.
      * @param len Maximum length of line.
      * @return The length of the line or -1 for EOF.
-     * @exception IOException 
+     * @throws IOException 
      */
     public int readLine(byte[] b,int off,int len)
         throws IOException
@@ -277,7 +277,7 @@ public class LineInput extends FilterInputStream
      * The default or supplied encoding is used to convert bytes to
      * characters.
      * @return LineBuffer instance or null for EOF.
-     * @exception IOException 
+     * @throws IOException 
      */
     public LineBuffer readLineBuffer()
         throws IOException
@@ -293,7 +293,7 @@ public class LineInput extends FilterInputStream
      * characters.
      * @param len Maximum length of a line, or 0 for default
      * @return LineBuffer instance or null for EOF.
-     * @exception IOException 
+     * @throws IOException 
      */
     public LineBuffer readLineBuffer(int len)
         throws IOException

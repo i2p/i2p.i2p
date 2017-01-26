@@ -117,7 +117,7 @@ private ResourceBundle _messages = ResourceBundle.getBundle(
   * @param flag If non-null, this is a location to store the value of "val" when this option is encountered, otherwise "val" is treated as the equivalent short option character.
   * @param val The value to return for this long option, or the equivalent single letter option to emulate if flag is null.
   * 
-  * @exception IllegalArgumentException If the has_arg param is not one of NO_ARGUMENT, REQUIRED_ARGUMENT or OPTIONAL_ARGUMENT.
+  * @throws IllegalArgumentException If the has_arg param is not one of NO_ARGUMENT, REQUIRED_ARGUMENT or OPTIONAL_ARGUMENT.
   */
 public
 LongOpt(String name, int has_arg, 

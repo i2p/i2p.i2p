@@ -38,7 +38,7 @@ public interface Mac
      * Initialise the MAC.
      *
      * @param key the key required by the MAC.
-     * @exception IllegalArgumentException if the params argument is
+     * @throws IllegalArgumentException if the params argument is
      * inappropriate.
      */
     public void init(byte key[])
@@ -62,7 +62,7 @@ public interface Mac
      * add a single byte to the mac for processing.
      *
      * @param in the byte to be processed.
-     * @exception IllegalStateException if the MAC is not initialised.
+     * @throws IllegalStateException if the MAC is not initialised.
      */
     public void update(byte in)
         throws IllegalStateException;
@@ -71,7 +71,7 @@ public interface Mac
      * @param in the array containing the input.
      * @param inOff the index in the array the data begins at.
      * @param len the length of the input starting at inOff.
-     * @exception IllegalStateException if the MAC is not initialised.
+     * @throws IllegalStateException if the MAC is not initialised.
      */
     public void update(byte[] in, int inOff, int len)
         throws IllegalStateException;
@@ -84,7 +84,7 @@ public interface Mac
      *
      * @param out the array the MAC is to be output to.
      * @param outOff the offset into the out buffer the output is to start at.
-     * @exception IllegalStateException if the MAC is not initialised.
+     * @throws IllegalStateException if the MAC is not initialised.
      */
     public int doFinal(byte[] out, int outOff)
         throws IllegalStateException;
