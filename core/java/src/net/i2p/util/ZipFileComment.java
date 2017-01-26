@@ -37,7 +37,7 @@ public abstract class ZipFileComment {
      *  @return empty string if no comment, or the comment.
      *          The string is decoded with UTF-8
      *
-     *  @throws IOE if no valid end-of-central-directory record found
+     *  @throws IOException if no valid end-of-central-directory record found
      */
     public static String getComment(File file, int max) throws IOException {
         return getComment(file, max, 0);
@@ -53,7 +53,7 @@ public abstract class ZipFileComment {
      *  @return empty string if no comment, or the comment.
      *          The string is decoded with UTF-8
      *
-     *  @throws IOE if no valid end-of-central-directory record found
+     *  @throws IOException if no valid end-of-central-directory record found
      */
     public static String getComment(File file, int max, int skip) throws IOException {
         if (!file.exists())

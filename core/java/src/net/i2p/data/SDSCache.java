@@ -155,8 +155,8 @@ public class SDSCache<V extends SimpleDataStructure> {
      *  @param off offset in the array to start reading from
      *  @return the cached value if available, otherwise
      *          makes a new object and returns it
-     *  @throws AIOOBE if not enough bytes
-     *  @throws NPE
+     *  @throws ArrayIndexOutOfBoundsException if not enough bytes
+     *  @throws NullPointerException
      */
     public V get(byte[] b, int off) {
         byte[] data = SimpleByteCache.acquire(_datalen);

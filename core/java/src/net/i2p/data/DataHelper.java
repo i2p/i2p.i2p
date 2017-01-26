@@ -736,7 +736,7 @@ public class DataHelper {
      * @param src if null returns 0
      * @param numBytes 1-8
      * @return non-negative
-     * @throws AIOOBE
+     * @throws ArrayIndexOutOfBoundsException
      * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
      */
     public static long fromLong(byte src[], int offset, int numBytes) {
@@ -760,7 +760,7 @@ public class DataHelper {
      *
      * @param numBytes 1-8
      * @return non-negative
-     * @throws AIOOBE
+     * @throws ArrayIndexOutOfBoundsException
      * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
      * @since 0.8.12
      */
@@ -1006,7 +1006,7 @@ public class DataHelper {
 
     /**
      * Helper util to compare two objects, including null handling.
-     * <p />
+     * <p>
      *
      * This treats (null == null) as true, and (null == (!null)) as false.
      */
@@ -1021,10 +1021,10 @@ public class DataHelper {
 
     /**
      * Run a deep comparison across the two collections.  
-     * <p />
+     * <p>
      *
      * This treats (null == null) as true, (null == (!null)) as false, and then 
-     * comparing each element via eq(object, object). <p />
+     * comparing each element via eq(object, object). <p>
      *
      * If the size of the collections are not equal, the comparison returns false.
      * The collection order should be consistent, as this simply iterates across both and compares
@@ -1043,7 +1043,7 @@ public class DataHelper {
     }
 
     /**
-     * Run a comparison on the byte arrays, byte by byte.  <p />
+     * Run a comparison on the byte arrays, byte by byte.  <p>
      *
      * This treats (null == null) as true, (null == (!null)) as false, 
      * and unequal length arrays as false.
