@@ -58,6 +58,7 @@ public class Ed25519FieldElement extends FieldElement {
      * Postconditions:
      * <p><ul>
      * <li>|h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     * </ul>
      *
      * @param val The field element to add.
      * @return The field element this + val.
@@ -86,6 +87,7 @@ public class Ed25519FieldElement extends FieldElement {
      * Postconditions:
      * <p><ul>
      * <li>|h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     * </ul>
      *
      * @param val The field element to subtract.
      * @return The field element this - val.
@@ -111,6 +113,7 @@ public class Ed25519FieldElement extends FieldElement {
      * Postconditions:
      * <p><ul>
      * <li>|h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+     * </ul>
      *
      * @return The field element (-1) * this.
      */

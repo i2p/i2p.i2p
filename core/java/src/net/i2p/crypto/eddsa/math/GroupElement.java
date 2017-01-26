@@ -33,6 +33,7 @@ public class GroupElement implements Serializable {
      * <li>P1P1: Completed representation ((X:Z), (Y:T)) satisfying x=X/Z, y=Y/T.
      * <li>PRECOMP: Precomputed representation (y+x, y-x, 2dxy).
      * <li>CACHED: Cached representation (Y+X, Y-X, Z, 2dT)
+     * </ul>
      */
     public enum Representation {
         /** Projective (P^2): (X:Y:Z) satisfying x=X/Z, y=Y/Z */
@@ -220,6 +221,7 @@ public class GroupElement implements Serializable {
      * <li>If v * β = -u multiply β with i=sqrt(-1).
      * <li>Set x := β.
      * <li>If sign(x) != bit 255 of s then negate x.
+     * </ul>
      *
      * @param curve The curve.
      * @param s The encoded point.

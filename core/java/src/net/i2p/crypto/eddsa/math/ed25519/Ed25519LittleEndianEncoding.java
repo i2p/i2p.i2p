@@ -213,6 +213,7 @@ public class Ed25519LittleEndianEncoding extends Encoding {
      * Preconditions:
      * <p><ul>
      * <li>|x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+     * </ul>
      *
      * @return true if x is in {1,3,5,...,q-2}, false otherwise.
      */
