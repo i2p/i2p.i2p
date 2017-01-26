@@ -27,7 +27,7 @@ import net.i2p.data.i2cp.SetDateMessage;
  * @author jrandom
  */
 class I2PClientMessageHandlerMap {
-    /** map of message type id --> I2CPMessageHandler */
+    /** map of message type id --&gt; I2CPMessageHandler */
     protected I2CPMessageHandler _handlers[];
 
     /** for extension */

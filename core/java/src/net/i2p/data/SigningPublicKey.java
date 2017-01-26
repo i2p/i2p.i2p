@@ -150,7 +150,7 @@ public class SigningPublicKey extends SimpleDataStructure {
      *  Get the portion of this (type 0) SPK that is really padding based on the Key Cert type given,
      *  if any
      *
-     *  @return leading padding length > 0 or null if no padding or type is unknown
+     *  @return leading padding length &gt; 0 or null if no padding or type is unknown
      *  @throws IllegalArgumentException if this is already typed to a different type
      *  @since 0.9.12
      */

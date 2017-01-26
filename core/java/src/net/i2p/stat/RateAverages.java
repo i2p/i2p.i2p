@@ -38,10 +38,10 @@ public class RateAverages {
     /**
      * @since 0.9.4
      * @return one of several things:
-     * if there are any events (current or last) => weighted average
+     * if there are any events (current or last) =&gt; weighted average
      * otherwise if the useLifetime parameter to Rate.computeAverages was:
-     * true => the lifetime average value
-     * false => zero
+     * true =&gt; the lifetime average value
+     * false =&gt; zero
      */
     public double getAverage() {
         return average;

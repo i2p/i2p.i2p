@@ -18,22 +18,22 @@ public class Ed25519LittleEndianEncoding extends Encoding {
      * Assumption:
      * <p><ul>
      * <li>p = 2^255 - 19
-     * <li>h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 <= |hi| < 2^27 for all i=0,...,9.
-     * <li>h congruent r modulo p, i.e. h = r + q * p for some suitable 0 <= r < p and an integer q.
+     * <li>h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 &lt;= |hi| &lt; 2^27 for all i=0,...,9.
+     * <li>h congruent r modulo p, i.e. h = r + q * p for some suitable 0 &lt;= r &lt; p and an integer q.
      * </ul><p>
      * Then q = [2^-255 * (h + 19 * 2^-25 * h9 + 1/2)] where [x] = floor(x).
      * <p>
      * Proof:
      * <p>
      * We begin with some very raw estimation for the bounds of some expressions:
-     * <pre>|h| < 2^230 * 2^30 = 2^260 ==> |r + q * p| < 2^260 ==> |q| < 2^10.
-     * ==> -1/4 <= a := 19^2 * 2^-255 * q < 1/4.
-     * |h - 2^230 * h9| = |h0 + ... + 2^204 * h8| < 2^204 * 2^30 = 2^234.
-     * ==> -1/4 <= b := 19 * 2^-255 * (h - 2^230 * h9) < 1/4</pre>
-     * Therefore 0 < 1/2 - a - b < 1.
+     * <pre>|h| &lt; 2^230 * 2^30 = 2^260 ==&gt; |r + q * p| &lt; 2^260 ==&gt; |q| &lt; 2^10.
+     * ==&gt; -1/4 &lt;= a := 19^2 * 2^-255 * q &lt; 1/4.
+     * |h - 2^230 * h9| = |h0 + ... + 2^204 * h8| &lt; 2^204 * 2^30 = 2^234.
+     * ==&gt; -1/4 &lt;= b := 19 * 2^-255 * (h - 2^230 * h9) &lt; 1/4</pre>
+     * Therefore 0 &lt; 1/2 - a - b &lt; 1.
      * <p>
      * Set x := r + 19 * 2^-255 * r + 1/2 - a - b then
-     * 0 <= x < 255 - 20 + 19 + 1 = 2^255 ==> 0 <= 2^-255 * x < 1. Since q is an integer we have
+     * 0 &lt;= x &lt; 255 - 20 + 19 + 1 = 2^255 ==&gt; 0 &lt;= 2^-255 * x &lt; 1. Since q is an integer we have
      *
      * <pre>[q + 2^-255 * x] = q        (1)</pre>
      * <p>

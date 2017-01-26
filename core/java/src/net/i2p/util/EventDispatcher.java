@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Event dispatching interface.  It allows objects to receive and
- * notify data events (basically String->Object associations) and
+ * notify data events (basically String-&gt;Object associations) and
  * create notification chains.  To ease the usage of this interface,
  * you could define an EventDispatcherImpl attribute called
  * <code>_event</code> (as suggested in EventDispatcherImpl documentation)

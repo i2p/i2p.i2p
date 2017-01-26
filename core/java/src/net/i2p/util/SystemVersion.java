@@ -149,7 +149,7 @@ public abstract class SystemVersion {
     }
 
     /**
-     *  Better than (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0
+     *  Better than (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") &gt;= 0
      *  as it handles Android also, where java.version = "0".
      *
      *  @return true if Java 1.6 or higher, or Android API 9 or higher
@@ -159,7 +159,7 @@ public abstract class SystemVersion {
     }
 
     /**
-     *  Better than (new VersionComparator()).compare(System.getProperty("java.version"), "1.7") >= 0
+     *  Better than (new VersionComparator()).compare(System.getProperty("java.version"), "1.7") &gt;= 0
      *  as it handles Android also, where java.version = "0".
      *
      *  @return true if Java 1.7 or higher, or Android API 19 or higher
@@ -193,8 +193,8 @@ public abstract class SystemVersion {
      * http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html
      * http://mark.koli.ch/2009/10/reliably-checking-os-bitness-32-or-64-bit-on-windows-with-a-tiny-c-app.html
      * sun.arch.data.model not on all JVMs
-     * sun.arch.data.model == 64 => 64 bit processor
-     * sun.arch.data.model == 32 => A 32 bit JVM but could be either 32 or 64 bit processor or libs
+     * sun.arch.data.model == 64 =&gt; 64 bit processor
+     * sun.arch.data.model == 32 =&gt; A 32 bit JVM but could be either 32 or 64 bit processor or libs
      * os.arch contains "64" could be 32 or 64 bit libs
      */
     public static boolean is64Bit() {

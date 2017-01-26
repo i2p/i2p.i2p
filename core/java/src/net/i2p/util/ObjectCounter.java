@@ -44,7 +44,7 @@ public class ObjectCounter<K> implements Serializable {
     }
 
     /**
-     *  @return set of objects with counts > 0
+     *  @return set of objects with counts &gt; 0
      */
     public Set<K> objects() {
         return this.map.keySet();

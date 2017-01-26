@@ -50,7 +50,7 @@ public class PortMapper {
 
     /**
      *  Add the service
-     *  @param port > 0
+     *  @param port &gt; 0
      *  @return success, false if already registered
      */
     public boolean register(String service, int port) {
@@ -59,7 +59,7 @@ public class PortMapper {
 
     /**
      *  Add the service
-     *  @param port > 0
+     *  @param port &gt; 0
      *  @return success, false if already registered
      *  @since 0.9.21
      */

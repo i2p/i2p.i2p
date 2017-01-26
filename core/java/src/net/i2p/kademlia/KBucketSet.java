@@ -72,9 +72,9 @@ public class KBucketSet<T extends SimpleDataStructure> {
      * Use the default trim strategy, which removes a random entry.
      * @param us the local identity (typically a SHA1Hash or Hash)
      *           The class must have a zero-argument constructor.
-     * @param max the Kademlia value "k", the max per bucket, k >= 4
+     * @param max the Kademlia value "k", the max per bucket, k &gt;= 4
      * @param b the Kademlia value "b", split buckets an extra 2**(b-1) times,
-     *           b > 0, use 1 for bittorrent, Kademlia paper recommends 5
+     *           b &gt; 0, use 1 for bittorrent, Kademlia paper recommends 5
      */
     public KBucketSet(I2PAppContext context, T us, int max, int b) {
         this(context, us, max, b, new RandomTrimmer<T>(context, max));
@@ -168,7 +168,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
 
     /**
      *  No lock required.
-     *  FIXME will split the closest buckets too far if B > 1 and K < 2**B
+     *  FIXME will split the closest buckets too far if B &gt; 1 and K &lt; 2**B
      *  Won't ever really happen and if it does it still works.
      */
     private boolean shouldSplit(KBucket<T> b) {
@@ -625,7 +625,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
     
     /**
      *  Make a new SimpleDataStrucure from the data
-     *  @param data size <= SDS length, else throws IAE
+     *  @param data size &lt;= SDS length, else throws IAE
      *              Can be 1 bigger if top byte is zero
      */
     @SuppressWarnings("unchecked")
