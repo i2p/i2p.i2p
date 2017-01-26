@@ -92,7 +92,7 @@ public class InNetMessagePool implements Service {
   
     /**
      * @return previous builder for this message type, or null
-     * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
+     * @throws ArrayIndexOutOfBoundsException if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
      */
     public synchronized HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
@@ -102,7 +102,7 @@ public class InNetMessagePool implements Service {
   
     /**
      * @return previous builder for this message type, or null
-     * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
+     * @throws ArrayIndexOutOfBoundsException if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
      * @deprecated unused
      */
     @Deprecated
