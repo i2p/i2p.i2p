@@ -833,7 +833,7 @@ public class FIFOBandwidthLimiter {
         /**
          *  Only used by SSU.
          *  May return without allocating.
-         *  Check getPendingRequested() > 0 in a loop.
+         *  Check getPendingRequested() &gt; 0 in a loop.
          */
         public void waitForNextAllocation() {
             boolean complete = false;
@@ -912,7 +912,7 @@ public class FIFOBandwidthLimiter {
         /**
          *  Block until we are allocated some more bytes.
          *  May return without allocating.
-         *  Check getPendingRequested() > 0 in a loop.
+         *  Check getPendingRequested() &gt; 0 in a loop.
          */
         public void waitForNextAllocation();
         /** we no longer want the data requested (the connection closed) */

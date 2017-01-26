@@ -1626,7 +1626,7 @@ class PeerState {
     /**
      * Pick one or more messages we want to send and allocate them out of our window
      * High usage -
-     * OutboundMessageFragments.getNextVolley() calls this 2nd, if finishMessages() returned > 0.
+     * OutboundMessageFragments.getNextVolley() calls this 2nd, if finishMessages() returned &gt; 0.
      * TODO combine finishMessages(), allocateSend(), and getNextDelay() so we don't iterate 3 times.
      *
      * @return allocated messages to send (never empty), or null if no messages or no resources
@@ -1857,7 +1857,7 @@ class PeerState {
     
     /**
      *  A full ACK was received.
-     *  TODO if messages awaiting ack were a HashMap<Long, OutboundMessageState> this would be faster.
+     *  TODO if messages awaiting ack were a HashMap&lt;Long, OutboundMessageState&gt; this would be faster.
      *
      *  @return true if the message was acked for the first time
      */

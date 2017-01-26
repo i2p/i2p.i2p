@@ -33,36 +33,36 @@ import net.i2p.util.Log;
  *
  *  Following tunnels are created by us:
  *
- *    Outbound Gateway > 0 hops:
+ *    Outbound Gateway &gt; 0 hops:
  *       PumpedTunnelGateway
- *         BatchedRouterPreprocessor -> OutboundSender -> OutboundReceiver -> OutNetMessagePool
+ *         BatchedRouterPreprocessor -&gt; OutboundSender -&gt; OutboundReceiver -&gt; OutNetMessagePool
  *
  *    Outbound zero-hop Gateway+Endpoint:
  *       TunnelGatewayZeroHop
- *         OutboundMessageDistributor -> OutNetMessagePool
+ *         OutboundMessageDistributor -&gt; OutNetMessagePool
  *
- *    Inbound Endpoint > 0 hops:
+ *    Inbound Endpoint &gt; 0 hops:
  *       TunnelParticipant
- *        RouterFragmentHandler ->  InboundEndpointProcessor -> InboundMessageDistributor -> InNetMessagePool
+ *        RouterFragmentHandler -&gt;  InboundEndpointProcessor -&gt; InboundMessageDistributor -&gt; InNetMessagePool
  *
  *    Inbound zero-hop Gateway+Endpoint:
  *       TunnelGatewayZeroHop
- *         InboundMessageDistributor -> InNetMessagePool
+ *         InboundMessageDistributor -&gt; InNetMessagePool
  *
  *
  *  Following tunnels are NOT created by us:
  *
  *    Participant (not gateway or endpoint)
  *       TunnelParticipant
- *         HopProcessor -> OutNetMessagePool
+ *         HopProcessor -&gt; OutNetMessagePool
  *
- *    Outbound Endpoint > 0 hops:
+ *    Outbound Endpoint &gt; 0 hops:
  *       OutboundTunnelEndpoint
- *         RouterFragmentHandler -> HopProcessor -> OutboundMessageDistributor -> OutNetMessagePool
+ *         RouterFragmentHandler -&gt; HopProcessor -&gt; OutboundMessageDistributor -&gt; OutNetMessagePool
  *
- *    Inbound Gateway > 0 hops:
+ *    Inbound Gateway &gt; 0 hops:
  *       ThrottledPumpedTunnelGateway
- *         BatchedRouterPreprocessor -> InboundSender -> InboundGatewayReceiver -> OutNetMessagePool
+ *         BatchedRouterPreprocessor -&gt; InboundSender -&gt; InboundGatewayReceiver -&gt; OutNetMessagePool
  *
  *</pre>
  */

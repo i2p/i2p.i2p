@@ -166,7 +166,7 @@ public class TunnelPoolSettings {
      * If there are no tunnels to build with, will this pool allow 0 hop tunnels?
      * Always true for exploratory.
      * Generally true for client, but should probably be ignored...
-     * use getLength() + getLengthVariance() > 0 instead.
+     * use getLength() + getLengthVariance() &gt; 0 instead.
      */
     public boolean getAllowZeroHop() { return _allowZeroHop; }
 

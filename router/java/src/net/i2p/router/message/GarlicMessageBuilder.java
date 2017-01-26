@@ -35,7 +35,7 @@ public class GarlicMessageBuilder {
 
     /**
      *  @param local non-null; do not use this method for the router's SessionKeyManager
-     *  @param minTagOverride 0 for no override, > 0 to override SKM's settings
+     *  @param minTagOverride 0 for no override, &gt; 0 to override SKM's settings
      */
     static boolean needsTags(RouterContext ctx, PublicKey key, Hash local, int minTagOverride) {
         SessionKeyManager skm = ctx.clientManager().getClientSessionKeyManager(local);

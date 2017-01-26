@@ -99,8 +99,8 @@ class OutboundClientMessageJobHelper {
      *
      * This is called from OCMOSJ
      *
-     * @param tagsToSendOverride if > 0, use this instead of skm's default
-     * @param lowTagsOverride if > 0, use this instead of skm's default
+     * @param tagsToSendOverride if &gt; 0, use this instead of skm's default
+     * @param lowTagsOverride if &gt; 0, use this instead of skm's default
      * @param wrappedKey output parameter that will be filled with the sessionKey used
      * @param wrappedTags output parameter that will be filled with the sessionTags used
      * @param replyTunnel non-null if requireAck is true or bundledReplyLeaseSet is non-null

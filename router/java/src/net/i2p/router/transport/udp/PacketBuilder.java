@@ -222,7 +222,7 @@ class PacketBuilder {
      *
      *  This doesn't leave anything for acks.
      *
-     *  @param numFragments >= 1
+     *  @param numFragments &gt;= 1
      *  @since 0.9.16
      */
     public static int getMaxAdditionalFragmentSize(PeerState peer, int numFragments, int curDataSize) {

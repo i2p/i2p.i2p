@@ -337,7 +337,7 @@ public class BlockFile implements Closeable {
 	/**
 	 *  Go to any page but the superblock.
 	 *  Page 1 is the superblock, must use file.seek(0) to get there.
-	 *  @param page >= 2
+	 *  @param page &gt;= 2
 	 */
 	public static void pageSeek(RandomAccessInterface file, int page) throws IOException {
 		if (page < METAINDEX_PAGE)

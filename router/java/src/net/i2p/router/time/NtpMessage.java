@@ -278,7 +278,7 @@ class NtpMessage {
     
     
     /**
-     * Constructs a new NtpMessage in client -> server mode, and sets the
+     * Constructs a new NtpMessage in client -&gt; server mode, and sets the
      * transmit timestamp to the current time.
      */
     public NtpMessage() {

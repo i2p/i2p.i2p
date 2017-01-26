@@ -35,8 +35,8 @@ import net.i2p.util.Log;
  * and this one won't fit,
  * let's look to see if we have somthing that would fit instead
  * by reordering:
- *   if (allocated > 0 && msg.getFragment == 0) {
- *       for (j = i+1, j < pending.size(); j++) {
+ *   if (allocated &gt; 0 &amp;&amp; msg.getFragment == 0) {
+ *       for (j = i+1, j &lt; pending.size(); j++) {
  *           if it will fit and it is fragment 0 {
  *               msg = pending.remove(j)
  *               pending.add(0, msg)

@@ -30,16 +30,16 @@ import net.i2p.util.SimpleByteCache;
  * =========================================================
  *
  * Message 1 (Session Request):
- *  X+(H(X) xor Bob.identHash)----------------------------->
+ *  X+(H(X) xor Bob.identHash)-----------------------------&gt;
  *
  * Message 2 (Session Created):
- *  <----------------------------------------Y+E(H(X+Y)+tsB, sk, Y[239:255])
+ *  &lt;----------------------------------------Y+E(H(X+Y)+tsB, sk, Y[239:255])
  *
  * Message 3 (Session Confirm A):
- *  E(sz+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB), sk, hX_xor_Bob.identHash[16:31])--->
+ *  E(sz+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB), sk, hX_xor_Bob.identHash[16:31])---&gt;
  *
  * Message 4 (Session Confirm B):
- *  <----------------------E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev)
+ *  &lt;----------------------E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev)
  *
  *  Key:
  *

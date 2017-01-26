@@ -62,7 +62,7 @@ import net.i2p.util.SystemVersion;
  *      http://www.itl.nist.gov/div897/pubs/fip180-1.htm</a></li>
  *   <li> Bruce Schneier, "Section 18.7 Secure Hash Algorithm (SHA)",
  *      <cite>Applied Cryptography, 2nd edition</cite>, <br>
- *      John Wiley & Sons, 1996</li>
+ *      John Wiley &amp; Sons, 1996</li>
  * </ol>
  */
 public final class SHA1 extends MessageDigest implements Cloneable {
