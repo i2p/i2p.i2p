@@ -169,10 +169,14 @@
                 <attribute name="Note" value="Intentionally empty" />
             </manifest>
         </jar>
+        <!-- TODO we may wish to put the compiler in jasper-runtime.jar instead -->
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.1.jar" />
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-api-2.3.1.jar" />
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-2.3.2.jar" />
+            <!-- These files are copied out of jetty-schemas-3.1.jar -->
+            <!-- In Debian packages they are found in /usr/share/java/tomcat8-servlet-api.jar in the libtomcat8-java package -->
+            <fileset dir="resources" includes="javax/**/*" />
         </jar>
       <!--
         <delete file="jetty.tar" />
@@ -237,16 +241,14 @@
 
 
     <target name="copyTomcatLib2" unless="${with-libtomcat-java}" >
-        <!-- EL libs.
+        <!-- EL API and compiler libs.
              Tomcat 6 has EL 2.1.
              Tomcat 7 / libservlet3.0 has EL 2.2.
+             Jetty 9 / Tomcat 8 / libservlet3.1 has EL 3.0.
              According to http://stackoverflow.com/questions/7202686/differences-between-el-2-1-and-2-2
              2.2 is backwards-compatible with 2.1.
          -->
-        <jar destfile="jettylib/commons-el.jar" duplicate="preserve" filesetmanifest="merge" >
-            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
-            <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
-        </jar>
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp/javax.el-3.0.0.jar" tofile="jettylib/commons-el.jar" />
 
         <jar destfile="jettylib/jasper-runtime.jar" >
             <manifest>
