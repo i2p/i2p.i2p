@@ -253,7 +253,7 @@ public class PrivateKeyFile {
     }
     
     /**
-     *  @param padding null OK, must be non-null if spubkey length < 128
+     *  @param padding null OK, must be non-null if spubkey length &lt; 128
      *  @throws IllegalArgumentException on mismatch of spubkey and spk types
      *  @since 0.9.16
      */

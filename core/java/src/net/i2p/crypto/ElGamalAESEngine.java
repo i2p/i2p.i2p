@@ -429,11 +429,11 @@ public final class ElGamalAESEngine {
      *
      * In the router, we always use garlic messages. A garlic message with a single
      * clove and zero data is about 84 bytes, so that's 123 bytes minimum. So any paddingSize
-     * <= 128 is a no-op as every message will be at least 128 bytes
+     * &lt;= 128 is a no-op as every message will be at least 128 bytes
      * (Streaming, if used, adds more overhead).
      *
      * Outside the router, with a client using its own message format, the minimum size
-     * is 48, so any paddingSize <= 48 is a no-op.
+     * is 48, so any paddingSize &lt;= 48 is a no-op.
      *
      * Not included in the minimum is a 32-byte session tag for an existing session,
      * or a 514-byte ElGamal block and several 32-byte session tags for a new session.

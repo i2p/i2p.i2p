@@ -862,7 +862,7 @@ public class GroupElement implements Serializable {
      * Constant time.
      * <p>
      * Preconditions: (TODO: Check this applies here)
-     *   a[31] <= 127
+     *   a[31] &lt;= 127
      * @param a = a[0]+256*a[1]+...+256^31 a[31]
      * @return the GroupElement
      */

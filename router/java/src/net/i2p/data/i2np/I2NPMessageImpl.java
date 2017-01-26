@@ -189,7 +189,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  we can use a large buffer but prevent the reader from reading off the end.
      *
      *  @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
-     *                This includes the type byte only if type < 0
+     *                This includes the type byte only if type &lt; 0
      *  @since 0.8.12
      */
     public int readBytes(byte data[], int type, int offset, int maxLen) throws I2NPMessageException {

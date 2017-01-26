@@ -116,7 +116,7 @@ public class Certificate extends DataStructureImpl {
     }
 
     /**
-     *  @throws IllegalArgumentException if type < 0
+     *  @throws IllegalArgumentException if type &lt; 0
      */
     public Certificate(int type, byte[] payload) {
         if (type < 0)
@@ -131,7 +131,7 @@ public class Certificate extends DataStructureImpl {
     }
 
     /**
-     *  @throws IllegalArgumentException if type < 0
+     *  @throws IllegalArgumentException if type &lt; 0
      *  @throws IllegalStateException if already set
      */
     public void setCertificateType(int type) {
