@@ -392,6 +392,11 @@ trans.tr_TR = apps/ministreaming/locale/messages_tr.po
 trans.uk_UA = apps/ministreaming/locale/messages_uk.po
 trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 
+[I2P.manpages]
+type = PO
+source_file = installer/resources/locale-man/man.pot
+source_lang = en
+
 [main]
 host = https://www.transifex.com
 

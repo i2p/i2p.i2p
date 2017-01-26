@@ -23,7 +23,9 @@ DIRS="\
   installer/resources/locale/po \
   debian/po"
 
-for i in `find $DIRS -maxdepth 1 -type f -name \*.po`
+FILES="installer/resources/locale-man/man.pot"
+
+for i in `find $DIRS -maxdepth 1 -type f -name \*.po` $FILES
 do
 	echo "Checking $i ..."
 	msgfmt -c $i -o /dev/null
