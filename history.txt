@@ -1,3 +1,16 @@
+2017-01-26 zzz
+ * Build: Set up translations for man pages
+ * Javadoc: Fixes (ticket #1894)
+
+2017-01-24 zzz
+ * i2prouter: Add root check to restart and condrestart (ticket #1770)
+
+2017-01-17 zzz
+ * Utils: Java 9 yakkety workarounds
+
+2017-01-12 zzz
+ * DTG: Don't try to start if headless (ticket #1924)
+
 2017-01-07 zzz
  * i2ptunnel: Fix NPE on proxy.i2p/add when no params
 
