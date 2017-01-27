@@ -93,7 +93,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     /**
      * This constructor is used to add a client to an existing socket manager.
-     * <p/>
+     * <p>
      * As of 0.9.21 this does NOT open the local socket. You MUST call
      * {@link #startRunning()} for that. The local socket will be opened
      * immediately (ignoring the <code>i2cp.delayOpen</code> option).
@@ -119,10 +119,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     /**
      * The main constructor.
-     * <p/>
+     * <p>
      * As of 0.9.21 this is fast, and does NOT connect the manager to the router,
      * or open the local socket. You MUST call startRunning() for that.
-     * <p/>
+     * <p>
      * (0.9.20 claimed to be fast, but due to a bug it DID connect the manager
      * to the router. It did NOT open the local socket however, so it was still
      * necessary to call startRunning() for that.)
@@ -139,10 +139,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     /**
      * Use this to build a client with a persistent private key.
-     * <p/>
+     * <p>
      * As of 0.9.21 this is fast, and does NOT connect the manager to the router,
      * or open the local socket. You MUST call startRunning() for that.
-     * <p/>
+     * <p>
      * (0.9.20 claimed to be fast, but due to a bug it DID connect the manager
      * to the router. It did NOT open the local socket however, so it was still
      * necessary to call startRunning() for that.)

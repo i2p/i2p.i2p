@@ -263,7 +263,7 @@ public class PluginStarter implements Runnable {
 
     /**
      *  @return true on success
-     *  @throws just about anything, caller would be wise to catch Throwable
+     *  @throws Exception just about anything, caller would be wise to catch Throwable
      */
     @SuppressWarnings("deprecation")
     public static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
@@ -466,7 +466,7 @@ public class PluginStarter implements Runnable {
 
     /**
      *  @return true on success
-     *  @throws just about anything, caller would be wise to catch Throwable
+     *  @throws Exception just about anything, caller would be wise to catch Throwable
      */
     public static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
@@ -702,7 +702,7 @@ public class PluginStarter implements Runnable {
 
     /**
      *  @param action "start" or "stop" or "uninstall"
-     *  @throws just about anything if an app has a delay less than zero, caller would be wise to catch Throwable
+     *  @throws Exception just about anything if an app has a delay less than zero, caller would be wise to catch Throwable
      *  If no apps have a delay less than zero, it shouldn't throw anything
      */
     private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) throws Exception {

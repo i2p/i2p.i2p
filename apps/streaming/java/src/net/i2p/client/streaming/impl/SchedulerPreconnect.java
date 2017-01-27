@@ -20,6 +20,7 @@ import net.i2p.util.Log;
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>{@link SchedulerConnecting connecting} - after sending a packet</li>
  * </ul>
  */

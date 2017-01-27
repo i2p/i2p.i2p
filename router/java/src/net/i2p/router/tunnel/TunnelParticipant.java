@@ -158,6 +158,7 @@ class TunnelParticipant {
     }
 ****/
     
+    /** getCompleteCount */
     public int getCompleteCount() { 
         if (_handler != null)
             return _handler.getCompleteCount();

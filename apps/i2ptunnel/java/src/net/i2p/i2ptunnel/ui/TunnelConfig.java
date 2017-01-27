@@ -249,7 +249,7 @@ public class TunnelConfig {
 
     /**
      * Controls how other tunnels are checked for access.
-     * <p/>
+     * <p>
      * The list used for whitelisting/blacklisting can be set with
      * {@link #setAccessList(String)}.
      *
@@ -280,7 +280,7 @@ public class TunnelConfig {
 
     /**
      * Controls how ephemeral the I2P Destination of a client tunnel is.
-     * <p/>
+     * <p>
      * If {@link #setClose(boolean)} is set to false then mode 1 == mode 0.
      * 
      * @param mode 0 for new dest on restart, 1 for new dest on resume from idle, 2 for persistent key

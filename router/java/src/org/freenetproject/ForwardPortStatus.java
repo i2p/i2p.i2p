@@ -9,7 +9,7 @@ public class ForwardPortStatus {
 	 * for example hostile action on the part of the router. */
 	public static final int PROBABLE_SUCCESS = 2;
 	/** The port forward may have succeeded. Or it may not have. We should 
-	 * definitely try to check out of band. See UP&P: Many routers say they've
+	 * definitely try to check out of band. See UP&amp;P: Many routers say they've
 	 * forwarded the port when they haven't. */
 	public static final int MAYBE_SUCCESS = 1;
 	/** The port forward is in progress */
