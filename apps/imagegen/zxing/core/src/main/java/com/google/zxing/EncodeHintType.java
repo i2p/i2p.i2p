@@ -40,21 +40,21 @@ public enum EncodeHintType {
   CHARACTER_SET,
 
   /**
-   * Specifies the matrix shape for Data Matrix (type {@link com.google.zxing.datamatrix.encoder.SymbolShapeHint})
+   * Specifies the matrix shape for Data Matrix (type com.google.zxing.datamatrix.encoder.SymbolShapeHint)
    */
   DATA_MATRIX_SHAPE,
 
   /**
-   * Specifies a minimum barcode size (type {@link Dimension}). Only applicable to Data Matrix now.
+   * Specifies a minimum barcode size (type Dimension). Only applicable to Data Matrix now.
    *
    * @deprecated use width/height params in
-   * {@link com.google.zxing.datamatrix.DataMatrixWriter#encode(String, BarcodeFormat, int, int)}
+   * com.google.zxing.datamatrix.DataMatrixWriter#encode(String, BarcodeFormat, int, int)
    */
   @Deprecated
   MIN_SIZE,
 
   /**
-   * Specifies a maximum barcode size (type {@link Dimension}). Only applicable to Data Matrix now.
+   * Specifies a maximum barcode size (type Dimension). Only applicable to Data Matrix now.
    *
    * @deprecated without replacement
    */
@@ -76,14 +76,14 @@ public enum EncodeHintType {
 
   /**
    * Specifies what compaction mode to use for PDF417 (type
-   * {@link com.google.zxing.pdf417.encoder.Compaction Compaction} or {@link String} value of one of its
+   * com.google.zxing.pdf417.encoder.Compaction Compaction or {@link String} value of one of its
    * enum values).
    */
   PDF417_COMPACTION,
 
   /**
    * Specifies the minimum and maximum number of rows and columns for PDF417 (type
-   * {@link com.google.zxing.pdf417.encoder.Dimensions Dimensions}).
+   * com.google.zxing.pdf417.encoder.Dimensions Dimensions).
    */
   PDF417_DIMENSIONS,
 

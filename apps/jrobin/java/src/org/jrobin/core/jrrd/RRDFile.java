@@ -30,7 +30,7 @@ import org.jrobin.core.RrdException;
  * This class is a quick hack to read information from an RRD file. Writing
  * to RRD files is not currently supported. As I said, this is a quick hack.
  * Some thought should be put into the overall design of the file IO.
- * <p/>
+ * <p>
  * Currently this can read RRD files that were generated on Solaris (Sparc)
  * and Linux (x86).
  *

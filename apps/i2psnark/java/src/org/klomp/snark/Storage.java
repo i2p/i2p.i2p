@@ -695,7 +695,7 @@ public class Storage implements Closeable
    * Doesn't really reopen the file descriptors for a restart.
    * Just does an existence check but no length check or data reverification
    *
-   * @throws IOE on fail
+   * @throws IOException on fail
    */
   public void reopen() throws IOException
   {
