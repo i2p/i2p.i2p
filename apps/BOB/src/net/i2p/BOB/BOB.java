@@ -155,7 +155,6 @@ public class BOB implements Runnable, ClientApp {
 	 *
 	 *  @param mgr may be null
 	 *  @param args non-null
-	 *  @throws Exception on bad args
 	 *  @since 0.9.10
 	 */
 	public BOB(I2PAppContext context, ClientAppManager mgr, String[] args) {

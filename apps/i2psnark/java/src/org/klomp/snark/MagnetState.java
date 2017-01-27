@@ -161,7 +161,7 @@ class MagnetState {
 
     /**
      *  @return true if this was the last piece
-     *  @throws NPE, IllegalArgumentException, IOException, ...
+     *  @throws NullPointerException IllegalArgumentException, IOException, ...
      */
     public boolean saveChunk(int chunk, byte[] data, int off, int length) throws Exception {
         if (!isInitialized)
@@ -185,7 +185,7 @@ class MagnetState {
 
     /**
      *  @return true if this was the last piece
-     *  @throws NPE, IllegalArgumentException, IOException, ...
+     *  @throws NullPointerException IllegalArgumentException, IOException, ...
      */
     private MetaInfo buildMetaInfo() throws Exception {
         // top map has nothing in it but the info map (no announce)

@@ -102,7 +102,7 @@ public class BDecoder
    * @return The first BEValue on the stream or null when the stream
    * has ended.
    *
-   * @throws InvalidBEncoding when the stream doesn't start with a
+   * @throws InvalidBEncodingException when the stream doesn't start with a
    * bencoded value or the stream isn't a bencoded stream at all.
    * @throws IOException when somthing bad happens with the stream
    * to read from.

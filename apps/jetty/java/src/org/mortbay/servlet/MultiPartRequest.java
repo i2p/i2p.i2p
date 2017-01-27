@@ -39,7 +39,7 @@ import org.mortbay.util.LineInput;
  * This class decodes the multipart/form-data stream sent by
  * a HTML form that uses a file input item.
  *
- * <p><h4>Usage</h4>
+ * <h4>Usage</h4>
  * Each part of the form data is named from the HTML form and
  * is available either via getString(name) or getInputStream(name).
  * Furthermore the MIME parameters and filename can be requested for

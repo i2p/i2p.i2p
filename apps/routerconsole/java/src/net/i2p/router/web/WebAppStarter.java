@@ -27,7 +27,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  *
  *  No, wac.addClassPath() does not work. For more info see:
  *
- *  http://servlets.com/archive/servlet/ReadMsg?msgId=511113&listName=jetty-support
+ *  http://servlets.com/archive/servlet/ReadMsg?msgId=511113&amp;listName=jetty-support
  *
  *  @since 0.7.12
  *  @author zzz
@@ -51,7 +51,7 @@ public class WebAppStarter {
      *  Adds and starts.
      *  Prior to 0.9.28, was not guaranteed to throw on failure.
      *
-     *  @throws just about anything, caller would be wise to catch Throwable
+     *  @throws Exception just about anything, caller would be wise to catch Throwable
      */
     static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
                             String appName, String warPath) throws Exception {
@@ -123,8 +123,8 @@ public class WebAppStarter {
     }
 
     /**
-     *  stop it and remove the context
-     *  @throws just about anything, caller would be wise to catch Throwable
+     *  Stop it and remove the context.
+     *  Throws just about anything, caller would be wise to catch Throwable
      */
     static void stopWebApp(String appName) {
         ContextHandler wac = getWebApp(appName);

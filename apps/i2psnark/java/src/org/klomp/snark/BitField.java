@@ -48,7 +48,7 @@ public class BitField
    * as set by the given byte array. This will make a copy of the array.
    * Extra bytes will be ignored.
    *
-   * @throws ArrayOutOfBoundsException if give byte array is not large
+   * @throws IndexOutOfBoundsException if give byte array is not large
    * enough.
    */
   public BitField(byte[] bitfield, int size)

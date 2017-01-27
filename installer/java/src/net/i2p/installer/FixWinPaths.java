@@ -17,7 +17,7 @@ import java.io.PrintStream;
  * <li>rewrites the applicable wrapper config options to point to <code>%APPDATA%\I2P</code></li>
  * <li>corrects the paths, rewriting <code>/</code> to <code>\</code></li>
  * </ul>
- * </p>
+ * <p>
  * Usage: <code>FixWinPaths [WrapperConfigFile]</code>
  * @since 0.9.5
  */

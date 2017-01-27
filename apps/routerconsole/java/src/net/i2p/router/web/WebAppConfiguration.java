@@ -37,7 +37,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
  *
  *  No, wac.addClassPath() does not work. For more info see:
  *
- *  http://servlets.com/archive/servlet/ReadMsg?msgId=511113&listName=jetty-support
+ *  http://servlets.com/archive/servlet/ReadMsg?msgId=511113&amp;listName=jetty-support
  *
  *  @since 0.7.12
  *  @author zzz
