@@ -197,7 +197,7 @@ public class LoadClientAppsJob extends JobImpl {
      *  @param clientName can be null
      *  @param args can be null
      *  @param cl can be null
-     *  @throws just about anything, caller would be wise to catch Throwable
+     *  @throws Exception just about anything, caller would be wise to catch Throwable
      *  @since 0.7.14
      */
     public static void runClientInline(String className, String clientName, String args[],

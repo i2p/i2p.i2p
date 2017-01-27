@@ -916,6 +916,7 @@ public class TunnelDispatcher implements Service {
     }
 ******/
 
+    /** startup */
     public synchronized void startup() {
         // Note that we only use the validator for participants and OBEPs, not IBGWs, so
         // this BW estimate will be high by about 33% assuming 2-hop tunnels average

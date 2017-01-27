@@ -27,7 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * This class is designed to be thread-safe, but this has not been
  * exhaustively tested.
  *
- * @author < A HREF="mailto:jddixon@users.sourceforge.net">Jim Dixon</A>
+ * @author <A HREF="mailto:jddixon@users.sourceforge.net">Jim Dixon</A>
  * 
  * BloomSHA1.java and KeySelector.java are BSD licensed from the xlattice
  * app - http://xlattice.sourceforge.net/

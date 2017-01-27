@@ -41,8 +41,6 @@ import net.i2p.util.SystemVersion;
  * After migration, the router will run using the new directory.
  * The wrapper, however, must be stopped and restarted from the new script - until then,
  * it will continue to write to wrapper.log* in the old directory.
- *
- * @param whether to copy all data over from an existing install
  */
 public class WorkingDir {
 
@@ -63,6 +61,8 @@ public class WorkingDir {
      * Caller should store the return value for future reference.
      *
      * This also redirects stdout and stderr to a wrapper.log file if there is no wrapper present.
+     *
+     * @param migrateOldConfig whether to copy all data over from an existing install
      */
     public static String getWorkingDir(Properties envProps, boolean migrateOldConfig) {
         String dir = null;

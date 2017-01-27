@@ -153,6 +153,7 @@ class SearchJob extends JobImpl {
     }
 ***/
     
+    /** timeout */
     static final int PER_FLOODFILL_PEER_TIMEOUT = 10*1000;
     static final long MIN_TIMEOUT = 2500;
     

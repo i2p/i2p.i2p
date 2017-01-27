@@ -1298,7 +1298,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     /**
      *  Is the key in the negative lookup cache?
-     *&
+     *
      *  @param key for Destinations or RouterIdentities
      *  @since 0.9.4 moved from FNDF to KNDF in 0.9.16
      */
