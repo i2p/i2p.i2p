@@ -324,7 +324,7 @@ public class SnarkManager implements CompleteListener {
 
     /**
      *  Use if it does not include a link.
-     *  Escapes '<' and '>' before queueing
+     *  Escapes '&lt;' and '&gt;' before queueing
      */
     public void addMessage(String message) {
         addMessageNoEscape(message.replace("<", "&lt;").replace(">", "&gt;"));
@@ -332,7 +332,7 @@ public class SnarkManager implements CompleteListener {
 
     /**
      * Use if it includes a link.
-     * Does not escape '<' and '>' before queueing
+     * Does not escape '&lt;' and '&gt;' before queueing
      * @since 0.9.14.1
      */
     public void addMessageNoEscape(String message) {
@@ -2558,7 +2558,7 @@ public class SnarkManager implements CompleteListener {
     /**
      * Stop all running torrents, and close the tunnel after a delay
      * to allow for announces.
-     * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
+     * If called at router shutdown via Jetty shutdown hook -&gt; webapp destroy() -&gt; stop(),
      * the tunnel won't actually be closed as the SimpleTimer2 is already shutdown
      * or will be soon, so we delay a few seconds inline.
      * @param finalShutdown if true, sleep at the end if any torrents were running

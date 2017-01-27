@@ -436,7 +436,7 @@ public class Storage implements Closeable
    *  Must call Snark.updatePiecePriorities()
    *  (which calls getPiecePriorities()) after calling this.
    *  @param fileIndex as obtained from indexOf
-   *  @param pri default 0; <0 to disable
+   *  @param pri default 0; &lt;0 to disable
    *  @since 0.8.1
    */
   public void setPriority(int fileIndex, int pri) {

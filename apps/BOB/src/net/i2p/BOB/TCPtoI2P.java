@@ -35,7 +35,7 @@ import net.i2p.util.I2PAppThread;
 
 /**
  *
- * Process TCP->I2P
+ * Process TCP-&gt;I2P
  *
  * @author sponge
  */

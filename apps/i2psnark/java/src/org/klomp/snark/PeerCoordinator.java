@@ -385,7 +385,7 @@ class PeerCoordinator implements PeerListener
 
   /**
    *  Inbound.
-   *  Not halted, peers < max.
+   *  Not halted, peers &lt; max.
    *  @since 0.9.1
    */
   public boolean needPeers()
@@ -395,7 +395,7 @@ class PeerCoordinator implements PeerListener
 
   /**
    *  Outbound.
-   *  Not halted, peers < max, and need pieces.
+   *  Not halted, peers &lt; max, and need pieces.
    *  @since 0.9.1
    */
   public boolean needOutboundPeers() {
