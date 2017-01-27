@@ -12,10 +12,10 @@ import net.i2p.i2ptunnel.udpTunnel.I2PTunnelUDPClientBase;
  * A Datagram Tunnel that can have multiple bidirectional ports on the UDP side.
  *
  * TX:
- *   (ReplyTracker in multiple SOCKSUDPPorts -> ) I2PSink
+ *   (ReplyTracker in multiple SOCKSUDPPorts -&gt; ) I2PSink
  *
  * RX:
- *   (SOCKSUDPWrapper in multiple SOCKSUDPPorts <- ) MultiSink <- I2PSource
+ *   (SOCKSUDPWrapper in multiple SOCKSUDPPorts &lt;- ) MultiSink &lt;- I2PSource
  *
  * The reply from a dest goes to the last SOCKSUDPPort that sent to that dest.
  * If multiple ports are talking to a dest at the same time, this isn't

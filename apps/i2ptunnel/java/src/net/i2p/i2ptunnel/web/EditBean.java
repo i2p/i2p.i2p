@@ -183,7 +183,7 @@ public class EditBean extends IndexBean {
     }
     
     /**
-     *  @param newTunnelType used if tunnel < 0
+     *  @param newTunnelType used if tunnel &lt; 0
      *  @since 0.9.12
      */
     public int getSigType(int tunnel, String newTunnelType) {

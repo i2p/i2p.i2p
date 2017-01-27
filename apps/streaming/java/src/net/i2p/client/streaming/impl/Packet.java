@@ -259,7 +259,7 @@ class Packet {
      * Not to be used without sanitizing for huge values.
      * Setters from options did not divide by 1000, and the options default
      * is 1000, so the value sent in the 1-byte field was always
-     * 1000 & 0xff = 0xe8 = 232
+     * 1000 &amp; 0xff = 0xe8 = 232
      *
      * @return Delay before resending a packet in seconds.
      */

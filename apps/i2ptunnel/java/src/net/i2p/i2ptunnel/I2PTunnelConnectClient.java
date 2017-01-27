@@ -49,7 +49,7 @@ import net.i2p.util.PortMapper;
  *<pre>
  *  INTERNET-DRAFT                                              Ari Luotonen
  *  Expires: September 26, 1997          Netscape Communications Corporation
- *  <draft-luotonen-ssl-tunneling-03.txt>                     March 26, 1997
+ *  draft-luotonen-ssl-tunneling-03.txt                       March 26, 1997
  *                     Tunneling SSL Through a WWW Proxy
  *</pre>
  *

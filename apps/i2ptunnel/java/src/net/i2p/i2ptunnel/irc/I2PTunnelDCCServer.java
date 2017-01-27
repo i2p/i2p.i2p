@@ -27,13 +27,13 @@ import net.i2p.util.Log;
  * <pre>
  *
  *                                            direct conn
- *                <---> I2PTunnelDCCServer <--------------->I2PTunnelDCCClient <---->
+ *                &lt;---&gt; I2PTunnelDCCServer &lt;---------------&gt;I2PTunnelDCCClient &lt;----&gt;
  *   originating                                                                     responding
  *   chat client                                                                     chat client
- *        CHAT    ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
- *        SEND    ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
- *        RESUME  <--- I2PTunnelIRCClient <-- IRC server <-- I2TunnelIRCClient <-----
- *        ACCEPT  ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        CHAT    ---&gt; I2PTunnelIRCClient --&gt; IRC server --&gt; I2TunnelIRCClient -----&gt;
+ *        SEND    ---&gt; I2PTunnelIRCClient --&gt; IRC server --&gt; I2TunnelIRCClient -----&gt;
+ *        RESUME  &lt;--- I2PTunnelIRCClient &lt;-- IRC server &lt;-- I2TunnelIRCClient &lt;-----
+ *        ACCEPT  ---&gt; I2PTunnelIRCClient --&gt; IRC server --&gt; I2TunnelIRCClient -----&gt;
  *
  * </pre>
  *

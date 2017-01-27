@@ -425,7 +425,7 @@ public class GeneralHelper {
     }
 
     /**
-     *  @param newTunnelType used if tunnel < 0
+     *  @param newTunnelType used if tunnel &lt; 0
      */
     public int getSigType(int tunnel, String newTunnelType) {
         SigType type;
