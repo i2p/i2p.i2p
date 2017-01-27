@@ -16,8 +16,8 @@ import net.i2p.util.SimpleTimer2;
  * A stream that we can shove data into that fires off those bytes
  * on flush or when the buffer is full.  It also blocks according
  * to the data receiver's needs.
- *<p>
- * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
+ *&lt;p&gt;
+ * MessageOutputStream -&gt; ConnectionDataReceiver -&gt; Connection -&gt; PacketQueue -&gt; I2PSession
  */
 class MessageOutputStream extends OutputStream {
     private final I2PAppContext _context;

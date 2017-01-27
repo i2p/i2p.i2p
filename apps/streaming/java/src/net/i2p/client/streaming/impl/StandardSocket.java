@@ -21,7 +21,7 @@ import net.i2p.client.streaming.I2PSocketOptions;
  * null for some methods.
  *
  * StandardSockets are always bound, and always start out connected
- * (unless connectDelay is > 0).
+ * (unless connectDelay is &gt; 0).
  * You may not create an unbound StandardSocket.
  * Create this through the SocketManager.
  *

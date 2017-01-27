@@ -632,7 +632,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     /**
      *  Like connect() but returns a real Socket, and throws only IOE,
      *  for easier porting of apps.
-     *  @param timeout ms if > 0, forces blocking (disables connectDelay)
+     *  @param timeout ms if &gt; 0, forces blocking (disables connectDelay)
      *  @since 0.8.4
      */
     public Socket connectToSocket(Destination peer, int timeout) throws IOException {

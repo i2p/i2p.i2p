@@ -16,9 +16,9 @@ import net.i2p.util.Log;
 /**
  * Stream that can be given messages out of order 
  * yet present them in order.
- *<p>
- * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
- *<p>
+ *&lt;p&gt;
+ * I2PSession -&gt; MessageHandler -&gt; PacketHandler -&gt; ConnectionPacketHandler -&gt; MessageInputStream
+ *&lt;p&gt;
  * This buffers unlimited data via messageReceived() -
  * limiting / blocking is done in ConnectionPacketHandler.receivePacket().
  *

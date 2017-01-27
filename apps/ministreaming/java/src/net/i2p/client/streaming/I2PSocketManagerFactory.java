@@ -80,7 +80,7 @@ public class I2PSocketManagerFactory {
      * The nonblocking createDisconnectedManager() is preferred.
      * 
      * @param host I2CP host null to use default, ignored if in router context
-     * @param port I2CP port <= 0 to use default, ignored if in router context
+     * @param port I2CP port &lt;= 0 to use default, ignored if in router context
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String host, int port) {
@@ -95,7 +95,7 @@ public class I2PSocketManagerFactory {
      * The nonblocking createDisconnectedManager() is preferred.
      *
      * @param i2cpHost I2CP host null to use default, ignored if in router context
-     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
+     * @param i2cpPort I2CP port &lt;= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, or null if there were errors
      */
@@ -157,7 +157,7 @@ public class I2PSocketManagerFactory {
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           or null for a transient destination. Caller must close.
      * @param i2cpHost I2CP host null to use default, ignored if in router context
-     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
+     * @param i2cpPort I2CP port &lt;= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, or null if there were errors
      */
@@ -184,7 +184,7 @@ public class I2PSocketManagerFactory {
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           or null for a transient destination. Caller must close.
      * @param i2cpHost I2CP host null to use default, ignored if in router context
-     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
+     * @param i2cpPort I2CP port &lt;= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @return the newly created socket manager, non-null (throws on error)
      * @since 0.9.8
@@ -216,7 +216,7 @@ public class I2PSocketManagerFactory {
      * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      *                           non-null. Caller must close.
      * @param i2cpHost I2CP host null to use default, ignored if in router context
-     * @param i2cpPort I2CP port <= 0 to use default, ignored if in router context
+     * @param i2cpPort I2CP port &lt;= 0 to use default, ignored if in router context
      * @param opts Streaming and I2CP options, may be null
      * @param connect true to connect (blocking)
      * @return the newly created socket manager, non-null (throws on error)

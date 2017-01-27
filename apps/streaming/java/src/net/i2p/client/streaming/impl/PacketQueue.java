@@ -23,8 +23,8 @@ import net.i2p.util.SimpleTimer2;
  * Well, thats the theory at least... in practice we just
  * send them immediately with no blocking, since the 
  * mode=bestEffort doesnt block in the SDK.
- *<p>
- * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
+ *&lt;p&gt;
+ * MessageOutputStream -&gt; ConnectionDataReceiver -&gt; Connection -&gt; PacketQueue -&gt; I2PSession
  */
 class PacketQueue implements SendMessageStatusListener, Closeable {
     private final I2PAppContext _context;

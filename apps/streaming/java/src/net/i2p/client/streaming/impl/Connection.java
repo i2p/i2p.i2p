@@ -177,7 +177,7 @@ class Connection {
      *
      * @param timeoutMs 0 or negative means wait forever, 5 minutes max
      * @return true if the packet should be sent, false for a fatal error
-     *         will return false after 5 minutes even if timeoutMs is <= 0.
+     *         will return false after 5 minutes even if timeoutMs is &lt;= 0.
      */
     public boolean packetSendChoke(long timeoutMs) throws IOException, InterruptedException {
         long start = _context.clock().now();
@@ -635,7 +635,7 @@ class Connection {
     /**
      *  Always true at the start, even if we haven't gotten a reply on an
      *  outbound connection. Only set to false on disconnect.
-     *  For outbound, use getHighestAckedThrough() >= 0 also,
+     *  For outbound, use getHighestAckedThrough() &gt;= 0 also,
      *  to determine if the connection is up.
      *
      *  In general, this is true until either:
@@ -961,9 +961,9 @@ class Connection {
     }
 
     /**
-     *  If the next send time is currently >= 0 (i.e. not "never"),
+     *  If the next send time is currently &gt;= 0 (i.e. not "never"),
      *  this may make the next time sooner but will not make it later.
-     *  If the next send time is currently < 0 (i.e. "never"),
+     *  If the next send time is currently &lt; 0 (i.e. "never"),
      *  this will set it to the time specified, but not later than
      *  options.getSendAckDelay() from now (1000 ms)
      */
@@ -1328,7 +1328,7 @@ class Connection {
          * we have to use forceReschedule() instead of schedule() below,
          * to prevent duplicates in the timer queue.
          *
-         * don't synchronize this, deadlock with ackPackets->ackReceived->SimpleTimer2.cancel
+         * don't synchronize this, deadlock with ackPackets-&gt;ackReceived-&gt;SimpleTimer2.cancel
          *
          * @return true if the packet was sent, false if it was not
          */

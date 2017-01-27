@@ -61,7 +61,7 @@ public class KeySelector {
      * Note that if k and m are too big, the GenericWordSelector blows up -
      * The max for 32-byte keys is m=23 and k=11.
      * The precise restriction appears to be:
-     * ((5k + (k-1)(m-5)) / 8) + 2 < keySizeInBytes
+     * ((5k + (k-1)(m-5)) / 8) + 2 &lt; keySizeInBytes
      *
      * It isn't clear how to fix this.
      */

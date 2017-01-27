@@ -232,7 +232,7 @@ class Packet {
     }
 
     /** 
-     * @param id if < 0, sets FLAG_NO_ACK
+     * @param id if &lt; 0, sets FLAG_NO_ACK
      */
     public void setAckThrough(long id) { 
         if (id < 0)

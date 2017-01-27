@@ -13,7 +13,7 @@ import net.i2p.util.SimpleTimer;
  * Receive a packet for a particular connection - placing the data onto the
  * queue, marking packets as acked, updating various fields, etc.
  *<p>
- * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
+ * I2PSession -&gt; MessageHandler -&gt; PacketHandler -&gt; ConnectionPacketHandler -&gt; MessageInputStream
  *<p>
  * One of these is instantiated per-Destination
  * (i.e. per-ConnectionManager, not per-Connection).

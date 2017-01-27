@@ -11,7 +11,7 @@ import net.i2p.util.Log;
  * delivery, or even the generation of a new packet.  This class
  * is the only one that builds useful outbound Packet objects.
  *<p>
- * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
+ * MessageOutputStream -&gt; ConnectionDataReceiver -&gt; Connection -&gt; PacketQueue -&gt; I2PSession
  *<p>
  * There's one of these per MessageOutputStream.
  * It stores no state. It sends everything to the Connection unless
@@ -36,7 +36,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * This tells the flusher in MessageOutputStream whether to flush.
      * It won't flush if this returns true.
      *
-     * It was: return con.getUnackedPacketsSent() > 0 (i.e. Nagle)
+     * It was: return con.getUnackedPacketsSent() &gt; 0 (i.e. Nagle)
      * But then, for data that fills more than one packet, the last part of
      * the data isn't sent until all the previous packets are acked. Which is very slow.
      * The poor interaction of Nagle and Delayed Acknowledgements is well-documented.
