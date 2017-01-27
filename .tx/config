@@ -396,6 +396,8 @@ trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 type = PO
 source_file = installer/resources/locale-man/man.pot
 source_lang = en
+trans.es = installer/resources/locale-man/man_es.po
+trans.zh_CN = installer/resources/locale-man/man_zh.po
 
 [main]
 host = https://www.transifex.com
