@@ -20,6 +20,7 @@ public abstract class SystemVersion {
      *  @since 0.9.28
      */
     public static final String DAEMON_USER = "i2psvc";
+    public static final String GENTOO_USER = "i2p";
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
@@ -63,7 +64,8 @@ public abstract class SystemVersion {
         String runtime = System.getProperty("java.runtime.name");
         _isOpenJDK = runtime != null && runtime.contains("OpenJDK");
         _isLinuxService = !_isWin && !_isMac && !_isAndroid &&
-                          DAEMON_USER.equals(System.getProperty("user.name"));
+                          (DAEMON_USER.equals(System.getProperty("user.name")) ||
+                           (_isGentoo && GENTOO_USER.equals(System.getProperty("user.name"))));
 
         int sdk = 0;
         if (_isAndroid) {
