@@ -320,6 +320,10 @@ public class SSLEepGet extends EepGet {
             return sslc;
         } catch (GeneralSecurityException gse) {
             _log.error("Key Store update error", gse);
+        } catch (ExceptionInInitializerError eiie) {
+            // java 9 b134 see ../crypto/CryptoCheck for example
+            // Catching this may be pointless, fetch still fails
+            _log.error("SSL context error - Java 9 bug?", eiie);
         }
         return null;
     }
