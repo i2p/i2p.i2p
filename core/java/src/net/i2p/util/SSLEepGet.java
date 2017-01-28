@@ -271,6 +271,7 @@ public class SSLEepGet extends EepGet {
             X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
             _stm = new SavingTrustManager(defaultTrustManager);
             sslc.init(null, new TrustManager[] {_stm}, null);
+        /****
             if (_log.shouldLog(Log.DEBUG)) {
                 SSLEngine eng = sslc.createSSLEngine();
                 SSLParameters params = sslc.getDefaultSSLParameters();
@@ -315,6 +316,7 @@ public class SSLEepGet extends EepGet {
                      _log.debug(s[i]);
                 }
             }
+          ****/
             return sslc;
         } catch (GeneralSecurityException gse) {
             _log.error("Key Store update error", gse);
