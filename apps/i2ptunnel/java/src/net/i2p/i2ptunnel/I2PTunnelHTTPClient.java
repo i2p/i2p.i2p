@@ -357,8 +357,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
     public static final String PROP_DISABLE_HELPER = "i2ptunnel.httpclient.disableAddressHelper";
     /** @since 0.9.11 */
-    public static final String PROP_USE_OUTPROXY_PLUGIN = "i2ptunnel.useLocalOutproxy";
-    /** @since 0.9.11 */
     public static final String PROP_SSL_OUTPROXIES = "i2ptunnel.httpclient.SSLOutproxies";
     /** @since 0.9.14 */
     public static final String PROP_ACCEPT = "i2ptunnel.httpclient.sendAccept";

@@ -59,6 +59,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static final int NONCE_BYTES = DataHelper.DATE_LENGTH + MD5_BYTES;
     private static final long MAX_NONCE_AGE = 60*60*1000L;
     private static final int MAX_NONCE_COUNT = 1024;
+    /** @since 0.9.11, moved to Base in 0.9.29 */
+    public static final String PROP_USE_OUTPROXY_PLUGIN = "i2ptunnel.useLocalOutproxy";
 
     private static final String ERR_AUTH1 =
             "HTTP/1.1 407 Proxy Authentication Required\r\n" +

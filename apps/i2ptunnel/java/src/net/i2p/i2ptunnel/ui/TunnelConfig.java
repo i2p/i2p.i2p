@@ -409,9 +409,9 @@ public class TunnelConfig {
 
     public void setUseOutproxyPlugin(boolean val) {
         if (val)
-            _booleanOptions.add(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+            _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN);
         else
-            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+            _booleanOptions.remove(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN);
     }
     
     /**
@@ -695,7 +695,7 @@ public class TunnelConfig {
         };
     private static final String _booleanProxyOpts[] = {
         I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH,
-        I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN,
+        I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN,
         I2PTunnelHTTPClient.PROP_USER_AGENT,
         I2PTunnelHTTPClient.PROP_REFERER,
         I2PTunnelHTTPClient.PROP_ACCEPT,

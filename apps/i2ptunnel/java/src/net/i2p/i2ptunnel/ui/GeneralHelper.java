@@ -579,7 +579,7 @@ public class GeneralHelper {
      *  Default true
      */
     public boolean getUseOutproxyPlugin(int tunnel) {
-        return getBooleanProperty(tunnel, I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, true);
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN, true);
     }
 
     /** all of these are @since 0.8.3 */
