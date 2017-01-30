@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -121,6 +122,8 @@ public class Router implements RouterClock.ClockShiftListener {
     private static final String PROP_JBIGI = "jbigi.loadedResource";
     public static final String UPDATE_FILE = "i2pupdate.zip";
         
+    private static final int SHUTDOWN_WAIT_SECS = 60;
+
     private static final String originalTimeZoneID;
     static {
         //
@@ -955,8 +958,6 @@ public class Router implements RouterClock.ClockShiftListener {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());
         bwLim = (int)(bwLim * getSharePercentage());
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         
         String force = _context.getProperty(PROP_FORCE_BWCLASS);
         if (force != null && force.length() > 0) {
@@ -1210,6 +1211,7 @@ public class Router implements RouterClock.ClockShiftListener {
         I2PThread.removeOOMEventListener(_oomListener);
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
+        LinkedList<Thread> tasks = new LinkedList<Thread>();
         for (Runnable task : _context.getShutdownTasks()) {
             //System.err.println("Running shutdown task " + task.getClass());
             if (_log.shouldLog(Log.WARN))
@@ -1219,13 +1221,32 @@ public class Router implements RouterClock.ClockShiftListener {
                 Thread t = new I2PAppThread(task, "Shutdown task " + task.getClass().getName());
                 t.setDaemon(true);
                 t.start();
-                try {
-                    t.join(10*1000);
-                } catch (InterruptedException ie) {}
-                if (t.isAlive())
-                    _log.logAlways(Log.WARN, "Shutdown task took more than 10 seconds to run: " + task.getClass());
+                tasks.add(t);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
+            }
+        }
+        long waitSecs = SHUTDOWN_WAIT_SECS;
+        if (SystemVersion.isARM())
+            waitSecs *= 2;
+        final long maxWait = System.currentTimeMillis() + (waitSecs *1000);
+        Thread th;
+        while ((th = tasks.poll()) != null) {
+            long toWait = maxWait - System.currentTimeMillis();
+            if (toWait <= 0) {
+                _log.logAlways(Log.WARN, "Shutdown tasks took more than " + waitSecs + " seconds to run");
+                tasks.clear();
+                break;
+            }
+            try {
+                th.join(toWait);
+            } catch (InterruptedException ie) {}
+            if (th.isAlive()) {
+                _log.logAlways(Log.WARN, "Shutdown task took more than " + waitSecs + " seconds to run: " + th.getName());
+                tasks.clear();
+                break;
+            } else if (_log.shouldInfo()) {
+                _log.info("Shutdown task complete: " + th.getName());
             }
         }
 

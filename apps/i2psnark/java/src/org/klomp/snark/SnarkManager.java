@@ -42,6 +42,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
@@ -302,6 +303,8 @@ public class SnarkManager implements CompleteListener {
      *  Runs inline.
      */
     public void stop() {
+        if (_log.shouldWarn())
+            _log.warn("Snark stop() begin", new Exception("I did it"));
         if (_umgr != null && _uhandler != null) {
             //_uhandler.shutdown();
             _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
@@ -312,6 +315,8 @@ public class SnarkManager implements CompleteListener {
         _connectionAcceptor.halt();
         _idleChecker.cancel();
         stopAllTorrents(true);
+        if (_log.shouldWarn())
+            _log.warn("Snark stop() end");
     }
     
     /** @since 0.9.1 */
@@ -2580,7 +2585,9 @@ public class SnarkManager implements CompleteListener {
                     stopTorrent(snark, false);
                 // Throttle since every unannounce is now threaded.
                 // How to do this without creating a ton of threads?
-                try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                if (count % 8 == 0) {
+                    try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                }
             }
         }
         if (_util.connected()) {
@@ -2593,8 +2600,12 @@ public class SnarkManager implements CompleteListener {
                 _context.simpleTimer2().addEvent(new Disconnector(), 60*1000);
                 addMessage(_t("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
-                    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                    long toWait = 5*1000;
+                    if (SystemVersion.isARM())
+                        toWait *= 2;
+                    try { Thread.sleep(toWait); } catch (InterruptedException ie) {}
                 }
+                _util.disconnect();
             } else {
                 _util.disconnect();
                 _stopping = false;
