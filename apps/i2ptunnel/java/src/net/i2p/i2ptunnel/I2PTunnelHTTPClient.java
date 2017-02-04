@@ -432,8 +432,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Deprecated
                         // /eepproxy/foo.i2p/bar/baz.html
                         String subRequest = request.substring("/eepproxy/".length());
-                        if(subRequest.indexOf("/") == -1) {
-                            subRequest += "/";
+                        if(subRequest.indexOf('/') == -1) {
+                            subRequest += '/';
                         }
                         request = "http://" + subRequest;
                     /****
@@ -537,10 +537,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     } else if(hostLowerCase.equals("i2p")) {
                         // pull the b64 _dest out of the first path element
                         String oldPath = requestURI.getPath().substring(1);
-                        int slash = oldPath.indexOf("/");
+                        int slash = oldPath.indexOf('/');
                         if(slash < 0) {
                             slash = oldPath.length();
-                            oldPath += "/";
+                            oldPath += '/';
                         }
                         String _dest = oldPath.substring(0, slash);
                         if(slash >= 516 && !_dest.contains(".")) {
