@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.time.Timestamper;
+import net.i2p.util.Addresses;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -173,6 +174,7 @@ public class RouterTimestamper extends Timestamper {
             while (_isRunning) {
                 // NOTE: _log is null the first time through, to prevent problems and stack overflows
                 updateConfig();
+                boolean preferIPv6 = Addresses.isConnectedIPv6();
                 if (!_disabled) {
                     // first the servers for our country and continent, we know what country we're in...
                     if (_priorityServers != null) {
@@ -180,7 +182,7 @@ public class RouterTimestamper extends Timestamper {
                             if (_log != null && _log.shouldDebug())
                                 _log.debug("Querying servers " + servers);
                             try {
-                                lastFailed = !queryTime(servers.toArray(new String[servers.size()]), SHORT_TIMEOUT);
+                                lastFailed = !queryTime(servers.toArray(new String[servers.size()]), SHORT_TIMEOUT, preferIPv6);
                             } catch (IllegalArgumentException iae) {
                                 if (!lastFailed && _log != null && _log.shouldWarn())
                                     _log.warn("Unable to reach any regional NTP servers: " + servers);
@@ -195,7 +197,10 @@ public class RouterTimestamper extends Timestamper {
                         if (_log != null && _log.shouldDebug())
                             _log.debug("Querying servers " + _servers);
                         try {
-                            lastFailed = !queryTime(_servers.toArray(new String[_servers.size()]), DEFAULT_TIMEOUT);
+                            // If we failed, maybe it's because IPv6 is blocked, so try IPv4 only
+                            // also first time through, and randomly
+                            boolean prefIPv6 = preferIPv6 && !lastFailed && _log != null && _context.random().nextInt(4) != 0;
+                            lastFailed = !queryTime(_servers.toArray(new String[_servers.size()]), DEFAULT_TIMEOUT, prefIPv6);
                         } catch (IllegalArgumentException iae) {
                             lastFailed = true;
                         }
@@ -262,7 +267,7 @@ public class RouterTimestamper extends Timestamper {
     /**
      * True if the time was queried successfully, false if it couldn't be
      */
-    private boolean queryTime(String serverList[], int perServerTimeout) throws IllegalArgumentException {
+    private boolean queryTime(String serverList[], int perServerTimeout, boolean preferIPv6) throws IllegalArgumentException {
         long found[] = new long[_concurringServers];
         long now = -1;
         int stratum = -1;
@@ -273,8 +278,7 @@ public class RouterTimestamper extends Timestamper {
             //    // this delays startup when net is disconnected or the timeserver list is bad, don't make it too long
             //    try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
             //}
-            // IPv6 arg TODO
-            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout, false, _log);
+            long[] timeAndStratum = NtpClient.currentTimeAndStratum(serverList, perServerTimeout, preferIPv6, _log);
             now = timeAndStratum[0];
             stratum = (int) timeAndStratum[1];
             long delta = now - _context.clock().now();

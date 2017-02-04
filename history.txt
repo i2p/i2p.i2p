@@ -1,3 +1,19 @@
+2017-02-04 zzz
+ * NTP: Enable IPv6 support (ticket #1896)
+
+2017-01-30 zzz
+ * Router: Run shutdown tasks in parallel,
+   increase max time for shutdown tasks (ticket #1893)
+   i2psnark: Remove most delay between announces at shutdown
+
+2017-01-29 zzz
+ * i2ptunnel CONNECT proxy:
+   - Add support for outproxy plugin (tickets #1364, #1895)
+   - Add support for ports
+
+2017-01-28 zzz
+ * Utils: Detect when running as service on Gentoo
+
 2017-01-26 zzz
  * Build: Set up translations for man pages
  * Javadoc: Fixes (ticket #1894)
@@ -41,8 +57,8 @@
  * NTP:
    - Verify source address and port
    - Add to command line
-   - Add KoD support (ticket #1896)
-   - Add initial IPv6 support (ticket #1897)
+   - Add KoD support (ticket #1897)
+   - Add initial IPv6 support (ticket #1896)
 
 2016-12-20 zzz
  * Build: Fix installer compile failure
