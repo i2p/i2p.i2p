@@ -400,6 +400,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             String authorization = null;
             int remotePort = 0;
             String referer = null;
+            URI origRequestURI = null;
             while((line = reader.readLine(method)) != null) {
                 line = line.trim();
                 if(_log.shouldLog(Log.DEBUG)) {
@@ -476,7 +477,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // to be the outgoing URI (with http:// if going to outproxy, otherwise without)
                     URI requestURI;
                     try {
-                        requestURI = new URI(request);
+                        origRequestURI = requestURI = new URI(request);
                         if(requestURI.getRawUserInfo() != null || requestURI.getRawFragment() != null) {
                             // these should never be sent to the proxy in the request line
                             if(_log.shouldLog(Log.WARN)) {
@@ -937,11 +938,33 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // save for address helper form below
                         referer = line.substring(9);
                         if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_REFERER))) {
-                            // Shouldn't we be more specific, like accepting in-site referers ?
-                            //line = "Referer: i2p";
-                            line = null;
-                            continue; // completely strip the line
-                        }
+                            try {
+                                // Either strip or rewrite the referer line
+                                URI refererURI = new URI(referer);
+                                String refererHost = refererURI.getHost();
+                                if (refererHost != null) {
+                                    String origHost = origRequestURI.getHost();
+                                    if (!refererHost.equals(origHost) ||
+                                        refererURI.getPort() != origRequestURI.getPort() ||
+                                        !DataHelper.eq(refererURI.getScheme(), origRequestURI.getScheme())) {
+                                        line = null;
+                                        continue; // completely strip the line if everything doesn't match
+                                    }
+                                    // Strip to a relative URI, to hide the original host name
+                                    StringBuilder buf = new StringBuilder();
+                                    buf.append("Referer: ");
+                                    String refererPath = refererURI.getRawPath();
+                                    buf.append(refererPath != null ? refererPath : "/");
+                                    String refererQuery = refererURI.getRawQuery();
+                                    if (refererQuery != null)
+                                        buf.append('?').append(refererQuery);
+                                    line = buf.toString();
+                                } // else relative URI, leave in
+                            } catch (URISyntaxException use) {
+                                line = null;
+                                continue; // completely strip the line
+                            }
+                        } // else allow
                     } else if(lowercaseLine.startsWith("via: ") &&
                             !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_VIA))) {
                         //line = "Via: i2p";
