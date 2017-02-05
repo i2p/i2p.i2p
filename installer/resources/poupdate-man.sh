@@ -9,6 +9,7 @@
 # Don't forget to check in those files and .tx/config .
 # Don't forget to mtn add and check in new files in man/ and locale-man/ .
 #
+cd `dirname $0`
 for i in eepget i2prouter i2prouter-nowrapper
 do
 	for f in locale-man/man_*.po
