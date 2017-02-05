@@ -38,7 +38,7 @@ public class StatSummarizer implements Runnable {
     private final List<SummaryListener> _listeners;
     // TODO remove static instance
     private static StatSummarizer _instance;
-    private static final int MAX_CONCURRENT_PNG = 3;
+    private static final int MAX_CONCURRENT_PNG = SystemVersion.isARM() ? 2 : 3;
     private final Semaphore _sem;
     private volatile boolean _isRunning = true;
     private boolean _isDisabled;
