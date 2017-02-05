@@ -248,6 +248,8 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
             // no tunnels may fix itself, allow retx
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS:
+            // probably took a long time to open the tunnel, allow retx
+            case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rcvd soft failure status " + status + " for msg " + msgId + " on " + con);
                 _messageStatusMap.remove(id);
@@ -274,7 +276,6 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_MESSAGE:
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_OPTIONS:
             case MessageStatusMessage.STATUS_SEND_FAILURE_OVERFLOW:
-            case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED:
             case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL_LEASESET:
             case MessageStatusMessage.STATUS_SEND_FAILURE_UNSUPPORTED_ENCRYPTION:
             case MessageStatusMessage.STATUS_SEND_FAILURE_DESTINATION:
