@@ -333,6 +333,9 @@ class Packet {
      */
     public Signature getOptionalSignature() { return _optionSignature; }
 
+    /** 
+     * This also sets flag FLAG_SIGNATURE_INCLUDED
+     */
     public void setOptionalSignature(Signature sig) { 
         setFlag(FLAG_SIGNATURE_INCLUDED, sig != null);
         _optionSignature = sig; 
@@ -346,6 +349,7 @@ class Packet {
     /** 
      * This sets the from field in the packet to the Destination for the session
      * provided in the constructor.
+     * This also sets flag FLAG_FROM_INCLUDED
      */
     public void setOptionalFrom() { 
         setFlag(FLAG_FROM_INCLUDED, true);
@@ -360,6 +364,9 @@ class Packet {
      */
     public int getOptionalDelay() { return _optionDelay; }
 
+    /** 
+     * Caller must also call setFlag(FLAG_DELAY_REQUESTED)
+     */
     public void setOptionalDelay(int delayMs) {
         if (delayMs > MAX_DELAY_REQUEST)
             _optionDelay = MAX_DELAY_REQUEST;
@@ -375,6 +382,10 @@ class Packet {
      * @return Maximum payload size sender can receive (MRU)
      */
     public int getOptionalMaxSize() { return _optionMaxSize; }
+
+    /** 
+     * This also sets flag FLAG_MAX_PACKET_SIZE_INCLUDED
+     */
     public void setOptionalMaxSize(int numBytes) { 
         setFlag(FLAG_MAX_PACKET_SIZE_INCLUDED, numBytes > 0);
         _optionMaxSize = numBytes; 

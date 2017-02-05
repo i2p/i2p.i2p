@@ -388,7 +388,7 @@ class Connection {
                     _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
             }
             // WHY always set?
-            packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+            //packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
             long timeout = _options.getRTO();
             if (timeout > MAX_RESEND_DELAY)
