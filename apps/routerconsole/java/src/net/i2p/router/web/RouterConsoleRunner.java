@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
@@ -95,6 +96,7 @@ public class RouterConsoleRunner implements RouterApp {
     private final ClientAppManager _mgr;
     private volatile ClientAppState _state = UNINITIALIZED;
     private static Server _server;
+    private static Timer _jettyTimer;
     private String _listenPort;
     private String _listenHost;
     private String _sslListenPort;
@@ -235,6 +237,12 @@ public class RouterConsoleRunner implements RouterApp {
         PortMapper portMapper = _context.portMapper();
         portMapper.unregister(PortMapper.SVC_CONSOLE);
         portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
+        synchronized(RouterConsoleRunner.class) {
+            if (_jettyTimer != null) {
+                _jettyTimer.cancel();
+                _jettyTimer = null;
+            }
+        }
         changeState(STOPPED);
     }
 
@@ -846,7 +854,7 @@ public class RouterConsoleRunner implements RouterApp {
             Map<String, String> userpw = mgr.getMD5(PROP_CONSOLE_PW);
             if (userpw.isEmpty()) {
                 enable = false;
-                ctx.router().saveConfig(PROP_CONSOLE_PW, "false");
+                ctx.router().saveConfig(PROP_PW_ENABLE, "false");
             } else {
                 HashLoginService realm = new CustomHashLoginService(JETTY_REALM, context.getContextPath(),
                                                                     ctx.logManager().getLog(RouterConsoleRunner.class));
@@ -931,8 +939,18 @@ public class RouterConsoleRunner implements RouterApp {
         sec.setConstraintMappings(cmarr);
 
         context.setSecurityHandler(sec);
+
+        // No, we can't share the ConstraintSecurityHandler across all webapps
+        // But we can force all webapps to use a single Timer thread
+        // see HashSessionManager javadoc
+        synchronized(RouterConsoleRunner.class) {
+            if (_jettyTimer == null) {
+                _jettyTimer = new Timer("Console HashSessionScavenger", true);
+            }
+            context.getServletContext().setAttribute("org.eclipse.jetty.server.session.timer", _jettyTimer);
+        }
     }
-    
+
     /**
      * For logging authentication failures
      * @since 0.9.28
