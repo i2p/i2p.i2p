@@ -5,54 +5,54 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# YF <yfdyh000@gmail.com>, 2017
+# Towinet <owan813@laposte.net>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: YF <yfdyh000@gmail.com>, 2017\n"
-"Language-Team: Chinese (China) (https://www.transifex.com/otf/teams/12694/zh_CN/)\n"
+"Last-Translator: Towinet <owan813@laposte.net>, 2017\n"
+"Language-Team: French (https://www.transifex.com/otf/teams/12694/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_CN\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. type: TH
 #: man/eepget.1:1
 #, no-wrap
 msgid "EEPGET"
-msgstr ""
+msgstr "EEPGET"
 
 #. type: TH
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "January 26, 2017"
-msgstr "2017年1月26日"
+msgstr "26 janvier 2017"
 
 #. type: TH
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "I2P"
-msgstr ""
+msgstr "I2P"
 
 #. type: SH
 #: man/eepget.1:3 man/i2prouter.1:3 man/i2prouter-nowrapper.1:3
 #, no-wrap
 msgid "NAME"
-msgstr "名称"
+msgstr "NOM"
 
 #. type: Plain text
 #: man/eepget.1:5
 msgid "Eepget - I2P downloader"
-msgstr "Eepget - I2P 下载器"
+msgstr "Eepget - téléchargeur I2P"
 
 #. type: SH
 #: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6
 #, no-wrap
 msgid "SYNOPSIS"
-msgstr "概要"
+msgstr "SYNOPSIS"
 
 #. type: Plain text
 #: man/eepget.1:9
@@ -63,14 +63,16 @@ msgstr "B<eepget> [I<options>]I<URL>"
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
 #, no-wrap
 msgid "DESCRIPTION"
-msgstr "描述"
+msgstr "DESCRIPTION"
 
 #. type: Plain text
 #: man/eepget.1:15
 msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
-msgstr "通过 HTTP 非交互式地下载一个文件。支持通过 I2P 和常规互联网传输。"
+msgstr ""
+"Télécharge un fichier de façon non interactive via HTTP. Les transferts sont"
+" permis aussi bien via I2P que via l'Internet habituel."
 
 #. type: Plain text
 #: man/eepget.1:21
@@ -81,14 +83,18 @@ msgid ""
 "  If supported by the remote server, eepget will instruct the server to "
 "continue the download from the point of interruption."
 msgstr ""
-"Eepget 能够处理缓慢或不稳定的网络连接；如果由于网络问题导致下载不成功，它将继续重试，直到检索到整个文件（如果已设定 -n "
-"选项）。如果远程服务器支持，eepget 将指示服务器从中断点继续。"
+"Eepget est capable de faire face aux connexions réseau lentes ou instables; "
+"si un téléchargement ne réussit pas à cause d'un problème de réseau, il "
+"continuera à réessayer jusqu'à ce que le fichier entier aie été téléchargé "
+"(si l'option -n est mise). S'il est supporté par le serveur distant, Eepget "
+"demandera au serveur de continuer le téléchargement à partir du point "
+"d'interruption."
 
 #. type: SH
 #: man/eepget.1:22
 #, no-wrap
 msgid "OPTIONS"
-msgstr "选项"
+msgstr "OPTIONS"
 
 #. type: Plain text
 #: man/eepget.1:25
@@ -99,34 +105,34 @@ msgstr "B<-c>"
 #: man/eepget.1:25
 #, no-wrap
 msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
-msgstr "明网。不使用代理。同 B<-p> :0 。"
+msgstr "Clearnet. N'utilise pas un proxy. Pareil que B<-p> :0 ."
 
 #. type: Plain text
 #: man/eepget.1:31
 msgid "B<-e> etag"
-msgstr "B<-e> etag"
+msgstr ""
 
 #. type: TP
 #: man/eepget.1:31
 #, no-wrap
 msgid "Sets the etag value in the request headers."
-msgstr "设定请求头中的 etag 值。"
+msgstr ""
 
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr "B<-h> 名称=值"
+msgstr "B<-h> name=value"
 
 #. type: TP
 #: man/eepget.1:37
 #, no-wrap
 msgid "Adds an arbitrary request header with the given name and value."
-msgstr "使用指定的名称和值添加任意请求头。"
+msgstr "Ajoute une en-tête de demande arbitraire avec nom précisé et valeur."
 
 #. type: Plain text
 #: man/eepget.1:43
 msgid "B<-l> lineLen"
-msgstr "B<-l> 行长度"
+msgstr "B<-l> lineLen"
 
 #. type: TP
 #: man/eepget.1:43
@@ -134,12 +140,14 @@ msgstr "B<-l> 行长度"
 msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
-msgstr "控制进度显示。B<\\ lineLen > 控制进度行的字符长度。默认为40。"
+msgstr ""
+"Contrôle l'affichage de la progression. B<\\ lineLen > est la longueur en "
+"caractères d'une ligne de progression. Le nombre par défaut est 40."
 
 #. type: Plain text
 #: man/eepget.1:49
 msgid "B<-m> markSize"
-msgstr ""
+msgstr "B<-m> markSize"
 
 #. type: TP
 #: man/eepget.1:49
@@ -152,7 +160,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr "B<-n> 次重试"
+msgstr "B<-n> réessais"
 
 #. type: TP
 #: man/eepget.1:55
@@ -161,11 +169,14 @@ msgid ""
 "Specify the number of times to retry downloading if the download isn't "
 "successful. If this option is not specified, eepget will not retry."
 msgstr ""
+"Spécifie le nombre de fois à réessayer le téléchargement si le "
+"téléchargement n'a pas réussi. Si cette option n'est pas spécifiée, Eepget "
+"ne réessayera pas."
 
 #. type: Plain text
 #: man/eepget.1:61
 msgid "B<-o> file"
-msgstr "B<-o> 文件"
+msgstr ""
 
 #. type: TP
 #: man/eepget.1:61
@@ -192,29 +203,29 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:73
 msgid "B<-t> seconds"
-msgstr "B<-t> 秒"
+msgstr ""
 
 #. type: TP
 #: man/eepget.1:73
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
-msgstr ""
+msgstr "Met le délai d'inactivité. Il est prédéfini à 60 secondes."
 
 #. type: Plain text
 #: man/eepget.1:79
 msgid "B<-u> username"
-msgstr "B<-u> 用户名"
+msgstr "B<-u> username"
 
 #. type: TP
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr ""
+msgstr "Met le nom d'utilisateur pour l'autorisation de proxy, si nécessaire."
 
 #. type: Plain text
 #: man/eepget.1:85
 msgid "B<-x> password"
-msgstr "B<-x> 密码"
+msgstr "B<-x> password"
 
 #. type: TP
 #: man/eepget.1:85
@@ -223,25 +234,28 @@ msgid ""
 "Sets the password for proxy authorization, if required. If a username is "
 "specified but not a password, EepGet will prompt for the password."
 msgstr ""
+"Met le mot de passe pour l'autorisation de proxy, si nécessaire. Si un nom "
+"d'utilisateur est spécifié, mais pas un mot de passe, EepGet demandera le "
+"mot de passe."
 
 #. type: SH
 #: man/eepget.1:89
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr "退出状态"
+msgstr ""
 
 #. type: Plain text
 #: man/eepget.1:93
 msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
-msgstr "B<eepget> 退出状态为 0 表示传输成功。如果下载遇到问题，则退出状态非 0。"
+msgstr ""
 
 #. type: SH
 #: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
-msgstr ""
+msgstr "RAPPORTER DES BUGS"
 
 #. type: Plain text
 #: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
@@ -249,17 +263,19 @@ msgid ""
 "Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
 "E<.UE .>"
 msgstr ""
+"Veuillez créer un ticket sur E<.UR https://trac.i2p2.de/> la page Trac d'I2P"
+" E<.UE .>"
 
 #. type: SH
 #: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
-msgstr "另见"
+msgstr "VOIR AUSSI"
 
 #. type: Plain text
 #: man/eepget.1:104
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 
 #. type: TH
 #: man/i2prouter.1:1
@@ -270,7 +286,7 @@ msgstr "I2PROUTER"
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr "i2prouter - 启动和停止 I2P 路由器"
+msgstr "i2prouter - démarre et stoppe le routeur I2P"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -284,7 +300,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr "控制 I2P 服务。"
+msgstr "Contrôle le service I2P."
 
 #. type: IP
 #: man/i2prouter.1:15
@@ -296,6 +312,8 @@ msgstr "B<console>"
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
 msgstr ""
+"Exécute I2P en tant qu'un application de console, sous le compte de "
+"l'utilisateur actuel."
 
 #. type: IP
 #: man/i2prouter.1:19
@@ -306,7 +324,7 @@ msgstr "B<start>"
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr "启动 I2P 服务。"
+msgstr "Démarre le service I2P."
 
 #. type: IP
 #: man/i2prouter.1:23
@@ -317,79 +335,83 @@ msgstr "B<stop>"
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr "停止 I2P 服务。"
+msgstr "Stoppe le service I2P."
 
 #. type: IP
 #: man/i2prouter.1:27
 #, no-wrap
 msgid "B<restart>"
-msgstr ""
+msgstr "B<restart>"
 
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr ""
+msgstr "Stoppe le service I2P puis le démarre."
 
 #. type: IP
 #: man/i2prouter.1:31
 #, no-wrap
 msgid "B<condrestart>"
-msgstr ""
+msgstr "B<condrestart>"
 
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
 msgstr ""
+"Redémarre le service I2P seulement si il est déjà en cours d'exécution."
 
 #. type: IP
 #: man/i2prouter.1:35
 #, no-wrap
 msgid "B<graceful>"
-msgstr ""
+msgstr "B<graceful>"
 
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr ""
+msgstr "Stoppe I2P gracieusement (cela peut prendre jusqu'à 11 minutes)."
 
 #. type: IP
 #: man/i2prouter.1:39
 #, no-wrap
 msgid "B<install>"
-msgstr ""
+msgstr "B<install>"
 
 #. type: Plain text
 #: man/i2prouter.1:41
 msgid "Install initscript to start I2P automatically when the system boots."
 msgstr ""
+"Installe un script d'initialisation pour exécuter automatiquement I2P "
+"lorsque le système démarre."
 
 #. type: IP
 #: man/i2prouter.1:43
 #, no-wrap
 msgid "B<remove>"
-msgstr ""
+msgstr "B<remove>"
 
 #. type: Plain text
 #: man/i2prouter.1:45
 msgid "Uninstall initscript that was installed with B<install>"
 msgstr ""
+"Désinstalle le script d'initialisation qui a été installé avec B<install>"
 
 #. type: IP
 #: man/i2prouter.1:47
 #, no-wrap
 msgid "B<status>"
-msgstr ""
+msgstr "B<status>"
 
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr ""
+msgstr "Imprime lorsque le service d'I2P est en cours d'exécution."
 
 #. type: IP
 #: man/i2prouter.1:51
 #, no-wrap
 msgid "B<dump>"
-msgstr ""
+msgstr "B<dump>"
 
 #. type: Plain text
 #: man/i2prouter.1:53
@@ -399,7 +421,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:61
 msgid "B<i2prouter-nowrapper>(1)"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>(1)"
 
 #. type: TH
 #: man/i2prouter-nowrapper.1:1
@@ -410,12 +432,12 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr ""
+msgstr "i2prouter-nowrapper - démarre le routeur I2P"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
 msgid "B<i2prouter-nowrapper>"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:14
@@ -424,6 +446,10 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
+"Démarre le routeur I2P, sans le wrapper (emballeur) de service. Cela "
+"signifie que le routeur ne redémarrera pas si se plante. Aussi, il utilisera"
+" la taille de mémoire par défaut, laquelle peut parfois être insuffisante "
+"pour I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
@@ -436,4 +462,4 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31
 msgid "B<i2prouter>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)"

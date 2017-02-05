@@ -1,0 +1,97 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "26. Januar 2017" "" I2P
+
+.SH NAME
+Eepget \- I2P Downloader
+
+.SH SYNOPSIS
+\fBeepget\fP [\fIOptionen\fP]\fIURL\fP
+.br
+
+.SH BESCHREIBUNG
+.P
+Downloaded eine Datei nicht interaktiv via HTTP Protokoll. Transfers im I2P
+und im normalen Netz sind möglich.
+.P
+Eepget kommt mit langsamen oder instabilen Netzwerkverbindungen zurecht;
+falls der Download aus Netzwerkgründen abbricht, versucht eepget es
+nocheinmal, bis die Datei komplett geholt wurde (falls die \-n Option gesetzt
+wurde). Falls der Server es zulässt, wird eepget dem Server anweisen, an der
+Stelle des Abbruchs fortzusetzen.
+
+.SH OPTIONEN
+\fB\-c\fP
+.TP 
+Internet. Nicht als Proxy benutzen. Gleich wie \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Legt den etag\-Wert in den Anforderungskopfdaten fest.
+.TP 
+
+\fB\-h\fP Name=Wert
+.TP 
+Fügt eine freie Request Kopfzeile mit gegebenen Namen und Wert hinzu
+.TP 
+
+\fB\-l\fP Zeilenlänge
+.TP 
+Kontrolliert die Fortschrittsanzeige. \fB\ linelen \fP ist die Länge einer Zeile in Zeichen. Das Default ist 40.
+.TP 
+
+\fB\-m\fP Marker Größe
+.TP 
+Kontrolliert die Größe der Fortschrittsanzeige. \fB\ markSize \fP ist die Anzahl an Bytes, die ein '#' Zeichen repräsentiert. Defaultwert ist 1024.
+.TP 
+
+\fB\-n\fP Wiederholungen
+.TP 
+Gibt die Anzahl an Wiederholungen an, wenn der Download nicht erfolgreich ist. Ist diese Option nicht gesetzt, wiederholt eepget nicht.
+.TP 
+
+\fB\-o\fP Datei
+.TP 
+Gibt die Ausgabedatei an. Ist diese Optione nicht gesetzt, wird der Name der Datei durch die URL bestimmt. 
+.TP 
+
+\fB\-p\fP Proxy_host[:port]
+.TP 
+Definiert einen I2P Proxy Server (Eepproxy) zur Nutzung. Ist der Port nicht angegeben, wird eepget 4444 nutzen. Ist diese Option nicht gesetzt, benutzt eepget 127.0.0.1:4444. Nutzen Sie \fB\-c\fP oder \fB\-p\fP um den Eepproxy zu deaktivieren.
+.TP 
+
+\fB\-t\fP Sekunden
+.TP 
+Legt die Inaktivitäts\-Zeitbeschränkung fest. Die Standardeinstellung ist 60 Sekunden.
+.TP 
+
+\fB\-u\fP Benutzername
+.TP 
+Legt den Benutzernamen für die Proxy\-Autorisierung fest, falls erforderlich.
+.TP 
+
+\fB\-x\fP Passwort
+.TP 
+Setzt das Passwort zur Proxy Authentifizierung, falls benötigt. Falls ein Benutzername, aber kein Passwort angegeben ist, wird Eepget nach dem Passwort fragen.
+.TP 
+
+.SH BEENDEN\-STATUS
+
+\fBeepget\fP endet mit dem Status null im Falle eines erfolgreichen Transfers,
+alternativ mit Nicht\-Null, falls es Problem beim Download gab.
+
+.SH "FEHLER MELDEN"
+Bitte tragen Sie ein Ticket auf
+.UR https://trac.i2p2.de/
+Die I2P Trac
+Seite
+.UE .
+ein.
+
+.SH "SIEHE AUCH"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+

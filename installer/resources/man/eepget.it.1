@@ -3,41 +3,45 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH EEPGET 1 2017年1月26日 "" I2P
+.TH EEPGET 1 "26 Gennaio 2017" "" I2P
 
-.SH 名称
-Eepget \- I2P 下载器
+.SH NOME
+Eepget \- I2P downloader
 
-.SH 概要
+.SH SINOSSI
 \fBeepget\fP [\fIoptions\fP]\fIURL\fP
 .br
 
-.SH 描述
+.SH DESCRIZIONE
 .P
-通过 HTTP 非交互式地下载一个文件。支持通过 I2P 和常规互联网传输。
+Download a file non\-interactively via HTTP. Transfers through both I2P and
+the regular Internet are supported.
 .P
-Eepget 能够处理缓慢或不稳定的网络连接；如果由于网络问题导致下载不成功，它将继续重试，直到检索到整个文件（如果已设定 \-n
-选项）。如果远程服务器支持，eepget 将指示服务器从中断点继续。
+Eepget is able to cope with slow or unstable network connections; if a
+download is not successful because of a network problem, it will keep
+retrying until the whole file has been retrieved (if the \-n option is set).
+If supported by the remote server, eepget will instruct the server to
+continue the download from the point of interruption.
 
-.SH 选项
+.SH OPZIONI
 \fB\-c\fP
 .TP 
-明网。不使用代理。同 \fB\-p\fP :0 。
+Clearnet. Do not use a proxy. Same as \fB\-p\fP :0 .
 .TP 
 
 \fB\-e\fP etag
 .TP 
-设定请求头中的 etag 值。
+Sets the etag value in the request headers.
 .TP 
 
-\fB\-h\fP 名称=值
+\fB\-h\fP name=value
 .TP 
-使用指定的名称和值添加任意请求头。
+Adds an arbitrary request header with the given name and value.
 .TP 
 
-\fB\-l\fP 行长度
+\fB\-l\fP lineLen
 .TP 
-控制进度显示。\fB\ lineLen \fP 控制进度行的字符长度。默认为40。
+Controls the progress display. \fB\ lineLen \fP is the length of one progress line in characters. The default is 40.
 .TP 
 
 \fB\-m\fP markSize
@@ -45,12 +49,12 @@ Eepget 能够处理缓慢或不稳定的网络连接；如果由于网络问题�
 Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. The default is 1024.
 .TP 
 
-\fB\-n\fP 次重试
+\fB\-n\fP numeroTentativi
 .TP 
 Specify the number of times to retry downloading if the download isn't successful. If this option is not specified, eepget will not retry.
 .TP 
 
-\fB\-o\fP 文件
+\fB\-o\fP file
 .TP 
 Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
 .TP 
@@ -60,24 +64,25 @@ Sets the output file to write to. If this option is not given, the output filena
 Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
 .TP 
 
-\fB\-t\fP 秒
+\fB\-t\fP secondi
 .TP 
 Sets the inactivity timeout. The default is 60 seconds.
 .TP 
 
-\fB\-u\fP 用户名
+\fB\-u\fP username
 .TP 
 Sets the username for proxy authorization, if required.
 .TP 
 
-\fB\-x\fP 密码
+\fB\-x\fP password
 .TP 
 Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password.
 .TP 
 
-.SH 退出状态
+.SH "EXIT STATUS"
 
-\fBeepget\fP 退出状态为 0 表示传输成功。如果下载遇到问题，则退出状态非 0。
+\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
+there were problems with the download.
 
 .SH "REPORTING BUGS"
 Please enter a ticket on
@@ -85,6 +90,6 @@ Please enter a ticket on
 the I2P trac page
 .UE .
 
-.SH 另见
+.SH "SEE ALSO"
 \fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
 

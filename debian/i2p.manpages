@@ -1,1 +1,12 @@
 installer/resources/man/i2prouter.1
+installer/resources/man/i2prouter.de.1
+installer/resources/man/i2prouter.es.1
+installer/resources/man/i2prouter.fr.1
+installer/resources/man/i2prouter.it.1
+installer/resources/man/i2prouter.zh.1
+installer/resources/man/i2prouter-nowrapper.1
+installer/resources/man/i2prouter-nowrapper.de.1
+installer/resources/man/i2prouter-nowrapper.es.1
+installer/resources/man/i2prouter-nowrapper.fr.1
+installer/resources/man/i2prouter-nowrapper.it.1
+installer/resources/man/i2prouter-nowrapper.zh.1

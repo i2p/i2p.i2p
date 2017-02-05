@@ -1,0 +1,96 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "26 janvier 2017" "" I2P
+
+.SH NOM
+Eepget \- téléchargeur I2P
+
+.SH SYNOPSIS
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH DESCRIPTION
+.P
+Télécharge un fichier de façon non interactive via HTTP. Les transferts sont
+permis aussi bien via I2P que via l'Internet habituel.
+.P
+Eepget est capable de faire face aux connexions réseau lentes ou instables;
+si un téléchargement ne réussit pas à cause d'un problème de réseau, il
+continuera à réessayer jusqu'à ce que le fichier entier aie été téléchargé
+(si l'option \-n est mise). S'il est supporté par le serveur distant, Eepget
+demandera au serveur de continuer le téléchargement à partir du point
+d'interruption.
+
+.SH OPTIONS
+\fB\-c\fP
+.TP 
+Clearnet. N'utilise pas un proxy. Pareil que \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Sets the etag value in the request headers.
+.TP 
+
+\fB\-h\fP name=value
+.TP 
+Ajoute une en\-tête de demande arbitraire avec nom précisé et valeur.
+.TP 
+
+\fB\-l\fP lineLen
+.TP 
+Contrôle l'affichage de la progression. \fB\ lineLen \fP est la longueur en caractères d'une ligne de progression. Le nombre par défaut est 40.
+.TP 
+
+\fB\-m\fP markSize
+.TP 
+Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. The default is 1024.
+.TP 
+
+\fB\-n\fP réessais
+.TP 
+Spécifie le nombre de fois à réessayer le téléchargement si le téléchargement n'a pas réussi. Si cette option n'est pas spécifiée, Eepget ne réessayera pas.
+.TP 
+
+\fB\-o\fP file
+.TP 
+Sets the output file to write to. If this option is not given, the output filename will be determined by the URL.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepget will use 4444. If this option is not specified, eepget will use 127.0.0.1:4444. Specify \fB\-c\fP or \fB\-p\fP :0 to disable the eeproxy.
+.TP 
+
+\fB\-t\fP seconds
+.TP 
+Met le délai d'inactivité. Il est prédéfini à 60 secondes.
+.TP 
+
+\fB\-u\fP username
+.TP 
+Met le nom d'utilisateur pour l'autorisation de proxy, si nécessaire.
+.TP 
+
+\fB\-x\fP password
+.TP 
+Met le mot de passe pour l'autorisation de proxy, si nécessaire. Si un nom d'utilisateur est spécifié, mais pas un mot de passe, EepGet demandera le mot de passe.
+.TP 
+
+.SH "EXIT STATUS"
+
+\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
+there were problems with the download.
+
+.SH "RAPPORTER DES BUGS"
+Veuillez créer un ticket sur
+.UR https://trac.i2p2.de/
+la page Trac d'I2P
+.UE .
+
+.SH "VOIR AUSSI"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+
