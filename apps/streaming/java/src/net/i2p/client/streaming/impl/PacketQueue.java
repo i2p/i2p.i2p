@@ -250,6 +250,8 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             case MessageStatusMessage.STATUS_SEND_FAILURE_NO_TUNNELS:
             // probably took a long time to open the tunnel, allow retx
             case MessageStatusMessage.STATUS_SEND_FAILURE_EXPIRED:
+            // overflow in router-side I2CP queue, sent as of 0.9.29, will be retried
+            case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Rcvd soft failure status " + status + " for msg " + msgId + " on " + con);
                 _messageStatusMap.remove(id);
@@ -269,7 +271,6 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 break;
 
 
-            case MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL:
             case MessageStatusMessage.STATUS_SEND_FAILURE_ROUTER:
             case MessageStatusMessage.STATUS_SEND_FAILURE_NETWORK:
             case MessageStatusMessage.STATUS_SEND_FAILURE_BAD_SESSION:

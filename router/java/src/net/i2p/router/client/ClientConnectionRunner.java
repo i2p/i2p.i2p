@@ -720,40 +720,44 @@ class ClientConnectionRunner {
     }
     
     /**
-     * Asynchronously deliver the message to the current runner
+     * Synchronously deliver the message to the current runner
      *
-     * Note that no failure indication is available.
-     * Fails silently on e.g. queue overflow to client, client dead, etc.
+     * Failure indication is available as of 0.9.29.
+     * Fails on e.g. queue overflow to client, client dead, etc.
      *
      * @param toDest non-null
      * @param fromDest generally null when from remote, non-null if from local
+     * @return success
      */ 
-    void receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
-        if (_dead) return;
+    boolean receiveMessage(Destination toDest, Destination fromDest, Payload payload) {
+        if (_dead)
+            return false;
         MessageReceivedJob j = new MessageReceivedJob(_context, this, toDest, fromDest, payload, _dontSendMSMOnReceive);
         // This is fast and non-blocking, run in-line
         //_context.jobQueue().addJob(j);
-        j.runJob();
+        //j.runJob();
+        return j.receiveMessage();
     }
     
     /**
-     * Asynchronously deliver the message to the current runner
+     * Synchronously deliver the message to the current runner
      *
-     * Note that no failure indication is available.
-     * Fails silently on e.g. queue overflow to client, client dead, etc.
+     * Failure indication is available as of 0.9.29.
+     * Fails on e.g. queue overflow to client, client dead, etc.
      *
      * @param toHash non-null
      * @param fromDest generally null when from remote, non-null if from local
+     * @return success
      * @since 0.9.21
      */ 
-    void receiveMessage(Hash toHash, Destination fromDest, Payload payload) {
+    boolean receiveMessage(Hash toHash, Destination fromDest, Payload payload) {
         SessionParams sp = _sessions.get(toHash);
         if (sp == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No session found for receiveMessage()");
-            return;
+            return false;
         }
-        receiveMessage(sp.dest, fromDest, payload);
+        return receiveMessage(sp.dest, fromDest, payload);
     }
     
     /**
