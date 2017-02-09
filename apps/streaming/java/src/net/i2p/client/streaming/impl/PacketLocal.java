@@ -111,18 +111,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                          FLAG_ECHO);
     }
     
-    /** last minute update of ack fields, just before write/sign  */
-    public void prepare() {
-        if (_connection != null)
-            _connection.getInputStream().updateAcks(this);
-        int numSends = _numSends.get();
-        if (numSends > 0) {
-            // so we can debug to differentiate resends
-            setOptionalDelay(numSends * 1000);
-            setFlag(FLAG_DELAY_REQUESTED);
-        }
-    }
-    
     public long getCreatedOn() { return _createdOn; }
     public long getLifetime() { return _context.clock().now() - _createdOn; }
     public void incrementSends() { 

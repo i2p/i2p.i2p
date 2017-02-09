@@ -1,4 +1,21 @@
+2017-02-09 zzz
+ * Streaming: Fix optional delay and choking (tickets #1046, 1939)
+
+2017-02-08 zzz
+ * I2CP: Return local delivery failure on queue overflow (ticket #1939)
+
+2017-02-05 zzz
+ * Console: Consolidate timer threads (ticket #1068)
+ * NTCP: Don't write to an inbound connection before
+   fully established, causing NPE (ticket #996)
+ * Streaming:
+   - Don't always send optional delay (ticket #1046)
+   - Don't hard fail on expired message error (ticket #1748)
+
 2017-02-04 zzz
+ * HTTP proxies:
+   - Pass through relative referer URIs, convert same-origin
+     absolute referer URIs to relative (ticket #1862)
  * NTP: Enable IPv6 support (ticket #1896)
 
 2017-01-30 zzz

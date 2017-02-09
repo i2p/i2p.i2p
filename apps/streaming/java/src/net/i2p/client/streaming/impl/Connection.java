@@ -69,6 +69,11 @@ class Connection {
     private int _lastCongestionSeenAt;
     private long _lastCongestionTime;
     private volatile long _lastCongestionHighestUnacked;
+    /** has the other side choked us? */
+    private volatile boolean _isChoked;
+    /** are we choking the other side? */
+    private volatile boolean _isChoking;
+    private final AtomicInteger _unchokesToSend = new AtomicInteger();
     private final AtomicBoolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
     private final Object _connectLock;
@@ -102,6 +107,7 @@ class Connection {
     private static final long MAX_CONNECT_TIMEOUT = 2*60*1000;
 
     public static final int MAX_WINDOW_SIZE = 128;
+    private static final int UNCHOKES_TO_SEND = 8;
     
 /****
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
@@ -187,7 +193,7 @@ class Connection {
             long timeLeft = writeExpire - _context.clock().now();
             synchronized (_outboundPackets) {
                 if (!started)
-                    _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size(), timeoutMs);
+                    _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size());
                 if (start + 5*60*1000 < _context.clock().now()) // ok, 5 minutes blocking?  I dont think so
                     return false;
                 
@@ -205,20 +211,20 @@ class Connection {
                 // Limit (highest-lowest) to twice the window (if far end doesn't like it, it can send a choke)
                 int unacked = _outboundPackets.size();
                 int wsz = _options.getWindowSize();
-                if (unacked >= wsz ||
+                if (_isChoked || unacked >= wsz ||
                     _activeResends.get() >= (wsz + 1) / 2 ||
                     _lastSendId.get() - _highestAckedThrough >= Math.max(MAX_WINDOW_SIZE, 2 * wsz)) {
                     if (timeoutMs > 0) {
                         if (timeLeft <= 0) {
                             if (_log.shouldLog(Log.INFO))
-                                _log.info("Outbound window is full " + unacked
+                                _log.info("Outbound window is full (choked? " + _isChoked + ' ' + unacked
                                           + " unacked with " + _activeResends + " active resends"
                                           + " and we've waited too long (" + (0-(timeLeft - timeoutMs)) + "ms): " 
                                           + toString());
                             return false;
                         }
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound window is full (" + unacked + "/" + wsz + "/" 
+                            _log.debug("Outbound window is full (choked? " + _isChoked + ' ' + unacked + '/' + wsz + '/' 
                                        + _activeResends + "), waiting " + timeLeft);
                         try {
                             _outboundPackets.wait(Math.min(timeLeft,250l));
@@ -240,7 +246,7 @@ class Connection {
                         } //10*1000
                     }
                 } else {
-                    _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
+                    _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size());
                     return true;
                 }
             }
@@ -257,7 +263,7 @@ class Connection {
     }
     
     void ackImmediately() {
-        PacketLocal packet = null;
+        PacketLocal packet;
 /*** why would we do this?
      was it to force a congestion indication at the other end?
      an expensive way to do that...
@@ -343,6 +349,12 @@ class Connection {
         }
     }
     
+    /**
+     *  This sends all 'normal' packets (acks and data) for the first time.
+     *  Retransmits are done in ResendPacketEvent below.
+     *  Resets, pings, and pongs are done elsewhere in this class,
+     *  or in ConnectionManager or ConnectionHandler.
+     */
     void sendPacket(PacketLocal packet) {
         if (packet == null) return;
         
@@ -353,8 +365,15 @@ class Connection {
         }
         
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("No resend for " + packet);
+            // ACK-only
+            if (_isChoking) {
+                packet.setOptionalDelay(Packet.SEND_DELAY_CHOKE);
+                packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+            } else if (_unchokesToSend.decrementAndGet() > 0) {
+                // don't worry about wrapping around
+                packet.setOptionalDelay(0);
+                packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+            }
         } else {
             int windowSize;
             int remaining;
@@ -364,13 +383,18 @@ class Connection {
                 remaining = windowSize - _outboundPackets.size() ;
                 _outboundPackets.notifyAll();
             }
-            // the other end has no idea what our window size is, so
-            // help him out by requesting acks below the 1/3 point,
-            // if remaining < 3, and every 8 minimum.
-            if (packet.isFlagSet(Packet.FLAG_CLOSE) ||
-                (remaining < (windowSize + 2) / 3) ||
+
+            if (_isChoking) {
+                packet.setOptionalDelay(Packet.SEND_DELAY_CHOKE);
+                packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+            } else if (packet.isFlagSet(Packet.FLAG_CLOSE) ||
+                _unchokesToSend.decrementAndGet() > 0 ||
+                // the other end has no idea what our window size is, so
+                // help him out by requesting acks below the 1/3 point,
+                // if remaining < 3, and every 8 minimum.
                 (remaining < 3) ||
-                (packet.getSequenceNum() % 8 == 0)) {
+                (remaining < (windowSize + 2) / 3) /* ||
+                (packet.getSequenceNum() % 8 == 0) */ ) {
                 packet.setOptionalDelay(0);
                 packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 //if (_log.shouldLog(Log.DEBUG))
@@ -380,15 +404,15 @@ class Connection {
                 // since the other end limits it to getSendAckDelay()
                 // which is always 2000, but it's good for diagnostics to see what the other end thinks
                 // the RTT is.
+/**
                 int delay = _options.getRTT() / 2;
                 packet.setOptionalDelay(delay);
                 if (delay > 0)
                     packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
+**/
             }
-            // WHY always set?
-            //packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
             long timeout = _options.getRTO();
             if (timeout > MAX_RESEND_DELAY)
@@ -984,6 +1008,55 @@ class Connection {
         }
     }
     
+    /**
+     *  Set or clear if we are choking the other side.
+     *  If on is true or the value has changed, this will call ackImmediately().
+     *  @param on true for choking
+     *  @since 0.9.29
+     */
+    public void setChoking(boolean on) {
+        if (on != _isChoking) {
+            _isChoking = on;
+           if (!on)
+               _unchokesToSend.set(UNCHOKES_TO_SEND);
+           ackImmediately();
+        } else if (on) {
+           ackImmediately();
+        }
+    }
+    
+    /**
+     *  Set or clear if we are being choked by the other side.
+     *  @param on true for choked
+     *  @since 0.9.29
+     */
+    public void setChoked(boolean on) {
+        _isChoked = on;
+        if (on) {
+            congestionOccurred();
+            // https://en.wikipedia.org/wiki/Transmission_Control_Protocol
+            // When a receiver advertises a window size of 0, the sender stops sending data and starts the persist timer.
+            // The persist timer is used to protect TCP from a deadlock situation that could arise
+            // if a subsequent window size update from the receiver is lost,
+            // and the sender cannot send more data until receiving a new window size update from the receiver.
+            // When the persist timer expires, the TCP sender attempts recovery by sending a small packet
+            // so that the receiver responds by sending another acknowledgement containing the new window size.
+            // ...
+            // We don't do any of that, but we set the window size to 1, and let the retransmission
+            // of packets do the "attempted recovery".
+            getOptions().setWindowSize(1);
+        }
+    }
+    
+    /**
+     *  Is the other side choking us?
+     *  @return if choked
+     *  @since 0.9.29
+     */
+    public boolean isChoked() {
+        return _isChoked;
+    }
+
     /** how many packets have we sent and the other side has ACKed?
      * @return Count of how many packets ACKed.
      */
@@ -1381,10 +1454,18 @@ class Connection {
                 // revamp various fields, in case we need to ack more, etc
                 // updateAcks done in enqueue()
                 //_inputStream.updateAcks(_packet);
-                int choke = getOptions().getChoke();
-                _packet.setOptionalDelay(choke);
-                if (choke > 0)
+                if (_isChoking) {
+                    _packet.setOptionalDelay(Packet.SEND_DELAY_CHOKE);
                     _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                } else if (_unchokesToSend.decrementAndGet() > 0) {
+                    // don't worry about wrapping around
+                    _packet.setOptionalDelay(0);
+                    _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                } else {
+                    // clear flag
+                    _packet.setFlag(Packet.FLAG_DELAY_REQUESTED, false);
+                }
+
                 // this seems unnecessary to send the MSS again:
                 //_packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
                 // bugfix release 0.7.8, we weren't dividing by 1000
@@ -1396,7 +1477,10 @@ class Connection {
                 
                 int newWindowSize = getOptions().getWindowSize();
 
-                if (_ackSinceCongestion.get()) {
+                if (_isChoked) {
+                    congestionOccurred();
+                    getOptions().setWindowSize(1);
+                } else if (_ackSinceCongestion.get()) {
                     // only shrink the window once per window
                     if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
                         congestionOccurred();

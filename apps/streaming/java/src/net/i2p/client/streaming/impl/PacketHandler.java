@@ -11,7 +11,7 @@ import net.i2p.util.Log;
 /**
  * receive a packet and dispatch it correctly to the connection specified,
  * the server socket, or queue a reply RST packet.
- *&lt;p&gt;
+ *<p>
  * I2PSession -&gt; MessageHandler -&gt; PacketHandler -&gt; ConnectionPacketHandler -&gt; MessageInputStream
  */
 class PacketHandler {

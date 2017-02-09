@@ -164,6 +164,8 @@ class Packet {
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     protected static final int MAX_DELAY_REQUEST = 65535;
+    public static final int MIN_DELAY_CHOKE = 60001;
+    public static final int SEND_DELAY_CHOKE = 61000;
 
     /**
      *  Does no initialization.

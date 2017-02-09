@@ -23,7 +23,7 @@ import net.i2p.util.SimpleTimer2;
  * Well, thats the theory at least... in practice we just
  * send them immediately with no blocking, since the 
  * mode=bestEffort doesnt block in the SDK.
- *&lt;p&gt;
+ *<p>
  * MessageOutputStream -&gt; ConnectionDataReceiver -&gt; Connection -&gt; PacketQueue -&gt; I2PSession
  */
 class PacketQueue implements SendMessageStatusListener, Closeable {
@@ -64,7 +64,8 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
     }
     
     /**
-     * Add a new packet to be sent out ASAP
+     * Add a new packet to be sent out ASAP.
+     * This updates the acks.
      *
      * keys and tags disabled since dropped in I2PSession
      * @return true if sent
@@ -72,8 +73,6 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
     public boolean enqueue(PacketLocal packet) {
         if (_dead)
             return false;
-        // this updates the ack/nack field
-        packet.prepare();
         
         //SessionKey keyUsed = packet.getKeyUsed();
         //if (keyUsed == null)
@@ -87,6 +86,12 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 _log.debug("Not resending " + packet);
             return false;
         }
+
+        Connection con = packet.getConnection();
+        if (con != null) {
+            // this updates the ack/nack fields
+            con.getInputStream().updateAcks(packet);
+        }
     
         ByteArray ba = _cache.acquire();
         byte buf[] = ba.getData();
@@ -96,14 +101,14 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
         boolean sent = false;
         try {
             int size = 0;
-            long beforeWrite = System.currentTimeMillis();
+            //long beforeWrite = System.currentTimeMillis();
             if (packet.shouldSign())
                 size = packet.writeSignedPacket(buf, 0);
             else
                 size = packet.writePacket(buf, 0);
-            long writeTime = System.currentTimeMillis() - beforeWrite;
-            if ( (writeTime > 1000) && (_log.shouldLog(Log.WARN)) )
-                _log.warn("took " + writeTime + "ms to write the packet: " + packet);
+            //long writeTime = System.currentTimeMillis() - beforeWrite;
+            //if ( (writeTime > 1000) && (_log.shouldLog(Log.WARN)) )
+            //    _log.warn("took " + writeTime + "ms to write the packet: " + packet);
 
             // last chance to short circuit...
             if (packet.getAckTime() > 0) return false;
@@ -121,7 +126,6 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 options.setDate(expires);
             boolean listenForStatus = false;
             if (packet.isFlagSet(FLAGS_INITIAL_TAGS)) {
-                Connection con = packet.getConnection();
                 if (con != null) {
                     if (con.isInbound())
                         options.setSendLeaseSet(false);
@@ -141,7 +145,6 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 options.setTagsToSend(FINAL_TAGS_TO_SEND);
                 options.setTagThreshold(FINAL_TAG_THRESHOLD);
             } else {
-                Connection con = packet.getConnection();
                 if (con != null) {
                     if (con.isInbound() && con.getLifetime() < 2*60*1000)
                         options.setSendLeaseSet(false);
@@ -157,7 +160,7 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
                 long id = session.sendMessage(packet.getTo(), buf, 0, size,
                                  I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort(),
                                  options, this);
-                _messageStatusMap.put(Long.valueOf(id), packet.getConnection());
+                _messageStatusMap.put(Long.valueOf(id), con);
                 sent = true;
             } else {
                 sent = session.sendMessage(packet.getTo(), buf, 0, size,
@@ -173,7 +176,6 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
             if (packet.getNumSends() > 1)
                 _context.statManager().addRateData("stream.con.sendDuplicateSize", size, packet.getLifetime());
             
-            Connection con = packet.getConnection();
             if (con != null) {
                 con.incrementBytesSent(size);
                 if (packet.getNumSends() > 1)
@@ -189,17 +191,15 @@ class PacketQueue implements SendMessageStatusListener, Closeable {
         if (!sent) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Send failed for " + packet);
-            Connection c = packet.getConnection();
-            if (c != null) // handle race on b0rk
-                c.disconnect(false);
+            if (con != null) // handle race on b0rk
+                con.disconnect(false);
         } else {
             //packet.setKeyUsed(keyUsed);
             //packet.setTagsSent(tagsSent);
             packet.incrementSends();
-            Connection c = packet.getConnection();
-            if (c != null && _log.shouldDebug()) {
-                String suffix = "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO();
-                c.getConnectionManager().getPacketHandler().displayPacket(packet, "SEND", suffix);
+            if (con != null && _log.shouldDebug()) {
+                String suffix = "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO();
+                con.getConnectionManager().getPacketHandler().displayPacket(packet, "SEND", suffix);
             }
             if (I2PSocketManagerFull.pcapWriter != null &&
                 _context.getBooleanProperty(I2PSocketManagerFull.PROP_PCAP))

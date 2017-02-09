@@ -14,7 +14,7 @@ import net.i2p.util.Log;
 /**
  * Receive raw information from the I2PSession and turn it into
  * Packets, if we can.
- *&lt;p&gt;
+ *<p>
  * I2PSession -&gt; MessageHandler -&gt; PacketHandler -&gt; ConnectionPacketHandler -&gt; MessageInputStream
  */
 class MessageHandler implements I2PSessionMuxedListener {

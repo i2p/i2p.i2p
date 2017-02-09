@@ -33,7 +33,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
-    private int _choke;
     private int _maxResends;
     private int _inactivityTimeout;
     private int _inactivityAction;
@@ -327,7 +326,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setWindowSize(opts.getWindowSize());
             setResendDelay(opts.getResendDelay());
             setMaxMessageSize(opts.getMaxMessageSize());
-            setChoke(opts.getChoke());
             setMaxResends(opts.getMaxResends());
             setInactivityTimeout(opts.getInactivityTimeout());
             setInactivityAction(opts.getInactivityAction());
@@ -677,15 +675,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getMaxMessageSize() { return _maxMessageSize; }
     public void setMaxMessageSize(int bytes) { _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE); }
     
-    /** 
-     * how long we want to wait before any data is transferred on the
-     * connection in either direction
-     *
-     * @return how long to wait before any data is transferred in either direction in ms
-     */
-    public int getChoke() { return _choke; }
-    public void setChoke(int ms) { _choke = ms; }
-
     /**
      * What profile do we want to use for this connection?
      * TODO: Only bulk is supported so far.
