@@ -634,6 +634,7 @@ input.optbox {
 }
 
 input[type="checkbox"], input[type="radio"] {
+     background: none;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
 }
@@ -1140,3 +1141,12 @@ textarea[name="new_text"] {
      margin: 3px 5px !important;
 }
 }
+
+/* end responsive layout */
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+

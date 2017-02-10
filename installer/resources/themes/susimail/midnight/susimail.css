@@ -286,6 +286,7 @@ input.optbox:hover {
 input[type="checkbox"], .optbox {
      min-width: 16px !important;
      min-height: 16px !important;
+     background: none;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
@@ -1194,6 +1195,10 @@ input.new_upload {
      padding: 5px 5px 5px 22px !important;
 }
 
+input.new_upload:hover, input.new_upload:focus {
+     background: #000 url(/themes/susimail/images/attach.png) no-repeat 6px center !important;
+}
+
 /* pagenav */
 
 input.firstpage, input[name="firstpage"],
@@ -1294,3 +1299,12 @@ input {
      margin: 3px 5px !important;
 }
 }
+
+/* end responsive layout */
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+

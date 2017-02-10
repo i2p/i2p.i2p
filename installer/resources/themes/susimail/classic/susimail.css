@@ -415,13 +415,6 @@ form {
      border: 1px solid #89f;
 }
 
-/*
-.mailhead {
-     font-size: 8.5pt;
-     font-weight: bold;
-}
-*/
-
 table#message_full {
      margin-bottom: -23px;
 }
@@ -432,6 +425,10 @@ table#message_full {
 
 #message_full tr:last-child {
      border-bottom: 1px solid #89f;
+}
+
+input[type="checkbox"], input[type="radio"] {
+     background: none;
 }
 
 input, textarea { /* opera fix */
@@ -449,7 +446,6 @@ input[type="text"], input[type="password"], textarea {
 
 input[type=submit] {
      margin: 3px;
-/*     min-width: 60px;*/
 }
 
 input.new_upload, input.delete_attachment {
@@ -1085,3 +1081,12 @@ body, td, textarea, input, div, p.mailbody {
      font-size: 10pt !important;
 }
 }
+
+/* end responsive layout */
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+

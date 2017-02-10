@@ -429,6 +429,7 @@ input {
 
 input[type="radio"], input[type="checkbox"] {
      vertical-align: middle;
+     background: none;
 }
 
 input[type="text"], input[type="password"] {
@@ -695,7 +696,7 @@ input.prevpage[disabled]:hover, input.prev[disabled]:hover, input[name="prev"][d
      text-indent: -99999px;
 }
 
-input.prevpage:hover, input.prev, input[name="prev"]:hover, input[name="prevpage"]:hover {
+input[name="prev"]:hover, input[name="prevpage"]:hover {
      background: #fff url(/themes/susimail/images/previous.png) no-repeat center center;
      background: url(/themes/susimail/images/previous.png) no-repeat center center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
@@ -1078,9 +1079,6 @@ table#pagenav {
      border-collapse: separate;
      border-spacing: 0;
      border-radius: 2px 2px 0 0;    
-/*     background: #fff;     
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
-     box-shadow: inset 0 0 0 1px #fff;*/ 
 }
 
 table#pagenav td {
@@ -1118,7 +1116,6 @@ div#bottombuttons {
 tr.bottombuttons table#pagenav {
      width: 100%;
      margin: 0;
-/*     border-bottom: 1px solid #555;*/
 }
 
 tr.bottombuttons:empty {
@@ -1208,3 +1205,12 @@ body, td, textarea, input, div, p.mailbody {
      font-size: 10pt !important;
 }
 }
+
+/* end responsive layout */
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+
