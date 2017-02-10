@@ -133,7 +133,7 @@ body.iframed {
 }
 
 .snarkRefresh:link:active {
-     box-shadow: inset 2px 2px 2px #333;
+     box-shadow: inset 0 0 0 1px #fff, inset 4px 4px 2px #555;
 }
 
 .snarkRefresh:link:active:first-child {
@@ -647,13 +647,16 @@ table.SnarkTorrentInfo {
 }
 
 table.SnarkDirInfo {
-     margin-top: -2px !important;
+     margin-top: 10px !important;
      margin-bottom: 0;
      border-bottom: 1px solid #89f;
 }
 
 .snarkDirInfo th img {
      margin: 0 !important;
+     max-height: 22px !important;
+     padding-top: 3px !important;
+     padding-bottom: 3px !important;
 }
 
 .snarkDirInfo th:nth-child(2) {
@@ -951,6 +954,7 @@ td.snarkTorrentDownloaded {
 
 .snarkTorrents th img {
      padding: 1px !important;
+     max-height: 22px;
 }
 
 .snarkTorrents tfoot th {
@@ -1064,12 +1068,12 @@ div.percentBarInner {
       border: none;
       height: 14px;
       background: #1c943a;
-      background: linear-gradient(to bottom,  #1c943a 0%, #092f10 50%, #0d2707 50%, #091b05 50%, #091503 100%); 
+      background: linear-gradient(to bottom,  #1c943a 0%, #092f10 50%, #0d2707 50%, #091b05 50%, #091503 100%);
 }
 
 div.percentBarInner.percentBarComplete {
       background: #eef;
-      background: linear-gradient(to bottom,  #eef 0%, #002200 52%, #000000 52%, #eef 100%); 
+      background: linear-gradient(to bottom,  #eef 0%, #002200 52%, #000000 52%, #eef 100%);
 }
 
 .percentBarText, .percentBarOuter {
@@ -1125,7 +1129,6 @@ div.percentBarInner.percentBarComplete {
      font-weight: normal;
 }
 
-
 .snarkConfigTitle:hover, label.toggleview:hover {
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
 }
@@ -1135,13 +1138,13 @@ div.percentBarInner.percentBarComplete {
 }
 
 .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
-     font-size: 12pt;
+     font-size: 13pt;
      font-weight: bold;
      font-variant: small-caps !important;
      display: inline-block;
      min-width: 180px;
      margin: 0 0 -4px !important;
-     padding: 3px 25px 3px 22px;
+     padding: 3px 25px 4px 22px;
      letter-spacing: .08em;
      border: 1px solid #89f;
      border-top: none;
@@ -1152,15 +1155,19 @@ div.percentBarInner.percentBarComplete {
      -webkit-filter: drop-shadow(0 1px 1px #bbb);
 }
 
-.configsectionpanel .snarkConfigTitle {
-     color: #444;
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
+     font-size: 14pt;
+}
 }
 
-@media screen and (-webkit-min-device-pixel-ratio: 0) { /* webkit hack */
-.snarkConfigTitle,
-label.toggleview {
-     padding-top: 1px;
+/* MS Edge 14+ fix */
+_:-ms-lang(x), .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
+     font-size: 11pt !important;
 }
+
+.configsectionpanel .snarkConfigTitle {
+     color: #444;
 }
 
 .snarkConfigTitle img,
@@ -1527,6 +1534,12 @@ select:focus {
 
 select:nth-child(2) {
      margin-left: -18px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+select {
+     padding: 6px 4px;
+}
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -1997,6 +2010,12 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
      transition: ease transform 0.3s 0s;
 }
 
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+
 /* responsive layout */
 
 @media screen and (min-width: 1400px) {
@@ -2004,13 +2023,16 @@ body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_
      font-size: 10pt !important;
 }
 
+.snarkRefresh {
+     font-size: 11pt !important;
+}
+
+.snarkRefresh:link:first-child {
+     padding-left: 13px !important;
+}
+
 .snarkMessages li, .snarkTorrents tt {
      font-size: 9pt;
 }
 }
 
-/* MS Edge 14+ fix */
-_:-ms-lang(x), * {
-     filter: none !important;
-     -webkit-filter: none !important;
-}

@@ -2402,9 +2402,10 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append(' ');
         buf.append(_t("Trackers"));
         buf.append("</span><hr>\n"   +
-                   "<table class=\"trackerconfig\"><tr><th>")
+                   "<table class=\"trackerconfig\"><tr><th title=\"")
+            .append(_t("Select trackers for removal from I2PSnark's known list"))
            //.append(_t("Remove"))
-           .append("</th><th>")
+           .append("\"></th><th>")
            .append(_t("Name"))
            .append("</th><th>")
            .append(_t("Website URL"))
@@ -2427,7 +2428,7 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
             boolean isOpen = isKnownOpen || openTrackers.contains(t.announceURL);
             buf.append("<tr><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
-               .append(name).append("\" title=\"").append(_t("Delete")).append("\">" +
+               .append(name).append("\" title=\"").append(_t("Mark tracker for deletion")).append("\">" +
                        "</td><td>").append(name)
                .append("</td><td>").append(urlify(homeURL, 35))
                .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"ttype_")

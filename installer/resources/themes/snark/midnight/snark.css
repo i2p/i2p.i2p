@@ -576,7 +576,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrentInfo tr:nth-last-child(2) td {
-     padding: 5px 2px; 
+     padding: 5px 2px;
 }
 
 .snarkTorrentInfo tr:last-child {
@@ -606,8 +606,8 @@ tfoot tr:nth-child(n+1) {
 }
 
 .SnarkDirInfo {
-     margin-top: -2px !important;
-     margin-bottom: 0;
+     margin-top: 10px !important;
+     margin-bottom: -12px;
      border-bottom: 1px solid #443da0;
 }
 
@@ -771,6 +771,11 @@ td:first-child {
      margin: 0 !important;
      padding: 1px !important;
      text-align: center !important;
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), .snarkTorrentAction {
+     width: 72px !important;
 }
 
 .snarkTorrentAction img {
@@ -984,12 +989,12 @@ div.percentBarInner {
       border: none;
       height: 14px;
       background: #1c943a;
-      background: linear-gradient(to bottom,  #1c943a 0%, #092f10 50%, #0d2707 50%, #091b05 50%, #091503 100%); 
+      background: linear-gradient(to bottom,  #1c943a 0%, #092f10 50%, #0d2707 50%, #091b05 50%, #091503 100%);
 }
 
 div.percentBarInner.percentBarComplete {
       background: #001100;
-      background: linear-gradient(to bottom,  #001100 0%, #002200 52%, #000000 52%, #001100 100%); 
+      background: linear-gradient(to bottom,  #001100 0%, #002200 52%, #000000 52%, #001100 100%);
 }
 
 .percentBarText, .percentBarOuter {
@@ -1043,8 +1048,7 @@ div.percentBarInner.percentBarComplete {
      margin-left: 10px;
 }
 
-.snarkConfigTitle,
-label.toggleview {
+.snarkConfigTitle, label.toggleview {
      font-size: 11pt;
      font-weight: bold;
      font-variant: small-caps !important;
@@ -1204,7 +1208,7 @@ input[type="submit"], input[type="reset"] {
      color: #443da0;
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
-     border-right-color: #14144f; 
+     border-right-color: #14144f;
      background: #000;
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      box-shadow: inset 0 0 0 1px #000;
@@ -1813,7 +1817,7 @@ table.trackerconfig td:first-child {
 }
 
 form:last-child > .configsectionpanel {
-     margin-top: 10px;     
+     margin-top: 10px;
      margin-bottom: -1px;
 }
 
@@ -1928,6 +1932,12 @@ label.toggleview,
      color: #89f;
 }
 
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+
 /* responsive layout */
 
 @media screen and (min-width: 1400px) {
@@ -1935,7 +1945,7 @@ code, textarea, .snarkMessages li, input, tt {
      font-size: 9pt !important;
 }
 
-thead th, tfoot th, td, select, select option, .snarkAddInfo {
+thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileName {
      font-size: 10pt !important;
 }
 
@@ -1968,3 +1978,6 @@ select:nth-child(2) {
      white-space: nowrap;
 }
 }
+
+/* end responsive layout */
+

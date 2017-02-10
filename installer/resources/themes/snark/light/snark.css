@@ -13,7 +13,7 @@ body {
 
 /* preload top navigation mouseovers */
 body {
-     background: url(images/tile2.png) fixed, 
+     background: url(images/tile2.png) fixed,
      url(images/button_snark_hover.png) no-repeat,
      url(images/button_snark_active.png) no-repeat,
      url(images/button_tracker_hover.png) no-repeat,
@@ -28,7 +28,7 @@ body.iframed {
 }
 
 body.iframed {
-     background: transparent url(/themes/console/images/transparent.gif), 
+     background: transparent url(/themes/console/images/transparent.gif),
      url(images/button_snark_hover.png) no-repeat,
      url(images/button_snark_active.png) no-repeat,
      url(images/button_tracker_hover.png) no-repeat,
@@ -64,7 +64,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      text-align: center;
      opacity: 1;
      background: #fff;
-     background: linear-gradient(to right, #fff 0%, #dfe0ff, #fff 100%);
+     background: linear-gradient(to right, #fff 0%, #dfe0ff, #fff 100%) #eef;
      background-size: 3px auto;
 }
 
@@ -262,7 +262,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      padding: 2px;
      filter: drop-shadow(0 0 1px #f60);
      -webkit-filter: drop-shadow(0 0 1px #f60);
-     mix-blend-mode: normal; 
+     mix-blend-mode: normal;
 }
 
 .logshim {
@@ -270,7 +270,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 }
 
 
-a:link {	
+a:link {
      color: #359;
      text-decoration: none;
      font-weight: normal;
@@ -296,7 +296,7 @@ a.control, a.controld {
      border-radius: 2px;
      font-weight: bold;
      margin: 5px 4px !important;
-     padding: 5px !important;	
+     padding: 5px !important;
      white-space: nowrap;
      display: inline-block;
      float: right;
@@ -316,7 +316,7 @@ pre {
      text-align: left !important;
      height: 8px;
      color: #35f;
-     font-weight: bold !important; 
+     font-weight: bold !important;
 }
 
 table {
@@ -330,7 +330,7 @@ table {
      opacity: 1 !important;
 }
 
-tr { 
+tr {
      opacity: 1;
 }
 
@@ -481,7 +481,7 @@ tfoot tr:nth-child(n+1) {
 .snarkTorrents td:nth-child(1) {
      width: 20px !important;
      text-align: left;
-     padding: 2px;   
+     padding: 2px;
 }
 
 .snarkTorrents td:nth-child(2) {
@@ -558,6 +558,11 @@ td:first-child {
      text-align: center;
      width: 60px;
      white-space: nowrap;
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), .snarkTorrentAction {
+     width: 72px !important;
 }
 
 .snarkTorrentAction img {
@@ -688,7 +693,7 @@ td:first-child {
 }
 
 .snarkFileName {
-     padding: 4px 0 !important; 
+     padding: 4px 0 !important;
      text-align: left !important;
      font-size: 8pt !important;
 }
@@ -772,10 +777,18 @@ td:first-child {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-.snarkConfigTitle a, label.toggleview {
+.snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
+.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 14pt !important;
-     padding: 1px 15px 4px;
+     padding: 3px 15px 4px;
 }
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), .snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
+.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
+     padding: 3px 15px 4px;
+     font-size: 13pt !important;
 }
 
 .snarkConfigTitle a:visited {
@@ -850,15 +863,15 @@ td:first-child {
 }
 
 .snarkTorrentInfo tr:nth-child(odd) {
-     background: #e0e0ff; 
+     background: #e0e0ff;
 }
 
 .snarkTorrentInfo tr:nth-child(even) {
-     background: #eef; 
+     background: #eef;
 }
 
 .snarkTorrentInfo tr:last-child td {
-     border-bottom: 1px solid #7778bf; 
+     border-bottom: 1px solid #7778bf;
 }
 
 .snarkTorrentInfo input {
@@ -965,7 +978,7 @@ input {
      padding: 4px !important;
      border-radius: 2px;
      border: 1px solid #7778bf;
-     background: #fff;	 
+     background: #fff;
      color: #272e3f;
      margin: 2px 4px 2px 0;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
@@ -1078,8 +1091,8 @@ input[type="radio"], input[type="checkbox"], .optbox {
 }
 
 input.default {
-     width: 1px; 
-     height: 1px; 
+     width: 1px;
+     height: 1px;
      visibility: hidden;
      display: none;
 }
@@ -1225,7 +1238,7 @@ img[src$="details.png"] {
      text-align: center;
      font-weight: bold;
      background: #fff url(images/configuration.png) 102% center no-repeat;
-     background: url(images/configuration.png) 102% center no-repeat, linear-gradient(to bottom, #fff, #e0e0ef);     
+     background: url(images/configuration.png) 102% center no-repeat, linear-gradient(to bottom, #fff, #e0e0ef);
      background-size: 84px 82px, 100%;
      background-blend-mode: luminosity;
 }
@@ -1272,7 +1285,7 @@ form:last-child .configsectionpanel {
 
 .newtorrentsection table, .addtorrentsection table {
      margin-top: -5px;
-} 
+}
 
 .newtorrentsection td:first-child, .addtorrentsection td:first-child {
      min-width: 140px;
@@ -1389,6 +1402,12 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
      display: none;
 }
 
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+
 /*responsive layout */
 
 @media screen and (max-width: 1000px) {
@@ -1402,7 +1421,7 @@ body, td, .snarkMessages li, .snarkMessages a, button, input, select, .snarkAddI
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 .snarkConfigTitle a, label.toggleview {
-     font-size: 12pt !important;
+     font-size: 14pt !important;
 }
 }
 }
@@ -1455,9 +1474,10 @@ a.snarkRefresh:first-child {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-.snarkConfigTitle a, label.toggleview {
-     font-size: 15pt !important;
-     padding: 1px 15px 4px;
+.snarkConfigTitle a, label.toggleview,
+.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
+     font-size: 14pt !important;
+     padding: 3px 15px 4px !important;
 }
 }
 
@@ -1478,3 +1498,6 @@ input[type="submit"] {
      white-space: nowrap;
 }
 }
+
+/* end responsive layout */
+
