@@ -735,7 +735,11 @@ button.search:active {
 
 /* client/plugin/webapps buttons aka project "X" */
 
-button.Xaccept {
+button.control {
+     font-size: 0 !important;
+}
+
+button.accept.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -743,15 +747,15 @@ button.Xaccept {
      padding: 12px 11px;
 }
 
-button.Xaccept:hover, button.Xaccept:focus {
+button.accept.control:hover, button.accept.control:focus {
      background: #000 url(/themes/console/images/buttons/Xstart.png) center center no-repeat !important;
 }
 
-button.Xaccept:active {
+button.accept.control:active {
      background: #652787 url(/themes/console/images/buttons/Xstart.png) center center no-repeat !important;
 }
 
-button.Xstop {
+button.stop.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -759,15 +763,15 @@ button.Xstop {
      padding: 12px 11px;
 }
 
-button.Xstop:hover, button.Xstop:focus {
+button.stop.control:hover, button.stop.control:focus {
      background: #000 url(/themes/console/images/buttons/Xstop.png) center center no-repeat !important;
 }
 
-button.Xstop:active {
+button.stop.control:active {
      background: #652787 url(/themes/console/images/buttons/Xstop.png) center center no-repeat !important;
 }
 
-button.Xadd {
+button.add.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -775,15 +779,15 @@ button.Xadd {
      padding: 12px 11px;
 }
 
-button.Xadd:hover, button.Xadd:focus {
+button.add.control:hover, button.add.control:focus {
      background: #000 url(/themes/console/images/buttons/edit2.png) center center no-repeat !important;
 }
 
-button.Xadd:active {
+button.add.control:active {
      background: #652787 url(/themes/console/images/buttons/edit2.png) center center no-repeat !important;
 }
 
-button.Xdelete {
+button.delete.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -791,15 +795,15 @@ button.Xdelete {
      padding: 12px 11px;
 }
 
-button.Xdelete:hover, button.Xdelete:focus {
+button.delete.control:hover, button.delete.control:focus {
      background: #000 url(/themes/console/images/buttons/delete_hover.png) center center no-repeat !important;
 }
 
-button.Xdelete:active {
+button.delete.control:active {
      background: #652787 url(/themes/console/images/buttons/delete_hover.png) center center no-repeat !important;
 }
 
-button.Xcheck {
+button.check.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -807,15 +811,15 @@ button.Xcheck {
      padding: 12px 11px;
 }
 
-button.Xcheck:hover, button.Xcheck:focus {
+button.check.control:hover, button.check.control:focus {
      background: #000 url(/themes/console/images/buttons/update_hover.png) center center no-repeat !important;
 }
 
-button.Xcheck:active {
+button.check.control:active {
      background: #652787 url(/themes/console/images/buttons/update_hover.png) center center no-repeat !important;
 }
 
-button.Xdownload {
+button.download.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -823,11 +827,11 @@ button.Xdownload {
      padding: 12px 11px;
 }
 
-button.Xdownload:hover, button.Xdownload:focus {
+button.download.control:hover, button.download.control:focus {
      background: #000 url(/themes/console/images/buttons/download.png) center center no-repeat !important;
 }
 
-button.Xdownload:active {
+button.download.control:active {
      background: #652787 url(/themes/console/images/buttons/download.png) center center no-repeat !important;
 }
 
@@ -5249,10 +5253,6 @@ h1 {
 
 .main button, .main input, select {
      font-size: 9pt !important;
-}
-
-button[class^="X"] {
-     font-size: 0 !important;
 }
 
 .main, .news, h1 {

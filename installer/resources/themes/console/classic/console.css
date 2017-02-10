@@ -925,10 +925,9 @@ button.search:focus {
      background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px 6px, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-
 /* client config buttons aka project "X" */
 
-button.Xaccept {
+button.accept.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -936,11 +935,11 @@ button.Xaccept {
      padding: 12px 11px;
 }
 
-button.Xaccept:hover, button.Xaccept:focus {
+button.accept.control:hover, button.accept.control:focus {
      background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-button.Xstop {
+button.stop.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -948,11 +947,11 @@ button.Xstop {
      padding: 12px 11px;
 }
 
-button.Xstop:hover, button.Xstop:focus {
+button.stop.control:hover, button.stop.control:focus {
      background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-button.Xadd {
+button.add.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -960,11 +959,11 @@ button.Xadd {
      padding: 12px 11px;
 }
 
-button.Xadd:hover, button.Xadd:focus {
+button.add.control:hover, button.add.control:focus {
      background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-button.Xdelete {
+button.delete.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -972,11 +971,11 @@ button.Xdelete {
      padding: 12px 11px;
 }
 
-button.Xdelete:hover, button.Xdelete:focus {
+button.delete.control:hover, button.delete.control:focus {
      background: url(/themes/console/images/buttons/delete_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-button.Xcheck {
+button.check.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -984,11 +983,11 @@ button.Xcheck {
      padding: 12px 11px;
 }
 
-button.Xcheck:hover, button.Xcheck:focus {
+button.check.control:hover, button.check.control:focus {
      background: url(/themes/console/images/buttons/update_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
-button.Xdownload {
+button.download.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -996,7 +995,7 @@ button.Xdownload {
      padding: 12px 11px;
 }
 
-button.Xdownload:hover, button.Xdownload:focus {
+button.download.control:hover, button.download.control:focus {
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
@@ -4429,7 +4428,7 @@ h3#webappconfig {
      margin-top: -15px;
 }
 
-button[class^="X"] {
+button.control {
      font-size: 0 !important;
 }
 
