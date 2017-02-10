@@ -182,10 +182,42 @@ class SummaryBarRenderer {
 
                    "<table id=\"sb_internals\"><tr><td>\n" +
 
-                   "<a href=\"/tunnels\" target=\"_top\" title=\"")
-           .append(_t("View existing tunnels and tunnel build status"))
+                   "<a href=\"/dns\" target=\"_top\" title=\"")
+           .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
-           .append(nbsp(_t("Tunnels")))
+           .append(nbsp(_t("Addressbook")))
+           .append("</a>\n");
+
+        if (!StatSummarizer.isDisabled()) {
+            buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
+               .append(_t("Graph router performance"))
+               .append("\">")
+               .append(nbsp(_t("Graphs")))
+               .append("</a>\n");
+        }
+
+        buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+           .append(_t("Local Tunnels"))
+           .append("\">")
+           .append(nbsp(_t("Hidden Services Manager")))
+           .append("</a>\n" +
+
+       //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
+       //  .append(_t("Show the router's workload, and how it's performing"))
+       //  .append("\">")
+       //  .append(_t("Jobs"))
+       //  .append("</a>\n" +
+
+                   "<a href=\"/logs\" target=\"_top\" title=\"")
+           .append(_t("Health Report"))
+           .append("\">")
+           .append(nbsp(_t("Logs")))
+           .append("</a>\n" +
+
+                   "<a href=\"/netdb\" target=\"_top\" title=\"")
+           .append(_t("Show list of all known I2P routers"))
+           .append("\">")
+           .append(nbsp(_t("NetDB")))
            .append("</a>\n" +
 
                    "<a href=\"/peers\" target=\"_top\" title=\"")
@@ -200,42 +232,10 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Profiles")))
            .append("</a>\n" +
 
-                   "<a href=\"/netdb\" target=\"_top\" title=\"")
-           .append(_t("Show list of all known I2P routers"))
+                   "<a href=\"/tunnels\" target=\"_top\" title=\"")
+           .append(_t("View existing tunnels and tunnel build status"))
            .append("\">")
-           .append(nbsp(_t("NetDB")))
-           .append("</a>\n" +
-
-                   "<a href=\"/logs\" target=\"_top\" title=\"")
-           .append(_t("Health Report"))
-           .append("\">")
-           .append(nbsp(_t("Logs")))
-           .append("</a>\n");
-
-       //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
-       //  .append(_t("Show the router's workload, and how it's performing"))
-       //  .append("\">")
-       //  .append(_t("Jobs"))
-       //  .append("</a>\n" +
-
-        if (!StatSummarizer.isDisabled()) {
-            buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
-               .append(_t("Graph router performance"))
-               .append("\">")
-               .append(nbsp(_t("Graphs")))
-               .append("</a>\n");
-        }
-
-        buf.append("<a href=\"/dns\" target=\"_top\" title=\"")
-           .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
-           .append("\">")
-           .append(nbsp(_t("Addressbook")))
-           .append("</a>\n" +
-
-                    "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-           .append(_t("Local Tunnels"))
-           .append("\">")
-           .append(nbsp(_t("Hidden Services Manager")))
+           .append(nbsp(_t("Tunnels")))
            .append("</a>\n");
 
         buf.append("</td></tr></table>\n");
