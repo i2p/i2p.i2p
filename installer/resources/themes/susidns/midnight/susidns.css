@@ -24,18 +24,23 @@ body.iframed {
 
 div#navi  {
      border: 1px solid #2d295f;
-     padding: 2px 0;
+     padding: 3px 0 2px;
      background: #002 url(/themes/console/midnight/images/header.png) repeat-x scroll center center !important;
      background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
-     margin: -10px 0 27px;
+     margin: -11px 0 27px;
      box-shadow: inset 0 0 0 1px #000;
      position: sticky;
-     top: 0;
+     top: -1px;
      z-index: 999;
+     text-align: center !important;
+     font-weight: bold;
+     font-size: 9pt;
+     padding: 6px 5px 5px !important;
+     min-width: 512px;
 }
 
 .iframed #navi {
-     padding: 0 !important;
+     padding: 5px !important;
      border: 1px solid #443da0 !important;
      margin: 0 0 27px;
 }
@@ -126,16 +131,7 @@ div#navi  {
      background: #652787 url(/themes/susidns/images/overview.png) 6px center no-repeat;
 }
 
-#navi p {
-     text-align: center !important;
-     text-transform: capitalize;
-     font-weight: bold;
-     font-size: 9pt;
-     padding: 2px 5px !important;
-     margin: 0 !important;
-}
-
-#navi p > * {
+#navi > * {
      vertical-align: middle;
 }
 
@@ -294,7 +290,7 @@ p {
      border: 1px solid #2d295f;
      background: #001 url(/themes/susidns/images/addressbook.png) 10px center no-repeat;
      background-size: 24px 24px;
-     padding: 20px 20px 20px 42px !important; 
+     padding: 20px 20px 20px 42px !important;
 }
 
 #messages {
@@ -316,7 +312,7 @@ h3 {
      font-weight: bold;
      border: 1px solid #2d295f;
      padding: 7px 10px;
-     border-radius: 2px; 
+     border-radius: 2px;
      background: #000 url(/themes/console/midnight/images/header.png) repeat-x scroll center center;
      background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%);
      letter-spacing: 0.08em;
@@ -364,7 +360,7 @@ h3 {
      margin-top: -1px;
      margin-left: -11px;
      margin-right: -11px;
-     padding: 5px 10px;
+     padding: 8px 10px;
      font-size: 10pt;
 }
 
@@ -440,11 +436,11 @@ th {
 }
 
 .iframed .book tr.head th {
-     border-top: 1px solid #2d295f; 
-     border-bottom: 1px solid #2d295f; 
-} 
+     border-top: 1px solid #2d295f;
+     border-bottom: 1px solid #2d295f;
+}
 
-.book th:first-child {
+.book th:last-child {
      background: #000 url(/themes/console/images/buttons/delete.png) center center no-repeat !important;
      font-size: 0;
      padding: 0 !important;
@@ -528,7 +524,7 @@ p.messages {
 
 .help ul li:last-child {
      margin-bottom: -10px;
-} 
+}
 
 .help p {
      border: none;
@@ -640,7 +636,7 @@ div#book {
 #book table {
      width: 100%;
      border: 1px solid #2d295f !important;
-     margin-top: -10px;
+/*     margin-top: -10px;*/
 }
 
 .iframed #book table {
@@ -671,22 +667,28 @@ div#book {
      background: #001;
 }
 
-.book td:nth-child(3) {
+.book th:first-child, .book td:first-child {
+     padding: 0 10px !important;
+     width: 200px;
+     white-space: nowrap;
+}
+
+.book td:nth-child(2) {
      padding: 2px 0 2px 5px !important;
      width: 30px;
 }
 
-.book td:nth-child(4) {
+.book td:nth-child(3) {
      text-align: center;
      width: 20px;
      padding: 2px 25px 2px 0 !important;
 }
 
-.book td:nth-child(4) a:not(old) {
+.book td:nth-child(3) a:not(old) {
      font-size: 0 !important;
 }
 
-.book td:nth-child(4) .addrhlpr a::after {
+.book td:nth-child(3) .addrhlpr a::after {
      content: url(/themes/console/images/buttons/fullview.png);
      text-align: center;
      padding: 2px 10px !important;
@@ -694,7 +696,7 @@ div#book {
      -webkit-filter: drop-shadow(0 0 1px #555);
 }
 
-.book td:nth-child(4) .addrhlpr:hover {
+.book td:nth-child(3) .addrhlpr:hover {
      filter: drop-shadow(0 0 1px #b73fff);
      -webkit-filter: drop-shadow(0 0 1px #b73fff);
 }
@@ -713,9 +715,40 @@ div#book {
      padding: 0;
 }
 
-#buttons + div > table {
-     width: auto;
-     margin: auto;
+#visualid {
+     border: 1px solid #2d295f;
+     margin-top: -10px;
+}
+
+.iframed #visualid {
+     border: none;
+}
+
+#visualid h3 {
+     margin-top: -1px;
+     border-left: none;
+     border-right: none;
+}
+
+#visualid table {
+     width: 100%;
+     margin-top: -15px;
+     margin-bottom: 1px;
+     border-collapse: collapse;
+}
+
+#visualid td:first-child {
+     text-align: right;
+}
+
+#visualid td[colspan="2"] {
+     text-align: right;
+     border-top: 1px solid #2d295f;
+     padding: 17px 9px 15px !important;
+}
+
+.iframed #visualid td[colspan="2"] {
+     padding: 20px 9px 5px !important;
 }
 
 div#add {
@@ -745,14 +778,14 @@ input {
      padding: 4px !important;
      border-radius: 2px;
      border: 1px solid #443da0;
-     background: #000 none !important;      
+     background: #000 none !important;
      color: #443da0;
      margin: 2px 4px 2px 0;
      font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      min-width: 64px !important;
 }
 
-input[type="checkbox"], .optbox {
+input[type="checkbox"], input[type="radio"], .optbox {
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
      background: none;
@@ -763,7 +796,7 @@ input[type=submit]::-moz-focus-inner, input[type=reset]::-moz-focus-inner {
      outline: none;
 }
 
-input[type=submit], input[type=reset] {
+input[type=submit], input[type=reset], .fakebutton {
      color: #443da0;
      background: #000;
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
@@ -775,17 +808,19 @@ input[type=submit], input[type=reset] {
      text-align: center;
      min-width: 90px !important;
      box-shadow: inset 0 0 0 1px #000;
+     border-radius: 2px;
 }
 
 input[type=submit]:hover, input[type=reset]:hover,
-input[type=submit]:focus, input[type=reset]:focus {
+input[type=submit]:focus, input[type=reset]:focus,
+.fakebutton:hover, .fakebutton:focus {
      background: #000 !important;
      color: #652787;
      border: 1px solid #652787;
      box-shadow: inset 0 1px 1px 0 #c9ceff;
 }
 
-input[type=submit]:active, input[type=reset]:active {
+input[type=submit]:active, input[type=reset]:active, .fakebutton:active {
      background: #652787 !important;
      color: #c9ceff !important;
      border: 1px solid #652787;
@@ -820,7 +855,7 @@ input[type=text]:focus {
      background: #000;
      filter: drop-shadow(0 0 1px #99f);
      -webkit-filter: drop-shadow( 0 0 1px #99f);
-     transition: filter ease 0.3s 0s; 
+     transition: filter ease 0.3s 0s;
 }
 
 textarea[cols="70"] {
@@ -837,7 +872,8 @@ textarea[cols="70"] {
      border-radius: 0;
      border: none;
      border-left: 1px solid #17142f;
-     height: 30px;
+     border-right: 3px solid #17142f;
+     height: 32px;
      overflow-x: auto;
      overflow-y: hidden !important;
 }
@@ -849,7 +885,7 @@ textarea[cols="70"] {
 /* iframed content border removal */
 
 .iframed #navi, .iframed h3, .iframed h4, .iframed #book, .iframed #add, .iframed #filtered, .iframed #filter, .iframed #search,
-table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .iframed p.book, .iframed #helpsubs, 
+table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .iframed p.book, .iframed #helpsubs,
 .iframed textarea[name="config"], .iframed textarea[name="content"], .iframed #helpconfig, .iframed p.messages {
      border-right: none !important;
      border-left: none !important;
@@ -892,20 +928,28 @@ p.book {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea, .help li {
+body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea, .help li, td, tt, code, textarea, input[type="submit"], input[type="reset"] {
      font-size: 10pt !important;
 }
 
-textarea, input[type="submit"], input[type="reset"] {
-     font-size: 9pt !important;
+#navi a {
+     font-size: 10.5pt !important;
 }
 
-h3, #filter a, #navi a {
-     font-size: 11pt;
+h3 {
+     font-size: 12pt !important;
+}
+
+#filter a {
+     font-size: 11pt !important;
 }
 
 #filter a:link, #filter a:visited {
      margin: 3px 2px !important;
+}
+
+.destinations textarea {
+     height: 34px;
 }
 }
 
@@ -942,3 +986,162 @@ p.book {
 #messages + form[action="export"] {
      display: none;
 }
+
+
+/* host details page */
+
+#host_details td {
+     padding: 5px 10px !important;
+}
+
+#host_details td:first-child {
+     min-width: 10px !important;
+     width: 10%;
+     white-space: nowrap;
+     font-weight: bold;
+     text-align: right;
+}
+
+#host_details td:last-child {
+     width: 90%;
+     text-align: left;
+     border-left: none !important;
+     border-right: none !important;
+}
+
+#host_details td.destinations {
+     background: none;
+}
+
+#host_details tr:hover {
+     background: #ffd;
+}
+
+#host_details .destaddress {
+     word-break: break-all !important;
+     white-space: normal !important;
+}
+
+/* end host details */
+
+.names img {
+     width: 20px;
+     height: 20px;
+     vertical-align: middle;
+     margin: 1px 10px 1px 1px;
+     padding: 1px;
+     border: 1px solid #17142f;
+     border-radius: 2px;
+     background: #000;
+}
+
+.names img:hover, .names a:focus img {
+     border: 1px solid #652787;
+     background: #652787;
+}
+
+.names a:active img, .names a:focus img {
+     transform: rotate(45deg) scale(0.8);
+     transition: ease all 0.1s 0s;
+}
+
+/* hostname list */
+
+#host_list {
+     margin-top: 28px;
+}
+
+#host_list th:first-child,
+#host_list td:first-child {
+     width: 150px;
+     width: 30%;
+     white-space: nowrap;
+     padding-left: 5px !important;
+}
+
+#host_list th:first-child {
+     padding-left: 39px !important;
+}
+
+#host_list td:last-child {
+     width: 16px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+#host_list th:nth-child(2), #host_list td:nth-child(2),
+#host_list th:nth-child(3), #host_list td:nth-child(3),
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     width: 35px;
+     width: 8%;
+     padding: 0 5px !important;
+     white-space: nowrap;
+     text-align: center;
+}
+
+#host_list td:nth-child(2) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(2) a::after {
+     content: url(/themes/console/images/buttons/link.png);
+     text-align: center;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(3) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(3) a::after {
+     content: url(/themes/console/images/buttons/helper.png);
+     cursor: pointer;
+}
+
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     padding-right: 30px !important;
+}
+
+#host_list td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(4) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 0 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
+#host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
+     filter: drop-shadow(0 0 2px #652787);
+     -webkit-filter: drop-shadow(0 0 2px #652787);
+}
+
+#host_list .destaddress {
+     overflow: auto !important;
+     white-space: nowrap;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-weight: normal;
+     padding: 3px !important;
+}
+
+/* end hostname list */
+
+td.destinations {
+     max-width: 50px !important;
+     border-left: 1px solid #2d295f;
+     border-right: 1px solid #2d295f;
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+

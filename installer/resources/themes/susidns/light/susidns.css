@@ -52,9 +52,13 @@ hr {
      display: none;
 }
 
+code, tt, .destaddress {
+     font-size: 8pt;
+}
+
 #navi {
      margin: -1px 0 0;
-     padding: 12px 3px;
+     padding: 5px 3px;
      text-align: center;
      border: 1px solid #7778bf;
      background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(239, 239, 255, 0.5) 50%, rgba(255, 255, 255, 1) 100%), linear-gradient(to bottom, #fff 0%, #fff 51%, #eef 51%, #ddf 100%);
@@ -67,45 +71,52 @@ hr {
 }
 
 .iframed #navi {
-     margin: -1px 0 0;
-     padding: 3px 2px;
+     margin: -1px 0 10px;
+     padding: 7px 5px 6px;
+     border-radius: 2px;
+     filter: drop-shadow(0px 0 1px #999);
+     -webkit-filter: drop-shadow(0px 0 1px #999);
 }
 
 #navi a {
      border: 1px solid #77789f;
      border-radius: 2px;
-     filter: drop-shadow(0 0 1px #ccc);
-     -webkit-filter: drop-shadow(0 0 1px #ccc);
+     filter: drop-shadow(0 0 1px #bbb);
+     -webkit-filter: drop-shadow(0 0 1px #bbb);
      display: inline-block;
      margin: 2px 0;
+     text-transform: capitalize;
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+#navi a:hover, #navi a:focus {
+     background-blend-mode: luminosity;
+}
+
+#navi a:active {
+     color: #555;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 2px #999;
+     mix-blend-mode: luminosity;
 }
 
 #navi a.abook {
-     background: #fff url(/themes/susidns/images/abook.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
      padding: 5px 5px 5px 24px;
 }
 
 #navi a#subs {
-     background: #fff url(/themes/susidns/images/subs.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
      padding: 5px 5px 5px 24px;
 }
 
 #navi a#config {
-     background: #fff url(/themes/console/images/buttons/configure.png) 5px center no-repeat;
+     background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
      padding: 5px 5px 5px 24px;
 }
 
 #navi a#overview {
-     background: #fff url(/themes/susidns/images/overview.png) 5px center no-repeat;
+     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
      padding: 5px 5px 5px 24px;
-}
-
-#navi p {
-     text-align: center !important;
-     text-transform: capitalize;
-     font-weight: bold;
-     padding: 0 5px !important;
-     margin: 0 !important;
 }
 
 .headline {
@@ -124,7 +135,7 @@ h3, h4, th, #filter span {
      margin: 0;
      padding: 2px 5px 3px 30px;
      background: url(/themes/susidns/images/addressbook.png) left center no-repeat;
-     font-size: 11pt; 
+     font-size: 11pt;
 }
 
 .headline#subscriptions h3 {
@@ -148,7 +159,7 @@ span.location {
      margin: 5px -6px 0;
      padding: 8px 10px 0;
      padding: 8px 10px 0 33px;
-     background: url(/themes/susidns/images/drive.png) 9px 6px no-repeat;
+     background: url(/themes/susidns/images/drive.png) 9px 7px no-repeat;
 }
 
 #content {
@@ -159,8 +170,8 @@ span.location {
 }
 
 .iframed #content {
-     border-radius: 0 0 2px 2px;
-     overflow: hidden; 
+     border-radius: 2px;
+     overflow: hidden;
 }
 
 form[action="subscriptions"] #content {
@@ -185,17 +196,23 @@ form[action="subscriptions"] #content {
 
 #content h3 {
      border: 1px solid #77789f;
-     padding: 3px 8px;
+     padding: 5px 8px;
      border-radius: 2px;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px #999);
      -webkit-filter: drop-shadow(0 0 1px #999);
 }
 
 div#add {
      border: 1px solid #7778bf;
+     margin-top: -1px;
      padding: 0 15px;
      background: #fff;
+}
+
+.iframed #add {
+     margin-top: 10px;
 }
 
 #add h3 {
@@ -225,7 +242,7 @@ div#add p.buttons {
 }
 
 div.help {
-     border: 1px solid #7778bf; 
+     border: 1px solid #7778bf;
      padding: 0 15px;
      background: #eef;
      margin: -11px 0 0;
@@ -233,7 +250,7 @@ div.help {
 
 .iframed div.help {
      border-radius: 0 0 2px 2px;
-} 
+}
 
 .help#helpsubs {
      background: #eef url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
@@ -256,6 +273,12 @@ p#help {
 p, #helpconfig {
      font-size: 10pt;
      text-align: justify;
+}
+
+.iframed #helpconfig, .iframed #helpsubs {
+     margin-top: 10px;
+     box-shadow: inset 0 0 0 1px #fff;
+     border-radius: 0;
 }
 
 span.addrhlpr {
@@ -295,6 +318,10 @@ td {
      padding: 5px 10px;
      font-size: 9pt;
      vertical-align: middle;
+}
+
+ol, ul {
+     margin-left: -30px;
 }
 
 li {
@@ -342,7 +369,7 @@ div#messages:empty {
 p.messages {
      color: #fff;
      text-align: center;
-     font-weight: bold;     
+     font-weight: bold;
 }
 
 #footer {
@@ -379,7 +406,6 @@ p.footer {
 }
 
 .page {
-/*     background-color: #fff;*/
      margin: 0;
      padding: 10px 0;
      font-size: 9pt !important;
@@ -515,7 +541,6 @@ td.search:first-child {
      padding: 2px 5px;
 }
 
-
 #filter span b {
      font-size: 11pt;
      margin: 0 5px;
@@ -554,6 +579,7 @@ form {
 
 th {
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     font-size: 9pt;
 }
 
 table {
@@ -565,7 +591,11 @@ table.book {
 /*     border: 1px solid #7778bf;*/
 }
 
-.book th:first-child  {
+.book th:first-child {
+     padding-left: 10px;
+}
+
+.book th:last-child  {
      background: #fff url(/themes/console/images/buttons/delete.png) center center no-repeat;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
      width: 16px;
@@ -574,11 +604,6 @@ table.book {
 .book th {
      text-align: left;
      padding-left: 3px;
-}
-
-.book th:last-child {
-     padding: 0 3px 0 0;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
 }
 
 .book tr:hover td {
@@ -594,40 +619,227 @@ table.book {
      padding: 3px;
 }
 
-.book td:first-child {
+/* hostname list */
+#host_list, #host_details {
+     border: 1px solid #7778bf;
+     box-shadow: 0 0 0 1px #fff;
+}
+
+#host_list th:first-child,
+#host_list td:first-child {
+     width: 150px;
+     width: 30%;
+     white-space: nowrap;
+     padding-left: 5px;
+}
+
+#host_list th:first-child {
+     padding-left: 39px;
+}
+
+#host_list td:last-child {
      width: 16px;
      white-space: nowrap;
      font-weight: bold;
-} 
+}
 
-.book td:nth-child(3) {
-     width: 30px;
+#host_list th:nth-child(2), #host_list td:nth-child(2),
+#host_list th:nth-child(3), #host_list td:nth-child(3),
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     width: 35px;
+     width: 8%;
+     padding: 0 5px !important;
      white-space: nowrap;
-     padding-left: 10px;
-}
-
-.book td:nth-child(4) {
      text-align: center;
-     width: 20px;
-     padding: 2px 25px 2px 0 !important;
 }
 
-.book td:nth-child(4) a:not(old) {
+#host_list td:nth-child(2) a:not(old) {
      font-size: 0 !important;
 }
 
-.book td:nth-child(4) .addrhlpr a::after {
+#host_list td:nth-child(2) a::after {
+     content: url(/themes/console/images/buttons/link.png);
+     text-align: center;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(3) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(3) a::after {
+     content: url(/themes/console/images/buttons/helper.png);
+     cursor: pointer;
+}
+
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     padding-right: 30px !important;
+}
+
+#host_list td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(4) .addrhlpr a::after {
      content: url(/themes/console/images/buttons/fullview.png);
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
      -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
 }
 
-.book td:nth-child(4) .addrhlpr:hover {
+#host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
+#host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
      filter: drop-shadow(0 0 1px #f60);
      -webkit-filter: drop-shadow(0 0 1px #f60);
 }
+
+#host_list .destaddress {
+     overflow: auto !important;
+     white-space: nowrap;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-weight: normal;
+     color: #555;
+     padding: 3px !important;
+}
+
+td.destinations {
+     max-width: 50px !important;
+     border-left: 1px solid #bbf;
+     border-right: 1px solid #bbf;
+     padding: 0;
+     background: #fff;
+}
+
+td.destinations textarea {
+     box-shadow: none;
+     height: 28px !important;
+}
+
+/* end hostname list */
+
+/* host details page */
+
+#host_details td {
+     padding: 5px 10px !important;
+}
+
+#host_details td:first-child {
+     min-width: 10px !important;
+     width: 10%;
+     white-space: nowrap;
+     font-weight: bold;
+     text-align: right;
+}
+
+#host_details td:last-child {
+     width: 90%;
+     text-align: left;
+     border-left: none !important;
+     border-right: none !important;
+}
+
+#host_details td.destinations {
+     background: none;
+}
+
+#host_details tr:hover {
+     background: #ffd;
+}
+
+#host_details .destaddress {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     word-break: break-all !important;
+     white-space: normal !important;
+}
+
+/* identicon + qr image */
+
+#visualid {
+     border: 1px solid #7778bf !important;
+     margin-top: -1px;
+     border-radius: 2px;
+     background: #fff;
+     padding-top: 0;
+}
+
+.iframed #visualid {
+     margin-top: 9px;
+}
+
+#visualid h3 {
+     border-bottom: 1px solid #7778bf;
+     padding: 8px 10px 6px;
+     margin-top: 0;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+#visualid table {
+     width: 100% !important;
+     margin: 12px 0 0;
+     background: none;
+     border: none;
+     border-collapse: collapse;
+}
+
+#visualid tr:first-child td {
+     padding-bottom: 15px;
+}
+
+#visualid td {
+     width: 50%;
+}
+
+#visualid td:first-child {
+     text-align: right;
+}
+
+#visualid td[colspan="2"] {
+     text-align: right;
+     padding: 20px 5px;
+     border-top: 1px solid #7778bf;
+     background: #fff;
+}
+
+img[src^="/imagegen"] {
+     height: 256px;
+     width: 256px;
+     border: 1px solid #7778bf;
+     padding: 3px;
+     border-radius: 2px;
+     background: #fff;
+     filter: drop-shadow(0 0 1px #999);
+     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+/* end host details */
+
+/* host list identicons */
+
+.names img {
+     width: 20px;
+     height: 20px;
+     vertical-align: middle;
+     margin: 1px 10px 1px 1px;
+     padding: 1px;
+}
+
+.names img:hover, .names a:focus img {
+     filter: drop-shadow(0 0 1px #f60) !important;
+     -webkit-filter: drop-shadow(0 0 1px #f60) !important;
+     box-shadow: 0 0 0 1px #f60;
+}
+
+.names a:active img, .names a:focus img {
+     transform: rotate(45deg) scale(0.8);
+     transition: ease all 0.1s 0s;
+}
+
+/* end host list identicons */
 
 .book th {
      border-bottom: 1px solid #7778bf;
@@ -637,29 +849,24 @@ table.book {
      padding: 0 !important;
      margin: 0;
      border: none;
-     border-left: 1px solid #bbf; 
+     border-left: 1px solid #bbf;
+     border-right: 1px solid #bbf;
      resize: none;
      background: none;
 }
 
 div#book {
-    padding: 0;
-    background: #eef;
+    padding: 8px;
+    background: #efefff;
+}
+
+.iframed div#book {
+     margin-bottom: 10px;
 }
 
 p.book {
      background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
      padding: 5px 5px 5px 33px;
-}
-
-td.destinations {
-     padding: 0;
-     background: #fff;
-}
-
-td.destinations textarea {
-     box-shadow: none;
-     height: 28px !important;
 }
 
 #buttons {
@@ -683,46 +890,26 @@ table + p.buttons {
      margin-top: -1px;
 }
 
-/* identicon + qr image */
-#book + #buttons + div {
-     border: 1px solid #7778bf;
-     margin-top: -1px;
-}
-
-#book + #buttons + div table {
-     width: 100%;
-}
-
-#book + #buttons + div td {
-     width: 50%;
-}
-
-#book + #buttons + div td:first-child {
-     text-align: right;
-}
-
-img[src^="/imagegen"] {
-     height: 256px;
-     width: 256px;
-     border: 1px solid #7778bf;
-     padding: 3px;
-     border-radius: 2px;
-     background: #fff;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+.iframed #book + #buttons {
+     margin-top: -11px;
 }
 
 form[action="export"] {
-     border: 1px solid #7778bf;
+/*     border: 1px solid #7778bf; */
      margin: -1px 0;
 }
 
-input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+input[type="radio"], input[type="checkbox"] {
+     background: none;
+     cursor: pointer;
+}
+
+input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner, button::-moz-focus-inner  {
      outline: none;
      border: none;
 }
 
-input[type="submit"], input[type="reset"] {
+input[type="submit"], input[type="reset"], .fakebutton {
      margin: 5px;
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      padding: 4px 3px;
@@ -736,9 +923,23 @@ input[type="submit"], input[type="reset"] {
      color: #333;
      filter: saturate(70%) drop-shadow(0 0 1px #ccc);
      -webkit-filter: saturate(70%) drop-shadow(0 0 1px #ccc);
+     cursor: pointer;
 }
 
-input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, input[type=reset]:focus {
+.fakebutton a {
+     color: #333;
+     font-weight: normal;
+}
+
+.fakebutton a:hover, .fakebutton a:focus {
+     color: #111;
+}
+
+.fakebutton a:active {
+     color: #666 !important;
+}
+
+input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, input[type=reset]:focus, .fakebutton:hover, .fakebutton:focus {
      background: #eee;
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      color: #111;
@@ -748,9 +949,10 @@ input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, inp
      -webkit-filter: saturate(100%) drop-shadow(0 0 1px #ccc);
 }
 
-input[type="submit"]:active, input[type="reset"]:active {
-     box-shadow: inset 2px 2px 2px #555;
+input[type="submit"]:active, input[type="reset"]:active, .fakebutton:active {
+     box-shadow: inset 3px 3px 2px #555;
      background-blend-mode: luminosity;
+     color: #666;
 }
 
 input.accept {
@@ -823,6 +1025,7 @@ input.export {
      background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 5px 5px 21px;
+     margin-top: 5px;
 }
 
 input.export:hover, input.export:focus {
@@ -860,11 +1063,24 @@ input.search:hover, input.search:focus {
 input.search[type="text"] {
      background: #fff url(/themes/console/images/buttons/search.png) no-repeat 6px center;
      padding: 5px 5px 5px 28px !important;
-     margin: 1px 5px 0; 
+     margin: 1px 5px 0;
 }
 
 input.search[type="text"]:focus {
      background: #fff url(/themes/console/images/buttons/search.png) no-repeat 6px center !important;
+}
+
+#visualid .fakebutton {
+     background: #eee url(/themes/console/images/buttons/go.png) no-repeat 6px center;
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background-size: 14px 14px, 100% 100%;
+     padding: 6px 8px 6px 22px;
+}
+
+#visualid .fakebutton:hover, #visualid .fakebutton:focus {
+     background: #fff url(/themes/console/images/buttons/go.png) no-repeat 6px center;
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background-size: 14px 14px, 100% 100%;
 }
 
 form[action="addressbook"] table {
@@ -879,7 +1095,11 @@ form[action="addressbook"] table {
      margin-top: -36px;
 }
 
-/* hide export button on published page when empty */ 
+.iframed #export {
+     margin-bottom: 11px;
+}
+
+/* hide export button on published page when empty */
 #messages + form[action="export"] {
      display: none;
 }
@@ -891,3 +1111,81 @@ form[action="addressbook"] table {
 p#filtered {
      padding-right: 200px !important;
 }
+
+/* responsive layout */
+
+@media screen and (max-width: 680px) {
+#navi {
+     padding: 5px 3px !important;
+}
+
+#navi a {
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff !important;
+     padding: 3px 5px !important;
+}
+
+#visualid img[src^="/imagegen"] {
+     width: 228px !important;
+     height: 228px !important;
+}
+}
+
+@media screen and (min-width: 1400px) {
+body, p, td, textarea, input, button, li, a, th, h4 {
+     font-size: 10pt !important;
+}
+
+code, tt, .destaddress {
+     font-size: 9pt !important;
+}
+
+#navi a {
+     font-size: 11pt;
+}
+
+h3 {
+     font-size: 12pt !important;
+}
+
+#export {
+     margin-top: -40px !important;
+}
+
+#filter span, #filter a {
+     font-size: 11pt !important;
+}
+
+td.destinations textarea {
+     height: 32px !important;
+}
+
+input.export {
+     margin-top: 8px;
+}
+
+#host_list th:nth-child(2), #host_list td:nth-child(2),
+#host_list th:nth-child(3), #host_list td:nth-child(3),
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     padding: 0 20px;
+     width: 6%;
+}
+
+.headline h4 {
+     background: rgba(0, 0, 0, 0) url("/themes/susidns/images/drive.png") no-repeat scroll 10px 8px;
+}
+}
+
+@media screen and (max-width: 1000px) {
+.iframed .illustrate {
+     margin: 0 10px 15px;
+}
+}
+
+/* end responsive layout */
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+

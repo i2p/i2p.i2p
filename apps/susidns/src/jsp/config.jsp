@@ -53,9 +53,9 @@
 <div class="page">
 <div id="logo">
 <a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
-</div><hr>
+</div>
+<hr>
 <div id="navi">
-<p>
 <a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
 <a class="abook" href="addressbook?book=private"><%=intl._t("Private")%></a>&nbsp;
 <a class="abook" href="addressbook?book=master"><%=intl._t("Master")%></a>&nbsp;
@@ -63,7 +63,6 @@
 <a class="abook" href="addressbook?book=published"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
 <a id="config" href="config"><%=intl._t("Configuration")%></a>
-</p>
 </div>
 <hr>
 <div class="headline" id="config">

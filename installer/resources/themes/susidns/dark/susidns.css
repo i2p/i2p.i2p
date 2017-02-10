@@ -60,6 +60,7 @@ div#navi  {
      top: -1px;
      border-radius: 0 0 2px 2px;
      z-index: 999;
+     text-align: center;
 }
 
 .iframed div#navi  {
@@ -69,12 +70,6 @@ div#navi  {
      border-left: none;
      padding: 5px 0;
      border-radius: 0;
-}
-
-#navi p {
-     text-align: center;
-     font-weight: bold;
-     font-size: 9pt;
 }
 
 #navi a:link {
@@ -90,6 +85,7 @@ div#navi  {
      box-shadow: inset 0 0 0 1px #000;
      filter: drop-shadow(0 0 1px #000);
      -webkit-filter: drop-shadow(0 0 1px #000);
+     padding: 2px 5px 3px 24px;
 }
 
 #navi a:hover, #navi a:focus  {
@@ -110,7 +106,6 @@ div#navi  {
 #navi a.abook {
      background: #000 url(/themes/susidns/images/abook.png) 5px center no-repeat;
      background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
-     padding: 3px 5px 3px 24px;
 }
 
 #navi a.abook:hover, #navi a.abook:focus {
@@ -124,7 +119,6 @@ div#navi  {
 #navi a#subs {
      background: #000 url(/themes/susidns/images/subs.png) 5px center no-repeat;
      background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
-     padding: 3px 5px 3px 24px;
 }
 
 #navi a#subs:hover, #navi a#subs:focus {
@@ -138,7 +132,6 @@ div#navi  {
 #navi a#config {
      background: #000 url(/themes/console/images/buttons/configure.png) 5px center no-repeat;
      background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
-     padding: 3px 5px 3px 24px;
 }
 
 #navi a#config:hover, #navi a#config:focus {
@@ -152,7 +145,6 @@ div#navi  {
 #navi a#overview {
      background: #000 url(/themes/susidns/images/overview.png) 5px center no-repeat;
      background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%);
-     padding: 3px 5px 3px 24px;
 }
 
 #navi a#overview:hover, #navi a#overview:focus {
@@ -161,18 +153,6 @@ div#navi  {
 
 #navi a#overview:active {
      background: #f60 url(/themes/susidns/images/overview.png) 5px center no-repeat !important;
-}
-
-#navi p {
-     text-align: center !important;
-     text-transform: capitalize;
-     font-weight: bold;
-     padding: 2px 5px !important;
-     margin: 0 !important;
-}
-
-#navi p > * {
-     vertical-align: middle;
 }
 
 /* end topnav */
@@ -190,7 +170,7 @@ hr {
 
 div#filter {
      border: 1px solid #2a5f29;
-     padding: 0 0 15px;
+     padding: 0 5px 15px;
      text-align: center;
      background: #000;
 }
@@ -328,7 +308,7 @@ h3 {
      font-size: 10pt;
      font-weight: bold;
      border: 1px solid #2a5f29;
-     padding: 5px 10px;
+     padding: 7px 10px;
      background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center;
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
      letter-spacing: 0.08em;
@@ -358,7 +338,7 @@ h3 {
 
 .headline h3:first-child + h4 {
      margin-top: -25px;
-     margin-bottom: 25px !important;
+     margin-bottom: 26px !important;
 }
 
 div.headline {
@@ -386,7 +366,7 @@ div#messages {
 #messages + p, p.book {
      border: 1px solid #2a5f29;
      background: #000 url(/themes/susidns/images/addressbook.png) 10px center no-repeat;
-     padding: 20px 20px 20px 50px !important; 
+     padding: 20px 20px 20px 50px !important;
 }
 
 #messages:empty {
@@ -396,37 +376,37 @@ div#messages {
 p#filtered {
      padding: 12px 10px 8px 20px;
      font-size: 10pt;
-     margin: -15px 0 10px;
+     margin: -14px 0 10px;
 }
 
 div#book p, p.messages {
      font-size: 10pt;
 }
 
-.book th:first-child {
-     padding: 0 !important;
+.book th:first-child, .book td:first-child {
+     padding: 0 10px !important;
 }
 
 .book td {
      padding: 0;
 }
 
-.book td:nth-child(3) {
+.book td:nth-child(2) {
      padding: 2px 0 2px 5px !important;
      width: 30px;
 }
 
-.book td:nth-child(4) {
+.book td:nth-child(3) {
      text-align: center;
      width: 20px;
      padding: 2px 25px 2px 0 !important;
 }
 
-.book td:nth-child(4) a:not(old) {
+.book td:nth-child(3) a:not(old) {
      font-size: 0 !important;
 }
 
-.book td:nth-child(4) .addrhlpr a::after {
+.book td:nth-child(3) .addrhlpr a::after {
      content: url(/themes/console/images/buttons/fullview.png);
      text-align: center;
      padding: 0 10px !important;
@@ -496,6 +476,7 @@ input[type="checkbox"], input[type="radio"] {
      min-width: 16px;
      min-height: 16px;
      background: none;
+     cursor: pointer;
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
@@ -503,22 +484,39 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
 }
 
-div#buttons + div > table {
+.iframed #visualid {
+     margin-top: 16px;
+}
+
+#visualid h3 {
+     margin-bottom: -1px;
+}
+
+#visualid h3 span {
+     text-transform: normal !important;
+}
+
+#visualid table {
      width: 100%;
      border: 1px solid #2a5f29;
-     margin-top: -46px;
+     border-collapse: collapse;
 }
 
-div#buttons + div > table > tbody > tr > td {
-     padding-top: 51px !important;
+#visualid tr:first-child td {
+     padding: 15px 5px !important;
 }
 
-div#buttons + div > table > tbody > tr > td:first-child {
+#visualid td:first-child {
      text-align: right;
 }
 
-div#buttons + div > table > tbody > tr > td {
+#visualid td {
      text-align: left;
+}
+
+#visualid td[colspan="2"] {
+     padding: 15px 3px;
+     border-top: 1px solid #2a5f29;
 }
 
 form[action="addressbook"] > p.buttons {
@@ -571,7 +569,7 @@ tr.list0 {
 
 .help ul li:last-child {
      margin-bottom: -10px;
-} 
+}
 
 #helpsubs {
      padding: 0 0 0 40px;
@@ -624,7 +622,7 @@ form[action="export"] > div#buttons {
 
 div#config > textarea, div#content > textarea {
      border-radius: 0;
-     margin-top: -26px;
+     margin-top: -27px;
 }
 
 textarea[name="config"] {
@@ -657,13 +655,13 @@ div#config + div#buttons, div#content + div#buttons {
 
 div#book {
      padding: 0;
-     margin: -15px 0 -5px; 
+     margin: -15px 0 -5px;
 }
 
 #book table {
      width: 100%;
      border: 1px solid #2a5f29;
-     margin-top: -10px;
+/*     margin-top: -10px;*/
 }
 
 #book table th {
@@ -685,7 +683,7 @@ div#book {
      color: #ee9;
 }
 
-#book th:first-child {
+#book th:last-child {
      background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
      background: url(images/bin.png) center center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
 }
@@ -693,11 +691,11 @@ div#book {
 #book input[type="checkbox"] {
      margin: 0;
 }
-	
+
 div#add {
      border: 1px solid #2a5f29;
      padding: 0 0 10px;
-     margin-top: 20px;
+     margin-top: 23px;
      background: #000;
 }
 
@@ -705,7 +703,7 @@ div#add {
      margin-top: -6px;
      margin-left: -1px;
      margin-right: -1px;
-     padding: 5px 10px;
+     padding: 8px 10px;
      font-size: 10pt;
 }
 
@@ -729,11 +727,19 @@ div#add {
      padding-top: 5px;
 }
 
-input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focus, input[type="reset"]:focus {
+input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focus, input[type="reset"]:focus, .fakebutton:hover, #fakebutton:focus {
      background: #000;
      color: #f60;
      border: 1px solid #f60;
      box-shadow: inset 0 1px 1px 0 #ee9;
+}
+
+.fakebutton, .fakebutton:visited {
+     color: #494;
+}
+
+.fakebutton:hover, .fakebutton:focus {
+     color: #f60;
 }
 
 input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
@@ -748,14 +754,14 @@ input {
      padding: 5px !important;
      border-radius: 2px;
      border: 1px solid #2a5f29;
-     background: #000 none !important;      
+     background: #000 none !important;
      color: #494;
      margin: 2px 4px 2px 0;
      font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      min-width: 64px !important;
 }
 
-input[type="submit"], input[type="reset"] {
+input[type="submit"], input[type="reset"], .fakebutton {
      color: #494;
      background: #000;
      border: 1px outset #191;
@@ -766,9 +772,10 @@ input[type="submit"], input[type="reset"] {
      text-align: center;
      min-height: 22px !important;
      min-width: 80px !important;
+     cursor: pointer;
 }
 
-input[type=submit]:active, input[type=reset]:active {
+input[type=submit]:active, input[type=reset]:active, .fakebutton:active {
      background: #f60 !important;
      color: #ee9 !important;
      border: 1px solid #f60;
@@ -801,7 +808,7 @@ textarea {
      padding: 3px 5px;
      font: bold 8.5pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
      border-radius: 2px;
-     width: 100%; 
+     width: 100%;
      height: 120px;
      line-height: 140%;
      resize: none;
@@ -819,6 +826,7 @@ textarea[cols="70"] {
      resize: none;
      border: none;
      border-left: 1px solid #2a5f29;
+     border-right: 1px solid #2a5f29;
      margin: 0 !important;
      border-radius: 0;
 }
@@ -871,7 +879,17 @@ input[name="search"]:focus {
 @media screen and (max-width: 710px) {
 #navi a {
      background: linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%) !important;
-     padding: 3px 8px !important;     
+     padding: 2px 8px !important;
+}
+
+#navi a.abook:hover, #navi a#overview:hover, #navi a#subs:hover, #navi a#config:hover,
+#navi a.abook:focus, #navi a#overview:focus, #navi a#subs:focus, #navi a#config:focus {
+     background: #000 !important;
+     padding: 2px 8px !important;
+}
+
+#navi a.abook:active, #navi a#overview:active, #navi a#subs:active, #navi a#config:active {
+     background: #f60 !important;
 }
 }
 
@@ -880,7 +898,7 @@ textarea {
      font-size: 9pt;
 }
 
-body, input[type="submit"], input[type="reset"], input, select, h4, td.names a, p, li {
+body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4, td.names a, p, li, #filter a, #host_details td {
      font-size: 10pt !important;
 }
 
@@ -889,16 +907,19 @@ div#navi {
 }
 
 #navi a {
-     font-size: 10.5pt !important;
-     padding: 6px 5px 6px 25px !important;
+     font-size: 10pt !important;
+     padding: 4px 7px 5px 25px !important;
 }
 
-h3, #filter a {
+h3 {
      font-size: 11pt !important;
 }
 
 #filter a:link, #filter a:visited {
      margin: 3px 2px !important;
+}
+form[action="addressbook"] > p.buttons {
+     margin-bottom: -20px;
 }
 }
 
@@ -937,3 +958,163 @@ p.book {
 #messages + form[action="export"] {
      display: none;
 }
+
+/* host details page */
+
+#host_details td {
+     padding: 6px 10px !important;
+}
+
+#host_details td:first-child {
+     min-width: 10px !important;
+     width: 10%;
+     white-space: nowrap;
+     font-weight: bold;
+     text-align: right;
+}
+
+#host_details td:last-child {
+     width: 90%;
+     text-align: left;
+     border-left: none !important;
+     border-right: none !important;
+}
+
+#host_details td.destinations {
+     background: none;
+}
+
+#host_details tr:hover {
+     background: #ffd;
+}
+
+#host_details .destaddress {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     word-break: break-all !important;
+     white-space: normal !important;
+}
+
+/* end host details */
+
+.names img {
+     width: 20px;
+     height: 20px;
+     vertical-align: middle;
+     margin: 1px 10px 1px 1px;
+     padding: 1px;
+     border: 1px solid #141;
+     border-radius: 2px;
+     background: #000;
+}
+
+.names img:hover, .names a:focus img {
+/*     filter: drop-shadow(0 0 1px #f60) !important;
+     -webkit-filter: drop-shadow(0 0 1px #f60) !important;*/
+     border: 1px solid #f60;
+}
+
+.names a:active img, .names a:focus img {
+     transform: rotate(45deg) scale(0.8);
+     transition: ease all 0.1s 0s;
+}
+
+/* hostname list */
+
+#host_list {
+     margin-top: 28px;
+}
+
+#host_list th:first-child,
+#host_list td:first-child {
+     width: 150px;
+     width: 30%;
+     white-space: nowrap;
+     padding-left: 5px !important;
+}
+
+#host_list th:first-child {
+     padding-left: 39px !important;
+}
+
+#host_list td:last-child {
+     width: 16px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+#host_list th:nth-child(2), #host_list td:nth-child(2),
+#host_list th:nth-child(3), #host_list td:nth-child(3),
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     width: 35px;
+     width: 8%;
+     padding: 0 5px !important;
+     white-space: nowrap;
+     text-align: center;
+}
+
+#host_list td:nth-child(2) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(2) a::after {
+     content: url(/themes/console/images/buttons/link.png);
+     text-align: center;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(3) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(3) a::after {
+     content: url(/themes/console/images/buttons/helper.png);
+     cursor: pointer;
+}
+
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     padding-right: 30px !important;
+}
+
+#host_list td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(4) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 0 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
+#host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
+}
+
+#host_list .destaddress {
+     overflow: auto !important;
+     white-space: nowrap;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-weight: normal;
+     padding: 3px !important;
+}
+
+/* end hostname list */
+
+td.destinations {
+     max-width: 50px !important;
+     border-left: 1px solid #141;
+     border-right: 1px solid #141;
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+

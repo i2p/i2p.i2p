@@ -29,6 +29,10 @@ body.iframed {
      display: none;
 }
 
+*, *:active {
+     outline: none;
+}
+
 hr {
      display: none;
 }
@@ -57,6 +61,10 @@ table.book th {
      padding-left: 5px;
 }
 
+.book th:last-child {
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+}
+
 table.book tr:hover textarea {
      background: #fff;
      border: none;
@@ -68,34 +76,35 @@ table.book tr:hover {
      border-bottom: 1px solid #89f;
 }
 
-
-table.book td:first-child	 {
-     width: 20px;
+table.book td:last-child {
+     width: 36px;
      white-space: no-wrap;
+     text-align: center;
+     padding: 0 5px;
 }
 
-table.book td:nth-child(2) {
+table.book td:first-child {
      width: 200px;
      white-space: nowrap;
 }
 
-table.book td:nth-child(3) {
+table.book td:nth-child(2) {
      width: 30px;
      white-space: nowrap;
      padding-left: 10px;
 }
 
-.book td:nth-child(4) {
+.book td:nth-child(3) {
      text-align: center;
      width: 20px;
-     padding: 2px 25px 2px 0 !important;
+     padding: 2px 20px 2px 0 !important;
 }
 
-.book td:nth-child(4) a:not(old) {
+.book td:nth-child(3) a:not(old) {
      font-size: 0 !important;
 }
 
-.book td:nth-child(4) .addrhlpr a::after {
+.book td:nth-child(3) .addrhlpr a::after {
      content: url(/themes/console/images/buttons/fullview.png);
      text-align: center;
      padding: 0 10px !important;
@@ -135,10 +144,6 @@ div#navi {
      padding: 0;
 }
 
-.iframed #navi p {
-     margin: 8px 0 7px;
-}
-
 .iframed #navi, .iframed h3, .iframed h4, .iframed #help, .iframed p.buttons, .iframed #filter {
      border-left: none !important;
      border-right: none !important;
@@ -173,15 +178,13 @@ div.page {
 
 div.help {
      border: 1px solid #89f;
-     margin: 0 0 -1px;
+     margin: 0 0 10px;
      background: #eef;
 }
 
-/*
-.iframed #help {
-     margin: 0 -10px -1px;
+.iframed #helpsubs {
+     margin: 0 0 -1px;
 }
-*/
 
 #helpconfig {
      margin: 0 0 -1px;
@@ -198,13 +201,6 @@ div.help {
 .help ul, .help ol {
      margin-left: -25px;
      list-style-type: square;
-}
-
-#navi p {
-     text-align: center !important;
-     text-transform: capitalize;
-     font-weight: bold;
-     line-height: 130%;
 }
 
 p {
@@ -267,7 +263,7 @@ th {
      padding:5px 10px;
      font-size:10pt;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
-     border-bottom: 1px solid #89f; 
+     border-bottom: 1px solid #89f;
 }
 
 td {
@@ -319,18 +315,18 @@ p.help {
 
 p.book, #messages + p {
      background: url(/themes/susidns/images/addressbook.png) center left no-repeat;
-     padding: 10px 10px 10px 38px; 
+     padding: 10px 10px 10px 38px;
 }
 
 p.footer {
-     font-size: 7pt;
-     text-align: center;
-     padding: 0;
-     margin: 12px auto -15px;
-     border: 1px solid #89f;
-     border-radius: 0 0 3px 3px;
-     width: 200px;
-     background: #fff;
+     position: absolute;
+     top: 0;
+     left: -24px;
+     border: none;
+     background: none;
+     opacity: 0.3;
+     font-size: 8pt !important;
+     display: none;
 }
 
 .iframed #footer {
@@ -408,7 +404,7 @@ div#filter {
 #filter span a {
      margin: 0 5px !important;
      display:inline-block;
-     padding: 1px 5px; 
+     padding: 1px 5px;
 }
 
 #search {
@@ -453,10 +449,36 @@ td.search:last-child {
      display: none;
 }
 
-#buttons + div > table {
-     width: 50%;
-     margin: auto;
-} 
+#visualid {
+     padding: 0;
+}
+
+#visualid h3 {
+     text-transform: none;
+}
+
+#visualid table {
+     width: 100%;
+     border-collapse: collapse;
+     margin: 0;
+}
+
+#visualid tr:first-child td {
+     padding: 10px 10px 20px;
+}
+
+#visualid td:first-child {
+     text-align: right;
+}
+
+#visualid td[colspan="2"] {
+     border-top: 1px solid #89f;
+     padding: 15px 0;
+}
+
+.iframed #visualid td[colspan="2"] {
+     padding-bottom: 0;
+}
 
 img[src*="imagegen"] {
      width: 256px;
@@ -494,7 +516,7 @@ p.buttons {
      background: #fff;
 }
 
-button, input, select {
+.fakebutton, input, select {
      font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
 }
 
@@ -532,18 +554,20 @@ textarea {
 }
 
 td.destinations textarea, td.destinations textarea:focus {
+     font: normal 8.5pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;*/
      resize: none;
      font-size: 8pt;
      padding: 0 !important;
      border: none;
      border-left: 1px solid #888 !important;
+     border-right: 1px solid #888 !important;
      border-radius: 0;
-     margin: 0px !important;
+     margin: 0 0 0 5px !important;
      background: none;
      box-shadow: 0 none !important;
 }
 
-button, input[type="submit"], input[type="reset"] {
+.fakebutton, input[type="submit"], input[type="reset"] {
      padding: 4px 3px !important;
      border-radius: 2px;
      border: 1px solid #bbb;
@@ -552,11 +576,11 @@ button, input[type="submit"], input[type="reset"] {
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      margin: 2px 0 2px 4px;
      filter: drop-shadow(0 0 1px #ccc);
-     color: #333;
+     color: #333 !important;
 }
 
-button:hover, input[type="submit"]:hover, input[type="reset"]:hover,
-button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
+.fakebutton:hover, input[type="submit"]:hover, input[type="reset"]:hover,
+.fakebutton:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      background: #fff;
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      border: 1px solid #89f;
@@ -565,7 +589,7 @@ button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      color: #222;
 }
 
-button:active, input[type="submit"]:active, input[type="reset"]:active {
+.fakebutton:active, input[type="submit"]:active, input[type="reset"]:active {
      box-shadow: inset 3px 3px 3px #999;
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #999;
      border: 1px solid #bbb;
@@ -590,6 +614,7 @@ form[action="subscriptions"] textarea {
 
 #navi {
      padding: 3px !important;
+     text-align: center !important;
 }
 
 #navi a, #navi a:visited {
@@ -655,21 +680,9 @@ form[action="subscriptions"] textarea {
      background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
 }
 
-#navi p {
-     text-align: center !important;
-     text-transform: capitalize;
-     font-weight: bold;
-     padding: 2px 5px !important;
-     margin: 0 !important;
-}
-
-#navi p > * {
-     vertical-align: middle;
-}
-
 .headline + #book > table {
      margin-top: 10px !important;
-} 
+}
 
 /* page titles */
 
@@ -724,9 +737,11 @@ h3 {
      font-size: 12pt !important;
 }
 
+/*
 p.footer {
      margin: 12px auto -21px !important;
 }
+*/
 
 #export {
      margin-top: -40px !important;
@@ -735,11 +750,9 @@ p.footer {
 #filter span, #filter a {
      font-size: 11pt !important;
 }
-
 }
 
 /* end responsive layout */
-
 
 /* export hosts */
 
@@ -749,7 +762,7 @@ p.footer {
      margin-bottom: -4px;
 }
 
-/* hide export button on published page when empty */ 
+/* hide export button on published page when empty */
 #messages + form[action="export"] {
      display: none;
 }
@@ -767,9 +780,166 @@ p#filtered {
 
 #book p {
      margin-left: 2px;
-} 
+}
 
 p.book {
      padding-left: 26px !important;
      background-position: left center !important;
 }
+
+/* host details page */
+
+#host_details td {
+     padding: 5px 10px !important;
+}
+
+#host_details td:first-child {
+     min-width: 10px !important;
+     width: 10%;
+     white-space: nowrap;
+     font-weight: bold;
+     text-align: right;
+}
+
+#host_details td:last-child {
+     width: 90%;
+     text-align: left;
+     border-left: none !important;
+     border-right: none !important;
+}
+
+#host_details td.destinations {
+     background: none;
+}
+
+#host_details tr:hover {
+     background: #ffd;
+}
+
+#host_details .destaddress {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     word-break: break-all !important;
+     white-space: normal !important;
+}
+
+/* end host details */
+
+.names img {
+     width: 20px;
+     height: 20px;
+     vertical-align: middle;
+     margin: 1px 10px 1px 1px;
+     padding: 1px;
+     border: 1px solid #89f;
+     border-radius: 2px;
+     background: #fff;
+}
+
+.names img:hover, .names a:focus img {
+     filter: drop-shadow(0 0 1px #f60) !important;
+     -webkit-filter: drop-shadow(0 0 1px #f60) !important;
+     box-shadow: 0 0 0 1px #f60;
+}
+
+.names a:active img, .names a:focus img {
+     transform: rotate(45deg) scale(0.8);
+     transition: ease all 0.1s 0s;
+}
+
+/* hostname list */
+
+#host_list th:first-child,
+#host_list td:first-child {
+     width: 150px;
+     width: 30%;
+     white-space: nowrap;
+     padding-left: 5px;
+}
+
+#host_list th:first-child {
+     padding-left: 39px;
+}
+
+#host_list td:last-child {
+     width: 16px;
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+#host_list th:nth-child(2), #host_list td:nth-child(2),
+#host_list th:nth-child(3), #host_list td:nth-child(3),
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     width: 35px;
+     width: 8%;
+     padding: 0 5px !important;
+     white-space: nowrap;
+     text-align: center;
+}
+
+#host_list td:nth-child(2) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(2) a::after {
+     content: url(/themes/console/images/buttons/link.png);
+     text-align: center;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(3) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(3) a::after {
+     content: url(/themes/console/images/buttons/helper.png);
+     cursor: pointer;
+}
+
+#host_list th:nth-child(4), #host_list td:nth-child(4) {
+     padding-right: 30px !important;
+}
+
+#host_list td:nth-child(4) a:not(old) {
+     font-size: 0 !important;
+}
+
+#host_list td:nth-child(4) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 0 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+     -webkit-filter: drop-shadow(0 0 1px #555);
+     cursor: pointer;
+}
+
+#host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
+#host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
+     filter: drop-shadow(0 0 1px #f60);
+     -webkit-filter: drop-shadow(0 0 1px #f60);
+}
+
+#host_list .destaddress {
+     overflow: auto !important;
+     white-space: nowrap;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-weight: normal;
+     color: #555;
+     padding: 3px !important;
+}
+
+/* end hostname list */
+
+td.destinations {
+     max-width: 50px !important;
+     border-left: 1px solid #89f;
+     border-right: 1px solid #89f;
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), * {
+     filter: none !important;
+     -webkit-filter: none !important;
+}
+
