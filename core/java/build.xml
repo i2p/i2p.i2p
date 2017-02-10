@@ -223,7 +223,11 @@
         <!-- warning - The junit.test target below doesn't actually include i2ptest.jar in the classpath,
              only the build/obj directory.
           -->
-        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class **/test.data **/baseDblPrecmp **/basePrecmp" />
+        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" >
+            <fileset dir="./build/obj" includes="**/*.class **/test.data **/baseDblPrecmp **/basePrecmp" />
+            <!-- the getopt translation files -->
+            <fileset dir="src" includes="${translation.includes}" />
+        </jar>
     </target>
     <!-- preparation of code coverage tool of choice -->
     <target name="prepareClover" depends="compile" if="with.clover">
