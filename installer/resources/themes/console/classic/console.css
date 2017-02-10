@@ -358,6 +358,11 @@ div.routersummary td {
      border: 0 !important;
 }
 
+#sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
+     padding-top: 1px;
+     padding-bottom: 1px;
+}
+
 #sb_bandwidth td:nth-child(2) {
      white-space: nowrap;
      width: 60%;
