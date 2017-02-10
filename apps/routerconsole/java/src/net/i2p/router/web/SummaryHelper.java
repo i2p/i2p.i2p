@@ -119,6 +119,7 @@ public class SummaryHelper extends HelperBase {
     }
 **/
     
+    /** allowReseed */
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
                (_context.netDb().getKnownRouters() < 30) ||

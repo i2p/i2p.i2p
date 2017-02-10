@@ -51,7 +51,7 @@ import org.freenetproject.ForwardPortStatus;
  *
  * ==================
  *
- * This plugin implements UP&P support on a Freenet node.
+ * This plugin implements UP&amp;P support on a Freenet node.
  * 
  * @author Florent Daigni&egrave;re &lt;nextgens@freenetproject.org&gt;
  *

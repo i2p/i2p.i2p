@@ -11,7 +11,7 @@ import net.i2p.util.Log;
  * delivery, or even the generation of a new packet.  This class
  * is the only one that builds useful outbound Packet objects.
  *<p>
- * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
+ * MessageOutputStream -&gt; ConnectionDataReceiver -&gt; Connection -&gt; PacketQueue -&gt; I2PSession
  *<p>
  * There's one of these per MessageOutputStream.
  * It stores no state. It sends everything to the Connection unless
@@ -36,7 +36,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * This tells the flusher in MessageOutputStream whether to flush.
      * It won't flush if this returns true.
      *
-     * It was: return con.getUnackedPacketsSent() > 0 (i.e. Nagle)
+     * It was: return con.getUnackedPacketsSent() &gt; 0 (i.e. Nagle)
      * But then, for data that fills more than one packet, the last part of
      * the data isn't sent until all the previous packets are acked. Which is very slow.
      * The poor interaction of Nagle and Delayed Acknowledgements is well-documented.
@@ -156,6 +156,11 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     }
     
     /** 
+     * Compose a packet.
+     * Most flags are set here; however, some are set in Connection.sendPacket()
+     * and Connection.ResendPacketEvent.retransmit().
+     * Take care not to set the same options both here and in Connection.
+     *
      * @param buf data to be sent - may be null
      * @param off offset into the buffer to start writing from
      * @param size how many bytes of the buffer to write (may be 0)
@@ -164,12 +169,11 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * @return the packet to be sent
      */
     private PacketLocal buildPacket(byte buf[], int off, int size, boolean forceIncrement) {
-        Connection con = _connection;
         if (size > Packet.MAX_PAYLOAD_SIZE) throw new IllegalArgumentException("size is too large (" + size + ")");
-        boolean ackOnly = isAckOnly(con, size);
-        boolean isFirst = (con.getAckedPackets() <= 0) && (con.getUnackedPacketsSent() <= 0);
+        boolean ackOnly = isAckOnly(_connection, size);
+        boolean isFirst = (_connection.getAckedPackets() <= 0) && (_connection.getUnackedPacketsSent() <= 0);
         
-        PacketLocal packet = new PacketLocal(_context, con.getRemotePeer(), con);
+        PacketLocal packet = new PacketLocal(_context, _connection.getRemotePeer(), _connection);
         //ByteArray data = packet.acquirePayload();
         ByteArray data = new ByteArray(new byte[size]);
         if (size > 0)
@@ -180,36 +184,32 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if ( (ackOnly && !forceIncrement) && (!isFirst) )
             packet.setSequenceNum(0);
         else
-            packet.setSequenceNum(con.getNextOutboundPacketNum());
-        packet.setSendStreamId(con.getSendStreamId());
-        packet.setReceiveStreamId(con.getReceiveStreamId());
+            packet.setSequenceNum(_connection.getNextOutboundPacketNum());
+        packet.setSendStreamId(_connection.getSendStreamId());
+        packet.setReceiveStreamId(_connection.getReceiveStreamId());
         
         // not needed here, handled in PacketQueue.enqueue()
         //con.getInputStream().updateAcks(packet);
-        // note that the optional delay is usually rewritten in Connection.sendPacket()
-        int choke = con.getOptions().getChoke();
-        packet.setOptionalDelay(choke);
-        if (choke > 0)
-            packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+
+        // Do not set optional delay here, set in Connection.sendPacket()
+
         // bugfix release 0.7.8, we weren't dividing by 1000
-        packet.setResendDelay(con.getOptions().getResendDelay() / 1000);
+        packet.setResendDelay(_connection.getOptions().getResendDelay() / 1000);
         
-        if (con.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
+        if (_connection.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, true);
         else
             packet.setFlag(Packet.FLAG_PROFILE_INTERACTIVE, false);
-        
-        packet.setFlag(Packet.FLAG_SIGNATURE_REQUESTED, con.getOptions().getRequireFullySigned());
         
         //if ( (!ackOnly) && (packet.getSequenceNum() <= 0) ) {
         if (isFirst) {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom();
-            packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
+            packet.setOptionalMaxSize(_connection.getOptions().getMaxMessageSize());
         }
-        packet.setLocalPort(con.getLocalPort());
-        packet.setRemotePort(con.getPort());
-        if (con.getSendStreamId() == Packet.STREAM_ID_UNKNOWN) {
+        packet.setLocalPort(_connection.getLocalPort());
+        packet.setRemotePort(_connection.getPort());
+        if (_connection.getSendStreamId() == Packet.STREAM_ID_UNKNOWN) {
             packet.setFlag(Packet.FLAG_NO_ACK);
         }
         
@@ -221,10 +221,10 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         // FIXME Implement better half-close by sending CLOSE whenever. Needs 0.9.9 bug fixes
         // throughout network?
         //
-        if (con.getOutputStream().getClosed() && 
-            ( (size > 0) || (con.getUnackedPacketsSent() <= 0) || (packet.getSequenceNum() > 0) ) ) {
+        if (_connection.getOutputStream().getClosed() && 
+            ( (size > 0) || (_connection.getUnackedPacketsSent() <= 0) || (packet.getSequenceNum() > 0) ) ) {
             packet.setFlag(Packet.FLAG_CLOSE);
-            con.notifyCloseSent();
+            _connection.notifyCloseSent();
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New OB pkt (acks not yet filled in): " + packet + " on " + _connection);

@@ -58,6 +58,19 @@ public abstract class Addresses {
         return !getAddresses(true, false, false).isEmpty();
     }
 
+    /**
+     *  Do we have any non-loop, non-wildcard IPv6 address at all?
+     *  @since 0.9.29
+     */
+    public static boolean isConnectedIPv6() {
+        // not as good as using a Java DBus implementation to talk to NetworkManager...
+        for (String ip : getAddresses(false, true)) {
+            if (ip.contains(":"))
+                return true;
+        }
+        return false;
+    }
+
     /** @return the first non-local address IPv4 address it finds, or null */
     public static String getAnyAddress() {
         SortedSet<String> a = getAddresses();
@@ -599,6 +612,7 @@ public abstract class Addresses {
             } catch (UnknownHostException uhe) {}
             System.out.println(buf.toString());
         }
-        System.out.println("\nIs connected? " + isConnected());
+        System.out.println("\nIs connected? " + isConnected() +
+                           "\nHas IPv6?     " + isConnectedIPv6());
     }
 }

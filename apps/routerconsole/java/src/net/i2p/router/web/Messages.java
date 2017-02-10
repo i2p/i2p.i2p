@@ -22,7 +22,7 @@ public class Messages extends Translate {
      *
      *  @param s string to be translated containing {0}
      *    The {0} will be replaced by the parameter.
-     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *    Single quotes must be doubled, i.e. ' -&gt; '' in the string.
      *  @param o parameter, not translated.
      *    To translate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.

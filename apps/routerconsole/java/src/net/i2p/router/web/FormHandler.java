@@ -13,7 +13,7 @@ import net.i2p.util.Log;
 /**
  * Simple form handler base class - does not depend on servlets or jsp,
  * but instead the subclasses are populated with javabean properties.  e.g.
- * <jsp:setProperty name="handler" property="*" />
+ * &lt;jsp:setProperty name="handler" property="*" /&gt;
  *
  * The form is "processed" after the properties are set and the first output
  * property is retrieved - either getAll(), getNotices() or getErrors().
@@ -126,7 +126,7 @@ public abstract class FormHandler {
     /**
      * Add an error message to display
      * Use if it does not include a link.
-     * Escapes '<' and '>' before queueing
+     * Escapes '&lt;' and '&gt;' before queueing
      */
     protected void addFormError(String errorMsg) {
         if (errorMsg == null) return;
@@ -136,7 +136,7 @@ public abstract class FormHandler {
     /**
      * Add a non-error message to display
      * Use if it does not include a link.
-     * Escapes '<' and '>' before queueing
+     * Escapes '&lt;' and '&gt;' before queueing
      */
     protected void addFormNotice(String msg) {
         if (msg == null) return;
@@ -146,7 +146,7 @@ public abstract class FormHandler {
     /**
      * Add a non-error message to display
      * Use if it includes a link or other formatting.
-     * Does not escape '<' and '>' before queueing
+     * Does not escape '&lt;' and '&gt;' before queueing
      * @since 0.9.14.1
      */
     protected void addFormNoticeNoEscape(String msg) {
@@ -157,7 +157,7 @@ public abstract class FormHandler {
     /**
      * Add an error message to display
      * Use if it includes a link or other formatting.
-     * Does not escape '<' and '>' before queueing
+     * Does not escape '&lt;' and '&gt;' before queueing
      * @since 0.9.19
      */
     protected void addFormErrorNoEscape(String msg) {
@@ -303,7 +303,7 @@ public abstract class FormHandler {
      *
      *  @param s string to be translated containing {0}
      *    The {0} will be replaced by the parameter.
-     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *    Single quotes must be doubled, i.e. ' -&gt; '' in the string.
      *  @param o parameter, not translated.
      *    To translate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.

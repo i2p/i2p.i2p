@@ -151,7 +151,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  @param maxNumRouters max to return
      *  @param kbuckets now unused
      *
-     *  Sorted by closest to the key if > maxNumRouters, otherwise not
+     *  Sorted by closest to the key if &gt; maxNumRouters, otherwise not
      *  The list is in 3 groups - sorted by routing key within each group.
      *  Group 1: No store or lookup failure in a long time, and
     *            lookup fail rate no more than 1.5 * average

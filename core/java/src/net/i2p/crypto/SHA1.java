@@ -28,8 +28,8 @@ import net.i2p.util.SystemVersion;
  *
  * <p>The FIPS PUB 180-2 standard specifies four secure hash algorithms (SHA-1,
  * SHA-256, SHA-384 and SHA-512) for computing a condensed representation of
- * electronic data (message).  When a message of any length < 2^^64 bits (for
- * SHA-1 and SHA-256) or < 2^^128 bits (for SHA-384 and SHA-512) is input to
+ * electronic data (message).  When a message of any length &lt; 2^^64 bits (for
+ * SHA-1 and SHA-256) or &lt; 2^^128 bits (for SHA-384 and SHA-512) is input to
  * an algorithm, the result is an output called a message digest.  The message
  * digests range in length from 160 to 512 bits, depending on the algorithm.
  * Secure hash algorithms are typically used with other cryptographic
@@ -62,7 +62,7 @@ import net.i2p.util.SystemVersion;
  *      http://www.itl.nist.gov/div897/pubs/fip180-1.htm</a></li>
  *   <li> Bruce Schneier, "Section 18.7 Secure Hash Algorithm (SHA)",
  *      <cite>Applied Cryptography, 2nd edition</cite>, <br>
- *      John Wiley & Sons, 1996</li>
+ *      John Wiley &amp; Sons, 1996</li>
  * </ol>
  */
 public final class SHA1 extends MessageDigest implements Cloneable {

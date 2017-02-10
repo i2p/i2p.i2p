@@ -34,17 +34,17 @@ import net.i2p.util.Log;
  * Therefore the compatibility situation is as follows:
  *
  * Compatibility:
- *    old streaming -> new streaming: sends proto anything, rcvs proto anything
- *    new streaming -> old streaming: sends PROTO_STREAMING, ignores rcvd proto
- *    old datagram -> new datagram: sends proto anything, rcvs proto anything
- *    new datagram -> old datagram: sends PROTO_DATAGRAM, ignores rcvd proto
+ *    old streaming -&gt; new streaming: sends proto anything, rcvs proto anything
+ *    new streaming -&gt; old streaming: sends PROTO_STREAMING, ignores rcvd proto
+ *    old datagram -&gt; new datagram: sends proto anything, rcvs proto anything
+ *    new datagram -&gt; old datagram: sends PROTO_DATAGRAM, ignores rcvd proto
  *    In all the above cases, streaming and datagram receive traffic for the other
  *    protocol, same as before.
  *
- *    old datagram -> new muxed: doesn't work because the old sends proto 0 but the udp side
+ *    old datagram -&gt; new muxed: doesn't work because the old sends proto 0 but the udp side
  *                               of the mux registers with PROTO_DATAGRAM, so the datagrams
  *                               go to the streaming side, same as before.
- *    old streaming -> new muxed: works
+ *    old streaming -&gt; new muxed: works
  *
  * Typical Usage:
  *    Streaming + datagrams:
@@ -421,7 +421,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 {
     /**
      *  No, we couldn't put any protocol byte in front of everything and
      *  keep backward compatibility. But there are several bytes that
-     *  are unused AND unchecked in the gzip header in releases <= 0.7.
+     *  are unused AND unchecked in the gzip header in releases &lt;= 0.7.
      *  So let's use 5 of them for a protocol and two 2-byte ports.
      *
      *  Following are all the methods to hide the

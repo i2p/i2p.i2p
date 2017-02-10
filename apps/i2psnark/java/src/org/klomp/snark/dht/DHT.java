@@ -42,7 +42,7 @@ public interface DHT {
      *
      *  @param ih the Info Hash (torrent)
      *  @param max maximum number of peers to return
-     *  @param maxWait the maximum time to wait (ms) must be > 0
+     *  @param maxWait the maximum time to wait (ms) must be &gt; 0
      *  @param annMax the number of peers to announce to
      *  @param annMaxWait the maximum total time to wait for announces, may be 0 to return immediately without waiting for acks
      *  @param isSeed true if seed, false if leech
@@ -81,7 +81,7 @@ public interface DHT {
 
     /**
      *  Announce to the closest DHT peers.
-     *  Blocking unless maxWait <= 0
+     *  Blocking unless maxWait &lt;= 0
      *  Caller should run in a thread.
      *  This also automatically announces ourself to our local tracker.
      *  For best results do a getPeers() first so we have tokens.

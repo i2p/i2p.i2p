@@ -14,10 +14,10 @@ import net.i2p.i2ptunnel.udp.*;
  * ports, it happens outside of here.
  *
  * TX:
- *   UDPSource -> SOCKSUDPUnwrapper -> ReplyTracker ( -> I2PSink in SOCKSUDPTunnel)
+ *   UDPSource -&gt; SOCKSUDPUnwrapper -&gt; ReplyTracker ( -&gt; I2PSink in SOCKSUDPTunnel)
  *
  * RX:
- *   UDPSink <- SOCKSUDPWrapper ( <- MultiSink <- I2PSource in SOCKSUDPTunnel)
+ *   UDPSink &lt;- SOCKSUDPWrapper ( &lt;- MultiSink &lt;- I2PSource in SOCKSUDPTunnel)
  *
  * The Unwrapper passes headers to the Wrapper through a cache.
  * The ReplyTracker passes sinks to MultiSink through a cache.

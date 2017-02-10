@@ -77,7 +77,7 @@ class NodeInfo extends SimpleDataStructure {
      * @param compactInfo 20 byte node ID, 32 byte destHash, 2 byte port
      * @param offset starting at this offset in compactInfo
      * @throws IllegalArgumentException
-     * @throws AIOOBE
+     * @throws ArrayIndexOutOfBoundsException
      */
     public NodeInfo(byte[] compactInfo, int offset) {
         super();

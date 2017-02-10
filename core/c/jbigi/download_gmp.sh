@@ -1,7 +1,7 @@
 #!/bin/sh
 
-export GMP_VER=6.0.0
-export GMP_TARVER=${GMP_VER}a
+export GMP_VER=6.1.2
+export GMP_TARVER=${GMP_VER}
 export GMP_DIR="gmp-$GMP_VER"
 export GMP_TAR="gmp-$GMP_TARVER.tar.bz2"
 

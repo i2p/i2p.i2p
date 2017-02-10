@@ -7,17 +7,20 @@ import net.i2p.util.Log;
  * <p>Scheduler used for locally created connections where we have not yet
  * sent the initial SYN packet.</p>
  *
- * <h2>Entry conditions:</h2><ul>
+ * <h2>Entry conditions:</h2>
+ * <ul>
  * <li>Locally created</li>
  * <li>No packets sent or received</li>
  * </ul>
  *
- * <h2>Events:</h2><ul>
+ * <h2>Events:</h2>
+ * <ul>
  * <li>Message flush (explicitly, through a full buffer, or stream closure)</li>
  * <li>Initial delay timeout (causing implicit flush of any data available)</li>
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>{@link SchedulerConnecting connecting} - after sending a packet</li>
  * </ul>
  */

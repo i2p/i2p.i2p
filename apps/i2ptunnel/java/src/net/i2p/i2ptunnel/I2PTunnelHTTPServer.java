@@ -387,19 +387,29 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return;
             }
 
-            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_REFERER)) &&
-                headers.containsKey("Referer")) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Refusing access from: " +
-                              Base32.encode(peerHash.getData()) + ".b32.i2p" +
-                              " with Referer: " + headers.get("Referer").get(0));
-                try {
-                    socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
-                } catch (IOException ioe) {}
-                try {
-                    socket.close();
-                } catch (IOException ioe) {}
-                return;
+            if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_REFERER))) {
+                // reject absolute URIs only
+                List<String> h = headers.get("Referer");
+                if (h != null) {
+                    String referer = h.get(0);
+                    if (referer.length() > 9) {
+                        // "Referer: "
+                        referer = referer.substring(9);
+                        if (referer.startsWith("http://") || referer.startsWith("https://")) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Refusing access from: " +
+                                          Base32.encode(peerHash.getData()) + ".b32.i2p" +
+                                          " with Referer: " + referer);
+                            try {
+                                socket.getOutputStream().write(ERR_INPROXY.getBytes("UTF-8"));
+                            } catch (IOException ioe) {}
+                            try {
+                                socket.close();
+                            } catch (IOException ioe) {}
+                            return;
+                        }
+                    }
+                }
             }
 
             if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_USER_AGENTS)) &&

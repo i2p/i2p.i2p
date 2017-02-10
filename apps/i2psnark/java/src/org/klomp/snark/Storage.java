@@ -436,7 +436,7 @@ public class Storage implements Closeable
    *  Must call Snark.updatePiecePriorities()
    *  (which calls getPiecePriorities()) after calling this.
    *  @param fileIndex as obtained from indexOf
-   *  @param pri default 0; <0 to disable
+   *  @param pri default 0; &lt;0 to disable
    *  @since 0.8.1
    */
   public void setPriority(int fileIndex, int pri) {
@@ -695,7 +695,7 @@ public class Storage implements Closeable
    * Doesn't really reopen the file descriptors for a restart.
    * Just does an existence check but no length check or data reverification
    *
-   * @throws IOE on fail
+   * @throws IOException on fail
    */
   public void reopen() throws IOException
   {
@@ -1111,7 +1111,7 @@ public class Storage implements Closeable
    *
    * @return true if the piece was correct (sha metainfo hash
    * matches), otherwise false.
-   * @exception IOException when some storage related error occurs.
+   * @throws IOException when some storage related error occurs.
    */
   public boolean putPiece(PartialPiece pp) throws IOException
   {

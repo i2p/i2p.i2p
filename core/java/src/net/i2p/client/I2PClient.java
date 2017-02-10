@@ -47,7 +47,7 @@ public interface I2PClient {
     public static final SigType DEFAULT_SIGTYPE = SigType.DSA_SHA1;
 
     /**
-     * For router->client payloads.
+     * For router-&gt;client payloads.
      *
      * If false, the router will send the MessageStatus,
      * the client must respond with a ReceiveMessageBegin,

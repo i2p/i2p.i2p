@@ -417,11 +417,10 @@ class ClientManager {
         public String getName() { return "Distribute local message"; }
 
         public void runJob() {
-            _to.receiveMessage(_toDest, _fromDest, _payload);
-            // note that receiveMessage() does not indicate a failure,
-            // so a queue overflow is not recognized. we always return success.
+            boolean ok = _to.receiveMessage(_toDest, _fromDest, _payload);
             if (_from != null) {
-                _from.updateMessageDeliveryStatus(_fromDest, _msgId, _messageNonce, MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL);
+                int rc = ok ? MessageStatusMessage.STATUS_SEND_SUCCESS_LOCAL : MessageStatusMessage.STATUS_SEND_FAILURE_LOCAL;
+                _from.updateMessageDeliveryStatus(_fromDest, _msgId, _messageNonce, rc);
             }
         }
     }

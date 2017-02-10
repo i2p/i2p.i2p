@@ -89,7 +89,7 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
         try {
             for (int i = 0; i < 2; i++)
                 test();
-            for (int i = 500; i < 64*1024; i++) {
+            for (int i = 0; i < 64*1024; i++) {
                 if (!test(i)) break;
             }
         } catch (Exception e) { e.printStackTrace(); }
@@ -106,7 +106,7 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
             byte compressed[] = o.getData();
             ReusableGZIPOutputStream.release(o);
             
-            GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(compressed));
+            ResettableGZIPInputStream in = new ResettableGZIPInputStream(new java.io.ByteArrayInputStream(compressed));
             byte rv[] = new byte[128];
             int read = in.read(rv);
             if (!DataHelper.eq(rv, 0, b, 0, b.length))
@@ -118,7 +118,7 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     
     private static boolean test(int size) {
         byte b[] = new byte[size];
-        new java.util.Random().nextBytes(b);
+        RandomSource.getInstance().nextBytes(b);
         try {
             ReusableGZIPOutputStream o = ReusableGZIPOutputStream.acquire();
             o.write(b);
@@ -127,8 +127,8 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
             byte compressed[] = o.getData();
             ReusableGZIPOutputStream.release(o);
             
-            GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(compressed));
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream(256*1024);
+            ResettableGZIPInputStream in = new ResettableGZIPInputStream(new java.io.ByteArrayInputStream(compressed));
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream(size);
             byte rbuf[] = new byte[128];
             while (true) {
                 int read = in.read(rbuf);

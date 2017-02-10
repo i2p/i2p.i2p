@@ -79,6 +79,7 @@ class StoreState {
     }
 ****/
 
+    /** getFailed */
     public Set<Hash> getFailed() { 
         synchronized (_failedPeers) {
             return new HashSet<Hash>(_failedPeers); 

@@ -6,17 +6,20 @@ import net.i2p.I2PAppContext;
  * <p>Scheduler used for after the final timeout has passed or the
  * connection was reset.</p>
  *
- * <h2>Entry conditions:</h2><ul>
+ * <h2>Entry conditions:</h2>
+ * <ul>
  * <li>Both sides have closed and ACKed and the timeout has passed. <br>
  *     <b>or</b></li>
  * <li>A RESET was received</li>
  * </ul>
  *
- * <h2>Events:</h2><ul>
+ * <h2>Events:</h2>
+ * <ul>
  * <li>None</li>
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>None</li>
  * </ul>
  *

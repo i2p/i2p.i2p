@@ -271,6 +271,7 @@ public class SSLEepGet extends EepGet {
             X509TrustManager defaultTrustManager = (X509TrustManager)tmf.getTrustManagers()[0];
             _stm = new SavingTrustManager(defaultTrustManager);
             sslc.init(null, new TrustManager[] {_stm}, null);
+        /****
             if (_log.shouldLog(Log.DEBUG)) {
                 SSLEngine eng = sslc.createSSLEngine();
                 SSLParameters params = sslc.getDefaultSSLParameters();
@@ -315,9 +316,14 @@ public class SSLEepGet extends EepGet {
                      _log.debug(s[i]);
                 }
             }
+          ****/
             return sslc;
         } catch (GeneralSecurityException gse) {
             _log.error("Key Store update error", gse);
+        } catch (ExceptionInInitializerError eiie) {
+            // java 9 b134 see ../crypto/CryptoCheck for example
+            // Catching this may be pointless, fetch still fails
+            _log.error("SSL context error - Java 9 bug?", eiie);
         }
         return null;
     }

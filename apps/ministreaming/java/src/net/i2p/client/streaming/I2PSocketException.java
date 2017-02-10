@@ -32,7 +32,7 @@ public class I2PSocketException extends SocketException {
      *  Standard codes from client-side I2CP are 256-511, defined in SendMessageStatusListener.
      *  Standard codes from streaming are 512-767, defined here.
      *
-     *  @param status >= 0 from MessageStatusMessage or SendMessageStatusListener
+     *  @param status &gt;= 0 from MessageStatusMessage or SendMessageStatusListener
      */
     public I2PSocketException(int status) {
         super();

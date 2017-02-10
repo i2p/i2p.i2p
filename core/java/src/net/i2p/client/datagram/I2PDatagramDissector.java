@@ -31,6 +31,7 @@ import net.i2p.util.Log;
 public final class I2PDatagramDissector {
 
     private static final int DGRAM_BUFSIZE = 32768;
+    private static final int MIN_DGRAM_SIZE = 387 + 40;
 
     private final DSAEngine dsaEng = DSAEngine.getInstance();
     private final SHA256Generator hashGen = SHA256Generator.getInstance();
@@ -68,9 +69,12 @@ public final class I2PDatagramDissector {
      * @throws DataFormatException If there's an error in the datagram format
      */
     public void loadI2PDatagram(byte[] dgram) throws DataFormatException {
-        ByteArrayInputStream dgStream = new ByteArrayInputStream(dgram);
         // set invalid(very important!)
         this.valid = false;
+        if (dgram.length < MIN_DGRAM_SIZE)
+            throw new DataFormatException("repliable datagram too small: " + dgram.length);
+
+        ByteArrayInputStream dgStream = new ByteArrayInputStream(dgram);
         
         try {
             // read destination
@@ -96,8 +100,9 @@ public final class I2PDatagramDissector {
                 rxHash = null;
             }
         } catch (IOException e) {
-            Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramDissector.class);
-            log.error("Error loading datagram", e);
+            // let the application do the logging
+            //Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramDissector.class);
+            //log.error("Error loading datagram", e);
             throw new DataFormatException("Error loading datagram", e);
         //} catch(AssertionError e) {
         //    Log log = I2PAppContext.getGlobalContext().logManager().getLog(I2PDatagramDissector.class);

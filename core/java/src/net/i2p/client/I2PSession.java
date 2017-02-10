@@ -73,7 +73,7 @@ public interface I2PSession {
      * End-to-End Crypto is disabled, tags and keys are ignored!
      * 
      * Like sendMessage above, except the key used and the tags sent are exposed to the 
-     * application.  <p /> 
+     * application.  <p> 
      * 
      * If some application layer message delivery confirmation is used,
      * rather than i2p's (slow) built in confirmation via guaranteed delivery mode, the 
@@ -331,7 +331,7 @@ public interface I2PSession {
      *  Suggested implementation:
      *
      *<pre>
-     *  if (name.length() == 60 && name.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
+     *  if (name.length() == 60 &amp;&amp; name.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
      *      if (session != null)
      *          return session.lookup(Hash.create(Base32.decode(name.toLowerCase(Locale.US).substring(0, 52))));
      *      else

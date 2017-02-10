@@ -6,18 +6,21 @@ import net.i2p.I2PAppContext;
  * <p>Scheduler used after we've locally done a hard disconnect, 
  * but the final timeout hasn't passed.</p>
  *
- * <h2>Entry conditions:</h2><ul>
+ * <h2>Entry conditions:</h2>
+ * <ul>
  * <li>Locally disconnected hard.</li>
  * <li>Less than the final timeout period has passed since the last ACK.</li>
  * </ul>
  *
- * <h2>Events:</h2><ul>
+ * <h2>Events:</h2>
+ * <ul>
  * <li>Packets received</li>
  * <li>RESET received</li>
  * <li>Message sending fails (error talking to the session)</li>
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>{@link SchedulerDead dead} - after the final timeout passes</li>
  * </ul>
  *

@@ -104,7 +104,7 @@ public interface IRandomStandalone extends Cloneable {
     *
     * @param attributes a set of name-value pairs that describe the desired
     * future instance behaviour.
-    * @exception IllegalArgumentException if at least one of the defined name/
+    * @throws IllegalArgumentException if at least one of the defined name/
     * value pairs contains invalid data.
     */
    void init(Map<String, byte[]> attributes);
@@ -113,8 +113,8 @@ public interface IRandomStandalone extends Cloneable {
      * <p>Returns the next 8 bits of random data generated from this instance.</p>
      * 
      * @return the next 8 bits of random data generated from this instance.
-     * @exception IllegalStateException if the instance is not yet initialised.
-     * @exception LimLimitReachedExceptionStandalone this instance has reached its
+     * @throws IllegalStateException if the instance is not yet initialised.
+     * @throws LimitReachedExceptionStandalone this instance has reached its
      * theoretical limit for generating non-repetitive pseudo-random data.
      */
    byte nextByte() throws IllegalStateException, LimitReachedExceptionStandalone;
@@ -130,8 +130,8 @@ public interface IRandomStandalone extends Cloneable {
      * <code>out.length</code>.
      * @param length the maximum number of required random bytes. This method
      * does nothing if this parameter is less than <code>1</code>.
-     * @exception IllegalStateException if the instance is not yet initialised.
-     * @exception LimitLimitReachedExceptionStandalonehis instance has reached its
+     * @throws IllegalStateException if the instance is not yet initialised.
+     * @throws LimitReachedExceptionStandalone this instance has reached its
      * theoretical limit for generating non-repetitive pseudo-random data.
      */
    void nextBytes(byte[] out, int offset, int length)
@@ -172,7 +172,7 @@ public interface IRandomStandalone extends Cloneable {
     * @param in The buffer of new random bytes to add.
     * @param offset The offset from whence to begin reading random bytes.
     * @param length The number of random bytes to add.
-    * @exception IndexOutOfBoundsException If <i>offset</i>, <i>length</i>,
+    * @throws IndexOutOfBoundsException If <i>offset</i>, <i>length</i>,
     * or <i>offset</i>+<i>length</i> is out of bounds.
     */
    void addRandomBytes(byte[] in, int offset, int length);

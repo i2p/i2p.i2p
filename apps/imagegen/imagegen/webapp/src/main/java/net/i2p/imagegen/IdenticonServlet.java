@@ -25,13 +25,13 @@ import net.i2p.util.ConvertToHash;
  * This servlet generates <i>identicon</i> (visual identifier) images ranging
  * from 16x16 to 512x512 in size.
  * 
- * <h5>Supported Image Formats</h5>
+ * <h3>Supported Image Formats</h3>
  * <p>
  * Currently only PNG is supported because <code>javax.imageio</code> package
  * does not come with built-in GIF encoder and PNG is the only remaining
  * reasonable format.
  * </p>
- * <h5>Initialization Parameters:</h5>
+ * <h3>Initialization Parameters:</h3>
  * <blockquote>
  * <dl>
  * <dt>inetSalt</dt>
@@ -42,7 +42,7 @@ import net.i2p.util.ConvertToHash;
  * (Optional)</dd>
  * </dl>
  * </blockquote>
- * <h5>Request ParametersP</h5>
+ * <h3>Request ParametersP</h3>
  * <blockquote>
  * <dl>
  * <dt>code</dt>

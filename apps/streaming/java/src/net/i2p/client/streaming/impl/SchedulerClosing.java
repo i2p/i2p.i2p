@@ -8,12 +8,14 @@ import net.i2p.util.Log;
  * have closed the stream, but either we haven't ACKed their close or
  * they haven't ACKed ours.</p>
  *
- * <h2>Entry conditions:</h2><ul>
+ * <h2>Entry conditions:</h2>
+ * <ul>
  * <li>Both sides have closed.</li>
  * <li>At least one direction has not ACKed the close.</li>
  * </ul>
  *
- * <h2>Events:</h2><ul>
+ * <h2>Events:</h2>
+ * <ul>
  * <li>Packets received (which may or may not ACK the ones sent)</li>
  * <li>RESET received</li>
  * <li>Message sending fails (error talking to the session)</li>
@@ -21,6 +23,7 @@ import net.i2p.util.Log;
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>{@link SchedulerClosed closed} - after both sending and receiving ACKs on the CLOSE</li>
  * <li>{@link SchedulerDead dead} - after sending or receiving a RESET</li>
  * </ul>

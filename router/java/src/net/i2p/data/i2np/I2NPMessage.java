@@ -38,8 +38,8 @@ public interface I2NPMessage extends DataStructure {
      * Unused - All transports provide encapsulation and so we have byte arrays available.
      *
      * @param in stream to read from
-     *           starting at type if type is < 0 (16 byte header)
-     *           starting at ID if type is >= 0 (15 byte header)
+     *           starting at type if type is &lt; 0 (16 byte header)
+     *           starting at ID if type is &gt;= 0 (15 byte header)
      * @param type I2NP message type. If less than zero, read the type from data
      * @param buffer scratch buffer to be used when reading and parsing
      * @return size of the message read (including headers)
@@ -58,11 +58,10 @@ public interface I2NPMessage extends DataStructure {
      * @param data the data
      * @param type I2NP message type. If less than zero, read the type from data
      * @param offset where to start
-     *           starting at type if type is < 0 (16 byte header)
-     *           starting at ID if type is >= 0 (15 byte header)
+     *           starting at type if type is &lt; 0 (16 byte header)
+     *           starting at ID if type is &gt;= 0 (15 byte header)
      * @return size of the message read (including headers)
      * @throws I2NPMessageException if there is no valid message
-     * @throws IOException if there is a problem reading from the stream
      */
     public int readBytes(byte data[], int type, int offset) throws I2NPMessageException;
 
@@ -73,13 +72,12 @@ public interface I2NPMessage extends DataStructure {
      * @param data the data, may or may not include the type
      * @param type I2NP message type. If less than zero, read the type from data
      * @param offset where to start
-     *           starting at type if type is < 0 (16 byte header)
-     *           starting at ID if type is >= 0 (15 byte header)
+     *           starting at type if type is &lt; 0 (16 byte header)
+     *           starting at ID if type is &gt;= 0 (15 byte header)
      * @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
-     *               This includes the type byte only if type < 0
+     *               This includes the type byte only if type &lt; 0
      * @return size of the message read (including headers)
      * @throws I2NPMessageException if there is no valid message
-     * @throws IOException if there is a problem reading from the stream
      * @since 0.8.12
      */
     public int readBytes(byte data[], int type, int offset, int maxLen) throws I2NPMessageException;
@@ -95,7 +93,6 @@ public interface I2NPMessage extends DataStructure {
      * @param type I2NP message type
      * @throws I2NPMessageException if the stream doesn't contain a valid message
      *          that this class can read.
-     * @throws IOException if there is a problem reading from the stream
      */
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException;
     public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException;

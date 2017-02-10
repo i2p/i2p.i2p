@@ -34,7 +34,7 @@ class CloveSet {
     
     public int getCloveCount() { return _cloves.length; }
 
-    /** @throws AIOOBE */
+    /** @throws ArrayIndexOutOfBoundsException */
     public GarlicClove getClove(int index) { return _cloves[index]; }
     
     public Certificate getCertificate() { return _cert; }

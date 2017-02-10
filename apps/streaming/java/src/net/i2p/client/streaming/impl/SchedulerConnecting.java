@@ -7,11 +7,13 @@ import net.i2p.util.Log;
  * <p>Scheduler used once we've sent our SYN but it hasn't been ACKed yet.
  * This connection may or may not be locally created.</p>
  *
- * <h2>Entry conditions:</h2><ul>
+ * <h2>Entry conditions:</h2>
+ * <ul>
  * <li>Packets sent but none ACKed</li>
  * </ul>
  *
- * <h2>Events:</h2><ul>
+ * <h2>Events:</h2>
+ * <ul>
  * <li>Packets received (which may or may not ACK the ones sent)</li>
  * <li>Message flush (explicitly, through a full buffer, or stream closure)</li>
  * <li>Connection establishment timeout</li>
@@ -19,6 +21,7 @@ import net.i2p.util.Log;
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>{@link SchedulerConnectedBulk connected} - after receiving an ACK</li>
  * <li>{@link SchedulerClosing closing} - after both sending and receiving a CLOSE</li>
  * <li>{@link SchedulerClosed closed} - after both sending and receiving ACKs on the CLOSE</li>

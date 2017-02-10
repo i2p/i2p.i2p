@@ -57,7 +57,7 @@ class URIUtil
         
     /** Encode a URI path.
      *
-     *  Somewhat oddly, this encodes all chars >= 0x80 if buf is null, (strict RFC 2396)
+     *  Somewhat oddly, this encodes all chars &gt;= 0x80 if buf is null, (strict RFC 2396)
      *  but only the control, space, and special chars if buf is non-null.
      *
      * @param path The path the encode

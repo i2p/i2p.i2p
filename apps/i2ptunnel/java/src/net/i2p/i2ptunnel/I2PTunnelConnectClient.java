@@ -14,6 +14,9 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.app.ClientApp;
+import net.i2p.app.ClientAppManager;
+import net.i2p.app.Outproxy;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base64;
@@ -34,7 +37,7 @@ import net.i2p.util.PortMapper;
  *      example.com (sent to one of the configured proxies)
  *   )
  *
- *   (port and protocol are ignored for i2p destinations)
+ *   (protocol is ignored for i2p destinations)
  *   CONNECT host
  *   CONNECT host protocol
  *   CONNECT host:port
@@ -49,7 +52,7 @@ import net.i2p.util.PortMapper;
  *<pre>
  *  INTERNET-DRAFT                                              Ari Luotonen
  *  Expires: September 26, 1997          Netscape Communications Corporation
- *  <draft-luotonen-ssl-tunneling-03.txt>                     March 26, 1997
+ *  draft-luotonen-ssl-tunneling-03.txt                       March 26, 1997
  *                     Tunneling SSL Through a WWW Proxy
  *</pre>
  *
@@ -147,6 +150,9 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         String targetRequest = null;
         boolean usingWWWProxy = false;
         String currentProxy = null;
+        // local outproxy plugin
+        boolean usingInternalOutproxy = false;
+        Outproxy outproxy = null;
         long requestId = __requestId.incrementAndGet();
         try {
             out = s.getOutputStream();
@@ -154,6 +160,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             String line, method = null, host = null, destination = null, restofline = null;
             StringBuilder newRequest = new StringBuilder();
             String authorization = null;
+            int remotePort = 443;
             while (true) {
                 // Use this rather than BufferedReader because we can't have readahead,
                 // since we are passing the stream on to I2PTunnelRunner
@@ -172,8 +179,20 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     String request = line.substring(pos + 1);
 
                     pos = request.indexOf(':');
-                    if (pos == -1)
+                    if (pos == -1) {
                        pos = request.indexOf(' ');
+                    } else {
+                       int spos = request.indexOf(' ');
+                       if (spos > 0) {
+                           try {
+                               remotePort = Integer.parseInt(request.substring(pos + 1, spos));
+                           } catch (NumberFormatException nfe) {
+                               break;
+                           } catch (IndexOutOfBoundsException ioobe) {
+                               break;
+                           }
+                       }
+                    }
                     if (pos == -1) {
                         host = request;
                         restofline = "";
@@ -185,19 +204,36 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     if (host.toLowerCase(Locale.US).endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
-                    } else if (host.indexOf('.') != -1) {
-                        // The request must be forwarded to a outproxy
-                        currentProxy = selectProxy();
-                        if (currentProxy == null) {
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
-                            writeErrorMessage(ERR_NO_OUTPROXY, out);
-                            s.close();
-                            return;
+                    } else if (host.contains(".") || host.startsWith("[")) {
+                        if (Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USE_OUTPROXY_PLUGIN, "true"))) {
+                            ClientAppManager mgr = _context.clientAppManager();
+                            if (mgr != null) {
+                                ClientApp op = mgr.getRegisteredApp(Outproxy.NAME);
+                                if (op != null) {
+                                    outproxy = (Outproxy) op;
+                                    usingInternalOutproxy = true;
+                                    if (host.startsWith("[")) {
+                                        host = host.substring(1);
+                                        if (host.endsWith("]"))
+                                            host = host.substring(0, host.length() - 1);
+                                    }
+                                }
+                            }
                         }
-                        destination = currentProxy;
-                        usingWWWProxy = true;
-                        newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n"); // HTTP spec
+                        if (!usingInternalOutproxy) {
+                            // The request must be forwarded to a outproxy
+                            currentProxy = selectProxy();
+                            if (currentProxy == null) {
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn(getPrefix(requestId) + "Host wants to be outproxied, but we dont have any!");
+                                writeErrorMessage(ERR_NO_OUTPROXY, out);
+                                s.close();
+                                return;
+                            }
+                            destination = currentProxy;
+                            usingWWWProxy = true;
+                            newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n"); // HTTP spec
+                         }
                     } else if (host.toLowerCase(Locale.US).equals("localhost")) {
                         writeErrorMessage(ERR_LOCALHOST, out);
                         s.close();
@@ -208,10 +244,12 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                     targetRequest = host;
 
                     if (_log.shouldLog(Log.DEBUG)) {
-                        _log.debug(getPrefix(requestId) + "METHOD:" + method + ":");
-                        _log.debug(getPrefix(requestId) + "HOST  :" + host + ":");
-                        _log.debug(getPrefix(requestId) + "REST  :" + restofline + ":");
-                        _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
+                        _log.debug(getPrefix(requestId) + "METHOD:" + method + ":\n" +
+                                   "HOST  :" + host + ":\n" +
+                                   "PORT  :" + remotePort + ":\n" +
+                                   "REST  :" + restofline + ":\n" +
+                                   "DEST  :" + destination + ":\n" +
+                                   "www proxy? " + usingWWWProxy + " internal proxy? " + usingInternalOutproxy);
                     }
                 } else if (line.toLowerCase(Locale.US).startsWith("proxy-authorization: ")) {
                     // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
@@ -250,7 +288,24 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 }
             }
 
-            if (destination == null || method == null || !"CONNECT".equals(method.toUpperCase(Locale.US))) {
+            if (method == null || !"CONNECT".equals(method.toUpperCase(Locale.US))) {
+                writeErrorMessage(ERR_BAD_PROTOCOL, out);
+                s.close();
+                return;
+            }
+            
+            // no destination, going to outproxy plugin
+            if (usingInternalOutproxy) {
+                Socket outSocket = outproxy.connect(host, remotePort);
+                OnTimeout onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
+                byte[] response = SUCCESS_RESPONSE.getBytes("UTF-8");
+                Thread t = new I2PTunnelOutproxyRunner(s, outSocket, sockLock, null, response, onTimeout);
+                // we are called from an unlimited thread pool, so run inline
+                t.run();
+                return;
+            }
+
+            if (destination == null) {
                 writeErrorMessage(ERR_BAD_PROTOCOL, out);
                 s.close();
                 return;
@@ -282,7 +337,10 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 return;
             }
 
-            I2PSocket i2ps = createI2PSocket(clientDest, getDefaultOptions());
+            I2PSocketOptions sktOpts = getDefaultOptions();
+            if (!usingWWWProxy && remotePort > 0)
+                sktOpts.setPort(remotePort);
+            I2PSocket i2ps = createI2PSocket(clientDest, sktOpts);
             byte[] data = null;
             byte[] response = null;
             if (usingWWWProxy)

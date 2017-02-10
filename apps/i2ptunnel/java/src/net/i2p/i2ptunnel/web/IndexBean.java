@@ -499,7 +499,7 @@ public class IndexBean {
         if (tun != null) {
             if (TunnelController.TYPE_HTTP_CLIENT.equals(tun.getType())) {
                 Properties opts = tun.getClientOptionProps();
-                if (Boolean.parseBoolean(opts.getProperty(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, "true"))) {
+                if (Boolean.parseBoolean(opts.getProperty(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN, "true"))) {
                     ClientAppManager mgr = _context.clientAppManager();
                     if (mgr != null)
                         return mgr.getRegisteredApp(Outproxy.NAME) != null;

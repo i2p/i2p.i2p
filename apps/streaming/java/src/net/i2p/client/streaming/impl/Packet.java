@@ -164,6 +164,8 @@ class Packet {
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     protected static final int MAX_DELAY_REQUEST = 65535;
+    public static final int MIN_DELAY_CHOKE = 60001;
+    public static final int SEND_DELAY_CHOKE = 61000;
 
     /**
      *  Does no initialization.
@@ -232,7 +234,7 @@ class Packet {
     }
 
     /** 
-     * @param id if < 0, sets FLAG_NO_ACK
+     * @param id if &lt; 0, sets FLAG_NO_ACK
      */
     public void setAckThrough(long id) { 
         if (id < 0)
@@ -259,7 +261,7 @@ class Packet {
      * Not to be used without sanitizing for huge values.
      * Setters from options did not divide by 1000, and the options default
      * is 1000, so the value sent in the 1-byte field was always
-     * 1000 & 0xff = 0xe8 = 232
+     * 1000 &amp; 0xff = 0xe8 = 232
      *
      * @return Delay before resending a packet in seconds.
      */
@@ -333,6 +335,9 @@ class Packet {
      */
     public Signature getOptionalSignature() { return _optionSignature; }
 
+    /** 
+     * This also sets flag FLAG_SIGNATURE_INCLUDED
+     */
     public void setOptionalSignature(Signature sig) { 
         setFlag(FLAG_SIGNATURE_INCLUDED, sig != null);
         _optionSignature = sig; 
@@ -346,6 +351,7 @@ class Packet {
     /** 
      * This sets the from field in the packet to the Destination for the session
      * provided in the constructor.
+     * This also sets flag FLAG_FROM_INCLUDED
      */
     public void setOptionalFrom() { 
         setFlag(FLAG_FROM_INCLUDED, true);
@@ -360,6 +366,9 @@ class Packet {
      */
     public int getOptionalDelay() { return _optionDelay; }
 
+    /** 
+     * Caller must also call setFlag(FLAG_DELAY_REQUESTED)
+     */
     public void setOptionalDelay(int delayMs) {
         if (delayMs > MAX_DELAY_REQUEST)
             _optionDelay = MAX_DELAY_REQUEST;
@@ -375,6 +384,10 @@ class Packet {
      * @return Maximum payload size sender can receive (MRU)
      */
     public int getOptionalMaxSize() { return _optionMaxSize; }
+
+    /** 
+     * This also sets flag FLAG_MAX_PACKET_SIZE_INCLUDED
+     */
     public void setOptionalMaxSize(int numBytes) { 
         setFlag(FLAG_MAX_PACKET_SIZE_INCLUDED, numBytes > 0);
         _optionMaxSize = numBytes; 

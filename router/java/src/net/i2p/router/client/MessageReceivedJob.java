@@ -48,7 +48,17 @@ class MessageReceivedJob extends JobImpl {
     public String getName() { return "Deliver New Message"; }
 
     public void runJob() {
-        if (_runner.isDead()) return;
+        receiveMessage();
+    }
+
+    /**
+     *  Same as runJob() but with a return value
+     *  @return success
+     *  @since 0.9.29
+     */
+    public boolean receiveMessage() {
+        if (_runner.isDead())
+            return false;
         MessageId id = null;
         try {
             long nextID = _runner.getNextMessageId();
@@ -59,6 +69,7 @@ class MessageReceivedJob extends JobImpl {
                 _runner.setPayload(id, _payload);
                 messageAvailable(id, _payload.getSize());
             }
+            return true;
         } catch (I2CPMessageException ime) {
             String msg = "Error sending data to client " + _runner.getDestHash();
             if (_log.shouldWarn())
@@ -67,6 +78,7 @@ class MessageReceivedJob extends JobImpl {
                 _log.logAlways(Log.WARN, msg);
             if (id != null && !_sendDirect)
                 _runner.removePayload(id);
+            return false;
         }
     }
     

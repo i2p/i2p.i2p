@@ -56,7 +56,7 @@ public class GraphHelper extends FormHandler {
     }
     
     /**
-     *  This must be output in the jsp since <meta> must be in the <head>
+     *  This must be output in the jsp since *lt;meta&gt; must be in the &lt;head&gt;
      *  @since 0.8.7
      */
     public String getRefreshMeta() {

@@ -21,7 +21,7 @@ package com.google.zxing.qrcode.decoder;
  * error correction level.</p>
  *
  * @author Sean Owen
- * @see DataMask
+ * See DataMask
  * @see ErrorCorrectionLevel
  */
 final class FormatInformation {

@@ -3,7 +3,7 @@
  * 
  *  This file is part of susimail project, see http://susi.i2p/
  *  
- *  Copyright (C) 2004-2005  <susi23@mail.i2p>
+ *  Copyright (C) 2004-2005  susi23@mail.i2p
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -204,7 +204,7 @@ class Mail {
 	}
 
 	/**
-	 * Returns the first email address portion, enclosed by <>
+	 * Returns the first email address portion, enclosed by &lt;&gt;
 	 * @param address
 	 */
 	public static String getAddress(String address )

@@ -19,8 +19,8 @@ abstract class ThreadDump {
      *  It waits for the signal to complete (which should be fast)
      *  but does not wait for the dump itself.
      *
-     *  @param secondsToWait if <= 0, don't wait
-     *  @return success, false if windows or no wrapper, true if secondsToWait <= 0,
+     *  @param secondsToWait if &lt;= 0, don't wait
+     *  @return success, false if windows or no wrapper, true if secondsToWait &lt;= 0,
                          false if timed out, dump result otherwise
      */
     public static boolean dump(I2PAppContext context, int secondsToWait) {

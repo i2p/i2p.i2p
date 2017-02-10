@@ -138,7 +138,7 @@ class SSLUtil {
      *  Sets up the SSLContext and sets the socket factory.
      *  No option prefix allowed.
      *
-     * @throws IOException; GeneralSecurityExceptions are wrapped in IOE for convenience
+     * @throws IOException GeneralSecurityExceptions are wrapped in IOE for convenience
      * @return factory, throws on all errors
      */
     public static SSLServerSocketFactory initializeFactory(Properties opts) throws IOException {

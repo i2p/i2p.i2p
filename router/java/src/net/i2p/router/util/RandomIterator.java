@@ -25,7 +25,7 @@ import net.i2p.util.SystemVersion;
  * Here is a sample on how to use the code:
  *
     <pre>
-        for(Iterator<Object> iter = new RandomIterator<Object>(myObjList); iter.hasNext();){
+        for(Iterator&lt;Object&gt; iter = new RandomIterator&lt;Object&gt;(myObjList); iter.hasNext();){
             Object o = iter.next();
             if(someCondition(o) )
                 return o; // iteration stopped early

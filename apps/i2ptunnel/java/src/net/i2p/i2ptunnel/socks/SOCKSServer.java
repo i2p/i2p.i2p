@@ -14,7 +14,7 @@ import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.util.Log;
 
 /**
@@ -89,7 +89,7 @@ abstract class SOCKSServer {
      *  @since 0.9.27
      */
     private boolean shouldUseOutproxyPlugin() {
-        return Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN, "true"));
+        return Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN, "true"));
     }
 
     /**

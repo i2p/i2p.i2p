@@ -26,7 +26,7 @@ public class InternalSocket extends Socket {
 
     /**
      *  client side
-     *  @param port > 0
+     *  @param port &gt; 0
      */
     public InternalSocket(int port) throws IOException {
          if (port <= 0)
@@ -36,7 +36,7 @@ public class InternalSocket extends Socket {
 
     /**
      *  Convenience method to return either a Socket or an InternalSocket
-     *  @param port > 0
+     *  @param port &gt; 0
      */
     public static Socket getSocket(String host, int port) throws IOException {
         if (System.getProperty("router.version") != null &&

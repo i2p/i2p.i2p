@@ -115,7 +115,7 @@ public class Peer implements Comparable<Peer>
    * the connect() method.
    *
    * @param metainfo null if in magnet mode
-   * @exception IOException when an error occurred during the handshake.
+   * @throws IOException when an error occurred during the handshake.
    */
   public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException

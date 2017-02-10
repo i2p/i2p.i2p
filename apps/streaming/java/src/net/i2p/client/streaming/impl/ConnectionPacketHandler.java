@@ -13,7 +13,7 @@ import net.i2p.util.SimpleTimer;
  * Receive a packet for a particular connection - placing the data onto the
  * queue, marking packets as acked, updating various fields, etc.
  *<p>
- * I2PSession -> MessageHandler -> PacketHandler -> ConnectionPacketHandler -> MessageInputStream
+ * I2PSession -&gt; MessageHandler -&gt; PacketHandler -&gt; ConnectionPacketHandler -&gt; MessageInputStream
  *<p>
  * One of these is instantiated per-Destination
  * (i.e. per-ConnectionManager, not per-Connection).
@@ -96,23 +96,27 @@ class ConnectionPacketHandler {
         
         boolean choke = false;
         if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) {
-            if (packet.getOptionalDelay() > 60000) {
+            if (packet.getOptionalDelay() >= Packet.MIN_DELAY_CHOKE) {
                 // requested choke 
                 choke = true;
+                if (_log.shouldWarn())
+                    _log.warn("Got a choke on connection " + con + ": " + packet);
                 //con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
             }
+            // Only call this if the flag is set
+            con.setChoked(choke);
         }
         
         if (!con.getInputStream().canAccept(seqNum, packet.getPayloadSize())) {
             if (_log.shouldWarn())
                 _log.warn("Inbound buffer exceeded on connection " + con +
-                          ", dropping " + packet);
-            con.getOptions().setChoke(61*1000);
+                          ", choking and dropping " + packet);
+            // this will call ackImmediately()
+            con.setChoking(true);
+            // TODO we could still process the acks for this packet before discarding
             packet.releasePayload();
-            con.ackImmediately();
             return;
-        }
-        con.getOptions().setChoke(0);
+        } // else we will call setChoking(false) below
 
         _context.statManager().addRateData("stream.con.receiveMessageSize", packet.getPayloadSize());
         
@@ -132,12 +136,20 @@ class ConnectionPacketHandler {
         // MessageInputStream will know the last sequence number.
         // But not ack-only packets!
         boolean isNew;
-        if (seqNum > 0 || isSYN)
-            isNew = con.getInputStream().messageReceived(seqNum, packet.getPayload());
-        else
+        if (seqNum > 0 || isSYN) {
+            isNew = con.getInputStream().messageReceived(seqNum, packet.getPayload()) &&
+                    !allowAck;
+        } else {
             isNew = false;
-        if (!allowAck)
-            isNew = false;
+        }
+
+        if (isNew && packet.getPayloadSize() > 1500) {
+            // don't clear choking unless it was new, and a big packet
+            // this will call ackImmediately() if changed
+            // TODO if this filled in a hole, we shouldn't unchoke
+            // TODO a bunch of small packets should unchoke also
+            con.setChoking(false);
+        }
         
         //if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
         //    if (_log.shouldLog(Log.DEBUG))
@@ -158,7 +170,6 @@ class ConnectionPacketHandler {
             _log.debug(type + " IB pkt: " + packet + " on " + con);
         }
 
-        boolean fastAck = false;
         boolean ackOnly = false;
         
         if (isNew) {
@@ -170,6 +181,9 @@ class ConnectionPacketHandler {
                     _log.debug("Scheduling immediate ack for " + packet);
                 //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
                 // honor request "almost" immediately
+                // TODO the 250 below _may_ be a big limiter in how fast local "loopback" connections
+                // can go, however if it goes too fast then we start choking which causes
+                // frequent stalls anyway.
                 con.setNextSendTime(_context.clock().now() + 250);
             } else {
                 int delay = con.getOptions().getSendAckDelay();
@@ -222,14 +236,16 @@ class ConnectionPacketHandler {
             }
         }
 
+        boolean fastAck;
         if (isSYN && (packet.getSendStreamId() <= 0) ) {
             // don't honor the ACK 0 in SYN packets received when the other side
             // has obviously not seen our messages
+            fastAck = false;
         } else {
             fastAck = ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew, choke);
         }
         con.eventOccurred();
-        if (fastAck) {
+        if (fastAck && !choke) {
             if (!isNew) {
                 // if we're congested (fastAck) but this is also a new packet, 
                 // we've already scheduled an ack above, so there is no need to schedule 
@@ -266,6 +282,8 @@ class ConnectionPacketHandler {
     
     /**
      * Process the acks in a received packet, and adjust our window and RTT
+     * @param isNew was it a new packet? false for ack-only
+     * @param choke did we get a choke in the packet?
      * @return are we congested?
      */
     private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew, boolean choke) {
@@ -354,16 +372,25 @@ class ConnectionPacketHandler {
         return rv;
     }
     
-    /** @return are we congested? */
+    /**
+     * This either does nothing or increases the window, it never decreases it.
+     * Decreasing is done in Connection.ResendPacketEvent.retransmit()
+     *
+     * @param isNew was it a new packet? false for ack-only
+     * @param sequenceNum 0 for ack-only
+     * @param choke did we get a choke in the packet?
+     * @return are we congested?
+     */
     private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked, boolean choke) {
-        boolean congested = false;
-        if ( (!isNew) && (sequenceNum > 0) ) {
+        boolean congested;
+        if (choke || (!isNew && sequenceNum > 0) || con.isChoked()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Congestion occurred on the sending side. Not adjusting window "+con);
-
             congested = true;
-        } 
-        
+        } else {
+            congested = false;
+        }
+
         long lowest = con.getHighestAckedThrough();
         // RFC 2581
         // Why wait until we get a whole cwin to start updating the window?

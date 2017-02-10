@@ -124,7 +124,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
 
     /** class that generates new messages */
     protected final I2CPMessageProducer _producer;
-    /** map of Long --> MessagePayloadMessage */
+    /** map of Long --&gt; MessagePayloadMessage */
     protected Map<Long, MessagePayloadMessage> _availableMessages;
 
     /** hashes of lookups we are waiting for */

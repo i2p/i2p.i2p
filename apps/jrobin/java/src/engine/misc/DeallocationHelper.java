@@ -330,15 +330,34 @@ public class DeallocationHelper {
                         // drops the "-internal" suffix from the major version number for
                         // an early access build (Ubuntu)
                         javaVersionElements[0] = javaVersionElements[0].substring(0, indexOfEarlyAccessSuffix);
+                    } else {
+                        indexOfEarlyAccessSuffix = javaVersionElements[0].lastIndexOf("-Ubuntu");
+                        if (indexOfEarlyAccessSuffix != -1) {
+                            // drops the "-Ubuntu suffix from the major version number for
+                            // an early access build (Ubuntu)
+                            javaVersionElements[0] = javaVersionElements[0].substring(0, indexOfEarlyAccessSuffix);
+                        }
                     }
                 }
                 final int major, minor;
                 if (javaVersionElements.length >= 2) {
                     major = Integer.parseInt(javaVersionElements[0]);
-                    minor = Integer.parseInt(javaVersionElements[1]);
+                    int min;
+                    try {
+                        min = Integer.parseInt(javaVersionElements[1]);
+                    } catch (NumberFormatException nfe) {
+                        min = 7;
+                    }
+                    minor = min;
                 } else {
                     major = 1;
-                    minor = Integer.parseInt(javaVersionElements[0]);
+                    int min;
+                    try {
+                        min = Integer.parseInt(javaVersionElements[0]);
+                    } catch (NumberFormatException nfe) {
+                        min = 7;
+                    }
+                    minor = min;
                 }
                 final String directBufferAttachmentFieldName;
                 if (minor == 1 && major <= 6)

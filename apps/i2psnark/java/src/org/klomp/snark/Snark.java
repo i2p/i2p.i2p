@@ -212,6 +212,7 @@ public class Snark
 
 ***********/
 
+  /** max connections */
   public static final String PROP_MAX_CONNECTIONS = "i2psnark.maxConnections";
 
   /** most of these used to be public, use accessors below instead */

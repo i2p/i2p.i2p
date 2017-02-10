@@ -223,8 +223,8 @@ public class Action
 	}
 
 	/**
-	 * @deprecated You should use one of the following methods instead:<br />
-	 *  - {@link #setInArgumentValues(ArgumentList)} <br/>
+	 * @deprecated You should use one of the following methods instead:<br>
+	 *  - {@link #setInArgumentValues(ArgumentList)} <br>
 	 *  - {@link #setOutArgumentValues(ArgumentList)} 
 	 */
 	@Deprecated

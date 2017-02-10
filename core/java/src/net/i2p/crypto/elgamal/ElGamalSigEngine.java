@@ -147,7 +147,7 @@ public final class ElGamalSigEngine extends Signature {
     }
 
     /**
-     * @deprecated replaced with <a href="#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+     * @deprecated replaced with <a href="#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">this</a>
      */
     @Override
     protected void engineSetParameter(String param, Object value) {

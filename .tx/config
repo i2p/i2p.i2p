@@ -392,6 +392,17 @@ trans.tr_TR = apps/ministreaming/locale/messages_tr.po
 trans.uk_UA = apps/ministreaming/locale/messages_uk.po
 trans.zh_CN = apps/ministreaming/locale/messages_zh.po
 
+[I2P.manpages]
+type = PO
+source_file = installer/resources/locale-man/man.pot
+source_lang = en
+; after adding languages here, add to debian/*.manpages also
+trans.de = installer/resources/locale-man/man_de.po
+trans.es = installer/resources/locale-man/man_es.po
+trans.fr = installer/resources/locale-man/man_fr.po
+trans.it = installer/resources/locale-man/man_it.po
+trans.zh_CN = installer/resources/locale-man/man_zh.po
+
 [main]
 host = https://www.transifex.com
 

@@ -279,6 +279,7 @@ class FragmentedMessage {
     }
 ****/
     
+    /** toString */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(128);

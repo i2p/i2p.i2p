@@ -54,7 +54,6 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 	 * @param nick nickname of the session
 	 * @throws IOException
 	 * @throws DataFormatException
-	 * @throws I2PSessionException
 	 */
 	public MasterSession(String nick, SAMv3DatagramServer dgServer, SAMv3Handler handler, Properties props) 
 			throws IOException, DataFormatException, SAMException {

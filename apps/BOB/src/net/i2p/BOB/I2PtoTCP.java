@@ -25,7 +25,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 
 /**
- * Process I2P->TCP
+ * Process I2P-&gt;TCP
  *
  * @author sponge
  */

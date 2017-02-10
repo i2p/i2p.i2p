@@ -336,7 +336,7 @@ import java.text.MessageFormat;
   *          break;
   *     }
   * //
-  * for (int i = g.getOptind(); i < argv.length ; i++)
+  * for (int i = g.getOptind(); i &lt; argv.length ; i++)
   *   System.out.println("Non option argv element: " + argv[i] + "\n");
   * </pre>
   * <p>

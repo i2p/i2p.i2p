@@ -559,7 +559,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Run the server pointing at the host and port specified using the private i2p
-     * destination loaded from the specified file. <p />
+     * destination loaded from the specified file. <p>
      *
      * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
@@ -669,7 +669,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     /**
      * Run the HTTP server pointing at the host and port specified using the private i2p
      * destination loaded from the specified file, replacing the HTTP headers
-     * so that the Host: specified is the one spoofed. <p />
+     * so that the Host: specified is the one spoofed. <p>
      *
      * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
@@ -733,7 +733,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      * Run the HTTP server pointing at the host and port specified using the private i2p
      * destination loaded from the specified file, replacing the HTTP headers
      * so that the Host: specified is the one spoofed. Also runs an HTTP proxy for
-     * bidirectional communications on the same tunnel destination.<p />
+     * bidirectional communications on the same tunnel destination.<p>
      *
      * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
@@ -808,7 +808,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Run the server pointing at the host and port specified using the private i2p
-     * destination loaded from the given base64 stream. <p />
+     * destination loaded from the given base64 stream. <p>
      *
      * Deprecated? Why run a server with a private destination?
      * Not available from the war GUI
@@ -1821,12 +1821,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /**
      * Generates a Destination from a name. Now only supports base64
-     * names - may support naming servers later. "file:<filename>" is
+     * names - may support naming servers later. "file:&lt;filename&gt;" is
      * also supported, where filename is a file that either contains a 
      * binary Destination structure or the Base64 encoding of that 
      * structure.
      *
-     * Since file:<filename> isn't really used, this method is deprecated,
+     * Since file:&lt;filename&gt; isn't really used, this method is deprecated,
      * just call context.namingService.lookup() directly.
      * @deprecated Don't use i2ptunnel for lookup! Use I2PAppContext.getGlobalContext().namingService().lookup(name) from i2p.jar
      */

@@ -25,7 +25,7 @@ import net.i2p.util.SystemVersion;
  *  Following is sample usage:
  *  <pre>
 
-    private static final SDSCache<Foo> _cache = new SDSCache(Foo.class, LENGTH, 1024);
+    private static final SDSCache&lt;Foo&gt; _cache = new SDSCache(Foo.class, LENGTH, 1024);
 
     public static Foo create(byte[] data) {
         return _cache.get(data);
@@ -113,7 +113,7 @@ public class SDSCache<V extends SimpleDataStructure> {
      *  @return the cached value if available, otherwise
      *          makes a new object and returns it
      *  @throws IllegalArgumentException if data is not the correct number of bytes
-     *  @throws NPE
+     *  @throws NullPointerException
      */
     public V get(byte[] data) {
         if (data == null)
@@ -155,8 +155,8 @@ public class SDSCache<V extends SimpleDataStructure> {
      *  @param off offset in the array to start reading from
      *  @return the cached value if available, otherwise
      *          makes a new object and returns it
-     *  @throws AIOOBE if not enough bytes
-     *  @throws NPE
+     *  @throws ArrayIndexOutOfBoundsException if not enough bytes
+     *  @throws NullPointerException
      */
     public V get(byte[] b, int off) {
         byte[] data = SimpleByteCache.acquire(_datalen);

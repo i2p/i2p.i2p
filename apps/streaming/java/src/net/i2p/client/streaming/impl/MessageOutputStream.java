@@ -17,7 +17,7 @@ import net.i2p.util.SimpleTimer2;
  * on flush or when the buffer is full.  It also blocks according
  * to the data receiver's needs.
  *<p>
- * MessageOutputStream -> ConnectionDataReceiver -> Connection -> PacketQueue -> I2PSession
+ * MessageOutputStream -&gt; ConnectionDataReceiver -&gt; Connection -&gt; PacketQueue -&gt; I2PSession
  */
 class MessageOutputStream extends OutputStream {
     private final I2PAppContext _context;

@@ -94,7 +94,7 @@ class InboundEstablishState {
 
     /**
      *  @param localPort Must be our external port, otherwise the signature of the
-     &                   SessionCreated message will be bad if the external port != the internal port.
+     *                   SessionCreated message will be bad if the external port != the internal port.
      */
     public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
                                  DHSessionKeyBuilder dh) {

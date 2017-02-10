@@ -43,8 +43,8 @@ class LookupDestJob extends JobImpl {
      *  For hash or b32 name, the dest will be returned if the LS can be found,
      *  even if the dest uses unsupported crypto.
      *
-     *  @param reqID must be >= 0 if name != null
-     *  @param sessID must non-null if reqID >= 0
+     *  @param reqID must be &gt;= 0 if name != null
+     *  @param sessID must non-null if reqID &gt;= 0
      *  @param fromLocalDest use these tunnels for the lookup, or null for exploratory
      *  @since 0.9.11
      */

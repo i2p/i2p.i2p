@@ -1922,6 +1922,7 @@ docommand() {
             ;;
 
         'restart')
+            checkifstartingasroot
             checkUser touchlock "$COMMAND"
             if [ ! -n "$FIXED_COMMAND" ] ; then
                 shift
@@ -1931,6 +1932,7 @@ docommand() {
             ;;
 
         'condrestart')
+            checkifstartingasroot
             checkUser touchlock "$COMMAND"
             if [ ! -n "$FIXED_COMMAND" ] ; then
                 shift

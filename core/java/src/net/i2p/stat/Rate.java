@@ -138,7 +138,7 @@ public class Rate {
 
     /**
      * Create a new rate and load its state from the properties, taking data 
-     * from the data points underneath the given prefix.  <p />
+     * from the data points underneath the given prefix.  <p>
      * (e.g. prefix = "profile.dbIntroduction.60m", this will load the associated data points such
      * as "profile.dbIntroduction.60m.lifetimeEventCount").  The data can be exported
      * through store(outputStream, "profile.dbIntroduction.60m").

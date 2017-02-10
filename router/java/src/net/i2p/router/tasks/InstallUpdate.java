@@ -202,16 +202,17 @@ public class InstallUpdate {
                 if (df.isAbsolute())
                     continue;
                 df = new File(context.getBaseDir(), fl);
-                if (df.exists() && !df.isDirectory()) {
+                if (df.exists() && df.isFile()) {
                     if (df.delete())
                         System.out.println("INFO: File [" + fl + "] deleted");
                 }
             }
-        } catch (IOException ioe) {}
-        finally {
+        } catch (IOException ioe) {
+        } finally {
             if (in != null) try { in.close(); } catch(IOException ioe) {}
-            if (deleteFile.delete())
-                System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
+            if (deleteFile.delete()) {
+                //System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
+            }
         }
     }
 }

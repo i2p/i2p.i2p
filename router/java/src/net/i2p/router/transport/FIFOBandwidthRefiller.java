@@ -51,7 +51,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     // no longer allow unlimited bandwidth - the user must specify a value, else use defaults below (KBps)
     public static final int DEFAULT_INBOUND_BANDWIDTH = 300;
     /**
-     *  Caution, do not make DEFAULT_OUTBOUND_BANDWIDTH * DEFAULT_SHARE_PCT > 32
+     *  Caution, do not make DEFAULT_OUTBOUND_BANDWIDTH * DEFAULT_SHARE_PCT &gt; 32
      *  without thinking about the implications (default connection limits, for example)
      *  of moving the default bandwidth class from L to M, or maybe
      *  adjusting bandwidth class boundaries.

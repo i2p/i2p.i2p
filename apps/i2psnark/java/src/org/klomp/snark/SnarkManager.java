@@ -42,6 +42,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
@@ -302,6 +303,8 @@ public class SnarkManager implements CompleteListener {
      *  Runs inline.
      */
     public void stop() {
+        if (_log.shouldWarn())
+            _log.warn("Snark stop() begin", new Exception("I did it"));
         if (_umgr != null && _uhandler != null) {
             //_uhandler.shutdown();
             _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
@@ -312,6 +315,8 @@ public class SnarkManager implements CompleteListener {
         _connectionAcceptor.halt();
         _idleChecker.cancel();
         stopAllTorrents(true);
+        if (_log.shouldWarn())
+            _log.warn("Snark stop() end");
     }
     
     /** @since 0.9.1 */
@@ -324,7 +329,7 @@ public class SnarkManager implements CompleteListener {
 
     /**
      *  Use if it does not include a link.
-     *  Escapes '<' and '>' before queueing
+     *  Escapes '&lt;' and '&gt;' before queueing
      */
     public void addMessage(String message) {
         addMessageNoEscape(message.replace("<", "&lt;").replace(">", "&gt;"));
@@ -332,7 +337,7 @@ public class SnarkManager implements CompleteListener {
 
     /**
      * Use if it includes a link.
-     * Does not escape '<' and '>' before queueing
+     * Does not escape '&lt;' and '&gt;' before queueing
      * @since 0.9.14.1
      */
     public void addMessageNoEscape(String message) {
@@ -2558,7 +2563,7 @@ public class SnarkManager implements CompleteListener {
     /**
      * Stop all running torrents, and close the tunnel after a delay
      * to allow for announces.
-     * If called at router shutdown via Jetty shutdown hook -> webapp destroy() -> stop(),
+     * If called at router shutdown via Jetty shutdown hook -&gt; webapp destroy() -&gt; stop(),
      * the tunnel won't actually be closed as the SimpleTimer2 is already shutdown
      * or will be soon, so we delay a few seconds inline.
      * @param finalShutdown if true, sleep at the end if any torrents were running
@@ -2580,7 +2585,9 @@ public class SnarkManager implements CompleteListener {
                     stopTorrent(snark, false);
                 // Throttle since every unannounce is now threaded.
                 // How to do this without creating a ton of threads?
-                try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                if (count % 8 == 0) {
+                    try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                }
             }
         }
         if (_util.connected()) {
@@ -2593,8 +2600,12 @@ public class SnarkManager implements CompleteListener {
                 _context.simpleTimer2().addEvent(new Disconnector(), 60*1000);
                 addMessage(_t("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
-                    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                    long toWait = 5*1000;
+                    if (SystemVersion.isARM())
+                        toWait *= 2;
+                    try { Thread.sleep(toWait); } catch (InterruptedException ie) {}
                 }
+                _util.disconnect();
             } else {
                 _util.disconnect();
                 _stopping = false;

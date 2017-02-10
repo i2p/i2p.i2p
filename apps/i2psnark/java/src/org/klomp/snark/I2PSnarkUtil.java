@@ -357,12 +357,12 @@ public class I2PSnarkUtil {
     public File get(String url, boolean rewrite) { return get(url, rewrite, 0); }
 
     /**
-     * @param retries if < 0, set timeout to a few seconds
+     * @param retries if &lt; 0, set timeout to a few seconds
      */
     public File get(String url, int retries) { return get(url, true, retries); }
 
     /**
-     * @param retries if < 0, set timeout to a few seconds
+     * @param retries if &lt; 0, set timeout to a few seconds
      */
     public File get(String url, boolean rewrite, int retries) {
         if (_log.shouldLog(Log.DEBUG))
@@ -413,7 +413,7 @@ public class I2PSnarkUtil {
     
     /**
      * Fetch to memory
-     * @param retries if < 0, set timeout to a few seconds
+     * @param retries if &lt; 0, set timeout to a few seconds
      * @param initialSize buffer size
      * @param maxSize fails if greater
      * @return null on error
@@ -659,7 +659,7 @@ public class I2PSnarkUtil {
      *
      *  @param s string to be translated containing {0}
      *    The {0} will be replaced by the parameter.
-     *    Single quotes must be doubled, i.e. ' -> '' in the string.
+     *    Single quotes must be doubled, i.e. ' -&gt; '' in the string.
      *  @param o parameter, not translated.
      *    To translate parameter also, use _t("foo {0} bar", _t("baz"))
      *    Do not double the single quotes in the parameter.

@@ -38,8 +38,9 @@ import org.mortbay.util.LineInput;
  * <p>
  * This class decodes the multipart/form-data stream sent by
  * a HTML form that uses a file input item.
+ * </p>
  *
- * <p><h4>Usage</h4>
+ * <h3>Usage</h3>
  * Each part of the form data is named from the HTML form and
  * is available either via getString(name) or getInputStream(name).
  * Furthermore the MIME parameters and filename can be requested for
@@ -71,7 +72,7 @@ public class MultiPartRequest
     /** Constructor. 
      * @param request The request containing a multipart/form-data
      * request
-     * @exception IOException IOException
+     * @throws IOException IOException
      */
     public MultiPartRequest(HttpServletRequest request)
         throws IOException

@@ -607,9 +607,9 @@ public class EepGet {
     /**
      * Blocking fetch.
      *
-     * @param fetchHeaderTimeout <= 0 for none (proxy will timeout if none, none isn't recommended if no proxy)
-     * @param totalTimeout <= 0 for default none
-     * @param inactivityTimeout <= 0 for default 60 sec
+     * @param fetchHeaderTimeout &lt;= 0 for none (proxy will timeout if none, none isn't recommended if no proxy)
+     * @param totalTimeout &lt;= 0 for default none
+     * @param inactivityTimeout &lt;= 0 for default 60 sec
      */
     public boolean fetch(long fetchHeaderTimeout, long totalTimeout, long inactivityTimeout) {
         _fetchHeaderTimeout = (int) Math.min(fetchHeaderTimeout, Integer.MAX_VALUE);

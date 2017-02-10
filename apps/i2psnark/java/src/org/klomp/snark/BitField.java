@@ -48,7 +48,7 @@ public class BitField
    * as set by the given byte array. This will make a copy of the array.
    * Extra bytes will be ignored.
    *
-   * @exception ArrayOutOfBoundsException if give byte array is not large
+   * @throws IndexOutOfBoundsException if give byte array is not large
    * enough.
    */
   public BitField(byte[] bitfield, int size)
@@ -90,7 +90,7 @@ public class BitField
   /**
    * Sets the given bit to true.
    *
-   * @exception IndexOutOfBoundsException if bit is smaller then zero
+   * @throws IndexOutOfBoundsException if bit is smaller then zero
    * bigger then size (inclusive).
    */
   public void set(int bit)
@@ -110,7 +110,7 @@ public class BitField
   /**
    * Sets the given bit to false.
    *
-   * @exception IndexOutOfBoundsException if bit is smaller then zero
+   * @throws IndexOutOfBoundsException if bit is smaller then zero
    * bigger then size (inclusive).
    * @since 0.9.22
    */
@@ -141,7 +141,7 @@ public class BitField
   /**
    * Return true if the bit is set or false if it is not.
    *
-   * @exception IndexOutOfBoundsException if bit is smaller then zero
+   * @throws IndexOutOfBoundsException if bit is smaller then zero
    * bigger then size (inclusive).
    */
   public boolean get(int bit)

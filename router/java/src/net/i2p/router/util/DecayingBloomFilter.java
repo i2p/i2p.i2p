@@ -21,7 +21,7 @@ import org.xlattice.crypto.filters.BloomSHA1;
  * See main() for an analysis of false positive rate.
  * See BloomFilterIVValidator for instantiation parameters.
  * See DecayingHashSet for a smaller and simpler version.
- * @see net.i2p.router.tunnel.BloomFilterIVValidator
+ * See net.i2p.router.tunnel.BloomFilterIVValidator
  * @see net.i2p.router.util.DecayingHashSet
  */
 public class DecayingBloomFilter {

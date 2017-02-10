@@ -18,7 +18,7 @@ import net.i2p.router.Router;
  * (and all that entails).  In addition, this creates a root I2PAppContext for
  * any objects not booted through one of the RouterContexts.  Each of these 
  * contexts are configured through a simple properties file (where the name=value
- * contained in them are used for the context's getProperty(name)). <p />
+ * contained in them are used for the context's getProperty(name)). <p>
  *
  * <b>Usage:</b><pre>
  *  MultiRouter numberRouters
@@ -40,7 +40,7 @@ import net.i2p.router.Router;
  * the CPU load (but obviously making the router incapable of talking to things 
  * that need the encryption enabled).  To run a client app through a router that
  * has i2p.encryption=off, you should also add that line to the client's JVM
- * (for example, <code>java -Di2p.encryption=off -jar lib/i2ptunnel.jar</code>).<p />
+ * (for example, <code>java -Di2p.encryption=off -jar lib/i2ptunnel.jar</code>).<p>
  * 
  * To make the router console work, either run from a directory containing 
  * lib/, webapps/, docs/, etc., or point i2p.dir.base to a directory containing the

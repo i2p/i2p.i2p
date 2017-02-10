@@ -369,7 +369,7 @@ public class Folder<O extends Object> {
 	 * Sets the sorting direction of the folder.
 	 * Does not re-sort. Caller must call sortBy()
 	 * 
-	 * @param direction @link UP or @link DOWN
+	 * @param direction UP or DOWN
 	 */
 	public synchronized void setSortingDirection(SortOrder direction)
 	{

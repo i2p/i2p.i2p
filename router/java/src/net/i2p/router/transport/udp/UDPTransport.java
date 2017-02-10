@@ -708,7 +708,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  The current or configured internal IPv4 port.
      *  UDPEndpoint should always be instantiated (and a random port picked if not configured)
-     *  before this is called, so the returned value should be > 0
+     *  before this is called, so the returned value should be &gt; 0
      *  unless the endpoint failed to bind.
      */
     @Override
@@ -719,7 +719,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  The current or configured internal port.
      *  UDPEndpoint should always be instantiated (and a random port picked if not configured)
-     *  before this is called, so the returned value should be > 0
+     *  before this is called, so the returned value should be &gt; 0
      *  unless the endpoint failed to bind.
      */
     private int getRequestedPort(boolean ipv6) {
@@ -903,7 +903,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * 
      * @param from Hash of inbound destination
      * @param ourIP publicly routable IPv4 only
-     * @param ourPort >= 1024
+     * @param ourPort &gt;= 1024
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
         boolean isValid = isValid(ourIP) &&
@@ -976,7 +976,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      * @param ourIP MUST have been previously validated with isValid()
      *              IPv4 or IPv6 OK
-     * @param ourPort >= 1024 or 0 for no change
+     * @param ourPort &gt;= 1024 or 0 for no change
      */
     private boolean changeAddress(byte ourIP[], int ourPort) {
         // this defaults to true when we are firewalled and false otherwise.

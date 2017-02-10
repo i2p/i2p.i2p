@@ -31,7 +31,7 @@ public class InternalServerSocket extends ServerSocket {
     //private static Log _log = I2PAppContext.getGlobalContext().logManager().getLog(InternalServerSocket.class);
 
     /**
-     *  @param port > 0
+     *  @param port &gt; 0
      */
     public InternalServerSocket(int port) throws IOException {
          if (port <= 0)
@@ -87,7 +87,7 @@ public class InternalServerSocket extends ServerSocket {
     /**
      *  This is how the client connects.
      *
-     *  @param port > 0
+     *  @param port &gt; 0
      */
     static void internalConnect(int port, InternalSocket clientSock) throws IOException {
         InternalServerSocket iss = _sockets.get(Integer.valueOf(port));

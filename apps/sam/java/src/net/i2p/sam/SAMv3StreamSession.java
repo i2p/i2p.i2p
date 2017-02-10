@@ -77,7 +77,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	     * @throws IOException
 	     * @throws DataFormatException
 	     * @throws SAMException 
-	     * @throws NPE if login nickname is not registered
+	     * @throws NullPointerException if login nickname is not registered
 	     */
 	    public SAMv3StreamSession(String login)
 	    		throws IOException, DataFormatException, SAMException
@@ -98,7 +98,6 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	     * @param login nickname of the session
 	     * @throws IOException
 	     * @throws DataFormatException
-	     * @throws I2PSessionException
 	     * @since 0.9.25
 	     */
 	    public SAMv3StreamSession(String login, Properties props, SAMv3Handler handler, I2PSocketManager mgr,

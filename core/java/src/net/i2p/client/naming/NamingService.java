@@ -534,7 +534,7 @@ public abstract class NamingService {
      *  See also lookup(Hash, int).
      *
      *  @param hostname must be {52 chars}.b32.i2p
-     *  @param timeout in seconds; <= 0 means use router default
+     *  @param timeout in seconds; &lt;= 0 means use router default
      *  @return dest or null
      *  @since 0.8.7
      */
@@ -546,7 +546,7 @@ public abstract class NamingService {
      *  Same as lookupBase32() but with the SHA256 Hash precalculated
      *  This implementation returns null.
      *
-     *  @param timeout in seconds; <= 0 means use router default
+     *  @param timeout in seconds; &lt;= 0 means use router default
      *  @return dest or null
      *  @since 0.8.7
      */

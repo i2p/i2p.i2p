@@ -33,7 +33,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
-    private int _choke;
     private int _maxResends;
     private int _inactivityTimeout;
     private int _inactivityAction;
@@ -227,7 +226,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * clearly from the math above that was not correct.
      * (Before 0.6.2, the reply leaseSet was bundled with every message, so it didn't even
      * fit in TWO tunnel messages - more like 2 1/3)
-     * <p/>
+     * <p>
      * Now, it's not clear how often we will get the ideal situation (no reply leaseSet bundling,
      * no key bundling, and especially not having a small message ahead of you, which will then cause
      * fragmentation for all subsequent messages until the queue is emptied - BatchedPreprocessor
@@ -235,7 +234,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * messages in a new stream are much larger due to the leaseSet and key bundling.
      * But for long-lived streams (like with i2psnark) this should pay dividends.
      * The tunnel.batch* stats should provide some data for test comparisons.
-     * <p/>
+     * <p>
      * As MTU and MRU are identical and are negotiated to the lowest value
      * for the two ends, you can't do widespread testing of a higher value.
      * Unless we change to allow MTU and MRU to be different,
@@ -244,7 +243,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * So let's try 1730 for release 0.6.5. This will allow for 738 testing as well,
      * with i2p.streaming.maxMessageSize=738 (in configadvanced.jsp, or in i2ptunnel, or
      * i2psnark, for example).
-     * <p/>
+     * <p>
      * Not that an isolated single packet is very common, but
      * in this case, 960 was 113.3% total overhead.
      * Compared to 738 (38.8% overhead) and 1730 (18.4%).
@@ -327,7 +326,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setWindowSize(opts.getWindowSize());
             setResendDelay(opts.getResendDelay());
             setMaxMessageSize(opts.getMaxMessageSize());
-            setChoke(opts.getChoke());
             setMaxResends(opts.getMaxResends());
             setInactivityTimeout(opts.getInactivityTimeout());
             setInactivityAction(opts.getInactivityAction());
@@ -677,15 +675,6 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getMaxMessageSize() { return _maxMessageSize; }
     public void setMaxMessageSize(int bytes) { _maxMessageSize = Math.max(bytes, MIN_MESSAGE_SIZE); }
     
-    /** 
-     * how long we want to wait before any data is transferred on the
-     * connection in either direction
-     *
-     * @return how long to wait before any data is transferred in either direction in ms
-     */
-    public int getChoke() { return _choke; }
-    public void setChoke(int ms) { _choke = ms; }
-
     /**
      * What profile do we want to use for this connection?
      * TODO: Only bulk is supported so far.

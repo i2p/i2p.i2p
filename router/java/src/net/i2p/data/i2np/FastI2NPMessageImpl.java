@@ -73,7 +73,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  Ignore, but save, the checksum, to be used later if necessary.
      *
      *  @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
-     *                This includes the type byte only if type < 0
+     *                This includes the type byte only if type &lt; 0
      *  @throws IllegalStateException if called twice, to protect saved checksum
      */
     @Override

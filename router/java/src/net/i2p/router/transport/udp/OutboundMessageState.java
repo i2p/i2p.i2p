@@ -47,7 +47,7 @@ class OutboundMessageState implements CDPQEntry {
      *  "injected" message from the establisher.
      *
      *  Called from UDPTransport.
-     *  @throws IAE if too big or if msg or peer is null
+     *  @throws IllegalArgumentException if too big or if msg or peer is null
      */
     public OutboundMessageState(I2PAppContext context, I2NPMessage msg, PeerState peer) {
         this(context, null, msg, peer);
@@ -57,7 +57,7 @@ class OutboundMessageState implements CDPQEntry {
      *  Normal constructor.
      *
      *  Called from OutboundMessageFragments.
-     *  @throws IAE if too big or if msg or peer is null
+     *  @throws IllegalArgumentException if too big or if msg or peer is null
      */
     public OutboundMessageState(I2PAppContext context, OutNetMessage m, PeerState peer) {
         this(context, m, m.getMessage(), peer);
@@ -66,7 +66,7 @@ class OutboundMessageState implements CDPQEntry {
     /**
      *  Internal.
      *  @param m null if msg is "injected"
-     *  @throws IAE if too big or if msg or peer is null
+     *  @throws IllegalArgumentException if too big or if msg or peer is null
      */
     private OutboundMessageState(I2PAppContext context, OutNetMessage m, I2NPMessage msg, PeerState peer) {
         if (msg == null || peer == null)

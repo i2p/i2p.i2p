@@ -44,7 +44,7 @@ public class RequestVariableLeaseSetMessage extends I2CPMessageImpl {
      *  Does the client support this message?
      *
      *  @param clientVersion may be null
-     *  @return version != null and version >= 0.9.7
+     *  @return version != null and version &gt;= 0.9.7
      */
     public static boolean isSupported(String clientVersion) {
         return clientVersion != null &&

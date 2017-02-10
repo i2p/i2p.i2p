@@ -43,7 +43,7 @@ import net.i2p.util.Log;
  * to implement something with a zero false positive rate, and uses less memory
  * for almost all bandwidth classes.
  *
- * This has a strictly zero false positive rate for <= 8 byte keys.
+ * This has a strictly zero false positive rate for &lt;= 8 byte keys.
  * For larger keys, it is 1 / (2**64) ~= 5E-20, which is better than
  * DBF for any entry count greater than about 14K.
  *
@@ -208,7 +208,7 @@ public class DecayingHashSet extends DecayingBloomFilter {
     }
     
     /**
-     *  This saves the data as-is if the length is <= 8 bytes,
+     *  This saves the data as-is if the length is &lt;= 8 bytes,
      *  otherwise it stores an 8-byte hash.
      *  Hash function is from DataHelper, modded to get
      *  the maximum entropy given the length of the data.

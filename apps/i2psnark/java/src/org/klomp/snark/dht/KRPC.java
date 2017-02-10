@@ -245,7 +245,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *
      *  @param target the key we are searching for
      *  @param maxNodes how many to contact
-     *  @param maxWait how long to wait for each to reply (not total) must be > 0
+     *  @param maxWait how long to wait for each to reply (not total) must be &gt; 0
      *  @param parallel how many outstanding at once (unimplemented, always 1)
      */
     @SuppressWarnings("unchecked")
@@ -326,7 +326,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *
      *  @param ih the Info Hash (torrent)
      *  @param max maximum number of peers to return
-     *  @param maxWait the maximum time to wait (ms) must be > 0
+     *  @param maxWait the maximum time to wait (ms) must be &gt; 0
      *  @param annMax the number of peers to announce to
      *  @param annMaxWait the maximum total time to wait for announces, may be 0 to return immediately without waiting for acks
      *  @param isSeed true if seed, false if leech
@@ -510,7 +510,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  Announce to the closest peers in the local DHT.
      *  This is NOT iterative - call getPeers() first to get the closest
      *  peers into the local DHT.
-     *  Blocking unless maxWait <= 0
+     *  Blocking unless maxWait &lt;= 0
      *  Caller should run in a thread.
      *  This also automatically announces ourself to our local tracker.
      *  For best results do a getPeersAndAnnounce() instead, as this announces to
@@ -544,7 +544,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
     /**
      *  Announce to a single DHT peer.
-     *  Blocking unless maxWait <= 0
+     *  Blocking unless maxWait &lt;= 0
      *  Caller should run in a thread.
      *  For best results do a getPeers() first so we have a token.
      *
@@ -1509,9 +1509,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
         /**
          *  Should contain null if getReplyCode is REPLY_PONG.
-         *  Should contain List<Hash> if getReplyCode is REPLY_PEERS.
-         *  Should contain List<NodeInfo> if getReplyCode is REPLY_NODES.
-         *  Should contain String if getReplyCode is > 200.
+         *  Should contain List&lt;Hash&gt; if getReplyCode is REPLY_PEERS.
+         *  Should contain List&lt;NodeInfo&gt; if getReplyCode is REPLY_NODES.
+         *  Should contain String if getReplyCode is &gt; 200.
          *  @return may be null depending on what happened. Cast to expected type.
          */
         public Object getReplyObject() {

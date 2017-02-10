@@ -1,3 +1,49 @@
+2017-02-09 zzz
+ * Streaming: Fix optional delay and choking (tickets #1046, 1939)
+
+2017-02-08 zzz
+ * I2CP: Return local delivery failure on queue overflow (ticket #1939)
+
+2017-02-05 zzz
+ * Console: Consolidate timer threads (ticket #1068)
+ * NTCP: Don't write to an inbound connection before
+   fully established, causing NPE (ticket #996)
+ * Streaming:
+   - Don't always send optional delay (ticket #1046)
+   - Don't hard fail on expired message error (ticket #1748)
+
+2017-02-04 zzz
+ * HTTP proxies:
+   - Pass through relative referer URIs, convert same-origin
+     absolute referer URIs to relative (ticket #1862)
+ * NTP: Enable IPv6 support (ticket #1896)
+
+2017-01-30 zzz
+ * Router: Run shutdown tasks in parallel,
+   increase max time for shutdown tasks (ticket #1893)
+   i2psnark: Remove most delay between announces at shutdown
+
+2017-01-29 zzz
+ * i2ptunnel CONNECT proxy:
+   - Add support for outproxy plugin (tickets #1364, #1895)
+   - Add support for ports
+
+2017-01-28 zzz
+ * Utils: Detect when running as service on Gentoo
+
+2017-01-26 zzz
+ * Build: Set up translations for man pages
+ * Javadoc: Fixes (ticket #1894)
+
+2017-01-24 zzz
+ * i2prouter: Add root check to restart and condrestart (ticket #1770)
+
+2017-01-17 zzz
+ * Utils: Java 9 yakkety workarounds
+
+2017-01-12 zzz
+ * DTG: Don't try to start if headless (ticket #1924)
+
 2017-01-07 zzz
  * i2ptunnel: Fix NPE on proxy.i2p/add when no params
 
@@ -28,8 +74,8 @@
  * NTP:
    - Verify source address and port
    - Add to command line
-   - Add KoD support (ticket #1896)
-   - Add initial IPv6 support (ticket #1897)
+   - Add KoD support (ticket #1897)
+   - Add initial IPv6 support (ticket #1896)
 
 2016-12-20 zzz
  * Build: Fix installer compile failure

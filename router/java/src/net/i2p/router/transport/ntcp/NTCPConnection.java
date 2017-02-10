@@ -791,9 +791,11 @@ class NTCPConnection implements Closeable {
     private void prepareNextWriteFast(PrepBuffer buf) {
         if (_closed.get())
             return;
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("prepare next write w/ isInbound? " + _isInbound + " established? " + _established);
-        if (!_isInbound && !isEstablished()) {
+        // Must be established or else session key is null and we can't encrypt
+        // This is normal for OB conns but can happen rarely for IB also.
+        // wantsWrite() is called at end of OB establishment, and
+        // enqueueInfoMessage() is called at end of IB establishment.
+        if (!isEstablished()) {
             return;
         }
         

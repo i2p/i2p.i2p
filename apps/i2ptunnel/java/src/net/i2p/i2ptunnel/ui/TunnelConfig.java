@@ -249,7 +249,7 @@ public class TunnelConfig {
 
     /**
      * Controls how other tunnels are checked for access.
-     * <p/>
+     * <p>
      * The list used for whitelisting/blacklisting can be set with
      * {@link #setAccessList(String)}.
      *
@@ -280,7 +280,7 @@ public class TunnelConfig {
 
     /**
      * Controls how ephemeral the I2P Destination of a client tunnel is.
-     * <p/>
+     * <p>
      * If {@link #setClose(boolean)} is set to false then mode 1 == mode 0.
      * 
      * @param mode 0 for new dest on restart, 1 for new dest on resume from idle, 2 for persistent key
@@ -409,9 +409,9 @@ public class TunnelConfig {
 
     public void setUseOutproxyPlugin(boolean val) {
         if (val)
-            _booleanOptions.add(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+            _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN);
         else
-            _booleanOptions.remove(I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN);
+            _booleanOptions.remove(I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN);
     }
     
     /**
@@ -695,7 +695,7 @@ public class TunnelConfig {
         };
     private static final String _booleanProxyOpts[] = {
         I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH,
-        I2PTunnelHTTPClient.PROP_USE_OUTPROXY_PLUGIN,
+        I2PTunnelHTTPClientBase.PROP_USE_OUTPROXY_PLUGIN,
         I2PTunnelHTTPClient.PROP_USER_AGENT,
         I2PTunnelHTTPClient.PROP_REFERER,
         I2PTunnelHTTPClient.PROP_ACCEPT,

@@ -18,7 +18,7 @@ public interface I2PSocketOptions {
      * How long we will wait for the ACK from a SYN, in milliseconds.
      *
      * Default 60 seconds. Max of 2 minutes enforced in Connection.java,
-     * and it also interprets <= 0 as default.
+     * and it also interprets &lt;= 0 as default.
      *
      * @return milliseconds to wait, or -1 if we will wait indefinitely
      */
@@ -28,7 +28,7 @@ public interface I2PSocketOptions {
      * Define how long we will wait for the ACK from a SYN, in milliseconds.
      *
      * Default 60 seconds. Max of 2 minutes enforced in Connection.java,
-     * and it also interprets <= 0 as default.
+     * and it also interprets &lt;= 0 as default.
      *
      * @param ms timeout in ms
      */

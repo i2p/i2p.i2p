@@ -8,12 +8,14 @@ import net.i2p.I2PAppContext;
  * stream must be using the BULK profile, rather than the INTERACTIVE
  * profile.</p>
  *
- * <h2>Entry conditions:</h2><ul>
+ * <h2>Entry conditions:</h2>
+ * <ul>
  * <li>Packets sent and ACKs received.</li>
  * <li>At least one direction is not closed</li>
  * </ul>
  *
- * <h2>Events:</h2><ul>
+ * <h2>Events:</h2>
+ * <ul>
  * <li>Packets received (which may or may not ACK the ones sent)</li>
  * <li>Message flush (explicitly, through a full buffer, or stream closure)</li>
  * <li>RESET received</li>
@@ -22,6 +24,7 @@ import net.i2p.I2PAppContext;
  * </ul>
  *
  * <h2>Next states:</h2>
+ * <ul>
  * <li>{@link SchedulerClosing closing} - after both sending and receiving a CLOSE</li>
  * <li>{@link SchedulerClosed closed} - after both sending and receiving ACKs on the CLOSE</li>
  * <li>{@link SchedulerDead dead} - after sending or receiving a RESET</li>

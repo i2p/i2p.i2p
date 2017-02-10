@@ -208,8 +208,8 @@ public class SimpleTimer2 {
      * state of a given TimedEvent
      * 
      * valid transitions:
-     * {IDLE,CANCELLED,RUNNING} -> SCHEDULED [ -> SCHEDULED ]* -> RUNNING -> {IDLE,CANCELLED,SCHEDULED}
-     * {IDLE,CANCELLED,RUNNING} -> SCHEDULED [ -> SCHEDULED ]* -> CANCELLED
+     * {IDLE,CANCELLED,RUNNING} -&gt; SCHEDULED [ -&gt; SCHEDULED ]* -&gt; RUNNING -&gt; {IDLE,CANCELLED,SCHEDULED}
+     * {IDLE,CANCELLED,RUNNING} -&gt; SCHEDULED [ -&gt; SCHEDULED ]* -&gt; CANCELLED
      * 
      * anything else is invalid.
      */
@@ -231,10 +231,10 @@ public class SimpleTimer2 {
      * in your constructor)
      *
      * Other porting:
-     *   SimpleTimer.getInstance().addEvent(new foo(), timeout) => new foo(SimpleTimer2.getInstance(), timeout)
-     *   SimpleTimer.getInstance().addEvent(this, timeout) => schedule(timeout)
-     *   SimpleTimer.getInstance().addEvent(foo, timeout) => foo.reschedule(timeout)
-     *   SimpleTimer.getInstance().removeEvent(foo) => foo.cancel()
+     *   SimpleTimer.getInstance().addEvent(new foo(), timeout) =&gt; new foo(SimpleTimer2.getInstance(), timeout)
+     *   SimpleTimer.getInstance().addEvent(this, timeout) =&gt; schedule(timeout)
+     *   SimpleTimer.getInstance().addEvent(foo, timeout) =&gt; foo.reschedule(timeout)
+     *   SimpleTimer.getInstance().removeEvent(foo) =&gt; foo.cancel()
      *
      * There's no global locking, but for scheduling, we synchronize on this
      * to reduce the chance of duplicates on the queue.

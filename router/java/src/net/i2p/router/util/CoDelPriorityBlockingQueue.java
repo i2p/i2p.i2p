@@ -69,7 +69,7 @@ public class CoDelPriorityBlockingQueue<E extends CDPQEntry> extends PriBlocking
     private final String STAT_DELAY;
     public static final int MIN_PRIORITY = 100;
     private static final int[] PRIORITIES = {MIN_PRIORITY, 200, 300, 400, 500};
-    /** if priority is >= this, never drop */
+    /** if priority is &gt;= this, never drop */
     public static final int DONT_DROP_PRIORITY = 1000;
     private static final long BACKLOG_TIME = 2*1000;
 
