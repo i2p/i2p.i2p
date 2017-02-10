@@ -75,7 +75,7 @@ public class LogsHelper extends HelperBase {
      */
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
-        return "<p>" + _t("File location") + ": <a href=\"/router.log\">" + _context.logManager().currentFile() + "</a></p>" + str;
+        return "<p>" + _t("File location") + ": <a href=\"/router.log\" target=\"_blank\">" + _context.logManager().currentFile() + "</a></p>" + str;
     }
     
     /**
@@ -131,7 +131,7 @@ public class LogsHelper extends HelperBase {
             return "<p>" + _t("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b></p>";
         } else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            return "<p>" + _t("File location") + ": <a href=\"/wrapper.log\">" + f.getAbsolutePath() + "</a></p></td></tr>\n<tr><td><pre>" + str + "</pre>";
+            return "<p>" + _t("File location") + ": <a href=\"/wrapper.log\" target=\"_blank\">" + f.getAbsolutePath() + "</a></p></td></tr>\n<tr><td><pre>" + str + "</pre>";
         }
     }
     
