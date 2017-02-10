@@ -4250,6 +4250,11 @@ div.debugcontainer {
      margin-top: -13px !important;
 }
 
+.main#certs textarea {
+     margin: -1px 0 11px 0;
+     width: 100%;
+}
+
 .main#jardump {
      overflow: auto !important;
      padding: 0;
@@ -4288,6 +4293,10 @@ div.debugcontainer {
      color: #eea;
 }
 
+.main#jardump th:nth-child(4), .main#jardump th:nth-child(5) {
+     white-space: nowrap !important;
+}
+
 .main#jardump tt {
      letter-spacing: -0.03em;
 }
@@ -4298,8 +4307,9 @@ div.debugcontainer {
 
 @media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes column wrapping on webkit */
 .main#jardump td {
-     word-wrap: break-word !important;
-     max-width: 220px;
+     word-break: break-word !important;
+     word-break: break-all !important;
+     max-width: 230px;
 }
 }
 
@@ -5030,7 +5040,7 @@ h3#shutdownrouter + p.infohelp {
      background-size: 28px 28px !important;
 }
 
-h3#restartrouter + p.infohelp {
+h3#restartrouter + p.infohelp, #config_family .infohelp.needrestart {
      background: #000 url(/themes/console/images/info/reboot.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px !important;

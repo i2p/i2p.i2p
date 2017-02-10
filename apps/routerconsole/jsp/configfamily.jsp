@@ -80,7 +80,7 @@
        } else {
            // family is not active
 %>
-<p class="infohelp"><b><%=intl._t("Restart required to activate family {0}.", '"' + family + '"')%>
+<p class="infohelp needrestart"><b><%=intl._t("Restart required to activate family {0}.", '"' + family + '"')%>
 <%=intl._t("After restarting, you may export the family key.")%></b></p>
 <%
        }

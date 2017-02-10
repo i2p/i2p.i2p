@@ -82,7 +82,7 @@ pre {
      width: 98%;
      overflow: auto;
      text-align: left;
-     font: 8pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #333;
      margin: 10px;
 }
@@ -234,7 +234,7 @@ div.routersummary h4 {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-.routersummary h4 {     
+.routersummary h4 {
      margin-bottom: -8px !important;
 }
 }
@@ -417,8 +417,14 @@ div.logo {
 }
 
 .logo hr {
-     margin: 8px -11px;
-     background: #447;
+     margin: 8px -10px;
+     background: #7789bf;
+     height: 1px
+}
+
+.logo a {
+     display: inline-block !important;
+     width: 100%;
 }
 
 div.warning {
@@ -490,7 +496,7 @@ div.warning {
 
 @media screen and (max-height: 700px) {
 .proxyfooter {
-     display: none;     
+     display: none;
 }
 }
 
@@ -591,6 +597,10 @@ div.main li:first-child {
      margin-top: -16px;
 }
 
+.main#debug hr {
+     display: none;
+}
+
 div.main hr, hr {
      color: #113;
      background: #113;
@@ -606,7 +616,7 @@ hr:last-child {
 div.main textarea {
      background: #fff;
      color: #001;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      margin: 5px 0;
      resize: none;
 }
@@ -766,7 +776,7 @@ div.newscontent h6 {
      box-shadow: 0 1px 1px #bbf; 
 }
 
-.tab, tab2 {
+.tab, .tab2 {
      min-width: 40px;
 }
 
@@ -964,7 +974,8 @@ table#wrapperlogs, table#routerlogs {
      white-space: pre-wrap !important;
      word-wrap: break-word !important;
      width: 100%;
-     overflow: auto; 
+     height: 600px;
+     overflow: auto;
 }
 
 .main#tunnels h3 a[href^="/configtunnels#"]:hover, #criticallogs + h3.tabletitle a:hover {
@@ -1353,7 +1364,7 @@ th {
      padding: 6px 5px;
      color: #31334f;
      background: #eef url(images/header.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%) !important;
+     background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) !important;
      text-align: left;
      font-size: 9pt;
      line-height: 110%;
@@ -1377,6 +1388,11 @@ tr:nth-child(odd) {
      background: #f7f8ff;
 }
 
+tr th {
+     background: #eef url(images/header.png) center center repeat-x;
+     background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) #fff !important;
+}
+
 td {
      padding: 3px 5px;
      color: #333;
@@ -1394,7 +1410,7 @@ td {
 }
 
 #bandwidthconfig td:first-child {
-     width: 100px;
+     width: 200px;
      white-space: nowrap;
      padding-right: 10px;
 }
@@ -1520,6 +1536,10 @@ div.app:active .applabel, div.app:active .applabel a  {
      color: #fff !important;
 }
 
+.appimg {
+     min-height: 52px;
+}
+
 div.appgroup {
      margin: 5px 0;
      padding: 0;
@@ -1560,6 +1580,7 @@ table.search td:first-child {
 table.search td:nth-child(2) {
      text-align: center !important;
      padding-right: 0;
+     width: 60px;
 }
 
 table.search td:nth-child(3) {
@@ -1634,7 +1655,7 @@ div.applabel {
 /* end home page */
 
 tt {
-     font: bold 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: bold 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #050;
 }
 
@@ -1673,7 +1694,7 @@ div.main li b {
 
 .tidylist code {
      text-align: left;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #910;
      font-weight: bold;
 }
@@ -1692,7 +1713,7 @@ ul {
 
 code {
      text-align: left;
-     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #030;
 }
 
@@ -1906,7 +1927,7 @@ h3#shutdownrouter + p.infohelp {
      background-size: 28px 28px;
 }
 
-h3#restartrouter + p.infohelp {
+h3#restartrouter + p.infohelp, #config_family .infohelp.needrestart {
      background: #fff url(/themes/console/images/info/reboot.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
@@ -2152,6 +2173,11 @@ h4 {
      box-shadow: inset 0 0 0 1px #fff;
 }
 
+#certs textarea {
+     margin: -1px 0 10px 0;
+     width: 100%;
+}
+
 .underline {
      border-bottom: 1px solid #000022;
      padding: 5px 0 5px 0;
@@ -2182,6 +2208,10 @@ h4 {
      -webkit-filter: drop-shadow(0 0 1px #f60);
      opacity: 1;
      transform: scale(1.2);
+}
+
+input[type="submit"], input[type="reset"], button, .optbox, select {
+     cursor: pointer;
 }
 
 button.search {
@@ -2652,7 +2682,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
 .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
@@ -2755,7 +2785,7 @@ textarea {
      background: #ffe;
      color: #333 !important;
      border-radius: 2px;
-     font: 8pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
      min-width: 97%;
      border: 1px solid #999;
@@ -2985,7 +3015,7 @@ iframe.iframed {
 
 .main#dns {
      padding: 0 8px;
-     min-width: 534px;
+     min-width: 540px;
 }
 
 #susidnsframe {
@@ -3974,6 +4004,10 @@ table#floodfills th {
      text-align: left;
 }
 
+#loggingoptions p {
+     text-align: left;
+}
+
 .main#proof textarea, .main#proof textarea:focus {
      background: none;
      border: none;
@@ -4069,6 +4103,13 @@ table#floodfills th {
      margin-bottom: 5px;
 }
 
+#changelog pre {
+     margin: 0;
+     width: 100%;
+     height: 600px;
+     white-space: pre-wrap;
+}
+
 .main#help h2 {
      margin: -1px -11px 10px !important;
      border-radius: 2px 2px 0 0;
@@ -4092,7 +4133,8 @@ table#floodfills th {
 
 .homelinkedit th:first-child, #sidebarconf th:first-child {
      text-align: center;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%) !important;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, url(images/header.png) center center repeat-x #eef;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) #fff !important;
      text-align: left;
      font-size: 0;
 }
@@ -4122,12 +4164,6 @@ table#floodfills th {
 #clientconfig th:nth-child(3), #webappconfig th:nth-child(3), #pluginconfig th:nth-child(3) {
      text-align: center;
 }
-
-/*
-#pluginconfig button {
-     min-width: 60px;
-}
-*/
 
 #pluginconfig table {
      margin: 5px 5px 5px 0 !important;
@@ -4174,7 +4210,7 @@ h3#displayevents {
 form[action="events"] {
      border: 1px solid #7778bf;
      padding: 10px 10px 10px 50px;
-     margin: -16px 0 -2px 0 ;
+     margin: -16px 0 -2px 0;
      background: url(/themes/console/images/info/logs.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
@@ -4234,13 +4270,13 @@ img.app, img.app2p {
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, 
-#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, #configinfo th {
+body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a,
+#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, #configinfo th, tt, code {
      font-size: 10pt !important;
 }
 
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a,
-code, tt, div.news {
+div.news {
      font-size: 9pt !important;
 }
 
@@ -4305,4 +4341,14 @@ h3#pluginconfig, h3#webappconfig, h3#i2pclientconfig, h3#pluginmanage, p#clientc
 .subheading b {
      font-size: 10.5pt !important;
 }
+
+h3#restartrouter, p#tunnelconfig {
+     margin-bottom: -15px !important;
+}
+}
+
+/* MS Edge 14+ fix */
+_:-ms-lang(x), *, *:hover {
+     filter: none !important;
+     -webkit-filter: none !important;
 }

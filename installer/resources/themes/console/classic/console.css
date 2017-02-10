@@ -141,6 +141,7 @@ div.warning h3:first-child {
      width: 100%;
      resize: none;
      white-space: pre-wrap;
+     word-break: break-all;
      height: 100% !important;
      font-size: 8pt;
      border: none;
@@ -610,6 +611,10 @@ input[name="refreshInterval"] {
 }
 
 /* accessibility tweak - colors rather than focus rings where possible */
+
+input[type="submit"], input[type="reset"], button, .optbox {
+     cursor: pointer;
+}
 
 .optbox:hover, .optbox:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
 /*	  -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#89f')";*/     
@@ -1083,7 +1088,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
 }
 
 .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
@@ -1102,8 +1107,6 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 
 /* end sidebar buttons */
 /* end buttons & inputs */
-
-
 
 div.main {
      margin: 0 1px 0 200px;
@@ -1235,7 +1238,7 @@ div.wideload p  {
 div.news {
      margin: -1px 1px 0 200px;
      background: #f9f9ea url(images/bg1.png);
-     background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.5)), url(images/bg1.png);
+     background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.5)), url(images/bg1.png) #efefe0;
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
      border-right: 1px solid #89f;
@@ -2262,6 +2265,10 @@ div.app:hover img, .appimg a:focus {
 
 div.app:hover .applabel {
      box-shadow: none;
+}
+
+.appimg {
+     min-height: 42px;
 }
 
 div.appgroup {
@@ -4145,6 +4152,11 @@ p#fullhistory {
      margin-bottom: 10px;
 }
 
+#certs textarea {
+     margin: -1px 0 10px 0;
+     width: 100%;
+}
+
 #advancedsettings h2 {
      margin: 10px 0 0 !important;
 }
@@ -4288,7 +4300,7 @@ h3#shutdownrouter + p.infohelp {
      background-size: 28px 28px;
 }
 
-h3#restartrouter + p.infohelp {
+h3#restartrouter + p.infohelp, #config_family .infohelp.needrestart {
      background: #fff url(/themes/console/images/info/reboot.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;

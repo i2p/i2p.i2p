@@ -2923,7 +2923,7 @@ table#configclient {
 
 /* configfamily */
 
-table#newfamily {
+table#newfamily, table#leavefamily {
      margin-bottom: 10px !important;
 }
 
@@ -4098,6 +4098,11 @@ table#jardump { /* /jars */
      margin-top: -13px !important;
 }
 
+.main#certs textarea {
+     margin: -1px 0 11px 0;
+     width: 100%;
+}
+
 .main#tunnels th {
      padding: 5px 2px;
 }
@@ -5178,7 +5183,7 @@ h3#shutdownrouter + p.infohelp {
      background-size: 28px 28px !important;
 }
 
-h3#restartrouter + p.infohelp {
+h3#restartrouter + p.infohelp, #config_family .infohelp.needrestart {
      background: #000 url(/themes/console/images/info/reboot.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px !important;

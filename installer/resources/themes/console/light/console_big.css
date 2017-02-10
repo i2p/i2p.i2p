@@ -41,7 +41,7 @@ div.routersummary table {
 }
 
 div.routersummary a {
-    font-size: 10pt;
+    font-size: 10pt !important;
 }
 
 div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
