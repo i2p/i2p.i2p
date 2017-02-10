@@ -343,9 +343,8 @@ h3 {
 }
 
 th {
-     background: #447;
-     color: #fff;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%) !important;
+     background: #eef url(images/header.png) center center repeat-x;
+     background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) !important;
      color: #333;
      padding: 5px;
      border-top: 1px solid #7778bf;
@@ -402,10 +401,6 @@ div[class^="status"] {
 .tunnelConfig td > b {
      min-width: 30px;
      display: inline-block;
-}
-
-#clientTunnels tr, #serverTunnels tr {
-     background: #eef;
 }
 
 .tunnelProperties {

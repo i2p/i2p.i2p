@@ -148,7 +148,7 @@ hr {
 h2, h3 {
      padding: 6px 10px;
      border: 1px solid #2d295f;
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #191729 50%, #000 50%, #000 100%) !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -180,7 +180,7 @@ h3 {
 
 th {
      background: #000;
-     background: linear-gradient(to bottom, #191729 0%, #191729 50%, #000 50%, #000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
      padding: 6px 5px;
      border-top: 1px solid #2d295f;
      border-bottom: 1px solid #2d295f;

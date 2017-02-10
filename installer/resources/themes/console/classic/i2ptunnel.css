@@ -284,7 +284,7 @@ h3 {
 
 th {
      background: #fff url(/themes/console/classic/images/tinytitle.png) repeat-x center center;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff, #eff2ff) !important;
      padding: 5px;
      border-top: 1px solid #89f;
      border-bottom: 1px solid #89f;
