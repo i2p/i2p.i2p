@@ -211,7 +211,7 @@ public class HomeHelper extends HelperBase {
 
     private String renderConfig(Collection<App> apps) {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table class=\"homelinkedit\"><tr><th>")
+        buf.append("<table class=\"homelinkedit\"><tr><th title=\"Mark for deletion\">")
            .append(_t("Remove"))
            .append("</th><th></th><th>")
            .append(_t("Name"))

@@ -929,7 +929,7 @@ public class SummaryHelper extends HelperBase {
         String imgPath = CSSHelper.BASE_THEME_PATH + theme + "/images/";
 
         StringBuilder buf = new StringBuilder(2048);
-        buf.append("<table id=\"sidebarconf\"><tr><th>")
+        buf.append("<table id=\"sidebarconf\"><tr><th title=\"Mark section for removal from the sidebar\">")
            .append(_t("Remove"))
            .append("</th><th>")
            .append(_t("Name"))
