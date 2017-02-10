@@ -288,6 +288,12 @@ class SummaryBarRenderer {
            .append("</a>\n")
 
            .append("<a title=\"")
+           .append(_t("Network database search tool"))
+           .append("\" href=\"/netdb?f=4\">")
+           .append(nbsp(_t("NetDB Search")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
            .append(_t("Signed proof of ownership of this router"))
            .append("\" href=\"proof\">")
            .append(nbsp(_t("Proof")))
