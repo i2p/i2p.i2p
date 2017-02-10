@@ -109,7 +109,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <input type="text" size="60" maxlength="80" name="nofilter_description"  title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext tunnelDescription" />                
+                <input type="text" size="60" maxlength="80" name="nofilter_description"  title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext tunnelDescription" />
             </td>
 
             <td>
@@ -143,7 +143,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                            out.write(" <span class=\"required\"><font color=\"red\">(");
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
-                       }   
+                       }
                      %>
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext port" placeholder="required" />
             </td>
@@ -169,7 +169,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <b><%=intl._t("Port")%>:</b>
-           	    
+
            	     <% String value4 = editBean.getClientPort(curTunnel);
            	        if (value4 == null || "".equals(value4.trim())) {
            	            out.write(" <span class=\"required\"><font color=\"red\">(");
@@ -205,7 +205,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
          <% } /* httpbidirserver || streamrserver */ %>
         </tr>
 
-            
+
             <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
           %>
 
@@ -217,15 +217,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
 
         <tr>
-            <td>
+            <td colspan="2">
                 <input type="text" size="20" id="websiteName" name="spoofedHost" title="Website Hostname" value="<%=editBean.getSpoofedHost(curTunnel)%>" class="freetext" />
                 <%=intl._t("(leave blank for outproxies)")%>
             </td>
-            <td></td>
         </tr>
             <% }
           %>
-          
+
         <tr>
             <th colspan="2">
                 <%=intl._t("Private key file")%>
@@ -267,7 +266,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <label for="signature">
                     <%=intl._t("Hostname Signature")%>
                 </label>
-                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=sig%>" wrap="off" class="freetext" />                
+                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=sig%>" wrap="off" class="freetext" />
             </div>
          <%
                    }  // sig
@@ -393,7 +392,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               %></select>
             </td>
         </tr>
-                           
+
          <% if (!"streamrserver".equals(tunnelType)) { %>
 
         <tr>
@@ -625,11 +624,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         <td>
                             <input type="text" name="postMax" value="<%=editBean.getPostMax(curTunnel)%>" class="freetext quantity"/>
                         </td>
-                        <td>
+                        <td colspan="2">
                             <input type="text" name="postBanTime" value="<%=editBean.getPostBanTime(curTunnel)%>" class="freetext period"/>
                             <%=intl._t("minutes")%>
                         </td>
-                        <td></td>
                         <td class="blankColumn"></td>
                     </tr>
                     <tr>
@@ -640,11 +638,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         <td>
                             <input type="text" name="postTotalMax" value="<%=editBean.getPostTotalMax(curTunnel)%>" class="freetext quantity"/>
                         </td>
-                        <td>
+                        <td colspan="2">
                             <input type="text" name="postTotalBanTime" value="<%=editBean.getPostTotalBanTime(curTunnel)%>" class="freetext period"/>
                             <%=intl._t("minutes")%>
                         </td>
-                        <td></td>
                         <td class="blankColumn"></td>
                     </tr>
                     <tr>
@@ -652,11 +649,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                             <b><%=intl._t("POST limit period")%>
                             </b>
                         </td>
-                        <td>
+                        <td colspan="2">
                             <input type="text" name="postCheckTime" value="<%=editBean.getPostCheckTime(curTunnel)%>" class="freetext period"/>
                             <%=intl._t("minutes")%>
                         </td>
-                        <td></td>
                         <td></td>
                         <td class="blankColumn"></td>
                     </tr>
@@ -693,7 +689,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <%=intl._t("minutes")%>
             </td>
         </tr>
-           
+
 <% /***************** %>
             <div id="tunnelOptionsField" class="rowItem">
                 <label for="cert" accesskey="c">
@@ -703,12 +699,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <div id="hostField" class="rowItem">
               <div id="portField" class="rowItem">
                 <label><%=intl._t("None")%></label>
-                <input value="0" type="radio" id="startOnLoad" name="cert" title="No Certificate"<%=(editBean.getCert(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="0" type="radio" id="startOnLoad" name="cert" title="No Certificate"<%=(editBean.getCert(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
               </div>
               <div id="portField" class="rowItem">
                 <label><%=intl._t("Hashcash (effort)")%></label>
-                <input value="1" type="radio" id="startOnLoad" name="cert" title="Hashcash Certificate"<%=(editBean.getCert(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <input type="text" id="port" name="effort" size="2" maxlength="2" title="Hashcash Effort" value="<%=editBean.getEffort(curTunnel)%>" class="freetext" />                
+                <input value="1" type="radio" id="startOnLoad" name="cert" title="Hashcash Certificate"<%=(editBean.getCert(curTunnel)==1 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <input type="text" id="port" name="effort" size="2" maxlength="2" title="Hashcash Effort" value="<%=editBean.getEffort(curTunnel)%>" class="freetext" />
               </div>
             </div>
             <div id="portField" class="rowItem">
@@ -720,14 +716,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <div id="hostField" class="rowItem">
               <div id="portField" class="rowItem">
                 <label><%=intl._t("Hidden")%></label>
-                <input value="2" type="radio" id="startOnLoad" name="cert" title="Hidden Certificate"<%=(editBean.getCert(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="2" type="radio" id="startOnLoad" name="cert" title="Hidden Certificate"<%=(editBean.getCert(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />
               </div>
               <div id="portField" class="rowItem">
                 <label for="signer" accesskey="c">
                     <%=intl._t("Signed (signed by)")%>:
                 </label>
-                <input value="3" type="radio" id="startOnLoad" name="cert" title="Signed Certificate"<%=(editBean.getCert(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <input type="text" id="port" name="signer" size="50" title="Cert Signer" value="<%=editBean.getSigner(curTunnel)%>" class="freetext" />                
+                <input value="3" type="radio" id="startOnLoad" name="cert" title="Signed Certificate"<%=(editBean.getCert(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <input type="text" id="port" name="signer" size="50" title="Cert Signer" value="<%=editBean.getSigner(curTunnel)%>" class="freetext" />
               </div>
             </div>
             <div id="portField" class="rowItem">

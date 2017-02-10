@@ -146,7 +146,7 @@ hr {
 }
 
 h2, h3 {
-     padding: 6px 10px;
+     padding: 7px 10px;
      border: 1px solid #2d295f;
      background: linear-gradient(to bottom, #191729 0%, #191729 50%, #000 50%, #000 100%) !important;
      font-size: 11pt;
@@ -186,7 +186,6 @@ th {
      border-bottom: 1px solid #2d295f;
      font-size: 10pt;
      color: #c9ceff;
-     text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
 }
@@ -400,6 +399,7 @@ input[type="checkbox"], input[type="radio"] {
      min-width: 16px;
      min-height: 16px;
      margin: 0;
+     background: none;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
@@ -597,7 +597,6 @@ input {
 
 select#profile, select#connectionProfile {
     width: 70%;
-    
 }
 
 #customOptions, #userAgents {
@@ -865,7 +864,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .tunnelConfig td, td {
      border-top: 1px inset #17142f;
-     padding: 5px;
+     padding: 6px 5px;
 }
 
 input[type="checkbox"], input[type="radio"] {
@@ -923,23 +922,15 @@ td.tunnelDestination, td.tunnelDescription {
 /* responsive layout */
 
 @media screen and (min-width: 1300px) {
-body, td {     
-     font-size: 10pt;
+body, td, .control, select, input {
+     font-size: 10pt !important;
 }
-
-.control, select, input {
-     font-size: 9pt;
-}
-
-/*
-select {
-     box-sizing: border-box;
-     padding-top: 3px;
-     padding-bottom: 3px;
-}
-*/
 
 td {
      padding: 7px 5px;
+}
+
+#localDestination, .authentication {
+     height: 34px !important;
 }
 }

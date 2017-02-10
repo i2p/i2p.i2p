@@ -46,6 +46,7 @@ input[type="checkbox"], input[type="radio"] {
      min-width: 16px;
      min-height: 16px;
      margin: 0;
+     background: none;
 }
 
 textarea, input, select, button {
@@ -382,17 +383,13 @@ div[class^="status"] {
      background-size: auto 16px;
 }
 
-/*
-#serverTunnels input, #serverTunnels .control,#serverTunnels select, #clientTunnels input, #clientTunnels .control, #clientTunnels select,
-#clientTunnelEdit input, #serverTunnelEdit .control
- {
-     float: none;
+.tunnelConfig th:first-child, .tunnelConfig td:first-child {
+     border-left: 1px solid #7778bf;
 }
 
-#clientTunnelEdit td, #advancedClientTunnelOptions td, #serverTunnelEdit td {
-     width: 50% !important;
+.tunnelConfig th:last-child, .tunnelConfig td:last-child {
+     border-right: 1px solid #7778bf;
 }
-*/
 
 .tunnelConfig td {
      width: 50%;
@@ -415,7 +412,7 @@ div[class^="status"] {
 .newTunnel {
      text-align: right;
      border-top: 2px solid #7778bf !important;
-     padding: 5px !important;
+     padding: 7px !important;
      background: #fff;
 }
 
@@ -484,7 +481,7 @@ th.tunnelControl {
 
 .buttons, .newTunnel {
      text-align: right;
-     padding: 5px;
+     padding: 7px 5px;
      background: #fff;
      background: linear-gradient(to bottom, #fff, #eef);
      border-top: 1px solid #7778bf !important;
@@ -576,6 +573,14 @@ td#throttle {
 
 #throttler {
      border: none;
+}
+
+#throttler th:first-child, #throttler td:first-child {
+     border-left: none;
+}
+
+#throttler th:last-child, #throttler td:last-child {
+     border-right: none;
 }
 
 #throttler th {

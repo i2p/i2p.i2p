@@ -152,7 +152,7 @@ hr {
 }
 
 h2, h3 {
-     padding: 6px 10px;
+     padding: 8px 10px;
      border: 1px solid #494;
      background: linear-gradient(to bottom, #1a261a 0%, #1a261a 50%, #000 50%, #000 100%) !important;
      font-size: 11pt;
@@ -223,6 +223,14 @@ td.infohelp {
 
 .tunnelConfig td {
      width: 50%;
+}
+
+.tunnelConfig th:first-child, .tunnelConfig td:first-child {
+     border-left: 1px solid #494;
+}
+
+.tunnelConfig th:last-child, .tunnelConfig td:last-child {
+     border-right: 1px solid #494;
 }
 
 #clientTunnels tr, #serverTunnels tr, .tunnelConfig tr {
@@ -352,7 +360,7 @@ textarea#statusMessages, textarea#statusMessages:active  {
      width: 150px; 
      border: 1px solid #494;
      padding: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      background: #fff;
      color: #333;
      border-radius: 2px;
@@ -397,8 +405,7 @@ input {
      text-decoration: none;
 }
 
-input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner,
-button::-moz-focus-inner {
+input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner, button::-moz-focus-inner {
      border: none;
      outline: none;
 }
@@ -413,6 +420,7 @@ input[type="checkbox"], input[type="radio"] {
      min-width: 16px;
      min-height: 16px;
      margin: 0;
+     background: none;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
 }
@@ -659,7 +667,7 @@ textarea[name="accessList"] {
 }
 
 #localDestination {
-     height: 30px !important;
+     height: 34px !important;
      margin: 0 !important;
 }
 
@@ -689,7 +697,7 @@ td#throttle {
 }
 
 #throttler {
-     border: none;
+     border: none !important;
 }
 
 #throttler th {
@@ -705,6 +713,15 @@ td#throttle {
      width: 20%;
      white-space: nowrap;
 }
+
+#throttler th:first-child, #throttler td:first-child {
+     border-left: none !important;
+}
+
+#throttler th:last-child, #throttler td:last-child {
+     border-right: none !important;
+}
+
 
 #throttler tr:first-child th {
      border-top: none;

@@ -325,16 +325,10 @@ td.infohelp {
      background: #ffd !important;
 }
 
-/*
-.tunnelProperties td > * {
-     vertical-align: middle;
-}
-*/
-
 .newTunnel {
      text-align: right;
      border-top: 1px solid #89f !important;
-     padding: 5px !important;
+     padding: 7px !important;
      background: #fff;
 }
 
@@ -409,6 +403,7 @@ input[type="checkbox"], input[type="radio"] {
      min-width: 16px;
      min-height: 16px;
      margin: 0;
+     background: none;
 }
 
 textarea, input, select, button {
@@ -470,7 +465,7 @@ a.control {
 
 .buttons, .newTunnel {
      text-align: right;
-     padding: 7px 5px !important;
+     padding: 7px 5px;
      background: #fff;
      background: linear-gradient(to bottom, #fff, #eff1ff);
      border-top: 1px solid #89f;
