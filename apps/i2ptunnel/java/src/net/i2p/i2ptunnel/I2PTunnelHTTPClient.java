@@ -220,6 +220,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
         _proxyNonce = Long.toString(_context.random().nextLong());
         // proxyList = new ArrayList();
+        if (tunnel.getClientOptions().getProperty("i2p.streaming.connectDelay") == null)
+            tunnel.getClientOptions().setProperty("i2p.streaming.connectDelay", "1000");
 
         setName("HTTP Proxy on " + getTunnel().listenHost + ':' + localPort);
         notifyEvent("openHTTPClientResult", "ok");
@@ -246,6 +248,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 _proxyList.add(tok.nextToken().trim());
             }
         }
+        if (tunnel.getClientOptions().getProperty("i2p.streaming.connectDelay") == null)
+            tunnel.getClientOptions().setProperty("i2p.streaming.connectDelay", "1000");
 
         setName("HTTP Proxy on " + tunnel.listenHost + ':' + localPort);
         notifyEvent("openHTTPClientResult", "ok");

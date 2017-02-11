@@ -408,6 +408,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             runIrcClient(args, l);
         } else if ("sockstunnel".equals(cmdname)) {
             runSOCKSTunnel(args, l);
+        } else if ("socksirctunnel".equals(cmdname)) {
+            runSOCKSIRCTunnel(args, l);
         } else if ("connectclient".equals(cmdname)) {
             runConnectClient(args, l);
         } else if ("streamrclient".equals(cmdname)) {
@@ -476,6 +478,10 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
               "  read_timeout <msecs>\n" +
               "  run <commandfile>\n" +
               "  server <host> <port> <privkeyfile>\n" +
+              "  socksirctunnel <port> [<sharedClient> [<privKeyFile>]]\n" +
+              "  sockstunnel <port>\n" +
+              "  streamrclient <host> <port> <destination>\n" +
+              "  streamrserver <port> <privkeyfile>\n" +
               "  textserver <host> <port> <privkey>\n");
     }
     
@@ -520,11 +526,12 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             l.log("Usage:\n" +
+                  "  clientoptions                   // show help and list current options\n" +
                   "  clientoptions [key=value ]*     // sets current options\n" +
                   "  clientoptions -a [key=value ]*  // adds to current options\n" +
                   "  clientoptions -c                // clears current options\n" +
                   "  clientoptions -x [key ]*        // removes listed options\n" +
-                  "Current options:\n");
+                  "\nCurrent options:");
             Properties p = new OrderedProperties();
             p.putAll(_clientOptions);
             for (Map.Entry<Object, Object> e : p.entrySet()) {
@@ -909,11 +916,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>[ <sharedClient>] [<privKeyFile>]\n" +
-                  "  creates a client that forwards port to the pubkey.\n"
-                  + "  use 0 as port to get a free port assigned.  If you specify\n"
-                  + "  a comma delimited list of pubkeys, it will rotate among them\n"
-                  + "  randomlyl. sharedClient indicates if this client shares \n"
-                  + "   with other clients (true of false)");
+                    "  Creates a standard client that listens on the port and forwards to the pubkey.\n"
+                  + "  With a comma delimited list of pubkeys, it will rotate among them randomly.\n"
+                  + "  sharedClient indicates if this client shares tunnels with other clients (true or false)");
             notifyEvent("clientTaskId", Integer.valueOf(-1));
         }
     }
@@ -985,9 +990,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             l.log("httpclient <port> [<sharedClient>] [<proxy>]\n" +
-                  "  creates a client that distributes HTTP requests.\n" +
-                  "  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)\n" +
-                  "  <proxy> (optional) indicates a proxy server to be used\n" +
+                  "  Creates a HTTP client proxy on the specified port.\n" +
+                  "  <sharedClient> (optional) Indicates if this client shares tunnels with other clients (true or false)\n" +
+                  "  <proxy> (optional) Indicates a proxy server to be used\n" +
                   "  when trying to access an address out of the .i2p domain");
             notifyEvent("httpclientTaskId", Integer.valueOf(-1));
         }
@@ -1053,7 +1058,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         } else {
             l.log("connectclient <port> [<sharedClient>] [<proxy>]\n" +
                   "  creates a client that for SSL/HTTPS requests.\n" +
-                  "  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)\n" +
+                  "  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true or false)\n" +
                   "  <proxy> (optional) indicates a proxy server to be used\n" +
                   "  when trying to access an address out of the .i2p domain\n");
         }
@@ -1119,8 +1124,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             l.log("ircclient <port> [<sharedClient> [<privKeyFile>]]\n" +
-                  "  creates a client that filter IRC protocol.\n" +
-                  "  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)\n");
+                  "  Creates an IRC client proxy on the specified port.\n" +
+                  "  <sharedClient> (optional) Indicates if this client shares tunnels with other clients (true or false)\n");
             notifyEvent("ircclientTaskId", Integer.valueOf(-1));
         }
     }
@@ -1173,7 +1178,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             l.log("sockstunnel <port>\n" +
-                  "  creates a tunnel that distributes SOCKS requests.");
+                  "  Creates a SOCKS proxy on the specified port.");
             notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
         }
     }
@@ -1221,7 +1226,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             }
         } else {
             l.log("socksirctunnel <port> [<sharedClient> [<privKeyFile>]]\n" +
-                  "  creates a tunnel for SOCKS IRC.");
+                  "  Creates a SOCKS IRC proxy on the specified port.");
             notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
         }
     }
