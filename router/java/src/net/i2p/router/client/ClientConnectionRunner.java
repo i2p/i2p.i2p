@@ -199,12 +199,15 @@ class ClientConnectionRunner {
         if (_sessionKeyManager != null)
             _sessionKeyManager.shutdown();
         _manager.unregisterConnection(this);
-        for (SessionParams sp : _sessions.values()) {
-            LeaseSet ls = sp.currentLeaseSet;
-            if (ls != null)
-                _context.netDb().unpublish(ls);
-            if (!sp.isPrimary)
-                _context.tunnelManager().removeAlias(sp.dest);
+        // netdb may be null in unit tests
+        if (_context.netDb() != null) {
+            for (SessionParams sp : _sessions.values()) {
+                LeaseSet ls = sp.currentLeaseSet;
+                if (ls != null)
+                    _context.netDb().unpublish(ls);
+                if (!sp.isPrimary)
+                    _context.tunnelManager().removeAlias(sp.dest);
+            }
         }
         synchronized (_alreadyProcessed) {
             _alreadyProcessed.clear();
