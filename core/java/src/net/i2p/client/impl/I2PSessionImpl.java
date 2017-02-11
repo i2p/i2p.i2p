@@ -446,6 +446,7 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 key.startsWith("user.") ||
                 key.startsWith("os.") ||
                 key.startsWith("sun.") ||
+                key.startsWith("awt.") ||
                 key.startsWith("file.") ||
                 key.equals("line.separator") ||
                 key.equals("path.separator") ||
@@ -457,6 +458,13 @@ public abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2
                 key.startsWith("stat.") ||
                 key.startsWith("gnu.") ||  // gnu JVM
                 key.startsWith("net.i2p.router.web.") ||  // console nonces
+                key.equals("loggerFilenameOverride") ||
+                key.equals("router.version") ||
+                key.equals("i2p.dir.base") ||
+                key.startsWith("networkaddress.cache.") ||
+                key.startsWith("http.") ||
+                key.startsWith("jetty.") ||
+                key.startsWith("org.mortbay.") ||
                 key.startsWith("wrapper.")) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping property: " + key);
                 continue;
