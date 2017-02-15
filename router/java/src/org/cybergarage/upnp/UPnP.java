@@ -269,7 +269,7 @@ public class UPnP
 			if(parserClass[i]==null)
 				continue;
 			try {
-				parser = (Parser) Class.forName(parserClass[i]).newInstance();
+				parser = (Parser) Class.forName(parserClass[i]).getDeclaredConstructor().newInstance();
 				return parser;
 			} catch (Throwable e) {
 				Debug.warning("Unable to load "+parserClass[i]+" as XMLParser due to "+e);

@@ -637,7 +637,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
             throw new IllegalArgumentException("bad length " + dlen + " > " + len);
         T rv;
         try {
-            rv = (T) _us.getClass().newInstance();
+            rv = (T) _us.getClass().getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             _log.error("fail", e);
             throw new RuntimeException(e);

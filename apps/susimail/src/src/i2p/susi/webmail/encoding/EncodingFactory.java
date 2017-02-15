@@ -51,7 +51,7 @@ public class EncodingFactory {
 			for( int i = 0; i < classNames.length; i++ ) {
 				try {
 					Class<?> c = Class.forName( classNames[i] );
-					Encoding e = (Encoding)c.newInstance();
+					Encoding e = (Encoding) (c.getDeclaredConstructor().newInstance());
 					encodings.put( e.getName(), e );
 					Debug.debug( Debug.DEBUG, "Registered " + e.getClass().getName() );
 				}

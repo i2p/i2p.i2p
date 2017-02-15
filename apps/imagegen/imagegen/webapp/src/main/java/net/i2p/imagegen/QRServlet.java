@@ -89,7 +89,7 @@ public class QRServlet extends HttpServlet {
 		if (cacheProvider != null) {
 			try {
 				Class<?> cacheClass = Class.forName(cacheProvider);
-				this.cache = (IdenticonCache) cacheClass.newInstance();
+				this.cache = (IdenticonCache) cacheClass.getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
