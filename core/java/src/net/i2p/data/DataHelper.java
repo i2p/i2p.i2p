@@ -1627,7 +1627,16 @@ public class DataHelper {
 
     /**
      *  Compress the data and return a new GZIP compressed byte array.
+     *  The compressed data conforms to RFC 1952,
+     *  with a 10-byte gzip header and a 8-byte gzip checksum footer.
+     *
+     *  Prior to 0.9.29, this would return a zero-length output
+     *  for a zero-length input. As of 0.9.29, output is valid for
+     *  a zero-length input also.
+     *
      *  @throws IllegalArgumentException if input size is over 40KB
+     *  @throws IllegalStateException on compression failure, as of 0.9.29
+     *  @return null if orig is null
      */
     public static byte[] compress(byte orig[]) {
         return compress(orig, 0, orig.length);
@@ -1635,7 +1644,16 @@ public class DataHelper {
 
     /**
      *  Compress the data and return a new GZIP compressed byte array.
+     *  The compressed data conforms to RFC 1952,
+     *  with a 10-byte gzip header and a 8-byte gzip checksum footer.
+     *
+     *  Prior to 0.9.29, this would return a zero-length output
+     *  for a zero-length input. As of 0.9.29, output is valid for
+     *  a zero-length input also.
+     *
      *  @throws IllegalArgumentException if size is over 40KB
+     *  @throws IllegalStateException on compression failure, as of 0.9.29
+     *  @return null if orig is null
      */
     public static byte[] compress(byte orig[], int offset, int size) {
         return compress(orig, offset, size, MAX_COMPRESSION);
@@ -1643,10 +1661,20 @@ public class DataHelper {
 
     /**
      *  Compress the data and return a new GZIP compressed byte array.
+     *  The compressed data conforms to RFC 1952,
+     *  with a 10-byte gzip header and a 8-byte gzip checksum footer.
+     *
+     *  Prior to 0.9.29, this would return a zero-length output
+     *  for a zero-length input. As of 0.9.29, output is valid for
+     *  a zero-length input also.
+     *
      *  @throws IllegalArgumentException if size is over 40KB
+     *  @throws IllegalStateException on compression failure, as of 0.9.29
+     *  @param level the compression level, 0 to 9
+     *  @return null if orig is null
      */
     public static byte[] compress(byte orig[], int offset, int size, int level) {
-        if ((orig == null) || (orig.length <= 0)) return orig;
+        if (orig == null) return orig;
         if (size > MAX_UNCOMPRESSED) 
             throw new IllegalArgumentException("tell jrandom size=" + size);
         ReusableGZIPOutputStream out = ReusableGZIPOutputStream.acquire();
@@ -1659,6 +1687,13 @@ public class DataHelper {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Compression of " + orig.length + " into " + rv.length + " (or " + 100.0d
             //               * (((double) orig.length) / ((double) rv.length)) + "% savings)");
+
+            // ticket 1915
+            // If we have a bug where the deflator didn't flush, this will catch it.
+            // gzip header is 10 bytes and footer is 8 bytes.
+            // size for zero-length input is 20.
+            if (rv.length <= 18)
+                throw new IllegalStateException("Compression failed, input size: " + size + " output size: " + rv.length);
             return rv;
         } catch (IOException ioe) {
             // Apache Harmony 5.0M13
@@ -1668,7 +1703,7 @@ public class DataHelper {
             //at net.i2p.data.DataHelper.compress(DataHelper.java:1048)
             //   ...
             ioe.printStackTrace();
-            return null;
+            throw new IllegalStateException("Compression failed, input size: " + size, ioe);
         } finally {
             ReusableGZIPOutputStream.release(out);
         }
@@ -1677,7 +1712,9 @@ public class DataHelper {
     
     /**
      *  Decompress the GZIP compressed data (returning null on error).
-     *  @throws IOException if uncompressed is over 40 KB
+     *  @throws IOException if uncompressed is over 40 KB,
+     *                      or on a decompression error
+     *  @return null if orig is null
      */
     public static byte[] decompress(byte orig[]) throws IOException {
         return (orig != null ? decompress(orig, 0, orig.length) : null);
@@ -1685,10 +1722,12 @@ public class DataHelper {
 
     /**
      *  Decompress the GZIP compressed data (returning null on error).
-     *  @throws IOException if uncompressed is over 40 KB
+     *  @throws IOException if uncompressed is over 40 KB,
+     *                      or on a decompression error
+     *  @return null if orig is null
      */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
-        if ((orig == null) || (orig.length <= 0)) return orig;
+        if (orig == null) return orig;
         if (offset + length > orig.length)
             throw new IOException("Bad params arrlen " + orig.length + " off " + offset + " len " + length);
         

@@ -1,5 +1,13 @@
+2017-02-15 zzz
+ * Utils: Disable caching of ResettableGZIPOutputStreams,
+   add more checks for compression failure,
+   fix output for zero-length input (ticket #1915)
+
+2017-02-10 zzz
+ * Test: Add random delays and drops to LocalClientManager
+
 2017-02-09 zzz
- * Streaming: Fix optional delay and choking (tickets #1046, 1939)
+ * Streaming: Fix optional delay and choking (tickets #1046, #1939)
 
 2017-02-08 zzz
  * I2CP: Return local delivery failure on queue overflow (ticket #1939)
