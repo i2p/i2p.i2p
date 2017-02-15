@@ -323,7 +323,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             try {
                 return DataHelper.decompress(compressed);
             } catch (IOException ioe) {
-                throw new I2PSessionException("Error decompressing message", ioe);
+                //throw new I2PSessionException("Error decompressing message", ioe);
+                if (_log.shouldWarn())
+                    _log.warn("Error decompressing message", ioe);
+                return null;
             }
         }
         return compressed;

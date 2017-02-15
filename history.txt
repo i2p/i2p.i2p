@@ -1,4 +1,7 @@
 2017-02-15 zzz
+ * Build: Fix calls to Class.newInstance() deprecated in Java 9
+ * I2CP: Return null on decompression failure instead of
+   throwing exception (ticket #1915)
  * Utils: Disable caching of ResettableGZIPOutputStreams,
    add more checks for compression failure,
    fix output for zero-length input (ticket #1915)
