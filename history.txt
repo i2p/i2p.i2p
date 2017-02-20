@@ -1,3 +1,6 @@
+2017-02-20 zzz
+ * GeoIP and blocklist update
+
 2017-02-15 zzz
  * Build: Fix calls to Class.newInstance() deprecated in Java 9
  * I2CP: Return null on decompression failure instead of

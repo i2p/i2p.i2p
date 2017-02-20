@@ -73,7 +73,11 @@ Friend of the Chinese Floodfill Flooder:159.226.40.3
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:203.0.113.0/24
 <a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:224.0.0.0/3
 Sybil:45.32.60.71
+Sybil:45.32.152.247
+Sybil:45.63.76.128
+Sybil:45.76.98.64
 Sybil:45.76.129.193
+Sybil:45.76.152.150
 Sybil:47.88.6.66
 Sybil:47.88.7.8
 Sybil:47.88.136.46
@@ -82,7 +86,17 @@ Sybil:47.88.138.200
 Sybil:47.89.38.177
 Sybil:47.90.1.15
 Sybil:47.90.1.26
+Sybil:104.156.254.54
+Sybil:108.61.251.143
+Sybil:133.130.124.185
 Sybil:150.95.128.165
+Sybil:163.44.149.31
+Sybil:2001;df6;b800;1128;a163;44;149;310
+Sybil:2001;19f0;4400;4376;5400;ff;fe47;bcbd
+Sybil:2001;19f0;5801;1d4;5400;ff;fe38;a26e
+Sybil:2001;19f0;5c01;1df;5400;ff;fe3e;ba8f
+Sybil:2001;19f0;7001;cb;5400;ff;fe47;c952
 Sybil:2001;19f0;7001;d99;5400;ff;fe41;829c
 Sybil:2001;19f0;7402;24d;5400;ff;fe41;9153
 Sybil:2400;8500;1302;816;a150;95;128;165b
+Sybil:2400;8500;1302;802;a133;130;124;1855

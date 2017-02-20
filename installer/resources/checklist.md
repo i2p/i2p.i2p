@@ -55,6 +55,7 @@
     tx and pull again, or (if new) comment out in .tx/config (add a comment why)
     and delete the po file
   - `installer/resources/poupdate-man.sh` to generate new man page translations
+    (requires po4a package)
   - `mtn add` for any new po files
   - `mtn ci` all changed po files, and .tx/config if changed
 
