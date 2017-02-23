@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException; 
 import java.util.Locale;
@@ -23,9 +24,11 @@ import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.client.naming.HostTxtEntry;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFileOutputStream;
 
@@ -72,9 +75,10 @@ public class PrivateKeyFile {
     public static void main(String args[]) {
         int hashEffort = HASH_EFFORT;
         String stype = null;
+        String hostname = null;
         int mode = 0;
         boolean error = false;
-        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:");
+        Getopt g = new Getopt("pkf", args, "t:nuxhse:c:a:");
         int c;
         while ((c = g.getopt()) != -1) {
           switch (c) {
@@ -91,6 +95,14 @@ public class PrivateKeyFile {
             case 'x':
             case 'h':
             case 's':
+                if (mode == 0)
+                    mode = c;
+                else
+                    error = true;
+                break;
+
+            case 'a':
+                hostname = g.getOptarg();
                 if (mode == 0)
                     mode = c;
                 else
@@ -171,6 +183,7 @@ public class PrivateKeyFile {
                 PrivateKeyFile pkf2 = new PrivateKeyFile(args[g.getOptind() + 1]);
                 pkf.setSignedCert(pkf2);
                 System.out.println("New destination with signed cert is:");
+                break;
 
               case 't':
                 // KeyCert
@@ -180,6 +193,18 @@ public class PrivateKeyFile {
                 pkf.setKeyCert(type);
                 System.out.println("New destination with key cert is:");
                 break;
+
+              case 'a':
+                // addressbook auth
+                OrderedProperties props = new OrderedProperties();
+                HostTxtEntry he = new HostTxtEntry(hostname, d.toBase64(), props);
+                he.sign(pkf.getSigningPrivKey());
+                System.out.println("Addressbook Authentication String:");
+                OutputStreamWriter out = new OutputStreamWriter(System.out);
+                he.write(out); 
+                out.flush();
+                System.out.println("");
+                return;
 
               default:
                 // shouldn't happen
@@ -202,6 +227,7 @@ public class PrivateKeyFile {
 
     private static void usage() {
         System.err.println("Usage: PrivateKeyFile [-c sigtype] filename (generates if nonexistent, then prints)\n" +
+                           "       PrivateKeyFile -a example.i2p filename (generate addressbook authentication string)\n" +
                            "       PrivateKeyFile -h filename (generates if nonexistent, adds hashcash cert)\n" +
                            "       PrivateKeyFile -h -e effort filename (specify HashCash effort instead of default " + HASH_EFFORT + ")\n" +
                            "       PrivateKeyFile -n filename (changes to null cert)\n" +

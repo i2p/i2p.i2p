@@ -236,21 +236,28 @@ class HostTxtParser {
     }
 
     /**
-     * Usage: HostTxtParser validate example.i2p=b64dest[#!key1=val1#key2=val2]
+     * Usage: HostTxtParser [-q] validate example.i2p=b64dest[#!key1=val1#key2=val2]
      */
     public static void main(String[] args) throws Exception {
+        boolean quiet = false;
+        if (args.length > 0 && args[0].equals("-q")) {
+            quiet = true;
+            args = java.util.Arrays.copyOfRange(args, 1, args.length);
+        }
         if (args.length != 2 || !args[0].equals("validate")) {
             System.err.println("Usage: HostTxtParser validate example.i2p=b64dest[#!key1=val1#key2=val2]");
             System.exit(1);
         }
         HostTxtEntry e = parse(args[1].trim(), false);
         if (e == null) {
-            System.err.println("Bad format");
-            System.exit(1);
+            if (!quiet)
+                System.err.println("Bad format");
+            System.exit(2);
         }
         if (!e.hasValidSig()) {
-            System.err.println("Bad signature");
-            System.exit(1);
+            if (!quiet)
+                System.err.println("Bad signature");
+            System.exit(3);
         }
         Properties p = e.getProps();
         if (p != null) {
@@ -259,12 +266,14 @@ class HostTxtParser {
                 p.containsKey(HostTxtEntry.PROP_OLDNAME) ||
                 p.containsKey(HostTxtEntry.PROP_OLDSIG)) {
                 if (!e.hasValidSig()) {
-                    System.err.println("Bad inner signature");
-                    System.exit(1);
+                    if (!quiet)
+                        System.err.println("Bad inner signature");
+                    System.exit(4);
                 }
             }
         }
-        System.err.println("Good signature for " + e.getName());
+        if (!quiet)
+            System.err.println("Good signature for " + e.getName());
         System.exit(0);
     }
 
