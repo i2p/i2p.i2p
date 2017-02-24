@@ -5,14 +5,15 @@
 # 
 # Translators:
 # 123hund123 <M8R-ra4r1r@mailinator.com>, 2011
+# Anders Nilsson <anders@devode.se>, 2016
 # Jonatan Nyberg <jonatan@autistici.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2016-06-14 13:22+0000\n"
-"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
+"PO-Revision-Date: 2016-12-19 13:35+0000\n"
+"Last-Translator: Anders Nilsson <anders@devode.se>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,12 +39,12 @@ msgstr "Startar"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 #: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
-msgstr "Öppna I2P browser"
+msgstr "Öppna I2P-browser"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr "Konfigurera I2P systemfältet"
+msgstr "Konfigurera I2P-meddelandefältet"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
@@ -68,28 +69,28 @@ msgstr "Starta om I2P omedelbart"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:143
 #: src/net/i2p/desktopgui/InternalTrayManager.java:295
 msgid "Stop I2P Immediately"
-msgstr ""
+msgstr "Stoppa I2P omedelbart"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:157
 #: src/net/i2p/desktopgui/InternalTrayManager.java:309
 msgid "Cancel I2P Shutdown"
-msgstr ""
+msgstr "Avbryt I2P-avstängning"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format
 msgid "Shutdown in {0}"
-msgstr ""
+msgstr "Stänger av om {0}"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:365
 msgid "Shutdown imminent"
-msgstr ""
+msgstr "Avstängning nära"
 
 #. status translations are in the console bundle
 #: src/net/i2p/desktopgui/InternalTrayManager.java:370
 msgid "Network"
-msgstr ""
+msgstr "Nätverk"
 
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63
 msgid "I2P: Right-click for menu"
-msgstr ""
+msgstr "I2P: Högerklicka för meny"

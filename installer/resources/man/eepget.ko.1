@@ -1,0 +1,92 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "2017년 1월 26일" "" I2P
+
+.SH 이름
+Eepget \- I2P 다운로더
+
+.SH SYNOPSIS
+\fBeepget\fP [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH 설명
+.P
+HTTP를 통해 파일을 바로 다운로드 받습니다. I2P와 기존 인터넷 모두 지원합니다.
+.P
+Eepget은 느리거나 불안정안 네트워크를 통해서도 파일을 운로드 받을 수 있게 합니다; 네트워크 문제로 파일이 성공적으로 다운받아지지
+않았다면, 모두 받아질 때 까지 계속 재시도합니다. (\-n 옵션이 설정되어 있다면요). 원격 서버에서 지원한다면 끊긴곳부터 다시 다운로드
+받을 것입니다.
+
+.SH 옵션
+\fB\-c\fP
+.TP 
+기존 네트워크. 프록시를 쓰지 않음. \fB\-p\fP :0 와 동일.
+.TP 
+
+\fB\-e\fP etag
+.TP 
+요청 헤더에 etag 값을 세팅.
+.TP 
+
+\fB\-h\fP name=value
+.TP 
+세팅된 name과 value로 요청 헤더를 추가
+.TP 
+
+\fB\-l\fP lineLen
+.TP 
+진행 디스플레이를 컨트롤. \fB\ lineLen \fP를 통해 문자 당 프로그레스 라인의 길이를 설정. 기본값은 40.
+.TP 
+
+\fB\-m\fP markSize
+.TP 
+진행 디스플레이를 컨트롤. \fB\ markSize \fP를 통해 하나의 '#' 문자가 몇 바이트를 뜻하는지 설정. 기본값은 1024.
+.TP 
+
+\fB\-n\fP retries
+.TP 
+다운로드가 실패했을 때 몇변 다시 시도할지 설정. 옵션이 설정되어 있지 않으면 다시 시도하지 않습니다.
+.TP 
+
+\fB\-o\fP file
+.TP 
+파일의 이름을 설정합니다. 세팅되지 않으면, URL에 표시된 파일이름 그대로 저장됩니다.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+사용할 I2P 프록시 서버 (eeproxy) 를 설정. 포트가 설정되어 있지 않으면 4444로 기본 설정되며, 옵션이 세팅되지 않았을 경우 기본값은 127.0.0.1:4444입니다. eeproxy를 사용하지 않으려면 \fB\-c\fP 또는 \fB\-p\fP :0 로 설정하세요.
+.TP 
+
+\fB\-t\fP seconds
+.TP 
+타임아웃 시간을 설정. 기본값은 60 초.
+.TP 
+
+\fB\-u\fP username
+.TP 
+프록시 인증에 필요한 유저네임 세팅. 필요할 때만 입력하세요.
+.TP 
+
+\fB\-x\fP password
+.TP 
+프록시 인증에 필요한 비밀번호 세팅. 필요할 때만 입력하세요.
+.TP 
+
+.SH "EXIT STATUS"
+
+\fBeepget\fP exits with status zero upon successful transfer and non\-zero if
+there were problems with the download.
+
+.SH "REPORTING BUGS"
+Please enter a ticket on
+.UR https://trac.i2p2.de/
+the I2P trac page
+.UE .
+
+.SH "SEE ALSO"
+\fBi2prouter\fP(1)  \fBcurl\fP(1)  \fBwget\fP(1)
+

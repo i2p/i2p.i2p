@@ -4,15 +4,17 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Besnik <besnik@programeshqip.org>, 2016
+# Shpetim <shpetim@privacysolutions.no>, 2014
 # Shpetim <shpetim@privacysolutions.no>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-06 18:28+0000\n"
-"PO-Revision-Date: 2015-02-06 18:33+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Albanian (http://www.transifex.com/projects/p/I2P/language/sq/)\n"
+"POT-Creation-Date: 2017-02-15 16:03+0000\n"
+"PO-Revision-Date: 2016-12-11 16:55+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/otf/I2P/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,330 +24,336 @@ msgstr ""
 #: src/src/i2p/susi/webmail/MailPart.java:207
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
-msgstr "Nuk gjindet koduesi për të koduar \\''{0}\\''."
+msgstr "S’u gjet kodues për kodimin \\''{0}\\''."
 
-#: src/src/i2p/susi/webmail/WebMail.java:324
-#: src/src/i2p/susi/webmail/WebMail.java:338
-#: src/src/i2p/susi/webmail/WebMail.java:990
+#: src/src/i2p/susi/webmail/WebMail.java:330
+#: src/src/i2p/susi/webmail/WebMail.java:344
+#: src/src/i2p/susi/webmail/WebMail.java:1018
 msgid "Re:"
-msgstr "Re:"
+msgstr "Pë:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:328
-#: src/src/i2p/susi/webmail/WebMail.java:342
-#: src/src/i2p/susi/webmail/WebMail.java:1028
+#: src/src/i2p/susi/webmail/WebMail.java:334
+#: src/src/i2p/susi/webmail/WebMail.java:348
+#: src/src/i2p/susi/webmail/WebMail.java:1056
 msgid "Fwd:"
-msgstr "Fwd:"
+msgstr "Pcl:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:579
+#: src/src/i2p/susi/webmail/WebMail.java:607
 msgid "unknown"
-msgstr "I panjohur"
+msgstr "e panjohur"
 
-#: src/src/i2p/susi/webmail/WebMail.java:600
+#: src/src/i2p/susi/webmail/WebMail.java:628
 msgid "Warning: no charset found, fallback to US-ASCII."
-msgstr "Vërejtje: nuk gjindet shenjetorja, kthehem në US-ASCII."
+msgstr "Sinjalizim: s’u gjet kodim germash, po përdoret US-ASCII."
 
-#: src/src/i2p/susi/webmail/WebMail.java:614
+#: src/src/i2p/susi/webmail/WebMail.java:642
 #, java-format
 msgid "Charset \\''{0}\\'' not supported."
-msgstr "Shenjëtorja \\''{0}\\'' nuk përkrahet."
+msgstr "Kodim \\''{0}\\'' i pambuluar."
 
-#: src/src/i2p/susi/webmail/WebMail.java:618
+#: src/src/i2p/susi/webmail/WebMail.java:646
 #, java-format
 msgid "Part ({0}) not shown, because of {1}"
-msgstr "Pjesa ({0}) nuk shfaqet, për arsye të {1}"
+msgstr "Nuk shfaqet pjesa ({0}), për shkak të {1}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:654
-#: src/src/i2p/susi/webmail/WebMail.java:657
+#: src/src/i2p/susi/webmail/WebMail.java:682
+#: src/src/i2p/susi/webmail/WebMail.java:685
 #, java-format
 msgid "Download attachment {0}"
-msgstr "Shkarko shtojcën {0}"
+msgstr "Shkarkoje bashkëngjitjen {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:658
+#: src/src/i2p/susi/webmail/WebMail.java:686
 msgid "File is packed into a zipfile for security reasons."
-msgstr "Fili është paluar në zipfile për arsye sigurie."
+msgstr "Për arsye sigurie, kartela është paketuar në një kartelë .zip."
 
-#: src/src/i2p/susi/webmail/WebMail.java:663
+#: src/src/i2p/susi/webmail/WebMail.java:691
 #, java-format
 msgid "Attachment ({0})."
-msgstr "Shtojca ({0})."
+msgstr "Bashkëngjitje ({0})."
 
-#: src/src/i2p/susi/webmail/WebMail.java:714
+#: src/src/i2p/susi/webmail/WebMail.java:742
 msgid "Need username for authentication."
-msgstr "Duhet emrin për vërtetim."
-
-#: src/src/i2p/susi/webmail/WebMail.java:718
-msgid "Need password for authentication."
-msgstr "Duhet fjalëkalimi për vërtetim."
-
-#: src/src/i2p/susi/webmail/WebMail.java:722
-msgid "Need hostname for connect."
-msgstr "Duhet hostname për lidhje."
-
-#: src/src/i2p/susi/webmail/WebMail.java:727
-msgid "Need port number for pop3 connect."
-msgstr "Duhet numri i portales për lidhje në pop3."
-
-#: src/src/i2p/susi/webmail/WebMail.java:734
-msgid "POP3 port number is not in range 0..65535."
-msgstr "Numri i portales së POP3'së nuk arritet 0..65535."
-
-#: src/src/i2p/susi/webmail/WebMail.java:740
-msgid "POP3 port number is invalid."
-msgstr "Numri i portales së POP3'së është invalid."
+msgstr "Lyp emër përdoruesi për mirëfilltësim"
 
 #: src/src/i2p/susi/webmail/WebMail.java:746
+msgid "Need password for authentication."
+msgstr "Lyp fjalëkalim për mirëfilltësim."
+
+#: src/src/i2p/susi/webmail/WebMail.java:750
+msgid "Need hostname for connect."
+msgstr "lyp strehëemër për lidhje."
+
+#: src/src/i2p/susi/webmail/WebMail.java:755
+msgid "Need port number for pop3 connect."
+msgstr "Lyp numër porte për lidhje pop3."
+
+#: src/src/i2p/susi/webmail/WebMail.java:762
+msgid "POP3 port number is not in range 0..65535."
+msgstr "Numri i portës POP3 s’gjendet në segmentin 0…65535."
+
+#: src/src/i2p/susi/webmail/WebMail.java:768
+msgid "POP3 port number is invalid."
+msgstr "Numri i portës SMTP është i pavlefshëm."
+
+#: src/src/i2p/susi/webmail/WebMail.java:774
 msgid "Need port number for smtp connect."
-msgstr "Duhet numri i portales për të lidhur smtp."
+msgstr "Lyp numër porte për lidhje smtp."
 
-#: src/src/i2p/susi/webmail/WebMail.java:753
+#: src/src/i2p/susi/webmail/WebMail.java:781
 msgid "SMTP port number is not in range 0..65535."
-msgstr "Numri i portales së SMTP'së nuk arritet 0..65535."
+msgstr "Numri i portës SMTP s’gjendet në segmentin 0…65535."
 
-#: src/src/i2p/susi/webmail/WebMail.java:759
+#: src/src/i2p/susi/webmail/WebMail.java:787
 msgid "SMTP port number is invalid."
-msgstr "Numri i portales së SMTP'së është invalid."
+msgstr "Numri i portës SMTP është i pavlefshëm."
 
-#: src/src/i2p/susi/webmail/WebMail.java:833
+#: src/src/i2p/susi/webmail/WebMail.java:861
 msgid "User logged out."
-msgstr "Përdoruesi është jashtkyqur. "
+msgstr "Përdoruesi doli."
 
-#: src/src/i2p/susi/webmail/WebMail.java:836
+#: src/src/i2p/susi/webmail/WebMail.java:864
+#: src/src/i2p/susi/webmail/WebMail.java:1170
 msgid "Internal error, lost connection."
-msgstr "Gabim brendësor, u shkëput lidhja."
+msgstr "Gabim i brendshëm, humbi lidhja."
 
-#: src/src/i2p/susi/webmail/WebMail.java:993
+#: src/src/i2p/susi/webmail/WebMail.java:1021
 #, java-format
 msgid "On {0} {1} wrote:"
-msgstr "Ditën e {0} {1} shkroi:"
+msgstr "Më {0}, {1} shkroi:"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1040
+#: src/src/i2p/susi/webmail/WebMail.java:1068
 msgid "begin forwarded mail"
-msgstr "fillo e-postin përcjellës"
+msgstr "fillon posta e përcjellë"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1062
+#: src/src/i2p/susi/webmail/WebMail.java:1090
 msgid "end forwarded mail"
-msgstr "përfundo e-postin përcjellës"
+msgstr "përfundon posta e përcjellë"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1069
-#: src/src/i2p/susi/webmail/WebMail.java:2367
+#: src/src/i2p/susi/webmail/WebMail.java:1097
+#: src/src/i2p/susi/webmail/WebMail.java:2441
 msgid "Could not fetch mail body."
-msgstr "Nuk mund të sjell përmbajtjen e e-postit."
+msgstr "S’u pru dot lënda e email-it."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1099
+#: src/src/i2p/susi/webmail/WebMail.java:1127
 msgid "Message id not valid."
-msgstr "Mesazhi nuk është i vlefshëm."
+msgstr "ID-ja e mesazhit s’është e vlefshme."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1137
+#: src/src/i2p/susi/webmail/WebMail.java:1165
 msgid "Configuration reloaded"
-msgstr "Konfigurimi u ringarkua"
+msgstr "Formësimi u ringarkua"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1198
+#: src/src/i2p/susi/webmail/WebMail.java:1232
 #, java-format
 msgid "No Encoding found for {0}"
-msgstr "Nuk gjindet Kodimi për {0}"
+msgstr "S’u gjet kodim për {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1202
+#: src/src/i2p/susi/webmail/WebMail.java:1236
 #, java-format
 msgid "Could not encode data: {0}"
-msgstr "Nuk mund të kodojë të dhënat: {0}"
+msgstr "S’kodoi dot të dhëna: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1207
+#: src/src/i2p/susi/webmail/WebMail.java:1241
 #, java-format
 msgid "Error reading uploaded file: {0}"
-msgstr "Gabim në leximin e filit të ngarkuar: {0}"
+msgstr "Gabim gjatë leximit të kartelës së ngarkuar: {0}"
 
 #. error if we get here
-#: src/src/i2p/susi/webmail/WebMail.java:1292
-#: src/src/i2p/susi/webmail/WebMail.java:1295
+#: src/src/i2p/susi/webmail/WebMail.java:1326
+#: src/src/i2p/susi/webmail/WebMail.java:1329
 msgid "Attachment not found."
-msgstr "Nuk gjindet shtojca."
+msgstr "S’u gjet bashkëngjitje."
 
 #. error if we get here
-#: src/src/i2p/susi/webmail/WebMail.java:1322
-#: src/src/i2p/susi/webmail/WebMail.java:1324
+#: src/src/i2p/susi/webmail/WebMail.java:1356
+#: src/src/i2p/susi/webmail/WebMail.java:1358
 msgid "Message not found."
-msgstr ""
+msgstr "Mesazhi s’u gjet."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1369
-#: src/src/i2p/susi/webmail/WebMail.java:1497
+#: src/src/i2p/susi/webmail/WebMail.java:1403
+#: src/src/i2p/susi/webmail/WebMail.java:1541
 msgid "Invalid pagesize number, resetting to default value."
-msgstr "Numri i madhësisë së faqes invalid, duke u rivendosur në vlerën e parazgjedhur."
+msgstr "Numër i pavlefshëm për madhësi faqeje, po i rijepet vlera parazgjedhje."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1393
+#: src/src/i2p/susi/webmail/WebMail.java:1427
 msgid "No messages marked for deletion."
-msgstr "Nuk ka mesazhe të shenjuara për fshirje."
+msgstr "S’ka mesazhe të shënuar për fshirje."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1409
+#: src/src/i2p/susi/webmail/WebMail.java:1443
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
-msgstr[0] "1 mesazh është fshirë."
-msgstr[1] "{0} mesazhe janë fshirë."
+msgstr[0] "U fshi 1 mesazh."
+msgstr[1] "U fshinë {0} mesazhe."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1476
+#: src/src/i2p/susi/webmail/WebMail.java:1505
+#, java-format
+msgid "Host unchanged. Edit configation file {0} to change host."
+msgstr "Strehë e  pandryshuar. Përpunoni kartelën e formësimit {0} që të ndryshoni strehën."
+
+#: src/src/i2p/susi/webmail/WebMail.java:1520
 msgid "Configuration saved"
-msgstr "Konfigurimi është ruajtur"
+msgstr "Formësimi u ruajt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1696
-#: src/src/i2p/susi/webmail/WebMail.java:2157
+#: src/src/i2p/susi/webmail/WebMail.java:1757
+#: src/src/i2p/susi/webmail/WebMail.java:2231
 msgid "Login"
-msgstr "Login"
+msgstr "Hyrje"
 
 #. mailbox.getNumMails() forces a connection, don't use it
 #. Not only does it slow things down, but a failure causes all our messages to
 #. "vanish"
 #. subtitle = ngettext("1 Message", "{0} Messages",
 #. sessionObject.mailbox.getNumMails());
-#: src/src/i2p/susi/webmail/WebMail.java:1701
+#: src/src/i2p/susi/webmail/WebMail.java:1762
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
 msgstr[0] "1 Mesazh"
 msgstr[1] "{0} Mesazhe"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1707
+#: src/src/i2p/susi/webmail/WebMail.java:1768
 msgid "Show Message"
-msgstr "Shfaqe Mesazhin"
+msgstr "Shfaqe mesazhin"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1709
+#: src/src/i2p/susi/webmail/WebMail.java:1770
 msgid "New Message"
-msgstr "Mesazh i ri"
+msgstr "Mesazh i Ri"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1711
+#: src/src/i2p/susi/webmail/WebMail.java:1772
 msgid "Configuration"
-msgstr "Konfigurimi"
+msgstr "Formësim"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1722
+#: src/src/i2p/susi/webmail/WebMail.java:1783
 msgid "SusiMail"
 msgstr "SusiMail"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1735
+#: src/src/i2p/susi/webmail/WebMail.java:1796
 msgid "Message has not been sent. Do you want to discard it?"
-msgstr "Mesazhi nuk u dërgua. Doni ta hudhni atë?"
+msgstr "Mesazhi s’u dërgua. Doni ta hidhni tej?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1797
+#: src/src/i2p/susi/webmail/WebMail.java:1870
 #, java-format
 msgid "Error decoding content: {0}"
-msgstr "Gabim në kodimin e përmbajtjes: {0}"
+msgstr "Gabim në shkodim lënde: {0}"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1905
+#: src/src/i2p/susi/webmail/WebMail.java:1979
 msgid "no subject"
-msgstr "pa titull"
+msgstr "s’ka subjekt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:1922
+#: src/src/i2p/susi/webmail/WebMail.java:1996
 msgid "Found no valid sender address."
-msgstr "Nuk gjej adresë dërguese të vleshme."
+msgstr "S’u gjet adresë e vlefshme dërguesi."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1928
+#: src/src/i2p/susi/webmail/WebMail.java:2002
 #, java-format
 msgid "Found no valid address in \\''{0}\\''."
-msgstr "Nuk gjej adresë të vlefshme në \\''{0}\\''."
+msgstr "S’u gjet adresë e vlefshme te \\''{0}\\''."
 
-#: src/src/i2p/susi/webmail/WebMail.java:1949
+#: src/src/i2p/susi/webmail/WebMail.java:2023
 msgid "No recipients found."
-msgstr "Nuk gjej marrës."
+msgstr "S’u gjetën marrës."
 
-#: src/src/i2p/susi/webmail/WebMail.java:2013
+#: src/src/i2p/susi/webmail/WebMail.java:2087
 msgid "Mail sent."
-msgstr "Posti u dërgua"
+msgstr "Posta u dërgua."
 
-#: src/src/i2p/susi/webmail/WebMail.java:2057
+#: src/src/i2p/susi/webmail/WebMail.java:2131
 msgid "Send"
-msgstr "Dërgo"
+msgstr "Dërgoje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2058
-#: src/src/i2p/susi/webmail/WebMail.java:2273
-#: src/src/i2p/susi/webmail/WebMail.java:2407
+#: src/src/i2p/susi/webmail/WebMail.java:2132
+#: src/src/i2p/susi/webmail/WebMail.java:2347
+#: src/src/i2p/susi/webmail/WebMail.java:2481
 msgid "Cancel"
-msgstr "Anulo"
+msgstr "Anuloje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2101
-#: src/src/i2p/susi/webmail/WebMail.java:2200
-#: src/src/i2p/susi/webmail/WebMail.java:2355
+#: src/src/i2p/susi/webmail/WebMail.java:2175
+#: src/src/i2p/susi/webmail/WebMail.java:2274
+#: src/src/i2p/susi/webmail/WebMail.java:2429
 msgid "From"
-msgstr "Nga"
+msgstr "Nga "
 
-#: src/src/i2p/susi/webmail/WebMail.java:2102
+#: src/src/i2p/susi/webmail/WebMail.java:2176
 msgid "To"
-msgstr "Te"
+msgstr "Për"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2103
+#: src/src/i2p/susi/webmail/WebMail.java:2177
 msgid "Cc"
 msgstr "Cc"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2104
+#: src/src/i2p/susi/webmail/WebMail.java:2178
 msgid "Bcc"
 msgstr "Bcc"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2105
+#: src/src/i2p/susi/webmail/WebMail.java:2179
 msgid "Bcc to self"
-msgstr "Bcc të vetëvetja"
+msgstr "Bcc vetvetes"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2106
-#: src/src/i2p/susi/webmail/WebMail.java:2201
-#: src/src/i2p/susi/webmail/WebMail.java:2357
+#: src/src/i2p/susi/webmail/WebMail.java:2180
+#: src/src/i2p/susi/webmail/WebMail.java:2275
+#: src/src/i2p/susi/webmail/WebMail.java:2431
 msgid "Subject"
-msgstr "Tema"
+msgstr "Subjekt"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2109
+#: src/src/i2p/susi/webmail/WebMail.java:2183
 msgid "Add Attachment"
-msgstr "Ngjite Shtojcën"
+msgstr "Shtoni Bashkëngjitje"
 
 #. TODO disable/hide in JS if no file selected
-#: src/src/i2p/susi/webmail/WebMail.java:2111
+#: src/src/i2p/susi/webmail/WebMail.java:2185
 msgid "Add another attachment"
-msgstr "Ngjite një shtojcë tjetër"
+msgstr "Shtoni një tjetër bashkëngjitje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2117
+#: src/src/i2p/susi/webmail/WebMail.java:2191
 msgid "Attachments"
-msgstr "Shtojcat"
+msgstr "Bashkëngjitje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2126
+#: src/src/i2p/susi/webmail/WebMail.java:2200
 msgid "Delete selected attachments"
-msgstr "Fshij shtojcat e shenjuara"
+msgstr "Fshi bashkëngjitjet e përzgjedhura"
 
 #. current postman hq length limits 16/12, new postman version 32/32
-#: src/src/i2p/susi/webmail/WebMail.java:2145
+#: src/src/i2p/susi/webmail/WebMail.java:2219
 msgid "User"
 msgstr "Përdorues"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2146
+#: src/src/i2p/susi/webmail/WebMail.java:2220
 msgid "Password"
-msgstr "Fjalëkalimi"
+msgstr "Fjalëkalim"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2151
+#: src/src/i2p/susi/webmail/WebMail.java:2225
 msgid "Host"
-msgstr "Host"
+msgstr "Strehë"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2152
+#: src/src/i2p/susi/webmail/WebMail.java:2226
 msgid "POP3 Port"
-msgstr "Portalja e POP3'së"
+msgstr "Portë POP3"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2153
+#: src/src/i2p/susi/webmail/WebMail.java:2227
 msgid "SMTP Port"
-msgstr "Portalja e SMTP'së"
+msgstr "Portë SMTP"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2158
+#: src/src/i2p/susi/webmail/WebMail.java:2232
 msgid "Read Mail Offline"
-msgstr "Lexo E-postin Offline"
+msgstr "Lexoni Postë Jo Në Linjë"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2162
-#: src/src/i2p/susi/webmail/WebMail.java:2291
+#: src/src/i2p/susi/webmail/WebMail.java:2236
+#: src/src/i2p/susi/webmail/WebMail.java:2366
 msgid "Settings"
-msgstr "Cilësimet"
+msgstr "Rregullime"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2165
+#: src/src/i2p/susi/webmail/WebMail.java:2239
 msgid "Learn about I2P mail"
-msgstr "Mëso për I2P mail"
+msgstr "Mësoni mmbi postën I2P"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2166
+#: src/src/i2p/susi/webmail/WebMail.java:2240
 msgid "Create Account"
-msgstr "Krijo Llogari"
+msgstr "Krijoni Llogari"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2179
-#: src/src/i2p/susi/webmail/WebMail.java:2335
+#: src/src/i2p/susi/webmail/WebMail.java:2253
+#: src/src/i2p/susi/webmail/WebMail.java:2409
 msgid "New"
-msgstr "I ri / e re"
+msgstr "I ri"
 
 #. In theory, these are valid and will apply to the first checked message,
 #. but that's not obvious and did it work?
@@ -353,178 +361,180 @@ msgstr "I ri / e re"
 #. button( REPLYALL, _t("Reply All") ) +
 #. button( FORWARD, _t("Forward") ) + spacer +
 #. button( DELETE, _t("Delete") ) + spacer +
-#: src/src/i2p/susi/webmail/WebMail.java:2186
+#: src/src/i2p/susi/webmail/WebMail.java:2260
 msgid "Check Mail"
-msgstr "Shiko E-postin"
+msgstr "Kontrollo Për Postë"
 
 #. if (Config.hasConfigFile())
 #. out.println(button( RELOAD, _t("Reload Config") ) + spacer);
-#: src/src/i2p/susi/webmail/WebMail.java:2189
+#: src/src/i2p/susi/webmail/WebMail.java:2263
+#: src/src/i2p/susi/webmail/WebMail.java:2418
+#: src/src/i2p/susi/webmail/WebMail.java:2483
 msgid "Logout"
-msgstr "Logout"
+msgstr "Dalje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2202
-#: src/src/i2p/susi/webmail/WebMail.java:2359
+#: src/src/i2p/susi/webmail/WebMail.java:2276
+#: src/src/i2p/susi/webmail/WebMail.java:2433
 msgid "Date"
-msgstr "Data"
+msgstr "Datë"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2205
+#: src/src/i2p/susi/webmail/WebMail.java:2279
 msgid "Size"
-msgstr "Madhësia"
+msgstr "Madhësi"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2246
+#: src/src/i2p/susi/webmail/WebMail.java:2320
 msgid "Message is new"
 msgstr "Mesazhi është i ri"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2249
+#: src/src/i2p/susi/webmail/WebMail.java:2323
 msgid "Message has an attachment"
-msgstr "Mesazhi ka një shtojcë"
+msgstr "Mesazhi ka një bashkëngjitje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2251
+#: src/src/i2p/susi/webmail/WebMail.java:2325
 msgid "Message is spam"
-msgstr "Mesazhi është spam"
+msgstr "Mesazhi është i padëshiruar"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2259
+#: src/src/i2p/susi/webmail/WebMail.java:2333
 msgid "No messages"
 msgstr "Nuk ka mesazhe"
 
 #. TODO ngettext
-#: src/src/i2p/susi/webmail/WebMail.java:2271
-msgid "Really delete the marked messages?"
-msgstr "Vërtet fshij mesazhet e shenjuara?"
-
-#: src/src/i2p/susi/webmail/WebMail.java:2272
-msgid "Yes, really delete them!"
-msgstr "Po, vërtet fshij ata!"
-
-#: src/src/i2p/susi/webmail/WebMail.java:2275
-msgid "Delete Selected"
-msgstr "Fshirja Zgjedhur"
-
-#: src/src/i2p/susi/webmail/WebMail.java:2277
-msgid "Mark All"
-msgstr "Shenjo të Gjitha"
-
-#: src/src/i2p/susi/webmail/WebMail.java:2279
-msgid "Clear All"
-msgstr "Pastro të Gjitha"
-
-#: src/src/i2p/susi/webmail/WebMail.java:2304
-#: src/src/i2p/susi/webmail/WebMail.java:2305
-msgid "First"
-msgstr "Së pari"
-
-#: src/src/i2p/susi/webmail/WebMail.java:2304
-#: src/src/i2p/susi/webmail/WebMail.java:2305
 #: src/src/i2p/susi/webmail/WebMail.java:2345
-msgid "Previous"
-msgstr "Mëparshme"
+msgid "Really delete the marked messages?"
+msgstr "Të fshihet vërtet mesazhet e shënuara?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2307
+#: src/src/i2p/susi/webmail/WebMail.java:2346
+msgid "Yes, really delete them!"
+msgstr "Po, fshiji vërtet!"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2349
+msgid "Delete Selected"
+msgstr "Fshi të Përzgjedhurën"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2351
+msgid "Mark All"
+msgstr "Shënoji Krejt"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2353
+msgid "Clear All"
+msgstr "Pastroji Krejt"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2378
+#: src/src/i2p/susi/webmail/WebMail.java:2379
+msgid "First"
+msgstr "I pari"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2378
+#: src/src/i2p/susi/webmail/WebMail.java:2379
+#: src/src/i2p/susi/webmail/WebMail.java:2420
+msgid "Previous"
+msgstr "I mëparshmi"
+
+#: src/src/i2p/susi/webmail/WebMail.java:2381
 #, java-format
 msgid "Page {0} of {1}"
-msgstr "Faqja {0} e {1}"
+msgstr "Faqja {0} nga {1} "
 
-#: src/src/i2p/susi/webmail/WebMail.java:2310
-#: src/src/i2p/susi/webmail/WebMail.java:2311
+#: src/src/i2p/susi/webmail/WebMail.java:2384
+#: src/src/i2p/susi/webmail/WebMail.java:2385
 msgid "Last"
-msgstr "Së fundi"
+msgstr "I fundit"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2310
-#: src/src/i2p/susi/webmail/WebMail.java:2311
-#: src/src/i2p/susi/webmail/WebMail.java:2347
+#: src/src/i2p/susi/webmail/WebMail.java:2384
+#: src/src/i2p/susi/webmail/WebMail.java:2385
+#: src/src/i2p/susi/webmail/WebMail.java:2422
 msgid "Next"
-msgstr "Tjetër"
+msgstr "Pasuesi"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2323
+#: src/src/i2p/susi/webmail/WebMail.java:2397
 msgid "Really delete this message?"
-msgstr "Vërtet fshij mesazhin?"
+msgstr "Të fshihet vërtet ky mesazh?"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2323
+#: src/src/i2p/susi/webmail/WebMail.java:2397
 msgid "Yes, really delete it!"
-msgstr "Po, vërtet fshije atë!"
+msgstr "Po, fshije vërtet"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2336
+#: src/src/i2p/susi/webmail/WebMail.java:2410
 msgid "Reply"
 msgstr "Përgjigju"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2337
+#: src/src/i2p/susi/webmail/WebMail.java:2411
 msgid "Reply All"
-msgstr "Përgjigju të Gjithave"
+msgstr "Përgjigju Të gjithëve"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2338
+#: src/src/i2p/susi/webmail/WebMail.java:2412
 msgid "Forward"
-msgstr "Përcjelle"
+msgstr "Përcille"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2339
+#: src/src/i2p/susi/webmail/WebMail.java:2413
 msgid "Save As"
-msgstr ""
+msgstr "Ruaje Si"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2341
-#: src/src/i2p/susi/webmail/WebMail.java:2343
+#: src/src/i2p/susi/webmail/WebMail.java:2415
+#: src/src/i2p/susi/webmail/WebMail.java:2417
 msgid "Delete"
-msgstr "Fshij"
+msgstr "Fshije"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2346
+#: src/src/i2p/susi/webmail/WebMail.java:2421
 msgid "Back to Folder"
-msgstr "Prapa te Folderi"
+msgstr "Mbrapsht te Kartela"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2371
+#: src/src/i2p/susi/webmail/WebMail.java:2445
 msgid "Could not fetch mail."
-msgstr "Nuk mund të sjell e-postin."
+msgstr "S’u pru dot email-i."
 
-#: src/src/i2p/susi/webmail/WebMail.java:2389
+#: src/src/i2p/susi/webmail/WebMail.java:2463
 msgid "Folder Page Size"
-msgstr "Madhësia e Faqes së Folderit"
+msgstr "Madhësi Faqeje Dosjeje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2392
+#: src/src/i2p/susi/webmail/WebMail.java:2466
 msgid "Set"
-msgstr "Vë"
+msgstr "Caktoje"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2395
+#: src/src/i2p/susi/webmail/WebMail.java:2469
 msgid "Advanced Configuration"
-msgstr "Konfigurim i avancuar"
+msgstr "Formësim i Mëtejshëm"
 
-#: src/src/i2p/susi/webmail/WebMail.java:2406
+#: src/src/i2p/susi/webmail/WebMail.java:2480
 msgid "Save Configuration"
-msgstr "Ruaj Konfigurimin"
+msgstr "Ruaje Formësimin"
 
 #. this appears in the UI so translate
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:102
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:751
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:793
 msgid "No response from server"
-msgstr "Nuk ka përgjegjje nga serveri"
+msgstr "S’ka përgjigje nga shërbyesi"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:668
 msgid "Error connecting to server"
-msgstr "Gabim lidhje me serverin"
+msgstr "Gabim gjatë lidhjes me shërbyesin"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:673
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:676
 msgid "Error opening mailbox"
-msgstr "Gabim në hapjen e mailbox'it."
+msgstr "Gabim gjatë hapjes së kutisë postare"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1025
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:249
 msgid "Login failed"
-msgstr "Login dështoi"
+msgstr "Hyrja dështoi"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:214
 msgid "Cannot connect"
-msgstr "Nuk mund të lidhem"
+msgstr "S’lidhet dot"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:225
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:237
 msgid "Server refused connection"
-msgstr "Serveri refuzoi lidhjen"
+msgstr "Shërbyesi e hodhi poshtë  lidhjen"
 
 #. TODO which recipient?
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:262
 msgid "Mail rejected"
-msgstr "E-posti nuk u pranua"
+msgstr "Postë e hedhur poshtë"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:276
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:279
 msgid "Error sending mail"
-msgstr "Gabim dërgimi të e-postit"
+msgstr "Gabim në dërgim email-i"

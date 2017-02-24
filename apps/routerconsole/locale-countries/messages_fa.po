@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Amir H. Firouzian, 2015
+# Amir H. Firouzian, 2015,2017
 # NoProfile, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2015-07-27 11:23+0000\n"
+"PO-Revision-Date: 2017-01-30 03:04+0000\n"
 "Last-Translator: Amir H. Firouzian\n"
 "Language-Team: Persian (http://www.transifex.com/otf/I2P/language/fa/)\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgid "Anonymous Proxy"
 msgstr "پروکسی ناشناس"
 
 msgid "Satellite Provider"
-msgstr "ارائه دهنده ماهواره ای"
+msgstr "ارائه‌دهنده ماهواره‌ای"
 
 msgid "Andorra"
 msgstr "آندورا"
@@ -306,7 +306,7 @@ msgid "South Georgia and the South Sandwich Islands"
 msgstr "جورجیای جنوبی و جزایر ساندویچ جنوبی"
 
 msgid "Guatemala"
-msgstr "گواتمالا"
+msgstr "گواتِمالا"
 
 msgid "Guam"
 msgstr "گوام"
@@ -345,7 +345,7 @@ msgid "Isle of Man"
 msgstr "جزیره من"
 
 msgid "India"
-msgstr "هندوستان"
+msgstr "هند"
 
 msgid "British Indian Ocean Territory"
 msgstr "مستعمرات انگلیسی اقیانوس هند"
@@ -396,7 +396,7 @@ msgid "North Korea"
 msgstr "کره شمالی"
 
 msgid "Republic of Korea"
-msgstr "جمهوری کره"
+msgstr "کره جنوبی"
 
 msgid "Kuwait"
 msgstr "کویت"

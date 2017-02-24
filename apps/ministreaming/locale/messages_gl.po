@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2016-10-20 00:46+0000\n"
+"PO-Revision-Date: 2016-12-25 04:06+0000\n"
 "Last-Translator: Uberius Crypto <uberius@anonymail.tech>\n"
 "Language-Team: Galician (http://www.transifex.com/otf/I2P/language/gl/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
-msgstr ""
+msgstr "Excedeuse o tempo límite para o envío da mensaxe"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
@@ -50,15 +50,15 @@ msgstr "Opcións de mensaxe non válidas"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
 msgid "Buffer overflow"
-msgstr ""
+msgstr "Búfer sobrecargado"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
 msgid "Message expired"
-msgstr ""
+msgstr "Mensaxe caducada"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
-msgstr ""
+msgstr "O lease set local non é válido"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
@@ -74,15 +74,15 @@ msgstr "Destino non válido"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
-msgstr ""
+msgstr "O lease set do destino caducou"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Non se atopou o lease set do destino"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"
-msgstr ""
+msgstr "Apaga-lo destino local "
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
 msgid "Connection was reset"

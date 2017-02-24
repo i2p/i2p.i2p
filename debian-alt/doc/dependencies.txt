@@ -64,7 +64,7 @@ Current Runtime Dependencies
   We've found some other packages that contain version 1.1 jars:
   libjakarta-taglibs-standard-java (containing standard.jar only)
   and libjstl1.1-java (containing jstl.jar only).
-  They may be inside tomcat or jetty packages also?
+  Jetty 9 does contain JSTL 1.2 ??? but not in packages???
   It's not clear why there isn't a libjstl1.2-java package.
   It also isn't clear why we upgraded to 1.2 years ago, but the rest of the world didn't.
   And it isn't clear why 1.1 won't work for us.
