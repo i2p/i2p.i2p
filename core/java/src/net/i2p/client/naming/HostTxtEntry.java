@@ -396,6 +396,8 @@ public class HostTxtEntry {
             throw new IllegalStateException();
         props.setProperty(PROP_NAME, name);
         props.setProperty(PROP_DEST, dest);
+        if (!props.containsKey(PROP_DATE))
+            props.setProperty(PROP_DATE, Long.toString(System.currentTimeMillis() / 1000));
         StringWriter buf = new StringWriter(1024);
         try {
             writeProps(buf);
@@ -418,6 +420,8 @@ public class HostTxtEntry {
             throw new IllegalStateException();
         if (props.containsKey(sigprop))
             throw new IllegalStateException();
+        if (!props.containsKey(PROP_DATE))
+            props.setProperty(PROP_DATE, Long.toString(System.currentTimeMillis() / 1000));
         StringWriter buf = new StringWriter(1024);
         buf.append(name);
         buf.append(KV_SEPARATOR);
