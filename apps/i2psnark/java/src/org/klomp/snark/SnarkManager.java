@@ -2595,17 +2595,18 @@ public class SnarkManager implements CompleteListener {
                 DHT dht = _util.getDHT();
                 if (dht != null)
                     dht.stop();
-                // Schedule this even for final shutdown, as there's a chance
-                // that it's just this webapp that is stopping.
-                _context.simpleTimer2().addEvent(new Disconnector(), 60*1000);
                 addMessage(_t("Closing I2P tunnel after notifying trackers."));
                 if (finalShutdown) {
                     long toWait = 5*1000;
                     if (SystemVersion.isARM())
                         toWait *= 2;
                     try { Thread.sleep(toWait); } catch (InterruptedException ie) {}
+                    _util.disconnect();
+                    _stopping = false;
+                } else {
+                    // Only schedule this if not a final shutdown
+                    _context.simpleTimer2().addEvent(new Disconnector(), 60*1000);
                 }
-                _util.disconnect();
             } else {
                 _util.disconnect();
                 _stopping = false;
