@@ -162,7 +162,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                            String oldb64 = pkf2.getDestination().toBase64();
                            if (!b64.equals(oldb64)) {
                                // disallow dup
-                               olddest = b64;
+                               olddest = oldb64;
                                spk2 = pkf2.getSigningPrivKey();
                            }
                        } catch (I2PSessionException ise) {
@@ -217,6 +217,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
 <%
                props.remove(HostTxtEntry.PROP_SIG);
+               props.remove(HostTxtEntry.PROP_OLDNAME);
           %><div id="sigField" class="rowItem">
                 <label for="signature">
                     <%=intl._t("Authentication for changing destination")%>
