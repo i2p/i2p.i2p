@@ -174,7 +174,9 @@
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.1.jar" />
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-api-2.3.1.jar" />
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-2.3.2.jar" />
+<!--
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/jetty-jsp-${jetty.ver}.jar" />
+-->
             <!-- In Debian packages they are found in /usr/share/java/tomcat8-servlet-api.jar in the libtomcat8-java package -->
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jetty-schemas-3.1.jar" />
         </jar>

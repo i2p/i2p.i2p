@@ -112,6 +112,13 @@ public class WebAppStarter {
 
         // see WebAppConfiguration for info
         String[] classNames = wac.getConfigurationClasses();
+        // In Jetty 9, it doesn't set the defaults if we've already added one, but the
+        // defaults aren't set yet when we call the above. So we have to get the defaults.
+        // Without the default configuration, the web.xml isn't read, and the webapp
+        // won't respond to any requests, even though it appears to be running.
+        // See WebAppContext.loadConfigurations() in source
+        if (classNames.length == 0)
+            classNames = wac.getDefaultConfigurationClasses();
         String[] newClassNames = new String[classNames.length + 1];
         for (int j = 0; j < classNames.length; j++)
              newClassNames[j] = classNames[j];
