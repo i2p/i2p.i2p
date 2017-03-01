@@ -327,7 +327,6 @@ public class WorkingDir {
         } catch (IOException ioe) {
             if (in != null) {
                 System.err.println("FAILED copy " + oldFile + ": " + ioe);
-                return false;
             }
             return false;
         } finally {
@@ -365,7 +364,6 @@ public class WorkingDir {
         } catch (IOException ioe) {
             if (in != null) {
                 System.err.println("FAILED copy " + oldFile + ": " + ioe);
-                return false;
             }
             return false;
         } finally {

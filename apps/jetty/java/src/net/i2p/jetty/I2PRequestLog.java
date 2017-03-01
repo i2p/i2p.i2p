@@ -80,7 +80,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient OutputStream _out;
     private transient OutputStream _fileOut;
     private transient DateCache _logDateCache;
-    private transient PathMap _ignorePathMap;
+    private transient PathMap<String> _ignorePathMap;
     private transient Writer _writer;
     private transient ArrayList<Utf8StringBuilder> _buffers;
     private transient char[] _copy;
@@ -472,7 +472,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         
         if (_ignorePaths != null && _ignorePaths.length > 0)
         {
-            _ignorePathMap = new PathMap();
+            _ignorePathMap = new PathMap<String>();
             for (int i = 0; i < _ignorePaths.length; i++) 
                 _ignorePathMap.put(_ignorePaths[i], _ignorePaths[i]);
         }
