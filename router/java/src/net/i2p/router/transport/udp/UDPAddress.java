@@ -26,6 +26,7 @@ class UDPAddress {
     private final int _introPorts[];
     private final byte[] _introKeys[];
     private final long _introTags[];
+    private final long _introExps[];
     private final int _mtu;
     
     public static final String PROP_PORT = RouterAddress.PROP_PORT;
@@ -41,22 +42,27 @@ class UDPAddress {
     public static final String PROP_INTRO_PORT_PREFIX = "iport";
     public static final String PROP_INTRO_KEY_PREFIX = "ikey";
     public static final String PROP_INTRO_TAG_PREFIX = "itag";
+    /** @since 0.9.30 */
+    public static final String PROP_INTRO_EXP_PREFIX = "iexp";
     static final int MAX_INTRODUCERS = 3;
     private static final String[] PROP_INTRO_HOST;
     private static final String[] PROP_INTRO_PORT;
     private static final String[] PROP_INTRO_IKEY;
     private static final String[] PROP_INTRO_TAG;
+    private static final String[] PROP_INTRO_EXP;
     static {
         // object churn
         PROP_INTRO_HOST = new String[MAX_INTRODUCERS];
         PROP_INTRO_PORT = new String[MAX_INTRODUCERS];
         PROP_INTRO_IKEY = new String[MAX_INTRODUCERS];
         PROP_INTRO_TAG = new String[MAX_INTRODUCERS];
+        PROP_INTRO_EXP = new String[MAX_INTRODUCERS];
         for (int i = 0; i < MAX_INTRODUCERS; i++) {
             PROP_INTRO_HOST[i] = PROP_INTRO_HOST_PREFIX + i;
             PROP_INTRO_PORT[i] = PROP_INTRO_PORT_PREFIX + i;
             PROP_INTRO_IKEY[i] = PROP_INTRO_KEY_PREFIX + i;
             PROP_INTRO_TAG[i] = PROP_INTRO_TAG_PREFIX + i;
+            PROP_INTRO_EXP[i] = PROP_INTRO_EXP_PREFIX + i;
         }
     }
 
@@ -70,6 +76,7 @@ class UDPAddress {
             _introPorts = null;
             _introKeys = null;
             _introTags = null;
+            _introExps = null;
             _mtu = 0;
             return;
         }
@@ -102,6 +109,7 @@ class UDPAddress {
         int[] cintroPorts = null;
         String[] cintroHosts = null;
         InetAddress[] cintroAddresses = null;
+        long[] cintroExps = null;
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
             String host = addr.getOption(PROP_INTRO_HOST[i]);
             if (host == null) continue;
@@ -128,6 +136,14 @@ class UDPAddress {
             } catch (NumberFormatException nfe) {
                 continue;
             }
+            // expiration is optional
+            long exp = 0;
+            t = addr.getOption(PROP_INTRO_EXP[i]);
+            if (t != null) {
+                try {
+                    exp = Long.parseLong(t) * 1000L;
+                } catch (NumberFormatException nfe) {}
+            }
 
             if (cintroHosts == null) {
                 cintroHosts = new String[i+1];
@@ -135,11 +151,13 @@ class UDPAddress {
                 cintroAddresses = new InetAddress[i+1];
                 cintroKeys = new byte[i+1][];
                 cintroTags = new long[i+1];
+                cintroExps = new long[i+1];
             }
             cintroHosts[i] = host;
             cintroPorts[i] = p;
             cintroKeys[i] = ikey;
             cintroTags[i] = tag;
+            cintroExps[i] = exp;
         }
         
         int numOK = 0;
@@ -169,6 +187,7 @@ class UDPAddress {
                             cintroPorts[cur] = cintroPorts[i];
                             cintroTags[cur] = cintroTags[i];
                             cintroKeys[cur] = cintroKeys[i];
+                            cintroExps[cur] = cintroExps[i];
                         }
                         cur++;
                     }
@@ -181,6 +200,7 @@ class UDPAddress {
         _introPorts = cintroPorts;
         _introHosts = cintroHosts;
         _introAddresses = cintroAddresses;
+        _introExps = cintroExps;
     }
     
     public String getHost() { return _host; }
@@ -234,6 +254,14 @@ class UDPAddress {
      *  @return greater than zero
      */
     long getIntroducerTag(int i) { return _introTags[i]; }
+
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return ms since epoch, zero if unset
+     *  @since 0.9.30
+     */
+    long getIntroducerExpiration(int i) { return _introExps[i]; }
         
     /**
      *  @return 0 if unset or invalid; recitified via MTU.rectify()
