@@ -128,6 +128,7 @@ class UDPAddress {
             } catch (NumberFormatException nfe) {
                 continue;
             }
+
             if (cintroHosts == null) {
                 cintroHosts = new String[i+1];
                 cintroPorts = new int[i+1];
@@ -143,6 +144,11 @@ class UDPAddress {
         
         int numOK = 0;
         if (cintroHosts != null) {
+            // Validate the intro parameters, and shrink the
+            // introAddresses array if they aren't all valid,
+            // since we use the length for the valid count.
+            // We don't bother shrinking the other arrays,
+            // we just remove the invalid entries.
             for (int i = 0; i < cintroHosts.length; i++) {
                 if ( (cintroKeys[i] != null) && 
                      (cintroPorts[i] > 0) &&
@@ -151,26 +157,22 @@ class UDPAddress {
                     numOK++;
             }
             if (numOK != cintroHosts.length) {
-                String hosts[] = new String[numOK];
-                int ports[] = new int[numOK];
-                long tags[] = new long[numOK];
-                byte keys[][] = new byte[numOK][];
                 int cur = 0;
                 for (int i = 0; i < cintroHosts.length; i++) {
                     if ( (cintroKeys[i] != null) && 
                          (cintroPorts[i] > 0) &&
                          (cintroTags[i] > 0) &&
                          (cintroHosts[i] != null) ) {
-                        hosts[cur] = cintroHosts[i];
-                        ports[cur] = cintroPorts[i];
-                        tags[cur] = cintroTags[i];
-                        keys[cur] = cintroKeys[i];
+                        if (cur != i) {
+                            // just shift these down
+                            cintroHosts[cur] = cintroHosts[i];
+                            cintroPorts[cur] = cintroPorts[i];
+                            cintroTags[cur] = cintroTags[i];
+                            cintroKeys[cur] = cintroKeys[i];
+                        }
+                        cur++;
                     }
                 }
-                cintroKeys = keys;
-                cintroTags = tags;
-                cintroPorts = ports;
-                cintroHosts = hosts;
                 cintroAddresses = new InetAddress[numOK];
             }
         }
@@ -201,16 +203,36 @@ class UDPAddress {
     
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return null if invalid
+     */
     InetAddress getIntroducerHost(int i) { 
         if (_introAddresses[i] == null)
             _introAddresses[i] = getByName(_introHosts[i]);
         return _introAddresses[i];
     }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return greater than zero
+     */
     int getIntroducerPort(int i) { return _introPorts[i]; }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return non-null
+     */
     byte[] getIntroducerKey(int i) { return _introKeys[i]; }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return greater than zero
+     */
     long getIntroducerTag(int i) { return _introTags[i]; }
         
     /**
