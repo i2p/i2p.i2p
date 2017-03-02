@@ -21,12 +21,12 @@ class UDPAddress {
     private InetAddress _hostAddress;
     private final int _port;
     private final byte[] _introKey;
-    private String _introHosts[];
-    private InetAddress _introAddresses[];
-    private int _introPorts[];
-    private byte[] _introKeys[];
-    private long _introTags[];
-    private int _mtu;
+    private final String _introHosts[];
+    private final InetAddress _introAddresses[];
+    private final int _introPorts[];
+    private final byte[] _introKeys[];
+    private final long _introTags[];
+    private final int _mtu;
     
     public static final String PROP_PORT = RouterAddress.PROP_PORT;
     public static final String PROP_HOST = RouterAddress.PROP_HOST;
@@ -61,22 +61,31 @@ class UDPAddress {
     }
 
     public UDPAddress(RouterAddress addr) {
-        // TODO make everything final
         if (addr == null) {
             _host = null;
             _port = 0;
             _introKey = null;
+            _introHosts = null;
+            _introAddresses = null;
+            _introPorts = null;
+            _introKeys = null;
+            _introTags = null;
+            _mtu = 0;
             return;
         }
         _host = addr.getHost();
         _port = addr.getPort();
+
+        int cmtu = 0;
         try { 
             String mtu = addr.getOption(PROP_MTU);
             if (mtu != null) {
                 boolean isIPv6 = _host != null && _host.contains(":");
-                _mtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
+                cmtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
             }
         } catch (NumberFormatException nfe) {}
+        _mtu = cmtu;
+
         String key = addr.getOption(PROP_INTRO_KEY);
         if (key != null) {
             byte[] ik = Base64.decode(key.trim());
@@ -88,6 +97,11 @@ class UDPAddress {
             _introKey = null;
         }
         
+        byte[][] cintroKeys = null;
+        long[] cintroTags = null;
+        int[] cintroPorts = null;
+        String[] cintroHosts = null;
+        InetAddress[] cintroAddresses = null;
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
             String host = addr.getOption(PROP_INTRO_HOST[i]);
             if (host == null) continue;
@@ -114,52 +128,57 @@ class UDPAddress {
             } catch (NumberFormatException nfe) {
                 continue;
             }
-            if (_introHosts == null) {
-                _introHosts = new String[i+1];
-                _introPorts = new int[i+1];
-                _introAddresses = new InetAddress[i+1];
-                _introKeys = new byte[i+1][];
-                _introTags = new long[i+1];
+            if (cintroHosts == null) {
+                cintroHosts = new String[i+1];
+                cintroPorts = new int[i+1];
+                cintroAddresses = new InetAddress[i+1];
+                cintroKeys = new byte[i+1][];
+                cintroTags = new long[i+1];
             }
-            _introHosts[i] = host;
-            _introPorts[i] = p;
-            _introKeys[i] = ikey;
-            _introTags[i] = tag;
+            cintroHosts[i] = host;
+            cintroPorts[i] = p;
+            cintroKeys[i] = ikey;
+            cintroTags[i] = tag;
         }
         
         int numOK = 0;
-        if (_introHosts != null) {
-            for (int i = 0; i < _introHosts.length; i++) {
-                if ( (_introKeys[i] != null) && 
-                     (_introPorts[i] > 0) &&
-                     (_introTags[i] > 0) &&
-                     (_introHosts[i] != null) )
+        if (cintroHosts != null) {
+            for (int i = 0; i < cintroHosts.length; i++) {
+                if ( (cintroKeys[i] != null) && 
+                     (cintroPorts[i] > 0) &&
+                     (cintroTags[i] > 0) &&
+                     (cintroHosts[i] != null) )
                     numOK++;
             }
-            if (numOK != _introHosts.length) {
+            if (numOK != cintroHosts.length) {
                 String hosts[] = new String[numOK];
                 int ports[] = new int[numOK];
                 long tags[] = new long[numOK];
                 byte keys[][] = new byte[numOK][];
                 int cur = 0;
-                for (int i = 0; i < _introHosts.length; i++) {
-                    if ( (_introKeys[i] != null) && 
-                         (_introPorts[i] > 0) &&
-                         (_introTags[i] > 0) &&
-                         (_introHosts[i] != null) ) {
-                        hosts[cur] = _introHosts[i];
-                        ports[cur] = _introPorts[i];
-                        tags[cur] = _introTags[i];
-                        keys[cur] = _introKeys[i];
+                for (int i = 0; i < cintroHosts.length; i++) {
+                    if ( (cintroKeys[i] != null) && 
+                         (cintroPorts[i] > 0) &&
+                         (cintroTags[i] > 0) &&
+                         (cintroHosts[i] != null) ) {
+                        hosts[cur] = cintroHosts[i];
+                        ports[cur] = cintroPorts[i];
+                        tags[cur] = cintroTags[i];
+                        keys[cur] = cintroKeys[i];
                     }
                 }
-                _introKeys = keys;
-                _introTags = tags;
-                _introPorts = ports;
-                _introHosts = hosts;
-                _introAddresses = new InetAddress[numOK];
+                cintroKeys = keys;
+                cintroTags = tags;
+                cintroPorts = ports;
+                cintroHosts = hosts;
+                cintroAddresses = new InetAddress[numOK];
             }
         }
+        _introKeys = cintroKeys;
+        _introTags = cintroTags;
+        _introPorts = cintroPorts;
+        _introHosts = cintroHosts;
+        _introAddresses = cintroAddresses;
     }
     
     public String getHost() { return _host; }
