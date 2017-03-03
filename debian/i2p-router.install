@@ -56,10 +56,10 @@ pkg-temp/lib/systray.jar usr/share/i2p/lib
 
 
 # uncomment if not building with libtomcat8-java
-pkg-temp/lib/commons-el.jar usr/share/i2p/lib
+#pkg-temp/lib/commons-el.jar usr/share/i2p/lib
 # legacy name, contains only tomcat-juli, not commons-logging
-pkg-temp/lib/commons-logging.jar usr/share/i2p/lib
-pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
+#pkg-temp/lib/commons-logging.jar usr/share/i2p/lib
+#pkg-temp/lib/jasper-runtime.jar usr/share/i2p/lib
 
 
 # uncomment if not building with either glassfish-javaee or libjakarta-taglibs-standard-java

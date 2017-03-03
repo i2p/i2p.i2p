@@ -238,7 +238,7 @@
      -->
     <target name="copyTomcatLib" depends="mkJettylibdir, copyTomcatLib1, copyTomcatLib2, copyTomcatLib3" />
 
-    <target name="copyTomcatLib1" unless="${with-libjetty9-java}" >
+    <target name="copyTomcatLib1" >
         <condition property="with-libtomcat-java" >
             <or>
                 <istrue value="${with-libtomcat6-java}" />

@@ -76,6 +76,9 @@
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="../../jrobin/java/build/jrobin.jar" />
+
+                <!-- following jars only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
             </classpath>
         </javac>
     </target>
