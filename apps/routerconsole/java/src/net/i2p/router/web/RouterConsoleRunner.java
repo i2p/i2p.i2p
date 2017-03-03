@@ -40,6 +40,7 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 
+import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -631,12 +632,6 @@ public class RouterConsoleRunner implements RouterApp {
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
-            if (!SystemVersion.isWindows() && !SystemVersion.isMac() &&
-                _context.getBaseDir().getAbsolutePath().equals("/usr/share/i2p")) {
-               // We are using Tomcat 6, so the Debian patch doesn't apply.
-               // Remove when we switch to Tomcat 8
-               _context.logManager().getLog(Server.class).logAlways(net.i2p.util.Log.INFO, "Please ignore any InstanceManager warnings");
-            }
             rootServletHandler = new ServletHandler();
             rootWebApp = new LocaleWebAppHandler(_context,
                                                   "/", _webAppsDir + ROUTERCONSOLE + ".war",
@@ -667,6 +662,10 @@ public class RouterConsoleRunner implements RouterApp {
         try {
             // start does a mapContexts()
             _server.start();
+            // can't do this before start
+            // http://stackoverflow.com/questions/17529936/issues-while-using-jetty-embedded-to-handle-jsp-jasperexception-unable-to-com
+            // https://github.com/jetty-project/embedded-jetty-jsp/blob/master/src/main/java/org/eclipse/jetty/demo/Main.java
+            rootServletHandler.getServletContext().setAttribute("org.apache.tomcat.InstanceManager", new SimpleInstanceManager());
         } catch (Throwable me) {
             // NoClassFoundDefError from a webapp is a throwable, not an exception
             System.err.println("Error starting the Router Console server: " + me);

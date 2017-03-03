@@ -10,6 +10,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.SecureDirectory;
 
+import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
@@ -63,6 +64,11 @@ public class WebAppStarter {
          // and the caller will know it failed
          wac.setThrowUnavailableOnStartupException(true);
          wac.start();
+         // can't do this before start
+         // do we just need one, in the ContextHandlerCollection, or one for each?
+         // http://stackoverflow.com/questions/17529936/issues-while-using-jetty-embedded-to-handle-jsp-jasperexception-unable-to-com
+         // https://github.com/jetty-project/embedded-jetty-jsp/blob/master/src/main/java/org/eclipse/jetty/demo/Main.java
+         wac.getServletContext().setAttribute("org.apache.tomcat.InstanceManager", new SimpleInstanceManager());
     }
 
     /**
