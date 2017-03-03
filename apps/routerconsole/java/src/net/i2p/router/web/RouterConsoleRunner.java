@@ -641,6 +641,18 @@ public class RouterConsoleRunner implements RouterApp {
             rootWebApp = new LocaleWebAppHandler(_context,
                                                   "/", _webAppsDir + ROUTERCONSOLE + ".war",
                                                  tmpdir, rootServletHandler);
+            try {
+                // Not sure who is supposed to call this, but unless we do,
+                // all the jsps die NPE, because JspFactory.getDefaultContext() returns null.
+                // We probably have to do this because we don't bundle the Jetty annotations jar and scanner.
+                // This is only with Tomcat 8, not with the Jetty (Eclipse) jsp impl.
+                // Got a clue from this ancient post for Tomcat 6:
+                // https://bz.apache.org/bugzilla/show_bug.cgi?id=39804
+                // see also apps/jetty/build.xml
+                Class.forName("org.eclipse.jetty.apache.jsp.JettyJasperInitializer");
+            } catch (ClassNotFoundException cnfe) {
+                System.err.println("Warning: JettyJasperInitializer not found");
+            }
             initialize(_context, (WebAppContext)(rootWebApp.getHandler()));
             chColl.addHandler(rootWebApp);
 

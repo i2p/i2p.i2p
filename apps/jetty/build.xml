@@ -3,7 +3,7 @@
 
     <!-- This copies jars, with some modifications and renaming,
          from the jetty-distribution directory to the jettylib directory.
-         This is disabled if the property with-libjetty8-java=true.
+         This is disabled if the property with-libjetty9-java=true.
 
          This copies jars, with some modifications and renaming,
          from the apache-tomcat-deployer and apache-tomcat directories to the jettylib directory.
@@ -25,10 +25,12 @@
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
+<!--
     <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
     <property name="tomcat.ver" value="6.0.48" />
     <property name="tomcat2.lib" value="apache-tomcat-${tomcat.ver}/lib" />
     <property name="tomcat2.lib.small" value="apache-tomcat/lib" />
+-->
 
     <target name="all" depends="build" />
 
@@ -44,7 +46,7 @@
     <target name="ensureJettylib1" >
         <condition property="jetty.zip.extracted" >
             <or>
-                <istrue value="${with-libjetty8-java}" />
+                <istrue value="${with-libjetty9-java}" />
                 <available file="${jetty.base}" type="dir" />
             </or>
         </condition>
@@ -56,7 +58,7 @@
         </condition>
         <condition property="verified.already" >
             <or>
-                <istrue value="${with-libjetty8-java}" />
+                <istrue value="${with-libjetty9-java}" />
                 <istrue value="${jetty.zip.extracted}" />
                 <and>
                     <available file="${jetty.filename}" />
@@ -126,7 +128,7 @@
     <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib" />
 
     <!-- Jetty files only -->
-    <target name="copyJettylib1" depends="extractJettylib" unless="${with-libjetty8-java}" >
+    <target name="copyJettylib1" depends="extractJettylib" unless="${with-libjetty9-java}" >
       <!-- We copy everything to names without the version numbers so we
            can update them later. Where there was something similar in Jetty 5/6,
            we use the same names so they will overwrite the Jetty 5/6 jar on upgrade.
@@ -169,14 +171,15 @@
                 <attribute name="Note" value="Intentionally empty" />
             </manifest>
         </jar>
-        <!-- TODO we may wish to put the compiler in jasper-runtime.jar instead -->
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.1.jar" />
+          <!--
+            Jetty version - see below for why we don't use this one
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-api-2.3.1.jar" />
-            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-2.3.2.jar" />
-<!--
-            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/jetty-jsp-${jetty.ver}.jar" />
--->
+           -->
+            <!-- Apache version -->
+            <!-- Also includes org.apache.*, this is copied into jasper-runtime.jar below -->
+            <zipfileset includes="javax/**/*" src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-8.0.33.jar"/>
             <!-- In Debian packages they are found in /usr/share/java/tomcat8-servlet-api.jar in the libtomcat8-java package -->
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jetty-schemas-3.1.jar" />
         </jar>
@@ -206,13 +209,16 @@
          Apparently this is only required for precompilation of jsps, so this is put in
          with the JspC compiler jasper-runtime.jar below.
      -->
-    <target name="buildTomcatUtilJar" unless="${with-libservlet2.5-java}" >
-        <!-- take only what we need from the tomcat-coyote jar -->
+
+    <!-- take only what we need from the tomcat-coyote jar -->
+<!--
+    <target name="buildTomcatUtilJar" unless="${with-libjetty9-java}" >
         <jar destfile="${tomcat2.lib.small}/tomcat-coyote-util.jar" >
             <zipfileset src="${tomcat2.lib}/tomcat-coyote.jar"
              includes="org/apache/tomcat/util/descriptor/* org/apache/tomcat/util/res/*" />
         </jar>
     </target>
+-->
 
     <!-- Tomcat.
          The glassfish jars bundled in Jetty 6 are way too old.
@@ -231,7 +237,7 @@
      -->
     <target name="copyTomcatLib" depends="mkJettylibdir, copyTomcatLib1, copyTomcatLib2, copyTomcatLib3" />
 
-    <target name="copyTomcatLib1" unless="${with-libservlet2.5-java}" >
+    <target name="copyTomcatLib1" unless="${with-libjetty9-java}" >
         <condition property="with-libtomcat-java" >
             <or>
                 <istrue value="${with-libtomcat6-java}" />
@@ -250,13 +256,36 @@
              According to http://stackoverflow.com/questions/7202686/differences-between-el-2-1-and-2-2
              2.2 is backwards-compatible with 2.1.
          -->
-        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp/javax.el-3.0.0.jar" tofile="jettylib/commons-el.jar" />
-
-        <jar destfile="jettylib/jasper-runtime.jar" >
-            <manifest>
-                <attribute name="Note" value="Intentionally empty" />
-            </manifest>
+        <!-- the javax.el API, AND the com.sun.el parser -->
+        <!-- actually from jetty9, not tomcat8... this will fail unless neither or both -->
+        <jar destfile="jettylib/commons-el.jar" >
+          <!--
+            Jetty version
+            <zipfileset src="${jetty.base}/lib/jsp/javax.el-3.0.0.jar"/>
+           -->
+            <!-- Apache version -->
+            <zipfileset src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-el-8.0.33.jar"/>
         </jar>
+
+        <!-- actually from jetty9, not tomcat8... this will fail unless neither or both -->
+        <jar destfile="jettylib/jasper-runtime.jar" >
+          <!--
+            Jetty version
+            <zipfileset src="${jetty.base}/lib/jsp/javax.servlet.jsp-2.3.2.jar"/>
+            To be included in jasper-runtime.jar?
+            Server complains "NO JSP Support for /, did not find org.eclipse.jetty.jsp.JettyJspServlet" even with this included (but it still works).
+            The following file has the class, but /usr/share/java/jetty8-jsp.jar is empty
+            We don't use this one, because we want to be consistent with Debian builds that
+            must use Apache (aka libtomcat8).
+            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/jetty-jsp-${jetty.ver}.jar" />
+           -->
+            <!-- Apache version -->
+            <!-- Also includes javax.servlet.jsp.*, this is copied into javax.servlet.jar above -->
+            <zipfileset includes="org/**/*" src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-8.0.33.jar"/>
+            <!-- required Jetty initializer (see RouterConsoleRunner) -->
+            <zipfileset src="${jetty.base}/lib/apache-jsp/org.eclipse.jetty.apache-jsp-${jetty.ver}.jar"/>
+        </jar>
+
 <!--
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/servlet-api.jar" />
@@ -269,7 +298,12 @@
              Their bug tracker claims fixed in 1.8.0 but broken for me in 1.8.1
           -->
         <jar destfile="jettylib/commons-logging.jar" update="true" >
+<!--
             <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-juli.jar" />
+-->
+            <manifest>
+                <attribute name="Note" value="Intentionally empty" />
+            </manifest>
         </jar>
     </target>
 

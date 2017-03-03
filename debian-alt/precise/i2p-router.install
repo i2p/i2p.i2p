@@ -34,7 +34,7 @@ pkg-temp/lib/streaming.jar usr/share/i2p/lib
 pkg-temp/lib/systray.jar usr/share/i2p/lib
 
 
-# uncomment if not building with libjetty8-java
+# uncomment if not building with libjetty9-java
 # ubuntu: in trusty vivid wily xenial
 # debian: in wheezy jessie stretch sid
 pkg-temp/lib/jetty-continuation.jar usr/share/i2p/lib
@@ -51,7 +51,7 @@ pkg-temp/lib/jetty-webapp.jar usr/share/i2p/lib
 pkg-temp/lib/jetty-xml.jar usr/share/i2p/lib
 pkg-temp/lib/org.mortbay.jetty.jar usr/share/i2p/lib
 pkg-temp/lib/org.mortbay.jmx.jar usr/share/i2p/lib
-# following two are from libservlet3.0-java which is a dependency of libjetty8-java
+# following two are from libservlet3.1-java which is a dependency of libjetty9-java
 pkg-temp/lib/javax.servlet.jar usr/share/i2p/lib
 
 

@@ -10,17 +10,16 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,ant-optional
  ,debconf
  ,openjdk-7-jdk
- ,libjetty9-java
- ,glassfish-javaee
- ,libtomcat8-java
+# Ant requires java 6 tools.jar:
+# Unable to locate tools.jar. Expected to find it in /usr/lib/jvm/java-6-openjdk-amd64/lib/tools.jar
+ ,openjdk-6-jdk
  ,dh-apparmor
  ,gettext
  ,libgetopt-java
- ,libgmp-dev (>= 2:5.0.5)
+ ,libgmp-dev (>= 2:5.0.2)
  ,libservice-wrapper-java
  ,hardening-wrapper
  ,po-debconf
- ,dh-systemd
 
 Package: i2p
 Architecture: all
@@ -75,14 +74,11 @@ Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- openjdk-9-jre-headless | openjdk-8-jre-headless | openjdk-7-jre-headless | default-jre-headless | java9-runtime-headless | java8-runtime-headless | java7-runtime-headless,
+ openjdk-8-jre-headless | openjdk-7-jre-headless | java8-runtime-headless | java7-runtime-headless,
  libecj-java,
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjetty9-java,
- glassfish-javaee,
- libtomcat8-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
