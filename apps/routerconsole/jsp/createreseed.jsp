@@ -20,7 +20,6 @@ try {
         response.addHeader("Pragma", "no-cache");
         response.setContentType("application/zip; name=\"i2preseed.zip\"");
         response.addHeader("Content-Disposition", "attachment; filename=\"i2preseed.zip\"");
-        byte buf[] = new byte[16*1024];
         in = new java.io.FileInputStream(zip);
         java.io.OutputStream cout = response.getOutputStream();
         net.i2p.data.DataHelper.copy(in, cout);

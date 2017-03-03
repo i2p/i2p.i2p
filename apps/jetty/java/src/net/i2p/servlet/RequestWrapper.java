@@ -43,7 +43,7 @@ import org.mortbay.servlet.MultiPartRequest;
  *  See https://bugs.eclipse.org/bugs/show_bug.cgi?id=349110
  *
  *  So we could either extend and fix MultiPartFilter, and rewrite everything here,
- *  or copy MultiParRequest into our war and fix it so it compiles with Jetty 6.
+ *  or copy MultiPartRequest into our war and fix it so it compiles with Jetty 6.
  *  We do the latter.
  *
  *  The filter would have been added in web.xml,
@@ -71,8 +71,11 @@ public class RequestWrapper {
 		if( contentType != null && contentType.toLowerCase(Locale.US).startsWith( "multipart/form-data" ) ) {
 			try {
 				mpr = new MultiPartRequest( httpRequest );
+			} catch (OutOfMemoryError oome) {
+				// TODO Throw ioe from constructor?
+				oome.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// TODO Throw ioe from constructor?
 				e.printStackTrace();
 			}
 		}

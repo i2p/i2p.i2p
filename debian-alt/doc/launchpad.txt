@@ -150,7 +150,7 @@ Down at bottom, click 'create milestone'
     Date targeted: Actual release date
     Tags: empty
     Summary: empty
-Click 'register milestone'
+Click 'create milestone'
 Now you are back on https://launchpad.net/i2p/trunk
 At your milestone, 'release now'
     Date released: Actual release date

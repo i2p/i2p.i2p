@@ -20,6 +20,9 @@ public abstract class SystemVersion {
      *  @since 0.9.28
      */
     public static final String DAEMON_USER = "i2psvc";
+    /*
+     *  @since 0.9.29
+     */
     public static final String GENTOO_USER = "i2p";
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");

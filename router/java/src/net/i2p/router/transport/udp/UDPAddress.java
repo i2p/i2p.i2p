@@ -21,12 +21,13 @@ class UDPAddress {
     private InetAddress _hostAddress;
     private final int _port;
     private final byte[] _introKey;
-    private String _introHosts[];
-    private InetAddress _introAddresses[];
-    private int _introPorts[];
-    private byte[] _introKeys[];
-    private long _introTags[];
-    private int _mtu;
+    private final String _introHosts[];
+    private final InetAddress _introAddresses[];
+    private final int _introPorts[];
+    private final byte[] _introKeys[];
+    private final long _introTags[];
+    private final long _introExps[];
+    private final int _mtu;
     
     public static final String PROP_PORT = RouterAddress.PROP_PORT;
     public static final String PROP_HOST = RouterAddress.PROP_HOST;
@@ -41,42 +42,57 @@ class UDPAddress {
     public static final String PROP_INTRO_PORT_PREFIX = "iport";
     public static final String PROP_INTRO_KEY_PREFIX = "ikey";
     public static final String PROP_INTRO_TAG_PREFIX = "itag";
+    /** @since 0.9.30 */
+    public static final String PROP_INTRO_EXP_PREFIX = "iexp";
     static final int MAX_INTRODUCERS = 3;
     private static final String[] PROP_INTRO_HOST;
     private static final String[] PROP_INTRO_PORT;
     private static final String[] PROP_INTRO_IKEY;
     private static final String[] PROP_INTRO_TAG;
+    private static final String[] PROP_INTRO_EXP;
     static {
         // object churn
         PROP_INTRO_HOST = new String[MAX_INTRODUCERS];
         PROP_INTRO_PORT = new String[MAX_INTRODUCERS];
         PROP_INTRO_IKEY = new String[MAX_INTRODUCERS];
         PROP_INTRO_TAG = new String[MAX_INTRODUCERS];
+        PROP_INTRO_EXP = new String[MAX_INTRODUCERS];
         for (int i = 0; i < MAX_INTRODUCERS; i++) {
             PROP_INTRO_HOST[i] = PROP_INTRO_HOST_PREFIX + i;
             PROP_INTRO_PORT[i] = PROP_INTRO_PORT_PREFIX + i;
             PROP_INTRO_IKEY[i] = PROP_INTRO_KEY_PREFIX + i;
             PROP_INTRO_TAG[i] = PROP_INTRO_TAG_PREFIX + i;
+            PROP_INTRO_EXP[i] = PROP_INTRO_EXP_PREFIX + i;
         }
     }
 
     public UDPAddress(RouterAddress addr) {
-        // TODO make everything final
         if (addr == null) {
             _host = null;
             _port = 0;
             _introKey = null;
+            _introHosts = null;
+            _introAddresses = null;
+            _introPorts = null;
+            _introKeys = null;
+            _introTags = null;
+            _introExps = null;
+            _mtu = 0;
             return;
         }
         _host = addr.getHost();
         _port = addr.getPort();
+
+        int cmtu = 0;
         try { 
             String mtu = addr.getOption(PROP_MTU);
             if (mtu != null) {
                 boolean isIPv6 = _host != null && _host.contains(":");
-                _mtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
+                cmtu = MTU.rectify(isIPv6, Integer.parseInt(mtu));
             }
         } catch (NumberFormatException nfe) {}
+        _mtu = cmtu;
+
         String key = addr.getOption(PROP_INTRO_KEY);
         if (key != null) {
             byte[] ik = Base64.decode(key.trim());
@@ -88,6 +104,12 @@ class UDPAddress {
             _introKey = null;
         }
         
+        byte[][] cintroKeys = null;
+        long[] cintroTags = null;
+        int[] cintroPorts = null;
+        String[] cintroHosts = null;
+        InetAddress[] cintroAddresses = null;
+        long[] cintroExps = null;
         for (int i = MAX_INTRODUCERS - 1; i >= 0; i--) {
             String host = addr.getOption(PROP_INTRO_HOST[i]);
             if (host == null) continue;
@@ -114,52 +136,71 @@ class UDPAddress {
             } catch (NumberFormatException nfe) {
                 continue;
             }
-            if (_introHosts == null) {
-                _introHosts = new String[i+1];
-                _introPorts = new int[i+1];
-                _introAddresses = new InetAddress[i+1];
-                _introKeys = new byte[i+1][];
-                _introTags = new long[i+1];
+            // expiration is optional
+            long exp = 0;
+            t = addr.getOption(PROP_INTRO_EXP[i]);
+            if (t != null) {
+                try {
+                    exp = Long.parseLong(t) * 1000L;
+                } catch (NumberFormatException nfe) {}
             }
-            _introHosts[i] = host;
-            _introPorts[i] = p;
-            _introKeys[i] = ikey;
-            _introTags[i] = tag;
+
+            if (cintroHosts == null) {
+                cintroHosts = new String[i+1];
+                cintroPorts = new int[i+1];
+                cintroAddresses = new InetAddress[i+1];
+                cintroKeys = new byte[i+1][];
+                cintroTags = new long[i+1];
+                cintroExps = new long[i+1];
+            }
+            cintroHosts[i] = host;
+            cintroPorts[i] = p;
+            cintroKeys[i] = ikey;
+            cintroTags[i] = tag;
+            cintroExps[i] = exp;
         }
         
         int numOK = 0;
-        if (_introHosts != null) {
-            for (int i = 0; i < _introHosts.length; i++) {
-                if ( (_introKeys[i] != null) && 
-                     (_introPorts[i] > 0) &&
-                     (_introTags[i] > 0) &&
-                     (_introHosts[i] != null) )
+        if (cintroHosts != null) {
+            // Validate the intro parameters, and shrink the
+            // introAddresses array if they aren't all valid,
+            // since we use the length for the valid count.
+            // We don't bother shrinking the other arrays,
+            // we just remove the invalid entries.
+            for (int i = 0; i < cintroHosts.length; i++) {
+                if ( (cintroKeys[i] != null) && 
+                     (cintroPorts[i] > 0) &&
+                     (cintroTags[i] > 0) &&
+                     (cintroHosts[i] != null) )
                     numOK++;
             }
-            if (numOK != _introHosts.length) {
-                String hosts[] = new String[numOK];
-                int ports[] = new int[numOK];
-                long tags[] = new long[numOK];
-                byte keys[][] = new byte[numOK][];
+            if (numOK != cintroHosts.length) {
                 int cur = 0;
-                for (int i = 0; i < _introHosts.length; i++) {
-                    if ( (_introKeys[i] != null) && 
-                         (_introPorts[i] > 0) &&
-                         (_introTags[i] > 0) &&
-                         (_introHosts[i] != null) ) {
-                        hosts[cur] = _introHosts[i];
-                        ports[cur] = _introPorts[i];
-                        tags[cur] = _introTags[i];
-                        keys[cur] = _introKeys[i];
+                for (int i = 0; i < cintroHosts.length; i++) {
+                    if ( (cintroKeys[i] != null) && 
+                         (cintroPorts[i] > 0) &&
+                         (cintroTags[i] > 0) &&
+                         (cintroHosts[i] != null) ) {
+                        if (cur != i) {
+                            // just shift these down
+                            cintroHosts[cur] = cintroHosts[i];
+                            cintroPorts[cur] = cintroPorts[i];
+                            cintroTags[cur] = cintroTags[i];
+                            cintroKeys[cur] = cintroKeys[i];
+                            cintroExps[cur] = cintroExps[i];
+                        }
+                        cur++;
                     }
                 }
-                _introKeys = keys;
-                _introTags = tags;
-                _introPorts = ports;
-                _introHosts = hosts;
-                _introAddresses = new InetAddress[numOK];
+                cintroAddresses = new InetAddress[numOK];
             }
         }
+        _introKeys = cintroKeys;
+        _introTags = cintroTags;
+        _introPorts = cintroPorts;
+        _introHosts = cintroHosts;
+        _introAddresses = cintroAddresses;
+        _introExps = cintroExps;
     }
     
     public String getHost() { return _host; }
@@ -182,17 +223,45 @@ class UDPAddress {
     
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return null if invalid
+     */
     InetAddress getIntroducerHost(int i) { 
         if (_introAddresses[i] == null)
             _introAddresses[i] = getByName(_introHosts[i]);
         return _introAddresses[i];
     }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return greater than zero
+     */
     int getIntroducerPort(int i) { return _introPorts[i]; }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return non-null
+     */
     byte[] getIntroducerKey(int i) { return _introKeys[i]; }
 
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return greater than zero
+     */
     long getIntroducerTag(int i) { return _introTags[i]; }
+
+    /**
+     *  @throws NullPointerException if getIntroducerCount() == 0
+     *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
+     *  @return ms since epoch, zero if unset
+     *  @since 0.9.30
+     */
+    long getIntroducerExpiration(int i) { return _introExps[i]; }
         
     /**
      *  @return 0 if unset or invalid; recitified via MTU.rectify()
