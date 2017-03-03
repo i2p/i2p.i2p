@@ -18,6 +18,11 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+// WARNING
+// Some methods called from install.jar (Windows installer utils)
+// or InstallUpdate (i2pupdate.zip installer),
+// where most external classes are not available, including DataHelper!
+// Use caution when adding dependencies.
 import net.i2p.data.DataHelper;
 
 // Pack200 now loaded dynamically in unpack() below
@@ -458,7 +463,14 @@ public class FileUtil {
         try {
             in = new FileInputStream(src);
             out = new FileOutputStream(dst);
-            DataHelper.copy(in, out);
+            // We do NOT use DataHelper.copy() because it's used in installer.jar
+            // which does not contain DataHelper
+            //DataHelper.copy(in, out);
+            int read;
+            byte buf[] = new byte[4096];
+            while ((read = in.read(buf)) != -1) {
+                out.write(buf, 0, read);
+            }
             return true;
         } catch (IOException ioe) {
             if (!quiet)
