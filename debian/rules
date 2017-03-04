@@ -83,8 +83,8 @@ endif
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-geoip-database=true" >> $(CURDIR)/override.properties
 
-	@# ubuntu: not in precise
-	@# debian: in wheezy jessie stretch sid
+	@# ubuntu: in xenial
+	@# debian: in jessie-backports stretch sid
 	@/bin/echo -e "with-libjetty9-java=true" >> $(CURDIR)/override.properties
 	mkdir -p $(CURDIR)/apps/jetty/jettylib
 	ln -sf /usr/share/java/jetty9-continuation.jar $(CURDIR)/apps/jetty/jettylib/jetty-continuation.jar
@@ -109,14 +109,14 @@ endif
 	@# debian and ubuntu: wheezy-backports, jessie+, xenial+
 	/bin/echo -e "with-libtomcat8-java=true" >> $(CURDIR)/override.properties
 	mkdir -p $(CURDIR)/apps/jetty/jettylib
-	ln -sf /usr/share/java/tomcat8-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
 	ln -sf /usr/share/java/tomcat8-api.jar $(CURDIR)/apps/jetty/jettylib/tomcat-api.jar
+	ln -sf /usr/share/java/tomcat8-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
+	ln -sf /usr/share/java/tomcat8-el-api.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
+	ln -sf /usr/share/java/tomcat8-jasper.jar $(CURDIR)/apps/jetty/jettylib/jasper-runtime.jar
+	ln -sf /usr/share/java/tomcat8-jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
+	ln -sf /usr/share/java/tomcat8-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
 	ln -sf /usr/share/java/tomcat8-util.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util.jar
 	ln -sf /usr/share/java/tomcat8-util-scan.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util-scan.jar
-	ln -sf /usr/share/java/tomcat8-coyote.jar $(CURDIR)/apps/jetty/jettylib/tomcat-coyote.jar
-	ln -sf /usr/share/java/tomcat8-juli.jar $(CURDIR)/apps/jetty/jettylib/commons-logging.jar
-	ln -sf /usr/share/java/tomcat8-jasper-el.jar $(CURDIR)/apps/jetty/jettylib/jasper-el.jar
-	ln -sf /usr/share/java/tomcat8-el-api.jar $(CURDIR)/apps/jetty/jettylib/commons-el.jar
 
 	@# debian and ubuntu: everywhere
 	@/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties

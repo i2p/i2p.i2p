@@ -7,7 +7,6 @@ Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
- ,ant-optional
  ,debconf
  ,openjdk-7-jdk
  ,libjetty9-java

@@ -40,7 +40,6 @@ import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PSSLSocketFactory;
 import net.i2p.util.SystemVersion;
 
-import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -648,7 +647,9 @@ public class RouterConsoleRunner implements RouterApp {
             } catch (ClassNotFoundException cnfe) {
                 System.err.println("Warning: JettyJasperInitializer not found");
             }
-            initialize(_context, (WebAppContext)(rootWebApp.getHandler()));
+            WebAppContext wac = (WebAppContext)(rootWebApp.getHandler());
+            initialize(_context, wac);
+            WebAppStarter.setWebAppConfiguration(wac);
             chColl.addHandler(rootWebApp);
 
         } catch (Exception ioe) {
@@ -662,10 +663,6 @@ public class RouterConsoleRunner implements RouterApp {
         try {
             // start does a mapContexts()
             _server.start();
-            // can't do this before start
-            // http://stackoverflow.com/questions/17529936/issues-while-using-jetty-embedded-to-handle-jsp-jasperexception-unable-to-com
-            // https://github.com/jetty-project/embedded-jetty-jsp/blob/master/src/main/java/org/eclipse/jetty/demo/Main.java
-            rootServletHandler.getServletContext().setAttribute("org.apache.tomcat.InstanceManager", new SimpleInstanceManager());
         } catch (Throwable me) {
             // NoClassFoundDefError from a webapp is a throwable, not an exception
             System.err.println("Error starting the Router Console server: " + me);
