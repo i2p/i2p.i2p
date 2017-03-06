@@ -473,7 +473,7 @@ textarea {
 /* compose mail */
 
 textarea[name="new_text"] {
-     width: 578px;
+     min-width: 662px;
      margin: 10px 10px 10px 3px;
      text-align: left;
 }
@@ -517,6 +517,7 @@ input {
 input[type="file"] {
      border: none !important;
      padding: 0 !important;
+     margin-left: 0;
 }
 
 input[type="file"]:hover, input[type="file"]:focus {

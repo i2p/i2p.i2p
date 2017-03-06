@@ -462,7 +462,7 @@ input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focu
 }
 
 input[type="submit"]:active, input[type="reset"]:active {
-     box-shadow: inset 2px 2px 2px #999;
+     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #999;
      color: #555;
      background-blend-mode: luminosity;
      border: 1px solid #f30;
@@ -761,6 +761,11 @@ input.new_upload {
      padding: 5px 5px 5px 22px;
 }
 
+input.new_upload:hover {
+     background: #fff url(/themes/susimail/images/attach.png) no-repeat 6px center;
+     background: url(/themes/susimail/images/attach.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+}
+
 input.new_upload {
      float: right;
 }
@@ -782,7 +787,7 @@ img.sort:hover, img.sort[disabled]:hover {
 }
 
 img.sort:active {
-     box-shadow: inset 2px 2px 2px #999;
+     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #999;
 }
 
 input[type="file"] {
@@ -832,13 +837,17 @@ input[type="text"][disabled] {
      padding: 3px;
 }
 
+#composemail td:first-child {
+    padding-right: 5px;
+}
+
 #composemail textarea {
      margin-top: 15px;
 }
 
 #composemail textarea, #composemail input[type="text"] {
      width: calc(100% - 20px);     
-     max-width: 665px;
+     min-width: 565px;
 }
 
 div#mailheader {
@@ -1055,9 +1064,7 @@ h3#config {
 }
 
 .topbuttons, .iframed .topbuttons {
-/*     height: 32px;*/
-     padding: 2px 3px 2px 3px;
-/*     background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(239, 239, 255, 0.5) 40%, rgba(239, 239, 255, 0.5) 60%, rgba(255, 255, 255, 1) 100%), linear-gradient(to bottom, #fff 0%, #fff 51%, #eef 51%, #ddf 100%);*/
+     padding: 2px 3px 2px 2px;
      white-space: nowrap;
 }
 
@@ -1164,12 +1171,12 @@ td p.error {
      padding: 10px;
 }
 
-#attachedfile input[type="checkbox"] {
+#newmail input[type="checkbox"],  #attachedfile input[type="checkbox"] {
      margin: 0 2px 0 0;
 }
 
 #attachedfile {
-border-bottom: 1px dotted #7778bf;
+     border-bottom: 1px dotted #7778bf;
 }
 
 .attached {
@@ -1192,6 +1199,10 @@ border-bottom: 1px dotted #7778bf;
      max-width: calc(100% - 5px);
      filter: drop-shadow(0 0 1px #999);
      -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+#deleteattached input {
+     margin: 8px 3px 0 0;
 }
 
 #prefsave {

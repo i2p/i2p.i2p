@@ -273,16 +273,6 @@ table#mailbox tr[class^="list"]:hover {
      overflow: hidden;
 }
 
-input.optbox {
-     opacity: 0.8;
-}
-
-input.optbox:hover {
-     opacity: 1.0;
-     filter: drop-shadow(0 0 2px #652787);
-     -webkit-filter: drop-shadow(0 0 2px #652787);
-}
-
 input[type="checkbox"], .optbox {
      min-width: 16px !important;
      min-height: 16px !important;
@@ -290,6 +280,17 @@ input[type="checkbox"], .optbox {
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
      -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
+
+input.optbox {
+     opacity: 0.8;
+}
+
+input.optbox:hover, input.optbox:focus {
+     opacity: 1.0;
+     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 2px #652787);
+     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 2px #652787);
+}
+
 
 td#deleteattached {
      padding-top: 5px !important;
@@ -512,7 +513,8 @@ textarea[name="config_text"] {
 /* compose mail */
 
 textarea[name="new_text"] {
-     width: 578px;
+     min-width: 581px;
+     width: 581px;
      margin: 10px 10px 10px 3px;
      text-align: left;
 }
