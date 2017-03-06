@@ -47,7 +47,7 @@ img[src="/flags.jsp?c=a1"], img[src="/flags.jsp?c=a2"] { /* more visibility for 
      width: 13px !important;
      height: 9px !important;
      padding-right: 0;
-     margin-left: 1px;     
+     margin-left: 1px;
      margin-right: 1px;
 }
 
@@ -90,7 +90,7 @@ div.logo { /* proxy error "fake" sidebar */
 }
 
 .logo a img {
-     opacity: 0.6;     
+     opacity: 0.6;
      filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 1px #494);
      -webkit-filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 1px #494);
      margin: 0;
@@ -158,7 +158,7 @@ div.warning {
 
 /* tags the proxy info onto the bottom of the warning box */
 /* comment out the @media .proxyfooter section below to avoid duplication */
-/* 
+/*
 .proxyfooter {
      margin: -3px 20px 10px 248px;
      padding: 0 25px 0 75px;
@@ -328,7 +328,7 @@ div.routersummary table {
 
 #sb_localtunnels {
      margin: -4px -7px -7px -8px !important;
-/*     text-transform: capitalize;*/ 
+/*     text-transform: capitalize;*/
 }
 
 #sb_localtunnels td:first-child {
@@ -342,7 +342,7 @@ div.routersummary table {
      padding-right: 0;
 }
 
-#sb_warning { /* check connection/firewall */ 
+#sb_warning { /* check connection/firewall */
      padding: 4px 6px 4px 26px;
      background: #000;
      background: url(images/warning24x24.png) 5px center no-repeat, linear-gradient(to right, #001900 0%, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900 100%);
@@ -371,7 +371,7 @@ div.routersummary table {
      word-break: break-all;
      max-width: 182px;
      overflow: hidden;
-     white-space: nowrap; 
+     white-space: nowrap;
      text-overflow: ellipsis;
      line-height: 140%;
 }
@@ -455,7 +455,7 @@ div.routersummary a:hover {
 }
 
 #sb_services a[href*="mail"], #sb_services a[href*="snark"], #sb_services a[href*="7658"], #sb_services a[href*="bote"] {
-     padding: 5px 5px 5px 26px !important; 
+     padding: 5px 5px 5px 26px !important;
      border: 1px outset transparent;
      margin: 0 !important;
      float: left;
@@ -1479,7 +1479,7 @@ input[type="file"]  {
 
 input[type="file"]:hover, input[type="file"]:active {
      color: #f60;
-} 
+}
 
 input[name="refreshInterval"] {
      margin-right: 3px;
@@ -1524,7 +1524,7 @@ select {
      text-overflow: ellipsis;
 }
 
-select option { 
+select option {
      font-size: 9.5pt !important;
      box-shadow: inset 0 0 20px 20px #000;
      color: #fff !important;
@@ -1606,7 +1606,7 @@ input[readonly="readonly"]:focus {
      color: #161 !important;
 }
 
-textarea#advancedsettings:focus { 
+textarea#advancedsettings:focus {
      box-shadow: inset 0 0 0 1px #880;
      filter: none;
      -webkit-filter: none;
@@ -1666,12 +1666,12 @@ input[type="submit"], input[type="reset"], button {
      -webkit-column-width: 400px;
      -webkit-column-gap: 100px;
      -webkit-column-rule: 1px dotted #494;
-/* untested 
+/* untested
      -ms-column-count: 2;
      -ms-column-width: 400px;
      -ms-column-gap: 100px;
      -ms-column-rule: 1px dotted #494;
-*/ 
+*/
      column-count: 2;
      column-width: 400px;
      column-gap: 100px;
@@ -2212,7 +2212,7 @@ div.themechoice {
 }
 
 .themechoice object {
-     opacity: 0.6;     
+     opacity: 0.6;
 }
 
 .themechoice .optbox:checked + object {
@@ -2262,7 +2262,7 @@ div.themechoice {
 .themechoice .optbox {
      min-width: 114px !important;
      min-height: 72px !important;
-     outline: 1px !important; /* placement guide */ 
+     outline: 1px !important; /* placement guide */
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
      margin-left: -33px;
      z-index: 999;
@@ -2338,7 +2338,7 @@ td#themeselect {
 
 .langselect { /* containing box for lang selection */
      background: #000;
-     background: linear-gradient(to bottom, #010 0%, #000 80%);     
+     background: linear-gradient(to bottom, #010 0%, #000 80%);
      width: 110px;
      float: left;
      margin: 4px;
@@ -2492,7 +2492,7 @@ table#consolepass th:nth-child(2) {
 
 table#consolepass td:first-child {
      width: 100px;
-     white-space:nowrap; 
+     white-space:nowrap;
 }
 
 table#consolepass th {
@@ -2729,7 +2729,7 @@ form[action="events"] > .formaction {
 
 .eventspanel table td {
      padding: 5px 10px;
-} 
+}
 
 table#addkeyring td:first-child {
      width: 170px;
@@ -2978,7 +2978,7 @@ table#sidebarconf {
 }
 
 #sidebarconf th:nth-child(1) {
-     text-align: center;     
+     text-align: center;
 }
 
 #sidebarconf th:nth-child(2) {
@@ -3074,7 +3074,7 @@ h3#servicedebug a, h3#graphinfo a {
      content: url(/themes/console/images/buttons/configure.png);
      float: right;
      padding: 0;
-     
+
 }
 
 .main#tunnels h3 a[href^="/configtunnels#"]:hover {
@@ -3164,7 +3164,7 @@ div#advancedsettings h2 {
           margin: -1px -16px 15px !important;
 }
 
-table#configinfo { 
+table#configinfo {
      border: none !important;
      margin: 0 auto 0;
      width: 99%;
@@ -4050,7 +4050,7 @@ div.applabel {
      line-height: 95%;
      text-transform: lowercase;
      border: none;
-     width: 120px; 
+     width: 120px;
      min-width: 72px;
      background: #001000;
      background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%);
@@ -4209,7 +4209,7 @@ table.netdbentry td, table.leaseset td, table#leasesetdebug td, .sybil_routerinf
 
 table.netdbentry td b, table.leaseset td b, table#leasesetdebug td b, .sybil_routerinfo td b {
      color: #ee9 !important;
-} 
+}
 
 a.viewfullentry:not(old) {
      font-size: 0;
@@ -4232,7 +4232,7 @@ table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
 table#leasesetdebug th a::after, table#leasesetsummary th a::after {
      content: url(/themes/console/images/buttons/floodfill.png);
      vertical-align: text-top;
-     padding-right: 0; 
+     padding-right: 0;
 }
 
 table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
@@ -4398,7 +4398,7 @@ div.debugcontainer {
 }
 
 table#leasesetdebug, table#leasesetsummary {
-     margin-bottom: 10px; 
+     margin-bottom: 10px;
 }
 
 table.leaseset th {
@@ -4489,7 +4489,7 @@ div#sybilnav, div#sybils_summary {
 }
 
 div#sybilnav {
-     -moz-columns: 4 200px; 
+     -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
      columns: 4 200px;
      padding: 10px;
@@ -4622,7 +4622,7 @@ p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sy
 }
 
 h3#known {
-     margin-bottom: 0 !important; 
+     margin-bottom: 0 !important;
 }
 
 h3#pairs {
@@ -4857,7 +4857,7 @@ input#hideme {
 }
 
 #plugininstall input[type="text"] {
-     width: 50%;     
+     width: 50%;
      min-width: 400px;
 }
 
@@ -4896,7 +4896,7 @@ h4.embeddedtitle#updateplugins {
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      margin-top: -13px;
-} 
+}
 
 #manualreseed input[type="text"] {
      width: 50%;
@@ -4963,7 +4963,7 @@ table#configstats {
      content: url(images/chart.png);
      vertical-align: bottom;
      filter: sepia(100%) hue-rotate(70deg) !important;
-     -webkit-filter: sepia(100%) hue-rotate(70deg) !important;     
+     -webkit-filter: sepia(100%) hue-rotate(70deg) !important;
 }
 */
 
@@ -5178,7 +5178,7 @@ form[action="events"] {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre, 
+body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre,
 ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover {
      font-size: 10pt !important;
 }
@@ -5251,7 +5251,7 @@ div.joblog h3 {
 }
 
  p#gatherstats {
-      margin-bottom: 12px !important; 
+      margin-bottom: 12px !important;
 }
 
 #certs.main p + p:empty + h4 {

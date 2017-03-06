@@ -41,7 +41,7 @@ p.error, p.info {
 }
 
 #prefsave {
-     margin: 10px -6px -17px !important;     
+     margin: 10px -6px -17px !important;
      border-left: none !important;
      border-right: none !important
 }
@@ -51,7 +51,7 @@ p.error, p.info {
 }
 
 #newmail input[type="text"], #composemail textarea {
-     width: 100%;     
+     width: 100%;
      min-width: 360px !important;
 }
 

@@ -1557,7 +1557,7 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
      margin: 2px 0 2px 5px;
 }
 
-/* Downloading Priorities */ 
+/* Downloading Priorities */
 
 .snarkDirInfo input[type="radio"], .snarkDirInfo input[type="radio"]:checked {
      margin: 0;

@@ -94,7 +94,7 @@ table {
 }
 
 th {
-     font-size: 10pt; 
+     font-size: 10pt;
 }
 
 td, .mediumtags {
@@ -125,7 +125,7 @@ code, tt, div {
 .messages, .messages li, .infohelp, .infowarn  {
      font-weight: normal !important;
      font-size: 11pt !important;
-} 
+}
 
 .tab, .tab2 {
      font-size: 11pt;

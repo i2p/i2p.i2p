@@ -82,7 +82,7 @@ hr {
 }
 
 .freetext {
-     width: 150px; 
+     width: 150px;
      border: 1px solid #999;
      padding: 4px;
      font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
@@ -626,7 +626,7 @@ input::-moz-placeholder {
 input.tunnelName, input.tunnelDescription, #userAgents {
      width: 80%;
      min-width: 280px;
-     text-overflow: ellipsis; 
+     text-overflow: ellipsis;
 }
 
 #websiteName, #privKeyFile, #targetHost, .host {
@@ -644,12 +644,12 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .username {
      background: #fff url(/themes/console/images/buttons/user.png) 3px center no-repeat;
-     padding-left: 22px; 
+     padding-left: 22px;
 }
 
 .password {
      background: #fff url(/themes/console/images/buttons/password.png) 3px center no-repeat;
-     padding-left: 22px; 
+     padding-left: 22px;
 }
 
 .proxyList {
@@ -670,7 +670,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      -webkit-filter: drop-shadow(0 0 1px #333);
      font-size: 11pt;
      font-weight: bold;
-} 
+}
 
 /* wizard specifics */
 
@@ -729,7 +729,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 #wizardPanel #name, #wizardPanel #description {
      width: 300px !important;
      margin: 5px 0 !important;
-}  
+}
 
 #wizardPanel p {
      padding: 5px 10px;

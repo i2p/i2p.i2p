@@ -264,7 +264,7 @@ public class I2PSnarkServlet extends BasicServlet {
             sendRedirect(req, resp, peerString);
             return;	
         }
-        
+
         setHTMLHeaders(resp);
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
@@ -283,7 +283,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if ("2".equals(peerParam))
             out.write(" | Debug Mode");
         out.write("</title>\n");
-                                         
+
         // we want it to go to the base URI so we don't refresh with some funky action= value
         int delay = 0;
         if (!isConfigure) {
@@ -728,13 +728,14 @@ public class I2PSnarkServlet extends BasicServlet {
             }
             out.write("</tr></tfoot>\n");
         }
-        
+
         out.write("</table>");
         if (isForm)
             out.write("</form>\n");
+
         return start == 0;
     }
-    
+
     /**
      *  hidden inputs for nonce and paramters p, st, and sort
      *
@@ -2108,7 +2109,7 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\n");
         out.write(_t("Removing a .torrent will cause it to stop."));
         out.write("<br></span></table>\n");
-        out.write("</div></form></div>");  
+        out.write("</div></form></div>");
     }
 
     private void writeSeedForm(PrintWriter out, HttpServletRequest req, List<Tracker> sortedTrackers) throws IOException {
@@ -2174,9 +2175,9 @@ public class I2PSnarkServlet extends BasicServlet {
         //out.write("\" > " +
         out.write("</td></tr>" +
                   "</table>\n" +
-                  "</form></div></div>");        
+                  "</form></div></div>");
     }
-    
+
     private static final int[] times = { 5, 15, 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
 
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -2188,7 +2189,7 @@ public class I2PSnarkServlet extends BasicServlet {
         //String openTrackers = _manager.util().getOpenTrackerString();
         boolean useDHT = _manager.util().shouldUseDHT();
         //int seedPct = 0;
-       
+
         out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
         writeHiddenInputs(out, req, "Save");
@@ -2599,7 +2600,7 @@ public class I2PSnarkServlet extends BasicServlet {
         else
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "&#8239;GB";
     }
-    
+
     /**
      * This is for a full URL. For a path only, use encodePath().
      * @since 0.7.14
@@ -2607,7 +2608,7 @@ public class I2PSnarkServlet extends BasicServlet {
     static String urlify(String s) {
         return urlify(s, 100);
     }
-    
+
     /**
      * This is for a full URL. For a path only, use encodePath().
      * @since 0.9
@@ -2770,7 +2771,7 @@ public class I2PSnarkServlet extends BasicServlet {
         else
             buf.append(_contextName);
         buf.append("</a></div></center>\n");
-        
+
         if (parent)  // always true
             buf.append("<div class=\"page\">\n<div class=\"mainsection\">");
         // for stop/start/check
@@ -3079,7 +3080,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (r.isDirectory()) {
             ls = r.listFiles();
         }  // if r is not a directory, we are only showing torrent info section
-        
+
         if (ls == null) {
             // We are only showing the torrent info section
             buf.append("</div></div></BODY></HTML>");
@@ -3189,18 +3190,18 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean showSaveButton = false;
         boolean rowEven = true;
         for (Sorters.FileAndIndex fai : fileList)
-        {   
+        {
             //String encoded = encodePath(ls[i].getName());
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
             //Resource item = addPath(encoded);
             File item = fai.file;
-            
+
             String rowClass = (rowEven ? "snarkTorrentEven" : "snarkTorrentOdd");
             rowEven = !rowEven;
             buf.append("<TR class=\"").append(rowClass).append("\">");
-            
+
             // Get completeness and status string
             boolean complete = false;
             String status = "";

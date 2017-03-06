@@ -2104,7 +2104,7 @@ tt, .snarkTorrents tt, .snarkMessages,  textarea {
      font-size: 9pt !important;
 }
 
-.snarkAddInfo, .configsectionpanel td, .snarkNewTorrent td, .configsectionpanel th, 
+.snarkAddInfo, .configsectionpanel td, .snarkNewTorrent td, .configsectionpanel th,
 .configsectionpanel td, .snarkNewTorrent td, select, select option, input, textarea, input[name="nofilter_dataDir"] {
      font-size: 10pt !important;
 }

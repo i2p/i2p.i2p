@@ -785,7 +785,7 @@ th.headerdownloaded {
 
 td.snarkFileStatus {
      text-align: center;
-     white-space:nowrap;     
+     white-space:nowrap;
 }
 
 td.snarkFileIcon {
@@ -2111,7 +2111,7 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
 .debugConnStat b {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif;
      color: #111;
-} 
+}
 
 .debugRequests {
      font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
@@ -2143,7 +2143,7 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
 .resourceError {
      border: 1px solid #89f;
      border-bottom: 2px solid #89f;
-     margin-bottom: 0;    
+     margin-bottom: 0;
 }
 
 .resourceError th {

@@ -17,7 +17,7 @@ body {
 
 /* preload button mouseovers */
 body {
-     background: url(images/tile2.png) fixed, 
+     background: url(images/tile2.png) fixed,
      url(/themes/console/images/buttons/clean_hover.png) no-repeat,
      url(/themes/console/images/buttons/configure_hover.png) no-repeat,
      url(/themes/console/images/buttons/delete_hover.png) no-repeat,
@@ -217,7 +217,7 @@ div.routersummary h3 {
 
 .routersummary h3:hover a {
      color: #f60;
-     text-shadow: 0 0 1px #fff; 
+     text-shadow: 0 0 1px #fff;
 }
 
 .routersummary h3:active {
@@ -245,7 +245,7 @@ div.routersummary h4 {
      text-decoration: none !important;
      color: #359;
      box-shadow: inset 0 0 0 1px #eef;
-     line-height: 105%; 
+     line-height: 105%;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -337,7 +337,7 @@ div.routersummary table {
 
 hr + .sb_notice {
      margin-top: -2px;
-} 
+}
 
 div.routersummary tr {
      background-image: none !important;
@@ -1102,11 +1102,11 @@ p#enablefullstats {
 }
 
 #sidebarconf th:nth-child(1), #sidebarconf th:last-child {
-     text-align: center;     
+     text-align: center;
 }
 
 #sidebarconf th:nth-child(2) {
-     text-align: left;     
+     text-align: left;
 }
 
 #sidebarconf td:first-child {
@@ -1116,7 +1116,7 @@ p#enablefullstats {
 
 #sidebarconf td {
      font-weight: bold;
-     font-size: 9pt;  
+     font-size: 9pt;
 }
 
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
@@ -1357,7 +1357,7 @@ td.optionsave {
 
 .configtable tr:last-child td {
      border-top: 1px solid #7778bf !important;
-} 
+}
 
 td.infohelp {
      background: #fff url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
@@ -1686,7 +1686,7 @@ div.applabel {
      box-shadow: inset 0 0 0 1px #fff;
      text-align: center;
      width: 146px;
-     overflow: hidden;     
+     overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
 }
@@ -1694,7 +1694,7 @@ div.applabel {
 .applabel a {
      display: inline-block;
      width: 100%;
-     overflow: hidden;     
+     overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
 }
@@ -1969,7 +1969,7 @@ p#pluginconfigtext {
      background-size: 28px 28px;
 }
 
-#plugininstall tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(3) td:nth-last-child(1), 
+#plugininstall tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(3) td:nth-last-child(1),
 #manualreseed tr:nth-child(5) td:nth-last-child(1) {
      background: #fff;
 }
@@ -2140,7 +2140,7 @@ h2 {
      text-transform: uppercase !important;
 }
 
-.welcome h2 { /* fixes occluded langbox rendering bug */ 
+.welcome h2 { /* fixes occluded langbox rendering bug */
      filter: none;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px #bbb;
      white-space: nowrap;
@@ -2445,7 +2445,7 @@ input.accept, button.accept {
      padding: 5px 5px 5px 21px;
 }
 
-input.accept:hover, button.accept:hover, 
+input.accept:hover, button.accept:hover,
 input.accept:focus, button.accept:focus {
      background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
@@ -2455,7 +2455,7 @@ input.accept[value^="Unban"], button.accept[value^="Unban"] {
      padding: 5px 5px 5px 21px;
 }
 
-input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover, 
+input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover,
 input.accept[value^="Unban"]:focus, button.accept[value^="Unban"]:focus {
      background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
@@ -2589,7 +2589,7 @@ input.download:focus, button.download:focus {
 input.download[value^="Join"], button.download[value^="Join"] {
      background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 21px;
-} 
+}
 
 input.download[value^="Join"]:hover, button.download[value^="Join"]:hover,
 input.download[value^="Join"]:focus, button.download[value^="Join"]:focus {
@@ -2699,7 +2699,7 @@ button.accept.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -2711,7 +2711,7 @@ button.stop.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -2723,7 +2723,7 @@ button.add.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -2735,7 +2735,7 @@ button.delete.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -2747,7 +2747,7 @@ button.check.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -2759,7 +2759,7 @@ button.download.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -2877,7 +2877,7 @@ input[type="text"], input[type="password"] {
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
-     box-shadow: none;     
+     box-shadow: none;
      filter: drop-shadow(0 0 1px #89f);
      color: #000;
 }
@@ -2952,7 +2952,7 @@ input[readonly], input[disabled], input[readonly]:focus, input[disabled]:focus {
      color: #333;
      filter: none;
      cursor: default;
-} 
+}
 
 textarea {
      padding: 5px;
@@ -3341,7 +3341,7 @@ div.themelabel {
      margin-top: -31px;
      padding: 3px 2px;
      background: #eef;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%) !important;     
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%) !important;
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -3482,7 +3482,7 @@ div.flagradio {
 }
 
 div.langselect + br {
-     display: none !important; 
+     display: none !important;
 }
 
 div.langselect br {
@@ -3521,7 +3521,7 @@ table#consolepass th:nth-child(2) {
 
 table#consolepass td:first-child {
      width: 100px;
-     white-space:nowrap; 
+     white-space:nowrap;
 }
 
 table#consolepass td {
@@ -3729,7 +3729,7 @@ table#leasesetdebug td, table.leaseset td {
      padding: 5px !important;
 }
 table#leasesetdebug {
-     margin-bottom: 10px; 
+     margin-bottom: 10px;
 }
 
 table.leaseset th {
@@ -4018,7 +4018,7 @@ ul#banlist {
 #tunnelconfig font[color="red"] {
      background: url(images/warn.png) left center no-repeat;
      padding: 4px 5px 4px 20px;
-} 
+}
 
 #tunnelconfig td:nth-child(n+2) {
      text-align: left;
@@ -4068,7 +4068,7 @@ ul#banlist {
      text-transform: capitalize;
 }
 
-table#profiles tr:hover td, table#floodfills tr:hover td, 
+table#profiles tr:hover td, table#floodfills tr:hover td,
 #ntcpconnections tr:nth-last-child(n+2):hover td, #udpconnections tr:nth-last-child(n+2):hover td,
 #schedjobs tr:hover td, #jobstats tr:nth-last-child(n+2):hover td,
 #jardump tr:hover td, #sidebarconf tr:nth-last-child(n+2):hover td,
@@ -4214,7 +4214,7 @@ table#floodfills th {
 
 #jardump a:visited tt {
     color: #218;
-} 
+}
 
 #jardump a:hover tt {
      color: #f60;
@@ -4225,11 +4225,11 @@ table#floodfills th {
 }
 
 /* experimental sidebar navigation for webapps */
- 
+
 #sb_services a:link, #sb_services a:visited {
      display: inline-block;
      width: 100%;
-     padding: 4px 2px 4px 20px; 
+     padding: 4px 2px 4px 20px;
      text-align: left;
      border-bottom: 1px dotted #89f;
      background: url(images/application.png) left center no-repeat;
@@ -4459,7 +4459,7 @@ img.app, img.app2p {
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, 
+body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, #configinfo th, tt, code, th, .statusnotes {
      font-size: 10pt !important;
 }
@@ -4565,7 +4565,7 @@ div.routersummary img[src$="i2plogo.png"] {
 .routersummary div[style="height: 36px;"] {
      height: 38px !important;
 }
-}	
+}
 }
 
 /* MS Edge 14+ fix */

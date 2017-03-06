@@ -372,7 +372,7 @@ form {
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
      background: linear-gradient(to right, #efefff, #fff, #efefff);
-     box-shadow: 0 0 0 1px #fff; 
+     box-shadow: 0 0 0 1px #fff;
 }
 
 .iframed .header + form {
@@ -415,7 +415,7 @@ form {
 #mailhead td:first-child {
      width: 45px;
      white-space: nowrap;
-     font-weight: bold; 
+     font-weight: bold;
 }
 
 button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
@@ -497,7 +497,7 @@ input.clearselection:hover {
 }
 
 input.delete, input.delete_attachment, input.really_delete {
-     background: #eee url(/themes/console/images/buttons/delete.png) no-repeat 6px center;     
+     background: #eee url(/themes/console/images/buttons/delete.png) no-repeat 6px center;
      background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 22px;
 }
@@ -574,29 +574,29 @@ input.logout:hover {
 }
 
 input.reload, input.refresh {
-     background: #eee url(/themes/console/images/buttons/update.png) no-repeat 6px center;     
+     background: #eee url(/themes/console/images/buttons/update.png) no-repeat 6px center;
      background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 22px;
 }
 
 input.reload:hover, input.refresh:hover {
-     background: #eee url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center;     
+     background: #eee url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center;
      background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
 input.invertselection {
-     background: #eee url(/themes/susimail/images/selection.png) no-repeat 6px center;     
+     background: #eee url(/themes/susimail/images/selection.png) no-repeat 6px center;
      background: url(/themes/susimail/images/selection.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 22px;
 }
 
 input.invertselection:hover {
-     background: #eee url(/themes/susimail/images/selection.png) no-repeat 6px center;     
+     background: #eee url(/themes/susimail/images/selection.png) no-repeat 6px center;
      background: url(/themes/susimail/images/selection.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
 input.show {
-     background: #eee url(/themes/console/images/buttons/yes.png) no-repeat 6px center;     
+     background: #eee url(/themes/console/images/buttons/yes.png) no-repeat 6px center;
      background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 22px;
 }
@@ -608,13 +608,13 @@ input.show:hover {
 }
 
 input.markall {
-     background: #eee url(/themes/susimail/images/all.png) no-repeat 6px center;     
+     background: #eee url(/themes/susimail/images/all.png) no-repeat 6px center;
      background: url(/themes/susimail/images/all.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 22px;
 }
 
 input.markall:hover {
-     background: #fff url(/themes/susimail/images/all.png) no-repeat 6px center;     
+     background: #fff url(/themes/susimail/images/all.png) no-repeat 6px center;
      background: url(/themes/susimail/images/all.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
 
@@ -846,7 +846,7 @@ input[type="text"][disabled] {
 }
 
 #composemail textarea, #composemail input[type="text"] {
-     width: calc(100% - 20px);     
+     width: calc(100% - 20px);
      min-width: 565px;
 }
 
@@ -1009,7 +1009,7 @@ h3#config {
      float: left;
 }
 
-.topbuttons input.prev, .topbuttons input[name="prev"], .topbuttons input.prevpage, .topbuttons input[name="prevpage"], 
+.topbuttons input.prev, .topbuttons input[name="prev"], .topbuttons input.prevpage, .topbuttons input[name="prevpage"],
 .topbuttons input.next, .topbuttons input[name="next"], .topbuttons input.nextpage, input[name="nextpage"],
 .topbuttons input.firstpage, .topbuttons input[name="firstpage"], .topbuttons input.lastpage, .topbuttons input[name="lastpage"],
 .topbuttons input.list {
@@ -1038,7 +1038,7 @@ h3#config {
 .topbuttons input.list {
      background-position: center center;
      text-indent: -99999px;
-     padding: 5px 10px;    
+     padding: 5px 10px;
 }
 
 .topbuttons input[type="text"] {
@@ -1085,7 +1085,7 @@ table#pagenav {
      padding: 2px;
      border-collapse: separate;
      border-spacing: 0;
-     border-radius: 2px 2px 0 0;    
+     border-radius: 2px 2px 0 0;
 }
 
 table#pagenav td {

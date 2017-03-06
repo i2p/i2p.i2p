@@ -3,7 +3,7 @@
 /* Author: dr|z3d */
 
 body {
-     margin: 3px 2px 3px 4px; 
+     margin: 3px 2px 3px 4px;
      padding: 0;
      text-align: left;
      background: #bbf url(images/bg.png) center center fixed;
@@ -13,7 +13,7 @@ body {
 
 /* preload button mouseovers */
 body {
-     background: url(images/bg.png) fixed, 
+     background: url(images/bg.png) fixed,
      url(/themes/console/images/buttons/clean_hover.png) no-repeat,
      url(/themes/console/images/buttons/configure_hover.png) no-repeat,
      url(/themes/console/images/buttons/delete_hover.png) no-repeat,
@@ -264,7 +264,7 @@ div.routersummary input[type=text] {
 }
 
 #xhr {
-     margin-top: 15px;     
+     margin-top: 15px;
 }
 
 div.routersummary hr {
@@ -421,7 +421,7 @@ div.routersummary td {
 }
 
 div.routersummary form {
-     margin: -2px 0;     
+     margin: -2px 0;
 }
 
 div.newsheadings {
@@ -642,7 +642,7 @@ input[type="submit"], input[type="reset"], button, .optbox {
 }
 
 .optbox:hover, .optbox:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
-/*	  -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#89f')";*/     
+/*	  -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#89f')";*/
      -webkit-filter: drop-shadow(0 0 2px #89f);
      filter: drop-shadow( 0 0 2px #89f);
      border: 0;
@@ -651,7 +651,7 @@ input[type="submit"], input[type="reset"], button, .optbox {
 
 .optbox:disabled:hover, input:disabled:hover {
      filter: none;
-} 
+}
 
 button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      filter: drop-shadow(0 0 2px #89f);
@@ -706,7 +706,7 @@ input.accept, button.accept {
      padding: 5px 5px 5px 21px;
 }
 
-input.accept:hover, button.accept:hover, 
+input.accept:hover, button.accept:hover,
 input.accept:focus, button.accept:focus {
      background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
@@ -716,7 +716,7 @@ input.accept[value^="Unban"], button.accept[value^="Unban"] {
      padding: 5px 5px 5px 21px;
 }
 
-input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover, 
+input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover,
 input.accept[value^="Unban"]:focus, button.accept[value^="Unban"]:focus {
      background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
 }
@@ -850,7 +850,7 @@ input.download:focus, button.download:focus {
 input.download[value^="Join"], button.download[value^="Join"] {
      background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
      padding: 5px 5px 5px 21px;
-} 
+}
 
 input.download[value^="Join"]:hover, button.download[value^="Join"]:hover,
 input.download[value^="Join"]:focus, button.download[value^="Join"]:focus {
@@ -966,7 +966,7 @@ button.accept.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -978,7 +978,7 @@ button.stop.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -990,7 +990,7 @@ button.add.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -1002,7 +1002,7 @@ button.delete.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -1014,7 +1014,7 @@ button.check.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -1026,7 +1026,7 @@ button.download.control {
      font-size: 0;
      text-indent: -99999px;
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;     
+     background-size: 16px 16px, 100% 100% !important;
      padding: 12px 11px;
 }
 
@@ -1244,7 +1244,7 @@ div.main h2:first-child, div.main h3:first-child {
 
 .topness {
      text-align: right;
-     font-size: 8pt;  
+     font-size: 8pt;
 }
 
 div.wideload h2 {
@@ -1537,7 +1537,7 @@ table#profiles td:first-child, #profiles td:last-child {
      display: none;
 }
 
-#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover, 
+#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
 .homelinkedit tr:hover, .main#debug table:first-of-type tr:hover td {
      background: #fff;
      background: linear-gradient(to bottom, #fff 0%, #ffe 100%);
@@ -1548,7 +1548,7 @@ table#profiles td:first-child, #profiles td:last-child {
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 
-#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover, 
+#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
 .homelinkedit tr:nth-last-child(n+2):hover, .main#debug table:first-of-type tr:hover td, #sidebarconf tr:nth-last-child(n+2):hover td {
      border-top: inherit;
      border-bottom: inherit;
@@ -1653,8 +1653,8 @@ ul#banlist + h3.tabletitle {
 }
 
 #bannedips table tr {
-     border-top: 1px solid #ddf; 
-} 
+     border-top: 1px solid #ddf;
+}
 
 #bannedips table td {
      text-align: center;
@@ -1703,7 +1703,7 @@ ul#banlist + h3.tabletitle {
 
 
 .widescroll {
-     overflow: auto; 
+     overflow: auto;
 }
 
 a[href^="configpeer?peer"] {
@@ -1761,7 +1761,7 @@ table#enviro td, table#eventlogs td {
      width: 100%;
      padding: 0;
      height: 600px;
-     overflow: auto;     
+     overflow: auto;
 }
 
 #wrapperlogs tr:last-child td {
@@ -1840,7 +1840,7 @@ div.configure h2:first-child {
 }
 
 #sidebarconf th:nth-child(1) {
-     text-align: center;     
+     text-align: center;
 }
 
 #sidebarconf th:nth-child(2), #sidebarconf td:nth-child(2) {
@@ -1890,7 +1890,7 @@ div.configure h2:first-child {
 
 #sidebarconf td {
      font-weight: bold;
-     font-size: 9pt;  
+     font-size: 9pt;
 }
 
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
@@ -1949,8 +1949,8 @@ div.error {
 }
 
 div.notice {
-     padding: 10px 10px 10px 0 !important; 
-     margin: 0;     
+     padding: 10px 10px 10px 0 !important;
+     margin: 0;
      background: url(/themes/console/images/info/infohelp.png) 15px center no-repeat;
 }
 
@@ -2205,7 +2205,7 @@ td.optionsave[colspan="2"] {
 }
 
 td.infohelp, p.infohelp, td.infowarn, p.infowarn, p#upnpstatus, p#gatherstats, p#debugmode, p#sybilinfo, p#pluginconfigtext {
-     padding: 15px 15px 15px 55px !important; 
+     padding: 15px 15px 15px 55px !important;
      border: 1px solid #89f;
      background: #fff url(/themes/console/images/info/infohelp.png) 15px center no-repeat;
      white-space: normal !important;
@@ -2753,7 +2753,7 @@ p {
 }
 
 p img:first-child {
-     display: none;     
+     display: none;
 }
 
 p.infohelp, p.infohelp + p, p#enablefullstats {
@@ -2819,7 +2819,7 @@ p#enablefullstats {
 }
 
 .formaction#shutdown, .formaction#restart, .formaction#systray, .formaction#runonstart,
-.formaction#dumpthreads, .formaction#browserstart, .formaction#sidebardefaults, 
+.formaction#dumpthreads, .formaction#browserstart, .formaction#sidebardefaults,
 .formaction#tunnelconfigsave, .formaction#updateplugins, .formaction#consolepass {
      border: 1px solid #89f;
      margin-top: -13px;
@@ -2890,7 +2890,7 @@ p#enablefullstats {
 }
 
 .langbox img:hover {
-     opacity: 1;     
+     opacity: 1;
      filter: drop-shadow(0 0 1px #f60);
      -webkit-filter: drop-shadow(0 0 1px #f60);
      transform: scale(1.1);
@@ -2997,9 +2997,9 @@ tt, code {
 */
 
 #netconfig tr, #externali2cp tr {
-     background: #fff; 
+     background: #fff;
 }
- 
+
 #pluginconfig tr {
      border-bottom: 1px solid #89f;
 }
@@ -3103,7 +3103,7 @@ p#graphopts + p {
      margin: -1px -5px 0;
      padding: 10px;
      border: 1px solid #89f;
-     display: none; 
+     display: none;
 }
 
 .formaction#graphing {
@@ -3424,7 +3424,7 @@ div.langselect { /* containing box for lang selection */
 .langselect:active input[name="lang"]:checked + img + .ui_lang {
      color: #338 !important;
      box-shadow: none !important;
-} 
+}
 
 .langselect input[name="lang"]:focus + img + .ui_lang {
      color: #f60 !important;
@@ -3439,7 +3439,7 @@ div.flagradio {
 }
 
 div.langselect + br {
-     display: none !important; 
+     display: none !important;
 }
 
 div.langselect br {
@@ -3477,7 +3477,7 @@ table#consolepass th:nth-child(2) {
 
 table#consolepass td:first-child {
      width: 100px;
-     white-space:nowrap; 
+     white-space:nowrap;
 }
 
 table#consolepass td {
@@ -3627,7 +3627,7 @@ table#leasesetdebug td, table#leaseset td {
      padding: 5px !important;
 }
 table#leasesetdebug {
-     margin-bottom: 10px; 
+     margin-bottom: 10px;
 }
 
 table#leasesetdebug th, table#leasesetsummary th {
@@ -3794,7 +3794,7 @@ table.sybil_routerinfo:first-of-type th {
 
 div#sybilnav {
      background: #eff1ff;
-     -moz-columns: 4 200px; 
+     -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
      columns: 4 200px;
      padding: 10px 0 0 5px;
@@ -4277,7 +4277,7 @@ p#fullhistory {
 }
 
 #advancedsettings td.infowarn {
-     padding: 10px 10px 10px 40px !important; 
+     padding: 10px 10px 10px 40px !important;
      border: 1px solid #89f;
      background: #fffff5 url(/themes/console/images/info/infowarn.png) 10px center no-repeat !important;
      background-size: 22px 22px !important;

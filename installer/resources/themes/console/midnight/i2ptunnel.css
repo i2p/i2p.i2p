@@ -1,4 +1,4 @@
-/* I2P TunnelManager theme: "Midnight" */ 
+/* I2P TunnelManager theme: "Midnight" */
 /* Author: dr|z3d.  */
 
 body {
@@ -14,7 +14,7 @@ body {
 body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
      padding: 0;
-     overflow: hidden; 
+     overflow: hidden;
 }
 
 :-moz-focusring {
@@ -138,7 +138,7 @@ hr {
 }
 
 .iframed #globalTunnelControl {
-     margin: 6px auto -26px !important; 
+     margin: 6px auto -26px !important;
 }
 
 #serverTunnels {
@@ -333,7 +333,7 @@ textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages
 }
 
 .freetext {
-     width: 150px; 
+     width: 150px;
      border: 1px solid #443da0;
      padding: 4px;
      font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
@@ -716,7 +716,7 @@ input::-moz-placeholder {
 input.tunnelName, input.tunnelDescription, #userAgents {
      width: 80%;
      min-width: 280px;
-     text-overflow: ellipsis; 
+     text-overflow: ellipsis;
 }
 
 #websiteName, #privKeyFile, #targetHost, .host {
@@ -734,23 +734,23 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .username {
      background: url(/themes/console/images/buttons/user.png) 3px center no-repeat, linear-gradient(to bottom, #001, #000) !important;
-     padding-left: 22px; 
+     padding-left: 22px;
 }
 
 .username:focus {
      background: #000 url(/themes/console/images/buttons/user.png) 3px center no-repeat !important;
-     padding-left: 22px; 
+     padding-left: 22px;
 }
 
 .password {
      background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #001, #000) !important;
-     padding-left: 22px; 
+     padding-left: 22px;
 }
 
 
 .password:focus {
      background: #000 url(/themes/console/images/buttons/password.png) 3px center no-repeat !important;
-     padding-left: 22px; 
+     padding-left: 22px;
 }
 
 .proxyList {
@@ -817,7 +817,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 #wizardPanel #name, #wizardPanel #description {
      width: 300px !important;
-}  
+}
 
 #wizardPanel p {
      padding: 5px 15px;

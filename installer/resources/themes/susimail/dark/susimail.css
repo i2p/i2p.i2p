@@ -162,7 +162,7 @@ div.topbuttons br {
 }
 
 .bottombuttons input:disabled {
-     display: none; 
+     display: none;
 }
 
 td[colspan="9"] hr {
@@ -238,7 +238,7 @@ table#mailbox tr[class^="list"]:hover {
 #mailbox td#from {
      white-space: nowrap;
      width: 100px;
-} 
+}
 
 #mailbox td#subject {
      max-height: 40px;
@@ -246,7 +246,7 @@ table#mailbox tr[class^="list"]:hover {
 }
 
 #message_full td {
-     background: #000; 
+     background: #000;
 }
 
 input.optbox {
@@ -333,11 +333,11 @@ tr.list0:hover td:nth-child(3) a, tr.list1:hover td:nth-child(3) a, #mailbox td:
 
 tr.list0:hover td:first-child, tr.list1:hover td:first-child {
 /*     background: url(images/highlight.png) left center repeat-y; */
-      box-shadow: inset 3px 0 0 #900; 
+      box-shadow: inset 3px 0 0 #900;
 }
 
 tr.list0:hover td:last-child, tr.list1:hover td:last-child {
-      box-shadow: inset -3px 0 0 #900; 
+      box-shadow: inset -3px 0 0 #900;
 }
 
 .list0 td:first-child, .list1 td:first-child, #mailbox th:first-child {
@@ -350,7 +350,7 @@ tr.list0:hover td:last-child, tr.list1:hover td:last-child {
 .list0 td:nth-child(2), .list1 td:nth-child(2) {
      width: 32px;
      text-align: right;
-} 
+}
 
 .list0 td:nth-child(3) a, .list1 td:nth-child(3) a {
      color: #bb7 !important;
@@ -367,7 +367,7 @@ table[id="mailbox"] tr th:last-child, .list0 td:last-child, .list1 td:last-child
      text-align: right;
      padding-right: 20px;
      white-space: nowrap;
-} 
+}
 
 table[id="mailbox"] th {
      font-size: 9pt;
@@ -984,12 +984,12 @@ div#prefsave { /* config page button positioning */
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {  /* webkit fixes */
-table#mailbox {  
+table#mailbox {
      margin-top: 1px;
 }
 
 div#prefsave {
-     padding-bottom: 5px;     
+     padding-bottom: 5px;
      border-bottom: 1px solid #494;
 }
 
