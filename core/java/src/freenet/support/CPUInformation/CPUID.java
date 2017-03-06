@@ -51,11 +51,8 @@ public class CPUID {
     private static boolean _doLog = System.getProperty("jcpuid.dontLog") == null &&
                                     I2PAppContext.getGlobalContext().isRouterContext();
 
-    private static final boolean isX86 = System.getProperty("os.arch").contains("86") ||
-                                         System.getProperty("os.arch").equals("amd64");
+    private static final boolean isX86 = SystemVersion.isX86();
     private static final boolean isWindows = SystemVersion.isWindows();
-    private static final String libPrefix = isWindows ? "" : "lib";
-    private static final String libSuffix = isWindows ? ".dll" : ".so";
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
     private static final boolean isKFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("kfreebsd");
     private static final boolean isFreebsd = (!isKFreebsd) && System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
@@ -304,13 +301,15 @@ public class CPUID {
      */
     public static CPUInfo getInfo() throws UnknownCPUException
     {
-        if(!_nativeOk)
-            throw new UnknownCPUException("Failed to read CPU information from the system. Please verify the existence of the jcpuid dll/so.");
+        if(!_nativeOk) {
+            throw new UnknownCPUException("Failed to read CPU information from the system. Please verify the existence of the " +
+                                          getLibraryPrefix() + "jcpuid " + getLibrarySuffix() + " file.");
+        }
         String id = getCPUVendorID();
         if(id.equals("CentaurHauls"))
             return new VIAInfoImpl();
         if(!isX86)
-            throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPU's only");
+            throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPUs only.");
         if(id.equals("AuthenticAMD"))
             return new AMDInfoImpl();
         if(id.equals("GenuineIntel"))
@@ -321,9 +320,23 @@ public class CPUID {
 
     public static void main(String args[])
     {
-        _doLog = true;
-        if(!_nativeOk){
-            System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
+        _doLog = true; // this is too late to log anything from above
+        String path = System.getProperty("java.library.path");
+        String name = getLibraryPrefix() + "jcpuid" + getLibrarySuffix();
+        System.out.println("Native library search path: " + path);
+        if (_nativeOk) {
+            String sep = System.getProperty("path.separator");
+            String[] paths = DataHelper.split(path, sep);
+            for (String p : paths) {
+                File f = new File(p, name);
+                if (f.exists()) {
+                    System.out.println("Found native library: " + f);
+                    break;
+                }
+            }
+        } else {
+            System.out.println("Failed to retrieve CPUInfo. Please verify the existence of the " +
+                               name + " file in the library path, or set -Djava.library.path=. in the command line");
         }
         System.out.println("JCPUID Version: " + _jcpuidVersion);
         System.out.println(" **CPUInfo**");
@@ -498,12 +511,22 @@ public class CPUID {
      *
      */
     private static final boolean loadFromResource() {
+        // Mac info:
+        // Through 0.9.25, we had a libjcpuid-x86_64-osx.jnilib and a libjcpuid-x86-osx.jnilib file.
+        // As of 0.9.26, we have a single libjcpuid-x86_64-osx.jnilib fat binary that has both 64- and 32-bit support.
+        // For updates, the 0.9.27 update contained the new jbigi.jar.
+        // However, in rare cases, a user may have skipped that update, going straight
+        // from 0.9.26 to 0.9.28. Since we can't be sure, always try both for Mac.
+        // getResourceName64() returns non-null for 64-bit OR for 32-bit Mac.
+
         // try 64 bit first, if getResourceName64() returns non-null
         String resourceName = getResourceName64();
         if (resourceName != null) {
             boolean success = extractLoadAndCopy(resourceName);
             if (success)
                 return true;
+            if (_doLog)
+                System.err.println("WARNING: Resource name [" + resourceName + "] was not found");
         }
 
         // now try 32 bit
@@ -511,7 +534,6 @@ public class CPUID {
         boolean success = extractLoadAndCopy(resourceName);
         if (success)
             return true;
-
         if (_doLog)
             System.err.println("WARNING: Resource name [" + resourceName + "] was not found");
         return false;
@@ -531,7 +553,7 @@ public class CPUID {
             return false;
         File outFile = null;
         FileOutputStream fos = null;
-        String filename = libPrefix + "jcpuid" + libSuffix;
+        String filename = getLibraryPrefix() + "jcpuid" + getLibrarySuffix();
         try {
             InputStream libStream = resource.openStream();
             outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
@@ -571,17 +593,20 @@ public class CPUID {
     /** @return non-null */
     private static final String getResourceName()
     {
-        return getLibraryPrefix()+getLibraryMiddlePart()+"."+getLibrarySuffix();
+        return getLibraryPrefix() + getLibraryMiddlePart() + getLibrarySuffix();
     }
 
     /**
-     * @return null if not on a 64 bit platform
+     * @return null if not on a 64 bit platform (except Mac)
      * @since 0.8.7
      */
     private static final String getResourceName64() {
-        if (!is64)
+        // As of GMP 6,
+        // libjcpuid-x86_64-osx.jnilib file is a fat binary that contains both 64- and 32-bit binaries
+        // See loadFromResource() for more info.
+        if (!is64 && !isMac)
             return null;
-        return getLibraryPrefix() + get64LibraryMiddlePart() + "." + getLibrarySuffix();
+        return getLibraryPrefix() + get64LibraryMiddlePart() + getLibrarySuffix();
     }
 
     private static final String getLibraryPrefix()
@@ -597,8 +622,14 @@ public class CPUID {
              return "jcpuid-x86-windows"; // The convention on Windows
 	if(isMac) {
 	    if(isX86) {
-	        return "jcpuid-x86-osx";  // The convention on Intel Macs
+                // As of GMP6,
+                // our libjcpuid-x86_64.osx.jnilib is a fat binary,
+                // with the 32-bit lib in it also.
+                // Not sure if that was on purpose...
+	        return "jcpuid-x86_64-osx";  // The convention on Intel Macs
 	    }
+            // this will fail, we don't have any ppc libs, but we can't return null here.
+	    return "jcpuid-ppc-osx";
 	}
         if(isKFreebsd)
             return "jcpuid-x86-kfreebsd"; // The convention on kfreebsd...
@@ -631,6 +662,8 @@ public class CPUID {
 	    if(isX86){
 	        return "jcpuid-x86_64-osx";
 	    }
+            // this will fail, we don't have any ppc libs, but we can't return null here.
+	    return "jcpuid-ppc_64-osx";
 	}
         if(isSunos)
             return "jcpuid-x86_64-solaris";
@@ -641,10 +674,10 @@ public class CPUID {
     private static final String getLibrarySuffix()
     {
         if(isWindows)
-            return "dll";
+            return ".dll";
 	if(isMac)
-	    return "jnilib";
+	    return ".jnilib";
 	else
-            return "so";
+            return ".so";
     }
 }

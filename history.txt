@@ -1,3 +1,28 @@
+2017-03-06 zzz
+ * CPUID:
+   - Fix saving of libjcpuid.jnifile on Macs,
+     was incorrectly saving as libjcpuid.so (tickets #1865, #1900)
+   - Try to load libjcpuid-x86_64-osx.jnilib for 32-bit Macs,
+     because as of 0.9.26 it's a 'fat binary' with 32-bit in it also.
+   - Add library search path logging to main()
+ * NBI:
+   - Try to load the "none" architecture for x86, even if
+     CPUID loading fails (tickets #1865, #1900)
+   - Add library search path logging to main()
+ * Throttle: Fix disable of probabalistic throttling
+   (ticket #1963) (thx mysterious)
+
+2017-03-03 zzz
+ * Utils: Fix crash in Windows installer
+
+2017-03-02 zzz
+ * SSU:
+   - Initial work on introducer expiration (proposal 133)
+   - Fix bug in error handling for introduction parameters in RI
+
+2017-03-01 zzz
+ * Servlet: Catch OOM in MultiPartRequest
+
 2017-02-27 zzz
  * i2psnark: Fix disappearing start button
  * addressbook: Add date parameter to authentication strings
