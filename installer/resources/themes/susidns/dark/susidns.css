@@ -3,8 +3,9 @@
 
 body {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
-     line-height:120%;
+     line-height: 120%;
      background: #000;
+     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.45)), url(/themes/console/dark/images/camotile2.png) top left fixed;
      color:#ee9;
      padding-top: 5px;
      margin: 0 10px;
@@ -12,7 +13,7 @@ body {
 }
 
 body.iframed {
-     background: transparent !important;
+/*     background: transparent !important;*/
      margin: 0;
 }
 
@@ -31,13 +32,13 @@ body.iframed {
      margin: 10px 0;
      padding: 0 5px;
      font-size: 9pt !important;
-     box-shadow: inset 0 0 1px 0 #002;
-     background: #000;
+/*     background: #000;*/
 }
 
 .iframed .page {
      margin: 0;
      padding: 0 15px;
+     background: transparent !important;
 }
 
 #logo {
@@ -172,7 +173,7 @@ div#filter {
      border: 1px solid #2a5f29;
      padding: 0 5px 15px;
      text-align: center;
-     background: #000;
+     background: #001000;
 }
 
 div#filter + div#search {
@@ -186,13 +187,12 @@ div#filter + div#search > form {
 }
 
 #filter p, #search td {
-     font-size: 10pt !important;
      font-weight: bold;
 }
 
 #search {
      text-align: center;
-     background: #000;
+     background: #000900;
 }
 
 #search table {
@@ -245,13 +245,16 @@ div#filter + div#search > form {
 
 #filter a {
      border: 1px solid #2a5f29;
-     padding: 3px 8px;
+     margin: 1px 0 3px;
+     padding: 1px 8px;
+     min-width: 18px;
      border-radius: 2px;
      background: #000;
      background: linear-gradient(to bottom, #010 0%, #000 100%);
      font-size: 10pt;
      text-transform: uppercase;
      white-space: nowrap;
+     display: inline-block;
 }
 
 #filter a:hover {
@@ -273,7 +276,9 @@ div#filter + div#search > form {
      white-space: nowrap;
      margin-top: -1px;
      padding: 5px;
+     font-size: 10pt;
      font-weight: bold;
+     text-transform: capitalize;
      background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
 }
 
@@ -334,6 +339,10 @@ h3 {
 
 #content h3:first-child {
      margin-top: -15px;
+}
+
+#content p {
+     line-height: 130%;
 }
 
 .headline h3:first-child + h4 {
@@ -455,7 +464,6 @@ th {
      color: #ee9;
      font-size: 9pt;
      padding: 5px 10px;
-     font-size: 10pt;
      text-align: left;
 }
 
@@ -536,7 +544,6 @@ td > img[width="320"], td > img[src^="/imagegen"] {
 ol, ul {
      margin: 0 20px 0 10px;
      display: table-row;
-     padding: 0px 10px;
 }
 
 li {
@@ -544,14 +551,15 @@ li {
      margin: 0;
      font-size: 9pt;
      list-style: square;
+     line-height: 150%;
 }
 
 tr.list1 {
-     background-color: #010;
+     background-color: #000900;
 }
 
 tr.list0 {
-     background-color: #000;
+     background-color: #001000;
 }
 
 .help {
@@ -661,7 +669,7 @@ div#book {
 #book table {
      width: 100%;
      border: 1px solid #2a5f29;
-/*     margin-top: -10px;*/
+     border-collapse: separate;
 }
 
 #book table th {
@@ -672,11 +680,18 @@ div#book {
 }
 
 #book table td {
-     border-bottom: 1px solid #141;
+     border-bottom: 1px solid #121;
+     border-top: 1px solid #000;
 }
 
-#book table tr:hover {
+#book table tr:hover td {
      background: #001a00;
+     border-bottom: 1px solid #2a5f29;
+     border-top: 1px solid #2a5f29;
+}
+
+#book table tr:nth-child(2):hover td {
+     border-top: 1px solid transparent;
 }
 
 #book table tr:hover td textarea {
@@ -819,6 +834,7 @@ textarea[cols="70"] {
      height: 40px;
 }
 
+/*
 .destinations textarea {
      width: 100%;
      padding: 1px !important;
@@ -830,6 +846,7 @@ textarea[cols="70"] {
      margin: 0 !important;
      border-radius: 0;
 }
+*/
 
 input:focus, textarea:focus {
      color: #ee9;
@@ -873,57 +890,6 @@ input[name="search"]:focus {
 .headline#config h3 {
      background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
 }
-
-/* responsive layout */
-
-@media screen and (max-width: 710px) {
-#navi a {
-     background: linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%) !important;
-     padding: 2px 8px !important;
-}
-
-#navi a.abook:hover, #navi a#overview:hover, #navi a#subs:hover, #navi a#config:hover,
-#navi a.abook:focus, #navi a#overview:focus, #navi a#subs:focus, #navi a#config:focus {
-     background: #000 !important;
-     padding: 2px 8px !important;
-}
-
-#navi a.abook:active, #navi a#overview:active, #navi a#subs:active, #navi a#config:active {
-     background: #f60 !important;
-}
-}
-
-@media screen and (min-width: 1400px) {
-textarea {
-     font-size: 9pt;
-}
-
-body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4, td.names a, p, li, #filter a, #host_details td {
-     font-size: 10pt !important;
-}
-
-div#navi {
-     padding: 6px 5px !important;
-}
-
-#navi a {
-     font-size: 10pt !important;
-     padding: 4px 7px 5px 25px !important;
-}
-
-h3 {
-     font-size: 11pt !important;
-}
-
-#filter a:link, #filter a:visited {
-     margin: 3px 2px !important;
-}
-form[action="addressbook"] > p.buttons {
-     margin-bottom: -20px;
-}
-}
-
-/* end responsive layout */
 
 /* export hosts button adjustments */
 
@@ -1000,7 +966,7 @@ p.book {
      width: 20px;
      height: 20px;
      vertical-align: middle;
-     margin: 1px 10px 1px 1px;
+     margin: 6px 8px 6px 2px;
      padding: 1px;
      border: 1px solid #141;
      border-radius: 2px;
@@ -1008,8 +974,6 @@ p.book {
 }
 
 .names img:hover, .names a:focus img {
-/*     filter: drop-shadow(0 0 1px #f60) !important;
-     -webkit-filter: drop-shadow(0 0 1px #f60) !important;*/
      border: 1px solid #f60;
 }
 
@@ -1024,8 +988,7 @@ p.book {
      margin-top: 28px;
 }
 
-#host_list th:first-child,
-#host_list td:first-child {
+#host_list th:first-child, #host_list td:first-child {
      width: 150px;
      width: 30%;
      white-space: nowrap;
@@ -1102,14 +1065,19 @@ p.book {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
      font-weight: normal;
      padding: 3px !important;
+     display: flex;
+}
+
+#host_list .destaddress:hover, #host_list .destaddress:focus {
+     color: #bb0;
 }
 
 /* end hostname list */
 
 td.destinations {
      max-width: 50px !important;
-     border-left: 1px solid #141;
-     border-right: 1px solid #141;
+     border-left: 1px solid #121;
+     border-right: 1px solid #121;
 }
 
 /* MS Edge 14+ fix */
@@ -1118,3 +1086,56 @@ _:-ms-lang(x), * {
      -webkit-filter: none !important;
 }
 
+/* responsive layout */
+
+@media screen and (max-width: 710px) {
+#navi a {
+     background: linear-gradient(to bottom, #020 0%, #020 50%, #000 50%, #000 100%) !important;
+     padding: 2px 8px !important;
+}
+
+#navi a.abook:hover, #navi a#overview:hover, #navi a#subs:hover, #navi a#config:hover,
+#navi a.abook:focus, #navi a#overview:focus, #navi a#subs:focus, #navi a#config:focus {
+     background: #000 !important;
+     padding: 2px 8px !important;
+}
+
+#navi a.abook:active, #navi a#overview:active, #navi a#subs:active, #navi a#config:active {
+     background: #f60 !important;
+}
+}
+
+@media screen and (min-width: 1400px) {
+
+body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4, td.names a, p, li, #filter a, #host_details td, textarea, th, #search td {
+     font-size: 10pt !important;
+}
+
+div#navi {
+     padding: 6px 5px !important;
+}
+
+#navi a {
+     font-size: 10pt !important;
+     padding: 4px 7px 5px 25px !important;
+}
+
+h3, #filter a, #filter span {
+     font-size: 11pt !important;
+}
+
+#filter a {
+     margin: 0 2px -2px !important;
+     min-width: 20px;
+}
+
+div#filter {
+     background: linear-gradient(to right, #000, #001000 10%, #001000 90%, #000);
+}
+
+form[action="addressbook"] > p.buttons {
+     margin-bottom: -20px;
+}
+}
+
+/* end responsive layout */

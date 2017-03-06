@@ -74,8 +74,8 @@ code, tt, .destaddress {
      margin: -1px 0 10px;
      padding: 7px 5px 6px;
      border-radius: 2px;
-     filter: drop-shadow(0px 0 1px #999);
-     -webkit-filter: drop-shadow(0px 0 1px #999);
+     filter: drop-shadow(0px 0 1px #bbb);
+     -webkit-filter: drop-shadow(0px 0 1px #bbb);
 }
 
 #navi a {
@@ -200,8 +200,8 @@ form[action="subscriptions"] #content {
      border-radius: 2px;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+     filter: drop-shadow(0 0 1px #bbb);
+     -webkit-filter: drop-shadow(0 0 1px #bbb);
 }
 
 div#add {
@@ -475,11 +475,13 @@ textarea[name="config"] {
 #search table {
      margin: 0;
      display: inline;
+     background: none;
 }
 
 td.search {
      text-align: left;
      padding: 0;
+     background: none;
 }
 
 td.search:first-child {
@@ -915,7 +917,6 @@ input[type="submit"], input[type="reset"], .fakebutton {
      padding: 4px 3px;
      text-decoration: none;
      border-radius: 2px;
-     box-shadow: inset 0px 2px 8px 0px #fff;
      border: 1px solid #999;
      box-shadow: inset 0 0 0 1px #fff;
      background: #eee;
@@ -950,7 +951,7 @@ input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, inp
 }
 
 input[type="submit"]:active, input[type="reset"]:active, .fakebutton:active {
-     box-shadow: inset 3px 3px 2px #555;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 2px #555;
      background-blend-mode: luminosity;
      color: #666;
 }
