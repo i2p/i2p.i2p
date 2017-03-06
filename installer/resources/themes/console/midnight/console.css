@@ -850,12 +850,6 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background-blend-mode: normal;
 }
 
-.routersummary .download {
-     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 5px 3px 5px 17px !important;
-}
-
 .routersummary .reload, .routersummary .stop {
      text-indent: -99999px;
      background-size: 16px 16px, 100% 100% !important;
@@ -930,23 +924,21 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background: #652787 url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+.routersummary .download, .routersummary .download:hover, .routersummary .download:focus {
+     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background-size: 14px 14px, 100% 100%;
+     min-width: 0 !important;
+}
+
 .routersummary .download, .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
-     padding-left: 19px !important;
-}
-}
-
-.routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
-     background: #000 url(/themes/console/images/buttons/download.png) 3px center no-repeat;
-     background-size: 16px 16px !important;
-     padding: 5px 3px 5px 17px !important;     
+     background-size: 14x 14px !important;
+     padding: 5px 3px 5px 22px !important;
 }
 
-.routersummary .download:focus {
+.routersummary .download:active {
      background: #652787 url(/themes/console/images/buttons/download.png) 3px center no-repeat;
-     background-size: 16px 16px !important;
-     padding: 5px 3px 5px 17px !important;     
 }
+
 /* end sidebar buttons */
 /* end buttons & inputs */
 
@@ -1085,27 +1077,31 @@ div.logo hr {
 
 .routersummary img[src*="i2plogo"] {
      opacity: 0.7;
-     transition: all 0.3s ease 0s;
+     transition: ease-out opacity 0.3s 0s, ease filter 0.3s 0s;
+     margin-top: 1px;
      margin-left: -3px;
-     filter: sepia(100%) hue-rotate(180deg);
-     -webkit-filter: sepia(100%) hue-rotate(180deg);
+     width: 176px;
+     height: auto;
+     filter: sepia(100%) hue-rotate(180deg) drop-shadow(0 0 1px #652787);
+     -webkit-filter: sepia(100%) hue-rotate(180deg) drop-shadow(0 0 1px #652787);
 }
 
 .routersummary img[src*="i2plogo"]:hover {
      opacity: 1;
-     transition: all 0.3s ease 0s;
-     filter: drop-shadow(0 0 3px #652787) saturate(200%);
-     -webkit-filter: drop-shadow(0 0 3px #652787) saturate(200%);
+     transition: ease-in opacity 0.3s 0s, ease filter 0.3s 0s;
+     filter: drop-shadow(0 0 2px #652787) saturate(100%);
+     -webkit-filter: drop-shadow(0 0 2px #652787) saturate(100%);
 }
 
 .routersummary img[src*="i2plogo"]:active {
-     filter: drop-shadow(0 0 5px #450519) saturate(200%) !important;
-     -webkit-filter: drop-shadow(0 0 5px #450519) saturate(200%) !important;
+     filter: drop-shadow(0 0 5px #450519) saturate(140%) !important;
+     -webkit-filter: drop-shadow(0 0 5px #450519) saturate(140%) !important;
+     transition: ease-out opacity 0s 0s, ease filter 0s 0s;
 }
 
 .routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
      opacity: 1;
-     transition: all 0.3s ease 0s;
+     transition: ease-in opacity 0.5s 0s, ease filter 0.5s 0s;
      filter: drop-shadow(0 0 3px #652787) saturate(200%);
      -webkit-filter: drop-shadow(0 0 3px #652787) saturate(200%);
 }
@@ -1186,10 +1182,23 @@ div.logo hr {
      background-color: transparent !important;
 }
 
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-bottom: -4px !important;
+}
+
+#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
+#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+   content: "";
+   display: inline-block;
+   min-height: 14px;
+}
+
+/*
 #sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
      padding-top: 1px;
      padding-bottom: 1px;
 }
+*/
 
 #sb_localtunnels {
      width: 189px !important;
@@ -2923,8 +2932,24 @@ table#configclient {
 
 /* configfamily */
 
-table#newfamily, table#leavefamily {
+#newfamily, #exportfamily {
+     margin-bottom: 14px !important;
+}
+
+#exportfamily tr:nth-child(2) td:first-child {
+     background: #000 url(/themes/console/images/info/export_key.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
+}
+
+#leavefamily {
      margin-bottom: 10px !important;
+}
+
+#leavefamily tr:last-child td:first-child {
+     background: #000 url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
 }
 
 /* configreseed */
@@ -2964,6 +2989,40 @@ ul#banlist {
 
 ul#banlist tt {
      color: #c11f5d;
+}
+
+ul#banlist {
+     border: 1px solid #443da0;
+     background: #000;
+     padding: 10px 10px 10px 0;
+     margin: -1px 0 13px;
+     -moz-column-count: auto;
+     -moz-column-width: 300px;
+     -moz-column-gap: 10px;
+     -moz-column-rule: 1px dotted #443da0;
+     -webkit-column-count: auto;
+     -webkit-column-width: 300px;
+     -webkit-column-gap: 10px;
+     -webkit-column-rule: 1px dotted #443da0;
+     column-count: auto;
+     column-width: 300px;
+     column-gap: 10px;
+     column-rule: 1px dotted #443da0;
+}
+
+#banlist li {
+     list-style: none !important;
+     border-bottom: 1px dotted #443da0;
+     margin: 0 10px 3px;
+     padding-top: 3px;
+     min-width: 250px;
+     min-height: 46px;
+     width: 88%;
+     padding-bottom: 5px;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-break-inside: avoid;
+     display: inline-block;
 }
 
 /* /confignet */
@@ -4020,7 +4079,7 @@ table#viewprofile td {
 ul#banlist {
      border: 1px solid #443da0;
      background: #000;
-     padding: 10px 10px 0 0;
+     padding: 10px 10px 10px 0;
      margin-bottom: 10px;
 }
 
@@ -4875,7 +4934,8 @@ td.optionsave {
      margin-bottom: 0;
 }
 
-h3.h3table, h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils {
+h3.h3table, h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pluginconfig, h3#pluginfromurl, 
+h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils {
      margin-bottom: 0 !important;
      border-radius: 0;
      border: 1px solid #443da0;
@@ -5019,18 +5079,82 @@ h4.embeddedtitle#updateplugins {
      width: calc(100% - 300px);
 }
 
-table#permabanned, table#loggingoptions, table#addkeyring {
+table#loggingoptions, table#addkeyring {
      margin-bottom: -3px !important;
      margin-top: -1px;
 }
 
-table#permabanned {
-     margin-bottom: 9px !important;
+/* /configpeers banlist */
+
+
+
+#bannedips {
+     margin-bottom: 8px;
+     margin-top: -1px;
+}
+
+#bannedips table {
+     margin-bottom: -1px !important;
+}
+
+#bannedips td {
+     vertical-align: top;
+     padding: 0;
+     width: 50%;
+}
+
+#bannedips table tr {
+     border-top: 1px solid #000; 
+} 
+
+#bannedips table td {
+     text-align: center;
+     padding: 4px 2px;
+}
+
+#bannedips table tr:last-child {
+     border-bottom: 1px solid #443da0;
 }
 
 #permabanned th, #banneduntilrestart th {
      padding: 5px 10px !important;
 }
+
+#permabanned, #banneduntilrestart {
+     margin: -1px 0 !important;
+     border: none;
+}
+
+#permabanned td:first-child {
+     border-left: 1px solid #443da0;
+     text-align: right;
+     padding-right: 10px;
+     width: 49%;
+}
+
+#permabanned td:nth-child(2) {
+     width: 2%;
+}
+
+#permabanned td:last-child {
+     text-align: left;
+     padding-left: 10px;
+     width: 49%;
+}
+
+#banneduntilrestart td {
+     border-right: 1px solid #443da0;
+     text-align: center !important;
+}
+
+#ipv4, #ipv6, #permabanned tr:nth-child(2) {
+     background: #000 url(images/titles.png) center center repeat-x;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     border-top: 1px solid #443da0 !important;
+     border-bottom: 1px solid #443da0 !important;
+}
+
+/* end /configpeer banlist */
 
 table#configstats {
      margin-bottom: -2px;
@@ -5252,7 +5376,7 @@ form[action="events"] {
 /* responsive layout */
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .statusnotes, textarea, pre, tt, code {
+body, .main, .main td, .news p, #news p, .statusnotes, textarea, pre, tt, code, th {
      font-size: 10pt !important;
 }
 
@@ -5273,13 +5397,16 @@ h1 {
      width: 200px !important;
 }
 
-.routersummary img[src$="i2plogo.png"] {
-     transform: scale(1.1);
-}
-
 .routersummary div[style="height: 36px;"] {
      height: 40px !important;
      margin-top: 3px;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     margin-left: -5px;
+     transform: none;
+     width: 207px;
+     margin-top: -3px;
 }
 
 .routersummary table[id^="sb_"], #sb_localtunnels {
@@ -5330,3 +5457,4 @@ h4#updateplugins {
      font-size: 10.5pt !important;
 }
 }
+

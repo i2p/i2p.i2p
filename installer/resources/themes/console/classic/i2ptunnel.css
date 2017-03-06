@@ -527,7 +527,7 @@ input {
 }
 
 #localDestination, .authentication {
-     height: 30px !important;
+     height: 32px !important;
 }
 
 #leasesetKey {
@@ -643,12 +643,12 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 }
 
 .username {
-     background: url(/themes/console/images/buttons/user.png) 3px center no-repeat;
+     background: #fff url(/themes/console/images/buttons/user.png) 3px center no-repeat;
      padding-left: 22px; 
 }
 
 .password {
-     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat;
+     background: #fff url(/themes/console/images/buttons/password.png) 3px center no-repeat;
      padding-left: 22px; 
 }
 
@@ -846,5 +846,9 @@ th {
 
 h2, h3 {
      font-size: 12pt;
+}
+
+#localDestination, .authentication {
+     height: 34px !important;
 }
 }

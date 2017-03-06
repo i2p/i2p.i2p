@@ -28,6 +28,10 @@ button, input[type="submit"], input[type="reset"] {
     padding: 5px 5px 5px 20px !important;
 }
 
+button.control {
+     padding: 12px 11px !important;
+}
+
 input.cancel {
      padding: 5px 5px 6px 20px !important;
 }

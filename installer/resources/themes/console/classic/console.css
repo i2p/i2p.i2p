@@ -241,6 +241,14 @@ div.routersummary {
      line-height: 125%;
 }
 
+div.routersummary img[src$="i2plogo.png"] {
+    margin-top: 3px;
+     margin-left: 0;
+     width: 173px;
+     height: auto;
+     filter: drop-shadow(0 0 1px #ccc);
+}
+
 .routersummary a {
      padding: 2px;
 }
@@ -359,9 +367,26 @@ div.routersummary td {
      border: 0 !important;
 }
 
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-bottom: -4px !important;
+}
+
+#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
+#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+   content: "";
+   display: inline-block;
+   min-height: 14px;
+}
+
+/*
 #sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
      padding-top: 1px;
      padding-bottom: 1px;
+}
+*/
+
+#sb_peers td:first-child, #sb_tunnels td:first-child, #sb_queue td:first-child, #sb_bandwidth td:first-child, #sb_general td:first-child, #sb_shortgeneral td:first-child {
+     white-space: nowrap;
 }
 
 #sb_bandwidth td:nth-child(2) {
@@ -446,7 +471,7 @@ div.newsheadings ul {
 }
 
 #sb_localtunnels td:first-child {
-     width: 16px !important;
+     width: 12px !important;
      padding-right: 0;
      text-align: left;
 }
@@ -1051,13 +1076,6 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      border: 1px solid #89f;
 }
 
-.routersummary .download {
-     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 5px 3px 5px 21px !important;
-/*     margin-top: -4px;*/
-}
-
 /* Show text on context specific buttons (eg deferred shutdown) */
 
 .routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"] {
@@ -1091,10 +1109,17 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
 }
 
+.routersummary .download {
+     background: url(/themes/console/images/buttons/download.png) 4px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 3px 5px 18px !important;
+/*     margin-top: -4px;*/
+}
+
 .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
      background: url(/themes/console/images/buttons/download.png) 4px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 5px 3px 5px 21px !important;
+     background-size: 14px 14px, 100% 100% !important;
+     padding: 5px 3px 5px 18px !important;
 }
 
 /*
@@ -1405,13 +1430,30 @@ table.configtable, table#permabanned, table#loggingoptions, table#configstats, u
      border-bottom: 1px solid #89f;
 }
 
-table#joinfamily {
+table#joinfamily, #exportfamily{
      margin-top: 15px !important;
 }
 
 table#newfamily {
      margin-bottom: 6px;
      margin-top: 4px;
+}
+
+#exportfamily tr:nth-child(2) td:first-child {
+     background: #fff url(/themes/console/images/info/export_key.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
+}
+
+#leavefamily {
+     margin-top: 19px;
+     margin-bottom: 7px;
+}
+
+#leavefamily tr:last-child td:first-child {
+     background: #fff url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
 }
 
 table#peerdefs td:first-child {
@@ -1569,6 +1611,10 @@ ul#banlist {
      font-size: 8pt;
 }
 
+ul#banlist + h3.tabletitle {
+     margin-top: 9px !important;
+}
+
 #banlist li {
      list-style: none !important;
      border-bottom: 1px dotted #89f;
@@ -1589,6 +1635,72 @@ ul#banlist {
 #banlist li:first-child {
      margin-top: 0;
 }
+
+/* /configpeers banlist */
+
+#bannedips {
+     margin-bottom: 4px;
+}
+
+#bannedips table {
+     margin-bottom: -1px !important;
+}
+
+#bannedips td {
+     vertical-align: top;
+     padding: 0;
+     width: 50%;
+}
+
+#bannedips table tr {
+     border-top: 1px solid #ddf; 
+} 
+
+#bannedips table td {
+     text-align: center;
+     padding: 4px 2px;
+}
+
+#bannedips table tr:last-child {
+     border-bottom: 1px solid #89f;
+}
+
+#permabanned, #banneduntilrestart {
+     margin: -1px 0 !important;
+     border: none;
+}
+
+#permabanned td:first-child {
+     border-left: 1px solid #89f;
+     text-align: right;
+     padding-right: 10px;
+     width: 49%;
+}
+
+#permabanned td:nth-child(2) {
+     width: 2%;
+}
+
+#permabanned td:last-child {
+     text-align: left;
+     padding-left: 10px;
+     width: 49%;
+}
+
+#banneduntilrestart td {
+     border-right: 1px solid #89f;
+     text-align: center !important;
+}
+
+#ipv4, #ipv6, #permabanned tr:nth-child(2) {
+     background: url(images/tinytitle.png) center center repeat-x;
+     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     border-top: 1px solid #89f !important;
+     border-bottom: 1px solid #89f !important;
+}
+
+/* end /configpeer banlist */
+
 
 .widescroll {
      overflow: auto; 
@@ -1741,7 +1853,9 @@ div.configure h2:first-child {
      padding: 2px;
 }
 
-#sidebarconf tr, .homelinkedit tr, #clientconfig tr, #webappconfig tr, #permabanned tr, #configstats tr, #tunnelconfig tr, #profiles tr, #floodfills tr, #netdboverview tr, .netdbentry tr, #leasesetdebug tr, #leasesetsummary tr, .leaseset tr, .sybil_routerinfo tr, #enviro tr, #schedjobs tr, #jobstats tr, #eventlog tr, .tunneldisplay tr, #udpconnections tr, #ntcpconnections tr {
+#sidebarconf tr, .homelinkedit tr, #clientconfig tr, #webappconfig tr,  #configstats tr, #tunnelconfig tr, #profiles tr,
+#floodfills tr, #netdboverview tr, .netdbentry tr, #leasesetdebug tr, #leasesetsummary tr, .leaseset tr,
+.sybil_routerinfo tr, #enviro tr, #schedjobs tr, #jobstats tr, #eventlog tr, .tunneldisplay tr, #udpconnections tr, #ntcpconnections tr {
      border-top: 1px inset #fff;
      border-bottom: 1px inset #fff;
 }
@@ -2062,6 +2176,7 @@ th {
      text-align: center;
      border-bottom: 1px solid #89f;
      border-top: 1px solid #89f;
+     font-size: 9pt;
 }
 
 th.th_title {
@@ -2589,7 +2704,7 @@ table#oldhome {
 
 .homelinkedit th:first-child, #sidebarconf th:first-child {
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
-     font-size: 0;
+     font-size: 0 !important;
 }
 
 .homelinkedit th:last-child, .homelinkedit th:nth-child(3) {
@@ -3151,10 +3266,6 @@ div.themechoice {
 
 .themechoice img {
      margin-bottom: 31px !important;
-}
-
-.themechoice .optbox:hover + img {
-/*     box-shadow: 0 0 1px 1px #33f;*/
 }
 
 .themechoice .optbox:hover + img ~ div.themelabel {
@@ -4363,12 +4474,11 @@ p#enablefullstats, p#gatherstats {
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
-.netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages {
+.netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a,
-div.news {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li {
      font-size: 9pt !important;
 }
 
@@ -4380,11 +4490,11 @@ div.news {
      width: 225px !important;
 }
 
-.routersummary div[style="height: 36px;"] {
-}
-
-.routersummary img[src$="i2plogo.png"] {
-     transform: scale(1.1);
+div.routersummary img[src$="i2plogo.png"] {
+     margin-left: -2px;
+     transform: none;
+     width: 210px;
+     margin-top: -1px;
 }
 
 .routersummary table[id^="sb_"] {
@@ -4477,3 +4587,7 @@ div.joblog h3 {
      font-size: 10.5pt !important;
 }
 }
+
+/* end responsive layout */
+
+

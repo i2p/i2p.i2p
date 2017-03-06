@@ -30,8 +30,8 @@ div.routersummary h4, .routersummary h4 a {
      letter-spacing: 0;
 }
 
-div.routersummary table {
-     font-size: 12pt;
+div.routersummary td {
+     font-size: 11pt;
 }
 
 div.routersummary {
@@ -42,13 +42,17 @@ div.routersummary table {
      width: 219px !important;
 }
 
-.routersummary #bandwidth td:first-child {
+#sb_bandwidth td:first-child {
      width: 20px !important;
      white-space: nowrap;
 }
 
-.routersummary #bandwidth td:last-child {
+#sb_bandwidth td:last-child {
      width: 80% !important;
+}
+
+#sb_bandwidth td:last-child, #sb_peers td:last-child, #sb_queue td:last-child,  #sb_tunnels td:last-child, #sb_general td:last-child, #sb_shortgeneral td:last-child {
+     font-size: 10pt !important;
 }
 
 div.routersummary table a:link, div.routersummary table a:visited {
@@ -57,10 +61,12 @@ div.routersummary table a:link, div.routersummary table a:visited {
      text-shadow: none;
 }
 
+/*
 .routersummary a img:first-child {
      transform: scale(1.2);
      -webkit-transform: scale(1.2);
 }
+*/
 
 div.tunnels a {
      font-size: 12pt !important;
@@ -141,6 +147,12 @@ table code {
      font-weight: normal;
 }
 
+.applabel a {
+     padding: 0 2px 6px !important;
+}
+
+
+
 .themelabel, .ui_lang {
      font-size: 12pt !important;
      font-weight: normal !important;
@@ -156,4 +168,16 @@ div.themechoice, div.langselect {
 
 .tab2::before, .tab2::after {
      font-size: 16pt;
+}
+
+@media screen and (min-width: 1500px) {
+body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
+#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
+.netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
+     font-size: 12pt !important;
+}
+
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li {
+     font-size: 11pt !important;
+}
 }

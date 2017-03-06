@@ -184,51 +184,6 @@ div.warning {
 }
 */
 
-/* responsive proxy errors */
-
-@media screen and (max-width: 800px) {
-.warning {
-     margin-left: 20px !important;
-     background: url(images/camotile2.png) !important;
-     padding-left: 25px !important;
-}
-
-.logo {
-     display: none;
-}
-}
-
-@media screen and (min-height: 700px) {
-.proxyfooter {
-     position: absolute;
-     bottom: 0;
-     right: 0;
-     padding: 0 20px 0 0;
-     text-align: right;
-     background: #030;
-     width: 100%;
-     opacity: 0.7;
-     border-top: 1px solid #000;
-}
-
-.proxyfooter p {
-     text-align: right;
-     line-height: 130% !important;
-     margin: 5px 0;
-}
-
-.warning {
-     margin-bottom: 30px;
-}
-}
-
-@media screen and (max-height: 700px) {
-.proxyfooter {
-     display: none;     
-}
-}
-/* end proxy errors */
-
 div.routersummaryouter {
      float: left;
      width: 200px;
@@ -259,6 +214,10 @@ div.routersummary {
 div.routersummary img[src$="i2plogo.png"] {
      opacity: 0.9;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
+     margin-top: 1px;
+     margin-left: -1px;
+     width: 176px;
+     height: auto;
 }
 
 div.routersummary img[src$="i2plogo.png"]:hover {
@@ -287,7 +246,6 @@ div.routersummary hr {
      background: #494;
      height: 1px;
      margin: 9px -10px 7px -10px;
-
 }
 
 div.routersummary h3 {
@@ -350,15 +308,27 @@ div.routersummary table {
      background-color: transparent !important;
 }
 
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-bottom: -4px !important;
+}
+
+#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
+#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+   content: "";
+   display: inline-block;
+   min-height: 14px;
+}
+
+/*
 #sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
      padding-top: 1px;
      padding-bottom: 1px;
 }
+*/
 
 #sb_localtunnels {
      margin: -4px -7px -7px -8px !important;
-     /*width: 191px !important;*/
-     text-transform: capitalize; 
+/*     text-transform: capitalize;*/ 
 }
 
 #sb_localtunnels td:first-child {
@@ -378,6 +348,10 @@ div.routersummary table {
      background: url(images/warning24x24.png) 5px center no-repeat, linear-gradient(to right, #001900 0%, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900 100%);
      text-align: center;
      line-height: 120%;
+}
+
+#sb_internals td, #sb_services td, #sb_advanced td { /* color ellipsis */
+     color: #595 !important;
 }
 
 #sb_internals a, #sb_services a, #sb_advanced a {
@@ -630,12 +604,16 @@ div.sorry {
      width: auto;
      border: 1px solid #494;
      border-radius: 0 0 2px 2px;
-     background: #000 url(images/scarface.jpg) right bottom no-repeat;
-/*     background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,34,0,0.3)), url(images/camotile2.png);
-     background-size: 3px 3px, 175px 175px;*/
+     background:  #000 url("images/camotile2.png") !important;
      min-width: 620px;
      box-shadow: 0 1px 5px #000;
      font-size: 9pt;
+}
+
+.main, .routersummary {
+     background:  #000 url("images/camotile2.png") !important;
+     background:  linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.45)), url("images/camotile2.png") #000 !important;
+     box-shadow: inset 0 0 0 1px #000, 0 1px 5px #000;
 }
 
 .main#dns {
@@ -698,11 +676,18 @@ div.news {
      border: 1px solid #494;
      background: #000;
      background: #000 url(images/news.png) no-repeat scroll bottom right;
-     color: #7b7;
+     background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url("images/news.png") no-repeat scroll right bottom,  url("images/camotile2.png") #000 !important;
+     background-blend-mode: lighten;
+     color: #ee9;
      font-size: 8pt;
      text-align: right;
      box-shadow: 0 1px 5px #000;
-     min-width: 580px;
+     min-width: 610px !important;
+}
+
+/* MS Edge 14+ fix (no support for blend-mode) */
+_:-ms-lang(x), div.news {
+     background: #000 url(images/news.png) no-repeat scroll bottom right;
 }
 
 div.news li {
@@ -997,6 +982,7 @@ h3#graphdisplay a {
 #graphs td.infohelp {
      border: 1px solid #131;
      border-right: none;
+     border-left: none;
      background-size: 20px 20px !important;
      padding: 5px 5px 5px 40px !important;
      background-color: #000800 !important;
@@ -1267,7 +1253,7 @@ h2 a:hover {
 h3, h3.welcome {
      border: 1px solid #494;
      border-left: 5px solid #494;
-     padding: 5px 10px 6px;
+     padding: 6px 10px 5px;
      margin: 12px 0 10px 0;
      border-radius: 0 2px 2px 0;
      background: #000 url(images/header.png) center center ;
@@ -1291,6 +1277,13 @@ h1, h2, h3:not([id*="help"]), h4.app, h4.app2, div.routersummary h3 {
 
 h2, h3, h4 {
      box-shadow: inset 0 0 0 1px #000;
+}
+
+h1, h4.app, h4.app2 {
+     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url("images/camotile2.png") #000 !important;
+     background-blend-mode: exclusion;
+     box-shadow: inset 0 0 0 1px #000;
+     text-shadow: 0 1px 1px #000;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {
@@ -1331,7 +1324,7 @@ button:active {
      box-shadow: inset 0 0 0 1px #000;
 }
 
-button.reload, button.stop {
+.routersummary button.reload, .routersummary button.stop {
      min-width: 86px;
      text-transform: capitalize;
 }
@@ -1344,11 +1337,11 @@ button.reload, button.stop {
 
 
 .langbox {
-     margin: 3px 4px 2px 5px;
+     margin: 4px 4px 2px 5px;
      padding: 0;
-     color: #EE9;
+     color: #ee9;
      font-size: 7pt;
-     width: 350px;
+     width: 400px;
      text-align: right;
      float: right;
      vertical-align: middle;
@@ -1356,12 +1349,19 @@ button.reload, button.stop {
 
 .langbox img {
      opacity: 0.5;
-     padding: 1px 2px !important;
-     transition: all 0.3s ease 0s;
+     padding: 0 !important;
+     margin: 0 1px -2px !important;
+     transition: ease opacity 0.3s 0s;
+     border: 1px solid #000;
 }
 
 .langbox img:hover {
      opacity: 1;
+     transform: scale(1.1);
+}
+
+.langbox img:active {
+     transform: scale(1);
 }
 
 img[src*="bound"], img[src*="bound"]:hover {
@@ -1524,8 +1524,7 @@ select {
      text-overflow: ellipsis;
 }
 
-select option { /* dropdown menu reverts to normal font-weight */
-     font-weight: normal;
+select option { 
      font-size: 9.5pt !important;
      box-shadow: inset 0 0 20px 20px #000;
      color: #fff !important;
@@ -1627,7 +1626,7 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
 }
 
 input[type="submit"], input[type="reset"], button {
-     padding: 5px 4px;
+     padding: 5px 8px !important;
 }
 
 .statusnotes {
@@ -1850,11 +1849,6 @@ h3.stats {
      border: 1px solid #494;
      border-radius: 0;
 }
-/*
-div.main li:last-child {
-     padding-bottom: 15px;
-}
-*/
 
 div.joblog li {
      word-wrap: break-word !important;
@@ -1932,15 +1926,6 @@ ul.statlist li li:last-child::before {
      content: "\27A1\00A0";
      color: #994
 }
-
-/*
-.statlist a[href*="graph"]::before {
-     content: "\1F4CA\00A0";
-     font-size: 11pt;
-     line-height: 140%;
-     font-weight: normal;     
-}
-*/
 
 .main#stats form {
      border: 1px solid #494;
@@ -2135,6 +2120,10 @@ a[name="chelp"]:hover, a[name="help"]:hover, a[name="chelp"]:active, a[name="hel
      color: #ee9 !important;
      text-decoration: none;
      text-shadow: none;
+}
+
+#oldhome td.optionsave {
+     background: none;
 }
 
 #oldhome input[type="checkbox"] {
@@ -2588,8 +2577,24 @@ table#configclient {
 
 /* configfamily */
 
-table#newfamily {
+table#newfamily, #leavefamily {
      margin-bottom: 10px !important;
+}
+
+#exportfamily tr:nth-child(2) td:first-child {
+     background: #000 url(/themes/console/images/info/export_key.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
+}
+
+#leavefamily {
+     margin-top: 14px !important;
+}
+
+#leavefamily tr:last-child td:first-child {
+     background: #000 url(/themes/console/images/info/leave_family.png) 12px center no-repeat;
+     padding: 15px 15px 15px 50px;
+     background-size: 28px 28px;
 }
 
 /* configreseed */
@@ -2961,9 +2966,10 @@ table#sidebarconf {
 }
 
 #sidebarconf button {
-     margin: 2px;
-     padding: 1px;
+     margin: 5px 3px !important;
+     padding: 5px 4px !important;
      min-width: 0;
+     display: inline-block !important;
 }
 
 #sidebarconf button img {
@@ -2976,7 +2982,7 @@ table#sidebarconf {
 }
 
 #sidebarconf th:nth-child(2) {
-     text-align: left;     
+     text-align: left;
 }
 
 #sidebarconf td:first-child {
@@ -2984,12 +2990,13 @@ table#sidebarconf {
 }
 
 #sidebarconf td:nth-child(2) {
-     font-weight: bold;     
+     font-weight: bold;
 }
 
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
-     width: 70px;
-     padding: 0;  
+     width: 75px;
+     padding: 0;
+     white-space: nowrap;
 }
 
 #sidebarconf td:nth-child(3) {
@@ -3231,11 +3238,12 @@ div#changelog pre {
 
 p#fullhistory {
      text-align: right;
-     margin-top: -20px;
+     margin-top: -11px;
      border: 1px solid #494;
      border-top: none;
-     padding: 10px 10px 5px 10px;
+     padding: 6px 10px;
      background: #000;
+     border-top: 1px solid #494;
 }
 
 ul#upnphelp li:last-child, #legal ul li:last-child {
@@ -3755,6 +3763,67 @@ ul#banlist + hr {
      margin-right: -20px;
      margin-top: -8px;
 }
+
+/* /configpeers banlist */
+
+#bannedips {
+     margin-bottom: 10px;
+}
+
+#bannedips table {
+     margin-bottom: -1px !important;
+}
+
+#bannedips td {
+     vertical-align: top;
+     padding: 0;
+     width: 50%;
+}
+
+#bannedips table td {
+     text-align: center;
+     padding: 4px 2px;
+}
+
+#bannedips table tr:last-child {
+     border-bottom: 1px solid #494;
+}
+
+#permabanned, #banneduntilrestart {
+     margin-top: -1px !important;
+     border: none;
+}
+
+#permabanned td:first-child {
+     border-left: 1px solid #494;
+     text-align: right;
+     padding-right: 10px;
+     width: 49%;
+}
+
+#permabanned td:nth-child(2) {
+     width: 2%;
+}
+
+#permabanned td:last-child {
+     text-align: left;
+     padding-left: 10px;
+     width: 49%;
+}
+
+#banneduntilrestart td {
+     border-right: 1px solid #494;
+     text-align: center !important;
+}
+
+#ipv4, #ipv6, #permabanned tr:nth-child(2) {
+     background: #000 url(images/header.png) center center repeat-x;
+     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494;
+}
+
+/* end /configpeers banlist */
 
 div.footnote {
      text-align: right;
@@ -5114,7 +5183,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover 
      font-size: 10pt !important;
 }
 
-.main button, .main input, select, textarea {
+.main button, .main input, select, textarea, div.news {
      font-size: 9pt !important;
 }
 
@@ -5189,12 +5258,91 @@ div.joblog h3 {
      margin-top: -15px !important;
 }
 
-button.reload, button.stop {
+.routersummary button.reload, .routersummary button.stop {
     min-width: 101px;
 }
 
 .subheading b {
      font-size: 10.5pt !important;
 }
+
+p#fullhistory {
+     text-align: right;
+     margin-top: -14px;
 }
 
+div.routersummary img[src$="i2plogo.png"] {
+     margin-left: -5px;
+     transform: none;
+     width: 210px;
+     margin-top: -3px;
+}
+
+#banlist + h3.tabletitle {
+     margin-bottom: -2px !important;
+}
+
+table#permabanned {
+     margin-top: -3px;
+}
+}
+
+/* responsive proxy errors */
+
+@media screen and (max-width: 800px) {
+.warning {
+     margin-left: 20px !important;
+     margin-top: 130px !important;
+     background: url(images/camotile2.png) !important;
+     padding: 5px 15px 15px !important;
+}
+
+.logo {
+     position: absolute;
+     top: 20px;
+     width: calc(100% - 62px) !important;
+     z-index: 999;
+     min-width: 330px;
+}
+
+.logo a {
+     width: auto !important;
+     padding: 2px 5px !important;
+}
+.logo a img {
+     padding: 0 !important;
+     margin-top: -2px;
+     margin-bottom: -4px;
+}
+}
+
+@media screen and (min-height: 700px) {
+.proxyfooter {
+     position: absolute;
+     bottom: 0;
+     right: 0;
+     padding: 0 20px 0 0;
+     text-align: right;
+     background: #030;
+     width: 100%;
+     opacity: 0.7;
+     border-top: 1px solid #000;
+}
+
+.proxyfooter p {
+     text-align: right;
+     line-height: 130% !important;
+     margin: 5px 0;
+}
+
+.warning {
+     margin-bottom: 30px;
+}
+}
+
+@media screen and (max-height: 700px) {
+.proxyfooter {
+     display: none;
+}
+}
+/* end proxy errors */
