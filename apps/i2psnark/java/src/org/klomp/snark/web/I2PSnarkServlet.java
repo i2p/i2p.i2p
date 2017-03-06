@@ -2565,13 +2565,15 @@ public class I2PSnarkServlet extends BasicServlet {
     // rounding makes us look faster :)
     private static String formatSize(long bytes) {
         if (bytes < 5000)
-            return bytes + "&nbsp;B";
+
+            // replace &nbsp; with narrow non-breaking space (&#8239;)
+            return bytes + "&#8239;B";
         else if (bytes < 5*1024*1024)
-            return ((bytes + 512)/1024) + "&nbsp;KB";
+            return ((bytes + 512)/1024) + "&#8239;KB";
         else if (bytes < 10*1024*1024*1024l)
-            return ((bytes + 512*1024)/(1024*1024)) + "&nbsp;MB";
+            return ((bytes + 512*1024)/(1024*1024)) + "&#8239;MB";
         else
-            return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "&nbsp;GB";
+            return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "&#8239;GB";
     }
     
     /**
@@ -2942,7 +2944,7 @@ public class I2PSnarkServlet extends BasicServlet {
             if (uploaded > 0) {
                 double ratio = uploaded / ((double) snark.getTotalLength());
                 buf.append((new DecimalFormat("0.000")).format(ratio));
-                buf.append("&nbsp;x");
+                buf.append("&#8239;x");
             } else {
                 buf.append('0');
             }
