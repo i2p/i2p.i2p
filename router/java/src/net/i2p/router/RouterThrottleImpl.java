@@ -197,8 +197,11 @@ public class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
-	// Throttle tunnels if min. throttle level is exceeded and default max participating tunnels (or fewer) is used.
-        if ((numTunnels > getMinThrottleTunnels()) && (DEFAULT_MAX_TUNNELS <= maxTunnels)) {
+        /*
+         * Throttle if we go above a minimum level of tunnels AND the maximum participating
+         * tunnels is default or lower.
+         */
+        if ((numTunnels > getMinThrottleTunnels()) && (DEFAULT_MAX_TUNNELS >= maxTunnels)) {
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(10*60*1000);
             if (avgTunnels != null) {
                 double avg = avgTunnels.getAvgOrLifetimeAvg();
