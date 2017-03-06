@@ -206,9 +206,7 @@ public class NetDbHelper extends HelperBase {
     private void renderNavBar() throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"confignav\" id=\"confignav\">");
-        // TODO fix up the non-light themes
-        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME);
-        boolean span = _graphical && (theme == null || theme.equals(CSSHelper.DEFAULT_THEME));
+        boolean span = _graphical;
         if (!span)
             buf.append("<center>");
         int tab = getTab();
@@ -229,13 +227,13 @@ public class NetDbHelper extends HelperBase {
                 buf.append("<a href=\"netdb").append(links[i]).append("\">").append(_t(titles[i])).append("</a>");
             }
             if (span)
-                buf.append(" </span>\n");
+                buf.append("</span>\n");
             else if (i != titles.length - 1)
-                buf.append(" |\n");
+                buf.append("&nbsp;&nbsp;\n");
         }
         if (!span)
             buf.append("</center>");
-        buf.append("</div>");
+        buf.append("</div>\n");
         _out.write(buf.toString());
     }
 
@@ -243,23 +241,25 @@ public class NetDbHelper extends HelperBase {
      *  @since 0.9.28
      */
     private void renderLookupForm() throws IOException {
-        _out.write("<form action=\"/netdb\" method=\"GET\"><p><b>Pick One</b></p>\n" +
-                   "Caps <input type=\"text\" name=\"caps\">e.g. f or XOfR<br>\n" +
-                   "Cost <input type=\"text\" name=\"cost\"><br>\n" +
-                   "Country code <input type=\"text\" name=\"c\">e.g. ru<br>\n" +
-                   "Family <input type=\"text\" name=\"fam\"><br>\n" +
-                   "Hash prefix <input type=\"text\" name=\"r\"><br>\n" +
-                   "IP <input type=\"text\" name=\"ip\">host name, IPv4, or IPv6, /24,/16,/8 suffixes optional for IPv4<br>\n" +
-                   "IPv6 Prefix <input type=\"text\" name=\"ipv6\"><br>\n" +
-                   "MTU <input type=\"text\" name=\"mtu\"><br>\n" +
-                   "Port <input type=\"text\" name=\"port\"><br>\n" +
-                   "Sig Type <input type=\"text\" name=\"type\"><br>\n" +
-                   "SSU Caps <input type=\"text\" name=\"ssucaps\"><br>\n" +
-                   "Version <input type=\"text\" name=\"v\"><br>\n" +
-                   "<p><b>Add Sybil analysis (must pick one above):</b></p>\n" +
-                   "Sybil close to <input type=\"text\" name=\"sybil2\">Router hash, dest hash, b32, or from address book<br>\n" +
-                   "or Sybil close to this router <input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"sybil\"><br>" +
-                   "<p><input type=\"submit\" class=\"search\" value=\"Lookup\"></p>" +
-                   "</form>\n");
+        _out.write("<form action=\"/netdb\" method=\"GET\">\n" + 
+                   "<table id=\"netdblookup\"><tr><th colspan=\"3\">Network Database Search</th></tr>\n" +
+                   "<tr><td colspan=\"3\" class=\"subheading\"><b>Select one search field <i>only</i>:</b></td></tr>\n" +
+                   "<tr><td>Capabilities:</td><td><input type=\"text\" name=\"caps\"></td><td>e.g. f or XOfR</td></tr>\n" +
+                   "<tr><td>Cost:</td><td><input type=\"text\" name=\"cost\"></td><td></td></tr>\n" +
+                   "<tr><td>Country Code:</td><td><input type=\"text\" name=\"c\"></td><td>e.g. ru</td></tr>\n" +
+                   "<tr><td>Router Family:</td><td><input type=\"text\" name=\"fam\"></td><td></td></tr>\n" +
+                   "<tr><td>Hash Prefix:</td><td><input type=\"text\" name=\"r\"></td><td></td></tr>\n" +
+                   "<tr><td>IP or Hostname:</td><td><input type=\"text\" name=\"ip\"></td><td>host name, IPv4, or IPv6, /24,/16,/8 suffixes optional for IPv4</td></tr>\n" +
+                   "<tr><td>IPv6 Prefix:</td><td><input type=\"text\" name=\"ipv6\"></td><td></td></tr>\n" +
+                   "<tr><td>MTU:</td><td><input type=\"text\" name=\"mtu\"></td><td></td></tr>\n" +
+                   "<tr><td>Port Number:</td><td><input type=\"text\" name=\"port\"></td><td></td></tr>\n" +
+                   "<tr><td>Signature Type:</td><td><input type=\"text\" name=\"type\"></td><td></td></tr>\n" +
+                   "<tr><td>SSU Capabilities:</td><td><input type=\"text\" name=\"ssucaps\"></td><td></td></tr>\n" +
+                   "<tr><td>Router Version:</td><td><input type=\"text\" name=\"v\"></td><td></td></tr>\n" +
+                   "<tr><td colspan=\"3\" class=\"subheading\"><b>Add Sybil analysis (must pick one above):</b></td></tr>\n" +
+                   "<tr><td>Sybil close to:</td><td><input type=\"text\" name=\"sybil2\"></td><td>Router hash, dest hash, b32, or from address book</td>\n" +
+                   "<tr><td>or Sybil close to this router:</td><td><input type=\"checkbox\" class=\"optbox\" value=\"1\" name=\"sybil\"></td><td></td></tr>\n" +
+                   "<tr><td colspan=\"3\" class=\"optionsave\"><button type=\"submit\" class=\"search\" value=\"Lookup\">Lookup</button></td></tr>\n" +
+                   "</table>\n</form>\n");
     }
 }

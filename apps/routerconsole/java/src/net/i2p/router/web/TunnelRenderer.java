@@ -33,7 +33,7 @@ class TunnelRenderer {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels") + " (<a href=\"/configtunnels#exploratory\">" + _t("configure") + "</a>)</h2>\n");
+        out.write("<h3 class=\"tabletitle\" id=\"exploratorytunnels\"><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels") + " <a href=\"/configtunnels#exploratory\" title=\"" + _t("Configure tunnels") + "\">[" + _t("configure") + "]</a></h3>\n");
         renderPool(out, _context.tunnelManager().getInboundExploratoryPool(), _context.tunnelManager().getOutboundExploratoryPool());
         
         List<Hash> destinations = null;
@@ -54,20 +54,20 @@ class TunnelRenderer {
                 name = outPool.getSettings().getDestinationNickname();
             if (name == null)
                 name = client.toBase64().substring(0,4);
-            out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
+            out.write("<h3 class=\"tabletitle\"><a name=\"" + client.toBase64().substring(0,4)
                       + "\" ></a>" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(name)));
             if (isLocal)
-                out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _t("configure") + "</a>)</h2>\n");
+                out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
             else
-                out.write(" (" + _t("dead") + ")</h2>\n");
+                out.write(" (" + _t("dead") + ")</h3>\n");
             renderPool(out, in, outPool);
         }
         
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
-        out.write("<h2><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h2>\n");
+        out.write("<h3 class=\"tabletitle\"><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h3>\n");
         if (!participating.isEmpty()) {
             Collections.sort(participating, new TunnelComparator());
-            out.write("<table><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
+            out.write("<table class=\"tunneldisplay\"><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
                   + _t("Send on") + "</th><th>" + _t("To") + "</th><th>" + _t("Expiration") + "</th>"
                   + "<th>" + _t("Usage") + "</th><th>" + _t("Rate") + "</th><th>" + _t("Role") + "</th></tr>\n");
         }
@@ -131,12 +131,11 @@ class TunnelRenderer {
         if (displayed > DISPLAY_LIMIT)
             out.write("<div class=\"statusnotes\"><b>" + _t("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
         if (inactive > 0)
-            out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
+            out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ":&nbsp;&nbsp;" + inactive + "</b></div>\n");
         else if (displayed <= 0)
             out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
+        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
-        out.write("</div>");
     }
     
     private static class TunnelComparator implements Comparator<HopConfig>, Serializable {
@@ -164,7 +163,7 @@ class TunnelRenderer {
             if (info.getLength() > maxLength)
                 maxLength = info.getLength();
         }
-        out.write("<table><tr><th>" + _t("In/Out") + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
+        out.write("<table class=\"tunneldisplay\"><tr><th>" + _t("In/Out") + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
             out.write("\">" + _t("Participants") + "</th>");
@@ -215,7 +214,7 @@ class TunnelRenderer {
             // PooledTunnelCreatorConfig
             List<?> pending = in.listPending();
             if (!pending.isEmpty()) {
-                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("inbound") + "</b></center></div>\n");
+                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ":&nbsp;&nbsp;" + pending.size() + " " + _t("inbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
@@ -223,13 +222,13 @@ class TunnelRenderer {
             // PooledTunnelCreatorConfig
             List<?> pending = outPool.listPending();
             if (!pending.isEmpty()) {
-                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("outbound") + "</b></center></div>\n");
+                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ":&nbsp;&nbsp;" + pending.size() + " " + _t("outbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
         if (live <= 0)
             out.write("<div class=\"statusnotes\"><center><b>" + _t("No tunnels; waiting for the grace period to end.") + "</b></center></div>\n");
-        out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ": " +
+        out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" +
                   DataHelper.formatSize2(processedIn*1024) + "B " + _t("in") + ", " +
                   DataHelper.formatSize2(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
     }

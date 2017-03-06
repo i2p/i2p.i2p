@@ -174,7 +174,7 @@ public class AddressbookBean extends BaseBean
 				try { fis.close(); } catch (IOException ioe) {}
 		}
 		if( message.length() > 0 )
-			message = "<p>" + message + "</p>";
+			message = "<p id=\"filtered\">" + message + "</p>";
 		return message;
 	}
 

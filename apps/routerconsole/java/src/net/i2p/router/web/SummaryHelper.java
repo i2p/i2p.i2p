@@ -61,6 +61,7 @@ public class SummaryHelper extends HelperBase {
 
     static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
+        "Bandwidth" + S +
         "NewsHeadings" + S +
         "UpdateStatus" + S +
         "NetworkReachability" + S +
@@ -192,7 +193,7 @@ public class SummaryHelper extends HelperBase {
                 return _t(status.toStatusString());
 
             case DISCONNECTED:
-                return _t("Disconnected - check network cable");
+                return _t("Disconnected - check network connection");
 
             case HOSED:
                 return _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
@@ -437,10 +438,10 @@ public class SummaryHelper extends HelperBase {
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Add/remove/edit &amp; control your client and server tunnels"))
            .append("\">").append(_t("Local Tunnels"))
-           .append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
+           .append("</a></h3><hr class=\"b\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
-            buf.append("<table>");
+            buf.append("<table id=\"sb_localtunnels\">");
             
             for (Destination client : clients) {
                 String name = getName(client);
@@ -478,7 +479,6 @@ public class SummaryHelper extends HelperBase {
         } else {
             buf.append("<center><i>").append(_t("none")).append("</i></center>");
         }
-        buf.append("</div>\n");
         return buf.toString();
     }
     
@@ -697,7 +697,7 @@ public class SummaryHelper extends HelperBase {
         String status = NewsHelper.getUpdateStatus();
         boolean needSpace = false;
         if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4>\n");
+            buf.append("<h4 class=\"sb_info\">").append(status).append("</h4>\n");
             needSpace = true;
         }
         String dver = NewsHelper.updateVersionDownloaded();
@@ -713,7 +713,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update downloaded")).append("<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update downloaded")).append("<br>");
             if (_context.hasWrapper())
                 buf.append(_t("Click Restart to install"));
             else
@@ -734,7 +734,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUpdateVersion())).append("<br>");
             buf.append(constraint).append("</b></h4>");
             avail = false;
@@ -746,7 +746,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUnsignedUpdateVersion())).append("<br>");
             buf.append(unsignedConstraint).append("</b></h4>");
             unsignedAvail = false;
@@ -758,7 +758,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getDevSU3UpdateVersion())).append("<br>");
             buf.append(devSU3Constraint).append("</b></h4>");
             devSU3Avail = false;
@@ -821,7 +821,7 @@ public class SummaryHelper extends HelperBase {
     public String getFirewallAndReseedStatus() {
         StringBuilder buf = new StringBuilder(256);
         if (showFirewallWarning()) {
-            buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
+            buf.append("<h4 id=\"sb_warning\"><a href=\"/help#configurationhelp\" target=\"_top\" title=\"")
                .append(_t("Help with firewall configuration"))
                .append("\">")
                .append(_t("Check network connection and NAT/firewall"))
@@ -833,7 +833,7 @@ public class SummaryHelper extends HelperBase {
         if (allowReseed()) {
             if (reseedInProgress) {
                 // While reseed occurring, show status message instead
-                buf.append("<i>").append(_context.netDb().reseedChecker().getStatus()).append("</i><br>");
+                buf.append("<div class=\"sb_notice\"><i>").append(_context.netDb().reseedChecker().getStatus()).append("</i></div>");
             } else {
                 // While no reseed occurring, show reseed link
                 long nonce = _context.random().nextLong();
@@ -843,14 +843,15 @@ public class SummaryHelper extends HelperBase {
                 String uri = getRequestURI();
                 buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
+                buf.append("<button type=\"submit\" title=\"").append(_t("Attempt to download router reference files (if automatic reseed has failed)"));
+                buf.append("\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
             }
         }
         // If a new reseed ain't running, and the last reseed had errors, show error message
         if (!reseedInProgress) {
             String reseedErrorMessage = _context.netDb().reseedChecker().getError();
             if (reseedErrorMessage.length() > 0) {
-                buf.append("<i>").append(reseedErrorMessage).append("</i><br>");
+                buf.append("<div class=\"sb_notice\"><i>").append(reseedErrorMessage).append("</i></div>");
             }
         }
         if (buf.length() <= 0)
@@ -929,7 +930,7 @@ public class SummaryHelper extends HelperBase {
         String imgPath = CSSHelper.BASE_THEME_PATH + theme + "/images/";
 
         StringBuilder buf = new StringBuilder(2048);
-        buf.append("<table class=\"sidebarconf\"><tr><th>")
+        buf.append("<table id=\"sidebarconf\"><tr><th title=\"Mark section for removal from the sidebar\">")
            .append(_t("Remove"))
            .append("</th><th>")
            .append(_t("Name"))
@@ -997,9 +998,8 @@ public class SummaryHelper extends HelperBase {
         buf.append("<tr><td align=\"center\">" +
                    "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
            .append(_t("Delete selected"))
-           .append("\"></td><td align=\"left\"><b>")
-           .append(_t("Add")).append(":</b> " +
-                   "<select name=\"name\">\n" +
+           .append("\"></td><td align=\"left\">")
+           .append("<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
            .append(_t("Select a section to add"))
            .append("</option>\n");

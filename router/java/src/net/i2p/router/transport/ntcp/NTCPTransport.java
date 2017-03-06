@@ -1368,7 +1368,7 @@ public class NTCPTransport extends TransportImpl {
             buf.append(". ").append(_t("Status")).append(": ").append(_t(getReachabilityStatus().toStatusString()));
         }
         buf.append(".</h3>\n" +
-                   "<table>\n" +
+                   "<table id=\"ntcpconnections\">\n" +
                    "<tr><th><a href=\"#def.peer\">").append(_t("Peer")).append("</a></th>" +
                    "<th>").append(_t("Dir")).append("</th>" +
                    "<th>").append(_t("IPv6")).append("</th>" +

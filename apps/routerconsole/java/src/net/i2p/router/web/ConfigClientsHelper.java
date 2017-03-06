@@ -112,7 +112,7 @@ public class ConfigClientsHelper extends HelperBase {
     /** clients */
     public String getForm1() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table>\n" +
+        buf.append("<table id=\"clientconfig\">\n" +
                    "<tr><th align=\"right\">").append(_t("Client")).append("</th><th>")
            .append(_t("Run at Startup?")).append("</th><th>")
            .append(_t("Control")).append("</th><th align=\"left\">")
@@ -198,7 +198,7 @@ public class ConfigClientsHelper extends HelperBase {
     /** webapps */
     public String getForm2() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table>\n" +
+        buf.append("<table id=\"webappconfig\">\n" +
                    "<tr><th align=\"right\">").append(_t("WebApp")).append("</th><th>")
            .append(_t("Run at Startup?")).append("</th><th>")
            .append(_t("Control")).append("</th><th align=\"left\">")
@@ -227,7 +227,7 @@ public class ConfigClientsHelper extends HelperBase {
     /** plugins */
     public String getForm3() {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table>\n" +
+        buf.append("<table id=\"pluginconfig\">\n" +
                    "<tr><th align=\"right\">").append(_t("Plugin")).append("</th><th>")
            .append(_t("Run at Startup?")).append("</th><th>")
            .append(_t("Control")).append("</th><th align=\"left\">")
@@ -290,15 +290,17 @@ public class ConfigClientsHelper extends HelperBase {
                 }
                 s = stripHTML(appProps, "websiteURL");
                 if (s != null) {
-                    desc.append("<tr><td>")
-                        .append("<a href=\"").append(s).append("\">").append(_t("Website")).append("</a><td>&nbsp;");
+                    desc.append("<tr><td><b>")
+                        .append(_t("Website")).append("</b></td><td><a href=\"")
+                        .append(s).append("\">").append(s).append("</a>");
                 }
                 String updateURL = stripHTML(appProps, "updateURL.su3");
                 if (updateURL == null)
                     updateURL = stripHTML(appProps, "updateURL");
                 if (updateURL != null) {
-                    desc.append("<tr><td>")
-                        .append("<a href=\"").append(updateURL).append("\">").append(_t("Update link")).append("</a><td>&nbsp;");
+                    desc.append("<tr><td><b>")
+                        .append(_t("Update link")).append("</b></td><td><a href=\"")
+                        .append(updateURL).append("\">").append(updateURL).append("</a>");
                 }
                 desc.append("</table>");
                 boolean isRunning = PluginStarter.isPluginRunning(app, _context);
@@ -347,26 +349,25 @@ public class ConfigClientsHelper extends HelperBase {
                 buf.append("disabled=\"disabled\" ");
         }
         buf.append("></td><td align=\"center\" width=\"15%\">");
-        // The icons were way too much, so there's an X in each button class,
-        // remove if you wnat to put them back
+
         if (showStartButton && (!ro) && !edit) {
-            buf.append("<button type=\"submit\" class=\"Xaccept\" name=\"action\" value=\"Start ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Start")).append("\" class=\"control accept\" name=\"action\" value=\"Start ").append(index).append("\" >")
                .append(_t("Start")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         if (showStopButton && (!edit))
-            buf.append("<button type=\"submit\" class=\"Xstop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Stop")).append("\" class=\"control stop\" name=\"action\" value=\"Stop ").append(index).append("\" >")
                .append(_t("Stop")).append("<span class=hide> ").append(index).append("</span></button>");
         if (isClientChangeEnabled() && showEditButton && (!edit) && !ro)
-            buf.append("<button type=\"submit\" class=\"Xadd\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Edit")).append("\" class=\"control add\" name=\"edit\" value=\"Edit ").append(index).append("\" >")
                .append(_t("Edit")).append("<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" class=\"Xcheck\" name=\"action\" value=\"Check ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Check for updates")).append("\" class=\"control check\" name=\"action\" value=\"Check ").append(index).append("\" >")
                .append(_t("Check for updates")).append("<span class=hide> ").append(index).append("</span></button>");
-            buf.append("<button type=\"submit\" class=\"Xdownload\" name=\"action\" value=\"Update ").append(index).append("\" >")
+            buf.append("<button type=\"submit\" title=\"").append(_t("Update")).append("\" class=\"control download\" name=\"action\" value=\"Update ").append(index).append("\" >")
                 .append(_t("Update")).append("<span class=hide> ").append(index).append("</span></button>");
         }
         if (showDeleteButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" class=\"Xdelete\" name=\"action\" value=\"Delete ").append(index)
+            buf.append("<button type=\"submit\" title=\"").append(_t("Delete")).append("\" class=\"control delete\" name=\"action\" value=\"Delete ").append(index)
                .append("\" onclick=\"if (!confirm('")
                .append(_t("Are you sure you want to delete {0}?", _t(escapedName)))
                .append("')) { return false; }\">")

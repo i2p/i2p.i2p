@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="fr">
  <head>
   <title>I2P serveur web anonyme | Bienvenue à votre eepsite</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -6,9 +7,7 @@
     <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
  </head>
  <body>
-<div class="fairylights">
 <div class="main">
- <h1>Serveur web anonyme I2P</h1>
 <div class="langbar">
 <!-- Some of these languages listed here are yet to be translated -->
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
@@ -21,8 +20,9 @@
 <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
 <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
 <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
-</div>
-<h2>Guide rapide pour faire un serveur web anonyme dans I2P</h2>
+</div> 
+ <h1>Serveur web anonyme I2P</h1>
+ <h2>Guide rapide pour faire un serveur web anonyme dans I2P</h2>
 
  <p>Ceci est votre eepsite, fonctionnant sur votre propre serveur web anonyme I2P. Pour le modifier, il suffit d'éditer les fichiers dans <code>~/.i2p/eepsite/docroot/</code> (Linux),
  <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows),
@@ -36,11 +36,11 @@
 </p>
 
  <h2>Comment configurer et annoncer votre eepsite</h2>
- Votre eepsite est par défaut arrêté. 20
+ <p>Votre eepsite est par défaut arrêté.
  Après que vous l'ayez lancé, il sera difficile à trouver par les autres gens, car ils n'a pas de nom et les gens n'ont pas votre longue clé Base64.
  
  Vous pourriez simplement distribuer manuellement aux gens cette longue clé, mais heureusement I2P a un carnet d'adresses 
- et plusieurs manières faciles de faire connaitre votre eepsite. Voici les instructions détaillées :
+ et plusieurs manières faciles de faire connaitre votre eepsite. Voici les instructions détaillées:</p>
  <ul>
  <li>Choissisez un nom pour votre eepsite (<i>quelquechose</i>.i2p). N'utilisez que des minuscules.
      D'abord, vérifiez dans le carnet d'adresse de votre routeur
@@ -71,8 +71,8 @@
  ou <code>/Users/(user)/Library/Application Support/i2p</code> (Mac), et remplacez la page index.html avec votre propre page. Les dossiers virtuels fonctionnent, 
  donc vous pouvez héberger un sous-dossier sans explicitement ajouter des liens vers des fichiers. Si vous avez besoin d'un gabarit pour un site de base, n'hésitez pas à utiliser et à changer <a href="pagetemplate.html">cette page</a> et <a href="lib/">contenu</a>!</li>
 </ul>
-<h2>Enregistrer votre propre domaine .I2P</h2><ul>
- <li>Maintenant il est temps d'ajouter votre eepsite à un carnet d'adresses hébergé par un site 
+<h2>Enregistrer votre propre domaine .I2P</h2>
+ <p>Maintenant il est temps d'ajouter votre eepsite à un carnet d'adresses hébergé par un site 
      tel que <a href="http://stats.i2p/">stats.i2p</a> ou <a href="http://no.i2p/">no.i2p</a>.
      C'est-à-dire que vous devez entrer
      le nom de votre eepsite et sa clé dans l'interface web d'un ou plus de ces sites. 
@@ -83,26 +83,26 @@
      Prenez toute la clé.
      N'oubliez pas de cliquer sur le bouton de validation (ex: "submit").
      Vérifiez que le site montre que la clé a été correctement ajoutée.
-     Sachant que beaucoup de routeurs récupèrent périodiquement des mises à jour de carnets d'adresses depuis ces sites, en quelques heures d'autres utilisateurs seront capables de trouver et d'accéder à votre eepsite simplement en tapant <i>quelquechose</i>.i2p dans leurs navigateurs web.</li>
-</ul><h2>Comment ajouter des abonnements de carnets d'adresses</h2><ul>
- <li>En parlant de mises à jour de carnets d'adresses, ce serait un bon moment pour ajouter quelques carnets d'adresses 
+     Sachant que beaucoup de routeurs récupèrent périodiquement des mises à jour de carnets d'adresses depuis ces sites, en quelques heures d'autres utilisateurs seront capables de trouver et d'accéder à votre eepsite simplement en tapant <i>quelquechose</i>.i2p dans leurs navigateurs web.</p>
+<h2>Comment ajouter des abonnements de carnets d'adresses</h2>
+ <p>En parlant de mises à jour de carnets d'adresses, ce serait un bon moment pour ajouter quelques carnets d'adresses 
  à votre <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">liste de souscriptions.</a> Allez sur la page appropriée afin d'en a
- jouter quelques uns listés ci-dessous afin que votre liste d'hôtes soit mise à jour automatiquement :</li><ul>
+ jouter quelques uns listés ci-dessous afin que votre liste d'hôtes soit mise à jour automatiquement:</p><ul>
 	 <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
 	 <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
 	 <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li>
 	 <li><a href="http://no.i2p/export/alive-hosts.txt">http://no.i2p/export/alive-hosts.txt</a></li></ul>
- <li>Si vous êtes pressé et que vous ne pouvez pas attendre quelques heures, vous pouvez demander aux gens d'utiliser une adresse de service de saut (jump service, service d'aide à la re-direction d'adresse).
+ <p>Si vous êtes pressé et que vous ne pouvez pas attendre quelques heures, vous pouvez demander aux gens d'utiliser une adresse de service de saut (jump service, service d'aide à la re-direction d'adresse).
      Cela marchera en quelques minutes après que vous ayez entré votre clé dans le carnet d'adresses du même site.
-     Testez-le vous-même en entrant : <code>
+     Testez-le vous-même en entrant: <code>
      http://stats.i2p/cgi-bin/jump.cgi?a=<i>que
  lquechose</i>.i2p</code>
      ou <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>quelquechose</i>.i2p</code>
      dans votre navigateur web.
-     Dès que cela fonctionnera, vous pourrez en informer les gens.</li>
- <li>Certains personnes s'informent des nouveaux eepsites sur des listes telles que
+     Dès que cela fonctionnera, vous pourrez en informer les gens.</p>
+ <p>Certains personnes s'informent des nouveaux eepsites sur des listes telles que
      <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> ou <a href="http://perv.i2p">perv.i2p</a>, c'est pourquoi vous pourriez commencer à avoir
-     quelques visiteurs. Mais il y a beaucoup d'autres manières d'informer les gens. Voici quelques idées :
+     quelques visiteurs. Mais il y a beaucoup d'autres manières d'informer les gens. Voici quelques idées:</p>
      <ul>
      <li>Poster un message sur le <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a> (forum d'annonce d'eepsite)
      situé sur <a href="http://forum.i2p/">forum.i2p</a>.</li>
@@ -111,21 +111,21 @@
  dans Syndie</a>.</li>
      <li>L'ajouter dans <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a></li>
      </ul>
-     Notez que certains sites recommandent de coller la longue clé de destination. Vous pouvez si vous voulez, 
+     <p>Notez que certains sites recommandent de coller la longue clé de destination. Vous pouvez si vous voulez, 
      mais si vous avez déjà réussi à poster la clé sur un service d'ajout de clé (type stats.i2p) et attendu 24 heures afin que la mise à jour de carnet d'adresses
-     se propage aux autres gens, cela ne devrait pas être nécessaire. </ul>
-<h2>Obtenir davantage d'assistance</h2><ul>
-	<li>Si vous avez d'autres questions, trouvez du soutien à ces endroits :
+     se propage aux autres gens, cela ne devrait pas être nécessaire.</p>
+<h2>Obtenir davantage d'assistance</h2>
+	<p>Si vous avez d'autres questions, trouvez du soutien à ces endroits:</p>
 <ul>
-	<li>Notre canal IRC de soutien : <ul><li><a href="irc://irc.freenode.net/i2p">#i2p sur Freenode</a></li>
+	<li>Notre canal IRC de soutien: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p sur Freenode</a></li>
 		<li>Anonymement via votre <a href="irc://127.0.0.1:6668/i2p">tunnel IRC I2P</a>.</li></ul>
      <li><a href="http://forum.i2p/viewforum.php?f=10">Section Technical problems</a> dans
   
     <a href="http://forum.i2p/">forum.i2p</a>.</li></ul>
- </ul><div class="notify">
+ <div class="notify">
 <b>Note:</b> cette page, le site web, et la console, ont tous besoin de traductions dans VOTRE langue si ce n'est pas encore fait ni en cours. Veuillez envisager d'aider le projet à grandir en <a href="http://www.i2p2.i2p/getinvolved.html">donnant volontairement de votre temps</a> pour la traduction. Contactez le projet via le canal IRC listé ci-dessus. Merci par avance !</div>
 <hr><div class="footnote">	
 Document dernièrement édité: Mai 2014.</div>
-</div></div>
+</div>
  </body>
 </html>

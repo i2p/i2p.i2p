@@ -32,7 +32,7 @@ public class GraphHelper extends FormHandler {
     private static final String PROP_REFRESH = "routerconsole.graphRefresh";
     private static final String PROP_PERIODS = "routerconsole.graphPeriods";
     private static final String PROP_EVENTS = "routerconsole.graphEvents";
-    public static final int DEFAULT_X = 250;
+    public static final int DEFAULT_X = 400;
     public static final int DEFAULT_Y = 100;
     private static final int DEFAULT_REFRESH = 5*60;
     private static final int DEFAULT_PERIODS = 60;
@@ -232,12 +232,13 @@ public class GraphHelper extends FormHandler {
                 name = r.getRateStat().getName();
                 displayName = name;
             }
-            _out.write("<h3>");
+            _out.write("<h3 id=\"graphinfo\">");
             _out.write(_t("{0} for {1}", displayName, DataHelper.formatDuration2(_periodCount * period)));
             if (_end > 0)
                 _out.write(' ' + _t("ending {0} ago", DataHelper.formatDuration2(_end * period)));
 
-            _out.write("</h3><img class=\"statimage\" border=\"0\""
+            _out.write("&nbsp;<a href=\"graphs\">[" + _t("Return to main graphs page") + "]</a></h3>\n"
+                       + "<div class=\"graphspanel\"><img class=\"statimage\" border=\"0\""
                        + " src=\"viewstat.jsp?stat="
                        + name
                        + "&amp;showEvents=" + _showEvents
@@ -246,7 +247,7 @@ public class GraphHelper extends FormHandler {
                        + "&amp;end=" + _end 
                        + "&amp;width=" + _width
                        + "&amp;height=" + _height
-                       + "\"><p>\n");
+                       + "\"></div><p id=\"graphopts\">\n");
 
             if (_width < MAX_X && _height < MAX_Y) {
                 _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 3 / 2, _height * 3 / 2));
@@ -343,7 +344,7 @@ public class GraphHelper extends FormHandler {
                + "\">";
     }
 
-    private static final int[] times = { 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
+    private static final int[] times = { 15, 30, 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
 
     public String getForm() { 
         if (StatSummarizer.isDisabled())
@@ -353,17 +354,18 @@ public class GraphHelper extends FormHandler {
         // So just use the "shared/console nonce".
         String nonce = CSSHelper.getNonce();
         try {
-            _out.write("<br><h3>" + _t("Configure Graph Display") + " [<a href=\"configstats\">" + _t("Select Stats") + "</a>]</h3>");
+            _out.write("<br><h3 id=\"graphdisplay\">" + _t("Configure Graph Display") + " <a href=\"configstats\">[" + _t("Select Stats") + "]</a></h3>");
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +
-                       "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
+                       "<table><tr><td><input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_t("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
-            _out.write(_t("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + "> ");
-            _out.write(_t("or")+ " " +_t("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + "><br>\n");
-            _out.write(_t("Image sizes") + ": " + _t("width") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
-                       + "\"> " + _t("pixels") + ", " + _t("height") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
-                       + "\"> " + _t("pixels") + "<br>\n");
-            _out.write(_t("Refresh delay") + ": <select name=\"refreshDelay\">");
+            _out.write(_t("Display period") + ":</td><td colspan=\"2\"><input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\">" + _t("minutes") + "</td></tr><tr><td>\n");
+            _out.write(_t("Plot type") + ":</td><td colspan=\"2\">");
+            _out.write("<input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + ">" + _t("Averages") + "&nbsp;&nbsp;&nbsp;");
+            _out.write ("<input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + ">" + _t("Events") + "</td></tr><tr><td>\n");
+            _out.write(_t("Graph size") + ":</td><td><input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
+                       + "\">" + _t("pixels wide") + "&nbsp;&nbsp;&nbsp;<input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
+                       + "\">" + _t("pixels high") + "</td><td class=\"infohelp\">" + _t("Note: Dimensions are for graph only (excludes title, labels and legend).") + "</td></tr><tr><td>\n");
+            _out.write(_t("Refresh delay") + ":</td><td colspan=\"2\"><select name=\"refreshDelay\">");
             for (int i = 0; i < times.length; i++) {
                 _out.write("<option value=\"");
                 _out.write(Integer.toString(times[i]));
@@ -377,14 +379,13 @@ public class GraphHelper extends FormHandler {
                     _out.write(_t("Never"));
                 _out.write("</option>\n");
             }
-            _out.write("</select><br>\n" +
-                       _t("Store graph data on disk?") +
-                       " <input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
+            _out.write("</select></td></tr><tr><td>\n" + _t("Persistence") +
+                       ":</td><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             if (persistent)
                 _out.write(HelperBase.CHECKED);
-            _out.write(">" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Save settings and redraw graphs") + "\"></div></form>");
+            _out.write(">" + _t("Store graph data on disk") + "</td></tr></table>" +
+                       "<hr><div class=\"formaction\" id=\"graphing\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
