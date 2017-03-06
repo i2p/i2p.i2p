@@ -7,22 +7,21 @@ html {
 
 body {
      background: #2f231a;
-     background: linear-gradient(-45deg, #2f231a, #1f120c);
+     background: repeating-linear-gradient(to bottom, #9F948B 1px, #6F5B4C 1px, #BFA285 3px);
      color: #2f1500;
-     font: 8pt "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     background-size: 3px 3px;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
 }
 
 /* preload top navigation mouseovers */
 body {
-     background: linear-gradient(-45deg, #2f231a, #1f120c),
+     background: repeating-linear-gradient(to bottom, #6F5B4C 1px, #9F948B 1px, #BFA285 4px),
      url(images/button_snark_hover.png) no-repeat,
      url(images/button_snark_active.png) no-repeat,
      url(images/button_tracker_hover.png) no-repeat,
      url(images/button_tracker_active.png) no-repeat,
      url(images/button_forum_hover.png) no-repeat,
      url(images/button_forum_active.png) no-repeat !important;
-     background-size: 3px 3px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
+     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
 }
 
 body.iframed {
@@ -45,14 +44,28 @@ body.iframed {
      outline: none;
 }
 
-*:focus {
-     filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
+td *:focus {
+     filter: drop-shadow(0 0 1px #df0067);
+     -webkit-filter: drop-shadow(0 0 1px #df0067);
+}
+
+::selection {
+     background: #900 !important;
+     color: white;
+}
+
+::-moz-selection {
+     background: #800 !important;
+     color: white;
+}
+
+input[type="submit"], input[type="reset"], button, a:link, input[type="checkbox"], input[type="radio"], select {
+     cursor: pointer;
 }
 
 .page {
-     background: #f1f2e4 url(images/tile2.png);
-     background: linear-gradient(to bottom, rgba(239,239,239,0.6) 0%, rgba(207,199,194,0.6) 100%), #f1f2e4 url('images/tile2.png');
+     background: #dfdccb url(images/tile2.png);
+     background: repeating-linear-gradient(to bottom, #ECEBDD 1px, #EFEBDD 2px, #EBE5D5 5px);
      color: #310;
      min-width: 900px !important;
      margin: 5px 0 0 0;
@@ -63,7 +76,6 @@ body.iframed {
      line-height: 160% !important;
      box-shadow: inset 0 0 3px 0 #a08160, 0 0 1px 0 #4f3d36;
      text-align: center;
-     opacity: 1;
 }
 
 .iframed .page {
@@ -73,23 +85,42 @@ body.iframed {
      padding: 0;
 }
 
-/*
-.snarkTitle {
-     font-size: 12pt;
-     font-weight: bold;
-     text-align: center;
+a:link, a:visited {
+     text-decoration: none;
 }
-*/
+
+td a:link {
+     color: #cf0f00;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+td a:visited {
+     color: #9F0B00 !important;
+}
+
+td a:hover, td a:visited:hover, td a:focus, td a:visited:focus {
+     color: #df0067 !important;
+     filter: none;
+     -webkit-filter: none;
+}
+
+td a:active, td a:visited:active {
+     color: #FF2F85 !important;
+}
+
+/* top nav */
 
 .snarknavbar {
-     margin: -10px 0 9px 0 !important;
-     padding: 14px 10px 12px;
+     margin: -11px 0 10px 0 !important;
+     padding: 13px 10px 12px;
      border: 1px solid #2f1b0c;
      border-radius: 0 0 2px 2px;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 #4f3d36;
-     background: #efefef url('images/bling2.png') repeat-x scroll center center;
-     background: linear-gradient(to bottom, #efefef 0%, #efefef 51%, #cfc7c2 52%, #cfc7c2 100%);
-     min-width: 700px;
+     box-shadow: inset 0 0 0 1px #fff5ef, 0 0 1px 0 #4f3d36;
+     background: #efefef;
+     background: linear-gradient(to bottom, #efefef 0%, #efefef 49%, #cfc7c2 52%, #cfc7c2 100%);
+     min-width: 900px;
      width: 70%;
      text-align: center;
      position: sticky;
@@ -98,95 +129,94 @@ body.iframed {
  }
 
 .iframed .snarknavbar {
-     padding-top: 14px;
+     padding-top: 13px;
      margin: -6px 0 !important;
      width: auto;
      border-radius: 0;
      box-shadow: 0 0 2px 0 #fff inset, 0 0 1px 0 #4f3d36;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-.snarknavbar {
-     padding-top: 15px;
-}
-
-.snarkRefresh:link:first-child {
-     padding-top: 4px !important;
-}
+.snarkRefresh img {
+     display: none;
 }
 
 .snarkRefresh:link, .snarkRefresh:visited {
      text-decoration: none !important;
      text-transform: uppercase !important;
-     padding: 5px 10px 5px 12px !important;
-     margin: -5px -2px -5px 0 !important;
+     padding: 4px 10px 4px 20px !important;
+     margin: -5px -4px -5px 0 !important;
      letter-spacing: 0.08em;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-weight: bold;
      font-size: 10pt;
      color: #930;
-     background: #fff7ef url('images/bling.png') repeat-x scroll center center;
-     background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
+     color: #3F271B;
+     background: #fff7ef url(images/button_snark.png) 11px center no-repeat;
+     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604E 1px, #A09286 1px, #BFAFA2 2px);
+     background-size: 18px auto, 100% 100%, 100% 100%;
      border-radius: 0;
      border: 1px solid #efe6e0;
      text-shadow: 0 0 1px #fff5ef;
-     box-shadow: inset 0 0 0 1px #efe6e0;
+     box-shadow: inset 0 0 0 1px #efe6e0, 0 0 0 1px rgba(77, 69, 62, 0.1);
      border: 1px solid #2f1b0c;
 }
 
 .snarkRefresh:hover, .snarkRefresh:focus {
      text-decoration: none !important;
      text-shadow: none;
-     color: #900;
-     color: #f60 !important;
-     background: #fff url('images/bling2.png') repeat-x scroll center center;
-     background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
+     color: #930 !important;
+     background: #ffeadf url(images/button_snark_hover.png) 11px center no-repeat;
+     background: url(images/button_snark_hover.png) 11px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
+     background-size: 18px auto, 100% 100%, 100% 100%;
+     box-shadow: inset 0 0 0 1px #fff5ef, 0 0 0 1px rgba(77, 69, 62, 0.1);
+     padding: 4px 10px 4px 20px !important;
 }
 
 .snarkRefresh:active {
-     color: #eee !important;
-     background: linear-gradient(to bottom, #dfb899 0%, #dfb899 50%, #af9178 50%, #af9178 100%);
+     background: #dfb899 url(images/button_snark_active.png) 11px center no-repeat;
+     background: url(images/button_snark_active.png) 11px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 47%, #af9178 50%, #af9178 100%);
+     background-size: 18px auto, 100% 100%, 100% 100%;
      text-shadow: none !important;
-     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #555;
-}
-
-.snarkRefresh:active img {
-     filter: sepia(100%) invert(50%) brightness(200%) !important;
-     -webkit-filter: sepia(100%) invert(50%) brightness(200%) !important;
-     opacity: 0.7;
+     box-shadow: inset 0 0 0 1px #efe6e0, inset 2px 2px 3px 1px #59513B, 0 0 0 1px rgba(77, 69, 62, 0.1);
+     padding: 4px 10px 4px 20px !important;
 }
 
 .snarkRefresh:nth-child(2) {
-     background: url(images/button_forum.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
-     padding: 5px 10px 5px 28px !important;
+     background: #fff7ef url(images/button_forum.png) 12px center no-repeat;
+     background: url(images/button_forum.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604E 1px, #A09286 1px, #BFAFA2 2px);
+     background-size: 16px auto, 100% 100%, 100% 100%;
+     padding: 4px 10px 4px 28px !important;
 }
 
 .snarkRefresh:nth-child(n+3) {
-     background: url(images/button_tracker.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
-     padding: 5px 10px 5px 28px !important;
+     background: #fff7ef url(images/button_tracker.png) 12px center no-repeat;
+     background: url(images/button_tracker.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(135deg, #75604E 1px, #A09286 1px, #BFAFA2 2px);
+     background-size: 16px auto, 100% 100%, 100% 100%;
+     padding: 4px 10px 4px 28px !important;
 }
 
 .snarkRefresh:nth-child(2):hover, .snarkRefresh:nth-child(2):focus {
-     background: url(images/button_forum_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
-     color: #f60;
+     background: #ffeadf url(images/button_forum_hover.png) 12px center no-repeat;
+     background: url(images/button_forum_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
+     background-size: 16px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(n+3):hover, .snarkRefresh:nth-child(n+3):focus {
-     background: url(images/button_tracker_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
-     color: #f60;
+     background: #ffeadf url(images/button_tracker_hover.png) 12px center no-repeat;
+     background: url(images/button_tracker_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
+     background-size: 16px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(2):active {
-     color: #eee;
-     background: url(images/button_forum_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 50%, #af9178 50%, #af9178 100%);
-     text-shadow: none;
+     background: #dfb899 url(images/button_forum_active.png) 12px;
+     background: url(images/button_forum_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 47%, #af9178 50%, #af9178 100%);
+     background-size: 16px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(n+3):active {
-     color: #eee;
-     background: url(images/button_tracker_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 50%, #af9178 50%, #af9178 100%);
-     background-blend-mode: normal;
-     text-shadow: none;
+     background: #dfb899 url(images/button_tracker_active.png) 12px center no-repeat;
+     background: url(images/button_tracker_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 47%, #af9178 50%, #af9178 100%);
+     background-size: 16px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:last-child {
@@ -202,43 +232,20 @@ body.iframed {
      margin: -5px 0 -2px !important;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) { /* button/bar alignment on config page */
-.iframed .snarknavbar {
-     padding-top: 16px;
-     margin-bottom: -6px !important;
+.snarkRefresh:hover, .snarkRefresh:visited:hover {
+     color: #930 !important;
 }
 
-.snarkRefresh:first-child {
-     margin: -5px -2px -3px 0 !important;
-     display: inline-block;
-     padding: 5px 10px 2px 12px !important;
+.snarkRefresh:active, .snarkRefresh:visited:active {
+     color: #eee !important;
 }
 
-.snarkRefresh:last-child[href="/i2psnark/"] {
-     margin: -5px 0 -3px !important;
-     display: inline-block;
-     padding: 5px 10px 3px 12px !important;
-}
+/* end topnav */
 
-.iframed .snarkRefresh:last-child[href="/i2psnark/"] {
-     margin: -5px 0 -2px !important;
-}
-}
-
-.snarkRefresh img {
-     margin: 0 -6px 2px -2px !important;
-     filter: sepia(65%);
-     -webkit-filter: sepia(65%);
-     vertical-align: middle;
-}
-
-.snarkRefresh:hover img {
-     filter: none;
-     -webkit-filter: none;
-}
+/* screenlog */
 
 .snarkMessages {
-     font: bold 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono !important;
+     font: bold 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace !important;
      text-align: left;
      margin: 0 0 10px;
      padding: 0 3px;
@@ -246,14 +253,19 @@ body.iframed {
      border: 1px solid #6f533e;
      border-radius: 2px;
      box-shadow: inset 0 0 6px 0 #3f2307;
-     overflow-y: auto;
-     overflow-x: hidden;
      color: #cfc7c2;
+     overflow: hidden;
      height: 56px;
      width: auto;
      background: #3f3833 url(images/hat.png) no-repeat scroll right center;
      background: url(images/hat.png) no-repeat scroll right center, linear-gradient(to bottom, #5f554d 0%, #3f3833 100%);
+     background: url(images/whippy.png) no-repeat scroll right 5px bottom -4px, linear-gradient(to bottom, #5f554d 0%, #3f3833 100%);
      background-size: 80px 83px, 100% 100%;
+     background-size: auto 100%, 100% 100%;
+}
+
+.snarkMessages:hover {
+     overflow: auto;
 }
 
 .snarkMessages:focus {
@@ -273,7 +285,7 @@ body.iframed {
 .snarkMessages li::before {
      content: '';
      display: inline-block;
-     background: url(images/bullet.png)  left 2px no-repeat;
+     background: url(images/bullet.png) left 2px no-repeat;
      width: 13px;
      height: 11px;
      background-size: 9px 9px;
@@ -281,17 +293,24 @@ body.iframed {
 
 .snarkMessages a:link:not([href*="action=Clear"]) {
      mix-blend-mode: exclusion;
+     color: #f60 !important;
 }
 
-/*
-.snarkMessages a:hover {
-     color: #f90 !important;
+.snarkMessages a:link:hover:not([href*="action=Clear"]) {
+     mix-blend-mode: normal;
 }
 
 .snarkMessages a:visited {
      color: #d30 !important;
 }
-*/
+
+.snarkMessages a:hover, .snarkMessages a:visited:hover, .snarkConfigTitle a:hover, .snarkConfigTitle a:visited:hover {
+     color: #930 !important;
+}
+
+.snarkMessages a:active, .snarkMessages a:visited:active, .snarkConfigTitle a:active, .snarkConfigTitle a:visited:active  {
+     color: #f30 !important;
+}
 
 .snarkMessages p {
      font-style: italic;
@@ -322,9 +341,48 @@ body.iframed {
      margin-top: -10px !important;
 }
 
+/* end screenlog */
+
+/* pagenav */
+
+#pagenav {
+     vertical-align: middle;
+     padding: 3px 2px 2px;
+     font-size: 9pt;
+}
+
+#pagenav img {
+     border: 1px solid #541;
+     border-radius: 2px;
+     margin-right: -3px;
+     padding: 3px 4px;
+     filter: sepia(100%) hue-rotate(340deg) drop-shadow(0 0 1px #999);
+     -webkit-filter: sepia(100%) hue-rotate(340deg) drop-shadow(0 0 1px #999);
+     background: linear-gradient(to bottom, #ffeadf 51%, #cfb6a8 52%);
+     box-shadow: inset 0 0 0 1px #fff;
+     mix-blend-mode: luminosity;
+}
+
+#pagenav img:hover, #pagenav a:focus img {
+     mix-blend-mode: normal;
+}
+
+#pagenav a:active img {
+     mix-blend-mode: normal;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #3f362f !important;
+}
+
+#pagenav img.disable, #pagenav img.disable:hover {
+     mix-blend-mode: luminosity;
+     opacity: 0.2;
+     margin-right: 1px;
+}
+
+/* end pagenav */
+
 pre {
      width: 100%;
-     font: 8pt "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", Courier, mono !important;
+     font: 8pt "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", Courier, monospace !important;
      padding: 0;
      text-align: left !important;
      height: 8px;
@@ -338,7 +396,7 @@ table {
      padding: 0;
      border-spacing: 0;
      border-collapse: collapse;
-     color: #323;
+     color: #2f1500;
      width: 100%;
      opacity: 1 !important;
      font-size: 8.5pt !important;
@@ -349,21 +407,21 @@ tr {
 }
 
 thead, tfoot {
-     background: url("images/bling2.png") repeat-x scroll center center #867;
+     background: #efefef;
      background: linear-gradient(to bottom, #efefef, #cfc7c2);
      font-weight: bold;
-     color: #503;
+     color: #2f1500;
 }
 
 thead a img, thead img {
- /*    mix-blend-mode: luminosity;*/
-     opacity: 1;
+     opacity: 0.9;
      filter: sepia(100%) hue-rotate(340deg);
      -webkit-filter: sepia(100%) hue-rotate(340deg);
-     max-height: 22px;
+     max-height: 18px;
 }
 
 thead a:hover img, thead a:focus img {
+     opacity: 1;
      mix-blend-mode: normal;
      filter: drop-shadow(0 0 1px #f60);
      -webkit-filter: drop-shadow(0 0 1px #f60);
@@ -374,7 +432,7 @@ th {
      font-size: 8pt;
      border-top: 1px solid #6f533e;
      border-bottom: 1px solid #6f533e;
-     color: #511;
+     color: #2f1500;
 }
 
 th br {
@@ -391,14 +449,6 @@ tfoot td:first-child {
      padding-left: 0;
 }
 
-th:first-child img {
-     margin: 1px 1px 3px 1px !important;
-}
-
-th:nth-child(2) img {
-     margin: 1px 7px 3px 2px !important;
-}
-
 tfoot th {
      padding-bottom: 4px !important;
 }
@@ -412,46 +462,12 @@ tfoot tr:nth-child(n+1) {
      text-align: left;
 }
 
-#pagenav {
-     vertical-align: middle;
-     padding: 3px 2px 2px;
-     font-size: 9pt;
-}
-
-#pagenav img {
-     border: 1px solid #541;
-     border-radius: 3px;
-     margin-right: -3px;
-     padding: 3px 4px;
-     filter: sepia(100%) hue-rotate(340deg) drop-shadow(0 0 1px #999);
-     -webkit-filter: sepia(100%) hue-rotate(340deg) drop-shadow(0 0 1px #999);
-     background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
-     box-shadow: inset 0 0 0 1px #fff;
-     mix-blend-mode: luminosity;
-}
-
-#pagenav img:hover, #pagenav a:focus img {
-     mix-blend-mode: normal;
-}
-
-#pagenav a:active img {
-     mix-blend-mode: normal;
-     box-shadow: inset 1px 1px 2px 1px #3f362f !important;
-}
-
-#pagenav img.disable, #pagenav img.disable:hover {
-     mix-blend-mode: luminosity;
-     opacity: 0.2;
-     margin-right: 1px;
-}
-
 .headerstatus {
      text-align: left;
-     padding-left: 15px;
 }
 
 .headerpriority {
-     text-align: left;
+     text-align: center;
      padding: 5px;
 }
 
@@ -460,32 +476,36 @@ tfoot tr:nth-child(n+1) {
 }
 
 .ParentDir {
-     background: #ffeddf;
+     background: #fff4ef;
+     background: linear-gradient(to right, #efe6e0, #dfd6d1 70%);
      text-align: left !important;
      padding: 4px 0 4px 4px;
 }
 
 .priority {
-     font-size: 7pt;
+     font-size: 8pt;
      vertical-align: middle;
-     text-align: right;
-     padding-right: 10px;
+     text-align: center;
+     white-space: nowrap;
+     width: 144px;
 }
 
 .snarkTorrents {
      margin: 0;
      border: 1px solid #6f533e;
-     background: #212;
+     background: #e8e5dc;
      border-collapse: separate;
      border-spacing: 0;
      border-radius: 2px;
-     filter: drop-shadow(0 0 1px #4d453e);
-     -webkit-filter: drop-shadow(0 0 1px #4d453e);
 }
 
 .snarkTorrents thead th {
      border-top: 0;
      border-bottom: 1px solid #6f533e;
+}
+
+.snarkTorrents thead th > * {
+     vertical-align: middle !important;
 }
 
 .snarkTorrents thead th:nth-child(2) {
@@ -494,13 +514,13 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrents tfoot th {
-     border-bottom: 0;
+     border-bottom: none !important;
      white-space: normal !important;
      font-weight: normal;
 }
 
-.snarkTorrents tfoot th::first-line {
-     font-weight: bold;
+.snarkTorrents tfoot th::first-line, .snarkTorrents tfoot th:nth-child(n+7) {
+     font-weight: bold !important;
 }
 
 .snarkTorrents tfoot th:nth-child(n+2) {
@@ -516,7 +536,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrents thead th:nth-child(3) {
-     padding: 4px 4px 4px 0	;
+     padding: 4px 4px 4px 0;
      text-align: right;
 }
 
@@ -538,10 +558,6 @@ tfoot tr:nth-child(n+1) {
      white-space: nowrap;
 }
 
-.snarkTorrents td:nth-child(n+6), .snarkTorrents tfoot th:nth-child(n+2) {
-     word-spacing: -0.4em;
-}
-
 .snarkTorrents tfoot {
      vertical-align: top;
 }
@@ -552,7 +568,6 @@ tfoot tr:nth-child(n+1) {
 
 .snarkTorrents td:first-child, .snarkTorrents td:nth-child(2) {
      padding: 2px 0 !important;
-     word-spacing: -0.2em;
 }
 
 .snarkTorrents td:nth-child(3), .snarkTorrents td:nth-child(4) {
@@ -561,8 +576,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrents td:nth-child(3) {
-     text-align: right;
-     padding-left: 3px !important;
+     padding: 0 3px !important;
 }
 
 .snarkTorrents td:nth-child(4) {
@@ -571,8 +585,9 @@ tfoot tr:nth-child(n+1) {
      font-weight: bold;
 }
 
-.snarkTorrents td:nth-child(7) {
-     font-weight: bold;
+.snarkTorrents td:nth-child(7), .peerinfo .snarkTorrentStatus {
+     font-weight: bold !important;
+     white-space: nowrap !important;
 }
 
 td {
@@ -596,11 +611,6 @@ td:first-child {
      line-height: 110%;
 }
 
-.snarkTorrentName[onclick], .snarkTorrentName[onclick]:hover a {
-     cursor: pointer;
-     color: #cf0f00;
-}
-
 .snarkTorrentName img {
      padding-bottom: 2px;
      text-align: left;
@@ -615,20 +625,25 @@ td:first-child {
      white-space: nowrap;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.snarkTorrentAction {
+     width: 48px !important;
+}
+}
+
 /* MS Edge 14+ fix */
 _:-ms-lang(x), .snarkTorrentAction {
      width: 72px !important;
 }
 
 .snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {
-     filter: drop-shadow(0 0 1px #7f6c5f);
-     -webkit-filter: drop-shadow(0 0 1px #7f6c5f);
+     filter: drop-shadow(0 0 1px rgba(127, 108, 95, 0.6));
+     -webkit-filter: drop-shadow(0 0 1px rgba(127, 108, 95, 0.6));
      border: 1px solid #4d453e;
      border-radius: 2px;
      padding: 3px !important;
-     background: linear-gradient(to bottom, #efefef 0%, #efefef 51%, #cfc7c2 52%, #cfc7c2 100%);
      background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #efe6e0;
      vertical-align: middle;
      mix-blend-mode: normal;
      opacity: 1 !important;
@@ -637,14 +652,14 @@ _:-ms-lang(x), .snarkTorrentAction {
 
 .snarkTorrentAction input[type="image"]:hover, .snarkTorrents th:last-child input[type="image"]:hover, .snarkTorrentAction input[type="image"]:focus, .snarkTorrents th:last-child input[type="image"]:focus  {
      background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
-     border: 1px solid #f60 !important;
+     border: 1px solid #930 !important;
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
+     filter: drop-shadow(0 0 1px #f30);
+     -webkit-filter: drop-shadow(0 0 1px #f30);
 }
 
 .snarkTorrentAction input[type="image"]:active, .snarkTorrents th:last-child input[type="image"]:active {
-     box-shadow: inset 2px 2px 2px 1px #4d453e;
+     box-shadow: inset 0 0 0 1px #efe6e0, inset 3px 3px 3px #4d453e;
      mix-blend-mode: multiply;
      filter: sepia(100%) hue-rotate(340deg);
      -webkit-filter: sepia(100%) hue-rotate(340deg);
@@ -682,15 +697,15 @@ _:-ms-lang(x), .snarkTorrentAction {
      margin-left: 6px !important;
 }
 
-.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded, .peerinfo .snarkTorrentStatus {
      font-size: 8pt;
      font-weight: bold;
      padding: 0 3px;
+     line-height: 120% !important;
 }
 
 .snarkTorrentDownloaded {
      color: #439 !important;
-     line-height: 88%;
      text-align: center !important;
      padding: 2px;
      vertical-align: middle;
@@ -713,15 +728,9 @@ _:-ms-lang(x), .snarkTorrentAction {
      font-size: 8pt;
 }
 
-/*
-.snarkTorrentOdd:hover, .snarkTorrentEven:hover {
-     box-shadow: inset 0 0 1px 0 #4d453e;
-}
-*/
-
-.snarkTorrentOdd td, .snarkTorrentEven td, .snarkTorrentInfo td {
-     border-top: 1px outset #efefef !important;
-     border-bottom: 1px outset #efefef !important;
+.snarkTorrentOdd td, .snarkTorrentEven td, .snarkTorrentInfo td, .ParentDir {
+     border-top: 1px outset #fff5ef !important;
+     border-bottom: 1px outset #efe8e0 !important;
 }
 
 .snarkTorrentOdd:last-child td, .snarkTorrentEven:last-child td {
@@ -729,7 +738,7 @@ _:-ms-lang(x), .snarkTorrentAction {
 }
 
 table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
-     background: #cfbda8 !important;
+     background: #f9efcf !important;
 }
 
 .snarkDirInfo tr:hover .snarkFileStatus img {
@@ -747,12 +756,11 @@ table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
 }
 
 .snarkTorrentEven + .snarkTorrentEven:nth-child(even) td, .snarkTorrentOdd + .snarkTorrentOdd:nth-child(even) td, .snarkTorrentEven + .snarkTorrentEven:nth-child(odd) td, .snarkTorrentOdd + .snarkTorrentOdd:nth-child(odd) td {
-     padding: 3px 0 !important;
+     padding: 3px 3px 3px 0 !important;
 }
 
 .snarkTorrents td[colspan="4"], .snarkTorrents td[colspan="10"]  {
      text-align: left;
-     word-spacing: 0.2em;
 }
 
 .snarkTorrents td[colspan="10"] {
@@ -760,18 +768,32 @@ table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
      white-space: normal;
 }
 
-.snarkTorrents td[colspan="4"] tt {
-     margin-left: -1px;
-     margin: 0 2px 0 -16px;
+.snarkTorrents tt {
+     background: #313;
+     background: #7F654F;
+     color: #fff;
+     padding: 2px 3px;
+     border-radius: 2px;
+     opacity: 0.8;
+     letter-spacing: 0.1em;
+}
+
+.peerinfo tt {
+     margin: 0 1px;
 }
 
 .snarkFileIcon {
      width: 16px;
 }
 
-.snarkFileIcon img {
+.snarkFileIcon img, .snarkFileIcon img:hover {
      filter: none;
      -webkit-filter: none;
+     opacity: 0.6;
+}
+
+.snarkFileIcon a img, .snarkFileIcon a:hover img {
+     opacity: 1;
 }
 
 td.snarkFileIcon:first-child {
@@ -782,6 +804,7 @@ td.snarkFileIcon:first-child {
      padding: 4px 0 !important;
      text-align: left !important;
      font-size: 8pt !important;
+     font-weight: bold;
 }
 
 .snarkFileSize {
@@ -791,17 +814,19 @@ td.snarkFileIcon:first-child {
 }
 
 .snarkFileStatus {
-     padding: 4px 5px 4px 15px;
+     padding: 4px 5px;
      text-align: center;
      font-style: italic;
      font-size: 8pt;
      text-align: left;
+     white-space: nowrap;
 }
 
 .snarkTorrentETA {
      font-weight: bold;
      font-style: italic;
      color: #505 !important;
+     line-height: 120%;
 }
 
 .snarkTorrentInfo img {
@@ -827,32 +852,55 @@ td.snarkFileIcon:first-child {
 }
 
 .snarkTorrentInfo th:first-child {
-     background: url(images/file.png) center center no-repeat, linear-gradient(to bottom, #efefef, #cfc7c2);
-     background-size: 14px 16px, 100% 100%;
+     background: url(images/file.png) left 7px center no-repeat, linear-gradient(to bottom, #efefef, #cfc7c2);
+     background-size: auto 16px, 100% 100%;
+     background-blend-mode: luminosity;
 }
 
 .snarkTorrentInfo th:first-child, .snarkTorrentInfo td:first-child {
      width: 20px;
      text-align: left;
-     padding: 2px 0 2px 5px !important;
+     padding: 2px 3px 2px 5px !important;
 }
 
 .snarkTorrentInfo {
      margin-bottom: 2px !important;
+     border-collapse: separate;
 }
 
-.snarkTorrentInfo tr:last-child {
+.snarkTorrentInfo tr:first-child th {
+     border-top: none;
+}
+
+#torrentInfoControl {
      border-top: 1px solid #6f533e;
+     background: linear-gradient(to bottom, #efefef, #cfc7c2);
+}
+
+#torrentInfoControl td {
+     border-bottom: none !important;;
+     background: linear-gradient(to bottom, #efefef, #cfc7c2);
+     text-align: right !important;
+     padding-right: 8px !important;
 }
 
 .snarkDirInfo {
      margin-top: 10px !important;
      margin-bottom: 0;
+     border-collapse: separate;
+}
+
+.snarkDirInfo tr:first-child th {
+     border-top: none !important;
 }
 
 .snarkDirInfo thead img {
      margin: 0 -1px 0 0 !important;
      padding: 0 3px !important;
+}
+
+.snarkTorrentInfo, .snarkDirInfo, .resourceError, .snarkTorrents {
+     box-shadow: 0 0 2px 1px rgba(77, 69, 62, 0.5);
 }
 
 thead img.disable, img.disable:hover {
@@ -869,15 +917,34 @@ thead img.disable, img.disable:hover {
      padding: 2px 0;
 }
 
-.snarkDirInfo .headerpriority {
-     text-align: right !important;
-     vertical-align: middle;
-     padding: 5px !important;
+.snarkDirInfo .ParentDir a img {
+     padding-right: 3px;
 }
 
-th[colspan="4"] + .headerpriority {
+.snarkDirInfo .headerpriority {
+     text-align: center !important;
+     vertical-align: middle;
+     padding: 5px !important;
+     width: 160px
+}
+
+#setPriority .headerpriority {
      text-align: right !important;
-     padding: 14px 5px 12px !important;
+     padding: 5px !important;
+     border-bottom: none;
+}
+
+#setPriority .headerpriority, #torrentInfoControl td {
+     box-shadow: inset 0 0 0 1px #efe8e0;
+     border-top: 1px solid #6f533e !important;
+}
+
+#torrentInfoStats td {
+     border-bottom: none !important;
+}
+
+#setPriority input.disabled, #setPriority a.controld {
+     display: none;
 }
 
 .choked {
@@ -905,11 +972,22 @@ th[colspan="4"] + .headerpriority {
 
 .snarkAddInfo {
      font-size: 8pt;
-     line-height: 130% !important;
+     display: inline-block;
+     margin-top: 7px;
+     background: url(images/infocircle.png) left center no-repeat;
+     background-size: 16px auto;
+     padding-left: 20px;
+     min-height: 16px;
 }
 
 #trackerselect {
      width: 100% !important;
+}
+
+#trackerselect tr:first-child td {
+     font-weight: bold;
+     padding-top: 7px;
+     padding-bottom: 7px;
 }
 
 #trackerselect td {
@@ -917,11 +995,13 @@ th[colspan="4"] + .headerpriority {
 }
 
 #trackerselect td:nth-child(2), #trackerselect td:nth-child(3) {
-     max-width: 60px !important;
+     min-width: 60px !important;
 }
 
-#trackerselect tr:first-child {
+.trackerconfig tr:first-child {
      font-weight: bold;
+     -webkit-filter: drop-shadow(0 0 1px #aaa);
+     filter: drop-shadow(0 0 1px #aaa);
 }
 
 #trackerselect td:first-child {
@@ -932,34 +1012,51 @@ th[colspan="4"] + .headerpriority {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-size: 12pt !important;
      font-weight: bold;
+     font-variant: small-caps !important;
      padding: 4px 15px 2px 12px;
      margin: 0 0 -3px !important;
      letter-spacing: 0.1em;
      border: 1px solid #111;
      border-top: 0;
-     background: #ffb url('images/bling.png') repeat-x scroll center center;
-     background: linear-gradient(to bottom, #efefef 0%, #efefef 51%, #cfc7c2 52%, #cfc7c2 100%);
-     background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
-     font-variant: small-caps !important;
-     color: #2f1500;
-     box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #fff;
+     background: #fff7ef;
+     background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, rgba(207, 193, 181, 0.6) 52%), repeating-linear-gradient(135deg, #75604E 1px, #A09286 1px, #BFAFA2 2px);
+     color: #444039;
+     box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #efe6e0;
      display: inline-block;
-     min-width: 200px;
+     min-width: 220px;
      vertical-align: middle;
      text-shadow: 0 0 1px #fff5ef;
 }
 
 .snarkConfigTitle:hover, label.toggleview:hover {
-     background: #fff url('images/bling2.png') repeat-x scroll center center;
+     background: #ffeadf;
      background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
 }
 
 .snarkConfigTitle:active, label.toggleview:active {
-     box-shadow:  0 0 2px #4d453e, inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #555;
+     box-shadow:  0 0 2px #4d453e, inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #59513B;
 }
 
 .snarkConfigTitle {
      padding-top: 3px !important;
+}
+
+.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
+     background: #f2eeed !important;
+     background: radial-gradient(circle at left bottom, #F9F8F2, #cfc7c2 400px) !important;
+     display: block;
+     margin: 0 -11px !important;
+     border-radius: 2px 2px 0 0;
+     padding: 5px 8px 3px !important;
+     font-variant: normal;
+     text-transform: uppercase;
+     font-size: 11pt !important;
+     box-shadow: inset 0 0 0 1px #efe6e0;
+     text-align: left;
+}
+
+.iframed .configsectionpanel .snarkConfigTitle, .iframed .configsectionpanel .snarkConfigTitle:hover, .iframed .configsectionpanel .snarkConfigTitle:active {
+     border-radius: 0;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -978,22 +1075,29 @@ _:-ms-lang(x), .snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
 
 .snarkConfigTitle a, label.toggleview {
      color: #930 !important;
+     color: #3F271B !important;
      text-shadow: 0 0 1px #fff5ef;
 }
 
 .snarkConfigTitle a:hover, label.toggleview:hover, .snarkConfigTitle a:focus, label.toggleview:focus {
      color: #df0072 !important;
-     color: #f60 !important;
+     color: #930 !important;
 }
 
-.snarkConfigTitle a:active, label.toggleview:active {
-     color: #f30 !important;
+
+.snarkConfigTitle a:active, .snarkConfigTitle a:visited:active, label.toggleview:active {
+     color: #603110 !important;
 }
 
 .snarkConfigTitle img, label.toggleview img {
      margin: 1px -2px 3px 0;
      filter: drop-shadow(0 0 1px #7f6c5f) !important;
      -webkit-filter: drop-shadow(0 0 1px #7f6c5f) !important;
+     mix-blend-mode: luminosity;
+}
+
+.snarkConfigTitle:hover img, label.toggleview:hover img, .snarkConfigTitle:focus img, label.toggleview:focus img {
+     mix-blend-mode: normal;
 }
 
 .snarkConfig {
@@ -1021,7 +1125,8 @@ hr {
 
 hr.debug {
      width: 100%;
-     margin: 2px 0;
+     margin: 5px 0;
+     background: linear-gradient(to right, #6f533e 40%, #9f8877);
 }
 
 hr.debug:nth-child(n+7) {
@@ -1038,56 +1143,55 @@ hr.debug:nth-child(n+7) {
 }
 }
 
-a:link {
-     color: #f30;
-     text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
-}
+/* buttons & inputs */
 
-a:visited {
-     color: #f60;
-     text-decoration: none;
-     font-weight: bold;
-}
-
-a:hover, a:focus {
-     color: #cf0f00;
-     font-weight: bold;
-     filter: none;
-     -webkit-filter: none;
-}
-
-a:active {
-     color: #ff007c !important;
+.script {
+     display: inline-block;
+     vertical-align: top !important;
 }
 
 a.control, input[type="submit"], input[type="reset"] {
      font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
      font-weight: bold;
      background-size: 14px 14px, 100% 100% !important;
+     box-shadow: inset 0 0 0 1px #efe6e0, 0 0 1px 0 #4d453e;
+     box-shadow: inset 0 0 0 1px #efe6e0, 0 0 1px 0 rgba(77, 69, 62, 0.7);
+     display: inline-block;
 }
 
 a.control, a.controld {
      background: linear-gradient(to bottom, #eeecea 0%, #eeecea 50%, #ded9d5 50%, #ded9d5 100%);
-     border: 1px solid #2f1a09;
+     background-size: 100% 100% !important;
+     border: 1px solid #4F3927;
      border-radius: 2px;
      color: #2f1500;
      font-weight: bold;
-     margin: 3px 2px !important;
-     padding: 5px 4px 5px 2px;
+     margin: 2px 4px 2px 3px !important;
+     padding: 5px 6px 5px 2px;
      white-space: nowrap;
+     display: inline-block;
 }
 
 a.controld {
      color: #f60;
      font-weight: normal;
-     display: none;
+/*     display: none;*/
 }
 
 a.control:hover, a.control:focus {
-     color: #f60;
+     color: #930 !important;
      background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
+     filter: drop-shadow(0px 0 1px #f60);
+     -webkit-filter: drop-shadow(0px 0 1px #f60);
+}
+
+a.control img, a.controld img {
+     height: 14px;
+     width: 14px;
+     vertical-align: top;
+     mix-blend-mode: normal !important;
+     filter: none !important;
+     -webkit-filter: none !important;
 }
 
 a.control:active {
@@ -1120,20 +1224,21 @@ input.r {
 
 input[type=submit] {
      color: #2f1500;
-     border: 1px solid #2f1a09;
-     box-shadow: inset 0 0 0 1px #fff;
+     border: 1px solid #4F3927;
      background-blend-mode: luminosity;
 }
 
-input[type=submit]:hover, a.control:hover {
-     color: #930;
-     box-shadow: inset 0 0 3px 0 #a08160;
+input[type=submit]:hover, input[type=submit]:focus, a.control:hover, a.control:focus {
+     color: #930 !important;
+     border: 1px solid #2f1a09 !important;
+     box-shadow: inset 0 0 0 1px #fff5ef, 0 0 1px 0 #4d453e;
      background-blend-mode: normal;
+     filter: drop-shadow(0 0 1px rgba(153, 51, 0, 0.6));
 }
 
 input[type=submit]:active, a.control:active {
-     color: #f30 !important;
-     box-shadow: inset 2px 2px 2px 1px #3f362f;
+     color: #603110 !important;
+     box-shadow: inset 0 0 0 1px #efe6e0, inset 2px 2px 2px 1px #3f362f;
 }
 
 input[type=image] {
@@ -1150,10 +1255,12 @@ input[type=image]:hover {
 input[type=text], input.r, textarea, input[name="nofilter_dataDir"]  {
      vertical-align: middle;
      padding: 2px 4px;
+     box-shadow: inset 0 0 0 1px #f9f5f2, 0 0 0 1px rgba(186, 160, 143, 0.6);
 }
 
-input[type=text]:active, input[type=text]:focus, input.r:focus, textarea:focus, input[name="nofilter_dataDir"]:focus {
+input[type=text]:focus, input[type=text]:focus, input.r:focus, textarea:focus, input[name="nofilter_dataDir"]:focus {
      background: #fffcdf;
+     color: #5f1227;
      color: #5f1227;
      text-shadow: none;
      transition: ease filter 0.3s 0s;
@@ -1173,15 +1280,22 @@ input.default {
      display: none;
 }
 
-input.disabled, input.disabled:hover {
-     background-color: #989;
-     border: 1px inset #bbb;
-     color: #f60;
+input.disabled, input.disabled:hover, input.disabled:focus, input.disabled:active, a.controld, a.controld:hover, a.controld:focus, a.controld:active {
      font-weight: normal;
-     display: none;
+     opacity: 0.6;
+     color: #2f1500 !important;
+     box-shadow: none;
+     cursor: not-allowed;
+     background-blend-mode: luminosity !important;
+     filter: none;
+     -webkit-filter: none;
 }
 
-input.accept {
+a.controld img, a.controld:hover img, a.controld:focus img, a.controld:active img {
+     mix-blend-mode: luminosity !important;
+}
+
+input.accept, input.disabled[name="savepri"] {
      background: url(images/accept.png) no-repeat 5px center, linear-gradient(to bottom, #eeecea 0%, #eeecea 50%, #ded9d5 50%, #ded9d5 100%);
      padding: 5px 5px 5px 21px !important;
 }
@@ -1235,10 +1349,9 @@ input.reload:hover, input.reload:focus {
      background: url(images/restore.png) no-repeat 5px center, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
 }
 
-input.reload[name="recheck"] {
+input.reload[name="recheck"], input.disabled[name="recheck"] {
      background: url(images/recheck.png) no-repeat 5px center, linear-gradient(to bottom, #eeecea 0%, #eeecea 50%, #ded9d5 50%, #ded9d5 100%);
      padding: 5px 5px 5px 21px !important;
-     float: right;
      margin: 6px 2px;
 }
 
@@ -1249,7 +1362,6 @@ input.reload[name="recheck"]:hover, input.reload[name="recheck"]:focus {
 input.starttorrent {
      background: url(images/next.png) no-repeat 5px center, linear-gradient(to bottom, #eeecea 0%, #eeecea 50%, #ded9d5 50%, #ded9d5 100%);
      padding: 5px 5px 5px 18px !important;
-     float: right;
      margin: 6px;
 }
 
@@ -1260,12 +1372,26 @@ input.starttorrent:hover, input.starttorrent:focus {
 input.stoptorrent {
      background: url(images/btn_stop.png) no-repeat 5px center, linear-gradient(to bottom, #eeecea 0%, #eeecea 50%, #ded9d5 50%, #ded9d5 100%);
      padding: 5px 5px 5px 21px !important;
-     float: right;
-     margin: 6px;
+     margin: 4px 5px;
 }
 
 input.stoptorrent:hover, input.stoptorrent:focus {
      background: url(images/btn_stop.png) no-repeat 5px center, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
+}
+
+input[name^="action_"] {
+     border-radius: 3px;
+     filter: sepia(100%) hue-rotate(340deg);
+     -webkit-filter: sepia(100%) hue-rotate(340deg);
+     max-width: 40px;
+     margin-left: 1px;
+}
+
+input[name^="action_"]:hover, input[name^="action_"]:focus {
+     filter: sepia(100%) hue-rotate(340deg) saturate(120%) drop-shadow(0 0 1px #f60);
+     -webkit-filter: sepia(100%) hue-rotate(340deg) saturate(120%) drop-shadow(0 0 1px #f60);
+     opacity: 1;
+     box-shadow: 0 0 1px 0 #f60;
 }
 
 select {
@@ -1275,31 +1401,32 @@ select {
      font-weight: bold;
      padding: 5px 14px 5px 5px;
      border-radius: 2px;
-     border: 1px solid #000;
-     margin: 2px 0 2px 5px;
+     border: 1px solid #2f1500;
+     margin: 2px 0 2px 4px;
      min-width: 100px;
      -moz-appearance: none;
      -webkit-appearance: none;
+     box-shadow: inset 0 0 0 1px #f9f5f2, 0 0 0 1px rgba(186, 160, 143, 0.6);
 }
 
-select + select {
-     margin-left: -12px;
+select option {
+     font-weight: bold;
 }
 
 select:focus {
      background: #fffcdf url(images/dropdown_hover.png) right center no-repeat !important;
-     color: #f60 !important;
+     color: #5f1227 !important;
 }
 
 @-moz-document url-prefix() {
 select option {
      background: #fffcdf;
      box-shadow: inset 0 0 20px 20px #fffcdf;
-     color: #2f1500;
+     color: #5f1227;
 }
 
 select option:hover, select option:checked {
-     box-shadow: inset 0 0 20px 20px #f60;
+     box-shadow: inset 0 0 20px 20px #5f1227;
      background: #f60;
 }
 }
@@ -1317,13 +1444,18 @@ textarea, input[name="nofilter_dataDir"] {
      border-radius: 2px;
      border: 1px solid #2f1500;
      font-size: 8pt;
-     margin-left: 5px;
+     margin-left: 4px;
      font-family: "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
      width: 70%;
 }
 
 textarea[name="i2cpOpts"] {
      overflow: hidden;
+}
+
+textarea[name="i2cpOpts"]:focus, .r:focus, input[type="text"]:focus, select:focus, input[name="nofilter_dataDir"]:focus, input[type="checkbox"]:focus, input[type="radio"]:focus {
+     box-shadow: 0 0 1px rgba(223, 0, 103, 0.6);
+     transition: ease box-shadow 0.3s 0s, ease filter 0.3s 0s;
 }
 
 textarea {
@@ -1335,14 +1467,16 @@ textarea {
      margin-top: 2px;
 }
 
+/* end buttons & inputs */
+
 img {
      border: none;
      margin: 0 2px;
      vertical-align: middle;
      opacity: 1.0;
      line-height: 100%;
-     filter: drop-shadow(0 0 1px #777);
-     -webkit-filter: drop-shadow(0 0 1px #777);
+     filter: drop-shadow(0 0 1px rgba(117, 114, 106, 0.6));
+     -webkit-filter: drop-shadow(0 0 1px rgba(117, 114, 106, 0.6));
 }
 
 img:hover {
@@ -1352,8 +1486,8 @@ img:hover {
 }
 
 a:hover img, a:focus img {
-     filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
+     filter: drop-shadow(0 0 1px #df0067);
+     -webkit-filter: drop-shadow(0 0 1px #df0067);
      mix-blend-mode: normal;
 }
 
@@ -1373,105 +1507,50 @@ img[src$="details.png"] {
      mix-blend-mode: normal !important;
 }
 
-input[name^="action_"] {
-     border-radius: 3px;
-     filter: sepia(100%) hue-rotate(340deg);
-     -webkit-filter: sepia(100%) hue-rotate(340deg);
-     max-width: 40px;
-     margin-left: 1px;
-}
-
-input[name^="action_"]:hover, input[name^="action_"]:focus {
-     filter: sepia(100%) hue-rotate(340deg) saturate(120%) drop-shadow(0 0 1px #f60);
-     -webkit-filter: sepia(100%) hue-rotate(340deg) saturate(120%) drop-shadow(0 0 1px #f60);
-     opacity: 1;
-     box-shadow: 0 0 1px 0 #f60;
+.newtorrentsection, .addtorrentsection, .configsection, .configsectionpanel, .section, .mainsection {
+     background: #dfd7d1;
+     background-blend-mode: luminosity;
+     margin: 0 0 10px 0;
+     padding: 0 10px;
+     border: 1px solid #1f1400;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px  #efe6e0, 0 0 1px 0 #4f3d36;
+     color: #ddd;
+     text-align: center;
+     word-wrap: break-word;
 }
 
 .section, .mainsection {
-     margin: 0 0 10px 0;
      padding: 10px;
-     border: 1px solid #001;
-     color: #001;
-     border-radius: 2px;
-     box-shadow: inset 0 0 3px 0 #a08160;
-     box-shadow: inset 0 0 2px 0 #fff, 0 0 1px 0 #4f3d36;
-     word-wrap: break-word;
-     text-align: center;
      background: #dfd7d1;
      background: linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
-     opacity: 1 !important;
 }
 
 .newtorrentsection {
-     margin: 0 0 10px 0;
-     padding: 0 10px;
-     border: 1px solid #001;
-     text-align: center;
-     color: #ddd;
-     border-radius: 2px;
-     box-shadow: inset 0 0 3px 0 #a08160;
-     box-shadow: inset 0 0 2px 0 #fff, 0 0 1px 0 #4f3d36;
-     word-wrap: break-word;
-     background: #ffd url('images/snark_create.png') no-repeat scroll right center;
-     background: url('images/snark_create.png') no-repeat scroll right center, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
+     background: #dfd7d1 url(images/snark_create.png) no-repeat scroll right center;
+     background: url(images/snark_create.png) no-repeat scroll right center, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
      background-size: 80px 80px, 100% 100%;
-     opacity: 1.0;
-     background-blend-mode: luminosity;
 }
 
 .addtorrentsection {
-     margin: 0 0 10px 0;
-     padding: 0 10px;
-     border: 1px solid #001;
-     text-align: center;
-     color: #ddd;
-     border-radius: 2px;
-     box-shadow: inset 0 0 3px 0 #a08160;
-     box-shadow: inset 0 0 2px 0 #fff, 0 0 1px 0 #4f3d36;
-     word-wrap: break-word;
-     background: #ffd url('images/snark_add.png') no-repeat scroll 99% center;
-     background: url('images/snark_add.png') no-repeat scroll 99% center, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
+     background: #dfd7d1 url(images/snark_add.png) no-repeat scroll right 10px center;
+     background: url(images/snark_add.png) no-repeat scroll right 10px center, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
      background-size: 61px 61px, 100% 100%;
-     opacity: 1.0;
-     background-blend-mode: luminosity;
 }
 
 .configsection {
-     margin: 0 0 10px 0;
      padding: 0 10px 13px 10px;
-     border: 1px solid #000;
-     color: #ddd;
-     border-radius: 2px;
-     box-shadow: inset 0 0 3px 0 #a08160;
-     box-shadow: inset 0 0 2px 0 #fff, 0 0 1px 0 #4f3d36;
-     word-wrap: break-word;
-     text-align: center;
-     background: #dfd7d1;
      background: url(images/configuration.png) 102% center no-repeat, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
      background-size: 84px 82px, 100% 100%;
-     font-weight: bold;
-     background-blend-mode: luminosity;
 }
 
 .configsectionpanel {
-     margin: 0 0 10px 0;
-     padding: 0 10px;
-     border: 1px solid #000;
-     color: #ddd;
-     border-radius: 2px;
-     box-shadow: inset 0 0 3px 0 #a08160;
-     box-shadow: inset 0 0 2px 0 #fff, 0 0 1px 0 #4f3d36;
-     word-wrap: break-word;
-     text-align: center;
-     background: #dfd7d1 url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center;
-     background: url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
+     background: #dfd7d1 url(/themes/snark/ubergine/images/configuration.png) no-repeat scroll right center;
+     background: url(/themes/snark/ubergine/images/configuration.png) no-repeat scroll right center, linear-gradient(to bottom, #dfd7d1 0%, #cfc7c2 100%);
      background-size: 84px 82px, 100% 100%;
-     font-weight: bold;
-     background-blend-mode: luminosity;
 }
 
-.configsectionpanel td, .snarkNewTorrent td {
+.configsectionpanel td, .snarkNewTorrent td, select, select option, input, textarea, input[name="nofilter_dataDir"], .configsectionpanel th {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-size: 9pt !important;
 }
@@ -1494,8 +1573,13 @@ input[name^="action_"]:hover, input[name^="action_"]:focus {
      font-weight: bold;
 }
 
+.addtorrentsection tr:first-child td:last-child {
+     white-space: nowrap;
+}
+
 .addtorrentsection input[type="text"], .newtorrentsection input[type="text"] {
-     width: 80%;
+     width: 75%;
+     width: calc(100% - 200px);
 }
 
 .snarkConfig tr:nth-last-child(4) td, .trackerconfig tr:nth-last-child(4) td {
@@ -1523,9 +1607,9 @@ input[name^="action_"]:hover, input[name^="action_"]:focus {
      color: #ddd !important;
 }
 
+/*)
 .configsection table {
      color: #ffb;
-     opacity: 1;
 }
 
 .configsection a {
@@ -1533,16 +1617,17 @@ input[name^="action_"]:hover, input[name^="action_"]:focus {
 }
 
 .configsection a:hover {
-     color: #f90;
+     color: #d30;
      text-decoration: none;
 }
+*/
 
 code, tt {
      font-size: 8pt;
      color: #313;
      padding: 0 1px;
      font-weight: bold;
-     font-family: "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", Courier, mono;
+     font-family: "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", Courier, monospace;
 }
 
 .routerdown {
@@ -1550,6 +1635,7 @@ code, tt {
 }
 
 .trackerconfig {
+     margin-top: 11px;
      text-align: left !important;
      border-collapse: separate;
      border-spacing: 0;
@@ -1612,8 +1698,8 @@ code, tt {
 }
 
 .optbox:hover, input[type="radio"]:hover, input[type="checkbox"]:hover, .optbox:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
-     filter: sepia(50%) invert(80%) hue-rotate(150deg) drop-shadow(0 0 2px #f60);
-     -webkit-filter: sepia(50%) invert(80%) hue-rotate(150deg) drop-shadow(0 0 2px #f60);
+     filter: sepia(50%) invert(80%) hue-rotate(150deg) drop-shadow(0 0 2px #df0067);
+     -webkit-filter: sepia(50%) invert(80%) hue-rotate(150deg) drop-shadow(0 0 2px #df0067);
 }
 
 /* toggle create/add panel view */
@@ -1659,11 +1745,7 @@ code, tt {
 }
 
 .toggleview, .snarkConfigTitle a:visited {
-     color: #f60;
-}
-
-.toggleview:active, .snarkConfigTitle a:active {
-     color: #f30 !important;
+     color: #930;
 }
 
 .toggleview img:hover, .toggleview:hover img, .snarkConfigTitle a:hover img {
@@ -1672,9 +1754,213 @@ code, tt {
      -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
+.toggleview:active, .snarkConfigTitle a:active {
+     color: #603110 !important;
+}
+
 .toggleview img:active, .toggleview:active img, .snarkConfigTitle a:active img {
      transform: rotate(90deg);
      transition: ease transform 0.3s 0s;
+}
+
+/* end panels toggle */
+
+/* debug */
+
+.debuginfo td:first-child {
+     background: url(images/debuginfo.png) center center no-repeat;
+     background-size: 14px 14px;
+}
+
+.debuginfo b {
+     text-transform: capitalize;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+}
+
+.from, .to {
+     font-family: sans-serif;
+     font-size: 12pt;
+     margin: -1px 0 0 0;
+     display: inline-block;
+}
+
+.debugConnStat {
+     display: inline-block;
+     white-space: nowrap;
+     font-family: "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace !important;
+     margin-right: 5px;
+}
+
+.debugConnstat b {
+     color: #2f1500;
+}
+
+.debugConnStat, .debugRequests {
+     color:#5F3117;
+     font-weight: bold;
+}
+
+.debugRequests {
+     font-family: "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace !important;
+     margin-left: 4px;
+}
+
+.debugConnection {
+     display: inline-block;
+     line-height: 100%;
+     color: #030;
+     font-weight: bold;
+     margin: 2px 3px !important;
+}
+
+/* end debug */
+
+.peerinfo td:first-child {
+     background: url(images/peer.png) center center no-repeat;
+}
+
+.peerinfo td, .debuginfo td {
+     padding-top: 5px !important;
+     padding-bottom: 5px !important;
+}
+
+#totals {
+     display: inline-block;
+     margin: 2px 0 2px 6px;
+     font-weight: bold;
+}
+
+/* Resource Errors */
+
+.resourceError {
+     border: 1px solid #6f533e;
+     margin-bottom: 0;
+}
+
+.resourceError th {
+     background: url(/themes/console/images/info/errortriangle.png) left 10px center no-repeat, linear-gradient(to bottom, #efefef, #cfc7c2);
+     background-size: 24px auto, 100% 100%;
+     padding: 10px 10px 10px 40px;
+}
+
+.mainsection .resourceError td {
+     padding: 10px !important;
+     font-size: 10pt !important;
+}
+
+.resourceError tr:nth-child(odd) {
+     background: #dfd6d1;
+}
+
+.resourceError tr:nth-child(even) {
+     background: #efe6e0;
+}
+
+#DoesNotExist {
+     margin-top: 10px;
+}
+
+/* end Resource Errors */
+
+.priorityHigh {
+     background: url(/i2psnark/.resources/icons/clock_red.png) left 28px center no-repeat;
+     display: inline-block;
+     width: 48px;
+     color: transparent;
+}
+
+.priorityNormal {
+     background: url(/i2psnark/.resources/icons/clock.png) left 28px  center no-repeat;
+     display: inline-block;
+     width: 48px;
+     color: transparent;
+}
+
+.prioritySkip {
+     background: url(/i2psnark/.resources/icons/cancel.png) left 26px center no-repeat;
+     display: inline-block;
+     width: 48px;
+     color: transparent;
+}
+
+/* configs */
+
+#configs {
+     border-collapse: separate;
+}
+
+#configs td:nth-child(2) {
+     white-space: nowrap;
+}
+
+#configs td:first-child {
+     min-width: 240px !important;
+     font-weight: bold;
+}
+
+#configs tr:nth-last-child(2) td, .trackerconfig tr:nth-last-child(2) td {
+     border-top: 1px solid #efe6e0 !important;
+}
+
+#configs tr:nth-last-child(4) td, .trackerconfig tr:nth-last-child(4) td {
+     border-bottom: 1px solid #4f3d36 !important;
+}
+
+td#bwHelp {
+     background: url(images/infocircle.png) left 10px center no-repeat;
+     background-size: 16px auto;
+     padding-left: 30px !important;
+     width: 90%;
+     line-height: 100%;
+}
+
+td#bwHelp a {
+     display: inline-block;
+     white-space: nowrap;
+     font-style: normal;
+}
+
+/* end configs */
+
+.knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover {
+     opacity: 0.5 !important;
+     cursor: not-allowed;
+     -webkit-filter: sepia(50%) invert(80%) hue-rotate(150deg) !important;
+     filter: sepia(50%) invert(80%) hue-rotate(150deg) !important;
+}
+
+#filecheck {
+     display: inline-block;
+     margin: 5px 0;
+     background: url(images/progressbar.gif) left center no-repeat;
+     padding-left: 22px;
+}
+
+#filecheck a {
+     margin: 8px;
+}
+
+#torrentInfoStats td {
+     text-align: left !important;
+}
+
+#torrentInfoStats img, .snarkTorrentInfo td:first-child img {
+     margin: 1px 3px 2px 2px !important;
+     mix-blend-mode: luminosity;
+}
+
+.snarkTorrentInfo a:hover img {
+     mix-blend-mode: normal !important;
+}
+
+#torrentInfoStats b {
+     margin-left: 1px;
+}
+
+#torrentInfoStats span {
+     white-space: nowrap;
+     display: inline-block;
+     margin-right: 3px;
 }
 
 /* MS Edge 14+ fix */
@@ -1685,21 +1971,146 @@ _:-ms-lang(x), * {
 
 /* responsive layout */
 
-@media screen and (min-width: 1400px) {
-body, .snarkTorrents td, .snarkAddInfo, th, td {
+@media screen and (max-width: 1000px) {
+.snarkTorrents td:nth-child(2) {
+     white-space: nowrap;
+     font-weight: bold;
+}
+
+.snarkTorrents td[colspan="10"] {
+     white-space: normal;
+}
+
+.snarkTorrentStatus b {
+     display: none;
+}
+
+b.alwaysShow {
+     display: inline;
+}
+
+.lowersection .snarkConfigTitle, .lowersection .snarkConfigTitle:hover,  label.toggleview {
+     font-size: 12pt !important;
+     max-width: 220px !important
+}
+
+.configsectionpanel .snarkConfigTitle {
+     font-size: 10.5pt !important;
+}
+
+.snarkTorrents td:first-child img {
+     max-height: 16px;
+}
+
+.from, .to {
+     font-size: 11pt !important;
+}
+
+.snarkTorrents tt {
+     background: none;
+     color: #030;
+}
+
+.snarkDirInfo thead img {
+     max-height: 18px;
+}
+}
+
+@media screen and (max-width: 1200px) {
+.snarknavbar {
+     width: calc(100% - 22px);
+     transition: ease width 0.5s 0.5s;
+}
+
+.snarkRefresh:first-child {
+     background: url(images/button_snark.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604E 1px, #A09286 1px, #BFAFA2 2px) !important;
+     background-size: 16px auto, 100% 100%, 100% 100% !important;
+}
+
+.snarkRefresh:first-child:hover, .snarkRefresh:first-child:focus {
+     background: url(images/button_snark_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%) !important;
+     background-size: 16px auto, 100% 100%, 100% 100% !important;
+}
+
+.snarkRefresh:first-child:active {
+     background: url(images/button_snark_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 47%, #af9178 50%, #af9178 100%) !important;
+     background-size: 16px auto, 100% 100%, 100% 100% !important;
+}
+
+.snarkTorrentETA {
+     padding-right: 10px !important;
+}
+
+.dirInfoComplete {
+     display: none;
+}
+
+#pagenav img {
+     height: 14px;
+}
+
+.snarkTorrents td:first-child img {
+     max-height: 17px;
+}
+}
+
+@media screen and (min-width: 1000px) {
+body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input[type="submit"], input[type="reset"], select, button {
      font-size: 9pt !important;
 }
 
-.snarkRefresh:link, .snarkAddInfo, .configsectionpanel td, .snarkNewTorrent td {
+.snarkRefresh:link {
+      font-size: 11.5pt;
+}
+
+.peerinfo tt {
+     display: inline-block;
+     margin: 1px 3px;
+}
+
+.snarkTorrentName {
+     padding-left: 1px;
+}
+
+.snarkTorrentStatus {
+     white-space: nowrap;
+}
+
+.snarkTorrentStatus b {
+     margin-right: 3px;
+}
+}
+
+@media screen and (min-width: 1200px) {
+.percentDownloaded {
+     pointer-events: none; /* hide tooltip */
+}
+
+.snarkTorrentRateUp, .snarkTorrents th:nth-child(9), .snarkTorrents tfoot th:nth-last-child(2), .snarkTorrents .peerinfo td:nth-last-child(2)  {
+     padding-right: 15px !important;
+}
+
+thead a img, thead img {
+     max-height: 20px;
+}
+}
+
+@media screen and (min-width: 1400px) {
+body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input[type="submit"], input[type="reset"], select, button, code, #pagenav {
      font-size: 10pt !important;
 }
 
-.snarkRefresh:link:first-child {
-     padding-left: 13px !important;
+tt, .snarkTorrents tt, .snarkMessages,  textarea {
+     font-size: 9pt !important;
 }
 
-tt, .snarkTorrents tt, code, .snarkMessages, input, input[type="submit"], input[type="reset"], select, button, textarea {
-     font-size: 9pt !important;
+.snarkAddInfo, .configsectionpanel td, .snarkNewTorrent td, .configsectionpanel th, 
+.configsectionpanel td, .snarkNewTorrent td, select, select option, input, textarea, input[name="nofilter_dataDir"] {
+     font-size: 10pt !important;
+}
+
+.snarkRefresh:link {
+      font-size: 13pt;
 }
 
 select {
@@ -1707,12 +2118,67 @@ select {
      padding-bottom: 4px;
 }
 
-select:nth-child(2) {
-     margin-left: -14px;
-}
-
 .snarkTorrentDownloaded {
      white-space: nowrap;
+     padding: 0 8px;
+}
+
+.snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {
+     padding: 4px !important;
+     margin: 2px !important;
+}
+
+thead a img, thead img {
+     max-height: 22px;
+}
+
+.snarkConfigTitle, .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover, label.toggleview {
+     min-width: 240px !important;
+     font-size: 12pt !important;
+}
+
+.mainsection td, .peerinfo td {
+     padding-top: 2px !important;
+     padding-bottom: 2px !important;
+}
+
+.snarkTorrentInfo td, .snarkDirInfo td {
+     padding-top: 5px !important;
+     padding-bottom: 5px !important;
+}
+
+.peerinfo tt {
+     margin: 1px 4px;
+}
+
+.snarkTorrentName {
+     padding-left: 2px;
+}
+
+.snarkTorrentStatus b, .dirInfoComplete {
+     margin-right: 4px;
+}
+
+.snarkDirInfo td:nth-child(n+2) {
+     padding-left: 10px;
+     padding-right: 10px;
+}
+
+tr#torrentInfoStats td {
+     padding-top: 5px !important;
+     padding-bottom: 5px !important;
+}
+
+.debugConnection {
+     margin: 0 4px;
+     padding: 2px 3px;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font-weight: bold;
+     background: #967158;
+     color: #fff;
+     border-radius: 2px;
+     display: inline-block;
+     vertical-align: middle;
 }
 }
 
