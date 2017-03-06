@@ -2265,8 +2265,7 @@ public class WebMail extends HttpServlet
 		String curSort = sessionObject.folder.getCurrentSortBy();
 		Folder.SortOrder curOrder = sessionObject.folder.getCurrentSortingDirection();
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
-			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr>" +
-			thSpacer +
+			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SENDER, _t("From"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder ) +
