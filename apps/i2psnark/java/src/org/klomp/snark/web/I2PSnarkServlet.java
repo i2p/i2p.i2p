@@ -3052,19 +3052,23 @@ public class I2PSnarkServlet extends BasicServlet {
         } else {
             // snark == null
             // shouldn't happen
-            buf.append("<tr><th>Not found<br>resource=\"").append(r.toString())
-               .append("\"<br>base=\"").append(base)
-               .append("\"<br>torrent=\"").append(torrentName)
-               .append("\"</th></tr>\n");
+            buf.append("<table class=\"resourceError\" id=\"NotFound\"><tr><th colspan=\"2\">")
+               .append(_t("Resource Not found"))
+               .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
+               .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
+               .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(torrentName)
+               .append("</td></tr>\n");
         }
         buf.append("</table>\n");
 
         if (snark != null && !r.exists()) {
             // fixup TODO
-            buf.append("<p>Does not exist<br>resource=\"").append(r.toString())
-               .append("\"<br>base=\"").append(base)
-               .append("\"<br>torrent=\"").append(torrentName)
-               .append("\"</p></div></div></BODY></HTML>");
+            buf.append("<table class=\"resourceError\" id=\"DoesNotExist\"><tr><th colspan=\"2\">")
+               .append(_t("Resource Does Not Exist"))
+               .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
+               .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
+               .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(torrentName)
+               .append("</td></tr></table></div></div></BODY></HTML>");
             return buf.toString();
         }
 
