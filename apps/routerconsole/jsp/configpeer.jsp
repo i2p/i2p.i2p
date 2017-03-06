@@ -26,7 +26,7 @@
  <a name="bonus"> </a>
  <h3 class="tabletitle"><%=intl._t("Manual Peer Controls")%></h3>
  <table class="configtable">
-   <tr><td colspan="2"><%=intl._t("Router Hash")%>:<input type="text" size="55" name="peer" value="<%=peer%>" /></td></tr>
+   <tr><td colspan="2"><%=intl._t("Router Hash")%>: <input type="text" size="55" name="peer" value="<%=peer%>" /></td></tr>
    <tr><th colspan="2"><%=intl._t("Manually Ban / Unban a Peer")%></th></tr>
    <tr><td class="infohelp" colspan="2"><%=intl._t("Banning will prevent the participation of this peer in tunnels you create.")%></td></tr>
    <tr>

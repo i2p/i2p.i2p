@@ -131,10 +131,10 @@ class TunnelRenderer {
         if (displayed > DISPLAY_LIMIT)
             out.write("<div class=\"statusnotes\"><b>" + _t("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
         if (inactive > 0)
-            out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
+            out.write("<div class=\"statusnotes\"><b>" + _t("Inactive participating tunnels") + ":&nbsp;&nbsp;" + inactive + "</b></div>\n");
         else if (displayed <= 0)
             out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
-        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
+        out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
     }
     
@@ -214,7 +214,7 @@ class TunnelRenderer {
             // PooledTunnelCreatorConfig
             List<?> pending = in.listPending();
             if (!pending.isEmpty()) {
-                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("inbound") + "</b></center></div>\n");
+                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ":&nbsp;&nbsp;" + pending.size() + " " + _t("inbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
@@ -222,13 +222,13 @@ class TunnelRenderer {
             // PooledTunnelCreatorConfig
             List<?> pending = outPool.listPending();
             if (!pending.isEmpty()) {
-                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ": " + pending.size() + " " + _t("outbound") + "</b></center></div>\n");
+                out.write("<div class=\"statusnotes\"><center><b>" + _t("Build in progress") + ":&nbsp;&nbsp;" + pending.size() + " " + _t("outbound") + "</b></center></div>\n");
                 live += pending.size();
             }
         }
         if (live <= 0)
             out.write("<div class=\"statusnotes\"><center><b>" + _t("No tunnels; waiting for the grace period to end.") + "</b></center></div>\n");
-        out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ": " +
+        out.write("<div class=\"statusnotes\"><center><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" +
                   DataHelper.formatSize2(processedIn*1024) + "B " + _t("in") + ", " +
                   DataHelper.formatSize2(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
     }

@@ -39,7 +39,8 @@
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
   <td>
-<%=intl._t("Enter zip or su3 URL")%>:<input name="url" type="text" size="60" value="" />
+<%=intl._t("Enter zip or su3 URL")%>:
+<input name="url" type="text" size="60" value="" />
   </td>
   <td class="optionsave">
 <input type="submit" name="action" class="download" value="<%=intl._t("Reseed from URL")%>" />
