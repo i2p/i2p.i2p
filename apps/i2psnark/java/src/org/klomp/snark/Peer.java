@@ -160,7 +160,7 @@ public class Peer implements Comparable<Peer>
     if (state != null) {
         String r = state.getRequests();
         if (r != null)
-            return sock.toString() + "<br>Requests: " + r;
+            return sock.toString() + "<br><b>Requests:</b> <span class=\"debugRequests\">" + r + "</span>";
     }
     return sock.toString();
   }
