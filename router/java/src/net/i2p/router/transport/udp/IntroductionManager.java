@@ -170,7 +170,7 @@ class IntroductionManager {
      * @return number of introducers added
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
-        int start = _context.random().nextInt(Integer.MAX_VALUE);
+        int start = _context.random().nextInt();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Picking inbound out of " + _inbound.size());
         if (_inbound.isEmpty()) return 0;
