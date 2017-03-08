@@ -56,7 +56,7 @@ abstract class MigrateJetty {
     private static final String TEST_CLASS = "org.eclipse.jetty.server.Server";
     private static final String BACKUP_SUFFIX = ".jetty6";
     private static final String BACKUP_SUFFIX_8 = ".jetty8";
-    private static final String JETTY_TEMPLATE_DIR = "eepsite-jetty7";
+    private static final String JETTY_TEMPLATE_DIR = "eepsite-jetty9";
     private static final String JETTY_TEMPLATE_PKGDIR = "eepsite";
     private static final String BASE_CONTEXT = "contexts/base-context.xml";
     private static final String CGI_CONTEXT = "contexts/cgi-context.xml";
@@ -87,7 +87,7 @@ abstract class MigrateJetty {
             } else if (app.className.equals(OLD_CLASS) || app.className.equals(OLD_CLASS_6)) {
                 client = "client application " + i + " [" + app.clientName +
                          "] from Jetty 5/6 " + app.className +
-                         " to Jetty 7 " + NEW_CLASS;
+                         " to Jetty 9 " + NEW_CLASS;
                 backupSuffix = BACKUP_SUFFIX;
             } else {
                 continue;
@@ -142,7 +142,7 @@ abstract class MigrateJetty {
                 continue;
             }
 
-            // Below here is migration of 5/6 to 7/8
+            // Below here is migration of 5/6 to 9
 
             File baseEep = new File(ctx.getBaseDir(), JETTY_TEMPLATE_DIR);
             // in packages, or perhaps on an uninstall/reinstall, the files are in eepsite/
@@ -199,7 +199,7 @@ abstract class MigrateJetty {
                 ClientAppConfig.writeClientAppConfig(ctx, apps);
                 System.err.println("WARNING: Migrated clients config file " + cfgFile +
                                " from Jetty 5/6 " + OLD_CLASS + '/' + OLD_CLASS_6 +
-                               " to Jetty 7 " + NEW_CLASS);
+                               " to Jetty 9 " + NEW_CLASS);
             }
         }
         if (jetty9success)
@@ -208,7 +208,7 @@ abstract class MigrateJetty {
 
     /**
      *  Migrate a jetty.xml file to Jetty 9.
-     *  Unlike above, where we just migrate the new install file over for Jetty 7/8,
+     *  Unlike above, where we just migrate the new install file over for Jetty 9,
      *  here we modify the xml file in-place to preserve settings where possible.
      *
      *  @return success
@@ -408,7 +408,7 @@ abstract class MigrateJetty {
     }
 
 
-    /** do we have Jetty 7? */
+    /** do we have Jetty 7/8/9? */
     private static boolean hasLatestJetty() {
         if (!_wasChecked) {
             try {

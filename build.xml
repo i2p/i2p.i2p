@@ -1597,13 +1597,13 @@
         <!--  We have to package the new eepsite files for MigrateJetty.java, but we
               can't overwrite an existing eepsite dir in a non-split configuration.
           -->
-        <copy todir="pkg-temp/eepsite-jetty7" >
+        <copy todir="pkg-temp/eepsite-jetty9" >
             <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
         </copy>
     </target>
 
     <target name="delete-j6-update">
-        <delete dir="pkg-temp/eepsite-jetty7" />
+        <delete dir="pkg-temp/eepsite-jetty9" />
     </target>
 
     <!-- Jetty 6 I2P logging addons, not really fixes -->
