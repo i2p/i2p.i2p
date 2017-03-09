@@ -1,3 +1,8 @@
+2017-03-09 zzz
+ * i2psnark: Prevent RuntimeException caused by corrupt i2psnark.dht.dat file
+ * Router: Set default sig type to EdDSA for non-Android ARM
+ * Streaming: Don't change buffer size when max message size is adjusted
+
 2017-03-06 zzz
  * CPUID:
    - Fix saving of libjcpuid.jnifile on Macs,
