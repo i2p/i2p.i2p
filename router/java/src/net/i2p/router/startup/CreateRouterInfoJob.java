@@ -55,7 +55,7 @@ public class CreateRouterInfoJob extends JobImpl {
     public static final String KEYS2_FILENAME = "router.keys.dat";
     static final String PROP_ROUTER_SIGTYPE = "router.sigType";
     /** TODO make everybody Ed */
-    private static final SigType DEFAULT_SIGTYPE = (SystemVersion.isARM() || SystemVersion.isAndroid()) ?
+    private static final SigType DEFAULT_SIGTYPE = SystemVersion.isAndroid() ?
                                                    SigType.DSA_SHA1 : SigType.EdDSA_SHA512_Ed25519;
 
     CreateRouterInfoJob(RouterContext ctx, Job next) {
