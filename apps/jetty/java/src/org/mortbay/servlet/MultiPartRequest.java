@@ -49,6 +49,7 @@ import org.mortbay.util.LineInput;
  * </pre>
  *
  * Modded to compile with Jetty 6 for I2P
+ * Modded to make fields private and final
  *
  * @version $Id: MultiPartRequest.java,v 1.16 2005/12/02 20:13:52 gregwilkins Exp $
  * @author  Greg Wilkins
@@ -59,14 +60,14 @@ public class MultiPartRequest
     //private static Log log = LogFactory.getLog(MultiPartRequest.class);
 
     /* ------------------------------------------------------------ */
-    HttpServletRequest _request;
-    LineInput _in;
-    String _boundary;
-    String _encoding;
-    byte[] _byteBoundary;
-    MultiMap<String> _partMap = new MultiMap<String>(10);
-    int _char=-2;
-    boolean _lastPart=false;
+    private final HttpServletRequest _request;
+    private final LineInput _in;
+    private final String _boundary;
+    private final String _encoding;
+    private final byte[] _byteBoundary;
+    private final MultiMap<String> _partMap = new MultiMap<String>(10);
+    private int _char=-2;
+    private boolean _lastPart=false;
     
     /* ------------------------------------------------------------ */
     /** Constructor. 
