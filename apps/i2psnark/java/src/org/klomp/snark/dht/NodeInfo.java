@@ -106,11 +106,11 @@ class NodeInfo extends SimpleDataStructure {
         if (parts.length != 4)
             throw new DataFormatException("Bad format");
         byte[] nid = Base64.decode(parts[0]);
-        if (nid == null)
+        if (nid == null || nid.length != NID.HASH_LENGTH)
             throw new DataFormatException("Bad NID");
         nID = new NID(nid);
         byte[] h = Base64.decode(parts[1]);
-        if (h == null)
+        if (h == null || h.length != Hash.HASH_LENGTH)
             throw new DataFormatException("Bad hash");
         //hash = new Hash(h);
         hash = Hash.create(h);
