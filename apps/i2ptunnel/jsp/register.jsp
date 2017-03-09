@@ -97,12 +97,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
        }
 %>
+<!--
             <div id="destinationField" class="rowItem">
                 <label for="localDestination" accesskey="L">
                     <%=intl._t("Local destination")%>
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
             </div>
+-->
             <div class="subdivider">
                 <hr />
             </div>
