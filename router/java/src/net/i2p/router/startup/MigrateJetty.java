@@ -215,6 +215,12 @@ abstract class MigrateJetty {
      *  @since Jetty 9
      */
     private static boolean migrateToJetty9(File xmlFile) {
+        if (xmlFile.getName().equals("jetty-jmx.xml")) {
+            // This is lazy but nobody's using jmx, not worth the trouble
+            System.err.println("ERROR: Migration  of " + xmlFile +
+                               " file is not supported. Copy new file from $I2P/eepsite-jetty9/jetty-jmx.xml");
+            return false;
+        }
         // we don't re-migrate from the template, we just add the
         // necessary args for the QueuedThreadPool constructor in-place
         // and fixup the renamed set call
@@ -237,7 +243,13 @@ abstract class MigrateJetty {
                 // readLine() doesn't strip \r
                 if (s.endsWith("\r"))
                     s = s.substring(0, s.length() - 1);
-                if (s.contains("org.eclipse.jetty.util.thread.QueuedThreadPool")) {
+                if (s.contains("Modified by I2P migration script for Jetty 9.") ||
+                    s.contains("This configuration supports Jetty 9.") ||
+                    s.contains("http://www.eclipse.org/jetty/configure_9_0.dtd")) {
+                    if (!modified)
+                        break;
+                    // else we've modified it twice?
+                } else if (s.contains("org.eclipse.jetty.util.thread.QueuedThreadPool")) {
                     foundQTP = true;
                 } else if (foundQTP) {
                     if (!(s.contains("Modified by") || s.contains("<Arg type=\"int\">"))) {

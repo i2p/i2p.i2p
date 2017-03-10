@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
+<!-- This configuration supports Jetty 9. Do not remove this line. -->
+
 <!-- ========================================================================= -->
 <!-- This file configures the Jetty server.                                    -->
 <!-- All changes require a restart of I2P.                                     -->

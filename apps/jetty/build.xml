@@ -262,9 +262,6 @@
             <zipfileset src="${jetty.base}/lib/apache-jsp/org.eclipse.jetty.apache-jsp-${jetty.ver}.jar"/>
         </jar>
 
-        <!-- Ant bug, don't set update and filesetmanifest or the update doesn't happen,
-             Their bug tracker claims fixed in 1.8.0 but broken for me in 1.8.1
-          -->
         <jar destfile="jettylib/commons-logging.jar" update="true" >
             <manifest>
                 <attribute name="Note" value="Intentionally empty" />
