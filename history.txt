@@ -1,3 +1,19 @@
+2017-03-11 zzz
+Prop from i2p.i2p.zzz.jetty9:
+ * Console: Fix RouterConsoleRunner for Jetty 9
+ * Debian packages:
+   - Remove libjetty8-java and ant-optional dependencies
+   - Add libjetty9-java and libtomcat8-java dependencies
+     Fixes stretch/sid package (ticket #1902)
+   - Fix up build files for package builds
+ * Eepsite: Update initial configuration files for Jetty 9
+ * Jetty:
+   - Update to Jetty 9.2.21.v20170120 and Tomcat 8.0.33 (tickets #1512, #1935)
+     Fixes jsp compilation on Java 9 (ticket #1870)
+     We now support servlet API 3.1, JSP API 2.3, and EL API 3.0.
+     Breaks the following plugins: bwschedule, i2pbote, i2pcontrol, zzzot
+ * Startup: Add migration code for eepsite Jetty 8 configuration files
+
 2017-03-09 zzz
  * i2psnark: Prevent RuntimeException caused by corrupt i2psnark.dht.dat file
  * Router: Set default sig type to EdDSA for non-Android ARM

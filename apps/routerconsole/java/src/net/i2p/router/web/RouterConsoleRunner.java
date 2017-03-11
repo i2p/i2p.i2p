@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
@@ -72,6 +71,7 @@ import org.eclipse.jetty.util.security.Credential.MD5;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
 import org.tanukisoftware.wrapper.WrapperManager;
@@ -98,7 +98,7 @@ public class RouterConsoleRunner implements RouterApp {
     private final ClientAppManager _mgr;
     private volatile ClientAppState _state = UNINITIALIZED;
     private static Server _server;
-    private static Timer _jettyTimer;
+    private static ScheduledExecutorScheduler _jettyTimer;
     private String _listenPort;
     private String _listenHost;
     private String _sslListenPort;
@@ -241,7 +241,9 @@ public class RouterConsoleRunner implements RouterApp {
         portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
         synchronized(RouterConsoleRunner.class) {
             if (_jettyTimer != null) {
-                _jettyTimer.cancel();
+                try {
+                    _jettyTimer.stop();
+                } catch (Exception e) {}
                 _jettyTimer = null;
             }
         }
@@ -954,7 +956,12 @@ public class RouterConsoleRunner implements RouterApp {
         // see HashSessionManager javadoc
         synchronized(RouterConsoleRunner.class) {
             if (_jettyTimer == null) {
-                _jettyTimer = new Timer("Console HashSessionScavenger", true);
+                _jettyTimer = new ScheduledExecutorScheduler("Console HashSessionScavenger", true);
+                try {
+                    _jettyTimer.start();
+                } catch (Exception e) {
+                    System.err.println("Warning: ScheduledExecutorScheduler start failed: " + e);
+                }
             }
             context.getServletContext().setAttribute("org.eclipse.jetty.server.session.timer", _jettyTimer);
         }
