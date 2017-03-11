@@ -30,6 +30,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.resource.Resource;
@@ -130,13 +131,17 @@ public class JettyStart implements ClientApp {
                                 Server server = (Server) lc;
                                 Connector[] connectors = server.getConnectors();
                                 if (connectors.length > 0) {
-                                    int port = connectors[0].getPort();
-                                    if (port > 0) {
-                                        _port = port;
-                                        String host = connectors[0].getHost();
-                                        if (host.equals("0.0.0.0") || host.equals("::"))
-                                            host = "127.0.0.1";
-                                        _context.portMapper().register(PortMapper.SVC_EEPSITE, host, port);
+                                    Connector conn = connectors[0];
+                                    if (conn instanceof NetworkConnector) {
+                                        NetworkConnector nconn = (NetworkConnector) conn;
+                                        int port = nconn.getPort();
+                                        if (port > 0) {
+                                            _port = port;
+                                            String host = nconn.getHost();
+                                            if (host.equals("0.0.0.0") || host.equals("::"))
+                                                host = "127.0.0.1";
+                                            _context.portMapper().register(PortMapper.SVC_EEPSITE, host, port);
+                                        }
                                     }
                                 }
                             }

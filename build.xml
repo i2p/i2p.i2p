@@ -70,8 +70,8 @@
             <echo message="The following command will install the build dependencies for you:" />
             <echo message=" " />
             <echo message="sudo apt-get install debhelper ant debconf default-jdk gettext libgmp-dev po-debconf fakeroot \" />
-            <echo message="  build-essential quilt libcommons-logging-java dh-apparmor dh-systemd libservice-wrapper-java \"  />
-            <echo message="  devscripts libjetty8-java glassfish-javaee"  />
+            <echo message="  build-essential quilt dh-apparmor dh-systemd libservice-wrapper-java \"  />
+            <echo message="  devscripts libjetty9-java libtomcat8-java glassfish-javaee libgetopt-java"  />
             <echo message=" " />
             <echo message="The following command will install the additional runtime dependencies:" />
             <echo message="sudo apt-get install libecj-java geoip-database" />
@@ -1242,7 +1242,7 @@
         <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="copyjetty-unlesspkg" unless="${with-libjetty8-java}" >
+    <target name="copyjetty-unlesspkg" unless="${with-libjetty9-java}" >
         <copy todir="pkg-temp/lib" >
             <fileset dir="build" includes="javax.servlet.jar jetty*.jar org.mortbay.*.jar" excludes="jetty-i2p.jar" />
         </copy>
@@ -1289,7 +1289,9 @@
     </target>
 
     <target name="preplicenses-unlesspkg" depends="settomcatprop" unless="${with-libtomcat-java}" >
+<!--  replacement?
         <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
+-->
     </target>
 
     <!-- DOES include launch4j licenses for Windows builds -->
@@ -1462,11 +1464,11 @@
         <!-- *nix here -->
         <exec executable="sh" osfamily="unix" failonerror="true">
             <arg value="-c" />
-            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/commons-logging.jar -o $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <exec executable="sh" osfamily="mac" failonerror="true">
             <arg value="-c" />
-            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/commons-logging.jar -o $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
         <exec executable="cmd" osfamily="windows" failonerror="true">
@@ -1595,13 +1597,13 @@
         <!--  We have to package the new eepsite files for MigrateJetty.java, but we
               can't overwrite an existing eepsite dir in a non-split configuration.
           -->
-        <copy todir="pkg-temp/eepsite-jetty7" >
+        <copy todir="pkg-temp/eepsite-jetty9" >
             <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
         </copy>
     </target>
 
     <target name="delete-j6-update">
-        <delete dir="pkg-temp/eepsite-jetty7" />
+        <delete dir="pkg-temp/eepsite-jetty9" />
     </target>
 
     <!-- Jetty 6 I2P logging addons, not really fixes -->
@@ -2204,7 +2206,7 @@
             <arg value="w:" />
             <arg value="../i2p-${Extended.Version}" />
         </exec>
-        <delete includeemptydirs="true" quiet="false">
+        <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
@@ -2220,19 +2222,14 @@
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
-            <!-- libjetty8-java -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.21.v20160908" />
+            <!-- libjetty9-java -->
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-9.2.21.v20170120" />
             <!-- libjstl1.1-java or glassfish-javaee -->
           <!--
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
            -->
             <!-- libjakarta-taglibs-standard-java or glassfish-javaee -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
-            <!-- libtomcat6-java or libtomcat7-java -->
-          <!--
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
-           -->
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2248,10 +2245,6 @@
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
            -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
-          <!--
-                <exclude name="apps/jetty/apache-tomcat/**"/>
-                <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
-           -->
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
@@ -2286,7 +2279,7 @@
             <arg value="i2p.i2p" />
             <arg value="../i2p-${Extended.Version}" />
         </exec>
-        <delete includeemptydirs="true" quiet="false">
+        <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
@@ -2302,9 +2295,9 @@
             <!-- geoip-database -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
-            <!-- libjetty8-java -->
+            <!-- libjetty9-java -->
           <!--
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.21.v20160908" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-9.2.21.v20170120" />
            -->
             <!-- libjstl1.1-java or glassfish-javaee -->
           <!--
@@ -2312,11 +2305,6 @@
            -->
             <!-- libjakarta-taglibs-standard-java or glassfish-javaee -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
-            <!-- libtomcat6-java or libtomcat7-java -->
-          <!--
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
-           -->
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2334,10 +2322,6 @@
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
            -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
-          <!--
-                <exclude name="apps/jetty/apache-tomcat/**"/>
-                <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
-           -->
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${Extended.Version}" filemode="755">
@@ -2369,7 +2353,7 @@
             <arg value="i2p.i2p" />
             <arg value="../i2p-${Extended.Version}" />
         </exec>
-        <delete includeemptydirs="true" quiet="false">
+        <delete includeemptydirs="true" quiet="false" failonerror="false">ilonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
@@ -2381,15 +2365,11 @@
            -->
             <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-8.1.21.v20160908" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-9.2.21.v20170120" />
           <!--
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
            -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
-          <!--
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat" />
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-deployer/" />
-           -->
             <!-- anything added above, add in debian-tarball also -->
         </delete>
         <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
@@ -2405,10 +2385,6 @@
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
            -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
-          <!--
-                <exclude name="apps/jetty/apache-tomcat/**"/>
-                <exclude name="apps/jetty/apache-tomcat-deployer/**"/>
-           -->
                 <!-- anything added above, add in debian-tarball also -->
             </tarfileset>
             <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}" filemode="755">

@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
+import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppClassLoader;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -191,6 +192,10 @@ public class WebAppConfiguration implements Configuration {
     /** @since Jetty 7 */
     public void configure(WebAppContext context) throws Exception {
         configureClassPath(context);
+        // do we just need one, in the ContextHandlerCollection, or one for each?
+        // http://stackoverflow.com/questions/17529936/issues-while-using-jetty-embedded-to-handle-jsp-jasperexception-unable-to-com
+        // https://github.com/jetty-project/embedded-jetty-jsp/blob/master/src/main/java/org/eclipse/jetty/demo/Main.java
+        context.getServletContext().setAttribute("org.apache.tomcat.InstanceManager", new SimpleInstanceManager());
     }
 
     /** @since Jetty 7 */

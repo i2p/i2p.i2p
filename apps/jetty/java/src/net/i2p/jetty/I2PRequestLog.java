@@ -24,7 +24,6 @@ import java.util.TimeZone;
 
 import javax.servlet.http.Cookie;
 
-import org.eclipse.jetty.http.HttpHeaders;
 import org.eclipse.jetty.http.PathMap;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.RequestLog;
@@ -81,7 +80,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient OutputStream _out;
     private transient OutputStream _fileOut;
     private transient DateCache _logDateCache;
-    private transient PathMap _ignorePathMap;
+    private transient PathMap<String> _ignorePathMap;
     private transient Writer _writer;
     private transient ArrayList<Utf8StringBuilder> _buffers;
     private transient char[] _copy;
@@ -286,7 +285,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 String addr = null;
                 if (_preferProxiedForAddress) 
                 {
-                    addr = request.getHeader(HttpHeaders.X_FORWARDED_FOR);
+                    addr = request.getHeader("X-Forwarded-For");
                 }
 
                 if (addr == null) {
@@ -310,7 +309,9 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 if (_logDateCache!=null)
                     buf.append(_logDateCache.format(request.getTimeStamp()));
                 else
-                    buf.append(request.getTimeStampBuffer().toString());
+                    //buf.append(request.getTimeStampBuffer().toString());
+                    // TODO SimpleDateFormat or something
+                    buf.append(request.getTimeStamp());
                     
                 buf.append("] \"");
                 buf.append(request.getMethod());
@@ -358,7 +359,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
             {
                 synchronized(_writer)
                 {
-                    buf.append(StringUtil.__LINE_SEPARATOR);
+                    buf.append(System.getProperty("line.separator", "\n"));
                     int l=buf.length();
                     if (l>_copy.length)
                         l=_copy.length;  
@@ -412,7 +413,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                         _writer.write(Long.toString(System.currentTimeMillis() - request.getTimeStamp()));
                     }
 
-                    _writer.write(StringUtil.__LINE_SEPARATOR);
+                    _writer.write(System.getProperty("line.separator", "\n"));
                     _writer.flush();
                 }
             }
@@ -429,7 +430,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                                Response response, 
                                Writer writer) throws IOException 
     {
-        String referer = request.getHeader(HttpHeaders.REFERER);
+        String referer = request.getHeader("Referer");
         if (referer == null) 
             writer.write("\"-\" ");
         else 
@@ -439,7 +440,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
             writer.write("\" ");
         }
         
-        String agent = request.getHeader(HttpHeaders.USER_AGENT);
+        String agent = request.getHeader("User-Agent");
         if (agent == null)
             writer.write("\"-\" ");
         else
@@ -455,8 +456,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     {
         if (_logDateFormat!=null)
         {       
-            _logDateCache = new DateCache(_logDateFormat, _logLocale);
-            _logDateCache.setTimeZoneID(_logTimeZone);
+            _logDateCache = new DateCache(_logDateFormat, _logLocale, _logTimeZone);
         }
         
         if (_filename != null) 
@@ -472,7 +472,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         
         if (_ignorePaths != null && _ignorePaths.length > 0)
         {
-            _ignorePathMap = new PathMap();
+            _ignorePathMap = new PathMap<String>();
             for (int i = 0; i < _ignorePaths.length; i++) 
                 _ignorePathMap.put(_ignorePaths[i], _ignorePaths[i]);
         }

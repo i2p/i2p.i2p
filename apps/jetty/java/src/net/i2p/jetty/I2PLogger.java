@@ -263,4 +263,11 @@ public class I2PLogger implements Logger
     public String getName() {
         return "net.i2p.jetty.I2PLogger";
     }
+
+    /**
+     *  @since Jetty 9
+     */
+    public void debug(String msg, long arg) {
+        debug(msg, Long.valueOf(arg), null);
+    }
 }

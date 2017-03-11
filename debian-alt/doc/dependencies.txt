@@ -41,8 +41,8 @@ Current Runtime Dependencies
   For /usr/share/java/gnu-getopt.jar.
   In non-Debian builds we bundle the source code; it's removed in the Debian source package.
 
-* libjetty8-java
-  For /usr/share/java/jetty8-*.jar.
+* libjetty9-java
+  For /usr/share/java/jetty9-*.jar.
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
   For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
   which is 8.1.21, but there's no particular version that we need.
@@ -52,7 +52,7 @@ Current Runtime Dependencies
   Jetty 9.2.x is in recent Ubuntu and Debian.
   Jetty 9 ticket is https://trac.i2p2.de/ticket/1512
   Updating Jetty may break external plugins. Extensive testing is required.
-  Note that the libjetty8-java dependency brings in libservlet3.0-java which we require.
+  Note that the libjetty9-java dependency brings in libservlet3.0-java which we require.
 
 * glassfish-javaee
   We need jstl.jar and standard.jar version 1.2.
