@@ -93,6 +93,9 @@ class SubSession extends I2PSessionMuxedImpl {
      * Disconnect / destroy from another thread may be called simultaneously and
      * will (should?) interrupt the connect.
      *
+     * Connecting a subsession will automatically connect the primary session
+     * if not previously connected.
+     *
      * @throws I2PSessionException if there is a configuration error or the router is
      *                             not reachable
      */

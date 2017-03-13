@@ -313,8 +313,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
-     *  Add a subsession to a shared client if necessary.
+     *  Add a DSA_SHA1 subsession to the shared client if necessary.
      *
+     *  @return subsession, or null if none was added
      *  @since 0.9.20
      */
     protected static synchronized I2PSession addSubsession(I2PTunnel tunnel) {

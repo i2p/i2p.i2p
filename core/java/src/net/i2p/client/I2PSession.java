@@ -272,8 +272,10 @@ public interface I2PSession {
     public List<I2PSession> getSubsessions();
 
     /**
-     * Actually connect the session and start receiving/sending messages
-     *
+     * Actually connect the session and start receiving/sending messages.
+     * Connecting a primary session will not automatically connect subsessions.
+     * Connecting a subsession will automatically connect the primary session
+     * if not previously connected.
      */
     public void connect() throws I2PSessionException;
 
