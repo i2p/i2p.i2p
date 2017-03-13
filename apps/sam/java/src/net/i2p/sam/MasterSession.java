@@ -389,7 +389,7 @@ class MasterSession extends SAMv3StreamSession implements SAMDatagramReceiver, S
 					boolean ok = ssess.queueSocket(i2ps);
 					if (!ok) {
 						_log.logAlways(Log.WARN, "Accept queue overflow for " + ssess);
-						try { i2ps.close(); } catch (IOException ioe) {}
+						try { i2ps.reset(); } catch (IOException ioe) {}
 					}
 				} else {
 					if (_log.shouldLog(Log.WARN))

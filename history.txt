@@ -1,3 +1,10 @@
+2017-03-13 zzz
+ * i2ptunnel:
+   - Add subsession support to servers
+   - Reset I2P socket on TCP socket errors
+ * SAM: Reset I2P socket on handler errors
+ * Streaming: Add reset() to I2PSocket API
+
 2017-03-11 zzz
 Prop from i2p.i2p.zzz.jetty9:
  * Console: Fix RouterConsoleRunner for Jetty 9

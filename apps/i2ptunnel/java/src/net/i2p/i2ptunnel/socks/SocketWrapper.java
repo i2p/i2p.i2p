@@ -87,6 +87,14 @@ class SocketWrapper implements I2PSocket {
         socket.close();
     }
 
+    /** 
+     * Just calls close()
+     * @since 0.9.30
+     */
+    public void reset() throws IOException {
+        close();
+    }
+
     public boolean isClosed() {
         return socket.isClosed();
     }

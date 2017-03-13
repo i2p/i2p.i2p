@@ -680,7 +680,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                           " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
         } catch (SocketException ex) {
             try {
-                socket.close();
+                socket.reset();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error connecting to server " + remoteHost + ':' + remotePort, ex);

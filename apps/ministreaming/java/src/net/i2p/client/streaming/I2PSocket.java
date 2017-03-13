@@ -112,6 +112,20 @@ public interface I2PSocket extends Closeable {
      *  @since 0.8.9
      */
     public int getLocalPort();
+    
+    /**
+     *  Resets and closes this socket. Sends a RESET indication to the far-end.
+     *  This is the equivalent of setSoLinger(true, 0) followed by close() on a Java Socket.
+     *
+     *  Nonblocking.
+     *  Any thread currently blocked in an I/O operation upon this socket will throw an IOException.
+     *  Once a socket has been reset, it is not available for further networking use
+     *  (i.e. can't be reconnected or rebound). A new socket needs to be created.
+     *  Resetting this socket will also close the socket's InputStream and OutputStream.
+     *
+     *  @since 0.9.30
+     */
+    public void reset() throws IOException;
 
     /**
      * Deprecated, unimplemented, does nothing. Original description:

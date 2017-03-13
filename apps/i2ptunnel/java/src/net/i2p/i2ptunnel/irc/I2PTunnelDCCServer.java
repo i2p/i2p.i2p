@@ -119,7 +119,7 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
                 _active.put(Integer.valueOf(myPort), local);
             } catch (SocketException ex) {
                 try {
-                    socket.close();
+                    socket.reset();
                 } catch (IOException ioe) {}
                 _log.error("Error relaying incoming DCC connection to IRC client at " + local.ia + ':' + local.port, ex);
             }
