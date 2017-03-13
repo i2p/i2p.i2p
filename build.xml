@@ -764,6 +764,7 @@
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="apps/jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-http.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-security.jar" />
