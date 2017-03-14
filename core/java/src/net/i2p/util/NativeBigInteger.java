@@ -982,7 +982,7 @@ public class NativeBigInteger extends BigInteger {
                     List<String> toTry = getResourceList();
                     debug("loadResource list to try is: " + toTry);
                     for (String s : toTry) {
-                        System.out.println("trying to load resource: " + s);
+                        debug("Trying to load resource " + s);
                         if (loadFromResource(s)) {
                             _nativeOk = true;
                             _extractedResource = s;
@@ -1115,7 +1115,7 @@ public class NativeBigInteger extends BigInteger {
         //URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
         URL resource = ClassLoader.getSystemResource(resourceName);
         if (resource == null) {
-            System.out.println("Resource name [" + resourceName + "] was not found");
+            info("Resource name [" + resourceName + "] was not found");
             return false;
         }
 
@@ -1130,15 +1130,15 @@ public class NativeBigInteger extends BigInteger {
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
-            System.out.println("Loaded library: " + resource);
+            info("Loaded library: " + resource);
         } catch (UnsatisfiedLinkError ule) {
             // don't include the exception in the message - too much
-            System.out.println("Failed to load the resource " + resourceName + " - not a valid library for this platform");
+            warn("Failed to load the resource " + resourceName + " - not a valid library for this platform");
             if (outFile != null)
                 outFile.delete();
             return false;
         } catch (IOException ioe) {
-            System.out.println("Problem writing out the temporary native library data: " + ioe.toString());
+            warn("Problem writing out the temporary native library data: " + ioe);
             if (outFile != null)
                 outFile.delete();
             return false;
