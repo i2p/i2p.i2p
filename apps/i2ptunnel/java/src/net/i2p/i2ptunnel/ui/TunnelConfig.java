@@ -161,6 +161,16 @@ public class TunnelConfig {
     public String getPrivKeyFile() {
         return _privKeyFile;
     }
+
+    /**
+     *  What filename is this server tunnel's alternate private keys stored in
+     *  @since 0.9.30
+     */
+    public void setAltPrivKeyFile(String file) { 
+        if (file != null)
+            _otherOptions.put(I2PTunnelServer.PROP_ALT_PKF, file.trim());
+    }
+
     /**
      * If called with any value, we want this tunnel to start whenever it is
      * loaded (aka right now and whenever the router is started up)
@@ -725,7 +735,8 @@ public class TunnelConfig {
          PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
          PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
          PROP_MAX_STREAMS, I2PClient.PROP_SIGTYPE,
-        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey"
+        "inbound.randomKey", "outbound.randomKey", "i2cp.leaseSetSigningPrivateKey", "i2cp.leaseSetPrivateKey",
+         I2PTunnelServer.PROP_ALT_PKF
         };
     private static final String _httpServerOpts[] = {
         I2PTunnelHTTPServer.OPT_POST_WINDOW,

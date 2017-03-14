@@ -1578,6 +1578,11 @@ public class BlockfileNamingService extends DummyNamingService {
                     }
                     storedOptions.remove(i);
                     removeReverseEntry(hostname, d);
+                    if (options != null) {
+                        String list = options.getProperty("list");
+                        if (list != null)
+                            storedOptions.get(0).setProperty("list", list);
+                    }
                     return put(hostname, newDests, storedOptions, false);
                 }
             }

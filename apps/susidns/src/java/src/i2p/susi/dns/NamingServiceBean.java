@@ -231,7 +231,7 @@ public class NamingServiceBean extends AddressbookBean
                         if (_context.getBooleanProperty(PROP_PW_ENABLE) ||
 			    (serial != null && serial.equals(lastSerial))) {
 				boolean changed = false;
-				if (action.equals(_t("Add")) || action.equals(_t("Replace"))) {
+				if (action.equals(_t("Add")) || action.equals(_t("Replace")) || action.equals(_t("Add Alternate"))) {
 					if(hostname != null && destination != null) {
 						try {
 							// throws IAE with translated message
@@ -243,20 +243,38 @@ public class NamingServiceBean extends AddressbookBean
 							Destination oldDest = getNamingService().lookup(host, nsOptions, outProperties);
 							if (oldDest != null && destination.equals(oldDest.toBase64())) {
 								message = _t("Host name {0} is already in address book, unchanged.", displayHost);
-							} else if (oldDest != null && !action.equals(_t("Replace"))) {
+							} else if (oldDest == null && action.equals(_t("Add Alternate"))) {
+								message = _t("Host name {0} is not in  the address book.", displayHost);
+							} else if (oldDest != null && action.equals(_t("Add"))) {
 								message = _t("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
 								try {
 									Destination dest = new Destination(destination);
 									if (oldDest != null) {
 										nsOptions.putAll(outProperties);
-							                        nsOptions.setProperty("m", Long.toString(_context.clock().now()));
+							                        String now = Long.toString(_context.clock().now());
+										if (action.equals(_t("Add Alternate")))
+							                        	nsOptions.setProperty("a", now);
+										else
+							                        	nsOptions.setProperty("m", now);
 									}
 						                        nsOptions.setProperty("s", _t("Manually added via SusiDNS"));
-									boolean success = getNamingService().put(host, dest, nsOptions);
+									boolean success;
+							                if (action.equals(_t("Add Alternate"))) {
+										// check all for dups
+										List<Destination> all = getNamingService().lookupAll(host);
+										if (all == null || !all.contains(dest)) {
+											success = getNamingService().addDestination(host, dest, nsOptions);
+										} else {
+											// will get generic message below
+											success = false;
+										}
+									} else {
+										success = getNamingService().put(host, dest, nsOptions);
+									}
 									if (success) {
 										changed = true;
-										if (oldDest == null)
+										if (oldDest == null || action.equals(_t("Add Alternate")))
 											message = _t("Destination added for {0}.", displayHost);
 										else
 											message = _t("Destination changed for {0}.", displayHost);
@@ -285,8 +303,21 @@ public class NamingServiceBean extends AddressbookBean
 				} else if (action.equals(_t("Delete Selected")) || action.equals(_t("Delete Entry"))) {
 					String name = null;
 					int deleted = 0;
+					Destination matchDest = null;
+					if (action.equals(_t("Delete Entry"))) {
+						// remove specified dest only in case there is more than one
+						if (destination != null) {
+							try {
+								matchDest = new Destination(destination);
+							} catch (DataFormatException dfe) {}
+						}
+					}
 					for (String n : deletionMarks) {
-						boolean success = getNamingService().remove(n, nsOptions);
+						boolean success;
+						if (matchDest != null)
+							success = getNamingService().remove(n, matchDest, nsOptions);
+						else
+							success = getNamingService().remove(n, nsOptions);
 						String uni = AddressBean.toUnicode(n);
 						String displayHost = uni.equals(n) ? n :  uni + " (" + n + ')';
 						if (!success) {

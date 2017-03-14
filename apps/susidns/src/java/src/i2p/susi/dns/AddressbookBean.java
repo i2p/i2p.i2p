@@ -314,6 +314,9 @@ public class AddressbookBean extends BaseBean
 					}
 					if (action.equals(_t("Delete Entry")))
 						search = null;
+				} else if (action.equals(_t("Add Alternate"))) {
+					// button won't be in UI
+					message = "Unsupported";
 				}
 				if( changed ) {
 					try {

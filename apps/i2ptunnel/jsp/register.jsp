@@ -259,10 +259,38 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <span class="comment"><%=intl._t("This will add an alternate destination for {0}", name)%></span>
 <%
                } else {
+                   // If set, use the configured alternate destination as the new alias destination,
+                   // and the configured primary destination as the inner signer.
+                   // This is backwards from all the other ones, so we have to make a second HostTxtEntry just for this.
+                   SigningPrivateKey spk3 = null;
+                   String altdest = null;
+                   String altdestfile = editBean.getAltPrivateKeyFile(curTunnel);
+                   if (altdestfile.length() > 0) {
+                       try {
+                           PrivateKeyFile pkf3 = new PrivateKeyFile(altdestfile);
+                           altdest = pkf3.getDestination().toBase64();
+                           if (!b64.equals(altdest)) {
+                               // disallow dup
+                               spk3 = pkf3.getSigningPrivKey();
+                           }
+                       } catch (Exception e) {}
+                   }
+                   if (spk3 != null) {
+                       OrderedProperties props2 = new OrderedProperties();
+                       HostTxtEntry he2 = new HostTxtEntry(name, altdest, props2);
+                       props2.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_ADDDEST);
+                       props2.setProperty(HostTxtEntry.PROP_OLDDEST, b64);
+                       he2.signInner(spk);
+                       he2.sign(spk3);
+                %><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he2.write(out); %></textarea>               
+                <span class="comment"><%=intl._t("This will add an alternate destination for {0}", name)%></span>
+<%
+                   } else {
                 %><span class="comment"><%=intl._t("This tunnel must be configured with the new destination.")%></span>
                   <span class="comment"><%=intl._t("Enter old destination below.")%></span>
 <%
-               }
+                   }  // spk3
+               }  // spk2
           %></div>
             <div class="separator">
                 <hr />

@@ -1,3 +1,15 @@
+2017-03-14 zzz
+ * Blockfile: Fix specified-destination deletion from the correct book
+ * i2ptunnel:
+   - New form to enter private key file for alternate destination
+   - Use alt destination for registration if set
+ * NBI: Adjust info logging at startup
+ * SusiDNS:
+   - New button for adding alternate destination
+   - Fix nonces on details page with multiple destinations
+   - Fix single dest deletion on details page with multiple destinations
+   - Set book in all forms to ensure correct book
+
 2017-03-13 zzz
  * i2ptunnel:
    - Add subsession support to servers

@@ -669,8 +669,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </div>
 <% **********************/ %>
 
-         <% if (true /* editBean.isAdvanced() */ ) {
-                int currentSigType = editBean.getSigType(curTunnel, tunnelType);
+         <%
+            int currentSigType = editBean.getSigType(curTunnel, tunnelType);
+            if (true /* editBean.isAdvanced() */ ) {
            %>
             <div id="tunnelOptionsField" class="rowItem">
                 <label>
@@ -713,6 +714,50 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <hr />
             </div>
          <% } // isAdvanced %>
+
+         <%
+            /* alternate dest, only if current dest is set and is DSA_SHA1 */
+
+            if (currentSigType == 0 && !"".equals(b64) && !"streamrserver".equals(tunnelType)) {
+          %><div id="privKeyField" class="rowItem">
+                <label for="privKeyFile"><%=intl._t("Alternate private key file")%> (Ed25519-SHA-512):</label>
+                <input type="text" size="30" id="privKeyFile" name="altPrivKeyFile" title="Path to Private Key File" value="<%=editBean.getAltPrivateKeyFile(curTunnel)%>" class="freetext" />               
+            </div>
+
+         <%
+              String ab64 = editBean.getAltDestinationBase64(curTunnel);
+              if (!"".equals(ab64)) {
+          %><div id="destinationField" class="rowItem">
+                <label for="localDestination"><%=intl._t("Alternate local destination")%>:</label>
+                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Alternate Local Destination" wrap="off" spellcheck="false"><%=ab64%></textarea>               
+            </div>
+            <div id="destinationField" class="rowItem">
+                <label> </label>
+                <span class="comment"><%=editBean.getAltDestHashBase32(curTunnel)%></span>
+            </div>
+            <div id="destinationField" class="rowItem">
+        <%
+                ab64 = ab64.replace("=", "%3d");
+                String name = editBean.getSpoofedHost(curTunnel);
+                if (name == null || name.equals(""))
+                    name = editBean.getTunnelName(curTunnel);
+                // mysite.i2p is set in the installed i2ptunnel.config
+                if (name != null && !name.equals("") && !name.equals("mysite.i2p") && !name.contains(" ") && name.endsWith(".i2p")) {
+           %><label>
+              <a class="control" title="<%=intl._t("Generate QR Code")%>" href="/imagegen/qr?s=320&amp;t=<%=name%>&amp;c=http%3a%2f%2f<%=name%>%2f%3fi2paddresshelper%3d<%=ab64%>" target="_top"><%=intl._t("Generate QR Code")%></a>
+              </label>
+              <a class="control" href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=name%>&amp;destination=<%=ab64%>#add"><%=intl._t("Add to local addressbook")%></a>
+        <%
+                } else {
+            %><label> </label>
+              <span class="comment"><%=intl._t("Set name with .i2p suffix to enable QR code generation")%></span>
+        <%
+                }  // name
+          %></div>
+        <%
+              }  // ab64
+          %><div class="subdivider"><hr /></div>
+         <% } // currentSigType %>
                  
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">

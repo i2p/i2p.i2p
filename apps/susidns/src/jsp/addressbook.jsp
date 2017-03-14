@@ -120,6 +120,7 @@ ${book.loadBookMessages}
 
 <div id="search">
 <form method="POST" action="addressbook">
+<input type="hidden" name="book" value="${book.book}">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <table><tr>
@@ -136,6 +137,7 @@ ${book.loadBookMessages}
 %>
 <c:if test="${book.notEmpty}">
 <form method="POST" action="addressbook">
+<input type="hidden" name="book" value="${book.book}">
 <input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
@@ -163,7 +165,7 @@ ${book.loadBookMessages}
 </td><td class="names">
 <span class="addrhlpr"><a href="http://${addr.b32}/" target="_top" title="<%=intl._t("Base 32 address")%>">b32</a></span>
 </td><td class="names">
-<span class="addrhlpr"><a href="details?h=${addr.name}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span>
+<span class="addrhlpr"><a href="details?h=${addr.name}&amp;book=${book.book}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span>
 </td>
 <td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="40" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
@@ -208,6 +210,7 @@ ${book.loadBookMessages}
 </c:if>
 
 <form method="POST" action="addressbook">
+<input type="hidden" name="book" value="${book.book}">
 <input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
@@ -221,6 +224,9 @@ ${book.loadBookMessages}
 <p class="buttons">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
 <input class="accept" type="submit" name="action" value="<%=intl._t("Replace")%>" >
+<% if (!book.getBook().equals("published")) { %>
+  <input class="add" type="submit" name="action" value="<%=intl._t("Add Alternate")%>" >
+<% } %>
 <input class="add" type="submit" name="action" value="<%=intl._t("Add")%>" >
 </p>
 </div></form>

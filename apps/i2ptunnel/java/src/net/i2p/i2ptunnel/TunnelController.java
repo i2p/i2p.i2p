@@ -254,6 +254,8 @@ public class TunnelController implements Logging {
         File altFile = getAlternatePrivateKeyFile();
         if (altFile == null)
             return false;
+        if (altFile.equals(keyFile))
+            return false;
         if (altFile.exists())
             return true;
         PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
