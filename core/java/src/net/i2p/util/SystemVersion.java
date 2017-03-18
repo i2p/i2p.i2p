@@ -39,6 +39,7 @@ public abstract class SystemVersion {
     private static final boolean _is64;
     private static final boolean _hasWrapper = System.getProperty("wrapper.version") != null;
     private static final boolean _isLinuxService;
+    private static final boolean _isSlow;
 
     private static final boolean _oneDotSix;
     private static final boolean _oneDotSeven;
@@ -69,6 +70,7 @@ public abstract class SystemVersion {
         _isLinuxService = !_isWin && !_isMac && !_isAndroid &&
                           (DAEMON_USER.equals(System.getProperty("user.name")) ||
                            (_isGentoo && GENTOO_USER.equals(System.getProperty("user.name"))));
+        _isSlow = _isAndroid || _isApache || _isArm || _isGNU || getMaxMemory() < 48*1024*1024L;
 
         int sdk = 0;
         if (_isAndroid) {
@@ -151,6 +153,18 @@ public abstract class SystemVersion {
      */
     public static boolean isX86() {
         return _isX86;
+    }
+
+    /**
+     *  Our best guess on whether this is a slow architecture / OS / JVM,
+     *  using some simple heuristics.
+     *
+     *  @since 0.9.30
+     */
+    public static boolean isSlow() {
+        // we don't put the NBI call in the static field,
+        // to prevent a circular initialization with NBI.
+        return _isSlow || !NativeBigInteger.isNative();
     }
 
     /**
@@ -290,6 +304,7 @@ public abstract class SystemVersion {
         System.out.println("Linux Svc: " + isLinuxService());
         System.out.println("Mac      : " + isMac());
         System.out.println("OpenJDK  : " + isOpenJDK());
+        System.out.println("Slow     : " + isSlow());
         System.out.println("Windows  : " + isWindows());
         System.out.println("Wrapper  : " + hasWrapper());
         System.out.println("x86      : " + isX86());

@@ -116,11 +116,7 @@ public final class KeyGenerator {
 
     /** @since 0.9.8 */
     private static final boolean DEFAULT_USE_LONG_EXPONENT =
-                                                   NativeBigInteger.isNative() &&
-                                                   SystemVersion.is64Bit() &&
-                                                   !SystemVersion.isGNU() &&
-                                                   !SystemVersion.isApache() &&
-                                                   !SystemVersion.isARM();
+                                                   !SystemVersion.isSlow();
 
     /**
      *  @deprecated use getElGamalExponentSize() which allows override in the properties

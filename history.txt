@@ -1,3 +1,10 @@
+2017-03-18 zzz
+ * Addressbook (ticket #1966):
+   - Build as jar, not war
+   - Put empty war in updater
+   - Move Servlet starter to SusiDNS
+   - Skip war in RouterConsoleRunner
+
 2017-03-14 zzz
  * Blockfile: Fix specified-destination deletion from the correct book
  * i2ptunnel:
