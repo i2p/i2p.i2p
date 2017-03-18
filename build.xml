@@ -310,7 +310,7 @@
         <copy file="apps/susimail/susimail.war" todir="build/" />
     </target>
 
-    <target name="buildSusiDNS" depends="buildCore, buildJetty, buildImagegen" >
+    <target name="buildSusiDNS" depends="buildCore, buildJetty, buildImagegen, buildAddressbook" >
         <ant dir="apps/susidns/src" target="all" />
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
     </target>
@@ -332,8 +332,10 @@
         <copy file="apps/addressbook/dist/addressbook.jar" todir="build/" />
     </target>
 
-    <target name="buildAddressbook" depends="buildCore, buildJetty" >
-        <ant dir="apps/addressbook/" target="war" />
+    <target name="buildAddressbook" depends="buildCore" >
+        <ant dir="apps/addressbook/" target="all" />
+        <copy file="apps/addressbook/dist/addressbook.jar" todir="build/" />
+        <!-- war is empty, only for updates -->
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
@@ -734,7 +736,7 @@
             <group title="JRobin Library" packages="org.jrobin:org.jrobin.*:engine.misc" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
             <group title="SAM Demos" packages="net.i2p.sam.client" />
-            <group title="SusiDNS Application" packages="i2p.susi.dns" />
+            <group title="SusiDNS Application" packages="i2p.susi.dns:net.i2p.addressbook.servlet" />
             <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
             <sourcepath>
@@ -1205,7 +1207,7 @@
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
-        <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+        <copy file="build/addressbook.jar" todir="pkg-temp/lib/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/imagegen.war" todir="pkg-temp/webapps/" />
@@ -1465,11 +1467,11 @@
         <!-- *nix here -->
         <exec executable="sh" osfamily="unix" failonerror="true">
             <arg value="-c" />
-            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/commons-logging.jar -o $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/commons-logging.jar -o $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar -o $i = pkg-temp/webapps/addressbook.war ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <exec executable="sh" osfamily="mac" failonerror="true">
             <arg value="-c" />
-            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/commons-logging.jar -o $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do if [ $i = pkg-temp/lib/commons-logging.jar -o $i = pkg-temp/lib/jasper-compiler.jar -o $i = pkg-temp/lib/jbigi.jar -o $i = pkg-temp/lib/jetty-java5-threadpool.jar -o $i = pkg-temp/lib/jetty-sslengine.jar -o $i = pkg-temp/webapps/addressbook.war ]; then continue; fi; echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
         <exec executable="cmd" osfamily="windows" failonerror="true">
@@ -1551,6 +1553,7 @@
         <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
+        <copy file="build/addressbook.jar" todir="pkg-temp/lib/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
@@ -1898,7 +1901,6 @@
             <!-- start of the files to be analyzed -->
             <arg value="build/BOB.jar"/>
             <arg value="build/addressbook.jar"/>
-            <arg value="build/addressbook.war"/>
             <arg value="build/i2p.jar"/>
             <arg value="build/i2psnark.jar"/>
             <arg value="build/i2psnark.war"/>

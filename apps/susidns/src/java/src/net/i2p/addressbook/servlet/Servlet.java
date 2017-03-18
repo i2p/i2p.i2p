@@ -19,11 +19,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package net.i2p.addressbook;
+package net.i2p.addressbook.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Random;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -31,12 +30,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.i2p.addressbook.DaemonThread;
+
 /**
  * A wrapper for addressbook to allow it to be started as a web application.
  * 
- * This was a GenericServlet, we make it an HttpServlet solely to provide a hook
- * for SusiDNS to wake us up when the subscription list changes.
+ * This was a GenericServlet, we make it an HttpServlet solely to provide a
+ * simple page to display status.
  * 
+ * @since 0.9.30 moved from addressbook to SusiDNS
  * @author Ragnarok
  *
  */
@@ -48,8 +50,7 @@ public class Servlet extends HttpServlet {
     //private static final String PROP_NONCE = "addressbook.nonce";
 
     /**
-     * Hack to allow susidns to kick the daemon when the subscription list changes.
-     * URL must be /addressbook/ with wakeup param set, and nonce param set from system property.
+     * Simple output to verify that the addressbook servlet is running.
      *
      * (non-Javadoc)
      * see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)

@@ -720,7 +720,13 @@ public class RouterConsoleRunner implements RouterApp {
                 for (int i = 0; i < fileNames.length; i++) {
                     String appName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
                     String enabled = props.getProperty(PREFIX + appName + ENABLED);
-                    if (! "false".equals(enabled)) {
+                    if (appName.equals("addressbook")) {
+                        // addressbook.war is now empty, thread is started by SusiDNS
+                        if (enabled != null) {
+                            props.remove(PREFIX + "addressbook" + ENABLED);
+                            rewrite = true;
+                        }
+                    } else if (! "false".equals(enabled)) {
                         try {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
                             WebAppStarter.startWebApp(_context, chColl, appName, path);
