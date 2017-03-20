@@ -204,7 +204,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "Proxy-Connection: close\r\n"+
             "\r\n" +
             "<html><body><H1>I2P ERROR: SSL to I2P address rejected</H1>" +
-            "SSL for to .i2p addresses denied by configuration." +
+            "SSL to .i2p addresses denied by configuration." +
             "You may change the configuration in I2PTunnel";
 
     /**
