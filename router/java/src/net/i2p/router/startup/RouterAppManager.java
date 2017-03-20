@@ -48,7 +48,7 @@ public class RouterAppManager implements ClientAppManager {
     public boolean addAndStart(ClientApp app, String[] args) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Client " + app.getDisplayName() + " ADDED");
-        String[] old = _clients.put(app, args);
+        String[] old = _clients.putIfAbsent(app, args);
         if (old != null)
             throw new IllegalArgumentException("already added");
         try {
