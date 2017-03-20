@@ -68,9 +68,9 @@ public class DataHelper {
             "cost", "host", "port",
             // SSU RouterAddress options
             "key", "mtu",
-            "ihost0", "iport0", "ikey0", "itag0",
-            "ihost1", "iport1", "ikey1", "itag1",
-            "ihost2", "iport2", "ikey2", "itag2",
+            "ihost0", "iport0", "ikey0", "itag0", "iexp0",
+            "ihost1", "iport1", "ikey1", "itag1", "iexp1",
+            "ihost2", "iport2", "ikey2", "itag2", "iexp2",
             // RouterInfo options
             "caps", "coreVersion", "netId", "router.version",
             "netdb.knownLeaseSets", "netdb.knownRouters",

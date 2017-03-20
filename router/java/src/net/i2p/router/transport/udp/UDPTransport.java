@@ -203,6 +203,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MIN_PEERS_IF_HAVE_V6 = 30;
     /** minimum peers volunteering to be introducers if we need that */
     private static final int MIN_INTRODUCER_POOL = 5;
+    private static final long INTRODUCER_EXPIRATION_MARGIN = 20*60*1000L;
     
     private static final int[] BID_VALUES = { 15, 20, 50, 65, 80, 95, 100, 115, TransportBid.TRANSIENT_FAIL };
     private static final int FAST_PREFERRED_BID = 0;
@@ -1558,17 +1559,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         RouterAddress addr = getCurrentAddress(false);
         if (introducersRequired()) {
             UDPAddress ua = new UDPAddress(addr);
+            long now = _context.clock().now();
             int valid = 0;
             for (int i = 0; i < ua.getIntroducerCount(); i++) {
                 // warning: this is only valid as long as we use the ident hash as their key.
                 byte[] key = ua.getIntroducerKey(i);
                 if (key.length != Hash.HASH_LENGTH)
                     continue;
+                long exp = ua.getIntroducerExpiration(i);
+                if (exp > 0 && exp < now + INTRODUCER_EXPIRATION_MARGIN)
+                    continue;
                 PeerState peer = getPeerState(new Hash(key));
                 if (peer != null)
                     valid++;
             }
-            long sinceSelected = _context.clock().now() - _introducersSelectedOn;
+            long sinceSelected = now - _introducersSelectedOn;
             if (valid >= PUBLIC_RELAY_COUNT) {
                 // try to shift 'em around every 10 minutes or so
                 if (sinceSelected > 17*60*1000) {
