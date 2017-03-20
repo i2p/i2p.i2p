@@ -33,7 +33,7 @@ public class CodedIconRendererServlet extends HttpServlet {
 
 
      @Override
-     protected void service(HttpServletRequest srq, HttpServletResponse srs) throws ServletException, IOException {
+     protected void doGet(HttpServletRequest srq, HttpServletResponse srs) throws ServletException, IOException {
          byte[] data;
          String name = srq.getParameter("plugin");
          data  = NavHelper.getBinary(name);
