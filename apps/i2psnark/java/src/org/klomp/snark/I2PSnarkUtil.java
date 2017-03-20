@@ -70,6 +70,7 @@ public class I2PSnarkUtil {
     private boolean _areFilesPublic;
     private List<String> _openTrackers;
     private DHT _dht;
+    private long _startedTime;
 
     private static final int EEPGET_CONNECT_TIMEOUT = 45*1000;
     private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
@@ -260,6 +261,8 @@ public class I2PSnarkUtil {
             if (opts.getProperty(I2PClient.PROP_SIGTYPE) == null)
                 opts.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
+            if (_manager != null)
+                _startedTime = _context.clock().now();
             _connecting = false;
         }
         if (_shouldUseDHT && _manager != null && _dht == null)
@@ -295,6 +298,7 @@ public class I2PSnarkUtil {
             _dht.stop();
             _dht = null;
         }
+        _startedTime = 0;
         I2PSocketManager mgr = _manager;
         // FIXME this can cause race NPEs elsewhere
         _manager = null;
@@ -310,6 +314,16 @@ public class I2PSnarkUtil {
         _tmpDir.mkdirs();
     }
     
+    /**
+     * When did we connect to the network?
+     * For RPC
+     * @return 0 if not connected
+     * @since 0.9.30
+     */
+    public long getStartedTime() {
+        return _startedTime;
+    }
+
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
         I2PSocketManager mgr = _manager;

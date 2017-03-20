@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -238,7 +239,8 @@ public class Snark
   // String indicating main activity
   private volatile String activity = "Not started";
   private final long savedUploaded;
-
+  private static final AtomicInteger __RPCID = new AtomicInteger();
+  private final int _rpcID = __RPCID.incrementAndGet();
 
   /**
    * from main() via parseArguments() single torrent
@@ -1363,5 +1365,14 @@ public class Snark
   public boolean overUpBWLimit(long total) {
     long limit = 1024l * _util.getMaxUpBW();
     return total > limit;
+  }
+
+  /**
+   *  A unique ID for this torrent, useful for RPC
+   *  @return positive value unless you wrap around
+   *  @since 0.9.30
+   */
+  public int getRPCID() {
+    return _rpcID;
   }
 }

@@ -27,7 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.app.ClientApp;
 import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppState;
 import net.i2p.crypto.SHA1Hash;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
@@ -51,7 +53,7 @@ import org.klomp.snark.dht.KRPC;
 /**
  * Manage multiple snarks
  */
-public class SnarkManager implements CompleteListener {
+public class SnarkManager implements CompleteListener, ClientApp {
     
     /**
      *  Map of (canonical) filename of the .torrent file to Snark instance.
@@ -246,6 +248,13 @@ public class SnarkManager implements CompleteListener {
      */
     public void start() {
         _running = true;
+        if ("i2psnark".equals(_contextName)) {
+            // Register with the ClientAppManager so the rpc plugin can find us
+            // only if default instance
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null)
+                cmgr.register(this);
+        }
         _peerCoordinatorSet = new PeerCoordinatorSet();
         _connectionAcceptor = new ConnectionAcceptor(_util, _peerCoordinatorSet);
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
@@ -315,12 +324,58 @@ public class SnarkManager implements CompleteListener {
         _connectionAcceptor.halt();
         _idleChecker.cancel();
         stopAllTorrents(true);
+        if ("i2psnark".equals(_contextName)) {
+            // only if default instance
+            ClientAppManager cmgr = _context.clientAppManager();
+            if (cmgr != null)
+                cmgr.unregister(this);
+        }
         if (_log.shouldWarn())
             _log.warn("Snark stop() end");
     }
     
     /** @since 0.9.1 */
     public boolean isStopping() { return _stopping; }
+
+    /**
+     *  ClientApp method. Does nothing.
+     *  Doesn't matter, we are only registering.
+     *  @since 0.9.30
+     */
+    public void startup() {}
+
+    /**
+     *  ClientApp method. Does nothing.
+     *  Doesn't matter, we are only registering.
+     *  @since 0.9.30
+     */
+    public void shutdown(String[] args) {}
+
+    /**
+     *  ClientApp method.
+     *  Doesn't matter, we are only registering.
+     *  @return INITIALIZED always.
+     *  @since 0.9.30
+     */
+    public ClientAppState getState() {
+        return ClientAppState.INITIALIZED;
+    }
+
+    /**
+     *  ClientApp method.
+     *  @since 0.9.30
+     */
+    public String getName() {
+        return "i2psnark";
+    }
+
+    /**
+     *  ClientApp method.
+     *  @since 0.9.30
+     */
+    public String getDisplayName() {
+        return "i2psnark: " + _contextPath;
+    }
 
     /** hook to I2PSnarkUtil for the servlet */
     public I2PSnarkUtil util() { return _util; }
@@ -438,6 +493,14 @@ public class SnarkManager implements CompleteListener {
                 f = new SecureDirectory(_context.getAppDir(), dir);
         }
         return f; 
+    }
+
+    /**
+     * For RPC
+     * @since 0.9.30
+     */
+    public File getConfigDir() { 
+        return _configDir; 
     }
 
     /**
@@ -1526,9 +1589,9 @@ public class SnarkManager implements CompleteListener {
      * Called from servlet. This is only for the 'create torrent' form.
      *
      * @param metainfo the metainfo for the torrent
-     * @param bitfield the current completion status of the torrent
+     * @param bitfield the current completion status of the torrent, or null
      * @param filename the absolute path to save the metainfo to, generally ending in ".torrent", which is also the name of the torrent
-     *                 Must be a filesystem-safe name.
+     *                 Must be a filesystem-safe name. If null, will generate a name from the metainfo.
      * @param baseFile may be null, if so look in rootDataDir
      * @throws RuntimeException via Snark.fatal()
      * @return success
@@ -1542,10 +1605,18 @@ public class SnarkManager implements CompleteListener {
             if (snark != null) {
                 addMessage(_t("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                 return false;
-            } else {
+            } else if (bitfield != null) {
                 saveTorrentStatus(metainfo, bitfield, null, baseFile, true, 0, true); // no file priorities
             }
             // so addTorrent won't recheck            
+            if (filename == null) {
+                File f = new File(getDataDir(), Storage.filterName(metainfo.getName()) + ".torrent");
+                if (f.exists()) {
+                    addMessage(_t("Failed to copy torrent file to {0}", f.getAbsolutePath()));
+                    _log.error("Torrent file already exists: " + f);
+                }
+                filename = f.getAbsolutePath();
+            }
             try {
                 locked_writeMetaInfo(metainfo, filename, areFilesPublic());
                 // hold the lock for a long time
