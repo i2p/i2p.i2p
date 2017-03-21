@@ -22,21 +22,19 @@ import net.i2p.util.Log;
  *
  *  @since 0.9.4
  */
-public class RouterAppManager implements ClientAppManager {
+public class RouterAppManager extends ClientAppManagerImpl {
     
     private final RouterContext _context;
     private final Log _log;
     // client to args
     // this assumes clients do not override equals()
     private final ConcurrentHashMap<ClientApp, String[]> _clients;
-    // registered name to client
-    private final ConcurrentHashMap<String, ClientApp> _registered;
 
     public RouterAppManager(RouterContext ctx) {
+        super(ctx);
         _context = ctx;
         _log = ctx.logManager().getLog(RouterAppManager.class);
         _clients = new ConcurrentHashMap<ClientApp, String[]>(16);
-        _registered = new ConcurrentHashMap<String, ClientApp>(8);
         ctx.addShutdownTask(new Shutdown());
     }
 
@@ -91,6 +89,7 @@ public class RouterAppManager implements ClientAppManager {
      *  @param message may be null
      *  @param e may be null
      */
+    @Override
     public void notify(ClientApp app, ClientAppState state, String message, Exception e) {
         switch(state) {
           case UNINITIALIZED:
@@ -137,6 +136,7 @@ public class RouterAppManager implements ClientAppManager {
      *  @param app non-null
      *  @return true if successful, false if duplicate name
      */
+    @Override
     public boolean register(ClientApp app) {
         if (!_clients.containsKey(app)) {
             // Allow registration even if we didn't start it,
@@ -148,32 +148,9 @@ public class RouterAppManager implements ClientAppManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Client " + app.getDisplayName() + " REGISTERED AS " + app.getName());
         // TODO if old app in there is not running and != this app, allow replacement
-        return _registered.putIfAbsent(app.getName(), app) == null;
+        return super.register(app);
     }
     
-    /**
-     *  Unregister with the manager. Name must be the same as that from register().
-     *  Only required for apps used by other apps.
-     *
-     *  @param app non-null
-     */
-    public void unregister(ClientApp app) {
-        _registered.remove(app.getName(), app);
-    }
-    
-    /**
-     *  Get a registered app.
-     *  Only used for apps finding other apps.
-     *  Do not hold a static reference.
-     *  If you only need to find a port, use the PortMapper instead.
-     *
-     *  @param name non-null
-     *  @return client app or null
-     */
-    public ClientApp getRegisteredApp(String name) {
-        return _registered.get(name);
-    }
-
     /// end ClientAppManager interface
 
     /**

@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Set;
 
 import net.i2p.app.ClientAppManager;
+import net.i2p.app.ClientAppManagerImpl;
 import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
@@ -116,6 +117,7 @@ public class I2PAppContext {
     private final File _appDir;
     private volatile File _tmpDir;
     private final Random _tmpDirRand = new Random();
+    private final ClientAppManager _appManager;
     // split up big lock on this to avoid deadlocks
     private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
                          _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
@@ -198,6 +200,7 @@ public class I2PAppContext {
             _overrideProps.putAll(envProps);
         _shutdownTasks = new ConcurrentHashSet<Runnable>(32);
         _portMapper = new PortMapper(this);
+        _appManager = isRouterContext() ? null : new ClientAppManagerImpl(this);
     
    /*
     *  Directories. These are all set at instantiation and will not be changed by
@@ -1007,8 +1010,11 @@ public class I2PAppContext {
     }
 
     /**
-     *  The RouterAppManager in RouterContext, null always in I2PAppContext
-     *  @return null always
+     *  As of 0.9.30, returns non-null in I2PAppContext, null in RouterContext.
+     *  Prior to that, returned null always.
+     *  Overridden in RouterContext to return the RouterAppManager.
+     *
+     *  @return As of 0.9.30, returns non-null in I2PAppContext, null in RouterContext
      *  @since 0.9.11, in RouterContext since 0.9.4
      */
     public ClientAppManager clientAppManager() {
