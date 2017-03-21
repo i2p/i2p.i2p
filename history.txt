@@ -1,5 +1,9 @@
+2017-03-21 zzz
+ * i2psnark: Enhancement to support RPC plugin
+
 2017-03-20 zzz
  * i2psnark: Enhancements to support RPC plugin
+ * SSU: More work on introducer expiration (proposal 133)
 
 2017-03-18 zzz
  * Addressbook (ticket #1966):

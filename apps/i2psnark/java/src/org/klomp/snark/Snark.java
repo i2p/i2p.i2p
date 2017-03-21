@@ -239,6 +239,7 @@ public class Snark
   // String indicating main activity
   private volatile String activity = "Not started";
   private final long savedUploaded;
+  private long _startedTime;
   private static final AtomicInteger __RPCID = new AtomicInteger();
   private final int _rpcID = __RPCID.incrementAndGet();
 
@@ -544,6 +545,7 @@ public class Snark
       starting = true;
       try {
           x_startTorrent();
+          _startedTime = _util.getContext().clock().now();
       } finally {
           starting = false;
       }
@@ -1375,4 +1377,14 @@ public class Snark
   public int getRPCID() {
     return _rpcID;
   }
+    
+    /**
+     * When did we start this torrent
+     * For RPC
+     * @return 0 if not started before. Not cleared when stopped.
+     * @since 0.9.30
+     */
+    public long getStartedTime() {
+        return _startedTime;
+    }
 }
