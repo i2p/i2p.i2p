@@ -457,6 +457,13 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _t("Plugin requires Jetty version {0} or higher", minVersion) + "</b>");
                     return;
                 }
+                String blacklistVersion = PluginStarter.jetty9Blacklist.get(appName);
+                if (blacklistVersion != null &&
+                    VersionComparator.comp(version, blacklistVersion) <= 0) {
+                    to.delete();
+                    statusDone("<b>" + _t("Plugin requires Jetty version {0} or lower", "8.9999") + "</b>");
+                    return;
+                }
                 maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
                 if (maxVersion != null &&
                     VersionComparator.comp(maxVersion, oldVersion) < 0) {
