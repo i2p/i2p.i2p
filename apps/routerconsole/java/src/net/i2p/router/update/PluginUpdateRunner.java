@@ -480,7 +480,7 @@ class PluginUpdateRunner extends UpdateRunner {
                     }
                     // we don't need the original file anymore.
                     to.delete();
-                    statusDone("<b>" + _t("Plugin will be installed on next restart.") + "</b>");
+                    statusDone("<b>" + _t("Plugin will be installed on next restart.") + ' ' + appName + ' ' + version + "</b>");
                     return;
                 }
                 if (PluginStarter.isPluginRunning(appName, _context)) {
@@ -498,7 +498,7 @@ class PluginUpdateRunner extends UpdateRunner {
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
                     to.delete();
-                    statusDone("<b>" + _t("Plugin is for upgrades only, but the plugin is not installed") + "</b>");
+                    statusDone("<b>" + _t("Plugin is for upgrades only, but the plugin is not installed") + ". " + appName + ' ' + version + "</b>");
                     return;
                 }
                 if (!destDir.mkdir()) {
@@ -518,7 +518,7 @@ class PluginUpdateRunner extends UpdateRunner {
             to.delete();
             // install != update. Changing the user's settings like this is probabbly a bad idea.
             if (Boolean.valueOf( props.getProperty("dont-start-at-install")).booleanValue()) {
-                statusDone("<b>" + _t("Plugin {0} installed", appName) + "</b>");
+                statusDone("<b>" + _t("Plugin {0} installed", appName + ' ' + version) + "</b>");
                 if(!update) {
                     Properties pluginProps = PluginStarter.pluginProperties();
                     pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
@@ -534,19 +534,19 @@ class PluginUpdateRunner extends UpdateRunner {
                         String linkURL = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
                         String link;
                         if (linkName != null && linkURL != null)
-                            link = "<a target=\"_blank\" href=\"" + linkURL + "\"/>" + linkName + "</a>";
+                            link = "<a target=\"_blank\" href=\"" + linkURL + "\"/>" + linkName + ' ' + version + "</a>";
                         else
-                            link = appName;
+                            link = appName + ' ' + version;
                         statusDone("<b>" + _t("Plugin {0} installed and started", link) + "</b>");
                     }
                     else
-                        statusDone("<b>" + _t("Plugin {0} installed but failed to start, check logs", appName) + "</b>");
+                        statusDone("<b>" + _t("Plugin {0} installed but failed to start, check logs", appName + ' ' + version) + "</b>");
                 } catch (Throwable e) {
-                    statusDone("<b>" + _t("Plugin {0} installed but failed to start", appName) + ": " + e + "</b>");
-                    _log.error("Error starting plugin " + appName, e);
+                    statusDone("<b>" + _t("Plugin {0} installed but failed to start", appName + ' ' + version) + ": " + e + "</b>");
+                    _log.error("Error starting plugin " + appName + ' ' + version, e);
                 }
             } else {
-                statusDone("<b>" + _t("Plugin {0} installed", appName) + "</b>");
+                statusDone("<b>" + _t("Plugin {0} installed", appName + ' ' + version) + "</b>");
             }
         }
 
