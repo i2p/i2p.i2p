@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="addressbook" default="war" basedir=".">
+<project name="addressbook" default="all" basedir=".">
 
 	<property name="src" value="java/src"/>
 	<property name="build" value="build"/>
