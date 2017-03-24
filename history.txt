@@ -1,5 +1,16 @@
+2017-03-24 zzz
+ * Addressbook: Remove static reference, hide implementation
+ * CPUID: Recognize Ryzen
+
+2017-03-23 zzz
+ * Plugins:
+   - Blacklist i2pbote and BwSchedule
+   - Translate exceptions thrown from PluginStarter
+   - Add version number to console messages when installing/starting
+
 2017-03-21 zzz
  * i2psnark: Enhancement to support RPC plugin
+ * Context: New ClientAppManagerImpl in AppContext, so registration works
 
 2017-03-20 zzz
  * i2psnark: Enhancements to support RPC plugin
