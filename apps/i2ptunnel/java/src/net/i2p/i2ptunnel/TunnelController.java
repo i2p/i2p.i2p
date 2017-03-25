@@ -159,9 +159,9 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList<String>(4);
         boolean keyOK = true;
-        if (createKey && (getType().endsWith("server") || getPersistentClientKey())) {
+        if (createKey && (!isClient() || getPersistentClientKey())) {
             keyOK = createPrivateKey();
-            if (keyOK && getType().endsWith("server") && !getType().equals(TYPE_STREAMR_SERVER)) {
+            if (keyOK && !isClient() && !getType().equals(TYPE_STREAMR_SERVER)) {
                 // check rv?
                 createAltPrivateKey();
             }
@@ -380,12 +380,16 @@ public class TunnelController implements Logging {
         }
         // Config options may have changed since instantiation, so do this again.
         // Or should we take it out of the constructor completely?
-        if (type.endsWith("server") || getPersistentClientKey()) {
+        if (!isClient() || getPersistentClientKey()) {
             boolean ok = createPrivateKey();
             if (!ok) {
                 changeState(TunnelState.STOPPED);
                 log("Failed to start tunnel " + getName() + " as the private key file could not be created");
                 return;
+            }
+            if (!isClient() && !getType().equals(TYPE_STREAMR_SERVER)) {
+                // check rv?
+                createAltPrivateKey();
             }
         }
         setI2CPOptions();
@@ -754,6 +758,7 @@ public class TunnelController implements Logging {
                 props.setProperty(key, val);
             }
         }
+        Properties oldConfig = _config;
         _config = props;
 
         // Set up some per-type defaults
@@ -798,6 +803,15 @@ public class TunnelController implements Logging {
                 return;
             }
         }
+
+        if (oldConfig != null) {
+            if (configChanged(_config, oldConfig, PROP_FILE) ||
+                configChanged(_config, oldConfig, OPT_ALT_PKF) ||
+                configChanged(_config, oldConfig, OPT_SIG_TYPE)) {
+                log("Tunnel must be stopped and restarted for private key file changes to take effect");
+            }
+        }
+
         // Running, so check sessions
         Collection<I2PSession> sessions = getAllSessions();
         if (sessions.isEmpty()) {
@@ -815,6 +829,17 @@ public class TunnelController implements Logging {
                     _log.debug("Session is closed, not updating: " + s);
             }
         }
+    }
+
+    /**
+     *  Is property p different in p1 and p2?
+     *  @since 0.9.30
+     */
+    private static boolean configChanged(Properties p1, Properties p2, String p) {
+        String s1 = p1.getProperty(p);
+        String s2 = p2.getProperty(p);
+        return (s1 != null && !s1.equals(s2)) ||
+               (s1 == null && s2 != null);
     }
 
     /**
