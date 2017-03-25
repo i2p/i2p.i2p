@@ -1,3 +1,7 @@
+2017-03-25 zzz
+ * Blockfile: Upgrade to Blockfile format 4 on non-Android ARM
+ * i2ptunnel: Allow alt priv key file to be added without restarting I2P
+
 2017-03-24 zzz
  * Addressbook: Remove static reference, hide implementation
  * CPUID: Recognize Ryzen

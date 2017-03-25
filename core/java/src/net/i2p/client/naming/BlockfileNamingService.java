@@ -418,10 +418,10 @@ public class BlockfileNamingService extends DummyNamingService {
             // version 3 -> version 4
             // support multiple destinations per hostname
             if (VersionComparator.comp(_version, "4") < 0) {
-                // Upgrade of 4K entry DB on RPi 2 is over 2 1/2 minutes, disable for now
-                if (SystemVersion.isAndroid() || SystemVersion.isARM()) {
+                // Upgrade of 4K entry DB on RPi 2 is over 2 1/2 minutes, probably worse on Android, disable for now
+                if (SystemVersion.isAndroid()) {
                     if (_log.shouldWarn())
-                        _log.warn("Deferring upgrade to version 4 on Android/ARM");
+                        _log.warn("Deferring upgrade to version 4 on Android");
                     return true;
                 }
                 SkipList<String, Properties> hdr = _bf.getIndex(INFO_SKIPLIST, _stringSerializer, _infoSerializer);
