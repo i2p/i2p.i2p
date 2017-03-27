@@ -1,3 +1,10 @@
+2017-03-27 zzz
+ * Blockfile: Include authentication strings in exports
+ * Debian: Add missing addressbook.jar to package (ticket #1973)
+ * SusiDNS: Add addressbook.jar to classpath, don't fail
+   to start if it's still not found (ticket #1973)
+ * Time: Fix crashes on old Androids (ticket #1976)
+
 2017-03-25 zzz
  * Blockfile: Upgrade to Blockfile format 4 on non-Android ARM
  * i2ptunnel: Allow alt priv key file to be added without restarting I2P
