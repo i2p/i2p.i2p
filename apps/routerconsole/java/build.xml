@@ -366,6 +366,8 @@
            **         -trimSpaces        Trim spaces in template text between actions, directives
         -->
         <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
+            <!-- this prevents tomcat from complaining in debian builds -->
+            <jvmarg value="-Dtomcat.util.scan.StandardJarScanFilter.jarsToSkip=commons-collections.jar,junit.jar,junit4.jar" />
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
