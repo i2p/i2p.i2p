@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1285,6 +1286,132 @@ public class BlockfileNamingService extends DummyNamingService {
             } catch (RuntimeException re) {
                 _log.error("DB lookup error", re);
                 return Collections.emptyMap();
+            } finally {
+                deleteInvalid();
+            }
+        }
+    }
+
+    /**
+     *  Export in a hosts.txt format.
+     *  Output is sorted.
+     *  Caller must close writer.
+     *
+     *  @param options If non-null and contains the key "list", get
+     *                from that list (default "hosts.txt", NOT all lists)
+     *                Key "search": return only those matching substring
+     *                Key "startsWith": return only those starting with
+     *                                  ("[0-9]" allowed)
+     *                Key "beginWith": start here in the iteration
+     *  @since 0.9.30 override NamingService to add stored authentication strings
+     */
+    @Override
+    public void export(Writer out, Properties options) throws IOException {
+        String listname = FALLBACK_LIST;
+        String search = null;
+        String startsWith = null;
+        String beginWith = null;
+        if (options != null) {
+            String ln = options.getProperty("list");
+            if (ln != null)
+                listname = ln;
+            search = options.getProperty("search");
+            startsWith = options.getProperty("startsWith");
+            beginWith = options.getProperty("beginWith");
+            if (beginWith == null && startsWith != null) {
+                if (startsWith.equals("[0-9]"))
+                    beginWith = "0";
+                else
+                    beginWith = startsWith;
+            }
+        }
+        out.write("# Address book: ");
+        out.write(getName());
+        out.write(" (" + listname + ')');
+        final String nl = System.getProperty("line.separator", "\n");
+        out.write(nl);
+        out.write("# Exported: ");
+        out.write((new Date()).toString());
+        out.write(nl);
+        synchronized(_bf) {
+            if (_isClosed)
+                return;
+            try {
+                SkipList<String, DestEntry> sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No skiplist found for lookup in " + listname);
+                    return;
+                }
+                if (beginWith == null && search == null) {
+                    int sz = sl.size();
+                    if (sz <= 0) {
+                        out.write("# No entries");
+                        out.write(nl);
+                        return;
+                    }
+                    if (sz > 1) {
+                        // actually not right due to multidest
+                        out.write("# " + sz + " entries");
+                        out.write(nl);
+                    }
+                }
+                SkipIterator<String, DestEntry> iter;
+                if (beginWith != null)
+                    iter = sl.find(beginWith);
+                else
+                    iter = sl.iterator();
+                int cnt = 0;
+                while (iter.hasNext()) {
+                    String key = iter.nextKey();
+                    if (startsWith != null) {
+                        if (startsWith.equals("[0-9]")) {
+                            if (key.charAt(0) > '9')
+                                break;
+                        } else if (!key.startsWith(startsWith)) {
+                            break;
+                        }
+                    }
+                    DestEntry de = iter.next();
+                    if (!validate(key, de, listname))
+                        continue;
+                    if (search != null && key.indexOf(search) < 0)
+                        continue;
+                    int dsz = de.destList != null ? de.destList.size() : 1;
+                    // new non-DSA dest is put first, so put in reverse
+                    // order so importers will see the older dest first
+                    for (int i = dsz - 1; i >= 0; i--) {
+                        Properties p;
+                        Destination d;
+                        if (i == 0) {
+                            p = de.props;
+                            d = de.dest;
+                        } else {
+                            p = de.propsList.get(i);
+                            d = de.destList.get(i);
+                        }
+                        out.write(key);
+                        out.write('=');
+                        out.write(d.toBase64());
+                        if (p != null)
+                            SingleFileNamingService.writeOptions(p, out);
+                        out.write(nl);
+                        cnt++;
+                    }
+                }
+                if (beginWith != null || search != null) {
+                    if (cnt <= 0) {
+                        out.write("# No entries");
+                        out.write(nl);
+                        return;
+                    }
+                    if (cnt > 1) {
+                        out.write("# " + cnt + " entries");
+                        out.write(nl);
+                    }
+                }
+            } catch (RuntimeException re) {
+                throw new IOException("DB lookup error", re);
             } finally {
                 deleteInvalid();
             }
