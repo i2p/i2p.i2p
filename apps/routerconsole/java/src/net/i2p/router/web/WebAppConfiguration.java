@@ -98,7 +98,11 @@ public class WebAppConfiguration implements Configuration {
             // Ticket #957... don't know why...
             // Only really required if started manually, but we don't know that from here
             cp = "jetty-util.jar";
-        } else ****/ if (pluginDir.exists()) {
+****/
+        if (ctxPath.equals("/susidns")) {
+            // Old installs don't have this in their wrapper.config classpath
+            cp = "addressbook.jar";
+        } else if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
@@ -174,11 +178,13 @@ public class WebAppConfiguration implements Configuration {
             }
         } else {
             // Java 9 - assume everything in lib/ is in the classpath
+            // except addressbook.jar
             File libDir = new File(ctx.getBaseDir(), "lib");
             File[] files = libDir.listFiles();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
-                    if (files[i].getName().endsWith(".jar"))
+                    String name = files[i].getName();
+                    if (name.endsWith(".jar") && !name.equals("addressbook.jar"))
                         rv.add(files[i].toURI());
                 }
             }

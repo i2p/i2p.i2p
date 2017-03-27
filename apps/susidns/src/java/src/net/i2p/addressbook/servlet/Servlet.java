@@ -30,7 +30,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.i2p.addressbook.DaemonThread;
+import net.i2p.I2PAppContext;
+//import net.i2p.addressbook.DaemonThread;
+import net.i2p.util.Log;
 
 /**
  * A wrapper for addressbook to allow it to be started as a web application.
@@ -45,7 +47,7 @@ import net.i2p.addressbook.DaemonThread;
 public class Servlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private transient DaemonThread thread;
+    private transient Thread thread;
     //private String nonce;
     //private static final String PROP_NONCE = "addressbook.nonce";
 
@@ -71,6 +73,7 @@ public class Servlet extends HttpServlet {
     /* (non-Javadoc)
      * @see javax.servlet.Servlet#init(javax.servlet.ServletConfig)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void init(ServletConfig config) {
         try {
@@ -83,17 +86,39 @@ public class Servlet extends HttpServlet {
         //System.setProperty(PROP_NONCE, this.nonce);
         String[] args = new String[1];
         args[0] = config.getInitParameter("home");
-        this.thread = new DaemonThread(args);
-        this.thread.setDaemon(true);
-        this.thread.setName("Addressbook");
-        this.thread.start();
-        //System.out.println("INFO: Starting Addressbook " + Daemon.VERSION);
-        //System.out.println("INFO: config root under " + args[0]);
+        try {
+            ClassLoader cl = getServletContext().getClassLoader();
+            Class cls = Class.forName("net.i2p.addressbook.DaemonThread", true, cl);
+            // We do it this way so that if we can't find addressbook,
+            // the whole thing doesn't die.
+            // We do add addressbook.jar in WebAppConfiguration,
+            // so this is just in case.
+            //Thread t = new DaemonThread(args);
+            Thread t = (Thread) cls.getConstructor(String[].class).newInstance((Object)args);
+            t.setDaemon(true);
+            t.setName("Addressbook");
+            t.start();
+            this.thread = t;
+            //System.out.println("INFO: Starting Addressbook " + Daemon.VERSION);
+            //System.out.println("INFO: config root under " + args[0]);
+        } catch (Throwable t) {
+            // addressbook.jar may not be in the classpath
+            I2PAppContext.getGlobalContext().logManager().getLog(Servlet.class).logAlways(Log.WARN, "Addressbook thread not started: " + t);
+        }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void destroy() {
-        this.thread.halt();
+        if (this.thread != null) {
+            //((DaemonThread)this.thread).halt();
+            try {
+                ClassLoader cl = getServletContext().getClassLoader();
+                Class<?> cls = Class.forName("net.i2p.addressbook.DaemonThread", true, cl);
+                Object t = cls.cast(this.thread);
+                cls.getDeclaredMethod("halt").invoke(t);
+            } catch (Throwable t) {}
+        }
         super.destroy();
     }
 }
