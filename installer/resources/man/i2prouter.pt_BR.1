@@ -3,30 +3,30 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH I2PROUTER 1 "26 Gennaio 2017" "" I2P
+.TH I2PROUTER 1 "26 de Janeiro de 2017" "" I2P
 
 .SH NOME
-i2prouter \- lancia e termina il router I2P
+i2prouter \- start and stop the I2P router
 
-.SH SINOSSI
+.SH SINOPSE
 \fBi2prouter\fP
 {\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
 .br
 
-.SH DESCRIZIONE
-Permette di controllare il servizio I2P.
+.SH DESCRIÇÃO
+Control the I2P service.
 
 .IP \fBconsole\fP
 Runs I2P as a console application under the current user.
 
 .IP \fBstart\fP
-Avvia il servizio I2P.
+Starts the I2P service.
 
 .IP \fBstop\fP
-Arresta il servizio I2P.
+Stops the I2P service.
 
 .IP \fBrestart\fP
-Arresta e poi riavvia il servizio I2P.
+Stops the I2P service and then starts it.
 
 .IP \fBcondrestart\fP
 Restart the I2P service only if it is already running.
@@ -41,16 +41,16 @@ Install initscript to start I2P automatically when the system boots.
 Uninstall initscript that was installed with \fBinstall\fP
 
 .IP \fBstatus\fP
-Scrive se il servizio I2P è in esecuzione.
+Prints whether the I2P service is running.
 
 .IP \fBdump\fP
 Dumps the current threads into \fBwrapper.log\fP.
 
-.SH "SEGNALAZIONE BUG"
+.SH "REPORTING BUGS"
 Please enter a ticket on
 .UR https://trac.i2p2.de/
 the I2P trac page
 .UE .
 
-.SH "VEDI ANCHE"
+.SH "VER TAMBÉM"
 \fBi2prouter\-nowrapper\fP(1)

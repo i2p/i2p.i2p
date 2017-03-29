@@ -1,0 +1,57 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "26 stycznia 2017" "" I2P
+
+.SH NAZWA
+I2prouter \- uruchom i zatrzymaj węzeł I2P
+
+.SH STRESZCZENIE
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH OPIS
+Zarządza usługą I2P.
+
+.IP \fBconsole\fP
+Uruchamia I2P jako aplikację konsoli jako obecny użytkownik.
+
+.IP \fBstart\fP
+Uruchamia usługę I2P.
+
+.IP \fBstop\fP
+Zatrzymuje usługę I2P.
+
+.IP \fBrestart\fP
+Zatrzymuje i uruchamia ponownie usługę I2P.
+
+.IP \fBcondrestart\fP
+Restartuje usługę I2P tylko jeżeli jest już uruchomiona.
+
+.IP \fBgraceful\fP
+Elegancko zatrzymuje I2P (może potrwać do 11 minut).
+
+.IP \fBinstall\fP
+Instaluje initscript, aby uruchamiać I2P automatycznie podczas startu
+systemu.
+
+.IP \fBremove\fP
+Usuwa initscript zainstalowany poprzez polecenie \fBinstall\fP.
+
+.IP \fBstatus\fP
+Wyświetla czy usługa I2P jest uruchomiona.
+
+.IP \fBdump\fP
+Zrzuca działające wątki do \fBwrapper.log\fP.
+
+.SH "ZGŁASZANIE BŁĘDÓW"
+Prosimy zgłosić błąd na
+.UR https://trac.i2p2.de/
+stronie I2P trac
+.UE .
+
+.SH "ZOBACZ TAKŻE"
+\fBi2prouter\-nowrapper\fP(1)

@@ -404,7 +404,11 @@ trans.fr = installer/resources/locale-man/man_fr.po
 trans.it = installer/resources/locale-man/man_it.po
 trans.ko = installer/resources/locale-man/man_ko.po
 trans.nl = installer/resources/locale-man/man_nl.po
+trans.pl = installer/resources/locale-man/man_pl.po
 trans.pt = installer/resources/locale-man/man_pt.po
+trans.pt_BR = installer/resources/locale-man/man_pt_BR.po
+trans.ru_RU = installer/resources/locale-man/man_ru.po
+trans.sv_SE = installer/resources/locale-man/man_sv.po
 trans.zh_CN = installer/resources/locale-man/man_zh.po
 
 [main]

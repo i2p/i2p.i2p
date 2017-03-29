@@ -1,0 +1,95 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "26 stycznia 2017" "" I2P
+
+.SH NAZWA
+Eepget \- asystent pobierania I2P
+
+.SH STRESZCZENIE
+\fBeepget\fP [\fIopcje\fP]\fIURL\fP
+.br
+
+.SH OPIS
+.P
+Pobiera plik niezależnie przez HTTP. Zarówno transfery przez I2P i przez
+zwykły Internet są wspierane.
+.P
+Eepget pozwala poradzić sobie z powolnym lub niestabilnym połączeniem;
+jeżeli pobieranie nie powiedzie się z powodu problemu z połączeniem,
+zostanie ono wznowione (jeżeli opcja \-n jest aktywna). Jeżeli jest to
+wspierane przez serwer, eepget spróbuje pobrać plik od miejsca w którym
+pobieranie zostało przerwane.
+
+.SH OPCJE
+\fB\-c\fP
+.TP 
+Clearnet (zwykły Internet). Nie używa proxy. To samo co \fB\-p\fP :0.
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Ustawia wartość etag w nagłówku żądania.
+.TP 
+
+\fB\-h\fP nazwa=wartość
+.TP 
+Dodaje dowolny nagłówek żądania z podaną nazwą i wartością.
+.TP 
+
+\fB\-l\fP długość_linii
+.TP 
+Dostosowuje wyświetlanie postępu. \fB\ lineLen \fP jest długością (w znakach) jednej linii paska postępu. Domyślnie 40.
+.TP 
+
+\fB\-m\fP rozmiar_znaku
+.TP 
+Dostosowuje wyświetlanie postępu. \fB\ markSize \fP jest liczbą bajtów reprezentowanych przez jeden znak '#'. Domyślnie 1024.
+.TP 
+
+\fB\-n\fP prób
+.TP 
+Określa ile razy spróbować ponownie pobierania w przypadku niepowodzenia. Jeżeli ta opcja nie zostanie podana, eepget nie spróbuje ponownie.
+.TP 
+
+\fB\-o\fP plik_wyjściowy
+.TP 
+Określa plik wyjściowy do zapisu. Jeżeli ta opcja nie zostanie sprecyzowana, wyjściowa nazwa pliku będzie taka sama jak pierwotna z URL.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Określa używane proxy I2P (eeproxy). Jeżeli port nie zostanie podany, eepget użyje 4444. Jeżeli ta opcja nie zostanie określona, eepget użyje 127.0.0.1:4444. Określ \fB\-c\fP lub \fB\-p\fP:0, aby wyłączyć eeproxy.
+.TP 
+
+\fB\-t\fP sekundy
+.TP 
+Określa limit czasu nieaktywności. Domyślnie 60 sekund.
+.TP 
+
+\fB\-u\fP użytkownik
+.TP 
+Ustawia nazwę użytkownika dla autoryzacji proxy (jeżeli konieczna).
+.TP 
+
+\fB\-x\fP hasło
+.TP 
+Ustawia hasło dla autoryzacji proxy (jeżeli konieczna). Jeżeli nazwa użytkownika jest określona, ale nie hasło, eepget zapyta o hasło.
+.TP 
+
+.SH "KOD WYJŚCIOWY"
+
+\fBeepget\fP kończy pracę z kodem zero po pomyślnym pobraniu i z kodem
+nie\-zerowym jeżeli wystąpiły problemy z pobieraniem.
+
+.SH "ZGŁASZANIE BŁĘDÓW"
+Prosimy zgłosić błąd na
+.UR https://trac.i2p2.de/
+stronie I2P trac
+.UE .
+
+.SH "ZOBACZ TAKŻE"
+\fBi2prouter\fP(1) \fBcurl\fP(1) \fBwget\fP(1)
+

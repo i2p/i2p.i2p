@@ -3,54 +3,54 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH I2PROUTER 1 "2017년 1월 26일" "" I2P
+.TH I2PROUTER 1 "January 26, 2017" "" I2P
 
-.SH 이름
-i2prouter \- I2P 라우터를 시작하거나 중지할 때 사용
+.SH NAME
+i2prouter \- start and stop the I2P router
 
 .SH SYNOPSIS
 \fBi2prouter\fP
 {\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
 .br
 
-.SH 설명
-I2P 서비스를 조정
+.SH DESCRIPTION
+Control the I2P service.
 
 .IP \fBconsole\fP
-현재 유저로 I2P를 콘솔 애플리케이션으로 동작시킴
+Runs I2P as a console application under the current user.
 
 .IP \fBstart\fP
-I2P 서비스를 시작
+Startar I2P\-tjänsten.
 
 .IP \fBstop\fP
-I2P 서비스를 중지
+Stoppar I2P\-tjänsten.
 
 .IP \fBrestart\fP
-I2P 서비스를 종료하고 재시작
+Stoppar I2P\-tjänsten och startar den sedan.
 
 .IP \fBcondrestart\fP
-I2P 서비스가 실행중이라면 재시작
+Startar om I2P\-tjänsten endast om den redan körs.
 
 .IP \fBgraceful\fP
-우아하게 종료 (11분 이상 걸릴 수 있음)
+Stoppar I2P varsamt (kan ta upp till 11 minuter)
 
 .IP \fBinstall\fP
-시스템이 켜짐젼 I2P를 자동 시작하게끔 initscript를 설치
+Install initscript to start I2P automatically when the system boots.
 
 .IP \fBremove\fP
-\fBinstall\fP로 설치된 initscript를 삭제
+Uninstall initscript that was installed with \fBinstall\fP
 
 .IP \fBstatus\fP
-I2P 작동 여부를 출력
+Prints whether the I2P service is running.
 
 .IP \fBdump\fP
-\fBwrapper.log\fP에 현재 쓰레드를 덤프
+Dumps the current threads into \fBwrapper.log\fP.
 
 .SH "REPORTING BUGS"
+Please enter a ticket on
 .UR https://trac.i2p2.de/
-I2P trac 페이지
+the I2P trac page
 .UE .
-에 티켓을 남겨 주세요
 
 .SH "SEE ALSO"
 \fBi2prouter\-nowrapper\fP(1)
