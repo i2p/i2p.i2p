@@ -815,18 +815,18 @@ public abstract class TransportImpl implements Transport {
     /**
      *  This returns true if the force-firewalled setting is configured, false otherwise.
      *
-     *  @since 0.9.20
+     *  @since 0.9.20, public since 0.9.30
      */
-    protected boolean isIPv4Firewalled() {
+    public boolean isIPv4Firewalled() {
         return TransportUtil.isIPv4Firewalled(_context, getStyle());
     }
 
     /**
      *  This returns true if the force-firewalled setting is configured, false otherwise.
      *
-     *  @since 0.9.27
+     *  @since 0.9.27, public since 0.9.30
      */
-    protected boolean isIPv6Firewalled() {
+    public boolean isIPv6Firewalled() {
         return TransportUtil.isIPv6Firewalled(_context, getStyle());
     }
 
@@ -987,9 +987,9 @@ public abstract class TransportImpl implements Transport {
     }
 
     /**
-     *  @since IPv6
+     *  @since IPv6, public since 0.9.30
      */
-    protected TransportUtil.IPv6Config getIPv6Config() {
+    public TransportUtil.IPv6Config getIPv6Config() {
         return TransportUtil.getIPv6Config(_context, getStyle());
     }
 
