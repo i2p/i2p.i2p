@@ -1,5 +1,17 @@
+2017-03-31 zzz
+ * SSU:
+   - When a IPv6 peer connects, trigger a IPv6 peer test, not a IPv4 one
+   - Require two consecutive peer test results for some state transitions,
+     to prevent frequent transitions to firewalled and back
+
+2017-03-29 zzz
+ * SSU: Refactor PeerTestEvent out of UDPTransport
+ * Throttle: Reduce threshold for probabalistic throttling
+   on slow platforms (ticket #1964)
+
 2017-03-27 zzz
  * Blockfile: Include authentication strings in exports
+ * Build: Suppress JarScanner warning during Debian build (ticket #1975)
  * Debian: Add missing addressbook.jar to package (ticket #1973)
  * SusiDNS: Add addressbook.jar to classpath, don't fail
    to start if it's still not found (ticket #1973)

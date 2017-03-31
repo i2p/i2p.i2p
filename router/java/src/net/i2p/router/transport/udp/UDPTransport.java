@@ -81,6 +81,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final PeerTestEvent _testEvent;
     private final PacketBuilder _destroyBuilder;
     private Status _reachabilityStatus;
+    private Status _reachabilityStatusPending;
+    // only for logging, to be removed
     private long _reachabilityStatusLastUpdated;
     private int _reachabilityStatusUnchanged;
     private long _introducersSelectedOn;
@@ -267,6 +269,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testManager = new PeerTestManager(_context, this);
         _testEvent = new PeerTestEvent(_context, this, _testManager);
         _reachabilityStatus = Status.UNKNOWN;
+        _reachabilityStatusPending = Status.OK;
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
         _lastInboundReceivedOn = -1;
@@ -1345,8 +1348,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 status != Status.IPV4_DISABLED_IPV6_FIREWALLED &&
                 status != Status.DISCONNECTED &&
                 _reachabilityStatusUnchanged < 7) {
-                // IPv4 only for now
-                _testEvent.forceRunSoon(false);
+                _testEvent.forceRunSoon(peer.isIPv6());
             }
         }
         return true;
@@ -3155,6 +3157,27 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
 
             if (status != old) {
+                // for the following transitions ONLY, require two in a row
+                // to prevent thrashing
+                if ((old == Status.OK && (status == Status.DIFFERENT ||
+                                          status == Status.REJECT_UNSOLICITED ||
+                                          status == Status.IPV4_FIREWALLED_IPV6_OK ||
+                                          status == Status.IPV4_SNAT_IPV6_OK ||
+                                          status == Status.IPV4_OK_IPV6_FIREWALLED)) ||
+                    (status == Status.OK && (old == Status.DIFFERENT ||
+                                             old == Status.REJECT_UNSOLICITED ||
+                                             old == Status.IPV4_FIREWALLED_IPV6_OK ||
+                                             old == Status.IPV4_SNAT_IPV6_OK ||
+                                             old == Status.IPV4_OK_IPV6_FIREWALLED))) {
+                    if (status != _reachabilityStatusPending) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Old status: " + old + " status pending confirmation: " + status +
+                                      " Caused by update: " + newStatus);
+                        _reachabilityStatusPending = status;
+                        _testEvent.forceRunSoon(isIPv6);
+                        return;
+                    }
+                }
                 _reachabilityStatusUnchanged = 0;
                 long now = _context.clock().now();
                 _reachabilityStatusLastUpdated = now;
@@ -3162,6 +3185,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             } else {
                 _reachabilityStatusUnchanged++;
             }
+            _reachabilityStatusPending = status;
         }
         if (status != old) {
             if (_log.shouldLog(Log.WARN))
