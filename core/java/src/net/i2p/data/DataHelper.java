@@ -46,6 +46,7 @@ import net.i2p.util.OrderedProperties;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.ReusableGZIPOutputStream;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
 /**
@@ -54,6 +55,9 @@ import net.i2p.util.Translate;
  * @author jrandom
  */
 public class DataHelper {
+
+    /** See storeProps(). 600-750 ms on RPi. */
+    private static final boolean SHOULD_SYNC = !(SystemVersion.isAndroid() || SystemVersion.isARM());
 
     /**
      *  Map of String to itself to cache common
@@ -514,8 +518,10 @@ public class DataHelper {
                 }
                 out.println(name + "=" + val);
             }
-            out.flush();
-            fos.getFD().sync();
+            if (SHOULD_SYNC) {
+                out.flush();
+                fos.getFD().sync();
+            }
             out.close();
             if (out.checkError()) {
                 out = null;

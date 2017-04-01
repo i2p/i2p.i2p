@@ -238,7 +238,7 @@ public class Snark
   private volatile boolean _autoStoppable;
   // String indicating main activity
   private volatile String activity = "Not started";
-  private final long savedUploaded;
+  private long savedUploaded;
   private long _startedTime;
   private static final AtomicInteger __RPCID = new AtomicInteger();
   private final int _rpcID = __RPCID.incrementAndGet();
@@ -637,16 +637,17 @@ public class Snark
     if (st != null) {
         // TODO: Cache the config-in-mem to compare vs config-on-disk
         // (needed for auto-save to not double-save in some cases)
-        //boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
-        boolean changed = true;
-        if (changed && completeListener != null)
-            completeListener.updateStatus(this);
+        long nowUploaded = getUploaded();
+        boolean changed = storage.isChanged() || nowUploaded != savedUploaded;
         try { 
             storage.close(); 
         } catch (IOException ioe) {
             System.out.println("Error closing " + torrent);
             ioe.printStackTrace();
         }
+        savedUploaded = nowUploaded;
+        if (changed && completeListener != null)
+            completeListener.updateStatus(this);
     }
     if (fast)
         // HACK: See above if(!fast)
@@ -1289,8 +1290,12 @@ public class Snark
 
     allChecked = true;
     checking = false;
-    if (storage.isChanged() && completeListener != null)
+    if (storage.isChanged() && completeListener != null) {
         completeListener.updateStatus(this);
+        // this saved the status, so reset the variables
+        storage.clearChanged();
+        savedUploaded = getUploaded();
+    }
   }
   
   public void storageCompleted(Storage storage)
@@ -1299,8 +1304,12 @@ public class Snark
         _log.info("Completely received " + torrent);
     //storage.close();
     //System.out.println("Completely received: " + torrent);
-    if (completeListener != null)
+    if (completeListener != null) {
         completeListener.torrentComplete(this);
+        // this saved the status, so reset the variables
+        savedUploaded = getUploaded();
+        storage.clearChanged();
+    }
   }
 
   public void setWantedPieces(Storage storage)

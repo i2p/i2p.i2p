@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -233,6 +234,7 @@ public class RouterConsoleRunner implements RouterApp {
         changeState(STOPPING);
         if (PluginStarter.pluginsEnabled(_context))
             (new I2PAppThread(new PluginStopper(_context), "PluginStopper")).start();
+        stopAllWebApps();
         try {
             _server.stop();
         } catch (Exception ie) {}
@@ -1038,6 +1040,32 @@ public class RouterConsoleRunner implements RouterApp {
         } catch (IOException ioe) {
             // _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
         }
+    }
+
+    /**
+     *  Stops all but the root webapp (routerconsole.war)
+     *  In Jetty 9, stopping the server doesn't stop the non-root webapps,
+     *  so we must do it here.
+     *  There should be a better way to do this, possibly by
+     *  making the webapps "managed".
+     *  @since 0.9.30
+     */
+    private void stopAllWebApps() {
+        Properties props = webAppProperties(_context);
+        Set<String> keys = props.stringPropertyNames();
+        for (String name : keys) {
+            if (name.startsWith(PREFIX) && name.endsWith(ENABLED)) {
+                String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
+                if (ROUTERCONSOLE.equals(app))
+                    continue;
+                if (WebAppStarter.isWebAppRunning(app)) {
+                    try {
+                        WebAppStarter.stopWebApp(app);
+                    } catch (Throwable t) { t.printStackTrace(); }
+                }
+            }
+        }
+
     }
 
     static class WarFilenameFilter implements FilenameFilter {
