@@ -1018,6 +1018,6 @@ public class I2PAppContext {
      *  @since 0.9.11, in RouterContext since 0.9.4
      */
     public ClientAppManager clientAppManager() {
-        return null;
+        return _appManager;
     }
 }

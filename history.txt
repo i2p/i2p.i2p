@@ -1,3 +1,7 @@
+2017-04-02 zzz
+ * Context: Fix ClientAppManagerImpl in AppContext
+ * i2psnark: Fix standalone configuration for Jetty 9
+
 2017-04-01 zzz
  * Console: Fix stopping of webapps when console stops (ticket #1893)
  * i2psnark: Only rewrite torrent config file if changed (ticket #1893)

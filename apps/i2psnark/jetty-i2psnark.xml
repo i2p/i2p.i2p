@@ -22,15 +22,24 @@
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <Call name="addConnector">
     <Arg>
-        <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+        <New class="org.eclipse.jetty.server.ServerConnector">
+          <Arg><Ref id="Server" /></Arg>
+          <Arg type="int">1</Arg>     <!-- number of acceptors -->
+          <Arg type="int">0</Arg>     <!-- default number of selectors -->
+          <Arg>
+            <Array type="org.eclipse.jetty.server.ConnectionFactory">    <!-- varargs so we need an array -->
+              <Item>
+                <New class="org.eclipse.jetty.server.HttpConnectionFactory">
+                  <Arg>
+                    <New class="org.eclipse.jetty.server.HttpConfiguration" />
+                  </Arg>
+                </New>
+              </Item>
+            </Array>
+          </Arg>
           <Set name="host">127.0.0.1</Set>
           <Set name="port">8002</Set>
-          <Set name="maxIdleTime">600000</Set>
-          <Set name="Acceptors">1</Set>
-          <Set name="statsOn">false</Set>
-          <Set name="lowResourcesConnections">5000</Set>
-          <Set name="lowResourcesMaxIdleTime">5000</Set>
-          <Set name="useDirectBuffers">false</Set>
+          <Set name="idleTimeout">600000</Set>
         </New>
     </Arg>
   </Call>
@@ -96,7 +105,7 @@
     <Ref id="DeploymentManager">
       <Call name="addAppProvider">
         <Arg>
-          <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
+          <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
             <Set name="monitoredDirName">./contexts</Set>
             <Set name="scanInterval">0</Set>
           </New>
