@@ -73,6 +73,7 @@ public class WorkingDir {
 
         boolean isWindows = SystemVersion.isWindows();
         File dirf = null;
+        String gentooWarning = null;
         if (dir != null) {
             dirf = new SecureDirectory(dir);
         } else {
@@ -92,10 +93,46 @@ public class WorkingDir {
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_MAC);
                 }
             } else {
-                if (SystemVersion.isLinuxService())
-                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_DAEMON);
-                else
+                if (SystemVersion.isLinuxService()) {
+                    if (SystemVersion.isGentoo() &&
+                        SystemVersion.GENTOO_USER.equals(System.getProperty("user.name"))) {
+                        // whoops, we didn't recognize Gentoo as a service until 0.9.29,
+                        // so the config dir was /var/lib/i2p/.i2p through 0.9.28
+                        // and changed to /var/lib/i2p/i2p-config in 0.9.29.
+                        // Look for both to decide which to use.
+                        // We prefer .i2p if neither exists.
+                        // We prefer the newer if both exist.
+                        File d1 = new SecureDirectory(home, WORKING_DIR_DEFAULT);
+                        File d2 = new SecureDirectory(home, WORKING_DIR_DEFAULT_DAEMON);
+                        boolean e1 = isSetup(d1);
+                        boolean e2 = isSetup(d2);
+                        if (e1 && e2) {
+                            // d1 is probably older. Switch if it isn't.
+                            if (d2.lastModified() < d1.lastModified()) {
+                                File tmp = d2;
+                                d2 = d1;
+                                d1 = tmp;
+                                // d1 now is the older one
+                            }
+                            dirf = d2;
+                            gentooWarning = "Warning - Found both an old configuration directory " + d1.getAbsolutePath() +
+                                            " and new configuration directory " + d2.getAbsolutePath() +
+                                            " created due to a bug in release 0.9.29\n. Using the new configuration" +
+                                            " directory. To use the old directory instead, stop i2p," +
+                                            " delete the new directory, and restart.";
+                        } else if (e1 && !e2) {
+                            dirf = d1;
+                        } else if (!e1 && e2) {
+                            dirf = d2;
+                        } else {
+                            dirf = d1;
+                        }
+                    } else {
+                        dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_DAEMON);
+                    }
+                } else {
                     dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
+                }
             }
         }
 
@@ -134,6 +171,9 @@ public class WorkingDir {
             if (dirf.isDirectory()) {
                 if (isSetup(dirf)) {
                     setupSystemOut(rv);
+                    // see above for why
+                    if (gentooWarning != null)
+                        System.err.println(gentooWarning);
                     return rv; // all is good, we found the user directory
                 }
             }

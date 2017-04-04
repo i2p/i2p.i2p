@@ -53,7 +53,10 @@ public class OOMListener implements I2PThread.OOMEventListener {
             // you the actual config file path, have to guess
             String path;
             if (SystemVersion.isLinuxService()) {
-                path = "/etc/i2p";
+                if (SystemVersion.isGentoo())
+                    path = "/usr/share/i2p";
+                else
+                    path = "/etc/i2p";
             } else {
                 path = _context.getBaseDir().toString();
             }
