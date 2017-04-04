@@ -17,6 +17,10 @@
 - ./makegeoipv6.sh
 - mtn ci geoip.txt geoipv6.dat.gz
 
+- BuildTime: Don't have to do this every release, but update the
+  EARLIEST and EARLIEST_LONG values in ~/mtn/i2p/core/java/src/net/i2p/time/BuildTime.java
+  to the current date, more or less.
+
 
 ## A day or two before
 
