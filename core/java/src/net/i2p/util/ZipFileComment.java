@@ -19,8 +19,10 @@ import net.i2p.data.DataHelper;
  * http://www.flattermann.net/2009/01/read-a-zip-file-comment-with-java/
  * Beerware.
  *
- * since 0.8.8
+ * @deprecated scheduled for removal late 2017, not for external use
+ * @since 0.8.8
  */
+@Deprecated
 public abstract class ZipFileComment {
 
     private static final int BLOCK_LEN = 22;
