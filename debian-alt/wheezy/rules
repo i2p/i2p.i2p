@@ -36,7 +36,7 @@ export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/^Version:/{prin
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
-	dh $@ --with systemd
+	dh $@ --with systemd,bash-completion
 
 clean: createcopyright
 

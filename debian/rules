@@ -38,7 +38,7 @@ export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
-	dh $@ --with systemd,quilt
+	dh $@ --with systemd,quilt,bash-completion
 
 clean: createcopyright
 

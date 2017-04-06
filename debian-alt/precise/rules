@@ -39,7 +39,7 @@ export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
-	dh $@
+	dh $@ --with bash-completion
 
 clean: createcopyright
 
