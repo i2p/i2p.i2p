@@ -44,18 +44,18 @@ public class SummaryHelper extends HelperBase {
 
     static final String DEFAULT_FULL =
         "HelpAndFAQ" + S +
+        "ShortGeneral" + S +
+        "Bandwidth" + S +
+        "UpdateStatus" + S +
+        "FirewallAndReseedStatus" + S +
+        "NetworkReachability" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
-        "General" + S +
-        "NetworkReachability" + S +
-        "UpdateStatus" + S +
-        "RestartStatus" + S +
         "Peers" + S +
-        "FirewallAndReseedStatus" + S +
-        "Bandwidth" + S +
         "Tunnels" + S +
-        "Congestion" + S +
         "TunnelStatus" + S +
+        "Congestion" + S +
+        "RestartStatus" + S +
         "Destinations" + S +
         "";
 
