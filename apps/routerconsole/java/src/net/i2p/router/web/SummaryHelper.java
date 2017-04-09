@@ -77,7 +77,7 @@ public class SummaryHelper extends HelperBase {
      */
     public String getIdent() { 
         if (_context == null) return "[no router]";
-        
+
         if (_context.routerHash() != null)
             return _context.routerHash().toBase64().substring(0, 4);
         else
@@ -96,14 +96,14 @@ public class SummaryHelper extends HelperBase {
      */
     public String getUptime() { 
         if (_context == null) return "[no router]";
-        
+
         Router router = _context.router();
         if (router == null) 
             return "[not up]";
         else
             return DataHelper.formatDuration2(router.getUptime());
     }
-    
+
 /**
     this displayed offset, not skew - now handled in reachability()
 
@@ -118,17 +118,17 @@ public class SummaryHelper extends HelperBase {
         return " (" + DataHelper.formatDuration2(diff) + " " + _t("skew") + ")";
     }
 **/
-    
+
     /** allowReseed */
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
                (_context.netDb().getKnownRouters() < 30) ||
                 _context.getBooleanProperty("i2p.alwaysAllowReseed");
     }
-    
+
     /** subtract one for ourselves, so if we know no other peers it displays zero */
     public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
-    
+
     public String getReachability() {
         return reachability(); // + timeSkew();
         // testing
@@ -215,7 +215,7 @@ public class SummaryHelper extends HelperBase {
                 return _t(status.toStatusString());
         }
     }
-    
+
     /**
      * Retrieve amount of used memory.
      *
@@ -228,7 +228,7 @@ public class SummaryHelper extends HelperBase {
         return integerFormatter.format(used) + "KB (" + usedPc + "%)"; 
     }
 ********/
-    
+
     /**
      * How many peers we are talking to now
      *
@@ -326,14 +326,14 @@ public class SummaryHelper extends HelperBase {
         return formatPair(_context.bandwidthLimiter().getReceiveBps(), 
                           _context.bandwidthLimiter().getSendBps());
     }
-    
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
     public String getFiveMinuteKBps() {
         if (_context == null) 
             return "0 / 0";
-        
+
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         double in = 0;
         if (receiveRate != null) {
@@ -350,14 +350,14 @@ public class SummaryHelper extends HelperBase {
         }
         return formatPair(in, out);
     }
-    
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
     public String getLifetimeKBps() { 
         if (_context == null) 
             return "0 / 0";
-        
+
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         double in;
         if (receiveRate == null)
@@ -372,7 +372,7 @@ public class SummaryHelper extends HelperBase {
             out = sendRate.getLifetimeAverageValue();
         return formatPair(in, out);
     }
-    
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
@@ -406,12 +406,12 @@ public class SummaryHelper extends HelperBase {
     public String getInboundTransferred() { 
         if (_context == null) 
             return "0";
-        
+
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
 
         return DataHelper.formatSize2(received) + 'B';
     }
-    
+
     /**
      * How much data have we sent since the router started (pretty printed
      * string with 2 decimal places and the appropriate units - GB/MB/KB/bytes)
@@ -420,11 +420,11 @@ public class SummaryHelper extends HelperBase {
     public String getOutboundTransferred() { 
         if (_context == null) 
             return "0";
-        
+
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         return DataHelper.formatSize2(sent) + 'B';
     }
-    
+
     /**
      * Client destinations connected locally.
      *
@@ -433,7 +433,7 @@ public class SummaryHelper extends HelperBase {
     public String getDestinations() {
         // convert the set to a list so we can sort by name and not lose duplicates
         List<Destination> clients = new ArrayList<Destination>(_context.clientManager().listClients());
-        
+
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Add/remove/edit &amp; control your client and server tunnels"))
@@ -442,11 +442,11 @@ public class SummaryHelper extends HelperBase {
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table id=\"sb_localtunnels\">");
-            
+
             for (Destination client : clients) {
                 String name = getName(client);
                 Hash h = client.calculateHash();
-                
+
                 buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
                 if (_context.clientManager().shouldPublishLeaseSet(h))
                     buf.append("server.png\" alt=\"Server\" title=\"").append(_t("Hidden Service")).append("\">");
@@ -463,9 +463,9 @@ public class SummaryHelper extends HelperBase {
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
                     long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                     if (timeToExpire < 0) {
-                        // red or yellow light                 
+                        // red or yellow light
                         buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Rebuilding")).append("&hellip;\" title=\"").append(_t("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
-                        buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+                        buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");
                     } else {
                         // green light 
                         buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_t("Ready")).append("\"></td></tr>\n");
@@ -481,7 +481,7 @@ public class SummaryHelper extends HelperBase {
         }
         return buf.toString();
     }
-    
+
     /**
      *  Compare translated nicknames - put "shared clients" first in the sort
      *  Inner class, can't be Serializable
@@ -529,7 +529,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getFreeTunnelCount();
     }
-    
+
     /**
      * How many active outbound tunnels we have.
      *
@@ -540,7 +540,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getOutboundTunnelCount();
     }
-    
+
     /**
      * How many inbound client tunnels we have.
      *
@@ -551,7 +551,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getInboundClientTunnelCount();
     }
-    
+
     /**
      * How many active outbound client tunnels we have.
      *
@@ -562,7 +562,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getOutboundClientTunnelCount();
     }
-    
+
     /**
      * How many tunnels we are participating in.
      *
@@ -591,7 +591,7 @@ public class SummaryHelper extends HelperBase {
     public String getJobLag() { 
         if (_context == null) 
             return "0";
-        
+
         RateStat rs = _context.statManager().getRate("jobQueue.jobLag");
         if (rs == null)
             return "0";
@@ -603,14 +603,14 @@ public class SummaryHelper extends HelperBase {
      * How long it takes us to pump out a message, averaged over the last minute 
      * (pretty printed with the units attached)
      *
-     */   
+     */
     public String getMessageDelay() { 
         if (_context == null) 
             return "0";
-        
+
         return DataHelper.formatDuration2(_context.throttle().getMessageDelay());
     }
-    
+
     /**
      * How long it takes us to test our tunnels, averaged over the last 10 minutes
      * (pretty printed with the units attached)
@@ -619,23 +619,23 @@ public class SummaryHelper extends HelperBase {
     public String getTunnelLag() { 
         if (_context == null) 
             return "0";
-        
+
         return DataHelper.formatDuration2(_context.throttle().getTunnelLag());
     }
-    
+
     public String getTunnelStatus() { 
         if (_context == null) 
             return "";
         return _context.throttle().getTunnelStatus();
     }
-    
+
     public String getInboundBacklog() {
         if (_context == null)
             return "0";
-        
+
         return String.valueOf(_context.tunnelManager().getInboundBuildQueueSize());
     }
-    
+
 /*******
     public String getPRNGStatus() {
         Rate r = _context.statManager().getRate("prng.bufferWaitTime").getRate(60*1000);

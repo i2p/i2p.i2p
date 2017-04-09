@@ -26,7 +26,7 @@ import net.i2p.stat.RateStat;
 class ProfileOrganizerRenderer {
     private final RouterContext _context;
     private final ProfileOrganizer _organizer;
-    
+
     public ProfileOrganizerRenderer(ProfileOrganizer organizer, RouterContext context) {
         _context = context;
         _organizer = organizer;
@@ -38,10 +38,10 @@ class ProfileOrganizerRenderer {
     public void renderStatusHTML(Writer out, int mode) throws IOException {
         boolean full = mode == 1;
         Set<Hash> peers = _organizer.selectAllPeers();
-        
+
         long now = _context.clock().now();
         long hideBefore = now - 90*60*1000;
-        
+
         Set<PeerProfile> order = new TreeSet<PeerProfile>(mode == 2 ? new HashComparator() : new ProfileComparator());
         int older = 0;
         int standard = 0;
@@ -66,7 +66,7 @@ class ProfileOrganizerRenderer {
             }
             order.add(prof);
         }
-        
+
         int fast = 0;
         int reliable = 0;
         int integrated = 0;
@@ -99,7 +99,7 @@ class ProfileOrganizerRenderer {
         int prevTier = 1;
         for (PeerProfile prof : order) {
             Hash peer = prof.getPeer();
-            
+
             int tier = 0;
             boolean isIntegrated = false;
             if (_organizer.isFast(peer)) {
@@ -113,23 +113,23 @@ class ProfileOrganizerRenderer {
             } else {
                 tier = 3;
             }
-            
+
             if (_organizer.isWellIntegrated(peer)) {
                 isIntegrated = true;
                 integrated++;
             }
-            
+
             if (tier != prevTier)
                 buf.append("<tr><td colspan=\"8\"><hr></td></tr>\n");
             prevTier = tier;
-            
+
             buf.append("<tr><td align=\"center\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(peer));
             // debug
             //if(prof.getIsExpandedDB())
             //   buf.append(" ** ");
             buf.append("</td><td align=\"center\">");
-            
+
             switch (tier) {
                 case 1: buf.append(_t("Fast, High Capacity")); break;
                 case 2: buf.append(_t("High Capacity")); break;
@@ -179,6 +179,7 @@ class ProfileOrganizerRenderer {
                 if (total / fails <= 10)   // hide if < 10%
                     buf.append(' ').append(fails).append('/').append(total).append(' ').append(_t("Test Fails"));
             }
+
             buf.append("&nbsp;</td>");
             //buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
             //   .append(peer.toBase64().substring(0,6)).append("\">").append(_t("profile")).append("</a>");
@@ -343,7 +344,7 @@ class ProfileOrganizerRenderer {
         out.write(buf.toString());
         out.flush();
     }
-    
+
     private class ProfileComparator extends HashComparator {
         public int compare(PeerProfile left, PeerProfile right) {
             if (_context.profileOrganizer().isFast(left.getPeer())) {
@@ -380,7 +381,7 @@ class ProfileOrganizerRenderer {
             }
         }
     }
-        
+
     /**
      *  Used for floodfill-only page
      *  As of 0.9.29, sorts in true binary order, not base64 string
@@ -390,9 +391,9 @@ class ProfileOrganizerRenderer {
         public int compare(PeerProfile left, PeerProfile right) {
             return DataHelper.compareTo(left.getPeer().getData(), right.getPeer().getData());
         }
-        
+
     }
-    
+
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
     private final static String NA = HelperBase._x("n/a");
