@@ -120,8 +120,15 @@ hr {
 
 iframe {
      border: none;
-     margin: 30px 50px 0;
+     margin: 40px 20px 0 60px;
+     overflow: hidden;
+     width: 230px;
+     height: 200px;
      transform: scale(1.4);
+}
+
+iframe pre {
+     font-size: 20pt !important;;
 }
 
 #qr, #randomart, #identicon {
