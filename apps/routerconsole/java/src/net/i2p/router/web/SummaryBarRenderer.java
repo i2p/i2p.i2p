@@ -255,25 +255,25 @@ class SummaryBarRenderer {
 
            .append("<a title=\"")
            .append(_t("Review active encryption certificates used in console"))
-           .append("\" href=\"certs\">")
+           .append("\" href=\"/certs\">")
            .append(nbsp(_t("Certs")))
            .append("</a>\n")
 
            .append("<a title=\"")
            .append(_t("View full changelog"))
-           .append("\" href=\"viewhistory\" target=\"_blank\">")
+           .append("\" href=\"/viewhistory\" target=\"_blank\">")
            .append(nbsp(_t("Changelog")))
            .append("</a>\n")
 
            .append("<a title=\"")
            .append(_t("View router debug information"))
-           .append("\" href=\"debug\">")
+           .append("\" href=\"/debug\">")
            .append(nbsp(_t("Debug")))
            .append("</a>\n")
 
            .append("<a title=\"")
            .append(_t("Review extended info about installed .jar and .war files"))
-           .append("\" href=\"jars\">")
+           .append("\" href=\"/jars\">")
            .append(nbsp(_t("Jars")))
            .append("</a>\n");
 
@@ -295,7 +295,7 @@ class SummaryBarRenderer {
 
            .append("<a title=\"")
            .append(_t("Signed proof of ownership of this router"))
-           .append("\" href=\"proof\">")
+           .append("\" href=\"/proof\">")
            .append(nbsp(_t("Proof")))
            .append("</a>\n")
 
