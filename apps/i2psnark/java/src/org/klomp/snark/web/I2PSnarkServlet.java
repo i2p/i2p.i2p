@@ -62,7 +62,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private String _themePath;
     private String _imgPath;
     private String _lastAnnounceURL;
-    
+
     private static final String DEFAULT_NAME = "i2psnark";
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     private static final String WARBASE = "/.resources/";
@@ -314,8 +314,6 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
             out.write(_t("Torrents"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write(toThemeImg("arrow_refresh"));
-            out.write("&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_t("I2PSnark"));
             else
@@ -325,8 +323,6 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + '/' + peerString + "\" title=\"");
             out.write(_t("Refresh page"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write(toThemeImg("arrow_refresh"));
-            out.write("&nbsp;&nbsp;");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_t("I2PSnark"));
             else
@@ -748,7 +744,7 @@ public class I2PSnarkServlet extends BasicServlet {
         writeHiddenInputs(buf, req, action);
         out.write(buf.toString());
     }
-    
+
     /**
      *  hidden inputs for nonce and paramters p, st, and sort
      *
@@ -779,7 +775,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(action).append("\" >\n");
         }
     }
-    
+
     /**
      *  Build HTML-escaped and stripped query string
      *
@@ -824,7 +820,7 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         return buf.toString();
     }
-    
+
     /**
      *  @since 0.9.6
      */
@@ -898,7 +894,7 @@ public class I2PSnarkServlet extends BasicServlet {
                           _imgPath + "last.png\">");
             }
     }
-    
+
     /**
      * Do what they ask, adding messages to _manager.addMessage as necessary
      */
@@ -941,7 +937,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 String canonical = null;
                 try {
                     canonical = local.getCanonicalPath();
-                    
+
                     if (local.exists()) {
                         if (_manager.getTorrent(canonical) != null)
                             _manager.addMessage(_t("Torrent already running: {0}", newFile));
@@ -1394,7 +1390,7 @@ public class I2PSnarkServlet extends BasicServlet {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }
     }
-    
+
     private static final String iopts[] = {"inbound.length", "inbound.quantity",
                                            "outbound.length", "outbound.quantity" };
 
@@ -1489,17 +1485,17 @@ public class I2PSnarkServlet extends BasicServlet {
             remainingSeconds = needed / downBps;
         else
             remainingSeconds = -1;
-        
+
         MetaInfo meta = snark.getMetaInfo();
         String b64 = Base64.encode(snark.getInfoHash());
         String b64Short = b64.substring(0, 6);
         // isValid means isNotMagnet
         boolean isValid = meta != null;
         boolean isMultiFile = isValid && meta.getFiles() != null;
-        
+
         String err = snark.getTrackerProblems();
         int knownPeers = Math.max(curPeers, snark.getTrackerSeenPeers());
-        
+
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         String statusString;
         if (snark.isChecking()) {
@@ -1601,7 +1597,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                "<td class=\"snarkTorrentStatus\"><b class=\"alwaysShow\">" + _t("Stopped") + "</b>";
             }
         }
-        
+
         out.write("<tr class=\"" + rowClass + "\" id=\"" + b64Short + "\">");
         out.write("<td class=\"center\">");
         out.write(statusString + "</td>\n\t");
@@ -1946,7 +1942,7 @@ public class I2PSnarkServlet extends BasicServlet {
         }
         return buf.toString();
     }
-    
+
     /** @since 0.8.2 */
     private static String thinsp(boolean disable) {
         if (disable)
@@ -2073,7 +2069,7 @@ public class I2PSnarkServlet extends BasicServlet {
             newURL = DataHelper.stripHTML(newURL);    // XSS
         //String newFile = req.getParameter("newFile");
         //if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
-        
+
         out.write("<div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -2764,8 +2760,6 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append(" onload=\"setupbuttons()\"");
         buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
         buf.append(" class=\"snarkRefresh\">");
-        toThemeImg(buf, "arrow_refresh");
-        buf.append("&nbsp;&nbsp;");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_t("I2PSnark"));
         else
@@ -3406,7 +3400,7 @@ public class I2PSnarkServlet extends BasicServlet {
             icon = "page_white";
         return icon;
     }
-    
+
     /**
      *  Icon file in the .war. Always 16x16.
      *
@@ -3426,7 +3420,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private String toImg(String icon, String altText) {
         return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"" + _contextPath + WARBASE + "icons/" + icon + ".png\">";
     }
-    
+
     /**
      *  Image file in the theme.
      *
@@ -3436,7 +3430,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private String toThemeImg(String image) {
         return toThemeImg(image, "", "");
     }
-    
+
     /**
      *  Image file in the theme.
      *
