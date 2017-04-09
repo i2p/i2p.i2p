@@ -88,12 +88,13 @@ class ProfileOrganizerRenderer {
                    buf.append("<table id=\"profiles\">");
                    buf.append("<tr>");
                    buf.append("<th>").append(_t("Peer")).append("</th>");
-                   buf.append("<th>").append(_t("Groups (Caps)")).append("</th>");
+                   buf.append("<th>").append(_t("Groups")).append("</th>");
+                   buf.append("<th>").append(_t("Caps")).append("</th>");
                    buf.append("<th>").append(_t("Speed")).append("</th>");
                    buf.append("<th>").append(_t("Capacity")).append("</th>");
                    buf.append("<th>").append(_t("Integration")).append("</th>");
                    buf.append("<th>").append(_t("Status")).append("</th>");
-                   buf.append("<th>&nbsp;</th>");
+                   buf.append("<th>").append(_t("View/Edit")).append("</th>");
                    buf.append("</tr>");
         int prevTier = 1;
         for (PeerProfile prof : order) {
@@ -119,7 +120,7 @@ class ProfileOrganizerRenderer {
             }
             
             if (tier != prevTier)
-                buf.append("<tr><td colspan=\"7\"><hr></td></tr>\n");
+                buf.append("<tr><td colspan=\"8\"><hr></td></tr>\n");
             prevTier = tier;
             
             buf.append("<tr><td align=\"center\" nowrap>");
@@ -139,14 +140,14 @@ class ProfileOrganizerRenderer {
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
             if (info != null) {
                 // prevent HTML injection in the caps and version
-                buf.append(" (").append(DataHelper.stripHTML(info.getCapabilities()));
+                buf.append("<td align=\"right\">").append(DataHelper.stripHTML(info.getCapabilities()));
                 String v = info.getOption("router.version");
                 if (v != null)
                     buf.append(' ').append(DataHelper.stripHTML(v));
-                buf.append(')');
+            } else {
+                buf.append("<td align=\"right\"><i>").append(_t("unknown")).append("</i></td>");
             }
-            
-            buf.append("<td align=\"right\">").append(num(prof.getSpeedValue()));
+            buf.append("</td><td align=\"right\">").append(num(prof.getSpeedValue()));
             long bonus = prof.getSpeedBonus();
             if (bonus != 0) {
                 if (bonus > 0)
@@ -183,7 +184,7 @@ class ProfileOrganizerRenderer {
             //   .append(peer.toBase64().substring(0,6)).append("\">").append(_t("profile")).append("</a>");
             buf.append("<td nowrap align=\"center\"><a href=\"viewprofile?peer=")
                .append(peer.toBase64()).append("\">").append(_t("profile")).append("</a>");
-            buf.append("&nbsp;<a href=\"configpeer?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
+            buf.append("&nbsp;<a title=\"").append(_t("Configure peer")).append("\" href=\"configpeer?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
             out.write(buf.toString());
@@ -260,23 +261,79 @@ class ProfileOrganizerRenderer {
       if (mode < 2) {
 
         buf.append("<h3 class=\"tabletitle\">").append(_t("Thresholds")).append("</h3>\n")
-           .append("<table id=\"thresholds\"><tbody><tr><td>");
-        buf.append("<p><b>").append(_t("Speed")).append(":</b> ").append(num(_organizer.getSpeedThreshold()))
-           .append(" (").append(fast).append(' ').append(_t("fast peers")).append(")<br>");
-        buf.append("<b>").append(_t("Capacity")).append(":</b> ").append(num(_organizer.getCapacityThreshold()))
-           .append(" (").append(reliable).append(' ').append(_t("high capacity peers")).append(")<br>");
-        buf.append("<b>").append(_t("Integration")).append(":</b> ").append(num(_organizer.getIntegrationThreshold()))
-           .append(" (").append(integrated).append(' ').append(_t(" well integrated peers")).append(")")
+           .append("<table id=\"thresholds\"><tbody>")
+           .append("<tr><th><b>")
+           .append(_t("Speed")).append(": </b>").append(num(_organizer.getSpeedThreshold()))
+           .append("</th><th><b>")
+           .append(_t("Capacity")).append(": </b>").append(num(_organizer.getCapacityThreshold()))
+           .append("</th><th><b>")
+           .append(_t("Integration")).append(": </b>").append(num(_organizer.getIntegrationThreshold()))
+           .append("</th></tr><tr><td>")
+           .append(fast).append(' ').append(_t("fast peers"))
+           .append("</td><td>")
+           .append(reliable).append(' ').append(_t("high capacity peers"))
+           .append("</td><td>")
+           .append(integrated).append(' ').append(_t(" well integrated peers"))
            .append("</td></tr></tbody></table>\n");
         buf.append("<h3 class=\"tabletitle\">").append(_t("Definitions")).append("</h3>\n")
-           .append("<table id=\"profile_defs\"><tbody><tr><td><ul>");
-        buf.append("<li><b>").append(_t("groups")).append("</b>: ").append(_t("as determined by the profile organizer")).append("</li>");
-        buf.append("<li><b>").append(_t("caps")).append("</b>: ").append(_t("capabilities in the netDb, not used to determine profiles")).append("</li>");
-        buf.append("<li><b>").append(_t("speed")).append("</b>: ").append(_t("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel")).append("</li>");
-        buf.append("<li><b>").append(_t("capacity")).append("</b>: ").append(_t("how many tunnels can we ask them to join in an hour?")).append("</li>");
-        buf.append("<li><b>").append(_t("integration")).append("</b>: ").append(_t("how many new peers have they told us about lately?")).append("</li>");
-        buf.append("<li><b>").append(_t("status")).append("</b>: ").append(_t("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
-        buf.append("</ul></td></tr></tbody></table>\n");
+           .append("<table id=\"profile_defs\"><tbody>");
+        buf.append("<tr><td><b>")
+           .append(_t("groups")).append(":</b></td><td>").append(_t("as determined by the profile organizer"))
+           .append("</td></tr>");
+        buf.append("<tr><td><b>")
+           .append(_t("caps")).append(":</b></td><td>").append(_t("capabilities in the netDb, not used to determine profiles"))
+           .append("</td></tr>");
+        buf.append("<tr id=\"capabilities_key\"><td colspan=\"2\"><table><tbody>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>B:</b></td><td>").append(_t("SSU Testing")).append("</td>")
+           .append("<td><b>C:</b></td><td>").append(_t("SSU Introducer")).append("</td>")
+           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>f:</b></td><td>").append(_t("Floodfill")).append("</td>")
+           .append("<td><b>H:</b></td><td>").append(_t("Hidden")).append("</td>")
+           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>K:</b></td><td>").append(_t("Under {0} shared bandwidth", "12KBps")).append("</td>")
+           .append("<td><b>L:</b></td><td>").append(_t("{0} shared bandwidth", "12 - 32KBps")).append("</td>")
+           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>M:</b></td><td>").append(_t("{0} shared bandwidth", "32 - 64KBps")).append("</td>")
+           .append("<td><b>N:</b></td><td>").append(_t("{0} shared bandwidth", "64 - 128KBps")).append("</td>")
+           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>O:</b></td><td>").append(_t("{0} shared bandwidth", "128 - 256KBps")).append("</td>")
+           .append("<td><b>P:</b></td><td>").append(_t("{0} shared bandwidth", "256 - 2000KBps")).append("</td>")
+           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>R:</b></td><td>").append(_t("Reachable")).append("</td>")
+           .append("<td><b>U:</b></td><td>").append(_t("Unreachable")).append("</td>")
+           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td>")
+           .append("<td><b>X:</b></td><td>").append(_t("Over {0} shared bandwidth", "2000KBps")).append("</td>")
+           .append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+        buf.append("</tbody></table></td></tr>"); // profile_defs
+        buf.append("<tr><td colspan=\"2\">").append(_t("Note: For P and X bandwidth capabilities, O is included for the purpose of backward compatibility")).append("</td></tr>");
+        buf.append("<tr><td><b>")
+           .append(_t("speed"))
+           .append(":</b></td><td>")
+           .append(_t("peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel"))
+           .append("</td></tr>");
+        buf.append("<tr><td><b>")
+           .append(_t("capacity"))
+           .append(":</b></td><td>")
+           .append(_t("how many tunnels can we ask them to join in an hour?"))
+           .append("</td></tr>");
+        buf.append("<tr><td><b>")
+           .append(_t("integration"))
+           .append(":</b></td><td>")
+           .append(_t("how many new peers have they told us about lately?"))
+           .append("</td></tr>");
+        buf.append("<tr><td><b>")
+           .append(_t("status"))
+           .append(":</b></td><td>")
+           .append(_t("is the peer banned, or unreachable, or failing tunnel tests?"))
+           .append("</td></tr>");
+        buf.append("</tbody></table>\n"); // thresholds
 
       ////
       //// don't bother reindenting
@@ -380,6 +437,10 @@ class ProfileOrganizerRenderer {
     /** translate a string */
     private String _t(String s) {
         return Messages.getString(s, _context);
+    }
+
+    private String _t(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 
     /** translate (ngettext) @since 0.8.5 */
