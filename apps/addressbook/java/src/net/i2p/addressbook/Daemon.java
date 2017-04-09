@@ -43,13 +43,13 @@ import net.i2p.util.SystemVersion;
 
 /**
  * Main class of addressbook.  Performs updates, and runs the main loop.
+ * As of 0.9.30, package private, run with DaemonThread.
  * 
  * @author Ragnarok
  *
  */
-public class Daemon {
+class Daemon {
     public static final String VERSION = "2.0.4";
-    private static final Daemon _instance = new Daemon();
     private volatile boolean _running;
     private static final boolean DEBUG = false;
     private static final String DEFAULT_SUB = "http://i2p-projekt.i2p/hosts.txt";
@@ -787,14 +787,15 @@ public class Daemon {
      *            others are ignored.
      */
     public static void main(String[] args) {
+        Daemon daemon = new Daemon();
         if (args != null && args.length > 0 && args[0].equals("test"))
-            _instance.test(args);
+            daemon.test(args);
         else
-            _instance.run(args);
+            daemon.run(args);
     }
 
     /** @since 0.9.26 */
-    private static void test(String[] args) {
+    public static void test(String[] args) {
         Properties ctxProps = new Properties();
         String PROP_FORCE = "i2p.naming.blockfile.writeInAppContext";
         ctxProps.setProperty(PROP_FORCE, "true");
@@ -875,14 +876,14 @@ public class Daemon {
      * Call this to get the addressbook to reread its config and 
      * refetch its subscriptions.
      */
-    public static void wakeup() {
-        synchronized (_instance) {
-            _instance.notifyAll();
+    public void wakeup() {
+        synchronized (this) {
+            notifyAll();
         }
     }
 
-    public static void stop() {
-        _instance._running = false;
+    public void stop() {
+        _running = false;
         wakeup();
     }
 }

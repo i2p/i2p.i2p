@@ -16,20 +16,22 @@
                   -->
 		<pathelement location="${lib}/commons-el.jar" />
 		<pathelement location="${lib}/javax.servlet.jar"/>
-                <!-- jsp-api.jar only present for debian builds -->
+
+                <!-- following jars only present for debian builds -->
                 <pathelement location="${lib}/jsp-api.jar" />
-                <!-- tomcat-api.jar only present for debian builds -->
                 <pathelement location="${lib}/tomcat-api.jar" />
-                <!-- tomcat-util.jar only present for debian builds -->
                 <pathelement location="${lib}/tomcat-util.jar" />
+                <pathelement location="${lib}/tomcat-util-scan.jar" />
+		<pathelement location="${lib}/jasper-el.jar" />
+
 		<pathelement location="lib/jstl.jar" />
 		<pathelement location="lib/standard.jar" />
 		<pathelement location="${lib}/jasper-runtime.jar" />
 		<pathelement location="${lib}/commons-logging.jar" />
-                <!-- jasper-el.jar only present for debian builds -->
-		<pathelement location="${lib}/jasper-el.jar" />
+		<pathelement location="${lib}/jetty-util.jar" />
 		<pathelement location="${ant.home}/lib/ant.jar" />
 		<pathelement location="../../../core/java/build/i2p.jar" />
+		<pathelement location="../../addressbook/dist/addressbook.jar" />
  	</path>
 
 	<property name="javac.compilerargs" value="" />

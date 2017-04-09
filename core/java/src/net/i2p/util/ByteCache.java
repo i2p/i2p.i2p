@@ -87,7 +87,7 @@ public final class ByteCache {
         if (cache == null) {
             cache = new ByteCache(cacheSize, size);
             _caches.put(sz, cache);
-;       }
+        }
         cache.resize(cacheSize);
         //I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).error("ByteCache size: " + size + " max: " + cacheSize, new Exception("from"));
         return cache;

@@ -1803,6 +1803,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     client = "Vuze" + getAzVersion(pid.getID());
                 else if ("CwsL".equals(ch))
                     client = "I2PSnarkXL";
+                else if ("LVhE".equals(ch))
+                    client = "XD" + getAzVersion(pid.getID());
                 else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
                     client = "Robert" + getRobtVersion(pid.getID());
                 else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4

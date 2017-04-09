@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
+import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppClassLoader;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -97,7 +98,11 @@ public class WebAppConfiguration implements Configuration {
             // Ticket #957... don't know why...
             // Only really required if started manually, but we don't know that from here
             cp = "jetty-util.jar";
-        } else ****/ if (pluginDir.exists()) {
+****/
+        if (ctxPath.equals("/susidns")) {
+            // Old installs don't have this in their wrapper.config classpath
+            cp = "addressbook.jar";
+        } else if (pluginDir.exists()) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             cp = props.getProperty(RouterConsoleRunner.PREFIX + appName + CLASSPATH);
@@ -173,11 +178,13 @@ public class WebAppConfiguration implements Configuration {
             }
         } else {
             // Java 9 - assume everything in lib/ is in the classpath
+            // except addressbook.jar
             File libDir = new File(ctx.getBaseDir(), "lib");
             File[] files = libDir.listFiles();
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
-                    if (files[i].getName().endsWith(".jar"))
+                    String name = files[i].getName();
+                    if (name.endsWith(".jar") && !name.equals("addressbook.jar"))
                         rv.add(files[i].toURI());
                 }
             }
@@ -191,6 +198,10 @@ public class WebAppConfiguration implements Configuration {
     /** @since Jetty 7 */
     public void configure(WebAppContext context) throws Exception {
         configureClassPath(context);
+        // do we just need one, in the ContextHandlerCollection, or one for each?
+        // http://stackoverflow.com/questions/17529936/issues-while-using-jetty-embedded-to-handle-jsp-jasperexception-unable-to-com
+        // https://github.com/jetty-project/embedded-jetty-jsp/blob/master/src/main/java/org/eclipse/jetty/demo/Main.java
+        context.getServletContext().setAttribute("org.apache.tomcat.InstanceManager", new SimpleInstanceManager());
     }
 
     /** @since Jetty 7 */

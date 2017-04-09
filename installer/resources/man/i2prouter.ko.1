@@ -6,7 +6,7 @@
 .TH I2PROUTER 1 "2017년 1월 26일" "" I2P
 
 .SH 이름
-i2prouter \- start and stop the I2P router
+i2prouter \- I2P 라우터를 시작하거나 중지할 때 사용
 
 .SH SYNOPSIS
 \fBi2prouter\fP
@@ -14,43 +14,43 @@ i2prouter \- start and stop the I2P router
 .br
 
 .SH 설명
-Control the I2P service.
+I2P 서비스를 조정
 
 .IP \fBconsole\fP
-Runs I2P as a console application under the current user.
+현재 유저로 I2P를 콘솔 애플리케이션으로 동작시킴
 
 .IP \fBstart\fP
-Starts the I2P service.
+I2P 서비스를 시작
 
 .IP \fBstop\fP
-Stops the I2P service.
+I2P 서비스를 중지
 
 .IP \fBrestart\fP
-Stops the I2P service and then starts it.
+I2P 서비스를 종료하고 재시작
 
 .IP \fBcondrestart\fP
-Restart the I2P service only if it is already running.
+I2P 서비스가 실행중이라면 재시작
 
 .IP \fBgraceful\fP
-Stop I2P gracefully (may take up to 11 minutes)
+우아하게 종료 (11분 이상 걸릴 수 있음)
 
 .IP \fBinstall\fP
-Install initscript to start I2P automatically when the system boots.
+시스템이 켜짐젼 I2P를 자동 시작하게끔 initscript를 설치
 
 .IP \fBremove\fP
-Uninstall initscript that was installed with \fBinstall\fP
+\fBinstall\fP로 설치된 initscript를 삭제
 
 .IP \fBstatus\fP
-Prints whether the I2P service is running.
+I2P 작동 여부를 출력
 
 .IP \fBdump\fP
-Dumps the current threads into \fBwrapper.log\fP.
+\fBwrapper.log\fP에 현재 쓰레드를 덤프
 
 .SH "REPORTING BUGS"
-Please enter a ticket on
 .UR https://trac.i2p2.de/
-the I2P trac page
+I2P trac 페이지
 .UE .
+에 티켓을 남겨 주세요
 
 .SH "SEE ALSO"
 \fBi2prouter\-nowrapper\fP(1)

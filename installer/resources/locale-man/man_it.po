@@ -23,7 +23,7 @@ msgstr ""
 #: man/eepget.1:1
 #, no-wrap
 msgid "EEPGET"
-msgstr ""
+msgstr "EEPGET"
 
 #. type: TH
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
@@ -46,7 +46,7 @@ msgstr "NOME"
 #. type: Plain text
 #: man/eepget.1:5
 msgid "Eepget - I2P downloader"
-msgstr ""
+msgstr "Eepget - Downloader I2P"
 
 #. type: SH
 #: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6
@@ -57,7 +57,7 @@ msgstr "SINOSSI"
 #. type: Plain text
 #: man/eepget.1:9
 msgid "B<eepget> [I<options>]I<URL>"
-msgstr ""
+msgstr "B<eepget> [I<opzioni>]I<URL>"
 
 #. type: SH
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
@@ -113,7 +113,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr ""
+msgstr "B<-h> nome=valore"
 
 #. type: TP
 #: man/eepget.1:37
@@ -239,7 +239,7 @@ msgstr ""
 #: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
-msgstr ""
+msgstr "SEGNALAZIONE BUG"
 
 #. type: Plain text
 #: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
@@ -252,7 +252,7 @@ msgstr ""
 #: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
-msgstr ""
+msgstr "VEDI ANCHE"
 
 #. type: Plain text
 #: man/eepget.1:104
@@ -268,7 +268,7 @@ msgstr "I2PROUTER"
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr ""
+msgstr "i2prouter - lancia e termina il router I2P"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -280,7 +280,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr ""
+msgstr "Permette di controllare il servizio I2P."
 
 #. type: IP
 #: man/i2prouter.1:15
@@ -302,7 +302,7 @@ msgstr "B<start>"
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr ""
+msgstr "Avvia il servizio I2P."
 
 #. type: IP
 #: man/i2prouter.1:23
@@ -313,7 +313,7 @@ msgstr "B<stop>"
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr ""
+msgstr "Arresta il servizio I2P."
 
 #. type: IP
 #: man/i2prouter.1:27
@@ -324,7 +324,7 @@ msgstr "B<restart>"
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr ""
+msgstr "Arresta e poi riavvia il servizio I2P."
 
 #. type: IP
 #: man/i2prouter.1:31
@@ -379,7 +379,7 @@ msgstr "B<status>"
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr ""
+msgstr "Scrive se il servizio I2P è in esecuzione."
 
 #. type: IP
 #: man/i2prouter.1:51
@@ -401,12 +401,12 @@ msgstr "B<i2prouter-nowrapper>(1)"
 #: man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "I2PROUTER-NOWRAPPER"
-msgstr ""
+msgstr "I2PROUTER-NOWRAPPER"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr ""
+msgstr "i2prouter-nowrapper - avvia il router I2P"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8

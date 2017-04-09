@@ -209,6 +209,9 @@ public class NativeBigInteger extends BigInteger {
      * Really this could be represented by a DAG, but the benefits don't
      * outweigh the implementation time.
      */
+
+    // none -> {"none"), since 0.9.30
+    private final static String[] JBIGI_COMPAT_LIST_NONE          = {JBIGI_OPTIMIZATION_X86};
     private final static String[] JBIGI_COMPAT_LIST_PPC           = {JBIGI_OPTIMIZATION_PPC};
     private final static String[] JBIGI_COMPAT_LIST_ARM           = {JBIGI_OPTIMIZATION_ARM_CORTEX_A15, JBIGI_OPTIMIZATION_ARM_CORTEX_A9, JBIGI_OPTIMIZATION_ARM_CORTEX_A8,
                                                                      JBIGI_OPTIMIZATION_ARM_CORTEX_A7, JBIGI_OPTIMIZATION_ARM_CORTEX_A5, JBIGI_OPTIMIZATION_ARM_ARMV7,
@@ -231,11 +234,14 @@ public class NativeBigInteger extends BigInteger {
     private final static String[] JBIGI_COMPAT_LIST_INTEL_CORE    = {JBIGI_OPTIMIZATION_COREI_BWL, JBIGI_OPTIMIZATION_COREI_HWL, JBIGI_OPTIMIZATION_COREI_SBR,
                                                                      JBIGI_OPTIMIZATION_COREI, JBIGI_OPTIMIZATION_CORE2, JBIGI_OPTIMIZATION_PENTIUMM,
                                                                      JBIGI_OPTIMIZATION_PENTIUM3, JBIGI_OPTIMIZATION_X86};
+
     /**
      * The mapping between CPU architecture and its compatibility list.
      */
     @SuppressWarnings("serial")
     private final static HashMap<String, String[]> JBIGI_COMPAT_MAP = new HashMap<String, String[]>() {{
+        // none -> {"none"), since 0.9.30
+        put(JBIGI_OPTIMIZATION_X86, JBIGI_COMPAT_LIST_NONE);
         put(JBIGI_OPTIMIZATION_PPC, JBIGI_COMPAT_LIST_PPC);
 
         put(JBIGI_OPTIMIZATION_ARM_ARMV5,      JBIGI_COMPAT_LIST_ARM);
@@ -406,10 +412,11 @@ public class NativeBigInteger extends BigInteger {
                     if (intelcpu.IsPentiumCompatible())
                         return JBIGI_OPTIMIZATION_PENTIUM;
                 }
-                return null;
             } catch (UnknownCPUException e) {
-                return null;
             }
+            // always try "none" if we don't know the x86 type,
+            // in case of CPUID fail or not finding compatibility above
+            return JBIGI_OPTIMIZATION_X86;
         } else if (_isArm) {
             if (_isWin)
                 return null;
@@ -739,9 +746,25 @@ public class NativeBigInteger extends BigInteger {
      */
     public static void main(String args[]) {
         _doLog = true;
+        String path = System.getProperty("java.library.path");
+        String name = _libPrefix + "jbigi" + _libSuffix;
+        System.out.println("Native library search path: " + path);
+        if (_nativeOk) {
+            String sep = System.getProperty("path.separator");
+            String[] paths = DataHelper.split(path, sep);
+            for (String p : paths) {
+                File f = new File(p, name);
+                if (f.exists()) {
+                    System.out.println("Found native library: " + f);
+                    break;
+                }
+            }
+        } else {
+            System.out.println("Failed to load native library. Please verify the existence of the " +
+                               name + " file in the library path, or set -Djava.library.path=. in the command line");
+        }
         boolean nativeOnly = args.length > 0 && args[0].equals("-n");
         if (nativeOnly && !_nativeOk) {
-            System.out.println("Failed to load native library");
             System.exit(1);
         }
         if (_nativeOk) {
@@ -959,7 +982,7 @@ public class NativeBigInteger extends BigInteger {
                     List<String> toTry = getResourceList();
                     debug("loadResource list to try is: " + toTry);
                     for (String s : toTry) {
-                        System.out.println("trying to load resource: " + s);
+                        debug("Trying to load resource " + s);
                         if (loadFromResource(s)) {
                             _nativeOk = true;
                             _extractedResource = s;
@@ -1092,7 +1115,7 @@ public class NativeBigInteger extends BigInteger {
         //URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
         URL resource = ClassLoader.getSystemResource(resourceName);
         if (resource == null) {
-            System.out.println("Resource name [" + resourceName + "] was not found");
+            info("Resource name [" + resourceName + "] was not found");
             return false;
         }
 
@@ -1107,15 +1130,15 @@ public class NativeBigInteger extends BigInteger {
             fos.close();
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
-            System.out.println("Loaded library: " + resource);
+            info("Loaded library: " + resource);
         } catch (UnsatisfiedLinkError ule) {
             // don't include the exception in the message - too much
-            System.out.println("Failed to load the resource " + resourceName + " - not a valid library for this platform");
+            warn("Failed to load the resource " + resourceName + " - not a valid library for this platform");
             if (outFile != null)
                 outFile.delete();
             return false;
         } catch (IOException ioe) {
-            System.out.println("Problem writing out the temporary native library data: " + ioe.toString());
+            warn("Problem writing out the temporary native library data: " + ioe);
             if (outFile != null)
                 outFile.delete();
             return false;
@@ -1141,6 +1164,7 @@ public class NativeBigInteger extends BigInteger {
             return Collections.emptyList();
         List<String> rv = new ArrayList<String>(20);
         String primary = getMiddleName2(true);
+        // primary may be null
         String[] compatList = JBIGI_COMPAT_MAP.get(primary);
 
         if (primary != null && compatList == null) {
@@ -1222,12 +1246,14 @@ public class NativeBigInteger extends BigInteger {
     /**
      *  @return may be null if optimized is true; returns jbigi-xxx-none if optimize is false
      */
+/****
     private static final String getMiddleName(boolean optimized) {
         String m2 = getMiddleName2(optimized);
         if (m2 == null)
             return null;
         return getMiddleName1() + m2;
     }
+****/
 
     /**
      *  @return may be null if optimized is true; returns "none" if optimize is false

@@ -7,11 +7,11 @@ Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
- ,ant-optional
  ,debconf
  ,openjdk-7-jdk
- ,libjetty8-java, libservlet3.0-java
+ ,libjetty9-java
  ,glassfish-javaee
+ ,libtomcat8-java
  ,dh-apparmor
  ,gettext
  ,libgetopt-java
@@ -79,8 +79,9 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  geoip-database,
  gettext-base,
  libgetopt-java,
- libjetty8-java, libservlet3.0-java,
- glassfish-javaee
+ libjetty9-java,
+ glassfish-javaee,
+ libtomcat8-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu

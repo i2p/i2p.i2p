@@ -8,6 +8,7 @@ import net.i2p.stat.RateAverages;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.SystemVersion;
 
 /**
  * Simple throttle that basically stops accepting messages or nontrivial 
@@ -33,6 +34,8 @@ public class RouterThrottleImpl implements RouterThrottle {
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
     private static final long DEFAULT_REJECT_STARTUP_TIME = 10*60*1000;
     private static final String PROP_REJECT_STARTUP_TIME = "router.rejectStartupTime";
+    private static final int DEFAULT_MIN_THROTTLE_TUNNELS = SystemVersion.isAndroid() ? 100 :
+                                                            SystemVersion.isARM() ? 500 : 1000;
 
     /**
      *  TO BE FIXED - SEE COMMENTS BELOW
@@ -197,8 +200,15 @@ public class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
-	// Throttle tunnels if min. throttle level is exceeded and default max participating tunnels (or fewer) is used.
-        if ((numTunnels > getMinThrottleTunnels()) && (DEFAULT_MAX_TUNNELS <= maxTunnels)) {
+        /*
+         * Throttle if we go above a minimum level of tunnels AND the maximum participating
+         * tunnels is default or lower.
+         *
+         * Lag based statistics use a moving average window (of for example 10 minutes), they are therefore
+         * sensitive to sudden rapid growth of load, which are not instantly detected by these metrics.
+         * Reduce tunnel growth if we are growing faster than the lag based metrics can detect reliably.
+         */
+        if ((numTunnels > getMinThrottleTunnels()) && (DEFAULT_MAX_TUNNELS >= maxTunnels)) {
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(10*60*1000);
             if (avgTunnels != null) {
                 double avg = avgTunnels.getAvgOrLifetimeAvg();
@@ -458,7 +468,7 @@ public class RouterThrottleImpl implements RouterThrottle {
     
     /** dont ever probabalistically throttle tunnels if we have less than this many */
     private int getMinThrottleTunnels() { 
-        return _context.getProperty("router.minThrottleTunnels", 1000);
+        return _context.getProperty("router.minThrottleTunnels", DEFAULT_MIN_THROTTLE_TUNNELS);
     }
     
     private double getTunnelGrowthFactor() {

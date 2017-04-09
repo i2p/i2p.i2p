@@ -65,10 +65,7 @@ public class TunnelPoolSettings {
     public static final int     DEFAULT_DURATION = 10*60*1000;
     //public static final int     DEFAULT_LENGTH = SystemVersion.isAndroid() ? 2 : 3;
 
-    private static final boolean isSlow = SystemVersion.isGNU() ||
-                                          SystemVersion.isARM() ||
-                                          SystemVersion.isApache() ||
-                                          !NativeBigInteger.isNative();
+    private static final boolean isSlow = SystemVersion.isSlow();
 
     /** client only */
     private static final int    DEFAULT_IB_LENGTH = 3;

@@ -108,19 +108,20 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
+        "https://randomrng.ddns.net/"         + ',' +   // randomrng_at_mail.i2p.crt // CA                         // Java 7+
         "https://itoopie.atomike.ninja/"      + ',' +   // atomike_at_mail.i2p.crt   // CA                         // Java 8+ only
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
-        "https://reseed.atomike.ninja/"       + "," +   // atomike_at_mail.i2p.crt   // CA                         // SNI required, Java 8+ only
+        "https://reseed.atomike.ninja/"       + ',' +   // atomike_at_mail.i2p.crt   // CA                         // SNI required, Java 8+ only
         "https://i2p.manas.ca:8443/"          + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
         "https://i2p-0.manas.ca:8443/"        + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
         "https://reseed.i2p.vzaws.com:8443/"  + ',' +   // parg_at_mail.i2p.crt      // reseed.i2p.vzaws.com.crt
         "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
-        "https://download.xxlspeed.com/"      + ',' +   // backup_at_mail.i2p.crt    // download.xxlspeed.com.crt  // SNI required
+        "https://download.xxlspeed.com/"      + ',' +   // backup_at_mail.i2p.crt    // CA                         // Java 8+
         "https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // netdb.i2p2.no.crt          // SNI required
         //"https://us.reseed.i2p2.no:444/"      + ',' +   // meeh_at_mail.i2p.crt      // us.reseed.i2p2.no.crt
         //"https://uk.reseed.i2p2.no:444/"      + ',' +   // meeh_at_mail.i2p.crt      // uk.reseed.i2p2.no.crt
-        "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // reseed.i2p-projekt.de.crt
+        "https://reseed.i2p-projekt.de/";               // echelon_at_mail.i2p.crt   // echelon.reseed2017.crt     // Java 8+
 
     private static final String SU3_FILENAME = "i2pseeds.su3";
 

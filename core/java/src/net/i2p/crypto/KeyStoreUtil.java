@@ -422,10 +422,11 @@ public final class KeyStoreUtil {
         } catch (CertificateExpiredException cee) {
             String s = "Rejecting expired X509 Certificate: " + file.getAbsolutePath();
             // Android often has old system certs
-            if (SystemVersion.isAndroid())
+            // our SSL certs may be old also
+            //if (SystemVersion.isAndroid())
                 warn(s, cee);
-            else
-                error(s, cee);
+            //else
+            //    error(s, cee);
             return false;
         } catch (CertificateNotYetValidException cnyve) {
             error("Rejecting X509 Certificate not yet valid: " + file.getAbsolutePath(), cnyve);

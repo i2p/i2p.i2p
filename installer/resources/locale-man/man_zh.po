@@ -6,12 +6,13 @@
 # 
 # Translators:
 # YF <yfdyh000@gmail.com>, 2017
+# 黃彥儒 <r1235613@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: YF <yfdyh000@gmail.com>, 2017\n"
+"Last-Translator: 黃彥儒 <r1235613@gmail.com>, 2017\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/otf/teams/12694/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -173,7 +174,7 @@ msgstr "B<-o> 文件"
 msgid ""
 "Sets the output file to write to. If this option is not given, the output "
 "filename will be determined by the URL."
-msgstr ""
+msgstr "设置要写入的输出文件。 如果未指定此选项，输出文件名将由URL确定。"
 
 #. type: Plain text
 #: man/eepget.1:67

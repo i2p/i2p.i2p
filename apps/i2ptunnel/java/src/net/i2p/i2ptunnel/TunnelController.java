@@ -3,6 +3,7 @@ package net.i2p.i2ptunnel;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,12 +17,22 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SigType;
 import net.i2p.data.Destination;
+import net.i2p.data.KeyCertificate;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.PrivateKeyFile;
+import net.i2p.data.PublicKey;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SystemVersion;
@@ -83,6 +94,8 @@ public class TunnelController implements Logging {
     private static final String OPT_TAGS_SEND = PFX_OPTION + "crypto.tagsToSend";
     private static final String OPT_LOW_TAGS = PFX_OPTION + "crypto.lowTagThreshold";
     private static final String OPT_SIG_TYPE = PFX_OPTION + I2PClient.PROP_SIGTYPE;
+    /** @since 0.9.30 */
+    private static final String OPT_ALT_PKF = PFX_OPTION + I2PTunnelServer.PROP_ALT_PKF;
 
     /** all of these @since 0.9.14 */
     public static final String TYPE_CONNECT = "connectclient";
@@ -106,7 +119,7 @@ public class TunnelController implements Logging {
      */
     public static final SigType PREFERRED_SIGTYPE;
     static {
-        if (SystemVersion.isARM() || SystemVersion.isGNU() || SystemVersion.isAndroid()) {
+        if (SystemVersion.isGNU() || SystemVersion.isAndroid()) {
             if (SigType.ECDSA_SHA256_P256.isAvailable())
                 PREFERRED_SIGTYPE = SigType.ECDSA_SHA256_P256;
             else
@@ -146,8 +159,13 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList<String>(4);
         boolean keyOK = true;
-        if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
+        if (createKey && (!isClient() || getPersistentClientKey())) {
             keyOK = createPrivateKey();
+            if (keyOK && !isClient() && !getType().equals(TYPE_STREAMR_SERVER)) {
+                // check rv?
+                createAltPrivateKey();
+            }
+        }
         _state = keyOK && getStartOnLoad() ? TunnelState.START_ON_LOAD : TunnelState.STOPPED;
     }
     
@@ -186,7 +204,7 @@ public class TunnelController implements Logging {
             String destStr = dest.toBase64();
             log("Private key created and saved in " + keyFile.getAbsolutePath());
             log("You should backup this file in a secure place.");
-            log("New destination: " + destStr);
+            log("New alternate destination: " + destStr);
             String b32 = dest.toBase32();
             log("Base32: " + b32);
             File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
@@ -212,6 +230,101 @@ public class TunnelController implements Logging {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
         return true;
+    }
+    
+    /**
+     * Creates alternate Destination with the same encryption keys as the primary Destination,
+     * but a different signing key.
+     *
+     * Must have already called createPrivateKey() successfully.
+     * Does nothing unless option OPT_ALT_PKF is set with the privkey file name.
+     * Does nothing if the file already exists.
+     *
+     * @return success
+     * @since 0.9.30
+     */
+    private boolean createAltPrivateKey() {
+        if (PREFERRED_SIGTYPE == SigType.DSA_SHA1)
+            return false;
+        File keyFile = getPrivateKeyFile();
+        if (keyFile == null)
+            return false;
+        if (!keyFile.exists())
+            return false;
+        File altFile = getAlternatePrivateKeyFile();
+        if (altFile == null)
+            return false;
+        if (altFile.equals(keyFile))
+            return false;
+        if (altFile.exists())
+            return true;
+        PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
+        FileOutputStream out = null;
+        try {
+            Destination dest = pkf.getDestination();
+            if (dest == null)
+                return false;
+            if (dest.getSigType() != SigType.DSA_SHA1)
+                return false;
+            PublicKey pub = dest.getPublicKey();
+            PrivateKey priv = pkf.getPrivKey();
+            SimpleDataStructure[] signingKeys = KeyGenerator.getInstance().generateSigningKeys(PREFERRED_SIGTYPE);
+            SigningPublicKey signingPubKey = (SigningPublicKey) signingKeys[0];
+            SigningPrivateKey signingPrivKey = (SigningPrivateKey) signingKeys[1];
+            KeyCertificate cert = new KeyCertificate(signingPubKey);
+            Destination d = new Destination();
+            d.setPublicKey(pub);
+            d.setSigningPublicKey(signingPubKey);
+            d.setCertificate(cert);
+            int len = signingPubKey.length();
+            if (len < 128) {
+                byte[] pad = new byte[128 - len];
+                RandomSource.getInstance().nextBytes(pad);
+                d.setPadding(pad);
+            } else if (len > 128) {
+                // copy of excess data handled in KeyCertificate constructor
+            }
+        
+            out = new SecureFileOutputStream(altFile);
+            d.writeBytes(out);
+            priv.writeBytes(out);
+            signingPrivKey.writeBytes(out);
+            try { out.close(); } catch (IOException ioe) {}
+
+            String destStr = d.toBase64();
+            log("Alternate private key created and saved in " + altFile.getAbsolutePath());
+            log("You should backup this file in a secure place.");
+            log("New destination: " + destStr);
+            String b32 = d.toBase32();
+            log("Base32: " + b32);
+            File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
+            if (backupDir.isDirectory() || backupDir.mkdir()) {
+                String name = b32 + '-' + I2PAppContext.getGlobalContext().clock().now() + ".dat";
+                File backup = new File(backupDir, name);
+                if (FileUtil.copy(altFile, backup, false, true)) {
+                    SecureFileOutputStream.setPerms(backup);
+                    log("Alternate private key backup saved to " + backup.getAbsolutePath());
+                }
+            }
+            return true;
+        } catch (GeneralSecurityException e) {
+            log("Error creating keys " + e);
+            return false;
+        } catch (I2PSessionException e) {
+            log("Error creating keys " + e);
+            return false;
+        } catch (I2PException e) {
+            log("Error creating keys " + e);
+            return false;
+        } catch (IOException e) {
+            log("Error creating keys " + e);
+            return false;
+        } catch (RuntimeException e) {
+            log("Error creating keys " + e);
+            return false;
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
+        }
     }
     
     public void startTunnelBackground() {
@@ -267,12 +380,16 @@ public class TunnelController implements Logging {
         }
         // Config options may have changed since instantiation, so do this again.
         // Or should we take it out of the constructor completely?
-        if (type.endsWith("server") || getPersistentClientKey()) {
+        if (!isClient() || getPersistentClientKey()) {
             boolean ok = createPrivateKey();
             if (!ok) {
                 changeState(TunnelState.STOPPED);
                 log("Failed to start tunnel " + getName() + " as the private key file could not be created");
                 return;
+            }
+            if (!isClient() && !getType().equals(TYPE_STREAMR_SERVER)) {
+                // check rv?
+                createAltPrivateKey();
             }
         }
         setI2CPOptions();
@@ -641,6 +758,7 @@ public class TunnelController implements Logging {
                 props.setProperty(key, val);
             }
         }
+        Properties oldConfig = _config;
         _config = props;
 
         // Set up some per-type defaults
@@ -685,6 +803,15 @@ public class TunnelController implements Logging {
                 return;
             }
         }
+
+        if (oldConfig != null) {
+            if (configChanged(_config, oldConfig, PROP_FILE) ||
+                configChanged(_config, oldConfig, OPT_ALT_PKF) ||
+                configChanged(_config, oldConfig, OPT_SIG_TYPE)) {
+                log("Tunnel must be stopped and restarted for private key file changes to take effect");
+            }
+        }
+
         // Running, so check sessions
         Collection<I2PSession> sessions = getAllSessions();
         if (sessions.isEmpty()) {
@@ -702,6 +829,17 @@ public class TunnelController implements Logging {
                     _log.debug("Session is closed, not updating: " + s);
             }
         }
+    }
+
+    /**
+     *  Is property p different in p1 and p2?
+     *  @since 0.9.30
+     */
+    private static boolean configChanged(Properties p1, Properties p2, String p) {
+        String s1 = p1.getProperty(p);
+        String s2 = p2.getProperty(p);
+        return (s1 != null && !s1.equals(s2)) ||
+               (s1 == null && s2 != null);
     }
 
     /**
@@ -797,7 +935,25 @@ public class TunnelController implements Logging {
      *  @since 0.9.17
      */
     public File getPrivateKeyFile() {
-        String f = getPrivKeyFile();
+        return filenameToFile(getPrivKeyFile());
+    }
+
+    /**
+     *  Does not necessarily exist.
+     *  @return absolute path or null if unset
+     *  @since 0.9.30
+     */
+    public File getAlternatePrivateKeyFile() {
+        return filenameToFile(_config.getProperty(OPT_ALT_PKF));
+    }
+
+    /**
+     *  Does not necessarily exist.
+     *  @param f relative or absolute path, may be null
+     *  @return absolute path or null
+     *  @since 0.9.30
+     */
+    static File filenameToFile(String f) {
         if (f == null)
             return null;
         f = f.trim();

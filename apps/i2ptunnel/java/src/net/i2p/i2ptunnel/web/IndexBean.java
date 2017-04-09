@@ -488,6 +488,39 @@ public class IndexBean {
             return d.toBase32();
         return "";
     }
+
+    /**
+     *  Works even if tunnel is not running.
+     *  @return Destination or null
+     *  @since 0.9.30
+     */
+    protected Destination getAltDestination(int tunnel) {
+        return _helper.getAltDestination(tunnel);
+    }
+    
+    /**
+     *  Works even if tunnel is not running.
+     *  @return Base64 or ""
+     *  @since 0.9.30
+     */
+    public String getAltDestinationBase64(int tunnel) {
+        Destination d = getAltDestination(tunnel);
+        if (d != null)
+            return d.toBase64();
+        return "";
+    }
+    
+    /**
+     *  Works even if tunnel is not running.
+     *  @return "{52 chars}.b32.i2p" or ""
+     *  @since 0.9.30
+     */
+    public String getAltDestHashBase32(int tunnel) {
+        Destination d = getAltDestination(tunnel);
+        if (d != null)
+            return d.toBase32();
+        return "";
+    }
     
     /**
      *  For index.jsp
@@ -613,10 +646,20 @@ public class IndexBean {
     public void setSpoofedHost(String host) { 
         _config.setSpoofedHost(host);
     }
+
     /** What filename is this server tunnel's private keys stored in */
     public void setPrivKeyFile(String file) { 
         _config.setPrivKeyFile(file);
     }
+
+    /**
+     *  What filename is this server tunnel's alternate private keys stored in
+     *  @since 0.9.30
+     */
+    public void setAltPrivKeyFile(String file) { 
+        _config.setAltPrivKeyFile(file);
+    }
+
     /**
      * If called with any value (and the form submitted with action=Remove),
      * we really do want to stop and remove the tunnel.

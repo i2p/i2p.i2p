@@ -23,7 +23,7 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.VersionComparator;
-import net.i2p.util.ZipFileComment;
+//import net.i2p.util.ZipFileComment;
 
 /**
  * <p>Handles DSA signing and verification of update files.
@@ -611,9 +611,10 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
      *
      * @since 0.8.8
      */
+    @SuppressWarnings("deprecation")
     private boolean verifyVersionMatch(File signedFile) {
         try {
-             String zipComment = ZipFileComment.getComment(signedFile, VERSION_BYTES, HEADER_BYTES);
+             String zipComment = net.i2p.util.ZipFileComment.getComment(signedFile, VERSION_BYTES, HEADER_BYTES);
              return zipComment.equals(_newVersion);
         } catch (IOException ioe) {}
         return false;

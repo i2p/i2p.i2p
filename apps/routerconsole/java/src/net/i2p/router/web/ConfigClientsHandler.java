@@ -573,7 +573,18 @@ public class ConfigClientsHandler extends FormHandler {
     private void startPlugin(String app) {
         try {
             PluginStarter.startPlugin(_context, app);
-            addFormNotice(_t("Started plugin {0}", app));
+            // linkify the app name for the message if available
+            Properties props = PluginStarter.pluginProperties(_context, app);
+            String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(_context));
+            if (name == null)
+                name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
+            String url = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
+            if (name != null && url != null && name.length() > 0 && url.length() > 0) {
+                app = "<a href=\"" + url + "\">" + name + "</a>";
+                addFormNoticeNoEscape(_t("Started plugin {0}", app));
+            } else {
+                addFormNotice(_t("Started plugin {0}", app));
+            }
         } catch (Throwable e) {
             addFormError(_t("Error starting plugin {0}", app) + ": " + e);
             _log.error("Error starting plugin " + app,  e);

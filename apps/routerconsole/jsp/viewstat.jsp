@@ -61,13 +61,13 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
         if (str != null) try { periodCount = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
         str = request.getParameter("end");
         if (str != null) try { end = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
-        boolean hideLegend = Boolean.parseBoolean((String) request.getParameter("hideLegend"));
-        boolean hideGrid = Boolean.parseBoolean((String) request.getParameter("hideGrid"));
-        boolean hideTitle = Boolean.parseBoolean((String) request.getParameter("hideTitle"));
-        boolean showEvents = Boolean.parseBoolean((String) request.getParameter("showEvents"));
+        boolean hideLegend = Boolean.parseBoolean(request.getParameter("hideLegend"));
+        boolean hideGrid = Boolean.parseBoolean(request.getParameter("hideGrid"));
+        boolean hideTitle = Boolean.parseBoolean(request.getParameter("hideTitle"));
+        boolean showEvents = Boolean.parseBoolean(request.getParameter("showEvents"));
         boolean showCredit = false;
         if (request.getParameter("showCredit") != null)
-          showCredit = Boolean.parseBoolean((String) request.getParameter("showCredit"));
+          showCredit = Boolean.parseBoolean(request.getParameter("showCredit"));
         if (fakeBw)
             rendered = net.i2p.router.web.StatSummarizer.instance().renderRatePng(cout, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit);
         else

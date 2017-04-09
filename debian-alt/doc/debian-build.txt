@@ -97,7 +97,22 @@ reprepro -v -A i386 copy jessie trusty libjbigi-jni
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc sid jessie i2p
 
+# install in the architectures not copied from ubuntu
+# 'flood' should do this but forgot how, can't make it work any more
+reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p_0.9.xxp-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-doc_0.9.xxp-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-router_0.9.xxp-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-doc_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-router_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf' includedeb sid i2p_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf' includedeb sid i2p-doc_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf' includedeb sid i2p-router_0.9.xx-1ubuntu1_all.deb
+
+
 
 # check status
 reprepro ls i2p
+reprepro ls i2p-doc
+reprepro ls i2p-router
 reprepro ls libjbigi-jni

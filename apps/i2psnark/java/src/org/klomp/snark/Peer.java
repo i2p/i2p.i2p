@@ -89,6 +89,7 @@ public class Peer implements Comparable<Peer>
 */
   //private static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
+  private final boolean _isIncoming;
 
   /**
    * Outgoing connection.
@@ -103,6 +104,7 @@ public class Peer implements Comparable<Peer>
     this.infohash = infohash;
     this.metainfo = metainfo;
     _id = __id.incrementAndGet();
+    _isIncoming = false;
     //_log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating"));
   }
 
@@ -130,6 +132,16 @@ public class Peer implements Comparable<Peer>
     _id = __id.incrementAndGet();
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Creating a new peer " + peerID.toString(), new Exception("creating " + _id));
+    _isIncoming = true;
+  }
+
+  /**
+   * Is this an incoming connection?
+   * For RPC
+   * @since 0.9.30
+   */
+  public boolean isIncoming() {
+      return _isIncoming;
   }
 
   /**

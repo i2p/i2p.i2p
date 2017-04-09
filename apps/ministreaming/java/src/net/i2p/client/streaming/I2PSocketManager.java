@@ -38,6 +38,10 @@ public interface I2PSocketManager {
     public I2PSession getSession();
     
     /**
+     *  For a server, you must call connect() on the returned object.
+     *  Connecting the primary session does NOT connect any subsessions.
+     *  If the primary session is not connected, connecting a subsession will connect the primary session first.
+     *
      *  @return a new subsession, non-null
      *  @param privateKeyStream null for transient, if non-null must have same encryption keys as primary session
      *                          and different signing keys

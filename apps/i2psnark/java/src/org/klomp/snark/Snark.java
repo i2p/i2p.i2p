@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -237,8 +238,10 @@ public class Snark
   private volatile boolean _autoStoppable;
   // String indicating main activity
   private volatile String activity = "Not started";
-  private final long savedUploaded;
-
+  private long savedUploaded;
+  private long _startedTime;
+  private static final AtomicInteger __RPCID = new AtomicInteger();
+  private final int _rpcID = __RPCID.incrementAndGet();
 
   /**
    * from main() via parseArguments() single torrent
@@ -542,6 +545,7 @@ public class Snark
       starting = true;
       try {
           x_startTorrent();
+          _startedTime = _util.getContext().clock().now();
       } finally {
           starting = false;
       }
@@ -633,16 +637,17 @@ public class Snark
     if (st != null) {
         // TODO: Cache the config-in-mem to compare vs config-on-disk
         // (needed for auto-save to not double-save in some cases)
-        //boolean changed = storage.isChanged() || getUploaded() != savedUploaded;
-        boolean changed = true;
-        if (changed && completeListener != null)
-            completeListener.updateStatus(this);
+        long nowUploaded = getUploaded();
+        boolean changed = storage.isChanged() || nowUploaded != savedUploaded;
         try { 
             storage.close(); 
         } catch (IOException ioe) {
             System.out.println("Error closing " + torrent);
             ioe.printStackTrace();
         }
+        savedUploaded = nowUploaded;
+        if (changed && completeListener != null)
+            completeListener.updateStatus(this);
     }
     if (fast)
         // HACK: See above if(!fast)
@@ -1285,8 +1290,12 @@ public class Snark
 
     allChecked = true;
     checking = false;
-    if (storage.isChanged() && completeListener != null)
+    if (storage.isChanged() && completeListener != null) {
         completeListener.updateStatus(this);
+        // this saved the status, so reset the variables
+        storage.clearChanged();
+        savedUploaded = getUploaded();
+    }
   }
   
   public void storageCompleted(Storage storage)
@@ -1295,8 +1304,12 @@ public class Snark
         _log.info("Completely received " + torrent);
     //storage.close();
     //System.out.println("Completely received: " + torrent);
-    if (completeListener != null)
+    if (completeListener != null) {
         completeListener.torrentComplete(this);
+        // this saved the status, so reset the variables
+        savedUploaded = getUploaded();
+        storage.clearChanged();
+    }
   }
 
   public void setWantedPieces(Storage storage)
@@ -1364,4 +1377,23 @@ public class Snark
     long limit = 1024l * _util.getMaxUpBW();
     return total > limit;
   }
+
+  /**
+   *  A unique ID for this torrent, useful for RPC
+   *  @return positive value unless you wrap around
+   *  @since 0.9.30
+   */
+  public int getRPCID() {
+    return _rpcID;
+  }
+    
+    /**
+     * When did we start this torrent
+     * For RPC
+     * @return 0 if not started before. Not cleared when stopped.
+     * @since 0.9.30
+     */
+    public long getStartedTime() {
+        return _startedTime;
+    }
 }

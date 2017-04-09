@@ -70,11 +70,15 @@
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-webapp.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="../../jrobin/java/build/jrobin.jar" />
+
+                <!-- following jars only present for debian builds -->
+                <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
             </classpath>
         </javac>
     </target>
@@ -362,17 +366,22 @@
            **         -trimSpaces        Trim spaces in template text between actions, directives
         -->
         <java classname="org.apache.jasper.JspC" fork="true" failonerror="true">
+            <!-- this prevents tomcat from complaining in debian builds -->
+            <jvmarg value="-Dtomcat.util.scan.StandardJarScanFilter.jarsToSkip=commons-collections.jar,junit.jar,junit4.jar" />
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
-                <!-- jsp-api.jar only present for debian builds -->
+
+                <!-- following jars only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
-                <!-- tomcat-api.jar only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
-                <!-- jasper-el.jar only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/jasper-el.jar" />
+                <pathelement location="../../jetty/jettylib/tomcat-util.jar" />
+                <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
+
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="${ant.home}/lib/ant.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
@@ -403,10 +412,13 @@
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
-                <!-- jsp-api.jar only present for debian builds -->
+
+                <!-- following jars only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
-                <!-- tomcat-api.jar only present for debian builds -->
                 <pathelement location="../../jetty/jettylib/tomcat-api.jar" />
+                <pathelement location="../../jetty/jettylib/tomcat-util.jar" />
+                <pathelement location="../../jetty/jettylib/tomcat-util-scan.jar" />
+
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />

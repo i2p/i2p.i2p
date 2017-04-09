@@ -210,13 +210,13 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 _log.error("Error connecting to IRC server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             try {
-                socket.close();
+                socket.reset();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error while receiving the new IRC Connection", ex);
         } catch (OutOfMemoryError oom) {
             try {
-                socket.close();
+                socket.reset();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.ERROR))
                 _log.error("OOM in IRC server", oom);

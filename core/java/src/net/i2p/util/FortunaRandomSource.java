@@ -108,12 +108,13 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
 
         // get at least 4 extra bits if possible for better
         // distribution after the %
+        // No extra needed if power of two.
         int numBits;
-        if (n > 0xfffff)
+        if (n > 0x100000)
             numBits = 31;
-        else if (n > 0xfff)
+        else if (n > 0x1000)
             numBits = 24;
-        else if (n > 0xf)
+        else if (n > 0x10)
             numBits = 16;
         else
             numBits = 8;

@@ -264,14 +264,23 @@ public class GeneralHelper {
         return (tun != null && tun.getSpoofedHost() != null) ? tun.getSpoofedHost() : "";
     }
 
+    /**
+     *  @return path, non-null, non-empty
+     */
     public String getPrivateKeyFile(int tunnel) {
         return getPrivateKeyFile(_group, tunnel);
     }
 
+    /**
+     *  @return path, non-null, non-empty
+     */
     public String getPrivateKeyFile(TunnelControllerGroup tcg, int tunnel) {
         TunnelController tun = getController(tcg, tunnel);
-        if (tun != null && tun.getPrivKeyFile() != null)
-            return tun.getPrivKeyFile();
+        if (tun != null) {
+            String rv = tun.getPrivKeyFile();
+            if (rv != null)
+                return rv;
+        }
         if (tunnel < 0)
             tunnel = tcg == null ? 999 : tcg.getControllers().size();
         String rv = "i2ptunnel" + tunnel + "-privKeys.dat";
@@ -282,6 +291,28 @@ public class GeneralHelper {
             rv = "i2ptunnel" + tunnel + '.' + (++i) + "-privKeys.dat";
         }
         return rv;
+    }
+
+    /**
+     *  @return path or ""
+     *  @since 0.9.30
+     */
+    public String getAltPrivateKeyFile(int tunnel) {
+        return getAltPrivateKeyFile(_group, tunnel);
+    }
+
+    /**
+     *  @return path or ""
+     *  @since 0.9.30
+     */
+    public String getAltPrivateKeyFile(TunnelControllerGroup tcg, int tunnel) {
+        TunnelController tun = getController(tcg, tunnel);
+        if (tun != null) {
+            File f = tun.getAlternatePrivateKeyFile();
+            if (f != null)
+                return f.getAbsolutePath();
+        }
+        return "";
     }
 
     public String getClientInterface(int tunnel) {
@@ -348,6 +379,29 @@ public class GeneralHelper {
                 PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
                 try {
                     rv = pkf.getDestination();
+                    if (rv != null)
+                        return rv;
+                } catch (I2PException e) {
+                } catch (IOException e) {}
+            }
+        }
+        return null;
+    }
+
+    /**
+     *  Works even if tunnel is not running.
+     *  @return Destination or null
+     *  @since 0.9.30
+     */
+    public Destination getAltDestination(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            // do this the hard way
+            File keyFile = tun.getAlternatePrivateKeyFile();
+            if (keyFile != null) {
+                PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
+                try {
+                    Destination rv = pkf.getDestination();
                     if (rv != null)
                         return rv;
                 } catch (I2PException e) {

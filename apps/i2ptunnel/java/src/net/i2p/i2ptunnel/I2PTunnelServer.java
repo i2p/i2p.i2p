@@ -18,6 +18,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,12 +30,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 
 import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.crypto.SigType;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.util.EventDispatcher;
@@ -67,6 +70,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     private static final boolean DEFAULT_USE_POOL = true;
     public static final String PROP_USE_SSL = "useSSL";
     public static final String PROP_UNIQUE_LOCAL = "enableUniqueLocal";
+    /** @since 0.9.30 */
+    public static final String PROP_ALT_PKF = "altPrivKeyFile";
     /** apparently unused */
     protected static volatile long __serverId = 0;
     /** max number of threads  - this many slowlorisses will DOS this server, but too high could OOM the JVM */
@@ -217,11 +222,52 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                                                                                     portNum, props);
             rv.setName("I2PTunnel Server");
             getTunnel().addSession(rv.getSession());
+            String alt = props.getProperty(PROP_ALT_PKF);
+            if (alt != null)
+                addSubsession(rv, alt);
             return rv;
         } catch (I2PSessionException ise) {
             throw new IllegalArgumentException("Can't create socket manager", ise);
         } finally {
             try { privData.close(); } catch (IOException ioe) {}
+        }
+    }
+
+    /**
+     *  Add a non-DSA_SHA1 subsession to the DSA_SHA1 server if necessary.
+     *
+     *  @return subsession, or null if none was added
+     *  @since 0.9.30
+     */
+    private I2PSession addSubsession(I2PSocketManager sMgr, String alt) {
+        File altFile = TunnelController.filenameToFile(alt);
+        if (alt == null)
+            return null;
+        I2PSession sess = sMgr.getSession();
+        if (sess.getMyDestination().getSigType() != SigType.DSA_SHA1)
+            return null;
+        Properties props = new Properties();
+        props.putAll(getTunnel().getClientOptions());
+        // fixme get actual sig type
+        String name = props.getProperty("inbound.nickname");
+        if (name != null)
+            props.setProperty("inbound.nickname", name + " (EdDSA)");
+        name = props.getProperty("outbound.nickname");
+        if (name != null)
+            props.setProperty("outbound.nickname", name + " (EdDSA)");
+        props.setProperty(I2PClient.PROP_SIGTYPE, "EdDSA_SHA512_Ed25519");
+        FileInputStream privData = null;
+        try {
+            privData = new FileInputStream(altFile);
+            return sMgr.addSubsession(privData, props);
+        } catch (IOException ioe) {
+            _log.error("Failed to add subssession", ioe);
+            return null;
+        } catch (I2PSessionException ise) {
+            _log.error("Failed to add subssession", ise);
+            return null;
+        } finally {
+            if (privData != null) try { privData.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -238,6 +284,22 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         while (sockMgr.getSession().isClosed()) {
             try {
                 sockMgr.getSession().connect();
+                // Now connect the subsessions, if any
+                List<I2PSession> subs = sockMgr.getSubsessions();
+                if (!subs.isEmpty()) {
+                    for (I2PSession sub : subs) {
+                        try {
+                            sub.connect();
+                            if (_log.shouldInfo())
+                                _log.info("Connected subsession " + sub);
+                        } catch (I2PSessionException ise) {
+                            // not fatal?
+                            String msg = "Unable to connect subsession " + sub;
+                            this.l.log(msg);
+                            _log.error(msg, ise);
+                        }
+                    }
+                }
             } catch (I2PSessionException ise) {
                 // try to make this error sensible as it will happen...
                 String portNum = getTunnel().port;
@@ -618,7 +680,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                           " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
         } catch (SocketException ex) {
             try {
-                socket.close();
+                socket.reset();
             } catch (IOException ioe) {}
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error connecting to server " + remoteHost + ':' + remotePort, ex);

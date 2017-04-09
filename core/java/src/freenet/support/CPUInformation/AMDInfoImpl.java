@@ -453,6 +453,30 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             modelString = "Jaguar";
           }
           break;
+
+        //Ryzen 7 (model 1), Ryzen 5 TBD
+        // untested
+          case 23: {
+            // Quote wikipedia:
+            // Zen is a clean sheet design that differs from the long-standing Bulldozer architecture.
+            // All models support: x87, MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AES, CLMUL,
+            // AVX, AVX2, FMA, CVT16/F16C, ABM, BMI1, BMI2, SHA.
+            isK6Compatible = true;
+            isK6_2_Compatible = true;
+            isK6_3_Compatible = true;
+            isAthlonCompatible = true;
+            isAthlon64Compatible = true;
+            // Pending testing of the bulldozer jbigi
+            //isPiledriverCompatible = true;
+            //isSteamrollerCompatible = true;
+            //isExcavatorCompatible = true;
+            //isBulldozerCompatible = true;
+            if (model == 1)
+               modelString = "Ryzen 7";
+            else
+               modelString = "Ryzen model " + model;
+          }
+          break;
         }
         return modelString;
     }

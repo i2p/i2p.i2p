@@ -1,0 +1,55 @@
+_eepget() 
+{
+    local cur prev opts
+    _init_completion || return
+
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-c -e -h -l -m -n -o -p -t -u -x"
+
+    case "${prev}" in
+      -e|-h|-u|-x)
+        return
+        ;;
+      -l|-m|-t)
+        if [[ $cur == "" ]]; then
+            COMPREPLY=( $( compgen -P "$cur" -W "{1..9}" ) )
+        elif [[ $cur == "0" ]]; then
+            COMPREPLY=( $( compgen -W "$cur" ) )
+        else
+            COMPREPLY=( $( compgen -P "$cur" -W "{0..9}" ) )
+        fi
+        compopt -o nospace
+        return
+        ;;
+      -n)
+        if [[ $cur == "0" ]]; then
+            COMPREPLY=( $( compgen -W "$cur" ) )
+        else
+            COMPREPLY=( $( compgen -P "$cur" -W "{0..9}" ) )
+        fi
+        compopt -o nospace
+        return
+        ;;
+      -o)
+        _filedir
+        return
+        ;;
+      -p)
+        _known_hosts_real "$cur"
+        return
+        ;;
+    esac
+
+    if [[ ${cur} == h* ]] ; then
+        COMPREPLY=( $(compgen -W "http://{a..z}" -- $cur) )
+        return
+    fi
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+}
+complete -F _eepget eepget

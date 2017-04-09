@@ -212,12 +212,11 @@ Applications:
      Zxing 3.3.0:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 8.1.21.v20160908:
+   Jetty 9.2.21.v20170120:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
    See licenses/LICENSE-ECLIPSE-1.0.html
-   See licenses/NOTICE-Commons-Logging.txt
 
    JRobin 1.6.0-1:
    Copyright (c) 2001-2005 Sasa Markovic and Ciaran Treanor.
@@ -284,7 +283,7 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
-   Tomcat 6.0.48:
+   Tomcat 8.0.33:
    Copyright 1999-2016 The Apache Software Foundation
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Tomcat.txt

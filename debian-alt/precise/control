@@ -7,7 +7,6 @@ Bugs: mailto:zzz@i2pmail.org
 Homepage: https://geti2p.net/
 Build-Depends: debhelper (>= 7.0.50~)
  ,ant (>= 1.8)
- ,ant-optional
  ,debconf
  ,openjdk-7-jdk
 # Ant requires java 6 tools.jar:
@@ -76,7 +75,6 @@ Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  openjdk-8-jre-headless | openjdk-7-jre-headless | java8-runtime-headless | java7-runtime-headless,
- libecj-java,
  geoip-database,
  gettext-base,
  libgetopt-java,

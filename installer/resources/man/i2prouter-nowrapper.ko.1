@@ -6,28 +6,27 @@
 .TH I2PROUTER\-NOWRAPPER 1 "2017년 1월 26일" "" I2P
 
 .SH 이름
-i2prouter\-nowrapper \- start the I2P router
+i2prouter\-nowrapper \- I2P 라우터를 시작
 
 .SH SYNOPSIS
 \fBi2prouter\-nowrapper\fP
 .br
 
 .SH 설명
-Start the I2P router, without the service wrapper.  This means the router
-will not restart if it crashes.  Also, it will use the default memory size,
-which may not be enough for I2P.
+Service wrapper 없이 I2P 라우터를 시작. 오류가 난다면 시작되지 않습니다. I2P 구동에 충분하지 않은 기본 메모리
+사이즈를 사용합니다.
 .P
-You should really use the \fBi2prouter\fP(1)  script instead.  There are no
-options.  To stop the router, use your browser to access
+\fBi2prouter\fP(1)를 사용해야 합니다. 다른 선택지는 없습니다. 라우터를 멈추려면, 브라우저를 통해
 .UR http://localhost:7657/
-the router console
+라우터 콘솔
 .UE .
+에 접근하세요.
 
 .SH "REPORTING BUGS"
-Please enter a ticket on
 .UR https://trac.i2p2.de/
-the I2P trac page
+I2P trac 페이지
 .UE .
+에 티켓을 남겨 주세요
 
 .SH "SEE ALSO"
 \fBi2prouter\fP(1)

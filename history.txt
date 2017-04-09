@@ -1,3 +1,127 @@
+2017-04-02 zzz
+ * Context: Fix ClientAppManagerImpl in AppContext
+ * i2psnark: Fix standalone configuration for Jetty 9
+
+2017-04-01 zzz
+ * Console: Fix stopping of webapps when console stops (ticket #1893)
+ * i2psnark: Only rewrite torrent config file if changed (ticket #1893)
+ * KeyStoreUtil: Reduce log level of expired cert error
+ * Util: Don't sync config writes on Android/ARM (ticket #1893)
+
+2017-03-31 zzz
+ * SSU:
+   - When a IPv6 peer connects, trigger a IPv6 peer test, not a IPv4 one
+   - Require two consecutive peer test results for some state transitions,
+     to prevent frequent transitions to firewalled and back
+
+2017-03-29 zzz
+ * SSU: Refactor PeerTestEvent out of UDPTransport
+ * Throttle: Reduce threshold for probabalistic throttling
+   on slow platforms (ticket #1964)
+
+2017-03-27 zzz
+ * Blockfile: Include authentication strings in exports
+ * Build: Suppress JarScanner warning during Debian build (ticket #1975)
+ * Debian: Add missing addressbook.jar to package (ticket #1973)
+ * SusiDNS: Add addressbook.jar to classpath, don't fail
+   to start if it's still not found (ticket #1973)
+ * Time: Fix crashes on old Androids (ticket #1976)
+
+2017-03-25 zzz
+ * Blockfile: Upgrade to Blockfile format 4 on non-Android ARM
+ * i2ptunnel: Allow alt priv key file to be added without restarting I2P
+
+2017-03-24 zzz
+ * Addressbook: Remove static reference, hide implementation
+ * CPUID: Recognize Ryzen
+
+2017-03-23 zzz
+ * Plugins:
+   - Blacklist i2pbote and BwSchedule
+   - Translate exceptions thrown from PluginStarter
+   - Add version number to console messages when installing/starting
+
+2017-03-21 zzz
+ * i2psnark: Enhancement to support RPC plugin
+ * Context: New ClientAppManagerImpl in AppContext, so registration works
+
+2017-03-20 zzz
+ * i2psnark: Enhancements to support RPC plugin
+ * SSU: More work on introducer expiration (proposal 133)
+
+2017-03-18 zzz
+ * Addressbook (ticket #1966):
+   - Build as jar, not war
+   - Put empty war in updater
+   - Move Servlet starter to SusiDNS
+   - Skip war in RouterConsoleRunner
+
+2017-03-14 zzz
+ * Blockfile: Fix specified-destination deletion from the correct book
+ * i2ptunnel:
+   - New form to enter private key file for alternate destination
+   - Use alt destination for registration if set
+ * NBI: Adjust info logging at startup
+ * SusiDNS:
+   - New button for adding alternate destination
+   - Fix nonces on details page with multiple destinations
+   - Fix single dest deletion on details page with multiple destinations
+   - Set book in all forms to ensure correct book
+
+2017-03-13 zzz
+ * i2ptunnel:
+   - Add subsession support to servers
+   - Reset I2P socket on TCP socket errors
+ * SAM: Reset I2P socket on handler errors
+ * Streaming: Add reset() to I2PSocket API
+
+2017-03-11 zzz
+Prop from i2p.i2p.zzz.jetty9:
+ * Console: Fix RouterConsoleRunner for Jetty 9
+ * Debian packages:
+   - Remove libjetty8-java and ant-optional dependencies
+   - Add libjetty9-java and libtomcat8-java dependencies
+     Fixes stretch/sid package (ticket #1902)
+   - Fix up build files for package builds
+ * Eepsite: Update initial configuration files for Jetty 9
+ * Jetty:
+   - Update to Jetty 9.2.21.v20170120 and Tomcat 8.0.33 (tickets #1512, #1935)
+     Fixes jsp compilation on Java 9 (ticket #1870)
+     Fixes InstanceManager warning (ticket #1818)
+     We now support servlet API 3.1, JSP API 2.3, and EL API 3.0.
+     Breaks the following plugins: bwschedule, i2pbote, i2pcontrol, zzzot
+ * Startup: Add migration code for eepsite Jetty 8 configuration files
+
+2017-03-09 zzz
+ * i2psnark: Prevent RuntimeException caused by corrupt i2psnark.dht.dat file
+ * Router: Set default sig type to EdDSA for non-Android ARM
+ * Streaming: Don't change buffer size when max message size is adjusted
+
+2017-03-06 zzz
+ * CPUID:
+   - Fix saving of libjcpuid.jnifile on Macs,
+     was incorrectly saving as libjcpuid.so (tickets #1865, #1900)
+   - Try to load libjcpuid-x86_64-osx.jnilib for 32-bit Macs,
+     because as of 0.9.26 it's a 'fat binary' with 32-bit in it also.
+   - Add library search path logging to main()
+ * NBI:
+   - Try to load the "none" architecture for x86, even if
+     CPUID loading fails (tickets #1865, #1900)
+   - Add library search path logging to main()
+ * Throttle: Fix disable of probabalistic throttling
+   (ticket #1963) (thx mysterious)
+
+2017-03-03 zzz
+ * Utils: Fix crash in Windows installer
+
+2017-03-02 zzz
+ * SSU:
+   - Initial work on introducer expiration (proposal 133)
+   - Fix bug in error handling for introduction parameters in RI
+
+2017-03-01 zzz
+ * Servlet: Catch OOM in MultiPartRequest
+
 2017-02-27 zzz
  * i2psnark: Fix disappearing start button
  * addressbook: Add date parameter to authentication strings

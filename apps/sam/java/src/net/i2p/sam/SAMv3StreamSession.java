@@ -383,7 +383,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 									Log log = ctx.logManager().getLog(SAMv3StreamSession.class);
 									log.error("SSL error", gse);
 									try {
-										i2ps.close();
+										i2ps.reset();
 									} catch (IOException ee) {}
 									throw new RuntimeException("SSL error", gse);
 								}
@@ -401,7 +401,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 					if (log.shouldLog(Log.WARN))
 						log.warn("Error forwarding", ioe);
 					try {
-						i2ps.close();
+						i2ps.reset();
 					} catch (IOException ee) {}
 					continue;
 	    			}
@@ -433,7 +433,7 @@ class SAMv3StreamSession  extends SAMStreamSession implements Session
 	    					clientServerSock.close();
 	    				} catch (IOException ee) {}
 	    				try {
-	    					i2ps.close();
+	    					i2ps.reset();
 	    				} catch (IOException ee) {}
 	    				continue ;
 	    			}

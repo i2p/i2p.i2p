@@ -15,7 +15,11 @@
 - replace header
 - fix date in header (get date from HEAD)
 - ./makegeoipv6.sh
-- mtn ci geoip.txt geoipv5.dat.gz
+- mtn ci geoip.txt geoipv6.dat.gz
+
+- BuildTime: Don't have to do this every release, but update the
+  EARLIEST and EARLIEST_LONG values in ~/mtn/i2p/core/java/src/net/i2p/time/BuildTime.java
+  to the current date, more or less.
 
 
 ## A day or two before
@@ -238,6 +242,7 @@
   - `i2p2www/__init__.py` (release number)
   - `i2p2www/pages/downloads/list.html` (release signer, if changed)
   - `i2p2www/pages/downloads/macros` (checksums)
+  - `i2p2www/pages/site/get-involved/roadmap.html` (release date, actual release contents)
   - `i2p2www/static/news/news.xml` (no longer necessary)
   - Sync with mtn.i2p-projekt.i2p
 

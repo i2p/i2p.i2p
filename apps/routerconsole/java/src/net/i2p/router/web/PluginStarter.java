@@ -67,6 +67,22 @@ public class PluginStarter implements Runnable {
     private static Map<String, ClassLoader> _clCache = new ConcurrentHashMap<String, ClassLoader>();
     private static Map<String, Collection<String>> pluginWars = new ConcurrentHashMap<String, Collection<String>>();
 
+    /**
+     *  Plugin name to plugin version of plugins that do not work
+     *  with Jetty 9, but do not have a max-jetty-version=8.9999 set.
+     *  Unmodifiable.
+     *
+     *  @since 0.9.30
+     */
+    public static final Map<String, String> jetty9Blacklist;
+
+    static {
+        Map<String, String> map = new HashMap<String, String>(4);
+        map.put("i2pbote", "0.4.5");
+        map.put("BwSchedule", "0.0.36");
+        jetty9Blacklist = Collections.unmodifiableMap(map);
+    }
+
     public PluginStarter(RouterContext ctx) {
         _context = ctx;
     }
@@ -297,8 +313,8 @@ public class PluginStarter implements Runnable {
 
         Properties props = pluginProperties(ctx, appName);
 
-
-
+        // For the following, we use the exact same translated strings as in PluginUpdateRunner
+        // to avoid duplication
 
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
@@ -306,6 +322,7 @@ public class PluginStarter implements Runnable {
             String foo = "Plugin " + appName + " requires I2P version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);
+            foo = gettext("This plugin requires I2P version {0} or higher", minVersion, ctx);
             throw new Exception(foo);
         }
 
@@ -315,6 +332,7 @@ public class PluginStarter implements Runnable {
             String foo = "Plugin " + appName + " requires Java version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);
+            foo = gettext("This plugin requires Java version {0} or higher", minVersion, ctx);
             throw new Exception(foo);
         }
 
@@ -325,6 +343,18 @@ public class PluginStarter implements Runnable {
             String foo = "Plugin " + appName + " requires Jetty version " + minVersion + " or higher";
             log.error(foo);
             disablePlugin(appName);
+            foo = gettext("Plugin requires Jetty version {0} or higher", minVersion, ctx);
+            throw new Exception(foo);
+        }
+
+        String blacklistVersion = jetty9Blacklist.get(appName);
+        String curVersion = ConfigClientsHelper.stripHTML(props, "version");
+        if (blacklistVersion != null &&
+            VersionComparator.comp(curVersion, blacklistVersion) <= 0) {
+            String foo = "Plugin " + appName + " requires Jetty version 8.9999 or lower";
+            log.error(foo);
+            disablePlugin(appName);
+            foo = gettext("Plugin requires Jetty version {0} or lower", "8.9999", ctx);
             throw new Exception(foo);
         }
 
@@ -334,6 +364,7 @@ public class PluginStarter implements Runnable {
             String foo = "Plugin " + appName + " requires Jetty version " + maxVersion + " or lower";
             log.error(foo);
             disablePlugin(appName);
+            foo = gettext("Plugin requires Jetty version {0} or lower", maxVersion, ctx);
             throw new Exception(foo);
         }
 
@@ -1000,6 +1031,14 @@ public class PluginStarter implements Runnable {
         Method method = urlClass.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(urlClassLoader, new Object[]{u});
+    }
+
+    /**
+     * translate a string
+     * @since 0.9.30
+     */
+    private static String gettext(String s, Object o, I2PAppContext ctx) {
+        return Messages.getString(s, o, ctx);
     }
 
     /** translate a string */

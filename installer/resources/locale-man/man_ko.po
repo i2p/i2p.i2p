@@ -6,12 +6,13 @@
 # 
 # Translators:
 # SEPT____ <xpressengine3@mail.beo.kr>, 2017
+# HelloKS <kqwe1859@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>, 2017\n"
+"Last-Translator: HelloKS <kqwe1859@gmail.com>, 2017\n"
 "Language-Team: Korean (https://www.transifex.com/otf/teams/12694/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,7 +58,7 @@ msgstr "SYNOPSIS"
 #. type: Plain text
 #: man/eepget.1:9
 msgid "B<eepget> [I<options>]I<URL>"
-msgstr ""
+msgstr "B<eepget> [I<options>]I<URL>"
 
 #. type: SH
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
@@ -94,7 +95,7 @@ msgstr "옵션"
 #. type: Plain text
 #: man/eepget.1:25
 msgid "B<-c>"
-msgstr ""
+msgstr "B<-c>"
 
 #. type: TP
 #: man/eepget.1:25
@@ -105,7 +106,7 @@ msgstr "기존 네트워크. 프록시를 쓰지 않음. B<-p> :0 와 동일."
 #. type: Plain text
 #: man/eepget.1:31
 msgid "B<-e> etag"
-msgstr ""
+msgstr "B<-e> etag"
 
 #. type: TP
 #: man/eepget.1:31
@@ -116,7 +117,7 @@ msgstr "요청 헤더에 etag 값을 세팅."
 #. type: Plain text
 #: man/eepget.1:37
 msgid "B<-h> name=value"
-msgstr ""
+msgstr "B<-h> name=value"
 
 #. type: TP
 #: man/eepget.1:37
@@ -127,7 +128,7 @@ msgstr "세팅된 name과 value로 요청 헤더를 추가"
 #. type: Plain text
 #: man/eepget.1:43
 msgid "B<-l> lineLen"
-msgstr ""
+msgstr "B<-l> lineLen"
 
 #. type: TP
 #: man/eepget.1:43
@@ -140,7 +141,7 @@ msgstr "진행 디스플레이를 컨트롤. B<\\ lineLen >를 통해 문자 당
 #. type: Plain text
 #: man/eepget.1:49
 msgid "B<-m> markSize"
-msgstr ""
+msgstr "B<-m> markSize"
 
 #. type: TP
 #: man/eepget.1:49
@@ -154,7 +155,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:55
 msgid "B<-n> retries"
-msgstr ""
+msgstr "B<-n> retries"
 
 #. type: TP
 #: man/eepget.1:55
@@ -167,7 +168,7 @@ msgstr "다운로드가 실패했을 때 몇변 다시 시도할지 설정. 옵�
 #. type: Plain text
 #: man/eepget.1:61
 msgid "B<-o> file"
-msgstr ""
+msgstr "B<-o> file"
 
 #. type: TP
 #: man/eepget.1:61
@@ -180,7 +181,7 @@ msgstr "파일의 이름을 설정합니다. 세팅되지 않으면, URL에 표�
 #. type: Plain text
 #: man/eepget.1:67
 msgid "B<-p> proxy_host[:port]"
-msgstr ""
+msgstr "B<-p> proxy_host[:port]"
 
 #. type: TP
 #: man/eepget.1:67
@@ -196,7 +197,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:73
 msgid "B<-t> seconds"
-msgstr ""
+msgstr "B<-t> seconds"
 
 #. type: TP
 #: man/eepget.1:73
@@ -207,7 +208,7 @@ msgstr "타임아웃 시간을 설정. 기본값은 60 초."
 #. type: Plain text
 #: man/eepget.1:79
 msgid "B<-u> username"
-msgstr ""
+msgstr "B<-u> username"
 
 #. type: TP
 #: man/eepget.1:79
@@ -218,7 +219,7 @@ msgstr "프록시 인증에 필요한 유저네임 세팅. 필요할 때만 입�
 #. type: Plain text
 #: man/eepget.1:85
 msgid "B<-x> password"
-msgstr ""
+msgstr "B<-x> password"
 
 #. type: TP
 #: man/eepget.1:85
@@ -232,49 +233,49 @@ msgstr "프록시 인증에 필요한 비밀번호 세팅. 필요할 때만 입�
 #: man/eepget.1:89
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr ""
+msgstr "EXIT STATUS"
 
 #. type: Plain text
 #: man/eepget.1:93
 msgid ""
 "B<eepget> exits with status zero upon successful transfer and non-zero if "
 "there were problems with the download."
-msgstr ""
+msgstr "B<eepget>은 정상적인 전송때에는 0 상태로 종료되며 다운로드에 문제가 있을 때는 0이 아닙니다."
 
 #. type: SH
 #: man/eepget.1:94 man/i2prouter.1:54 man/i2prouter-nowrapper.1:24
 #, no-wrap
 msgid "REPORTING BUGS"
-msgstr ""
+msgstr "REPORTING BUGS"
 
 #. type: Plain text
 #: man/eepget.1:99 man/i2prouter.1:59 man/i2prouter-nowrapper.1:29
 msgid ""
 "Please enter a ticket on E<.UR https://trac.i2p2.de/> the I2P trac page "
 "E<.UE .>"
-msgstr ""
+msgstr "E<.UR https://trac.i2p2.de/> I2P trac 페이지 E<.UE .>에 티켓을 남겨 주세요"
 
 #. type: SH
 #: man/eepget.1:100 man/i2prouter.1:60 man/i2prouter-nowrapper.1:30
 #, no-wrap
 msgid "SEE ALSO"
-msgstr ""
+msgstr "SEE ALSO"
 
 #. type: Plain text
 #: man/eepget.1:104
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 
 #. type: TH
 #: man/i2prouter.1:1
 #, no-wrap
 msgid "I2PROUTER"
-msgstr ""
+msgstr "I2PROUTER"
 
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr ""
+msgstr "i2prouter - I2P 라우터를 시작하거나 중지할 때 사용"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -282,142 +283,144 @@ msgid ""
 "B<i2prouter> "
 "{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 msgstr ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr ""
+msgstr "I2P 서비스를 조정"
 
 #. type: IP
 #: man/i2prouter.1:15
 #, no-wrap
 msgid "B<console>"
-msgstr ""
+msgstr "B<console>"
 
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
-msgstr ""
+msgstr "현재 유저로 I2P를 콘솔 애플리케이션으로 동작시킴"
 
 #. type: IP
 #: man/i2prouter.1:19
 #, no-wrap
 msgid "B<start>"
-msgstr ""
+msgstr "B<start>"
 
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr ""
+msgstr "I2P 서비스를 시작"
 
 #. type: IP
 #: man/i2prouter.1:23
 #, no-wrap
 msgid "B<stop>"
-msgstr ""
+msgstr "B<stop>"
 
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr ""
+msgstr "I2P 서비스를 중지"
 
 #. type: IP
 #: man/i2prouter.1:27
 #, no-wrap
 msgid "B<restart>"
-msgstr ""
+msgstr "B<restart>"
 
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr ""
+msgstr "I2P 서비스를 종료하고 재시작"
 
 #. type: IP
 #: man/i2prouter.1:31
 #, no-wrap
 msgid "B<condrestart>"
-msgstr ""
+msgstr "B<condrestart>"
 
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr ""
+msgstr "I2P 서비스가 실행중이라면 재시작"
 
 #. type: IP
 #: man/i2prouter.1:35
 #, no-wrap
 msgid "B<graceful>"
-msgstr ""
+msgstr "B<graceful>"
 
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr ""
+msgstr "우아하게 종료 (11분 이상 걸릴 수 있음)"
 
 #. type: IP
 #: man/i2prouter.1:39
 #, no-wrap
 msgid "B<install>"
-msgstr ""
+msgstr "B<install>"
 
 #. type: Plain text
 #: man/i2prouter.1:41
 msgid "Install initscript to start I2P automatically when the system boots."
-msgstr ""
+msgstr "시스템이 켜짐젼 I2P를 자동 시작하게끔 initscript를 설치"
 
 #. type: IP
 #: man/i2prouter.1:43
 #, no-wrap
 msgid "B<remove>"
-msgstr ""
+msgstr "B<remove>"
 
 #. type: Plain text
 #: man/i2prouter.1:45
 msgid "Uninstall initscript that was installed with B<install>"
-msgstr ""
+msgstr "B<install>로 설치된 initscript를 삭제"
 
 #. type: IP
 #: man/i2prouter.1:47
 #, no-wrap
 msgid "B<status>"
-msgstr ""
+msgstr "B<status>"
 
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr ""
+msgstr "I2P 작동 여부를 출력"
 
 #. type: IP
 #: man/i2prouter.1:51
 #, no-wrap
 msgid "B<dump>"
-msgstr ""
+msgstr "B<dump>"
 
 #. type: Plain text
 #: man/i2prouter.1:53
 msgid "Dumps the current threads into B<wrapper.log>."
-msgstr ""
+msgstr "B<wrapper.log>에 현재 쓰레드를 덤프"
 
 #. type: Plain text
 #: man/i2prouter.1:61
 msgid "B<i2prouter-nowrapper>(1)"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>(1)"
 
 #. type: TH
 #: man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "I2PROUTER-NOWRAPPER"
-msgstr ""
+msgstr "I2PROUTER-NOWRAPPER"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr ""
+msgstr "i2prouter-nowrapper - I2P 라우터를 시작"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
 msgid "B<i2prouter-nowrapper>"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:14
@@ -426,6 +429,8 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
+"Service wrapper 없이 I2P 라우터를 시작. 오류가 난다면 시작되지 않습니다. I2P 구동에 충분하지 않은 기본 메모리 "
+"사이즈를 사용합니다."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
@@ -434,8 +439,10 @@ msgid ""
 "options.  To stop the router, use your browser to access E<.UR "
 "http://localhost:7657/> the router console E<.UE .>"
 msgstr ""
+"B<i2prouter>(1)를 사용해야 합니다. 다른 선택지는 없습니다. 라우터를 멈추려면, 브라우저를 통해 E<.UR "
+"http://localhost:7657/> 라우터 콘솔 E<.UE .> 에 접근하세요."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31
 msgid "B<i2prouter>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)"

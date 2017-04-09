@@ -67,6 +67,32 @@ class I2PSocketFull implements I2PSocket {
         destroy();
     }
     
+    /**
+     *  Resets and closes this socket. Sends a RESET indication to the far-end.
+     *  This is the equivalent of setSoLinger(true, 0) followed by close() on a Java Socket.
+     *
+     *  Nonblocking.
+     *  Any thread currently blocked in an I/O operation upon this socket will throw an IOException.
+     *  Once a socket has been reset, it is not available for further networking use
+     *  (i.e. can't be reconnected or rebound). A new socket needs to be created.
+     *  Resetting this socket will also close the socket's InputStream and OutputStream.
+     *
+     *  @since 0.9.30
+     */
+    public void reset() throws IOException {
+        Connection c = _connection;
+        if (c == null) return;
+        if (log.shouldLog(Log.INFO))
+            log.info("reset() called, connected? " + c.getIsConnected() + " : " + c, new Exception());
+        if (c.getIsConnected()) {
+            c.disconnect(false);
+            // this will cause any thread waiting in Connection.packetSendChoke()
+            // to throw an IOE
+            c.windowAdjusted();
+        }
+        destroy();
+    }
+    
     Connection getConnection() { return _connection; }
     
     /**

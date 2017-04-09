@@ -70,6 +70,14 @@ public class EditBean extends IndexBean {
     public String getPrivateKeyFile(int tunnel) {
         return _helper.getPrivateKeyFile(tunnel);
     }
+
+    /**
+     *  @return path or ""
+     *  @since 0.9.30
+     */
+    public String getAltPrivateKeyFile(int tunnel) {
+        return _helper.getAltPrivateKeyFile(tunnel);
+    }
     
 /****
     public String getNameSignature(int tunnel) {

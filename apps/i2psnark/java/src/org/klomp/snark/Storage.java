@@ -306,6 +306,14 @@ public class Storage implements Closeable
   }
 
   /**
+   *  Clear the storage changed variable
+   *  @since 0.9.30
+   */
+  void clearChanged() {
+      changed = false;
+  }
+
+  /**
    *  File checking in progress.
    *  @since 0.9.3
    */

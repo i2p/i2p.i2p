@@ -77,6 +77,8 @@
         if (addrs == null) {
             %><p>Not found: <%=detail%></p><%
         } else {
+            // use one nonce for all
+            String nonce = book.getSerial();
             for (i2p.susi.dns.AddressBean addr : addrs) {
                 String b32 = addr.getB32();
 %>
@@ -149,10 +151,12 @@
 <div id="buttons">
 <form method="POST" action="addressbook">
 <p class="buttons">
-<input type="hidden" name="serial" value="${book.serial}">
+<input type="hidden" name="book" value="${book.book}">
+<input type="hidden" name="serial" value="<%=nonce%>">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <input type="hidden" name="checked" value="<%=detail%>">
+<input type="hidden" name="destination" value="<%=addr.getDestination()%>">
 <input class="delete" type="submit" name="action" value="<%=intl._t("Delete Entry")%>" >
 </p>
 </form>

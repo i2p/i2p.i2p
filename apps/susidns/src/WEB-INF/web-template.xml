@@ -13,6 +13,22 @@
     </filter-mapping>
 
   <display-name>susidns</display-name>
+
+    <servlet>
+        <servlet-name>addressbook-runner</servlet-name>
+        <servlet-class>net.i2p.addressbook.servlet.Servlet</servlet-class>
+        <init-param>
+            <param-name>home</param-name>
+            <param-value>./addressbook</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping> 
+      <servlet-name>addressbook-runner</servlet-name>
+      <url-pattern>/addressbook-runner</url-pattern>
+    </servlet-mapping>
+
     <!-- precompiled servlets -->
 
     <!-- non-.jsp URLs -->

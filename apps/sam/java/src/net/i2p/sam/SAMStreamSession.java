@@ -564,7 +564,7 @@ class SAMStreamSession implements SAMMessageSess {
                     int id = createSocketHandler(i2ps, 0);
                     if (id == 0) {
                         _log.error("SAM STREAM session handler not created!");
-                        i2ps.close();
+                        i2ps.reset();
                         continue;
                     }
 

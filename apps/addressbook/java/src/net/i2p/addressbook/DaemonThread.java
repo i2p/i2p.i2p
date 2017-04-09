@@ -36,6 +36,7 @@ import net.i2p.util.I2PAppThread;
 public class DaemonThread extends I2PAppThread implements NamingServiceUpdater {
 
     private final String[] args;
+    private final Daemon daemon;
 
     /**
      * Construct a DaemonThread with the command line arguments args.
@@ -44,6 +45,7 @@ public class DaemonThread extends I2PAppThread implements NamingServiceUpdater {
      */
     public DaemonThread(String[] args) {
         this.args = args;
+        daemon = new Daemon();
     }
 
     /* (non-Javadoc)
@@ -56,18 +58,28 @@ public class DaemonThread extends I2PAppThread implements NamingServiceUpdater {
         //} catch (InterruptedException exp) {
         //}
         I2PAppContext.getGlobalContext().namingService().registerUpdater(this);
-        Daemon.main(this.args);
-        I2PAppContext.getGlobalContext().namingService().unregisterUpdater(this);
+        try {
+            if (args != null && args.length > 0 && args[0].equals("test"))
+                daemon.test(args);
+            else
+                daemon.run(args);
+        } finally {
+            I2PAppContext.getGlobalContext().namingService().unregisterUpdater(this);
+        }
     }
 
     public void halt() {
-        Daemon.stop();
+        daemon.stop();
         interrupt();
     }
 
     /**
-     *  The NamingServiceUpdater interface
-     *  @param options ignored
+     *  The NamingServiceUpdater interface.
+     *  While this may be called directly, the recommended way
+     *  is to call I2PAppContext.namingService().requestUpdate(Properties)
+     *  which will call this.
+     *
+     *  @param options ignored, may be null
      *  @since 0.8.7
      */
     public void update(Properties options) {

@@ -1,7 +1,13 @@
-The files in ../debian/ are for jessie/stable.
-Alternates are in the subdirectories here.
+The files in ../debian/ are for stretch.
+You may also use them for jessie if you have libjetty9-java from jessie-backports.
 
-trusty may be copied to utopic, vivid, wily, xenial.
+Alternates are in the subdirectories here.
+To use them, copy them over the files in ../debian/  .
+
+Built file compatibility:
+trusty may be copied to vivid.
+trusty may be used for jessie without libjetty9-java from backports.
+xenial may be copied to yakkety, zesty.
 
 tails-jessie and tails-wheezy are currently the same as
 jessie and wheezy, respectively. If they diverge, put the changes here.

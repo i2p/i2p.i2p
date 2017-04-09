@@ -1215,17 +1215,20 @@ class PacketBuilder {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
         List<UDPPacket> rv = new ArrayList<UDPPacket>(count);
+        long cutoff = _context.clock().now() + 5*60*1000L;
         for (int i = 0; i < count; i++) {
             InetAddress iaddr = addr.getIntroducerHost(i);
             int iport = addr.getIntroducerPort(i);
             byte ikey[] = addr.getIntroducerKey(i);
             long tag = addr.getIntroducerTag(i);
+            long exp = addr.getIntroducerExpiration(i);
             // let's not use an introducer on a privileged port, sounds like trouble
             if (ikey == null || !TransportUtil.isValidPort(iport) ||
                 iaddr == null || tag <= 0 ||
                 // must be IPv4 for now as we don't send Alice IP/port, see below
                 iaddr.getAddress().length != 4 ||
                 (!_transport.isValid(iaddr.getAddress())) ||
+                (exp > 0 && exp < cutoff) ||
                 (Arrays.equals(iaddr.getAddress(), _transport.getExternalIP()) && !_transport.allowLocal())) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash()

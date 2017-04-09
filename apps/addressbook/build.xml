@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="addressbook" default="war" basedir=".">
+<project name="addressbook" default="all" basedir=".">
 
 	<property name="src" value="java/src"/>
 	<property name="build" value="build"/>
@@ -8,6 +8,8 @@
 	<property name="war" value="addressbook.war"/>
 	<property name="javac.compilerargs" value="" />
 	<property name="javac.version" value="1.7" />
+
+	<target name="all" depends="jar, emptyWar"/> 
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
@@ -36,24 +38,10 @@
             </depend>
         </target>
 
-        <target name="dependServlet" if="depend.available">
-            <depend
-                cache="../../build"
-                srcdir="${src}"
-                destdir="${build}" >
-                <!-- Depend on classes instead of jars where available -->
-                <classpath>
-                    <pathelement location="../../core/java/build/obj" />
-                    <pathelement location="../jetty/jettylib/javax.servlet.jar" />
-                </classpath>
-            </depend>
-        </target>
-
-	<target name="compile" depends="init, depend">
+	<target name="compile" depends="init, depend, warUpToDate">
             <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
                        includeAntRuntime="false"
-                       srcdir="${src}" destdir="${build}"
-                       excludes="net/i2p/addressbook/Servlet.java">
+                       srcdir="${src}" destdir="${build}">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
@@ -61,20 +49,6 @@
 		</javac>
 	</target>
 
-	<target name="compileServlet" depends="init, dependServlet, compile">
-            <javac debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
-                       includeAntRuntime="false"
-                       srcdir="${src}" destdir="${build}"
-                       includes="net/i2p/addressbook/Servlet.java">
-            <compilerarg line="${javac.compilerargs}" />
-            <classpath>
-                <pathelement location="../../core/java/build/i2p.jar" />
-                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
-            </classpath>
-		</javac>
-	</target>
-
-        <!-- unused for now (except for Android), as we oddly ship addressbook as a .war -->
 	<target name="jar" depends="compile, changes">
 		<!-- set if unset -->
 		<property name="workspace.changes.tr" value="" />
@@ -91,29 +65,14 @@
 			</manifest>
 		</jar>
 	</target>
-	
-	<target name="war" depends="compileServlet, changes, warUpToDate" unless="war.uptodate">
-		<mkdir dir="${dist}/tmp"/>
-		<mkdir dir="${dist}/tmp/WEB-INF"/>
-		<mkdir dir="${dist}/tmp/WEB-INF/classes"/>
-		<copy todir="${dist}/tmp/WEB-INF/classes">
-			<fileset dir="${build}"/>
-		</copy>
-		<!-- set if unset -->
-		<property name="workspace.changes.tr" value="" />
-		<war basedir="${dist}/tmp" webxml="web.xml" destfile="${dist}/${war}">
-			<manifest>
-				<attribute name="Implementation-Version" value="${full.version}" />
-				<attribute name="Built-By" value="${build.built-by}" />
-		                <attribute name="Build-Date" value="${build.timestamp}" />
-		                <attribute name="Base-Revision" value="${workspace.version}" />
-		                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
-				<attribute name="X-Compile-Source-JDK" value="${javac.version}" />
-				<attribute name="X-Compile-Target-JDK" value="${javac.version}" />
-			</manifest>
-		</war>
-		<delete dir="${dist}/tmp"/>
-	</target>
+
+        <target name="emptyWar" depends="init">
+            <jar destfile="${dist}/${war}" >
+                <manifest>
+                    <attribute name="Note" value="Intentionally empty" />
+                </manifest>
+            </jar>
+        </target>
 	
 	<target name="warUpToDate">
 	        <uptodate property="war.uptodate" targetfile="${dist}/${war}">
