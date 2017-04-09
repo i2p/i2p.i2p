@@ -1149,6 +1149,11 @@ tr.bottombuttons:empty {
      display: none;
 }
 
+#composemail .bottombuttons {
+     background: none !important;
+     box-shadow: none !important;
+}
+
 .notifications {
      bottom: 0;
      left: 0;

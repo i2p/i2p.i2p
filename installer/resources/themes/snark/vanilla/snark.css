@@ -292,14 +292,14 @@ td a:active, td a:visited:active {
 }
 
 .snarkMessages a:visited {
-     color: #d30 !important;
+     color: #d30;
 }
 
-.snarkMessages a:hover, .snarkMessages a:visited:hover, .snarkConfigTitle a:hover, .snarkConfigTitle a:visited:hover {
-     color: #930 !important;
+.snarkMessages a:hover, .snarkMessages a:visited:hover {
+     color: #f60 !important;
 }
 
-.snarkMessages a:active, .snarkMessages a:visited:active, .snarkConfigTitle a:active, .snarkConfigTitle a:visited:active  {
+.snarkMessages a:link:active, .snarkMessages a:visited:active  {
      color: #f30 !important;
 }
 
@@ -1041,6 +1041,14 @@ thead img.disable, img.disable:hover {
 
 .snarkConfigTitle:active, label.toggleview:active {
      box-shadow:  0 0 2px #4d453e, inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #59513B;
+}
+
+.snarkConfigTitle a:hover, .snarkConfigTitle a:visited:hover {
+     color: #930 !important;
+}
+
+.snarkConfigTitle a:active, .snarkConfigTitle a:visited:active  {
+     color: #f30 !important;
 }
 
 .snarkConfigTitle {

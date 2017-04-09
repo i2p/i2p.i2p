@@ -4199,7 +4199,6 @@ table#profile_defs td, table#thresholds td {
 }
 
 #profile_defs td:last-child {
-     width: 95%;
      white-space: normal;
      line-height: 120%;
 }
