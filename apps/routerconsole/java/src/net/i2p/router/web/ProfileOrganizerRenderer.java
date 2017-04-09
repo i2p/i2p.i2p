@@ -312,8 +312,9 @@ class ProfileOrganizerRenderer {
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>X:</b></td><td>").append(_t("Over {0} shared bandwidth", "2000KBps")).append("</td>")
            .append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td><td colspan=\"4\">").append(_t("Note: For P and X bandwidth capabilities, O is included for the purpose of backward compatibility in the NetDB."))
+           .append("<td>&nbsp;</td></tr>");
         buf.append("</tbody></table></td></tr>"); // profile_defs
-        buf.append("<tr><td colspan=\"2\">").append(_t("Note: For P and X bandwidth capabilities, O is included for the purpose of backward compatibility")).append("</td></tr>");
         buf.append("<tr><td><b>")
            .append(_t("speed"))
            .append(":</b></td><td>")
