@@ -126,7 +126,7 @@ class SummaryBarRenderer {
 
     public String renderHelpAndFAQHTML() {
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/help\" target=\"_top\" title=\"")
+        buf.append("<h3 id=\"helpfaq\"><a href=\"/help\" target=\"_top\" title=\"")
            .append(_t("I2P Router Help &amp; FAQ"))
            .append("\">")
            .append(_t("Help &amp; FAQ"))
