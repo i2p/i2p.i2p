@@ -29,6 +29,7 @@ public class HomeHelper extends HelperBase {
     static final String DEFAULT_SERVICES =
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "action_log.png" + S +
+        _x("Configure Plugins") + S + _x("Install and configure plugins") + S + "/configplugins" + S + I + "plugin.png" + S +
         _x("Configure UI") + S + _x("Select console theme & language & set optional console password") + S + "/configui" + S + I + "wrench_orange.png" + S +
         _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "home_page.png" + S +
         _x("Email") + S + _x("Anonymous webmail client") + S + "/susimail/susimail" + S + I + "email.png" + S +
