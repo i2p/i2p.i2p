@@ -3,6 +3,7 @@
 
 body {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font-size: 9pt;
      background-color: #fff;
      background: #a4a4cb url(/themes/console/light/images/tile2.png) center center;
      color: #333;
@@ -18,11 +19,13 @@ body.iframed {
 ::selection {
      background: #27377f !important;
      color: white;
+     text-shadow: none;
 }
 
 ::-moz-selection {
      background: #27377f !important;
      color: white;
+     text-shadow: none;
 }
 
 #logo {
@@ -56,6 +59,11 @@ code, tt, .destaddress {
      font-size: 8pt;
 }
 
+#host_list .destaddress {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+}
+
 #navi {
      margin: -1px 0 0;
      padding: 5px 3px;
@@ -71,26 +79,27 @@ code, tt, .destaddress {
 }
 
 .iframed #navi {
-     margin: -1px 0 10px;
+     margin: -11px -11px 10px;
      padding: 7px 5px 6px;
-     border-radius: 2px;
-     filter: drop-shadow(0px 0 1px #bbb);
-     -webkit-filter: drop-shadow(0px 0 1px #bbb);
+     border-radius: 0;
 }
 
-#navi a {
+#navi a, #navi a:visited {
      border: 1px solid #77789f;
      border-radius: 2px;
-     filter: drop-shadow(0 0 1px #bbb);
-     -webkit-filter: drop-shadow(0 0 1px #bbb);
+     color: #3b6bbf;
      display: inline-block;
      margin: 2px 0;
      text-transform: capitalize;
      box-shadow: inset 0 0 0 1px #fff;
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     -webkit-filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
 }
 
 #navi a:hover, #navi a:focus {
      background-blend-mode: luminosity;
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+     -webkit-filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
 }
 
 #navi a:active {
@@ -125,6 +134,10 @@ code, tt, .destaddress {
      padding: 8px 5px;
      background: #fff;
      background: linear-gradient(to right, #fff 70%, #eef);
+}
+
+.iframed .headline {
+     margin-top: 6px;
 }
 
 h3, h4, th, #filter span {
@@ -170,8 +183,10 @@ span.location {
 }
 
 .iframed #content {
-     border-radius: 2px;
      overflow: hidden;
+     border: none;
+     background: none;
+     padding: 0;
 }
 
 form[action="subscriptions"] #content {
@@ -189,19 +204,32 @@ form[action="subscriptions"] #content {
      box-shadow: none;
 }
 
+.iframed #content textarea {
+     border: 1px solid #7778bf;
+     margin: 0;
+}
+
 #content + #buttons {
      border: 1px solid #7778bf;
      margin: -1px 0 10px;
+     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 #content h3 {
      border: 1px solid #77789f;
      padding: 5px 8px;
      border-radius: 2px;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
-     box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #bbb);
-     -webkit-filter: drop-shadow(0 0 1px #bbb);
+     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+}
+
+.iframed #content h3 {
+     margin-top: 3px;
+}
+
+#content p {
+     margin-left: 15px;
+     margin-right: 15px;
 }
 
 div#add {
@@ -239,6 +267,7 @@ div#add {
 div#add p.buttons {
      border: 1px solid #7778bf;
      margin: 0 -16px -1px;
+     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 div.help {
@@ -271,7 +300,7 @@ p#help {
 }
 
 p, #helpconfig {
-     font-size: 10pt;
+     font-size: 9pt;
      text-align: justify;
 }
 
@@ -285,6 +314,14 @@ span.addrhlpr {
      font-size: 9pt;
 }
 
+a, button, input[type="submit"], input[type="cancel"], select, h3 {
+     text-shadow: 0 1px 1px #fff;
+}
+
+a:hover, a:focus, a:active, select:hover, select:focus, select:active, input:hover, input:focus, input:active, button:hover, button:focus, button:active {
+     text-shadow: none;
+}
+
 h3 {
      font-size: 11pt;
      letter-spacing: 0.08em;
@@ -294,10 +331,14 @@ h3 {
 }
 
 a {
-     color: #359;
+     color: #3b6bbf;
      text-decoration:none;
      font-weight: bold;
      outline: none;
+}
+
+a:visited {
+     color: #2c4e8f;
 }
 
 a:hover, a:focus {
@@ -336,10 +377,12 @@ li b {
 
 tr.list1 {
      background-color: #f7f8ff;
+     background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff;
 }
 
 tr.list0 {
      background-color: #eef;
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px), #fff;
 }
 
 div#messages {
@@ -419,7 +462,7 @@ p.footer {
      background-color: transparent !important;
      margin: 1px;
      border: none;
-     padding: 10px 0 0;
+     padding: 10px 10px 0;
      overflow: hidden !important;
      min-width: 520px;
 }
@@ -457,6 +500,7 @@ textarea[name="config"] {
 #config + #buttons {
      border: 1px solid #7778bf;
      margin: -2px 0 10px;
+     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 #filter, #search {
@@ -496,8 +540,9 @@ td.search:first-child {
 
 #filter a {
      border: 1px solid #7778bf;
-     padding: 3px 8px;
+     padding: 4px 8px;
      display: inline-block;
+     min-width: 20px;
      text-align: center;
      border-radius: 2px;
      text-transform: capitalize;
@@ -557,7 +602,8 @@ td.search:first-child {
 
 p#filtered {
      background: #eef url(/themes/console/images/buttons/filter.png) 8px center no-repeat;
-     padding: 10px 10px 10px 32px !important;
+     background: url(/themes/console/images/buttons/filter.png) 8px center no-repeat, repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.4) 3px, #fff 5px), #fff;
+     padding: 10px 200px 10px 32px !important;
 }
 
 div#book, #messages + p {
@@ -617,7 +663,7 @@ table.book {
 }
 
 .book td {
-     border-top: 1px solid #bbf;
+     border-top: 1px solid #ddf;
      padding: 3px;
 }
 
@@ -710,8 +756,8 @@ table.book {
 
 td.destinations {
      max-width: 50px !important;
-     border-left: 1px solid #bbf;
-     border-right: 1px solid #bbf;
+     border-left: 1px solid #ddf;
+     border-right: 1px solid #ddf;
      padding: 0;
      background: #fff;
 }
@@ -805,6 +851,7 @@ td.destinations textarea {
      padding: 20px 5px;
      border-top: 1px solid #7778bf;
      background: #fff;
+     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 img[src^="/imagegen"] {
@@ -814,8 +861,8 @@ img[src^="/imagegen"] {
      padding: 3px;
      border-radius: 2px;
      background: #fff;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+     filter: drop-shadow(0 0 1px #ccc);
+     -webkit-filter: drop-shadow(0 0 1px #ccc);
 }
 
 /* end host details */
@@ -843,6 +890,11 @@ img[src^="/imagegen"] {
 
 /* end host list identicons */
 
+.names a[href^="http"], .names a[href^="details"], .helper a {
+     display: inline-block;
+     width: 100%;
+}
+
 .book th {
      border-bottom: 1px solid #7778bf;
 }
@@ -860,6 +912,7 @@ img[src^="/imagegen"] {
 div#book {
     padding: 8px;
     background: #efefff;
+    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.5) 3px, #fff 5px), #fff;
 }
 
 .iframed div#book {
@@ -875,6 +928,7 @@ p.book {
      padding: 10px 5px;
      text-align: right;
      background: #fff;
+     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 p.buttons {
@@ -906,6 +960,11 @@ input[type="radio"], input[type="checkbox"] {
      cursor: pointer;
 }
 
+input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
+     filter: drop-shadow(0 0 2px #89f);
+     -webkit-filter: drop-shadow(0 0 2px #89f);
+}
+
 input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner, button::-moz-focus-inner  {
      outline: none;
      border: none;
@@ -922,21 +981,21 @@ input[type="submit"], input[type="reset"], .fakebutton {
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      color: #333;
-     filter: saturate(70%) drop-shadow(0 0 1px #ccc);
-     -webkit-filter: saturate(70%) drop-shadow(0 0 1px #ccc);
+     filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     -webkit-filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
      cursor: pointer;
 }
 
-.fakebutton a {
+a.fakebutton {
      color: #333;
      font-weight: normal;
 }
 
-.fakebutton a:hover, .fakebutton a:focus {
+a.fakebutton:hover, a.fakebutton:focus {
      color: #111;
 }
 
-.fakebutton a:active {
+a.fakebutton:active {
      color: #666 !important;
 }
 
@@ -946,8 +1005,8 @@ input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, inp
      color: #111;
      border: 1px solid #f60;
      box-shadow: inset 0px 0px 0px 1px #fff;
-     filter: saturate(100%) drop-shadow(0 0 1px #ccc);
-     -webkit-filter: saturate(100%) drop-shadow(0 0 1px #ccc);
+     filter: saturate(100%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+     -webkit-filter: saturate(100%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
 }
 
 input[type="submit"]:active, input[type="reset"]:active, .fakebutton:active {
@@ -1107,10 +1166,6 @@ form[action="addressbook"] table {
 
 #filter {
      margin-top: -2px !important;
-}
-
-p#filtered {
-     padding-right: 200px !important;
 }
 
 /* responsive layout */

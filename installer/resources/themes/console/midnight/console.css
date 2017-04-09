@@ -145,7 +145,7 @@ textarea {
      padding: 5px;
      margin: 10px;
      border-radius: 2px;
-     font: 8.5pt "Droid Sans Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8.5pt "Droid Sans Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      min-height: 100px;
      min-width: 97%;
      width: calc(100% - 15px);
@@ -913,15 +913,18 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .reload[value="Reseed"] {
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .reload[value="Reseed"]:hover {
-     background: #000 url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important;
+     background: #000 url(/themes/console/images/buttons/download.png) center left 6px no-repeat !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
-     background: #652787 url(/themes/console/images/buttons/download.png) center left 4px no-repeat !important;
+     background: #652787 url(/themes/console/images/buttons/download.png) center left 6px no-repeat !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .download, .routersummary .download:hover, .routersummary .download:focus {
@@ -950,7 +953,7 @@ pre {
      width: 98%;
      overflow-x: auto;
      text-align: left;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      color: #c9ceff;
 }
 
@@ -1007,6 +1010,12 @@ div.logo hr {
      word-wrap: break-word;
      font-size: 9pt;
      min-width: 300px;
+/* stripey borders */
+     box-shadow: inset 0 0 0 1px #44175f, inset 0 0 3px 3px #000, 0 0 0 2px #443da0;;
+     border: 5px solid #443da0;
+     border-image: repeating-linear-gradient(135deg, #003 0px, #003 20px, #550 20px, #550 40px, #003 40px) 5 repeat repeat;
+     border-image-width: 5px;
+     border-image-outset: 1px;
 }
 
 .warning p, .warning a {
@@ -1174,7 +1183,7 @@ div.logo hr {
 .routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -7px -6px -8px !important;
+     margin: -4px -7px -6px -8px !important;
      width: 189px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -1183,14 +1192,16 @@ div.logo hr {
 }
 
 #sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
-     margin-bottom: -4px !important;
+     margin-top: -3px !important;
+     margin-bottom: -5px !important;
 }
 
-#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
-#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
-   min-height: 14px;
+   box-sizing: border-box;
+   vertical-align: bottom;
 }
 
 /*
@@ -1202,6 +1213,13 @@ div.logo hr {
 
 #sb_localtunnels {
      width: 189px !important;
+     border-collapse: separate;
+     border-spacing: 0;
+}
+
+#sb_localtunnels a {
+     display: inline-block;
+     width: 100%;
 }
 
 #sb_localtunnels img {
@@ -1212,12 +1230,24 @@ div.logo hr {
 #sb_localtunnels td:first-child {
      width: 16px;
      text-align: left;
-     padding: 2px 0 0 1px;
+     padding: 2px 0 2px 1px;
 }
 
 #sb_localtunnels td:last-child {
      text-align: right;
      padding-right: 0;
+}
+
+#sb_localtunnels tr:hover td {
+     background: #652787;
+}
+
+#sb_localtunnels tr:hover td:first-child {
+     border-radius: 2px 0 0 2px;
+}
+
+#sb_localtunnels tr:hover td:last-child {
+     border-radius: 0 2px 2px 0;
 }
 
 #sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
@@ -1227,6 +1257,26 @@ div.logo hr {
      white-space: nowrap;
      text-overflow: ellipsis;
      line-height: 140%;
+     vertical-align: middle;
+     display: inline-block;
+     padding: 1px 3px;
+}
+
+#sb_services a:hover, #sb_internals a:hover, #sb_advanced a:hover, #sb_localtunnels tr:hover, #sb_localtunnels tr:hover a, .news a:hover, #console a:hover ,
+tt a:hover {
+     background: #652787;
+     color: #fff; !important;
+     border-radius: 2px;
+}
+
+#sb_services a:active, #sb_internals a:active, #sb_advanced a:active, #sb_localtunnels tr:active,
+.news a:active, #console a:active, tt a:active {
+     background: #39144F;
+     color: #c9ceff !important;
+}
+
+#sb_localtunnels tr:active a {
+     color: #c9ceff !important;
 }
 
 .sb_notice {
@@ -1234,12 +1284,12 @@ div.logo hr {
      border: 1px solid #241f69;
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px #000;
-     margin: 10px -4px -2px;
+     margin: 5px -4px -3px;
      padding: 5px 3px;
 }
 
-hr + .sb_notice {
-     margin-top: 6px;
+p:empty + .sb_notice {
+     margin-top: 10px;
 }
 
 /* sidebar stacked tables fix */
@@ -1571,41 +1621,61 @@ div.sorry hr {
      white-space: nowrap;
 }
 
-.confignav {
-     background: url(images/header.png) repeat-x scroll center center #000;
-     padding: 8px 5px 7px !important;
-     margin: -1px -11px 10px;
+/* top navigation */
+
+div.confignav {
+     background: #010010 url(images/titles.png) center center repeat-x !important;
+     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     padding: 7px 5px 8px !important;
+     margin: -1px -11px 15px;
      border: 1px solid #443da0;
      font-weight: bold !important;
      line-height: 130% !important;
      text-align: center;
-}
-
-.confignav a:hover {
-     text-decoration: none;
+     box-shadow: inset 0 0 0 1px #000, inset 0 0 3px 1px #030;
 }
 
 .tab, .tab2 {
-     padding: 1px 3px;
-     white-space: nowrap;
-     margin: 0;
+     box-sizing: border-box;
+     display: inline-block;
+     border: 1px solid #443da0;
+     margin: 0 -2px -1px -2px !important;
+     padding: 1px 0 2px;
+     min-width: 60px !important;
+     box-shadow: inset 0 0 0 1px #000;
 }
 
-.tab2::before {
-     content: '\1F892\00A0';
-     content: '\25B8\00A0';
-     font-size: 10pt;
-     line-height: 50%;
-     vertical-align: baseline;
+.tab a {
+     display: inline-block;
+     padding: 4px 16px 5px;
 }
 
-.tab2::after {
-     content: '\00A0\1F890';
-     content: '\00A0\25C2';
-     font-size: 10pt;
-     line-height: 50%;
-     vertical-align: baseline;
+.tab {
+     background: #010010 url(images/titles.png) center center repeat-x;
+     background: linear-gradient(to bottom, #1a1b2f 50%, #000011 50%, #00000d 50%) !important;
 }
+
+.tab:hover {
+     background: #000 !important;
+     box-shadow: inset 0 0 0 1px #404;
+}
+
+.tab:active {
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px 1px #2d103f;
+     background: #652787 !important;
+}
+
+.tab:active a {
+     color: #c9ceff !important;
+}
+
+.tab2 {
+     background: #040033;
+     color: #c9ceff;
+     padding: 5px 14px 7px;
+}
+
+/* end topnav */
 
 #bwlimiter a, #advancedconfig a, .tabletitle a, #upnpconfig a, #servicedebug a, .ptitle a, #configstats th a, h3#graphinfo a, .h3navlinks {
      float: right;
@@ -1639,7 +1709,6 @@ div.sorry hr {
 }
 
 #criticallogs li::first-line, #routerlogs li::first-line {
-     font-weight: bold;
      display: inline-block;
      border: 1px solid #f00;
 }
@@ -1923,7 +1992,7 @@ td img[src$="c=a1"], td img[src$="c=a2"] {
 }
 
 tt {
-     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      color: #393;
 }
 
@@ -1951,12 +2020,6 @@ div.main li {
      word-wrap: break-word;
 }
 
-div.main li b {
-     color: #EBDBFF !important;
-     letter-spacing: 0.08em;
-     font-size: 9pt;
-}
-
 .tidylist {
      text-align: justify !important;
      line-height: 150%;
@@ -1968,9 +2031,9 @@ div.main li b {
 
 .tidylist code {
      text-align: left;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
-     color: #D6FFFD;
-     padding: 1px 3px;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     color: #fff;
+     padding: 2px 3px;
      background: #040033;
      margin: 0 2px;
      border-radius: 2px;
@@ -1991,7 +2054,7 @@ ul {
 
 code {
      text-align: left;
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      color: #393;
 }
 
@@ -2051,6 +2114,11 @@ p img:first-child {
 p:empty { /* kills empty paragraphs that are likely erroneous eg. see top of /profiles?f=1, /profiles */
      display: none;
      border: 1px dotted #652787; /* display in order to bug hunt */
+}
+
+#config_logging p {
+     text-align: left;
+     margin: 3px 0 0 !important;
 }
 
 h1 {
@@ -2115,13 +2183,17 @@ h2 a[name]:hover, h2 a[name]:active {
 h3, h3.welcome, div.news h3 {
      border: 1px solid #443da0;
      border-left: 5px solid #443da0;
-     padding: 5px 10px;
+     padding: 7px 10px;
      margin: 10px 0 10px 0;
      border-radius: 0 2px 2px 0;
      background: #000 url(images/header.png) center center ;
      text-transform: uppercase;
      text-shadow: 0 0 2px #010011;
      letter-spacing: 0.08em;
+}
+
+div.news h3 {
+     padding: 6px 10px;
 }
 
 h4 {
@@ -2476,8 +2548,9 @@ table#udpconnections tr a img {
       margin-top: 3px !important;
 }
 
-table#udpconnections tr:hover, table#ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #jardump tr:hover {
+table#udpconnections tr:hover, table#ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #jardump tr:hover, #webappconfig tr:hover td {
      background: #020022;
+     color: #eff1ff;
 }
 
 table#udpconnections td > *, table#ntcpconnections td > * {
@@ -2578,7 +2651,7 @@ tr#addnew {
 
 div.themechoice {
      width: 120px;
-     height: 78px;
+/*     height: 78px;*/
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -3077,6 +3150,32 @@ table#bandwidthconfig input, table#bandwidthconfig select {
      margin-right: 3px;
 }
 
+/* confignet tidyup */
+
+#netconfig .optbox {
+     margin: 10px 6px 2px !important;
+     display: inline-block !important;
+     vertical-align: sub !important;
+}
+
+#netconfig .optbox:first-child {
+     margin-top: 6px !important;
+     margin-bottom: 6px !important;
+}
+
+#netconfig .optbox:last-child, #netconfig .optbox[value="only"], #netconfig .optbox[name="disableUDP"], #netconfig .optbox[value="disabled"] {
+     margin-bottom: 6px !important;
+}
+
+#netconfig input[type="text"] + br + .optbox, #netconfig .optbox[name="ntcpAutoPort"] {
+     margin-top: 3px !important;
+}
+
+#netconfig input[name*="ost"] {
+     width: 250px !important;
+}
+
+/* end confignet tidyup */
 /* end /confignet */
 
 /* /events */
@@ -3170,6 +3269,18 @@ p#webappconfigtext + p, p#pluginconfigtext {
      text-align: right;
      width: 100px;
      white-space: nowrap;
+}
+
+#webappconfig th:last-child {
+     text-align: left;
+     padding-left: 5px;
+}
+
+#webappconfig td:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 28px;
+     vertical-align: middle;
 }
 
 #pluginconfig td:nth-child(2) {
@@ -3288,6 +3399,15 @@ ul.statlist li li:last-child::before {
 
 ul.statlist li li:last-child {
      padding-bottom: 5px !important;
+}
+
+.statlist a[href*="graph"]::before {
+     content: "\27A1\00A0";
+     font-size: 14pt;
+}
+
+.statlist a[href$="&showEvents=true"]::before {
+     display: none;
 }
 
 /*
@@ -3413,6 +3533,7 @@ table#loggingoptions td:first-child {
 #loggingoptions textarea {
      width: 99%;
      width: calc(100% - 8px);
+     resize: none;
 }
 
 #loggingoptions select[name="newlogclass"] {
@@ -3663,7 +3784,7 @@ div#volunteer {
 #configinfo th {
      text-align: left;
      padding: 8px 10px;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      color: #393;
      background: #002;
      background: linear-gradient(to right, #000, #002);
@@ -3883,7 +4004,7 @@ table[id$="logs"] tr:nth-child(even){
 }
 
 table[id$="logs"] ul {
-     margin: 5px 10px -5px -15px !important;
+     margin: -3px 15px -10px -18px !important;
 }
 
 #wrapperlogs {
@@ -3902,17 +4023,98 @@ table[id$="logs"] ul {
      height: 600px;
 }
 
+.main#logs li {
+     word-break: break-all;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+}
+
 .logtable ul li:not(old) {
      list-style: none !important;
      margin-left: 15px;
 }
 
-.logtable ul li::before {
-     content: "\279C\00A0\00A0";
-     font-size: 12pt;
-     line-height: 50%;
-     vertical-align: baseline;
-     color: #3f5182;
+/* Override error log colors */
+
+font[color="#006600"] { /* debug */
+     color: #090;
+}
+
+font[color="#ff00cc"] { /* warning */
+     color: #909;
+}
+
+font[color="#ff3300"] { /* error */
+     color: #d00;
+}
+
+font[color="#cc0000"] { /* critical */
+     color: #f00;
+}
+
+font[color="#000099"] { /* info */
+     color: #bb0;
+}
+
+/* end log color overrides */
+
+#logs li {
+     list-style: none;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     line-height: 130%;
+     text-align: left;
+     display: inline-block;
+     width: 100%;
+     margin-right: 5px !important;
+     padding: 2px 0;
+}
+
+#criticallogs li {
+     width: 100%;
+}
+
+#logs li::after {
+     content: "";
+     display: block;
+     border-top: 1px dotted #005;
+     width: 100%;
+     margin: 5px 0 -3px;
+}
+
+#logs li:last-child::after {
+     border: none;
+     margin: 0;
+}
+
+#logs font[color^="#"]::before {
+     content: "";
+     display: inline-block;
+     width: 6px;
+     height: 6px;
+     background: #fff;
+     border-radius: 50%;
+     margin-right: 5px;
+     margin-left: 0;
+     vertical-align: calc(1px);
+}
+
+#logs li font[color="#cc0000"]::before {
+     background: #f00;
+}
+
+#logs li font[color="#006600"]::before {
+     background: #090;
+}
+
+#logs li font[color="#ff3300"]::before {
+     background: #d00;
+}
+
+#logs li font[color="#ff00cc"]::before {
+     background: #909;
+}
+
+#logs li font[color="#000099"]::before {
+     background: #bb0;
 }
 
 /* /profiles */
@@ -3927,10 +4129,6 @@ table#profiles tr:hover td, table#floodfills tr:hover td {
 
 table#profiles th, table#profiles td {
      text-align: right;
-}
-
-table#profiles td {
-     color: #7670c2;
 }
 
 table#profiles td:nth-child(2), table#profiles th:nth-child(2) {
@@ -3952,14 +4150,17 @@ table#profiles td:first-child, table#profiles th:first-child, table#profiles td:
      text-align: center;
 }
 
+table#profiles th:last-child {
+     text-align: center;
+}
+
 table#profiles td:last-child {
      text-align: right;
-/*     padding-right: 10px;*/
      width: 60px;
      white-space: nowrap;
 }
 
-table#profiles td[colspan="7"] { /* profile class separator */
+table#profiles td[colspan="8"] { /* profile class separator */
      background: #050044;
      padding: 1px;
      border: 1px inset #000;
@@ -3988,23 +4189,50 @@ table#profile_defs, table#thresholds {
 }
 
 table#profile_defs td, table#thresholds td {
-     padding: 10px;
+     padding: 5px;
 }
 
-table#profile_defs ul {
-     margin-left: -30px;
+#profile_defs td:first-child {
+     width: 5% !important;
+     white-space: nowrap;
+     text-align: right;
 }
 
-table#profile_defs ul li:last-child {
-     margin-bottom: -10px;
+#profile_defs td:last-child {
+     width: 95%;
+     white-space: normal;
+     line-height: 120%;
 }
 
-#profile_defs li {
-     list-style: none !important;
+#thresholds th, #thresholds td {
+     text-align: center !important;
 }
 
-#profile_defs li::first-letter {
+#capabilities_key td {
+     padding: 0 !important;
+}
+
+#capabilities_key table {
+     margin: 0 !important;
+     border: none;
+     border-top: 1px solid #004;
+     border-bottom: 1px solid #004;
+}
+
+#capabilities_key table td {
+     padding: 3px 5px !important;
+}
+
+#capabilities_key table td:nth-child(even) {
+     width: 16px;
+}
+
+#profile_defs b {
      text-transform: capitalize;
+}
+
+#capabilities_key b {
+     text-transform: none !important;
 }
 
 table#profile_defs + hr {
@@ -4530,30 +4758,6 @@ body.iframed {
 
 /* end iframed console fixes */
 
-/* Override error log colors */
-
-font[color="#006600"] { /* debug */
-     color: #ebdbff;
-}
-
-font[color="#ff00cc"] { /* warning */
-     color: #0028a0;
-}
-
-font[color="#ff3300"] { /* critical */
-     color: #002cbd;
-}
-
-font[color="#cc0000"] { /* error */
-     color: #0037eb;
-}
-
-font[color="#000099"] { /* info */
-     color: #001e80;
-}
-
-/* end log color overrides */
-
 /* global overrides */
 
 h3[id*="job"] {
@@ -4727,11 +4931,13 @@ div#sybilnav, div#sybils_summary {
      margin-bottom: 10px;
 }
 
+/* sybil from dark */
+
 div#sybilnav {
      -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
      columns: 4 200px;
-     padding: 10px 10px 0 10px;
+     padding: 10px;
 }
 
 #sybilnav li {
@@ -4740,26 +4946,69 @@ div#sybilnav {
      -webkit-column-break-inside: avoid;
 }
 
-#sybilnav ul li:last-child {
-     margin-bottom: -10px;
-}
-
 #sybilnav ul li {
      list-style: none;
      padding-left: 0;
      margin-left: 0;
-     width: 50px;
+     margin-bottom: 5px;
+     min-width: 110px;
      white-space: nowrap;
+     border: 1px solid #443da0;
+     border-radius: 2px;
+     background: linear-gradient(to right, #000 0%, #002 80%);
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+#sybilnav ul li:hover {
+     border: 1px solid #652787;
+     background: #652787;
+}
+
+#sybilnav a {
+     display: inline-block;
+     width: 100%;
+}
+
+#sybilnav ul li:hover a {
+     color: #652787;
+     color: #fff;
+}
+
+#sybilnav ul li:active {
+     background: #39144f;
+}
+
+#sybilnav ul li:active a {
+     color: #c9ceff !important;
+}
+
+#sybilnav ul li a {
+     padding-right: 30%;
+     box-sizing: border-box;
 }
 
 #sybilnav ul li::before {
-     content: '\1F441\00A0\00A0';
+/*     content: '\1F441\00A0'; */
      content: url(/themes/console/images/buttons/show.png);
      mix-blend-mode: luminosity;
-     vertical-align: middle;
      margin-right: 5px;
      font-size: 16pt;
+     line-height: 50%;
+     vertical-align: middle;
+     padding-left: 5px;
 }
+
+#sybilnav ul li:first-child {
+     margin-top: 0;
+}
+
+#sybilnav ul li:last-child {
+     margin-bottom: -10px;
+     padding-bottom: 2px;
+}
+
+
+/* end sybilnav */
 
 table.sybil_routerinfo {
      margin-bottom: 10px;
@@ -5179,6 +5428,7 @@ table#configstats {
 
 #configstats td {
     color: #b2bcf7;
+    padding: 8px 4px;
 }
 
 #configstats td b {
@@ -5188,6 +5438,7 @@ table#configstats {
 #configstats input.optbox {
      margin: 0;
      padding: 0;
+     vertical-align: middle;
 }
 #configstats tr.tablefooter td {
      padding: 4px 10px;
@@ -5375,8 +5626,34 @@ form[action="events"] {
 
 /* responsive layout */
 
+@media screen and (max-width: 1200px) {
+.tab, .tab2 {
+     padding: 1px 0 2px;
+     min-width: 50px !important;
+}
+
+.tab2 {
+     padding: 3px 12px 4px;
+}
+
+.tab a {
+     padding: 2px 14px;
+}
+}
+
+@media screen and (max-width: 1500px) {
+button.control, button.control:hover, button.control:active, button.control:focus {
+     padding: 12px 10px !important;
+}
+
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+   min-height: 14px;
+}
+}
+
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .statusnotes, textarea, pre, tt, code, th {
+body, .main, .main td, .news p, #news p, .statusnotes, textarea, th, .applabel a {
      font-size: 10pt !important;
 }
 
@@ -5386,7 +5663,7 @@ h1 {
 }
 
 .main button, .main input, select {
-     font-size: 9pt !important;
+     font-size: 10pt !important;
 }
 
 .main, .news, h1 {
@@ -5413,11 +5690,16 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 216px !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, .smallhead, .applabel a {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+   min-height: 18px;
+}
+
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, .smallhead, pre, tt, code {
      font-size: 9pt !important;
 }
 
-.routersummary h3 a {
+.routersummary h3 a, #netdboverview th {
      font-size: 11pt !important;
 }
 
@@ -5429,12 +5711,12 @@ div.app {
      min-width: 138px;
 }
 
-.applabel {
-     width: 134px !important;
+.app:hover {
+     cursor: pointer;
 }
 
-.themelabel {
-     padding: 2px;
+.applabel {
+     width: 134px !important;
 }
 
 h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, #clientconf.infohelp, h3#pluginmanage, h3#webappconfig {
@@ -5445,7 +5727,7 @@ h4#updateplugins {
      margin-top: -15px !important;
 }
 
-#profiles td:first-child, #profiles th:first-child, #floodfills td:first-child, #floodfills th:first-child {
+table#profiles td:first-child, table#profiles th:first-child, #floodfills td:first-child, #floodfills th:first-child {
      width: 56px !important;
 }
 
@@ -5456,5 +5738,130 @@ h4#updateplugins {
 .subheading b {
      font-size: 10.5pt !important;
 }
+
+#webappconfig td:first-child::after {
+     min-height: 30px;
 }
+
+
+div.joblog h3 {
+     margin-top: 8px !important;
+}
+
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+     max-width: 208px;
+}
+
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-top: -6px !important;
+     margin-bottom: -4px !important;
+}
+}
+
+@media screen and (min-width: 1840px) {
+div[id^="config_"] div.confignav {
+     display: flex;
+     flex-direction: row;
+     flex-wrap: wrap;
+     align-content: space-evenly;
+     justify-content: center;
+     padding: 4px 4px 5px 3px !important;
+}
+
+div[id^="config_"] .tab, div[id^="config_"] .tab2 {
+     flex: auto;
+     flex-basis: content;
+     flex-grow: 0.06;
+     margin: 0 -1px -1px 0 !important;
+     white-space: nowrap;
+     min-width: 70px !important;
+}
+
+div[id^="config_"] .tab2 {
+     padding: 5px 6px;
+}
+
+div[id^="config_"] .tab a {
+     padding: 4px 6px;
+}
+
+div[id^="config_"] div.confignav {
+     padding: 0 !important;
+}
+
+div[id^="config_"] .tab, div[id^="config_"] .tab2 {
+     margin-top: -1px !important;
+}
+
+div[id^="config_"] .tab:first-child {
+     margin-left: -1px !important;
+}
+}
+
+/* responsive proxy errors */
+
+@media screen and (max-width: 800px) {
+.warning {
+     margin-left: 20px !important;
+     margin-top: 130px !important;
+     background: url(images/camotile2.png) !important;
+     padding: 5px 15px 15px !important;
+}
+
+.warning h3, .warning a, .warning p {
+     font-size: 9pt;
+}
+
+.logo {
+     position: absolute;
+     top: 20px;
+     width: calc(100% - 62px) !important;
+     z-index: 999;
+     min-width: 330px;
+     display: block;
+}
+
+.logo a {
+     width: auto !important;
+     padding: 2px 5px !important;
+     display: inline-block !important;
+}
+
+.logo a img {
+     padding: 0 !important;
+     margin-top: -2px;
+     margin-bottom: -4px;
+}
+}
+
+@media screen and (min-height: 700px) {
+.proxyfooter {
+     position: absolute;
+     bottom: 0;
+     right: 0;
+     padding: 0 20px 0 0;
+     text-align: right;
+     background: #030;
+     width: 100%;
+     opacity: 0.7;
+     border-top: 1px solid #000;
+}
+
+.proxyfooter p {
+     text-align: right;
+     line-height: 130% !important;
+     margin: 5px 0;
+}
+
+.warning {
+     margin-bottom: 30px;
+}
+}
+
+@media screen and (max-height: 700px) {
+.proxyfooter {
+     display: none;
+}
+}
+/* end proxy errors */
 

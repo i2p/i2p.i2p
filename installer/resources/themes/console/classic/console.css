@@ -8,7 +8,7 @@ body {
      text-align: left;
      background: #bbf url(images/bg.png) center center fixed;
      color: #0c153d;
-     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
 }
 
 /* preload button mouseovers */
@@ -46,11 +46,25 @@ div.logo {
      position: relative;
      width: 200px;
      margin: 0 0 0 20px;
-     padding: 10px 5px;
+     padding: 10px 5px 8px;
      text-align: center;;
      border: 5px solid #ddf;
-     border: 5px solid #ddf;
-     background-color: #eff1ff;
+     background: #eff1ff;
+}
+
+.logo {
+     background: url(/themes/console/classic/images/i2plogo.png) center 12px no-repeat #eff1ff !important;
+     background-size: 90% auto !important;
+     background-blend-mode: luminosity;
+}
+
+.logo:hover {
+     background-blend-mode: normal;
+}
+
+.logo a img, .logo a:first-child:hover {
+     opacity: 0;
+     background: none !important;
 }
 
 div.logo hr {
@@ -58,47 +72,54 @@ div.logo hr {
      background: #ddf;
      height: 5px;
      border: 0 solid #ddf;
-     margin: 8px -3px;
+     margin: 8px -5px 8px;
 }
 
-div.logo a:link, div.logo a:visited {
+div.logo a {
+     display: inline-block;
+     padding: 4px 0;
+     width: 100%;
 }
 
 div.logo a:active {
      color: #f60;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #999 !important;
 }
 
 div.logo a:hover {
      color: #900;
+     background: rgba(220,220,255,0.5);
+     box-shadow: inset 0 0 0 1px #fff;
+     border-radius: 3px;
 }
 
 /* HTTP Proxy warning Main box */
 
 div.warning {
      margin: 25px 20px 0 260px;
-     padding: 0 20px 40px 75px;
+     padding: 0 20px 40px;
      border: 5px solid #fb7;
      text-align: left;
      color: inherit;
-     background: #ffd url(/themes/console/images/itoopie_sm.png) 12px center no-repeat;
+     background: #ffd;
      box-shadow: inset 0 0 0 2px #f60;
      min-width: 500px;
 }
 
 div.warning a:link {
-     color: #f60;
+     color: #f60 !important;
 }
 
 div.warning a:visited {
-     color: #f90;
+     color: #f90 !important;
 }
 
 div.warning a:hover {
-     color: #d30;
+     color: #d30 !important;
 }
 
 div.warning a:active {
-     color: #900;
+     color: #900 !important;
 }
 
 div.warning hr {
@@ -119,14 +140,16 @@ div.warning h3 {
 }
 
 div.warning h3:first-child {
-     margin: 2px -18px 10px -73px;
-     padding: 14px 10px 10px 15px;
+     margin: 2px -18px 10px -18px;
+     padding: 10px 10px 10px 38px;
      background: #ffe !important;
+     background: #ffe url(/themes/console/images/itoopie_sm.png) 6px center no-repeat !important;
+     background-size: auto 80% !important;
      border-bottom: 1px solid #fb7;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
-     font-size: 12pt;
+     font-size: 12.5pt;
 }
 
 .warning p {
@@ -176,6 +199,13 @@ div.warning h3:first-child {
 .warning table td:first-child {
      font-weight: bold;
      vertical-align: top;
+}
+
+.warning a[href*="jump"]::before {
+     content: "\279F\00A0";
+     font-size: 14pt;
+     display: inline-block;
+     padding: 3px 0;
 }
 
 .proxyfooter {
@@ -368,11 +398,12 @@ div.routersummary td {
 }
 
 #sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
-     margin-bottom: -4px !important;
+     margin-bottom: -5px !important;
+     margin-top: -6px !important;
 }
 
-#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
-#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
    min-height: 14px;
@@ -406,9 +437,26 @@ div.routersummary td {
      margin: -1px 0 -3px;
 }
 
+#sb_internals, #sb_services, #sb_advanced {
+     margin-top: -2px !important;
+}
+
 #sb_internals a, #sb_services a, #sb_advanced a {
      display: inline-block;
-     padding: 2px 2px 1px;
+     padding: 2px;
+     max-width: 178px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     vertical-align: middle !important;
+}
+
+#sb_warning {
+     border-bottom: 1px solid #89f !important;
+}
+
+#sb_warning + hr {
+     margin-bottom: 5px;
 }
 
 .sb_notice {
@@ -416,8 +464,12 @@ div.routersummary td {
      border: 1px solid #89f;
      border-radius: 2px;
      box-shadow: 0 0 1px #bbb;
-     margin: 7px 5px -2px;
+     margin: -5px 1px -6px;
      padding: 5px 3px;
+}
+
+p:empty + .sb_notice {
+     margin-top: 7px;
 }
 
 div.routersummary form {
@@ -521,6 +573,51 @@ div.routersummary a:hover {
 }
 /* end sidebar */
 
+a:link {
+     color: #33a;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #448 !important;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover, a:visited:hover, a:focus, a:visited:focus {
+     color: #f60 !important;
+     text-decoration: none;
+     font-weight: bold;
+     outline: none;
+}
+
+a:active, a:visited:active {
+     color: #f93 !important;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a.script {
+     letter-spacing: normal;
+     word-spacing: normal;
+}
+
+pre {
+     margin: 0 20px;
+     overflow: auto;
+     font-size: 8pt !important;
+     width: 95%;
+     padding-top: 10px;
+}
+
+tt, code {
+     font-size: 9pt;
+     font-weight: bold;
+     color: darkgreen;
+}
+
 /* buttons & inputs */
 select {
      margin: 3px 5px;
@@ -533,6 +630,7 @@ select {
      padding: 4px 16px 4px 2px;
      text-overflow: ellipsis;
      color: #333;
+     cursor: pointer;
 }
 
 select option {
@@ -610,7 +708,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 button, input, select {
-     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
      color: #333;
 }
 
@@ -635,27 +733,22 @@ input[name="refreshInterval"] {
      text-align: right;
 }
 
-/* accessibility tweak - colors rather than focus rings where possible */
-
 input[type="submit"], input[type="reset"], button, .optbox {
      cursor: pointer;
 }
 
+/* accessibility tweak - colors rather than focus rings where possible */
 .optbox:hover, .optbox:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
 /*	  -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#89f')";*/
      -webkit-filter: drop-shadow(0 0 2px #89f);
-     filter: drop-shadow( 0 0 2px #89f);
+     filter: drop-shadow(0 0 2px #89f);
      border: 0;
      outline: none;
 }
 
 .optbox:disabled:hover, input:disabled:hover {
      filter: none;
-}
-
-button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
-     filter: drop-shadow(0 0 2px #89f);
-     -webkit-filter: drop-shadow(0 0 2px #89f);
+     -webkit-filter: none;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {
@@ -665,39 +758,61 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 /* end accessibility */
 
+/* confignet tidyup */
+
+#netconfig .optbox {
+     margin: 10px 6px 2px !important;
+     display: inline-block !important;
+     vertical-align: sub !important;
+}
+
+#netconfig .optbox:first-child {
+     margin-top: 6px !important;
+     margin-bottom: 6px !important;
+}
+
+#netconfig .optbox:last-child, #netconfig .optbox[value="only"], #netconfig .optbox[name="disableUDP"], #netconfig .optbox[value="disabled"] {
+     margin-bottom: 6px !important;
+}
+
+#netconfig input[type="text"] + br + .optbox, #netconfig .optbox[name="ntcpAutoPort"] {
+     margin-top: 3px !important;
+}
+
+#netconfig input[name*="ost"] {
+     width: 250px !important;
+}
+
+/* end confignet tidyup */
+
 /* graphical buttons */
 
 input[type="submit"], input[type="reset"], button {
      border: 1px solid #999;
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ddd;
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      color: #333;
      margin: 3px 8px 3px 0;
-     font: 9pt "Droid Sans", Ubuntu, "Noto Sans", "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font: 9pt "Droid Sans", Ubuntu, "Noto Sans", "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
      padding: 4px 5px;
      text-decoration: none;
      border-radius: 2px;
      opacity: 1;
      background-size: 14px auto, 100% 100% !important;
-     filter: saturate(70%) drop-shadow(0 0 1px #ccc);
-     -webkit-filter: saturate(70%) drop-shadow(0 0 1px #ccc);
 }
 
 button:hover, input[type="submit"]:hover, input[type="reset"]:hover, button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      border: 1px solid #89f;
      color: #222;
-     filter: saturate(100%) drop-shadow(0 0 1px #89f);
-     -webkit-filter: saturate(100%) drop-shadow(0 0 1px #89f);
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #89f;
 }
 
 button:active, input[type="submit"]:active, input[type="reset"]:active {
      border: 1px solid #999;
-     box-shadow: inset 2px 2px 2px #555;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #555;
      background-blend-mode: luminosity;
-     filter: saturate(100%) drop-shadow(0 0 1px #ccc);
-     -webkit-filter: saturate(100%) drop-shadow(0 0 1px #ccc);
      color: #555;
 }
 
@@ -1063,7 +1178,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .reload:active, .routersummary .stop:active, .routersummary .download:active {
-     box-shadow: inset 2px 2px 2px #555;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #555;
      border: 1px solid #999 !important;
 }
 
@@ -1210,7 +1325,7 @@ div.main h2 {
 }
 
 div.welcome {
-     margin-top: 5px;
+     margin-top: 0;
 }
 
 .welcome + div .tidylist {
@@ -1325,11 +1440,11 @@ div.news p:last-child {
      margin-bottom: 10px;
 }
 
-div.news a:link {
+div.news a {
      color: #663;
 }
 
-div.news a:hover {
+div.news a:hover, div.news a:visited:hover {
      color: #f60 !important;
 }
 
@@ -1350,8 +1465,10 @@ div.news hr:last-child {
      margin-bottom: 10px !important;
 }
 
+/* top navigation */
+
 div.confignav {
-     padding: 7px 5px;
+     padding: 6px 5px;
      margin: -16px -16px 5px -16px;
      border: 1px solid #89f;
      font-size: 9pt;
@@ -1361,27 +1478,51 @@ div.confignav {
 }
 
 .tab, .tab2 {
-     padding: 3px;
-     white-space: nowrap;
+     box-sizing: border-box;
+     display: inline-block;
+     border: 1px solid #89f;
+     margin: 0 -2px -1px -2px !important;
+     padding: 1px 0;
+     background: #fff;
+     min-width: 60px !important;
+}
+
+.tab a {
+     display: inline-block;
+     padding: 4px 14px;
+}
+
+.tab:hover a {
+     color: #f60 !important;
+}
+
+.tab {
+     background: linear-gradient(to bottom, #fff 50%, #efefff 50%);
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+.tab:hover {
+     background: #fff;
+     box-shadow: inset 0 0 0 1px #f90;
+}
+
+.tab:active {
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #5f2400;
+     background: #f60;
+}
+
+.tab:active a {
+     color: #fff !important;
 }
 
 .tab2 {
-     color: #111;
+     background: #89f;
+     box-shadow: inset 0 0 0 1px #fff;
+     color: #fff;
+     padding: 5px 12px;
 }
 
-.tab2::before {
-     content: '\1F892\00A0';
-     content: '\25B8\00A0';
-     font-size: 10pt;
-     line-height: 110%;
-}
-
-.tab2::after {
-     content: '\00A0\1F890';
-     content: '\00A0\25C2';
-     font-size: 10pt;
-     line-height: 110%;
-}
+/* end topnav */
 
 div.configure {
      padding: 0;
@@ -1399,6 +1540,10 @@ div.configure table {
 
 table.configtable, table#permabanned, table#loggingoptions, table#configstats, ul#banlist {
      margin-bottom: -5px;
+}
+
+#config_homepage td {
+     padding: 5px;
 }
 
 #config_peers #permabanned {
@@ -1517,27 +1662,27 @@ table#loggingoptions textarea {
      width: 170px;
 }
 
-table#profiles td:first-child, #profiles td:last-child {
+table#profiles td:first-child, table#profiles td:last-child {
      width: 50px;
      white-space: nowrap;
 }
 
-#profiles th:nth-child(3), #profiles th:nth-child(4), #profiles th:nth-child(5) {
+#profiles th:nth-child(3), #profiles th:nth-child(4), #profiles th:nth-child(5), #profiles th:nth-child(6) {
      text-align: right;
 }
 
-#profiles td[colspan="7"], #profiles td[colspan="7"]:hover {
-     background: #6992d3;
+#profiles td[colspan="8"], #profiles tr td[colspan="8"]:hover {
+     background: #77f;
      padding: 1px 0;
      border-top: 1px inset #fff !important;
      border-bottom: 1px inset #fff !important;
 }
 
-#profiles td[colspan="7"] hr {
+#profiles td[colspan="8"] hr {
      display: none;
 }
 
-#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
+table#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
 .homelinkedit tr:hover, .main#debug table:first-of-type tr:hover td {
      background: #fff;
      background: linear-gradient(to bottom, #fff 0%, #ffe 100%);
@@ -1548,7 +1693,7 @@ table#profiles td:first-child, #profiles td:last-child {
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 
-#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
+table#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
 .homelinkedit tr:nth-last-child(n+2):hover, .main#debug table:first-of-type tr:hover td, #sidebarconf tr:nth-last-child(n+2):hover td {
      border-top: inherit;
      border-bottom: inherit;
@@ -1570,17 +1715,47 @@ table#thresholds, table#profile_defs {
      margin-top: 0 !important;
 }
 
-#profile_defs ul {
-     margin: 10px 10px 5px -35px;
+#profile_defs td:first-child {
+     width: 5% !important;
+     white-space: nowrap;
+     text-align: right;
 }
 
-#profile_defs li {
-     padding: 0;
-     list-style: none;
+#profile_defs td:last-child {
+     width: 95%;
+     white-space: normal;
+     line-height: 120%;
+}
+
+#thresholds th, #thresholds td {
+     text-align: center !important;
+}
+
+#capabilities_key td {
+     padding: 0 !important;
+}
+
+#capabilities_key table {
+     margin: 0 !important;
+     border: none;
+     border-top: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+}
+
+#capabilities_key table td {
+     padding: 3px 5px !important;
+}
+
+#capabilities_key table td:nth-child(even) {
+     width: 16px;
 }
 
 #profile_defs b {
      text-transform: capitalize;
+}
+
+#capabilities_key b {
+     text-transform: none !important;
 }
 
 table#floodfills {
@@ -1714,7 +1889,7 @@ a[href^="configpeer?peer"] {
 
 a[href^="configpeer?peer"]::after {
      content: url(/themes/console/images/buttons/edit.png);
-     vertical-align: bottom;
+     vertical-align: top;
 }
 
 a[href^="configpeer?peer"]:hover {
@@ -1757,6 +1932,7 @@ table#enviro td, table#eventlogs td {
 
 #wrapperlogs pre {
      white-space: pre-wrap;
+     word-break: break-all;
      margin: 0;
      width: 100%;
      padding: 0;
@@ -1856,11 +2032,17 @@ div.configure h2:first-child {
 #sidebarconf tr, .homelinkedit tr, #clientconfig tr, #webappconfig tr,  #configstats tr, #tunnelconfig tr, #profiles tr,
 #floodfills tr, #netdboverview tr, .netdbentry tr, #leasesetdebug tr, #leasesetsummary tr, .leaseset tr,
 .sybil_routerinfo tr, #enviro tr, #schedjobs tr, #jobstats tr, #eventlog tr, .tunneldisplay tr, #udpconnections tr, #ntcpconnections tr {
-     border-top: 1px inset #fff;
-     border-bottom: 1px inset #fff;
+     border-top: 1px inset #ccf;
 }
 
-#addkeyring tr, #loggingoptions tr, tr.tablefooter, #profiles tr:hover, #floodfills tr:hover, #jardump tr {
+#config_stats tr:not(.tablefooter) td:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 24px;
+     vertical-align: middle;
+}
+
+#addkeyring tr, #loggingoptions tr, tr.tablefooter, table#profiles tr:hover, #floodfills tr:hover, #jardump tr {
      border-top: 1px solid #89f !important;
      border-bottom: 1px solid #89f !important;
 }
@@ -1941,10 +2123,9 @@ div.messages li, div.messages ul {
 
 div.error {
      color: #d00000;
-     background-image: url(/themes/console/images/info/errortriangle.png);
-     background-position: 10px center;
-     background-repeat: no-repeat;
-     padding: 10px 0;
+     background: url(/themes/console/images/info/errortriangle.png) 20px center no-repeat;
+     background-size: 28px auto;
+     padding: 10px 5px;
      margin-left: -5px;
 }
 
@@ -1962,8 +2143,6 @@ h1 {
      font-size: 18pt;
      text-align: left;
      border: 1px solid #89f;
-     border-bottom: 1px solid #89f;
-     border-right: 1px solid #89f;
      padding: 19px 20px;
      margin: 0 1px 0 200px;
      line-height: 93%;
@@ -1971,7 +2150,7 @@ h1 {
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      background: #fff url(images/titlebg.png) center right no-repeat !important;
-     background: linear-gradient(to right, #fff, #fff 30%, rgba(255,255,255, 0.5) 70%), linear-gradient(to bottom, #e5f0f7 0%, #e5f0f7 50%, #b9c2f9 50%, #b9c2f9 100%) !important;
+     background: linear-gradient(to right, #fff 20%, rgba(255,255,255, 0.5) 70%), linear-gradient(to bottom, #e5f0f7 0%, #e5f0f7 50%, #b9c2f9 50%, #b9c2f9 100%) !important;
      min-width: 500px;
 }
 
@@ -2058,6 +2237,8 @@ h3#iptransport a::after, h3#advancedconfig a::after {
      padding: 0;
      margin: 0;
      vertical-align: bottom;
+     height: 16px !important;
+     display: inline-block;
 }
 
 h3#iptransport a:hover {
@@ -2225,6 +2406,7 @@ p#profiles_overview, h3#shutdownrouter, h3#themeheading {
 
 p#gatherstats {
      margin-top: -9px;
+     margin-bottom: 28px;
 }
 
 p#upnpstatus {
@@ -2315,6 +2497,15 @@ div.app {
 div.app:hover {
      border: 1px solid #f60;
      background: #fff;
+     cursor: pointer;
+}
+
+div.app:hover a {
+     color: #f60 !important;
+}
+
+td.app {
+     vertical-align: middle;
 }
 
 div.applabel {
@@ -2335,13 +2526,13 @@ div.applabel {
 }
 
 .applabel a {
-     display: block;
+     margin: 0;
+     padding: 1px;
+     display: inline-block;
      width: 100%;
-     height: 13px;
-     text-overflow: ellipsis;
      white-space: nowrap;
      overflow: hidden;
-     margin: 0;
+     text-overflow: ellipsis;
 }
 
 .app:hover div.applabel {
@@ -2386,6 +2577,11 @@ div.app:hover .applabel {
      min-height: 42px;
 }
 
+.appimg a {
+     display: inline-block;
+     width: 100%;
+}
+
 div.appgroup {
      margin: 0;
      padding: 0 8px;
@@ -2402,10 +2598,19 @@ table.search {
      background: #eff1ff;
      margin-left: auto;
      margin-right: auto;
-     padding: 1px 0;
      width: auto;
+     border: 1px solid #89f !important;
      border-collapse: separate;
      border-radius: 0 0 2px 2px;
+}
+
+.search td:nth-child(2) {
+     text-align: center !important;
+     padding: 0;
+}
+
+.search button.search {
+     margin: 0;
 }
 
 img.app, img.app2p {
@@ -2451,7 +2656,7 @@ tt {
 }
 
 tt, pre {
-     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
 }
 
 hr {
@@ -2509,6 +2714,10 @@ h3#servicedebug a, h3#graphinfo a {
 
 .main#debug td[colspan="2"] {
      text-align: left;
+}
+
+.main#debug h2 + hr {
+     display: none;
 }
 
 h3 + .statusnotes {
@@ -2702,7 +2911,7 @@ table#oldhome {
      vertical-align: sub !important;
 }
 
-.homelinkedit th:first-child, #sidebarconf th:first-child {
+.homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
      font-size: 0 !important;
 }
@@ -2773,6 +2982,11 @@ p#pluginconfigtext {
      border: 1px solid #89f;
      padding: 10px;
      margin: -11px 0 -1px;
+}
+
+#config_logging p {
+     text-align: left;
+     margin: 3px 0 5px -15px !important;
 }
 
 .formaction, td.optionsave {
@@ -2871,7 +3085,7 @@ p#enablefullstats {
 }
 
 .langbox {
-     margin: 4px 4px 0;
+     margin: 4px 2px 0;
      color: #001;
      font-size: 7pt;
      width: 360px;
@@ -2882,19 +3096,15 @@ p#enablefullstats {
 }
 
 .langbox img {
-     padding: 0 2px; /* Ignored by IE8 */
+     padding: 0 !important;
+     margin: 0 1px -1px;
      opacity: 0.9;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
-     transition: ease all 0.3s 0s;
+     border: 1px solid #999;
+     transform: none !important;
 }
 
 .langbox img:hover {
      opacity: 1;
-     filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
-     transform: scale(1.1);
-     transition: ease all 0.3s 0s;
 }
 
 .links {
@@ -2923,51 +3133,6 @@ p#enablefullstats {
      letter-spacing: 0.02em;
 }
 
-a:link {
-     color: #33a;
-     text-decoration: none;
-     font-weight: bold;
-     word-wrap: break-word;
-}
-
-a:visited {
-     color: #448;
-     text-decoration: none;
-     font-weight: bold;
-}
-
-a:hover, a:focus {
-     color: #f60;
-     text-decoration: none;
-     font-weight: bold;
-     outline: none;
-}
-
-a:active {
-     color: #f93 !important;
-     text-decoration: none;
-     font-weight: bold;
-}
-
-a.script {
-     letter-spacing: normal;
-     word-spacing: normal;
-}
-
-pre {
-     margin: 0 20px;
-     overflow: auto;
-     font-size: 8pt !important;
-     width: 95%;
-     padding-top: 10px;
-}
-
-tt, code {
-     font-size: 9pt;
-     font-weight: bold;
-     color: darkgreen;
-}
-
 .main#logs code {
      font-size: 8pt;
 }
@@ -2989,12 +3154,6 @@ tt, code {
      line-height: normal;
      padding: 2px 5px;
 }
-
-/*
-.main[id^="config_"] tr:nth-child(even) {
-     background: #f7f8ff;
-}
-*/
 
 #netconfig tr, #externali2cp tr {
      background: #fff;
@@ -3018,7 +3177,7 @@ tt, code {
 
 .tidylist code {
      text-align: left;
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      color: #723;
      font-weight: bold;
 }
@@ -3306,12 +3465,12 @@ div#themeoptions {
 }
 
 #themeoptions input {
-     margin-left: 5px;
+     margin: 6px 8px 6px 6px;
      vertical-align: sub;
 }
 
 div.themelabel {
-     border-top: 1px solid #bbf !important;
+     border-top: 1px solid #89f !important;
      margin: -30px -4px 0;
      padding: 3px 2px;
      background: #eef url(images/tinytitle.png) center center;
@@ -3455,7 +3614,7 @@ div.ui_lang { /* lang text label */
      text-overflow: ellipsis;
      white-space: nowrap;
      margin: -32px -4px 0;
-     border-top: 1px solid #bbf;
+     border-top: 1px solid #89f;
      border-radius: 0 0 2px 2px;
      text-transform: capitalize;
      font-size: 9pt;
@@ -3471,25 +3630,26 @@ p#helptranslate {
 
 /* configui password*/
 
-table#consolepass th:nth-child(2) {
+#consolepass th:nth-child(2) {
      text-align: left;
 }
 
-table#consolepass td:first-child {
-     width: 100px;
-     white-space:nowrap;
+#consolepass tr:first-child td {
+     background: #fff url("/themes/console/images/info/user_add.png") no-repeat scroll 12px center / 28px 28px;
+     padding: 15px 15px 15px 50px;
 }
 
-table#consolepass td {
+#consolepass td {
      padding: 5px 10px;
      font-size: 9pt;
+     white-space: nowrap;
 }
 
-table#consolepass input {
+#consolepass input {
      margin: 5px;
 }
 
-table#consolepass td#pw_adduser {
+#consolepass td#pw_adduser {
      padding: 5px 10px;
      border-top: 1px solid #89f;
 }
@@ -3498,7 +3658,7 @@ td#pw_adduser input {
      margin: 5px 20px 5px 5px !important;
 }
 
-table#consolepass input[name="name"] {
+#consolepass input[name="name"] {
      margin-right: 20px;
 }
 
@@ -3576,7 +3736,7 @@ table.netdbentry th:last-child {
      border-radius: 3px;
      padding: 1px 3px;
      margin-left: 4px;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono !important;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace !important;
 }
 
 a.viewfullentry:not(old) {
@@ -3788,7 +3948,7 @@ table.sybil_routerinfo:first-of-type th {
 
 .main#netdb code, .main#netdb tt {
      color: #03183f;
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
      font-weight: normal;
 }
 
@@ -3954,21 +4114,19 @@ ul.statlist li b, ul.statlist b a:hover, h3.stats a:hover  {
 }
 
 ul.statlist li::before {
-     content: "\1F6C8\00A0";
      content: "\2B26\00A0";
      margin-left: 5px;
      font-size: 14pt;
      line-height: 60%;
      vertical-align: baseline;
      color: #0c153d;
-     filter: drop-shadow(0 1px 1px #999);
+     filter: drop-shadow(0 1px 1px #aaa);
      -webkit-filter: drop-shadow(0 1px 1px #aaa);
 }
 
 ul.statlist li {
      margin-left: 5px;
      padding: 2px;
-/*     line-height: 190% !important;*/
      list-style: none;
 }
 
@@ -3993,6 +4151,23 @@ ul.statlist li li::before {
      content: "\279F\00A0";
      vertical-align: baseline;
      margin-left: 3px;
+}
+
+.main#stats a[href^="graph?"]::before {
+     content: "\279F\00A0";
+     color: #33a;
+     font-size: 14pt;
+     margin-left: 4px;
+     filter: drop-shadow(0 1px 1px #aaa);
+     -webkit-filter: drop-shadow(0 1px 1px #aaa);
+}
+
+.main#stats a[href^="graph?"]:hover::before {
+     color: #33a;
+}
+
+.main#stats a[href$="showEvents=true"]::before {
+     display: none;
 }
 
 ul.statlist li li:last-child {
@@ -4021,16 +4196,6 @@ ul.statlist li li:last-child::before {
 .statlist a[href*="graph"] {
      margin-top: 2px !important;
 }
-
-/*
-.statlist a[href*="graph"]::before {
-     content: "\1F5E0";
-     font-size: 16pt;
-     line-height: 60%;
-     font-weight: normal !important;
-     padding-bottom: 2px;
-}
-*/
 
 .statlist li a[href*="graph"]:first-of-type {
      margin-left: -1px;
@@ -4285,7 +4450,7 @@ p#fullhistory {
 
 #configinfo th {
      text-align: left;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
      padding: 7px 10px;
      color: #070;
 }
@@ -4469,7 +4634,166 @@ p#enablefullstats, p#gatherstats {
      background-size: 16px 16px !important;
 }
 
+/* logs */
+
+#logs ul {
+     margin-left: -22px;
+     margin-right: -28px;
+     margin: -4px 0 0 -20px;
+     display: inline-block;
+     word-break: break-all;
+}
+
+#logs li {
+     list-style: none;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     line-height: 130%;
+     text-align: left;
+     display: inline-block;
+     width: 100%;
+}
+
+#logs li::after {
+     content: "";
+     display: block;
+     border-top: 1px dotted #bbf;
+     width: 100%;
+     margin: 4px 0 0;
+}
+
+#logs li:last-child::after {
+     border: none;
+     margin: 0;
+}
+
+#logs font[color^="#"]::before {
+     content: "";
+     display: inline-block;
+     width: 6px;
+     height: 6px;
+     background: #fff;
+     border-radius: 50%;
+     margin-right: 5px;
+     margin-left: -17px;
+     vertical-align: calc(1px);
+}
+
+#logs li font[color="#cc0000"]::before {
+     background: #cc0000;
+}
+
+#logs li font[color="#006600"]::before {
+     background: #006600;
+}
+
+#logs li font[color="#ff3300"]::before {
+     background: #ff3300;
+}
+
+#logs li font[color="#ff00cc"]::before {
+     background: #ff00cc;
+}
+
+#logs li font[color="#000099"]::before {
+     background: #000099;
+}
+
+/* end logs */
+
+
 /* responsive layout */
+
+@media screen and (max-width: 1200px) {
+.tab, .tab2 {
+     padding: 1px 0;
+     min-width: 50px !important;
+}
+
+.tab2 {
+     padding: 3px 10px;
+}
+
+.tab a {
+     padding: 2px 12px;
+}
+
+#consolepass input[name="name"], #externali2cp input[name="user"],
+#consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
+     width: 160px !important;
+}
+}
+
+@media screen and (max-width: 1000px) {
+div.confignav {
+     font-size: 8.5pt !important;
+}
+
+.tab2 {
+     padding: 3px 8px;
+}
+
+.tab a {
+     padding: 2px 10px;
+}
+
+input.search[type="text"] {
+     width: 200px;
+}
+
+div.logo {
+     float: none;
+     position: absolute;
+     top: 10px !important;
+     margin: 0 5px !important;
+     display: block;
+     background-size: 200px auto !important;
+     min-width: 500px;
+     width: calc(100% - 36px);
+}
+
+div.warning {
+     margin: 140px 5px 0 !important;
+}
+
+.logo a:nth-child(n+2) {
+     width: 25%;
+     white-space: nowrap;
+     font-size: 10pt;
+}
+
+.proxyfooter {
+     display: none;
+}
+
+img[src$="bound.png"] {
+     transform: scale(0.9);
+}
+
+.main#tunnels th, .main#profiles th {
+font-size: 8pt;
+}
+}
+
+@media screen and (max-width: 1200px) {
+.main#peers th {
+font-size: 8pt;
+}
+
+img[src^="/flags.jsp"] {
+     transform: scale(0.9);
+}
+}
+
+@media screen and (max-width: 1500px) {
+#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
+#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+   min-height: 12px;
+}
+
+.langbox {
+     margin-top: 3px !important;
+}
+}
 
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
@@ -4501,10 +4825,17 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 226px !important;
 }
 
+#sb_internals, #sb_services, #sb_advanced {
+     margin-top: -3px !important;
+}
+
 .routersummary h3 a, #netdboverview th, .newsentry h3 {
      font-size: 11pt !important;
 }
 
+#sb_internals a, #sb_services a, #sb_advanced a {
+     max-width: 210px;
+}
 .routersummary button[type="submit"] {
      min-width: 100px;
      margin: 2px 4px 1px;
@@ -4563,7 +4894,7 @@ button.control {
      font-size: 9pt !important;
 }
 
-#jardump tt {
+#jardump tt, #wrapperlogs pre {
      font-size: 8pt !important;
 }
 
@@ -4586,8 +4917,19 @@ div.joblog h3 {
 .subheading b {
      font-size: 10.5pt !important;
 }
+
+#stats.main form {
+     margin-top: -14px;
+}
+
+.confignav {
+     padding: 0 5px !important;
+}
+
+.tab, .tab2 {
+     margin-top: -1px !important;
+}
 }
 
 /* end responsive layout */
-
 

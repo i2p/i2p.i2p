@@ -134,9 +134,14 @@ div.warning {
      background: url(/themes/console/images/itoopie_sm.png) 10px center no-repeat, url(images/camotile2.png);
      box-shadow: inset 0 0 0 1px #700;
      box-shadow: inset 0 0 0 1px #700, inset 0 0 3px 3px #000;
+     box-shadow: inset 0 0 0 1px #700, inset 0 0 3px 3px #000, 0 0 0 2px #000;;
      word-wrap: break-word;
      font-size: 10pt;
      min-width: 300px;
+     border: 5px solid #010;
+     border-image: repeating-linear-gradient(135deg, #010 0px, #010 20px, #440 20px, #440 40px, #010 40px) 5 repeat repeat;
+     border-image-width: 5px;
+     border-image-outset: 1px;
 }
 
 .warning p, .warning a {
@@ -259,6 +264,17 @@ div.routersummary h3 {
      mix-blend-mode: exclusion;
 }
 
+.routersummary h3::after {
+     content: "";
+     display: inline-block;
+     min-height: 15px;
+     vertical-align: middle;
+}
+
+.routersummary h3 a {
+     vertical-align: middle;
+}
+
 .routersummary h3:hover {
      background: #010 !important;
      box-shadow: inset 0 0 2px 2px #000;
@@ -287,6 +303,13 @@ div.routersummary h4 {
      box-shadow: inset 0 0 0 1px #121, inset 0 0 5px 2px #000;
 }
 
+.routersummary h4::after {
+     content: "";
+     display: inline-block;
+     min-height: 16px;
+     vertical-align: middle;
+}
+
 .routersummary h3 a, .routersummary h4 a {
      white-space: normal !important;
      display: inline-block;
@@ -312,8 +335,8 @@ div.routersummary table {
      margin-bottom: -4px !important;
 }
 
-#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
-#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
    min-height: 14px;
@@ -337,15 +360,28 @@ div.routersummary table {
      padding: 1px 0;
 }
 
+#sb_localtunnels td::after {
+     content: "";
+     display: inline-block;
+     min-height: 10px;
+     vertical-align: middle;
+     border-sizing: border-box;
+}
+
+#sb_localtunnels a {
+     display: inline-block;
+}
+
 #sb_localtunnels td:last-child {
      text-align: right;
      padding-right: 0;
 }
 
 #sb_warning { /* check connection/firewall */
-     padding: 4px 6px 4px 26px;
+     padding: 4px 4px 4px 26px;
      background: #000;
-     background: url(images/warning24x24.png) 5px center no-repeat, linear-gradient(to right, #001900 0%, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900 100%);
+     background: url(images/warning24x24.png) 4px center no-repeat, linear-gradient(to right, #001900 0%, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900 100%);
+     background-size: 22px 22px, 100% 100%;
      text-align: center;
      line-height: 120%;
 }
@@ -356,6 +392,8 @@ div.routersummary table {
 
 #sb_internals a, #sb_services a, #sb_advanced a {
      padding: 1px 2px;
+     display: inline-block;
+     vertical-align: middle;
 }
 
 #sb_version {
@@ -381,12 +419,12 @@ div.routersummary table {
      border: 1px solid #262;
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px #000;
-     margin: 10px -4px -2px;
+     margin: -2px -5px -4px;
      padding: 5px 3px;
 }
 
-hr + .sb_notice {
-     margin-top: 7px;
+p:empty + .sb_notice {
+     margin-top: 9px;
 }
 
 div.routersummary tr {
@@ -596,6 +634,8 @@ div.sorry {
      margin: 10px 0;
 }
 
+/* main section */
+
 .main {
      margin: -1px 5px 5px 206px;
      padding: 0 15px 5px 15px;
@@ -640,6 +680,8 @@ div.sorry {
 div.main#news {
      background: #000 url(images/news.png) no-repeat scroll bottom right !important;
 }
+
+/* end main */
 
 #news h3 {
      padding: 4px 6px 5px;
@@ -750,57 +792,74 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
      white-space: nowrap;
 }
 
+/* top navigation */
+
 div.confignav {
      background: url(images/header.png) repeat-x scroll center center #000;
-     background: linear-gradient(to bottom, #1a261a 0%,#223022 7%,#212f21 9%,#172317 21%,#091109 49%,#050d05 50%,#020602 51%,#010301 53%,#000000 56%,#000000 100%) !important;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
-     padding: 8px 5px 7px !important;
+     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     padding: 7px 5px !important;
      margin: -1px -16px 15px;
-/*     border-radius: 0 0 4px 4px; */
      border: 1px solid #494;
      font-weight: bold !important;
      line-height: 130% !important;
      text-align: center;
-     box-shadow: inset 0 0 0 1px #000;
      box-shadow: inset 0 0 0 1px #000, inset 0 0 3px 1px #030;
 }
 
-.confignav a:hover {
-     text-decoration: none;
-}
-
-.confignav a:active {
-     color: #f90 !important;
-}
-
 .tab, .tab2 {
-     padding: 1px 3px;
-     white-space: nowrap;
-     margin: 0;
+     box-sizing: border-box;
+     display: inline-block;
+     border: 1px solid #494;
+     margin: 0 -2px -1px -2px !important;
+     padding: 1px 0;
+     background: #fff;
+     min-width: 60px !important;
 }
 
-.tab2::before {
-     content: '\1F892\00A0';
-     content: '\25B8\00A0';
-     font-size: 11pt;
-     line-height: 50%;
-     vertical-align: baseline;
+.tab2 {
+     background: #030;
+     box-shadow: inset 0 0 0 1px #000;
+     color: #ee9;
+     padding: 5px 12px !important;
 }
 
-.tab2::after {
-     content: '\00A0\1F890';
-     content: '\00A0\25C2';
-     font-size: 11pt;
-     line-height: 50%;
-     vertical-align: baseline;
+.tab a {
+     display: inline-block;
+     padding: 4px 14px !important;
 }
+
+.tab {
+     background: linear-gradient(to bottom, #001900 0%, #002900 50%, #000 51%, #000 100%) !important;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.tab:hover {
+     background: #000 !important;
+     box-shadow: inset 0 0 0 1px #914600;
+}
+
+.tab:hover a {
+     color: #f60;
+}
+
+.tab:active {
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px 1px #5f2400;
+     background: #f60 !important;
+}
+
+.tab:active a {
+     color: #ee9 !important;
+}
+
+/* end topnav */
 
 div.messages {
      padding: 20px 10px 20px 50px;
      margin: 10px 0 15px 0;
      border: 1px solid #494;
      background: #000;
-     background: url(images/infohelp.png) no-repeat 12px center, #000;
+     background: url(images/infohelp.png) no-repeat 12px center, url(images/scarface.jpg) right bottom no-repeat #000;
+     background-size: 28px 28px, auto 90%;
      font-weight: bold;
      font-size: 9.5pt;
      color: #2b2 !important;
@@ -822,6 +881,10 @@ div.messages li {
      margin: 0 5px 0 0 !important;
      padding: 0 10px 0 0 !important;
      border: 0 !important;
+}
+
+#messages, .error, .notice {
+     color: #ee9;
 }
 
 div.widepanel h3 {
@@ -859,9 +922,8 @@ div.graphspanel a img {
      padding: 3px;
      margin: 5px;
      text-align: center !important;
-/*     background: #000; */
      opacity: 0.9;
-     transition: all 0.3s ease 0s;
+     transition: ease all 0.3s 0s;
 }
 
 div.graphspanel a img:hover {
@@ -869,9 +931,8 @@ div.graphspanel a img:hover {
      padding: 3px;
      margin: 5px;
      text-align: center !important;
-/*     background: #000; */
      opacity: 1;
-     transition: all 0.3s ease 0s;
+     transition: ease all 0.3s 0s;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
 }
 
@@ -882,7 +943,6 @@ div.graphspanel img {
      vertical-align: top;
      max-width: 95%;
      max-width: calc(100% - 18px);
-/*     filter: invert(100%) sepia(100%) hue-rotate(78deg) saturate(150%); enable for theme-colored graph images */
 }
 
 div.graphspanel p {
@@ -1052,14 +1112,12 @@ td {
      border-top: 1px inset #131;
 }
 
-/*
-td:hover, tr:hover td {
-     color: #ee9;
-}
-*/
-
 td img {
      padding: 0 1px 0 2px;
+}
+
+#udpconnections td:nth-child(2) img, #ntcpconnections td:nth-child(2) img {
+     padding: 0;
 }
 
 tt {
@@ -1192,6 +1250,11 @@ p img:first-child {
 p:empty { /* kills empty paragraphs that are likely erroneous eg. see top of /profiles?f=1, /profiles */
      display: none;
      border: 1px dotted #f00; /* display in order to bug hunt */
+}
+
+#config_logging p {
+     text-align: left;
+     margin: 3px 0 5px !important;
 }
 
 h1 {
@@ -1635,7 +1698,7 @@ input[type="submit"], input[type="reset"], button {
      color: #EE9;
      text-align: center;
      border: 1px solid #494 !important;
-     margin: -3px 0 5px 0;
+     margin: -2px 0 5px 0;
      padding: 7px;
      background: #000;
      background: linear-gradient(to bottom, #001400, #001000 50%, #000 100%);
@@ -1660,22 +1723,13 @@ input[type="submit"], input[type="reset"], button {
      padding: 5px 20px 5px 0;
      -moz-column-count: 2;
      -moz-column-width: 400px;
-     -moz-column-gap: 15px;
-     -moz-column-rule: 1px dotted #494;
+     -moz-column-gap: 50px;
      -webkit-column-count: 2;
      -webkit-column-width: 400px;
-     -webkit-column-gap: 100px;
-     -webkit-column-rule: 1px dotted #494;
-/* untested
-     -ms-column-count: 2;
-     -ms-column-width: 400px;
-     -ms-column-gap: 100px;
-     -ms-column-rule: 1px dotted #494;
-*/
+     -webkit-column-gap: 50px;
      column-count: 2;
      column-width: 400px;
-     column-gap: 100px;
-     column-rule: 1px dotted #494;
+     column-gap: 50px;
 }
 
 .joblog ol li {
@@ -1683,9 +1737,10 @@ input[type="submit"], input[type="reset"], button {
      page-break-inside: avoid;
      -webkit-break-inside: avoid;
      display: inline-block;
-     border-bottom: 1px dotted #494;
-     min-width: 400px;
-     width: 88%;
+     border-bottom: 1px dotted #030;
+     min-width: 360px;
+     width: 90%;
+     width: calc(100% - 45px);
      padding-bottom: 5px !important;
 }
 
@@ -1761,16 +1816,6 @@ div.joblog p {
 div.joblog th:first-child {
      text-align: left;
      padding-left: 6px;
-}
-
-div.joblog th:last-child { /* kludge for broken table in /jobs .. requires additional trailing td per tr to fix */
-      width: 0;
-      height: 0;
-      padding: 0;
-}
-
-.joblog > .wideload > b ~ ol > li:last-child { /* jobs ol tidy */
-     margin-bottom: -10px;
 }
 
 /* /jobs */
@@ -1883,7 +1928,6 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover 
 }
 
 ul.statlist li::before {
-     content: "\1F6C8\00A0";
      content: "\2B26\00A0";
      font-size: 14pt;
      line-height: 50%;
@@ -1900,7 +1944,7 @@ ul.statlist li {
 ul.statlist li li {
      margin-left: 16px;
      margin-right: -20px;
-     line-height: 120% !important;
+     line-height: 140% !important;
      list-style: none;
 }
 
@@ -1914,8 +1958,28 @@ ul.statlist li li:last-child {
      padding-bottom: 5px;
 }
 
+ul.statlist li li:last-child::after {
+     content: "";
+     display: block;
+     border-bottom: 1px dotted #030;
+     margin-top: 6px;
+     margin-bottom: -12px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+ul.statlist li li:last-child::after {
+     margin-bottom: -6px;
+}
+}
+
 li.noevents {
      margin-bottom: 5px !important;
+}
+
+li.noevents::after {
+     margin-top: 6px !important;
+     margin-bottom: 0 !important;
+     margin-right: 20px;
 }
 
 ul.statlist li b {
@@ -1927,7 +1991,19 @@ ul.statlist li li:last-child::before {
      color: #994
 }
 
+.statlist a[href^="graph"]::before {
+     content: "\27A1\00A0";
+     content: "\21B3\00A0";
+     color: #994;
+     font-size: 14pt;
+}
+
+.statlist a[href$="true"]::before {
+     display: none;
+}
+
 .main#stats form {
+     background: #000;
      border: 1px solid #494;
      padding: 10px;
      margin: -13px 0 -11px;
@@ -2076,8 +2152,14 @@ table#udpconnections table i {
      color: #ee9;
 }
 
-#udpconnections tr.tablefooter td {
+#udpconnections tr.tablefooter td, #ntcpconnections tr.tablefooter td {
      color: #ee9;
+     text-align: center;
+}
+
+#udpconnections tr.tablefooter td:first-child, #ntcpconnections tr.tablefooter td:first-child {
+     padding-left: 6px;
+     text-align: left;
 }
 
 #udpconnections tr.tablefooter:hover td {
@@ -2089,9 +2171,9 @@ table#udpconnections table i {
 }
 
 #udpconnections td[class="cells"]:first-child, #ntcpconnections td[class="cells"]:first-child {
-	  width: 50px;
-	  white-space: nowrap;
-	  text-align: right;
+     width: 50px;
+     white-space: nowrap;
+     text-align: right;
 }
 
 #udpconnections td > *, #ntcpconnections td > *,
@@ -2685,6 +2767,32 @@ table#bandwidthconfig input, table#bandwidthconfig select {
      margin-right: 3px;
 }
 
+/* confignet tidyup */
+
+#netconfig .optbox {
+     margin: 10px 6px 2px !important;
+     display: inline-block !important;
+     vertical-align: sub !important;
+}
+
+#netconfig .optbox:first-child {
+     margin-top: 6px !important;
+     margin-bottom: 6px !important;
+}
+
+#netconfig .optbox:last-child, #netconfig .optbox[value="only"], #netconfig .optbox[name="disableUDP"], #netconfig .optbox[value="disabled"] {
+     margin-bottom: 6px !important;
+}
+
+#netconfig input[type="text"] + br + .optbox, #netconfig .optbox[name="ntcpAutoPort"] {
+     margin-top: 3px !important;
+}
+
+#netconfig input[name*="ost"] {
+     width: 250px !important;
+}
+
+/* end confignet tidyup */
 /* end /confignet */
 
 /* /events */
@@ -2756,6 +2864,10 @@ p#keyringhelp, p#webappconfig, p#availableplugins, p#pluginconfigtext, p#clientd
      background: #000 url(images/infohelp.png) 12px center no-repeat;
      border: 1px solid #494;
      padding: 15px 15px 15px 50px;
+}
+
+p#gatherstats {
+     margin-bottom: 28px !important;
 }
 
 #webappconfig th:first-child {
@@ -2938,6 +3050,7 @@ table#loggingoptions td:first-child {
      width: 99%;
      width: calc(100% - 8px);
      margin-bottom: 8px;
+     resize: none;
 }
 
 #loggingoptions select[name="newlogclass"] {
@@ -2949,7 +3062,7 @@ table#loggingoptions td:first-child {
 
 #config_summarybar .configtable td:not(.optionsave) {
      padding-left: 45px;
-     background: url(/themes/console/images/info/interval.png) 12px center no-repeat;
+     background: url(/themes/console/images/info/interval.png) 12px center no-repeat #000;
      background-size: 28px 28px;
 }
 
@@ -3023,7 +3136,7 @@ table#sidebarconf {
      width: 100%;
 }
 
-#sidebarconf th:nth-child(1), .homelinkedit th:first-child {
+#sidebarconf th:nth-child(1), .homelinkedit th:first-child, #consolepass th:first-child {
      text-align: center;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
      text-indent: -99999px;
@@ -3390,6 +3503,10 @@ th > img[src^="/imagegen"] { /* scale down header images */
 
 /* logs */
 
+#logs pre, #logs li {
+     font-weight: bold;
+}
+
 #criticallogs ul { /* tidy router logs ul */
      border: 1px solid #494;
      margin: -6px -11px !important;
@@ -3443,11 +3560,7 @@ table[id$="logs"] tr:nth-child(even){
 }
 
 table[id$="logs"] ul {
-     margin: 5px 10px -5px -15px !important;
-}
-
-table[id$="logs"] li::first-line {
-     font-weight: bold;
+     margin: -5px 12px -5px -18px !important;
 }
 
 table#wrapperlogs {
@@ -3470,48 +3583,92 @@ table#wrapperlogs {
      padding: 0 0 0 5px !important;
 }
 
-
-
-/*
-a[name="criticallogs"] ~ h3 + p {
-     border: 1px solid #494;
-     padding: 10px;
-     margin-top: -11px;
-     margin-bottom: 10px;
-}
-
-a[name="criticallogs"] ~ h3 + p ~ h3 + a[href="events"] + h3 + a[name="servicelogs"] + p {
-     border: 1px solid #494;
-     padding: 10px;
-     margin-top: -11px;
-     margin-bottom: 10px;
-}
-
-a[name="criticallogs"] ~ h3 + p ~ h3 + a[href="events"] + h3 + a[name="servicelogs"] + p + pre {
-     border: 1px solid #494;
-     padding: 10px;
-     width: calc(100% - 22px) !important;
-     margin-top: -11px;
-     margin-bottom: 10px;
-}
-
-a[name="servicelogs"] + p + pre {
-     border: 1px solid #f60;
-}
-*/
-
 .logtable ul li {
      list-style: none !important;
      margin-left: 15px;
 }
 
-.logtable ul li::before {
-     content: "\26A0\00A0";
-     font-size: 12pt;
-     line-height: 50%;
-     vertical-align: baseline;
-     color: #ff0;
+#logs li {
+     list-style: none;
+     font: bold 8pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     line-height: 130%;
+     text-align: left;
+     display: inline-block;
+     width: 100%;
+     word-break: break-all;
 }
+
+#criticallogs li {
+     width: auto;
+     width: calc(100% - 15px);
+     margin: 2px -10px 0 7px;
+}
+
+#logs li::after {
+     content: "";
+     display: block;
+     border-top: 1px dotted #030;
+     width: 100%;
+     margin: 5px 0 -3px;
+}
+
+#logs li:last-child::after {
+     border: none;
+     margin: 0;
+}
+
+#logs font[color^="#"]::before {
+     content: "";
+     display: inline-block;
+     width: 6px;
+     height: 6px;
+     margin-left: 0;
+     margin-right: 5px;
+     border-radius: 50%;
+     vertical-align: calc(1px);
+}
+
+font[color="#cc0000"] {
+     color: #c33 !important;
+}
+
+#logs li font[color="#cc0000"]::before {
+     background: #c33;
+}
+
+font[color="#006600"] {
+     color: #ee7 !important;
+}
+
+#logs li font[color="#006600"]::before {
+     background: #ee7;
+}
+
+font[color="#ff3300"] {
+     color: #990 !important;
+}
+
+#logs li font[color="#ff3300"]::before {
+     background: #990;
+}
+
+font[color="#ff00cc"] {
+     color: #880 !important;
+}
+
+#logs li font[color="#ff00cc"]::before {
+     background: #880;
+}
+
+font[color="#000099"] {
+     color: #660 !important;
+}
+
+#logs li font[color="#000099"]::before {
+     background: #660;
+}
+
+/* end logs */
 
 /* /profiles */
 
@@ -3550,13 +3707,17 @@ table#profiles td:first-child, table#profiles th:first-child, table#profiles td:
      text-align: center;
 }
 
+table#profiles th:last-child {
+     padding-right: 10px;
+}
+
 table#profiles td:last-child {
      text-align: right;
      width: 60px;
      white-space: nowrap;
 }
 
-table#profiles td[colspan="7"] { /* profile class separator */
+table#profiles td[colspan="8"] { /* profile class separator */
      background: #040;
      padding: 1px;
      border: 1px inset #000;
@@ -3585,23 +3746,50 @@ table#profile_defs, table#thresholds {
 }
 
 table#profile_defs td, table#thresholds td {
-     padding: 5px 10px;
+     padding: 5px;
 }
 
-table#profile_defs ul {
-     margin: -3px 0 12px -30px;
+#profile_defs td:first-child {
+     width: 5% !important;
+     white-space: nowrap;
+     text-align: right;
 }
 
-table#profile_defs ul li:last-child {
-     margin-bottom: -13px;
+#profile_defs td:last-child {
+     width: 95%;
+     white-space: normal;
+     line-height: 120%;
 }
 
-#profile_defs li {
-     list-style: none !important;
+#thresholds th, #thresholds td {
+     text-align: center;
 }
 
-#profile_defs li::first-letter {
+#capabilities_key td {
+     padding: 0 !important;
+}
+
+#capabilities_key table {
+     margin: 0 !important;
+     border: none;
+     border-top: 1px solid #373;
+     border-bottom: 1px solid #373;
+}
+
+#capabilities_key table td {
+     padding: 3px 5px !important;
+}
+
+#capabilities_key table td:nth-child(even) {
+     width: 16px;
+}
+
+#profile_defs b {
      text-transform: capitalize;
+}
+
+#capabilities_key b {
+     text-transform: none !important;
 }
 
 table#profile_defs + hr {
@@ -3629,56 +3817,6 @@ table#floodfills td  {
      vertical-align: middle;
      text-align: right !important;
      white-space: nowrap;
-}
-
-/* responsive /profiles & /peers */
-
-@media screen and (max-width: 1060px) {
-
-table#floodfills, #profiles ul#banlist, table#profile_defs {
-     margin-bottom: 5px;
-}
-
-table#floodfills td {
-     font-size: 8pt;
-     border-right: 0 outset transparent !important;
-}
-
-.main#profiles {
-     padding: 5px 5px 0;
-}
-
-#profiles .confignav {
-     margin: -6px -6px 5px;
-}
-
-p#profiles_overview {
-     margin: 5px 0;
-}
-
-#profiles h3 {
-     margin-top: 5px !important;
-}
-
-#profiles #thresholds + h3 {
-     margin-top: -5px !important;
-}
-
-#floodfills tr:hover td:nth-child(n+2){
-     transform: scale(1.1);
-     text-align: center !important;
-}
-}
-
-@media screen and (max-width: 1220px) {
-#udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2)  {
-     transform: scale(1.1);
-     text-align: center !important;
-}
-
-.main#peers .widescroll td.cells {
-     font-size: 8pt !important;
-}
 }
 
 table#floodfills th:first-child, table#floodfills td:first-child  {
@@ -4122,30 +4260,6 @@ body.iframed {
 }
 
 /* end iframed console fixes */
-
-/* Override error log colors */
-
-font[color="#ff00cc"] {
-     color: #660 !important;
-}
-
-font[color="#ff3300"] {
-     color: #990 !important;
-}
-
-font[color="#cc0000"] {
-     color: #cc0 !important;
-}
-
-font[color="#000099"] { /* info log level */
-     color: #550 !important;
-}
-
-font[color="#006600"] { /* debug log level */
-     color: #bb0 !important;
-}
-
-/* end log color overrides */
 
 /* global overrides */
 
@@ -5177,26 +5291,115 @@ form[action="events"] {
 
 /* responsive layout */
 
+/* responsive /profiles & /peers */
+
+@media screen and (max-width: 1060px) {
+
+table#floodfills, #profiles ul#banlist, table#profile_defs {
+     margin-bottom: 5px;
+}
+
+table#floodfills td {
+     font-size: 8pt;
+     border-right: 0 outset transparent !important;
+}
+
+#floodfills tr:hover td:nth-child(n+2){
+     transform: scale(1.1);
+     text-align: center !important;
+}
+}
+
+@media screen and (max-width: 1240px) {
+#udpconnections td, #ntcpconnections td {
+     padding: 3px 2px;
+}
+
+#udpconnections tr.tablefooter td, #ntcpconnections tr.tablefooter td {
+     border: 1px inset #131 !important;
+     border-top: 1px solid #494 !important;
+}
+
+.main#profiles, .main#peers {
+     padding: 5px 5px 0;
+}
+
+#profiles .confignav {
+     margin: -6px -6px 5px;
+}
+
+p#upnpstatus, .main#peers .infohelp {
+     margin: 0;
+}
+
+.main#peers h3, #profiles h3, .main#peers .infohelp {
+     margin-top: 5px !important;
+}
+
+p#profiles_overview {
+     margin: 5px 0;
+}
+
+#profiles #thresholds + h3 {
+     margin-top: -5px !important;
+}
+}
+
+/* end profiles/peers */
+
+@media screen and (max-width: 1220px) {
+#udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2)  {
+     transform: scale(1.05);
+     text-align: center !important;
+}
+
+.main#peers .widescroll td.cells {
+     font-size: 8pt !important;
+}
+}
+
+@media screen and (max-width: 1200px) {
+.tab, .tab2 {
+     padding: 1px 0;
+     min-width: 50px !important;
+}
+
+.tab2 {
+     padding: 3px 12px;
+}
+
+.tab a {
+     padding: 2px 14px;
+}
+}
+
+@media screen and (max-width: 1500px) {
+#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
+#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+   min-height: 12px;
+}
+}
+
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, pre,
-ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover {
+body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt,
+ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, .confignav {
      font-size: 10pt !important;
 }
 
 .main button, .main input, select, textarea, div.news {
-     font-size: 9pt !important;
+     font-size: 10pt !important;
 }
 
 .main, .news, h1 {
      margin-left: 232px !important;
 }
 
-.routersummary {
-     width: 200px !important;
+pre, #logs li {
+     font-size: 9pt !important;
 }
 
-.routersummary img[src$="i2plogo.png"] {
-     transform: scale(1.1);
+.routersummary {
+     width: 200px !important;
 }
 
 .routersummary table[id^="sb_"] {
@@ -5250,10 +5453,6 @@ div.joblog h3 {
      padding-top: 7px !important;
 }
 
- p#gatherstats {
-      margin-bottom: 12px !important;
-}
-
 #certs.main p + p:empty + h4 {
      margin-top: -15px !important;
 }
@@ -5278,12 +5477,65 @@ div.routersummary img[src$="i2plogo.png"] {
      margin-top: -3px;
 }
 
+.routersummary h3::after {
+     min-height: 19px;
+}
+
 #banlist + h3.tabletitle {
      margin-bottom: -2px !important;
 }
 
 table#permabanned {
      margin-top: -3px;
+}
+
+#udpconnections td[class="cells"]:first-child, #ntcpconnections td[class="cells"]:first-child {
+     width: 55px;
+     padding-right: 8px;
+}
+
+.main#jobs h2 {
+     margin-bottom: 10px !important;
+}
+}
+
+@media screen and (min-width: 1840px) {
+div[id^="config_"] div.confignav {
+     display: flex;
+     flex-direction: row;
+     flex-wrap: wrap;
+     align-content: space-evenly;
+     justify-content: center;
+     padding: 4px 4px 5px 3px !important;
+}
+
+div[id^="config_"] .tab, div[id^="config_"] .tab2 {
+     flex: auto;
+     flex-basis: content;
+     flex-grow: 0.06;
+     margin: 0 -1px -1px 0 !important;
+     white-space: nowrap;
+     min-width: 70px !important;
+}
+
+div[id^="config_"] .tab2 {
+     padding: 5px 6px;
+}
+
+div[id^="config_"] .tab a {
+     padding: 4px 6px;
+}
+
+div[id^="config_"] div.confignav {
+     padding: 0 !important;
+}
+
+div[id^="config_"] .tab, div[id^="config_"] .tab2 {
+     margin-top: -1px !important;
+}
+
+div[id^="config_"] .tab:first-child {
+     margin-left: -1px !important;
 }
 }
 

@@ -85,7 +85,7 @@ hr {
      width: 150px;
      border: 1px solid #999;
      padding: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
      background: #fff;
      color: #333;
      border-radius: 2px;
@@ -141,7 +141,7 @@ hr {
 }
 
 .control:active {
-     box-shadow: inset 2px 2px 1px #999 !important;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #555 !important;
      border: 1px solid #999 !important;
      color: #333 !important;
 }

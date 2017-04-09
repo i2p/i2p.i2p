@@ -23,6 +23,15 @@ div.routersummary {
      margin: 0 auto;
 }
 
+div[style="height: 36px;"] {
+     height: auto !important;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     width: 357px;
+     margin-top: 6px;
+}
+
 @media screen and (min-width: 1500px) {
 div.routersummary {
      width: 600px !important;
@@ -56,6 +65,10 @@ div.routersummary table,
      min-width: 100% !important;
      min-width: calc(100% - 1px) !important;
      margin-bottom: -7px !important;
+}
+
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-bottom: -8px !important;
 }
 
 #sb_localtunnels {

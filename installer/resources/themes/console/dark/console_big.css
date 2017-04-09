@@ -35,10 +35,6 @@ div.routersummary {
      width: 200px;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
-     transform: scale(1.2);
-}
-
 div.routersummary table, table#sb_localtunnels {
     font-size: 10pt;
     width: 215px !important;
@@ -49,7 +45,7 @@ div.routersummary table td {
 }
 
 div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
-     text-shadow: 0 0 0 0 !important;
+     text-shadow: none !important;
 }
 
 div.routersummary h3 a {
@@ -58,8 +54,8 @@ div.routersummary h3 a {
      letter-spacing: 0.15em !important;
 }
 
-div.routersummary h4 {
-     font-size: 11pt;
+div.routersummary h4, .routersummary h4 a {
+     font-size: 11pt !important;
      font-weight: normal;
 }
 
@@ -71,6 +67,11 @@ div.routersummary b {
 div.routersummary a {
      font-size: 10pt;
      font-weight: normal;
+}
+
+#sb_warning {
+     padding-top: 10px;
+     padding-bottom: 10px;
 }
 
 div.messages, div.error, .error ul li {
@@ -153,3 +154,45 @@ input[type="submit"], input[type="reset"] {
 .langselect .optbox {
      min-height: 68px;
 }
+
+table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old),
+a[href^="configpeer?peer"], h3#iptransport a:not(old), h3#iptransport a:not(old) {
+     font-size: 0 !important;
+}
+
+h3#webappconfig, h3#i2pclientconfig {
+    margin-bottom: -15px !important;
+}
+
+td.optionsave {
+     border-top: 1px solid #494;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 0) {
+p, .main {
+     font-size: 11pt !important;
+}
+
+.tab, .tab2, .confignav a {
+     font-size: 11pt !important;
+     margin-right: -2px !important;
+}
+
+.news p, .news a {
+     font-size: 10pt !important;
+}
+}
+
+@media screen and (max-width: 1500px) {
+.tab, .tab2 {
+     font-size: 10.5pt !important;
+     margin-right: -3px !important;
+}
+
+h3#webappconfig, h3#i2pclientconfig {
+    margin-bottom: -16px !important;
+}
+}
+

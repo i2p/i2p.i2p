@@ -46,6 +46,10 @@ div.tunnels table {
      font-size: 11pt;
 }
 
+.tab, .tab2 {
+     margin-right: -4px !important;
+}
+
 .themechoice {
      height: 82px !important;
 }
@@ -71,4 +75,8 @@ div.joblog li i {
 
 b, div.joblog b {
     font-size: 110%;
+}
+
+p, div[id^="config_"] th {
+     font-size: 11pt !important;
 }

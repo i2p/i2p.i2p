@@ -9,7 +9,7 @@ body {
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #333;
      font-size: 9pt;
-     background: #a4a4cb url(images/tile2.png);
+     background: #a4a4cb url(images/tile2.png) fixed;
      background-size: 32px 32px;
 }
 
@@ -21,16 +21,19 @@ body.iframed {
 ::selection {
      background: #27377f !important;
      color: white;
+     text-shadow: none;
 }
 
 ::-moz-selection {
      background: #27377f !important;
      color: white;
+     text-shadow: none;
 }
 
 div {
      -moz-box-sizing: border-box;
      -webkit-box-sizing: border-box;
+     box-sizing: border-box;
 }
 
 a {
@@ -42,11 +45,16 @@ form {
 }
 
 input[type="checkbox"], input[type="radio"] {
-     vertical-align: middle;
+     margin: 5px 3px 5px 5px;
+     background: none;
+     vertical-align: sub;
      min-width: 16px;
      min-height: 16px;
-     margin: 0;
-     background: none;
+}
+
+input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
+     filter: drop-shadow(0 0 2px #89f);
+     -webkit-filter: drop-shadow(0 0 2px #89f);
 }
 
 textarea, input, select, button {
@@ -70,7 +78,7 @@ textarea {
      border: 1px solid #999;
      border-radius: 2px;
      resize: none;
-     box-shadow: inset 2px 2px 1px #ccc;
+     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
 }
 
 textarea:focus {
@@ -92,43 +100,33 @@ br {
      clear: left;
 }
 
-div.statusNotRunning {
-     float: left;
-     width: 68px;
-     height: 24px;
-     overflow: hidden;
+.statusNotRunning {
      color: #d00;
-     background: url('images/console_status_stopped.png') 0 0 no-repeat;
-     padding-top: 24px;
-     margin-top: 4px;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+     background: url(images/console_status_stopped.png) 0 0 no-repeat;
 }
 
-div.statusRunning {
-   float: left;
-     width: 68px;
-     height: 24px;
-     overflow: hidden;
+.statusRunning {
      color: #0b0;
-     background: url('images/console_status_running.png') 0 0 no-repeat;
-     padding-top: 24px;
-     margin-top: 4px;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+     background: url(images/console_status_running.png) 0 0 no-repeat;
 }
 
-div.statusStarting {
-     float: left;
-     width: 68px;
+.statusStarting {
+     color: #ff3;
+     background: url(images/console_status_starting.png) 0 0 no-repeat;
+}
+
+.statusNotRunning, .statusRunning, .statusStarting {
+     margin: 0;
+     padding: 0;
+     width: 100%;
      height: 24px;
+     background-position: center center;
+     background-size: auto 16px;
+     font-size: 0 !important;
+     text-align: center;
      overflow: hidden;
-     color: #339933;
-     background: url('images/console_status_starting.png') 0 0 no-repeat;
-     padding-top: 24px;
-     margin-top: 4px;
-     filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     -webkit-filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
 }
 
 hr {
@@ -139,11 +137,11 @@ hr {
      width: 150px;
      border: 1px solid #999;
      padding: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
      background: #fff;
      color: #333;
      border-radius: 2px;
-     box-shadow: inset 2px 2px 1px #ccc;
+     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
 }
 
 .freetext:focus {
@@ -152,8 +150,8 @@ hr {
 }
 
 .freetext[readonly], .freetext[readonly]:focus {
-     background: #ddd;
-     box-shadow: inset 2px 2px 1px #ccc;
+     background: #e9e9e9;
+     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
      color: #333;
 }
 
@@ -163,6 +161,10 @@ hr {
 
 #clientPort {
      width: 100px;
+}
+
+.control, input[type="radio"], input[type="checkbox"], select {
+     cursor: pointer;
 }
 
 .control::-moz-focus-inner {
@@ -182,8 +184,7 @@ hr {
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #ccc);
-/*     -webkit-filter: drop-shadow(0 0 1px #ccc); */
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
      box-sizing: border-box;
      margin: 2px 4px !important;
      min-width: 70px !important;
@@ -201,6 +202,7 @@ button.control, input.control {
      background: #ddd;
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      box-shadow: inset 0 0 0 1px #fff !important;
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
 }
 
 .control:active {
@@ -221,7 +223,7 @@ a.control {
      width: calc(100% - 14px);
      max-width: 1400px;
      margin: 8px auto;
-     min-width: 450px;
+     min-width: 540px;
      overflow: hidden;
      text-align: left !important;
      border-radius: 2px;
@@ -242,33 +244,25 @@ a.control {
 }
 
 select {
-     background: #fff;
-     color: #333;
      margin: 4px !important;
-     font-family: "Droid Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #999;
-     padding: 3px 3px 3px 0;
+     padding: 4px 16px 4px 4px;
      min-width: 140px;
+     background: #fff;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     color: #333;
+     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      font-size: 9pt;
+     border: 1px solid #999;
      border-radius: 2px;
      overflow: hidden;
      text-overflow: ellipsis;
-     filter: drop-shadow(0 0 1px #ccc);
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
 }
 
 select:hover {
      color: #111;
-}
-
-select:focus {
-     box-shadow: 0 0 1px #89f;
-}
-
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-select {
-     -moz-appearance: none;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 4px 16px 4px 4px;
 }
 
 select:hover, select:active {
@@ -279,10 +273,9 @@ select:focus {
      background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
      box-shadow: 0 0 1px #89f;
 }
-}
 
 a:link {
-     color: #359;
+     color: #3b6bbf;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
@@ -290,7 +283,7 @@ a:link {
 }
 
 a:visited {
-     color: #218;
+     color: #2c4e8f;
      text-decoration: none;
 }
 
@@ -312,6 +305,7 @@ h2, h3 {
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%) !important;
+     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8)) 15% !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -320,13 +314,6 @@ h2, h3 {
      color: #31334f;
      box-shadow: inset 0 0 0 1px #fff;
 }
-
-/*
-h3 {
-     border-radius: 0;
-     margin-top: -1px;
-}
-*/
 
 .iframed #globalTunnelControl h2 {
      margin-top: 2px;
@@ -358,10 +345,31 @@ th:first-child {
      padding-left: 10px;
 }
 
+
+h2, h3, th, a, button.control, select {
+     text-shadow: 0 1px 1px #fff;
+}
+
+a:hover, a:focus, a:active, button:hover, button:focus, button:active, select:hover, select:focus, select:active {
+     text-shadow: none;
+}
+
+.tunnelConfig tr, #wizardPanel tr {
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px);
+}
+
+#wizardPanel tr:first-child {
+     background: #fff;
+}
+
 td {
-     border-top: 1px solid #7778bf;
+     border-top: 1px inset #cfd1ff;
      vertical-align: middle;
-     padding: 4px 5px;
+     padding: 5px;
+}
+
+#serverTunnels td, #clientTunnels td {
+     border-top: 1px inset #efefff;
 }
 
 td.infohelp {
@@ -370,17 +378,6 @@ td.infohelp {
      background-position: 6px center;
      padding: 10px 10px 10px 38px !important;
      border: 1px solid #7778bf;
-}
-
-div[class^="status"] {
-     float: none;
-     font-size: 0 !important;
-     background-position: center center;
-     text-align: center;
-     margin: 0;
-     padding: 0;
-     width: 100%;
-     background-size: auto 16px;
 }
 
 .tunnelConfig th:first-child, .tunnelConfig td:first-child {
@@ -396,12 +393,17 @@ div[class^="status"] {
 }
 
 .tunnelConfig td > b {
+     margin-left: 5px;
      min-width: 30px;
      display: inline-block;
 }
 
 .tunnelProperties {
      background: #fff !important;
+}
+
+.tunnelProperties td {
+     border-top: 1px inset #cfd1ff !important;
 }
 
 .tunnelProperties:hover {
@@ -447,12 +449,9 @@ div[class^="status"] {
      width: 25%;
 }
 
-.tunnelPreview {
-     text-align: left;
-}
-
 .tunnelPreview, .tunnelPort {
      width: 15%;
+     text-align: center;
 }
 
 .tunnelLocation, .tunnelInterface {
@@ -484,7 +483,9 @@ th.tunnelControl {
      padding: 7px 5px;
      background: #fff;
      background: linear-gradient(to bottom, #fff, #eef);
+     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
      border-top: 1px solid #7778bf !important;
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 .buttons > * {
@@ -522,15 +523,9 @@ input {
 }
 
 #oldName, #targetDestination, select#profile, select#connectionProfile {
-     min-width: 280px;
+     min-width: 310px;
      width: 30%;
 }
-
-/*
-select#profile, select#connectionProfile {
-     margin: 0 !important;
-}
-*/
 
 #customOptions, #userAgents {
      width: calc(100% - 10px) !important;
@@ -542,29 +537,30 @@ select#profile, select#connectionProfile {
 }
 
 #localDestination {
-     height: 30px !important;
+     height: 32px !important;
 }
 
 #leasesetKey {
-     height: 24px !important;
+     height: 28px !important;
      vertical-align: middle;
      padding: 4px;
+     box-sizing: border-box;
 }
 
 .multiOption {
+     margin: 5px 10px 5px 5px;
      display: inline-block;
-     margin-right: 10px;
      vertical-align: middle;
 }
 
 .multiOption#isServer {
      background: url(/themes/console/images/server.png) left center no-repeat;
-     padding-left: 18px;
+     padding-left: 16px;
 }
 
 .multiOption#isClient {
      background: url(/themes/console/images/client.png) left center no-repeat;
-     padding-left: 18px;
+     padding-left: 16px;
 }
 
 td#throttle {
@@ -607,10 +603,12 @@ td.blankColumn {
 
 #throttler tr:nth-child(odd) {
      background: #f7f8ff;
+     background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(211, 211, 255, 0.3) 3px, #fff 5px);
 }
 
 #throttler tr:nth-child(even) {
      background: #eef;
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(230, 230, 255, 0.3) 3px, #fff 5px);
 }
 
 #throttler input[type="text"] {
@@ -642,9 +640,17 @@ input::-moz-placeholder {
      opacity: 1;
 }
 
+input:focus::-moz-placeholder {
+     opacity: 0;
+}
+
 ::-webkit-input-placeholder {
      color: #f00;
      opacity: 1;
+}
+
+:focus::-webkit-input-placeholder {
+     opacity: 0;
 }
 
 input.tunnelName, input.tunnelDescription, #userAgents {
@@ -702,6 +708,10 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      padding: 0;
 }
 
+#wizardPanel td:not(#wizardTable), #wizardTunnelTypes td {
+     padding: 10px;
+}
+
 #wizardPanel .freetext {
      margin-left: 0 !important;
 }
@@ -716,7 +726,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 #wizardTunnelTypes td:last-child {
      text-align: justify;
-     padding: 5px 10px 5px 5px;
+     padding: 10px 20px 10px 10px !important;
 }
 
 #wizardTunnelTypes select {
@@ -771,7 +781,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      display: inline-block;
      font-weight: bold;
      text-align: right;
-     margin-right: 3px;
+     margin-right: 10px;
 }
 
 #wizardPanel select {
@@ -786,21 +796,8 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 /* more space */
 
-.tunnelConfig td, td {
-     border-top: 1px inset #cfd1ff;
-     padding: 5px;
-}
-
-input[type="checkbox"], input[type="radio"] {
-     margin: 5px 3px 5px 5px;
-}
-
 .freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField  {
      margin: 5px !important;
-}
-
-.multiOption {
-     margin: 5px 10px 5px 5px;
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
@@ -823,12 +820,6 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
 
 #customOptions, #userAgents, #leasesetKey {
      width: calc(100% - 20px) !important;
-}
-
-.tunnelConfig td > b {
-     min-width: 30px;
-     display: inline-block;
-     margin-left: 5px;
 }
 
 .tunnelDestination {
@@ -859,6 +850,20 @@ td.tunnelDestination, td.tunnelDescription {
 
 /* responsive layout */
 
+@media screen and (max-width: 800px) {
+th {
+     font-size: 9pt;
+}
+
+.statusNotRunning, .statusRunning, .statusStarting {
+     background-size: auto 14px;
+}
+
+#leasesetKey {
+     height: 38px !important;
+}
+}
+
 @media screen and (min-width: 1500px) {
 body, select, .control, input, textarea {
      font-size: 10pt !important;
@@ -867,5 +872,12 @@ body, select, .control, input, textarea {
 th {
      font-size: 10.5pt;
 }
+
+.statusNotRunning, .statusRunning, .statusStarting {
+     background-size: auto 18px;
 }
 
+#localDestination {
+     height: 34px !important;
+}
+}

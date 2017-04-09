@@ -5,14 +5,16 @@
 * {
      text-shadow: none !important;
      font-weight: normal !important;
-     font-size: 12pt !important;
+     font-size: 11pt !important;
      letter-spacing: normal !important;
      word-spacing: normal !important;
-     line-height: 115% !important;
+     line-height: 140% !important;
 }
 
-input[type="submit"], input[type="cancel"], input[type="file"], button {
-     font-size: 14pt !important;
+input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel {
+     font-size: 11pt !important;
+     padding-top: 2px;
+     padding-bottom: 2px;
 }
 
 .routersummary button {
@@ -22,11 +24,11 @@ input[type="submit"], input[type="cancel"], input[type="file"], button {
 /* sidepanel */
 
 div.routersummary h3, .routersummary h3 a  {
-     font-size: 14pt !important;
+     font-size: 13pt !important;
 }
 
 div.routersummary h4, .routersummary h4 a {
-     font-size: 14pt !important;
+     font-size: 13pt !important;
      letter-spacing: 0;
 }
 
@@ -61,12 +63,48 @@ div.routersummary table a:link, div.routersummary table a:visited {
      text-shadow: none;
 }
 
-/*
-.routersummary a img:first-child {
-     transform: scale(1.2);
-     -webkit-transform: scale(1.2);
+/* end sidepanel */
+
+/* global overrides */
+
+a, b, div.routersummary h3 a, div.routersummary h4 {
+    font-weight: normal !important;
+    font-size: 100%;
 }
-*/
+
+b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4, .messages {
+     font-weight: normal !important;
+     font-style: normal !important;
+     text-shadow: none;
+}
+
+body, .main {
+     font: 12pt "Droid Sans", Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
+}
+
+h1 {
+     font-size: 18pt !important;
+     padding: 14px 20px 12px;
+}
+
+h2 {
+     font-size: 16pt !important;
+}
+
+h3, .configtable th {
+     font-size: 14pt !important;
+}
+
+h3 a {
+     display: inline-block;
+     padding: 3px 2px;
+}
+
+h4 {
+     font-size: 13pt !important;
+}
+
+/* end global overrides */
 
 div.tunnels a {
      font-size: 12pt !important;
@@ -86,22 +124,6 @@ div.tunnels td:last-child {
 div.tunnels td {
      padding: 0 2px;
 }
-/* global overrides */
-
-a, b, div.routersummary h3 a, div.routersummary h4 {
-    font-weight: normal !important;
-    font-size: 100%;
-}
-
-b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4, .messages {
-     font-weight: normal !important;
-     font-style: normal !important;
-     text-shadow: none;
-}
-
-body, .main {
-     font: 12pt "Droid Sans", Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
-}
 
 div.main, div.main p, div.news p {
      line-height: 140%;
@@ -111,22 +133,10 @@ div.main, div.news, h1 {
      margin-left: 226px;
 }
 
-h1 {
-     font-size: 18pt !important;
-     padding: 16px 20px;
-}
-
-h2 {
-     font-size: 17pt !important;
-}
-
-h3, .configtable th {
-     font-size: 16pt !important;
-}
-
 .langbox {
      width: 400px;
-     margin-top: 2px;
+     margin-top: 5px;
+     margin-right: 8px;
 }
 
 div.joblog li i {
@@ -142,16 +152,13 @@ table code {
      font-size: 120%;
 }
 
-.confignav a, .tab, .tab2 {
-     font-size: 16pt !important;
-     font-weight: normal;
-}
+.tab, .tab2 {
+     font-size: 11pt;
+} 
 
 .applabel a {
      padding: 0 2px 6px !important;
 }
-
-
 
 .themelabel, .ui_lang {
      font-size: 12pt !important;
@@ -166,12 +173,117 @@ div.themechoice, div.langselect {
      width: 128px;
 }
 
-.tab2::before, .tab2::after {
-     font-size: 16pt;
+h3.ptitle, h3#i2pclientconfig {
+     margin-bottom: -17px !important;
+}
+
+h3#pluginmanage {
+     margin-bottom: -22px !important;
+}
+
+.formaction {
+     margin-top: -17px !important;
+}
+
+table + .formaction, #consolepass + .formaction {
+     margin-top: -7px !important;
+}
+
+hr + .formaction {
+     margin-top: 0 !important;
+}
+
+h3.stats {
+     margin-top: -1px !important;
+}
+
+.main#stats form {
+     margin-top: 0;
+     margin-bottom: -1px;
+}
+input[type="text"], input[type="password"] {
+     min-width: 0;
+}
+
+input[type="radio"], input[type="checkbox"] {
+     margin-top: 6px;
+     margin-bottom: 6px;
+}
+
+button.control {
+     font-size: 0 !important;
+}
+
+.infohelp, .infowarn {
+     line-height: 160% !important;
+}
+
+p.infohelp {
+     margin-bottom: -7px;
+}
+
+#advancedsettings, .main textarea {
+     font-size: 10pt !important;
+}
+
+#webappconfig {
+     margin-bottom: -37px !important;
+}
+
+.formaction#webappconfigactions {
+     margin-top: 36px !important;
+}
+
+p[style="margin: 0px 12px"] {
+     margin-left: 5px !important;
+     padding: 8px 0 !important;
+}
+
+#news hr + i {
+     display: inline-block;
+     margin-top: 4px !important;
+}
+
+input.search[type="text"] {
+     padding-left: 30px;
+     background-position: 8px center;
+}
+
+.main#jardump b {
+     font-size: 9pt !important;
+}
+
+#wrapperlogs pre, pre#transports {
+     font-size: 10pt !important;
+}
+
+table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old), a[href^="configpeer?peer"] {
+     font-size: 0 !important;
+}
+
+/* responsive layout */
+
+@media screen and (max-width: 1200px) {
+.main td, .main td b {
+     font-size: 10pt !important;
+}
+}
+
+@media screen and (min-width: 0) {
+div.routersummary img[src$="i2plogo.png"] {
+     margin-top: -1px;
+     transform: none;
+     width: 210px;
+}
+
+.tab, .tab2 {
+     font-size: 11pt !important;
+     margin-right: -3px !important;
+}
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
+body, .main, .main td, .news p, #news p, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
 .netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
      font-size: 12pt !important;
@@ -181,3 +293,5 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      font-size: 11pt !important;
 }
 }
+
+/* end responsive layout */
