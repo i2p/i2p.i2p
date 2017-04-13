@@ -339,7 +339,7 @@ public class ConfigNetHandler extends FormHandler {
 
             changes.put(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
 
-            if (Boolean.parseBoolean(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)) !=
+            if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UPNP) !=
                 _upnp) {
                 // This is minor, don't set restartRequired
                 if (_upnp)
