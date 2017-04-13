@@ -99,6 +99,7 @@ class IntroductionManager {
     private static final long PUNCH_CLEAN_TIME = 5*1000;
     /** Max for all targets per PUNCH_CLEAN_TIME */
     private static final int MAX_PUNCHES = 8;
+    private static final long INTRODUCER_EXPIRATION = 80*60*1000L;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -178,7 +179,8 @@ class IntroductionManager {
         int sz = peers.size();
         start = start % sz;
         int found = 0;
-        long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);    // 15 min
+        long now = _context.clock().now();
+        long inactivityCutoff = now - (UDPTransport.EXPIRE_TIMEOUT / 2);    // 15 min
         // if not too many to choose from, be less picky
         if (sz <= howMany + 2)
             inactivityCutoff -= UDPTransport.EXPIRE_TIMEOUT / 4;
@@ -235,12 +237,14 @@ class IntroductionManager {
 
         // we sort them so a change in order only won't happen, and won't cause a republish
         Collections.sort(introducers);
+        String exp = Long.toString((now + INTRODUCER_EXPIRATION) / 1000);
         for (int i = 0; i < found; i++) {
             Introducer in = introducers.get(i);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, in.sip);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, in.sport);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, in.skey);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, in.stag);
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_EXP_PREFIX + i, exp);
         }
 
         // FIXME failsafe if found == 0, relax inactivityCutoff and try again?

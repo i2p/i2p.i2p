@@ -1,3 +1,12 @@
+2017-04-13 zzz
+ * SSU: Publish introducer expiration (proposal 133)
+
+2017-04-06 zzz
+ * Debian: Add bash-completion scripts
+
+2017-04-04 zzz
+ * Router: Fix config dir location in Gentoo
+
 2017-04-02 zzz
  * Context: Fix ClientAppManagerImpl in AppContext
  * i2psnark: Fix standalone configuration for Jetty 9
