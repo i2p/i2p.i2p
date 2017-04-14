@@ -1,3 +1,9 @@
+2017-04-14 zzz
+ * SSU:
+   - Reuse previous introducer expiration if available,
+     so we don't force a republish
+   - Don't run peer test if configured to force firewalled
+
 2017-04-13 zzz
  * SSU: Publish introducer expiration (proposal 133)
 

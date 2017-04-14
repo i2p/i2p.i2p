@@ -167,10 +167,11 @@ class IntroductionManager {
      * to keep the connection up, since the netDb can have quite stale information,
      * and we want to keep our introducers valid.
      *
+     * @param current current router address, may be null
      * @param ssuOptions out parameter, options are added
      * @return number of introducers added
      */
-    public int pickInbound(Properties ssuOptions, int howMany) {
+    public int pickInbound(RouterAddress current, Properties ssuOptions, int howMany) {
         int start = _context.random().nextInt();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Picking inbound out of " + _inbound.size());
@@ -244,7 +245,31 @@ class IntroductionManager {
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, in.sport);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, in.skey);
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, in.stag);
-            ssuOptions.setProperty(UDPAddress.PROP_INTRO_EXP_PREFIX + i, exp);
+            String sexp = exp;
+            // look for existing expiration in current published
+            // and reuse if still recent enough, so deepEquals() won't fail in UDPT.rEA
+            if (current != null) {
+                for (int j = 0; j < UDPTransport.PUBLIC_RELAY_COUNT; j++) {
+                    if (in.sip.equals(current.getOption(UDPAddress.PROP_INTRO_HOST_PREFIX + j)) &&
+                        in.sport.equals(current.getOption(UDPAddress.PROP_INTRO_PORT_PREFIX + j)) &&
+                        in.skey.equals(current.getOption(UDPAddress.PROP_INTRO_KEY_PREFIX + j)) &&
+                        in.stag.equals(current.getOption(UDPAddress.PROP_INTRO_TAG_PREFIX + j))) {
+                        // found old one
+                        String oexp = current.getOption(UDPAddress.PROP_INTRO_EXP_PREFIX + j);
+                        if (oexp != null) {
+                            try {
+                                long oex = Long.parseLong(oexp) * 1000;
+                                if (oex > now + UDPTransport.INTRODUCER_EXPIRATION_MARGIN) {
+                                    // still good, use old expiration time
+                                    sexp = oexp;
+                                }
+                            } catch (NumberFormatException nfe) {}
+                        }
+                        break;
+                    }
+                }
+            }
+            ssuOptions.setProperty(UDPAddress.PROP_INTRO_EXP_PREFIX + i, sexp);
         }
 
         // FIXME failsafe if found == 0, relax inactivityCutoff and try again?

@@ -203,7 +203,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MIN_PEERS_IF_HAVE_V6 = 30;
     /** minimum peers volunteering to be introducers if we need that */
     private static final int MIN_INTRODUCER_POOL = 5;
-    private static final long INTRODUCER_EXPIRATION_MARGIN = 20*60*1000L;
+    static final long INTRODUCER_EXPIRATION_MARGIN = 20*60*1000L;
     
     private static final int[] BID_VALUES = { 15, 20, 50, 65, 80, 95, 100, 115, TransportBid.TRANSIENT_FAIL };
     private static final int FAST_PREFERRED_BID = 0;
@@ -2130,7 +2130,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // intro manager now sorts introducers, so
             // deepEquals() below will not fail even with same introducers.
             // Was only a problem when we had very very few peers to pick from.
-            int found = _introManager.pickInbound(options, PUBLIC_RELAY_COUNT);
+            RouterAddress current = getCurrentAddress(isIPv6);
+            int found = _introManager.pickInbound(current, options, PUBLIC_RELAY_COUNT);
             if (found > 0) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Direct? " + directIncluded + " reqd? " + introducersRequired +

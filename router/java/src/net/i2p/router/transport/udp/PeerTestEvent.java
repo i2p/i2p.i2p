@@ -39,18 +39,19 @@ class PeerTestEvent extends SimpleTimer2.TimedEvent {
     }
         
     public synchronized void timeReached() {
-        // just for IPv6 for now
         if (shouldTest()) {
             long now = _context.clock().now();
             long sinceRunV4 = now - _lastTested.get();
             long sinceRunV6 = now - _lastTestedV6.get();
-            if (_forceRun == FORCE_IPV4 && sinceRunV4 >= MIN_TEST_FREQUENCY) {
+            boolean configV4fw = _transport.isIPv4Firewalled();
+            boolean configV6fw = _transport.isIPv6Firewalled();
+            if (!configV4fw && _forceRun == FORCE_IPV4 && sinceRunV4 >= MIN_TEST_FREQUENCY) {
                 locked_runTest(false);
-            } else if (_transport.hasIPv6Address() &&_forceRun == FORCE_IPV6 && sinceRunV6 >= MIN_TEST_FREQUENCY) {
+            } else if (!configV6fw && _transport.hasIPv6Address() &&_forceRun == FORCE_IPV6 && sinceRunV6 >= MIN_TEST_FREQUENCY) {
                 locked_runTest(true);
-            } else if (sinceRunV4 >= TEST_FREQUENCY && _transport.getIPv6Config() != IPV6_ONLY) {
+            } else if (!configV4fw && sinceRunV4 >= TEST_FREQUENCY && _transport.getIPv6Config() != IPV6_ONLY) {
                 locked_runTest(false);
-            } else if (_transport.hasIPv6Address() && sinceRunV6 >= TEST_FREQUENCY) {
+            } else if (!configV6fw && _transport.hasIPv6Address() && sinceRunV6 >= TEST_FREQUENCY) {
                 locked_runTest(true);
             } else {
                 if (_log.shouldLog(Log.INFO))
