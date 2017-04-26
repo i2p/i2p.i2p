@@ -108,7 +108,7 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
-        "https://randomrng.ddns.net/"         + ',' +   // randomrng_at_mail.i2p.crt // CA                         // Java 7+
+        //"https://randomrng.ddns.net/"         + ',' +   // randomrng_at_mail.i2p.crt // CA                         // Java 7+
         "https://itoopie.atomike.ninja/"      + ',' +   // atomike_at_mail.i2p.crt   // CA                         // Java 8+ only
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
