@@ -1,3 +1,6 @@
+2017-04-26 zzz
+ * HTTP Proxy: Add delay before jump page
+
 2017-04-14 zzz
  * SSU:
    - Reuse previous introducer expiration if available,

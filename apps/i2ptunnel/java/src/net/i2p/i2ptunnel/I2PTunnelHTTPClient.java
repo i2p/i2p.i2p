@@ -1198,6 +1198,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if(jumpServers == null) {
                         jumpServers = DEFAULT_JUMP_SERVERS;
                     }
+                    int jumpDelay = 400 + _context.random().nextInt(256);
+                    try {
+                        Thread.sleep(jumpDelay);
+                    } catch (InterruptedException ie) {}
                 }
                 try {
                     writeErrorMessage(header, extraMessage, out, targetRequest, usingWWWProxy, destination, jumpServers);
