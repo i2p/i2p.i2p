@@ -1,3 +1,7 @@
+2017-04-27 zzz
+ * Console: Disable Jetty timer thread consolidation
+   causing log file rollover to stop (ticket #1068)
+
 2017-04-26 zzz
  * HTTP Proxy: Add delay before jump page
 
