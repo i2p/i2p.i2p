@@ -962,18 +962,6 @@ public class RouterConsoleRunner implements RouterApp {
         // No, we can't share the ConstraintSecurityHandler across all webapps
         // But we can force all webapps to use a single Timer thread
         // see HashSessionManager javadoc
-/****
-        // TODO kills rollover
-
-        2017/xx/xx 00:00:00 | Exception in thread "org.eclipse.jetty.util.RolloverFileOutputStream" java.lang.IllegalStateException: Task already scheduled or cancelled
-        2017/xx/xx 00:00:00 |	at java.util.Timer.sched(Timer.java:401)
-        2017/xx/xx 00:00:00 |	at java.util.Timer.schedule(Timer.java:208)
-        2017/xx/xx 00:00:00 |	at org.eclipse.jetty.util.RolloverFileOutputStream.scheduleNextRollover(RolloverFileOutputStream.java:195)
-        2017/xx/xx 00:00:00 |	at org.eclipse.jetty.util.RolloverFileOutputStream.access$200(RolloverFileOutputStream.java:46)
-        2017/xx/xx 00:00:00 |	at org.eclipse.jetty.util.RolloverFileOutputStream$RollTask.run(RolloverFileOutputStream.java:338)
-        2017/xx/xx 00:00:00 | 	at java.util.TimerThread.mainLoop(Timer.java:555)
-        2017/xx/xx 00:00:00 | 	at java.util.TimerThread.run(Timer.java:505)
-
         synchronized(RouterConsoleRunner.class) {
             if (_jettyTimer == null) {
                 _jettyTimer = new ScheduledExecutorScheduler("Console HashSessionScavenger", true);
@@ -985,7 +973,6 @@ public class RouterConsoleRunner implements RouterApp {
             }
             context.getServletContext().setAttribute("org.eclipse.jetty.server.session.timer", _jettyTimer);
         }
-****/
     }
 
     /**
