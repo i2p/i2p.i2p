@@ -129,7 +129,7 @@
     <target name="copyJettylib" depends="mkJettylibdir, copyJettylib1, copyTomcatLib1, copyJettylib2, copyTomcatLib" />
 
     <!-- Jetty files only -->
-    <target name="copyJettylib1" depends="extractJettylib" unless="${with-libjetty9-java}" >
+    <target name="copyJettylib1" depends="extractJettylib, buildPatches" unless="${with-libjetty9-java}" >
       <!-- We copy everything to names without the version numbers so we
            can update them later. Where there was something similar in Jetty 5/6,
            we use the same names so they will overwrite the Jetty 5/6 jar on upgrade.
@@ -159,7 +159,13 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-security-${jetty.ver}.jar" tofile="jettylib/jetty-security.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlet-${jetty.ver}.jar" tofile="jettylib/jetty-servlet.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-servlets-${jetty.ver}.jar" tofile="jettylib/jetty-servlets.jar" />
+      <!--
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />
+       -->
+        <jar destfile="jettylib/jetty-util.jar"  manifest="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" filesetmanifest="mergewithoutmain" >
+            <zipfileset excludes="**/RolloverFileOutputStream*.class" src="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" />
+            <zipfileset src="build/jetty-util-patch.jar" />
+        </jar>
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-webapp-${jetty.ver}.jar" tofile="jettylib/jetty-webapp.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-xml-${jetty.ver}.jar" tofile="jettylib/jetty-xml.jar" />
         <jar destfile="jettylib/jetty-java5-threadpool.jar" >
@@ -363,6 +369,37 @@
                 </not>
                 <isset property="mtn.available" />
             </and>
+        </condition>
+    </target>    
+
+    <target name="buildPatches" depends="jarPatches" unless="${with-libjetty9-java}" />
+
+    <target name="compilePatches" unless="${with-libjetty9-java}" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/objPatches" />
+        <javac 
+            srcdir="./patches/jetty-util/src/main/java" 
+            debug="true" deprecation="on" source="${javac.version}" target="${javac.version}" 
+            destdir="./build/objPatches" 
+            includeAntRuntime="false"
+            classpath="" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="jarPatches" depends="compilePatches, jarPatchesUpToDate" unless="jarPatches.uptodate" >
+        <jar destfile="./build/jetty-util-patch.jar" basedir="./build/objPatches" includes="**/*.class" >
+        </jar>
+    </target>    
+
+    <target name="jarPatchesUpToDate" >
+        <condition property="jarPatches.uptodate" >
+            <or>
+                <equals arg1="${with-libjetty9-java}" arg2="true" />
+                <uptodate property="jarPatches.uptodate" targetfile="jettylib/jetty-i2p.jar" >
+                    <srcfiles dir= "build/objPatches" includes="**/*.class" />
+                </uptodate>
+            </or>
         </condition>
     </target>    
 
