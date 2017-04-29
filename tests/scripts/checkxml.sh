@@ -13,7 +13,6 @@ cd `dirname $0`/../..
 
 XMLFILES="\
 ./apps/addressbook/build.xml \
-./apps/addressbook/web.xml \
 ./apps/BOB/build.xml \
 ./apps/BOB/Demos/echo/echoclient/build.xml \
 ./apps/BOB/Demos/echo/echoclient/nbproject/build-impl.xml \
