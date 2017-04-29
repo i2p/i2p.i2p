@@ -24,7 +24,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-02-15 16:03+0000\n"
-"PO-Revision-Date: 2017-02-22 08:47+0000\n"
+"PO-Revision-Date: 2017-04-10 08:42+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -123,18 +123,18 @@ msgstr[1] "{0,number,###} μs"
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:221
 #, java-format
 msgid "Banned by router hash: {0}"
-msgstr "Bannad med hjälp av routerhash: {0}"
+msgstr "Förbjuden med hjälp av routerhash: {0}"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:223
 msgid "Banned by router hash"
-msgstr "Bannad med hjälp av routerhash"
+msgstr "Förbjuden med hjälp av routerhash"
 
 #. Temporary reason, until the job finishes
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:896
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:982
 #, java-format
 msgid "IP banned by blocklist.txt entry {0}"
-msgstr "IP bannad med hjälp av blocklist.txt post {0}"
+msgstr "IP-förbjuden med hjälp av blocklist.txt-post {0}"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1021
 msgid "IPs Banned Until Restart"
@@ -249,7 +249,7 @@ msgstr "Testar"
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:136
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:524
 msgid "Rejecting tunnels: Starting up"
-msgstr "Avvisar tunlar: Startar"
+msgstr "Avvisar tunnlar: Startar"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:183
 msgid "Rejecting tunnels: High message delay"
@@ -412,7 +412,7 @@ msgstr "Status"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:743
 msgid "Router Transport Addresses"
-msgstr "Router transport adresser"
+msgstr "Router transport-adresser"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:751
 #, java-format
@@ -500,7 +500,7 @@ msgstr "Stillastående"
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2675
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:167
 msgid "In/Out"
-msgstr "In/Ut"
+msgstr "In/ut"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:787
 msgid "The smoothed inbound / outbound transfer rate (KBytes per second)"
@@ -681,7 +681,7 @@ msgstr "Inaktiverade UPnP Enheter"
 msgid ""
 "UPnP has been disabled; Do you have more than one UPnP Internet Gateway "
 "Device on your LAN ?"
-msgstr "UPnP har deaktiverats. Har du mer än en   UPnP Internet Gateway enhet i ditt LAN?"
+msgstr "UPnP har deaktiverats. Har du mer än en UPnP internet inkörsports enhet i ditt LAN?"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:700
 msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
@@ -914,17 +914,17 @@ msgstr "Släpper tunnelförfrågningar: Kötid"
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:898
 #, java-format
 msgid "New plugin version {0} is available"
-msgstr "Ny version för plugin {0} finns tillgänglig"
+msgstr "Ny version för insticksprogram {0} finns tillgänglig"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:978
 #, java-format
 msgid "Update check failed for plugin {0}"
-msgstr "Uppdateringskontroll misslyckades för plugin {0}"
+msgstr "Uppdateringskontroll misslyckades för insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:982
 #, java-format
 msgid "No new version is available for plugin {0}"
-msgstr "Ingen ny version tillgänglig för plugin {0}"
+msgstr "Ingen ny version tillgänglig för insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/update/ConsoleUpdateManager.java:1006
 #, java-format
@@ -1028,7 +1028,7 @@ msgstr "Uppdatera först till version {0}"
 #: ../java/src/net/i2p/router/update/PluginUpdateChecker.java:62
 #, java-format
 msgid "Checking for update of plugin {0}"
-msgstr "Letar efter uppdatering till plugin {0}"
+msgstr "Letar efter uppdatering till insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:90
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:515
@@ -1052,17 +1052,17 @@ msgstr "Det gick inte att installera från {0}, misslyckades kopiera."
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:526
 #, java-format
 msgid "Downloading plugin from {0}"
-msgstr "Laddar ner plugin från {0}"
+msgstr "Hämta insticksprogram från {0}"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:139
 msgid "Plugin downloaded"
-msgstr "Plugin nedladdad"
+msgstr "Insticksprogram hämtad"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:144
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:506
 #, java-format
 msgid "Cannot create plugin directory {0}"
-msgstr "Kan inte skapa pluginmapp {0}"
+msgstr "Kan inte skapa insticksprogramsmapp {0}"
 
 #. updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' '
 #. + signer + "</b>");
@@ -1071,7 +1071,7 @@ msgstr "Kan inte skapa pluginmapp {0}"
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:318
 #, java-format
 msgid "Plugin from {0} contains an invalid key"
-msgstr "Plugin från {0} innehåller en felaktig nyckel"
+msgstr "Insticksprogram från {0} innehåller en felaktig nyckel"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:247
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:257
@@ -1079,71 +1079,71 @@ msgstr "Plugin från {0} innehåller en felaktig nyckel"
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:329
 #, java-format
 msgid "Plugin signature verification of {0} failed"
-msgstr "Pluginsignaturen för {0} kund ej verifieras"
+msgstr "Insticksprogramssignatur för {0} kund ej verifieras"
 
 #. don't display signer, we're really checking the key not the signer name
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:280
 msgid "Plugin not installed - signer is untrusted"
-msgstr "Plugin inte installerad - signatur ej betrodd"
+msgstr "Insticksprogram inte installerad - signatur ej betrodd"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:345
 #, java-format
 msgid "Plugin from {0} is corrupt"
-msgstr "Plugin från {0} är korrupt"
+msgstr "Insticksprogram från {0} är korrupt"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:355
 #, java-format
 msgid "Plugin from {0} does not contain the required configuration file"
-msgstr "Plugin från {0} innehåller inte deb konfiguration som krävs"
+msgstr "Insticksprogram från {0} innehåller inte konfigurationsfilen som krävs"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:377
 #, java-format
 msgid "Plugin from {0} has invalid name or version"
-msgstr "Plugin från {0} har felaktigt namn eller version"
+msgstr "Insticksprogram från {0} har felaktigt namn eller version"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:382
 #, java-format
 msgid "Plugin {0} has mismatched versions"
-msgstr "Plugin {0} har omatchande versioner"
+msgstr "Insticksprogram {0} har omatchande versioner"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:393
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
-msgstr "Denna plugin kräver I2P version {0} eller högre"
+msgstr "Detta insticksprogram kräver I2P-version {0} eller högre"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:401
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
-msgstr "Denna plugin kräver Java version {0} eller högre"
+msgstr "Detta insticksprogram kräver Java-version {0} eller högre"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:410
 msgid ""
 "Downloaded plugin is for new installs only, but the plugin is already "
 "installed"
-msgstr "Nedladdad plugin är för nya endast för nya installationer, men denna plugin är redan installerad"
+msgstr "Hämtat insticksprogram är för nya endast för nya installationer, men denna insticksprogram är redan installerat"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:420
 msgid "Installed plugin does not contain the required configuration file"
-msgstr "Installerad plugin innehåller inte den konfigurations som krävs"
+msgstr "Installerat insticksprogram innehåller inte den konfigurationsfil som krävs"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:428
 msgid "Signature of downloaded plugin does not match installed plugin"
-msgstr "Signaturen av nerladdad plugin matchar inte den plugin som är installerad"
+msgstr "Signaturen av hämtat insticksprogram matchar inte insticksprogrammet som är installerat"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:435
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
-msgstr "Hämtad plugin version {0} är inte nyare än den installerade"
+msgstr "Hämtat insticksprogramsversion {0} är inte nyare än det installerade insticksprogrammet"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:442
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
-msgstr "Pluginuppdatering kräver installerad plugin version {0} eller högre"
+msgstr "Insticksprogramsuppdatering kräver installerat insticksprogramsversion {0} eller högre"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:449
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
-msgstr "Pluginuppdatering kräver installerad plugin version {0} eller lägre"
+msgstr "Insticksprogramsuppdatering kräver installerad insticksprogramsversion {0} eller lägre"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:457
 #, java-format
@@ -1166,38 +1166,38 @@ msgstr "Insticksprogrammet kommer att installeras vid nästa omstart."
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:501
 msgid "Plugin is for upgrades only, but the plugin is not installed"
-msgstr "Plugin är endast för uppdateringar, men denna plugin är inte installerad"
+msgstr "Insticksprogram är endast för uppgraderingar, men detta insticksprogram är inte installerat"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:514
 #, java-format
 msgid "Failed to install plugin in {0}"
-msgstr "Misslyckades att installera plugin i {0}"
+msgstr "Misslyckades att installera insticksprogram i {0}"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:521
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:549
 #, java-format
 msgid "Plugin {0} installed"
-msgstr "Plugin {0} installerad"
+msgstr "Insticksprogram {0} installerat"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:540
 #, java-format
 msgid "Plugin {0} installed and started"
-msgstr "Plugin {0} installerad och startad"
+msgstr "Insticksprogram {0} installerat och startad"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:543
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
-msgstr "Plugin {0} installerad men kunde inte startas, kolla loggarna"
+msgstr "Insticksprogram {0} installerat men kunde inte startas, kolla loggarna"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:545
 #, java-format
 msgid "Plugin {0} installed but failed to start"
-msgstr "Plugin {0} installerad men kunde inte startas"
+msgstr "Insticksprogram {0} installerat men kunde inte startas"
 
 #: ../java/src/net/i2p/router/update/PluginUpdateRunner.java:557
 #, java-format
 msgid "Failed to download plugin from {0}"
-msgstr "Misslyckades med att ladda ner plugin från {0}"
+msgstr "Misslyckades med att hämta insticksprogram från {0}"
 
 #: ../java/src/net/i2p/router/update/UpdateRunner.java:202
 #, java-format
@@ -1400,18 +1400,18 @@ msgstr "Spara WebApp konfiguration"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:61
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:509
 msgid "Save Plugin Configuration"
-msgstr "Spara pluginkonfiguration"
+msgstr "Spara insticksprogramskonfiguration"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:68
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:525
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:529
 msgid "Install Plugin"
-msgstr "Installera plugin"
+msgstr "Installera insticksprogram"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:77
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:539
 msgid "Install Plugin from File"
-msgstr "Installera plugin från fil"
+msgstr "Installera insticksprogram från fil"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:86
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:550
@@ -1422,22 +1422,22 @@ msgstr "Uppdatera alla installerade insticksprogram"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:175
 #, java-format
 msgid "Error stopping plugin {0}"
-msgstr "Problem när plugin {0} stoppades"
+msgstr "Problem när insticksprogram {0} stoppades"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:143
 #, java-format
 msgid "Deleted plugin {0}"
-msgstr "Tog bort plugin {0}"
+msgstr "Tog bort insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:145
 #, java-format
 msgid "Error deleting plugin {0}"
-msgstr "Problem vid borttagning av plugin {0}"
+msgstr "Problem vid borttagning av insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:170
 #, java-format
 msgid "Stopped plugin {0}"
-msgstr "Stoppade plugin {0}"
+msgstr "Stoppade insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:180
 #, java-format
@@ -1506,7 +1506,7 @@ msgstr "Det gick inte att hitta servern."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:400
 msgid "No plugin URL specified."
-msgstr "Ingen plugin-URL angiven."
+msgstr "Ingen insticksprograms-URL angiven."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:421
 #: ../java/src/net/i2p/router/web/ConfigFamilyHandler.java:47
@@ -1526,7 +1526,7 @@ msgstr "Ingen uppdaterings-URL specificerad för {0}"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:484
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:508
 msgid "Plugin or update download already in progress."
-msgstr "Plugin- eller uppdateringsnerladdning pågår redan"
+msgstr "Insticksprogram- eller uppdateringshämtning pågår redan"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:489
 msgid "Updating all plugins"
@@ -1535,7 +1535,7 @@ msgstr "Uppdatera alla insticksprogram"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:524
 #, java-format
 msgid "Installing plugin from {0}"
-msgstr "Installerar plugin från {0}"
+msgstr "Installerar insticksprogram från {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:545
 #, java-format
@@ -1545,12 +1545,12 @@ msgstr "Kontrollerar uppdateringar för {0}"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:576
 #, java-format
 msgid "Started plugin {0}"
-msgstr "Startade plugin {0}"
+msgstr "Startade insticksprogram {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:578
 #, java-format
 msgid "Error starting plugin {0}"
-msgstr "Fel när plugin {0} startades"
+msgstr "Fel när insticksprogram {0} startades"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:600
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:105
@@ -1614,7 +1614,7 @@ msgstr "Beskrivning"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:231
 msgid "Plugin"
-msgstr "Plugin"
+msgstr "Insticksprogram"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:248
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:453
@@ -1854,7 +1854,7 @@ msgstr "DEBUG"
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:65
 #: ../java/src/net/i2p/router/web/LogsHelper.java:174
 msgid "ERROR"
-msgstr "ERROR"
+msgstr "FEL"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:65
 #: ../java/src/net/i2p/router/web/LogsHelper.java:178
@@ -2156,7 +2156,7 @@ msgstr "eller högst {0} byte per månad"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:20
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:509
 msgid "Ban peer until restart"
-msgstr "Banna nod tills omstart"
+msgstr "Förbjud nod tills omstart"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:23
 #, java-format
@@ -2176,7 +2176,7 @@ msgstr "Ogiltig nod"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:511
 msgid "Unban peer"
-msgstr "Avbanna nod"
+msgstr "Ta bort förbud av nod"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:33
 msgid "unbanned"
@@ -2189,7 +2189,7 @@ msgstr "är för närvarande inte förbjuden"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:39
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:537
 msgid "Adjust peer bonuses"
-msgstr "Justera nod-bonusar"
+msgstr "Justera nodbonusar"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:47
 msgid "Bad speed value"
@@ -2759,7 +2759,7 @@ msgstr "Nederländska"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:101
 msgid "Norwegian Bokmaal"
-msgstr "Norksa Bokmål"
+msgstr "Norska Bokmål"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:102
 msgid "Polish"
@@ -3258,11 +3258,11 @@ msgstr "Anoncoinprojektet"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:44
 msgid "Bug Reports"
-msgstr "Bugg rapporter"
+msgstr "Felrapporter"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:44
 msgid "Bug tracker"
-msgstr "Bugg tracker"
+msgstr "Fel tracker"
 
 #. "colombo-bt.i2p" + S + _x("The Italian Bittorrent Resource") + S + "http
 #. ://colombo-bt.i2p/" + S + I + "colomboicon.png" + S +
@@ -3375,7 +3375,7 @@ msgstr "I2P startsida"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:65
 msgid "Project Website"
-msgstr "Projektets webbsida"
+msgstr "Projektets webbplats"
 
 #. _x("Russian News Feed") + S + "lenta.i2p" + S + "http://lenta.i2p/" + S + I
 #. + "lenta_main_logo.png" + S +
@@ -3407,7 +3407,7 @@ msgstr "Trac Wiki"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:113
 msgid "The HTTP proxy is not up"
-msgstr "HTTP proxyn är inte uppe"
+msgstr "HTTP-proxyn är inte uppe"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:115
 #, java-format
@@ -3519,7 +3519,7 @@ msgstr "Fil inte funnen"
 
 #: ../java/src/net/i2p/router/web/LogsHelper.java:149
 msgid "No log messages"
-msgstr "Inga logmeddelande"
+msgstr "Inga loggmeddelanden"
 
 #. 0
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:20
@@ -3534,12 +3534,12 @@ msgstr "Router uppslag"
 #. 2
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:22
 msgid "All Routers"
-msgstr "Alla routers"
+msgstr "Alla routrar"
 
 #. 3
 #: ../java/src/net/i2p/router/web/NetDbHelper.java:23
 msgid "All Routers with Full Stats"
-msgstr "'Alla routers med fulla stats"
+msgstr "'Alla routrar med fulla stats"
 
 #. 4
 #. 5
@@ -3594,7 +3594,7 @@ msgstr "Gick ut {0} sedan"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:320
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:167
 msgid "Gateway"
-msgstr "Gateway"
+msgstr "Inkörsport"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:320
 msgid "Lease"
@@ -3774,7 +3774,7 @@ msgstr "Sök efter uppdateringar för insticksprogram "
 #: ../java/src/net/i2p/router/web/PluginStarter.java:156
 #: ../java/src/net/i2p/router/web/PluginStarter.java:162
 msgid "Plugin update check failed"
-msgstr "Test av pluginuppdatering misslyckades"
+msgstr "Test av insticksprogramsuppdatering misslyckades"
 
 #: ../java/src/net/i2p/router/web/PluginStarter.java:200
 #, java-format
@@ -3936,11 +3936,11 @@ msgstr "snabba noder"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:265
 msgid "high capacity peers"
-msgstr "högkapacitets-noder"
+msgstr "högkapacitetsnoder"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:267
 msgid " well integrated peers"
-msgstr "väintegrerade noder"
+msgstr "väl integrerade noder"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:269
 msgid "as determined by the profile organizer"
@@ -3988,7 +3988,7 @@ msgstr "integration"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:274
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
-msgstr "är noden bannad, eller inte kan nås, eller misslyckas tunneltest?"
+msgstr "är noden förbjuden, eller inte kan nås, eller misslyckas tunneltest?"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:274
 msgid "status"
@@ -4138,7 +4138,7 @@ msgstr "I2P tjänster"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:175
 msgid "Configure I2P Router"
-msgstr "Konfigurera I2P Router"
+msgstr "Konfigurera I2P-router"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:177
 msgid "I2P Internals"
@@ -4199,7 +4199,7 @@ msgstr "Lokala tunnlar"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:179
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/i2ptunnelmgr_jsp.java:352
 msgid "Hidden Services Manager"
-msgstr "Dolda tjänster hanterare"
+msgstr "Hanterare för dolda tjänster"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:259
 msgid "General"
@@ -4376,7 +4376,7 @@ msgstr "Arbetsfördröjning"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:565
 msgid "Indicates how quickly outbound messages to other I2P routers are sent"
-msgstr "Indikerar hur snabbt utåtgåendemeddelanden till andra I2P routers sänds "
+msgstr "Indikerar hur snabbt utåtgåendemeddelanden till andra I2P-routers sänds "
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:568
 msgid "Message delay"
@@ -4404,24 +4404,24 @@ msgstr "Nyheter &amp; uppdateringar "
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:144
 msgid "ERR-Client Manager I2CP Error - check logs"
-msgstr "ERR-Client Manager I2CP Fel - kontrollera loggar"
+msgstr "FEL-Client Manager I2CP Fel - kontrollera loggar"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:151
 #, java-format
 msgid "ERR-Clock Skew of {0}"
-msgstr "ERR-Tidsfördröjning {0}"
+msgstr "FEL-Tidsfördröjning {0}"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:171
 msgid "ERR-Unresolved TCP Address"
-msgstr "ERR-Ej upplöst TCP adress"
+msgstr "FEL-Ej upplöst TCP-adress"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:175
 msgid "ERR-Private TCP Address"
-msgstr "ERR-Privat TCP Adress"
+msgstr "FEL-Privat TCP-Adress"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:179
 msgid "ERR-SymmetricNAT"
-msgstr "ERR-Symmetrisk NAT"
+msgstr "FEL-SymmetricNAT"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:184
 msgid "WARN-Firewalled with Inbound TCP Enabled"
@@ -4439,15 +4439,15 @@ msgstr "Ej ansluten - kontrollera sladd"
 msgid ""
 "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and "
 "restart"
-msgstr "ERR-UDP port används redan - Sätt i2np.udp.internalPort=xxxx i advancerade inställningar och starta om"
+msgstr "FEL-UDP-port används redan - Sätt i2np.udp.internalPort=xxxx i avancerade inställningar och starta om"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:207
 msgid "ERR-No Active Peers, Check Network Connection and Firewall"
-msgstr "ERR-Inga aktiva noder, kontrollera nätverkanslutning och brandvägg"
+msgstr "FEL-Inga aktiva noder, kontrollera nätverkanslutning och brandvägg"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:210
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
-msgstr "ERR-UDP avslaget och inåtriktad TCP adress/port är inte inställd"
+msgstr "FEL-UDP avslaget och inåtriktad TCP-adress/port är inte inställd"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:212
 msgid "WARN-Firewalled with UDP Disabled"
@@ -4570,7 +4570,7 @@ msgstr "Top"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:959
 msgid "Move to top"
-msgstr "Flytta längst upp"
+msgstr "Flytta högst upp"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:969
 msgid "Move up"
@@ -4613,7 +4613,7 @@ msgstr "Händelser per period"
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:192
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:205
 msgid "avg"
-msgstr "genomsnitt"
+msgstr "avg"
 
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:193
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:206
@@ -4653,7 +4653,7 @@ msgstr "Ta emot på"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:71
 msgid "Expiration"
-msgstr "Utgång"
+msgstr "Upphörande"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:71
 msgid "Send on"
@@ -4682,7 +4682,7 @@ msgstr "Utåtgående ändpunkt"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:124
 msgid "Inbound Gateway"
-msgstr "Inåtgående gateway"
+msgstr "Inåtgående inkörsport"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:126
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:173
@@ -4701,7 +4701,7 @@ msgstr "Oaktiva deltagande tunnlar"
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:137
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:232
 msgid "Lifetime bandwidth usage"
-msgstr "Livstids bandbreddsanvändning"
+msgstr "Livstidsbandbreddsanvändning"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:167
 msgid "Expiry"
@@ -4775,7 +4775,7 @@ msgstr "Webbkonsol"
 
 #: ../java/strings/Strings.java:23
 msgid "SAM application bridge"
-msgstr "SAM applikationsbrygga"
+msgstr "SAM-applikationsbrygga"
 
 #: ../java/strings/Strings.java:24
 msgid "Application tunnels"
@@ -4787,19 +4787,19 @@ msgstr "Min eepsite webbserver"
 
 #: ../java/strings/Strings.java:26
 msgid "I2P webserver (eepsite)"
-msgstr "I2P webbserver (eepsite)"
+msgstr "I2P-webbserver (eepsite)"
 
 #: ../java/strings/Strings.java:27
 msgid "Browser launch at startup"
-msgstr "Kör webbläsare vid start"
+msgstr "Starta webbläsare vid uppstart"
 
 #: ../java/strings/Strings.java:28
 msgid "BOB application bridge"
-msgstr "BOB applikationsbrygga"
+msgstr "BOB-applikationsbrygga"
 
 #: ../java/strings/Strings.java:30
 msgid "Open Router Console in web browser at startup"
-msgstr "Öppna router konsolen i browser vid start"
+msgstr "Öppna routerkonsolen i webbläsare vid uppstart"
 
 #: ../java/strings/Strings.java:37
 msgid "shared clients (DSA)"
@@ -4807,7 +4807,7 @@ msgstr "delade klienter (DSA)"
 
 #: ../java/strings/Strings.java:38
 msgid "IRC proxy"
-msgstr "IRC proxy"
+msgstr "IRC-proxy"
 
 #: ../java/strings/Strings.java:39
 msgid "eepsite"
@@ -4815,7 +4815,7 @@ msgstr "eepsite"
 
 #: ../java/strings/Strings.java:40
 msgid "I2P webserver"
-msgstr "I2P webbserver"
+msgstr "I2P-webbserver"
 
 #: ../java/strings/Strings.java:41
 msgid "HTTP Proxy"
@@ -4879,7 +4879,7 @@ msgstr "InNetPool"
 
 #: ../java/strings/Strings.java:65
 msgid "JobQueue"
-msgstr "JobbKö"
+msgstr "Jobbkö"
 
 #: ../java/strings/Strings.java:66
 msgid "NetworkDatabase"
@@ -5113,7 +5113,7 @@ msgstr "Dela"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:508
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:490
 msgid "NOTE"
-msgstr "NOTERA"
+msgstr "OBSERVERA"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:496
 #, java-format
@@ -5212,7 +5212,7 @@ msgstr "Avaktivera"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:488
 msgid "Advanced I2P Configuration"
-msgstr "Avancerad I2P Konfiguration"
+msgstr "Avancerad I2P-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:510
 msgid "Some changes may require a restart to take effect."
@@ -5231,7 +5231,7 @@ msgstr "konfigurera klienter"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:377
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:377
 msgid "I2P Client Configuration"
-msgstr "I2P klientkonfiguration"
+msgstr "I2P-klientkonfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:494
 msgid "Client Configuration"
@@ -5241,7 +5241,7 @@ msgstr "Klientkonfiguration"
 msgid ""
 "The Java clients listed below are started by the router and run in the same "
 "JVM."
-msgstr "Java klienter som anges nedan startade av routern och körs i samma JVM."
+msgstr "Java-klienter som anges nedan startade av routern och körs i samma JVM."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:498
 msgid ""
@@ -5269,13 +5269,13 @@ msgstr "Avancerad gränssnittskonfiguration för klienten"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:377
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:494
 msgid "WebApp Configuration"
-msgstr "WebApp inställningar"
+msgstr "WebApp-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:527
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:377
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:499
 msgid "Plugin Configuration"
-msgstr "Plugin Konfiguration"
+msgstr "Insticksprogramskonfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:165
 msgid "config router family"
@@ -5283,11 +5283,11 @@ msgstr "konfigurera routerfamilj"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:374
 msgid "I2P Router Family Configuration"
-msgstr "Inställningar för I2P routerfamilj "
+msgstr "I2P-routerfamilj konfiguration "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:490
 msgid "Routers in the same family share a family key."
-msgstr "Routers i samma familj delar en familjenyckel"
+msgstr "Routrar i samma familj delar en familjenyckel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:492
 msgid ""
@@ -5321,7 +5321,7 @@ msgstr "Exportera familjenyckel"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:530
 msgid ""
 "Export the secret family key to be imported into other routers you control."
-msgstr "Exportera den hemliga familjenyckeln som skall importeras till andra routers som du kontrollerar."
+msgstr "Exportera den hemliga familjenyckeln som skall importeras till andra routrar som du kontrollerar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:539
 #, java-format
@@ -5339,15 +5339,15 @@ msgstr "Inte längre en medlem av familj {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:165
 msgid "config home"
-msgstr "konfa start"
+msgstr "config hem"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:489
 msgid "Default Home Page"
-msgstr "Standard startsida "
+msgstr "Standard hemsida "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:495
 msgid "Use old home page"
-msgstr "Använd den gamla startsidan"
+msgstr "Använd gammal hemsida"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:503
 msgid "Search Engines"
@@ -5365,7 +5365,7 @@ msgstr "Applikationer och konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:498
 msgid "External I2CP (I2P Client Protocol) Interface Configuration"
-msgstr "Extern I2CP (I2P Client Protocol) gränssnittskonfiguration"
+msgstr "Extern I2CP (I2P-klientprotokoll) gränssnittskonfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:504
 msgid "Enabled without SSL"
@@ -5377,23 +5377,23 @@ msgstr "Aktiverad med krav på SSL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:516
 msgid "Disabled - Clients outside this Java process may not connect"
-msgstr "Inaktivera - klienter utanför denna Java process kan inte ansluta"
+msgstr "Inaktiverad - klienter utanför denna Java-process kan inte ansluta"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:518
 msgid "I2CP Interface"
-msgstr "I2CP Interface"
+msgstr "I2CP-gränssnitt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:534
 msgid "I2CP Port"
-msgstr "I2CP Port"
+msgstr "I2CP-port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:538
 msgid "Authorization"
-msgstr "Auktorisation"
+msgstr "Autentisering"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:544
 msgid "Require username and password"
-msgstr "Kräv användarnamn och lösenord"
+msgstr "Kräver användarnamn och lösenord"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:546
 msgid "Username"
@@ -5411,7 +5411,7 @@ msgstr "Alla ändringar som görs här måste också konfigureras i den externa 
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:554
 msgid "Many clients do not support SSL or authorization."
-msgstr "Många klienter saknar stöd för SSL eller auktorisation."
+msgstr "Många klienter saknar stöd för SSL eller autentisering."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:165
 msgid "config keyring"
@@ -5419,11 +5419,11 @@ msgstr "Konfigurera nyckelring"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:361
 msgid "I2P Keyring Configuration"
-msgstr "I2P Nyckelrings konfiguration"
+msgstr "I2P-nyckelringskonfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:494
 msgid "The router keyring is used to decrypt encrypted leaseSets."
-msgstr "Router-nyckelringen används för att dekryptera krypterade leaseSets."
+msgstr "Routernyckelringen används för att dekryptera krypterade leaseSets."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:497
 msgid ""
@@ -5448,7 +5448,7 @@ msgstr "I2PTunnelsida"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:512
 msgid "Dest. name, hash, or full key"
-msgstr "Mål namn, hash, elle full nyckel"
+msgstr "Målnamn, hash, eller hel nyckel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:514
 msgid "Encryption Key"
@@ -5460,11 +5460,11 @@ msgstr "konfigurationsloggning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:345
 msgid "I2P Logging Configuration"
-msgstr "I2P Loggningskonfiguration"
+msgstr "I2P-loggningskonfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:452
 msgid "Configure I2P Logging Options"
-msgstr "Konfigurera I2P Loggningsval"
+msgstr "Konfigurera I2P-loggningsalternativ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:454
 msgid "Log file"
@@ -5490,7 +5490,7 @@ msgstr "(använd 'd' = daum, 'c' = klass, 't' = tråd, 'p' = prioritet, 'm' = me
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:468
 msgid "Log date format"
-msgstr "Logg datumformat"
+msgstr "Logg-datumformat"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:472
 msgid ""
@@ -5500,11 +5500,11 @@ msgstr "('MM' = månad, 'dd' = dag, 'HH' = timme, 'mm' = minut, 'ss' = sekund, '
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:474
 msgid "Max log file size"
-msgstr "Loggfilens maxima storlek"
+msgstr "Loggfilens max storlek"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:478
 msgid "Default log level"
-msgstr "Standard loggnings nivå  "
+msgstr "Standard loggningsnivå  "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:482
 msgid ""
@@ -5526,7 +5526,7 @@ msgstr "konfigurera nätverk"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:374
 msgid "I2P Network Configuration"
-msgstr "I2P nätverkskonfiguration"
+msgstr "I2P-nätverkskonfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:493
 msgid "IP and Transport Configuration"
@@ -5538,7 +5538,7 @@ msgstr "Det finns hjälp nedan."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:499
 msgid "UPnP Configuration"
-msgstr "UPnP konfiguration"
+msgstr "UPnP-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:503
 msgid "Enable UPnP to open firewall ports"
@@ -5546,11 +5546,11 @@ msgstr "Aktivera UPnP för att öppna brandväggsportar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:505
 msgid "UPnP status"
-msgstr "UPnP status"
+msgstr "UPnP-status"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:507
 msgid "IP Configuration"
-msgstr "IP Konfiguration"
+msgstr "IP-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:509
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:605
@@ -5594,7 +5594,7 @@ msgstr "Åtgärd när IP-adressen ändras"
 msgid ""
 "Laptop mode - Change router identity and UDP port when IP changes for "
 "enhanced anonymity"
-msgstr "Laptop-läge - Ändra routeridentitet och UDP-port när IP-adressen ändras, för ökad anonymitet"
+msgstr "Bärbar dator-läge - Ändra routeridentitet och UDP-port när IP-adressen ändras, för ökad anonymitet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:545
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:579
@@ -5608,35 +5608,35 @@ msgstr "IPv4-konfiguration"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:551
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:557
 msgid "Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)"
-msgstr "Avaktivera inkommande(Bakom brandvägg av typ Carrier-NAT eller DS-Lite)"
+msgstr "Avaktivera inkommande (Bakom brandvägg av typ Carrier-NAT eller DS-Lite)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:553
 msgid "IPv6 Configuration"
-msgstr "IPv6 Konfiguration"
+msgstr "IPv6-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:561
 msgid "Disable IPv6"
-msgstr "Slå av IPv6"
+msgstr "Inaktivera IPv6"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:565
 msgid "Enable IPv6"
-msgstr "Slå på IPv6"
+msgstr "Aktivera IPv6"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:569
 msgid "Prefer IPv4 over IPv6"
-msgstr "Föredra IPv4 och IPv6"
+msgstr "Föredra IPv4 över IPv6"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:573
 msgid "Prefer IPv6 over IPv4"
-msgstr "Föredra IPv6 och IPv4"
+msgstr "Föredra IPv6 över IPv4"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:577
 msgid "Use IPv6 only (disable IPv4)"
-msgstr "Använd IPv6 (slå av IPv4)"
+msgstr "Använd IPv6 (inaktivera IPv4)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:581
 msgid "UDP Configuration:"
-msgstr "UDP konfiguration:"
+msgstr "UDP-konfiguration:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:583
 msgid "UDP port:"
@@ -5653,7 +5653,7 @@ msgstr "(enbart om brandväggen blockerar utgående UDP)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:603
 msgid "TCP Configuration"
-msgstr "TCP konfiguration"
+msgstr "TCP-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:609
 msgid "Use auto-detected IP address"
@@ -5662,7 +5662,7 @@ msgstr "Använd automatiskt upptäckt IP-adress"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:611
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:643
 msgid "currently"
-msgstr "för närvarande"
+msgstr "aktuell"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:615
 msgid "if we are not firewalled"
@@ -5670,7 +5670,7 @@ msgstr "om vi inte är stoppade av brandvägg"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:619
 msgid "Always use auto-detected IP address (Not firewalled)"
-msgstr "Använd alltid automatiskt uptäckta IP adresser (som inte finns bakom en brandvägg)"
+msgstr "Använd alltid automatiskt upptäckta IP-adresser (som inte finns bakom en brandvägg)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:629
 msgid "Disable inbound (Firewalled)"
@@ -5691,7 +5691,7 @@ msgstr "Använd samma port konfiguration för UDP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:649
 msgid "Specify Port"
-msgstr "Ange Port"
+msgstr "Ange port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:653
 msgid "Notes"
@@ -5701,7 +5701,7 @@ msgstr "Anteckningar"
 msgid ""
 "a) Do not reveal your port numbers to anyone!   b) Changing these settings "
 "will restart your router."
-msgstr "a) avslöja inte dit portnummer för någon! b) om dessa inställningar ändras kommer din router starta om."
+msgstr "a) avslöja inte ditt portnummer för någon! b) om dessa inställningar ändras kommer din router startas om."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:662
 msgid "Configuration Help"
@@ -5713,7 +5713,7 @@ msgid ""
 "While I2P will work fine behind most firewalls, your speeds and network "
 "integration will generally improve if the I2P port is forwarded for both UDP"
 " and TCP."
-msgstr "Även om I2P fungera bra bakom de flesta brandväggar kommer din hastighet och nätverksintegrering allmänt förbättra om I2P porten vidarebefordrar både UDP och TCP."
+msgstr "Även om I2P fungerar bra bakom de flesta brandväggar kommer din hastighet och nätverksintegrering allmänt förbättras om I2P-porten vidarebefordrar både UDP och TCP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:666
 msgid ""
@@ -5742,7 +5742,7 @@ msgstr "Vissa brandväggar såsom symmetriska NAT kan  fungerar dåligt med I2P.
 msgid ""
 "UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect "
 "the external IP address and forward ports."
-msgstr "UPnP används för att kommunicera med Internet Gateway-enheter (IGDs) för att upptäcka den externa IP-adressen och att vidarebefordra portar"
+msgstr "UPnP används för att kommunicera med Internet inkörsportsenheter (IGDs) för att upptäcka den externa IP-adressen och att vidarebefordra portar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:683
 msgid "UPnP support is beta, and may not work for any number of reasons"
@@ -5762,7 +5762,7 @@ msgstr "Mjukvarubrandvägg stör UPnP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:691
 msgid "Bugs in the device's UPnP implementation"
-msgstr "Buggar i enhetens UPnP implementering"
+msgstr "Fel i enhetens UPnP-implementering"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:693
 msgid "Multiple firewall/routers in the internet connection path"
@@ -5826,11 +5826,11 @@ msgstr "Om det finns ett fel, kan <a href=\"logs.jsp\">loggar</a> hjälpa till a
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:723
 msgid "Your UDP port does not appear to be firewalled."
-msgstr "Din UDP port verkar inte vara bakom en brandvägg."
+msgstr "Din UDP-port verkar inte vara bakom en brandvägg."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:727
 msgid "Your UDP port appears to be firewalled."
-msgstr "Din UDP port verkar vara bakom en brandvägg."
+msgstr "Din UDP-port verkar vara bakom en brandvägg."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:729
 msgid ""
@@ -5868,7 +5868,7 @@ msgid ""
 "Also, some routers cannot correctly forward both TCP and UDP on a single "
 "port, or may have other limitations or bugs that prevent them from passing "
 "traffic through to I2P."
-msgstr "Dessutom kan vissa routrar inte riktigt vidarebefordra både TCP och UDP på en enda port, eller kan ha andra begränsningar eller buggar som hindrar dem från skicka trafik genom I2P."
+msgstr "Dessutom kan vissa routrar inte riktigt vidarebefordra både TCP och UDP på en enda port, eller kan ha andra begränsningar eller fel som hindrar dem från skicka trafik genom I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:743
 msgid "The router is currently testing whether your UDP port is firewalled."
@@ -6028,7 +6028,7 @@ msgstr "En omstart krävs alltid efter detta fel."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:807
 msgid "ERR - UDP Disabled and Inbound TCP host/port not set"
-msgstr "FEL - UDP Inaktivera och Inkommande TCP värd/port inte satt"
+msgstr "FEL - UDP Inaktivera och Inkommande TCP-värd/port inte satt"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confignet_jsp.java:809
 msgid ""
@@ -6068,7 +6068,7 @@ msgstr "I2P nod-konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:499
 msgid "Manual Peer Controls"
-msgstr "Manuell nod-kontroll"
+msgstr "Manuell nodkontroll"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:501
 msgid "Router Hash"
@@ -6076,16 +6076,16 @@ msgstr "Router Hash"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:505
 msgid "Manually Ban / Unban a Peer"
-msgstr "Manuellt banna / avbanna en nod"
+msgstr "Manuell förbjuda / ta bort förbud av nod"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:507
 msgid ""
 "Banning will prevent the participation of this peer in tunnels you create."
-msgstr "Banning kommer hindra noden från att delta i tunnlar du skapar."
+msgstr "Förbud kommer hindra noden från att delta i tunnlar du skapar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:517
 msgid "Adjust Profile Bonuses"
-msgstr "Justera profil bonus"
+msgstr "Justera profilbonusar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:519
 msgid ""
@@ -6093,7 +6093,7 @@ msgid ""
 " and High Capacity tiers. Fast peers are used for client tunnels, and High "
 "Capacity peers are used for some exploratory tunnels. Current bonuses are "
 "displayed on the"
-msgstr "Bonusar kan vara positiva eller negativa, och påverkar om noden inräknas i nivåerna snabb och högkapacitet. Snabba noder används för klienttunnlar, och högkapacitets-noder används för vissa utforskande tunnlar. Aktuell bonus visas på"
+msgstr "Bonusar kan vara positiva eller negativa, och påverkar om noden inräknas i nivåerna snabb och högkapacitet. Snabba noder används för klienttunnlar, och högkapacitetsnoder används för vissa utforskande tunnlar. Aktuell bonus visas på"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:521
 msgid "profiles page"
@@ -6101,48 +6101,48 @@ msgstr "profilsida"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:539
 msgid "Banned Peers"
-msgstr "Bannade noder"
+msgstr "Förbjudna noder"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:560
 msgid "Banned IPs"
-msgstr "Förbjudna IPn"
+msgstr "Förbjudna IP:n"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:165
 msgid "config plugins"
-msgstr "konfigurera plugin"
+msgstr "konfigurera insticksprogram"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:501
 msgid "The plugins listed below are started by the webConsole client."
-msgstr "De plugins som anges nedan startas av webConsole klienten."
+msgstr "De insticksprogram som anges nedan startas av webConsole-klienten."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:516
 msgid "Plugin Installation from URL"
-msgstr "Plugininstallation från URL"
+msgstr "Insticksprogramsinstallation från URL"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:518
 #, java-format
 msgid "Look for available plugins on {0}."
-msgstr "Sök efter tillgängliga plugins på {0}."
+msgstr "Sök efter tillgängliga insticksprogram på {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:521
 msgid "To install a plugin, enter the download URL:"
-msgstr "För att installera en plugin anger du URL att hämta från:"
+msgstr "För att installera ett insticksprogram anger du URL att hämta från:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:531
 msgid "Plugin Installation from File"
-msgstr "Plugininstallation från fil"
+msgstr "Insticksprogramsinstallation från fil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:535
 msgid "Install plugin from file."
-msgstr "Installera plugin från fil"
+msgstr "Installera insticksprogram från fil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:537
 msgid "Select xpi2p or su3 file"
-msgstr "Välj xpi2p eller su3 fil"
+msgstr "Välj xpi2p- eller su3-fil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configplugins_jsp.java:546
 msgid "Update All Plugins"
-msgstr "Uppdatera alla plugins"
+msgstr "Uppdatera alla insticksprogram"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:165
 msgid "config reseeding"
@@ -6260,7 +6260,7 @@ msgstr "HTTP Proxy Värd"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:564
 msgid "HTTP Proxy Port"
-msgstr "HTTP Proxy Port"
+msgstr "HTTP-proxyport"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:568
 msgid "Use HTTP Proxy Authorization?"
@@ -6284,7 +6284,7 @@ msgstr " HTTP proxy värd"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:588
 msgid "HTTPS Proxy Port"
-msgstr "HTTP proxy port"
+msgstr "HTTP-proxyport"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:592
 msgid "Use HTTPS Proxy Authorization?"
@@ -6372,7 +6372,7 @@ msgstr "Om du föredrar kommandoraden, kan du också köra "
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:545
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:512
 msgid "Note"
-msgstr "Notera"
+msgstr "Observera"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:547
 msgid ""
@@ -6388,7 +6388,7 @@ msgstr "Du kanske vill överväga att stänga snyggt , som ovan och  kör sedan 
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:553
 msgid "Debugging"
-msgstr "Debugging"
+msgstr "Felsöka"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:555
 msgid "View the job queue"
@@ -6441,7 +6441,7 @@ msgstr "I2P statistik konfigurering"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:452
 msgid "Configure I2P Stat Collection"
-msgstr "Konfigurera I2P statistik insamling"
+msgstr "Konfigurera I2P-statistiksinsamling"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:454
 msgid "Enable full stats?"
@@ -6550,13 +6550,13 @@ msgstr "Om du inte använder Internet Explorer (IE), är det troligt att din web
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:468
 msgid "Router Console Language"
-msgstr "Routerkonsolens Språk"
+msgstr "Routerkonsolens språk"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:474
 msgid ""
 "Please contribute to the router console translation project! Contact the "
 "developers in #i2p-dev on IRC to help."
-msgstr "Hjälptill gärna till med att översätta router konsol projektet. Kontakta utvecklarna på IRC i #i2p-dev kanalen för mer information."
+msgstr "Hjälp gärna till med att översätta routerkonsol projektet. Kontakta utvecklarna på IRC i #i2p-dev kanalen för mer information."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:478
 msgid "Apply"
@@ -6564,7 +6564,7 @@ msgstr "Applicera"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:480
 msgid "Router Console Password"
-msgstr "Router Console lösenord"
+msgstr "Routerkonsol lösenord"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:163
 msgid "config update"
@@ -6620,7 +6620,7 @@ msgstr "eepProxy värd"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:516
 msgid "eepProxy port"
-msgstr "eepProxy port"
+msgstr "eepProxy-port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:524
 msgid "Update URLs"
@@ -6750,7 +6750,7 @@ msgstr "Fel {0}"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:361
 msgid "I2P Version and Running Environment"
-msgstr "I2P Version och Körmiljö"
+msgstr "I2P-version och körmiljö"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:274
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:447
@@ -6794,7 +6794,7 @@ msgstr "grafer"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graph_jsp.java:394
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:354
 msgid "I2P Performance Graphs"
-msgstr "I2P prestandagrafer"
+msgstr "I2P-prestandagrafer"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:343
 msgid ""
@@ -6816,7 +6816,7 @@ msgstr "Jobbkö"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:333
 msgid "I2P Router Job Queue"
-msgstr "I2P Routerns Jobbkö"
+msgstr "I2P-routernsjobbkö"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:163
 msgid "logs"
@@ -6824,15 +6824,15 @@ msgstr "loggar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:359
 msgid "I2P Router Logs"
-msgstr "I2P Router Loggar"
+msgstr "I2P-routerloggar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:449
 msgid "Critical Logs"
-msgstr "Kritiska Loggar"
+msgstr "Kritiska loggar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:453
 msgid "Router Logs"
-msgstr "Router Loggar"
+msgstr "Routerloggar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:459
 msgid "Event Logs"
@@ -6844,7 +6844,7 @@ msgstr "Visa händelseloggar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:463
 msgid "Service (Wrapper) Logs"
-msgstr "Service (Wrapper) Loggar"
+msgstr "Service (Wrapper) loggar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:161
 msgid "network database"

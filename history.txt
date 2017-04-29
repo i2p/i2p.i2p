@@ -1,3 +1,10 @@
+2017-04-29 zzz
+ * Build: Fix failing release tests
+ * Jetty:
+   - Revert previous checkin, unrelated to the Jetty Timer bug
+   - Add patch to fix Jetty Timer bug, backported from Jetty 9.4
+ * Translations update
+
 2017-04-27 zzz
  * Console: Disable Jetty timer thread consolidation
    causing log file rollover to stop (ticket #1068)

@@ -25,7 +25,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-02-15 16:03+0000\n"
-"PO-Revision-Date: 2017-01-27 22:45+0000\n"
+"PO-Revision-Date: 2017-03-26 11:43+0000\n"
 "Last-Translator: Verdulo :-) <cybertomek@openmailbox.org>\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -2348,7 +2348,7 @@ msgstr "Uruchom ponownie za {0}"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:227
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:486
 msgid "Shutdown gracefully"
-msgstr "Eleganckie zamkniecie"
+msgstr "Eleganckie zamknięcie"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:231
 msgid "Graceful shutdown initiated"
@@ -2420,20 +2420,20 @@ msgstr "Wątki zrzucone do {0}"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:272
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:575
 msgid "View console on startup"
-msgstr "Zobacz konsole przy starcie"
+msgstr "Wyświetla konsolę przy starcie"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:274
 msgid "Console is to be shown on startup"
-msgstr "Konsola będzie pokazana przy starcie"
+msgstr "Konsola będzie otwierana podczas startu"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:275
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:577
 msgid "Do not view console on startup"
-msgstr "Nie patrz na kosole przy starcie"
+msgstr "Nie otwieraj konsoli przy starcie"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:277
 msgid "Console is not to be shown on startup"
-msgstr "Nie pokazuj kosoli przy starcie"
+msgstr "Konsola nie będzie otwierana podczas startu"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:278
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:563
@@ -2788,7 +2788,7 @@ msgstr "Holenderski"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:101
 msgid "Norwegian Bokmaal"
-msgstr "Norweski Bokmaal"
+msgstr "Norweski Bokmål"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:102
 msgid "Polish"

@@ -5,15 +5,16 @@
 # 
 # Translators:
 # CimpianAlin <inactive+CimpianAlin@transifex.com>, 2013
+# Predator <Predator@windowslive.com>, 2016-2017
 # titus <titus0818@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:08+0000\n"
-"PO-Revision-Date: 2015-07-19 20:01+0000\n"
-"Last-Translator: titus <titus0818@gmail.com>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/I2P/language/ro/)\n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2017-04-07 21:31+0000\n"
+"Last-Translator: Predator <Predator@windowslive.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/otf/I2P/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
 msgid "Anonymous Proxy"
-msgstr "Proxy anonim"
+msgstr "Proxy Anonim"
 
 msgid "Satellite Provider"
 msgstr "Provider satelit"
@@ -81,7 +82,7 @@ msgid "Azerbaijan"
 msgstr "Azerbaijan"
 
 msgid "Bosnia and Herzegovina"
-msgstr "Bosnia and Herzegovina"
+msgstr "Bosnia și Herzegovina"
 
 msgid "Barbados"
 msgstr "Barbados"
@@ -324,7 +325,7 @@ msgid "Honduras"
 msgstr "Honduras"
 
 msgid "Croatia"
-msgstr "Croatia"
+msgstr "Croația"
 
 msgid "Haiti"
 msgstr "Haiti"
@@ -339,7 +340,7 @@ msgid "Ireland"
 msgstr "Irlanda"
 
 msgid "Israel"
-msgstr "Izrael"
+msgstr "Israel"
 
 msgid "Isle of Man"
 msgstr "Insula Man"

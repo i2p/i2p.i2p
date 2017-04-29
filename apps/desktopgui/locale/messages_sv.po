@@ -6,14 +6,14 @@
 # Translators:
 # 123hund123 <M8R-ra4r1r@mailinator.com>, 2011
 # Anders Nilsson <anders@devode.se>, 2016
-# Jonatan Nyberg <jonatan@autistici.org>, 2016
+# Jonatan Nyberg <jonatan@autistici.org>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2016-12-19 13:35+0000\n"
-"Last-Translator: Anders Nilsson <anders@devode.se>\n"
+"PO-Revision-Date: 2017-03-02 08:31+0000\n"
+"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -39,7 +39,7 @@ msgstr "Startar"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 #: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
-msgstr "Öppna I2P-browser"
+msgstr "Starta I2P-webbläsare"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228

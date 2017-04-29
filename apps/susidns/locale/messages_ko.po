@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-25 12:28+0000\n"
-"PO-Revision-Date: 2016-09-20 04:25+0000\n"
-"Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>\n"
+"POT-Creation-Date: 2017-04-19 12:55+0000\n"
+"PO-Revision-Date: 2017-04-19 13:00+0000\n"
+"Last-Translator: zzzi2p\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,152 +81,163 @@ msgstr "{0} 타입"
 msgid "DSA 1024 bit"
 msgstr "DSA 1024 bit"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:188
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:191
 #, java-format
 msgid "One result for search within filtered list."
 msgid_plural "{0} results for search within filtered list."
 msgstr[0] "{0} 상세검색 결과"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:192
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:195
 #, java-format
 msgid "Filtered list contains 1 entry."
 msgid_plural "Filtered list contains {0} entries."
 msgstr[0] "{0} 항목을 포함하는 필터된 리스트"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:197
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:200
 #, java-format
 msgid "One result for search."
 msgid_plural "{0} results for search."
 msgstr[0] "{0} 검색결과"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:206
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:209
 #, java-format
 msgid "Address book contains 1 entry."
 msgid_plural "Address book contains {0} entries."
 msgstr[0] "{0} 항목을 포함하는 주소록"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:222
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:225
 #, java-format
 msgid "Showing {0} of {1}"
 msgstr "{1}에서 {0} 보여짐"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:247
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:453
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:248
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:526
 msgid "Add"
 msgstr "추가"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:244
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:255
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:247
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:258
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:246
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:451
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:518
 msgid "Replace"
 msgstr "교체"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:254
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:257
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
 msgstr "호스트 이름 {0}은 이미 주소록에 있습니다, 변경안됨."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:256
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
 #, java-format
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
 " \"Replace\" to overwrite."
 msgstr "호스트 이름 {0}은 이미 다른 목적지를 가지고 주소록에 있습니다. 목적지를 변경하려면 \"교체\" 하세요."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:269
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:260
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:272
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
 #, java-format
 msgid "Destination added for {0}."
 msgstr "{0} 목적지 추가됨."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:271
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:262
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:274
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:280
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "{0}으로 목적지 변경됨."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:273
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:264
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:276
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:282
 msgid "Warning - host name does not end with \".i2p\""
 msgstr "경고 - 호스트 이름이 \".i2p\"로 끝나지 않습니다"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:272
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:281
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:290
 msgid "Invalid Base 64 destination."
 msgstr "잘못된 Base64 목적지"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
 #, java-format
 msgid "Invalid host name \"{0}\"."
 msgstr "잘못된 호스트 이름 \"{0}\"."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:287
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:281
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:290
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
 msgid "Please enter a host name and destination"
 msgstr "호스트 이름과 목적지를 입력하세요"
 
 #. clear search when deleting
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:312
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:285
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:310
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:285
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:294
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:315
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:307
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:341
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:350
 msgid "Delete Entry"
 msgstr "항목 삭제"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:285
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:369
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:294
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:434
 msgid "Delete Selected"
 msgstr "선택된 것 삭제"
 
 #. parameter is a host name
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:302
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:333
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "목적지 {0}  삭제."
 
 #. parameter will always be >= 2
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:308
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:305
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:311
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:336
 #, java-format
 msgid "1 destination deleted."
 msgid_plural "{0} destinations deleted."
 msgstr[0] "{0} 목적지 삭제."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:307
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:338
 msgid "No entries selected to delete."
 msgstr "삭제될 항목 없음."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:314
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:317
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:246
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:256
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:263
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:277
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:522
+msgid "Add Alternate"
+msgstr ""
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
 msgid "Address book saved."
 msgstr "주소록 저장됨."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:321
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:327
 msgid "ERROR: Could not write addressbook file."
 msgstr "오류: 주소록 파일 쓰기 불가."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:326
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:318
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:349
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:157
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
 msgstr "잘못된 폼 서브미션. 뒤로가기나 새로고침을 누르셨을 수 있습니다. 재시도해주세요."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:328
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:334
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:320
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:351
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:159
 msgid ""
 "If the problem persists, verify that you have cookies enabled in your "
@@ -235,8 +246,8 @@ msgstr "문제가 지속되면 브라우저의 쿠키가 활성화되어 있는�
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:99
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:131
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:161
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:152
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:220
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:217
 msgid "Save"
 msgstr "저장"
 
@@ -246,8 +257,8 @@ msgstr "설정 저장됨."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:102
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:159
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:150
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:218
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:215
 msgid "Reload"
 msgstr "다시 읽기"
 
@@ -260,16 +271,21 @@ msgstr "설정 다시 불러옴"
 msgid "{0} address book in {1} database"
 msgstr "{1} 데이터베이스의 {0} 주소록"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:255
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
+#, java-format
+msgid "Host name {0} is not in  the address book."
+msgstr ""
+
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
 msgid "Manually added via SusiDNS"
 msgstr "SusiDNS를 통해 수동으로 저장됨"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:269
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:287
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
 msgstr "네이밍 서비스 {1}으로 {0} 목적지 추가 실패"
 
-#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:293
+#: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:324
 #, java-format
 msgid "Failed to delete Destination for {0} from naming service {1}"
 msgstr "네이밍 서비스 {1}에서 {0} 목적지 삭제 실패"
@@ -287,441 +303,441 @@ msgstr "구독 저장됨."
 msgid "Subscriptions reloaded."
 msgstr "구독 다시 불러옴."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:135
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:192
 msgid "address book"
 msgstr "주소록"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:141
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:157
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:133
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:149
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:125
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:141
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:136
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:124
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:140
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:200
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:216
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:192
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:208
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:184
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:200
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:195
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:189
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:205
 msgid "Overview"
 msgstr "미리보기"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:143
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:135
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:127
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:122
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:126
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:202
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:194
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:186
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:181
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:191
 msgid "Address books"
 msgstr "주소록"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:145
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:137
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:129
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:124
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:128
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:204
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:196
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:188
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:183
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:193
 msgid "private"
 msgstr "사설"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:147
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:139
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:131
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:126
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:130
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:206
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:198
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:190
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:185
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:195
 msgid "master"
 msgstr "마스터"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:149
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:141
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:133
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:128
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:132
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:208
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:200
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:192
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:187
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:197
 msgid "router"
 msgstr "라우터"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:151
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:143
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:135
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:130
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:134
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:210
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:202
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:194
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:189
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:199
 msgid "published"
 msgstr "게시됨"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:153
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:145
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:137
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:132
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:136
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:212
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:204
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:196
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:191
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:201
 msgid "Subscriptions"
 msgstr "구독"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:155
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:147
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:139
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:134
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:138
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:214
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:206
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:198
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:193
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:203
 msgid "Configuration"
 msgstr "설정"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:159
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:143
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:218
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:202
 msgid "Address book"
 msgstr "주소록"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:164
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:148
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:223
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:207
 msgid "Storage"
 msgstr "스토리지"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:184
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:243
 msgid "Filter"
 msgstr "핉"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:187
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:246
 msgid "other"
 msgstr "그 외"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:189
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:248
 msgid "all"
 msgstr "모두"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:201
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:260
 msgid "Current filter"
 msgstr "현재 필터"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:206
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:265
 msgid "clear filter"
 msgstr "필터 소거"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:219
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:223
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:280
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:284
 msgid "Search"
 msgstr "검색"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:262
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:325
 msgid "Name"
 msgstr "이름"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:264
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:327
 msgid "Links"
 msgstr "링크들"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:266
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:445
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:277
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:329
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:512
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:338
 msgid "Destination"
 msgstr "목적지"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:302
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:365
 msgid "Mark for deletion"
 msgstr "삭제표시"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:321
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:384
 msgid "Base 32 address"
 msgstr "Base32 주소"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:325
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:390
 msgid "More information on this entry"
 msgstr "해당 항목들 상세정보"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:328
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:393
 msgid "details"
 msgstr "상세정보"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:367
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:449
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:432
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:516
 msgid "Cancel"
 msgstr "취소"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:396
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:461
 msgid "Export in hosts.txt format"
 msgstr "hosts.txt 포맷으로 내보내기"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:424
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:489
 msgid "This address book is empty."
 msgstr "주소록 빔."
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:439
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:506
 msgid "Add new destination"
 msgstr "새 목적지 축"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:441
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:177
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:508
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:238
 msgid "Host Name"
 msgstr "호스트 이름"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:127
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:184
 msgid "configuration"
 msgstr "설정"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:163
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:222
 msgid "Hints"
 msgstr "힌트"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:165
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:224
 msgid ""
 "File and directory paths here are relative to the addressbook's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%APPDATA%\\I2P\\addressbook\\ (Windows)."
 msgstr "여기 있는 파일과 디렉토리들은 주소록 디렉토리와 연관이 있습니다, 주소록 디렉토리는 보통 ~/.i2p/addressbook/ (Linux) 또는 %APPDATA%\\I2P\\addressbook\\ (Windows)입니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:167
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:226
 msgid ""
 "If you want to manually add lines to an addressbook, add them to the private"
 " or master addressbooks."
 msgstr "주소록에 내용을 추가하고 싶다면 사설 또는 마스터 주소록에 넣으세요."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:169
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:228
 msgid ""
 "The router addressbook and the published addressbook are updated by the "
 "addressbook application."
 msgstr "라우터 주소록과 게시된 주소록은 주소록 어플리케이션이 업데이트 합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:171
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:230
 msgid ""
 "When you publish your addressbook, ALL destinations from the master and "
 "router addressbooks appear there."
 msgstr "주소록을 게시했을 때 모든 마스터, 라우터 주소록의 목적지가 나타납니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:173
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:232
 msgid ""
 "Use the private addressbook for private destinations, these are not "
 "published."
 msgstr "개인 목적지를 위해서는 사설 주소록을 사용하세요. 게시되지 않습니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:175
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:234
 msgid "Options"
 msgstr "옵션"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:177
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:236
 msgid "File containing the list of subscriptions URLs (no need to change)"
 msgstr "구독 URL 리스트가 담긴 파일 (변경 필요없음)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:179
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:238
 msgid "Update interval in hours"
 msgstr "시간당 간격 업데이트"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:181
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:240
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
 msgstr "공개 hosts.txt 파일 (웹서버 문서 루트에 있는 경로를 고르세요)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:183
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:242
 msgid "Your hosts.txt (don't change)"
 msgstr "hosts.txt 파일 (변경하지 마세요)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:185
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:244
 msgid "Your personal addressbook, these hosts will be published"
 msgstr "개인 주소록, 호스트들이 게시됩니다"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:187
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:246
 msgid "Your private addressbook, it is never published"
 msgstr "사설 주소록, 게시되지 않습니다"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:189
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:248
 msgid "Port for your eepProxy (no need to change)"
 msgstr "eepProxy 포트 (변경 필요없음)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:191
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:250
 msgid "Hostname for your eepProxy (no need to change)"
 msgstr "eepProxy 호스트 이름 (변경 필요없음)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:193
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:252
 msgid "Whether to update the published addressbook"
 msgstr "게시된 주소록 업데이트 여부"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:195
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:254
 msgid ""
 "File containing the etags header from the fetched subscription URLs (no need"
 " to change)"
 msgstr "불러온 구독 URL의 etags 헤드를 담은 파일 (변경 필요없음)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:197
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:256
 msgid ""
 "File containing the modification timestamp for each fetched subscription URL"
 " (no need to change)"
 msgstr "불러온 구독 URL을 위한 수정 타임스탬프를 담은 파일 (변경 필요없음)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:199
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:258
 msgid "File to log activity to (change to /dev/null if you like)"
-msgstr ""
+msgstr "로그 기록 파일 저장장소 (원한다면 /dev/null로 변경하세요)"
 
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:201
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:260
 msgid "Name of the theme to use (defaults to 'light')"
 msgstr "사용할 테마 이름 (기본값은 'light')"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:119
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:176
 msgid "addressbook"
 msgstr "주소록"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:191
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:252
 msgid "Encoded Name"
 msgstr "인코딩된 이름"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:205
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:266
 msgid "Base 32 Address"
 msgstr "Base32 주소"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:213
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:274
 msgid "Base 64 Hash"
 msgstr "Base64 해시"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:219
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:280
 msgid "Address Helper"
 msgstr "주소록 도우미"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:225
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:286
 msgid "link"
 msgstr "링크"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:229
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:290
 msgid "Public Key"
 msgstr "공개키"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:231
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:292
 msgid "ElGamal 2048 bit"
 msgstr "ElGamal 2048 bit"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:235
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:296
 msgid "Signing Key"
 msgstr "키 사인"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:241
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:302
 msgid "Certificate"
 msgstr "인증서"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:247
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:308
 msgid "Added Date"
 msgstr "추가된 날짜"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:253
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
 msgid "Validated"
 msgstr "증명됨"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:255
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
 msgid "no"
 msgstr "아니오"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:255
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:316
 msgid "yes"
 msgstr "예"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:259
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:320
 msgid "Source"
 msgstr "출저"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:265
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:326
 msgid "Last Modified"
 msgstr "마지막 수정"
 
-#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:271
+#: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:332
 msgid "Notes"
 msgstr "정보"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:116
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:173
 msgid "Introduction"
 msgstr "소개"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:138
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:197
 msgid "What is the addressbook?"
 msgstr "주소록이란?"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:140
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:199
 msgid "The addressbook application is part of your I2P installation."
 msgstr "주소록 어플리케이션은 I2P 설치의 일부입니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:142
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:201
 msgid ""
 "It regularly updates your hosts.txt file from distributed sources or "
 "\"subscriptions\"."
 msgstr "분산된 출저 또는 \"구독\"들을 통해 주기적으로 hosts.txt파일을 업데이트 합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:144
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:203
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
 msgstr "기본 설정에서는, 주소록은 {0}만 구독합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:146
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:205
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a> file."
 msgstr "추가적인 사이트들을 구독하는것은 쉽습니다.  <a href=\"subscriptions\">구독</a> 파일에 추가하기만 하세요."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:148
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:207
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_top\">the overview</a>."
 msgstr "I2P의 네이밍에 대해 더 알고 싶으시면 see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">개요</a>를 보세요."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:150
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:209
 msgid "How does the addressbook application work?"
 msgstr "어떻게 주소록 어플리케이션이 작동합니까?"
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:152
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:211
 msgid ""
 "The addressbook application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
 msgstr "주소록 어플리케이션은 정기적으로 당신의 구독정보들을 수집하고 \"라우터\" 주소록에 그 정보를 종합합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:154
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:213
 msgid ""
 "Then it merges your \"master\" address book into the router address book as "
 "well."
 msgstr "다음 라우터 주소록에 \"마스터\" 주소록을 종합합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:156
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:215
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
 msgstr "설정 되었다면, 라우터 주소록은 \"게시된\" 주소록으로 기입됩니다. eepsite를 구동하고 있다면 공개적으로 사용이 가능합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:158
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:217
 msgid ""
 "The router also uses a private address book (not shown in the picture), "
 "which is not merged or published."
 msgstr "라우터는 또한 사설 주소록을 사용합니다 (사진에는 나오지 않습니다). 합쳐지거나 게시되지 않습니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:160
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:219
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
 msgstr "사설 주소록의 Hosts들에는 당신만 접속 가능합니다. 다른사람에게 분산되지 않습니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:162
+#: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:221
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."
 msgstr "사설 주소록은 또한 당신의 다른 주소록의 호스트들의 aliases 에도 사용할 수 있습니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:118
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:181
 msgid "subscriptions"
 msgstr "구독"
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:154
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:219
 msgid "The subscription file contains a list of i2p URLs."
 msgstr "구독파일이 i2p URL 리스트를 담고 있습니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:156
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:221
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
 msgstr "새 eepsite를 찾기 위해 주소록 어플리케이션은 주기적으로 해당 리스트를 확인합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:158
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:223
 msgid "Those URLs refer to published hosts.txt files."
 msgstr "그 URL들은 게시된 hosts.txt 파일을 참조합니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:160
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:225
 #, java-format
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
 msgstr "기본 구독은 {0}의 hosts.txt 입니다. 드물게 업데이트 될 것입니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:162
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:227
 msgid ""
 "So it is a good idea to add additional subscriptions to sites that have the "
 "latest addresses."
 msgstr "그러므로 최신 주소들을 받고 싶으시다면, 추가 구독을 하는 것이 좋습니다."
 
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:164
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:229
 msgid "See the FAQ for a list of subscription URLs."
 msgstr "구독 URL 리스트들을 확인하려면 FAQ를 참조하세요."

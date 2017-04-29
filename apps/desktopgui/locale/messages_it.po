@@ -6,13 +6,15 @@
 # Translators:
 # Leelium <bovas85@gmail.com>, 2012
 # mkkid <jokjok@hotmail.it>, 2011
+# Leelium <bovas85@gmail.com>, 2012
+# mkkid <jokjok@hotmail.it>, 2011
 # Sebastiano Pistore <olatusrooc@virgilio.it>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2016-05-26 09:32+0000\n"
+"PO-Revision-Date: 2017-03-29 09:21+0000\n"
 "Last-Translator: Sebastiano Pistore <olatusrooc@virgilio.it>\n"
 "Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -34,17 +36,17 @@ msgstr "Avvio di I2P in corso!"
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:44
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:72
 msgid "Starting"
-msgstr "Avvio"
+msgstr "Avvio in corso"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 #: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
-msgstr "Avvia il Browser I2P"
+msgstr "Lancia il browser I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr "Configura l'icona di I2P nella Barra dei notifica"
+msgstr "Configura l'icona di I2P nella Barra di notifica"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
@@ -93,4 +95,4 @@ msgstr "Rete"
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63
 msgid "I2P: Right-click for menu"
-msgstr "I2P: Fai un click destro per aprire il menu"
+msgstr "I2P: Fai click destro per aprire il menu"

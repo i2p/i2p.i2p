@@ -22,7 +22,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-02-15 16:03+0000\n"
-"PO-Revision-Date: 2017-02-22 08:48+0000\n"
+"PO-Revision-Date: 2017-03-10 06:34+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:75
 msgid "No more torrents running."
-msgstr "Inga fler torrentar kör."
+msgstr "Inga fler torrentar körs."
 
 #: ../java/src/org/klomp/snark/IdleChecker.java:76
 #: ../java/src/org/klomp/snark/SnarkManager.java:2612
@@ -50,7 +50,7 @@ msgstr "Magnet"
 #: ../java/src/org/klomp/snark/SnarkManager.java:832
 #, java-format
 msgid "Total uploaders limit changed to {0}"
-msgstr "Gräns för totalt antal uppladdare är bytt till {0}"
+msgstr "Gräns för totalt antal uppladdare är ändrat till {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:834
 #, java-format
