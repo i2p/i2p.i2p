@@ -15,7 +15,7 @@
 # How soon is too soon for a cert to expire?
 # By default <= 60 will fail. 90 < x < 60 will warn.
 WARN=90
-SOON=60
+SOON=10
 
 
 date2julian() {
