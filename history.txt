@@ -1,3 +1,6 @@
+2017-04-30 zzz
+ * Jetty: Rollover log files at midnight, not noon
+
 2017-04-29 zzz
  * Build: Fix failing release tests
  * Jetty:

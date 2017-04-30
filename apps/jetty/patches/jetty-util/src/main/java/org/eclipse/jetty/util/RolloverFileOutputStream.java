@@ -185,7 +185,7 @@ public class RolloverFileOutputStream extends FilterOutputStream
         midnight = Calendar.getInstance();
         midnight.setTimeZone(_zone);
         // set to midnight
-        midnight.set(Calendar.HOUR, 0);
+        midnight.set(Calendar.HOUR_OF_DAY, 0);
         midnight.set(Calendar.MINUTE, 0);
         midnight.set(Calendar.SECOND, 0);
         midnight.set(Calendar.MILLISECOND, 0);
