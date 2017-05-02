@@ -438,4 +438,44 @@
         </unzip>
     </target>
 
+    <!-- for Maven Central -->
+    <target name="servletJar" depends="compile" >
+        <!-- set if unset -->
+        <jar destfile="./build/servlet-i2p-${release.number}.jar" basedir="./build/obj" includes="net/i2p/servlet/filters/*.class" >
+            <manifest>
+                <attribute name="Specification-Title" value="I2P Servlet classes" />
+                <attribute name="Specification-Version" value="${release.number}" />
+                <attribute name="Specification-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Implementation-Title" value="I2P Java Servlet classes" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Implementation-Vendor" value="The I2P Project https://geti2p.net/" />
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+        </jar>
+    </target>    
+    <target name="servletJavadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/servlet-i2p-javadoc" />
+        <javadoc
+            sourcepath="./java/src:../../core/java/src" destdir="./build/servlet-i2p-javadoc"
+            packagenames="net.i2p.servlet.filters.*"
+            use="true"
+            splitindex="true"
+            windowtitle="I2P Servlet classes" />
+    </target>
+    <target name="servletJavadocJar" depends="servletJavadoc">
+        <jar jarfile="./build/servlet-i2p-${release.number}-javadoc.jar">
+            <fileset dir="./build/servlet-i2p-javadoc" />
+        </jar>
+    </target>
+    <target name="servletSourcesJar">
+        <jar jarfile="./build/servlet-i2p-${release.number}-sources.jar">
+            <fileset dir="./java/src" includes="net/i2p/servlet/filters/**" />
+        </jar>
+    </target>
+
 </project>
