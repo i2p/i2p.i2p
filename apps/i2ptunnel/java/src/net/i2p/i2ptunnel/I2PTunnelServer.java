@@ -241,7 +241,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     private I2PSession addSubsession(I2PSocketManager sMgr, String alt) {
         File altFile = TunnelController.filenameToFile(alt);
-        if (alt == null)
+        if (altFile == null)
             return null;
         I2PSession sess = sMgr.getSession();
         if (sess.getMyDestination().getSigType() != SigType.DSA_SHA1)
