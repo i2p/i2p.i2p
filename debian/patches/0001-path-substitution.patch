@@ -176,7 +176,7 @@ Debian wrapper.config to try to prevent confusion.
          exit 1
      fi
  }
-@@ -1944,24 +1857,10 @@
+@@ -1946,24 +1859,10 @@
              status
              ;;
  
@@ -558,26 +558,24 @@ Debian wrapper.config to try to prevent confusion.
 +"För att köra som root oavsett, ändra /etc/default/i2p och sätt ALLOW_ROOT=true"
 --- a/installer/resources/locale/po/messages_ro.po
 +++ b/installer/resources/locale/po/messages_ro.po
-@@ -187,15 +187,15 @@
- msgstr "Solicitarea dump-ului firului Java daca este pornit"
+@@ -187,13 +187,13 @@
+ msgstr "Solicită Java thread dump dacă rulează."
  
- #: ../i2prouter:1864
+ #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
--msgstr "Vă rugăm să editați i2prouter și setați variabila RUN_AS_USER "
+-msgstr "Vă rugăm să editați i2prouter și să setați variabila RUN_AS_USER "
 +msgid "Please edit /etc/default/i2p and set the variable RUN_AS_USER"
-+msgstr "Vă rugăm să editați /etc/default/i2p și setați variabila RUN_AS_USER "
++msgstr "Vă rugăm să editați /etc/default/i2p și să setați variabila RUN_AS_USER "
  
- #: ../i2prouter:1869
+ #: ../i2prouter:1879
  msgid "Running I2P as the root user is *not* recommended."
  msgstr "Rularea I2P ca root *nu* este recomandată."
  
- #: ../i2prouter:1872
+ #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
+-msgstr "Pentru a rula ca root, oricum, editați i2prouter și setați ALLOW_ROOT=true."
 +msgid "To run as root anyway, edit /etc/default/i2p and set ALLOW_ROOT=true."
- msgstr ""
--"Pentru a rula ca root, oricum, editati i2prouter  și setați ALLOW_ROOT = "
-+"Pentru a rula ca root, oricum, editati /etc/default/i2p și setați ALLOW_ROOT = "
- "true."
++msgstr "Pentru a rula ca root, oricum, editați /etc/default/i2p și setați ALLOW_ROOT=true."
 --- a/installer/resources/locale/po/messages_pt_BR.po
 +++ b/installer/resources/locale/po/messages_pt_BR.po
 @@ -189,13 +189,13 @@

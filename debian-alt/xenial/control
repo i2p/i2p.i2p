@@ -13,6 +13,8 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,glassfish-javaee
  ,libtomcat8-java
  ,dh-apparmor
+ ,dh-systemd
+ ,bash-completion
  ,gettext
  ,libgetopt-java
  ,libgmp-dev (>= 2:5.0.2)
