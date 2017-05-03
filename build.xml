@@ -2386,7 +2386,7 @@
             <arg value="i2p.i2p" />
             <arg value="../i2p-${Extended.Version}" />
         </exec>
-        <delete includeemptydirs="true" quiet="false" failonerror="false">ilonerror="false">
+        <delete includeemptydirs="true" quiet="false" failonerror="false">
             <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
