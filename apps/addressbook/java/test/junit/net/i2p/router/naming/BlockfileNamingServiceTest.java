@@ -1,4 +1,4 @@
-package net.i2p.client.naming;
+package net.i2p.router.naming;
 
 import junit.framework.TestCase;
 
