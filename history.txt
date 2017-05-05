@@ -1,6 +1,8 @@
 2017-05-05 zzz
  * Blockfile: Move from i2p.jar to addressbook.jar
  * i2psnark: Initial support for ut_comment, no UI yet
+ * Jetty: New default servlet for eepsite, with
+   locale-independent directory listing (ticket #1965)
 
 * 2017-05-03 0.9.30 released
 

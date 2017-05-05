@@ -34,7 +34,7 @@ to serve static html files and images.
     </Arg>
   </Call>
   <Call name="addServlet">
-    <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
+    <Arg>net.i2p.servlet.I2PDefaultServlet</Arg>
     <Arg>/</Arg>
   </Call>
   <Call name="addFilter">
