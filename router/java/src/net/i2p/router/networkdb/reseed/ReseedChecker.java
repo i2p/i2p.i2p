@@ -50,7 +50,7 @@ public class ReseedChecker {
     /**
      *  Check if a reseed is needed, and start it
      *
-     *  @param count current number of known routers
+     *  @param count current number of known routers, includes us
      *  @return true if a reseed was started
      */
     public boolean checkReseed(int count) {
@@ -58,14 +58,26 @@ public class ReseedChecker {
             return false;
 
         if (_context.getBooleanProperty(Reseeder.PROP_DISABLE)) {
-            String s = "Only " + count + " peers remaining but reseed disabled by configuration";
+            int x = count - 1;  // us
+            // no ngettext, this is rare
+            String s;
+            if (x > 0)
+                s = "Only " + x + " peers remaining but reseed disabled by configuration";
+            else
+                s = "No peers remaining but reseed disabled by configuration";
             _lastError = s;
             _log.logAlways(Log.WARN, s);
             return false;
         }
 
         if (_context.router().gracefulShutdownInProgress()) {
-            String s = "Only " + count + " peers remaining but reseed disabled by shutdown in progress";
+            int x = count - 1;
+            // no ngettext, this is rare
+            String s;
+            if (x > 0)
+                s = "Only " + x + " peers remaining but reseed disabled by shutdown in progress";
+            else
+                s = "No peers remaining but reseed disabled by shutdown in progress";
             _lastError = s;
             _log.logAlways(Log.WARN, s);
             return false;
@@ -93,7 +105,13 @@ public class ReseedChecker {
                 _log.logAlways(Log.WARN, "Very few known peers remaining - reseeding now");
             return requestReseed();
         } else {
-            String s = "Only " + count + " peers remaining but reseed disabled by config file";
+            int x = count - 1;  // us
+            // no ngettext, this is rare
+            String s;
+            if (x > 0)
+                s = "Only " + x + " peers remaining but reseed disabled by config file";
+            else
+                s = "No peers remaining but reseed disabled by config file";
             _lastError = s;
             _log.logAlways(Log.WARN, s);
             return false;
