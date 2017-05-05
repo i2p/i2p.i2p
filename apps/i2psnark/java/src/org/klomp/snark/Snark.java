@@ -36,6 +36,10 @@ import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 
+import org.klomp.snark.comments.Comment;
+import org.klomp.snark.comments.CommentSet;
+
+
 /**
  * Main Snark program startup class.
  *
@@ -240,6 +244,8 @@ public class Snark
   private volatile String activity = "Not started";
   private long savedUploaded;
   private long _startedTime;
+  private CommentSet _comments;
+  private final Object _commentLock = new Object();
   private static final AtomicInteger __RPCID = new AtomicInteger();
   private final int _rpcID = __RPCID.incrementAndGet();
 
@@ -474,6 +480,9 @@ public class Snark
 */
     
     savedUploaded = (completeListener != null) ? completeListener.getSavedUploaded(this) : 0;
+    if (completeListener != null)
+        _comments = completeListener.getSavedComments(this);
+
     if (start)
         startTorrent();
   }
@@ -648,6 +657,17 @@ public class Snark
         savedUploaded = nowUploaded;
         if (changed && completeListener != null)
             completeListener.updateStatus(this);
+        // TODO should save comments at shutdown even if never started...
+        if (completeListener != null) {
+            synchronized(_commentLock) {
+                if (_comments != null) {
+                    synchronized(_comments) {
+                        if (_comments.isModified())
+                            completeListener.locked_saveComments(this, _comments);
+                    }
+                }
+            }
+        }
     }
     if (fast)
         // HACK: See above if(!fast)
@@ -1396,4 +1416,38 @@ public class Snark
     public long getStartedTime() {
         return _startedTime;
     }
+    
+  /**
+   * The current comment set for this torrent.
+   * Not a copy.
+   * Caller MUST synch on the returned object for all operations.
+   *
+   * @return may be null if none
+   * @since 0.9.31
+   */
+  public CommentSet getComments() {
+      synchronized(_commentLock) {
+          return _comments;
+      }
+  }
+    
+  /**
+   * Add to the current comment set for this torrent,
+   * creating it if it didn't previously exist.
+   *
+   * @return true if the set changed
+   * @since 0.9.31
+   */
+  public boolean addComments(List<Comment> comments) {
+      synchronized(_commentLock) {
+          if (_comments == null) {
+              _comments = new CommentSet(comments);
+              return true;
+          } else {
+              synchronized(_comments) {
+                  return _comments.addAll(comments);
+              }
+          }
+      }
+  }
 }

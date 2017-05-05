@@ -1150,9 +1150,13 @@ public class I2PSnarkServlet extends BasicServlet {
             //String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
             String lang = req.getParameter("lang");
+            boolean ratings = req.getParameter("ratings") != null;
+            boolean comments = req.getParameter("comments") != null;
+            String commentsName = req.getParameter("nofilter_commentsName");
             _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
-                                  upLimit, upBW, useOpenTrackers, useDHT, theme, lang);
+                                  upLimit, upBW, useOpenTrackers, useDHT, theme,
+                                  lang, ratings, comments, commentsName);
             // update servlet
             try {
                 setResourceBase(_manager.getDataDir());

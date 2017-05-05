@@ -47,6 +47,8 @@ import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
 
+import org.klomp.snark.comments.Comment;
+import org.klomp.snark.comments.CommentSet;
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.dht.KRPC;
 
@@ -113,6 +115,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
     private static final String CONFIG_FILE_SUFFIX = ".config";
     private static final String CONFIG_FILE = "i2psnark" + CONFIG_FILE_SUFFIX;
+    private static final String COMMENT_FILE_SUFFIX = ".comments.txt.gz";
     public static final String PROP_FILES_PUBLIC = "i2psnark.filesPublic";
     public static final String PROP_OLD_AUTO_START = "i2snark.autoStart";   // oops
     public static final String PROP_AUTO_START = "i2psnark.autoStart";      // convert in migration to new config file
@@ -133,6 +136,12 @@ public class SnarkManager implements CompleteListener, ClientApp {
     private static final String PROP_SMART_SORT = "i2psnark.smartSort";
     private static final String PROP_LANG = "i2psnark.lang";
     private static final String PROP_COUNTRY = "i2psnark.country";
+    /** @since 0.9.31 */
+    private static final String PROP_RATINGS = "i2psnark.ratings";
+    /** @since 0.9.31 */
+    private static final String PROP_COMMENTS = "i2psnark.comments";
+    /** @since 0.9.31 */
+    private static final String PROP_COMMENTS_NAME = "i2psnark.commentsName";
 
     public static final int MIN_UP_BW = 10;
     public static final int DEFAULT_MAX_UP_BW = 25;
@@ -387,7 +396,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
      *  Escapes '&lt;' and '&gt;' before queueing
      */
     public void addMessage(String message) {
-        addMessageNoEscape(message.replace("<", "&lt;").replace(">", "&gt;"));
+        addMessageNoEscape(message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"));
     }
 
     /**
@@ -655,6 +664,53 @@ public class SnarkManager implements CompleteListener, ClientApp {
     }
 
     /**
+     *  The conmment file for a torrent
+     *  @param confDir the config directory
+     *  @param ih 20-byte infohash
+     *  @since 0.9.31
+     */
+    private static File commentFile(File confDir, byte[] ih) {
+        String hex = I2PSnarkUtil.toHex(ih);
+        File subdir = new SecureDirectory(confDir, SUBDIR_PREFIX + B64.charAt((ih[0] >> 2) & 0x3f));
+        return new File(subdir, hex + COMMENT_FILE_SUFFIX);
+    }
+
+    /**
+     *  The conmments for a torrent
+     *  @return null if none
+     *  @since 0.9.31
+     */
+    public CommentSet getSavedComments(Snark snark) {
+        File com = commentFile(_configDir, snark.getInfoHash());
+        if (com.exists()) {
+            try {
+                return new CommentSet(com);
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Comment load error", ioe);
+            }
+        }
+        return null;
+    }
+
+    /**
+     *  Save the conmments for a torrent
+     *  Caller must synchronize on comments.
+     *
+     *  @param comments non-null
+     *  @since 0.9.31
+     */
+    public void locked_saveComments(Snark snark, CommentSet comments) {
+        File com = commentFile(_configDir, snark.getInfoHash());
+        try {
+            comments.save(com);
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Comment save error", ioe);
+        }
+    }
+
+    /**
      *  Extract the info hash from a config file name
      *  @return null for invalid name
      *  @since 0.9.20
@@ -730,6 +786,12 @@ public class SnarkManager implements CompleteListener, ClientApp {
         // no, so we can switch default to true later
         //if (!_config.containsKey(PROP_USE_DHT))
         //    _config.setProperty(PROP_USE_DHT, Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT));
+        if (!_config.containsKey(PROP_RATINGS))
+            _config.setProperty(PROP_RATINGS, "true");
+        if (!_config.containsKey(PROP_COMMENTS))
+            _config.setProperty(PROP_COMMENTS, "true");
+        if (!_config.containsKey(PROP_COMMENTS_NAME))
+            _config.setProperty(PROP_COMMENTS_NAME, "");
         updateConfig();
     }
 
@@ -831,6 +893,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
         // careful, so we can switch default to true later
         _util.setUseDHT(Boolean.parseBoolean(_config.getProperty(PROP_USE_DHT,
                                           Boolean.toString(I2PSnarkUtil.DEFAULT_USE_DHT))));
+        _util.setRatingsEnabled(Boolean.parseBoolean(_config.getProperty(PROP_RATINGS, "true")));
+        _util.setCommentsEnabled(Boolean.parseBoolean(_config.getProperty(PROP_COMMENTS, "true")));
+        _util.setCommentsName(_config.getProperty(PROP_COMMENTS_NAME, ""));
         getDataDir().mkdirs();
         initTrackerMap();
     }
@@ -853,13 +918,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
-                             String lang) {
+                             String lang, boolean enableRatings, boolean enableComments, String commentName) {
         synchronized(_configLock) {
             locked_updateConfig(dataDir, filesPublic, autoStart, smartSort,refreshDelay,
                                 startDelay,  pageSize,  seedPct,  eepHost, 
                                 eepPort,  i2cpHost,  i2cpPort,  i2cpOpts,
                                 upLimit,  upBW, useOpenTrackers, useDHT,  theme,
-                                lang);
+                                lang, enableRatings, enableComments, commentName);
         }
     }
 
@@ -867,7 +932,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                              String startDelay, String pageSize, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
-                             String lang) {
+                             String lang, boolean enableRatings, boolean enableComments, String commentName) {
         boolean changed = false;
         boolean interruptMonitor = false;
         //if (eepHost != null) {
@@ -1136,6 +1201,37 @@ public class SnarkManager implements CompleteListener, ClientApp {
             if (_util.connected())
                 addMessage(_t("DHT change requires tunnel shutdown and reopen"));
             _util.setUseDHT(useDHT);
+            changed = true;
+        }
+        if (_util.ratingsEnabled() != enableRatings) {
+            _config.setProperty(PROP_RATINGS, Boolean.toString(enableRatings));
+            if (enableRatings)
+                addMessage(_t("Enabled Ratings."));
+            else
+                addMessage(_t("Disabled Ratings."));
+            _util.setRatingsEnabled(enableRatings);
+            changed = true;
+        }
+        if (_util.commentsEnabled() != enableComments) {
+            _config.setProperty(PROP_COMMENTS, Boolean.toString(enableComments));
+            if (enableComments)
+                addMessage(_t("Enabled Comments."));
+            else
+                addMessage(_t("Disabled Comments."));
+            _util.setCommentsEnabled(enableComments);
+            changed = true;
+        }
+        if (commentName == null) {
+            commentName = "";
+        } else {
+            commentName = commentName.replaceAll("[\n\r<>#;]", "");
+            if (commentName.length() > Comment.MAX_NAME_LEN)
+                commentName = commentName.substring(0, Comment.MAX_NAME_LEN);
+        }
+        if (!_util.getCommentsName().equals(commentName)) {
+            _config.setProperty(PROP_COMMENTS_NAME, commentName);
+            addMessage(_t("Comments name set to {0}.", commentName));
+            _util.setCommentsName(commentName);
             changed = true;
         }
         if (theme != null) {
@@ -1936,7 +2032,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
     private void removeTorrentStatus(Snark snark) {
         byte[] ih = snark.getInfoHash();
         File conf = configFile(_configDir, ih);
+        File comm = commentFile(_configDir, ih);
         synchronized (_configLock) {
+            comm.delete();
             boolean ok = conf.delete();
             if (ok) {
                 if (_log.shouldInfo())
@@ -2658,6 +2756,15 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 // How to do this without creating a ton of threads?
                 if (count % 8 == 0) {
                     try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                }
+            } else {
+                CommentSet cs = snark.getComments();
+                if (cs != null) {
+                    synchronized(cs) {
+                        if (cs.isModified()) {
+                            locked_saveComments(snark, cs);
+                        }
+                    }
                 }
             }
         }

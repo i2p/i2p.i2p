@@ -47,6 +47,8 @@ import net.i2p.util.SimpleTimer2;
 
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
+import org.klomp.snark.comments.Comment;
+import org.klomp.snark.comments.CommentSet;
 import org.klomp.snark.dht.DHT;
 
 /**
@@ -1386,6 +1388,8 @@ class PeerCoordinator implements PeerListener
       } else if (id == ExtensionHandler.ID_HANDSHAKE) {
           sendPeers(peer);
           sendDHT(peer);
+          if (_util.utCommentsEnabled())
+              sendCommentReq(peer);
       }
   }
 
@@ -1431,6 +1435,35 @@ class PeerCoordinator implements PeerListener
       try {
           if (bev.getMap().get(ExtensionHandler.TYPE_DHT) != null)
               ExtensionHandler.sendDHT(peer, dht.getPort(), dht.getRPort());
+      } catch (InvalidBEncodingException ibee) {}
+  }
+
+  /**
+   *  Send a commment request message to the peer, if he supports it.
+   *  @since 0.9.31
+   */
+  void sendCommentReq(Peer peer) {
+      Map<String, BEValue> handshake = peer.getHandshakeMap();
+      if (handshake == null)
+          return;
+      BEValue bev = handshake.get("m");
+      if (bev == null)
+          return;
+      // TODO if peer hasn't been connected very long, don't bother
+      // unless forced at handshake time (see above)
+      try {
+          if (bev.getMap().get(ExtensionHandler.TYPE_COMMENT) != null) {
+              int sz = 0;
+              CommentSet comments = snark.getComments();
+              if (comments != null) {
+                  synchronized(comments) {
+                      sz = comments.size();
+                  }
+              }
+              if (sz >= CommentSet.MAX_SIZE)
+                  return;
+              ExtensionHandler.sendCommentReq(peer, CommentSet.MAX_SIZE - sz);
+          }
       } catch (InvalidBEncodingException ibee) {}
   }
 
@@ -1483,6 +1516,40 @@ class PeerCoordinator implements PeerListener
       }
       // TrackerClient will poll for pexPeers and do the add in its thread,
       // rather than running another thread here.
+  }
+
+  /**
+   * Called when comments are requested via ut_comment
+   *
+   * @since 0.9.31
+   */
+  public void gotCommentReq(Peer peer, int num) {
+      /* if disabled, return */
+      CommentSet comments = snark.getComments();
+      if (comments != null) {
+          int lastSent = peer.getTotalCommentsSent();
+          int sz;
+          synchronized(comments) {
+              sz = comments.size();
+              // only send if we have more than last time
+              if (sz <= lastSent)
+                  return;
+              ExtensionHandler.locked_sendComments(peer, num, comments);
+          }
+          peer.setTotalCommentsSent(sz);
+      }
+  }
+
+  /**
+   * Called when comments are received via ut_comment
+   *
+   * @param comments non-null
+   * @since 0.9.31
+   */
+  public void gotComments(Peer peer, List<Comment> comments) {
+      /* if disabled, return */
+      if (!comments.isEmpty())
+          snark.addComments(comments);
   }
 
   /**

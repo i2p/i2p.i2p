@@ -90,6 +90,7 @@ public class Peer implements Comparable<Peer>
   //private static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
   private final boolean _isIncoming;
+  private int _totalCommentsSent;
 
   /**
    * Outgoing connection.
@@ -290,7 +291,8 @@ public class Peer implements Comparable<Peer>
             int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly));
+            boolean comment = util.utCommentsEnabled();
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly, comment));
         }
 
         // Send our bitmap
@@ -745,5 +747,15 @@ public class Peer implements Comparable<Peer>
   public long getDownloadRate()
   {
     return PeerCoordinator.getRate(downloaded_old);
+  }
+
+  /** @since 0.9.31 */
+  int getTotalCommentsSent() {
+    return _totalCommentsSent;
+  }
+
+  /** @since 0.9.31 */
+  void setTotalCommentsSent(int count) {
+    _totalCommentsSent = count;
   }
 }

@@ -11,6 +11,9 @@ import net.i2p.update.*;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.comments.CommentSet;
+
+
 /**
  *  The downloader for router signed updates.
  *
@@ -297,6 +300,16 @@ class UpdateRunner implements UpdateTask, CompleteListener {
 
     public long getSavedUploaded(Snark snark) {
         return _smgr.getSavedUploaded(snark);
+    }
+
+    /** @since 0.9.31 */
+    public CommentSet getSavedComments(Snark snark) {
+        return _smgr.getSavedComments(snark);
+    }
+
+    /** @since 0.9.31 */
+    public void locked_saveComments(Snark snark, CommentSet comments) {
+        _smgr.locked_saveComments(snark, comments);
     }
 
     //////// end CompleteListener methods

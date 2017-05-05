@@ -81,7 +81,9 @@ class PeerCheckerTask implements Runnable
                        " interested: " + coordinator.getInterestedUploaders() +
                        " limit: " + uploadLimit + " overBW? " + overBWLimit);
         DHT dht = _util.getDHT();
+        int i = 0;
         for (Peer peer : peerList) {
+            i++;
 
             // Remove dying peers
             if (!peer.isConnected())
@@ -226,9 +228,12 @@ class PeerCheckerTask implements Runnable
                   }
               }
             peer.retransmitRequests();
-            // send PEX
-            if ((_runCount % 17) == 0 && !peer.isCompleted())
+            // send PEX, about every 12 minutes
+            if (((_runCount + i) % 17) == 0 && !peer.isCompleted())
                 coordinator.sendPeers(peer);
+            // send Comment Request, about every 30 minutes
+            if ( /* comments enabled && */ ((_runCount + i) % 47) == 0)
+                coordinator.sendCommentReq(peer);
             // cheap failsafe for seeds connected to seeds, stop pinging and hopefully
             // the inactive checker (above) will eventually disconnect it
             if (coordinator.getNeededLength() > 0 || !peer.isCompleted())
@@ -238,7 +243,7 @@ class PeerCheckerTask implements Runnable
                 dht.announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash(),
                              peer.isCompleted());
             }
-          }
+        } // for peer
 
         // Resync actual uploaders value
         // (can shift a bit by disconnecting peers)

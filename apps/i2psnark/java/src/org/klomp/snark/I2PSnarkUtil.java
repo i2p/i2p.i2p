@@ -67,6 +67,8 @@ public class I2PSnarkUtil {
     private int _startupDelay;
     private boolean _shouldUseOT;
     private boolean _shouldUseDHT;
+    private boolean _enableRatings, _enableComments;
+    private String _commentsName;
     private boolean _areFilesPublic;
     private List<String> _openTrackers;
     private DHT _dht;
@@ -104,6 +106,8 @@ public class I2PSnarkUtil {
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
         _openTrackers = Collections.emptyList();
         _shouldUseDHT = DEFAULT_USE_DHT;
+        _enableRatings = _enableComments = true;
+        _commentsName = "";
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -643,6 +647,44 @@ public class I2PSnarkUtil {
     /** @since DHT */
     public boolean shouldUseDHT() {
         return _shouldUseDHT;
+    }
+
+    /** @since 0.9.31 */
+    public void setRatingsEnabled(boolean yes) {
+        _enableRatings = yes;
+    }
+
+    /** @since 0.9.31 */
+    public boolean ratingsEnabled() {
+        return _enableRatings;
+    }
+
+    /** @since 0.9.31 */
+    public void setCommentsEnabled(boolean yes) {
+        _enableComments = yes;
+    }
+
+    /** @since 0.9.31 */
+    public boolean commentsEnabled() {
+        return _enableComments;
+    }
+
+    /** @since 0.9.31 */
+    public void setCommentsName(String name) {
+        _commentsName = name;
+    }
+
+    /**
+     *  @return non-null, "" if none
+     *  @since 0.9.31
+     */
+    public String getCommentsName() {
+        return _commentsName;
+    }
+
+    /** @since 0.9.31 */
+    public boolean utCommentsEnabled() {
+        return _enableRatings || _enableComments;
     }
 
     /**
