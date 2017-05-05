@@ -19,8 +19,10 @@ import net.i2p.util.SystemVersion;
 
 /**
  * A Dummy naming service that can only handle base64 and b32 destinations.
+ *
+ * @since public since 0.9.31
  */
-class DummyNamingService extends NamingService {
+public class DummyNamingService extends NamingService {
 
     protected static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
     public final static String PROP_B32 = "i2p.naming.hostsTxt.useB32";

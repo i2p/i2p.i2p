@@ -21,7 +21,6 @@ public class CommandLine {
     protected static final List<String> CLASSES = Arrays.asList(new String[] {
         "freenet.support.CPUInformation.CPUID",
         "net.i2p.CoreVersion",
-        "net.i2p.client.naming.BlockfileNamingService",
         "net.i2p.crypto.CertUtil",
         "net.i2p.crypto.CryptoCheck",
         "net.i2p.crypto.SU3File",

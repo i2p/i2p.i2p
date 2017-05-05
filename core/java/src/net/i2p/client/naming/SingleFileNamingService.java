@@ -268,9 +268,9 @@ public class SingleFileNamingService extends NamingService {
      *  Does not write a newline.
      *
      *  @param options non-null
-     *  @since 0.9.26, package private since 0.9.30
+     *  @since 0.9.26, package private since 0.9.30, public since 0.9.31
      */
-    static void writeOptions(Properties options, Writer out) throws IOException {
+    public static void writeOptions(Properties options, Writer out) throws IOException {
         boolean started = false;
         for (Map.Entry<Object, Object> e : options.entrySet()) {
             String k = (String) e.getKey();

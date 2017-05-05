@@ -37,7 +37,8 @@ public abstract class NamingService {
 
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";
-    private static final String DEFAULT_IMPL = "net.i2p.client.naming.BlockfileNamingService";
+    private static final String DEFAULT_IMPL = "net.i2p.router.naming.BlockfileNamingService";
+    private static final String OLD_DEFAULT_IMPL = "net.i2p.client.naming.BlockfileNamingService";
     private static final String BACKUP_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
     
     /** 
@@ -751,7 +752,10 @@ public abstract class NamingService {
      */
     public static final synchronized NamingService createInstance(I2PAppContext context) {
         NamingService instance = null;
+        String dflt = context.isRouterContext() ? DEFAULT_IMPL : BACKUP_IMPL;
         String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL);
+        if (impl.equals(OLD_DEFAULT_IMPL))
+            impl = dflt;
         try {
             Class<?> cls = Class.forName(impl);
             Constructor<?> con = cls.getConstructor(I2PAppContext.class);

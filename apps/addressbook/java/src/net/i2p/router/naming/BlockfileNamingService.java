@@ -5,7 +5,7 @@
  * It probably won't make your computer catch on fire, or eat 
  * your children, but it might.  Use at your own risk.
  */
-package net.i2p.client.naming;
+package net.i2p.router.naming;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -30,6 +30,11 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.DummyNamingService;
+import net.i2p.client.naming.HostsTxtNamingService;
+import net.i2p.client.naming.NamingService;
+import net.i2p.client.naming.NamingServiceListener;
+import net.i2p.client.naming.SingleFileNamingService;
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -95,7 +100,7 @@ import net.metanotion.util.skiplist.SkipList;
  *
  * All host names are converted to lower case.
  *
- * @since 0.8.7
+ * @since 0.8.7, moved from core to addressbook in 0.9.31
  */
 public class BlockfileNamingService extends DummyNamingService {
 
