@@ -4,10 +4,10 @@
  */
 package net.i2p.crypto;
 
-import java.io.PrintWriter;
+//import java.io.PrintWriter;
 import java.security.InvalidKeyException;
 
-import net.i2p.util.Clock;
+//import net.i2p.util.Clock;
 
 //...........................................................................
 /**
@@ -552,21 +552,22 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param blockSize  The block size in bytes of this Rijndael.
      * @throws  InvalidKeyException  If the key is invalid.
      */
-    public static final/* synchronized */Object makeKey(byte[] k, int blockSize) throws InvalidKeyException {
+    public static final Object makeKey(byte[] k, int blockSize) throws InvalidKeyException {
         return makeKey(k, blockSize, null);
     }
-    public static final/* synchronized */Object makeKey(byte[] k, int blockSize, CryptixAESKeyCache.KeyCacheEntry keyData) throws InvalidKeyException {
+
+    public static final Object makeKey(byte[] k, int blockSize, CryptixAESKeyCache.KeyCacheEntry keyData) throws InvalidKeyException {
         //if (_RDEBUG) trace(_IN, "makeKey(" + k + ", " + blockSize + ")");
         if (k == null) throw new InvalidKeyException("Empty key");
         if (!(k.length == 16 || k.length == 24 || k.length == 32))
             throw new InvalidKeyException("Incorrect key length");
         int ROUNDS = getRounds(k.length, blockSize);
         int BC = blockSize / 4;
-        int[][] Ke = null; // new int[ROUNDS + 1][BC]; // encryption round keys
-        int[][] Kd = null; // new int[ROUNDS + 1][BC]; // decryption round keys
+        int[][] Ke; // new int[ROUNDS + 1][BC]; // encryption round keys
+        int[][] Kd; // new int[ROUNDS + 1][BC]; // decryption round keys
         int ROUND_KEY_COUNT = (ROUNDS + 1) * BC;
         int KC = k.length / 4;
-        int[] tk = null; // new int[KC];
+        int[] tk; // new int[KC];
         int i, j;
         
         if (keyData == null) {
@@ -628,15 +629,16 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
                 Kd[ROUNDS - (t / BC)][t % BC] = tk[j];
             }
         }
-        for (int r = 1; r < ROUNDS; r++)
+        for (int r = 1; r < ROUNDS; r++) {
             // inverse MixColumn where needed
             for (j = 0; j < BC; j++) {
                 tt = Kd[r][j];
                 Kd[r][j] = _U1[(tt >>> 24) & 0xFF] ^ _U2[(tt >>> 16) & 0xFF] ^ _U3[(tt >>> 8) & 0xFF] ^ _U4[tt & 0xFF];
             }
+        }
         // assemble the encryption (Ke) and decryption (Kd) round keys into
         // one sessionKey object
-        Object[] sessionKey = null;
+        Object[] sessionKey;
         if (keyData == null)
             sessionKey = new Object[] { Ke, Kd};
         else

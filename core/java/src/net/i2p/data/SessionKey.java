@@ -37,15 +37,14 @@ public class SessionKey extends SimpleDataStructure {
     }
 
     /**
-     * caveat: this method isn't synchronized with the preparedKey, so don't
-     * try to *change* the key data after already doing some 
-     * encryption/decryption (or if you do change it, be sure this object isn't
-     * mid decrypt)
+     * Sets the data.
+     * @param data 32 bytes, or null
+     * @throws IllegalArgumentException if data is not the legal number of bytes (but null is ok)
+     * @throws RuntimeException if data already set.
      */
     @Override
     public void setData(byte[] data) {
         super.setData(data);
-        _preparedKey = null;
     }
     
     /** 

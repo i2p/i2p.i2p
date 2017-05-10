@@ -208,17 +208,18 @@ public final class CryptixAESEngine extends AESEngine {
      */
     @Override
     public final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
-        if (sessionKey.getPreparedKey() == null) {
+        Object pkey = sessionKey.getPreparedKey();
+        if (pkey == null) {
             try {
-                Object key = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
-                sessionKey.setPreparedKey(key);
+                pkey = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
+                sessionKey.setPreparedKey(pkey);
             } catch (InvalidKeyException ike) {
                 _log.log(Log.CRIT, "Invalid key", ike);
                 throw new IllegalArgumentException("invalid key?  " + ike.getMessage());
             }
         }
         
-        CryptixRijndael_Algorithm.blockEncrypt(payload, out, inIndex, outIndex, sessionKey.getPreparedKey());
+        CryptixRijndael_Algorithm.blockEncrypt(payload, out, inIndex, outIndex, pkey);
     }
 
     /** decrypt exactly 16 bytes of data with the session key provided
@@ -235,17 +236,18 @@ public final class CryptixAESEngine extends AESEngine {
         //    throw new IllegalArgumentException("bad block args [payload.len=" + payload.length 
         //                                       + " inIndex=" + inIndex + " rv.len=" + rv.length 
         //                                       + " outIndex="+outIndex);
-        if (sessionKey.getPreparedKey() == null) {
+        Object pkey = sessionKey.getPreparedKey();
+        if (pkey == null) {
             try {
-                Object key = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
-                sessionKey.setPreparedKey(key);
+                pkey = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
+                sessionKey.setPreparedKey(pkey);
             } catch (InvalidKeyException ike) {
                 _log.log(Log.CRIT, "Invalid key", ike);
                 throw new IllegalArgumentException("invalid key?  " + ike.getMessage());
             }
         }
 
-        CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, sessionKey.getPreparedKey());
+        CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, pkey);
     }
     
 /******
