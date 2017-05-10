@@ -52,6 +52,7 @@ class Daemon {
     public static final String VERSION = "2.0.4";
     private volatile boolean _running;
     private static final boolean DEBUG = false;
+    // If you change this, change in SusiDNS SubscriptionBean also
     private static final String DEFAULT_SUB = "http://i2p-projekt.i2p/hosts.txt";
     /** @since 0.9.12 */
     static final String OLD_DEFAULT_SUB = "http://www.i2p2.i2p/hosts.txt";

@@ -45,6 +45,8 @@ public class SubscriptionsBean extends BaseBean
 {
 	private String fileName, content;
 	private static final String SUBS_FILE = "subscriptions.txt";
+	// If you change this, change in Addressbook Daemon also
+	private static final String DEFAULT_SUB = "http://i2p-projekt.i2p/hosts.txt";
 	
 	public String getFileName()
 	{
@@ -87,6 +89,8 @@ public class SubscriptionsBean extends BaseBean
 				if (br != null)
 					try { br.close(); } catch (IOException ioe) {}
 			}
+		} else {
+			content = DEFAULT_SUB;
 		}
 	}
 	
