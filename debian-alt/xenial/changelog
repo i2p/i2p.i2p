@@ -2,7 +2,7 @@ i2p (0.9.30-3ubuntu1) xenial; urgency=medium
 
   * New upstream version 0.9.30
 
- -- zzz on i2p (key signing) <zzz@i2pmail.org>  Mon, 03 May 2017 12:12:12 +0000
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 03 May 2017 12:12:12 +0000
 
 i2p (0.9.29-1ubuntu1) trusty; urgency=medium
 

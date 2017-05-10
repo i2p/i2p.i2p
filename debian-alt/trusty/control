@@ -14,6 +14,8 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,openjdk-6-jdk
  ,glassfish-javaee
  ,dh-apparmor
+ ,dh-systemd
+ ,bash-completion
  ,gettext
  ,libgetopt-java
  ,libgmp-dev (>= 2:5.0.2)
@@ -75,10 +77,10 @@ Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  openjdk-8-jre-headless | openjdk-7-jre-headless | java8-runtime-headless | java7-runtime-headless,
- glassfish-javaee,
  geoip-database,
  gettext-base,
  libgetopt-java,
+ glassfish-javaee
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu

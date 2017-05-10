@@ -1,3 +1,15 @@
+i2p (0.9.30p-2~trusty+1) trusty; urgency=medium
+
+  * Restore systemd usage
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 10 May 2017 12:12:12 +0000
+
+i2p (0.9.30p-1~precise+1) precise; urgency=medium
+
+  * Backport to Precise
+
+ -- zzz on i2p (key signing) <zzz@i2pmail.org>  Wed, 03 May 2017 12:12:12 +0000
+
 i2p (0.9.29-1ubuntu1) trusty; urgency=medium
 
   * New upstream version 0.9.29

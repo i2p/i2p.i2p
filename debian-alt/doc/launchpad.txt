@@ -29,7 +29,7 @@ Prep
     not utopic (obsolete, disabled by launchpad)
 
 - you need the following packages
-  sudo apt-get install devscripts dput dh_systemd
+  sudo apt-get install devscripts dput dh_systemd bash-completion
 
 - check out clean copy of release:
   mtn co -d i2p.mtn -b i2p.i2p i2p.i2p.foobar -r t:i2p-0.9.xx
@@ -43,19 +43,19 @@ Generate files to upload
 - edit debian/changelog to add the release at the top
   * version MUST be 0.9.XX-1ubuntu1
     next version for fixes would be 0.9.XX-2ubunutu1
-  * series MUST be trusty (or precise)
+  * series MUST be xenial or trusty or precise
   * name and email MUST EXACTLY match what's in your GPG keyring
     or the signing will fail.
     (or add -kkeyid argument to debuild, which you must do
      if you want to sign with a subkey)
     run gpg -K to list your private keys
-- ant debian-release-tarball (ant precise-release-tarball for precise)
+- ant debian-release-tarball (ant precise-release-tarball for precise/trusty)
   this will make a directory ../i2p-0.9.XX-0-xxxxxxxx/
   and a tarball ../i2p_0.9.XX.orig.tar.bz2
 - cp debian/changelog ../i2p-0.9.XX-0-xxxxxxxx/debian/
 - cp debian-alt/(series)/(other files besides changelog) to ../i2p-0.9.XX-0-xxxxxxxx/debian/
 - cd ../i2p-0.9.XX-0-xxxxxxxx/
-- Note: If building for precise and you are on yakkety or higher without Java 7,
+- Note: If building for precise/trusty and you are on yakkety or higher without Java 7,
   make a symlink so debuild will work: cd /var/lib/jvm; sudo ln -s java-8-openjdk-amd64/ java-7-openjdk-amd64
 - Build the *1ubuntu1* files:
   If you have NOT done a successful dput for this release yet:
@@ -103,7 +103,7 @@ So the build isn't done until both arch builds are complete.
 Don't
 
 
-If it works, copy trusty the series you are running (e.g. yakkety) in your PPA
+If it works, copy the series you are running (e.g. yakkety) in your PPA
 so that you can test.
   (select "copy existing binaries")
   Wait a few minutes for that to happen
@@ -127,12 +127,13 @@ Add your PPA following the instructions at http://i2p-projekt.i2p/en/download/de
 Release
 -------
 
-Then copy trusty from your PPA to the i2p-maintainers PPA.
-Then in the i2p-maintainers PPA, copy trusty to vivid, xenial, yakkety, zesty
+Then copy from your PPA to the i2p-maintainers PPA.
+Then in the i2p-maintainers PPA, copy trusty to vivid. Copy xenial to yakkety, zesty.
 Did a new series open up since the last time you did this? Copy to the new one also.
   (select "copy existing binaries")
-  Copy trusty first and wait for it to be published in i2p-maintainers or the others will fail.
-For precise, build and copy it separately.
+  Copy xenial first and wait for it to be published in i2p-maintainers or the others will fail.
+For precise and trusty, build and copy it separately. Both precise and trusty are built
+from the "ant precise-release-tarball" source.
 
 
 Creating milestone, release, and uploading files
