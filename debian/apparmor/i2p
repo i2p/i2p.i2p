@@ -51,6 +51,26 @@
   /usr/sbin/wrapper                                       rix,
   /usr/share/java/wrapper*.jar                            r,
 
+  # Dependent packages
+  /usr/share/java/libintl.jar                             r,
+  /usr/share/java/glassfish-appserv-jstl.jar              r,
+  /usr/share/maven-repo/jstl/jstl/1.2/jstl-1.2.jar        r,
+  /usr/share/java/gnu-getopt.jar                          r,
+  /usr/share/java/gnu-getopt-*.jar                        r,
+  /usr/share/java/jetty9-*.jar                            r,
+  /usr/share/java/jsp-api-*.jar                           r,
+  /usr/share/java/servlet-api-*.jar                       r,
+  /usr/share/java/standard.jar                            r,
+  /usr/share/java/standard-*.jar                          r,
+  /usr/share/java/tomcat8-*.jar                           r,
+
+  # GeoIP data
+  /usr/share/GeoIP/*                                      r,
+
+  # Other /proc
+  @{PROC}/cpuinfo                                         r,
+  @{PROC}/net/if_inet6                                    r,
+
   # 'm' is needed by the I2P-Bote plugin
   /{,lib/live/mount/overlay/}tmp/                         rwm,
   owner /{,lib/live/mount/overlay/}tmp/hsperfdata_i2psvc/ rwk,
