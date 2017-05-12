@@ -1243,8 +1243,13 @@ public class Snark
       } catch (IOException ioe) {
           if (storage != null) {
               try { storage.close(); } catch (IOException ioee) {}
+              // clear storage, we have a mess if we have non-null storage and null metainfo,
+              // as on restart, Storage.reopen() will throw an ioe
+              storage = null;
           }
-          fatal("Could not check or create storage", ioe);
+          // TODO we're still in an inconsistent state, won't work if restarted
+          // (PeerState "disconnecting seed that connects to seeds"
+          fatal("Could not create data files", ioe);
       }
   }
 

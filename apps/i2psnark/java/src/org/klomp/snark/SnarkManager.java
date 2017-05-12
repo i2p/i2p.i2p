@@ -731,7 +731,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         return new SHA1Hash(ih);
     }
 
-    /** null to set initial defaults */
+    /** @param filename null to set initial defaults */
     public void loadConfig(String filename) {
         synchronized(_configLock) {
             locked_loadConfig(filename);
@@ -896,7 +896,14 @@ public class SnarkManager implements CompleteListener, ClientApp {
         _util.setRatingsEnabled(Boolean.parseBoolean(_config.getProperty(PROP_RATINGS, "true")));
         _util.setCommentsEnabled(Boolean.parseBoolean(_config.getProperty(PROP_COMMENTS, "true")));
         _util.setCommentsName(_config.getProperty(PROP_COMMENTS_NAME, ""));
-        getDataDir().mkdirs();
+        File dd = getDataDir();
+        if (dd.isDirectory()) {
+            if (!dd.canWrite())
+                addMessage(_t("No write permissions for data directory") + ": " + dd);
+        } else {
+            if (!dd.mkdirs())
+                addMessage(_t("Data directory cannot be created") + ": " + dd);
+        }
         initTrackerMap();
     }
     
@@ -1031,6 +1038,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
             } else if (!dd.canRead()) {
                 addMessage(_t("Unreadable") + ": " + dataDir);
             } else {
+                if (!dd.canWrite())
+                    addMessage(_t("No write permissions for data directory") + ": " + dataDir);
                 changed = true;
                 interruptMonitor = true;
                 _config.setProperty(PROP_DIR, dataDir);
@@ -2640,6 +2649,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
     /**
      *  If not connected, thread it, otherwise inline
+     *  @throws RuntimeException via Snark.fatal()
      *  @since 0.9.1
      */
     public void startTorrent(byte[] infoHash) {
@@ -2654,6 +2664,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 
     /**
      *  If not connected, thread it, otherwise inline
+     *  @throws RuntimeException via Snark.fatal()
      *  @since 0.9.23
      */
     public void startTorrent(Snark snark) {
@@ -2701,17 +2712,14 @@ public class SnarkManager implements CompleteListener, ClientApp {
         private final Snark snark;
         public ThreadedStarter(Snark s) { snark = s; }
         public void run() {
-            try {
-                run2();
-            } catch (RuntimeException e) {
-                _log.error("Error starting", e);
-            }
-        }
-
-        private void run2() {
             if (snark != null) {
-                if (snark.isStopped())
-                    snark.startTorrent();
+                if (snark.isStopped()) {
+                    try {
+                        snark.startTorrent();
+                    } catch (RuntimeException re) {
+                        // Snark.fatal() will log and call fatal() here for user message before throwing
+                    }
+                }
             } else {
                 startAll();
             }
@@ -2724,8 +2732,13 @@ public class SnarkManager implements CompleteListener, ClientApp {
      */
     private void startAll() {
         for (Snark snark : _snarks.values()) {
-            if (snark.isStopped())
-                snark.startTorrent();
+            if (snark.isStopped()) {
+                try {
+                    snark.startTorrent();
+                } catch (RuntimeException re) {
+                    // Snark.fatal() will log and call fatal() here for user message before throwing
+                }
+            }
         }
     }
 

@@ -987,6 +987,11 @@ public class I2PSnarkServlet extends BasicServlet {
                         }
                     }
                 }
+                File dd = _manager.getDataDir();
+                if (!dd.canWrite()) {
+                    _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
+                    return;
+                }
                 if (newURL.startsWith("http://")) {
                     FetchAndAdd fetch = new FetchAndAdd(_context, _manager, newURL, dir);
                     _manager.addDownloader(fetch);
@@ -1045,12 +1050,18 @@ public class I2PSnarkServlet extends BasicServlet {
                                 _manager.addMessage(_t("Magnet deleted: {0}", name));
                                 return;
                             }
-                            _manager.stopTorrent(snark, true);
-                            // should we delete the torrent file?
-                            // yeah, need to, otherwise it'll get autoadded again (at the moment
                             File f = new File(name);
-                            f.delete();
-                            _manager.addMessage(_t("Torrent file deleted: {0}", f.getAbsolutePath()));
+                            File dd = _manager.getDataDir();
+                            boolean canDelete = dd.canWrite() || !f.exists();
+                            _manager.stopTorrent(snark, canDelete);
+                            // TODO race here with the DirMonitor, could get re-added
+                            if (f.delete()) {
+                                _manager.addMessage(_t("Torrent file deleted: {0}", f.getAbsolutePath()));
+                            } else if (f.exists()) {
+                                if (!canDelete)
+                                    _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
+                                _manager.addMessage(_t("Torrent file could not be deleted: {0}", f.getAbsolutePath()));
+                            }
                             break;
                         }
                     }
@@ -1074,10 +1085,19 @@ public class I2PSnarkServlet extends BasicServlet {
                                     _manager.addMessage(_t("Magnet deleted: {0}", name));
                                 return;
                             }
-                            _manager.stopTorrent(snark, true);
                             File f = new File(name);
-                            f.delete();
-                            _manager.addMessage(_t("Torrent file deleted: {0}", f.getAbsolutePath()));
+                            File dd = _manager.getDataDir();
+                            boolean canDelete = dd.canWrite() || !f.exists();
+                            _manager.stopTorrent(snark, canDelete);
+                            // TODO race here with the DirMonitor, could get re-added
+                            if (f.delete()) {
+                                _manager.addMessage(_t("Torrent file deleted: {0}", f.getAbsolutePath()));
+                            } else if (f.exists()) {
+                                if (!canDelete)
+                                    _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
+                                _manager.addMessage(_t("Torrent file could not be deleted: {0}", f.getAbsolutePath()));
+                                return;
+                            }
                             Storage storage = snark.getStorage();
                             if (storage == null)
                                 break;
@@ -1178,6 +1198,11 @@ public class I2PSnarkServlet extends BasicServlet {
                 //    announceURL = announceURLOther;
 
                 if (baseFile.exists()) {
+                    File dd = _manager.getDataDir();
+                    if (!dd.canWrite()) {
+                        _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
+                        return;
+                    }
                     String torrentName = baseFile.getName();
                     if (torrentName.toLowerCase(Locale.US).endsWith(".torrent")) {
                         _manager.addMessage(_t("Cannot add a torrent ending in \".torrent\": {0}", baseFile.getAbsolutePath()));
