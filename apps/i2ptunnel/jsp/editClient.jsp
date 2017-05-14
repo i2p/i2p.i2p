@@ -148,7 +148,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                            out.write(" <span class=\"required\"><font color=\"red\">(");
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
-                       }   
+                       }
           %>
 
                 <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=targetHost%>" class="freetext host" placeholder="required" />
@@ -172,13 +172,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                         out.write("</option>\n");
                     }
               %>
-                </select>                
+                </select>
             </td>
          <% } /* streamrclient */ %>
         </tr>
 
          <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) {
-          %>                    
+          %>
         <tr>
             <th colspan="2">
                     <%=intl._t("Use SSL?")%>
@@ -246,7 +246,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                            out.write(" <span class=\"required\"><font color=\"red\">(");
                            out.write(intl._t("required"));
                            out.write(")</font></span>");
-                       }   
+                       }
                      %>
 
                 <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="required" />
@@ -380,7 +380,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               %></select>
             </td>
         </tr>
-                            
+
 
          <% if (!"streamrclient".equals(tunnelType)) { %>
         <tr>
@@ -400,7 +400,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
                   %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._t("interactive connection")%> </option>
                     <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._t("bulk connection (downloads/websites/BT)")%> </option>
-                </select>                
+                </select>
             </td>
 
             <td>
@@ -428,7 +428,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <input type="text" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
             </td>
         </tr>
-                 
+
          <% if (!"streamrclient".equals(tunnelType)) { // streamr client sends pings so it will never be idle %>
 
         <tr>
@@ -445,7 +445,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
 
          <% } // !streamrclient %>
-                 
+
         <tr>
             <th colspan="2">
                 <%=intl._t("Reduce tunnel quantity when idle")%>
@@ -486,7 +486,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
             <td>
                 <b><%=intl._t("Idle period")%>:</b>
-                <input type="text" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext period" />   
+                <input type="text" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext period" />
                 minutes
             </td>
         </tr>
@@ -526,9 +526,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </td>
         </tr>
          <%
-            String destb64 = editBean.getDestinationBase64(curTunnel);     
+            String destb64 = editBean.getDestinationBase64(curTunnel);
             if (destb64.length() > 0) {
-           %>   
+           %>
 
         <tr>
             <td colspan="2">
