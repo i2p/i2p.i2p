@@ -708,10 +708,6 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write("</tt>");
             }
             out.write("</span>");
-            if (dht != null) {
-                if (showDebug)
-                    out.write(dht.renderStatusHTML());
-            }
             out.write("</th>\n");
             if (_manager.util().connected() && total > 0) {
                 out.write("    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
@@ -721,6 +717,12 @@ public class I2PSnarkServlet extends BasicServlet {
                       "    <th></th>");
             } else {
                 out.write("<th colspan=\"5\"></th>");
+            }
+            if (dht != null) {
+                if (showDebug) {
+                    out.write("</tr>\n<tr class=\"dhtDebug\">");
+                    out.write(dht.renderStatusHTML());
+                }
             }
             out.write("</tr></tfoot>\n");
         }
@@ -2270,19 +2272,28 @@ public class I2PSnarkServlet extends BasicServlet {
 
         out.write("<tr><td>");
         out.write(_t("Theme"));
-        out.write(":<td colspan=\"2\"><select name='theme'>");
-        String theme = _manager.getTheme();
-        String[] themes = _manager.getThemes();
-        Arrays.sort(themes);
-        for(int i = 0; i < themes.length; i++) {
-            if(themes[i].equals(theme))
-                out.write("\n<OPTION value=\"" + themes[i] + "\" SELECTED>" + themes[i]);
-            else
-                out.write("\n<OPTION value=\"" + themes[i] + "\">" + themes[i]);
+        out.write(":<td colspan=\"2\">");
+        if (_manager.getUniversalTheming()) {
+            out.write("<b>");
+            out.write(_manager.getTheme());
+            out.write("</b> (<a href=\"/configui\">");
+            out.write(_t("Universal theming is enabled"));
+            out.write("</a>)");
+        } else {
+            out.write("<select name='theme'>");
+            String theme = _manager.getTheme();
+            String[] themes = _manager.getThemes();
+            Arrays.sort(themes);
+            for (int i = 0; i < themes.length; i++) {
+                if(themes[i].equals(theme))
+                    out.write("\n<OPTION value=\"" + themes[i] + "\" SELECTED>" + themes[i]);
+                else
+                    out.write("\n<OPTION value=\"" + themes[i] + "\">" + themes[i]);
+            }
+            out.write("</select>\n");
         }
-        out.write("</select>\n" +
 
-                  "<tr><td>");
+        out.write("<tr><td>");
         out.write(_t("Refresh time"));
         out.write(":<td colspan=\"2\"><select name=\"refreshDelay\""
                   + " title=\"");
