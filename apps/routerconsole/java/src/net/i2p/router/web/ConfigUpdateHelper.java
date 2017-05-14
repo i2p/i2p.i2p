@@ -76,27 +76,27 @@ public class ConfigUpdateHelper extends HelperBase {
     
     public String getUpdateThroughProxy() {
         if (_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY))
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"checked\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" id=\"updateThroughProxy\" checked=\"checked\" >";
         else
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" id=\"updateThroughProxy\" >";
     }
     
     /** @since 0.9.9 */
     public String getNewsThroughProxy() {
         if (_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY_NEWS, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY_NEWS))
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"newsThroughProxy\" checked=\"checked\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"newsThroughProxy\" id=\"newsThroughProxy\" checked=\"checked\" >";
         else
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"newsThroughProxy\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"newsThroughProxy\" id=\"newsThroughProxy\" >";
     }
     
     public String getUpdateUnsigned() {
-        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" " +
+        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" id=\"updateUnsigned\" " +
                getChecked(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED) + '>';
     }
     
     /** @since 0.9.20 */
     public String getUpdateDevSU3() {
-        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" " +
+        return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateDevSU3\" id=\"updateDevSU3\" " +
                getChecked(ConfigUpdateHandler.PROP_UPDATE_DEV_SU3) + '>';
     }
     

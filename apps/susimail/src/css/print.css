@@ -1,27 +1,76 @@
-.header, .footer, .topbuttons, .bottombuttons {
-	display: none;
+/* Susimail Print Theme Override */
+
+*, th, .list0 td:nth-child(3) a, .list1 td:nth-child(3) a, #mailbox th:nth-child(n+1) {
+     text-shadow: none !important;
+     background: #fff !important;
+     color: #000 !important;
 }
 
-p.error, p.info {
-	display: none;
+html, body, .page, form {
+     margin: 0;
+     padding: 0;
 }
 
-a.sort, img.sort {
-	display: none;
+body, td, p.mailbody {
+     font-size: 10pt !important;
 }
 
-input.optbox {
-	display: none;
+.page, table {
+     width: 100%;
+     margin: 0;
+     float: none;
 }
 
-div.page, table {
-	width: 100%;
-	margin: 0;
-	float: none;
+#mailhead, .mailbody, table, td, tr, .attached, th {
+     border-color: #999 !important;
+}
+
+#mailbox th:nth-child(1), #mailbox td:nth-child(1),
+#mailbox th:nth-child(2), #mailbox td:nth-child(2),
+#mailbox th:nth-child(6), #mailbox td:nth-child(6),
+#mailbox th:nth-child(8), #mailbox td:nth-child(8) {
+     display: none;
+}
+
+#mailbox tr th:last-child, .list0 td:last-child, .list1 td:last-child {
+     padding-right: 4px;
+}
+
+p.mailbody {
+     margin: 0;
+     padding-left: 0 !important;
+     padding-right: 0 !important;
+}
+
+tr.list0 td, tr.list1 td {
+     border-top: 1px solid rgba(240,240,240,0.5);
+}
+
+tr.list1 td, tr.list1 a, .list1 td:nth-child(3) a, .list1 td:nth-child(4) img  {
+     background: rgba(245,245,245,0.5) !important;
+     -webkit-print-color-adjust: exact;
+}
+
+form, textarea, input[type=text] {
+     border: none;
 }
 
 textarea, input[type=text] {
-	border-style: none;
-	border-color: Transparent;
-	overflow: auto;
+     overflow: auto;
+}
+
+.header, .footer, .topbuttons, .bottombuttons, .notifications, p.error, p.info, a.sort, img.sort, .optbox, hr {
+     display: none;
+}
+
+div.attached {
+     border-bottom: none !important;
+     padding-top: 5px !important;
+}
+
+.attached a::before {
+     content: url(/themes/susimail/images/attach.png);
+     vertical-align: middle;
+     margin-left: -25px;
+     margin-bottom: 2px;
 }

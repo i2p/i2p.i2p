@@ -2,30 +2,65 @@
 /* Comment: Larger text (and other tweaks) for Chinese & other doublebyte charactersets */
 /* Author: dr|z3d */
 
+h1, h2, h3, h4 {
+     text-shadow: none !important;
+     font-weight: normal !important;
+}
+
+h1 {
+     font-size: 20pt;
+     padding: 11px 15px;
+}
+
+h3 {
+     font-size: 14pt !important;
+}
+
 body {
-     font: 9pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font-size: 12pt;
+     line-height: 130%;
 }
 
 div.news {
-     font-size: 9.5pt;
+     font-size: 10pt;
      font-style: normal !important;
 }
 
-div.routersummary table {
-    font-size: 8.5pt;
+div.main, div.news, h1 {
+     margin-left: 232px !important;
+}
+
+div.routersummary {
+     width: 200px;
+}
+
+div.routersummary table, table#sb_localtunnels {
+    font-size: 10pt;
+    width: 215px !important;
+}
+
+div.routersummary table td {
+     padding: 2px 1px;
 }
 
 div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
-     text-shadow: 0 0 0 0 !important;
+     text-shadow: none !important;
 }
 
-div.routersummary h4 {
-     font-size: 10pt;
+div.routersummary h3 a {
+     font-size: 14pt !important;
+     text-transform: uppercase !important;
+     letter-spacing: 0.15em !important;
+}
+
+div.routersummary h4, .routersummary h4 a {
+     font-size: 11pt !important;
      font-weight: normal;
 }
 
 div.routersummary b {
-     font-size: 9pt;
+     font-size: 10pt;
      font-weight: normal;
 }
 
@@ -34,27 +69,61 @@ div.routersummary a {
      font-weight: normal;
 }
 
+#sb_warning {
+     padding-top: 10px;
+     padding-bottom: 10px;
+}
+
+div.messages, div.error, .error ul li {
+     font-size: 11pt;
+     font-weight: normal !important;
+}
+
 b, a, a:link, a:hover, a:visited {
      font-weight: normal;
+     font-size: 11pt !important;
 }
 
 h2 {
-     font-size: 15pt;
+     font-size: 16pt;
      text-shadow: none;
      font-weight: normal;
 }
 
-p {
-     font-size: 9.5pt;
+h3 {
+     font-size: 15pt;
+}
+
+h4, h4.app, h4.app2 {
+     font-size: 14pt;
+}
+
+p, div.main {
+     font-size: 11pt;
 }
 
 button, button:visited {
-    font: normal 10pt Verdana,"Bitstream Vera Sans",Tahoma,Helvetica,sans-serif !important;
+    font: normal 10pt "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif !important;
+}
+
+button.reload, button.stop {
+     padding: 2px !important;
+     font-size: 12pt !important;
+     min-width: 100px;
+}
+
+.main li, ul.statlist li b, ul.statlist a[name] {
+     line-height: 160%;
+     font-size: 11pt !important;
 }
 
 code, pre, tt {
-     font-size: 10pt;
+     font-size: 11pt;
      font-weight: normal;
+}
+
+#changelog pre {
+     font-size: 10pt !important;
 }
 
 .smallhead, th {
@@ -63,9 +132,123 @@ code, pre, tt {
 }
 
 table {
-     font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font: 10pt/130% "Droid Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
 }
 
-div.applabel {
-     font-size: 8.5pt;
+.applabel {
+     font-size: 10pt;
+     width: 134px !important;
+     margin-top: 10px;
+}
+
+div.app {
+     width: 138px;
+}
+
+img.app, img.app2p {
+     margin-top: -6px !important;
+}
+
+.confignav {
+     font-size: 13pt;
+}
+
+input[type="submit"], input[type="reset"], .cancel, .accept {
+     padding: 5px 8px !important;
+     font-size: 12pt !important;
+     min-width: 80px;
+     font-weight: normal;
+}
+
+.langselect, .themechoice {
+     font-size: 11pt !important;
+}
+
+.langselect .optbox {
+     min-height: 68px;
+}
+
+.langselect img {
+     margin-top: 12px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-top: 10px !important;
+}
+
+table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old),
+a[href^="configpeer?peer"], h3#iptransport a:not(old), h3#iptransport a:not(old) {
+     font-size: 0 !important;
+}
+
+h3#webappconfig, h3#i2pclientconfig {
+    margin-bottom: -15px !important;
+}
+
+td.optionsave {
+     border-top: 1px solid #494;
+}
+
+.newsentry + hr {
+     margin-bottom: 5px !important;
+}
+
+#newsDisplay, #newsDisplay a, #newsStatus, td.infohelp, td.infowarn, p.infohelp, p.infowarn {
+     font-size: 11pt !important;
+}
+
+@media screen and (min-width: 0) {
+p, .main {
+     font-size: 11pt !important;
+}
+
+.tab, .tab2, .confignav a {
+     font-size: 11pt !important;
+     margin-right: -2px !important;
+}
+
+.news p, .news a {
+     font-size: 10pt !important;
+}
+
+p#fullhistory {
+     margin-top: -13px !important;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+    margin-left: -5px;
+    margin-top: -3px;
+    width: 211px;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 215px !important;
+}
+
+.routersummary button {
+     font-size: 11pt !important;
+     padding: 5px 8px !important;
+}
+}
+
+@media screen and (max-width: 1500px) {
+.tab, .tab2 {
+     font-size: 10.5pt !important;
+     margin-right: -3px !important;
+}
+
+h3#webappconfig, h3#i2pclientconfig {
+    margin-bottom: -16px !important;
+}
+
+.langbox {
+     margin-top: 6px !important;
+     line-height: 17px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+img.app, img.app2p {
+     margin-top: -4px !important;
+}
 }

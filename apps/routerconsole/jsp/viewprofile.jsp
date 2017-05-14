@@ -11,7 +11,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("Peer Profile")%></h1>
-<div class="main" id="main"><div class="wideload">
+<div class="main" id="view_profile"><div class="wideload">
 <%
     String peerB64 = request.getParameter("peer");
     if (peerB64 == null || peerB64.length() <= 0 ||
@@ -25,9 +25,9 @@
 <jsp:setProperty name="stathelper" property="peer" value="<%=peerB64%>" />
 <% stathelper.storeWriter(out); %>
 <h2><%=intl._t("Profile for peer {0}", peerB64)%></h2>
-<pre>
+<table id="viewprofile"><tbody><tr><td><pre>
 <jsp:getProperty name="stathelper" property="profile" />
-</pre>
+</pre></td></tr></tbody></table>
 <%
     }
 %>

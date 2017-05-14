@@ -53,34 +53,34 @@
 <div class="page">
 <div id="logo">
 <a href="index"><img src="<%=base.getTheme()%>images/logo.png" alt="" title="<%=intl._t("Overview")%>" border="0"/></a>
-</div><hr>
+</div>
+<hr>
 <div id="navi">
-<p>
-<%=intl._t("Address books")%>:
-<a href="addressbook?book=private"><%=intl._t("private")%></a> |
-<a href="addressbook?book=master"><%=intl._t("master")%></a> |
-<a href="addressbook?book=router"><%=intl._t("router")%></a> |
-<a href="addressbook?book=published"><%=intl._t("published")%></a> *
-<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
-<%=intl._t("Configuration")%> *
-<a href="index"><%=intl._t("Overview")%></a>
-</p>
-</div><hr>
-<div id="headline">
-<h3>${cfg.fileName}</h3>
+<a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
+<a class="abook" href="addressbook?book=private"><%=intl._t("Private")%></a>&nbsp;
+<a class="abook" href="addressbook?book=master"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=router"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook" href="addressbook?book=published"><%=intl._t("Published")%></a>&nbsp;
+<a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
+<a id="config" href="config"><%=intl._t("Configuration")%></a>
+</div>
+<hr>
+<div class="headline" id="config">
+<h3><%=intl._t("Configuration")%></h3>
+<h4><%=intl._t("Location:")%> ${cfg.fileName}</h4>
 </div>
 <div id="messages">${cfg.messages}</div>
 <form method="POST" action="config">
 <div id="config">
 <input type="hidden" name="serial" value="${cfg.serial}" >
-<textarea name="config" rows="10" cols="80">${cfg.config}</textarea>
+<textarea name="config" rows="10" cols="80" spellcheck="false">${cfg.config}</textarea>
 </div>
 <div id="buttons">
 <input class="reload" type="submit" name="action" value="<%=intl._t("Reload")%>" >
 <input class="accept" type="submit" name="action" value="<%=intl._t("Save")%>" >
 </div>
 </form>
-<div id="help">
+<div class="help" id="helpconfig">
 <h3><%=intl._t("Hints")%></h3>
 <ol>
 <li>

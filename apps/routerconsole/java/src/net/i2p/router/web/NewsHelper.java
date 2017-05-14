@@ -286,7 +286,7 @@ public class NewsHelper extends ContentHelper {
     public static String status(RouterContext ctx) {
          StringBuilder buf = new StringBuilder(128);
          long now = ctx.clock().now();
-         buf.append("<i>");
+         buf.append("<span id=\"newsStatus\"><i>");
          long lastUpdated = lastUpdated(ctx);
          long lastFetch = lastChecked(ctx);
          if (lastUpdated > 0) {
@@ -300,7 +300,7 @@ public class NewsHelper extends ContentHelper {
                                            DataHelper.formatDuration2(now - lastFetch),
                                            ctx));
          }
-         buf.append("</i>");
+         buf.append("</i></span><span id=\"newsDisplay\">");
          String consoleNonce = CSSHelper.getNonce();
          if (lastUpdated > 0 && consoleNonce != null) {
              if (shouldShowNews(ctx)) {
@@ -311,9 +311,9 @@ public class NewsHelper extends ContentHelper {
                     .append(Messages.getString("Show news", ctx));
              }
              buf.append("</a>" +
-                        " - <a href=\"/news\">")
+                        " | <a href=\"/news\">")
                 .append(Messages.getString("Show all news", ctx))
-                .append("</a>");
+                .append("</a></span>");
          }
          return buf.toString();
     }

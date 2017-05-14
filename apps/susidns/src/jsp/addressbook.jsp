@@ -59,19 +59,16 @@
 </div>
 <hr>
 <div id="navi">
-<p>
-<%=intl._t("Address books")%>:
-<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("private")%></a> |
-<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("master")%></a> |
-<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("router")%></a> |
-<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._t("published")%></a> *
-<a href="subscriptions"><%=intl._t("Subscriptions")%></a> *
-<a href="config"><%=intl._t("Configuration")%></a> *
-<a href="index"><%=intl._t("Overview")%></a>
-</p>
+<a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
+<a class="abook" href="addressbook?book=private"><%=intl._t("Private")%></a>&nbsp;
+<a class="abook" href="addressbook?book=master"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=router"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook" href="addressbook?book=published"><%=intl._t("Published")%></a>&nbsp;
+<a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
+<a id="config" href="config"><%=intl._t("Configuration")%></a>
 </div>
 <hr>
-<div id="headline">
+<div class="headline" id="addressbook">
 <h3><%=intl._t("Address book")%>: <%=intl._t(book.getBook())%></h3>
 <h4><%=intl._t("Storage")%>: ${book.displayName}</h4>
 </div>
@@ -81,11 +78,33 @@
 ${book.loadBookMessages}
 
 <c:if test="${book.notEmpty}">
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
+<form action="export" method="GET" target="_top">
+<div id="export">
+<input type="hidden" name="book" value="${book.book}">
+<c:if test="${book.search} != null && ${book.search}.length() > 0">
+<input type="hidden" name="search" value="${book.search}">
+</c:if>
+<c:if test="${book.hasFilter}">
+<input type="hidden" name="filter" value="${book.filter}">
+</c:if>
+<input type="submit" class="export" value="<%=intl._t("Export in hosts.txt format")%>" />
+</div>
+</form>
+<% } /* book.getEntries().length() > 0 */ %>
+
 <div id="filter">
-<p><%=intl._t("Filter")%>:
+<c:if test="${book.hasFilter}">
+<span><%=intl._t("Current filter")%>: <b>${book.filter}</b>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a></span>
+</c:if>
+<c:if test="${!book.hasFilter}">
+<span><%=intl._t("Filter")%></span>
+</c:if>
+<p>
 <a href="addressbook?filter=a&amp;begin=0&amp;end=49">a</a>
 <a href="addressbook?filter=b&amp;begin=0&amp;end=49">b</a>
-<a href="addressbook?filter=c&amp;begin=0&amp;end=49">c</a> 
+<a href="addressbook?filter=c&amp;begin=0&amp;end=49">c</a>
 <a href="addressbook?filter=d&amp;begin=0&amp;end=49">d</a>
 <a href="addressbook?filter=e&amp;begin=0&amp;end=49">e</a>
 <a href="addressbook?filter=f&amp;begin=0&amp;end=49">f</a>
@@ -111,11 +130,8 @@ ${book.loadBookMessages}
 <a href="addressbook?filter=z&amp;begin=0&amp;end=49">z</a>
 <a href="addressbook?filter=0-9&amp;begin=0&amp;end=49">0-9</a>
 <a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._t("other")%></a>
-<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a></p>
-<c:if test="${book.hasFilter}">
-<p><%=intl._t("Current filter")%>: ${book.filter}
-(<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("clear filter")%></a>)</p>
-</c:if>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._t("all")%></a>
+</p>
 </div>
 
 <div id="search">
@@ -123,12 +139,14 @@ ${book.loadBookMessages}
 <input type="hidden" name="book" value="${book.book}">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
-<table><tr>
+<table>
+<tr>
 <td class="search"><%=intl._t("Search")%>: <input class="search" type="text" name="search" value="${book.search}" size="20" ></td>
 <td class="search"><input class="search" type="submit" name="submitsearch" value="<%=intl._t("Search")%>" ></td>
 </tr>
 </table>
-</form></div>
+</form>
+</div>
 </c:if>
 
 <%
@@ -143,32 +161,37 @@ ${book.loadBookMessages}
 <input type="hidden" name="end" value="49">
 <jsp:setProperty name="book" property="trClass"	value="0" />
 <div id="book">
-<table class="book" cellspacing="0" cellpadding="5">
+<table class="book" id="host_list" cellspacing="0" cellpadding="5">
 <tr class="head">
 
+<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
+<th><%=intl._t("Hostname")%></th>
+<th><%=intl._t("Link (b32)")%></th>
+<th>Helper</th>
+<th>Details</th>
+<th><%=intl._t("Destination")%></th>
+
 <c:if test="${book.validBook}">
-<th>&nbsp;</th>
+<th title="<%=intl._t("Select hosts for deletion from addressbook")%>"></th>
 </c:if>
 
-<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
-<th><%=intl._t("Name")%></th>
-<th colspan="2"><%=intl._t("Links")%></th>
-<th><%=intl._t("Destination")%></th>
 </tr>
+
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
 <c:forEach items="${book.entries}" var="addr" begin="${book.resultBegin}" end="${book.resultEnd}">
 <tr class="list${book.trClass}">
+<td class="names"><a href="/imagegen/id?s=256&amp;c=${addr.b32}" target="_blank" title="<%=intl._t("View larger version of identicon for this hostname")%>"><img src="/imagegen/id?s=20&amp;c=${addr.b32}"></a><a href="http://${addr.name}/" target="_top">${addr.displayName}</a></td>
+<td class="names"><span class="addrhlpr"><a href="http://${addr.b32}/" target="_blank" title="<%=intl._t("Base 32 address")%>">b32</a></span></td>
+<td class="helper"><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}" target="_blank" title="<%=intl._t("Helper link to share host address with option to add to addressbook")%>">link</a></td>
+<td class="names"><span class="addrhlpr"><a href="details?h=${addr.name}&amp;book=${book.book}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span></td>
+<td class="destinations"><div class="destaddress" name="dest_${addr.name}" width="200px">${addr.destination}</div></td>
+
 <c:if test="${book.validBook}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._t("Mark for deletion")%>"></td>
 </c:if>
-<td class="names"><a href="http://${addr.name}/" target="_top">${addr.displayName}</a>
-</td><td class="names">
-<span class="addrhlpr"><a href="http://${addr.b32}/" target="_top" title="<%=intl._t("Base 32 address")%>">b32</a></span>
-</td><td class="names">
-<span class="addrhlpr"><a href="details?h=${addr.name}&amp;book=${book.book}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span>
-</td>
-<td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="40" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
+
 </tr>
+
 </c:forEach>
 <% } /* book..getEntries().length() > 0 */ %>
 </table>
@@ -185,22 +208,6 @@ ${book.loadBookMessages}
 </c:if>
 <% } /* book..getEntries().length() > 0 */ %>
 </form>
-
-<% if (book.getEntries().length > 0) { /* Don't show if no results. Can't figure out how to do this with c:if */ %>
-<form action="export" method="GET" target="_top">
-<div id="buttons">
-<p class="buttons">
-<input type="hidden" name="book" value="${book.book}">
-<c:if test="${book.search} != null && ${book.search}.length() > 0">
-<input type="hidden" name="search" value="${book.search}">
-</c:if>
-<c:if test="${book.hasFilter}">
-<input type="hidden" name="filter" value="${book.filter}">
-</c:if>
-<input type="submit" class="export" value="<%=intl._t("Export in hosts.txt format")%>" />
-</p></div></form>
-<% } /* book..getEntries().length() > 0 */ %>
-
 </c:if><% /* book.notEmpty */ %>
 
 <c:if test="${book.isEmpty}">
@@ -215,12 +222,17 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
 <div id="add">
-<h3><%=intl._t("Add new destination")%>:</h3>
-<table><tr><td>
-<b><%=intl._t("Host Name")%></b></td><td><input type="text" name="hostname" value="${book.hostname}" size="54">
-</td></tr><tr><td>
-<b><%=intl._t("Destination")%></b></td><td><textarea name="destination" rows="1" style="height:3em" wrap="off" cols="70" spellcheck="false">${book.destination}</textarea>
-</td></tr></table>
+<h3><%=intl._t("Add new destination")%></h3>
+<table>
+<tr>
+<td><b><%=intl._t("Hostname")%></b></td>
+<td><input type="text" name="hostname" value="${book.hostname}" size="54"></td>
+</tr>
+<tr>
+<td><b><%=intl._t("Destination")%></b></td>
+<td><textarea name="destination" rows="1" style="height:3em" wrap="off" cols="70" spellcheck="false">${book.destination}</textarea></td>
+</tr>
+</table>
 <p class="buttons">
 <input class="cancel" type="reset" value="<%=intl._t("Cancel")%>" >
 <input class="accept" type="submit" name="action" value="<%=intl._t("Replace")%>" >
@@ -229,7 +241,8 @@ ${book.loadBookMessages}
 <% } %>
 <input class="add" type="submit" name="action" value="<%=intl._t("Add")%>" >
 </p>
-</div></form>
+</div>
+</form>
 
 <div id="footer">
 <hr>

@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="es">
  <head>
   <title>Servidor web anónimo I2P| Bienvenido a tu eepsite</title>
   <link rel="shortcut icon" href="favicon.ico" />
@@ -6,9 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  </head>
  <body>
-<div class="fairylights">
 <div class="main">
- <h1>Servidor web anónimo I2P</h1>
 <div class="langbar">
 <!-- Some of these languages listed here are yet to be translated -->
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
@@ -22,7 +21,8 @@
 <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a>
 <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
 </div>
-<h2>Guía rápida para crear el servidor web en I2P</h2>
+ <h1>Servidor web anónimo I2P</h1>
+ <h2>Guía rápida para crear el servidor web en I2P</h2>
  <p>Esta es tu eepsite, tu propio servidor web anónimo en I2P - simplemente edita los archivos dentro de <code>~/.i2p/eepsite/docroot/</code> (en Linux),
  <code>%APPDATA%\I2P\eepsite\docroot\</code> (en Windows),
  o <code>/Users/(user)/Library/Application Support/i2p</code> (en Mac),
@@ -36,12 +36,12 @@
 </p>
 
  <h2>Cómo configurar y anunciar tu eepsite</h2>
- Tu eepsite por defecto está apagada.
+ <p>Tu eepsite por defecto está apagada.
  Después de arrancarla será difícil que otras personas la encuentren porque
  no tiene un nombre y porque ellos no tienen la clave Base64.
  Podrías simplemente decir a la gente tu clave Base64, pero afortunadamente I2P tiene
  una libreta de direcciones y varias formas fáciles de indicar a la gente como alcanzar tu eepsite.
- Aquí están las instrucciones detalladas.
+ Aquí están las instrucciones detalladas.</p>
  <ul>
  <li>Selecciona un nombre para tu eepsite (<i>algo</i>.i2p). Usa sólo minúsculas.
      Deberías comprobar primero si el nombre ya existe en tu libreta de direcciones
@@ -65,18 +65,17 @@
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">libreta de direcciones maestras</a>.
      Pulsa "Add/Añadir" para añadir la destinación a tu libreta de direcciones.</li>
  <li>Escribe el nombre de la eepsite en tu navegador (<i>algo</i>.i2p) y deberías
- verla inmediatamente.</li>
- <li>Antes de anunciar tu nueva eepsite al mundo, deberías añadir contenido.
+ verla inmediatamente.</li></ul>
+ <p>Antes de anunciar tu nueva eepsite al mundo, deberías añadir contenido.
  Ves a <code>~/.i2p/eepsite/docroot/</code> (en Linux),
  <code>%APPDATA%\I2P\eepsite\docroot\</code> (en Windows),
  o <code>/Users/(user)/Library/Application Support/i2p</code> (en Mac),
  y reemplaza la página de redirección index.html con tu contenido. Las carpetas virtuales funcionan, por lo que puedes hospedar 
  archivos desde un subdirectorio sin la necesidad de proveer explícitamente una página con enlaces a los archivos.
  Si necesitas una plantilla para una web básica, puedes utilizar y adaptar <a href="pagetemplate.html">esta página</a>
- y <a href="lib/">su contenido</a></li>
-</ul>
-<h2>Registra tu propio dominio .I2P</h2><ul>
- <li>Ahora es el momento de añadir tu eepsite a una libreta de direcciones de I2P
+ y <a href="lib/">su contenido</a>.</p>
+<h2>Registra tu propio dominio .I2P</h2>
+ <p>Ahora es el momento de añadir tu eepsite a una libreta de direcciones de I2P
      alojada en una web como <a href="http://stats.i2p/">stats.i2p</a>.
      Debes ingresar el nombre de tu eepsite y la clave en una o más de estas webs.
      Aquí tienes <a href="http://stats.i2p/i2p/addkey.html">el formulario en stats.i2p</a>.
@@ -86,27 +85,26 @@
      No olvides en pulsar "add a key/añadir una clave".
      Comprueba que ha indicado que la clave ha sido añadida.
      Ya que muchos ruters periódicamente obtienen las direcciones de estas webs, en unas cuantas horas
-     otros usuarios serán capaces de encontrar tu eepsite simplemente escribiendo <i>algo</i>.i2p en sus navegadores.</li>
-</ul>
-<h2>Añadiendo suscripciones a otras libretas de direcciones</h2><ul>
- <li>Ya que hablamos de las actualizaciones de las libretas de direcciones, este es buen 
+     otros usuarios serán capaces de encontrar tu eepsite simplemente escribiendo <i>algo</i>.i2p en sus navegadores.</p>
+<h2>Añadiendo suscripciones a otras libretas de direcciones</h2>
+ <p>Ya que hablamos de las actualizaciones de las libretas de direcciones, este es buen 
      momento para añadir más libretas de direcciones a tu propia 
      <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">lista de suscripciones</a>.
      Ves a tu página de configuración de suscripciones y añade algunas de estas para la
-     actualización automática de nuevas eepsites:<ul>
+     actualización automática de nuevas eepsites:</p><ul>
      <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
      <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
      <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li></ul>
- <li>Si tienes prisa y no puedes esperar unas horas, puedes decir a la gente que use los servicios de ayuda de
+ <p>Si tienes prisa y no puedes esperar unas horas, puedes decir a la gente que use los servicios de ayuda de
      redirección "saltos/jump".
      Esto hará que funcione en unos minutos tras haber incluido la clave en la libreta de direcciones de 
      dicha web. Puedes probarlo tu mismo escribiendo <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>algo</i>.i2p</code>
      o <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>algo</i>.i2p</code> en tu navegador.
-     Una vez que ya funcione ya puedes avisar a otros para que lo utilicen.</li>
- <li>Algunas personas comprueban listas de eepsites como
+     Una vez que ya funcione ya puedes avisar a otros para que lo utilicen.</p>
+ <p>Algunas personas comprueban listas de eepsites como
  <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> o <a href="http://perv.i2p">perv.i2p</a> en busca 
      de nuevas eepsites, con lo cual puede ser que empiece a visitarla gente.
-     Pero hay muchas otras formas de avisar a la gente. Aquí tienes unas cuantas ideas:</li>
+     Pero hay muchas otras formas de avisar a la gente. Aquí tienes unas cuantas ideas:</p>
      <ul>
      <li>Escribe un mensaje en el <a href="http://forum.i2p/viewforum.php?f=16">foro de anuncio de Eepsites</a>
      en <a href="http://forum.i2p/">forum.i2p</a>.</li>
@@ -114,24 +112,24 @@
      <li>Escribe una nueva entrada en <a href="http://syndie.i2p2.de/">el nuevo Syndie</a>.</li>
      <li>Escribe en la <a href="http://ugha.i2p/EepsiteIndex">Wiki de Ugha</a></li>
      </ul>
-     Date cuenta que algunas webs recomiendan pegar esa clave de destino Base64 larga.
+     <p>Date cuenta que algunas webs recomiendan pegar esa clave de destino Base64 larga.
      Pero si has conseguido poner tu clave en un servicio 'add-key/añadido-de-clave', haberla probado
      usando un servicio de 'salto', y esperado 24 horas para que se propague por
-     las libretas de direcciones de otros, esto no debería ser necesario.</ul>
-<h2>Más ayuda</h2><ul>
-    <li>Si tienes alguna pregunta, puedes mirar en los siguientes sitios para obtener ayuda:</li>
+     las libretas de direcciones de otros, esto no debería ser necesario.</p>
+<h2>Más ayuda</h2>
+    <p>Si tienes alguna pregunta, puedes mirar en los siguientes sitios para obtener ayuda:</p>
 <ul>
 <li>Nuestro canal de soporte en el IRC: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p en Freenode</a></li>
 <li>Anónimamente a través de nuestro <a href="irc://127.0.0.1:6668/i2p-help">túnel de IRC en I2P</a>.</li></ul>
 	<li><a href="http://forum.i2p/viewforum.php?f=10">La sección de problemas técnicos</a> en
      <a href="http://forum.i2p/">forum.i2p</a>.</li></ul>
- </ul><div class="notify">
+<div class="notify">
 <b>Nota:</b> Esta web y la consola necesitan ser traducidas a TU idioma si esto no ha sido sido hecho ya
    o está en progreso de traducirse. Por favor, considere ayudar al crecimiento del proyecto
    <a href="http://www.i2p2.i2p/getinvolved.html">ayudando</a> a traducir. Contacta con el proyecto a través 
    del canal de IRC mostrado más abajo. ¡Gracias!</div>
 <hr><div class="footnote">	
 Documento editado por última vez en: Noviembre del 2010.</div>
-</div></div>
+</div>
  </body>
 </html>

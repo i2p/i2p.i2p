@@ -1,17 +1,126 @@
-#mailbox tr, #mailbox td {
-     display: block;
+/* Susimail Mobile Theme Override "Dark" */
+
+body {
+     margin: 0;
+}
+
+.page {
+     min-width: 400px;
+}
+
+#dologin {
+     width: 500px !important;
+}
+
+#dologin input[type="text"], #dologin input[type="password"] {
+     width: 70% !important;
+}
+
+#pagenav {
+     margin-bottom: -7px !important;
+     border-bottom: 1px solid #494 !important;
+}
+
+div.topbuttons {
+     padding: 6px 0 !important;
+}
+
+.topbuttons input[type="submit"], .topbuttons input[type="reset"] {
+     min-width: 40px !important;
+     padding: 5px !important;
+     margin: 4px 5px !important;
 }
 
 #mailbox th {
-     position: absolute;
-     top: -9999px;
-     left: -9999px;
-}
-
-#mailbox .optbox {
-     float: left;
-}
-
-div.header, div.footer {
      display: none;
+}
+
+#mailbox tr, #mailbox td {
+     display: block;
+     padding: 1px 0;
+}
+
+#mailbox td:first-child {
+     float: right;
+     padding-right: 3px;
+}
+
+#mailbox td:last-child {
+     font-style: italic;
+}
+
+#mailbox td[colspan="9"] {
+     display: none;
+}
+
+table#mailbox td[colspan="5"], table#mailbox td[colspan="4"] {
+     background: #000 !important;
+     border: none !important;
+     display: block;
+}
+
+.list0 td, .list1 td {
+     border: none !important;
+}
+
+#mailbox td:nth-child(2), #mailbox td:nth-child(4), #mailbox td:nth-child(6), #mailbox td:nth-child(8) {
+     display: none;
+}
+
+input[type="text"], input[type="password"], textarea {
+     width: 90% !important;
+     min-width: 0 !important;
+}
+
+input[name="pagesize"] {
+     width: 40px !important;
+}
+
+input[type="submit"], input.cancel {
+     min-width: 70px !important;
+     margin: 2px 0 3px 3px !important;
+}
+
+#newmail {
+     margin: 0 !important;
+     width: 100% !important;
+}
+
+#newmail td:first-child {
+     width: 10%;
+}
+
+form {
+     line-height: 110% !important;
+}
+
+tr.list0:hover td:first-child, tr.list1:hover td:first-child, tr.list0:hover td:last-child, tr.list1:hover td:last-child {
+     box-shadow: none !important;
+}
+
+.attached img {
+     max-width: 95%;
+     height: auto;
+}
+
+textarea[name="config_text"] {
+     width: 90%;
+}
+
+h3#config {
+     width: 200px;
+     white-space: nowrap;
+}
+
+.header, #footer {
+     display: none;
+}
+
+#mailbox td:nth-child(3) a.linkold::before {
+     content: "From: ";
+}
+
+
+#mailbox td:nth-child(5) a.linkold::before {
+     content: "Subject: ";
 }

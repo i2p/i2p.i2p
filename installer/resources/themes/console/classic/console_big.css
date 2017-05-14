@@ -1,41 +1,122 @@
 /* I2P Theme: I2P Classic Theme Override */
 /* I2P Description: Larger fontsize override for console to accomodate foreign charactersets */
-/* Author: Dr|Z3d */
+/* Author: dr|z3d */
 
+* {
+     text-shadow: none !important;
+     font-weight: normal !important;
+     font-size: 11pt !important;
+     letter-spacing: normal !important;
+     word-spacing: normal !important;
+     line-height: 140% !important;
+}
+
+input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel {
+     font-size: 11pt !important;
+     padding-top: 5px;
+     padding-bottom: 5px;
+}
+
+input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel, div.app, .themelabel, .ui_lang, .tab a, label, a, li {
+     letter-spacing: 0.05em !important;
+}
+
+.routersummary button {
+     min-width: 100px !important;
+}
 
 /* sidepanel */
 
-div.routersummary {
-     font: 9.5pt/125%;
+div.routersummary h3, .routersummary h3 a  {
+     font-size: 13pt !important;
 }
 
-div.routersummary h3 {
-     font-size: 12.5pt;
-}
-
-div.routersummary h4 {
-     font-size: 11.5pt;
+div.routersummary h4, .routersummary h4 a {
+     font-size: 13pt !important;
      letter-spacing: 0;
 }
 
+div.routersummary td {
+     font-size: 11pt;
+}
+
+div.routersummary {
+     width: 220px;
+}
+
 div.routersummary table {
-     font-size: 9pt;
+     width: 219px !important;
+}
+
+#sb_bandwidth td:first-child {
+     width: 20px !important;
+     white-space: nowrap;
+}
+
+#sb_bandwidth td:last-child {
+     width: 80% !important;
+}
+
+#sb_bandwidth td:last-child, #sb_peers td:last-child, #sb_queue td:last-child,  #sb_tunnels td:last-child, #sb_general td:last-child, #sb_shortgeneral td:last-child {
+     font-size: 10pt !important;
 }
 
 div.routersummary table a:link, div.routersummary table a:visited {
-     font-size: 10.5pt;
+     font-size: 12pt;
+     font-weight: normal;
+     text-shadow: none;
 }
 
-div.routersummary a {
-     word-spacing: 0em !important;
-     letter-spacing: 0.2em !important;
+/* end sidepanel */
+
+/* global overrides */
+
+a, b, div.routersummary h3 a, div.routersummary h4 {
+    font-weight: normal !important;
+    font-size: 100%;
 }
+
+b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4, .messages {
+     font-weight: normal !important;
+     font-style: normal !important;
+     text-shadow: none;
+}
+
+body, .main {
+     font: 12pt "Noto Sans", "Droid Sans", "Segoe UI", "Lucida Grande", Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
+}
+
+h1 {
+     font-size: 18pt !important;
+     padding: 14px 20px 12px;
+}
+
+h2 {
+     font-size: 16pt !important;
+}
+
+h3, .configtable th {
+     font-size: 14pt !important;
+}
+
+h3 a {
+     display: inline-block;
+     padding: 3px 2px;
+}
+
+h4 {
+     font-size: 13pt !important;
+}
+
+h1, h2, h3, h4 {
+     letter-spacing: 0.08em !important;
+     word-spacing: 0.1em !important;
+}
+
+/* end global overrides */
 
 div.tunnels a {
-     font-size: 9pt !important;
-}
-
-div.tunnels table {
+     font-size: 12pt !important;
 }
 
 div.tunnels td:first-child, div.tunnels td:last-child  {
@@ -49,27 +130,19 @@ div.tunnels td:last-child {
 div.tunnels td {
      padding: 0 2px;
 }
-/* global overrides */
-
-a, b, div.routersummary h3 a, div.routersummary h4 {
-    font-weight: normal !important;
-    font-size: 100%;
-}
-
-b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4{
-     font-weight: normal !important;
-     font-style: normal !important;
-     -moz-text-shadow: 0 0 0;
-     -khtml-text-shadow: 0 0 0;
-     text-shadow: 0 0 0;
-}
-
-body {
-     font: 10pt Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
-}
 
 div.main, div.main p, div.news p {
      line-height: 140%;
+}
+
+div.main, div.news, h1 {
+     margin-left: 226px;
+}
+
+.langbox {
+     width: 400px;
+     margin-top: 5px;
+     margin-right: 8px;
 }
 
 div.joblog li i {
@@ -84,3 +157,305 @@ b, div.joblog b {
 table code {
      font-size: 120%;
 }
+
+.tab, .tab2 {
+     font-size: 11pt;
+} 
+
+.applabel a {
+     padding: 0 2px 6px !important;
+}
+
+.themelabel, .ui_lang {
+     font-size: 12pt !important;
+     font-weight: normal !important;
+     overflow: hidden;
+     text-overflow: hidden;
+     margin-bottom: -2px;
+     padding-bottom: 4px !important;
+}
+
+#themeui.formaction {
+     margin-top: 8px !important;
+}
+
+div.themechoice, div.langselect {
+     width: 128px;
+}
+
+h3.ptitle, h3#i2pclientconfig {
+     margin-bottom: -17px !important;
+}
+
+h3#systray, h3#servicedebug, h3#browseronstart {
+     margin-bottom: -17px !important;
+}
+
+h3#pluginmanage {
+     margin-bottom: -22px !important;
+}
+
+.formaction, #consolepass + .formaction, #sidebardefaults, #webappconfigactions.formaction, #clientsconfig.formaction, #homesites, #homeapps {
+     margin-top: -6px !important;
+}
+
+table + .formaction {
+     margin-top: -1px !important;
+}
+
+hr + .formaction {
+     margin-top: 0 !important;
+}
+
+h4#updateplugins {
+     margin-top: -16px;
+}
+
+ #tunnelconfigsave {
+     margin-top: -6px !important;
+}
+
+#resetreseed input.reload {
+     margin-top: 20px;
+     margin-bottom: 0;
+}
+
+p#keyringhelp, #tunnelconfig + .infohelp {
+     margin-bottom: 15px !important;
+}
+
+h3.stats {
+     margin-top: -1px !important;
+}
+
+.main#stats form {
+     margin-top: 0;
+     margin-bottom: -1px;
+}
+input[type="text"], input[type="password"] {
+     min-width: 0;
+}
+
+input[type="radio"], input[type="checkbox"] {
+     margin-top: 6px;
+     margin-bottom: 6px;
+}
+
+input[name="pluginURL"] {
+     max-width: 250px !important;
+     width: 250px !important;
+}
+
+button.control {
+     font-size: 0 !important;
+}
+
+.infohelp, .infowarn {
+     line-height: 160% !important;
+}
+
+p.infohelp {
+     margin-bottom: -7px;
+}
+
+#advancedsettings, .main textarea {
+     font-size: 10pt !important;
+}
+
+#webappconfig {
+     margin-bottom: -37px !important;
+}
+
+.formaction#webappconfigactions {
+     margin-top: 36px !important;
+}
+
+p[style="margin: 0px 12px"] {
+     margin-left: 5px !important;
+     padding: 8px 0 !important;
+}
+
+#news hr + i {
+     display: inline-block;
+     margin-top: 4px !important;
+}
+
+.newsAuthor {
+     background-position: left top 8px !important;
+     background-size: 12px 12px !important;
+     padding-left: 14px;
+}
+
+input.search[type="text"] {
+     padding-left: 30px;
+     background-position: 8px center;
+}
+
+.main#jardump b {
+     font-size: 9pt !important;
+}
+
+#wrapperlogs pre, pre#transports {
+     font-size: 10pt !important;
+}
+
+table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old), a[href^="configpeer?peer"] {
+     font-size: 0 !important;
+}
+
+h3#iptransport a:not(old), h3#advancedconfig a:not(old) {
+     font-size: 0 !important;
+}
+
+h3#iptransport a::after, h3#advancedconfig a::after {
+     vertical-align: sub;
+     margin-left: 5px;
+}
+
+/* responsive layout */
+
+@media screen and (max-width: 1200px) {
+.main td, .main td b {
+     font-size: 10pt !important;
+}
+
+.tab, .tab2 {
+     margin-right: -2px !important;
+}
+}
+
+@media screen and (max-width: 1500px) {
+div.applabel {
+     height: 22px !important;
+     padding: 2px;
+     width: 140px;
+}
+}
+
+@media screen and (min-width: 0) {
+div.routersummary img[src$="i2plogo.png"] {
+     margin-top: -1px;
+     transform: none;
+     width: 210px;
+}
+
+.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"], .routersummary button[name="updateAction"] {
+     font-size: 11pt !important;
+}
+
+.tab, .tab2, .main[id^="config_"] td {
+     font-size: 11pt !important;
+}
+
+.main[id^="config_"] th {
+     font-size: 12pt !important;
+}
+
+.optbox, #netconfig .optbox:last-child, #netconfig .optbox[value="only"], #netconfig .optbox[name="disableUDP"], #netconfig .optbox[value="disabled"] {
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+}
+
+.langselect .optbox {
+     margin: -4px 0 8px -54px !important;
+}
+
+#console h2 {
+     margin-bottom: -5px !important;
+}
+
+#console h2 a[name], #console h2 a[name]:hover {
+     font-size: 16pt !important;
+     color: #0c153d !important;
+}
+
+.welcome h2 {
+     font-size: 14pt !important;
+}
+
+p#fullhistory {
+     padding: 8px 10px !important;
+}
+
+div.news {
+     padding-bottom: 7px !important;
+}
+
+div.news h3, .newsDate, div.news a {
+     font-size: 12pt !important;
+}
+
+#sb_internals, #sb_services, #sb_advanced {
+     margin-top: -5px !important;
+}
+
+.main#console code {
+     font-size: 13pt !important;
+}
+
+#faq ul {
+     margin-bottom: 0 !important;
+}
+
+#changelog pre {
+     font-size: 10pt !important;
+}
+
+.homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
+     font-size: 0 !important;
+}
+
+.homelinkedit td img {
+     width: 24px;
+     height: 24px;
+}
+
+#netdboverview th {
+     font-size: 12pt !important;
+}
+}
+
+@media screen and (min-width: 1200px) {
+.tab, .tab2 {
+     margin-right: -3px !important;
+}
+
+#faq th, #portfaq th, #portfaq th[colspan="3"] {
+     font-size: 12pt !important;
+}
+}
+
+@media screen and (min-width: 1500px) {
+body, .main, .main td, .news p, #news p, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
+#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
+.netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
+     font-size: 12pt !important;
+}
+
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li {
+     font-size: 11pt !important;
+}
+
+.langbox {
+     margin-top: 2px !important;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     margin-left: 1px;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 225px !important;
+}
+
+div.app {
+     width: 164px;
+}
+
+div.applabel {
+     padding: 3px 2px 4px !important;
+     width: 160px !important;
+}
+}
+
+/* end responsive layout */

@@ -29,7 +29,7 @@ public class FileDumpHelper extends HelperBase {
     
     public String getFileSummary() {
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<table><tr><th>File</th><th>Size</th><th>Date</th><th>SHA 256</th><th>Revision</th>" +
+        buf.append("<table id=\"jardump\"><tr><th>File</th><th>Size</th><th>Date</th><th>SHA 256</th><th>Revision</th>" +
                    "<th>JDK</th><th>Built</th><th>By</th><th>Mods</th></tr>");
 
         // jars added in wrapper.config

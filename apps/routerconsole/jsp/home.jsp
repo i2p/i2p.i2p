@@ -53,11 +53,11 @@
    }  // shouldShowNews()
 %>
 
-<div class="main" id="main">
+<div class="main" id="home">
 <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
-<div class="welcome" title="<%=intl._t("Click a flag to select a language. Click 'configure language' below to change it later.")%>">
+<div class="welcome" title="<%=intl._t("Click a flag to select a language. Click 'Configure UI' below to change it later.")%>">
   <div class="langbox" id="langbox">
     <a href="/home?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=us" title="English" alt="English"></a>
     <a href="/home?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
@@ -94,16 +94,16 @@
 </div>
 <% }  // shouldShowWelcome %>
 
-<div class="home" id="home">
+<div id="homepanel">
 <%
    if (homehelper.shouldShowSearch()) {
 %>
   <div class="search">
-    <form action="/search.jsp" method="POST">
+    <form action="/search.jsp" target="_blank" method="POST">
       <table class="search"><tr><td align="right">
         <input size="40" type="text" class="search" name="query" />
       </td><td align="left">
-        <button type="submit" value="search" class="search"><%=intl._t("Search I2P")%></button>
+        <button type="submit" value="search" class="search"><%=intl._t("Search")%></button>
       </td><td align="left">
         <jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
         <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
@@ -115,12 +115,12 @@
    }  // shouldShowSearch()
 %>
   <div class="ag2">
-    <h4 class="app"><%=intl._t("Hidden Services of Interest")%></h4>
-    <jsp:getProperty name="homehelper" property="favorites" /><br>
+    <h4 class="app"><%=intl._t("Applications and Configuration")%></h4>
+    <jsp:getProperty name="homehelper" property="services" /><br>
   </div>
   <div class="ag2">
-    <h4 class="app2"><%=intl._t("Applications and Configuration")%></h4>
-    <jsp:getProperty name="homehelper" property="services" /><br>
+    <h4 class="app2"><%=intl._t("Hidden Services of Interest")%></h4>
+    <jsp:getProperty name="homehelper" property="favorites" /><br>
     <div class="clearer">&nbsp;</div>
   </div>
 </div>

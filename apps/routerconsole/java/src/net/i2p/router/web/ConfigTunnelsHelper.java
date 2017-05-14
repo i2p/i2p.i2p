@@ -26,7 +26,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             cur++;
         }
 
-        buf.append("<table>\n");
+        buf.append("<table id=\"tunnelconfig\">\n");
         TunnelPoolSettings exploratoryIn = _context.tunnelManager().getInboundSettings();
         TunnelPoolSettings exploratoryOut = _context.tunnelManager().getOutboundSettings();
         
@@ -69,7 +69,7 @@ public class ConfigTunnelsHelper extends HelperBase {
 
         boolean advanced = isAdvanced();
 
-        buf.append("<tr><th colspan=\"3\"><a name=\"").append(prefix).append("\">");
+        buf.append("<tr><th colspan=\"3\" class=\"th_title\"><a name=\"").append(prefix).append("\">");
         buf.append(name).append("</a></th></tr>\n");
         if (in.getLength() <= 0 ||
             in.getLength() + in.getLengthVariance() <= 0 ||
@@ -94,7 +94,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         
         // tunnel depth
         int maxLength = advanced ? MAX_ADVANCED_LENGTH : MAX_LENGTH;
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _t("Length") + ":</td>\n");
+        buf.append("<tr><td align=\"right\"><b>" + _t("Length") + ":</b></td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".depthInbound\">\n");
         int now = in.getLength();
         renderOptions(buf, 0, maxLength, now, "", HOP);
@@ -111,7 +111,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         buf.append("</tr>\n");
 
         // tunnel depth variance
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _t("Randomization") + ":</td>\n");
+        buf.append("<tr><td align=\"right\"><b>" + _t("Randomization") + ":</b></td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".varianceInbound\">\n");
         now = in.getLengthVariance();
         renderOptions(buf, 0, 0, now, "", HOP);
@@ -136,7 +136,7 @@ public class ConfigTunnelsHelper extends HelperBase {
 
         // tunnel quantity
         int maxQuantity = advanced ? MAX_ADVANCED_QUANTITY : MAX_QUANTITY;
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _t("Quantity") + ":</td>\n");
+        buf.append("<tr><td align=\"right\"><b>" + _t("Quantity") + ":</b></td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".quantityInbound\">\n");
         now = in.getQuantity();
         renderOptions(buf, 1, maxQuantity, now, "", TUNNEL);
@@ -154,7 +154,7 @@ public class ConfigTunnelsHelper extends HelperBase {
 
         // tunnel backup quantity
         int maxBQuantity = advanced ? MAX_ADVANCED_BACKUP_QUANTITY : MAX_BACKUP_QUANTITY;
-        buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _t("Backup quantity") + ":</td>\n");
+        buf.append("<tr><td align=\"right\"><b>" + _t("Backup quantity") + ":</b></td>\n");
         buf.append("<td align=\"center\"><select name=\"").append(index).append(".backupInbound\">\n");
         now = in.getBackupQuantity();
         renderOptions(buf, 0, maxBQuantity, now, "", TUNNEL);
@@ -176,7 +176,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         // And let's not display them at all unless they have contents, which should be rare.
         Properties props = in.getUnknownOptions();
         if (!props.isEmpty()) {
-            buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _t("Inbound options") + ":</td>\n" +
+            buf.append("<tr><td align=\"right\"><b>" + _t("Inbound options") + ":</b></td>\n" +
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
             buf.append(".inboundOptions\" type=\"text\" size=\"32\" disabled=\"disabled\" " +
                        "value=\"");
@@ -188,7 +188,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         }
         props = out.getUnknownOptions();
         if (!props.isEmpty()) {
-            buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _t("Outbound options") + ":</td>\n" +
+            buf.append("<tr><td align=\"right\"><b>" + _t("Outbound options") + ":</b></td>\n" +
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
             buf.append(".outboundOptions\" type=\"text\" size=\"32\" disabled=\"disabled\" " +
                        "value=\"");

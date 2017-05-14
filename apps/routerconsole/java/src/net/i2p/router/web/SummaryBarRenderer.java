@@ -28,7 +28,7 @@ class SummaryBarRenderer {
     static final String ALL_SECTIONS[] =
         {"HelpAndFAQ", "I2PServices", "I2PInternals", "General", "ShortGeneral", "NetworkReachability",
         "UpdateStatus", "RestartStatus", "Peers", "FirewallAndReseedStatus", "Bandwidth", "Tunnels",
-        "Congestion", "TunnelStatus", "Destinations", "NewsHeadings" };
+        "Congestion", "TunnelStatus", "Destinations", "NewsHeadings", "Advanced" };
     static final Map<String, String> SECTION_NAMES;
 
     static {
@@ -49,6 +49,7 @@ class SummaryBarRenderer {
         aMap.put("TunnelStatus", "Tunnel Status");
         aMap.put("Destinations", "Local Tunnels");
         aMap.put("NewsHeadings", "News &amp; Updates");
+        aMap.put("Advanced", "Advanced");
         SECTION_NAMES = Collections.unmodifiableMap(aMap);
     }
 
@@ -88,6 +89,8 @@ class SummaryBarRenderer {
                 buf.append(renderI2PServicesHTML());
             else if ("I2PInternals".equals(section))
                 buf.append(renderI2PInternalsHTML());
+            else if ("Advanced".equals(section))
+                buf.append(renderAdvancedHTML());
             else if ("General".equals(section))
                 buf.append(renderGeneralHTML());
             else if ("ShortGeneral".equals(section))
@@ -123,7 +126,7 @@ class SummaryBarRenderer {
 
     public String renderHelpAndFAQHTML() {
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/help\" target=\"_top\" title=\"")
+        buf.append("<h3 id=\"helpfaq\"><a href=\"/help\" target=\"_top\" title=\"")
            .append(_t("I2P Router Help &amp; FAQ"))
            .append("\">")
            .append(_t("Help &amp; FAQ"))
@@ -139,7 +142,7 @@ class SummaryBarRenderer {
            .append(_t("I2P Services"))
            .append("</a></h3>\n" +
 
-                   "<hr class=\"b\"><table><tr><td>" +
+                   "<hr class=\"b\"><table id=\"sb_services\"><tr><td>" +
 
                    "<a href=\"/susimail/susimail\" target=\"_blank\" title=\"")
            .append(_t("Anonymous webmail client"))
@@ -160,7 +163,7 @@ class SummaryBarRenderer {
            .append("/\" target=\"_blank\" title=\"")
            .append(_t("Local web server"))
            .append("\">")
-           .append(nbsp(_t("Website")))
+           .append(nbsp(_t("Web Server")))
            .append("</a>\n")
 
            .append(NavHelper.getClientAppLinks(_context))
@@ -177,12 +180,44 @@ class SummaryBarRenderer {
            .append(_t("I2P Internals"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table><tr><td>\n" +
+                   "<table id=\"sb_internals\"><tr><td>\n" +
 
-                   "<a href=\"/tunnels\" target=\"_top\" title=\"")
-           .append(_t("View existing tunnels and tunnel build status"))
+                   "<a href=\"/dns\" target=\"_top\" title=\"")
+           .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
            .append("\">")
-           .append(nbsp(_t("Tunnels")))
+           .append(nbsp(_t("Addressbook")))
+           .append("</a>\n");
+
+        if (!StatSummarizer.isDisabled()) {
+            buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
+               .append(_t("Graph router performance"))
+               .append("\">")
+               .append(nbsp(_t("Graphs")))
+               .append("</a>\n");
+        }
+
+        buf.append("<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
+           .append(_t("Local Tunnels"))
+           .append("\">")
+           .append(nbsp(_t("Hidden Services Manager")))
+           .append("</a>\n" +
+
+       //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
+       //  .append(_t("Show the router's workload, and how it's performing"))
+       //  .append("\">")
+       //  .append(_t("Jobs"))
+       //  .append("</a>\n" +
+
+                   "<a href=\"/logs\" target=\"_top\" title=\"")
+           .append(_t("Health Report"))
+           .append("\">")
+           .append(nbsp(_t("Logs")))
+           .append("</a>\n" +
+
+                   "<a href=\"/netdb\" target=\"_top\" title=\"")
+           .append(_t("Show list of all known I2P routers"))
+           .append("\">")
+           .append(nbsp(_t("NetDB")))
            .append("</a>\n" +
 
                    "<a href=\"/peers\" target=\"_top\" title=\"")
@@ -197,56 +232,86 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Profiles")))
            .append("</a>\n" +
 
-                   "<a href=\"/netdb\" target=\"_top\" title=\"")
-           .append(_t("Show list of all known I2P routers"))
+                   "<a href=\"/tunnels\" target=\"_top\" title=\"")
+           .append(_t("View existing tunnels and tunnel build status"))
            .append("\">")
-           .append(nbsp(_t("NetDB")))
-           .append("</a>\n" +
-
-                   "<a href=\"/logs\" target=\"_top\" title=\"")
-           .append(_t("Health Report"))
-           .append("\">")
-           .append(nbsp(_t("Logs")))
+           .append(nbsp(_t("Tunnels")))
            .append("</a>\n");
 
-       //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
-       //  .append(_t("Show the router's workload, and how it's performing"))
-       //  .append("\">")
-       //  .append(_t("Jobs"))
-       //  .append("</a>\n" +
+        buf.append("</td></tr></table>\n");
+        return buf.toString();
+    }
 
-        if (!StatSummarizer.isDisabled()) {
-            buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
-               .append(_t("Graph router performance"))
-               .append("\">")
-               .append(nbsp(_t("Graphs")))
-               .append("</a>\n");
-        }
+    public String renderAdvancedHTML() {
+        StringBuilder buf = new StringBuilder(512);
 
-        buf.append("<a href=\"/stats\" target=\"_top\" title=\"")
-           .append(_t("Textual router performance statistics"))
-           .append("\">")
-           .append(nbsp(_t("Stats")))
-           .append("</a>\n" +
+        buf.append("<h3 id=\"advanced\"><a title=\"")
+           .append(_t("Advanced Configuration"))
+           .append("\" href=\"/configadvanced\">")
+           .append(_t("Advanced"))
+           .append("</a></h3>\n")
 
-                   "<a href=\"/dns\" target=\"_top\" title=\"")
-           .append(_t("Manage your I2P hosts file here (I2P domain name resolution)"))
-           .append("\">")
-           .append(nbsp(_t("Addressbook")))
-           .append("</a>\n" +
+           .append("<hr class=\"b\"><table id=\"sb_advanced\"><tr><td>")
 
-                    "<a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
-           .append(_t("Local Tunnels"))
-           .append("\">")
-           .append(nbsp(_t("Hidden Services Manager")))
+           .append("<a title=\"")
+           .append(_t("Review active encryption certificates used in console"))
+           .append("\" href=\"/certs\">")
+           .append(nbsp(_t("Certs")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("View full changelog"))
+           .append("\" href=\"/viewhistory\" target=\"_blank\">")
+           .append(nbsp(_t("Changelog")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("View router debug information"))
+           .append("\" href=\"/debug\">")
+           .append(nbsp(_t("Debug")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Review extended info about installed .jar and .war files"))
+           .append("\" href=\"/jars\">")
+           .append(nbsp(_t("Jars")))
            .append("</a>\n");
 
-        if (_context.getBooleanProperty(HelperBase.PROP_ADVANCED))
-            buf.append("<a href=\"/debug\">Debug</a>\n");
         File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
         if (javadoc.exists())
             buf.append("<a href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");
-        buf.append("</td></tr></table>\n");
+
+        buf.append("<a title=\"")
+           .append(_t("View active leasesets (debug mode)"))
+           .append("\" href=\"/netdb?l=2\">")
+           .append(nbsp(_t("Leasesets")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Network database search tool"))
+           .append("\" href=\"/netdb?f=4\">")
+           .append(nbsp(_t("NetDB Search")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Signed proof of ownership of this router"))
+           .append("\" href=\"/proof\">")
+           .append(nbsp(_t("Proof")))
+           .append("</a>\n")
+
+           .append("<a href=\"/stats\" target=\"_top\" title=\"")
+           .append(_t("Textual router performance statistics"))
+           .append("\">")
+           .append(nbsp(_t("Stats")))
+           .append("</a>\n")
+
+           .append("<a title=\"")
+           .append(_t("Review possible sybils in network database"))
+           .append("\" href=\"/netdb?f=3\">")
+           .append(nbsp(_t("Sybils")))
+           .append("</a>\n")
+
+           .append("</td></tr></table>");
         return buf.toString();
     }
 
@@ -259,7 +324,7 @@ class SummaryBarRenderer {
            .append(_t("General"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table><tr>" +
+                   "<table id=\"sb_localid\"><tr>" +
                    "<td align=\"left\"><b title=\"")
            .append(_t("Your Local Identity is your unique I2P router identity, similar to an ip address but tailored to I2P. "))
            .append(_t("Never disclose this to anyone, as it can reveal your real world ip."))
@@ -277,7 +342,7 @@ class SummaryBarRenderer {
            .append(_t("show"))
            .append("</a></td></tr>\n" +
 
-                   "</table><table>" + // fix for some rows with a big left side and some with a big right side
+                   "</table><table id=\"sb_version\">" + // fix for some rows with a big left side and some with a big right side
                    "<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
@@ -288,7 +353,7 @@ class SummaryBarRenderer {
            .append(_helper.getVersion())
            .append("</td></tr>\n" +
 
-                   "</table><table>" + // fix for some rows with a big left side and some with a big right side
+                   "</table><table id=\"sb_uptime\">" + // fix for some rows with a big left side and some with a big right side
                    "<tr title=\"")
            .append(_t("How long we've been running for this session"))
            .append("\">" +
@@ -304,7 +369,7 @@ class SummaryBarRenderer {
     public String renderShortGeneralHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<table>" +
+        buf.append("<table id=\"sb_shortgeneral\">" +
                    "<tr title=\"")
            .append(_t("The version of the I2P software we are running"))
            .append("\">" +
@@ -330,7 +395,7 @@ class SummaryBarRenderer {
     public String renderNetworkReachabilityHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
+        buf.append("<h4><a href=\"/help#confignet\" target=\"_top\" title=\"")
            .append(_t("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_t("Network"))
@@ -387,7 +452,7 @@ class SummaryBarRenderer {
            .append(_t("Peers"))
            .append("</a></h3><hr class=\"b\">\n" +
 
-                   "<table>\n" +
+                   "<table id=\"sb_peers\">\n" +
 
                    "<tr title=\"")
            .append(_t("Peers we've been talking to in the last few minutes/last hour"))
@@ -456,7 +521,7 @@ class SummaryBarRenderer {
            .append("\" target=\"_top\">")
            .append(_t("Bandwidth in/out"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table>\n" +
+                   "<table id=\"sb_bandwidth\">\n" +
 
                    "<tr><td align=\"left\"><b>")
            .append(DataHelper.formatDuration2(3 * 1000))   // lie and say 3 sec since 1 sec would appear as 1000 ms
@@ -500,7 +565,7 @@ class SummaryBarRenderer {
            .append("\">")
            .append(_t("Tunnels"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table>\n" +
+                   "<table id=\"sb_tunnels\">\n" +
 
                    "<tr title=\"")
            .append(_t("Used for building and testing tunnels, and communicating with floodfill peers"))
@@ -550,7 +615,7 @@ class SummaryBarRenderer {
            .append("\">")
            .append(_t("Congestion"))
            .append("</a></h3><hr class=\"b\">" +
-                   "<table>\n" +
+                   "<table id=\"sb_queue\">\n" +
 
                    "<tr title=\"")
            .append(_t("Indicates router performance"))

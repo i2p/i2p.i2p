@@ -1566,17 +1566,19 @@ public class DataHelper {
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
 
+        // Replace &nbsp; with thin non-breaking space &#8239; (more consistent/predictable width between fonts & point sizes)
+
         String str = fmt.format(val);
         switch (scale) {
-            case 1: return str + "&nbsp;K";
-            case 2: return str + "&nbsp;M";
-            case 3: return str + "&nbsp;G";
-            case 4: return str + "&nbsp;T";
-            case 5: return str + "&nbsp;P";
-            case 6: return str + "&nbsp;E";
-            case 7: return str + "&nbsp;Z";
-            case 8: return str + "&nbsp;Y";
-            default: return bytes + "&nbsp;";
+            case 1: return str + "&#8239;K";
+            case 2: return str + "&#8239;M";
+            case 3: return str + "&#8239;G";
+            case 4: return str + "&#8239;T";
+            case 5: return str + "&#8239;P";
+            case 6: return str + "&#8239;E";
+            case 7: return str + "&#8239;Z";
+            case 8: return str + "&#8239;Y";
+            default: return bytes + "&#8239;";
         }
     }
     

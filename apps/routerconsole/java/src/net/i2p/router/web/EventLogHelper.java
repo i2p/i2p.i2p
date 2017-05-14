@@ -99,16 +99,16 @@ public class EventLogHelper extends FormHandler {
         // So just use the "shared/console nonce".
         String nonce = CSSHelper.getNonce();
         try {
-            _out.write("<br><h3>" + _t("Display Events") + "</h3>");
+            _out.write("<br><h3 id=\"displayevents\">" + _t("Display Events") + "</h3>");
             _out.write("<form action=\"events\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
-                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_t("Events since") + ": <select name=\"from\">");
+                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n<b>");
+            _out.write(_t("Events since") + ":</b> <select name=\"from\">");
             for (int i = 0; i < _times.length; i++) {
                 writeOption(_times[i]);
             }
-            _out.write("</select><br>");
-            _out.write(_t("Event type") + ": <select name=\"type\">");
+            _out.write("</select>&nbsp;<b>");
+            _out.write(_t("Event type") + ":</b> <select name=\"type\">");
             // sorted by translated display string
             Map<String, String> events = new TreeMap<String, String>(Collator.getInstance());
             for (int i = 0; i < _events.length; i += 2) {
@@ -119,7 +119,7 @@ public class EventLogHelper extends FormHandler {
                 writeOption(e.getKey(), e.getValue());
             }
             _out.write("</select>" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Filter events") + "\"></div></form>");
+                       "&nbsp;<input type=\"submit\" class=\"accept\" value=\"" + _t("Filter events") + "\"></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -175,7 +175,7 @@ public class EventLogHelper extends FormHandler {
             return _t("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
         }
         StringBuilder buf = new StringBuilder(2048);
-        buf.append("<table><tr><th>");
+        buf.append("<table id=\"eventlog\"><tr><th>");
         buf.append(_t("Time"));
         buf.append("</th><th>");
         if (isAll) {

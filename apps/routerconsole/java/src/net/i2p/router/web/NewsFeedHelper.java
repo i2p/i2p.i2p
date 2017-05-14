@@ -78,9 +78,9 @@ public class NewsFeedHelper extends HelperBase {
                 buf.append("<div class=\"newsentry\"><h3>");
                 if (entry.updated > 0) {
                     Date date = new Date(entry.updated);
-                    buf.append("<font size=\"-1\">")
+                    buf.append("<span class=\"newsDate\">")
                        .append(fmt.format(date))
-                       .append(":</font> ");
+                       .append("</span> ");
                 }
                 if (entry.link != null)
                     buf.append("<a href=\"").append(DataHelper.escapeHTML(entry.link)).append("\">");
@@ -88,9 +88,9 @@ public class NewsFeedHelper extends HelperBase {
                 if (entry.link != null)
                     buf.append("</a>");
                 if (entry.authorName != null) {
-                    buf.append(" <font size=\"-2\">(<i>")
-                       .append(Messages.getString("by {0}", DataHelper.escapeHTML(entry.authorName), ctx))
-                       .append("</i>)</font>\n");
+                    buf.append(" <span class=\"newsAuthor\" title=\"Post author\"><i>")
+                       .append(Messages.getString("{0}", DataHelper.escapeHTML(entry.authorName), ctx))
+                       .append("</i></span>\n");
                 }
                 buf.append("</h3>\n<div class=\"newscontent\">\n")
                    .append(entry.content)
