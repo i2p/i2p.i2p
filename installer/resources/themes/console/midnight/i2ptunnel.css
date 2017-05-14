@@ -5,7 +5,7 @@ body {
      margin: 0;
      padding: 0;
      text-align: center;
-     font-family: "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
      background: #000;
      color: #c9ceff;
      font-size: 9pt;
@@ -15,6 +15,10 @@ body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
      padding: 0;
      overflow: hidden;
+}
+
+* {
+     outline: none;
 }
 
 :-moz-focusring {
@@ -32,7 +36,7 @@ a {
 }
 
 a:link {
-     color: #443da0;
+     color: #4e47bf;
      outline: none;
 }
 
@@ -108,7 +112,7 @@ hr {
      margin: 8px auto;
      padding: 5px 3px !important;
      width: calc(100% - 14px);
-     min-width: 450px;
+     min-width: 540px;
      max-width: 1400px;
      overflow: hidden;
      text-align: left;
@@ -122,6 +126,14 @@ hr {
 
 .panel:last-child {
      margin-bottom: 5px;
+}
+
+.panel#clients {
+     margin-top: -23px !important;
+}
+
+.iframed .panel#clients {
+     margin-top: -20px !important;
 }
 
 .iframed .panel.iframed {
@@ -148,7 +160,7 @@ hr {
 h2, h3 {
      padding: 7px 10px;
      border: 1px solid #2d295f;
-     background: linear-gradient(to bottom, #191729 0%, #191729 50%, #000 50%, #000 100%) !important;
+     background: linear-gradient(to bottom, #191729 50%, #000 50%) !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -166,6 +178,49 @@ h3 {
      margin: 10px 0 -1px;
 }
 
+/* title images */
+
+h2, h3 {
+     padding-left: 32px;
+     background-blend-mode: luminosity, normal, normal !important;
+}
+
+.panel:hover h2, .panel:hover h3 {
+     background-blend-mode: normal, normal, normal !important;
+}
+
+#messages h2 {
+     background: url(/themes/console/images/info/logs.png) left 6px center no-repeat, linear-gradient(to bottom, #191729 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#globalTunnelControl h2 {
+     background: url(/themes/console/images/info/control.png) left 6px center no-repeat, linear-gradient(to bottom, #191729 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#servers h2 {
+     background: url(/themes/console/images/info/server.png) left 6px center no-repeat, linear-gradient(to bottom, #191729 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#clients h2 {
+     background: url(/themes/console/images/info/client.png) left 6px center no-repeat, linear-gradient(to bottom, #191729 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
+     background: url(/themes/console/images/info/configure.png) left 6px center no-repeat, linear-gradient(to bottom, #191729 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#wizardPanel h2 {
+     background: url(/themes/console/images/info/wizard.png) left 6px center no-repeat, linear-gradient(to bottom, #191729 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+/* end title images */
+
 .iframed #globalTunnelControl h2 {
      margin-top: 2px;
 }
@@ -173,21 +228,19 @@ h3 {
 .panel table {
      width: 100%;
      border-collapse: collapse;
-     border: 1px solid #443da0;
      border: 1px solid #2d295f;
      margin: 0;
 }
 
 th {
      background: #000;
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      padding: 6px 5px;
      border-top: 1px solid #2d295f;
      border-bottom: 1px solid #2d295f;
      font-size: 10pt;
      color: #c9ceff;
-     letter-spacing: 0.08em;
-     word-spacing: 0.1em;
+     text-align: left;
 }
 
 td {
@@ -195,6 +248,14 @@ td {
      vertical-align: middle;
      padding: 5px;
      font-size: 9pt;
+}
+
+th:last-child, td:last-child {
+     border-right: 1px solid #2d295f;
+}
+
+#throttler th:last-child, #throttler td:last-child, #wizardTunnelTypes td:last-child, table table th:last-child, table table td:last-child {
+     border-right: none;
 }
 
 td > input {
@@ -209,9 +270,8 @@ td > b {
 
 td.infohelp {
      background: url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
-     background-size: 24px 24px;
-     background-position: 10px center;
-     padding: 10px 10px 10px 40px !important;
+     background-size: 20px 20px;
+     padding: 10px 10px 10px 38px !important;
 }
 
 .tunnelConfig td {
@@ -227,6 +287,11 @@ td.infohelp {
      overflow: hidden;
      text-align: left;
      border: 1px solid #2d295f;
+     border-bottom: 1px inset #120f35 !important;
+}
+
+_:-ms-lang(x), .tunnelProperties {
+     border-bottom: 1px solid #120f35 !important;
 }
 
 #serverTunnels {
@@ -305,7 +370,7 @@ textarea {
      background: #000;
      margin-left: 4px;
      margin-right: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: bold 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      resize: none;
      box-sizing: border-box;
      border-radius: 2px;
@@ -314,8 +379,8 @@ textarea {
 textarea:focus {
      color: #c9ceff;
      background: #000 !important;
+     box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
 }
 
@@ -330,13 +395,14 @@ textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages
      padding: 2px 4px;
      color: #69f;
      background: linear-gradient(to bottom, #000 0%, #000019 100%) !important;
+     font-family: "Droid Sans Mono", "Noto Mono", Consolas, "Lucida Console", "DejaVu Sans Mono", monospace;
 }
 
 .freetext {
      width: 150px;
      border: 1px solid #443da0;
      padding: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: bold 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      background: #fff;
      color: #7670c2;
      border-radius: 2px;
@@ -352,7 +418,7 @@ textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages
 .freetext[readonly], .freetext[readonly]:focus {
      background: #000 !important;
      box-shadow: inset 2px 2px 1px #000;
-     color: #558;
+     color: #669;
      cursor: default;
      border: 1px solid #443da0 !important;
      opacity: 0.8;
@@ -363,7 +429,7 @@ input[type="hidden"], input.default {
 }
 
 input, select, button, .control {
-     font-family: "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
      font-size: 9pt;
@@ -372,14 +438,13 @@ input, select, button, .control {
      resize: none;
      cursor: pointer;
      filter: drop-shadow(0 0 1px #115);
-     -webkit-filter: drop-shadow(0 0 1px #115);
 }
 
 input {
      background-color: #002;
      color: #c9ceff;
      margin: 0 2px 0 2px;
-     font-family: "Droid Sans", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
      border: 1px solid #443da0;
      text-decoration: none;
 }
@@ -395,18 +460,21 @@ input[type="file"] {
 }
 
 input[type="checkbox"], input[type="radio"] {
-     vertical-align: middle;
+     vertical-align: sub;
      min-width: 16px;
      min-height: 16px;
      margin: 0;
      background: none;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
+     box-shadow: 0 0 2px 1px #99f;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 2px #c9ceff); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 2px #c9ceff);
+}
+
+label {
+     cursor: pointer;
 }
 
 input[type="password"] {
@@ -424,12 +492,13 @@ input[type="text"], input[type="password"], textarea, textarea[readonly="readonl
 input[type="text"]:focus, input[type="password"]:focus {
      color: #c9ceff;
      background: #000;
+     box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
      filter: drop-shadow(0 0 1px #99f);
-     -webkit-filter: drop-shadow(0 0 1px #99f);
      transition: ease filter 0.3s 0s;
 }
 
 input[readonly="readonly"]:focus {
+     box-shadow: none;
      filter: none;
      background: linear-gradient(to bottom, #000 0%, #010 100%) !important;
 }
@@ -456,7 +525,7 @@ a.control, input.control {
      box-sizing: border-box;
      min-width: 70px !important;
      padding: 5px 8px !important;
-     color: #443da0 !important;
+     color: #4e47bf !important;
      background: #000 !important;
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
 }
@@ -491,11 +560,14 @@ button, input[type="submit"], input[type="reset"], .control, select {
 }
 
 select {
-     color: #443da0;
-     font: 8pt "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
+     color: #4e47bf;
+     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
      font-weight: bold;
-     padding: 3px 16px 3px 3px;
-     background: #000;
+     padding: 4px 16px 4px 4px !important;
      border-radius: 2px;
      cursor: pointer;
      border: 1px solid #3e3f8f;
@@ -523,29 +595,21 @@ select:hover {
      box-shadow: inset 0 1px 1px 0 #c9ceff;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-
-select {
-     -moz-appearance: none;
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-}
-
-select:hover, select:active {
+select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
 }
 
-select:focus {
-     background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
-}
+select::-ms-expand {
+     display: none;
 }
 
 input, select, button {
-     font-size: 8pt;
+     font-size: 9pt;
      vertical-align: middle;
 }
 
 button, input[type="submit"], input[type="reset"], a.control {
-     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
      font-weight: bold;
 }
 
@@ -554,7 +618,7 @@ button, input[type="submit"], input[type="reset"], a.control {
      padding: 7px 5px !important;
      background: #000;
      background: linear-gradient(to bottom, #001, #000);
-     border-top: 1px inset #2d295f !important;
+     border-top: 1px solid #2d295f !important;
 }
 
 .tunnelDescriptionLabel, .tunnelDestinationLabel {
@@ -596,7 +660,12 @@ input {
 }
 
 select#profile, select#connectionProfile {
-    width: 70%;
+     width: 70%;
+     width: calc(100% - 10px) !important;
+}
+
+td[colspan="2"] > select#profile {
+     width: calc(50% - 15px) !important;
 }
 
 #customOptions, #userAgents {
@@ -622,7 +691,6 @@ textarea[name="accessList"] {
 
 #localDestination:focus, .authentication:focus {
      filter: drop-shadow(0 0 1px #c9ceff);
-     -webkit-filter: drop-shadow(0 0 1px #c9ceff);
 }
 
 #leasesetKey {
@@ -634,7 +702,10 @@ textarea[name="accessList"] {
      display: inline-block;
      margin: 5px 10px 5px 0;
      padding: 0;
-     vertical-align: middle;
+}
+
+.multiOption input {
+     vertical-align: sub;
 }
 
 .multiOption#isServer {
@@ -713,6 +784,14 @@ input::-moz-placeholder {
      opacity: 1;
 }
 
+input:focus::-moz-placeholder {
+     opacity: 0;
+}
+
+:focus::-webkit-input-placeholder {
+     opacity: 0;
+}
+
 input.tunnelName, input.tunnelDescription, #userAgents {
      width: 80%;
      min-width: 280px;
@@ -726,6 +805,10 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .port, .quantity, .period {
      width: 80px;
+}
+
+.port[readonly] {
+     width: 120px;
 }
 
 .username, .password {
@@ -921,8 +1004,37 @@ td.tunnelDestination, td.tunnelDescription {
 
 /* responsive layout */
 
+@media screen and (max-width: 800px) {
+th {
+     font-size: 9pt;
+}
+
+.statusNotRunning, .statusRunning, .statusStarting {
+     background-size: auto 14px;
+}
+
+#leasesetKey {
+     height: 38px !important;
+}
+
+.port, .quantity, .period {
+     width: 60px;
+}
+
+#clientHost, .host {
+     width: 200px;
+     min-width: 210px;
+}
+}
+
+@media screen and (max-width: 1300px) {
+h2, h3 {
+     font-size: 10.5pt !important;
+}
+}
+
 @media screen and (min-width: 1300px) {
-body, td, .control, select, input {
+body, td, .control, select, input, textarea {
      font-size: 10pt !important;
 }
 
@@ -934,3 +1046,5 @@ td {
      height: 34px !important;
 }
 }
+
+/* end responsive layout */

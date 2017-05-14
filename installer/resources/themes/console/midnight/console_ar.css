@@ -26,6 +26,10 @@ div.news {
      direction: ltr;
 }
 
+.news h3, #newspage h3 {
+     direction: ltr;
+}
+
 div.main {
      margin: -1px 205px 5px 5px;
      background: url("images/scarface.jpg") no-repeat scroll left bottom #000000 !important;
@@ -42,6 +46,11 @@ h1,h2,h3,h4 {
 
 button.search {
      margin-right: 30px;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     width: 173px;
+     margin: 0 -2px 0 0;
 }
 
 div.routersummary h3, div.routersummary h4, .routersummary a, .routersummary b {
@@ -68,6 +77,10 @@ div.routersummary td:first-child {
 
 #sb_services td, #sb_internals td, #sb_advanced td {
      text-align: center;
+}
+
+#sb_localtunnels td:nth-child(2), #sb_localtunnels a {
+     text-align: right !important;
 }
 
 #sb_localtunnels td:last-child {
@@ -324,6 +337,12 @@ div[lang="ar"] ul, div[lang="ar"] p {
      margin: 10px;
 }
 
+#advancedsettings p.infohelp {
+     margin: 12px 0 -2px;
+}
+
+/* responsive layout */
+
 @media screen and (min-width: 1500px) {
 .main, .news, h1 {
      margin-right: 232px !important;
@@ -332,6 +351,12 @@ div[lang="ar"] ul, div[lang="ar"] p {
 
 div.routersummaryouter {
      margin-right: 27px !important;
+}
+
+
+div.routersummary img[src$="i2plogo.png"] {
+     width: 196px;
+     margin: -2px 0 0;
 }
 
 .routersummary h4 {
@@ -346,3 +371,5 @@ div[lang="ar"], div[lang="ar"] code, div[lang="ar"] b {
      font-size: 11pt !important;
 }
 }
+
+/* end responsive layout */

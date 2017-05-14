@@ -10,7 +10,7 @@ pre {
      text-align: right;
 }
 
-#help pre, #logs li {
+#help pre, #logs li, #proof textarea {
      text-align: left;
      direction: ltr;
 }
@@ -42,6 +42,14 @@ h1 {
      padding: 20px 20px 20px 10px;
 }
 
+h2 {
+     font-size: 16pt;
+}
+
+h3 {
+     font-size: 14pt;
+}
+
 form {
     text-align: right;
     margin: 0 16px 0 -16px;
@@ -68,8 +76,8 @@ button.search, input[type="submit"], input[type="reset"],
 button.search:hover, input[type="submit"]:hover, input[type="reset"]:hover,
 button.search:focus, input[type="submit"]:focus, input[type="reset"]:focus,
 button.search:active, input[type="submit"]:active, input[type="reset"]:active {
-    background-position: right 6px center;
-    padding: 5px 21px 5px 5px;
+    background-position: right 6px center !important;
+    padding: 5px 22px 5px 7px !important;
 }
 
 select, select:hover, select:focus, select:active {
@@ -147,7 +155,13 @@ div.tunnels td:first-child {
      text-align: right;
 }
 
-/* proxy error messages */
+div.messages li, .messages li:first-child, .error li:first-child, .error li {
+     padding: 0 24px 0 0 !important;
+}
+
+.error li {
+     background-position: right center !important;
+}
 
 div.warning {
      text-align: right;
@@ -162,9 +176,17 @@ div.main li {
      text-align: right;
 }
 
+.main#home {
+     padding-bottom: 10px;
+}
+
 div.news {
-     margin: 10px 205px -12px 10px;
+     margin: 10px 205px -12px 0;
      padding: 7px 20px 10px 20px;
+     direction: ltr;
+}
+
+.news h3, #newspage h3 {
      direction: ltr;
 }
 
@@ -190,8 +212,9 @@ div.graphspanel form {
      margin: 0 -16px 0 16px;
 }
 
-.formaction#consolepass, .formaction#tunnelconfigsave, .formaction#homeapps, .formaction#homesites {
-     margin-bottom: 15px;
+.formaction#consolepass, .formaction#tunnelconfigsave, .formaction#homeapps, .formaction#homesites, #sidebardefaults, #loggingoptions,
+#reseedconfig, #addkeyring, #netconfig, #advconf, #bandwidthconfig, #externali2cp, #pluginupdater, #newfamily, #webappconfigactions, #configstats {
+     margin-bottom: 15px !important;
 }
 
 #webappconfig th:first-child, #webappconfig td:first-child {
@@ -210,7 +233,7 @@ div.graphspanel form {
 
 div[lang="ar"] p, div[lang="ar"] ul {
      padding: 0 20px;
-     font-size: 10pt;
+     font-size: 11pt;
 }
 
 div[lang="ar"] li.tidylist {
@@ -222,6 +245,18 @@ ul.links li:first-child {
      margin-top: 15px !important;
 }
 
+.main#help ul.links li:first-child {
+     margin-top: -10px !important;
+}
+
+.main#help ul.links li {
+     margin-right: 70px !important;
+}
+
+.main#help .tidylist {
+    margin: 5px 50px 5px 20px;
+}
+
 .tidylist code {
      text-align: right;
 }
@@ -231,7 +266,7 @@ code {
 }
 
 th {
-     text-align:right; 
+     text-align:right;
 }
 
 th a.script {
@@ -248,6 +283,7 @@ span.newtab {
      font-size: 8pt;
      float: left;
      letter-spacing: 0;
+     margin-left: 10px;
 }
 
 #tunnelconfig + hr {
@@ -329,10 +365,6 @@ div.themechoice, div.langselect {
      text-align: right;
 }
 
-#sidebardefaults, #loggingoptions, #reseedconfig, #addkeyring, #netconfig, #advconf {
-     margin-bottom: 15px;
-}
-
 table#manualreseed, #config_keyring .configtable { 
      margin-right: 0 !important;
 }
@@ -372,8 +404,20 @@ table#pluginconfig {
      margin-bottom: 15px;
 }
 
-.infohelp#webappconfig, h3#webappconfig, #pluginconfig, h3#pluginconfig {
+.infohelp#webappconfig, h3#webappconfig, #pluginconfig, h3#pconfig {
      margin-right: 0; 
+}
+
+#configstats td:first-child {
+     text-align: center !important;
+}
+
+#configstats td:nth-child(2) {
+     padding-right: 10px;
+}
+
+#configstats tr:last-child td {
+     text-align: left !important;
 }
 
 textarea[name="levels"] {
@@ -471,7 +515,19 @@ div.news h3, #news h3 {
      background: url(images/news.png) right 8px center no-repeat, linear-gradient(to left, #fff, #eef) !important;
      background: url(images/news.png) right 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
      padding: 5px 30px 5px 10px;
-/*     background-position: right 8px center, right center !important;*/
+}
+
+#newsStatus {
+     float: none;
+}
+
+#newsDisplay {
+     float: left;
+     margin-left: 0 !important;
+}
+
+#newsStatus, #newsDisplay {
+     margin-bottom: -2px !important;
 }
 
 #netdboverview, #netdboverview td, #netdboverview table {
@@ -514,14 +570,6 @@ table#leasesetdebug td:nth-child(2n) {
 
 table#leasesetdebug, table#leasesetsummary, table.leaseset, table.sybil_routerinfo, #netdboverview, .netdbentry {
      margin-right: 0;
-}
-
-table#profiles, p#profiles_overview, #profiles + h3, #thresholds + h3, ul#banlist {
-     margin-right: -16px;
-}
-
-p#profiles_overview, #profiles + h3, #thresholds + h3, ul#banlist {
-     margin-left: 16px;
 }
 
 p.family, p.sybil_info {
@@ -592,12 +640,36 @@ table.netdbentry td:nth-child(2) {
      margin-right: 20px;
 }
 
-#profiles td:nth-child(2) {
-     text-align: right;
+p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, ul#banlist {
+     margin-right: -16px !important;
 }
 
-#profiles td:last-child {
-     text-align: left !important;
+p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, ul#banlist {
+     margin-left: 16px;
+}
+
+#profiles_overview + .widescroll {
+     margin: 0 -16px 0 16px !important;
+}
+
+#profiles .confignav + .widescroll {
+     overflow: visible;
+}
+
+#profilelist {
+     margin: 0 !important;
+}
+
+#profilelist th:last-child, #profilelist td:last-child {
+     text-align: left;
+}
+
+#profiledefs td:last-child {
+     text-align: right !important;
+}
+
+#profilelist td:nth-child(2) {
+     text-align: right;
 }
 
 #thresholds p {
@@ -607,6 +679,10 @@ table.netdbentry td:nth-child(2) {
 .wideload .confignav {
      margin-left: -3px !important;
      margin-right: -35px !important;
+}
+
+#floodfills, .statusnotes:last-child {
+     margin-bottom: -10px !important;
 }
 
 .main#profiles ul#banlist {
@@ -619,6 +695,7 @@ table.netdbentry td:nth-child(2) {
 
 #logs table td:first-child {
      text-align: left;
+     padding-right: 15px;
 }
 
 .logtable tr:first-child td {
@@ -636,6 +713,34 @@ table.netdbentry td:nth-child(2) {
 
 #pluginupdater.formaction {
      margin: -16px 0;
+}
+
+pre#transports {
+     padding: 10px 10px 0 0;
+}
+
+#changelog {
+     margin-bottom: -9px !important;
+}
+
+#advancedsettings #configinfo {
+     margin: 0 0 5px !important;
+}
+
+#portfaq {
+     width: auto;
+     margin: 16px 0 5px;
+}
+
+#help h3 {
+     border-width: 1px 5px 1px 1px !important;
+}
+
+#faq h3 {
+     background: url(/themes/console/images/info/question.png) no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)) repeat scroll 0 0%, rgba(0, 0, 0, 0) linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
+     background-position: right 6px center, right center, right center !important;
+     padding-right: 30px;
+     background-size: 18px 18px, 100% 100%, 100% 100% !important;
 }
 
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus,

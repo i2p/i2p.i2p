@@ -27,6 +27,10 @@ body.iframed {
      color: white;
 }
 
+* {
+     outline: none;
+}
+
 div.header {
      padding: 8px 5px 12px 5px;
 }
@@ -115,7 +119,7 @@ p.footer {
 }
 
 p.mailbody, textarea {
-     font: 9pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      margin: 0 5px;
      text-align: left;
 }
@@ -256,8 +260,7 @@ input.optbox {
 
 input.optbox:hover {
      opacity: 1.0;
-     filter: drop-shadow(0 0 2px #f60);
-     -webkit-filter: drop-shadow(0 0 2px #f60);
+     filter: drop-shadow(0 0 3px #f60);
 }
 
 #attachedfile {
@@ -377,6 +380,7 @@ table[id="mailbox"] th {
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      border-top: none;
+     white-space: nowrap;
 }
 
 table[id="mailbox"] th img {
@@ -385,6 +389,10 @@ table[id="mailbox"] th img {
 
 table[id="mailbox"] th img:hover, table[id="mailbox"] th a:focus img {
      opacity: 1 !important;
+}
+
+#mailbox td:nth-child(5) {
+     text-align: left;
 }
 
 #mailbox .list0 td, #mailbox .list1 td {
@@ -412,7 +420,7 @@ td:first-child {
 }
 
 pre {
-     font: 9pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      margin-left: 1cm;
      margin-right: 1cm;
 }
@@ -511,7 +519,7 @@ table#mailhead {
      font-weight: normal;
 }
 
-input {
+input, label {
      cursor: pointer;
 }
 input[type="file"] {
@@ -531,90 +539,6 @@ input.new_upload {
 * {
      outline: none;
 }
-
-/*
-input.cancel, input.clearselection, input.logout {
-     background: #000 url('/themes/console/images/cancel.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.delete, input.delete_attachment, input.really_delete {
-     background: #000 url('/themes/console/images/delete.png') no-repeat 2px center;
-     min-height: 22px;
-     margin-left: 0;
-}
-
-input.download, input.lastpage {
-     background: #000 url('/themes/console/images/arrow_down.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.firstpage {
-     background: #000 url('/themes/console/images/arrow_up.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.list, input.offline {
-     background: #000 url('/themes/console/images/folder.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.forward, input.login, input.nextpage, input.send, input.next {
-     background: #000 url('/themes/console/images/arrow_right.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.invertselection, input.reload, input.refresh {
-     background: #000 url('/themes/console/images/arrow_refresh.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.markall, input.show {
-     background: #000 url('/themes/console/images/tick.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.new {
-     background: #000 url('/themes/console/images/email.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.reply, input.replyall {
-     background: #000 url('/themes/console/images/arrow_turn_left.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.prevpage, input.prev {
-     background: #000 url('/themes/console/images/arrow_left.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.send, input.setpagesize, input.save {
-     background: #000 url('/themes/console/images/accept.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.configure {
-     background: #000 url('/susimail/icons/wrench.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input.saveas {
-     background: #000 url('/susimail/icons/drive_edit.png') no-repeat 2px center;
-     min-height: 22px;
-}
-
-input[type=file], input.new_upload {
-     background: #000 url('/themes/console/images/add.png') no-repeat 2px center;
-     min-height: 22px;
-     padding: 2px 1px !important;
-}
-
-input[type=checkbox] {
-     max-width: 16px !important;
-     min-width: 16px !important;
-}
-*/
 
 input {
      font-size: 9pt;
@@ -636,12 +560,13 @@ input.optbox {
 
 input[type="checkbox"], input[type="radio"] {
      background: none;
+     min-width: 16px;
+     min-height: 16px;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60);
 }
 
 input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
@@ -659,7 +584,6 @@ input[type=submit], input.cancel {
      min-width: 95px !important;
      margin: 4px 5px;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 input[type=submit]:hover, input.cancel:hover, input[type=submit]:focus, input.cancel:focus {
@@ -675,6 +599,7 @@ input[type=submit]:active, input.cancel:active {
      color: #EE9 !important;
      box-shadow: inset 3px 3px 3px #000;
      box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000;
+     outline: none;
 }
 
 #dologin input:disabled, #dologin input:disabled:hover, #dologin input:disabled:active {
@@ -701,7 +626,7 @@ input[name="user"]:focus, input[name="pass"]:focus, input[type="text"]:focus, te
 input[name="host"], input[name="pop3"], input[name="smtp"] {
     display: inline !important;
     margin-top: 3px !important;
-    font-family: "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+    font-family: "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
     color: #ff0;
     background: none !important;
     border-radius: 0;
@@ -722,7 +647,6 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      color: #ee9 !important;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
 }
 
@@ -951,7 +875,7 @@ table#pagenav td:first-child {
 
 table#pagenav td:nth-child(2) {
      text-align: center !important;
-     width: 80px;
+     width: 4%;
      white-space: nowrap;
 }
 
@@ -1145,9 +1069,8 @@ textarea[name="new_text"] {
 
 /* end responsive layout */
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
 

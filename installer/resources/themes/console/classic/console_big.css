@@ -1,6 +1,6 @@
 /* I2P Theme: I2P Classic Theme Override */
 /* I2P Description: Larger fontsize override for console to accomodate foreign charactersets */
-/* Author: Dr|Z3d */
+/* Author: dr|z3d */
 
 * {
      text-shadow: none !important;
@@ -13,8 +13,12 @@
 
 input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel {
      font-size: 11pt !important;
-     padding-top: 2px;
-     padding-bottom: 2px;
+     padding-top: 5px;
+     padding-bottom: 5px;
+}
+
+input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel, div.app, .themelabel, .ui_lang, .tab a, label, a, li {
+     letter-spacing: 0.05em !important;
 }
 
 .routersummary button {
@@ -79,7 +83,7 @@ b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4, .messages {
 }
 
 body, .main {
-     font: 12pt "Droid Sans", Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
+     font: 12pt "Noto Sans", "Droid Sans", "Segoe UI", "Lucida Grande", Verdana, "Bitstream Vera Sans", Helvetica, Sans, sans-serif;
 }
 
 h1 {
@@ -104,13 +108,15 @@ h4 {
      font-size: 13pt !important;
 }
 
+h1, h2, h3, h4 {
+     letter-spacing: 0.08em !important;
+     word-spacing: 0.1em !important;
+}
+
 /* end global overrides */
 
 div.tunnels a {
      font-size: 12pt !important;
-}
-
-div.tunnels table {
 }
 
 div.tunnels td:first-child, div.tunnels td:last-child  {
@@ -169,6 +175,10 @@ table code {
      padding-bottom: 4px !important;
 }
 
+#themeui.formaction {
+     margin-top: 8px !important;
+}
+
 div.themechoice, div.langselect {
      width: 128px;
 }
@@ -177,20 +187,41 @@ h3.ptitle, h3#i2pclientconfig {
      margin-bottom: -17px !important;
 }
 
+h3#systray, h3#servicedebug, h3#browseronstart {
+     margin-bottom: -17px !important;
+}
+
 h3#pluginmanage {
      margin-bottom: -22px !important;
 }
 
-.formaction {
-     margin-top: -17px !important;
+.formaction, #consolepass + .formaction, #sidebardefaults, #webappconfigactions.formaction, #clientsconfig.formaction, #homesites, #homeapps {
+     margin-top: -6px !important;
 }
 
-table + .formaction, #consolepass + .formaction {
-     margin-top: -7px !important;
+table + .formaction {
+     margin-top: -1px !important;
 }
 
 hr + .formaction {
      margin-top: 0 !important;
+}
+
+h4#updateplugins {
+     margin-top: -16px;
+}
+
+ #tunnelconfigsave {
+     margin-top: -6px !important;
+}
+
+#resetreseed input.reload {
+     margin-top: 20px;
+     margin-bottom: 0;
+}
+
+p#keyringhelp, #tunnelconfig + .infohelp {
+     margin-bottom: 15px !important;
 }
 
 h3.stats {
@@ -208,6 +239,11 @@ input[type="text"], input[type="password"] {
 input[type="radio"], input[type="checkbox"] {
      margin-top: 6px;
      margin-bottom: 6px;
+}
+
+input[name="pluginURL"] {
+     max-width: 250px !important;
+     width: 250px !important;
 }
 
 button.control {
@@ -244,6 +280,12 @@ p[style="margin: 0px 12px"] {
      margin-top: 4px !important;
 }
 
+.newsAuthor {
+     background-position: left top 8px !important;
+     background-size: 12px 12px !important;
+     padding-left: 14px;
+}
+
 input.search[type="text"] {
      padding-left: 30px;
      background-position: 8px center;
@@ -261,11 +303,32 @@ table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels
      font-size: 0 !important;
 }
 
+h3#iptransport a:not(old), h3#advancedconfig a:not(old) {
+     font-size: 0 !important;
+}
+
+h3#iptransport a::after, h3#advancedconfig a::after {
+     vertical-align: sub;
+     margin-left: 5px;
+}
+
 /* responsive layout */
 
 @media screen and (max-width: 1200px) {
 .main td, .main td b {
      font-size: 10pt !important;
+}
+
+.tab, .tab2 {
+     margin-right: -2px !important;
+}
+}
+
+@media screen and (max-width: 1500px) {
+div.applabel {
+     height: 22px !important;
+     padding: 2px;
+     width: 140px;
 }
 }
 
@@ -276,9 +339,89 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 210px;
 }
 
-.tab, .tab2 {
+.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"], .routersummary button[name="updateAction"] {
      font-size: 11pt !important;
+}
+
+.tab, .tab2, .main[id^="config_"] td {
+     font-size: 11pt !important;
+}
+
+.main[id^="config_"] th {
+     font-size: 12pt !important;
+}
+
+.optbox, #netconfig .optbox:last-child, #netconfig .optbox[value="only"], #netconfig .optbox[name="disableUDP"], #netconfig .optbox[value="disabled"] {
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+}
+
+.langselect .optbox {
+     margin: -4px 0 8px -54px !important;
+}
+
+#console h2 {
+     margin-bottom: -5px !important;
+}
+
+#console h2 a[name], #console h2 a[name]:hover {
+     font-size: 16pt !important;
+     color: #0c153d !important;
+}
+
+.welcome h2 {
+     font-size: 14pt !important;
+}
+
+p#fullhistory {
+     padding: 8px 10px !important;
+}
+
+div.news {
+     padding-bottom: 7px !important;
+}
+
+div.news h3, .newsDate, div.news a {
+     font-size: 12pt !important;
+}
+
+#sb_internals, #sb_services, #sb_advanced {
+     margin-top: -5px !important;
+}
+
+.main#console code {
+     font-size: 13pt !important;
+}
+
+#faq ul {
+     margin-bottom: 0 !important;
+}
+
+#changelog pre {
+     font-size: 10pt !important;
+}
+
+.homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
+     font-size: 0 !important;
+}
+
+.homelinkedit td img {
+     width: 24px;
+     height: 24px;
+}
+
+#netdboverview th {
+     font-size: 12pt !important;
+}
+}
+
+@media screen and (min-width: 1200px) {
+.tab, .tab2 {
      margin-right: -3px !important;
+}
+
+#faq th, #portfaq th, #portfaq th[colspan="3"] {
+     font-size: 12pt !important;
 }
 }
 
@@ -291,6 +434,27 @@ body, .main, .main td, .news p, #news p, .main li b, div.joblog li, .themelabel,
 
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li {
      font-size: 11pt !important;
+}
+
+.langbox {
+     margin-top: 2px !important;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     margin-left: 1px;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 225px !important;
+}
+
+div.app {
+     width: 164px;
+}
+
+div.applabel {
+     padding: 3px 2px 4px !important;
+     width: 160px !important;
 }
 }
 

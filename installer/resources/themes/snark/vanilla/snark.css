@@ -46,7 +46,6 @@ body.iframed:not(old) {
 
 td *:focus {
      filter: drop-shadow(0 0 1px #df0067);
-     -webkit-filter: drop-shadow(0 0 1px #df0067);
 }
 
 ::selection {
@@ -59,7 +58,7 @@ td *:focus {
      color: white;
 }
 
-input[type="submit"], input[type="reset"], button, a:link, input[type="checkbox"], input[type="radio"], select {
+input[type="submit"], input[type="reset"], button, a:link, input[type="checkbox"], input[type="radio"], select, label {
      cursor: pointer;
 }
 
@@ -103,11 +102,17 @@ td a:visited {
 td a:hover, td a:visited:hover, td a:focus, td a:visited:focus {
      color: #df0067 !important;
      filter: none;
-     -webkit-filter: none;
 }
 
 td a:active, td a:visited:active {
      color: #FF2F85 !important;
+}
+
+.snarkRefresh, .toggleview, .snarkConfigTitle, thead img, .snarkTorrentAction,
+input[type="submit"], input[type="reset"], .control, .input[type="radio"], input[type="checkbox"] {
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     user-select: none;
 }
 
 /* top nav */
@@ -135,6 +140,7 @@ td a:active, td a:visited:active {
      width: auto;
      border-radius: 0;
      box-shadow: 0 0 2px 0 #fff inset, 0 0 1px 0 #4f3d36;
+     position: static;
 }
 
 .snarkRefresh:link, .snarkRefresh:visited {
@@ -155,6 +161,12 @@ td a:active, td a:visited:active {
      text-shadow: 0 0 1px #fff5ef;
      box-shadow: inset 0 0 0 1px #efe6e0, 0 0 0 1px rgba(77, 69, 62, 0.1);
      border: 1px solid #2f1b0c;
+     font-size-adjust: 0.56;
+}
+
+_:-ms-lang(x), .snarkRefresh:link, .snarkRefresh:visited {
+     padding-top: 1px !important;
+     margin-right: -5px !important;
 }
 
 .snarkRefresh:hover, .snarkRefresh:focus {
@@ -178,37 +190,37 @@ td a:active, td a:visited:active {
 .snarkRefresh:nth-child(2) {
      background: #fff7ef url(images/button_forum.png) 12px center no-repeat;
      background: url(images/button_forum.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604E 1px, #A09286 1px, #BFAFA2 2px);
-     background-size: 16px auto, 100% 100%, 100% 100%;
+     background-size: 17px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(n+3) {
      background: #fff7ef url(images/button_tracker.png) 12px center no-repeat;
      background: url(images/button_tracker.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(135deg, #75604E 1px, #A09286 1px, #BFAFA2 2px);
-     background-size: 16px auto, 100% 100%, 100% 100%;
+     background-size: 17px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(2):hover, .snarkRefresh:nth-child(2):focus {
      background: #ffeadf url(images/button_forum_hover.png) 12px center no-repeat;
      background: url(images/button_forum_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
-     background-size: 16px auto, 100% 100%, 100% 100%;
+     background-size: 17px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(n+3):hover, .snarkRefresh:nth-child(n+3):focus {
      background: #ffeadf url(images/button_tracker_hover.png) 12px center no-repeat;
      background: url(images/button_tracker_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
-     background-size: 16px auto, 100% 100%, 100% 100%;
+     background-size: 17px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(2):active {
      background: #dfb899 url(images/button_forum_active.png) 12px;
      background: url(images/button_forum_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
-     background-size: 16px auto, 100% 100%, 100% 100%;
+     background-size: 17px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:nth-child(n+3):active {
      background: #dfb899 url(images/button_tracker_active.png) 12px center no-repeat;
      background: url(images/button_tracker_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
-     background-size: 16px auto, 100% 100%, 100% 100%;
+     background-size: 17px auto, 100% 100%, 100% 100%;
 }
 
 .snarkRefresh:last-child {
@@ -238,7 +250,7 @@ td a:active, td a:visited:active {
 /* screenlog */
 
 .snarkMessages {
-     font: bold 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace !important;
+     font: bold 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
      text-align: left;
      margin: 0 0 10px;
      padding: 0 3px;
@@ -325,7 +337,6 @@ td a:active, td a:visited:active {
 .snarkMessages img:hover, .snarkMessages a:focus img {
      mix-blend-mode: normal;
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 .logshim {
@@ -348,7 +359,6 @@ td a:active, td a:visited:active {
      margin-right: -3px;
      padding: 3px 4px;
      filter: sepia(100%) hue-rotate(340deg) drop-shadow(0 0 1px #999);
-     -webkit-filter: sepia(100%) hue-rotate(340deg) drop-shadow(0 0 1px #999);
      background: linear-gradient(to bottom, #ffeadf 51%, #cfb6a8 52%);
      box-shadow: inset 0 0 0 1px #fff;
      mix-blend-mode: luminosity;
@@ -373,7 +383,7 @@ td a:active, td a:visited:active {
 
 pre {
      width: 100%;
-     font: 8pt "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", Courier, monospace !important;
+     font: 8pt "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", monospace !important;
      padding: 0;
      text-align: left !important;
      height: 8px;
@@ -407,7 +417,6 @@ thead, tfoot {
 thead a img, thead img {
      opacity: 0.9;
      filter: sepia(100%) hue-rotate(340deg);
-     -webkit-filter: sepia(100%) hue-rotate(340deg);
      max-height: 20px;
 }
 
@@ -415,7 +424,6 @@ thead a:hover img, thead a:focus img {
      opacity: 1;
      mix-blend-mode: normal;
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 th {
@@ -478,7 +486,7 @@ tfoot tr:nth-child(n+1) {
      vertical-align: middle;
      text-align: center;
      white-space: nowrap;
-     width: 144px;
+     width: 2%;
 }
 
 .snarkTorrents {
@@ -622,14 +630,13 @@ td:first-child {
 }
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), .snarkTorrentAction {
      width: 72px !important;
 }
 
 .snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {
      filter: drop-shadow(0 0 1px rgba(127, 108, 95, 0.6));
-     -webkit-filter: drop-shadow(0 0 1px rgba(127, 108, 95, 0.6));
      border: 1px solid #4d453e;
      border-radius: 2px;
      padding: 3px !important;
@@ -646,14 +653,12 @@ _:-ms-lang(x), .snarkTorrentAction {
      border: 1px solid #930 !important;
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px #f30);
-     -webkit-filter: drop-shadow(0 0 1px #f30);
 }
 
 .snarkTorrentAction input[type="image"]:active, .snarkTorrents th:last-child input[type="image"]:active {
      box-shadow: inset 0 0 0 1px #efe6e0, inset 3px 3px 3px #4d453e;
      mix-blend-mode: multiply;
      filter: sepia(100%) hue-rotate(340deg);
-     -webkit-filter: sepia(100%) hue-rotate(340deg);
 }
 
 .snarkTorrentEven {
@@ -724,6 +729,11 @@ _:-ms-lang(x), .snarkTorrentAction {
      border-bottom: 1px outset #efe8e0 !important;
 }
 
+_:-ms-lang(x), .snarkTorrentOdd td, .snarkTorrentEven td, .snarkTorrentInfo td, .ParentDir {
+     border-top: 1px solid #fff5ef !important;
+     border-bottom: 1px solid #efe8e0 !important;
+}
+
 .snarkTorrentOdd:last-child td, .snarkTorrentEven:last-child td {
      border-bottom: none !important;
 }
@@ -737,6 +747,10 @@ table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
 table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
      background: #f9efcf !important;
 }
+}
+
+_:-ms-lang(x), table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
+     background: #f9efcf !important;
 }
 
 .snarkDirInfo tr:hover .snarkFileStatus img {
@@ -794,7 +808,6 @@ table.snarkTorrents tbody tr:hover, table.snarkDirInfo tbody tr:hover {
 
 .snarkFileIcon img, .snarkFileIcon img:hover {
      filter: none;
-     -webkit-filter: none;
      opacity: 0.6;
 }
 
@@ -962,14 +975,21 @@ thead img.disable, img.disable:hover {
 }
 
 .thumb {
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
      max-width: 16px;
 }
 
 .thumb:hover {
+     margin: -3px 0 -2px 2px !important;
      max-width: 80px;
      max-height: 80px;
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.thumb:hover {
+     margin: -3px 0 -2px -1px !important;
+}
 }
 
 .snarkNewTorrent {
@@ -1006,7 +1026,6 @@ thead img.disable, img.disable:hover {
 
 .trackerconfig tr:first-child {
      font-weight: bold;
-     -webkit-filter: drop-shadow(0 0 1px #aaa);
      filter: drop-shadow(0 0 1px #aaa);
 }
 
@@ -1055,7 +1074,8 @@ thead img.disable, img.disable:hover {
      padding-top: 3px !important;
 }
 
-.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
+.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover,
+.configsectionpanel .snarkConfigTitle:active, .configsectionpanel .snarkConfigTitle:focus {
      background: #f2eeed !important;
      background: radial-gradient(circle at left bottom, #F9F8F2, #cfc7c2 400px) !important;
      display: block;
@@ -1081,11 +1101,11 @@ thead img.disable, img.disable:hover {
 }
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), .snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
 .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      padding: 3px 15px 4px;
-     font-size: 11pt !important;
+     font-size: 12pt !important;
 }
 
 .snarkConfigTitle a, label.toggleview {
@@ -1107,7 +1127,6 @@ _:-ms-lang(x), .snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
 .snarkConfigTitle img, label.toggleview img {
      margin: 1px -2px 3px 0;
      filter: drop-shadow(0 0 1px #7f6c5f) !important;
-     -webkit-filter: drop-shadow(0 0 1px #7f6c5f) !important;
      mix-blend-mode: luminosity;
 }
 
@@ -1197,7 +1216,6 @@ a.control:hover, a.control:focus {
      color: #930 !important;
      background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, #cfc1b5 52%, #cfc1b5 100%);
      filter: drop-shadow(0px 0 1px #f60);
-     -webkit-filter: drop-shadow(0px 0 1px #f60);
 }
 
 a.control img, a.controld img {
@@ -1206,7 +1224,6 @@ a.control img, a.controld img {
      vertical-align: top;
      mix-blend-mode: normal !important;
      filter: none !important;
-     -webkit-filter: none !important;
 }
 
 a.control:active {
@@ -1303,7 +1320,6 @@ input.disabled, input.disabled:hover, input.disabled:focus, input.disabled:activ
      cursor: not-allowed;
      background-blend-mode: luminosity !important;
      filter: none;
-     -webkit-filter: none;
 }
 
 a.controld img, a.controld:hover img, a.controld:focus img, a.controld:active img {
@@ -1397,14 +1413,12 @@ input.stoptorrent:hover, input.stoptorrent:focus {
 input[name^="action_"] {
      border-radius: 3px;
      filter: sepia(100%) hue-rotate(340deg);
-     -webkit-filter: sepia(100%) hue-rotate(340deg);
      max-width: 40px;
      margin-left: 1px;
 }
 
 input[name^="action_"]:hover, input[name^="action_"]:focus {
      filter: sepia(100%) hue-rotate(340deg) saturate(120%) drop-shadow(0 0 1px #f60);
-     -webkit-filter: sepia(100%) hue-rotate(340deg) saturate(120%) drop-shadow(0 0 1px #f60);
      opacity: 1;
      box-shadow: 0 0 1px 0 #f60;
 }
@@ -1452,6 +1466,10 @@ select {
 }
 }
 
+select::-ms-expand {
+     display: none;
+}
+
 textarea, input[name="nofilter_dataDir"] {
      background: #efe6e0;
      font-weight: bold;
@@ -1491,7 +1509,6 @@ img {
      opacity: 1.0;
      line-height: 100%;
      filter: drop-shadow(0 0 1px rgba(117, 114, 106, 0.6));
-     -webkit-filter: drop-shadow(0 0 1px rgba(117, 114, 106, 0.6));
 }
 
 img:hover {
@@ -1502,7 +1519,6 @@ img:hover {
 
 a:hover img, a:focus img {
      filter: drop-shadow(0 0 1px #df0067);
-     -webkit-filter: drop-shadow(0 0 1px #df0067);
      mix-blend-mode: normal;
 }
 
@@ -1627,7 +1643,7 @@ code, tt {
      color: #313;
      padding: 0 1px;
      font-weight: bold;
-     font-family: "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", monospace;
 }
 
 .routerdown {
@@ -1694,12 +1710,12 @@ code, tt {
      opacity: 0.8;
      background: none;
      filter: sepia(50%) invert(80%) hue-rotate(150deg);
-     -webkit-filter: sepia(50%) invert(80%) hue-rotate(150deg);
 }
 
 .optbox:hover, input[type="radio"]:hover, input[type="checkbox"]:hover, .optbox:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
+     outline: none;
+     opacity: 1;
      filter: sepia(50%) invert(80%) hue-rotate(150deg) drop-shadow(0 0 2px #df0067);
-     -webkit-filter: sepia(50%) invert(80%) hue-rotate(150deg) drop-shadow(0 0 2px #df0067);
 }
 
 /* toggle create/add panel view */
@@ -1751,7 +1767,6 @@ code, tt {
 .toggleview img:hover, .toggleview:hover img, .snarkConfigTitle a:hover img {
      color: #f90;
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 .toggleview:active, .snarkConfigTitle a:active {
@@ -1788,7 +1803,7 @@ code, tt {
 .debugConnStat {
      display: inline-block;
      white-space: nowrap;
-     font-family: "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace !important;
+     font-family: "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      margin-right: 5px;
 }
 
@@ -1802,7 +1817,7 @@ code, tt {
 }
 
 .debugRequests {
-     font-family: "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace !important;
+     font-family: "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      margin-left: 4px;
 }
 
@@ -1926,7 +1941,6 @@ td#bwHelp a {
 .knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover {
      opacity: 0.5 !important;
      cursor: not-allowed;
-     -webkit-filter: sepia(50%) invert(80%) hue-rotate(150deg) !important;
      filter: sepia(50%) invert(80%) hue-rotate(150deg) !important;
 }
 
@@ -1964,11 +1978,16 @@ td#bwHelp a {
      margin-right: 3px;
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
+
+_:-ms-lang(x), input[type="radio"], input[type="checkbox"] {
+     filter: sepia(50%) invert(80%) hue-rotate(150deg) !important;
+}
+
+/* end Edge fix */
 
 /* responsive layout */
 
@@ -2020,6 +2039,26 @@ b.alwaysShow {
 .snarkDirInfo thead img {
      max-height: 18px;
 }
+
+.knownTracker a, #trackerselect td a {
+     display: inline-block;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     max-width: 200px !important;
+}
+
+#trackerselect td a {
+     max-width: 350px !important;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 1000px) {
+.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
+     font-size: 12pt !important;
+     letter-spacing: 0.1em !important;
+}
 }
 
 @media screen and (max-width: 1200px) {
@@ -2028,19 +2067,20 @@ b.alwaysShow {
      transition: ease width 0.5s 0.5s;
 }
 
+.snarkRefresh:nth-child(n+2) {
+     padding: 4px 8px 4px 24px !important;
+     background-size: 14px auto, 100% 100%, 100% 100% !important;
+     background-position: 8px center, center center, center center !important;
+}
+
 .snarkRefresh:first-child {
-     background: url(images/button_snark.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 0%, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604E 1px, #A09286 1px, #BFAFA2 2px) !important;
+     padding: 4px 8px 4px 26px !important;
      background-size: 16px auto, 100% 100%, 100% 100% !important;
+     background-position: 9px center, center center, center center !important;
 }
 
-.snarkRefresh:first-child:hover, .snarkRefresh:first-child:focus {
-     background: url(images/button_snark_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 0%, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%) !important;
-     background-size: 16px auto, 100% 100%, 100% 100% !important;
-}
-
-.snarkRefresh:first-child:active {
-     background: url(images/button_snark_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 0%, #dfb899 47%, #af9178 50%, #af9178 100%) !important;
-     background-size: 16px auto, 100% 100%, 100% 100% !important;
+_:-ms-lang(x), .snarkRefresh:link, .snarkRefresh:visited {
+     padding-top: 3px !important;
 }
 
 .peerinfo td, .debuginfo td {
@@ -2058,6 +2098,14 @@ b.alwaysShow {
 
 #pagenav img {
      height: 14px;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 1200px) {
+.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
+     font-size: 11pt !important;
+     letter-spacing: 0.1em !important;
 }
 }
 
@@ -2125,7 +2173,7 @@ body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input
      font-size: 10pt !important;
 }
 
-tt, .snarkTorrents tt, .snarkMessages,  textarea {
+tt, .snarkTorrents tt, .snarkMessages, textarea {
      font-size: 9pt !important;
 }
 
@@ -2161,7 +2209,8 @@ thead a img, thead img {
      margin: 2px !important;
 }
 
-.snarkConfigTitle, .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover, label.toggleview {
+.snarkConfigTitle, .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle,
+.configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active, label.toggleview {
      min-width: 240px !important;
      font-size: 12pt !important;
 }
@@ -2208,7 +2257,7 @@ tr#torrentInfoStats td {
 .debugConnection {
      margin: 0 4px;
      padding: 2px 3px;
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-weight: bold;
      background: #967158;
      color: #fff;

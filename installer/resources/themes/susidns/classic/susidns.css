@@ -48,8 +48,8 @@ table.book {
 }
 
 .book tr {
-     border-top: 1px inset #fff;
-     border-bottom: 1px inset #fff;
+     border-top: 1px inset #ccf;
+     border-bottom: 1px inset #ccf;
 }
 
 table.book td {
@@ -109,12 +109,10 @@ table.book td:nth-child(2) {
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
 }
 
 .book td:nth-child(4) .addrhlpr:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 td.destinations {
@@ -125,23 +123,24 @@ td.destinations {
      background: #fff;
 }
 
-/*
-.iframed #add {
-     margin: 0 -10px;
-}
-*/
-
 #add td:first-child {
      width: 100px;
      white-space: nowrap;
      text-align: right;
 }
 
-div#navi {
+#navi {
      border: 1px solid #89f;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
      margin: -1px -11px 0;
      padding: 0;
+     position: sticky;
+     top: -1px;
+     z-index: 999;
+}
+
+.iframed #navi {
+     position: static;
 }
 
 .iframed #navi, .iframed h3, .iframed h4, .iframed #help, .iframed p.buttons, .iframed #filter {
@@ -186,7 +185,7 @@ div.help {
      margin: 0 0 -1px;
 }
 
-#helpconfig {
+.iframed #helpconfig {
      margin: 0 0 -1px;
 }
 
@@ -211,12 +210,6 @@ p {
      text-align: justify;
 }
 
-/*
-span.addrhlpr {
-     font-size: 8pt;
-}
-*/
-
 h3 {
      color: #0c153d;
      font-size: 11pt;
@@ -236,7 +229,7 @@ h4 {
      border: 1px solid #89f;
      padding: 3px 10px;
      margin: -11px -11px 5px;
-     background: linear-gradient(to right, #fff 0%, #eef 100%);
+     background: linear-gradient(to right, #fff, #eef);
 }
 
 a {
@@ -280,10 +273,12 @@ li {
 
 tr.list1 {
      background-color:#dde1ff;
+     background: rgba(220,220,255,0.5);
 }
 
 tr.list0 {
      background-color:#eff1ff;
+     background: rgba(240,240,255,0.5);
 }
 
 tr.list0:hover, tr.list1:hover {
@@ -311,6 +306,7 @@ p.help {
      padding: 15px 15px 15px 45px;
      margin: 0;
      background: #ffe url(/themes/console/images/info/infohelp.png) 8px center no-repeat;
+     line-height: 120%;
 }
 
 p.book, #messages + p {
@@ -350,7 +346,8 @@ div#filter {
 
 #filter a, #filter a:visited {
      border: 1px solid #ccc;
-     padding: 3px 8px;
+     margin: 2px 0;
+     padding: 0 6px;
      border-radius: 2px;
      background: #fff;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -358,6 +355,8 @@ div#filter {
      box-shadow: inset 0 0 0 1px #fff;
      text-transform: capitalize;
      color: #555;
+     display: inline-block;
+     min-width: 16px;
 }
 
 #filter a:hover, #filter a:focus {
@@ -382,7 +381,7 @@ div#filter {
      display: inline-block;
      border: 1px solid #89f;
      margin-top: -1px;
-     min-width: 300px;
+     min-width: 300px !important;
      padding: 5px;
      font-weight: bold;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
@@ -457,6 +456,10 @@ td.search:last-child {
      text-transform: none;
 }
 
+#idAddress {
+     text-transform: none;
+}
+
 #visualid table {
      width: 100%;
      border-collapse: collapse;
@@ -502,7 +505,11 @@ img.illustrate {
      box-shadow: inset 0 0 1px #002;
      background: #fff;
      filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+_:-ms-lang(x), img.illustrate {
+     width: auto;
+     max-width: 600px;
 }
 
 #buttons, .buttons {
@@ -534,6 +541,7 @@ input[type="text"], input[type="password"], textarea {
 
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      box-shadow: inset 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f, 0 0 1px rgba(136, 153, 255, 0.4);
      color: #000;
 }
 
@@ -554,7 +562,7 @@ textarea {
 }
 
 td.destinations textarea, td.destinations textarea:focus {
-     font: normal 8.5pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;*/
+     font: normal 8.5pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      resize: none;
      font-size: 8pt;
      padding: 0 !important;
@@ -568,14 +576,13 @@ td.destinations textarea, td.destinations textarea:focus {
 }
 
 .fakebutton, input[type="submit"], input[type="reset"] {
-     padding: 4px 3px !important;
+     padding: 4px 8px !important;
      border-radius: 2px;
      border: 1px solid #bbb;
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 #ddd;
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      margin: 2px 0 2px 4px;
-     filter: drop-shadow(0 0 1px #ccc);
      color: #333 !important;
 }
 
@@ -585,7 +592,6 @@ td.destinations textarea, td.destinations textarea:focus {
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      border: 1px solid #89f;
      filter: drop-shadow(0 0 1px #89f);
-     -webkit-filter: drop-shadow(0 0 1px #89f);
      color: #222;
 }
 
@@ -600,6 +606,12 @@ input[type="radio"], input[type="checkbox"] {
      min-width: 16px;
      min-height: 16px;
      background: none;
+}
+
+input[type="radio"]:hover, input[type="radio"]:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
+     box-shadow: inset 0 0 1px 2px #89f;
+     filter: drop-shadow(0 0 3px #89f);
+     outline: none;
 }
 
 form[action="subscriptions"], form[action="config"] {
@@ -621,8 +633,7 @@ form[action="subscriptions"] textarea {
      border: 1px solid #6b78bf;
      border-radius: 2px;
      margin: 3px 0 !important;
-     filter: drop-shadow(0 0 1px #ccc);
-     -webkit-filter: drop-shadow(0 0 1px #ccc);
+     box-shadow: 0 0 1px 0 #ddd;
      display: inline-block;
      outline: none;
      color: #448 !important;
@@ -718,42 +729,6 @@ p.book {
      padding: 0 10px 0 38px !important;
 }
 
-/* responsive layout */
-
-@media screen and (min-width: 1400px) {
-body, p, td, textarea, input, button, li, a {
-     font-size: 10pt !important;
-}
-
-code, tt {
-     font-size: 9pt !important;
-}
-
-h4, #navi a {
-     font-size: 11pt;
-}
-
-h3 {
-     font-size: 12pt !important;
-}
-
-/*
-p.footer {
-     margin: 12px auto -21px !important;
-}
-*/
-
-#export {
-     margin-top: -40px !important;
-}
-
-#filter span, #filter a {
-     font-size: 11pt !important;
-}
-}
-
-/* end responsive layout */
-
 /* export hosts */
 
 #export {
@@ -773,7 +748,7 @@ p.footer {
 
 p#filtered {
      padding-right: 200px !important;
-	  padding-top: 2px !important;
+     padding-top: 2px !important;
      padding: 2px 200px 0 20px !important;
      background-position: left center !important;
 }
@@ -817,7 +792,7 @@ p.book {
 }
 
 #host_details .destaddress {
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      word-break: break-all !important;
      white-space: normal !important;
 }
@@ -837,7 +812,6 @@ p.book {
 
 .names img:hover, .names a:focus img {
      filter: drop-shadow(0 0 1px #f60) !important;
-     -webkit-filter: drop-shadow(0 0 1px #f60) !important;
      box-shadow: 0 0 0 1px #f60;
 }
 
@@ -884,7 +858,6 @@ p.book {
      content: url(/themes/console/images/buttons/link.png);
      text-align: center;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
@@ -910,36 +883,73 @@ p.book {
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
 #host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
 #host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 #host_list .destaddress {
      overflow: auto !important;
      white-space: nowrap;
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      font-weight: normal;
      color: #555;
      padding: 3px !important;
+     -webkit-user-select: all;
+     -moz-user-select: all;
+     user-select: all;
 }
 
 /* end hostname list */
 
 td.destinations {
      max-width: 50px !important;
-     border-left: 1px solid #89f;
-     border-right: 1px solid #89f;
+     border-left: 1px inset #ccf;
+     border-right: 1px inset #ccf;
 }
 
-/* MS Edge 14+ fix */
+/* responsive layout */
+
+@media screen and (min-width: 1400px) {
+body, p, td, textarea, input, button, li, a {
+     font-size: 10pt !important;
+}
+
+code, tt {
+     font-size: 9pt !important;
+}
+
+h4, #navi a {
+     font-size: 11pt;
+}
+
+h3 {
+     font-size: 12pt !important;
+}
+
+#export {
+     margin-top: -40px !important;
+}
+
+#filter span, #filter a {
+     font-size: 11pt !important;
+     min-width: 24px !important;
+}
+
+#filter span {
+     font-size: 11pt !important;
+     min-width: 400px !important;
+}
+
+/* end responsive layout */
+
+/* Edge/IE tweaks */
+
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
 
+/* end Edge/IE tweaks */

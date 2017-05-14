@@ -41,7 +41,7 @@ img {
 
 /* Sidepanel for proxy errors */
 
-div.logo {
+.logo {
      float: left;
      position: relative;
      width: 200px;
@@ -67,7 +67,7 @@ div.logo {
      background: none !important;
 }
 
-div.logo hr {
+.logo hr {
      color: #ddf;
      background: #ddf;
      height: 5px;
@@ -75,18 +75,18 @@ div.logo hr {
      margin: 8px -5px 8px;
 }
 
-div.logo a {
+.logo a {
      display: inline-block;
      padding: 4px 0;
      width: 100%;
 }
 
-div.logo a:active {
+.logo a:active {
      color: #f60;
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #999 !important;
 }
 
-div.logo a:hover {
+.logo a:hover {
      color: #900;
      background: rgba(220,220,255,0.5);
      box-shadow: inset 0 0 0 1px #fff;
@@ -95,7 +95,7 @@ div.logo a:hover {
 
 /* HTTP Proxy warning Main box */
 
-div.warning {
+.warning {
      margin: 25px 20px 0 260px;
      padding: 0 20px 40px;
      border: 5px solid #fb7;
@@ -106,23 +106,23 @@ div.warning {
      min-width: 500px;
 }
 
-div.warning a:link {
+.warning a:link {
      color: #f60 !important;
 }
 
-div.warning a:visited {
+.warning a:visited {
      color: #f90 !important;
 }
 
-div.warning a:hover {
+.warning a:hover {
      color: #d30 !important;
 }
 
-div.warning a:active {
+.warning a:active {
      color: #900 !important;
 }
 
-div.warning hr {
+.warning hr {
      color: #fb7;
      background: #fb7;
      height: 1px;
@@ -130,7 +130,7 @@ div.warning hr {
      margin: 5px 0;
 }
 
-div.warning h3 {
+.warning h3 {
      border: 0;
      border-bottom: 1px solid #fb7;
      padding-bottom: 10px;
@@ -139,7 +139,7 @@ div.warning h3 {
      font-size: 10.5pt;
 }
 
-div.warning h3:first-child {
+.warning h3:first-child {
      margin: 2px -18px 10px -18px;
      padding: 10px 10px 10px 38px;
      background: #ffe !important;
@@ -211,7 +211,7 @@ div.warning h3:first-child {
 .proxyfooter {
      font-size: 8pt;
      padding: 0 5px 5px;
-     margin: -60px 20px 0 260px;
+     margin: -50px 8px 0 260px;
      min-width: 600px;
 }
 
@@ -223,10 +223,10 @@ div.warning h3:first-child {
 
 /* console error messages */
 
-div.sorry {
+.sorry {
      padding: 20px 20px 20px 60px;
      background: #fff url(/themes/console/images/info/errortriangle.png) 10px center no-repeat;
-     background: url(/themes/console/images/info/errortriangle.png) 10px center no-repeat, linear-gradient(to bottom, #fff 0%, #ffe 100%);
+     background: url(/themes/console/images/info/errortriangle.png) 10px center no-repeat, linear-gradient(to bottom, #fff, #ffe);
      margin: -1px 1px 0 200px;
      min-width: 460px;
      border: 1px solid #89f;
@@ -237,7 +237,7 @@ div.sorry {
      color: #351d02;
 }
 
-div.sorry hr {
+.sorry hr {
      color: #89f;
      background: #8c4d16;
      height: 1px;
@@ -245,9 +245,9 @@ div.sorry hr {
      margin: 10px 0;
 }
 
-/* Side panel */
+/* Sidebar */
 
-div.routersummaryouter {
+.routersummaryouter {
      float: left;
      width: 193px;
      margin: 0;
@@ -257,7 +257,7 @@ div.routersummaryouter {
      position: absolute; /* so no interference with /home app icons */
 }
 
-div.routersummary {
+.routersummary {
      background: #eef url(images/bg0.png);
      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.2)), url(images/bg0.png);
      width: 193px;
@@ -271,7 +271,7 @@ div.routersummary {
      line-height: 125%;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
     margin-top: 3px;
      margin-left: 0;
      width: 173px;
@@ -283,21 +283,20 @@ div.routersummary img[src$="i2plogo.png"] {
      padding: 2px;
 }
 
-div.routersummary input[type=text] {
+.routersummary input[type=text] {
      text-align: right !important;
 }
 
 .routersummary button[type="submit"] {
      min-width: 87px;
      margin: 2px 2px 1px;
-/*     padding: 5px 2px !important;*/
 }
 
 #xhr {
      margin-top: 15px;
 }
 
-div.routersummary hr {
+.routersummary hr {
      color: #89f;
      background: #89f;
      height: 0;
@@ -309,19 +308,23 @@ div.routersummary hr {
      text-transform: capitalize;
 }
 
-div.routersummary h3 {
+.routersummary h3 {
      border: none;
      font-size: 9.5pt;
      letter-spacing: 0.05em;
      margin: -7px -1px -8px -1px;
      padding: 3px 0;
      background: #fff url(images/tinytitle.png) center center repeat;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) !important;
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%) !important;
      text-transform: uppercase;
 }
 
 .routersummary h3:hover {
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%) !important;
+     background: linear-gradient(to bottom, #fff 50%, #ffd 50%) !important;
+}
+
+.routersummary h3:hover a {
+     color: #f60 !important;
 }
 
 .routersummary h3:active {
@@ -332,7 +335,7 @@ div.routersummary h3 {
      color: #f90 !important;
 }
 
-div.routersummary h4 {
+.routersummary h4 {
      border: 0;
      border-bottom: 0 !important;
      font-size: 8.5pt;
@@ -341,15 +344,14 @@ div.routersummary h4 {
      padding: 8px 2px;
      text-transform: capitalize;
      text-decoration: none !important;
-     color: #2b2;
      color: #1f7096;
      line-height: 110%;
      background: #fff url(images/bg2.png);
-     background: linear-gradient(to right, #eff2ff 0%, #fff 50%, #eff2ff 100%);
+     background: linear-gradient(to right, #eff2ff 0%, #fff 50%, #eff2ff);
      box-shadow: inset 0 0 2px 1px #f2f7fa;
 }
 
-div.routersummary h3 a, div.routersummary h4 a {
+.routersummary h3 a, .routersummary h4 a {
      text-decoration: none;
      white-space: normal;
      display: inline-block;
@@ -357,22 +359,11 @@ div.routersummary h3 a, div.routersummary h4 a {
      width: calc(100% - 5px);
 }
 
-/*
-.routersummary h4 a::before {
-     content: url(images/ntwrk.png);
-     padding: 0 !important;
-     margin: 0 4px 0 -5px;
-     line-height: 10%;
-     vertical-align: sub;
-     vertical-align: -moz-middle-with-baseline;
-}
-*/
-
-div.routersummary ul {
+.routersummary ul {
      text-align: left !important;
 }
 
-div.routersummary table {
+.routersummary table {
      table-layout: fixed;
      border: 0;
      text-align: center !important;
@@ -385,13 +376,13 @@ div.routersummary table {
      background-color: transparent !important;
 }
 
-div.routersummary tr {
+.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
 }
 
-div.routersummary td {
+.routersummary td {
      padding: 0 3px;
      background-image: none !important;
      border: 0 !important;
@@ -402,19 +393,11 @@ div.routersummary td {
      margin-top: -6px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after, #sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
    min-height: 14px;
 }
-
-/*
-#sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
-     padding-top: 1px;
-     padding-bottom: 1px;
-}
-*/
 
 #sb_peers td:first-child, #sb_tunnels td:first-child, #sb_queue td:first-child, #sb_bandwidth td:first-child, #sb_general td:first-child, #sb_shortgeneral td:first-child {
      white-space: nowrap;
@@ -438,7 +421,7 @@ div.routersummary td {
 }
 
 #sb_internals, #sb_services, #sb_advanced {
-     margin-top: -2px !important;
+     margin-top: -3px !important;
 }
 
 #sb_internals a, #sb_services a, #sb_advanced a {
@@ -449,6 +432,52 @@ div.routersummary td {
      overflow: hidden;
      text-overflow: ellipsis;
      vertical-align: middle !important;
+}
+
+#sb_localtunnels {
+     margin: -6px -2px -6px 0 !important;
+     text-align: center !important;
+     width: 196px;
+     box-sizing: border-box;
+}
+
+#sb_localtunnels td {
+     padding: 1px !important;
+}
+
+#sb_localtunnels tr:nth-child(odd) td {
+     background: rgba(220,220,255,0.5);
+}
+
+#sb_localtunnels tr:nth-child(even) td {
+     background: rgba(230,230,255,0.5);
+}
+
+#sb_localtunnels tr:hover td {
+     background: #ffe !important;
+     transition: ease background 0.3s;
+}
+
+#sb_localtunnels a {
+     text-transform: capitalize;
+     display: inline-block;
+     width: 100%;
+}
+
+#sb_localtunnels td:first-child {
+     width: 12px !important;
+     padding-right: 0;
+     text-align: left;
+}
+
+#sb_localtunnels td:nth-child(2) {
+     width: 156px;
+}
+
+#sb_localtunnels td:last-child {
+     width: 12px;
+     text-align: right;
+     padding-right: 2px !important;
 }
 
 #sb_warning {
@@ -472,7 +501,7 @@ p:empty + .sb_notice {
      margin-top: 7px;
 }
 
-div.routersummary form {
+.routersummary form {
      margin: -2px 0;
 }
 
@@ -497,58 +526,17 @@ div.newsheadings ul {
      padding: 0;
 }
 
-#sb_localtunnels {
-     margin: -5px -2px -6px 0 !important;
-     text-align: center !important;
-     width: 194px;
-     box-sizing: border-box;
-}
-
-#sb_localtunnels tr td {
-     padding: 1px !important;
-}
-
-/*
-#sb_localtunnels tr:nth-child(odd) td {
-     background: #bbf;
-}
-
-#sb_localtunnels tr:nth-child(even) td {
-     background: #ddf;
-}
-*/
-
-#sb_localtunnels a {
-     text-transform: capitalize;
-}
-
-#sb_localtunnels td:first-child {
-     width: 12px !important;
-     padding-right: 0;
-     text-align: left;
-}
-
-#sb_localtunnels td:nth-child(2) {
-     width: 156px;
-}
-
-#sb_localtunnels td:last-child {
-     width: 12px;
-     text-align: right;
-     padding-right: 2px !important;
-}
-
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
      padding: 2px 0 !important;
 }
 
-div.routersummary p {
+.routersummary p {
      padding: 0;
 }
 
-div.routersummary a:hover {
+.routersummary a:hover {
      color: #f60;
 }
 
@@ -560,7 +548,6 @@ div.routersummary a:hover {
 .routersummary a img:first-child:hover, .routersummary a img:first-child:active {
      opacity: 1;
      filter: drop-shadow(0 0 1px #89f);
-     -webkit-filter: drop-shadow(0 0 1px #89f);
 }
 
 .routersummary a[href="/"], .routersummary a[href="/console"] {
@@ -569,9 +556,9 @@ div.routersummary a:hover {
 
 .routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
      filter: drop-shadow(0 0 1px #f60) saturate(200%);
-     -webkit-filter: drop-shadow(0 0 1px #f60) saturate(200%);
 }
-/* end sidebar */
+
+/* end Sidebar */
 
 a:link {
      color: #33a;
@@ -614,20 +601,25 @@ pre {
 
 tt, code {
      font-size: 9pt;
-     font-weight: bold;
+     font-weight: bold !important;
      color: darkgreen;
 }
 
 /* buttons & inputs */
+
 select {
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+     background: url(images/dropdown.png) right center no-repeat #fff;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #ddd);
      margin: 3px 5px;
      vertical-align: middle;
      min-width: 160px;
-     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      border-radius: 2px;
      border: 1px solid #bbb;
      box-shadow: inset 0 0 0 1px #fff;
-     padding: 4px 16px 4px 2px;
+     padding: 4px 16px 4px 4px;
      text-overflow: ellipsis;
      color: #333;
      cursor: pointer;
@@ -635,12 +627,6 @@ select {
 
 select option {
      background: #fff;
-}
-
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-select {
-     -moz-appearance: none;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
 }
 
 select:hover, select:active {
@@ -651,10 +637,13 @@ select:focus {
      background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
      box-shadow: 0 0 0 1px #89f;
 }
-}
 
 select:focus {
      color: #000;
+}
+
+select::-ms-expand {
+     display: none;
 }
 
 select[name="newlogclass"] {
@@ -676,6 +665,11 @@ select[name="newlogclass"] {
      margin: 0;
 }
 
+#config_homepage .delete {
+     float: left !important;
+     margin-left: 5px;
+}
+
 input {
      margin: 3px 5px 3px 0;
 }
@@ -683,8 +677,39 @@ input {
 input[type="radio"], input[type="checkbox"] {
      min-width: 16px !important;
      min-height: 16px !important;
-     vertical-align: middle;
+     vertical-align: sub;
      background: none;
+     margin: 6px;
+}
+
+input[type="radio"]:hover, input[type="radio"]:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
+     filter: drop-shadow(0 0 2px #89f);
+     box-shadow: inset 0 0 1px 2px #89f;
+     outline: none;
+}
+
+input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
+input[type="checkbox"][disabled]:focus, input[type="radio"][disabled]:focus {
+     box-shadow: none;
+     filter: none;
+}
+
+label {
+     cursor: pointer;
+}
+
+label:hover {
+     color: #03050f;
+}
+
+label[for="0"] {
+     cursor: default;
+     color: #0c153d;
+}
+
+.main#config_clients label[for="0"] {
+     cursor: default;
+     color: #0c153d;
 }
 
 input[type="file"] {
@@ -703,8 +728,14 @@ input[type="text"], input[type="password"] {
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
-     box-shadow: inset 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f, 0 0 1px rgba(136, 153, 255, 0.4);
      color: #000;
+}
+
+input[type="text"][readonly], input[type="text"][readonly]:focus {
+     background: #efefef;
+     box-shadow: inset 1px 1px 1px #ddd;
+     color: #333;
 }
 
 button, input, select {
@@ -714,7 +745,7 @@ button, input, select {
 
 button:hover, input[type="submit"]:hover, input[type="reset"]:hover {
      background: #fff;
-     background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: linear-gradient(to bottom, #ddd, #fff);
 }
 
 button:active, input[type="submit"]:active, input[type="reset"]:active {
@@ -738,17 +769,16 @@ input[type="submit"], input[type="reset"], button, .optbox {
 }
 
 /* accessibility tweak - colors rather than focus rings where possible */
+
 .optbox:hover, .optbox:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
-/*	  -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=0, Color='#89f')";*/
-     -webkit-filter: drop-shadow(0 0 2px #89f);
      filter: drop-shadow(0 0 2px #89f);
+     box-shadow: 0 0 0 1px #89f;
      border: 0;
      outline: none;
 }
 
 .optbox:disabled:hover, input:disabled:hover {
      filter: none;
-     -webkit-filter: none;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {
@@ -791,7 +821,7 @@ input[type="submit"], input[type="reset"], button {
      border: 1px solid #999;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ddd;
      background: #eee;
-     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: linear-gradient(to bottom, #fff, #ddd);
      color: #333;
      margin: 3px 8px 3px 0;
      font: 9pt "Droid Sans", Ubuntu, "Noto Sans", "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
@@ -803,7 +833,7 @@ input[type="submit"], input[type="reset"], button {
 }
 
 button:hover, input[type="submit"]:hover, input[type="reset"]:hover, button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
-     background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: linear-gradient(to bottom, #ddd, #fff);
      border: 1px solid #89f;
      color: #222;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px #89f;
@@ -817,336 +847,319 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
 }
 
 input.accept, button.accept {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.accept:hover, button.accept:hover,
 input.accept:focus, button.accept:focus {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.accept[value^="Unban"], button.accept[value^="Unban"] {
-     background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/unban.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover,
 input.accept[value^="Unban"]:focus, button.accept[value^="Unban"]:focus {
-     background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/unban.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.accept[value^="Create"], button.accept[value^="Create"] {
-     background: url(/themes/console/images/buttons/create.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/create.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.accept[value^="Create"]:hover, button.accept[value^="Create"]:hover,
 input.accept[value^="Create"]:focus, button.accept[value^="Create"]:focus {
-     background: url(/themes/console/images/buttons/create.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/create.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.accept[value^="Filter"], button.accept[value^="Filter"] {
-     background: url(/themes/console/images/buttons/filter.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/filter.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.accept[value^="Filter"]:hover, button.accept[value^="Filter"]:hover,
 input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
-     background: url(/themes/console/images/buttons/filter.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/filter.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.add, button.add {
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/add.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.add:hover, button.add:hover,
 input.add:focus, button.add:focus {
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.add[value^="Adjust"], button.add[value^="Adjust"] {
-     background: url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/edit2.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.add[value^="Adjust"]:hover, button.add[value^="Adjust"]:hover,
 input.add[value^="Adjust"]:focus, button.add[value^="Adjust"]:focus {
-     background: url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/edit2.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.cancel, button.cancel {
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/no.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.cancel:hover, button.cancel:hover,
 input.cancel:focus, button.cancel:focus {
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.accept[value^="Show"], button.accept[value^="Show"],
 input.check[value^="View"], button.check[value^="View"] {
-     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/show.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.accept[value^="Show"]:hover, button.accept[value^="Show"]:hover,
 input.check[value^="View"]:hover, button.check[value^="View"]:hover,
 input.accept[value^="Show"]:focus, button.accept[value^="Show"]:focus,
 input.check[value^="View"]:focus, button.check[value^="View"]:focus {
-     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/show.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.cancel[value^="Hide"], button.cancel[value^="Hide"],
 input.delete[value^="Do not view"], button.delete[value^="Do not view"] {
-     background: url(/themes/console/images/buttons/hide.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/hide.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.cancel[value^="Hide"]:hover, button.cancel[value^="Hide"]:hover,
 input.delete[value^="Do not view"]:hover, button.delete[value^="Do not view"]:hover,
 input.cancel[value^="Hide"]:focus, button.cancel[value^="Hide"]:focus,
 input.delete[value^="Do not view"]:focus, button.delete[value^="Do not view"]:focus {
-     background: url(/themes/console/images/buttons/hide.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/hide.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.check, button.check {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.check:hover, button.check:hover,
 input.check:focus, button.check:focus {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.check[value$="updates"], button.check[value$="updates"] {
-     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/update.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.check[value$="updates"]:hover, button.check[value$="updates"]:hover,
 input.check[value$="updates"]:focus, button.check[value$="updates"]:focus {
-     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.delete, button.delete {
-     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/delete.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.delete:hover, button.delete:hover,
 input.delete:focus, button.delete:focus {
-     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.delete[value^="Ban"], button.delete[value^="Ban"] {
-     background: url(/themes/console/images/buttons/ban.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/ban.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.delete[value^="Ban"]:hover, button.delete[value^="Ban"]:hover,
 input.delete[value^="Ban"]:focus, button.delete[value^="Ban"]:focus {
-     background: url(/themes/console/images/buttons/ban.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/ban.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.download, button.download {
-     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/download.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.download:hover, button.download:hover,
 input.download:focus, button.download:focus {
-     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/download.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.download[value^="Join"], button.download[value^="Join"] {
-     background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/users.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.download[value^="Join"]:hover, button.download[value^="Join"]:hover,
 input.download[value^="Join"]:focus, button.download[value^="Join"]:focus {
-     background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/users.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.download[value$="from File"], button.download[value$="from File"],
 input.download[value$="from file"], button.download[value$="from file"] {
-     background: url(/themes/console/images/buttons/from-file.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/from-file.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.download[value$="from File"]:hover, button.download[value$="from File"]:hover,
 input.download[value$="from file"]:hover, button.download[value$="from file"]:hover,
 input.download[value$="from File"]:focus, button.download[value$="from File"]:focus,
 input.download[value$="from file"]:focus, button.download[value$="from file"]:focus {
-     background: url(/themes/console/images/buttons/from-file.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/from-file.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.download[value^="Dump"], button.download[value^="Dump"] {
-     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.download[value^="Dump"]:hover, button.download[value^="Dump"]:hover,
 input.download[value^="Dump"]:focus, button.download[value^="Dump"]:focus {
-     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.go, button.go, input[value="GO"] {
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/go.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.go:hover, button.go:hover, input[value="GO"]:hover,
 input.go:focus, button.go:focus, input[value="GO"]:focus {
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.go[value^="Create"], button.go[value^="Create"] {
-     background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/create-file.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.go[value^="Create"]:hover, button.go[value^="Create"]:hover,
 input.go[value^="Create"]:focus, button.go[value^="Create"]:focus {
-     background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/create-file.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.reload, button.reload {
-     background: url(/themes/console/images/buttons/restore.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/restore.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.reload:hover, button.reload:hover,
 input.reload:focus, button.reload:focus {
-     background: url(/themes/console/images/buttons/restore_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/restore_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.reload[value$="restart"], button.reload[value$="restart"] {
-     background: url(/themes/console/images/buttons/restart.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/restart.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.reload[value$="restart"]:hover, button.reload[value$="restart"]:hover,
 input.reload[value$="restart"]:focus, button.reload[value$="restart"]:focus {
-     background: url(/themes/console/images/buttons/restart_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/restart_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.reload[value^="Update"], button.reload[value^="Update"] {
-     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/update.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.reload[value^="Update"]:hover, button.reload[value^="Update"]:hover,
 input.reload[value^="Update"]:focus, button.reload[value^="Update"]:focus {
-     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.reload[value="Force GC"], button.reload[value="Force GC"] {
-     background: url(/themes/console/images/buttons/clean.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/clean.png) no-repeat 7px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.reload[value="Force GC"]:hover, button.reload[value="Force GC"]:hover,
 input.reload[value="Force GC"]:focus, button.reload[value="Force GC"]:focus {
-     background: url(/themes/console/images/buttons/clean_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/clean_hover.png) no-repeat 7px center, linear-gradient(to bottom, #ddd, #fff);
 }
 
 input.stop, button.stop {
-     background: url(/themes/console/images/buttons/shutdown.png) no-repeat 6px 6px, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/shutdown.png) no-repeat 7px 6px, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 input.stop:hover, button.stop:hover,
 input.stop:focus, button.stop:focus {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) no-repeat 6px 6px, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/shutdown_hover.png) no-repeat 7px 6px, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button.search {
-     background: url(/themes/console/images/buttons/search.png) no-repeat 6px 6px, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background: url(/themes/console/images/buttons/search.png) no-repeat 7px 6px, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 23px;
 }
 
 button.search:hover,
 button.search:focus {
-     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px 6px, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 7px 6px, linear-gradient(to bottom, #ddd, #fff);
 }
 
 /* client config buttons aka project "X" */
 
-button.accept.control {
-     font-size: 0;
-     text-indent: -99999px;
-     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+button.control {
+     font-size: 0 !important;
+     text-indent: -99999px !important;
      background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
+     padding: 12px !important;
+}
+
+button.accept.control {
+     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 button.accept.control:hover, button.accept.control:focus {
-     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button.stop.control {
-     font-size: 0;
-     text-indent: -99999px;
-     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
+     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 button.stop.control:hover, button.stop.control:focus {
-     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button.add.control {
-     font-size: 0;
-     text-indent: -99999px;
-     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
+     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 button.add.control:hover, button.add.control:focus {
-     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button.delete.control {
-     font-size: 0;
-     text-indent: -99999px;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 button.delete.control:hover, button.delete.control:focus {
-     background: url(/themes/console/images/buttons/delete_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/delete_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button.check.control {
-     font-size: 0;
-     text-indent: -99999px;
-     background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
+     background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 button.check.control:hover, button.check.control:focus {
-     background: url(/themes/console/images/buttons/update_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/update_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button.download.control {
-     font-size: 0;
-     text-indent: -99999px;
-     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
+     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 button.download.control:hover, button.download.control:focus {
-     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
 button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
@@ -1183,11 +1196,11 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .stop {
-     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
 }
 
 .routersummary .stop:hover, .routersummary .stop:focus {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
      border: 1px solid #89f;
 }
 
@@ -1197,75 +1210,73 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      text-indent: 0;
      text-align: left;
      min-width: 0 !important;
-     padding-left: 21px !important;
+     padding: 5px 7px 5px 23px !important;
+     text-transform: capitalize;
+}
+
+.routersummary .cancel {
+     text-transform: capitalize;
 }
 
 .routersummary .reload[value="restartImmediate"] {
-     background: url(/themes/console/images/buttons/restart.png) center left 4px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background: url(/themes/console/images/buttons/restart.png) center left 7px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background-size: 14px auto, 100% 100% !important;
 }
 
 .routersummary .reload[value="restartImmediate"]:hover, .routersummary .reload[value="restartImmediate"]:focus, .routersummary .reload[value="restartImmediate"]:active {
-     background: url(/themes/console/images/buttons/restart_hover.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(/themes/console/images/buttons/restart_hover.png) center left 7px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background-size: 14px auto, 100% 100% !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"] {
-     background: url(/themes/console/images/buttons/shutdown.png) center left 4px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background: url(/themes/console/images/buttons/shutdown.png) center left 7px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background-size: 14px auto, 100% 100% !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"]:hover, .routersummary .stop[value="shutdownImmediate"]:focus, .routersummary .stop[value="shutdownImmediate"]:active {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 7px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background-size: 14px auto, 100% 100% !important;
 }
 
 .routersummary .reload[value="Reseed"] {
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 7px no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background-size: 14px auto, 100% 100% !important;
 }
 
 .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 7px no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background-size: 14px auto, 100% 100% !important;
 }
 
 .routersummary .download {
-     background: url(/themes/console/images/buttons/download.png) 4px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/download.png) 7px center no-repeat, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 3px 5px 18px !important;
-/*     margin-top: -4px;*/
 }
 
 .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
-     background: url(/themes/console/images/buttons/download.png) 4px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/download.png) 7px center no-repeat, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 3px 5px 18px !important;
 }
-
-/*
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-.routersummary .download, .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
-     padding-left: 19px !important;
-}
-}
-*/
 
 /* end sidebar buttons */
 /* end buttons & inputs */
 
-div.main {
+.main {
      margin: 0 1px 0 200px;
      padding: 15px 15px 10px 15px;
      background: #eff1ff;
      border: 1px solid #89f;
-     border-bottom: 1px solid #89f;
-     border-right: 1px solid #89f;
      border-top: 0;
      text-align: left;
      color: #0c153d;
-     min-width: 510px;
+     min-width: 540px;
      background: #eef url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom !important;
      background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, url(images/bg0.png) repeat scroll top left !important;
      background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)), url(images/bg0.png) !important;
 }
 
 .main#news h3 {
-     padding: 3px 10px;
+     padding: 3px 0;
      font-size: 10pt;
      border: none;
      border-bottom: 1px solid #bfc9ff;
@@ -1276,33 +1287,33 @@ div.main {
      padding: 0 10px 3px;
 }
 
-div.main ul {
+.main ul {
      margin: -10px 0 10px -10px;
 }
 
-div.main li {
+.main li {
      padding: 0 0 5px 0;
      list-style: square;
      word-wrap: break-word;
      margin-right: 20px;
 }
 
-div.main li:first-child {
+.main li:first-child {
      padding-top: 15px;
 }
 
-div.main li b {
+.main li b {
      color: #1f7096 !important;
      letter-spacing: 0.01em;
      font-size: 9.5pt;
      line-height: 170%;
 }
 
-div.main hr:last-child {
+.main hr:last-child {
      margin: 15px 0 10px 0;
 }
 
-div.main textarea {
+.main textarea {
      width: 98%;
      width: calc(100% - 5px);
      margin: 2px 0 2px 5px;
@@ -1317,11 +1328,20 @@ div.main textarea {
 
 .main textarea:focus {
      box-shadow: inset 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f, 0 0 1px rgba(136, 153, 255, 0.4);
      color: #000;
 }
 
-div.main h2 {
+.main h2 {
      margin-bottom: 10px !important;
+}
+
+.main#home .welcome h2 {
+     margin: -9px -10px -8px;
+}
+
+.main#home .langbox {
+     margin-right: -7px;
 }
 
 div.welcome {
@@ -1334,26 +1354,34 @@ div.welcome {
 
 .main#dns, .main#webmail, .main#torrents {
      padding: 0 !important;
+     min-width: 570px;
 }
 
 .main#jardump {
      padding: 0;
      overflow-y: hidden !important;
+     min-width: 570px;
 }
 
 .main#proof {
      padding: 0;
+     min-width: 570px;
 }
 
 .main#tunnelmgr {
      padding: 0 10px;
+     min-width: 550px;
+}
+
+.main#help {
+     background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)), url(images/bg0.png) !important;
 }
 
 .welcome h2 {
      margin-top: 0;
 }
 
-div.main h2:first-child, div.main h3:first-child {
+.main h2:first-child, .main h3:first-child {
      margin-top: 0;
 }
 
@@ -1384,7 +1412,7 @@ div.news {
      border-right: 1px solid #89f;
      text-align: right;
      color: #331e0c;
-     min-width: 520px;
+     min-width: 540px;
      padding: 3px 10px 3px 10px;
      font-size: 8pt;
 }
@@ -1404,7 +1432,6 @@ div.news li {
 }
 
 div.news h3 {
-     background: none !important;
      text-align: left;
      border: none !important;
      border-bottom: 1px dotted !important;
@@ -1413,17 +1440,22 @@ div.news h3 {
      letter-spacing: 0.05em;
      text-transform: capitalize !important;
      text-shadow: none !important;
-     padding: 5px 10px 3px;
+     padding: 5px 0 3px 10px;
      margin: 10px 10px -7px !important;
      letter-spacing: 0.1em;
 }
 
 .newsentry h3 {
      letter-spacing: 0.1em;
+     box-shadow: none;
+     background: url(/themes/console/images/info/newspaper.png) left center no-repeat !important;
+     background-size: 16px 16px !important;
+     padding-left: 22px !important;
 }
 
 .newsentry h3 a {
      letter-spacing: 0.08em !important;
+     font-size: 10pt !important;
 }
 
 .newsentry p {
@@ -1457,7 +1489,7 @@ div.news hr {
      background: #775628;
      height: 1px;
      border: 0 solid #cc7;
-     margin: 10px 0 2px;
+     margin: 10px 0 2px !important;
      opacity: 0.7;
 }
 
@@ -1478,6 +1510,7 @@ div.news hr:last-child {
      padding: 2px 4px 0 14px;
      display: inline-block;
      opacity: 0.8;
+     text-transform: none;
 }
 
 .newsDate {
@@ -1584,8 +1617,12 @@ div.configure table {
      border: 1px solid #89f;
 }
 
-table.configtable, table#permabanned, table#loggingoptions, table#configstats, ul#banlist {
+table.configtable, #permabanned, #loggingoptions, #configstats, ul#banlist {
      margin-bottom: -5px;
+}
+
+.configtable, .main[id^="config_"] table {
+     background: #fff;
 }
 
 #config_homepage td {
@@ -1611,6 +1648,10 @@ table.configtable, table#permabanned, table#loggingoptions, table#configstats, u
      text-transform: none;
 }
 
+#configstats td:first-child:empty + td > label { /* remove pointer from inert labels */
+     cursor: default;
+}
+
 #configstats td:last-child { /* epiphany fix */
      border-right: 1px solid #89f !important;
 }
@@ -1621,11 +1662,11 @@ table.configtable, table#permabanned, table#loggingoptions, table#configstats, u
      border-bottom: 1px solid #89f;
 }
 
-table#joinfamily, #exportfamily{
+#joinfamily, #exportfamily{
      margin-top: 15px !important;
 }
 
-table#newfamily {
+#newfamily {
      margin-bottom: 6px;
      margin-top: 4px;
 }
@@ -1647,27 +1688,29 @@ table#newfamily {
      background-size: 28px 28px;
 }
 
-table#peerdefs td:first-child {
+#peerdefs td:first-child {
      text-align: right;
-     width: 50px;
+     width: 10%;
+     white-space: nowrap;
+     padding: 5px;
+     border-right: 1px inset #ccf;
+}
+
+#bandwidthconfig td:first-child {
+     width: 10%;
      white-space: nowrap;
 }
 
-table#bandwidthconfig td:first-child {
-     width: 100px;
-     white-space: nowrap;
-}
-
-table#advconf {
+#advconf {
      margin-bottom: -5px !important;
 }
 
-table#addkeyring {
+#addkeyring {
      margin-bottom: -5px;
 }
 
-table#addkeyring td:first-child:not(.infohelp) {
-     font-weight: bold;
+#addkeyring td:first-child:not(.infohelp) {
+     line-height: 115%;
 }
 
 #addkeyring input[type="text"] {
@@ -1675,11 +1718,11 @@ table#addkeyring td:first-child:not(.infohelp) {
      width: calc(100% - 5px);
 }
 
-table#manualreseed {
+#manualreseed {
      margin-bottom: 10px;
 }
 
-table#manualreseed tr:nth-child(odd) {
+#manualreseed tr:nth-child(odd) {
      background: #fff;
 }
 
@@ -1699,7 +1742,16 @@ table#manualreseed tr:nth-child(odd) {
      width: 60%;
 }
 
-table#loggingoptions textarea {
+#reseedconfig tr:nth-child(2) br {
+     display: none;
+}
+
+#reseedconfig tr:nth-child(2) label {
+     white-space: nowrap;
+     margin-right: 10px;
+}
+
+#loggingoptions textarea {
      width: 99%;
      width: calc(100% - 5px);
 }
@@ -1708,46 +1760,40 @@ table#loggingoptions textarea {
      width: 170px;
 }
 
-table#profiles td:first-child, table#profiles td:last-child {
-     width: 50px;
+#profilelist {
+     margin: 0 !important;
+}
+
+#profilelist td:first-child, #profilelist td:last-child {
+     width: 1%;
      white-space: nowrap;
 }
 
-#profiles th:nth-child(3), #profiles th:nth-child(4), #profiles th:nth-child(5), #profiles th:nth-child(6) {
+#profilelist th:nth-child(3), #profiles th:nth-child(4), #profiles th:nth-child(5), #profiles th:nth-child(6) {
      text-align: right;
 }
 
-#profiles td[colspan="8"], #profiles tr td[colspan="8"]:hover {
+#profilelist td[colspan="8"], #profilelist tr td[colspan="8"]:hover {
      background: #77f;
      padding: 1px 0;
      border-top: 1px inset #fff !important;
      border-bottom: 1px inset #fff !important;
 }
 
-#profiles td[colspan="8"] hr {
+#profilelist td[colspan="8"] hr {
      display: none;
 }
 
-table#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
+#profilelist tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
 .homelinkedit tr:hover, .main#debug table:first-of-type tr:hover td {
-     background: #fff;
-     background: linear-gradient(to bottom, #fff 0%, #ffe 100%);
+     background: #ffe;
+     background: linear-gradient(to bottom, #fff, #ffe);
      color: #104e99;
      border-top: 1px solid #89f;
      border-bottom: 1px solid #89f;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-
-table#profiles tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
-.homelinkedit tr:nth-last-child(n+2):hover, .main#debug table:first-of-type tr:hover td, #sidebarconf tr:nth-last-child(n+2):hover td {
-     border-top: inherit;
-     border-bottom: inherit;
-     background: #ffd !important;
-}
-}
-
-tr:hover th {
+tr.tablefooter:hover td {
      color: #0c153d;
 }
 
@@ -1842,7 +1888,16 @@ tr:hover th {
 
 /* end peer sort */
 
-table#thresholds, table#profile_defs {
+.backlogged {
+     font-size: 14pt;
+     line-height: 0;
+}
+
+tr:hover th {
+     color: #0c153d;
+}
+
+#thresholds, #profile_defs {
      margin-top: -1px;
      line-height: 150%;
 }
@@ -1865,10 +1920,19 @@ table#thresholds, table#profile_defs {
 
 #thresholds th, #thresholds td {
      text-align: center !important;
+     width: auto !important;
+}
+
+#profile_defs td:nth-child(2)::first-letter {
+     text-transform: uppercase;
 }
 
 #capabilities_key td {
      padding: 0 !important;
+}
+
+#capabilities_key table td:nth-child(2)::first-letter {
+     text-transform: none;
 }
 
 #capabilities_key table {
@@ -1886,6 +1950,10 @@ table#thresholds, table#profile_defs {
      width: 16px;
 }
 
+#thresholds tr:hover td, #profile_defs tr:hover td {
+     background: none;
+}
+
 #profile_defs b {
      text-transform: capitalize;
 }
@@ -1894,12 +1962,16 @@ table#thresholds, table#profile_defs {
      text-transform: none !important;
 }
 
-table#floodfills {
+#floodfills {
      margin-top: 10px;
 }
 
 #floodfills th {
      font-size: 8pt;
+}
+
+#floodfills td:first-child, #profilelist td:first-child {
+     text-align: right;
 }
 
 ul#banlist {
@@ -1931,6 +2003,7 @@ ul#banlist + h3.tabletitle {
      border-bottom: 1px dotted #89f;
      margin-bottom: 5px;
      min-width: 250px;
+     width: calc(100% - 5px);
      padding-bottom: 2px;
      break-inside: avoid;
      page-break-inside: avoid;
@@ -2005,13 +2078,12 @@ ul#banlist + h3.tabletitle {
 
 #ipv4, #ipv6, #permabanned tr:nth-child(2) {
      background: url(images/tinytitle.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      border-top: 1px solid #89f !important;
      border-bottom: 1px solid #89f !important;
 }
 
 /* end /configpeer banlist */
-
 
 .widescroll {
      overflow: auto;
@@ -2020,7 +2092,6 @@ ul#banlist + h3.tabletitle {
 a[href^="configpeer?peer"] {
      font-size: 0;
      filter: drop-shadow(0 0 1px #777);
-     -webkit-filter: drop-shadow(0 0 1px #777);
 }
 
 a[href^="configpeer?peer"]::after {
@@ -2030,7 +2101,6 @@ a[href^="configpeer?peer"]::after {
 
 a[href^="configpeer?peer"]:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 pre#transports {
@@ -2042,7 +2112,24 @@ pre#transports {
      background: #fff;
 }
 
-table#pluginconfig {
+#view_profile pre {
+     word-break: break-all;
+     word-wrap: break-word;
+     white-space: pre-wrap;
+}
+
+#view_profile h2 {
+     text-transform: none;
+     line-height: 120%;
+     margin-bottom: -1px !important;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     letter-spacing: 0;
+     word-spacing: 0;
+}
+
+#pluginconfig {
      margin-bottom: 0 !important;
 }
 
@@ -2051,11 +2138,15 @@ table#pluginconfig {
      width: calc(100% - 5px);
 }
 
+#pluginconfig tr td {
+     background: #fff;
+}
+
 #pluginconfig button, #webappconfig button, #clientconfig button {
      margin: 3px;
 }
 
-table#enviro td, table#eventlogs td {
+#enviro td, #eventlogs td {
      padding: 5px 10px;
 }
 
@@ -2113,6 +2204,7 @@ table#enviro td, table#eventlogs td {
 
 #i2pupdates td:first-child {
      padding-right: 0;
+     line-height: 120%;
 }
 
 #i2pupdates tr:last-child td {
@@ -2128,7 +2220,7 @@ div.configure tr, div.configure td {
      padding: 5px;
 }
 
-div.configure li:first-child, div.main li:first-child {
+div.configure li:first-child, .main li:first-child {
      margin-top: -10px;
 }
 
@@ -2178,14 +2270,14 @@ div.configure h2:first-child {
      vertical-align: middle;
 }
 
-#addkeyring tr, #loggingoptions tr, tr.tablefooter, table#profiles tr:hover, #floodfills tr:hover, #jardump tr {
+#addkeyring tr, #loggingoptions tr, tr.tablefooter, #profilelist tr:hover, #floodfills tr:hover, #jardump tr {
      border-top: 1px solid #89f !important;
      border-bottom: 1px solid #89f !important;
 }
 
 #sidebarconf tr:hover, #eventlog tr:hover, .tunneldisplay tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #jardump tr:hover {
      background: #ffd;
-     background: linear-gradient(to bottom, #fff 0%, #ffe 100%);
+     background: linear-gradient(to bottom, #fff, #ffe);
      color: #104e99;
      border-top: 1px solid #89f !important;
      border-bottom: 1px solid #89f;
@@ -2206,11 +2298,6 @@ div.configure h2:first-child {
      text-align: center;
 }
 
-#sidebarconf td {
-     font-weight: bold;
-     font-size: 9pt;
-}
-
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
      width: 59px;
      padding: 0;
@@ -2222,7 +2309,8 @@ div.configure h2:first-child {
 }
 
 #sidebarconf tr:last-child td:last-child {
-     text-align: left;
+     text-align: right;
+     padding-right: 2px;
 }
 
 .topshimten {
@@ -2230,8 +2318,8 @@ div.configure h2:first-child {
      margin-bottom: 15px;
 }
 
-div.messages {
-     padding: 10px 10px;
+.messages {
+     padding: 15px 10px;
      background: #fff;
      border: 1px solid #89f;
      border-right: 0;
@@ -2242,23 +2330,46 @@ div.messages {
      color: #474;
 }
 
+#config_update .messages {
+     background: url(/themes/console/images/info/newspaper.png) 10px center no-repeat #fff;
+     background-size: 28px 28px;
+     padding-left: 48px;
+     text-align: left;
+     font-weight: normal;
+}
+
 #messages {
      margin-bottom: 5px;
 }
 
-div.messages li, div.messages ul {
-     padding: 10px 0 0 5px !important;
+.messages li, .messages ul {
+     padding: 0 !important;
      margin: -10px 0 0 25px !important;
      list-style: none;
      text-align: left;
 }
 
-#graphs .messages {
+.messages li {
+     padding-left: 60px !important
+}
+
+#graphs .messages, #events #messages {
      margin-top: -16px;
 }
 
+#events #messages {
+     margin-bottom: 15px;
+     vertical-align: middle;
+}
+
+#events .messages li {
+     padding: 0 !important;
+     margin: 10px 10px 0 35px !important;
+     text-align: justify;
+}
+
 div.error {
-     color: #d00000;
+     color: #900;
      background: url(/themes/console/images/info/errortriangle.png) 20px center no-repeat;
      background-size: 28px auto;
      padding: 10px 5px;
@@ -2287,7 +2398,7 @@ h1 {
      word-spacing: 0.1em;
      background: #fff url(images/titlebg.png) center right no-repeat !important;
      background: linear-gradient(to right, #fff 20%, rgba(255,255,255, 0.5) 70%), linear-gradient(to bottom, #e5f0f7 0%, #e5f0f7 50%, #b9c2f9 50%, #b9c2f9 100%) !important;
-     min-width: 500px;
+     min-width: 530px;
 }
 
 span.newtab {
@@ -2299,7 +2410,6 @@ span.newtab {
 
 .newtab img:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 h2 {
@@ -2379,13 +2489,12 @@ h3#iptransport a::after, h3#advancedconfig a::after {
 
 h3#iptransport a:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 h4 {
      border: 1px solid #89f;
      background: #fff;
-     background: linear-gradient(to right, #fff 0%, #eff2ff 100%);
+     background: linear-gradient(to right, #fff, #eff2ff);
      padding: 3px 5px;
      font-size: 9pt;
      margin: 5px 0;
@@ -2400,7 +2509,7 @@ table[id*="connections"] td {
 }
 
 table[id*="connections"] td:first-child {
-     width: 40px;
+     width: 1%;
      white-space: nowrap;
      text-align: right;
 }
@@ -2425,7 +2534,7 @@ h3#pluginmanage {
      margin-top: 15px;
 }
 
-h3#advancedclientconfig, h3#pluginconfig {
+h3#advancedclientconfig, h3#pconfig {
      margin-top: 15px;
 }
 
@@ -2453,7 +2562,8 @@ h2 {
 
 h2, h3, h4#updateplugins {
      background: url(images/titlebg.png) right center no-repeat;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 h4#updateplugins {
@@ -2462,7 +2572,7 @@ h4#updateplugins {
 
 .routersummary h2, .routersummary h3, div.confignav, th {
      background: url(images/tinytitle.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 table {
@@ -2471,6 +2581,7 @@ table {
      margin: 0 0 5px 0;
      font-size: 9pt;
      background: #fff;
+     background: rgba(255,255,255,0.1);
      width: 100%;
 }
 
@@ -2526,10 +2637,17 @@ td.infohelp, p.infohelp, td.infowarn, p.infowarn, p#upnpstatus, p#gatherstats, p
      border: 1px solid #89f;
      background: #fff url(/themes/console/images/info/infohelp.png) 15px center no-repeat;
      white-space: normal !important;
+     text-align: justify;
 }
 
 td.infowarn, p.infowarn {
      background: #fff url(/themes/console/images/info/infowarn.png) 15px center no-repeat !important;
+}
+
+#config_summarybar .configtable td:not(.optionsave) {
+     padding: 15px 15px 15px 50px !important;
+     background: url(/themes/console/images/info/interval.png) 12px center no-repeat, #fff;
+     background-size: 28px 28px;
 }
 
 .confignav + .infohelp, .confignav + h3.tabletitle, .confignav + form > h3.tabletitle, .confignav + .configure > form > h3.ptitle {
@@ -2573,14 +2691,14 @@ td.tabletextarea {
      color: #000;
 }
 
-tr:nth-child(even) {
-     background: #ddf;
+tr:nth-child(even), #pluginconfig table tr:nth-child(even) td {
      background: #dde1ff;
+     background: rgba(220,220,255,0.5);
 }
 
-tr:nth-child(odd) {
-     background: #eef;
+tr:nth-child(odd), #pluginconfig table tr:nth-child(odd) td, .main#profiles ul#banlist {
      background: #eff1ff;
+     background: rgba(230,230,255,0.5);
 }
 
 .configtable th {
@@ -2590,17 +2708,17 @@ tr:nth-child(odd) {
 /* begin home page */
 
 h4.app, h4.app2 {
-     margin: 0 -1px 5px;
-     padding: 10px 0 8px 0;
+     margin: 0 -1px 7px;
      font-size: 11pt;
-     padding: 6px 10px;
+     padding: 7px 10px 6px;
      border: 1px solid #89f;
+     box-shadow: inset 0 0 0 1px #fff;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      background: #fff;
      text-transform: uppercase;
      background: url(images/tinytitle.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 h4.app {
@@ -2626,7 +2744,7 @@ div.app {
      border: 1px solid #89f;
      border-radius: 2px;
      background: #fff;
-     background: linear-gradient(to bottom, #fff 0%, #ddf 100%);
+     background: linear-gradient(to bottom, #fff, #ddf);
      box-shadow: 0 0 1px #fff;
 }
 
@@ -2640,18 +2758,18 @@ div.app:hover a {
      color: #f60 !important;
 }
 
-td.app {
+.app td {
      vertical-align: middle;
 }
 
 div.applabel {
      background: url(images/tinytitle.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      font-size: 9pt;
      margin: 0;
      padding: 4px 2px;
      text-align: center;
-     width: 108px;
+     width: 120px;
      line-height: 110%;
      text-transform: lowercase;
      font-size: 8pt;
@@ -2666,6 +2784,7 @@ div.applabel {
      padding: 1px;
      display: inline-block;
      width: 100%;
+     width: calc(100% - 2px);
      white-space: nowrap;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -2700,8 +2819,7 @@ div.app:hover a, .applabel a:focus {
 }
 
 div.app:hover img, .appimg a:focus {
-     filter: drop-shadow(0 0 1px #f60) saturate(160%);
-     -webkit-filter: drop-shadow(0 0 1px #f60) saturate(160%);
+     filter: drop-shadow(0 0 1px rgba(255, 102, 0, 0.6)) saturate(150%);
      outline: none;
 }
 
@@ -2749,12 +2867,12 @@ table.search {
      margin: 0;
 }
 
-img.app, img.app2p {
+.app img {
      height: 32px;
      width: auto;
      max-height: 32px;
      max-width: 32px;
-     padding: 5px 40px;
+     padding: 10px 46px 9px;
 }
 
 .app table {
@@ -2787,12 +2905,12 @@ div.applabel:hover {
      margin-bottom: -18px;
 }
 
-tt {
-     font-size: 8pt;
+#i2ptunnelframe {
+     margin-bottom: -3px;
 }
 
-tt, pre {
-     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+tt, pre, textarea, code {
+     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 hr {
@@ -2832,7 +2950,6 @@ h3#servicedebug a, h3#graphinfo a {
 
 .main#tunnels h3 a[href^="/configtunnels#"]:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 .main#debug h2 {
@@ -2870,7 +2987,7 @@ h3 + .statusnotes {
      border-top: 0;
      padding: 5px 0;
      background: #fff url(images/tinytitle.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 .statusnotes + .statusnotes {
@@ -2976,6 +3093,7 @@ div.joblog ol {
 
 h3#finishedjobs + ol li, h3#scheduledjobs + ol li, h3#activejobs + ol li, h3#readyjobs + ol li {
     list-style: none !important;
+    width: 100%;
 }
 
 h3#activejobs + ol li:before, h3#scheduledjobs + ol li:before, h3#readyjobs + ol li:before, h3#finishedjobs + ol li:before {
@@ -2989,7 +3107,7 @@ h3#activejobs + ol li:before, h3#scheduledjobs + ol li:before, h3#readyjobs + ol
 }
 
 h3#finishedjobs + ol li:before {
-     color: #3D3;
+     color: #5a5;
      content: '\2714\00A0';
 }
 
@@ -2998,7 +3116,7 @@ h3#readyjobs + ol li:before {
 }
 
 h3#scheduledjobs + ol li:before {
-     color: #773;
+     color: #970;
 }
 
 h3#totaljobstats {
@@ -3018,9 +3136,9 @@ h3#totaljobstats {
      font-size: 9pt;
 }
 
-table#schedjobs {
+#schedjobs {
      width: 100% !important;
-     margin: 15px 0 0 !important;
+     margin: -11px 0 0 !important;
 }
 
 #schedjobs th {
@@ -3039,7 +3157,7 @@ table#schedjobs {
      font-weight: bold;
 }
 
-table#oldhome {
+#oldhome {
      margin-bottom: 10px;
 }
 
@@ -3048,8 +3166,9 @@ table#oldhome {
 }
 
 .homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      font-size: 0 !important;
+     width: 5%;
 }
 
 .homelinkedit th:last-child, .homelinkedit th:nth-child(3) {
@@ -3084,7 +3203,11 @@ tr#addnew:hover {
      width: 160px;
 }
 
-table#oldhome {
+#loggingoptions td:first-child {
+     line-height: 120%;
+}
+
+#oldhome {
      margin-bottom: 10px;
 }
 
@@ -3144,8 +3267,9 @@ p#pluginconfigtext {
 
 p#enablefullstats {
      padding: 5px 10px;
-     line-height: 150%;
+     line-height: 120%;
      background: #fff;
+     text-align: left;
 }
 
 .formaction {
@@ -3189,6 +3313,9 @@ p#enablefullstats {
 
 .formaction#pluginupdater {
      margin-bottom: 6px;
+     background: url(/themes/console/images/info/update.png) 12px center no-repeat, #fff;
+     background-size: 28px 28px;
+     padding: 15px 15px 15px 50px;
 }
 
 .formaction#webappconfigactions, .formaction#clientsconfig {
@@ -3211,6 +3338,10 @@ p#enablefullstats {
      margin-bottom: -5px;
 }
 
+.formaction#homesites {
+     margin-bottom: -6px;
+}
+
 .formaction#themeui {
      margin: 8px -5px 0;
      border-top: 1px solid #89f;
@@ -3221,7 +3352,7 @@ p#enablefullstats {
 }
 
 .langbox {
-     margin: 4px 2px 0;
+     margin: 3.5px 2px 0;
      color: #001;
      font-size: 7pt;
      width: 360px;
@@ -3239,8 +3370,9 @@ p#enablefullstats {
      transform: none !important;
 }
 
-.langbox img:hover {
+.langbox img:hover, .langbox a:focus img {
      opacity: 1;
+     transform: scale(1.1) !important;
 }
 
 .links {
@@ -3280,7 +3412,6 @@ p#enablefullstats {
 .tablefooter tr, .tablefooter td {
      background: #fff !important;
      font-size: 9pt;
-     font-weight: bold;
      line-height: 150%;
      white-space: nowrap;
      padding: 8px 5px !important;
@@ -3293,6 +3424,15 @@ p#enablefullstats {
 
 #netconfig tr, #externali2cp tr {
      background: #fff;
+}
+
+#externali2cp label + br {
+     display: none;
+}
+
+#externali2cp label {
+     white-space: nowrap;
+     margin-right: 10px;
 }
 
 #pluginconfig tr {
@@ -3313,7 +3453,7 @@ p#enablefullstats {
 
 .tidylist code {
      text-align: left;
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #723;
      font-weight: bold;
 }
@@ -3381,7 +3521,7 @@ form[action="graphs"] input[type="text"] {
 p#graphopts {
      text-align: center;
      border: 1px solid #89f;
-     background: #fff;
+     background: rgba(255,255,255,0.8);
      margin: 25px -5px 0;
      padding: 10px;
      text-transform: capitalize;
@@ -3448,7 +3588,7 @@ p#graphopts + p {
      border-right: none;
      background-size: 20px 20px !important;
      padding: 5px 5px 5px 40px !important;
-     background-color: #eff1ff !important;
+     background: url(/themes/console/images/info/infohelp.png) 15px center no-repeat #eaeaff;
      text-align: left;
 }
 
@@ -3492,7 +3632,7 @@ body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
 }
 
-.iframed div.routersummaryouter {
+.iframed .routersummaryouter {
      display: none !important;
 }
 
@@ -3500,7 +3640,7 @@ body.iframed {
      margin: 0 1px 0 0 !important;
 }
 
-.iframed div.sorry {
+.iframed .sorry {
      margin: -1px 1px 0 0 !important;
 }
 
@@ -3525,7 +3665,7 @@ div.themechoice {
      margin: 4px;
      border-radius: 2px;
      background: #fff;
-     background: linear-gradient(to bottom, #fff 0%, #ddf 100%);
+     background: linear-gradient(to bottom, #fff, #ddf);
      transition: all 0.3s ease 0s;
      box-shadow: 0 0 1px #fff;
 }
@@ -3548,13 +3688,17 @@ div.themechoice {
 .themechoice .optbox {
      height: 80px !important;
      width: 110px !important;
+     padding: 2px;
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
-     margin-left: -31px;
+     margin-top: 4px;
+     margin-left: -32px;
+     position: absolute;
      z-index: 999;
 }
 
 .themechoice .optbox + object {
-     margin-left: -79px;
+     margin-left: 0;
+     margin-top: 8px;
      padding: 0 !important;
      margin-bottom: 31px;
 }
@@ -3582,6 +3726,8 @@ div.themechoice {
 
 .themechoice .optbox:focus + object ~ div.themelabel {
      color: #f60 !important;
+     background: #fff;
+     background: linear-gradient(to right, #eef, #fff, #eef);
 }
 
 .themechoice .optbox:active + object ~ div.themelabel {
@@ -3589,15 +3735,41 @@ div.themechoice {
 }
 
 .themechoice:active .optbox:checked + object ~ .themelabel {
-     background: #ddf !important;
-     color: #338 !important;
+     background: linear-gradient(to right, #eef, #fff, #eef) !important;
+     color: #f60 !important;
      box-shadow: none !important;
      font-weight: bold;
 }
 
-div#themeoptions {
+#themeoptions {
      clear: both;
-     padding-top: 5px;
+     border-top: 1px solid #89f;
+     background: rgba(230, 230, 255, 0.5);
+     margin: 0 -5px -3px;
+     position: relative;
+     top: 4px;
+     padding: 5px 10px 3px 5px;
+}
+
+#themeoptions br {
+     display: none;
+}
+
+#themeoptions label {
+     white-space: nowrap;
+     margin: 4px 10px 4px 0 !important;
+     display: inline-block;
+}
+
+p#helptranslate {
+     position: relative;
+     top: 4px;
+     padding: 15px 10px 15px 50px !important;
+     text-align: left !important;
+     border-top: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     background: url(/themes/console/images/info/notice.png) left 14px center no-repeat, #fff;
+     background-size: 28px 28px;
 }
 
 #themeoptions input {
@@ -3607,10 +3779,10 @@ div#themeoptions {
 
 div.themelabel {
      border-top: 1px solid #89f !important;
-     margin: -30px -4px 0;
+     margin: -25px -4px 0;
      padding: 3px 2px;
      background: #eef url(images/tinytitle.png) center center;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -3648,7 +3820,7 @@ div.langselect { /* containing box for lang selection */
      padding: 4px 4px 0;
      border-radius: 2px;
      background: #fff;
-     background: linear-gradient(to bottom, #fff 0%, #ddf 100%);
+     background: linear-gradient(to bottom, #fff, #ddf);
      transition: all 0.3s ease 0s;
      box-shadow: 0 0 1px #fff;
 }
@@ -3660,11 +3832,9 @@ div.langselect { /* containing box for lang selection */
 }
 
 .langselect .optbox {
-     width: 110px;
-     background: #f00;
-     height: 52px;
-     margin-left: -49px;
-     margin-bottom: 14px;
+     width: 122px;
+     height: 66px;
+     margin: -4px 0 8px -54px;
      opacity: 0;
      z-index: 999;
      position: relative;
@@ -3678,7 +3848,7 @@ div.langselect { /* containing box for lang selection */
 .langselect img[src^="/flags"] {
      border: 1px solid #89f;
      margin-bottom: 42px;
-     margin-left: -63px;
+     margin-left: -72px;
      opacity: 1;
      z-index: 3;
      position: relative;
@@ -3702,7 +3872,7 @@ div.langselect { /* containing box for lang selection */
      transition: all 0.1s ease 0s;
 }
 
-.langselect input[name="lang"]:checked + img + div.ui_lang {
+.langselect input[name="lang"]:checked + img + .ui_lang {
      background: #ddf !important;
      color: #338;
      font-weight: bold;
@@ -3717,16 +3887,20 @@ div.langselect { /* containing box for lang selection */
 }
 
 .langselect:active input[name="lang"]:checked + img + .ui_lang {
-     color: #338 !important;
+     color: #f60 !important;
      box-shadow: none !important;
+     background: linear-gradient(to right, #eef, #fff, #eef) !important;
 }
 
 .langselect input[name="lang"]:focus + img + .ui_lang {
      color: #f60 !important;
+     background: #fff !important;
+     background: linear-gradient(to right, #eef, #fff, #eef) !important;
 }
 
 .langselect input[name="lang"]:active + img + .ui_lang {
      color: #fff !important;
+     background: #f60 !important;
 }
 
 div.flagradio {
@@ -3744,7 +3918,7 @@ div.langselect br {
 div.ui_lang { /* lang text label */
      text-align: center;
      background: #eef url(images/tinytitle.png) center center;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      padding: 3px 2px;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -3850,17 +4024,21 @@ td#pw_adduser input {
      text-align: left;
 }
 
-table#netconfig {
+#netconfig {
      line-height: 160%;
 }
 
 /* netdb */
 
-table.netdbentry th {
+.netdbentry {
+     margin-top: 10px !important;
+}
+
+.netdbentry th {
      font-weight: normal;
 }
 
-table.netdbentry th:last-child {
+.netdbentry th:last-child {
      text-align: right;
      padding: 5px;
      white-space: nowrap;
@@ -3872,7 +4050,7 @@ table.netdbentry th:last-child {
      border-radius: 3px;
      padding: 1px 3px;
      margin-left: 4px;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace !important;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
 }
 
 a.viewfullentry:not(old) {
@@ -3885,20 +4063,19 @@ a.viewfullentry::after {
 
 a.viewfullentry:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
-table.netdbentry th:first-child, table.netdbentry td:first-child  {
+.netdbentry th:first-child, .netdbentry td:first-child  {
      white-space: nowrap;
      padding: 4px 6px !important;
      text-align: left;
 }
 
-table.netdbentry td:first-child  {
+.netdbentry td:first-child  {
      width: 80px;
 }
 
-table.netdbentry td:nth-child(2) {
+.netdbentry td:nth-child(2) {
      word-wrap: break-word;
 }
 
@@ -3906,8 +4083,9 @@ table.netdbentry td:nth-child(2) {
      margin: 1px 0 0 0;
 }
 
-table#leasesetsummary {
+#leasesetsummary {
      margin-top: 15px;
+     margin-bottom: 10px;
 }
 
 #leasesetsummary td:first-child {
@@ -3915,64 +4093,64 @@ table#leasesetsummary {
      white-space: nowrap;
 }
 
-table#leasesetdebug, table#leasesetsummary {
+#leasesetdebug, #leasesetsummary {
      font-size: 9pt;
 }
 
-table#leasesetdebug td, table#leaseset td {
+#leasesetdebug td, #leaseset td {
      padding: 5px !important;
 }
-table#leasesetdebug {
+
+#leasesetdebug {
      margin-bottom: 10px;
 }
 
-table#leasesetdebug th, table#leasesetsummary th {
+#leasesetdebug th, #leasesetsummary th {
      font-weight: bold;
      padding: 8px 5px;
      text-align: left;
 }
 
-table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+#leasesetdebug th:last-child, #leasesetsummary th:last-child {
      text-align: right;
 }
 
-table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
+#leasesetdebug th:first-child, #leasesetsummary th:first-child {
      font-size: 10pt;
 }
 
-table#leasesetdebug th a, table#leasesetsummary th a {
+#leasesetdebug th a, #leasesetsummary th a {
      font-size: 8pt;
      text-transform: capitalize;
      letter-spacing: normal;
      word-spacing: normal;
 }
 
-table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
+#leasesetdebug th a:not(old), #leasesetsummary th a:not(old) {
      font-size: 0;
 }
 
-table#leasesetdebug th a::after, table#leasesetsummary th a::after {
+#leasesetdebug th a::after, #leasesetsummary th a::after {
      content: url(/themes/console/images/buttons/floodfill.png);
 }
 
-table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
+#leasesetdebug th a:hover, #leasesetsummary th a:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
-table#leasesetdebug td:nth-child(odd) {
+#leasesetdebug td:nth-child(odd) {
      width: 200px;
      white-space: nowrap;
      text-align: right;
-     border-right: 1px inset #fff;
+     border-right: 1px inset #ccf;
 }
 
-table#leasesetdebug td:nth-child(even) {
+#leasesetdebug td:nth-child(even) {
      text-align: left;
      white-space: nowrap;
 }
 
-table#leasesetdebug td:nth-child(2) {
+#leasesetdebug td:nth-child(2) {
      width: 10px;
 }
 
@@ -4006,7 +4184,6 @@ table.leaseset:last-child {
 
 .leaseset tr:nth-child(2) td:last-child a:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 div#noleasesets {
@@ -4040,6 +4217,8 @@ div#sybilnav {
 #sybilnav li a {
      display: inline-block;
      width: calc(100% - 34px);
+     vertical-align: middle;
+     line-height: 100%;
 }
 
 table.sybil_routerinfo {
@@ -4080,6 +4259,8 @@ table.sybil_routerinfo:first-of-type th {
 .sybil_routerinfo img[width="32"] {
      width: 24px;
      height: 24px;
+     margin: -1px;
+     border-left: 1px solid #89f;
 }
 
 .main#netdb code, .main#netdb tt {
@@ -4126,14 +4307,19 @@ div#sybilnav {
      vertical-align: middle;
 }
 
-p.sybil_info, p.family, p.threatpoints, p.hashdist {
+p.sybil_info, p.family, p.threatpoints, p.hashdist, p.notfound {
      border: 1px solid #89f;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
      color: #33f;
      font-weight: bold;
+     text-align: left;
      background: #ffe url(images/eye.png) 8px center no-repeat;
-     background: url(images/eye.png) 8px center no-repeat, linear-gradient(to right, #fff 0%, #dde1ff 70%);
+     background: url(images/eye.png) 8px center no-repeat, linear-gradient(to right, #fff 40%, #dde1ff);
+}
+
+p.family a {
+     display: inline-block;
 }
 
 p.family + p.family, p.sybil_info + p.sybil_info {
@@ -4164,7 +4350,7 @@ p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sy
      margin-bottom: 6px;
 }
 
-p.notfound, p#sybil_totals {
+p#sybil_totals {
      padding: 15px;
      border: 1px solid #89f;
      background: #fff;
@@ -4256,8 +4442,7 @@ ul.statlist li::before {
      line-height: 60%;
      vertical-align: baseline;
      color: #0c153d;
-     filter: drop-shadow(0 1px 1px #aaa);
-     -webkit-filter: drop-shadow(0 1px 1px #aaa);
+     filter: drop-shadow(0 0 1px #ccc);
 }
 
 ul.statlist li {
@@ -4294,8 +4479,7 @@ ul.statlist li li::before {
      color: #33a;
      font-size: 14pt;
      margin-left: 4px;
-     filter: drop-shadow(0 1px 1px #aaa);
-     -webkit-filter: drop-shadow(0 1px 1px #aaa);
+     filter: drop-shadow(0 0 1px #ccc);
 }
 
 .main#stats a[href^="graph?"]:hover::before {
@@ -4358,7 +4542,7 @@ h3.stats {
 
 /* netdb (main section) */
 
-table#netdboverview {
+#netdboverview {
      margin: 15px 0 5px;
      border: 1px solid #89f !important;
 }
@@ -4368,12 +4552,33 @@ table#netdboverview {
      font-size: 10pt;
 }
 
+#netdboverview td {
+     padding: 5px 5px 0;
+     padding: 0;
+     background: rgba(255,255,255,0.4) !important;
+}
+
 #netdbtransports th:first-child, #netdbcountrylist th:first-child {
      text-align: left;
 }
 
-#netdboverview td {
-     padding: 5px 5px 0;
+#netdbversions, #netdbtransports, #netdbcountrylist {
+     border: none;
+     margin: -1px 0;
+}
+
+#netdbversions {
+     border-right: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+}
+
+#netdbtransports {
+     border-bottom: 1px solid #89f;
+}
+
+#netdbcountrylist {
+     border-left: 1px solid #89f;
+     border-bottom: 1px solid #89f;
 }
 
 #netdbversions td, #netdbtransports td, #netdbcountrylist td {
@@ -4401,17 +4606,26 @@ table#netdboverview {
 
 /* /help */
 
-div#volunteer, div#sidebarhelp, div#configurationhelp, div#reachabilityhelp, div#legal, div#changelog {
+#volunteer, #sidebarhelp, #configurationhelp, #reachabilityhelp, #legal, #changelog, #faq {
      border: 1px solid #89f;
      padding: 10px 15px 5px;
-     margin-bottom: 10px;
+     margin-bottom: 20px;
      margin-top: 15px !important;
      background: #eff1ff;
+     background: rgba(230,230,255,0.5);
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
-div#volunteer {
-     margin-top: -25px !important;
+#advancedsettings {
+     margin-top: -5px;
+     margin-bottom: 20px;
+}
+
+#volunteer {
+     margin-top: 20px !important;
      padding-bottom: 0 !important;
+     background: linear-gradient(to bottom, rgba(230,230,255,0.5), rgba(230,230,255,0.5)), url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom !important;
+     background-size: 100% 100%, auto 75% !important;
 }
 
 #volunteer ul li, #volunteer ul li:first-child {
@@ -4419,24 +4633,24 @@ div#volunteer {
 }
 
 #sidebarhelp h2 {
-     margin-bottom: 0 !important;
+     margin-bottom: 5px !important;
 }
 
-div.main#help h2 {
+.main#help h2 {
      margin: -16px -16px 0;
 }
 
-div.main#help h3 {
-     margin: -5px -16px 0;
+.main#help h3 {
+     margin: -5px -16px 3px;
 }
 
 .main#help p {
-     padding: 5px 0;
-     margin-top: 5px;
+     padding: 5px 0 0;
+     margin-top: 0;
 }
 
 .main#help ul {
-     margin-bottom: 15px;
+     margin-bottom: 5px;
      margin-top: -5px;
      padding-left: 15px;
 }
@@ -4455,9 +4669,14 @@ ul#reachability {
      padding-left: 15px;
 }
 
-div#changelog {
+#configinfo th {
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+#changelog {
      padding: 0;
-     margin-top: 0 !important;
+     margin-top: -5px !important;
+     margin-bottom: 10px !important;
 }
 
 #changelog h2 {
@@ -4472,6 +4691,7 @@ div#changelog {
      width: calc(100% - 10px);
      height: 600px;
      overflow: auto;
+     white-space: pre-wrap;
 }
 
 p#fullhistory {
@@ -4479,9 +4699,81 @@ p#fullhistory {
      margin-bottom: -5px;
      margin: -5px -1px -6px !important;
      border: 1px solid #89f;
-     padding-right: 10px !important;
+     padding: 5px 10px 5px 5px !important;
      background: #fff;
 }
+
+.main#help td.infohelp, .main#help td.infowarn, .main#help td.infohelp, .main#help p.infohelp {
+     background-size: 24px 24px !important;
+     padding-left: 46px !important;
+}
+
+/* mini faq */
+
+#faq h3 {
+     padding-left: 35px;
+     background: url(/themes/console/images/info/question.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%) !important;
+     background-size: 18px 18px, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+     text-transform: none;
+     letter-spacing: 0;
+     word-spacing: 0;
+     font-size: 10.5pt;
+}
+
+#faq p.infohelp {
+     margin: -11px -16px 4px;
+}
+
+#faq ul {
+     margin: -5px 15px 0 !important;
+}
+
+#portfaq {
+     margin: -4px -16px -6px;
+     width: auto;
+}
+
+#portfaq th:first-child, #portfaq td:first-child {
+     font-weight: bold;
+     text-align: right;
+     padding-top: 6px;
+     padding-bottom: 6px;
+     padding-left: 10px;
+}
+
+#portfaq th:nth-child(n+2) {
+     text-align: left;
+}
+
+#portfaq .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#portfaq th[colspan="3"] {
+     text-align: left;
+     font-size: 10.5pt !important;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+}
+
+#portfaq td:nth-child(2) {
+     white-space: nowrap;
+}
+
+#portfaq td:last-child, #portfaq td[colspan="3"] {
+     text-align: justify;
+     padding-right: 10px;
+}
+
+#portfaq td[colspan="3"] {
+     font-weight: normal;
+}
+
+/* end mini faq */
+
+/* end /help */
 
 .eventspanel br {
      display: none;
@@ -4586,20 +4878,21 @@ p#fullhistory {
 
 #configinfo th {
      text-align: left;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      padding: 7px 10px;
-     color: #070;
+     color: #050;
 }
 
 #configinfo td {
      text-align: justify;
      padding: 5px 15px;
      background: #eff1ff;
+     background: rgba(230,230,255,0.5);
 }
 
 /* informational images */
 
-table#bugreports td.infohelp {
+#bugreports td.infohelp {
      background: #fff url(/themes/console/images/info/bugreport.png) no-repeat 12px center;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
@@ -4658,7 +4951,7 @@ p.infowarn {
      background-size: 28px 28px;
 }
 
-#floodfillconfig .infohelp {
+#floodfillconfig tr:first-child .infohelp {
      background: #fff url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
@@ -4782,7 +5075,7 @@ p#enablefullstats, p#gatherstats {
 
 #logs li {
      list-style: none;
-     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 130%;
      text-align: left;
      display: inline-block;
@@ -4836,30 +5129,82 @@ p#enablefullstats, p#gatherstats {
 
 /* end logs */
 
-
 /* responsive layout */
 
-@media screen and (max-width: 1200px) {
-.tab, .tab2 {
-     padding: 1px 0;
-     min-width: 50px !important;
+@media screen and (max-width: 900px) {
+.welcome h2 {
+     font-size: 10pt !important;
 }
 
-.tab2 {
-     padding: 3px 10px;
+.homelinkedit input[name="nofilter_url"] {
+     width: 240px !important;
 }
 
-.tab a {
-     padding: 2px 12px;
+#newfamily input[type="text"] {
+     width: 160px !important;
+}
+
+#joinfamily input[type="file"] {
+     width: 220px;
+}
+
+h3.ptitle, h3.tabletitle, th.th_title, h3#udpcon, h3#ntcpcon {
+     font-size: 10pt;
+}
+
+#ntcpconnections th:last-child:not(old) {
+     font-size: 0;
+}
+
+#ntcpconnections th:last-child::before {
+     content: url(/themes/console/images/info/backlogged.png) !important;
 }
 
 #consolepass input[name="name"], #externali2cp input[name="user"],
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
-     width: 160px !important;
+     width: 130px !important;
+     min-width: 130px !important;
+}
+
+input[name="pluginURL"] {
+     width: 190px !important;
+     margin-left: 0 !important;
+}
+
+#plugininstall tr:nth-child(3) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+     background-size: 0 0 !important;
+     padding-left: 5px !important;
+}
+
+#plugininstall .optionsave {
+     padding-right: 0 !important;
+}
+
+input[name="pluginFile"] {
+     transform: scale(0.9);
+     margin-left: 0 !important;
+}
+
+.main#profiles table, .main#peers table, .main#tunnels table, .main#jobs table {
+     font-size: 8pt;
+}
+
+#netdbversions th:last-child, #netdbtransports th:last-child, #netdbcountrylist th:last-child {
+     max-width: 60px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+#netdbversions td, #netdbtransports td, #netdbcountrylist td {
+     font-size: 8.5pt !important;
 }
 }
 
 @media screen and (max-width: 1000px) {
+.welcome h2 {
+     font-size: 11pt;
+}
+
 div.confignav {
      font-size: 8.5pt !important;
 }
@@ -4876,7 +5221,17 @@ input.search[type="text"] {
      width: 200px;
 }
 
-div.logo {
+input[name="pluginURL"] {
+     width: 260px;
+}
+
+#plugininstall tr:nth-child(3) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2) {
+     background-size: 20px 20px;
+     padding: 15px 0 15px 36px;
+     background-position: 10px center;
+}
+
+.logo {
      float: none;
      position: absolute;
      top: 10px !important;
@@ -4887,7 +5242,7 @@ div.logo {
      width: calc(100% - 36px);
 }
 
-div.warning {
+.warning {
      margin: 140px 5px 0 !important;
 }
 
@@ -4906,17 +5261,241 @@ img[src$="bound.png"] {
 }
 
 .main#tunnels th, .main#profiles th {
-font-size: 8pt;
+     font-size: 8pt;
+}
+
+#config_update .messages {
+     background-size: 22px 22px;
+     background-position: 8px center;
+     padding-left: 40px;
+}
+
+.main#view_profile {
+     padding: 0 !important;
+     min-width: 540px;
+}
+
+#view_profile pre {
+     margin: -5px 5px;
+     width: calc(100% - 5px);
+}
+
+#view_profile h2 {
+     margin: -1px;
+     font-size: 13pt;
+}
+
+#viewprofile {
+     border: none;
+     min-width: 500px;
+}
+
+input[name="speed"], input[name="capacity"] {
+     min-width: 80px;
+     width: 80px;
+}
+
+#netdbversions th, #netdbtransports th, #netdbcountrylist th {
+     font-size: 9pt !important;
+}
+
+.main#events {
+     min-width: 510px;
+}
+
+#events select {
+     min-width: 100px;
+}
+
+#events table {
+     table-layout: fixed;
+     width: 100%;
+}
+
+#events td:last-child {
+     word-break: break-all;
 }
 }
 
 @media screen and (max-width: 1200px) {
-.main#peers th {
-font-size: 8pt;
+.tab, .tab2 {
+     padding: 1px 0;
+     min-width: 50px !important;
 }
 
-img[src^="/flags.jsp"] {
+.tab2 {
+     padding: 3px 10px;
+}
+
+.tab a {
+     padding: 2px 12px;
+}
+
+.main#peers th {
+     font-size: 8pt;
+}
+
+#peers img[src^="/flags.jsp"], #profiles img[src^="/flags.jsp"], #tunnels img[src^="/flags.jsp"] {
      transform: scale(0.9);
+}
+
+p#enablefullstats input[type="checkbox"] {
+     float: left;
+     margin-top: 0;
+}
+
+/* profiles, peers, tunnels, job queue, netdb - whitespace reduction */
+
+.main#profiles, .main#peers, .main#tunnels, .main#jobs, .main#netdb {
+     padding: 5px;
+     min-width: 560px;
+}
+
+.main#profiles .confignav, .main#netdb .confignav {
+     margin: -6px;
+}
+
+.main#profiles table, .main#peers table, .main#tunnels table {
+     margin: 5px 0;
+} 
+
+#ntcpconnections {
+     margin-bottom: 0 !important;
+}
+
+.main#profiles .infohelp {
+     margin: 11px 0 5px !important;
+}
+
+.widescroll + .infohelp {
+     margin: 0 !important;
+}
+
+.main#peers #upnpstatus {
+     margin-bottom: 5px 0 !important;
+}
+
+.main#peers .infohelp {
+     margin: 5px 0 0;
+}
+
+.main#profiles h3, .main#peers h3, .main#tunnels h3 {
+     margin: 5px 0 -6px !important;
+     font-size: 10.5pt;
+}
+
+.main#tunnels h3 {
+     margin-top: -2px !important;
+}
+
+.main#jobs h3 {
+     margin-top: 0;
+}
+
+.main#tunnels h3#exploratorytunnels {
+     margin-top: 0 !important;
+}
+
+h3 + .statusnotes {
+     margin-top: 5px !important;
+}
+
+h2 {
+     font-size: 12pt !important;
+}
+
+.main#jobs h2 {
+     margin-bottom: 5px !important;
+}
+
+.main#jobs h3 + ol:empty + h3 {
+     margin-top: -16px !important;
+}
+
+#jobstats {
+     margin-bottom: 0;
+}
+
+h3#totaljobstats {
+     margin-top: 11px !important;
+}
+
+.statusnotes:last-child {
+     margin-bottom: 0;
+}
+
+#profile_defs, #floodfills, #profiles ul, .main#peers h3#transports {
+     margin-bottom: 0 !important;
+}
+
+.main#peers pre {
+     margin-top: -1px;
+}
+
+.main#peers pre + h3 {
+     margin-bottom: 5px !important;
+}
+
+#floodfills, #profiles ul {
+     margin-top: 11px !important;
+}
+
+table[id*="connections"] td, #floodfills td,  #profilelist td, #jobstats td, .main#tunnels td {
+    padding: 3px;
+    border-right: 1px inset #ccf;
+}
+
+.main#netdb #netdboverview, #netdblookup {
+     margin: 11px 0 0;
+}
+
+#netdb h3.tabletitle, h3.sybils {
+     font-size: 10pt;
+}
+
+#netdblookup {
+     margin-bottom: -11px;
+}
+
+.netdbentry, #leasesetdebug, #leasesetsummary, table.leaseset {
+     margin: 11px 0 -6px !important;
+}
+
+.netdbentry:last-child, table.leaseset:last-child {
+     margin-bottom: 0 !important;
+}
+
+.netdbentry th code, .sybil_routerinfo th code, .leaseset th code {
+     font-size: 8pt;
+}
+
+#debugmode {
+     margin-bottom: -6px !important;
+}
+
+table.sybil_routerinfo:last-child {
+     margin-bottom: 0 !important;
+}
+
+#banlist li {
+     width: calc(100% - 5px);
+}
+
+#schedjobs {
+     margin: -11px 0 -6px !important;
+}
+
+#upnpstatus + #ntcpcon {
+     margin-top: 5px !important;
+}
+/* end whitespace reduction */
+
+.main#help h3, #faq h3 {
+     font-size: 10pt !important;
+}
+
+#portfaq td:nth-child(2) {
+     white-space: normal;
 }
 }
 
@@ -4929,16 +5508,43 @@ img[src^="/flags.jsp"] {
 .langbox {
      margin-top: 3px !important;
 }
+
+#sb_localtunnels td:first-child {
+     padding-right: 3px !important;
+}
+
+.tunnels_client th:first-child:not(old) {
+     font-size: 0 !important;
+}
+
+.tunnels_client th:first-child::after {
+     content: "\21E9\21E7";
+     font-size: 12pt;
+     line-height: 0;
+     vertical-align: middle;
+     letter-spacing: -0.3em;
+}
+
+.main#help h3, #faq h3 {
+     font-size: 10.5pt !important;
+}
+}
+
+@media screen and (min-width: 900px) {
+#consolepass input[name="name"], #externali2cp input[name="user"],
+#consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
+     width: 160px;
+}
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
-#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
-.netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
+body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes, .routersummary button.download,
+#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, ul.statlist a[name],
+ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li, .news #newsStatus, .news #ewsDisplay, .topness, .footnote {
      font-size: 9pt !important;
 }
 
@@ -4950,7 +5556,7 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      width: 225px !important;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
      margin-left: -2px;
      transform: none;
      width: 210px;
@@ -4961,12 +5567,12 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 226px !important;
 }
 
-#sb_internals, #sb_services, #sb_advanced {
-     margin-top: -3px !important;
+.routersummary h3 a, #netdboverview th {
+     font-size: 11pt !important;
 }
 
-.routersummary h3 a, #netdboverview th, .newsentry h3 {
-     font-size: 11pt !important;
+.routersummary h3 {
+     padding: 4.5px 0 !important;
 }
 
 #sb_internals a, #sb_services a, #sb_advanced a {
@@ -4977,12 +5583,12 @@ div.routersummary img[src$="i2plogo.png"] {
      margin: 2px 4px 1px;
 }
 
-.routersummary button[value="cancelShutdown"] {
-     padding-left: 21px !important;
-}
-
 div.app {
      width: 154px;
+}
+
+.app img {
+     padding: 10px 60px 9px;
 }
 
 .applabel {
@@ -5002,7 +5608,34 @@ h3, h3.ptitle, h3.tabletitle, th.th_title {
      font-size: 11pt;
 }
 
+.newsentry h3, .newsentry h3 a, #news.main h3, .newsDate {
+     font-size: 10.5pt !important;
+}
+
+.newsAuthor {
+     font-size: 9pt;
+     background-size: 12px 12px;
+     padding-left: 14px;
+     background-position: left center;
+}
+
+#news #newsDisplay, #news #newsStatus {
+     margin-bottom: 0 !important;
+}
+
+#console h3 {
+     font-size: 12pt;
+}
+
+#netdb h3.tabletitle, h3.sybils {
+     font-size: 10.5pt;
+}
+
 h3#i2pclientconfig, h3.ptitle {
+     margin-bottom: -15px !important;
+}
+
+h3#systray, h3#servicedebug, h3#browseronstart {
      margin-bottom: -15px !important;
 }
 
@@ -5012,6 +5645,8 @@ h3#pluginmanage {
 
 h4#updateplugins {
      margin-top: -16px !important;
+     font-size: 10pt;
+     padding: 5px 10px;
 }
 
 h3#webappconfig {
@@ -5024,6 +5659,7 @@ h3#webappconfig {
 
 button.control {
      font-size: 0 !important;
+     padding: 14px !important;
 }
 
 #jardump td {
@@ -5034,7 +5670,7 @@ button.control {
      font-size: 8pt !important;
 }
 
-table#leasesetdebug th, table#leasesetsummary th {
+#leasesetdebug th, #leasesetsummary th {
      font-size: 11pt !important;
 }
 
@@ -5065,7 +5701,45 @@ div.joblog h3 {
 .tab, .tab2 {
      margin-top: -1px !important;
 }
+
+#help .confignav {
+     padding: 0 !important;
+     position: sticky;
+     top: -1px;
+     z-index: 999;
+}
+
+#help .tab {
+     margin-top: -1px !important;
+     margin-bottom: -1px !important;
+}
+
+.main[id^="config_"] th, h4#updateplugins {
+    font-size: 10.5pt !important;
+}
+
+.homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
+     font-size: 0 !important;
+}
 }
 
 /* end responsive layout */
 
+/* Edge/IE tweaks */
+
+_:-ms-lang(x), #sidebarconf tr, .homelinkedit tr, #clientconfig tr, #webappconfig tr,  #configstats tr, #tunnelconfig tr, #profiles tr,
+#floodfills tr, #netdboverview tr, .netdbentry tr, #leasesetdebug tr, #leasesetsummary tr, .leaseset tr,
+.sybil_routerinfo tr, #enviro tr, #schedjobs tr, #jobstats tr, #eventlog tr, .tunneldisplay tr, #udpconnections tr, #ntcpconnections tr {
+     border-top: 1px solid #ccf;
+}
+
+_:-ms-lang(x), #peerdefs td:first-child {
+     border-right: 1px solid #ccf;
+}
+
+_:-ms-lang(x), .tunnels_client th:first-child::after {
+     letter-spacing: -0.05em;
+     font-weight: normal;
+}
+
+/* end Edge/IE tweaks */

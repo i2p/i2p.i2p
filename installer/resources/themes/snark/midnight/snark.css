@@ -58,11 +58,12 @@ body.iframed {
 }
 
 .iframed .page {
-     margin: 5px 0;
+     margin: 4px 0 5px;
      padding: 0;
      border: none;
      background: none;
      box-shadow: none;
+     border-radius: 0;
 }
 
 .snarknavbar, .page {
@@ -77,7 +78,6 @@ body.iframed {
      text-align: center;
      border: 1px solid #443da0;
      border-radius: 2px 2px 0 0;
-     background: linear-gradient(to bottom, #181d4f 0%, #181d4f 50%, #001 50%, #001 100%);
      background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
      position: sticky;
      top: -1px;
@@ -91,6 +91,7 @@ body.iframed {
      border-radius: 0;
      padding-top: 14px;
      margin-bottom: -1px;
+     position: static;
 }
 
 .snarkRefresh:link:first-child {
@@ -112,7 +113,6 @@ body.iframed {
      text-transform: uppercase !important;
      opacity: .8;
      color: #89f;
-     border: 1px solid #b0aaff;
      border: 1px solid #443da0;
      border-radius: 0;
      background: #001 url(images/button_tracker.png) 9px center no-repeat;
@@ -203,7 +203,7 @@ body.iframed {
 /* screenlog */
 
 .snarkMessages {
-     font: normal 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: normal 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      overflow: auto;
      width: auto;
      height: 55px;
@@ -245,7 +245,6 @@ body.iframed {
      height: 11px;
      background-size: 9px 9px;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 .snarkMessages img {
@@ -275,14 +274,18 @@ body.iframed {
      margin-top: 10px !important;
 }
 
+.iframed .logshim {
+     margin-top: 20px !important;
+}
+
 /* end screenlog */
 
 tt, code {
-     font-family: "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 pre {
-     font: 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      font-weight: bold !important;
      width: 100%;
      height: 8px;
@@ -316,7 +319,7 @@ thead {
 
 th {
      font-size: 8pt;
-     padding: 3px 2px;
+     padding: 8px 2px;
      color: #c9ceff;
      border-top: 1px solid #443da0;
      border-bottom: 1px solid #443da0;
@@ -513,7 +516,7 @@ tfoot tr:nth-child(n+1) {
 }
 
 .snarkTorrents tt {
-     font-family: "Droid Sans Mono", "Noto Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      font-size: 8pt;
      background: #2d103f;
      color: #fff;
@@ -787,7 +790,7 @@ td:first-child {
      text-align: center !important;
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), .snarkTorrentAction {
      width: 72px !important;
 }
@@ -938,6 +941,10 @@ td[onclick]:hover {
      border-top: 1px inset #12111f !important;
 }
 
+_:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkTorrentEven td {
+     border-top: 1px solid #12111f !important;
+}
+
 .snarkTorrentOdd {
      background: #010008 !important;
 }
@@ -1041,13 +1048,14 @@ div.percentBarInner.percentBarComplete {
 
 .thumb {
      max-width: 16px;
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
 }
 
 .thumb:hover {
      max-width: 96px;
      max-height: 64px;
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
+     margin-left: -4px;
 }
 
 .snarkNewTorrent {
@@ -1128,7 +1136,7 @@ div.percentBarInner.percentBarComplete {
      width: 100%;
 }
 
-.snarkConfigTitle:hover a, .snarkConfigTitle a:hover, .toggleview:hover {
+.snarkConfigTitle:hover a, .snarkConfigTitle a:hover, .snarkConfigTitle a:visited:hover, .toggleview:hover {
      color: #652787 !important;
 }
 
@@ -1138,7 +1146,6 @@ div.percentBarInner.percentBarComplete {
 
 .snarkConfigTitle a:hover img, .snarkConfigTitle a:focus img, .toggleview:hover img, .toggleview:focus img {
      filter: drop-shadow(0 0 1px #652787);
-     -webkit-filter: drop-shadow(0 0 1px #652787);
 }
 
 .snarkConfigTitle a:active img, .toggleview:active img {
@@ -1150,7 +1157,6 @@ div.percentBarInner.percentBarComplete {
      margin-right: -2px;
      margin-top: -1px;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 /*     filter: sepia(100%) hue-rotate(150deg) drop-shadow(0 0 1px #000);*/
 }
 
@@ -1209,8 +1215,7 @@ a:link {
 }
 
 a:visited {
-     color: #362e9e;
-     color: #5D599F;
+     color: #4e47bf;
 }
 
 a:hover, a:focus {
@@ -1227,7 +1232,7 @@ input {
      padding: 3px 4px !important;
      cursor: pointer;
      text-align: left;
-     color: #443da0;
+     color: #4e47bf;
      border: 1px solid #443da0;
      border-radius: 2px;
      background: #001;
@@ -1258,11 +1263,11 @@ input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
 
 input[type="submit"], input[type="reset"], a.control, a.controld, a.controld:hover, a.controld:focus, a.controld:active,
 input:disabled[type="submit"], input:disabled:hover[type="submit"], input:disabled:active[type="submit"]  {
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
      min-width: 95px !important;
      padding: 6px 8px !important;
      text-align: center;
-     color: #443da0 !important;
+     color: #4e47bf !important;
      border: 1px solid #3e3f8f !important;
      border-bottom-color: #14144f !important;
      border-right-color: #14144f !important;
@@ -1270,7 +1275,6 @@ input:disabled[type="submit"], input:disabled:hover[type="submit"], input:disabl
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      box-shadow: inset 0 0 0 1px #000;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 a.control, a.controld, a.control:hover, a.controld:hover, a.control:focus, a.controld:focus {
@@ -1284,15 +1288,6 @@ a.control img, a.controld img {
      margin: 0;
      padding: 0;
 }
-
-/*
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-input[type="submit"],
-input[type="reset"] {
-	padding: 5px !important;
-}
-}
-*/
 
 input[type="submit"]:hover, input[type="submit"]:focus, input[type="reset"]:hover, input[type="reset"]:focus, a.control:hover, a.control:focus {
      color: #652787 !important;
@@ -1325,17 +1320,14 @@ input[type=image], thead img {
 
 input[type="image"], a img {
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 input[type="image"]:hover, a img:hover, input[type="image"]:focus, a img:focus {
      filter: saturate(200%) drop-shadow(0 0 2px #652787) !important;
-     -webkit-filter: saturate(200%) drop-shadow(0 0 2px #652787) !important;
 }
 
 thead a img:hover, thead a img:focus, thead a:hover img, thead a:focus img {
      filter: saturate(200%) hue-rotate(80deg) drop-shadow(0 0 2px #652787) !important;
-     -webkit-filter: saturate(200%) hue-rotate(80deg) drop-shadow(0 0 2px #652787) !important;
 }
 
 input[type="checkbox"], .optbox, input[type="radio"] {
@@ -1343,15 +1335,21 @@ input[type="checkbox"], .optbox, input[type="radio"] {
      min-width: 16px !important;
      min-height: 16px !important;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
 
 input[type="checkbox"]:hover, .optbox:hover, input[type="radio"]:hover,
 input[type="checkbox"]:focus, .optbox:focus, input[type="radio"]:focus {
-     box-shadow: 0 0 3px 1px #f00;
-     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 2px #652787);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 2px #652787);
+     outline: none;
+     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 5px #652787);
+}
 
+label {
+     cursor: pointer;
+}
+
+thead a img:hover {
+     mix-blend-mode: normal !important;
+     filter: drop-shadow(0 0 1px #f60) !important;
 }
 
 .snarkTorrentAction {
@@ -1405,8 +1403,8 @@ input[type=text]:hover, input.r:hover {
 input[type=text]:focus, textarea:focus, input.r:focus, textarea[name="i2cpOpts"]:focus, input[name="nofilter_dataDir"]:focus {
      color: #7166ff;
      background: #000;
+     box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
      filter: drop-shadow(0px 0 1px #99f);
-     -webkit-filter: drop-shadow(0px 0 1px #99f);
      transition: ease all 0.3s 0s;
 }
 
@@ -1465,7 +1463,7 @@ select {
      padding: 5px 20px 5px 4px;
      cursor: pointer;
      text-overflow: ellipsis;
-     color: #443da0;
+     color: #4e47bf;
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
      border-right-color: #14144f;
@@ -1498,17 +1496,15 @@ select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right 3px center no-repeat !important;
 }
 
-/*
-select:nth-child(2) {
-     margin-left: -16px;
+select::-ms-expand {
+     display: none;
 }
-*/
 
 textarea {
-     font: 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      font-weight: bold;
      padding: 1px 4px 0;
-     color: #443da0;
+     color: #4e47bf;
      border: 1px solid #443da0;
      border-radius: 2px;
      background: #001;
@@ -1534,7 +1530,6 @@ img:hover {
 
 a:hover img, a:focus img {
      filter: drop-shadow(0 0 1px #652787);
-     -webkit-filter: drop-shadow(0 0 1px #652787);
      mix-blend-mode: normal;
 }
 
@@ -1625,6 +1620,14 @@ img.thumb {
      background: #010010;
 }
 
+_:-ms-lang(x), #trackerselect tr:nth-child(odd) {
+     border-bottom: 1px solid #000;
+}
+
+_:-ms-lang(x), #trackerselect tr:last-child {
+     border-bottom: 1px solid #120f35;
+}
+
 #trackerselect tr:first-child {
      font-weight: bold;
      border-bottom: 1px solid #120f35;
@@ -1659,11 +1662,25 @@ img.thumb {
 
 .trackerconfig th {
      min-width: 50px;
-     padding: 7px 0;
+     padding: 7px 5px;
 }
 
 .trackerconfig th:first-child {
-     background: url(/themes/snark/ubergine/images/nuke.png) center right 8px no-repeat;
+     background: url(/themes/snark/ubergine/images/nuke.png) center center no-repeat;
+}
+
+.trackerconfig td:first-child {
+     text-align: right !important;
+}
+
+.knownTracker td:first-child {
+     text-align: center !important;
+}
+
+.trackerconfig th:first-child, .trackerconfig td:first-child {
+     padding: 5px 10px !important;
+     width: 5%;
+     min-width: 30px !important;
 }
 
 .trackerconfig td {
@@ -1682,11 +1699,6 @@ img.thumb {
      border: 1px solid #443da0;
      background: #001;
      background: linear-gradient(to bottom, #010011, #000) repeat scroll 0 0 #000;
-}
-
-table.trackerconfig td:first-child {
-     width: 70px !important;
-     padding: 5px 10px !important;
 }
 
 .trackerconfig tr:nth-child(even), .snarkConfig tr:nth-child(even) {
@@ -1766,10 +1778,6 @@ table.trackerconfig td:first-child {
      text-align: left !important;
 }
 
-.trackerconfig td:first-child {
-     text-align: right !important;
-}
-
 .configsectionpanel th, .configsectionpanel td {
       font-size: 9pt;
 }
@@ -1789,11 +1797,6 @@ table.trackerconfig td:first-child {
 
 #configs td:nth-child(2) {
      white-space: nowrap;
-}
-
-#configs tr:nth-last-child(6) td {
-     padding-top: 1px !important;
-     padding-bottom: 1px !important
 }
 
 #configs tr:last-child {
@@ -1874,6 +1877,19 @@ table.trackerconfig td:first-child {
 .iframed .newtorrentsection, .iframed .addtorrentsection, .iframed .configsection {
      margin-left: 0;
      margin-right: 0;
+     border-radius: 0;
+     border-left: none;
+     border-right: none;
+}
+
+.iframed .snarkTorrents, .iframed .snarkMessages, .iframed .configsectionpanel, .iframed .snarkDirInfo, .iframed .snarkTorrentInfo {
+     border-radius: 0;
+     border-left: none;
+     border-right: none;
+}
+
+.iframed .snarkTorrentInfo {
+     margin-top: -5px;
 }
 
 .configsection {
@@ -1899,7 +1915,7 @@ table.trackerconfig td:first-child {
 }
 
 form:last-child > .configsectionpanel {
-     margin-top: 10px;
+     margin-top: -1px;
      margin-bottom: -1px;
 }
 
@@ -1918,7 +1934,7 @@ form:last-child > .configsectionpanel {
 }
 
 code {
-     font-family: "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      font-size: 8pt;
      font-weight: bold;
      padding: 0 2px;
@@ -1943,12 +1959,6 @@ input.trackerannounce {
      width: 210px;
 }
 
-/*
-div[class*="section"] {
-     background: #001 !important;
-}
-*/
-
 /* toggle create/add panel view */
 input.toggle_input {
      /* hide checkbox and use label as faux panel heading */
@@ -1957,7 +1967,6 @@ input.toggle_input {
 
 label.toggleview:hover {
      cursor: pointer;
-     color: #f60;
 }
 
 input#toggle_addtorrent:not(checked) + label + hr + table,
@@ -1997,9 +2006,8 @@ input#toggle_createtorrent:checked + label + hr + table {
      display: none;
 }
 
-label.toggleview,
-.snarkConfigTitle a:visited {
-     color: #89f;
+label.toggleview, .snarkConfigTitle a, .snarkConfigTitle a:visited {
+     color: #7972d1 !important;
 }
 
 .peerinfo td:first-child {
@@ -2030,7 +2038,7 @@ label.toggleview,
 
 .debugConnection {
      line-height: 130%;
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #090 !important;
      padding: 0 5px;
 }
@@ -2050,7 +2058,7 @@ label.toggleview,
 }
 
 .debugConnStat, .debugRequests {
-     font-family: "Droid Sans Mono", "Noto Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #ee0;
      color: #995FBF;
 }
@@ -2191,7 +2199,6 @@ td#bwHelp a {
 .knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover {
      opacity: 0.5;
      cursor: not-allowed;
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) !important;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) !important;
 }
 
@@ -2206,10 +2213,9 @@ td#bwHelp a {
      margin: 8px;
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
 
 /* responsive layout */
@@ -2268,9 +2274,25 @@ b.alwaysShow {
 .configsectionpanel .snarkConfigTitle {
      font-size: 10.5pt !important;
 }
+
+.knownTracker a, #trackerselect a {
+     display: inline-block;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     max-width: 210px;
+     white-space: nowrap;
+}
+
+#trackerselect a {
+     max-width: 280px;
+}
 }
 
 @media screen and (max-width: 1400px) {
+.iframed .snarkMessages {
+     margin-top: -4px;
+} 
+
 .addtorrentsection, .newtorrentsection, .configsection {
      margin-left: 0;
      margin-right: 0;
@@ -2281,7 +2303,7 @@ b.alwaysShow {
 }
 
 .configsectionpanel .snarkConfigTitle {
-     margin-top: -12px;
+     margin-top: -1px;
 }
 }
 
@@ -2301,7 +2323,7 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
 
 @media screen and (min-width: 1400px) {
 code, textarea, .snarkMessages li, .snarkMessages a, input, tt {
-     font-size: 9pt !important;
+     font-size: 10pt !important;
 }
 
 a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileName, code, textarea, input[name="nofilter_dataDir"], input, code {
@@ -2316,7 +2338,7 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      padding: 4px 25px 4px 22px;
 }
 
-.snarkConfigTitle, .snarkConfigTitle a, .toggleview {
+.snarkConfigTitle, .snarkConfigTitle a, label.toggleview {
      font-size: 12.5pt !important;
 }
 

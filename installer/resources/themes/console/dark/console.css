@@ -39,7 +39,6 @@ img {
 
 a img:hover, a:focus img  {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 img[src="/flags.jsp?c=a1"], img[src="/flags.jsp?c=a2"] { /* more visibility for anonymous flags */
@@ -60,7 +59,7 @@ pre {
      width: 98%;
      overflow-x: auto;
      text-align: left;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #EE9;
 }
 
@@ -71,7 +70,7 @@ div.logo { /* proxy error "fake" sidebar */
      padding: 10px;
      text-align: center;
      color: #EE9;
-     margin: 0 20px 0 20px;
+     margin: -1px 20px 0;
      border: 1px solid #494;
      background: #000 url(images/camotile2.png);
      width: 185px;
@@ -92,7 +91,6 @@ div.logo { /* proxy error "fake" sidebar */
 .logo a img {
      opacity: 0.6;
      filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 1px #494);
-     -webkit-filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 1px #494);
      margin: 0;
      padding: 0;
      text-align: center;
@@ -101,13 +99,11 @@ div.logo { /* proxy error "fake" sidebar */
 .logo a:hover img {
      opacity: 1;
      filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 2px #f60);
-     -webkit-filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 2px #f60);
 }
 
 .logo a:active img {
      opacity: 1;
      filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 2px #f90);
-     -webkit-filter: sepia(100%) invert(100%) hue-rotate(260deg) drop-shadow(0 0 2px #f90);
 }
 
 div.logo hr {
@@ -120,7 +116,6 @@ div.logo hr {
 
 .logo, .warning {
      filter: drop-shadow(0 0 5px #000);
-     -webkit-filter: drop-shadow(0 0 5px #000);
 }
 
 div.warning {
@@ -161,44 +156,16 @@ div.warning {
      text-align: left;
 }
 
-/* tags the proxy info onto the bottom of the warning box */
-/* comment out the @media .proxyfooter section below to avoid duplication */
-/*
-.proxyfooter {
-     margin: -3px 20px 10px 248px;
-     padding: 0 25px 0 75px;
-     color: #ee9;
-     font-size: 9pt;
-     text-align: right !important;
-     border: 1px solid #494;
-     box-shadow: inset 0 0 0 1px #700;
-     box-shadow: inset 0 0 0 1px #700, inset 0 0 3px 3px #000;
-     background: #000 url(images/camotile2.png);
-     display: none;
-     filter: drop-shadow(0 0 5px #000);
-     -webkit-filter: drop-shadow(0 0 5px #000);
-}
-
-.proxyfooter p {
-     text-align: right;
-     line-height: 130% !important;
-}
-
-.warning {
-     margin-bottom: 0;
-}
-*/
-
 div.routersummaryouter {
      float: left;
      width: 200px;
      margin: 0 0 10px 5px;
      padding: 0;
      border: 0;
-     clear: left;/* fixes a bug in Opera */
+     clear: left; /* fixes a bug in Opera */
      text-align: center;
      display: block;
-     position: absolute;/* so no interference with /home app icons */
+     position: absolute; /* so no interference with /home app icons */
 }
 
 div.routersummary {
@@ -207,9 +174,9 @@ div.routersummary {
      text-align: center;
      border: 1px solid #494;
      background: #000 url(images/camotile2.png) left top;
-     color: #EE9;
+     color: #ee9;
      font-size: 8pt;
-     clear: left;/* fixes a bug in Opera */
+     clear: left; /* fixes a bug in Opera */
      border-radius: 2px;
      float: left;
      box-shadow: 0 1px 5px #000;
@@ -229,7 +196,6 @@ div.routersummary img[src$="i2plogo.png"]:hover {
      opacity: 1;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
      filter: saturate(200%) drop-shadow(0 0 2px #f60);
-     -webkit-filter: saturate(200%) drop-shadow(0 0 2px #f60);
 }
 
 .routersummary a[href="/"], .routersummary a[href="/console"] {
@@ -238,7 +204,6 @@ div.routersummary img[src$="i2plogo.png"]:hover {
 
 .routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
      filter: drop-shadow(0 0 2px #f60) saturate(200%);
-     -webkit-filter: drop-shadow(0 0 2px #f60) saturate(200%);
 }
 
 div.routersummary input[type="text"] {
@@ -295,7 +260,7 @@ div.routersummary h4 {
      margin: -6px -9px -8px !important;
      padding: 6px 1px;
      background: #000;
-     background: linear-gradient(to right, #001900 0%, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900 100%);
+     background: linear-gradient(to right, #001900, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900);
      text-decoration: none !important;
      color: #2b2;
      line-height: 120%;
@@ -342,16 +307,8 @@ div.routersummary table {
    min-height: 14px;
 }
 
-/*
-#sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
-     padding-top: 1px;
-     padding-bottom: 1px;
-}
-*/
-
 #sb_localtunnels {
      margin: -4px -7px -7px -8px !important;
-/*     text-transform: capitalize;*/
 }
 
 #sb_localtunnels td:first-child {
@@ -380,7 +337,7 @@ div.routersummary table {
 #sb_warning { /* check connection/firewall */
      padding: 4px 4px 4px 26px;
      background: #000;
-     background: url(images/warning24x24.png) 4px center no-repeat, linear-gradient(to right, #001900 0%, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900 100%);
+     background: url(images/warning24x24.png) 4px center no-repeat, linear-gradient(to right, #001900, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900);
      background-size: 22px 22px, 100% 100%;
      text-align: center;
      line-height: 120%;
@@ -684,7 +641,7 @@ div.main#news {
 /* end main */
 
 #news h3 {
-     padding: 4px 6px 5px;
+     padding: 4px 8px 5px 10px;
      letter-spacing: 0.08em !important;
      word-spacing: normal !important;
 }
@@ -694,11 +651,7 @@ div.main#news {
      text-transform: none;
 }
 
-#news h3 > * {
-     vertical-align: middle;
-}
-
-div.news h3, div.fixme h3 {
+div.news h3, #newspage h3 {
      text-align: left !important;
      font-size: 10pt !important;
      letter-spacing: 0.03em;
@@ -708,7 +661,7 @@ div.news h3, div.fixme h3 {
 div.main textarea {
      background: #000;
      color: #EE9;
-     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      resize: none;
 }
 
@@ -716,7 +669,6 @@ div.news {
      margin: -1px 5px 0 206px;
      padding: 6px 20px 5px;
      border: 1px solid #494;
-     background: #000;
      background: #000 url(images/news.png) no-repeat scroll bottom right;
      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url("images/news.png") no-repeat scroll right bottom,  url("images/camotile2.png") #000 !important;
      background-blend-mode: lighten;
@@ -813,9 +765,9 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 
 /* top navigation */
 
-div.confignav {
+.confignav {
      background: url(images/header.png) repeat-x scroll center center #000;
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
      padding: 7px 5px !important;
      margin: -1px -16px 15px;
      border: 1px solid #494;
@@ -848,7 +800,7 @@ div.confignav {
 }
 
 .tab {
-     background: linear-gradient(to bottom, #001900 0%, #002900 50%, #000 51%, #000 100%) !important;
+     background: linear-gradient(to bottom, #001900, #002900 50%, #000 51%, #000) !important;
      box-shadow: inset 0 0 0 1px #000;
 }
 
@@ -919,6 +871,12 @@ div.widepanel h3 {
 
 #graphs .messages {
      margin-top: 15px;
+}
+
+.main#events .messages {
+     margin-top: 26px;
+     margin-bottom: -13px;
+     box-shadow: inset 0 0 0 1px #700 !important;
 }
 
 div.graphspanel {
@@ -1104,7 +1062,7 @@ th {
      text-align: center;
      font-size: 9pt;
      background: #000 url(images/header.png) center center repeat-x;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494 !important;
      line-height: 110%;
@@ -1223,7 +1181,7 @@ td img {
 /* end peer sort */
 
 tt {
-     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: bold 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #FF0;
 }
 
@@ -1269,7 +1227,7 @@ div.main li b {
 
 .tidylist code {
      text-align: left;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #dd0;
      padding: 1px 3px;
      background: #030;
@@ -1292,7 +1250,7 @@ ul {
 
 code {
      text-align: left;
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #dd0;
 }
 
@@ -1418,7 +1376,7 @@ h2 a:hover {
 h3, h3.welcome {
      border: 1px solid #494;
      border-left: 5px solid #494;
-     padding: 6px 10px 5px;
+     padding: 6px 10px;
      margin: 12px 0 10px 0;
      border-radius: 0 2px 2px 0;
      background: #000 url(images/header.png) center center ;
@@ -1471,7 +1429,6 @@ button, button:visited {
      background: #000;
      color: #494;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 button:hover, button:focus {
@@ -1500,9 +1457,8 @@ button:active {
      margin: 0 0 10px 0;
 }
 
-
 .langbox {
-     margin: 4px 4px 2px 5px;
+     margin: 4px 3px 2px 5px;
      padding: 0;
      color: #ee9;
      font-size: 7pt;
@@ -1510,28 +1466,28 @@ button:active {
      text-align: right;
      float: right;
      vertical-align: middle;
+     line-height: 16px;
 }
 
 .langbox img {
-     opacity: 0.5;
+     opacity: 0.7;
      padding: 0 !important;
      margin: 0 1px -2px !important;
-     transition: ease opacity 0.3s 0s;
+     transition: ease opacity 0.3s;
      border: 1px solid #000;
 }
 
-.langbox img:hover {
+.langbox img:hover, .langbox a:focus img {
      opacity: 1;
      transform: scale(1.1);
 }
 
-.langbox img:active {
+.langbox a:active img {
      transform: scale(1);
 }
 
 img[src*="bound"], img[src*="bound"]:hover {
      filter: sepia(100%) hue-rotate(70deg) !important;
-     -webkit-filter: sepia(100%) hue-rotate(70deg) !important;
 }
 
 hr {
@@ -1622,14 +1578,21 @@ input[type="image"] {
 input[type="checkbox"], .optbox {
      min-width: 16px !important;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
-     vertical-align: middle;
+     vertical-align: sub;
      background: none;
 }
 
 input[type="checkbox"]:hover, .optbox:hover, input[type="checkbox"]:focus, .optbox:focus {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
+     outline: none;
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60);
+}
+
+label {
+     cursor: pointer;
+}
+
+.main#config_clients label[for="0"] {
+     cursor: default;
 }
 
 input[type="file"]  {
@@ -1640,6 +1603,7 @@ input[type="file"]  {
      padding: 0 !important;
      cursor: pointer;
      margin: 5px 8px;
+     font-weight: normal;
 }
 
 input[type="file"]:hover, input[type="file"]:active {
@@ -1675,7 +1639,11 @@ fieldset {
 }
 
 select {
-     background: #000;
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
      color: #494;
      margin: 5px 10px;
      border: 1px outset #191;
@@ -1683,7 +1651,7 @@ select {
      min-width: 110px;
      font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
-     padding: 2px 16px 2px 2px;
+     padding: 4px 16px 4px 4px !important;
      cursor: pointer;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -1710,31 +1678,12 @@ select:hover {
      box-shadow: inset 0 1px 1px 0 #ee9;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-select {
-     padding: 3px 4px !important;
-}
-
-select option {
-     background: #000 !important;
-     color: #f60 !important;
-}
-}
-
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-select {
-     -moz-appearance: none;
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
-}
-
-select:hover, select:active {
+select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
 }
 
-select:focus {
-     background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
-}
+select::-ms-expand {
+     display: none;
 }
 
 textarea {
@@ -1745,7 +1694,7 @@ textarea {
      padding: 5px;
      margin: 10px;
      border-radius: 2px;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      min-height: 100px;
      min-width: 97%;
      width: calc(100% - 15px);
@@ -1761,24 +1710,25 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      color: #ee9 !important;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: filter ease 0.3s 0s;
+     font-weight: bold;
+     outline: none;
 }
 
-input[readonly="readonly"]:focus {
+input[readonly]:focus {
      filter: none !important;
-     -webkit-filter: none;
      color: #161 !important;
+     font-weight: normal;
 }
 
 textarea#advancedsettings:focus {
      box-shadow: inset 0 0 0 1px #880;
      filter: none;
-     -webkit-filter: none;
 }
 
 textarea[readonly]:focus {
      box-shadow: inset 0 0 3px 3px #000;
+     font-weight: normal;
 }
 
 input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
@@ -1787,11 +1737,11 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
      border-right: 1px solid #171;
      background: linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%);
      filter: drop-shadow(0 0 1px #131);
-     -webkit-filter: drop-shadow(0 0 1px #131);
 }
 
 input[type="submit"], input[type="reset"], button {
      padding: 5px 8px !important;
+     outline: none;
 }
 
 .statusnotes {
@@ -1844,10 +1794,12 @@ input[type="submit"], input[type="reset"], button {
      width: 90%;
      width: calc(100% - 45px);
      padding-bottom: 5px !important;
+     text-align: left;
 }
 
 .joblog ol li:last-child {
      border: none;
+     text-align: left;
 }
 
 .joblog ol:empty {
@@ -2236,7 +2188,7 @@ table#udpconnections table i {
       margin-top: 3px !important;
 }
 
-#udpconnections tr:hover, #ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover {
+#udpconnections tr:hover, #ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #netdboverview table tr:hover, #portfaq tr:hover {
      background: #020;
 }
 
@@ -2290,6 +2242,11 @@ table#udpconnections table i {
 
 table#ntcpconnections {
      overflow-x: scroll !important;
+}
+
+.backlogged {
+     font-size: 14pt;
+     line-height: 0;
 }
 
 pre#transports {
@@ -2401,13 +2358,11 @@ div.themechoice {
 
 .themechoice .optbox:checked + object {
      filter: none;
-     -webkit-filter: none;
      opacity: 1;
 }
 
 .themechoice:hover object {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
      transition: ease filter 0.3s 0s;
 }
 
@@ -2445,7 +2400,7 @@ div.themechoice {
 
 .themechoice .optbox {
      min-width: 114px !important;
-     min-height: 72px !important;
+     min-height: 80px !important;
      outline: 1px !important; /* placement guide */
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
      margin-left: -33px;
@@ -2467,13 +2422,43 @@ div.themechoice {
 }
 }
 
-div#themeoptions {
+#themeoptions {
      clear: both;
-     padding-top: 5px;
+     border-top: 1px solid #494;
+     margin: 0 -7px 5px;
+     position: relative;
+     top: 8px;
+     padding: 5px 10px 8px 5px;
+}
+
+#themeoptions br {
+     display: none;
+}
+
+#themeoptions label {
+     white-space: nowrap;
+     margin: 4px 10px 4px 0 !important;
+     display: inline-block;
+}
+
+p#helptranslate {
+     position: relative;
+     top: 8px;
+     margin: 0 -7px;
+     padding: 15px 10px 15px 50px !important;
+     text-align: left !important;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494;
+     background: url(/themes/console/images/info/notice.png) left 14px center no-repeat, #000;
+     background-size: 28px 28px;
 }
 
 #themeoptions input {
      margin-left: 5px;
+}
+
+#themeoptions input[type="checkbox"] {
+     min-height: 16px;
 }
 
 div.themelabel {
@@ -2482,7 +2467,7 @@ div.themelabel {
      margin-right: -4px;
      padding: 4px 2px 5px;
      background: #001000;
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%);
+     background: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000);
      color: #bb7;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -2622,7 +2607,7 @@ td#themeselect {
 div.ui_lang { /* lang text label */
      text-align: center;
      background: #001000;
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%);
+     background: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000);
      padding: 3px 2px 4px;
      overflow: hidden;;
      text-overflow: ellipsis;
@@ -2657,7 +2642,7 @@ div#langsettings {
 }
 
 .formaction#langui {
-     margin: -10px -8px -15px;
+     margin: 7px -8px -15px;
      padding: 5px;
      border: 1px solid #494;
      background: #000;
@@ -2801,8 +2786,20 @@ table#reseedconfig input[type="text"], table#reseedconfig input[type="password"]
 
 table#reseedconfig textarea, #i2pupdates textarea {
      width: 100%;
-/*     width: calc(100% - 5px);*/
      resize: none;
+}
+
+#reseedconfig tr:nth-child(2) br {
+     display: none;
+}
+
+#reseedconfig tr:nth-child(2) label {
+     white-space: nowrap;
+     margin-right: 10px;
+}
+
+#reseedconfig td:first-child {
+     line-height: 120%;
 }
 
 .formaction#shutdown, .formaction#restart, .formaction#systray, .formaction#runonstart, .formaction#dumpthreads, .formaction#browserstart {
@@ -2858,7 +2855,6 @@ table#bandwidthconfig {
 table#bandwidthconfig td:first-child {
      width: 200px;
      white-space: nowrap;
-     font-weight: bold;
 }
 
 table#bandwidthconfig {
@@ -3001,7 +2997,6 @@ p#webappconfig + p, p#pluginconfigtext {
 #pluginconfig table {
      border: 1px solid #151;
      filter: drop-shadow(0 0 3px #000);
-     -webkit-filter: drop-shadow(0 0 3px #000);
 }
 
 #pluginconfig table td:first-child {
@@ -3056,6 +3051,16 @@ h3.tabletitle + .statusnotes, table.tunneldisplay {
      margin-top: -1px;
 }
 
+.tunnels_client th:first-child, .tunnels_client td:first-child {
+     width: 4%;
+}
+
+.tunnels_client th:nth-child(2), .tunnels_client th:nth-child(3),
+.tunnels_client td:nth-child(2), .tunnels_client td:nth-child(3) {
+     width: 7%;
+     white-space: nowrap;
+}
+
 .statusnotes + .statusnotes {
      margin-top: -6px;
 }
@@ -3087,9 +3092,10 @@ table#i2pupdates {
 }
 
 table#i2pupdates td:first-child {
-     width: 100px;
+     width: 15%;
      white-space: nowrap;
      padding-left: 10px;
+     line-height: 120%;
 }
 
 table#i2pupdates td {
@@ -3121,8 +3127,6 @@ table#loggingoptions td {
 }
 
 table#loggingoptions td:first-child {
-     width: 110px;
-     white-space: nowrap;
      padding-right: 3px;
 }
 
@@ -3130,17 +3134,8 @@ table#loggingoptions td:first-child {
      width: 170px;
 }
 
-#loggingoptions td:nth-child(4) {
-     width: auto;
-}
-
 #loggingoptions tr:nth-last-child(2) {
      white-space: nowrap;
-}
-
-#loggingoptions tr:last-child td {
-     padding: 5px 4px;
-     text-align: right;
 }
 
 #loggingoptions input[type="text"], #loggingoptions select, #loggingoptions textarea {
@@ -3204,10 +3199,6 @@ table#sidebarconf {
      width: 60px;
 }
 
-#sidebarconf td:nth-child(2) {
-     font-weight: bold;
-}
-
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
      width: 75px;
      padding: 0;
@@ -3240,7 +3231,7 @@ table#sidebarconf {
 
 #sidebarconf th:nth-child(1), .homelinkedit th:first-child, #consolepass th:first-child {
      text-align: center;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
      text-indent: -99999px;
 }
 
@@ -3292,9 +3283,9 @@ h3#servicedebug a, h3#graphinfo a {
 
 }
 
-.main#tunnels h3 a[href^="/configtunnels#"]:hover {
+.main#tunnels h3 a[href^="/configtunnels#"]:hover, h3.tabletitle a:hover::after,
+.main#tunnels h3 a[href^="/configtunnels#"]:focus, h3.tabletitle a:focus::after {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 /* configclients */
@@ -3320,6 +3311,10 @@ table#clientconfig th:last-child {
      margin-top: -2px;
 }
 
+#webappconfig th:last-child {
+     text-align: left;
+}
+
 table#externali2cp {
      margin-bottom: 4px !important;
 }
@@ -3337,25 +3332,19 @@ table#externali2cp {
     font-size: 11pt;
 }
 
-div#volunteer {
+#volunteer, #legal, #sidebarhelp, #volunteer, #reachabilityhelp, #configurationhelp, #advancedsettings, #faq {
      border: 1px solid #494;
      padding: 0 20px;
-     margin: 15px 0 10px !important;
-}
-
-div#legal, div#sidebarhelp, div#volunteer, div#reachabilityhelp, div#configurationhelp, div#advancedsettings {
-     border: 1px solid #494;
-     padding: 0 20px;
-     margin: 10px 0;
+     margin: 10px 0 15px;
      background: #000;
 }
 
-div#volunteer {
+#volunteer {
      background: #000 url(images/scarface.jpg) right bottom no-repeat;
      background-size: auto 75%;
 }
 
-div#advancedsettings {
+#advancedsettings {
      padding: 0 15px 10px;
 }
 
@@ -3363,7 +3352,7 @@ div#advancedsettings {
      font-size: 12pt;
 }
 
-div#legal h2, div#sidebarhelp h2, div#volunteer h2, div#reachabilityhelp h2, div#configurationhelp h2, div#advancedsettings h2 {
+#legal h2, #sidebarhelp h2, #volunteer h2, #reachabilityhelp h2, #configurationhelp h2, #advancedsettings h2, #faq h2 {
      padding: 10px;
      text-transform: uppercase;
      font-size: 11pt;
@@ -3375,7 +3364,7 @@ div#legal h2, div#sidebarhelp h2, div#volunteer h2, div#reachabilityhelp h2, div
      background: linear-gradient(to right, #000 0%, #001000 70%, #001300 90%);
 }
 
-div#advancedsettings h2 {
+#advancedsettings h2 {
           margin: -1px -16px 15px !important;
 }
 
@@ -3394,7 +3383,7 @@ table#configinfo {
      background: #000 !important;
      border: none;
      border-bottom: 1px solid #131 !important;
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
 }
 
 #configinfo td {
@@ -3404,19 +3393,11 @@ table#configinfo {
      text-align: justify;
 }
 
-#configinfo .infowarn {
-     border: none;
-     border-bottom: 1px solid #000;
-     box-shadow: none;
-     background-size: 20px 20px !important;
-     padding: 7px 10px 7px 36px !important;
-}
-
 .main#help h2 a:hover {
      color: #ee9 !important;
 }
 
-div#sidebarhelp h3 {
+#sidebarhelp h3, #faq h3 {
      padding: 10px;
      text-transform: uppercase;
      font-size: 10.5pt;
@@ -3429,7 +3410,7 @@ div#sidebarhelp h3 {
      border: 1px solid #494;
 }
 
-div#changelog h2 {
+#changelog h2 {
      padding: 10px;
      text-transform: uppercase;
      font-size: 11pt;
@@ -3440,7 +3421,7 @@ div#changelog h2 {
      margin: 0 0 -11px !important;
 }
 
-div#changelog pre {
+#changelog pre {
      padding: 10px 10px 10px 20px;
      max-height: 600px;
      overflow-y: scroll;
@@ -3453,17 +3434,114 @@ div#changelog pre {
 
 p#fullhistory {
      text-align: right;
-     margin-top: -11px;
+     margin-top: -12px;
+     margin-bottom: 11px;
      border: 1px solid #494;
-     border-top: none;
      padding: 6px 10px;
      background: #000;
-     border-top: 1px solid #494;
+     position: relative;
+     z-index: 999;
 }
 
 ul#upnphelp li:last-child, #legal ul li:last-child {
      padding-bottom: 0;
 }
+
+.main#help td.infohelp, .main#help td.infowarn {
+     background-size: 24px 24px !important;
+     padding-left: 46px !important;
+}
+
+.main#help #configinfo .infowarn {
+     border: none;
+     border-bottom: 1px solid #000;
+     box-shadow: none;
+     background-size: 20px 20px !important;
+     padding: 7px 10px 7px 36px !important;
+}
+
+/* mini faq */
+
+#faq h3 {
+     padding-left: 35px !important;
+     background: url(/themes/console/images/info/question.png) 10px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+     background-size: 18px 18px, 100% 100% !important;
+     text-transform: none;
+     font-size: 10.5pt !important;
+     letter-spacing: 0;
+     word-spacing: 0;
+}
+
+#faq p.infohelp {
+     margin: -1px -11px 9px;
+}
+
+#portfaq {
+     margin: 9px -10px 10px;
+     width: auto;
+}
+
+#portfaq td, #portfaq th {
+     padding-top: 10px !important;
+     padding-bottom: 10px !important;
+}
+
+#portfaq th:first-child, #portfaq td:first-child {
+     font-weight: bold;
+     text-align: right;
+}
+
+#portfaq .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#portfaq th {
+     text-align: left;
+     padding: 8px 5px !important;
+}
+
+#portfaq th[colspan="3"] {
+     text-align: left;
+     font-size: 10.5pt !important;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     padding: 8px 10px !important;
+}
+
+#portfaq td[colspan="3"] {
+     font-weight: normal;
+}
+
+#portfaq td:nth-child(2) {
+     white-space: nowrap;
+}
+
+#portfaq td:first-child {
+     padding-left: 10px;
+}
+
+#portfaq td:last-child, #portfaq td[colspan="3"] {
+     text-align: justify;
+     padding-right: 10px;
+}
+
+#faq ul {
+     margin-bottom: 15px;
+}
+
+#faq code {
+     user-select: all;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+}
+
+#faq li code {
+     margin-left: 10px;
+}
+
+/* end mini faq */
+/* end help */
 
 /* netdb (main section) */
 
@@ -3531,8 +3609,8 @@ table[cellspacing="30"] > tbody > tr > td:first-child > table > tbody > tr > th:
 th > img[src^="/imagegen"] { /* scale down header images */
      height: 24px;
      width: 24px;
-     border-radius: 2px;
-     border: 1px solid #000;
+     margin: -1px;
+     border-left: 1px solid #494;
 }
 
 /* Advanced lookup */
@@ -3692,7 +3770,7 @@ table#wrapperlogs {
 
 #logs li {
      list-style: none;
-     font: bold 8pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font: bold 8pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 130%;
      text-align: left;
      display: inline-block;
@@ -3774,52 +3852,52 @@ font[color="#000099"] {
 
 /* /profiles */
 
-table#profiles tr:hover, table#floodfills tr:hover {
+#profilelist tr:hover, table#floodfills tr:hover {
      background: #030;
 }
 
-table#profiles tr:hover td, table#floodfills tr:hover td {
+#profilelist tr:hover td, table#floodfills tr:hover td {
      color: #ee9;
 }
 
-table#profiles th, table#profiles td {
+#profilelist th, #profilelist td {
      text-align: right;
      padding-left: 5px;
 }
 
-table#profiles td {
+#profilelist td {
      color: #bb7;
 }
 
-table#profiles td:nth-child(2), table#profiles th:nth-child(2) {
+#profilelist td:nth-child(2), #profilelist th:nth-child(2) {
      text-align: left;
 }
 
-table#profiles td:first-child, table#profiles th:first-child {
+#profilelist td:first-child, #profilelist th:first-child {
      width: 40px;
 }
 
-table#profiles td:first-child {
+#profilelist td:first-child {
      text-align: right !important;
      padding-left: 3px !important;
 }
 
-table#profiles td:first-child, table#profiles th:first-child, table#profiles td:nth-last-child(2), table#profiles th:nth-last-child(2) {
+#profilelist td:first-child, #profilelist th:first-child, #profilelist td:nth-last-child(2), #profilelist th:nth-last-child(2) {
      white-space: nowrap;
      text-align: center;
 }
 
-table#profiles th:last-child {
+#profilelist th:last-child {
      padding-right: 10px;
 }
 
-table#profiles td:last-child {
+#profilelist td:last-child {
      text-align: right;
      width: 60px;
      white-space: nowrap;
 }
 
-table#profiles td[colspan="8"] { /* profile class separator */
+#profilelist td[colspan="8"] { /* profile class separator */
      background: #040;
      padding: 1px;
      border: 1px inset #000;
@@ -3828,7 +3906,6 @@ table#profiles td[colspan="8"] { /* profile class separator */
 a[href^="configpeer?peer"] {
      font-size: 0;
      filter: drop-shadow(0 0 1px #777);
-     -webkit-filter: drop-shadow(0 0 1px #777);
 }
 
 a[href^="configpeer?peer"]::after {
@@ -3839,7 +3916,6 @@ a[href^="configpeer?peer"]::after {
 
 a[href^="configpeer?peer"]:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 table#profile_defs, table#thresholds {
@@ -4057,7 +4133,7 @@ ul#banlist + hr {
 
 #ipv4, #ipv6, #permabanned tr:nth-child(2) {
      background: #000 url(images/header.png) center center repeat-x;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494;
 }
@@ -4082,7 +4158,7 @@ div.footnote hr {
 .topness {
      font-size: 7.5pt;
      text-align: right;
-     margin-top: -20px !important;
+     margin-top: -10px !important;
      margin-bottom: -5px;
      margin-right: 5px;
 }
@@ -4098,7 +4174,7 @@ div.footnote hr {
 
 /* begin home page */
 
-div.home {
+#homepanel {
      margin: 0 -8px;
 }
 
@@ -4142,6 +4218,8 @@ div.app {
 
 .app a:link, .app a:visited {
      color: #494;
+     padding: 2px;
+     display: inline-block;
 }
 
 div.app:hover {
@@ -4200,7 +4278,7 @@ table.search {
 
 .search tr {
      background: #000 url(images/header.png) center center repeat-x;
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
 }
 
 .search td {
@@ -4239,48 +4317,49 @@ input.search:focus {
 button.search {
      white-space: nowrap;
 }
+
 .appimg {
      height: 35px;
+     padding: 5px 0 8px;
 }
 
-img.app, img.app2p {
+.app img {
      height: 32px;
      width: auto;
      max-height: 32px;
      max-width: 32px;
-     padding: 3px 44px 23px;
-     margin-bottom: 1px;
+     padding: 10px 52px 38px;
+     margin: -8px 0 1px;
 /*     filter: sepia(100%) hue-rotate(70deg); enable for green-tinted app icons */
 }
 
-div.app:hover img.app, a:focus img.app {
+div.app:hover.app img, a:focus .app img {
      filter: drop-shadow(0 0 1px #f60) saturate(200%);
-     -webkit-filter: drop-shadow(0 0 1px #f60) saturate(200%);
      opacity: 1;
      transition: filter ease 0.3s 0s;
 }
 
-table.app {
+.app table {
      background: none;
      border: 0;
      margin: auto;
      width: auto;
 }
 
-tr.app {
+.app tr {
      background: none;
      border: 0;
      margin: 0;
 }
 
-td.app {
+.app td {
      background: none;
      border: 0;
      margin: 0;
      padding: 3px 0 0;
 }
 
-div.applabel {
+.applabel {
      font-size: 8pt;
      margin: 2px 0 0;
      padding: 4px 2px 6px;
@@ -4292,7 +4371,7 @@ div.applabel {
      width: 120px;
      min-width: 72px;
      background: #001000;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%);
+     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000);
      border-radius: 0 0 2px 2px;
      border-top: 1px solid #494;
      white-space: nowrap;
@@ -4301,13 +4380,22 @@ div.applabel {
      color: #494;
 }
 
-div.applabel:hover {
+.applabel:hover {
      background: #000;
      border-top: 1px solid #f60;
      color: #f60;
 }
 
-div.applabel a, div.applabel a:hover {
+.applabel a {
+     max-width: 116px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     padding: 3px 2px !important;
+     display: inline-block;
+}
+
+.applabel a, .applabel a:hover {
      text-decoration: none !important;
      outline: none;
 }
@@ -4437,7 +4525,6 @@ a.viewfullentry::after {
 
 a.viewfullentry:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
@@ -4452,7 +4539,6 @@ table#leasesetdebug th a::after, table#leasesetsummary th a::after {
 
 table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 .main#debug {
@@ -4637,7 +4723,6 @@ table.leaseset th:last-child, table.leaseset td:nth-child(2) {
 
 .leaseset tr:nth-child(2) td:last-child a:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 table#leasesetdebug th, table#leasesetsummary th {
@@ -4701,6 +4786,7 @@ div#sybilnav, div#sybils_summary {
      padding: 10px;
      margin-bottom: 10px;
      line-height: 160%;
+     background: #000;
 }
 
 div#sybilnav {
@@ -4748,7 +4834,6 @@ div#sybilnav {
 }
 
 #sybilnav ul li::before {
-/*     content: '\1F441\00A0'; */
      content: url(/themes/console/images/buttons/show.png);
      mix-blend-mode: luminosity;
      margin-right: 5px;
@@ -4803,7 +4888,7 @@ table.sybil_routerinfo:first-of-type th {
      font-size: 9pt;
 }
 
-p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
+p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals, p.notfound {
      border: 1px solid #494;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
@@ -4879,7 +4964,6 @@ h3#iptransport a::after, h3#advancedconfig a::after {
 
 h3#iptransport a:hover, h3#advancedconfig a:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 table.configtable {
@@ -4970,7 +5054,7 @@ td.optionsave {
      margin-bottom: 0;
 }
 
-h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils, #certs h3 {
+h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils, #certs h3 {
      margin-bottom: 0 !important;
      border-radius: 0;
      border: 1px solid #494;
@@ -4994,11 +5078,6 @@ h3.tabletitle a {
 
 h3.sybils + div, h3.sybils + a[name] + table {
      margin-top: -1px;
-}
-
-p.notfound {
-     border: 1px solid #494;
-     padding: 10px;
 }
 
 h3#transports {
@@ -5031,7 +5110,7 @@ table#pluginconfig, table#i2pupdates, table.homelinkedit, table#peerdefs {
      margin-left: 2px;
 }
 
-h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, h3#webappconfig {
+h3#i2pclientconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile, h3#webappconfig {
      margin-bottom: -14px !important;
 }
 
@@ -5082,18 +5161,15 @@ input#hideme {
 
 #pluginupdater {
      border: 1px solid #494;
-     padding: 5px;
+     padding: 15px 5px 15px 50px;
      margin-top: -11px;
      margin-bottom: 10px !important;
-     background: #000;
+     background: url(/themes/console/images/info/update.png) 12px center no-repeat, #000;
+     background-size: 28px 28px;
 }
 
 #pluginupdater form {
      margin-bottom: 0;
-}
-
-.formaction#pluginupdater {
-      margin-bottom: 5px;
 }
 
 .formaction#tunnelconfigsave, .formaction#homeapps, .formaction#browserstart {
@@ -5103,7 +5179,7 @@ input#hideme {
 h4.embeddedtitle#updateplugins {
      padding: 5px 10px;
      background: #000 url(images/header.png) center center repeat-x;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
      border: 1px solid #494;
      text-align: left;
      text-transform: uppercase;
@@ -5143,8 +5219,8 @@ table#configstats {
      margin-bottom: -2px;
 }
 
-#configstats th {
-     padding: 8px 10px;
+#configstats th, #configstats tr.tablefooter td {
+     padding: 8px 10px !important;
      text-align: left;
 }
 
@@ -5160,9 +5236,21 @@ table#configstats {
      word-spacing: 0.1em;
 }
 
+#configstats td {
+     padding: 6px 5px;
+}
+
 #configstats td:first-child {
      width: 20px;
      white-space: nowrap;
+}
+
+#configstats td:first-child:empty + td > label { /* remove pointer from inert labels */
+     cursor: default;
+}
+
+#configstats td:last-child {
+     border-right: 1px solid #494;
 }
 
 #configstats tr {
@@ -5178,12 +5266,12 @@ table#configstats {
      content: url(images/chart.png);
      vertical-align: bottom;
      filter: sepia(100%) hue-rotate(70deg) !important;
-     -webkit-filter: sepia(100%) hue-rotate(70deg) !important;
 }
 */
 
 #configstats .tablefooter:last-child td {
      background: #000 !important;
+     text-align: right;
 }
 
 #configstats td {
@@ -5216,17 +5304,6 @@ p#enablefullstats {
      border: 1px inset #131;
      text-align: right;
 }
-
-/* experimental webkit scrollbar customization */
-/*
-::-webkit-scrollbar { width: 18px; height: 5px;}
-::-webkit-scrollbar-button { background-color: #f00; color: #fff; display: none;}
-::-webkit-scrollbar-track { background-color: #000;}
-::-webkit-scrollbar-track-piece { background-color: #000;}
-::-webkit-scrollbar-thumb { height: 100px; background-color: #131; border: 4px solid #000;}
-::-webkit-scrollbar-corner { background-color: #999;}
-::-webkit-resizer { background-color: #666;}
-*/
 
 /* infohelp/warn overrides and misc ornamentation */
 
@@ -5282,7 +5359,7 @@ p#sybilinfo {
      vertical-align: middle;
 }
 
-#floodfillconfig .infohelp {
+#floodfillconfig tr:first-child .infohelp {
      background: #000 url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px !important;
@@ -5448,14 +5525,32 @@ p#profiles_overview {
 
 /* end profiles/peers */
 
-@media screen and (max-width: 1220px) {
-#udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2)  {
-     transform: scale(1.05);
-     text-align: center !important;
+/* responsive layout */
+
+@media screen and (max-width: 900px) {
+#ntcpconnections th:last-child:not(old) {
+     font-size: 0;
 }
 
-.main#peers .widescroll td.cells {
-     font-size: 8pt !important;
+#ntcpconnections th:last-child::before {
+     content: url(/themes/console/images/info/backlogged.png) !important;
+}
+
+#ntcpconnections td:last-child {
+     width: 24px !important;
+     white-space: nowrap;
+}
+
+th {
+     font-size: 8pt;
+}
+
+.tunneldisplay .cells {
+     padding: 4px 2px !important;
+}
+
+.langbox {
+     line-height: 15px;
 }
 }
 
@@ -5472,6 +5567,55 @@ p#profiles_overview {
 .tab a {
      padding: 2px 14px;
 }
+
+#plugininstall input[type="text"] {
+     min-width: 200px !important;
+}
+
+table#i2pupdates td:first-child {
+     white-space: normal;
+     width: 30%;
+}
+
+td.optionsave {
+     white-space: normal;
+}
+
+.main#tunnels {
+     padding: 0 5px;
+     min-width: 640px;
+}
+
+.main#tunnels h3 {
+     margin-top: 6px;
+}
+
+.statusnotes:last-child {
+     margin-bottom: 6px;;
+}
+
+#portfaq td:nth-child(2) {
+     white-space: normal;
+}
+
+#faq h3 {
+     font-size: 10pt !important;
+}
+}
+
+@media screen and (max-width: 1220px) {
+#udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2)  {
+     transform: scale(1.05);
+     text-align: center !important;
+}
+
+.main#peers .widescroll td.cells {
+     font-size: 8pt !important;
+}
+
+.main#help h3, #faq h3 {
+     font-size: 10pt !important;
+}
 }
 
 @media screen and (max-width: 1500px) {
@@ -5479,10 +5623,38 @@ p#profiles_overview {
 #sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
    min-height: 12px;
 }
+
+#banlist + h3 {
+     margin-bottom: -2px !important;
+}
+
+.tunnels_client th:first-child:not(old) {
+     font-size: 0;
+}
+
+.tunnels_client th:first-child::after {
+     content: "\21E9\21E7";
+     font-size: 12pt;
+     line-height: 0;
+     vertical-align: middle;
+     letter-spacing: -0.25em;
+}
+
+img.app, img.app2p {
+     padding: 14px 44px 40px;
+}
+
+.applabel {
+     margin-top: 8px;
+}
+
+.main#help h3, #faq h3 {
+     font-size: 10.5pt !important;
+}
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt,
+body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, #changelog pre,
 ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, .confignav {
      font-size: 10pt !important;
 }
@@ -5495,7 +5667,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover,
      margin-left: 232px !important;
 }
 
-pre, #logs li {
+pre, #logs li, .smallhead {
      font-size: 9pt !important;
 }
 
@@ -5512,12 +5684,25 @@ pre, #logs li {
      font-size: 9pt !important;
 }
 
+.routersummary button {
+     font-size: 10pt !important;
+}
+
 div.app {
      min-width: 138px;
 }
 
+img.app, img.app2p {
+     padding: 10px 58px 38px;
+}
+
 .applabel {
-     width: 134px !important;
+     width: 150px !important;
+}
+
+.applabel a {
+     max-width: 148px;
+     font-size: 10pt !important;
 }
 
 th, #configinfo th, code, tt {
@@ -5568,7 +5753,7 @@ div.joblog h3 {
 
 p#fullhistory {
      text-align: right;
-     margin-top: -14px;
+     margin-top: -13px;
 }
 
 div.routersummary img[src$="i2plogo.png"] {
@@ -5598,10 +5783,47 @@ table#permabanned {
 .main#jobs h2 {
      margin-bottom: 10px !important;
 }
+
+div.footnote, div.topness {
+     font-size: 9pt !important;
+}
+
+.main[id^="config_"] th, h4#updateplugins {
+    font-size: 10.5pt !important;
+}
+
+.langbox {
+     margin: 5px 4px 2px 5px;
+}
+
+.langbox img {
+     margin-bottom: -1px;
+}
+
+#help .confignav {
+     padding: 0 !important;
+     position: sticky;
+     top: -1px;
+     z-index: 999;
+}
+
+#help .tab {
+     margin-top: -1px !important;;
+}
+
+.newsAuthor {
+     font-size: 9pt !important;
+     background-size: 15px 15px !important;
+     padding-left: 19px !important;
+}
+
+table#reseedconfig input[type="text"], table#reseedconfig input[type="password"] {
+     width: 250px;
+}
 }
 
 @media screen and (min-width: 1840px) {
-div[id^="config_"] div.confignav {
+div[id^="config_"] .confignav {
      display: flex;
      flex-direction: row;
      flex-wrap: wrap;
@@ -5627,7 +5849,7 @@ div[id^="config_"] .tab a {
      padding: 4px 6px;
 }
 
-div[id^="config_"] div.confignav {
+div[id^="config_"] .confignav {
      padding: 0 !important;
 }
 
@@ -5640,7 +5862,7 @@ div[id^="config_"] .tab:first-child {
 }
 }
 
-/* responsive proxy errors */
+/* proxy errors */
 
 @media screen and (max-width: 800px) {
 .warning {
@@ -5699,3 +5921,13 @@ div[id^="config_"] .tab:first-child {
 }
 }
 /* end proxy errors */
+/* end responsive layout */
+
+/* Edge/IE tweaks */
+
+_:-ms-lang(x), .tunnels_client th:first-child::after {
+     letter-spacing: -0.05em;
+     font-weight: normal;
+}
+
+/* end Edge/IE tweaks */

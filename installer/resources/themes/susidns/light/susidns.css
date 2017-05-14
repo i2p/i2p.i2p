@@ -28,6 +28,10 @@ body.iframed {
      text-shadow: none;
 }
 
+* {
+     outline: none;
+}
+
 #logo {
      margin: -5px 0 -1px;
      text-align: center;
@@ -76,12 +80,15 @@ code, tt, .destaddress {
      font-weight: bold;
      vertical-align: middle;
      font-size: 9pt;
+     position: sticky;
+     top: -1px;
 }
 
 .iframed #navi {
      margin: -11px -11px 10px;
      padding: 7px 5px 6px;
      border-radius: 0;
+     position: static;
 }
 
 #navi a, #navi a:visited {
@@ -93,13 +100,14 @@ code, tt, .destaddress {
      text-transform: capitalize;
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
-     -webkit-filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
 }
 
 #navi a:hover, #navi a:focus {
      background-blend-mode: luminosity;
      filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
-     -webkit-filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+     color: #f60;
+     border: 1px solid #f60;
+     transition: ease border 0.7s;
 }
 
 #navi a:active {
@@ -109,22 +117,22 @@ code, tt, .destaddress {
 }
 
 #navi a.abook {
-     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
+     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 50%, #ebebff) #fff;
      padding: 5px 5px 5px 24px;
 }
 
 #navi a#subs {
-     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
+     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 50%, #ebebff) #fff;
      padding: 5px 5px 5px 24px;
 }
 
 #navi a#config {
-     background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
+     background: url(/themes/console/images/buttons/configure.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 50%, #ebebff) #fff;
      padding: 5px 5px 5px 24px;
 }
 
 #navi a#overview {
-     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff;
+     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 50%, #ebebff) #fff;
      padding: 5px 5px 5px 24px;
 }
 
@@ -200,7 +208,6 @@ form[action="subscriptions"] #content {
      width: 100%;
      resize: none;
      filter: none;
-     -webkit-filter: none;
      box-shadow: none;
 }
 
@@ -445,7 +452,11 @@ p.footer {
      background: #fff;
      opacity: 0.85;
      filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
+}
+
+_:-ms-lang(x), img.illustrate {
+     width: auto;
+     max-width: 600px;
 }
 
 .page {
@@ -468,6 +479,8 @@ p.footer {
 }
 
 textarea {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font-size: 9pt;
      width: 100%;
      border-radius: 2px;
      border: 1px solid #7778bf;
@@ -549,7 +562,6 @@ td.search:first-child {
      margin: 2px 1px;
      background: #fff;
      filter: drop-shadow(0 0 1px #ccc);
-     -webkit-filter: drop-shadow(0 0 1px #ccc);
 }
 
 #filter a:hover {
@@ -578,7 +590,7 @@ td.search:first-child {
      min-width: 300px;
      margin: -1px 10%;
      box-shadow: inset 0 0 0 1px #fff;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
 }
 
 #filter span a {
@@ -602,7 +614,7 @@ td.search:first-child {
 
 p#filtered {
      background: #eef url(/themes/console/images/buttons/filter.png) 8px center no-repeat;
-     background: url(/themes/console/images/buttons/filter.png) 8px center no-repeat, repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.4) 3px, #fff 5px), #fff;
+     background: url(/themes/console/images/buttons/filter.png) 8px center no-repeat, repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.5) 3px, #fff 5px), #fff;
      padding: 10px 200px 10px 32px !important;
 }
 
@@ -626,7 +638,7 @@ form {
 }
 
 th {
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
      font-size: 9pt;
 }
 
@@ -636,7 +648,6 @@ table {
 
 table.book {
      width: 100%;
-/*     border: 1px solid #7778bf;*/
 }
 
 .book th:first-child {
@@ -645,7 +656,7 @@ table.book {
 
 .book th:last-child  {
      background: #fff url(/themes/console/images/buttons/delete.png) center center no-repeat;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 50%);
      width: 16px;
 }
 
@@ -709,7 +720,6 @@ table.book {
      content: url(/themes/console/images/buttons/link.png);
      text-align: center;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
@@ -735,20 +745,18 @@ table.book {
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
 #host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
 #host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 #host_list .destaddress {
      overflow: auto !important;
      white-space: nowrap;
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-weight: normal;
      color: #555;
      padding: 3px !important;
@@ -799,7 +807,7 @@ td.destinations textarea {
 }
 
 #host_details .destaddress {
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      word-break: break-all !important;
      white-space: normal !important;
 }
@@ -822,8 +830,12 @@ td.destinations textarea {
      border-bottom: 1px solid #7778bf;
      padding: 8px 10px 6px;
      margin-top: 0;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #eef 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
      box-shadow: inset 0 0 0 1px #fff;
+}
+
+#idAddress {
+     text-transform: none;
 }
 
 #visualid table {
@@ -862,7 +874,6 @@ img[src^="/imagegen"] {
      border-radius: 2px;
      background: #fff;
      filter: drop-shadow(0 0 1px #ccc);
-     -webkit-filter: drop-shadow(0 0 1px #ccc);
 }
 
 /* end host details */
@@ -879,7 +890,6 @@ img[src^="/imagegen"] {
 
 .names img:hover, .names a:focus img {
      filter: drop-shadow(0 0 1px #f60) !important;
-     -webkit-filter: drop-shadow(0 0 1px #f60) !important;
      box-shadow: 0 0 0 1px #f60;
 }
 
@@ -912,7 +922,8 @@ img[src^="/imagegen"] {
 div#book {
     padding: 8px;
     background: #efefff;
-    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.5) 3px, #fff 5px), #fff;
+    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.5) 3px, #fff 5px), #fff;
+    box-shadow: inset 0 0 0 1px #fff;
 }
 
 .iframed div#book {
@@ -951,18 +962,18 @@ table + p.buttons {
 }
 
 form[action="export"] {
-/*     border: 1px solid #7778bf; */
      margin: -1px 0;
 }
 
 input[type="radio"], input[type="checkbox"] {
      background: none;
      cursor: pointer;
+     min-width: 16px !important;
+     min-height: 16px !important;
 }
 
 input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
-     filter: drop-shadow(0 0 2px #89f);
-     -webkit-filter: drop-shadow(0 0 2px #89f);
+     filter: drop-shadow(0 0 3px #89f);
 }
 
 input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner, button::-moz-focus-inner  {
@@ -979,10 +990,9 @@ input[type="submit"], input[type="reset"], .fakebutton {
      border: 1px solid #999;
      box-shadow: inset 0 0 0 1px #fff;
      background: #eee;
-     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: linear-gradient(to bottom, #fff, #ddd);
      color: #333;
      filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
-     -webkit-filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
      cursor: pointer;
 }
 
@@ -1001,12 +1011,12 @@ a.fakebutton:active {
 
 input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, input[type=reset]:focus, .fakebutton:hover, .fakebutton:focus {
      background: #eee;
-     background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: linear-gradient(to bottom, #ddd, #fff);
      color: #111;
      border: 1px solid #f60;
      box-shadow: inset 0px 0px 0px 1px #fff;
      filter: saturate(100%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
-     -webkit-filter: saturate(100%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+     transition: ease border 0.7s;
 }
 
 input[type="submit"]:active, input[type="reset"]:active, .fakebutton:active {
@@ -1017,106 +1027,106 @@ input[type="submit"]:active, input[type="reset"]:active, .fakebutton:active {
 
 input.accept {
      background: #eee url(/themes/console/images/buttons/yes.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 5px 5px 5px 21px;
+     padding: 5px 7px 5px 22px;
 }
 
 input.accept:hover, input.accept:focus {
      background: #fff url(/themes/console/images/buttons/yes.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 /*
 input.accept[value="Replace"] {
      background: #eee url(/themes/console/images/buttons/edit2.png) no-repeat 6px center;
-     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 5px 5px 5px 21px;
+     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     padding: 5px 7px 5px 22px;
 }
 
 input.accept[value="Replace"]:hover, input.accept[value="Replace"]:focus {
      background: #fff url(/themes/console/images/buttons/edit2.png) no-repeat 6px center;
-     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
 }
 */
 
 input.add {
      background: #eee url(/themes/console/images/buttons/add.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 5px 5px 5px 21px;
+     padding: 5px 7px 5px 22px;
 }
 
 input.add:hover, input.add:focus {
      background: #fff url(/themes/console/images/buttons/add.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.cancel {
      background: #eee url(/themes/console/images/buttons/no.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 5px 5px 5px 21px;
+     padding: 5px 7px 5px 22px;
 }
 
 input.cancel:hover, input.cancel:focus {
      background: #fff url(/themes/console/images/buttons/no.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.delete {
      background: #eee url(/themes/console/images/buttons/delete.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 5px 5px 5px 21px;
+     padding: 5px 7px 5px 22px;
 }
 
 input.delete:hover, input.delete:focus {
      background: #fff url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.export {
      background: #eee url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 5px 5px 5px 21px;
+     padding: 5px 7px 5px 22px;
      margin-top: 5px;
 }
 
 input.export:hover, input.export:focus {
      background: #fff url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.reload {
      background: #eee url(/themes/console/images/buttons/update.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 5px 5px 5px 21px;
+     padding: 5px 7px 5px 22px;
 }
 
 input.reload:hover, input.reload:focus {
      background: #fff url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.search {
      background: #eee url(/themes/console/images/buttons/search.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
      padding: 6px 8px 6px 22px;
 }
 
 input.search:hover, input.search:focus {
      background: #fff url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
@@ -1132,14 +1142,14 @@ input.search[type="text"]:focus {
 
 #visualid .fakebutton {
      background: #eee url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
      padding: 6px 8px 6px 22px;
 }
 
 #visualid .fakebutton:hover, #visualid .fakebutton:focus {
      background: #fff url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
@@ -1176,7 +1186,7 @@ form[action="addressbook"] table {
 }
 
 #navi a {
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eef 50%, #ebebff 100%) #fff !important;
+     background: linear-gradient(to bottom, #fff 50%, #eef 50%, #ebebff) #fff !important;
      padding: 3px 5px !important;
 }
 
@@ -1227,7 +1237,7 @@ input.export {
 }
 
 .headline h4 {
-     background: rgba(0, 0, 0, 0) url("/themes/susidns/images/drive.png") no-repeat scroll 10px 8px;
+     background: rgba(0, 0, 0, 0) url(/themes/susidns/images/drive.png) no-repeat scroll 10px 8px;
 }
 }
 
@@ -1235,13 +1245,25 @@ input.export {
 .iframed .illustrate {
      margin: 0 10px 15px;
 }
+
+#content h3 {
+     font-size: 10pt;
+}
+}
+
+@media screen and (min-width: 1000px) {
+#content h3 {
+     font-size: 10.5pt;
+}
 }
 
 /* end responsive layout */
 
-/* MS Edge 14+ fix */
+/* Edge/IE tweaks */
+
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
+     text-shadow: none !important;
 }
 
+/* end Edge/IE tweaks */

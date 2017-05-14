@@ -42,7 +42,7 @@ body.iframed {
 
 .page {
      color: #310;
-     min-width: 960px !important;
+     min-width: 890px !important;
      margin: 5px 0 0 0;
      font-size: 9pt !important;
      line-height: 160% !important;
@@ -73,6 +73,10 @@ body.iframed {
      color: white;
 }
 
+* {
+     outline: none;
+}
+
 /* topnav */
 
 .snarknavbar {
@@ -80,13 +84,17 @@ body.iframed {
      padding: 9px 0 8px;
      background: #010 !important;
      background-image: linear-gradient(to bottom, #001000 0%, #001900 51%, #000 51%, #000 100%) !important;
-     min-width: 958px;
+     min-width: 888px;
      text-align: center;
      border: 1px solid #494;
+     position: sticky;
+     top: -1px;
+     z-index: 999;
 }
 
 .iframed .snarknavbar {
      margin-top: -2px !important;
+     position: static;
 }
 
 .snarkRefresh:link, .snarkRefresh:visited {
@@ -100,7 +108,7 @@ body.iframed {
      border: 1px solid #494;
      box-shadow: inset 0 0 0 1px #000;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
+     opacity: 0.7;
 }
 
 .snarkRefresh:link:last-child {
@@ -197,7 +205,7 @@ body.iframed {
 /* screenlog */
 
 .snarkMessages {
-     font: normal 8pt "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: normal 8pt "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      line-height: 120%;
      text-align: left;
      margin: 0;
@@ -213,7 +221,7 @@ body.iframed {
      background-blend-mode: screen;
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), .snarkMessages {
      background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, linear-gradient(to bottom, #010, #000);
      background-size: auto 95%;
@@ -246,7 +254,6 @@ _:-ms-lang(x), .snarkMessages {
      height: 11px;
      background-size: 9px 9px;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 .snarkMessages img {
@@ -273,7 +280,7 @@ _:-ms-lang(x), .snarkMessages {
 /* end screenlog */
 
 tt {
-     font-family: "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 .logshim {
@@ -282,7 +289,7 @@ tt {
 
 pre {
      width: 100%;
-     font: 8pt "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      padding: 0;
      text-align: left !important;
      height: 8px;
@@ -342,12 +349,6 @@ th:first-child img {
      margin: 1px -2px 3px 1px !important;
 }
 
-/*
-th:nth-child(2) img {
-     margin: 1px 5px 3px 2px !important;
-}
-*/
-
 tfoot th {
      padding-bottom: 4px !important;
      white-space: normal;
@@ -389,6 +390,7 @@ tfoot tr:nth-child(n+1) {
      font-size: 8pt;
      vertical-align: middle;
      max-width: 160px;
+     width: 1% !important;
 }
 
 .SnarkTorrents {
@@ -406,12 +408,6 @@ tfoot tr:nth-child(n+1) {
      width: 30px;
      padding-right: 0;
 }
-
-/*
-.SnarkTorrents th:nth-child(2) {
-     text-align: center;
-}
-*/
 
 .SnarkTorrents th br {
      display: none; /* kill double height button display */
@@ -613,13 +609,6 @@ table.SnarkDirInfo {
      padding-left: 2px;
 }
 
-/*
-.snarkDirInfo .headerpriority {
-     text-align: center !important;
-     vertical-align: middle;
-}
-*/
-
 .snarkDirInfo tr:last-child {
      border-bottom: 1px solid #494 !important;
 }
@@ -679,7 +668,6 @@ td.subHeaderPriority {
 }
 
 td.priority:last-child {
-/*     min-width: 350px !important;*/
      padding-right: 10px !important;
      text-align: right !important;
      white-space: nowrap;
@@ -746,12 +734,8 @@ td:first-child {
      padding: 1px 1px 1px 1px !important;
      margin: 0 !important;
      text-align: center !important;
-     width: 40px !important;
+     width: 1% !important;
      white-space: nowrap;
-}
-
-_:-ms-lang(x), .snarkTorrentAction { /* MS Edge 14+ wrap fix */
-     width: 72px !important;
 }
 
 .snarkTorrentAction img {
@@ -857,11 +841,11 @@ td.snarkTorrentDownloaded {
      box-shadow: inset 0 0 1px 0 #494;
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), .snarkTorrents tr, .snarkTorrents tr:hover, .snarkDirInfo tr:hover {
      box-shadow: none !important;
-     border-top: 1px solid #494 !important;
-     border-bottom: 1px solid #494 !important;
+     border-top: 1px solid #000 !important;
+     border-bottom: 1px solid #000 !important;
 }
 
 .snarkTorrents tr:hover td, .snarkDirInfo tr:hover td {
@@ -898,6 +882,10 @@ td[onclick^="document.location"]:hover {
 
 .snarkTorrentOdd, .SnarkTorrentEven {
      border-bottom: 1px inset #000 !important;
+}
+
+_:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
+     border-bottom: 1px solid #000 !important;
 }
 
 .snarkTorrentOdd {
@@ -954,6 +942,7 @@ td[onclick^="document.location"]:hover {
      color: #dd7 !important;
      padding-right: 2px;
 }
+
 /*
 div.percentBarOuter {
      background: #000 !important;
@@ -1016,6 +1005,8 @@ div.percentBarInner.percentBarComplete {
      max-height: 80px;
      max-width: 80px;
      transition: ease all 0.3s 0s;
+     margin: -5px 0 -5px -4px;
+     filter: none !important;
 }
 
 .snarkNewTorrent {
@@ -1044,7 +1035,6 @@ div.percentBarInner.percentBarComplete {
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
      font-variant: small-caps !important;
      filter: drop-shadow(0 2px 1px #000);
-     -webkit-filter: drop-shadow(0 2px 1px #000);
      display: inline-block;
      margin: 0 0 -3px !important;
      min-width: 220px;
@@ -1095,7 +1085,6 @@ label.toggleview:active, .snarkConfigTitle a:active {
 
 label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle a:hover img {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:active img {
@@ -1115,7 +1104,6 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
      font-variant: normal;
      font-size: 10.5pt !important;
      filter: none;
-     -webkit-filter: none;
      box-shadow: inset 0 0 0 1px #000;
 }
 
@@ -1241,7 +1229,6 @@ input[type=submit], input[type=submit]:visited, input.disabled:hover {
      min-width: 95px;
      text-align: center;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 input[type=submit]:hover, input[type=submit]:focus, a.control:hover, a.control:focus {
@@ -1278,12 +1265,10 @@ input[type=image], thead img {
 
 input[type="image"], a img {
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
 }
 
 input[type="image"]:hover, a img:hover, input[type="image"]:focus, a:focus img {
      filter: saturate(200%) drop-shadow(0 0 1px #f90) !important;
-     -webkit-filter: saturate(200%) drop-shadow(0 0 1px #f90) !important;
      outline: none;
 }
 
@@ -1325,6 +1310,7 @@ input[type=text], input.r, textarea[name="i2cpOpts"], input[name="nofilter_dataD
      background: #000;
      background: linear-gradient(to bottom, #000 0%, #010 100%);
      box-shadow: inset 0 0 3px 3px #000;
+     outline: none;
 }
 
 input[type=text]:hover, input.r:hover {
@@ -1335,7 +1321,6 @@ input[type=text]:focus, textarea:focus, input.r:focus, textarea[name="i2cpOpts"]
      background: #000;
      color: #ee9;
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
 }
 
@@ -1348,6 +1333,10 @@ textarea[name="i2cpOpts"], input[name="nofilter_dataDir"] {
      width: 70%;
      resize: none;
      overflow: hidden;
+}
+
+input[name="nofilter_dataDir"] {
+     height: auto;
 }
 
 .configsectionpanel input[type=text], input.r, textarea[name="i2cpOpts"], input[name="nofilter_dataDir"], #configs select {
@@ -1378,12 +1367,18 @@ input[type=radio] {
 input[type="checkbox"], input[type="radio"], input[type="checkbox"]:disabled:hover, input[type="radio"]:disabled:hover {
      background: none;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
+     min-width: 16px;
+     min-height: 16px;
+     outline: none;
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60);
+     box-shadow: inset 0 0 2px 1px #f60;
+}
+
+label {
+     cursor: pointer;
 }
 
 input.default {
@@ -1406,16 +1401,24 @@ select {
      background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%) !important;
      -moz-appearance: none;
      -webkit-appearance: none;
+     appearance: none;
      color: #494;
      font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
-     padding: 2px 16px 2px 2px;
+     padding: 4px 16px 4px 4px;
      border-radius: 2px;
      border: 1px outset #191;
      margin: 2px 4px 2px 0;
      min-width: 100px;
      cursor: pointer;
      text-overflow: ellipsis;
+     outline: none;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+select {
+     padding: 6px 16px 6px 6px !important;
+}
 }
 
 select option { /* dropdown menu reverts to normal font-weight */
@@ -1441,16 +1444,8 @@ select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-select {
-     padding: 4px 16px 4px 4px;
-}
-}
-
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-select {
-     padding: 4px;
-}
+select::-ms-expand {
+     display: none;
 }
 
 textarea {
@@ -1460,7 +1455,7 @@ textarea {
      padding: 1px 4px 0;
      border-radius: 2px;
      border: 1px solid #494;
-     font: 8pt "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 textarea:focus {
@@ -1497,7 +1492,6 @@ a.control img, a.controld img, a.control:hover img, a.control img:hover {
      padding: 0;
      vertical-align: middle;
      filter: none !important;
-     -webkit-filter: none !important;
 }
 
 a.control:hover img {
@@ -1571,6 +1565,14 @@ table#trackerselect {
 #trackerselect tr:nth-child(odd) {
      background: #001000;
      border-bottom: 1px inset #000;
+}
+
+_:-ms-lang(x), #trackerselect tr:nth-child(odd) {
+     border-bottom: 1px solid #000;
+}
+
+_:-ms-lang(x), #trackerselect tr:last-child {
+     border-bottom: 1px solid #131;
 }
 
 #trackerselect tr:first-child {
@@ -1719,15 +1721,6 @@ table.trackerconfig td:first-child {
      text-align: right !important;
 }
 
-/*
-.trackerconfig td:last-child {
-     white-space: nowrap;
-     overflow: hidden;
-     text-overflow: ellipsis;
-     min-width: 230px;
-}
-*/
-
 #configs td:first-child {
      padding-left: 15px !important;
      line-height: 80%;
@@ -1843,7 +1836,6 @@ table.trackerconfig td:first-child {
 }
 
 .configsection a {
-/*     color: #f60; */
      text-shadow: 0 1px 1px #000;
      font-weight: bold;
 }
@@ -1857,7 +1849,13 @@ code {
      font-size: 8.5pt;
      color: #ff6;
      padding: 0 2px;
-     font-family: "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+}
+
+.snarkAddInfo code {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
 }
 
 .iframed .snarknavbar, .iframed .mainsection, .iframed .addtorrentsection,
@@ -1865,9 +1863,6 @@ code {
       border-left: none !important;
       border-right: none !important;
       border-radius: 0;
-}
-
-.iframed .mainsection, .iframed .addtorrentsection, .iframed .newtorrentsection, .iframed .configsection, .iframed .configsectionpanel {
 }
 
 .routerdown {
@@ -1945,7 +1940,6 @@ label.toggleview, .snarkConfigTitle a:visited {
      padding-bottom: 5px;
 }
 
-
 /* debug */
 
 .debuginfo td:first-child {
@@ -1964,7 +1958,7 @@ label.toggleview, .snarkConfigTitle a:visited {
 }
 
 .debugConnection {
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #ee0;
      line-height: 130%;
      margin-right: 5px;
@@ -1986,7 +1980,7 @@ label.toggleview, .snarkConfigTitle a:visited {
 }
 
 .debugConnStat, .debugRequests {
-     font-family: "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Noto Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #ee0;
 }
 
@@ -2000,6 +1994,7 @@ label.toggleview, .snarkConfigTitle a:visited {
 #totals {
      display: inline-block;
      margin-left: 3px;
+     font-weight: bold;
 }
 
 .priorityHigh, .priorityNormal, .prioritySkip {
@@ -2065,10 +2060,9 @@ td#bwHelp {
      margin-right: 3px;
 }
 
-.knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover {
+.knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover, .knownTracker input[type="radio"]:focus {
      opacity: 0.5;
      cursor: not-allowed;
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) !important;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) !important;
 }
 
@@ -2143,11 +2137,106 @@ td#bwHelp a {
 
 /* end Resource Errors */
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
+
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
+
+_:-ms-lang(x), input[type="radio"], input[type="checkbox"] {
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) !important; /* colorize radios and checkboxes */
+}
+
+_:-ms-lang(x), input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
+     box-shadow: none !important;
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60) !important;
+}
+
+input[type="radio"][disabled]:hover, input[type="radio"][disabled]:focus {
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) !important;
+}
+
+_:-ms-lang(x), .snarkTorrents tr:last-child {
+     border-top: 1px solid #494 !important;
+     border-bottom: 1px solid #494 !important;
+}
+
+/* end Edge fix */
+
+/* custom radios/checkboxes for chrome/blink  */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution:.001dpcm) {
+input[type="checkbox"], input[type="checkbox"]:checked, input[type="checkbox"][disabled], input[type="checkbox"][disabled]:checked {
+     background: linear-gradient(to bottom, #010, #000);
+     width: 19px;
+     height: 19px;
+     border-radius: 2px;
+     -webkit-appearance: inherit;
+     border: 1px solid #494;
+     position: relative;
+     box-sizing: border-box;
+     filter: none !important;
+}
+
+input[type="checkbox"]:checked::before {
+     position: absolute;
+     top: 1px;
+     left: 1px;
+     content: "\2714";
+     border-radius: 1px;
+     font-size: 14pt;
+     color: #69EF68;
+     line-height: 80%;
+     font-family: sans-serif;
+     overflow: hidden;
+     width: 16px;
+     height: 16px;
+}
+
+input[type="radio"], input[type="radio"]:checked, input[type="radio"][disabled], input[type="radio"][disabled]:checked {
+     background: linear-gradient(to bottom, #010, #000);
+     width: 19px;
+     height: 19px;
+     box-shadow: inset 0 0 2px green;
+     border-radius: 50%;
+     -webkit-appearance: none;
+     border: 1px solid #494;
+     position: relative;
+     box-sizing: border-box;
+     filter: none !important;
+}
+
+input[type="radio"]:checked::before {
+     content: "";
+     position: absolute;
+     border-radius: 50%;
+     left: 25%;
+     top: 25%;
+     width: 9px;
+     height: 9px;
+     background: #69EF68;
+}
+
+input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
+     background: #000;
+     filter: none !important;
+     box-shadow: 0 0 1px 1px #f60;
+}
+
+input[type="checkbox"][disabled], input[type="radio"][disabled], input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
+input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked, input[type="checkbox"][disabled]:checked:hover, input[type="radio"][disabled]:checked:hover,
+.knownTracker input[type="radio"]:hover, .knownTracker input[type="radio"]:checked:hover, .knownTracker input[type="radio"][disabled]:hover, .knownTracker input[type="radio"][disabled]:checked:hover {
+     filter: none !important;
+     box-shadow: none !important;
+     opacity: 0.5;
+}
+
+.priority input[type="radio"] {
+     transform: scale(0.8);
+}
+}
+
+/* end custom radios/checkboxes */
 
 /* responsive layout */
 
@@ -2199,6 +2288,18 @@ b.alwaysShow {
 td#bwHelp a {
      margin-left: 2px;
 }
+
+.knownTracker a, #trackerselect a {
+     display: inline-block;
+     max-width: 210px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+#trackerselect a {
+     max-width: 300px;
+}
 }
 
 @media screen and (min-width: 1100px) {
@@ -2247,12 +2348,6 @@ td#bwHelp a {
 .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 11pt !important;
 }
-
-.snarknavbar {
-     position: sticky;
-     top: -1px;
-     z-index: 999;
-}
 }
 
 @media screen and (min-width: 1400px) {
@@ -2286,11 +2381,6 @@ body, .snarkTorrents td, .snarkAddInfo, th, td,  code, textarea, input, input[ty
 
 tt, .snarkTorrents tt, .snarkMessages, .snarkMessages a {
      font-size: 9pt !important;
-}
-
-select {
-     padding-top: 4px;
-     padding-bottom: 4px;
 }
 
 textarea[name="i2cpOpts"] {

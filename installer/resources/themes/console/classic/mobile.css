@@ -72,35 +72,38 @@ table#sb_localtunnels td {
 
 table[id^="sb_"] tr:nth-child(even) td {
      background: #eef;
-     background: rgba(238, 238, 255, 0.4);
+     background: rgba(240, 240, 255, 0.5);
 }
 
 table[id^="sb_"] tr:nth-child(odd) td {
      background: #ddf;
-     background: rgba(221, 221, 255, 0.4);
+     background: rgba(220, 220, 255, 0.5);
 }
 
 table[id^="sb_"] tr:hover td {
-     background: #ccf !important;
+     background: #ffe !important;
+     transition: ease background 0.3s;
 }
 
 #sb_services {
      text-align: center;
 }
 
-/*
-#sb_services a {
-     display: inline-block;
-     width: 24% !important;
-     min-width: 100px;
-     box-sizing: border-box;
-     white-space: nowrap;
-     border: none !important;
-}
-*/
-
 #sb_localtunnels td:nth-child(2) {
      width: auto !important;
+}
+
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-bottom: -7px !important;
+}
+
+#sb_internals, #sb_services, #sb_advanced {
+     margin-top: -6px !important;
+}
+
+
+#sb_internals a, #sb_services a, #sb_advanced a {
+     max-width: 600px;
 }
 
 .routersummary button[type="submit"], .routersummary button[type="cancel"] {
@@ -128,10 +131,14 @@ div.main {
      margin: -1px 0 0 !important;
 }
 
-@media screen and (min-width: 1500px) {
+.confignav {
+     padding: 3px 5px !important;
+     line-height: 180%;
+}
 
+@media screen and (min-width: 1500px) {
 h1 {
-          margin: 9px 0 -1px !important;
+     margin: 9px 0 -1px !important;
 }
 
 div.news {

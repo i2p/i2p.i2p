@@ -5,7 +5,7 @@ body {
      margin: 0;
      padding: 0;
      text-align: center;
-     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
      color: #333;
      font-size: 9pt;
      background: #a4a4cb url(images/bg.png);
@@ -41,7 +41,6 @@ div.statusNotRunning {
      background: url(images/console_status_stopped.png) center center no-repeat;
      padding-top: 24px;
      filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
 }
 
 div.statusRunning {
@@ -51,7 +50,6 @@ div.statusRunning {
      color: #0b0;
      background: url(images/console_status_running.png) center center no-repeat;
      filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
 }
 
 div.statusStarting {
@@ -62,7 +60,6 @@ div.statusStarting {
      color: #339933;
      background: url(images/console_status_starting.png) center center no-repeat;
      filter: drop-shadow(0 0 1px #999);
-     -webkit-filter: drop-shadow(0 0 1px #999);
 }
 
 div[class^="status"] {
@@ -85,15 +82,16 @@ hr {
      width: 150px;
      border: 1px solid #999;
      padding: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      background: #fff;
      color: #333;
      border-radius: 2px;
-     box-shadow: inset 2px 2px 1px #ccc;
+     box-shadow: inset 1px 1px 1px #ddd;
 }
 
 .freetext:focus {
-     box-shadow: 0 0 1px #89f;
+     box-shadow: 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f, 0 0 1px rgba(136, 153, 255, 0.4); 
      color: #111;
 }
 
@@ -126,9 +124,7 @@ hr {
      border-radius: 2px;
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #ccc);
-/*     -webkit-filter: drop-shadow(0 0 1px #ccc); */
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 #ccc;
 }
 
 .control:hover, .control:focus {
@@ -147,13 +143,13 @@ hr {
 }
 
 .iframed .panel.iframed {
-     margin: 0 auto -8px auto !important;
+     margin: 0 auto -8px !important;
 }
 
 .panel {
      width: calc(100% - 14px);
      margin: 8px auto;
-     min-width: 600px;
+     min-width: 640px;
      max-width: 1500px;
      overflow: hidden;
      text-align: left !important;
@@ -170,23 +166,32 @@ hr {
      background: none;
      box-shadow: none;
      padding: 0;
-     margin: 16px auto -8px auto !important;
+     margin: 16px auto -8px !important;
      width: 100%;
 }
 
+.iframed .panel#clients {
+     margin-top: 8px !important;
+}
+
 select {
-     background: #fff;
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+     background: url(images/dropdown.png) right center no-repeat #fff;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     padding: 4px 16px 4px 4px;
      color: #333;
      margin: 4px !important;
-     font-family: "Droid Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
      border: 1px solid #999;
-     padding: 3px 3px 3px 0;
+     padding: 4px 16px 4px 4px;
      min-width: 140px;
      font-size: 9pt;
      border-radius: 2px;
      overflow: hidden;
      text-overflow: ellipsis;
-     filter: drop-shadow(0 0 1px #ccc);
+     box-shadow: 0 0 0 1px #fff inset, 0 0 1px 0 #ccc;
 }
 
 select:hover {
@@ -201,13 +206,6 @@ select option {
      background: #fff;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-select {
-     -moz-appearance: none;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     padding: 4px 16px 4px 4px;
-}
-
 select:hover, select:active {
      background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
 }
@@ -216,6 +214,9 @@ select:focus {
      background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
      box-shadow: 0 0 1px #89f;
 }
+
+select::-ms-expand {
+     display: none;
 }
 
 a:link {
@@ -247,7 +248,7 @@ input[type="hidden"], input.default {
 h2, h3 {
      padding: 6px 10px;
      border: 1px solid #89f;
-     background: #fff url("/themes/console/classic/images/tinytitle.png") repeat right center;
+     background: #fff url(/themes/console/classic/images/tinytitle.png) repeat right center;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
      font-size: 11pt;
      text-transform: uppercase;
@@ -256,14 +257,46 @@ h2, h3 {
      margin: 10px 0 -1px;
      color: #0c153d;
      box-shadow: inset 0 0 0 1px #fff;
+     position: relative;
 }
 
-/*
-h3 {
-     border-radius: 0;
-     margin-top: -1px;
+/* title images */
+
+h2, h3 {
+     padding-left: 30px;
 }
-*/
+
+#messages h2 {
+     background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#globalTunnelControl h2 {
+     background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#servers h2 {
+     background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#clients h2 {
+     background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
+     background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#wizardPanel h2 {
+     background: url(/themes/console/images/info/wizard.png) left 6px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+/* end title images */
 
 .iframed #globalTunnelControl h2 {
      margin-top: 2px;
@@ -286,6 +319,7 @@ th {
      background: #fff url(/themes/console/classic/images/tinytitle.png) repeat-x center center;
      background: linear-gradient(to bottom, #fff, #eff2ff) !important;
      padding: 5px;
+     text-align: left;
      border-top: 1px solid #89f;
      border-bottom: 1px solid #89f;
      font-size: 10pt;
@@ -297,15 +331,22 @@ tr {
 }
 
 td {
-     border-top: 1px solid #89f;
      vertical-align: middle;
-     padding: 4px 5px;
+     border-top: 1px inset #cfd1ff;
+     padding: 5px;
+}
+
+th:last-child, td:last-child {
+     border-right: 1px solid #89f; /* fixes chrome rendering bug */
+}
+
+#throttler th:last-child, #throttler td:last-child {
+     border-right: none;
 }
 
 td.infohelp {
      background: url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
-     background-size: 24px 24px;
-     background-position: 6px center;
+     background-size: 20px 20px;
      padding: 10px 10px 10px 38px !important;
 }
 
@@ -319,10 +360,12 @@ td.infohelp {
 
 .tunnelProperties {
      background: #fff !important;
+     border-top: 1px solid #89f;
 }
 
 .tunnelProperties:hover {
-     background: #ffd !important;
+     background: #ffe !important;
+     transition: ease background 0.3s;
 }
 
 .newTunnel {
@@ -370,10 +413,15 @@ td.infohelp {
 
 .tunnelPreview, .tunnelPort {
      width: 15%;
+     text-align: center;
 }
 
 .tunnelLocation, .tunnelInterface {
      width: 20%;
+}
+
+.tunnelLocation font[color="red"] {
+     margin-left: 3px;
 }
 
 .tunnelStatus {
@@ -397,13 +445,26 @@ th.tunnelControl {
      text-align: center;
 }
 
-
 input[type="checkbox"], input[type="radio"] {
-     vertical-align: middle;
+     vertical-align: sub;
      min-width: 16px;
      min-height: 16px;
      margin: 0;
      background: none;
+}
+
+input[type="radio"]:hover, input[type="radio"]:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
+     filter: drop-shadow(0 0 2px #89f);
+     box-shadow: inset 0 0 1px 2px #89f;
+     outline: none;
+}
+
+label {
+     cursor: pointer;
+}
+
+input[type="checkbox"] {
+     margin: 5px 3px 5px 5px;
 }
 
 textarea, input, select, button {
@@ -421,21 +482,23 @@ button {
 }
 
 button, input[type="submit"], input[type="reset"], a.control {
-     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
      font-size: 9pt;
 }
 
 textarea {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #333;
      background: #fff;
      border: 1px solid #999;
      border-radius: 2px;
      resize: none;
-     box-shadow: inset 2px 2px 1px #ccc;
+     box-shadow: inset 1px 1px 1px #ddd;
 }
 
 textarea:focus {
      box-shadow: inset 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f, 0 0 1px rgba(136, 153, 255, 0.4);
      color: #111;
 }
 
@@ -448,6 +511,11 @@ textarea#statusMessages {
      box-shadow: none;
      border: none;
      margin: 0;
+     font-family: "Droid Sans Mono", "Noto Mono", Consolas, "Lucida Console", "DejaVu Sans Mono", monospace;
+}
+
+textarea#statusMessages:focus {
+     caret-color: transparent;
 }
 
 a.control {
@@ -515,6 +583,11 @@ input {
 #oldName, #targetDestination, select#profile, select#connectionProfile {
      min-width: 280px;
      width: 30%;
+     width: calc(100% - 10px) !important;
+}
+
+td[colspan="2"] select#profile {
+     width: calc(50% - 15px) !important;
 }
 
 #customOptions, #userAgents {
@@ -537,8 +610,11 @@ input {
 
 .multiOption {
      display: inline-block;
-     margin-right: 10px;
-     vertical-align: middle;
+     margin: 5px 10px 5px 5px;
+}
+
+.multiOption input {
+     vertical-align: sub;
 }
 
 .multiOption#isServer {
@@ -581,12 +657,14 @@ td.blankColumn {
      width: 20% !important;
 }
 
-#throttler tr:nth-child(odd) {
+#throttler tr:nth-child(odd), #wizardTunnelTypes tr:nth-child(odd), #wizardSummary tr:nth-child(odd) {
      background: #eff2ff;
+     background: rgba(240,240,255,0.5);
 }
 
-#throttler tr:nth-child(even) {
+#throttler tr:nth-child(even),  #wizardTunnelTypes tr:nth-child(even), #wizardSummary tr:nth-child(even) {
      background: #e7e7ff;
+     background: rgba(220,220,255,0.5);
 }
 
 #throttler input[type="text"] {
@@ -623,10 +701,22 @@ input::-moz-placeholder {
      opacity: 1;
 }
 
+input:focus::-moz-placeholder {
+     opacity: 0;
+}
+
+:focus::-webkit-input-placeholder {
+     opacity: 0;
+}
+
 input.tunnelName, input.tunnelDescription, #userAgents {
      width: 80%;
      min-width: 280px;
      text-overflow: ellipsis;
+}
+
+input[type="file"] {
+     margin: 5px 3px;
 }
 
 #websiteName, #privKeyFile, #targetHost, .host {
@@ -667,7 +757,6 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px #333);
-     -webkit-filter: drop-shadow(0 0 1px #333);
      font-size: 11pt;
      font-weight: bold;
 }
@@ -693,6 +782,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 #wizardTunnelTypes td:last-child {
      text-align: justify;
      padding: 5px 10px 5px 5px;
+     border: none;
 }
 
 #wizardTunnelTypes select {
@@ -704,22 +794,12 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      margin-top: -1px;
 }
 
-/*
-#wizardPanel tr:nth-child(n+2) {
-     background: #eef;
+#wizardSummary td:last-child {
+     border-right: none !important;
 }
 
-#wizardPanel tr:nth-child(2n+2) {
-     background: #f7f8ff;
-}
-*/
-
-#wizardTunnelTypes tr:nth-child(even), #wizardSummary tr:nth-child(even) {
-     background: #dde1ff;
-}
-
-#wizardTunnelTypes tr:nth-child(odd), #wizardSummary tr:nth-child(odd) {
-     background: #eff1ff;
+#wizardTable td {
+     border-top: 1px solid #cfd1ff !important;
 }
 
 #wizardTunnelTypes tr:last-child {
@@ -773,21 +853,8 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 /* more space */
 
-.tunnelConfig td, td {
-     border-top: 1px inset #cfd1ff;
-     padding: 5px;
-}
-
-input[type="checkbox"] {
-     margin: 5px 3px 5px 5px;
-}
-
 .freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField  {
      margin: 5px !important;
-}
-
-.multiOption {
-     margin: 5px 10px 5px 5px;
 }
 
 #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
@@ -835,6 +902,39 @@ td.tunnelDestination, td.tunnelDescription {
 
 /* responsive layout */
 
+@media screen and (max-width: 700px) {
+#leasesetKey, #tunnelDepth, #tunnelVariance, #tunnelQuantity, #tunnelBackupQuantity, #leasesetKey {
+    min-width: 270px;
+}
+}
+
+@media screen and (max-width: 800px) {
+.tunnelProperties td {
+     border-right: 1px dotted #cfd1ff;
+}
+
+.tunnelProperties td:last-child {
+     border-right: 1px solid #89f;
+}
+
+div[class^="status"] {
+     background-size: auto 14px;
+}
+
+.port, .quantity, .period {
+     width: 60px;
+}
+
+#clientHost, .host {
+     width: 200px;
+     min-width: 210px;
+}
+
+.control, .control:link, .control:visited {
+     min-width: 60px !important;
+}
+}
+
 @media screen and (min-width: 1200px) {
 body, .control, button, select, textarea, .freetext {
      font-size: 10pt !important;
@@ -852,3 +952,19 @@ h2, h3 {
      height: 34px !important;
 }
 }
+
+/* Edge/IE tweaks */
+
+_:-ms-lang(x), td {
+     border-top: 1px solid #cfd1ff;
+}
+
+_:-ms-lang(x), td.tunnelDestination, td.tunnelDescription {
+     border-bottom-color: transparent;
+}
+
+_:-ms-lang(x), h2, h3 {
+     box-shadow: none;
+}
+
+/* end Edge/IE tweaks */

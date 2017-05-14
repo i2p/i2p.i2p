@@ -14,6 +14,10 @@ body.iframed {
      overflow: hidden; /* webkit fix */
 }
 
+* {
+     outline: none;
+}
+
 div.header {
      padding: 30px 10px;
      margin: 0 -10px;
@@ -78,6 +82,7 @@ p.error, p.info {
      box-shadow: inset 0 0 0 1px #fff;
      display: block;
      font-weight: bold;
+     line-height: 120%;
 }
 
 td p.info, td p.error {
@@ -104,13 +109,21 @@ span.coloured {
      color:#327BBF;
 }
 
+div.footer {
+     border-top: 1px solid #89f;
+     margin: 0 -10px -10px;
+     background: #fff;
+     background: rgba(255,255,255,0.5);
+     padding: 1px;
+     display: none;
+}
+
 p.footer {
-     margin-left:10mm;
-     margin-right:10mm;
+     padding: 1px;
+     margin: 0;
      font-size:8pt;
      line-height:10pt;
      text-align: center;
-     display: none;
 }
 
 .iframed .footer {
@@ -118,7 +131,7 @@ p.footer {
 }
 
 p.mailbody {
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      margin: 0 20px 10px;
      text-align: left;
 }
@@ -205,16 +218,21 @@ td {
 
 tr.list0 {
      background: #dde1ff;
+     background: rgba(220,220,255,0.5);
 }
 
 tr.list1 {
-     background-color: #ccf;
      background: #eff1ff;
+     background: rgba(240,240,255,0.5);
 }
 
 tr.list0, tr.list1 {
-     border-top: 1px inset #fff !important;
-     border-bottom: 1px inset #fff !important;
+     border-top: 1px inset #ccf !important;
+     border-bottom: 1px inset #ccf !important;
+}
+
+_:-ms-lang(x), tr.list0, tr.list1 {
+     border-bottom: 1px solid #ccf !important;
 }
 
 tr.list0:hover, tr.list1:hover {
@@ -260,9 +278,14 @@ table#mailbox {
 table#mailbox {
      margin-top: 1px;
 }
+
 div#prefsave {
      border-bottom: 1px solid #89f;
 }
+}
+
+_:-ms-lang(x), table#mailbox {
+     margin-top: 1px;
 }
 
 #mailbox th {
@@ -327,6 +350,8 @@ div#prefsave {
 #mailbox tr.bottombuttons td {
      border-top: 1px solid #89f;
      background: #fff;
+     padding-top: 3px;
+     padding-bottom: 3px;
 }
 
 #mailbox tr.bottombuttons td:first-child {
@@ -340,7 +365,6 @@ div#prefsave {
 #mailbox a img.sort:hover, .sort:focus {
      opacity: 1 !important;
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 img.sort {
@@ -358,7 +382,7 @@ img.sort {
 }
 
 pre {
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      margin-left: 1cm;
      margin-right: 1cm;
 }
@@ -429,10 +453,23 @@ table#message_full {
 
 input[type="checkbox"], input[type="radio"] {
      background: none;
+     min-width: 16px;
+     min-height: 16px;
 }
 
-input, textarea { /* opera fix */
+input[type="radio"]:hover, input[type="radio"]:focus, input[type="checkbox"]:hover, input[type="checkbox"]:focus {
+     filter: drop-shadow(0 0 3px #89f);
+     box-shadow: inset 0 0 1px 2px #89f;
+     outline: none;
+}
+
+input { /* opera fix */
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font-size: 9pt;
+}
+
+textarea {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-size: 9pt;
 }
 
@@ -463,7 +500,6 @@ button::-moz-focus-inner, input[type="button"]::-moz-focus-inner, input[type="su
 
 button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      filter: drop-shadow(0 0 1px #89f);
-     -webkit-filter: drop-shadow(0 0 1px #89f);
 }
 
 button, input[type="submit"], input[type="reset"] {
@@ -471,13 +507,10 @@ button, input[type="submit"], input[type="reset"] {
      border-radius: 2px;
      color: #333;
      border: 1px solid #bbb;
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 #ddd;
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
-/*     min-width: 88px;*/
      outline: none !important;
-     filter: drop-shadow(0 0 1px #fff);
-     -webkit-filter: drop-shadow(0 0 1px #fff);
      display: inline-block;
      background-size: 14px 14px, 100% 100% !important;
      cursor: pointer;
@@ -494,11 +527,11 @@ button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
      background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
      border: 1px solid #89f;
      filter: drop-shadow(0 0 1px #89f);
-     -webkit-filter: drop-shadow(0 0 1px #89f);
 }
 
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
-     box-shadow: 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f;
+     box-shadow: inset 0 0 0 1px #89f, 0 0 1px rgba(136, 153, 255, 0.4);
      color: #000;
 }
 
@@ -511,13 +544,21 @@ button:active, input[type="submit"]:active, input[type="reset"]:active {
 }
 
 input[disabled][type="submit"], input[disabled][type="submit"]:hover, input[disabled][type="submit"]:active {
-	  background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
-	  opacity: 0.6;
+     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     opacity: 0.6;
 }
 
 input.optbox {
      vertical-align: middle;
      background: none;
+}
+
+input, label {
+     cursor: pointer;
+}
+
+input[type="text"], input[type="password"] {
+     cursor: text;
 }
 
 /* illustrated images inc */
@@ -832,7 +873,6 @@ input[disabled] {
      border: 1px solid #bbb;
      box-shadow: inset 0 0 0 1px #fff;
      filter: none !important;
-     -webkit-filter: none !important;
 }
 
 /* end pagenav */
@@ -856,12 +896,6 @@ div#composemail {
 #composemail input[type="file"] {
      padding: 0;
 }
-
-/*
-div#mailheader {
-     margin: 10px 10px 10px 20px;
-}
-*/
 
 #mailhead {
      margin: 0;
@@ -997,6 +1031,7 @@ hr {
 #composemail textarea {
      width: 665px;
      min-width: 665px;
+     min-height: 200px;
      margin-top: 5px;
 }
 
@@ -1076,17 +1111,30 @@ table#pagenav td:last-child {
 
 /* responsive layout */
 
+@media screen and (max-width: 1024px) {
+.page {
+     min-width: 600px;
+}
+
+#composemail textarea, #newmail input[type="text"] {
+     min-width: 400px;
+     width: 100% !important;
+}
+}
+
 @media screen and (min-width: 1024px) {
-body, td, textarea, input, div, p.mailbody {
+body, td, textarea, input, div, p.mailbody, p.error {
      font-size: 10pt !important;
 }
 }
 
 /* end responsive layout */
 
-/* MS Edge 14+ fix */
+/* Edge/IE tweaks*/
+
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
+
+/* end Edge/IE tweaks */
 

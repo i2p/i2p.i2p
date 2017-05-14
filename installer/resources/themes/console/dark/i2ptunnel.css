@@ -5,7 +5,7 @@ body {
      margin: 0;
      padding: 0;
      text-align: center;
-     font-family: "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      background: #010 url(images/camotile.png) center bottom;
      color: #ee9;
      font-size: 9pt;
@@ -25,6 +25,10 @@ body.iframed {
 ::-moz-selection {
      background: #030 !important;
      color: white;
+}
+
+* {
+     outline: none;
 }
 
 div {
@@ -71,21 +75,21 @@ div.statusNotRunning {
      height: 16px;
      overflow: hidden;
      color: #d00;
-     background: url('images/console_status_stopped.png') center center no-repeat;
+     background: url(images/console_status_stopped.png) center center no-repeat;
 }
 
 div.statusRunning {
      height: 16px;
      overflow: hidden;
      color: #0b0;
-     background: url('images/console_status_running.png') center center no-repeat;
+     background: url(images/console_status_running.png) center center no-repeat;
 }
 
 div.statusStarting {
      height: 16px;
      overflow: hidden;
      color: #393;
-     background: url('images/console_status_starting.png') center center no-repeat;
+     background: url(images/console_status_starting.png) center center no-repeat;
 }
 
 div[class^="status"] {
@@ -114,7 +118,7 @@ hr {
      margin: 8px auto;
      padding: 5px 3px 5px 1px !important;
      width: calc(100% - 14px);
-     min-width: 450px;
+     min-width: 540px;
      max-width: 1400px;
      overflow: hidden;
      text-align: left;
@@ -128,6 +132,14 @@ hr {
 
 .panel:last-child {
      margin-bottom: 5px;
+}
+
+.panel#clients {
+     margin-top: -23px !important;
+}
+
+.iframed .panel#clients {
+     margin-top: -20px !important;
 }
 
 .iframed .panel.iframed {
@@ -154,7 +166,7 @@ hr {
 h2, h3 {
      padding: 8px 10px;
      border: 1px solid #494;
-     background: linear-gradient(to bottom, #1a261a 0%, #1a261a 50%, #000 50%, #000 100%) !important;
+     background: linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -164,13 +176,51 @@ h2, h3 {
      box-shadow: inset 0 0 0 1px #000;
 }
 
+/* title images */
+
+h2, h3 {
+     padding-left: 32px;
+}
+
+#messages h2 {
+     background: url(/themes/console/images/info/logs.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#globalTunnelControl h2 {
+     background: url(/themes/console/images/info/control.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#servers h2 {
+     background: url(/themes/console/images/info/server.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#clients h2 {
+     background: url(/themes/console/images/info/client.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
+     background: url(/themes/console/images/info/configure.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+#wizardPanel h2 {
+     background: url(/themes/console/images/info/wizard.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+}
+
+/* end title images */
+
 .iframed h2 {
      margin: 10px 0 -1px;
 }
 
 h3 {
      border-radius: 0;
-     margin-top: 15px;
+     margin-top: 10px;
 }
 
 .iframed #globalTunnelControl h2 {
@@ -192,6 +242,7 @@ th {
      border-bottom: 1px solid #494;
      font-size: 9pt;
      color: #ee9;
+     text-align: left;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -216,8 +267,7 @@ td > b {
 
 td.infohelp {
      background: url(images/infohelp.png) 10px center no-repeat;
-     background-size: 24px 24px;
-     background-position: 6px center;
+     background-size: 20px 20px;
      padding: 10px 10px 10px 38px !important;
 }
 
@@ -234,7 +284,7 @@ td.infohelp {
 }
 
 #clientTunnels tr, #serverTunnels tr, .tunnelConfig tr {
-     background: rgba(0,0,0,0.4);
+     background: rgba(0,4,0,0.4);
 }
 
 .tunnelProperties {
@@ -242,6 +292,7 @@ td.infohelp {
      overflow: hidden;
      text-align: left;
      border: 1px solid #494;
+     border-bottom: 1px inset #010 !important;
 }
 
 #serverTunnels {
@@ -280,7 +331,6 @@ td.infohelp {
 
 .tunnelName a:hover {
      filter: drop-shadow(0 0 1px #730);
-     -webkit-filter: drop-shadow(0 0 1px #730);
 }
 
 .tunnelName a {
@@ -329,7 +379,7 @@ textarea {
      background: #000;
      margin-left: 4px;
      margin-right: 4px;
-     font: 9pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      resize: none;
      box-sizing: border-box;
      border-radius: 2px;
@@ -339,12 +389,17 @@ textarea:focus {
      color: #ee9;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
      box-shadow: inset 0 0 1px #880;
+     font-weight: bold;
+     outline: none;
 }
 
-textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus  {
+textarea[readonly]:focus {
+     font-weight: normal;
+}
+
+textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus {
      background: #000;
      background: linear-gradient(to bottom, #000 0%, #010 100%) !important;
      box-shadow: inset 0 0 3px 3px #000 !important;
@@ -352,18 +407,22 @@ textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages
      border: 0;
      box-shadow: none;
      height: 80px;
-     font-size: 9pt;
      width: 100%;
      border-radius: 0;
      padding: 2px 4px;
      color: #69f;
+     font-family: "Droid Sans Mono", "Noto Mono", Consolas, "Lucida Console", "DejaVu Sans Mono", monospace;
+}
+
+_:-ms-lang(x), textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus {
+     box-shadow: none !important;
 }
 
 .freetext {
      width: 150px;
      border: 1px solid #494;
      padding: 4px;
-     font: 8pt "Droid Sans Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      background: #fff;
      color: #333;
      border-radius: 2px;
@@ -373,6 +432,8 @@ textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages
 .freetext:focus {
      box-shadow: 0 0 1px #f60;
      color: #111;
+     font-weight: bold;
+     outline: none;
 }
 
 .freetext[readonly], .freetext[readonly]:focus {
@@ -382,6 +443,7 @@ textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages
      cursor: default;
      border: 1px solid #494 !important;
      opacity: 0.8;
+     font-weight: normal;
 }
 
 input[type="hidden"], input.default {
@@ -389,7 +451,7 @@ input[type="hidden"], input.default {
 }
 
 input, select, button, a {
-     font-family: "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      -moz-box-sizing: border-box;
      box-sizing: border-box;
      font-size: 9pt;
@@ -403,7 +465,7 @@ input {
      background-color: #020;
      color: #ee9;
      margin: 0 2px 0 2px;
-     font-family: "Droid Sans", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      border: 1px solid #494;
      text-decoration: none;
 }
@@ -425,12 +487,16 @@ input[type="checkbox"], input[type="radio"] {
      margin: 0;
      background: none;
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
 }
 
-input[type="checkbox"]:hover, input[type="radio"]:hover {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
+input[type="checkbox"]:hover, input[type="radio"]:hover,
+input[type="checkbox"]:focus, input[type="radio"]:focus  {
+     outline: none;
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60);
+}
+
+label {
+     cursor: pointer;
 }
 
 input[type="password"] {
@@ -453,7 +519,6 @@ input[type="text"]:focus, input[type="password"]:focus {
      color: #ee9;
      background: #000;
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
 }
 
@@ -544,10 +609,13 @@ a.control {
 
 select {
      color: #494;
-     font: 8pt "Droid Sans", "Noto Sans", "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
+     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
-     padding: 3px 16px 3px 3px;
-     background: #000;
+     padding: 4px 16px 4px 4px !important;
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
      border-radius: 2px;
      cursor: pointer;
      filter: drop-shadow(0 0 1px #000);
@@ -575,32 +643,23 @@ select:hover {
      box-shadow: inset 0 1px 1px 0 #ee9;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-
-select {
-     -moz-appearance: none;
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-}
-
-select:hover, select:active {
+select:hover, select:focus, select:active {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
 }
 
-select:focus {
-     background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
-}
+select::-ms-expand {
+     display: none;
 }
 
 input, select, button {
-     font-size: 8pt;
+     font-size: 9pt;
      vertical-align: middle;
 }
 
 button, input[type="submit"], input[type="reset"], a.control, select {
-     font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
      filter: drop-shadow(0 0 1px #131);
-     -webkit-filter: drop-shadow(0 0 1px #131);
 }
 
 .buttons, .newTunnel {
@@ -653,6 +712,14 @@ select#profile, select#connectionProfile {
      margin: 5px !important;
 }
 
+select#connectionProfile {
+     width: calc(100% - 10px);
+}
+
+td[colspan="2"] > select#profile {
+     width: calc(50% - 15px);
+}
+
 #customOptions, #userAgents {
      width: calc(100% - 10px) !important;
      width: 100% !important;
@@ -682,7 +749,10 @@ textarea[name="accessList"] {
 .multiOption {
      display: inline-block;
      margin: 5px 10px 5px 0;
-     vertical-align: middle;
+}
+
+.multiOption input {
+     vertical-align: sub;
 }
 
 .multiOption#isServer {
@@ -735,11 +805,11 @@ td.blankColumn {
 }
 
 #throttler tr:nth-child(odd) {
-     background: #001000;
+     background: rgba(0,16,0,0.7);
 }
 
 #throttler tr:nth-child(even) {
-     background: #000500;
+     background: rgba(0,8,0,0.7);
 }
 
 #throttler input[type="text"] {
@@ -770,6 +840,14 @@ input::-moz-placeholder {
      opacity: 1;
 }
 
+input:focus::-moz-placeholder {
+     opacity: 0;
+}
+
+:focus::-webkit-input-placeholder {
+     opacity: 0;
+}
+
 input.tunnelName, input.tunnelDescription, #userAgents {
      width: 80%;
      min-width: 280px;
@@ -783,6 +861,10 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .port, .quantity, .period {
      width: 80px;
+}
+
+.port[readonly] {
+     width: 120px;
 }
 
 .username, .password {
@@ -962,6 +1044,18 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
      border-bottom: 1px solid transparent !important;
 }
 
+_:-ms-lang(x), .tunnelDestination {
+     border-bottom: none !important;
+}
+
+_:-ms-lang(x), .tunnelDescription {
+     border-top: none !important;
+}
+
+_:-ms-lang(x), .tunnelProperties {
+     border-bottom: 1px solid #010 !important;
+}
+
 #clientTunnels .tunnelDescription {
      padding-top: 1px !important;
 }
@@ -978,13 +1072,34 @@ td.tunnelDestination, td.tunnelDescription {
 
 /* responsive layout */
 
-@media screen and (min-width: 1400px) {
-
-body, td, a {
-     font-size: 10pt;
+@media screen and (max-width: 800px) {
+.statusNotRunning, .statusRunning, .statusStarting {
+     background-size: auto 14px;
 }
 
-button, input, .control, select, textarea#statusMessages, .freetext, textarea {
-     font-size: 9pt;
+#leasesetKey {
+     height: 38px !important;
+}
+
+.port, .quantity, .period {
+     width: 60px;
+}
+
+#clientHost, .host {
+     width: 200px;
+     min-width: 210px;
+}
+}
+
+@media screen and (max-width: 1400px) {
+h2,h3 {
+     font-size: 10.5pt;
+}
+}
+
+@media screen and (min-width: 1400px) {
+
+body, td, a, button, input, .control, select, textarea#statusMessages, .freetext, textarea {
+     font-size: 10pt;
 }
 }

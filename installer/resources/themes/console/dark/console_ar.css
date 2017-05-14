@@ -302,6 +302,11 @@ p.infowarn, td.infowarn {
      margin: 0 5px
 }
 
+.messages {
+     background-position: right 12px center, left bottom !important;
+     padding: 20px 40px 20px 10px !important;
+}
+
 td.optionsave {
      text-align: left;
 }
@@ -317,6 +322,13 @@ td.optionsave {
      margin: 5px 3px 5px 15px !important;
 }
 
+@-moz-document url-prefix() {
+select, select:hover, select:focus {
+     background-position: left center !important;
+     padding: 3px 2px 3px 16px;
+}
+}
+
 #consolepass tr:first-child td, p#clientconf.infohelp, p#webappconfigtext.infohelp, #floodfillconfig .infohelp, 
 #bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
 h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, table#addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
@@ -329,12 +341,20 @@ table#bugreports td.infohelp {
      padding: 15px 50px 15px 15px !important;
 }
 
+div[lang="ar"] ul {
+     margin-right: 20px !important;
+}
+
 div[lang="ar"] ul li {
      list-style-image: url("images/link.png") !important;
-     list-style-position: inside;
-     margin-left: 0 !important;
+     list-style-position: outside;
+     margin: 10px 15px 0 0 !important;
      padding-left: 0 !important;
      margin-top: 15px !important;]
+}
+
+div[lang="ar"] ul ul {
+     margin-right: -10px;
 }
 
 div[lang="ar"] ul, div[lang="ar"] p {

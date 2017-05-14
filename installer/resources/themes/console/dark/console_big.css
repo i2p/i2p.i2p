@@ -112,9 +112,18 @@ button.reload, button.stop {
      min-width: 100px;
 }
 
+.main li, ul.statlist li b, ul.statlist a[name] {
+     line-height: 160%;
+     font-size: 11pt !important;
+}
+
 code, pre, tt {
-     font-size: 12pt;
+     font-size: 11pt;
      font-weight: normal;
+}
+
+#changelog pre {
+     font-size: 10pt !important;
 }
 
 .smallhead, th {
@@ -126,23 +135,27 @@ table {
      font: 10pt/130% "Droid Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
 }
 
-div.applabel {
+.applabel {
      font-size: 10pt;
-     width: 134px;
+     width: 134px !important;
+     margin-top: 10px;
 }
 
 div.app {
-     height: 64px;
      width: 138px;
 }
 
-div.confignav {
+img.app, img.app2p {
+     margin-top: -6px !important;
+}
+
+.confignav {
      font-size: 13pt;
 }
 
-input[type="submit"], input[type="reset"] {
-     padding: 3px 2px;
-     font-size: 12pt;
+input[type="submit"], input[type="reset"], .cancel, .accept {
+     padding: 5px 8px !important;
+     font-size: 12pt !important;
      min-width: 80px;
      font-weight: normal;
 }
@@ -153,6 +166,14 @@ input[type="submit"], input[type="reset"] {
 
 .langselect .optbox {
      min-height: 68px;
+}
+
+.langselect img {
+     margin-top: 12px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-top: 10px !important;
 }
 
 table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old),
@@ -189,6 +210,25 @@ p, .main {
 .news p, .news a {
      font-size: 10pt !important;
 }
+
+p#fullhistory {
+     margin-top: -13px !important;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+    margin-left: -5px;
+    margin-top: -3px;
+    width: 211px;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 215px !important;
+}
+
+.routersummary button {
+     font-size: 11pt !important;
+     padding: 5px 8px !important;
+}
 }
 
 @media screen and (max-width: 1500px) {
@@ -200,5 +240,15 @@ p, .main {
 h3#webappconfig, h3#i2pclientconfig {
     margin-bottom: -16px !important;
 }
+
+.langbox {
+     margin-top: 6px !important;
+     line-height: 17px;
+}
 }
 
+@media screen and (min-width: 1500px) {
+img.app, img.app2p {
+     margin-top: -4px !important;
+}
+}

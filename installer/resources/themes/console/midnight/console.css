@@ -58,7 +58,6 @@ div.clearer {
 
 button, input[type="submit"], input[type="reset"], select {
      filter: drop-shadow(0 0 1px #115);
-     -webkit-filter: drop-shadow(0 0 1px #115);
      box-shadow: inset 0 0 0 1px #000020;
 }
 
@@ -76,7 +75,7 @@ button, button:visited, input[type="submit"], input[type="reset"] {
      min-width: 75px;
      background: #000;
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%);
-     color: #443da0;
+     color: #4e47bf;
 }
 
 button:hover, button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
@@ -145,7 +144,7 @@ textarea {
      padding: 5px;
      margin: 10px;
      border-radius: 2px;
-     font: 8.5pt "Droid Sans Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 8.5pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      min-height: 100px;
      min-width: 97%;
      width: calc(100% - 15px);
@@ -163,7 +162,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 
 input[type=text], input[type=password], textarea {
      color: #7670c2 !important;
-     background: linear-gradient(to bottom, #000 0%, #000019 100%);
+     background: linear-gradient(to bottom, #000, #000019);
      box-shadow: inset 0 0 3px 3px #000;
      border: 1px solid #3e3f8f;
      padding: 4px;
@@ -173,8 +172,8 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
      color: #c9ceff !important;
      background: #000;
      border: 1px solid #443da0;
+     box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
      filter: drop-shadow(0 0 1px #99f);
-     -webkit-filter: drop-shadow( 0 0 1px #99f);
      transition: filter ease 0.3s 0s;
 }
 
@@ -190,12 +189,26 @@ input[type="checkbox"], .optbox {
      min-width: 16px !important;
      vertical-align: sub;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
      background: none;
 }
 
 input[type="checkbox"]:hover, .optbox:hover, input[type="checkbox"]:focus, .optbox:focus {
+     box-shadow: 0 0 2px 1px #99f;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) drop-shadow(0 0 3px #99f);
+}
+
+input[type="checkbox"][disabled]:hover, input[type="checkbox"][disabled]:focus,
+input[type="radio"][disabled]:hover, input[type="radio"][disabled]:focus {
+     box-shadow: none;
+     filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
+}
+
+label {
+     cursor: pointer;
+}
+
+.main#config_clients label[for="0"] {
+     cursor: default;
 }
 
 input[type="file"]  {
@@ -206,6 +219,7 @@ input[type="file"]  {
      padding: 0;
      cursor: pointer;
      margin: 5px 10px;
+     font-weight: normal;
 }
 
 input[type="file"]:hover, input[type="file"]:active {
@@ -225,6 +239,7 @@ input:disabled {
 
 input[type="text"]:disabled, input[readonly], input[readonly]:focus {
      color: #443da0 !important;
+     box-shadow: none;
      filter: none;
 }
 
@@ -233,8 +248,11 @@ input[class="check"] { /* nudge "check for updates" button into alignment on /co
 }
 
 select {
-     background: #000;
-     color: #443da0;
+     -moz-appearance: none;
+     -webkit-appearance: none;
+     appearance: none;
+     background: #000 url(images/dropdown.png) right center no-repeat !important;
+     color: #4e47bf;
      margin: 5px 10px;
      border: 1px solid #3e3f8f;
      border-bottom-color: #14144f;
@@ -243,7 +261,7 @@ select {
      min-width: 110px;
      font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
-     padding: 3px 16px 3px 2px;
+     padding: 4px 16px 4px 4px !important;
      cursor: pointer;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -265,12 +283,6 @@ select option:hover, select option:focus, select option:checked {
      box-shadow: inset 0 0 20px 20px #652787;
 }
 
-@-moz-document url-prefix() { /* target firefox and derivatives only */
-select {
-     -moz-appearance: none;
-     background: #000 url(images/dropdown.png) right center no-repeat !important;
-}
-
 img[src="dropdown.png"] {
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
 }
@@ -282,6 +294,9 @@ select:hover, select:active {
 select:focus {
      background: #000 url(images/dropdown_hover.png) right center no-repeat !important;
 }
+
+select::-ms-expand {
+     display: none;
 }
 
 /* buttons (experimental) */
@@ -289,7 +304,6 @@ select:focus {
 input[type="submit"], input[type="reset"], button {
      background-size: 14px 14px, 100% 100%;
      filter: drop-shadow(0 0 1px #115);
-     -webkit-filter: drop-shadow(0 0 1px #115);
      box-shadow: inset 0 0 0 1px #000020;
      min-width: 0 !important;
 }
@@ -308,7 +322,7 @@ input[type="submit"]:active, input[type="reset"]:active, button:active {
 input.accept, button.accept {
      background: url(/themes/console/images/buttons/yes.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.accept:hover, button.accept:hover,
@@ -325,7 +339,7 @@ input.accept:active, button.accept:active {
 input.accept[value^="Unban"], button.accept[value^="Unban"] {
      background: url(/themes/console/images/buttons/unban.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover,
@@ -342,7 +356,7 @@ input.accept[value^="Unban"]:active, button.accept[value^="Unban"]:active {
 input.accept[value^="Create"], button.accept[value^="Create"] {
      background: url(/themes/console/images/buttons/create.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.accept[value^="Create"]:hover, button.accept[value^="Create"]:hover,
@@ -359,7 +373,7 @@ input.accept[value^="Create"]:active, button.accept[value^="Create"]:active {
 input.accept[value^="Filter"], button.accept[value^="Filter"] {
      background: url(/themes/console/images/buttons/filter.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.accept[value^="Filter"]:hover, button.accept[value^="Filter"]:hover,
@@ -376,7 +390,7 @@ input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
 input.add, button.add {
      background: url(/themes/console/images/buttons/add.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.add:hover, button.add:hover,
@@ -393,7 +407,7 @@ input.add:active, button.add:active {
 input.add[value^="Adjust"], button.add[value^="Adjust"] {
      background: url(/themes/console/images/buttons/edit2.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.add[value^="Adjust"]:hover, button.add[value^="Adjust"]:hover,
@@ -410,7 +424,7 @@ input.add[value^="Adjust"]:active, button.add[value^="Adjust"]:active {
 input.cancel, button.cancel {
      background: url(/themes/console/images/buttons/no.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.cancel:hover, button.cancel:hover,
@@ -428,7 +442,7 @@ input.accept[value^="Show"], button.accept[value^="Show"],
 input.check[value^="View"], button.check[value^="View"] {
      background: url(/themes/console/images/buttons/show.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.accept[value^="Show"]:hover, button.accept[value^="Show"]:hover,
@@ -449,7 +463,7 @@ input.cancel[value^="Hide"], button.cancel[value^="Hide"],
 input.delete[value^="Do not view"], button.delete[value^="Do not view"] {
      background: url(/themes/console/images/buttons/hide.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.cancel[value^="Hide"]:hover, button.cancel[value^="Hide"]:hover,
@@ -469,7 +483,7 @@ input.delete[value^="Do not view"]:active, button.delete[value^="Do not view"]:a
 input.check, button.check {
      background: url(/themes/console/images/buttons/yes.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.check:hover, button.check:hover,
@@ -486,7 +500,7 @@ input.check:active, button.check:active {
 input.check[value$="updates"], button.check[value$="updates"] {
      background: url(/themes/console/images/buttons/update.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.check[value$="updates"]:hover, button.check[value$="updates"]:hover,
@@ -503,7 +517,7 @@ input.check[value$="updates"]:active, button.check[value$="updates"]:active {
 input.delete, button.delete {
      background: url(/themes/console/images/buttons/delete.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.delete:hover, button.delete:hover,
@@ -520,7 +534,7 @@ input.delete:active, button.delete:active {
 input.delete[value^="Ban"], button.delete[value^="Ban"] {
      background: url(/themes/console/images/buttons/ban.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.delete[value^="Ban"]:hover, button.delete[value^="Ban"]:hover,
@@ -537,7 +551,7 @@ input.delete[value^="Ban"]:active, button.delete[value^="Ban"]:active {
 input.download, button.download {
      background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.download:hover, button.download:hover,
@@ -554,7 +568,7 @@ input.download:active, button.download:active {
 input.download[value^="Join"], button.download[value^="Join"] {
      background: url(/themes/console/images/buttons/users.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.download[value^="Join"]:hover, button.download[value^="Join"]:hover,
@@ -572,7 +586,7 @@ input.download[value$="from File"], button.download[value$="from File"],
 input.download[value$="from file"], button.download[value$="from file"] {
      background: url(/themes/console/images/buttons/from-file.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.download[value$="from file"]:hover, button.download[value$="from file"]:hover,
@@ -589,26 +603,26 @@ input.download[value$="from file"]:active, button.download[value$="from file"]:a
 input.download[value^="Dump"], button.download[value^="Dump"] {
      background: url(/themes/console/images/buttons/dump-threads.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.download[value^="Dump"]:hover, button.download[value^="Dump"]:hover,
 input.download[value^="Dump"]:focus, button.download[value^="Dump"]:focus {
      background: #000 url(/themes/console/images/buttons/dump-threads.png) 6px center no-repeat !important;
      background-size: 14px 14px !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.download[value^="Dump"]:active, button.download[value^="Dump"]:active {
      background: #652787 url(/themes/console/images/buttons/dump-threads.png) 6px center no-repeat !important;
      background-size: 14px 14px !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.go, button.go, input[value="GO"] {
      background: url(/themes/console/images/buttons/go.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.go:hover, button.go:hover, input[value="GO"]:hover,
@@ -625,7 +639,7 @@ input.go:active, button.go:active, input[value="GO"]:active {
 input.go[value^="Create"], button.go[value^="Create"] {
      background: url(/themes/console/images/buttons/create-file.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.go[value^="Create"]:hover, button.go[value^="Create"]:hover,
@@ -642,7 +656,7 @@ input.go[value^="Create"]:active, button.go[value^="Create"]:active {
 input.reload, button.reload {
      background: url(/themes/console/images/buttons/restore.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.reload:hover, button.reload:hover,
@@ -659,7 +673,7 @@ input.reload:active, button.reload:active {
 input.reload[value$="restart"], button.reload[value$="restart"] {
      background: url(/themes/console/images/buttons/restart.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 
 }
 
@@ -672,7 +686,7 @@ input.reload[value$="restart"]:focus, button.reload[value$="restart"]:focus {
 input.reload[value^="Update"], button.reload[value^="Update"] {
      background: url(/themes/console/images/buttons/update.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 
 }
 
@@ -688,7 +702,7 @@ input.reload[value^="Update"]:active, button.reload[value^="Update"]:active {
 input.reload[value="Force GC"], button.reload[value="Force GC"] {
      background: url(/themes/console/images/buttons/clean.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.reload[value="Force GC"]:hover, button.reload[value="Force GC"]:hover,
@@ -703,14 +717,14 @@ input.reload[value="Force GC"]:active, button.reload[value="Force GC"]:active {
 input.stop, button.stop {
      background: url(/themes/console/images/buttons/shutdown.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.stop:hover, button.stop:hover,
 input.stop:focus, button.stop:focus {
      background: #000 url(/themes/console/images/buttons/shutdown_hover.png) 6px center no-repeat !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 input.stop:active, button.stop:active {
@@ -720,7 +734,7 @@ input.stop:active, button.stop:active {
 button.search {
      background: url(/themes/console/images/buttons/search.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
-     padding: 5px 5px 5px 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 button.search:hover, button.search:focus {
@@ -736,15 +750,14 @@ button.search:active {
 /* client/plugin/webapps buttons aka project "X" */
 
 button.control {
+     padding: 12px !important;
      font-size: 0 !important;
+     text-indent: -99999px !important;
+     background-size: 16px 16px, 100% 100% !important;
 }
 
 button.accept.control {
-     font-size: 0;
-     text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
 }
 
 button.accept.control:hover, button.accept.control:focus {
@@ -756,11 +769,7 @@ button.accept.control:active {
 }
 
 button.stop.control {
-     font-size: 0;
-     text-indent: -99999px;
      background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
 }
 
 button.stop.control:hover, button.stop.control:focus {
@@ -772,11 +781,7 @@ button.stop.control:active {
 }
 
 button.add.control {
-     font-size: 0;
-     text-indent: -99999px;
      background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
 }
 
 button.add.control:hover, button.add.control:focus {
@@ -788,11 +793,7 @@ button.add.control:active {
 }
 
 button.delete.control {
-     font-size: 0;
-     text-indent: -99999px;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
 }
 
 button.delete.control:hover, button.delete.control:focus {
@@ -804,11 +805,7 @@ button.delete.control:active {
 }
 
 button.check.control {
-     font-size: 0;
-     text-indent: -99999px;
      background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
 }
 
 button.check.control:hover, button.check.control:focus {
@@ -820,11 +817,7 @@ button.check.control:active {
 }
 
 button.download.control {
-     font-size: 0;
-     text-indent: -99999px;
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
-     background-size: 16px 16px, 100% 100% !important;
-     padding: 12px 11px;
 }
 
 button.download.control:hover, button.download.control:focus {
@@ -885,31 +878,37 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      text-indent: 0;
      text-align: left;
      min-width: 0 !important;
-     padding-left: 21px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 .routersummary .reload[value="restartImmediate"] {
-     background: url(/themes/console/images/buttons/restart.png) center left 4px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background: url(/themes/console/images/buttons/restart.png) center left 6px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .reload[value="restartImmediate"]:hover {
-     background: #000 url(/themes/console/images/buttons/restart.png) center left 4px no-repeat !important;
+     background: #000 url(/themes/console/images/buttons/restart.png) center left 6px no-repeat !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .reload[value="restartImmediate"]:focus, .routersummary .reload[value="restartImmediate"]:active {
-     background: url(/themes/console/images/buttons/restart_hover.png) center left 4px no-repeat;
+     background: url(/themes/console/images/buttons/restart_hover.png) center left 6px no-repeat;
+     background-size: 14px auto !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"] {
-     background: url(/themes/console/images/buttons/shutdown.png) center left 4px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background: url(/themes/console/images/buttons/shutdown.png) center left 6px no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"]:hover {
-     background: #000 url(/themes/console/images/buttons/shutdown_hover.png) center left 4px no-repeat !important;
+     background: #000 url(/themes/console/images/buttons/shutdown_hover.png) center left 6px no-repeat !important;
+     background-size: 14px auto !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"]:focus, .routersummary .stop[value="shutdownImmediate"]:active {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 4px no-repeat;
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 6px no-repeat;
+     background-size: 14px auto !important;
 }
 
 .routersummary .reload[value="Reseed"] {
@@ -928,18 +927,18 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 .routersummary .download, .routersummary .download:hover, .routersummary .download:focus {
-     background: url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat;
      background-size: 14px 14px, 100% 100%;
      min-width: 0 !important;
 }
 
 .routersummary .download, .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
      background-size: 14x 14px !important;
-     padding: 5px 3px 5px 22px !important;
+     padding: 5px 7px 5px 23px !important;
 }
 
 .routersummary .download:active {
-     background: #652787 url(/themes/console/images/buttons/download.png) 3px center no-repeat;
+     background: #652787 url(/themes/console/images/buttons/download.png) 6px center no-repeat;
 }
 
 /* end sidebar buttons */
@@ -953,7 +952,7 @@ pre {
      width: 98%;
      overflow-x: auto;
      text-align: left;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #c9ceff;
 }
 
@@ -964,7 +963,7 @@ div.logo { /* proxy error "fake" sidebar */
      padding: 10px;
      text-align: center;
      color: #c9ceff;
-     margin: 0 20px 0 20px;
+     margin: -2px 20px 0 20px;
      border: 1px solid #443da0;
      background: #000;
      width: 185px;
@@ -975,13 +974,11 @@ div.logo { /* proxy error "fake" sidebar */
 .logo a img {
      opacity: 0.6;
      filter: invert(100%) sepia(100%) hue-rotate(175deg);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(175deg);
 }
 
 .logo a img:hover {
      opacity: 1;
      filter: invert(100%) sepia(100%) hue-rotate(175deg) drop-shadow(0 0 3px #652787);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(175deg) drop-shadow(0 0 3px #652787);
 }
 
 div.logo hr {
@@ -1010,7 +1007,6 @@ div.logo hr {
      word-wrap: break-word;
      font-size: 9pt;
      min-width: 300px;
-/* stripey borders */
      box-shadow: inset 0 0 0 1px #44175f, inset 0 0 3px 3px #000, 0 0 0 2px #443da0;;
      border: 5px solid #443da0;
      border-image: repeating-linear-gradient(135deg, #003 0px, #003 20px, #550 20px, #550 40px, #003 40px) 5 repeat repeat;
@@ -1092,19 +1088,16 @@ div.logo hr {
      width: 176px;
      height: auto;
      filter: sepia(100%) hue-rotate(180deg) drop-shadow(0 0 1px #652787);
-     -webkit-filter: sepia(100%) hue-rotate(180deg) drop-shadow(0 0 1px #652787);
 }
 
 .routersummary img[src*="i2plogo"]:hover {
      opacity: 1;
      transition: ease-in opacity 0.3s 0s, ease filter 0.3s 0s;
      filter: drop-shadow(0 0 2px #652787) saturate(100%);
-     -webkit-filter: drop-shadow(0 0 2px #652787) saturate(100%);
 }
 
 .routersummary img[src*="i2plogo"]:active {
      filter: drop-shadow(0 0 5px #450519) saturate(140%) !important;
-     -webkit-filter: drop-shadow(0 0 5px #450519) saturate(140%) !important;
      transition: ease-out opacity 0s 0s, ease filter 0s 0s;
 }
 
@@ -1112,7 +1105,6 @@ div.logo hr {
      opacity: 1;
      transition: ease-in opacity 0.5s 0s, ease filter 0.5s 0s;
      filter: drop-shadow(0 0 3px #652787) saturate(200%);
-     -webkit-filter: drop-shadow(0 0 3px #652787) saturate(200%);
 }
 
 .routersummary input[type=text] {
@@ -1141,18 +1133,23 @@ div.logo hr {
 }
 
 .routersummary h3:hover {
-     background: linear-gradient(to bottom, #001050 0%, #001030 30%, #001020 50%, #000 50%) !important;
+     background: linear-gradient(to bottom, #001020 50%, #000 50%) !important;
+}
+
+.routersummary h3:hover a {
+    color: #652787 !important;
 }
 
 .routersummary h3:active {
      box-shadow: inset 3px 3px 3px #000;
 }
 
-.routersummary h3 a {
+.routersummary h3 a, .routersummary h3 a:visited {
      display: inline-block;
      width: calc(100% - 6px);
      padding: 1px 0 !important;
      margin: 0;
+     color: #7670c2;
 }
 
 .routersummary h4 {
@@ -1183,7 +1180,7 @@ div.logo hr {
 .routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -4px -7px -6px -8px !important;
+     margin: -4px -7px -5px -8px !important;
      width: 189px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -1192,29 +1189,23 @@ div.logo hr {
 }
 
 #sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
-     margin-top: -3px !important;
+     margin-top: -6px !important;
      margin-bottom: -5px !important;
 }
 
 #sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
 #sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
-   content: "";
-   display: inline-block;
-   box-sizing: border-box;
-   vertical-align: bottom;
+     content: "";
+     display: inline-block;
+     vertical-align: bottom;
+     min-height: 16px !important;
 }
-
-/*
-#sb_peers td, #sb_tunnels td, #sb_queue td, #sb_bandwidth td, #sb_general td, #sb_shortgeneral td {
-     padding-top: 1px;
-     padding-bottom: 1px;
-}
-*/
 
 #sb_localtunnels {
      width: 189px !important;
      border-collapse: separate;
      border-spacing: 0;
+     margin-top: -5px !important;
 }
 
 #sb_localtunnels a {
@@ -1494,6 +1485,8 @@ div.sorry hr {
      margin: 10px 0;
 }
 
+/* end error msgs */
+
 .main {
      margin: -1px 5px 5px 205px;
      padding: 0 10px 1px 10px;
@@ -1503,7 +1496,7 @@ div.sorry hr {
      border: 1px solid #443da0;
      border-radius: 0 0 2px 2px;
      background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
-     background-size: auto 120px !important;
+     background-size: auto 200px !important;
      min-width: 620px;
      box-shadow: 0 1px 5px #000, inset 0 0 0 1px #000;
      font-size: 9pt;
@@ -1511,6 +1504,7 @@ div.sorry hr {
 
 .main#news {
      background: #000 url(images/earth.jpg) no-repeat scroll bottom right !important;
+     background-size: auto 200px !important;
      padding-bottom: 0;
 }
 
@@ -1518,21 +1512,13 @@ div.sorry hr {
      margin: -1px 5px 0 205px;
      padding: 6px 20px 5px;
      border: 1px solid #443da0;
-     background: #000;
      background: #000 url(images/earth.jpg) no-repeat scroll bottom right;
-     background-size: auto 30%;
+     background-size: auto 200px;
      color: #7670c2;
      font-size: 8pt;
      text-align: right;
      box-shadow: 0 1px 5px #000;
-     min-width: 580px;
-}
-
-.news h3, .fixme h3 {
-     text-align: left !important;
-     font-size: 9.5pt !important;
-     letter-spacing: 0.03em;
-     color: #c9ceff;
+     min-width: 600px;
 }
 
 /*
@@ -1617,6 +1603,14 @@ div.sorry hr {
      margin-left: 10px;
 }
 
+#news #newsDisplay {
+     margin-right: -5px;
+}
+
+#news #newsDisplay a {
+     padding: 2px 3px;
+}
+
 .newsAuthor {
      float: right;
      background: url(/themes/console/images/info/author_dark.png) left 2px top no-repeat;
@@ -1684,6 +1678,12 @@ div.sorry hr {
      background-size: auto, 80px !important;
 }
 
+.main#events .messages {
+     margin-top: 21px;
+     margin-bottom: -16px;
+     box-shadow: inset 0 0 0 1px #300 !important;
+}
+
 .wideload {
      margin: 0;
 }
@@ -1700,7 +1700,7 @@ div.sorry hr {
 
 div.confignav {
      background: #010010 url(images/titles.png) center center repeat-x !important;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      padding: 7px 5px 8px !important;
      margin: -1px -11px 15px;
      border: 1px solid #443da0;
@@ -1720,9 +1720,10 @@ div.confignav {
      box-shadow: inset 0 0 0 1px #000;
 }
 
-.tab a {
+.tab a, .tab a:visited {
      display: inline-block;
      padding: 4px 16px 5px;
+     color: #7670c2
 }
 
 .tab {
@@ -1794,11 +1795,11 @@ div.confignav {
 
 img[src$="inbound.png"], img[src$="outbound.png"] {
      filter: hue-rotate(-47deg);
-     -webkit-filter: hue-rotate(-47deg);
 }
 
 h3#iptransport a:not(old), h3#advancedconfig a:not(old) {
      font-size: 0;
+     height: 20px;
 }
 
 h3#iptransport a::after, h3#advancedconfig a::after {
@@ -1812,7 +1813,7 @@ h3#iptransport a::after, h3#advancedconfig a::after {
 
 div.messages {
      padding: 20px 10px;
-     margin: 10px 0;
+     margin: -4px 0 10px;
      border: 1px solid #443da0;
      background: #000;
      background: url(/themes/console/images/info/infohelp.png) no-repeat 15px center, #000;
@@ -1940,12 +1941,6 @@ h3#graphdisplay a {
      float: right;
 }
 
-/*
-.main#graphs hr {
-     margin: 10px -10px 8px !important;
-}
-*/
-
 /* new graphs optionbox */
 
 #graphs form {
@@ -1985,8 +1980,9 @@ h3#graphdisplay a {
 }
 
 #graphs td.infohelp {
-     border: 1px solid #120f35;
+     border: 1px inset #120f35;
      border-right: none;
+     border-left: none;
      background-size: 20px 20px !important;
      padding: 5px 5px 5px 40px !important;
      background-color: #010008 !important;
@@ -2030,7 +2026,7 @@ th {
      text-align: center;
      font-size: 9pt;
      background: #000 url(images/titles.png) center center repeat-x;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      border-top: 1px solid #443da0;
      border-bottom: 1px solid #443da0 !important;
      line-height: 110%;
@@ -2063,11 +2059,10 @@ td img {
 
 td img[src$="c=a1"], td img[src$="c=a2"] {
      filter: drop-shadow(0 0 1px #337);
-     -webkit-filter: drop-shadow(0 0 1px #337);
 }
 
 tt {
-     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #393;
 }
 
@@ -2076,7 +2071,7 @@ table tt {
 }
 
 a:link tt, a:visited tt {
-     color: #443da0;
+     color: #4e47bf;
 }
 
 a:hover tt {
@@ -2106,7 +2101,7 @@ div.main li {
 
 .tidylist code {
      text-align: left;
-     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: bold 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #fff;
      padding: 2px 3px;
      background: #040033;
@@ -2129,12 +2124,12 @@ ul {
 
 code {
      text-align: left;
-     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font: 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #393;
 }
 
 a:link, h2 a:link {
-     color: #443da0;
+     color: #7972d1;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
@@ -2142,7 +2137,7 @@ a:link, h2 a:link {
 }
 
 a:visited {
-     color: #7670c2;
+     color: #4e47bf;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
@@ -2160,7 +2155,6 @@ a:active {
 }
 
 .links {
-/*     padding-bottom: -2px; */
      text-align: justify;
      margin-top: 10px;
      margin-bottom: -10px;
@@ -2172,8 +2166,8 @@ a:active {
 
 .links b {
      color: #ebdbff !important;
+     color: #8f7959 !important;
      letter-spacing: 0.08em;
-     font-size: 8.5pt;
      line-height: 165%;
 }
 
@@ -2212,7 +2206,7 @@ h1 {
      border: 1px solid #443da0;
      border-radius: 2px 2px 0 0;
      line-height: 120%;
-     min-width: 620px;
+     min-width: 610px;
      box-shadow: 0 1px 5px #000;
 }
 
@@ -2225,7 +2219,6 @@ span.newtab {
 
 .newtab:hover {
      filter: drop-shadow(0 0 3px #652787) !important;
-     -webkit-filter: drop-shadow(0 0 3px #652787) !important;
 }
 
 h2, h2.welcome {
@@ -2268,7 +2261,7 @@ h3, h3.welcome, div.news h3 {
 }
 
 div.news h3 {
-     padding: 6px 10px;
+     padding: 6px 10px 6px 0;
 }
 
 h4 {
@@ -2281,7 +2274,7 @@ h4 {
 }
 
 h1, h2, h3:not([id*="help"]), h4.app, h4.app2, div.routersummary h3, .confignav {
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
 }
 
 h2, h3, h4, .confignav {
@@ -2296,12 +2289,13 @@ h2, h3, h4, .confignav {
      letter-spacing: 0.08em;
      color: #c9ceff;
      padding: 6px 10px 6px 30px;
-     background: url(/themes/console/images/info/newspaper.png) left 8px center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: url(/themes/console/images/info/newspaper.png) left 8px center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      background-size: 16px 16px, 100% 100% !important;
 }
 
 .news h3 {
-     background: url(/themes/console/images/info/newspaper.png) left 8px center no-repeat !important;
+     padding-left: 23px !important;
+     background: url(/themes/console/images/info/newspaper.png) left 1px center no-repeat !important;
      background-size: 16px 16px !important;
      border: none !important;
      border-bottom: 1px solid #443da0 !important;
@@ -2325,12 +2319,12 @@ h2, h3, h4, .confignav {
 }
 
 .langbox img {
-     opacity: 0.5;
+     opacity: 0.7;
      margin: 0 !important;
      padding: 0;
 }
 
-.langbox img:hover {
+.langbox img:hover, .langbox a:focus img {
      opacity: 1;
      transform: scale(1.1);
 }
@@ -2438,12 +2432,6 @@ div.joblog th:first-child {
      padding-left: 6px;
 }
 
-div.joblog th:last-child { /* kludge for broken table in /jobs .. requires additional trailing td per tr to fix */
-      width: 0;
-      height: 0;
-      padding: 0;
-}
-
 /* /jobs */
 
 h2#jobrunners {
@@ -2533,7 +2521,6 @@ h3#scheduledjobs + ol li:before {
 
 /* end /jobs */
 
-
 /* /eventlogs */
 
 table#eventlog {
@@ -2549,7 +2536,6 @@ table#eventlog td {
 table#eventlog td:last-child {
      width: 40%;
 }
-
 
 form[action="events"] {
      background: #000;
@@ -2588,7 +2574,6 @@ form[action="events"] {
 
 .cells {
      border: 1px inset #120f35;
-     /*border-left: 1px outset #141;*/
      text-align: center;
 }
 
@@ -2674,9 +2659,9 @@ table#udpconnections tr.tablefooter td:first-child {
 }
 
 table#udpconnections td[class="cells"]:first-child, table#ntcpconnections td[class="cells"]:first-child {
-	  width: 50px;
-	  white-space: nowrap;
-	  text-align: right;
+     width: 50px;
+     white-space: nowrap;
+     text-align: right;
 }
 
 table#ntcpconnections td[class="cells"]:last-child {
@@ -2774,11 +2759,17 @@ table#ntcpconnections {
 
 /* end peer sort */
 
+.backlogged {
+     font-size: 14pt;
+     line-height: 0;
+}
+
 pre#transports {
      border: 1px solid #443da0;
      padding: 15px 7px 5px 15px;
-     margin: 0 20px 0 0;
+     margin: 0;
      background: #000;
+     width: calc(100% - 24px);
 }
 
 a[name="chelp"]:hover, a[name="help"]:hover, a[name="chelp"]:active, a[name="help"]:active { /* hide /help anchorpoints */
@@ -2799,6 +2790,10 @@ a[name="chelp"]:hover, a[name="help"]:hover, a[name="chelp"]:active, a[name="hel
 
 .homelinkedit input[type="text"] {
      margin-left: 0;
+}
+
+#config_homepage .delete {
+     float: left;
 }
 
 .formaction#homesites {
@@ -2831,7 +2826,6 @@ tr#addnew {
 
 div.themechoice {
      width: 120px;
-/*     height: 78px;*/
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -2878,8 +2872,7 @@ div.themechoice {
 
 .themechoice .optbox {
      min-width: 114px !important;
-     min-height: 74px !important;
-     outline: 1px !important; /* placement guide */
+     min-height: 80px !important;
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
      margin-left: -33px;
      z-index: 999;
@@ -2907,11 +2900,41 @@ div.themechoice {
 
 #themeoptions {
      clear: both;
-     padding-top: 5px;
+     border-top: 1px solid #443da0;
+     margin: 0 -7px 5px;
+     position: relative;
+     top: 8px;
+     padding: 5px 10px 8px 5px;
+}
+
+#themeoptions br {
+     display: none;
+}
+
+#themeoptions label {
+     white-space: nowrap;
+     margin: 4px 10px 4px 0 !important;
+     display: inline-block;
+}
+
+p#helptranslate {
+     position: relative;
+     top: 8px;
+     margin: 0 -7px;
+     padding: 15px 10px 15px 50px !important;
+     text-align: left !important;
+     border-top: 1px solid #443da0;
+     border-bottom: 1px solid #443da0;
+     background: url(/themes/console/images/info/notice.png) left 14px center no-repeat, #000;
+     background-size: 28px 28px;
 }
 
 #themeoptions input {
      margin-left: 5px;
+}
+
+#themeoptions input[type="checkbox"] {
+     min-height: 16px;
 }
 
 .themelabel {
@@ -2920,7 +2943,7 @@ div.themechoice {
      margin-right: -4px;
      padding: 4px 2px;
      background: #010010 url(images/titles.png) center center repeat-x;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      color: #7670c2;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -3052,7 +3075,7 @@ td#themeselect {
      border-top: 1px solid #241f69;
      border-radius: 0 0 2px 2px;
      text-transform: capitalize;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      color: #7670c2;
      box-shadow: inset 0 0 0 1px #000;
 }
@@ -3083,7 +3106,7 @@ div#langsettings {
 }
 
 .formaction#langui {
-     margin: -10px -8px -15px;
+     margin: 7px -8px -15px;
      border: 1px solid #443da0;
      background: #000;
 }
@@ -3147,7 +3170,7 @@ table#consolepass input[type="password"] {
 
 #consolepass input[name="name"], #externali2cp input[name="user"] {
      background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat;
-     background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%);
+     background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000, #000019);
      padding: 4px 5px 4px 26px !important;
      background-size: 16px 16px, 100% 100% !important;
 }
@@ -3158,7 +3181,7 @@ table#consolepass input[type="password"] {
 
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
      background: #000 url(/themes/console/images/buttons/password.png) 3px center no-repeat;
-     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%);
+     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #000, #000019);
      padding: 4px 5px 4px 22px !important;
      background-size: 16px 16px, 100% 100% !important;
 }
@@ -3224,6 +3247,19 @@ table#reseedconfig textarea {
      width: calc(100% - 5px);
 }
 
+#reseedconfig tr:nth-child(2) br {
+     display: none;
+}
+
+#reseedconfig tr:nth-child(2) label {
+     white-space: nowrap;
+     margin-right: 10px;
+}
+
+#reseedconfig td:first-child {
+     line-height: 120%;
+}
+
 /* /configservice */
 
 .formaction#shutdown, .formaction#restart, .formaction#systray, .formaction#runonstart, .formaction#dumpthreads, .formaction#browserstart {
@@ -3261,6 +3297,10 @@ ul#banlist {
      column-width: 300px;
      column-gap: 10px;
      column-rule: 1px dotted #443da0;
+}
+
+#profiles ul#banlist {
+     margin-top: -4px !important;
 }
 
 #banlist li {
@@ -3319,7 +3359,6 @@ table#bandwidthconfig {
 table#bandwidthconfig td:first-child {
      width: 200px;
      white-space: nowrap;
-     font-weight: bold;
 }
 
 table#bandwidthconfig {
@@ -3403,7 +3442,7 @@ form[action="events"] > .formaction {
 }
 
 table#addkeyring td:first-child {
-     width: 170px;
+     width: 15%;
      white-space: nowrap;
      font-weight: bold;
      padding-right: 0;
@@ -3429,8 +3468,13 @@ p#keyringhelp, p#webappconfig, p#availableplugins, p#pluginconfigtext, p#clientd
      padding: 15px 15px 15px 45px !important;
 }
 
-p#keyringhelp, #config_reseed p.infohelp, #config_family p.infohelp, p#tunnelconfig {
+#config_reseed p.infohelp, #config_family p.infohelp, p#tunnelconfig {
      margin-top: 0;
+}
+
+p#keyringhelp, #ffconf, #bwlimiter, #i2pclientconfig, .confignav + h3, #advancedclientconfig, .confignav + .infowarn, #webappconfig,
+#config_logging h3, #iptransport, .confignav + form > h3, #pluginmanage, .confignav + .infohelp, #statsForm > h3.ptitle, .infowarn + .infohelp {
+     margin-top: -4px !important;
 }
 
 p#availableplugins {
@@ -3445,9 +3489,12 @@ p#webappconfigtext + p, p#pluginconfigtext {
      margin-bottom: -1px;
 }
 
+h3#pconfig {
+     margin-top: -4px;
+}
+
 #pluginconfig th:first-child, #pluginconfig td:first-child, #webappconfig th:first-child {
      text-align: right;
-     width: 100px;
      white-space: nowrap;
 }
 
@@ -3487,16 +3534,6 @@ input[type="hidden"] + p {
      margin-bottom: -21px;
      background: #000;
 }
-
-/*
-form[action="configclients"]:first-child > input[type="hidden"] + p {
-     border: 1px solid #443da0;
-     padding: 10px;
-     margin-top: -1px !important;
-     margin-bottom: -21px;
-     background: #000;
-}
-*/
 
 input[type="hidden"] + p + p {
      border: 1px solid #443da0;
@@ -3590,14 +3627,6 @@ ul.statlist li li:last-child {
      display: none;
 }
 
-/*
-.statlist a[href*="graph"]::before {
-     content: "\1F4CA\00A0";
-     font-size: 11pt;
-     line-height: 140%;
-}
-*/
-
 .main#stats form {
      border: 1px solid #443da0;
      padding: 10px;
@@ -3634,6 +3663,7 @@ h3.tabletitle + .statusnotes, table.tunneldisplay {
 form > table {
      font-size: 9pt;
 }
+
 /* configtunnels */
 
 table#tunnelconfig td:first-child {
@@ -3654,7 +3684,7 @@ table#i2pupdates {
 }
 
 table#i2pupdates td:first-child {
-     width: 100px;
+     width: 15%;
      white-space: nowrap;
      padding-left: 10px;
 }
@@ -3676,33 +3706,21 @@ input[name="logfilename"], input[name="logformat"], input[name="logdateformat"],
      width: 125px;
 }
 
-table#loggingoptions {
-}
-
-table#loggingoptions td {
+#loggingoptions td {
      padding: 6px;
 }
 
-table#loggingoptions td:first-child {
-     width: 110px;
-     white-space: nowrap;
+#loggingoptions td:first-child {
      padding-right: 3px;
+     line-height: 120%;
 }
 
 #loggingoptions td:nth-child(2) {
      width: 170px;
 }
 
-#loggingoptions td:nth-child(4) {
-     width: auto;
-}
-
 #loggingoptions tr:nth-last-child(2) {
      white-space: nowrap;
-}
-
-#loggingoptions tr:last-child td {
-     padding: 5px 4px 10px;
 }
 
 #loggingoptions input[type="text"], #loggingoptions select, #loggingoptions textarea {
@@ -3742,7 +3760,7 @@ table#sidebarconf {
 
 #sidebarconf button {
      margin: 2px;
-     padding: 4px 1px;
+     padding: 4px 3px;
      min-width: 0;
      background: #000;
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%);
@@ -3761,15 +3779,15 @@ table#sidebarconf {
 }
 
 #sidebarconf button img {
-     opacity: 0.8;
      height: 12px;
      width: auto;
 }
 
-#sidebarconf th:nth-child(1), .homelinkedit th:first-child {
+#sidebarconf th:nth-child(1), .homelinkedit th:first-child, #consolepass th:first-child {
      text-align: center;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      text-indent: -99999px;
+     width: 5%;
 }
 
 #sidebarconf th:nth-child(2) {
@@ -3778,10 +3796,6 @@ table#sidebarconf {
 
 #sidebarconf td:first-child {
      width: 60px;
-}
-
-#sidebarconf td:nth-child(2) {
-     font-weight: bold;
 }
 
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
@@ -3825,8 +3839,12 @@ h3#shutdownrouter, h3#restartrouter, h3#servicedebug, h3#browseronstart, h3#rono
      margin-bottom: -6px;
 }
 
+h3#restartrouter, h3#servicedebug, h3#browseronstart, h3#rononstartup, h3#systray {
+      margin-top: 11px !important;
+}
 
 /* info paragraphs */
+
 h3#shutdownrouter + p, h3#restartrouter + p, h3#servicedebug + p, h3#browseronstart + p, h3#runonstartup + p, h3#systray + p {
      background: #010008 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
      padding: 10px 15px 10px 50px;
@@ -3887,22 +3905,22 @@ table#externali2cp {
     font-size: 10pt;
 }
 
-div#volunteer {
-     border: 1px solid #443da0;
-     padding: 0 20px;
-     margin: 10px 0 !important;
-     background: #000 url(images/scarface.jpg) bottom right no-repeat !important;
-     background-size: auto 60% !important;
-}
-
-#legal, #sidebarhelp, #volunteer, #reachabilityhelp, #configurationhelp {
+#legal, #sidebarhelp, #volunteer, #reachabilityhelp, #configurationhelp, #faq {
      border: 1px solid #443da0;
      padding: 0 20px;
      margin: 10px 0;
      background: #000;
 }
 
-#legal h2, #sidebarhelp h2, #volunteer h2, #reachabilityhelp h2, #configurationhelp h2 {
+div#volunteer {
+     border: 1px solid #443da0;
+     padding: 0 20px;
+     margin: -5px 0 10px !important;
+     background: #000 url(images/scarface.jpg) bottom right no-repeat !important;
+     background-size: auto 60% !important;
+}
+
+#legal h2, #sidebarhelp h2, #volunteer h2, #reachabilityhelp h2, #configurationhelp h2, #faq h2 {
      padding: 10px;
      text-transform: uppercase;
      font-size: 11pt;
@@ -3918,7 +3936,7 @@ div#volunteer {
      padding-top: 10px;
 }
 
-#sidebarhelp h3 {
+#sidebarhelp h3, #faq h3 {
      padding: 10px;
      text-transform: uppercase;
      font-size: 10.5pt;
@@ -3958,13 +3976,14 @@ div#volunteer {
 }
 
 #advancedsettings p.infohelp {
+     margin-top: 12px;
      margin-bottom: -2px !important;
 }
 
 #configinfo th {
      text-align: left;
      padding: 8px 10px;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      color: #393;
      background: #002;
      background: linear-gradient(to right, #000, #002);
@@ -3977,22 +3996,119 @@ div#volunteer {
 
 p#fullhistory {
      text-align: right;
-     margin-top: -20px;
-     margin-bottom: 9px;
+     margin: -13px 0 9px;
      border: 1px solid #443da0;
-     border-top: none;
-     padding: 10px 10px 5px 10px;
+     padding: 5px 10px;
      background: #000;
+     position: relative;
+     z-index: 999;
 }
 
 ul#upnphelp li:last-child, #legal ul li:last-child {
      padding-bottom: 0;
 }
 
+.main#help td.infohelp, .main#help td.infowarn {
+     background-size: 24px 24px !important;
+     padding-left: 46px !important;
+}
+
+.main#help #configinfo .infowarn {
+     border: none;
+     border-bottom: 1px inset #010008;
+     box-shadow: none;
+     background-size: 20px 20px !important;
+     padding: 7px 10px 7px 40px !important;
+}
+
+/* mini faq */
+
+#faq h3 {
+     padding: 6px 10px 8px 35px !important;
+     background: url(/themes/console/images/info/question.png) 10px center no-repeat, linear-gradient(to bottom, #191729, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%) !important;
+     background-size: 18px 18px, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+     text-transform: none;
+     font-size: 10.5pt !important;
+     letter-spacing: 0;
+     word-spacing: 0;
+}
+
+#faq p.infohelp {
+     margin: 10px -10px !important;
+}
+
+#faq ul {
+     margin-bottom: -15px !important;
+}
+
+#faq li code {
+     margin-left: 10px;
+}
+
+#faq code, #help code {
+     user-select: all;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+}
+
+#portfaq {
+     width: auto;
+     margin: 10px -10px;
+}
+
+#portfaq td, #portfaq th {
+     padding-top: 10px !important;
+     padding-bottom: 10px !important;
+}
+
+#portfaq th:first-child, #portfaq td:first-child {
+     font-weight: bold;
+     text-align: right;
+}
+
+#portfaq .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#portfaq th {
+     text-align: left;
+     padding: 8px 5px !important;
+}
+
+#portfaq th[colspan="3"] {
+     text-align: left;
+     font-size: 10.5pt !important;
+     letter-spacing: 0.08em;
+     word-spacing: 0.1em;
+     padding-left: 10px !important;
+}
+
+#portfaq td[colspan="3"] {
+     font-weight: normal;
+}
+
+#portfaq td:nth-child(2) {
+     white-space: nowrap;
+}
+
+#portfaq td:first-child {
+     padding-left: 10px;
+}
+
+#portfaq td:last-child, #portfaq td[colspan="3"] {
+     text-align: justify;
+     padding-right: 10px;
+}
+
+/* end mini faq */
+/* end help */
+
 /* netdb (main section) */
 
 table#netdboverview {
-     margin-bottom: 10px;
+     margin: -5px 0 10px;
 }
 
 #netdboverview td {
@@ -4054,9 +4170,9 @@ table[cellspacing="30"] > tbody > tr > td:first-child > table > tbody > tr > th:
 
 th > img[src^="/imagegen"] { /* scale down header images */
      height: 24px;
-     width: 24px;
-     border-radius: 2px;
-     border: 1px solid #000;
+     width: 24px;;
+     margin: -1px;
+     border-left: 1px solid #443da0;
 }
 
 /* Advanced lookup */
@@ -4205,7 +4321,7 @@ table[id$="logs"] ul {
 
 .main#logs li {
      word-break: break-all;
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, monospace;
+     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 .logtable ul li:not(old) {
@@ -4239,7 +4355,7 @@ font[color="#000099"] { /* info */
 
 #logs li {
      list-style: none;
-     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, monospace;
+     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 130%;
      text-align: left;
      display: inline-block;
@@ -4299,48 +4415,48 @@ font[color="#000099"] { /* info */
 
 /* /profiles */
 
-table#profiles tr:hover, table#floodfills tr:hover {
+#profilelist tr:hover, table#floodfills tr:hover {
      background: #040033;
 }
 
-table#profiles tr:hover td, table#floodfills tr:hover td {
+#profilelist tr:hover td, table#floodfills tr:hover td {
      color: #c9ceff;
 }
 
-table#profiles th, table#profiles td {
+#profilelist th, #profilelist td {
      text-align: right;
 }
 
-table#profiles td:nth-child(2), table#profiles th:nth-child(2) {
+#profilelist td:nth-child(2), #profilelist th:nth-child(2) {
      text-align: left;
 }
 
-table#profiles td:first-child, table#profiles th:first-child {
+#profilelist td:first-child, #profilelist th:first-child {
      width: 52px;
      text-align: right;
 }
 
-table#profiles td:first-child {
+#profilelist td:first-child {
      text-align: right !important;
      padding-left: 4px;
 }
 
-table#profiles td:first-child, table#profiles th:first-child, table#profiles td:nth-last-child(2), table#profiles th:nth-last-child(2) {
+#profilelist td:first-child, #profilelist th:first-child, #profilelist td:nth-last-child(2), #profilelist th:nth-last-child(2) {
      white-space: nowrap;
      text-align: center;
 }
 
-table#profiles th:last-child {
+#profilelist th:last-child {
      text-align: center;
 }
 
-table#profiles td:last-child {
+#profilelist td:last-child {
      text-align: right;
      width: 60px;
      white-space: nowrap;
 }
 
-table#profiles td[colspan="8"] { /* profile class separator */
+#profilelist td[colspan="8"] { /* profile class separator */
      background: #050044;
      padding: 1px;
      border: 1px inset #000;
@@ -4349,7 +4465,6 @@ table#profiles td[colspan="8"] { /* profile class separator */
 a[href^="configpeer?peer"] {
      font-size: 0;
      filter: drop-shadow(0 0 1px #777);
-     -webkit-filter: drop-shadow(0 0 1px #777);
 }
 
 a[href^="configpeer?peer"]::after {
@@ -4360,7 +4475,6 @@ a[href^="configpeer?peer"]::after {
 
 a[href^="configpeer?peer"]:hover {
      filter: drop-shadow(0 0 1px #99f);
-     -webkit-filter: drop-shadow(0 0 1px #99f);
 }
 
 table#profile_defs, table#thresholds {
@@ -4427,11 +4541,11 @@ table#profile_defs + hr {
 }
 
 #profiles_overview {
-     margin-top: 10px;
+     margin-top: -4px;
 }
 
 table#floodfills {
-     margin: 5px 0 10px;
+     margin: 0 0 10px;
 }
 
 table#floodfills + hr {
@@ -4448,7 +4562,6 @@ table#floodfills th {
 }
 
 table#floodfills td  {
-     color: #7670c2;
      padding: 3px !important;
 }
 
@@ -4465,7 +4578,7 @@ table#floodfills td:first-child {
      padding-right: 5px !important;
 }
 
-table#profiles td:first-child > *, table#floodfills td:first-child > *,
+#profilelist td:first-child > *, table#floodfills td:first-child > *,
 table#udpconnections td:first-child > *, table#ntcpconnections td:first-child > * {
      vertical-align: middle;
 }
@@ -4546,7 +4659,7 @@ table#jardump { /* /jars */
      border: 1px solid #443da0;
      letter-spacing: 0.05em;
      font-size: 10pt;
-     background: linear-gradient(to right, #000 0%, #002 100%);
+     background: linear-gradient(to right, #000, #002);
 }
 
 .main#certs h3 + p {
@@ -4641,7 +4754,6 @@ table#jardump { /* /jars */
 
 div.footnote {
      text-align: right;
-     color: #443da0;
      font-size: 7pt;
      margin-bottom: 5px !important;
 }
@@ -4657,19 +4769,19 @@ div.footnote hr {
 .topness {
      font-size: 7.5pt;
      text-align: right;
-     margin-top: -20px !important;
+     margin-top: -10px !important;
      margin-bottom: -5px;
      margin-right: 5px;
 }
 
 /* begin home page */
 
-div.home {
+#homepanel {
      margin: 0 -8px;
 }
 
 h4.app, h4.app2 {
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      border: 1px solid #443da0;
      font-size: 10.5pt;
      font-variant: small-caps;
@@ -4710,7 +4822,7 @@ div.app {
 }
 
 .app a:link, .app a:visited {
-     color: #443da0;
+     color: #7670c2;
      display: inline-block;
      width: 100%;
 }
@@ -4724,7 +4836,8 @@ div.app:hover {
 }
 
 div.app:hover img {
-     filter: drop-shadow(0 0 2px #652787) !important;
+     filter: drop-shadow(0 0 3px #652787) !important;
+     mix-blend-mode: normal;
 }
 
 div.app:active .applabel {
@@ -4786,7 +4899,7 @@ table.search {
 
 .search tr {
      background: #000 url(images/header.png) center center repeat-x;
-     background: linear-gradient(to bottom, #000010 0%, #000019 50%, #000 51%, #000 100%) !important;
+     background: linear-gradient(to bottom, #000010 0%, #000019 50%, #000 51%) !important;
 }
 
 .search td {
@@ -4807,7 +4920,7 @@ table.search {
 
 input.search, input.search:hover {
      background: #000 url(/themes/console/images/buttons/search.png) 4px center no-repeat;
-     background: url(/themes/console/images/buttons/search.png) 4px center no-repeat, linear-gradient(to bottom, #000 0%, #000019 100%);
+     background: url(/themes/console/images/buttons/search.png) 4px center no-repeat, linear-gradient(to bottom, #000, #000019);
      padding: 4px 3px 4px 24px;
      vertical-align: middle;
      width: 100%;
@@ -4822,44 +4935,45 @@ input.search:focus {
 }
 
 .appimg {
-     height: 35px;
+     height: 45px;
 }
 
-img.app, img.app2p {
+.app img {
      height: 32px;
      width: auto;
      max-height: 32px;
      max-width: 32px;
-     padding: 3px 21px 0;
+     padding: 9px 50px 35px;
      margin-bottom: 1px;
+     mix-blend-mode: luminosity;
 }
 
-div.app:hover img.app {
+div.app:hover .app img {
      filter: saturate(200%);
+     mix-blend-mode: normal;
 }
 
-table.app {
+.app table {
      background: none;
      border: 0;
      margin: auto;
      width: auto;
 }
 
-tr.app {
+.app tr {
      background: none;
      border: 0;
      margin: 0;
 }
 
-td.app {
+.app td {
      background: none;
      border: 0;
      margin: 0;
      padding: 3px 0 0;
 }
 
-div.applabel {
-     font-size: 8pt;
+.applabel {
      margin: 2px 0 0;
      padding: 5px 2px 6px;
      text-align: center;
@@ -4867,28 +4981,33 @@ div.applabel {
      line-height: 95%;
      text-transform: lowercase;
      border: none;
-     width: 120px;
+     width: 130px;
      min-width: 72px;
      background: #001 url(images/titles.png) center center;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      border-radius: 0 0 2px 2px;
      border-top: 1px solid #443da0;
      white-space: nowrap;
      overflow: hidden;
-     text-overflow: ellipsis; /* ellipsize overlong app labels */
-     color: #443da0;
+     text-overflow: ellipsis;
+     color: #4e47bf;
      box-shadow: inset 0 0 0 1px #000;
 }
 
-div.applabel:hover {
+.applabel:hover {
      background: #000;
      border-top: 1px solid #652787;
      color: #652787;
 }
 
-div.applabel a, div.applabel a:hover {
+.applabel a, .applabel a:hover {
      text-decoration: none !important;
      outline: none;
+     max-width: 126px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     display: inline-block;
+     padding: 2px 0;
 }
 
 div.app:hover .applabel {
@@ -4956,8 +5075,8 @@ table.netdbentry, table.leaseset {
      margin-bottom: 10px;
 }
 
-.netdbentry td, .leaseset td, table#leasesetdebug td, .sybil_routerinfo td {
-     color: #7670c2 !important;
+.confignav + .netdbentry {
+     margin-top: -4px !important;
 }
 
 .netdbentry td b, .leaseset td b, table#leasesetdebug td b, .sybil_routerinfo td b {
@@ -4965,7 +5084,7 @@ table.netdbentry, table.leaseset {
 }
 
 span#distance {
-     color: #D6FFFD !important;
+     color: #d6fffd !important;
 }
 
 .netdbentry th {
@@ -4976,6 +5095,7 @@ span#distance {
 
 .netdbentry th code, .leaseset th code, .sybil_routerinfo th code {
      font-size: 9pt;
+     font-weight: bold;
      margin-left: 5px;
 }
 
@@ -4995,7 +5115,8 @@ span#distance {
 }
 
 .netdbentry td:nth-child(2) {
-     word-wrap: break-word;
+     word-break: break-all;
+     hyphens: none;
 }
 
 .netdbentry img {
@@ -5003,10 +5124,11 @@ span#distance {
 }
 
 .netdbentry tr:last-child code {
-     color: #7670c2;
+     font-weight: bold;
 }
 
 table#leasesetdebug, table#leasesetsummary {
+     margin-top: -4px;
      margin-bottom: 10px;
 }
 
@@ -5110,8 +5232,6 @@ div#sybilnav, div#sybils_summary {
      margin-bottom: 10px;
 }
 
-/* sybil from dark */
-
 div#sybilnav {
      -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
@@ -5134,7 +5254,7 @@ div#sybilnav {
      white-space: nowrap;
      border: 1px solid #443da0;
      border-radius: 2px;
-     background: linear-gradient(to right, #000 0%, #002 80%);
+     background: linear-gradient(to right, #000, #002 80%);
      box-shadow: inset 0 0 0 1px #000;
 }
 
@@ -5167,7 +5287,6 @@ div#sybilnav {
 }
 
 #sybilnav ul li::before {
-/*     content: '\1F441\00A0'; */
      content: url(/themes/console/images/buttons/show.png);
      mix-blend-mode: luminosity;
      margin-right: 5px;
@@ -5185,7 +5304,6 @@ div#sybilnav {
      margin-bottom: -10px;
      padding-bottom: 2px;
 }
-
 
 /* end sybilnav */
 
@@ -5223,13 +5341,13 @@ table.sybil_routerinfo:first-of-type th {
      white-space: nowrap;
 }
 
-p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals {
+p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals, p.notfound {
      border: 1px solid #443da0;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
      font-weight: bold;
-     background: url(/themes/console/images/buttons/show.png) 8px center no-repeat;
-     background: url(/themes/console/images/buttons/show.png) 8px center no-repeat, linear-gradient(to right, #000, #001 80%, #002 100%);
+     background: url(/themes/console/images/buttons/show.png) 8px center no-repeat, #002;
+     background: url(/themes/console/images/buttons/show.png) 8px center no-repeat, linear-gradient(to right, #000, #001 80%, #002);
      background-blend-mode: luminosity;
      box-shadow: inset 0 0 0 1px #080077;
 }
@@ -5259,7 +5377,6 @@ p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sy
 /* end netdb */
 
 /* /confignet, /configadvanced */
-
 
 .configtable + .tabletitle {
      margin-top: 12px;
@@ -5342,7 +5459,7 @@ p.infohelp, p#debugmode, p#sybilinfo {
 }
 
 p#debugmode, p#sybilinfo {
-     margin-top: 0;
+     margin-top: -4px;
 }
 
 p#gatherstats {
@@ -5362,7 +5479,7 @@ td.optionsave {
      margin-bottom: 0;
 }
 
-h3.h3table, h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pluginconfig, h3#pluginfromurl,
+h3.h3table, h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pconfig, h3#pluginfromurl,
 h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils {
      margin-bottom: 0 !important;
      border-radius: 0;
@@ -5386,8 +5503,7 @@ h3.sybils + div, h3.sybils + a[name] + table {
 }
 
 p.notfound {
-     border: 1px solid #443da0;
-     padding: 10px;
+     margin-top: -1px;
 }
 
 h3#transports {
@@ -5424,7 +5540,7 @@ table#pluginconfig, table#i2pupdates, table.homelinkedit, table#peerdefs {
      margin-left: 8px;
 }
 
-h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile {
+h3#i2pclientconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile {
      margin-bottom: -13px !important;
 }
 
@@ -5457,7 +5573,7 @@ table#externali2cp th {
 th.th_title {
      padding: 7px 10px !important;
      text-align: left;
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      box-shadow: inset 0 0 0 1px #000;
 }
 
@@ -5476,9 +5592,11 @@ input#hideme {
 
 #pluginupdater {
      border: 1px solid #443da0;
+     padding: 15px 5px 15px 50px;
      margin-top: -11px;
      margin-bottom: 10px !important;
-     background: #000;
+     background: url(/themes/console/images/info/update.png) 12px center no-repeat, #000;
+     background-size: 28px 28px;
 }
 
 #pluginupdater form {
@@ -5492,7 +5610,7 @@ input#hideme {
 h4.embeddedtitle#updateplugins {
      padding: 5px 10px;
      font-size: 9pt;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      border: 1px solid #443da0;
      text-align: left;
      text-transform: uppercase;
@@ -5507,14 +5625,12 @@ h4.embeddedtitle#updateplugins {
      width: calc(100% - 300px);
 }
 
-table#loggingoptions, table#addkeyring {
+#loggingoptions, table#addkeyring {
      margin-bottom: -3px !important;
      margin-top: -1px;
 }
 
 /* /configpeers banlist */
-
-
 
 #bannedips {
      margin-bottom: 8px;
@@ -5577,7 +5693,7 @@ table#loggingoptions, table#addkeyring {
 
 #ipv4, #ipv6, #permabanned tr:nth-child(2) {
      background: #000 url(images/titles.png) center center repeat-x;
-     background: linear-gradient(to bottom, #121225 0%, #121225 50%, #000011 50%, #00000d 50%, #00000d 100%);
+     background: linear-gradient(to bottom, #121225 50%, #000011 50%, #00000d 50%);
      border-top: 1px solid #443da0 !important;
      border-bottom: 1px solid #443da0 !important;
 }
@@ -5605,9 +5721,17 @@ table#configstats {
      white-space: nowrap;
 }
 
+#configstats td:first-child:empty + td > label { /* remove pointer from inert labels */
+     cursor: default;
+}
+
 #configstats td {
     color: #b2bcf7;
     padding: 8px 4px;
+}
+
+#configstats td:last-child {
+     border-right: 1px solid #443da0;
 }
 
 #configstats td b {
@@ -5619,11 +5743,13 @@ table#configstats {
      padding: 0;
      vertical-align: middle;
 }
+
 #configstats tr.tablefooter td {
      padding: 4px 10px;
      line-height: 140%;
      background: #000 !important;
 }
+
 p#enablefullstats {
      margin-top: 5px;
      padding: 5px 10px;
@@ -5657,6 +5783,7 @@ p#debugmode {
 
 p#sybilinfo {
      padding: 15px 15px 15px 50px;
+     margin-bottom: 10px;
      background: url(/themes/console/images/info/experimental.png) 12px center no-repeat !important;
      background-size: 28px 28px !important;
 }
@@ -5695,7 +5822,7 @@ p#sybilinfo {
      vertical-align: sub;
 }
 
-#floodfillconfig .infohelp {
+#floodfillconfig tr:first-child .infohelp {
      background: #000 url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px !important;
@@ -5805,6 +5932,21 @@ form[action="events"] {
 
 /* responsive layout */
 
+@media screen and (max-width: 900px) {
+#ntcpconnections th:last-child:not(old) {
+     font-size: 0;
+}
+
+#ntcpconnections th:last-child::before {
+     content: url(/themes/console/images/info/backlogged.png) !important;
+}
+
+#ntcpconnections td:last-child {
+     width: 24px !important;
+     white-space: nowrap;
+}
+}
+
 @media screen and (max-width: 1200px) {
 .tab, .tab2 {
      padding: 1px 0 2px;
@@ -5818,21 +5960,77 @@ form[action="events"] {
 .tab a {
      padding: 2px 14px;
 }
+
+#floodfills td {
+     border-right: 1px inset #120f35;
+}
+
+#floodfills td:last-child {
+     border-right: 1px solid #443da0;
+}
+
+#plugininstall input[type="text"] {
+     min-width: 200px !important;
+}
+
+td.optionsave, table#i2pupdates td:first-child {
+     white-space: normal !important;
+     width: 30%;
+}
+
+table#i2pupdates td:first-child {
+     line-height: 120%;
+}
+
+#portfaq td:nth-child(2) {
+     white-space: normal;
+}
+
+.main#help h3, #faq h3 {
+     font-size: 10pt !important;
+}
 }
 
 @media screen and (max-width: 1500px) {
-button.control, button.control:hover, button.control:active, button.control:focus {
-     padding: 12px 10px !important;
-}
-
 #sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
 #sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 14px;
 }
+
+.tunnels_client th:first-child:not(old) {
+     font-size: 0;
+}
+
+.tunnels_client th:first-child::after {
+     content: "\21F5";
+     content: "\21E9\21E7";
+     font-size: 12pt;
+     line-height: 0;
+     vertical-align: middle;
+     letter-spacing: -0.25em;
+}
+}
+
+@media screen and (min-width: 1200px) {
+#floodfills td:last-child {
+     padding-right: 5px !important;
+}
+
+.topness, .footnote, #newsStatus, #newsDisplay {
+     font-size: 9pt !important;
+}
+
+.news hr {
+     margin-bottom: 5px;
+}
+
+.main#help h3, #faq h3 {
+     font-size: 10.5pt !important;
+}
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .statusnotes, textarea, th, .applabel a {
+body, .main, .main td, .news p, #news p, .statusnotes, textarea, th, .applabel a, tt, code, .messages, .messages #newsStatus, .messages #newsDisplay, #changelog pre {
      font-size: 10pt !important;
 }
 
@@ -5874,8 +6072,12 @@ div.routersummary img[src$="i2plogo.png"] {
    min-height: 18px;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, .smallhead, pre, tt, code {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, .smallhead, pre, #newsStatus, #newsDisplay {
      font-size: 9pt !important;
+}
+
+.routersummary button.download {
+     font-size: 10pt !important;
 }
 
 .routersummary h3 a, #netdboverview th {
@@ -5895,10 +6097,25 @@ div.app {
 }
 
 .applabel {
-     width: 134px !important;
+     width: 150px !important;
 }
 
-h3#i2pclientconfig, h3#pluginconfig, h3#pluginfromurl, h3#pluginfromfile, #clientconf.infohelp, h3#pluginmanage, h3#webappconfig {
+.applabel a, .applabel a:hover {
+     max-width: 146px;
+     padding: 3px 0;
+}
+
+.appimg {
+     height: 50px;
+     padding-top: 4px;
+}
+
+img.app, img.app2p {
+     padding: 14px 61px 44px;
+     margin-top: -5px;
+}
+
+h3#i2pclientconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile, #clientconf.infohelp, h3#pluginmanage, h3#webappconfig {
      margin-bottom: -15px !important;
 }
 
@@ -5906,7 +6123,7 @@ h4#updateplugins {
      margin-top: -15px !important;
 }
 
-table#profiles td:first-child, table#profiles th:first-child, #floodfills td:first-child, #floodfills th:first-child {
+#profilelist td:first-child, #profilelist th:first-child, #floodfills td:first-child, #floodfills th:first-child {
      width: 56px !important;
 }
 
@@ -5928,12 +6145,47 @@ div.joblog h3 {
 }
 
 #sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
-     max-width: 208px;
+     max-width: 207px;
 }
 
 #sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
-     margin-top: -6px !important;
+     margin-top: -4px !important;
      margin-bottom: -4px !important;
+}
+
+.langbox {
+     margin-top: 5px;
+}
+
+button.control {
+     padding: 14px !important;
+     font-size: 0 !important;
+}
+
+.main[id^="config_"] th, h4#updateplugins {
+    font-size: 10.5pt !important;
+}
+
+#help .confignav {
+     padding: 0 !important;
+     position: sticky;
+     top: 0;
+     z-index: 999;
+}
+
+#help .tab {
+     margin-top: -1px !important;
+     margin-bottom: -1px !important;
+}
+
+.newsAuthor {
+     font-size: 9pt !important;
+     background-size: 15px 15px !important;
+     padding-left: 19px !important;
+}
+
+table#reseedconfig input[type="text"], table#reseedconfig input[type="password"] {
+     width: 250px;
 }
 }
 
@@ -6043,4 +6295,17 @@ div[id^="config_"] .tab:first-child {
 }
 }
 /* end proxy errors */
+/* end responsive layout */
 
+/* IE/Edge tweaks */
+
+_:-ms-lang(x), .tunnels_client th:first-child::after {
+     letter-spacing: -0.05em;
+     font-weight: normal;
+}
+
+_:-ms-lang(x), table + .statusnotes {
+     margin-top: -2px;
+}
+
+/* end IE/Edge tweaks */

@@ -16,6 +16,10 @@ body.iframed {
      overflow: hidden;
 }
 
+* {
+     outline: none;
+}
+
 #logo {
      display: none;
 }
@@ -26,7 +30,7 @@ div#navi  {
      border: 1px solid #2d295f;
      padding: 3px 0 2px;
      background: #002 url(/themes/console/midnight/images/header.png) repeat-x scroll center center !important;
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      margin: -11px 0 27px;
      box-shadow: inset 0 0 0 1px #000;
      position: sticky;
@@ -43,6 +47,7 @@ div#navi  {
      padding: 5px !important;
      border: 1px solid #443da0 !important;
      margin: 0 0 27px;
+     position: static;
 }
 
 #navi a, #navi a:visited {
@@ -51,7 +56,6 @@ div#navi  {
      padding: 5px;
      margin: 3px 0 !important;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
      display: inline-block;
      outline: none;
      text-transform: capitalize;
@@ -314,7 +318,7 @@ h3 {
      padding: 7px 10px;
      border-radius: 2px;
      background: #000 url(/themes/console/midnight/images/header.png) repeat-x scroll center center;
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%);
+     background: linear-gradient(to bottom, #191729 0%, #000 50%);
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      text-shadow: 0 0 2px #010011;
@@ -407,7 +411,7 @@ div#messages > p.messages {
 }
 
 a:link {
-     color: #443da0;
+     color: #7972d1;
      text-decoration: none;
      font-weight: bold;
      outline: none;
@@ -419,7 +423,7 @@ a:hover, a:focus {
 }
 
 a:visited {
-     color: #7670c2;
+     color: #4e47bf;
      text-decoration: none;
 }
 
@@ -625,7 +629,11 @@ div#config + div#buttons, div#content + div#buttons {
      box-shadow: inset 0px 0px 1px 0px #020022;
      background: #fff;
      filter: sepia(100%) invert(100%);
-     -webkit-filter: sepia(100%) invert(100%);
+}
+
+_:-ms-lang(x), img.illustrate {
+     width: auto;
+     max-width: 600px;
 }
 
 div#book {
@@ -693,12 +701,10 @@ div#book {
      text-align: center;
      padding: 2px 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
 }
 
 .book td:nth-child(3) .addrhlpr:hover {
      filter: drop-shadow(0 0 1px #b73fff);
-     -webkit-filter: drop-shadow(0 0 1px #b73fff);
 }
 
 .headline + #book > table td {
@@ -718,6 +724,7 @@ div#book {
 #visualid {
      border: 1px solid #2d295f;
      margin-top: -10px;
+     background: #001;
 }
 
 .iframed #visualid {
@@ -728,6 +735,10 @@ div#book {
      margin-top: -1px;
      border-left: none;
      border-right: none;
+}
+
+#idAddress {
+     text-transform: none;
 }
 
 #visualid table {
@@ -779,7 +790,7 @@ input {
      border-radius: 2px;
      border: 1px solid #443da0;
      background: #000 none !important;
-     color: #443da0;
+     color: #4e47bf;
      margin: 2px 4px 2px 0;
      font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      min-width: 64px !important;
@@ -787,8 +798,9 @@ input {
 
 input[type="checkbox"], input[type="radio"], .optbox {
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%);
      background: none;
+     min-width: 16px;
+     min-height: 16px;
 }
 
 input[type=submit]::-moz-focus-inner, input[type=reset]::-moz-focus-inner {
@@ -797,7 +809,7 @@ input[type=submit]::-moz-focus-inner, input[type=reset]::-moz-focus-inner {
 }
 
 input[type=submit], input[type=reset], .fakebutton {
-     color: #443da0;
+     color: #4e47bf;
      background: #000;
      background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      border: 1px solid #3e3f8f;
@@ -832,7 +844,7 @@ textarea {
      background: #000;
      border: 1px solid #443da0;
      padding: 3px 5px;
-     font: bold 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: bold 8.5pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      border-radius: 2px;
      width: 100%;
      height: 120px;
@@ -848,14 +860,15 @@ input[type="text"], textarea {
 input[type="text"]:focus, textarea:focus {
      background: #000 !important;
      color: #c9ceff;
+     border-radius: 2px;
 }
 
-input[type=text]:focus {
+input[type=text]:focus, textarea[name="destination"]:focus {
      color: #c9ceff !important;
      background: #000;
      filter: drop-shadow(0 0 1px #99f);
-     -webkit-filter: drop-shadow( 0 0 1px #99f);
-     transition: filter ease 0.3s 0s;
+     box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
+     transition: filter ease 0.3s;
 }
 
 textarea[cols="70"] {
@@ -895,7 +908,7 @@ table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .ifram
 
 .headline h3 {
      padding: 10px 5px 10px 40px;
-     background: url(/themes/susidns/images/addressbook.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%);
+     background: url(/themes/susidns/images/addressbook.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%);
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -903,11 +916,11 @@ table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .ifram
 }
 
 .headline#subscriptions h3 {
-     background: url(/themes/susidns/images/subs_24.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%);
+     background: url(/themes/susidns/images/subs_24.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%);
 }
 
 .headline#config h3 {
-     background: url(/themes/susidns/images/configure_24.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%);
+     background: url(/themes/susidns/images/configure_24.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%);
 }
 
 .headline h4 {
@@ -917,40 +930,12 @@ table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .ifram
 
 p#filtered {
      background: url(/themes/console/images/buttons/filter.png) 13px center no-repeat;
-     padding: 15px 15px 15px 35px !important;
+     padding: 15px 250px 15px 35px !important;
 }
 
 p.book {
      background: url(/themes/susidns/images/abook.png) 13px center no-repeat;
      padding: 10px 10px 10px 35px !important;
-}
-
-/* responsive layout */
-
-@media screen and (min-width: 1500px) {
-body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea, .help li, td, tt, code, textarea, input[type="submit"], input[type="reset"] {
-     font-size: 10pt !important;
-}
-
-#navi a {
-     font-size: 10.5pt !important;
-}
-
-h3 {
-     font-size: 12pt !important;
-}
-
-#filter a {
-     font-size: 11pt !important;
-}
-
-#filter a:link, #filter a:visited {
-     margin: 3px 2px !important;
-}
-
-.destinations textarea {
-     height: 34px;
-}
 }
 
 /* export hosts button adjustments */
@@ -968,11 +953,6 @@ h3 {
      display: inline-block;
 }
 
-p#filtered {
-     padding-left: 35px !important;
-     padding-right: 250px !important;
-}
-
 p.book {
      padding-left: 35px !important;
 }
@@ -986,7 +966,6 @@ p.book {
 #messages + form[action="export"] {
      display: none;
 }
-
 
 /* host details page */
 
@@ -1087,7 +1066,6 @@ p.book {
      content: url(/themes/console/images/buttons/link.png);
      text-align: center;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
@@ -1113,25 +1091,24 @@ p.book {
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
 #host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
 #host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
      filter: drop-shadow(0 0 2px #652787);
-     -webkit-filter: drop-shadow(0 0 2px #652787);
 }
 
 #host_list .destaddress {
      overflow: auto !important;
      white-space: nowrap;
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      font-weight: normal;
      padding: 3px !important;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
 }
-
-/* end hostname list */
 
 td.destinations {
      max-width: 50px !important;
@@ -1139,9 +1116,49 @@ td.destinations {
      border-right: 1px solid #2d295f;
 }
 
-/* MS Edge 14+ fix */
+/* end hostname list */
+
+/* responsive layout */
+
+@media screen and (min-width: 1200px) {
+#filter a {
+     font-size: 10pt;
+     margin: 0 2px -5px !important;
+     display: inline-block;
+     min-width: 12px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+body, input[type="text"], select, h4, td.names a, #filter p, #search td, p, a, textarea, .help li, td, tt, code, textarea, input[type="submit"], input[type="reset"], .destaddress {
+     font-size: 10pt !important;
+}
+
+#navi a {
+     font-size: 10.5pt !important;
+}
+
+h3 {
+     font-size: 12pt !important;
+}
+
+#filter a {
+     font-size: 11pt !important;
+     min-width: 14px;
+}
+
+.destinations textarea {
+     height: 34px;
+}
+}
+
+/* end responsive layout */
+
+/* Edge/IE tweaks */
+
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
+
+/* end Edge/IE tweaks */
 

@@ -71,6 +71,7 @@ div#navi  {
      border-left: none;
      padding: 5px 0;
      border-radius: 0;
+     position: static;
 }
 
 #navi a:link {
@@ -85,7 +86,6 @@ div#navi  {
      margin: 1px 0;
      box-shadow: inset 0 0 0 1px #000;
      filter: drop-shadow(0 0 1px #000);
-     -webkit-filter: drop-shadow(0 0 1px #000);
      padding: 2px 5px 3px 24px;
 }
 
@@ -420,12 +420,10 @@ div#book p, p.messages {
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
 }
 
 .book td:nth-child(4) .addrhlpr:hover {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 h4 {
@@ -480,7 +478,6 @@ td.checkbox {
 
 input[type="checkbox"], input[type="radio"] {
      filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%); /* colorize radios and checkboxes */
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%);
      min-width: 16px;
      min-height: 16px;
      background: none;
@@ -488,8 +485,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
-     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
-     -webkit-filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 1px #f60);
+     filter: invert(100%) sepia(100%) hue-rotate(70deg) saturate(200%) drop-shadow(0 0 3px #f60);
 }
 
 .iframed #visualid {
@@ -500,14 +496,15 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
      margin-bottom: -1px;
 }
 
-#visualid h3 span {
-     text-transform: normal !important;
+#idAddress {
+     text-transform: none;
 }
 
 #visualid table {
      width: 100%;
      border: 1px solid #2a5f29;
      border-collapse: collapse;
+     background: #000900;
 }
 
 #visualid tr:first-child td {
@@ -525,6 +522,10 @@ input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:
 #visualid td[colspan="2"] {
      padding: 15px 3px;
      border-top: 1px solid #2a5f29;
+}
+
+#visualid tr:last-child {
+     background: #000;
 }
 
 form[action="addressbook"] > p.buttons {
@@ -658,7 +659,11 @@ div#config + div#buttons, div#content + div#buttons {
      box-shadow: inset 0px 0px 1px 0px #002;
      background: #fff;
      filter: invert(1) sepia(100%) hue-rotate(30deg);
-     -webkit-filter: invert(1) sepia(100%) hue-rotate(30deg);
+}
+
+_:-ms-lang(x), img.illustrate {
+     width: auto;
+     max-width: 600px;
 }
 
 div#book {
@@ -821,7 +826,7 @@ textarea {
      color: #bb7;
      border: 1px solid #2a5f29;
      padding: 3px 5px;
-     font: bold 8.5pt "Noto Mono", "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
+     font: bold 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      border-radius: 2px;
      width: 100%;
      height: 120px;
@@ -852,13 +857,12 @@ input:focus, textarea:focus {
      color: #ee9;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
-     -webkit-filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
+     outline: none;
 }
 
 textarea:focus {
      filter: none;
-     -webkit-filter: none;
      box-shadow: inset 0 0 1px #880;
 }
 
@@ -955,7 +959,7 @@ p.book {
 }
 
 #host_details .destaddress {
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      word-break: break-all !important;
      white-space: normal !important;
 }
@@ -1023,7 +1027,6 @@ p.book {
      content: url(/themes/console/images/buttons/link.png);
      text-align: center;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
@@ -1049,23 +1052,23 @@ p.book {
      text-align: center;
      padding: 0 10px !important;
      filter: drop-shadow(0 0 1px #555);
-     -webkit-filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
 #host_list td:nth-child(2) a:hover, #host_list td:nth-child(3) a:hover, #host_list td:nth-child(4) a:hover,
 #host_list td:nth-child(2) a:focus, #host_list td:nth-child(3) a:focus, #host_list td:nth-child(4) a:focus {
      filter: drop-shadow(0 0 1px #f60);
-     -webkit-filter: drop-shadow(0 0 1px #f60);
 }
 
 #host_list .destaddress {
      overflow: auto !important;
      white-space: nowrap;
-     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", Courier, mono !important;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      font-weight: normal;
      padding: 3px !important;
-     display: flex;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
 }
 
 #host_list .destaddress:hover, #host_list .destaddress:focus {
@@ -1080,10 +1083,9 @@ td.destinations {
      border-right: 1px solid #121;
 }
 
-/* MS Edge 14+ fix */
+/* MS Edge fix */
 _:-ms-lang(x), * {
      filter: none !important;
-     -webkit-filter: none !important;
 }
 
 /* responsive layout */
@@ -1107,7 +1109,7 @@ _:-ms-lang(x), * {
 
 @media screen and (min-width: 1400px) {
 
-body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4, td.names a, p, li, #filter a, #host_details td, textarea, th, #search td {
+body, input[type="submit"], input[type="reset"], .fakebutton, input, select, h4, td.names a, p, li, #filter a, #host_details td, textarea, th, #search td, .destaddress {
      font-size: 10pt !important;
 }
 
