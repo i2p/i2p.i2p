@@ -67,7 +67,7 @@ class TunnelRenderer {
         out.write("<h3 class=\"tabletitle\"><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h3>\n");
         if (!participating.isEmpty()) {
             Collections.sort(participating, new TunnelComparator());
-            out.write("<table class=\"tunneldisplay\"><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
+            out.write("<table class=\"tunneldisplay tunnels_participating\"><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
                   + _t("Send on") + "</th><th>" + _t("To") + "</th><th>" + _t("Expiration") + "</th>"
                   + "<th>" + _t("Usage") + "</th><th>" + _t("Rate") + "</th><th>" + _t("Role") + "</th></tr>\n");
         }
@@ -163,7 +163,8 @@ class TunnelRenderer {
             if (info.getLength() > maxLength)
                 maxLength = info.getLength();
         }
-        out.write("<table class=\"tunneldisplay\"><tr><th>" + _t("In/Out") + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
+        out.write("<table class=\"tunneldisplay tunnels_client\"><tr><th title=\"" + _t("Inbound or outbound?") + ("\">") + _t("In/Out")
+                  + "</th><th>" + _t("Expiry") + "</th><th>" + _t("Usage") + "</th><th>" + _t("Gateway") + "</th>");
         if (maxLength > 3) {
             out.write("<th align=\"center\" colspan=\"" + (maxLength - 2));
             out.write("\">" + _t("Participants") + "</th>");

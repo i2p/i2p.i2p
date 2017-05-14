@@ -35,8 +35,8 @@
  </tr>
  <tr>
   <td>
-    <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> >
-    <%=intl._t("Enable UPnP to open firewall ports")%>
+    <label><input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> >
+    <%=intl._t("Enable UPnP to open firewall ports")%></label>
   </td>
  </tr>
  <tr>
@@ -44,19 +44,19 @@
  </tr>
  <tr>
   <td>
- <%=intl._t("Externally reachable hostname or IP address")%>:<br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> >
-    <%=intl._t("Use all auto-detect methods")%><br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="local,ssu" <%=nethelper.getUdpAutoIPChecked(4) %> >
-    <%=intl._t("Disable UPnP IP address detection")%><br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="upnp,ssu" <%=nethelper.getUdpAutoIPChecked(5) %> >
-    <%=intl._t("Ignore local interface IP address")%><br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="ssu" <%=nethelper.getUdpAutoIPChecked(0) %> >
-    <%=intl._t("Use SSU IP address detection only")%><br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> >
-    <%=intl._t("Hidden mode - do not publish IP")%> <i><%=intl._t("(prevents participating traffic)")%></i><br>
-    <input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> >
-    <%=intl._t("Specify hostname or IP")%>:
+ <b class="suboption"><%=intl._t("Externally reachable hostname or IP address")%>:</b><br>
+    <label><input type="radio" class="optbox" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> >
+    <%=intl._t("Use all auto-detect methods")%></label><br>
+    <label><input type="radio" class="optbox" name="udpAutoIP" value="local,ssu" <%=nethelper.getUdpAutoIPChecked(4) %> >
+    <%=intl._t("Disable UPnP IP address detection")%></label><br>
+    <label><input type="radio" class="optbox" name="udpAutoIP" value="upnp,ssu" <%=nethelper.getUdpAutoIPChecked(5) %> >
+    <%=intl._t("Ignore local interface IP address")%></label><br>
+    <label><input type="radio" class="optbox" name="udpAutoIP" value="ssu" <%=nethelper.getUdpAutoIPChecked(0) %> >
+    <%=intl._t("Use SSU IP address detection only")%></label><br>
+    <label><input type="radio" class="optbox" name="udpAutoIP" value="hidden" <%=nethelper.getUdpAutoIPChecked(2) %> >
+    <%=intl._t("Hidden mode - do not publish IP")%> <i><%=intl._t("(prevents participating traffic)")%></i></label><br>
+    <label><input type="radio" class="optbox" name="udpAutoIP" value="fixed" <%=nethelper.getUdpAutoIPChecked(1) %> >
+    <%=intl._t("Specify hostname or IP")%>:</label>
     <%=nethelper.getAddressSelector() %>
   </td>
  </tr>
@@ -65,9 +65,9 @@
  </tr>
  <tr>
   <td>
-    <input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >
+    <label><input type="checkbox" class="optbox" name="laptop" value="true" <jsp:getProperty name="nethelper" property="laptopChecked" /> >
     <%=intl._t("Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity")%>
-    (<i><%=intl._t("Experimental")%></i>)
+    (<i><%=intl._t("Experimental")%></i>)</label>
   </td>
  </tr>
  <tr>
@@ -75,8 +75,8 @@
  </tr>
  <tr>
   <td>
-    <input type="checkbox" class="optbox" name="IPv4Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv4FirewalledChecked" /> >
-    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%>
+    <label><input type="checkbox" class="optbox" name="IPv4Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv4FirewalledChecked" /> >
+    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label>
   </td>
  </tr>
  <tr>
@@ -84,19 +84,19 @@
  </tr>
  <tr>
   <td>
-    <input type="checkbox" class="optbox" name="IPv6Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv6FirewalledChecked" /> >
-    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%><br>
-    <input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
-    <%=intl._t("Disable IPv6")%><br>
-    <input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >
-    <%=intl._t("Enable IPv6")%><br>
-    <input type="radio" class="optbox" name="ipv6" value="preferIPv4" <%=nethelper.getIPv6Checked("preferIPv4") %> >
-    <%=intl._t("Prefer IPv4 over IPv6")%><br>
-    <input type="radio" class="optbox" name="ipv6" value="preferIPv6" <%=nethelper.getIPv6Checked("preferIPv6") %> >
-    <%=intl._t("Prefer IPv6 over IPv4")%><br>
-    <input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
+    <label><input type="checkbox" class="optbox" name="IPv6Firewalled" value="true" <jsp:getProperty name="nethelper" property="IPv6FirewalledChecked" /> >
+    <%=intl._t("Disable inbound (Firewalled by Carrier-grade NAT or DS-Lite)")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="false" <%=nethelper.getIPv6Checked("false") %> >
+    <%=intl._t("Disable IPv6")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="enable" <%=nethelper.getIPv6Checked("enable") %> >
+    <%=intl._t("Enable IPv6")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="preferIPv4" <%=nethelper.getIPv6Checked("preferIPv4") %> >
+    <%=intl._t("Prefer IPv4 over IPv6")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="preferIPv6" <%=nethelper.getIPv6Checked("preferIPv6") %> >
+    <%=intl._t("Prefer IPv6 over IPv4")%></label><br>
+    <label><input type="radio" class="optbox" name="ipv6" value="only" <%=nethelper.getIPv6Checked("only") %> >
     <%=intl._t("Use IPv6 only (disable IPv4)")%>
-    (<i><%=intl._t("Experimental")%></i>)
+    (<i><%=intl._t("Experimental")%></i>)</label>
   </td>
  </tr>
  <tr>
@@ -109,10 +109,10 @@
  </tr>
  <tr>
   <td>
- <%=intl._t("UDP port:")%>
+ <b><%=intl._t("UDP port:")%></b>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" ><br>
- <input type="checkbox" class="optbox" name="disableUDP" value="disabled" <%=nethelper.getUdpDisabledChecked() %> >
- <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that blocks outbound UDP)")%></i>
+ <label><input type="checkbox" class="optbox" name="disableUDP" value="disabled" <%=nethelper.getUdpDisabledChecked() %> >
+ <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that blocks outbound UDP)")%></i></label>
   </td>
  </tr>
 <% /********
@@ -129,20 +129,20 @@
  </tr>
  <tr>
   <td>
- <%=intl._t("Externally reachable hostname or IP address")%>:<br>
-    <input type="radio" class="optbox" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> >
+ <b class="suboption"><%=intl._t("Externally reachable hostname or IP address")%>:</b><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="true" <%=nethelper.getTcpAutoIPChecked(2) %> >
     <%=intl._t("Use auto-detected IP address")%>
     <i>(<%=intl._t("currently")%> <jsp:getProperty name="nethelper" property="udpIP" />)</i>
-    <%=intl._t("if we are not firewalled")%><br>
-    <input type="radio" class="optbox" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> >
-    <%=intl._t("Always use auto-detected IP address (Not firewalled)")%><br>
-    <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> >
-    <%=intl._t("Specify hostname or IP")%>:
+    <%=intl._t("if we are not firewalled")%></label><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="always" <%=nethelper.getTcpAutoIPChecked(3) %> >
+    <%=intl._t("Always use auto-detected IP address (Not firewalled)")%></label><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(1) %> >
+    <%=intl._t("Specify hostname or IP")%>:</label>
     <input name ="ntcphost" type="text" size="16" value="<jsp:getProperty name="nethelper" property="ntcphostname" />" ><br>
-    <input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> >
-    <%=intl._t("Disable inbound (Firewalled)")%><br>
-    <input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> >
-    <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i>
+    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="false" <%=nethelper.getTcpAutoIPChecked(0) %> >
+    <%=intl._t("Disable inbound (Firewalled)")%></label><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoIP" value="disabled" <%=nethelper.getTcpAutoIPChecked(4) %> >
+    <%=intl._t("Completely disable")%> <i><%=intl._t("(select only if behind a firewall that throttles or blocks outbound TCP)")%></i></label>
   </td>
  </tr>
  <tr>
@@ -150,11 +150,11 @@
  </tr>
  <tr>
   <td>
-    <input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> >
+    <label><input type="radio" class="optbox" name="ntcpAutoPort" value="2" <%=nethelper.getTcpAutoPortChecked(2) %> >
     <%=intl._t("Use the same port configured for UDP")%>
-    <i>(<%=intl._t("currently")%> <jsp:getProperty name="nethelper" property="udpPort" />)</i><br>
-    <input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> >
-    <%=intl._t("Specify Port")%>:
+    <i>(<%=intl._t("currently")%> <jsp:getProperty name="nethelper" property="udpPort" />)</i></label><br>
+    <label><input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> >
+    <%=intl._t("Specify Port")%>:</label>
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" >
   </td>
  </tr>

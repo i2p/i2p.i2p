@@ -31,7 +31,7 @@
   <tr><td class="infohelp">
 <%=intl._t("Floodfill participation helps the network, but may use more of your computer's resources.")%>
   </td></tr>
-  <tr><td>
+  <tr><td class="infohelp">
 <%
     if (advancedhelper.isFloodfill()) {
 %><%=intl._t("This router is currently a floodfill participant.")%><%
@@ -43,12 +43,13 @@
   <tr><td>
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <input type="hidden" name="action" value="ff" >
-<input type="radio" class="optbox" name="ff" value="auto" <%=advancedhelper.getFFChecked(2) %> >
-<%=intl._t("Automatic")%>&nbsp;
-<input type="radio" class="optbox" name="ff" value="true" <%=advancedhelper.getFFChecked(1) %> >
-<%=intl._t("Force On")%>&nbsp;
-<input type="radio" class="optbox" name="ff" value="false" <%=advancedhelper.getFFChecked(0) %> >
-<%=intl._t("Disable")%>
+<b><%=intl._t("Enrollment")%>:</b>
+<label><input type="radio" class="optbox" name="ff" value="auto" <%=advancedhelper.getFFChecked(2) %> >
+<%=intl._t("Automatic")%></label>&nbsp;
+<label><input type="radio" class="optbox" name="ff" value="true" <%=advancedhelper.getFFChecked(1) %> >
+<%=intl._t("Force On")%></label>&nbsp;
+<label><input type="radio" class="optbox" name="ff" value="false" <%=advancedhelper.getFFChecked(0) %> >
+<%=intl._t("Disable")%></label>
   </td></tr>
   <tr><td class="optionsave" align="right">
 <input type="submit" name="shouldsave" class="accept" value="<%=intl._t("Save changes")%>" >

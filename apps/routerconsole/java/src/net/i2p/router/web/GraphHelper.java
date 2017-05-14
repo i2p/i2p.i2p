@@ -360,8 +360,8 @@ public class GraphHelper extends FormHandler {
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
             _out.write(_t("Display period") + ":</td><td colspan=\"2\"><input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\">" + _t("minutes") + "</td></tr><tr><td>\n");
             _out.write(_t("Plot type") + ":</td><td colspan=\"2\">");
-            _out.write("<input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + ">" + _t("Averages") + "&nbsp;&nbsp;&nbsp;");
-            _out.write ("<input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + ">" + _t("Events") + "</td></tr><tr><td>\n");
+            _out.write("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + ">" + _t("Averages") + "</label>&nbsp;&nbsp;&nbsp;");
+            _out.write ("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + ">" + _t("Events") + "</label></td></tr><tr><td>\n");
             _out.write(_t("Graph size") + ":</td><td><input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
                        + "\">" + _t("pixels wide") + "&nbsp;&nbsp;&nbsp;<input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\">" + _t("pixels high") + "</td><td class=\"infohelp\">" + _t("Note: Dimensions are for graph only (excludes title, labels and legend).") + "</td></tr><tr><td>\n");
@@ -380,11 +380,11 @@ public class GraphHelper extends FormHandler {
                 _out.write("</option>\n");
             }
             _out.write("</select></td></tr><tr><td>\n" + _t("Persistence") +
-                       ":</td><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
+                       ":</td><td colspan=\"2\"><label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             if (persistent)
                 _out.write(HelperBase.CHECKED);
-            _out.write(">" + _t("Store graph data on disk") + "</td></tr></table>" +
+            _out.write(">" + _t("Store graph data on disk") + "</label></td></tr></table>" +
                        "<hr><div class=\"formaction\" id=\"graphing\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();

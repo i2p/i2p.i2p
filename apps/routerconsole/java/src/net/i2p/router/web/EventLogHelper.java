@@ -102,13 +102,13 @@ public class EventLogHelper extends FormHandler {
             _out.write("<br><h3 id=\"displayevents\">" + _t("Display Events") + "</h3>");
             _out.write("<form action=\"events\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"save\">\n" +
-                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_t("Events since") + ": <select name=\"from\">");
+                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n<b>");
+            _out.write(_t("Events since") + ":</b> <select name=\"from\">");
             for (int i = 0; i < _times.length; i++) {
                 writeOption(_times[i]);
             }
-            _out.write("</select>&nbsp;");
-            _out.write(_t("Event type") + ": <select name=\"type\">");
+            _out.write("</select>&nbsp;<b>");
+            _out.write(_t("Event type") + ":</b> <select name=\"type\">");
             // sorted by translated display string
             Map<String, String> events = new TreeMap<String, String>(Collator.getInstance());
             for (int i = 0; i < _events.length; i += 2) {

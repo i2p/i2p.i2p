@@ -327,7 +327,7 @@ public class ConfigClientsHelper extends HelperBase {
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
                             boolean showDeleteButton, boolean showStartButton) {
         String escapedName = DataHelper.escapeHTML(name);
-        buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
+        buf.append("<tr><td align=\"right\">");
         if (urlify && enabled) {
             String link = "/";
             if (! RouterConsoleRunner.ROUTERCONSOLE.equals(name))
@@ -340,15 +340,15 @@ public class ConfigClientsHelper extends HelperBase {
             buf.append("\" >");
         } else {
             if (name.length() > 0)
-                buf.append(_t(escapedName));
+                buf.append("<label for=\"").append(index).append("\">").append(_t(escapedName)).append("</label>");
         }
-        buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\"");
+        buf.append("</td><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" id=\"").append(index).append("\" name=\"").append(index).append(".enabled\"");
         if (enabled) {
             buf.append(CHECKED);
             if (ro || preventDisable)
                 buf.append("disabled=\"disabled\" ");
         }
-        buf.append("></td><td align=\"center\" width=\"15%\">");
+        buf.append("></td><td align=\"center\">");
 
         if (showStartButton && (!ro) && !edit) {
             buf.append("<button type=\"submit\" title=\"").append(_t("Start")).append("\" class=\"control accept\" name=\"action\" value=\"Start ").append(index).append("\" >")
@@ -373,7 +373,7 @@ public class ConfigClientsHelper extends HelperBase {
                .append("')) { return false; }\">")
                .append(_t("Delete")).append("<span class=hide> ").append(index).append("</span></button>");
         }
-        buf.append("</td><td align=\"left\" width=\"50%\">");
+        buf.append("</td><td align=\"left\">");
         if (edit && !ro) {
             buf.append("<input type=\"text\" size=\"80\" spellcheck=\"false\" name=\"nofilter_desc").append(index).append("\" value=\"");
             buf.append(escapedDesc);

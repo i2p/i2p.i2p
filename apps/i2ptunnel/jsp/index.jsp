@@ -35,7 +35,7 @@
 </head>
 <body id="tunnelListPage">
 
-<div class="panel">
+<div class="panel" id="messages">
     <h2><%=intl._t("Status Messages")%></h2>
     <table id="statusMessagesTable">
         <tr>
@@ -78,7 +78,7 @@
     </table>
 </div>
 
-<div class="panel">
+<div class="panel" id="servers">
     
     <h2><%=intl._t("I2P Hidden Services")%></h2>
 
@@ -193,7 +193,9 @@
         </td>
     </tr>
 </table>
-          
+</div>
+
+<div class="panel" id="clients">
     <h2><%=intl._t("I2P Client Tunnels")%></h2>
 
 <table id="clientTunnels">

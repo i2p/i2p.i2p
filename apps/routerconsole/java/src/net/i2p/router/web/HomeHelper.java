@@ -212,7 +212,9 @@ public class HomeHelper extends HelperBase {
 
     private String renderConfig(Collection<App> apps) {
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<table class=\"homelinkedit\"><tr><th title=\"Mark for deletion\">")
+        buf.append("<table class=\"homelinkedit\"><tr><th title=\"")
+           .append(_t("Mark for deletion"))
+           .append("\">")
            .append(_t("Remove"))
            .append("</th><th></th><th>")
            .append(_t("Name"))
@@ -222,11 +224,15 @@ public class HomeHelper extends HelperBase {
         for (App app : apps) {
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(app.name)
+               .append("\" id=\"")
+               .append(app.name)
                .append("\"></td><td align=\"center\">");
             if (app.icon != null) {
                 buf.append("<img height=\"16\" alt=\"\" src=\"").append(app.icon).append("\">");
             }
-            buf.append("</td><td align=\"left\">")
+            buf.append("</td><td align=\"left\"><label for=\"")
+               .append(app.name)
+               .append("\">")
                .append(DataHelper.escapeHTML(app.name))
                .append("</td><td align=\"left\"><a href=\"");
             String url = DataHelper.escapeHTML(app.url);

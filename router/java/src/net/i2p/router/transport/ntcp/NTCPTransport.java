@@ -1368,7 +1368,7 @@ public class NTCPTransport extends TransportImpl {
             buf.append(". ").append(_t("Status")).append(": ").append(_t(getReachabilityStatus().toStatusString()));
         }
         buf.append(".</h3>\n" +
-                   "<table id=\"ntcpconnections\">\n" +
+                   "<div class=\"widescroll\"><table id=\"ntcpconnections\">\n" +
                    "<tr><th><a href=\"#def.peer\">").append(_t("Peer")).append("</a></th>" +
                    "<th>").append(_t("Dir")).append("</th>" +
                    "<th>").append(_t("IPv6")).append("</th>" +
@@ -1379,7 +1379,7 @@ public class NTCPTransport extends TransportImpl {
                    "<th align=\"right\"><a href=\"#def.send\">").append(_t("TX")).append("</a></th>" +
                    "<th align=\"right\"><a href=\"#def.recv\">").append(_t("RX")).append("</a></th>" +
                    "<th>").append(_t("Out Queue")).append("</th>" +
-                   "<th>").append(_t("Backlogged?")).append("</th>" +
+                   "<th title=\"").append(_t("Is peer backlogged?")).append("\">").append(_t("Backlogged?")).append("</th>" +
                    //"<th>").append(_t("Reading?")).append("</th>" +
                    " </tr>\n");
         out.write(buf.toString());
@@ -1397,7 +1397,7 @@ public class NTCPTransport extends TransportImpl {
                 buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_t("Outbound")).append("\"/>");
             buf.append("</td><td class=\"cells\" align=\"center\">");
             if (con.isIPv6())
-                buf.append("&#x2713;");
+                buf.append("<span class=\"backlogged\">&#x2714;</span>");
             else
                 buf.append("&nbsp;");
             buf.append("</td><td class=\"cells\" align=\"right\">");
@@ -1432,7 +1432,7 @@ public class NTCPTransport extends TransportImpl {
             buf.append("</td><td class=\"cells\" align=\"center\">").append(outQueue);
             buf.append("</td><td class=\"cells\" align=\"center\">");
             if (con.isBacklogged())
-                buf.append("&#x2713;");
+                buf.append("<span class=\"backlogged\">&#x2714;</span>");
             else
                 buf.append("&nbsp;");
             //long readTime = con.getReadTime();
@@ -1457,7 +1457,7 @@ public class NTCPTransport extends TransportImpl {
             buf.append("</b></td><td>&nbsp;</td><td>&nbsp;</td></tr>\n");
         }
 
-        buf.append("</table>\n");
+        buf.append("</table></div>\n");
         out.write(buf.toString());
         buf.setLength(0);
     }

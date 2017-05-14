@@ -39,15 +39,15 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 </td></tr>
 <tr><th><%=intl._t("External I2CP (I2P Client Protocol) Interface Configuration")%></th></tr>
 <tr><td>
-<input type="radio" class="optbox" name="mode" value="1" <%=clientshelper.i2cpModeChecked(1) %> >
-<%=intl._t("Enabled without SSL")%><br>
-<input type="radio" class="optbox" name="mode" value="2" <%=clientshelper.i2cpModeChecked(2) %> >
-<%=intl._t("Enabled with SSL required")%><br>
-<input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
-<%=intl._t("Disabled - Clients outside this Java process may not connect")%><br>
+<label><input type="radio" class="optbox" name="mode" value="1" <%=clientshelper.i2cpModeChecked(1) %> >
+<%=intl._t("Enabled without SSL")%></label><br>
+<label><input type="radio" class="optbox" name="mode" value="2" <%=clientshelper.i2cpModeChecked(2) %> >
+<%=intl._t("Enabled with SSL required")%></label><br>
+<label><input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
+<%=intl._t("Disabled - Clients outside this Java process may not connect")%></label><br>
 </td></tr>
 <tr><td>
-<%=intl._t("I2CP Interface")%>:
+<b><%=intl._t("I2CP Interface")%>:</b>
 <select name="interface">
 <%
        String[] ips = clientshelper.intfcAddresses();
@@ -63,18 +63,18 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
        }
 %>
 </select>&nbsp;
-<%=intl._t("I2CP Port")%>:
+<b><%=intl._t("I2CP Port")%>:</b>
 <input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="clientshelper" property="port" />" >
 </td></tr>
 <tr><th><%=intl._t("Authorization")%></th></tr>
 <tr><td>
-<input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
-<%=intl._t("Require username and password")%><br>
+<label><input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
+<%=intl._t("Require username and password")%></label><br>
 </td></tr>
 <tr><td>
-<%=intl._t("Username")%>:
+<b><%=intl._t("Username")%>:</b>
 <input name="user" type="text" value="" />&nbsp;
-<%=intl._t("Password")%>:
+<b><%=intl._t("Password")%>:</b>
 <input name="nofilter_pw" type="password" value="" />
 </td></tr>
 <tr><td class="optionsave" align="right">

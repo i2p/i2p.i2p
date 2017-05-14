@@ -75,10 +75,10 @@ function toggleAll(category)
  <input type="hidden" name="action" value="foo" >
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <h3 class="ptitle"><%=intl._t("Configure I2P Stat Collection")%>&nbsp;<a class="script" title="<%=intl._t("Toggle full stat collection and all graphing options")%>" href="javascript:void(null);" onclick="toggleAll('*')">[<%=intl._t("toggle all")%>]</a></h3>
- <p id="enablefullstats"><b><%=intl._t("Enable full stats?")%></b>
+ <p id="enablefullstats"><label><b><%=intl._t("Enable full stats?")%></b>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
  if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
- (<%=intl._t("change requires restart to take effect")%>)<br>
+ (<%=intl._t("change requires restart to take effect")%>)</label><br>
 <%
 
   // stats.log for devs only and grows without bounds, not recommended
@@ -120,28 +120,24 @@ Warning - Log with care, stat file grows without limit.<br>
 
   if (shouldShowLog) {
 
-%>   <td align="center">
-     <a name="<%=statshelper.getCurrentStatName()%>"></a>
-     <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
+%>   <td align="center"><a name="<%=statshelper.getCurrentStatName()%>"></a><input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
      if (statshelper.getCurrentIsLogged()) { %>checked="checked" <% } %> ></td>
 <%
 
   }  // shouldShowLog
 
-%>   <td align="center">
-     <% if (statshelper.getCurrentCanBeGraphed()) { %>
-       <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
-       if (statshelper.getCurrentIsGraphed()) { %>checked="checked" <% } %> ><% } %></td>
-     <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b>&nbsp;
-     <%=statshelper.getCurrentStatDescription()%></td></tr><%
+%>   <td align="center"><% if (statshelper.getCurrentCanBeGraphed()) { %><input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" id="<%=statshelper.getCurrentStatName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
+       if (statshelper.getCurrentIsGraphed()) { %>checked="checked" <% } %> ><% } %></td> <% // no whitespace here so we can use td:empty to remove css pointer from inert labels %>
+     <td align="left"><label for="<%=statshelper.getCurrentStatName()%>"><b><%=statshelper.getCurrentStatName()%>:</b>&nbsp;
+     <%=statshelper.getCurrentStatDescription()%></label></td></tr><%
     } // end iterating over all stats
 
   if (shouldShowLog) {
 
 %> <tr><td colspan="3"></td></tr>
- <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" ></td>
-     <td colspan="2"><%=intl._t("Advanced filter")%>:
-     <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
+ <tr><td align="center"><label><input type="checkbox" class="optbox" name="explicitFilter" ></td>
+     <td colspan="2"><%=intl._t("Advanced filter")%>:</label>
+<input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
 <%
 
   }  // shouldShowLog

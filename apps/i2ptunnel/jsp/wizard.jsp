@@ -114,12 +114,12 @@
     <tr>
         <td class="options">
             <span class="multiOption" id="isServer">
-                <input value="false" type="radio" id="baseType" name="isClient" class="tickbox" />
-                &nbsp;<%=intl._t("Server Tunnel")%>
+                <label><input value="false" type="radio" id="baseType" name="isClient" class="tickbox" />
+                &nbsp;<%=intl._t("Server Tunnel")%></label>
             </span>
             <span class="multiOption" id="isClient">
-                <input value="true" type="radio" id="baseType" name="isClient" class="tickbox" checked="checked" />
-                &nbsp;<%=intl._t("Client Tunnel")%>
+                <label><input value="true" type="radio" id="baseType" name="isClient" class="tickbox" checked="checked" />
+                &nbsp;<%=intl._t("Client Tunnel")%></label>
             </span>
         </td>
     </tr>
@@ -456,8 +456,8 @@
     </tr>
     <tr>
         <td class="options">
-                <input value="1" type="checkbox" id="startOnLoad" name="startOnLoad" title="Start Tunnel Automatically"<%=("1".equals(request.getParameter("startOnLoad")) ? " checked=\"checked\"" : "")%> class="tickbox" />
-            &nbsp;<%=intl._t("Automatically start tunnel when router starts")%>
+                <label><input value="1" type="checkbox" id="startOnLoad" name="startOnLoad" title="Start Tunnel Automatically"<%=("1".equals(request.getParameter("startOnLoad")) ? " checked=\"checked\"" : "")%> class="tickbox" />
+            &nbsp;<%=intl._t("Automatically start tunnel when router starts")%></label>
         </td>
     </tr>
             <%

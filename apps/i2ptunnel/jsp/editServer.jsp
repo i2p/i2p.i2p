@@ -113,8 +113,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </td>
 
             <td>
-                <input value="1" type="checkbox" name="startOnLoad" title="Start Tunnel Automatically"<%=(editBean.startAutomatically(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Automatically start tunnel when router starts")%>
+                <label><input value="1" type="checkbox" name="startOnLoad" title="Start Tunnel Automatically"<%=(editBean.startAutomatically(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Automatically start tunnel when router starts")%></label>
             </td>
         </tr>
 
@@ -153,8 +153,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <input value="1" type="checkbox" name="useSSL" title="Use SSL to connect to target" <%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Use SSL to connect to target")%>
+                <label><input value="1" type="checkbox" name="useSSL" title="Use SSL to connect to target" <%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Use SSL to connect to target")%></label>
          <% } /* !streamrserver */ %>
             </td>
          <% if ("httpbidirserver".equals(tunnelType)) { %>
@@ -437,8 +437,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="ONLY clients with the encryption key will be able to connect"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Only allow clients with the encryption key to connect to this server")%>
+                <label><input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="ONLY clients with the encryption key will be able to connect"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Only allow clients with the encryption key to connect to this server")%></label>
             </td>
         </tr>
 
@@ -471,12 +471,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td colspan="2">
                 <% /* can't use <label> here */ %>
-                <span class="multiOption"><input value="0" type="radio" name="accessMode" title="<%=intl._t("Allow all clients")%>"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Disable")%></span>
-                <span class="multiOption"><input value="2" type="radio" name="accessMode" title="<%=intl._t("Reject listed clients")%>"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Blacklist")%></span>
-                <span class="multiOption"><input value="1" type="radio" name="accessMode" title="<%=intl._t("Allow listed clients only")%>"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    <%=intl._t("Whitelist")%></span>
+                <span class="multiOption"><label><input value="0" type="radio" name="accessMode" title="<%=intl._t("Allow all clients")%>"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Disable")%></label></span>
+                <span class="multiOption"><label><input value="2" type="radio" name="accessMode" title="<%=intl._t("Reject listed clients")%>"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Blacklist")%></label></span>
+                <span class="multiOption"><label><input value="1" type="radio" name="accessMode" title="<%=intl._t("Allow listed clients only")%>"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <%=intl._t("Whitelist")%></label></span>
             </td>
         </tr>
 
@@ -503,20 +503,20 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <input value="1" type="checkbox" name="rejectInproxy" title="<%=intl._t("Deny inproxy access when enabled")%>" <%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Block Access via Inproxies")%>
+                <label><input value="1" type="checkbox" name="rejectInproxy" title="<%=intl._t("Deny inproxy access when enabled")%>" <%=(editBean.isRejectInproxy(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Block Access via Inproxies")%></label>
             </td>
 
             <td>
-                <input value="1" type="checkbox" name="rejectReferer" title="<%=intl._t("Deny accesseses with referers (probably from inproxies)")%>" <%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Block Accesses containing Referers")%>
+                <label><input value="1" type="checkbox" name="rejectReferer" title="<%=intl._t("Deny accesseses with referers (probably from inproxies)")%>" <%=(editBean.isRejectReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Block Accesses containing Referers")%></label>
             </td>
         </tr>
 
         <tr>
             <td>
-                <input value="1" type="checkbox" name="rejectUserAgents" title="<%=intl._t("Deny User-Agents matching these strings (probably from inproxies)")%>" <%=(editBean.isRejectUserAgents(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Block these User-Agents")%>
+                <label><input value="1" type="checkbox" name="rejectUserAgents" title="<%=intl._t("Deny User-Agents matching these strings (probably from inproxies)")%>" <%=(editBean.isRejectUserAgents(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Block these User-Agents")%></label>
             </td>
 
             <td>
@@ -528,13 +528,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <input value="1" type="checkbox" name="uniqueLocal" title="<%=intl._t("Use unique IP addresses for each connecting client (local non-SSL servers only)")%>" <%=(editBean.getUniqueLocal(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Unique Local Address per Client")%>
+                <label><input value="1" type="checkbox" name="uniqueLocal" title="<%=intl._t("Use unique IP addresses for each connecting client (local non-SSL servers only)")%>" <%=(editBean.getUniqueLocal(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Unique Local Address per Client")%></label>
             </td>
 
             <td>
-                <input value="1" type="checkbox" name="multihome" title="<%=intl._t("Only enable if you are hosting this service on multiple routers")%>" <%=(editBean.getMultihome(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Optimize for Multihoming")%>
+                <label><input value="1" type="checkbox" name="multihome" title="<%=intl._t("Only enable if you are hosting this service on multiple routers")%>" <%=(editBean.getMultihome(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Optimize for Multihoming")%></label>
             </td>
         </tr>
 
@@ -673,8 +673,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <input value="1" type="checkbox" id="startOnLoad" name="reduce" title="Reduce Tunnels"<%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                <%=intl._t("Reduce tunnel quantity when idle to conserve resources")%>
+                <label><input value="1" type="checkbox" id="startOnLoad" name="reduce" title="Reduce Tunnels"<%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <%=intl._t("Reduce tunnel quantity when idle to conserve resources")%></label>
             </td>
         </tr>
         <tr>
@@ -747,31 +747,31 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td colspan="2">
                 <span class="multiOption">
-                    <input value="0" type="radio" id="startOnLoad" name="sigType" title="Default"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    DSA-SHA1
+                    <label><input value="0" type="radio" id="startOnLoad" name="sigType" title="Default"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    DSA-SHA1</label>
                 </span>
            <% if (editBean.isSigTypeAvailable(1)) { %>
                 <span class="multiOption">
-                    <input value="1" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==1 ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    ECDSA-P256
+                    <label><input value="1" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==1 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    ECDSA-P256</label>
                 </span>
            <% }
               if (editBean.isSigTypeAvailable(2)) { %>
                 <span class="multiOption">
-                    <input value="2" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==2 ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    ECDSA-P384
+                    <label><input value="2" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==2 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    ECDSA-P384</label>
                 </span>
            <% }
               if (editBean.isSigTypeAvailable(3)) { %>
                 <span class="multiOption">
-                    <input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==3 ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    ECDSA-P521
+                    <label><input value="3" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==3 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    ECDSA-P521</label>
                 </span>
            <% }
               if (editBean.isSigTypeAvailable(7)) { %>
                 <span class="multiOption">
-                    <input value="7" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
-                    Ed25519-SHA-512
+                    <label><input value="7" type="radio" id="startOnLoad" name="sigType" title="Advanced users only"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    Ed25519-SHA-512</label>
                 </span>
            <% }   // isAvailable %>
 

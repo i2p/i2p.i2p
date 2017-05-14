@@ -26,24 +26,24 @@ public class ConfigUIHelper extends HelperBase {
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
         buf.append("</div><div id=\"themeoptions\">");
-        buf.append("<input type=\"checkbox\" name=\"universalTheming\" ");
+        buf.append("<label><input type=\"checkbox\" name=\"universalTheming\" ");
         if (universalTheming)
             buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Set theme universally across all apps"))
-           .append("<br>\n");
+           .append("</label><br>\n");
         return buf.toString();
     }
 
     public String getForceMobileConsole() {
         StringBuilder buf = new StringBuilder(256);
         boolean forceMobileConsole = _context.getBooleanProperty(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
-        buf.append("<input type=\"checkbox\" name=\"forceMobileConsole\" ");
+        buf.append("<label><input type=\"checkbox\" name=\"forceMobileConsole\" ");
         if (forceMobileConsole)
             buf.append(CHECKED);
         buf.append("value=\"1\">")
            .append(_t("Force the mobile console to be used"))
-           .append("</div>\n");
+           .append("</label></div>\n");
         return buf.toString();
     }
 
@@ -190,17 +190,23 @@ public class ConfigUIHelper extends HelperBase {
             buf.append(_t("Add a user and password to enable."));
             buf.append("</td></tr>");
         } else {
-            buf.append("<tr><th>")
+            buf.append("<tr><th title=\"")
+               .append(_t("Mark for deletion"))
+               .append("\">")
                .append(_t("Remove"))
                .append("</th><th>")
                .append(_t("Username"))
                .append("</th><th>&nbsp;</th></tr>\n");
             for (String name : userpw.keySet()) {
-                buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+                buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" id=\"")
                    .append(name)
-                   .append("\"></td><td colspan=\"2\">")
+                   .append("\" name=\"delete_")
                    .append(name)
-                   .append("</td></tr>\n");
+                   .append("\"></td><td colspan=\"2\"><label for=\"")
+                   .append(name)
+                   .append("\">")
+                   .append(name)
+                   .append("</label></td></tr>\n");
             }
         }
         buf.append("<tr><td id=\"pw_adduser\" align=\"left\" colspan=\"3\">")

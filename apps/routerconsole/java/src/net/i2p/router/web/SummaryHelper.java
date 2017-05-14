@@ -939,11 +939,15 @@ public class SummaryHelper extends HelperBase {
            .append("</th></tr>\n");
         for (String section : sections) {
             int i = sections.indexOf(section);
-            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" id=\"")
+               .append(sectionNames.get(section))
+               .append("\" name=\"delete_")
                .append(i)
-               .append("\"></td><td align=\"left\">")
+               .append("\"></td><td align=\"left\"><label for=\"")
+               .append(sectionNames.get(section))
+               .append("\">")
                .append(_t(sectionNames.get(section)))
-               .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
+               .append("</label></td><td align=\"right\"><input type=\"hidden\" name=\"order_")
                .append(i).append('_').append(section)
                .append("\" value=\"")
                .append(i)

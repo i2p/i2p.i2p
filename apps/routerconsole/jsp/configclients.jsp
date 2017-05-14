@@ -36,8 +36,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  </h3>
  <p class="infohelp" id="clientconf">
  <%=intl._t("The Java clients listed below are started by the router and run in the same JVM.")%>&nbsp;
- <%=intl._t("To change other client options, edit the file")%></i><tt>
- <%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.</tt>
+ <%=intl._t("To change other client options, edit the file")%>
+ <tt><%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.</tt>
  <%=intl._t("All changes require restart to take effect.")%>
  </p>
  <p class="infowarn" id="clientconf">

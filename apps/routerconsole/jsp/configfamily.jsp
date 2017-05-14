@@ -34,9 +34,9 @@
 <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <tr><th colspan="2"><%=intl._t("Join Existing Router Family")%></th></tr>
- <tr><td colspan="2"><%=intl._t("Import the secret family key that you exported from an existing router in the family.")%></td></tr>
+ <tr><td colspan="2" class="infohelp"><%=intl._t("Import the secret family key that you exported from an existing router in the family.")%></td></tr>
  <tr>
-  <td><%=intl._t("Select secret key file")%>:
+  <td><b><%=intl._t("Select secret key file")%>:</b>
 <input name="file" type="file" value="" />
   </td>
   <td class="optionsave">

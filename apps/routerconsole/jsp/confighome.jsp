@@ -33,8 +33,8 @@ input.default {
 <table id="oldhome" class="configtable">
  <tr>
   <td>
- <input type="checkbox" name="oldHome" <jsp:getProperty name="homehelper" property="configHome" /> >
- <%=intl._t("Use old home page")%>
+ <label><input type="checkbox" name="oldHome" <jsp:getProperty name="homehelper" property="configHome" /> >
+ <%=intl._t("Use old home page")%></label>
   </td>
   <td class="optionsave">
  <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >

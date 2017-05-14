@@ -85,7 +85,7 @@ class ProfileOrganizerRenderer {
         if (standard > 0)
             buf.append("<a href=\"/profiles?f=1\">").append(ngettext("Hiding 1 standard profile.", "Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
-                   buf.append("<table id=\"profiles\">");
+                   buf.append("<div class=\"widescroll\"><table id=\"profilelist\">");
                    buf.append("<tr>");
                    buf.append("<th>").append(_t("Peer")).append("</th>");
                    buf.append("<th>").append(_t("Groups")).append("</th>");
@@ -191,7 +191,7 @@ class ProfileOrganizerRenderer {
             out.write(buf.toString());
             buf.setLength(0);
         }
-        buf.append("</table>");
+        buf.append("</table></div>");
 
       ////
       //// don't bother reindenting
@@ -312,8 +312,8 @@ class ProfileOrganizerRenderer {
         buf.append("<tr><td>&nbsp;</td>")
            .append("<td><b>X:</b></td><td>").append(_t("Over {0} shared bandwidth", "2000KBps")).append("</td>")
            .append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
-        buf.append("<tr><td>&nbsp;</td><td colspan=\"4\">").append(_t("Note: For P and X bandwidth capabilities, O is included for the purpose of backward compatibility in the NetDB."))
-           .append("<td>&nbsp;</td></tr>");
+        buf.append("<tr><td>&nbsp;</td><td colspan=\"5\">").append(_t("Note: For P and X bandwidth tiers, O is included for the purpose of backward compatibility in the NetDB."))
+           .append("</tr>");
         buf.append("</tbody></table></td></tr>"); // profile_defs
         buf.append("<tr><td><b>")
            .append(_t("speed"))

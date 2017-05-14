@@ -31,7 +31,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
    if (clientshelper.showPlugins()) {
        if (clientshelper.isPluginUpdateEnabled()) {
 %>
-<h3 id="pluginconfig"><a name="pconfig"></a><%=intl._t("Plugin Configuration")%></h3><p id="pluginconfigtext">
+<h3 id="pconfig"><%=intl._t("Plugin Configuration")%></h3><p id="pluginconfigtext">
  <%=intl._t("The plugins listed below are started by the webConsole client.")%>
  </p><div class="wideload">
 <form action="" method="POST">
@@ -57,7 +57,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <form action="configplugins" method="POST">
 <td>
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
- URL:&nbsp;
+ <b>URL:</b>
  <input type="text" size="60" name="pluginURL" title="<%=intl._t("To install a plugin, enter the download URL:")%>" >
 </td>
 <td class="optionsave" align="right">
@@ -74,7 +74,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <form action="configplugins" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <td>
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
-<%=intl._t("Select xpi2p or su3 file")%>:&nbsp;
+<b><%=intl._t("Select xpi2p or su3 file")%>:</b>
 <input type="file" name="pluginFile" accept=".xpi2p,.su3" >
 </td>
 <td class="optionsave" align="right">

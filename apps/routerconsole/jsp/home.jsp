@@ -94,7 +94,7 @@
 </div>
 <% }  // shouldShowWelcome %>
 
-<div class="home" id="home">
+<div id="homepanel">
 <%
    if (homehelper.shouldShowSearch()) {
 %>

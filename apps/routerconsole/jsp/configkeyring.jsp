@@ -32,10 +32,10 @@
  <%=intl._t("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/"><%=intl._t("I2PTunnel page")%></a>.
           </td>
         </tr><tr>
-          <td class="mediumtags" align="right"><%=intl._t("Dest. name, hash, or full key")%>:</td>
+          <td align="right"><b><%=intl._t("Dest. name, hash, or full key")%>:</b></td>
           <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off" spellcheck="false"></textarea></td>
         </tr><tr>
-          <td class="mediumtags" align="right"><%=intl._t("Encryption Key")%>:</td>
+          <td align="right"><b><%=intl._t("Encryption Key")%>:</b></td>
           <td><input type="text" size="55" name="key" ></td>
         </tr><tr>
           <td align="right" colspan="2">

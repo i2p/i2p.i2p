@@ -14,6 +14,6 @@
 <jsp:useBean class="net.i2p.router.web.NewsFeedHelper" id="feedHelper" scope="request" />
 <jsp:setProperty name="feedHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% feedHelper.setLimit(0); %>
-<div class="fixme" id="fixme">
+<div id="newspage">
 <jsp:getProperty name="feedHelper" property="entries" />
 </div></div></body></html>

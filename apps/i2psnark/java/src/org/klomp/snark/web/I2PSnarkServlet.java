@@ -2205,25 +2205,25 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\" value=\"" +
                   DataHelper.escapeHTML(dataDir) + "\" spellcheck=\"false\"></td>\n" +
 
-                  "<tr><td>");
+                  "<tr><td><label for=\"filesPublic\">");
         out.write(_t("Files readable by all"));
-        out.write(":<td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"filesPublic\" value=\"true\" "
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"filesPublic\" id=\"filesPublic\" value=\"true\" "
                   + (filesPublic ? "checked " : "") 
                   + "title=\"");
         out.write(_t("Set file permissions to allow other local users to access the downloaded files"));
         out.write("\" >" +
 
-                  "<tr><td>");
+                  "<tr><td><label for=\"autoStart\">");
         out.write(_t("Auto start torrents"));
-        out.write(":<td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" "
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" id=\"autoStart\" value=\"true\" "
                   + (autoStart ? "checked " : "") 
                   + "title=\"");
         out.write(_t("Automatically start torrents when added and restart torrents when I2PSnark starts"));
         out.write("\" >" +
 
-                  "<tr><td>");
+                  "<tr><td><label for=\"smartSort\">");
         out.write(_t("Smart torrent sorting"));
-        out.write(":<td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"smartSort\" value=\"true\" "
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"smartSort\" id=\"smartSort\" value=\"true\" "
                   + (smartSort ? "checked " : "") 
                   + "title=\"");
         out.write(_t("Ignore words such as 'a' and 'the' when sorting"));
@@ -2338,17 +2338,17 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(_t("View or change router bandwidth"));
             out.write("]</a></i>");
         }
-        out.write("\n<tr><td>");
+        out.write("\n<tr><td><label for=\"useOpenTrackers\">");
         out.write(_t("Use open trackers also"));
-        out.write(":<td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" "
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" id=\"useOpenTrackers\" value=\"true\" "
                   + (useOpenTrackers ? "checked " : "")
                   + "title=\"");
         out.write(_t("Announce torrents to open trackers as well as tracker(s) listed in the torrent file"));
         out.write("\" ></td></tr>\n" +
 
-                  "<tr><td>");
+                  "<tr><td><label for=\"useDHT\">");
         out.write(_t("Enable DHT"));
-        out.write(":<td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"useDHT\" value=\"true\" "
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"useDHT\" id=\"useDHT\" value=\"true\" "
                   + (useDHT ? "checked " : "")
                   + "title=\"");
         out.write(_t("Use DHT to find additional peers"));
@@ -2450,9 +2450,9 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean isPrivate = privateTrackers.contains(t.announceURL);
             boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
             boolean isOpen = isKnownOpen || openTrackers.contains(t.announceURL);
-            buf.append("<tr class=\"knownTracker\"><td><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+            buf.append("<tr class=\"knownTracker\"><td><input type=\"checkbox\" class=\"optbox\" id=\"").append(name).append("\" name=\"delete_")
                .append(name).append("\" title=\"").append(_t("Mark tracker for deletion")).append("\">" +
-                       "</td><td>").append(name)
+                       "</td><td><label for=\"").append(name).append("\">").append(name)
                .append("</td><td>").append(urlify(homeURL, 35))
                .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"ttype_")
                .append(announceURL).append("\"");

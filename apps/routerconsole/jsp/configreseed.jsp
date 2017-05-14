@@ -39,7 +39,7 @@
 <form action="" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
   <td>
-<%=intl._t("Enter zip or su3 URL")%>:
+<b><%=intl._t("Enter zip or su3 URL")%>:</b>
 <input name="url" type="text" size="60" value="" />
   </td>
   <td class="optionsave">
@@ -54,7 +54,7 @@
 <form action="" method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
   <td>
-<%=intl._t("Select zip or su3 file")%>:
+<b><%=intl._t("Select zip or su3 file")%>:</b>
 <input name="file" type="file" accept=".zip,.su3" value="" />
   </td>
   <td class="optionsave">
@@ -92,45 +92,45 @@
 <%=intl._t("Change these only if HTTPS is blocked by a restrictive firewall and reseed has failed.")%>
   </td>
  </tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("Reseed URL Selection")%>:</b></td>
-<td><input type="radio" class="optbox" name="mode" value="0" <%=reseedHelper.modeChecked(0) %> >
-<b><%=intl._t("Try SSL first then non-SSL")%></b><br>
-<input type="radio" class="optbox" name="mode" value="1" <%=reseedHelper.modeChecked(1) %> >
-<b><%=intl._t("Use SSL only")%></b><br>
-<input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
-<b><%=intl._t("Use non-SSL only")%></b></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("Reseed URLs")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("Reseed URL Selection")%>:</b></td>
+<td><label><input type="radio" class="optbox" name="mode" value="0" <%=reseedHelper.modeChecked(0) %> >
+<%=intl._t("Try SSL first then non-SSL")%></label><br>
+<label><input type="radio" class="optbox" name="mode" value="1" <%=reseedHelper.modeChecked(1) %> >
+<%=intl._t("Use SSL only")%></label><br>
+<label><input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
+<%=intl._t("Use non-SSL only")%></label></td></tr>
+<tr><td align="right"><b><%=intl._t("Reseed URLs")%>:</b></td>
 <td><textarea wrap="off" name="reseedURL" cols="60" rows="7" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea>
 <div class="formaction" id="resetreseed"><input type="submit" name="action" class="reload" value="<%=intl._t("Reset URL list")%>" /></div>
 </td></tr>
 
-<tr><td class="mediumtags" align="right"><b><%=intl._t("Enable HTTP Proxy?")%></b></td>
-<td><input type="checkbox" class="optbox" name="enable" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTP Proxy Host")%>:</b></td>
+<tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable HTTP Proxy?")%></b></label></td>
+<td><input type="checkbox" class="optbox" name="enable" id="enableproxy" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
+<tr><td align="right"><b><%=intl._t("HTTP Proxy Host")%>:</b></td>
 <td><input name="host" type="text" value="<jsp:getProperty name="reseedHelper" property="host" />" ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTP Proxy Port")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("HTTP Proxy Port")%>:</b></td>
 <td><input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="reseedHelper" property="port" />" ></td></tr>
 
-<tr><td class="mediumtags" align="right"><b><%=intl._t("Use HTTP Proxy Authorization?")%></b></td>
-<td><input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="reseedHelper" property="auth" /> ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTP Proxy Username")%>:</b></td>
+<tr><td align="right"><label for="useproxyauth"><b><%=intl._t("Use HTTP Proxy Authorization?")%></b></label></td>
+<td><input type="checkbox" class="optbox" name="auth" id="useproxyauth" value="true" <jsp:getProperty name="reseedHelper" property="auth" /> ></td></tr>
+<tr><td align="right"><b><%=intl._t("HTTP Proxy Username")%>:</b></td>
 <td><input name="username" type="text" value="<jsp:getProperty name="reseedHelper" property="username" />" ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTP Proxy Password")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("HTTP Proxy Password")%>:</b></td>
 <td><input name="nofilter_password" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_password" />" ></td></tr>
 
 <!-- TODO Need SSLEepGet support
-<tr><td class="mediumtags" align="right"><b><%=intl._t("Enable HTTPS Proxy?")%></b></td>
+<tr><td align="right"><b><%=intl._t("Enable HTTPS Proxy?")%></b></td>
 <td><input type="checkbox" class="optbox" name="senable" value="true" <jsp:getProperty name="reseedHelper" property="senable" /> ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTPS Proxy Host")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Host")%>:</b></td>
 <td><input name="shost" type="text" value="<jsp:getProperty name="reseedHelper" property="shost" />" ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTPS Proxy Port")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Port")%>:</b></td>
 <td><input name="sport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="reseedHelper" property="sport" />" ></td></tr>
 
-<tr><td class="mediumtags" align="right"><b><%=intl._t("Use HTTPS Proxy Authorization?")%></b></td>
+<tr><td align="right"><b><%=intl._t("Use HTTPS Proxy Authorization?")%></b></td>
 <td><input type="checkbox" class="optbox" name="sauth" value="true" <jsp:getProperty name="reseedHelper" property="sauth" /> ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTPS Proxy Username")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Username")%>:</b></td>
 <td><input name="susername" type="text" value="<jsp:getProperty name="reseedHelper" property="susername" />" ></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._t("HTTPS Proxy Password")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Password")%>:</b></td>
 <td><input name="nofilter_spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_spassword" />" ></td></tr>
 -->
 

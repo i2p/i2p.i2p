@@ -162,7 +162,7 @@
 </form>
 </div>
 <div id="visualid">
-<h3><%=intl._t("Visual Identification for")%> <%=addr.getName()%></h3>
+<h3><%=intl._t("Visual Identification for")%> <span id="idAddress"><%=addr.getName()%></span></h3>
 <table>
 <tr>
 <td><img src="/imagegen/id?s=256&amp;c=<%=addr.getB64().replace("=", "%3d")%>" width="256" height="256"></td>

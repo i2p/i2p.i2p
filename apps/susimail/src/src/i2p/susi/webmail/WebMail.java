@@ -2176,7 +2176,7 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _t("To") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_TO + "\" value=\"" + quoteHTML(to) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + quoteHTML(cc) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + quoteHTML(bcc) + "\"></td></tr>\n" +
-				"<tr><td align=\"right\">" + _t("Bcc to self") + ": </td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
+				"<tr><td align=\"right\"><label for=\"bcctoself\">" + _t("Bcc to self") + ":</label></td><td align=\"left\"><input type=\"checkbox\" class=\"optbox\" id=\"bcctoself\" name=\"" + NEW_BCC_TO_SELF + "\" value=\"1\" " + (sessionObject.bccToSelf ? "checked" : "" ) + "></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
 				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\">" + text + "</textarea></td></tr>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
@@ -2457,9 +2457,9 @@ public class WebMail extends HttpServlet
 			sz = sessionObject.folder.getPageSize();
 		else
 			sz = Config.getProperty(Folder.PAGESIZE, Folder.DEFAULT_PAGESIZE);
-		out.println("<div class=\"topbuttons\">");
+		out.println("<div class=\"topbuttons\"><b>");
 		out.println(
-			_t("Folder Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
+			_t("Folder Page Size") + ":</b>&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE +
 			"\" size=\"4\" value=\"" +  sz + "\">" +
 			"&nbsp;" + 
 			button( SETPAGESIZE, _t("Set") ) );
