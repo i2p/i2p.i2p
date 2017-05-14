@@ -28,15 +28,15 @@ public class HomeHelper extends HelperBase {
     // No commas allowed in text strings!
     static final String DEFAULT_SERVICES =
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
-        _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "action_log.png" + S +
-        _x("Configure Plugins") + S + _x("Install and configure plugins") + S + "/configplugins" + S + I + "plugin.png" + S +
-        _x("Configure UI") + S + _x("Select console theme & language & set optional console password") + S + "/configui" + S + I + "wrench_orange.png" + S +
+        _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "info/bandwidth.png" + S +
+        _x("Configure UI") + S + _x("Select console theme & language & set optional console password") + S + "/configui" + S + I + "info/ui.png" + S +
         _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "home_page.png" + S +
         _x("Email") + S + _x("Anonymous webmail client") + S + "/susimail/susimail" + S + I + "email.png" + S +
         _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "support.png" + S +
-        _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "toolbox.png" + S +
+        _x("Manage Plugins") + S + _x("Install and configure I2P plugins") + S + "/configplugins" + S + I + "plugin.png" + S +
+        _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "info/console.png" + S +
         _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/i2psnark/" + S + I + "magnet.png" + S +
-        _x("Website") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
+        _x("Web Server") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         "";
 
     // No commas allowed in text strings!
@@ -176,7 +176,7 @@ public class HomeHelper extends HelperBase {
     }
 
     private String renderApps(Collection<App> apps) {
-        String website = _t("Website");
+        String website = _t("Web Server");
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<div class=\"appgroup\">");
         for (App app : apps) {
@@ -188,23 +188,18 @@ public class HomeHelper extends HelperBase {
             } else {
                 url = app.url;
             }
-            buf.append("<div class=\"app\">" +
+            buf.append("\n<div class=\"app\">\n" +
                        "<div class=\"appimg\">" +
-                       "<a href=\"").append(url).append("\">" +
-                       "<img class=\"");
-            // toopie is 54x68, not 16x16, needs special alignment and sizing
-            if (app.icon.endsWith("/itoopie_sm.png"))
-                buf.append("app2p");
-            else
-                buf.append("app");
-            buf.append("\" alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon).append("\"></a>\n" +
-                       "</div>" +
-                       "<table class=\"app\"><tr class=\"app\"><td class=\"app\">" +
+                       // usability: add tabindex -1 so we avoid 2 tabs per app
+                       "<a href=\"").append(url).append("\" tabindex=\"-1\">" +
+                       "<img alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon).append("\"></a>" +
+                       "</div>\n" +
+                       "<table><tr><td>" +
                        "<div class=\"applabel\">" +
                        "<a href=\"").append(url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +
                        "</div>" +
-                       "</td></tr></table>" +
-                       "</div>\n");
+                       "</td></tr></table>\n" +
+                       "</div>");
         }
         buf.append("</div>\n");
         return buf.toString();

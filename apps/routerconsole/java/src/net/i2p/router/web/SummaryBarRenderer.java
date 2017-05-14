@@ -163,7 +163,7 @@ class SummaryBarRenderer {
            .append("/\" target=\"_blank\" title=\"")
            .append(_t("Local web server"))
            .append("\">")
-           .append(nbsp(_t("Website")))
+           .append(nbsp(_t("Web Server")))
            .append("</a>\n")
 
            .append(NavHelper.getClientAppLinks(_context))
