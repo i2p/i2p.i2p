@@ -569,15 +569,19 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         int KC = k.length / 4;
         int[] tk; // new int[KC];
         int i, j;
-        
+        // the return value
+        Object[] sessionKey;
+
         if (keyData == null) {
             Ke = new int[ROUNDS + 1][BC];
             Kd = new int[ROUNDS + 1][BC];
             tk = new int[KC];
+            sessionKey = new Object[] { Ke, Kd};
         } else {
             Ke = keyData.Ke;
             Kd = keyData.Kd;
             tk = keyData.tk;
+            sessionKey = keyData.key;
         }
 
         // copy user material bytes into temporary ints
@@ -636,14 +640,6 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
                 Kd[r][j] = _U1[(tt >>> 24) & 0xFF] ^ _U2[(tt >>> 16) & 0xFF] ^ _U3[(tt >>> 8) & 0xFF] ^ _U4[tt & 0xFF];
             }
         }
-        // assemble the encryption (Ke) and decryption (Kd) round keys into
-        // one sessionKey object
-        Object[] sessionKey;
-        if (keyData == null)
-            sessionKey = new Object[] { Ke, Kd};
-        else
-            sessionKey = keyData.key;
-        //if (_RDEBUG) trace(_OUT, "makeKey()");
         return sessionKey;
     }
 
