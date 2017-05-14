@@ -602,8 +602,8 @@ class SybilRenderer {
         for (String s : foo) {
             int count = oc.count(s);
             String ss = DataHelper.escapeHTML(s);
-            buf.append("<p class=\"family\"><b>").append(count).append(" floodfills in declared family \"<a href=\"/netdb?fam=")
-               .append(ss).append("&amp;sybil\">").append(ss).append("</a>\"</b></p>");
+            buf.append("<p class=\"family\"><b>").append(count).append(" floodfills in family:&nbsp;&nbsp;<a href=\"/netdb?fam=")
+               .append(ss).append("&amp;sybil\">").append(ss).append("</a></b></p>");
             for (RouterInfo info : ris) {
                 String fam = info.getOption("family");
                 if (fam == null)

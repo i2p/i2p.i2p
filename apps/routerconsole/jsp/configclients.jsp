@@ -30,8 +30,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <h3 id="i2pclientconfig"><%=intl._t("Client Configuration")%>&nbsp;
   <span class="h3navlinks">
    <a href="configi2cp" title="<%=intl._t("Advanced Client Interface Configuration")%>">[I2CP]</a>&nbsp;
-   <a href="configwebapps" title="<%=intl._t("WebApp Configuration")%>">[WebApps]</a>&nbsp;
-   <a href="configplugins" title="<%=intl._t("Plugin Configuration")%>">[Plugins]</a>
+   <a href="configplugins" title="<%=intl._t("Plugin Configuration")%>">[Plugins]</a>&nbsp;
+   <a href="configwebapps" title="<%=intl._t("WebApp Configuration")%>">[WebApps]</a>
   </span>
  </h3>
  <p class="infohelp" id="clientconf">
