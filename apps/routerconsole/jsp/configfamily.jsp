@@ -40,7 +40,7 @@
 <input name="file" type="file" value="" />
   </td>
   <td class="optionsave">
-<input type="submit" name="action" class="download" value="<%=intl._t("Join Existing Router Family")%>" />
+<input type="submit" name="action" class="download" value="<%=intl._t("Join Family")%>" />
   </td>
  </tr>
 </form></table>
@@ -50,11 +50,11 @@
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <tr><th colspan="2"><%=intl._t("Create New Router Family")%></th></tr>
  <tr>
-  <td><%=intl._t("Family Name")%>:
+  <td><b><%=intl._t("Family Name")%>:</b>
 <input name="family" type="text" size="30" value="" />
   </td>
   <td class="optionsave">
-<input type="submit" name="action" class="accept" value="<%=intl._t("Create New Router Family")%>" />
+<input type="submit" name="action" class="accept" value="<%=intl._t("Create Family")%>" />
   </td>
  </tr>
 </form>
@@ -91,7 +91,7 @@
  <tr><th colspan="2"><%=intl._t("Leave Router Family")%></th></tr>
  <tr><td><%=intl._t("No longer be a member of the family {0}.", '"' + family + '"')%></td>
   <td class="optionsave">
-<input type="submit" name="action" class="delete" value="<%=intl._t("Leave Router Family")%>" />
+<input type="submit" name="action" class="delete" value="<%=intl._t("Leave Family")%>" />
   </td>
  </tr>
 </form>
