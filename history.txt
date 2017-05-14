@@ -1,3 +1,14 @@
+2017-05-14 zzz
+ * i2psnark: Fix HTML double-escape (ticket #1992)
+ * Router: New method to get bandwidth class
+
+2017-05-12 zzz
+ * i2psnark: Better handling of read-only i2psnark dir (ticket #1990)
+
+2017-05-10 zzz
+ * Debian: Fix apparmor profile (ticket #1986)
+ * SusiDNS: Fix display of default subscription
+
 2017-05-05 zzz
  * Blockfile: Move from i2p.jar to addressbook.jar
  * i2psnark: Initial support for ut_comment, no UI yet

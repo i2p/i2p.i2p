@@ -142,9 +142,8 @@ public abstract class TransportImpl implements Transport {
             maxProp = "i2np." + style.toLowerCase(Locale.US) + ".maxConnections";
         int def = MAX_CONNECTION_FACTOR;
         // get it from here, not the RI, to avoid deadlock
-        String caps = _context.router().getCapabilities();
+        char bw = _context.router().getBandwidthClass();
 
-            char bw = caps.charAt(0);
             switch (bw) {
                 case Router.CAPABILITY_BW12:
                 case 'u':  // unknown

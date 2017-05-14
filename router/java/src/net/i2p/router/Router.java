@@ -949,41 +949,53 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
     /**
+     *  The current bandwidth class.
      *  For building our RI. Not for external use.
      *
-     *  @return a capabilities string to be added to the RI
+     *  @return a character to be added to the RI, one of "KLMNOPX"
+     *  @since 0.9.31
      */
-    public String getCapabilities() {
-        StringBuilder rv = new StringBuilder(4);
+    public char getBandwidthClass() {
         int bwLim = Math.min(_context.bandwidthLimiter().getInboundKBytesPerSecond(),
                              _context.bandwidthLimiter().getOutboundKBytesPerSecond());
         bwLim = (int)(bwLim * getSharePercentage());
         
         String force = _context.getProperty(PROP_FORCE_BWCLASS);
         if (force != null && force.length() > 0) {
-            rv.append(force.charAt(0));
+            return force.charAt(0);
         } else if (bwLim < 12) {
-            rv.append(CAPABILITY_BW12);
+            return CAPABILITY_BW12;
         } else if (bwLim <= 48) {
-            rv.append(CAPABILITY_BW32);
+            return CAPABILITY_BW32;
         } else if (bwLim <= 64) {
-            rv.append(CAPABILITY_BW64);
+            return CAPABILITY_BW64;
         } else if (bwLim <= 128) {
-            rv.append(CAPABILITY_BW128);
+            return CAPABILITY_BW128;
         } else if (bwLim <= 256) {
-            rv.append(CAPABILITY_BW256);
+            return CAPABILITY_BW256;
         } else if (bwLim <= 2000) {    // TODO adjust threshold
             // 512 supported as of 0.9.18;
-            // Add 256 as well for compatibility
-            rv.append(CAPABILITY_BW512);
-            rv.append(CAPABILITY_BW256);
+            return CAPABILITY_BW512;
         } else {
             // Unlimited supported as of 0.9.18;
-            // Add 256 as well for compatibility
-            rv.append(CAPABILITY_BW_UNLIMITED);
-            rv.append(CAPABILITY_BW256);
+            return CAPABILITY_BW_UNLIMITED;
         }
+    }
         
+    /**
+     *  For building our RI. Not for external use.
+     *
+     *  @return a capabilities string to be added to the RI
+     */
+    public String getCapabilities() {
+        StringBuilder rv = new StringBuilder(4);
+        char bw = getBandwidthClass();
+        rv.append(bw);
+        // 512 and unlimited supported as of 0.9.18;
+        // Add 256 as well for compatibility
+        if (bw == CAPABILITY_BW512 || bw == CAPABILITY_BW_UNLIMITED)
+            rv.append(CAPABILITY_BW256);
+
         // if prop set to true, don't tell people we are ff even if we are
         if (_context.netDb().floodfillEnabled() &&
             !_context.getBooleanProperty("router.hideFloodfillParticipant"))
