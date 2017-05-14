@@ -1139,6 +1139,89 @@ td img {
      padding: 0;
 }
 
+/* peers - sort icons */
+
+#udpconnections th {
+     vertical-align: top;
+     padding-top: 3px;
+}
+
+.sortup, .sortdown, .sortupactive, .sortdownactive {
+     padding: 1px 0;
+     border: 1px solid #171;
+     border-radius: 1px;
+     opacity: 0.7;
+     margin: 5px 1px 0 !important;
+     vertical-align: middle;
+     text-align: center;
+     display: inline-block;
+     width: 16px;
+     height: 12px;
+     background-size: 10px auto, 100% 100% !important;
+}
+
+.sortup, .sortdown {
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.sortup img, .sortdown img, .sortupactive img, .sortdownactive img {
+     margin: 0;
+     padding: 0;
+     opacity: 0;
+     width: 16px;
+     height: 14px;
+     vertical-align: middle;
+     text-align: center;
+}
+
+.sortup:hover, .sortdown:hover {
+     opacity: 0.9;
+     transition: ease all 0.3s;
+}
+
+.sortupactive, .sortdownactive {
+     opacity: 1;
+     box-shadow: inset 1px 1px 1px #000;
+}
+
+.sortup {
+     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #040, #000);
+}
+
+.sortup:hover {
+     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #000, #040);
+     border: 1px solid #f60;
+}
+
+.sortup a:focus, .sortdown a:focus {
+     background: rgba(255,255,0,0.2);
+     border-radius: 1px;
+     margin-top: -1px;
+     height: 14px;
+     width: 16px;
+     display: inline-block;
+}
+
+.sortupactive {
+     background: url(images/sort_up.png) center center no-repeat, #050;
+}
+
+.sortdown {
+     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #040, #000);
+}
+
+.sortdown:hover {
+     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #000, #040);
+     border: 1px solid #f60;
+}
+
+.sortdownactive {
+     background: url(images/sort_down.png) center center no-repeat, #050;
+     border: 1px solid #050;
+}
+
+/* end peer sort */
+
 tt {
      font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", Courier, mono;
      color: #FF0;

@@ -4530,6 +4530,85 @@ table#profiles tr:hover td, table#floodfills tr:hover td, #ntcpconnections tr:nt
      color: #111;
 }
 
+/* peers - sort icons */
+
+#udpconnections th {
+     vertical-align: top;
+     padding-top: 3px;
+}
+
+.sortup, .sortdown, .sortupactive, .sortdownactive {
+     padding: 1px 0;
+     border: 1px solid #999;
+     border-radius: 2px;
+     margin: 3px 1px 0 !important;
+     vertical-align: middle;
+     text-align: center;
+     display: inline-block;
+     width: 16px;
+     height: 12px;
+     background-size: 10px auto, 100% 100% !important;
+}
+
+.sortup, .sortdown {
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ddd;
+     opacity: 0.75;
+}
+
+.sortup img, .sortdown img, .sortupactive img, .sortdownactive img {
+     margin: 0;
+     padding: 0;
+     opacity: 0;
+     width: 16px;
+     height: 14px;
+     vertical-align: middle;
+     text-align: center;
+}
+
+.sortupactive, .sortdownactive {
+     opacity: 1;
+     box-shadow: inset 1px 1px 1px #ccc;
+}
+
+.sortup {
+     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+}
+
+.sortup:hover {
+     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     border: 1px solid #f60;
+     opacity: 1;
+}
+
+.sortup a:focus, .sortdown a:focus {
+     background: rgba(255,102,0,0.15);
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #fff;
+     margin-top: -1px;
+     display: inline-block;
+}
+
+.sortupactive {
+     background: url(images/sort_up.png) center center no-repeat, #fff;
+}
+
+.sortdown {
+     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+}
+
+.sortdown:hover {
+     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     border: 1px solid #f60;
+     opacity: 1;
+}
+
+.sortdownactive {
+     background: url(images/sort_down.png) center center no-repeat, #fff;
+}
+
+/* end peer sort */
+
+
 table#schedjobs {
      margin-top: -11px !important;
 }
