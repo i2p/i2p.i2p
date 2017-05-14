@@ -1465,6 +1465,52 @@ div.news hr:last-child {
      margin-bottom: 10px !important;
 }
 
+.newsentry + hr {
+     margin-bottom: 5px !important;
+}
+
+.newsAuthor {
+     padding-left: 14px;
+     float: right;
+     background: url(/themes/console/images/info/author.png) left 2px bottom 3px no-repeat;
+     background-size: 10px 10px;
+     font-size: 8.5pt;
+     padding: 2px 4px 0 14px;
+     display: inline-block;
+     opacity: 0.8;
+}
+
+.newsDate {
+     font-size: 10pt !important;
+}
+
+#newsStatus {
+     float: left;
+     text-align: justify;
+}
+
+#newsDisplay {
+     white-space: nowrap;
+     margin-left: 10px;
+     color: #663;
+     font-weight: bold;
+}
+
+#news #newsDisplay, #news #newsStatus {
+     margin-top: 3px !important;
+     margin-bottom: 3px !important;
+     display: inline-block;
+}
+
+.messages #newsStatus, .messages #newsDisplay {
+     float: none;
+     color: #005;
+}
+
+.messages #newsDisplay {
+     margin-left: 5px;
+}
+
 /* top navigation */
 
 div.confignav {

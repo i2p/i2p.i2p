@@ -760,27 +760,46 @@ div.news h4 {
 }
 
 div.news p, div.newscontent p {
-     margin-top: -5px;
      font-size: 9pt;
      color: #EE9;
-     margin-bottom: 0;
-/*     padding: 0 15px;*/
+     margin: 0 !important;
 }
 
-.newscontent b {
-/*     text-transform: uppercase;
-     letter-spacing: 0.1em; */
-}
-
-div.news p:nth-child(n+1), div.newscontent p:nth-child(n+1) {
-     margin-top: 5px;
+div.news p:nth-child(n+2), div.newscontent p:nth-child(n+2) {
+     margin-top: 8px !important;
 }
 
 div.news hr {
      margin: 8px 0 3px 0;
 }
 
-div.fixme {
+#newsStatus {
+     float: left;
+}
+
+#newsDisplay {
+     white-space: nowrap;
+     margin-left: 10px;
+}
+
+.newsAuthor {
+     float: right;
+     background: url(/themes/console/images/info/author_dark.png) left 2px center no-repeat;
+     background-size: 14px 14px;
+     font-size: 8pt !important;
+     padding: 1px 0 0 18px;
+     display: inline-block;
+     opacity: 0.9;
+     text-transform: none;
+}
+
+.newsDate {
+     opacity: 0.9;
+     font-style: italic;
+     margin-right: 3px;
+}
+
+#newspage {
      margin: 18px 5px; /* positional parity with homepage news */
 }
 

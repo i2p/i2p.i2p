@@ -26,6 +26,15 @@ div.news {
      direction: ltr;
 }
 
+.news h3, #newspage h3 {
+     direction: ltr;
+}
+
+.news hr + i {
+     float: left;
+     direction: rtl;
+}
+
 div.main {
      margin: -1px 205px 5px 5px;
      background: url("images/scarface.jpg") no-repeat scroll left bottom #000000 !important;

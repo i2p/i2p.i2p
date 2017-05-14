@@ -168,7 +168,13 @@ td.optionsave {
      border-top: 1px solid #494;
 }
 
-/* responsive layout */
+.newsentry + hr {
+     margin-bottom: 5px !important;
+}
+
+#newsDisplay, #newsDisplay a, #newsStatus, td.infohelp, td.infowarn, p.infohelp, p.infowarn {
+     font-size: 11pt !important;
+}
 
 @media screen and (min-width: 0) {
 p, .main {

@@ -1535,10 +1535,46 @@ div.sorry hr {
      color: #c9ceff;
 }
 
+/*
 .newsentry font[size="-2"] {
      letter-spacing: 0.15em;
      font-style: italic;
      text-transform: capitalize;
+}
+*/
+
+.main#news .newscontent {
+     border: 1px solid #443da0;
+     margin: -11px 0 10px;
+     padding: 0 10px 5px;
+     border-radius: 0 0 2px 2px;
+     background: rgba(0,0,0,0.6);
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.main#news .newsentry h3 {
+     border: 1px solid #443da0;
+     border-radius: 2px 2px 0 0;
+}
+
+.main#news .newsentry {
+     margin-bottom: 14px !important;
+}
+
+.main#news .newsentry:first-child {
+     margin-top: -3px !important;
+}
+
+.main#news .newsentry:last-child {
+     margin-bottom: -3px !important;
+}
+
+.news .newsentry {
+     margin-top: -3px !important;
+}
+
+.news .newsentry:first-child {
+     margin-top: -7px !important;
 }
 
 .news h4 {
@@ -1564,11 +1600,50 @@ div.sorry hr {
 }
 
 .news hr {
-     margin: 8px -20px 3px;
+     margin: 8px -20px 5px;
 }
 
-.fixme {
+#newspage {
      margin: 18px 5px; /* positional parity with homepage news */
+}
+
+#newsStatus {
+     float: left;
+     color: #c9ceff;
+}
+
+#newsDisplay {
+     white-space: nowrap;
+     margin-left: 10px;
+}
+
+.newsAuthor {
+     float: right;
+     background: url(/themes/console/images/info/author_dark.png) left 2px top no-repeat;
+     background-size: 14px 14px;
+     font-size: 8pt !important;
+     padding: 0 0 0 18px;
+     display: inline-block;
+     opacity: 0.7;
+     text-transform: none;
+}
+
+.newsDate {
+     opacity: 0.7;
+     font-style: italic;
+     margin-right: 2px;
+}
+
+.messages i {
+     text-align: left;
+     float: none;
+     display: inline-block;
+}
+
+.messages #newsDisplay {
+     display: inline-block;
+     white-space: normal;
+     margin-left: 45px;
 }
 
 .main#jobs .joblog {
@@ -2211,6 +2286,25 @@ h1, h2, h3:not([id*="help"]), h4.app, h4.app2, div.routersummary h3, .confignav 
 
 h2, h3, h4, .confignav {
      box-shadow: inset 0 0 0 1px #000;
+}
+
+
+.news h3, #newspage h3 {
+     padding-left: 30px !important;
+     text-align: left !important;
+     font-size: 9.5pt !important;
+     letter-spacing: 0.08em;
+     color: #c9ceff;
+     padding: 6px 10px 6px 30px;
+     background: url(/themes/console/images/info/newspaper.png) left 8px center no-repeat, linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000000 56%, #000000 100%) !important;
+     background-size: 16px 16px, 100% 100% !important;
+}
+
+.news h3 {
+     background: url(/themes/console/images/info/newspaper.png) left 8px center no-repeat !important;
+     background-size: 16px 16px !important;
+     border: none !important;
+     border-bottom: 1px solid #443da0 !important;
 }
 
 .underline {

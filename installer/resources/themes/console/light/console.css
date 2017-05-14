@@ -907,6 +907,43 @@ div.newscontent p {
      margin-right: 8px;
 }
 
+#newsStatus, #newsDisplay {
+     display: inline-block;
+}
+
+.newsentry + hr + #newsStatus, .newsentry + hr + #newsStatus + #newsDisplay {
+     margin-top: -6px !important;
+}
+
+#newsStatus {
+     float: left;
+     text-align: justify;
+     margin-bottom: 6px !important;
+}
+
+#newsDisplay {
+     white-space: nowrap;
+     margin-left: 10px;
+     color: #337;
+}
+
+.newsAuthor {
+     padding: 0 0 0 15px !important;
+     float: right;
+     background: url(/themes/console/images/info/author.png) left 2px center no-repeat;
+     background-size: 10px 10px;
+     font-size: 8pt !important;
+     display: inline-block;
+     opacity: 0.8;
+     letter-spacing: 0.1em !important;
+     text-transform: none;
+}
+
+.newsDate {
+     opacity: 0.8;
+     margin-right: 1px;
+}
+
 .main#news {
      padding: 3px 15px 5px;
      background: #fff url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom;
@@ -5004,6 +5041,21 @@ div.routersummary img[src$="i2plogo.png"] {
 .statlist li a[href^="graph"]::before, .statlist li::before {
      height: 6px;
      width: 6px;
+}
+
+button.control {
+     padding: 14px !important;
+}
+
+#configstats td::before {
+     min-height: 24px;
+}
+
+.newsAuthor {
+     font-size: 9pt;
+     background-size: 11px 11px;
+     padding: 0 0 0 14px;
+     background-position: left center !important;
 }
 }
 
