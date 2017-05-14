@@ -3275,26 +3275,26 @@ public class I2PSnarkServlet extends BasicServlet {
             if (showPriority) {
                 buf.append("<td class=\"priority\">");
                 if ((!complete) && (!item.isDirectory())) {
-                    buf.append("<span class=\"priorityHigh\" title=\"").append(_t("Download file at high priority")).append("\">")
+                    buf.append("<label class=\"priorityHigh\" title=\"").append(_t("Download file at high priority")).append("\">")
                        .append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prihigh\" value=\"5\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority > 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>')
-                       .append(_t("High")).append("</span>");
+                       .append(_t("High")).append("</label>");
 
-                    buf.append("<span class=\"priorityNormal\" title=\"").append(_t("Download file at normal priority")).append("\">")
+                    buf.append("<label class=\"priorityNormal\" title=\"").append(_t("Download file at normal priority")).append("\">")
                     .append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"prinorm\" value=\"0\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority == 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>')
-                       .append(_t("Normal")).append("</span>");
+                       .append(_t("Normal")).append("</label>");
 
-                    buf.append("<span class=\"prioritySkip\" title=\"").append(_t("Do not download this file")).append("\">")
+                    buf.append("<label class=\"prioritySkip\" title=\"").append(_t("Do not download this file")).append("\">")
                     .append("\n<input type=\"radio\" onclick=\"priorityclicked();\" class=\"priskip\" value=\"-9\" name=\"pri.").append(fileIndex).append("\" ");
                     if (priority < 0)
                         buf.append("checked=\"checked\"");
                     buf.append('>')
-                       .append(_t("Skip")).append("</span>");
+                       .append(_t("Skip")).append("</label>");
                     showSaveButton = true;
                 }
                 buf.append("</td>");
