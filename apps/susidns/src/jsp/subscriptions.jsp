@@ -85,7 +85,7 @@
 <%=intl._t("Those URLs refer to published hosts.txt files.")%>
 <%=intl._t("The default subscription is the hosts.txt from {0}, which is updated infrequently.", "i2p-projekt.i2p")%>
 <%=intl._t("So it is a good idea to add additional subscriptions to sites that have the latest addresses.")%>
-<a href="http://i2p-projekt.i2p/faq.html#subscriptions" target="_top"><%=intl._t("See the FAQ for a list of subscription URLs.")%></a>
+<a href="/help#addressbooksubs" target="_top"><%=intl._t("See the FAQ for a list of subscription URLs.")%></a>
 </p>
 </div>
 <div id="footer">

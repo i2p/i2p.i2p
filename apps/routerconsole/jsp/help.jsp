@@ -14,13 +14,24 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P Router Help &amp; Support</h1>
-<div class="main" id="help"><p>
+<div class="main" id="help">
+
+<div class="confignav">
+<span class="tab"><a href="#sidebarhelp">Sidebar</a></span>
+<span class="tab"><a href="#configurationhelp">Configuration</a></span>
+<span class="tab"><a href="#reachabilityhelp">Reachability</a></span>
+<span class="tab"><a href="#advancedsettings">Advanced Settings</a></span>
+<span class="tab"><a href="#faq">FAQ</a></span>
+<span class="tab"><a href="#legal">Legal</a></span>
+<span class="tab"><a href="#changelog">Change Log</a></span>
+</div>
 
 <div id="volunteer"><%@include file="help.jsi" %></div>
 <div id="sidebarhelp"><%@include file="help-sidebar.jsi" %></div>
 <div id="configurationhelp"><%@include file="help-configuration.jsi" %></div>
 <div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>
 <div id="advancedsettings"><%@include file="help-advancedsettings.jsi" %></div>
+<div id="faq"><%@include file="help-faq.jsi" %></div>
 <div id="legal"><%@include file="help-legal.jsi" %></div>
 <div id="changelog">
 <h2>Change Log</h2>

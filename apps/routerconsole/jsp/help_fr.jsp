@@ -15,16 +15,31 @@
 <%@include file="summary.jsi" %>
 <!-- Traduction de mars 2011 (magma@mail.i2p) -->
 <h1>Aide et assistance du routeur I2P</h1>
-<div class="main" id="help"><p>
-Si vous souhaitez améliorer ou traduire la documentation ou d'autres versants du projet, merci de vous reporter à 
+<div class="main" id="help">
+
+<div class="confignav">
+<span class="tab"><a href="#sidebarhelp">Barre latérale</a></span>
+<span class="tab"><a href="#configurationhelp">Configuration</a></span>
+<span class="tab"><a href="#reachabilityhelp">Joignabilité</a></span>
+<span class="tab"><a href="#advancedsettings">Réglages avancés</a></span>
+<span class="tab"><a href="#faq">FAQ</a></span>
+<span class="tab"><a href="#legal">Légal</a></span>
+<span class="tab"><a href="#changelog">Historique</a></span>
+</div>
+
+<div id="volunteer">
+<h2>Assistance Supplémentaire</h2>
+<p>Si vous souhaitez améliorer ou traduire la documentation ou d'autres versants du projet, merci de vous reporter à 
 la page consacrée aux <a href="http://i2p-projekt.i2p/fr/get-involved">volontaires</a>.
 </p>D'autres détails sont disponibles ici:
 <ul class="links">
 <li class="tidylist"><a href="http://i2p-projekt.i2p/en/faq">FAQ en anglais sur i2p-projekt.i2p</a></li>
-<li class="tidylist"><a href="http://i2p-projekt.i2p/fr/faq">les FAQ en français</a>.</li></ul>
-<br>Il y a aussi le <a href="http://forum.i2p/">forum I2P</a>
-et l'IRC.
+<li class="tidylist"><a href="http://i2p-projekt.i2p/fr/faq">les FAQ en français</a>.</li>
+<li>Il y a aussi le <a href="http://forum.i2p/">forum I2P</a> et l'IRC.</li>
+</ul><br>
+</div>
 
+<div id="sidebarhelp">
 <h2>Informations du panneau de surveillance</h2><p>
 Plusieurs des statistiques affichées dans le panneau de surveillance peuvent être 
 <a href="configstats.jsp">configurées</a> pour être affichées sous forme de <a href="graphs.jsp">graphiques</a> pour 
@@ -64,19 +79,20 @@ diffusion ("floodfill"). Vos pairs "bien intégrés" sont affichés en bas de la
 page <a href="netdb.jsp">base de données du réseau</a>. De moins de 100 à 1000 ou plus. Ce nombre ne représente pas la 
 taille totale du réseau; il varie en fonction de votre bande passante totale et son rapport de partage, et du trafic 
 local. I2P n'a pas besoin que chaque routeur connaisse tous les autres.
-</li></ul><h3>Bande passante entrée/sortie</h3><div align="justify"> 
-Ça parle tout seul. Toutes les valeurs sont en octets par seconde (o/s), pas en bits par seconde (b/s). Modifiez vos 
+</li></ul><h3>Bande passante entrée/sortie</h3>
+<p>Ça parle tout seul. Toutes les valeurs sont en octets par seconde (o/s), pas en bits par seconde (b/s). Modifiez vos 
 limites de bande passante sur la page de <a href="confignet#help">configuration</a>.
-Le <a href="graphs.jsp">graphique de bande passante</a> est activé par défaut.</div>
+Le <a href="graphs.jsp">graphique de bande passante</a> est activé par défaut.</p>
 
-<h3>Destinations locales</h3><div align="justify">
-C'est le nom I2P des applications qui se connectent par votre routeur. Elles peuvent être des clients lancés depuis 
+<h3>Destinations locales</h3>
+<p>C'est le nom I2P des applications qui se connectent par votre routeur. Elles peuvent être des clients lancés depuis 
 <a href="i2ptunnel/index.jsp">I2PTunnel</a> ou des programmes tiers qui se connectent via SAM, BOB ou directement à 
-I2CP.
-</div><h3>TUNNELS:</h3><div align="justify">
-Les tunnels actuels sont affichés sur la page <a href="tunnels.jsp">tunnels</a>.</div><ul>
-<li class="tidylist"><div align="justify"><b>Exploratoires:</b> tunnels créés par votre routeur et utilisés avec les 
-pairs diffuseurs pour la création des nouveaux tunnels et le test des tunnels existants.</div></li>
+I2CP.</p>
+<h3>TUNNELS:</h3>
+<p>Les tunnels actuels sont affichés sur la page <a href="tunnels.jsp">tunnels</a>.</p>
+<ul>
+<li class="tidylist"><b>Exploratoires:</b> tunnels créés par votre routeur et utilisés avec les 
+pairs diffuseurs pour la création des nouveaux tunnels et le test des tunnels existants.</li>
 <li class="tidylist"><b>Clients:</b> tunnels créés par votre routeur pour chaque utilisation cliente.</li>
 <li class="tidylist"><b>Participants:</b> les tunnels créés par d'autres routeurs et qui passent par le votre. Leur 
 nombre dépend largement de la demande du réseau, de votre part de bande passante partagée, et du trafic local. 
@@ -87,10 +103,12 @@ La méthode recommandée pour limiter leur nombre est de diminuer le rapport de 
 <li class="tidylist"><b>Rapport de partage:</b> le nombre de tunnels participants que vous routez pour les autres, 
 divisé par le nombre total de sauts dans tous vos tunnels exploratoires et clients. S'il est supérieur à 1, cela 
 signifie que vous contribuez à plus de tunnels que vous n'en utilisez.
-</li></ul>
+</li>
+</ul>
 
-<h3>ENCOMBREMENT</h3><div align="justify">
-Indications de base sur la charge du routeur:</div><ul>
+<h3>ENCOMBREMENT</h3>
+<p>Indications de base sur la charge du routeur:</p>
+<ul>
 <li class="tidylist"><b>Retard de tâches:</b> temps d'attente des tâches avant exécution. La file d'attente est 
 présentée la pages des <a href="jobs.jsp">tâches</a>. Malheureusement, il y a dans le routeur plusieurs autres files 
 d'attentes qui ne peuvent être affichées dans la console. Le retard de tâches devrait rester à zéro en permamence. s'il 
@@ -112,7 +130,14 @@ limite de bande passante partagée.</li>
 des demandes de création de tunnels participants provenant d'autres routeurs. Votre routeur peut accepter ou refuser 
 tout ou partie des requêtes, ou les refuser en totalité pour des raisons prévues telles que le contrôle de la bande 
 passante et des ressources CPU en vue de préserver les performances des clients locaux.</li></ul>
+</div>
 
+<div id="configurationhelp"><%@include file="help-configuration.jsi" %></div>
+<div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>
+<div id="advancedsettings"><%@include file="help-advancedsettings.jsi" %></div> <% /* untranslated */ %>
+<div id="faq"><%@include file="help-faq.jsi" %></div> <% /* untranslated */ %>
+
+<div id="legal">
 <h2>Informations légales</h2><p>Le routeur I2P (router.jar) et le SDK (i2p.jar) sont presque entièrement dans le 
 domaine public, à quelques notobles exceptions près:</p><ul>
 <li class="tidylist">Le code ElGamal et DSA, sous licence BSD, écrits par TheCrypto</li>
@@ -148,7 +173,9 @@ leurs licences respectives, référez-vous à notre <a href="http://i2p-projekt.
 Les sources du code I2P et de la plupart des applications jointes est sur notre page de 
 <a href="http://i2p-projekt.i2p/fr/download">téléchargements</a>.
 .</p>
+</div>
 
+<div id="changelog">
 <h2>Historique des évolutions</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
@@ -157,5 +184,7 @@ Les sources du code I2P et de la plupart des applications jointes est sur notre 
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
 
- <p><a href="/history.txt">Historique complet</a>
- </p><hr></div></body></html>
+ <p id="fullhistory"><a href="/history.txt" target="_blank">Historique complet</a>
+ </p>
+</div>
+</div></body></html>
