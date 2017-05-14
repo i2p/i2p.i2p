@@ -292,7 +292,7 @@ public class ConfigClientsHelper extends HelperBase {
                 if (s != null) {
                     desc.append("<tr><td><b>")
                         .append(_t("Website")).append("</b></td><td><a href=\"")
-                        .append(s).append("\">").append(s).append("</a>");
+                        .append(s).append("\" target=\"_blank\">").append(s).append("</a>");
                 }
                 String updateURL = stripHTML(appProps, "updateURL.su3");
                 if (updateURL == null)

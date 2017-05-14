@@ -48,7 +48,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <h3 id="pluginmanage"><a name="plugin"></a><%=intl._t("Plugin Installation")%></h3><p>
 <table id="plugininstall" class="configtable">
 <tr><td class="infohelp" colspan="2">
- <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://i2pwiki.i2p/index.php?title=Plugins\">i2pwiki.i2p</a>")%>
+ <%=intl._t("Look for available plugins on {0}.", "<a href=\"http://i2pwiki.i2p/index.php?title=Plugins\" target=\"_blank\">i2pwiki.i2p</a>")%>
 </td></tr>
 <tr><th colspan="2">
  <%=intl._t("Installation from URL")%>
