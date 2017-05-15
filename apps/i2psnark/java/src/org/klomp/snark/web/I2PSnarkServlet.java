@@ -721,7 +721,9 @@ public class I2PSnarkServlet extends BasicServlet {
             if (dht != null) {
                 if (showDebug) {
                     out.write("</tr>\n<tr class=\"dhtDebug\">");
+                    out.write("<th colspan=\"11\">");
                     out.write(dht.renderStatusHTML());
+                    out.write("</th>");
                 }
             }
             out.write("</tr></tfoot>\n");
