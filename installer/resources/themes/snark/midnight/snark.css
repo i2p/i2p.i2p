@@ -387,12 +387,6 @@ tfoot tr:nth-child(n+1) {
      width: 100%;
 }
 
-.priority {
-     font-size: 8pt;
-     min-width: 160px;
-     vertical-align: middle;
-}
-
 .snarkTorrents {
      margin: 10px 0 0 0;
      border: none;
@@ -639,14 +633,6 @@ tfoot tr:nth-child(n+1) {
      border-bottom: 1px solid #443da0 !important;
 }
 
-/*
-.snarkDirInfo .ParentDir a, .snarkDirInfo .snarkFileName a, .snarkTorrents .snarkTorrentName a {
-     display: inline-block;
-     width: 100%;
-     padding: 2px 0;
-}
-*/
-
 .snarkDirInfo .headerpriority {
      text-align: center !important;
      vertical-align: middle;
@@ -671,13 +657,6 @@ table.SnarkDirInfo img {
      margin: 0 !important;
 }
 
-/*
-.snarkDirInfo .headerpriority {
-     text-align: center !important;
-     vertical-align: middle;
-}
-*/
-
 td.subHeaderPriority, td.priority {
      width: 0;
      min-width: 160px !important;
@@ -701,15 +680,6 @@ td.subHeaderPriority {
 .headerpriority img {
      padding: 4px !important;
 }
-
-/*
-.headerstatus {
-     min-width: 250px;
-}
-
-td.priority:last-child {
-}
-*/
 
 .priority {
      white-space: nowrap;
@@ -2149,9 +2119,24 @@ td#bwHelp a {
 
 /* torrent priorities */
 
+.priority {
+     font-size: 8pt;
+     width: 1%;
+     min-width: 160px;
+     white-space: nowrap;
+     vertical-align: middle;
+}
+
+.priority::after {
+     content: "";
+     display: inline-block;
+     min-height: 30px;
+     vertical-align: middle;
+}
+
 .priority input[type="radio"] {
      text-align: left;
-     margin: 0;
+     margin: 3px;
 }
 
 .priorityHigh, .priorityNormal, .prioritySkip {
@@ -2160,20 +2145,21 @@ td#bwHelp a {
      width: 50px;
      font-size: 0;
      text-align: left;
+     vertical-align: middle;
      color: transparent;
      overflow: hidden;
 }
 
 .priorityHigh {
-     background: url(/i2psnark/.resources/icons/clock_red.png) left 20px center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/i2psnark/.resources/icons/clock.png) left 20px  center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock.png) left 24px  center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/i2psnark/.resources/icons/cancel.png) left 18px center no-repeat;
+     background: url(/i2psnark/.resources/icons/cancel.png) left 22px center no-repeat;
 }
 
 #setPriority a.control img {

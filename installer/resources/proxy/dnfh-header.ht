@@ -6,14 +6,16 @@ Connection: close
 Proxy-Connection: close
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
+<html>
+<head>
 <title>_("Website Unknown")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div class="logo">
- <a href="http://127.0.0.1:7657/" title="_("Router Console")"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="_("I2P Router Console")" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/" title="_("Router Console")"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="_("I2P Router Console")" border="0"></a>
+ <hr>
  <a href="http://127.0.0.1:7657/config.jsp">_("Configuration")</a> <a href="http://127.0.0.1:7657/help.jsp">_("Help")</a> <a href="http://127.0.0.1:7657/susidns/index">_("Addressbook")</a>
 </div>
 <div class="warning" id="warning">
@@ -25,8 +27,9 @@ _("If you have the Base 64 address, {0}add it to your addressbook{1}.", "<a href
 _("Otherwise, find a Base 32 or address helper link, or use a jump service link below.")
 </p>
 <p>
-_("Seeing this page often? See {0}the FAQ{1} for help in {2}adding some subscriptions{3} to your addressbook.", "<a href=\"http://i2p-projekt.i2p/faq.html#subscriptions\">", "</a>", "<a href=\"http://127.0.0.1:7657/susidns/config.jsp\">", "</a>")
-</p><hr>
+_("Seeing this page often? See {0}the FAQ{1} for help in {2}adding some subscriptions{3} to your addressbook.", "<a href=\"http://127.0.0.1:7657/help#addressbooksubs\">", "</a>", "<a href=\"http://127.0.0.1:7657/susidns/config.jsp\">", "</a>")
+</p>
+<hr>
 <p>
 <b>_("Could not find the following destination:")</b>
 </p>

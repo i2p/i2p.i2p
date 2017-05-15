@@ -63,7 +63,7 @@ pre {
      color: #EE9;
 }
 
-/* proxy error messages */
+/* proxy errors */
 
 div.logo { /* proxy error "fake" sidebar */
      float: left;
@@ -155,6 +155,24 @@ div.warning {
      padding: 7px 10px;
      text-align: left;
 }
+
+#jumplinks a {
+     display: inline-block;
+     padding: 2px 0;
+     line-height: 16px;
+}
+
+#jumplinks a::before {
+     content: "\279F\00A0";
+     font-size: 16pt;
+     display: inline-block;
+     padding: 3px 0;
+     vertical-align: sub;
+     line-height: 16px;
+}
+
+/* end proxy errors */
+
 
 div.routersummaryouter {
      float: left;
@@ -1212,8 +1230,6 @@ div.main li {
 
 div.main li b {
      color: #bb0 !important;
-     letter-spacing: 0.08em;
-     font-size: 9pt;
 }
 
 .tidylist {
@@ -5241,8 +5257,9 @@ table#configstats {
 }
 
 #configstats td:first-child {
-     width: 20px;
+     width: 1%;
      white-space: nowrap;
+     padding: 6px 8px;
 }
 
 #configstats td:first-child:empty + td > label { /* remove pointer from inert labels */

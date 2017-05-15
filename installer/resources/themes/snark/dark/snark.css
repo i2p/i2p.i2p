@@ -386,13 +386,6 @@ tfoot tr:nth-child(n+1) {
      margin-left: -4px;
 }
 
-.priority {
-     font-size: 8pt;
-     vertical-align: middle;
-     max-width: 160px;
-     width: 1% !important;
-}
-
 .SnarkTorrents {
      margin: 0;
      border: 1px solid #101;
@@ -1997,6 +1990,24 @@ label.toggleview, .snarkConfigTitle a:visited {
      font-weight: bold;
 }
 
+.priority {
+     font-size: 8pt;
+     vertical-align: middle;
+     max-width: 160px;
+     width: 1% !important;
+}
+
+.priority::after {
+     content: "";
+     display: inline-block;
+     min-height: 30px;
+     vertical-align: middle;
+}
+
+.priority input[type="radio"] {
+     margin: 3px;
+}
+
 .priorityHigh, .priorityNormal, .prioritySkip {
      display: inline-block;
      width: 48px;
@@ -2004,18 +2015,19 @@ label.toggleview, .snarkConfigTitle a:visited {
      font-size: 0;
      overflow: hidden;
      text-align: left;
+     vertical-align: middle;
 }
 
 .priorityHigh {
-     background: url(/i2psnark/.resources/icons/clock_red.png) left 28px center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/i2psnark/.resources/icons/clock.png) left 28px  center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock.png) left 24px  center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/i2psnark/.resources/icons/cancel.png) left 26px center no-repeat;
+     background: url(/i2psnark/.resources/icons/cancel.png) left 22px center no-repeat;
 }
 
 /* configs */

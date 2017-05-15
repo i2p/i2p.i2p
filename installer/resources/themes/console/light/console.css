@@ -585,6 +585,10 @@ div.logo {
      width: 100%;
 }
 
+.logo hr ~ a {
+     margin: 3px 2px;
+}
+
 div.warning {
      margin: 20px 20px 30px 240px;
      padding: 10px 25px 20px 75px;
@@ -608,6 +612,25 @@ div.warning {
 
 .warning h3 {
      text-align: left;
+}
+
+#jumplinks h3 {
+     margin: 0 0 10px;
+}
+
+#jumplinks a {
+     display: inline-block;
+     padding: 2px 0;
+     line-height: 16px;
+}
+
+#jumplinks a::before {
+     content: "\279F\00A0";
+     font-size: 16pt;
+     display: inline-block;
+     padding: 3px 0;
+     vertical-align: sub;
+     line-height: 16px;
 }
 
 .proxyfooter {
@@ -1283,12 +1306,14 @@ p#enablefullstats {
 }
 
 #configstats td:first-child {
-     width: 48px;
+     width: 1%;
      white-space: nowrap;
+     padding: 4px 8px;
 }
 
 #configstats td:first-child:empty + td > label { /* remove pointer from inert labels */
-     cursor: default;
+     cursor: text;
+     color: #333;
 }
 
 #configstats td:last-child {
@@ -2069,8 +2094,6 @@ div.main li {
 
 div.main li b, .statlist b a:hover {
      color: #335 !important;
-     font-size: 9.5pt;
-     line-height: 170%;
 }
 
 .tidylist {
@@ -4410,6 +4433,7 @@ p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals, p.notfound {
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
      font-weight: bold;
+     text-align: left;
      background: url(images/eye.png) 8px center no-repeat, repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px), #fff;
 }
 
@@ -4967,6 +4991,7 @@ table#floodfills th {
      background-size: 24px 24px !important;
      padding-left: 46px !important;
      color: #333 !important;
+     padding-right: 15px !important;
 }
 
 #sidebarhelp ul {
@@ -5367,10 +5392,6 @@ input[name="pluginURL"] {
      vertical-align: middle;
      letter-spacing: -0.25em;
 }
-
-.main#help h3, #faq h3 {
-     font-size: 10.5pt !important;
-}
 }
 
 @media screen and (min-width: 1500px) {
@@ -5525,6 +5546,10 @@ button.control {
      background-size: 11px 11px;
      padding: 0 0 0 14px;
      background-position: left center !important;
+}
+
+.topness, .footnote {
+     font-size: 9pt !important;
 }
 
 _:-ms-lang(x), #browseronstart {

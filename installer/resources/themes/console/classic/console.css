@@ -130,13 +130,15 @@ img {
      margin: 5px 0;
 }
 
-.warning h3 {
+#jumplinks h3 {
      border: 0;
+     border-top: 1px solid #fb7;
      border-bottom: 1px solid #fb7;
      padding-bottom: 10px;
-     background: none !important;
-     padding-left: 0;
+     background: #ffe !important;
+     padding-left: 15px;
      font-size: 10.5pt;
+     margin-top: 20px;
 }
 
 .warning h3:first-child {
@@ -145,6 +147,7 @@ img {
      background: #ffe !important;
      background: #ffe url(/themes/console/images/itoopie_sm.png) 6px center no-repeat !important;
      background-size: auto 80% !important;
+     border: none;
      border-bottom: 1px solid #fb7;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -201,7 +204,7 @@ img {
      vertical-align: top;
 }
 
-.warning a[href*="jump"]::before {
+#jumplinks a::before {
      content: "\279F\00A0";
      font-size: 14pt;
      display: inline-block;
@@ -1304,9 +1307,6 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 
 .main li b {
      color: #1f7096 !important;
-     letter-spacing: 0.01em;
-     font-size: 9.5pt;
-     line-height: 170%;
 }
 
 .main hr:last-child {
@@ -4024,6 +4024,10 @@ td#pw_adduser input {
      text-align: left;
 }
 
+#clientconfig td:nth-child(3) {
+     white-space: nowrap;
+}
+
 #netconfig {
      line-height: 160%;
 }
@@ -5238,7 +5242,7 @@ input[name="pluginURL"] {
      margin: 0 5px !important;
      display: block;
      background-size: 200px auto !important;
-     min-width: 500px;
+     min-width: 530px;
      width: calc(100% - 36px);
 }
 
@@ -5250,6 +5254,10 @@ input[name="pluginURL"] {
      width: 25%;
      white-space: nowrap;
      font-size: 10pt;
+}
+
+#jumplinks {
+     margin-bottom: -15px;
 }
 
 .proxyfooter {

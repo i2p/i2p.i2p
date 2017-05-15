@@ -2494,14 +2494,14 @@ public class I2PSnarkServlet extends BasicServlet {
                .append(name).append("\" title=\"").append(_t("Mark tracker for deletion")).append("\">" +
                        "</td><td><label for=\"").append(name).append("\">").append(name)
                .append("</td><td>").append(urlify(homeURL, 35))
-               .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" name=\"ttype_")
+               .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" tabindex=\"-1\" name=\"ttype_")
                .append(announceURL).append("\"");
             if (!(isOpen || isPrivate))
                 buf.append(" checked=\"checked\"");
             else if (isKnownOpen)
                 buf.append(" disabled=\"disabled\"");
             buf.append(">" +
-                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" name=\"ttype_")
+                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"1\" tabindex=\"-1\" name=\"ttype_")
                .append(announceURL).append("\"");
             if (isOpen)
                 buf.append(" checked=\"checked\"");
@@ -2509,7 +2509,7 @@ public class I2PSnarkServlet extends BasicServlet {
                      t.announceURL.equals("http://tracker2.postman.i2p/announce.php"))
                 buf.append(" disabled=\"disabled\"");
             buf.append(">" +
-                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"2\" name=\"ttype_")
+                       "</td><td><input type=\"radio\" class=\"optbox\" value=\"2\" tabindex=\"-1\" name=\"ttype_")
                .append(announceURL).append("\"");
             if (isPrivate) {
                 buf.append(" checked=\"checked\"");

@@ -3,6 +3,7 @@ html {
 }
 
 body {
+     min-width: 500px;
      background: #bfbfff;
      background: linear-gradient(to bottom, #bfbfff, #dfdfff) !important;
      color: #333;
@@ -16,9 +17,9 @@ h1 {
      font-size: 12pt;
      color: #fff;
      width: auto;
-     padding: 7px 5px 7px 30px;
-     background: #bbf url(itoopie.png) 5px center no-repeat;
-     background: url(itoopie.png) 5px center no-repeat, linear-gradient(to right, #ddf, #bbf);
+     padding: 10px 5px 10px 45px;
+     background: #bbf url(resources/folder_32x32.png) 6px center no-repeat;
+     background: url(resources/folder_32x32.png) 6px center no-repeat, linear-gradient(to right, #ddf, #bbf);
      background-size: auto 80%, 100% 100%;
 }
 
@@ -45,8 +46,8 @@ table {
 }
 
 tr {
-     border-top: 1px solid #337;
-     border-bottom: 1px solid #337;
+     border-top: 1px solid #99b;
+     border-bottom: 1px solid #99b;
 }
 
 tr:hover td {
@@ -65,7 +66,7 @@ tr:nth-child(even) {
 }
 
 td {
-     padding: 5px;
+     padding: 7px 5px;
      text-align: right;
      white-space: nowrap;
 }
@@ -74,11 +75,13 @@ td:first-child {
      width: 90%;
      white-space: nowrap;
      text-align: left;
+     padding-left: 8px;
 }
 
 td:last-child {
      text-align: right;
      font-style: italic;
+     padding-right: 8px;
 }
 
 /* filetype icons */
@@ -173,4 +176,10 @@ td:first-child a[href$=".pdf"] {
 td:first-child a[href$=".iso"],
 td:first-child a[href$=".nrg"]  {
      background: url(resources/iso.png) left center no-repeat;
+}
+
+@media screen and (max-width: 600px) {
+body, table {
+     font-size: 9pt !important;
+}
 }

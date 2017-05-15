@@ -5,7 +5,8 @@ Connection: close
 Proxy-Connection: close
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
+<html>
+<head>
 <title>_("Outproxy Not Found")</title>
 <noscript><style>.script {display: none;}</style></noscript>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">

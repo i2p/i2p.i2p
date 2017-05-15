@@ -1,5 +1,4 @@
 body {
-    margin: 6% 8.7%;
     margin: 25px 10%;
     text-align: justify;
     color: #ffffe0;
@@ -253,10 +252,9 @@ div.notify {
 }
 
 code {
-    font-size: 9pt;
+    font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
     font-weight: bold;
-    color: #ff5;
-    text-shadow: 1px 1px 1px #000;
+    color: #dd5;
 }
 
 #navbar {
@@ -276,4 +274,12 @@ code {
      background: #000;
      text-decoration: none;
      outline: none;
+}
+
+/* responsive layout */
+
+@media screen and (max-width: 1000px) {
+body {
+     margin: 10px !important;
+}
 }

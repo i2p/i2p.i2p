@@ -434,14 +434,6 @@ tfoot tr:nth-child(n+1) {
      display: none;
 }
 
-.priority {
-     font-size: 8pt;
-     vertical-align: middle;
-     text-align: right !important;
-     padding-right: 15px;
-     white-space: nowrap;
-}
-
 .script {
      display: inline-block;
      vertical-align: top;
@@ -1954,9 +1946,25 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
      font-weight: bold;
 }
 
+.priority {
+     font-size: 8pt;
+     vertical-align: middle;
+     text-align: right !important;
+     padding-right: 15px;
+     white-space: nowrap;
+     width: 1%;
+}
+
+.priority::after {
+     content: "";
+     display: inline-block;
+     min-height: 30px;
+     vertical-align: middle;
+}
+
 .priority input[type="radio"] {
      text-align: left;
-     margin: 0;
+     margin: 3px;
 }
 
 .priorityHigh, .priorityNormal, .prioritySkip {
@@ -1965,20 +1973,21 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
      width: 50px;
      font-size: 0;
      text-align: left;
+     vertical-align: middle;
      color: transparent;
      overflow: hidden;
 }
 
 .priorityHigh {
-     background: url(/i2psnark/.resources/icons/clock_red.png) left 20px center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/i2psnark/.resources/icons/clock.png) left 20px  center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock.png) left 24px center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/i2psnark/.resources/icons/cancel.png) left 18px center no-repeat;
+     background: url(/i2psnark/.resources/icons/cancel.png) left 22px center no-repeat;
 }
 
 .priority, .snarkDirInfo .headerpriority {
@@ -2193,7 +2202,6 @@ b.alwaysShow {
 #trackerselect td a {
      max-width: 350px;
 }
-
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 1050px) {
@@ -2211,7 +2219,7 @@ b.alwaysShow {
 
 .snarkRefresh:link,.snarkRefresh:visited {
      background-size: 15px auto, 100% 100% !important;
-     background-position: 11px 4px, center center !important;
+     background-position: 11px 60%, center center !important;
      padding: 4px 10px 4px 28px !important;
      margin-right: -5px !important;
 }

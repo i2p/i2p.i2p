@@ -481,14 +481,6 @@ tfoot tr:nth-child(n+1) {
      padding: 4px 0 4px 4px;
 }
 
-.priority {
-     font-size: 8pt;
-     vertical-align: middle;
-     text-align: center;
-     white-space: nowrap;
-     width: 2%;
-}
-
 .snarkTorrents {
      margin: 0;
      border: 1px solid #6f533e;
@@ -1878,25 +1870,47 @@ code, tt {
 
 /* end Resource Errors */
 
-.priorityHigh {
-     background: url(/i2psnark/.resources/icons/clock_red.png) left 28px center no-repeat;
+.priority {
+     font-size: 8pt;
+     vertical-align: middle;
+     text-align: center;
+     white-space: nowrap;
+     width: 2%;
+}
+
+.priority::after {
+     content: "";
      display: inline-block;
-     width: 48px;
+     min-height: 30px;
+     vertical-align: middle;
+}
+
+.priority input[type="radio"] {
+     text-align: left;
+     margin: 3px;
+}
+
+.priorityHigh, .priorityNormal, .prioritySkip {
+     padding: 0;
+     display: inline-block;
+     width: 50px;
+     font-size: 0;
+     text-align: left;
+     vertical-align: middle;
      color: transparent;
+     overflow: hidden;
+}
+
+.priorityHigh {
+     background: url(/i2psnark/.resources/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/i2psnark/.resources/icons/clock.png) left 28px  center no-repeat;
-     display: inline-block;
-     width: 48px;
-     color: transparent;
+     background: url(/i2psnark/.resources/icons/clock.png) left 24px center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/i2psnark/.resources/icons/cancel.png) left 26px center no-repeat;
-     display: inline-block;
-     width: 48px;
-     color: transparent;
+     background: url(/i2psnark/.resources/icons/cancel.png) left 22px center no-repeat;
 }
 
 /* configs */

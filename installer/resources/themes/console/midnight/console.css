@@ -749,7 +749,7 @@ button.search:active {
 
 /* client/plugin/webapps buttons aka project "X" */
 
-button.control {
+button.control, button.control:hover, button.control:focus {
      padding: 12px !important;
      font-size: 0 !important;
      text-indent: -99999px !important;
@@ -956,7 +956,7 @@ pre {
      color: #c9ceff;
 }
 
-/* proxy error messages */
+/* proxy errors */
 
 div.logo { /* proxy error "fake" sidebar */
      float: left;
@@ -1027,6 +1027,21 @@ div.logo hr {
      padding: 5px 10px;
 }
 
+#jumplinks a {
+     display: inline-block;
+     padding: 2px 0;
+     line-height: 16px;
+}
+
+#jumplinks a::before {
+     content: "\279F\00A0";
+     font-size: 16pt;
+     display: inline-block;
+     padding: 3px 0;
+     vertical-align: sub;
+     line-height: 16px;
+}
+
 .proxyfooter {
      margin: 0 20px 10px 240px;
      padding: 20px 25px 20px 75px;
@@ -1051,7 +1066,8 @@ div.logo hr {
      display: none;
 }
 }
-/* end proxy error messages */
+
+/* end proxy errors */
 
 .routersummaryouter {
      float: left;
@@ -3868,6 +3884,10 @@ table#clientconfig th:first-child {
      padding-right: 5px;
 }
 
+#clientconfig td:nth-child(3) {
+     white-space: nowrap;
+}
+
 table#clientconfig th:last-child {
      text-align: left;
      padding-left: 5px;
@@ -5716,18 +5736,19 @@ table#configstats {
      word-spacing: 0.1em;
 }
 
+#configstats td {
+    color: #b2bcf7;
+    padding: 8px 4px;
+}
+
 #configstats td:first-child {
-     width: 40px;
+     width: 1%;
      white-space: nowrap;
+    padding: 8px;
 }
 
 #configstats td:first-child:empty + td > label { /* remove pointer from inert labels */
      cursor: default;
-}
-
-#configstats td {
-    color: #b2bcf7;
-    padding: 8px 4px;
 }
 
 #configstats td:last-child {
@@ -6157,7 +6178,7 @@ div.joblog h3 {
      margin-top: 5px;
 }
 
-button.control {
+button.control, button.control:hover, button.control:focus {
      padding: 14px !important;
      font-size: 0 !important;
 }

@@ -743,7 +743,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
 
                     if (first) {
                         first = false;
-                        out.write("<br><br><h3>");
+                        out.write("<br><br>\n<div id=\"jumplinks\">\n<h3>");
                         out.write(_t("Click a link below for an address helper from a jump service"));
                         out.write("</h3>\n");
                     } else {
@@ -759,7 +759,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                 }
             }
         }
-        out.write("</div>");
+        out.write("</div>\n</div>\n");
         writeFooter(out);
     }
 
@@ -791,7 +791,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         StringBuilder buf = new StringBuilder(128);
         buf.append("<div class=\"proxyfooter\"><p><i>I2P HTTP Proxy Server<br>Generated on: ")
            .append(new Date().toString())
-           .append("</i></div></body></html>\n");
+           .append("</i></div>\n</body>\n</html>\n");
         return buf.toString();
     }
 

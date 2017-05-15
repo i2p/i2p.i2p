@@ -132,6 +132,10 @@ div.wideload {
      margin-right: 16px;
 }
 
+.routersummary h3 a {
+     font-size: 140% !important;
+}
+
 .routersummary h3, .routersummary h4 {
      text-align: center !important;
 }
@@ -530,6 +534,10 @@ div.news h3, #news h3 {
      margin-bottom: -2px !important;
 }
 
+.newsAuthor {
+     float: left;
+}
+
 #netdboverview, #netdboverview td, #netdboverview table {
      direction: ltr;
 }
@@ -734,6 +742,11 @@ pre#transports {
 
 #help h3 {
      border-width: 1px 5px 1px 1px !important;
+}
+
+#help.main td.infohelp, #help.main td.infowarn {
+     padding-right: 46px !important;
+     padding-left: 15px !important;
 }
 
 #faq h3 {

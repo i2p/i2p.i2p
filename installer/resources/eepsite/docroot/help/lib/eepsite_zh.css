@@ -2,7 +2,8 @@ body, p, li, a {
      font-size: 12pt;
      line-height: 160%;
      font-weight: normal;
-     letter-spacing: 0.08em;
+     letter-spacing: 0.1em;
+     word-spacing: 0.1em;
 }
 
 .langbar, h1 {
@@ -25,10 +26,15 @@ p {
 li {
      padding-right: 35px;
      margin-left: 15px;
+     line-height: 180%;
+}
+
+li a {
+     white-space: nowrap;
 }
 
 code {
-     font-size: 11pt;
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-weight: normal;
 }
 
@@ -40,6 +46,6 @@ code {
 }
 
 .footnote {
-     font-size: 10pt !important; 
+     font-size: 11pt !important;
  }
  

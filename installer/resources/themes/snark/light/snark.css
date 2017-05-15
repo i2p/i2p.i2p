@@ -406,7 +406,8 @@ tfoot tr:nth-child(n+1) {
 
 .priority {
      vertical-align: middle;
-     width: 200px;
+     width: 1%;
+     white-space: nowrap;
 }
 
 .snarkTorrents {
@@ -1515,7 +1516,7 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
 /* Downloading Priorities */
 
 .snarkDirInfo input[type="radio"], .snarkDirInfo input[type="radio"]:checked {
-     margin: 0;
+     margin: 4px;
      padding: 0;
      min-height: 16px;
      min-width: 16px;
@@ -1528,27 +1529,34 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
      white-space: nowrap;
 }
 
+.priority::after {
+     content: "";
+     display: inline-block;
+     min-height: 30px;
+     vertical-align: middle;
+}
+
 .priorityHigh, .priorityNormal, .prioritySkip {
      display: inline-block;
-     width: 40px;
+     width: 44px;
      color: transparent;
      vertical-align: middle;
-     margin: 3px 10px 3px 3px;
+     margin: 3px;
      overflow: hidden;
      font-size: 0;
      text-align: left;
 }
 
 .priorityHigh {
-     background: url(/i2psnark/.resources/icons/clock_red.png) left 20px center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock_red.png) left 24px center no-repeat;
 }
 
 .priorityNormal {
-     background: url(/i2psnark/.resources/icons/clock.png) left 20px center no-repeat;
+     background: url(/i2psnark/.resources/icons/clock.png) left 24px center no-repeat;
 }
 
 .prioritySkip {
-     background: url(/i2psnark/.resources/icons/cancel.png) left 18px center no-repeat;
+     background: url(/i2psnark/.resources/icons/cancel.png) left 22px center no-repeat;
 }
 
 /* end priorities */
