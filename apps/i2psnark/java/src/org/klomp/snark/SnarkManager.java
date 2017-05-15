@@ -2278,7 +2278,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
             // don't bother delaying if auto start is false
             long delay = (60L * 1000) * getStartupDelayMinutes();
             if (delay > 0 && shouldAutoStart()) {
-                addMessage(_t("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
+                addMessageNoEscape(_t("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                 // Remove that first message
                 if (_messages.size() == 1)
