@@ -9,6 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * data referenced in it is needed (which often is only one or two lines
  * of code)
  *
+ * Not for external use, not a public API.
+ *
  * Unused as a class, as the keys are cached in the SessionKey objects,
  * but the static methods are used in FortunaStandalone.
  */
