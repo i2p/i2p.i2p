@@ -28,9 +28,9 @@ Depends: ${java:Depends}, ${shlibs:Depends},
  debconf,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni,
- lsb-base,
+ lsb-base (>= 3.0-6),
  service-wrapper
-Description: I2P anonymous network
+Description: Anonymous network (I2P)
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
@@ -98,7 +98,7 @@ Suggests: tor
  ,syndie
  ,www-browser
  ,xul-ext-torbutton
-Description: I2P router
+Description: Router for I2P
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no

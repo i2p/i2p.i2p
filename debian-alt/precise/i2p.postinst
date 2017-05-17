@@ -74,9 +74,9 @@ case "$1" in
             if grep -q 'systemd' /proc/1/comm > /dev/null 2>&1; then
                 systemctl --system daemon-reload
                 if [ $RUN_DAEMON = 'true' ]; then
-                    deb-systemd-helper enable i2p.service
+                    systemctl enable i2p.service
                 else
-                    deb-systemd-helper disable i2p.service
+                    systemctl disable i2p.service
                 fi
             fi
         fi
