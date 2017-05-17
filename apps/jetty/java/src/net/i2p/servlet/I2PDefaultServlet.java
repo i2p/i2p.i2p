@@ -131,9 +131,6 @@ public class I2PDefaultServlet extends DefaultServlet
      * Overridden to set the Locale for the dates.
      *
      * Get the resource list as a HTML directory listing.
-     * @param base The base URL
-     * @param parent True if the parent directory should be included
-     * @return String of HTML
      */
     @Override
     protected void sendDirectory(HttpServletRequest request,
