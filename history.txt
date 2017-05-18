@@ -1,3 +1,61 @@
+2017-05-18 str4d
+Prop from i2p.i2p.str4d.ui:
+ * Backend HTML changes to routerconsole and apps:
+   - IDs, classes and <span>s for styling
+   - <label>s to extend touch targets
+   - Table layouts where it makes sense
+   - Tooltips
+   - Move most of the hard-coded styles to CSS
+ * Overhaul all themes:
+   - Responsive layouts
+   - Standardisation of UI elements, configuration labels, etc.
+   - Consistent layouts, spacing, font sizes, etc.
+   - Routerconsole themes now present for all bundled plugins
+   - HiDPI images
+   - Accessibility and localisation improvements
+   - Testing on a wide array of browsers and screen sizes
+ * Console:
+   - /home:
+     - Move console links above hidden service links
+     - Link are now full touch button targets
+     - Add tabindex ="-1" to icon links
+   - Sidebar:
+     - Include bandwidth in minimal sidebar
+     - Optional Advanced section
+   - /graphs:
+     - Graph image updates
+       - Improve contrast
+       - Custom fonts with fallback
+       - Left-align legend
+       - Thinner restart and graph lines for clarity
+       - Separate legend and display period date
+       - Text tidyups
+     - Tweak layout and text of configuration options
+     - Default width to 400px to avoid info truncation
+     - 15s and 30s refresh options
+   - /help:
+     - Collate help topics from various routerconsole pages
+     - Document various router.config settings
+     - Add mini-FAQ
+   - /peers: CSS sort buttons, with new icons to avoid conflation of
+     tunnel direction and sort direction
+   - /profiles: Add definitions for capabilities
+   - Limit file inputs to accepted extensions
+   - Fix bug in /configui lang selector when not in advanced mode
+ * i2psnark:
+   - Collapsible "Add Torrent" and "Create Torrent" sections
+   - Disable theme selector when "universal theming" enabled
+   - Debug info styling
+   - <noscript> fallbacks:
+     - Use meta-refresh
+     - Hide JavaScript-dependent buttons
+ * SusiDNS:
+   - Disable spellcheck on config editor
+   - Additional column on hostname list page for helper address with icon, and
+     iconfication of b32 addresses
+   - Add minified identicon to hostname column
+   - Consolidation of Hostname/host name/name referenced: now all "Hostname"
+
 2017-05-14 zzz
  * i2psnark: Fix HTML double-escape (ticket #1992)
  * Router: New method to get bandwidth class
