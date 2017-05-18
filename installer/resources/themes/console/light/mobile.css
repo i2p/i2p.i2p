@@ -1,6 +1,8 @@
+/* Console Theme "Light" - Mobile Override */
+
 div.routersummaryouter {
      float: none;
-     margin: 0 10px 10px 0;
+     margin: 0 !important;
      position: relative;
      width: auto;
 }
@@ -8,23 +10,109 @@ div.routersummaryouter {
 div.routersummary {
      float: none;
      width: auto;
+     max-width: 600px;
+     margin: 0 auto -6px;
 }
 
-div.routersummary table {
+@media screen and (min-width: 1500px) {
+div.routersummary {
+     width: 600px !important;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 600px !important;
+}
+}
+
+#xhr {
+     margin-top: 9px !important;
+}
+
+.routersummary hr:first-child {
+     margin-bottom: 11px;
+}
+
+.routersummary td, .routersummary h4, .routersummary a {
+     font-size: 9pt !important;
+}
+
+div.routersummary table, table[id^="sb_"] {
      width: 100% !important;
+     margin: -7px 0 -4px !important;
+}
+
+table[id^="sb_"] td {
+     padding: 3px 2px;
+}
+
+table[id^="sb_"] tr:nth-child(even) td {
+     background: #eef;
+     background: rgba(238, 238, 255, 0.4);
+}
+
+table[id^="sb_"] tr:nth-child(odd) td {
+     background: #ddf;
+     background: rgba(221, 221, 255, 0.4);
+}
+
+#sb_services {
+     text-align: center;
+}
+
+#sb_services a {
+     display: inline-block;
+     width: 24% !important;
+     min-width: 100px;
+     box-sizing: border-box;
+     white-space: nowrap;
+     border: none !important;
+}
+
+.routersummary button[type="submit"], .routersummary button[type="cancel"] {
+     margin: 5px 5px 3px !important;
+     padding: 8px 5px !important;
+     min-width: 120px !important;
 }
 
 h1 {
-     margin: 0 10px 10px 0;
+     margin: 14px 0 -1px;
      min-width: 0;
 }
 
 div.news {
-     margin: 0 10px 5px 0;
+     margin: 0 0 -11px;
      min-width: 0;
 }
 
 div.main {
-     margin: 10px 10px 20px 0;
+     margin: 10px 0 0;
      min-width: 0;
+}
+
+.sorry {
+     margin-left: 0 !important;
+}
+
+@media screen and (min-width: 1500px) {
+
+h1 {
+    margin: 14px 0 -1px !important;
+}
+
+div.news {
+     margin: 0 0 -11px !important;
+}
+
+div.main {
+     margin: 10px 0 0 !important;
+     min-width: 0;
+}
+
+.sorry {
+     margin-left: 0 !important;
+}
+}
+
+.confignav {
+     padding-bottom: 10px !important;
 }

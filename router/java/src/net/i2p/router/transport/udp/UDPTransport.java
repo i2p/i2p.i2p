@@ -2672,7 +2672,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(". ").append(_t("Status")).append(": ").append(_t(_reachabilityStatus.toStatusString()));
         }
         buf.append(".</h3>\n");
-        buf.append("<table>\n");
+        buf.append("<div class=\"widescroll\"><table id=\"udpconnections\">\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_t("Peer")).append("</a><br>");
         if (sortFlags != FLAG_ALPHA)
             appendSortLinks(buf, urlBase, sortFlags, _t("Sort by peer hash"), FLAG_ALPHA);
@@ -2936,7 +2936,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td></tr>");
         }
      }  // numPeers > 0
-        buf.append("</table>\n");
+        buf.append("</table></div>\n");
 
       /*****
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();

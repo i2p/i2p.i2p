@@ -3,31 +3,132 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>Image Generator Webapp</title>
+    <title>I2P Imagegen</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="icon" href="/themes/console/classic/images/favicon.ico">
+    <link rel="stylesheet" href="/themes/imagegen/imagegen.css" type="text/css">
 </head>
 <body>
-<h2>Image Generator Webapp</h2>
-<p>This is the webapp that creates identification images.</p>
 
-<h2>Identicon Test</h2>
-<img src="id?c=-2044886870&amp;s=15" width=15 height=15>
-<img src="id?c=-2044886870&amp;s=21" width=21 height=21>
-<img src="id?c=-2044886870&amp;s=30" width=30 height=30>
-<img src="id?c=-2044886870&amp;s=48" width=48 height=48>
-<img src="id?c=-2044886870&amp;s=64" width=64 height=64>
-<img src="id?c=-2044886870&amp;s=128" width=128 height=128>
+<h1>I2P Identification Image Generator</h1>
 
-<h2>QR Test</h2>
-<img src="qr?c=https%3a%2f%2fgeti2p.net%2f&amp;s=128&t=geti2p.net" width=128 height=128>
-<img src="qr?c=https%3a%2f%2fgeti2p.net%2f&amp;s=256&t=geti2p.net" width=256 height=256>
+<p>
+This is the webapp that creates identification images. They can be found in the host list and
+<a href="http://127.0.0.1:7657/susidns/details?h=i2p-projekt.i2p">hostname details section</a>
+of the addressbook, in the <a href="http://127.0.0.1:7657/netdb?f=3">Sybils section</a> of
+the network database, and you can generate a QR code for your .i2p named website or hidden
+service in the edit section of the <a href="http://127.0.0.1:7657/i2ptunnelmgr">Tunnel Manager</a>.
+You can use the tools below to generate arbitrary identicons, QR codes and "random art" images.
+</p>
 
-<h2>Random Art Test</h2>
-<iframe src="ra?c=i2p-projekt.i2p&amp;m=html" width=180 height=200>
-<a href="ra?c=i2p-projekt.i2p&amp;m=html">HTML test</a>
-</iframe>
-<iframe src="ra?c=i2p-projekt.i2p&amp;m=text" width=180 height=200>
-<a href="ra?c=i2p-projekt.i2p&amp;m=text">UTF-8 text test</a>
-</iframe>
+<h2>Identicons</h2>
+
+<div id="identicon">
+
+<table cellspacing="10" align="center">
+<tr>
+<th colspan="4" class="title">Identicons for string: <i>planet.i2p</i></th>
+</tr>
+<tr>
+<th>16x16</th><th>32x32</th><th>64x64</th><th>256x256</th>
+</tr>
+<tr>
+<td><img src="id?c=planet.i2p&amp;s=16" width=16 height=16></td>
+<td><img src="id?c=planet.i2p&amp;s=32" width=32 height=32></td>
+<td><img src="id?c=planet.i2p&amp;s=64" width=64 height=64></td>
+<td rowspan="3"><img src="id?c=planet.i2p&amp;s=256" width=256 height=256></td>
+</tr>
+<tr><th>22x22</th><th>48x48</th><th>96x96</th></tr>
+<tr>
+<td><img src="id?c=planet.i2p&amp;s=22" width=22 height=22></td>
+<td><img src="id?c=planet.i2p&amp;s=48" width=48 height=48></td>
+<td><img src="id?c=planet.i2p&amp;s=96" width=96 height=96></td>
+</tr>
+</table>
+
+<form action="/imagegen/id" method="get" target="_blank">
+<div class="formtitle">Identicon Generator</div>
+<input type="text" name="c" required x-moz-errormessage="You need to provide some text for the image generation to work!" placeholder="text to encode" title="Enter text string for conversion">
+<select name="s" title="Select image output size">
+<option value="16">16 by 16 pixels</option>
+<option value="22">22 by 22 pixels</option>
+<option value="32">32 by 32 pixels</option>
+<option value="48">48 by 48 pixels</option>
+<option value="64">64 by 64 pixels</option>
+<option value="96">96 by 96 pixels</option>
+<option value="128">128 by 128 pixels</option>
+<option value="256">256 by 256 pixels</option>
+<option value="384">384 by 384 pixels</option>
+<option value="512">512 by 512 pixels</option>
+</select>
+<button>Create Identicon</button>
+</form>
+</div>
+
+<h2>QR Codes</h2>
+
+<div id="qr">
+
+<table cellspacing="10" align="center">
+<tr>
+<th colspan="3" class="title">QR Codes for string: <i>https://geti2p.net</i></th>
+</tr>
+<tr>
+<th>128x128</th><th>160x160</th><th>256x256</th>
+</tr>
+<tr>
+<td><img src="qr?c=https%3a%2f%2fgeti2p.net%2f&amp;s=128" width=128 height=128></td>
+<td><img src="qr?c=https%3a%2f%2fgeti2p.net%2f&amp;s=160&amp;t=geti2p.net" width=160 height=160></td>
+<td><img src="qr?c=https%3a%2f%2fgeti2p.net%2f&amp;s=256&amp;t=geti2p.net" width=256 height=256></td>
+</tr>
+</table>
+
+<form action="/imagegen/qr" method="get" target="_blank">
+<div class="formtitle">QR Code Generator</div>
+<input type="text" name="c" required x-moz-errormessage="You need to provide some text for the image generation to work!" placeholder="text to encode" title="Enter text string for conversion">
+<input type="text" name="t" placeholder="optional display text" title="Optional text to be displayed underneath the QR code">
+<select name="s" title="Select image output size">
+<option value="128">128 by 128 pixels</option>
+<option value="160">160 by 160 pixels</option>
+<option value="256">256 by 256 pixels</option>
+<option value="384">384 by 384 pixels</option>
+<option value="512">512 by 512 pixels</option>
+</select>
+<button>Create QR Code</button>
+</form>
+</div>
+
+<h2>Random Art</h2>
+
+<p>This technique renders an ASCII-Art representation of a digital fingerprint so the human brain can profit from its built-in pattern recognition ability. <span class="reference"><a href="http://people.eecs.berkeley.edu/~dawnsong/papers/randomart.pdf" target="_blank">"Hash Visualization: a New Technique to improve Real-World Security" by Perrig A. and Song D.</a></span></p>
+
+<div id="randomart">
+
+<table>
+<tr>
+<th colspan="2" class="title">Random Art for I2P address: <i>i2p-projekt.i2p</i></th>
+</tr>
+<tr>
+<th>HTML Test</th><th>UTF-8 Text Test</th>
+</tr>
+<tr>
+<td><iframe src="ra?c=i2p-projekt.i2p&amp;m=html" width=300 height=300><a href="ra?c=i2p-projekt.i2p&amp;m=html">HTML test</a></iframe></td>
+<td><iframe src="ra?c=i2p-projekt.i2p&amp;m=text" width=300 height=300><a href="ra?c=i2p-projekt.i2p&amp;m=text">UTF-8 text test</a></iframe></td>
+</tr>
+</table>
+
+<form action="/imagegen/ra" method="get" target="_blank">
+<div class="formtitle">Random Art Generator</div>
+<input type="text" name="c" required x-moz-errormessage="You need to provide an I2P address for the image generation to work!" placeholder="[URL].i2p to encode" title="Enter I2P address for conversion">
+<input hidden="hidden" name="m" value="html">
+<button>Create Random Art</button>
+</form>
+
+</div>
+
+<hr>
+
+<div id="nav"><a href="../">Return to I2P Console</a></div>
+
 </body>
 </html>

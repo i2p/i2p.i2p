@@ -18,7 +18,7 @@ input.default {
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Summary Bar Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_summarybar">
 <%@include file="confignav.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigSummaryHandler" id="formhandler" scope="request" />
@@ -29,21 +29,29 @@ input.default {
 <jsp:useBean class="net.i2p.router.web.SummaryHelper" id="summaryhelper" scope="request" />
 <jsp:setProperty name="summaryhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
-<h3><%=intl._t("Refresh Interval")%></h3>
+<h3 class="tabletitle"><%=intl._t("Refresh Interval")%></h3>
+<table class="configtable">
+ <tr>
 <form action="" method="POST">
+  <td>
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="0">
  <input type="text" name="refreshInterval" value="<jsp:getProperty name="intl" property="refresh" />" >
  <%=intl._t("seconds")%>
+  </td>
+  <td class="optionsave">
  <input type="submit" name="action" class="accept" value="<%=intl._t("Save")%>" >
+  </td>
 </form>
+ </tr>
+</table>
 
-<h3><%=intl._t("Customize Summary Bar")%></h3>
+<h3 class="tabletitle"><%=intl._t("Customize Summary Bar")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <input type="hidden" name="group" value="2">
  <jsp:getProperty name="summaryhelper" property="configTable" />
- <div class="formaction">
+ <div class="formaction" id="sidebardefaults">
   <input type="submit" class="reload" name="action" value="<%=intl._t("Restore full default")%>" >
   <input type="submit" class="reload" name="action" value="<%=intl._t("Restore minimal default")%>" >
  </div>

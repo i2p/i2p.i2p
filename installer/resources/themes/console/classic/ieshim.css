@@ -246,7 +246,7 @@ th {
      padding-right: 1px;
 }
 
-div.configure hr{
+div.configure hr {
      margin: 10px 0 15px 0;
 }
 
@@ -258,7 +258,6 @@ div.graphspanel img {
      border: 1px solid #99f;
      margin: 6px 0 !important;
      background: #ddf;
-     -moz-box-shadow: inset 0px 0px 1px 1px #99f;
 }
 
 div.graphspanel hr {
@@ -278,7 +277,6 @@ table {
      display:list-item;
 }
 
-
 div.news {
      margin: -1px 2px 0 200px !important;
      padding: -10px 0px 8px 0px;
@@ -297,3 +295,4 @@ div.news {
 
 .routersummary h2, .routersummary h3 {
      background: #fff url(images/tinytitle.png) center right tile-x !important;
+}

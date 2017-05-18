@@ -1,0 +1,185 @@
+html {
+     min-height: 100%;
+}
+
+body {
+     min-width: 500px;
+     background: #bfbfff;
+     background: linear-gradient(to bottom, #bfbfff, #dfdfff) !important;
+     color: #333;
+     font-family: sans-serif;
+     margin: 0;
+     font-size: 10pt;
+}
+
+h1 {
+     text-shadow: 1px 1px 1px #000;
+     font-size: 12pt;
+     color: #fff;
+     width: auto;
+     padding: 10px 5px 10px 45px;
+     background: #bbf url(resources/folder_32x32.png) 6px center no-repeat;
+     background: url(resources/folder_32x32.png) 6px center no-repeat, linear-gradient(to right, #ddf, #bbf);
+     background-size: auto 80%, 100% 100%;
+}
+
+a {
+     text-decoration: none;
+     outline: none;
+     color: #23b;
+}
+
+a:hover, a:focus, a:visited:hover, a:visited:focus {
+     color: #d40;
+}
+
+a:visited {
+     color: #125;
+}
+
+table {
+     border-collapse: collapse;
+     font-size: 10pt;
+     width: 100%;
+     margin-top: -11px;
+     color: #333;
+}
+
+tr {
+     border-top: 1px solid #99b;
+     border-bottom: 1px solid #99b;
+}
+
+tr:hover td {
+     background: #ffe;
+     color: #111;
+     border-top: 1px solid #115;
+     border-bottom: 1px solid #115;
+}
+
+tr:nth-child(odd) {
+     background: #efefff;
+}
+
+tr:nth-child(even) {
+     background: #dfdfff;
+}
+
+td {
+     padding: 7px 5px;
+     text-align: right;
+     white-space: nowrap;
+}
+
+td:first-child {
+     width: 90%;
+     white-space: nowrap;
+     text-align: left;
+     padding-left: 8px;
+}
+
+td:last-child {
+     text-align: right;
+     font-style: italic;
+     padding-right: 8px;
+}
+
+/* filetype icons */
+
+td:first-child a {
+     display: inline-block;
+     padding: 0 0 0 25px;
+     width: 100%;
+     background: url(resources/file.png) left center no-repeat;
+}
+
+td:first-child a[href$="/"] {
+     background: url(resources/folder.png) left center no-repeat;
+}
+
+td:first-child a:hover[href$="/"] {
+     background: url(resources/folder_open.png) left center no-repeat;
+}
+
+td:first-child a[href$=".png"],
+td:first-child a[href$=".jpg"],
+td:first-child a[href$=".jpeg"],
+td:first-child a[href$=".gif"],
+td:first-child a[href$=".tif"],
+td:first-child a[href$=".tga"],
+td:first-child a[href$=".bmp"] {
+     background: url(resources/image.png) left center no-repeat;
+}
+
+td:first-child a[href$=".txt"],
+td:first-child a[href$=".css"],
+td:first-child a[href$=".html"],
+td:first-child a[href$=".htm"],
+td:first-child a[href$=".js"],
+td:first-child a[href$=".log"],
+td:first-child a[href$=".nfo"] {
+     background: url(resources/text.png) left center no-repeat;
+}
+
+td:first-child a[href$=".wav"],
+td:first-child a[href$=".mp3"],
+td:first-child a[href$=".flac"],
+td:first-child a[href$=".mpa"],
+td:first-child a[href$=".mka"],
+td:first-child a[href$=".wma"],
+td:first-child a[href$=".pcm"],
+td:first-child a[href$=".cda"],
+td:first-child a[href$=".ape"] {
+     background: url(resources/audio.png) left center no-repeat;
+}
+
+td:first-child a[href$=".m3u"],
+td:first-child a[href$=".m3a"],
+td:first-child a[href$=".wpl"] {
+     background: url(resources/playlist.png) left center no-repeat;
+}
+
+
+td:first-child a[href$=".mpg"],
+td:first-child a[href$=".mp4"],
+td:first-child a[href$=".mov"],
+td:first-child a[href$=".wmv"],
+td:first-child a[href$=".flv"],
+td:first-child a[href$=".avi"],
+td:first-child a[href$=".webm"],
+td:first-child a[href$=".divx"] {
+     background: url(resources/video.png) left center no-repeat;
+}
+
+td:first-child a[href$=".zip"],
+td:first-child a[href$=".7z"],
+td:first-child a[href$=".rar"],
+td:first-child a[href$=".tar"],
+td:first-child a[href$=".gz"] {
+     background: url(resources/zip.png) left center no-repeat;
+}
+
+td:first-child a[href$=".fla"],
+td:first-child a[href$=".swf"] {
+     background: url(resources/flash.png) left center no-repeat;
+}
+
+td:first-child a[href$=".docx"],
+td:first-child a[href$=".doc"] {
+     background: url(resources/word.png) left center no-repeat;
+}
+
+td:first-child a[href$=".pdf"] {
+     background: url(resources/pdf.png) left center no-repeat;
+}
+
+td:first-child a[href$=".iso"],
+td:first-child a[href$=".nrg"]  {
+     background: url(resources/iso.png) left center no-repeat;
+}
+
+@media screen and (max-width: 600px) {
+body, table {
+     font-size: 9pt !important;
+}
+}

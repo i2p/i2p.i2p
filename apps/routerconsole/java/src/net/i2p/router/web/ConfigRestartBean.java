@@ -104,7 +104,8 @@ public class ConfigRestartBean {
         for (int i = 0; i < s.length; i+= 3) {
             buf.append("<button type=\"submit\" name=\"action\" value=\"")
                .append(s[i]).append("\" class=\"")
-               .append(s[i+1]).append("\" >")
+               .append(s[i+1]).append("\" title=\"")
+               .append(_t(s[i+2], ctx)).append("\" >")
                .append(_t(s[i+2], ctx)).append("</button>\n");
         }
         buf.append("</form>\n");

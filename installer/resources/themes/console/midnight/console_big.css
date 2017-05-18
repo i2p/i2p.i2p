@@ -9,12 +9,12 @@ div.routersummary {
      font: 9.5pt/125%;
 }
 
-div.routersummary h3 {
-     font-size: 12.5pt;
+div.routersummary h3, div.routersummary h3 a {
+     font-size: 12.5pt !important;
 }
 
-div.routersummary h4 {
-     font-size: 11.5pt;
+div.routersummary h4, div.routersummary h4 a {
+     font-size: 11.5pt !important;
      letter-spacing: 0;
 }
 
@@ -25,16 +25,82 @@ div.routersummary table {
 }
 
 div.routersummary table a:link, div.routersummary table a:visited {
-     font-size: 10.5pt;
+     font-size: 11pt !important;
 }
 
-div.tunnels a{
+div.tunnels a {
      font-size: 9pt !important;
 }
 
-div.tunnels table{
+div.tunnels table {
      margin: -2px -0px -4px 2px !important;
      width: 185px;
+}
+
+#newsDisplay, #newsStatus {
+     font-size: 11pt !important;
+}
+
+.langbox {
+     margin-top: 4px !important;
+}
+
+.applabel, .themechoice, .langselect {
+     width: 152px !important;
+}
+
+.ui_lang {
+    width: 156px !important;
+}
+
+.appimg {
+     height: 50px !important;
+}
+
+img.app, img.app2p {
+     padding-top: 12px !important;
+}
+
+.applabel a, .applabel a:hover {
+     padding: 4px 2px;
+}
+
+.applabel a, .applabel a:hover, .ui_lang, .themelabel {
+     font-size: 11pt !important;
+}
+
+.themechoice .optbox {
+     min-width: 156px !important;
+     margin-left: -50px !important;
+}
+
+.langselect .optbox {
+     min-width: 156px !important;
+}
+
+.langselect img {
+     margin-left: -87px !important;
+}
+
+label, select, select option, #configstats th b, .infohelp, .infowarn {
+     font-size: 11pt !important;
+}
+
+.messages li {
+     font-weight: normal !important;
+     font-size: 11pt;
+}
+
+.confignav {
+     font-size: 12pt;
+}
+
+.tab, .tab2 {
+     margin-right: -4px !important;
+}
+
+.themechoice {
+     height: 82px !important;
 }
 
 /* global overrides */
@@ -57,6 +123,44 @@ div.joblog li i {
 }
 
 b, div.joblog b {
-    color: #ee8;
     font-size: 110%;
 }
+
+p, div[id^="config_"] th {
+     font-size: 11pt !important;
+}
+
+input[type="submit"], input[type="reset"] {
+     font-size: 12pt !important;
+     font-weight: normal !important;
+}
+
+/* responsive layout */
+
+@media screen and (min-width: 800px) {
+label, select, select option, #configstats th b, p.infohelp, p.infowarn, td.infohelp, td.infowarn {
+     font-size: 11pt !important;
+     font-weight: normal !important;
+}
+
+input[type="text"], input[type="password"], textarea {
+     font-size: 11pt !important;
+}
+}
+
+@media screen and (min-width: 1200px) {
+.langbox {
+     margin-top: 5px !important;
+     line-height: 16px;
+}
+}
+
+
+@media screen and (min-width: 1500px) {
+.langbox {
+     margin-top: 6px !important;
+     line-height: 16px;
+}
+}
+
+/* end responsive layout */

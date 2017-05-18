@@ -14,16 +14,30 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P مساعدة لوحة التحكم</h1>
-<div class="main" id="main" dir="rtl" lang="ar"><p>
-اذا رغبت في المساعدة أو ترجمة الوثائق، أو المساعدة في أشياء أخرى، انظر اسفله
 
-<a href="http://i2p-projekt.i2p/ar/get-involved">تطوع</a>
-</p>المزيد من المساعدة هنا:
+<div class="main" id="help" dir="rtl" lang="ar">
+
+<div class="confignav">
+<span class="tab"><a href="#sidebarhelp">Sidebar</a></span>
+<span class="tab"><a href="#configurationhelp">Configuration</a></span>
+<span class="tab"><a href="#reachabilityhelp">Reachability</a></span>
+<span class="tab"><a href="#advancedsettings">Advanced Settings</a></span>
+<span class="tab"><a href="#faq">FAQ</a></span>
+<span class="tab"><a href="#legal">Legal</a></span>
+<span class="tab"><a href="#changelog">Change Log</a></span>
+</div>
+
+<div id="volunteer">
+<h2>مساعدة إضافية</h2>
+<p>اذا رغبت في المساعدة أو ترجمة الوثائق، أو المساعدة في أشياء أخرى، انظر اسفله <a href="http://i2p-projekt.i2p/ar/get-involved">تطوع</a></p>
+<p>المزيد من المساعدة هنا:</p>
 <ul class="links">
-<li class="tidylist"><a href="http://i2p-projekt.i2p/ar/faq">ابئلة شائعة i2p-projekt.i2p</a>
-<br>يمكن ايضا<a href="http://forum.i2p/">I2P منتدى</a>
-او بالدردشة على  IRC.</li></ul>
+<li class="tidylist"><a href="http://i2p-projekt.i2p/ar/faq">ابئلة شائعة i2p-projekt.i2p</a></li>
+<li>يمكن ايضا<a href="http://forum.i2p/">I2P منتدى</a></li>
+<li>او بالدردشة على IRC.</li></ul>
+</div>
 
+<div id="sidebarhelp">
 <h2>شريط المعلومات</h2><p>
 يمكن للاحصائات أن
 <a href="configstats.jsp">تتغير</a> لكي تظهر على شكل
@@ -66,20 +80,19 @@ The full hash is shown on your <a href="netdb.jsp?r=.">صفحة معلومات �
 هذا العدد ليس حجم الاجمالي للشبكة، 
 يمكنه ان بتغيير حسب سرعة الاتصال.
 </li>
-</ul><h3>سرعة الاتصال الداخلي/خارجي</h3><div align="justify">
-السرعة ب بايت في الثانية
+</ul>
+<h3>سرعة الاتصال الداخلي/خارجي</h3>
+<p>السرعة ب بايت في الثانية
 غير السرعة في <a href="confignet#help">صفحة الاعدادات</a>.
-السرعة <a href="graphs.jsp">مرسومة</a> </div>
-<h3>الوجهات الداخلية</h3><div align="justify">
-الاتصالات الداخلية 
-البرامج المحلية المتصلة عبر الموجه
-<a href="i2ptunnel/index.jsp">I2PTunnel</a>
-او برامج خارجية متصلة SAM, BOB, او مباشرة بـ I2CP.
-</div><h3>الأنفاق الداخلة/خارجة</h3><div align="justify">
-الأنفاق الحالية موجودة في <a href="tunnels.jsp">صفحة الأنفاق</a>.</div><ul>
-<li class="tidylist"><div align="justify"><b>تصفح</b>
+السرعة <a href="graphs.jsp">مرسومة</a> </p>
+<h3>الوجهات الداخلية</h3>
+<p>الاتصالات الداخلية  البرامج المحلية المتصلة عبر الموجه <a href="i2ptunnel/index.jsp">I2PTunnel</a></p>
+<p>او برامج خارجية متصلة SAM, BOB, او مباشرة بـ I2CP.</p>
+<h3>الأنفاق الداخلة/خارجة</h3>
+<p>الأنفاق الحالية موجودة في <a href="tunnels.jsp">صفحة الأنفاق</a>.</p><ul>
+<li class="tidylist"><b>تصفح</b>
 الأنفاق المستخدمة من طرف الموجه تستعمل في الاتصال مع النظائر، انشاء انفاق جديدة.
-</div></li>
+</li>
 <li class="tidylist"><b>المستخدمين</b>
 الأنفاق المستخدمة من طرف الموجه </li>
 <li class="tidylist"><b>المشاركة</b>
@@ -93,8 +106,9 @@ the <a href="configadvanced.jsp">صفحة الاعدادات المتقدمة</a
 عدد أكبر من 1.00 يعني انك تساهم في الشبكة بعدد اكبر مما تستهلك.</li>
 </ul>
 
-<h3>ازدحام</h3><div align="justify">
-بعض مشرات ازدحام الموجه</div><ul>
+<h3>ازدحام</h3>
+<p>بعض مشرات ازدحام الموجه</p>
+<ul>
 <li class="tidylist"><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
 Unfortunately, there are several other job queues in the router that may be congested,
@@ -131,15 +145,22 @@ Your router may accept all requests, accept or reject a percentage of requests,
 or reject all requests for a number of reasons, to control
 the bandwidth and CPU demands and maintain capacity for
 local clients.</li></ul>
+</div>
 
+<% /* untranslated */ %>
+<div id="configurationhelp"><%@include file="help-configuration.jsi" %></div>
+<div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>
+<div id="advancedsettings"><%@include file="help-advancedsettings.jsi" %></div> <% /* untranslated */ %>
+<div id="faq"><%@include file="help-faq.jsi" %></div> <% /* untranslated */ %>
+
+<div id="legal">
 <h2>Legal stuff</h2><p>The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with
 a few notable exceptions:</p><ul>
 <li class="tidylist">ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
 <li class="tidylist">SHA256 and HMAC-SHA256, under the MIT license, written by the Legion of the Bouncycastle</li>
 <li class="tidylist">AES code, under the Cryptix (MIT) license, written by the Cryptix team</li>
 <li class="tidylist">SNTP code, under the BSD license, written by Adam Buckley</li>
-<li class="tidylist">The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo,
-    ugha, duck, shendaras, and others.</li>
+<li class="tidylist">The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo, ugha, duck, shendaras, and others.</li>
 </ul>
 
 <p>On top of the I2P router are a series of client applications, each with their own set of
@@ -169,7 +190,9 @@ details on other applications available, as well as their licenses, please see t
 <a href="http://i2p-projekt.i2p/ar/get-involved/develop/licenses">license policy</a>.  Source for the I2P code and most bundled
 client applications can be found on our <a href="http://i2p-projekt.i2p/ar/download">download page</a>.
 .</p>
+</div>
 
+<div id="changelog">
 <h2>Change Log</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
@@ -178,5 +201,7 @@ client applications can be found on our <a href="http://i2p-projekt.i2p/ar/downl
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
 
- <p><a href="/history.txt">View the full change log</a>
- </p><hr></div></body></html>
+ <p id="fullhistory"><a href="/history.txt">View the full change log</a></p>
+</div>
+
+</div></body></html>

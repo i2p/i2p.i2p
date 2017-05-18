@@ -9,7 +9,7 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1><%=intl._t("I2P Peer Configuration")%></h1>
-<div class="main" id="main">
+<div class="main" id="config_peers">
  <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
@@ -19,42 +19,53 @@
     if (request.getParameter("peer") != null)
         peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
  %>
- <div class="configure">
  <form action="configpeer" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>
- <h2><%=intl._t("Manual Peer Controls")%></h2>
- <div class="mediumtags"><p><%=intl._t("Router Hash")%>:
-<input type="text" size="55" name="peer" value="<%=peer%>" /></p></div>
- <h3><%=intl._t("Manually Ban / Unban a Peer")%></h3>
- <p><%=intl._t("Banning will prevent the participation of this peer in tunnels you create.")%></p>
-      <div class="formaction">
+ <h3 class="tabletitle"><%=intl._t("Manual Peer Controls")%></h3>
+ <table class="configtable">
+   <tr><td colspan="2"><b><%=intl._t("Router Hash")%>:</b> <input type="text" size="55" name="peer" value="<%=peer%>" /></td></tr>
+   <tr><th colspan="2"><%=intl._t("Manually Ban / Unban a Peer")%></th></tr>
+   <tr><td class="infohelp" colspan="2"><%=intl._t("Banning will prevent the participation of this peer in tunnels you create.")%></td></tr>
+   <tr>
+     <td class="optionsave" colspan="2">
         <input type="submit" name="action" class="delete" value="<%=intl._t("Ban peer until restart")%>" />
         <input type="submit" name="action" class="accept" value="<%=intl._t("Unban peer")%>" />
         <% if (! "".equals(peer)) { %>
         <!-- <font color="blue">&lt;---- click to verify action</font> -->
         <% } %>
-      </div>
- <h3><%=intl._t("Adjust Profile Bonuses")%></h3>
- <p><%=intl._t("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles"><%=intl._t("profiles page")%></a>.</p>
+     </td>
+   </tr>
+   <tr><th colspan="2"><%=intl._t("Adjust Profile Bonuses")%></th></tr>
+   <tr>
+     <td class="infohelp" colspan="2">
+     <%=intl._t("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles"><%=intl._t("profiles page")%></a>.
+     </td>
+   </tr>
+   <tr>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?
     }
  %>
- <div class="mediumtags"><p><%=intl._t("Speed")%>:
+     <td><b><%=intl._t("Speed")%>:</b>
  <input type="text" size="8" name="speed" value="<%=speed%>" />
- <%=intl._t("Capacity")%>:
+ <b><%=intl._t("Capacity")%>:</b>
  <input type="text" size="8" name="capacity" value="<%=capacity%>" />
- <input type="submit" name="action" class="add" value="<%=intl._t("Adjust peer bonuses")%>" /></p></div>
+     </td>
+     <td class="optionsave">
+       <input type="submit" name="action" class="add" value="<%=intl._t("Adjust peer bonuses")%>" />
+     </td>
+   </tr>
+ </table>
  </form>
- <a name="banlist"> </a><h2><%=intl._t("Banned Peers")%></h2>
+ <a name="banlist"> </a><h3 id="bannedpeers"><%=intl._t("Banned Peers")%></h3>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% profilesHelper.storeWriter(out); %>
  <jsp:getProperty name="profilesHelper" property="banlistSummary" />
- <div class="wideload"><h2><%=intl._t("Banned IPs")%></h2>
+ <h3 class="tabletitle"><%=intl._t("Banned IPs")%></h3>
  <jsp:getProperty name="peerhelper" property="blocklistSummary" />
-</div></div></div></body></html>
+ </div></body></html>

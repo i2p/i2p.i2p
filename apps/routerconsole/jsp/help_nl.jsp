@@ -14,17 +14,31 @@
 </head><body onload="initAjax()">
 <%@include file="summary.jsi" %>
 <h1>I2P Router Help &amp; Support</h1>
-<div class="main" id="main"><p>
-Als je wilt helpen om de documentatie te verbeteren of vertalen, of wilt helpen
+<div class="main" id="help">
+
+<div class="confignav">
+<span class="tab"><a href="#sidebarhelp">Summary Bar</a></span>
+<span class="tab"><a href="#configurationhelp">Configuratie</a></span>
+<span class="tab"><a href="#reachabilityhelp">Bereikbaarheid</a></span>
+<span class="tab"><a href="#advancedsettings">Geavanceerde Instellingen</a></span>
+<span class="tab"><a href="#faq">FAQ</a></span>
+<span class="tab"><a href="#legal">Juridische</a></span>
+<span class="tab"><a href="#changelog">Geschiedenis</a></span>
+</div>
+
+<div id="volunteer">
+<h2>Verdere Assistentie</h2>
+<p>Als je wilt helpen om de documentatie te verbeteren of vertalen, of wilt helpen
 met andere aspecten van het project, zie dan de documentatie voor 
 <a href="http://i2p-projekt.i2p/nl/get-involved">vrijwilligers.</a>
-</p>Verdere ondersteuning is hier beschikbaar:
+</p><p>Verdere ondersteuning is hier beschikbaar:</p>
 <ul class="links">
 <li class="tidylist"><a href="http://i2p-projekt.i2p/nl/faq">FAQ op i2p-projekt.i2p</a></li>
-</ul>
-<br>Je kunt ook het <a href="http://forum.i2p/">I2P forum</a>
-of IRC proberen.
+<li class="tidylist">Je kunt ook het <a href="http://forum.i2p/">I2P forum</a> of IRC proberen.</li>
+</ul><br>
+</div>
 
+<div id="sidebarhelp">
 <h2>Informatie over de Summary Bar</h2><p>
 Veel van de statistieken op de summary bar kunnen
 <a href="configstats.jsp">geconfigureerd</a> worden om te worden
@@ -79,16 +93,17 @@ gedeelde bandbreedte en lokaal gegenereerd verkeer.
 Voor I2P is het niet nodig dat een router alle andere routers kent.
 </li></ul>
 
-<h3>Bandbreedte in/out</h3><div align="justify">
-Dit zou zichzelf moeten verklaren. Alle waarden zijn in bytes per seconde, niet in bits per seconde.
+<h3>Bandbreedte in/out</h3>
+<p>Dit zou zichzelf moeten verklaren. Alle waarden zijn in bytes per seconde, niet in bits per seconde.
 Wijzig je bandbreedte limieten op de <a href="confignet#help">configuratie pagina</a>.
-Bandbreedte wordt standaard <a href="graphs.jsp">geplot</a>.</div>
+Bandbreedte wordt standaard <a href="graphs.jsp">geplot</a>.</p>
 
-<h3>Tunnels</h3><div align="justify">
-De tunnels zelf worden getoond op de <a href="tunnels.jsp">tunnels pagina</a>.</div><ul>
-<li class="tidylist"><div align="justify"><b>Onderzoekend:</b>
+<h3>Tunnels</h3>
+<p>De tunnels zelf worden getoond op de <a href="tunnels.jsp">tunnels pagina</a>.</p>
+<ul>
+<li class="tidylist"><b>Onderzoekend:</b>
 Tunnels gebouwd door je router en gebruikt om te communiceren met de floodfill peers,
-voor het bouwen van nieuwe tunnels en testen van bestaande tunnels.</div></li>
+voor het bouwen van nieuwe tunnels en testen van bestaande tunnels.</li>
 <li class="tidylist"><b>Client:</b>
 Tunnels gebouwd door je router voor het gebruik door elke client.</li>
 <li class="tidylist"><b>Deelnemend:</b>
@@ -102,10 +117,12 @@ de <a href="configadvanced.jsp">geavanceerde configuratie pagina</a>. <a href="c
 <li class="tidylist"><b>Share rato:</b>
 Het aantal deelnemende tunnels dat je voor andere routeert, gedeeld door het totale aantal hops in al je onderzoekende en client tunnels.
 Een aantal groter dan 1.00 betekent dat je meer tunnels aan het netwerk bijdraagt dan je gebruikt.
-</li></ul>
+</li>
+</ul>
 
-<h3>Verstopping</h3><div align="justify">
-Een aantal basis indicatoren voor een router overbelasting:</div><ul>
+<h3>Verstopping</h3>
+<p>Een aantal basis indicatoren voor een router overbelasting:</p>
+<ul>
 <li class="tidylist"><b>Taak vertraging:</b>
 Hoe lang taken moeten wachten voordat ze uitgevoerd worden. De taak wachtrij wordt getoond op de <a href="jobs.jsp">taken pagina</a>.
 Helaas zijn er ook verschillende andere taak wachtrijen in de router die verstopt kunnen raken,
@@ -141,19 +158,26 @@ Je router kan alle aanvragen accepteren, een percentage accepteren of weigeren,
 of alle aanvragen weigeren om verschillende redenen, om de bandbreedte en CPU
 gebruik te beheren en capaciteit te houden voor lokale clients.</li></ul>
 
-<h3>Lokale bestemmingen</h3><div align="justify">
-De lokale applicaties die door je router verbinden.
+<h3>Lokale bestemmingen</h3>
+<p>De lokale applicaties die door je router verbinden. 
 Dit kunnen clients zijn die gestart zijn door <a href="i2ptunnel/index.jsp">I2PTunnel</a>
-of externe programma's die verbinden via SAM, BOB of direct met I2CP.
+of externe programma's die verbinden via SAM, BOB of direct met I2CP.</p>
 </div>
 
-<h2>Juridische zaken</h2><p>De I2P router (router.jar) en SDK (i2p.jar) zijn bijna geheel in het publieke domein, met een aantal noemenswaardige uitzonderingen:</p><ul>
+<div id="configurationhelp"><%@include file="help-configuration.jsi" %></div>
+<div id="reachabilityhelp"><%@include file="help-reachability.jsi" %></div>
+<div id="advancedsettings"><%@include file="help-advancedsettings.jsi" %></div> <% /* untranslated */ %>
+<div id="faq"><%@include file="help-faq.jsi" %></div> <% /* untranslated */ %>
+
+<div id="legal">
+<h2>Juridische zaken</h2>
+<p>De I2P router (router.jar) en SDK (i2p.jar) zijn bijna geheel in het publieke domein, met een aantal noemenswaardige uitzonderingen:</p>
+<ul>
 <li class="tidylist">ElGamal en DSA code, valt onder de BSD licentie, geschreven door TheCrypto</li>
 <li class="tidylist">SHA256 en HMAC-SHA256, valt onder de MIT licentie, geschreven door the Legion of the Bouncycastle</li>
 <li class="tidylist">AES code, valt onder de MIT licentie, geschreven door het Cryptix team</li>
 <li class="tidylist">SNTP code, valt onder de BSD licentie, geschreven door Adam Buckley</li>
-<li class="tidylist">De rest is helemaal public domain, geschreven door jrandom, mihi, hypercubus, oOo,
-    ugha, duck, shendaras, en anderen.</li>
+<li class="tidylist">De rest is helemaal public domain, geschreven door jrandom, mihi, hypercubus, oOo, ugha, duck, shendaras, en anderen.</li>
 </ul>
 
 <p>Bovenop de I2P router zijn een aantal client applicaties gemaakt, elk met
@@ -187,10 +211,12 @@ architecturen.  Opstarters voor windows gebruikers zijn gemaakt met <a
 href="http://launch4j.sourceforge.net/">Launch4J</a>, en de installer is
 gemaakt met <a href="http://www.izforge.com/izpack/">IzPack</a>.  Voor details
 over andere beschikbare applicaties, en hun licenties, zie het <a
-href="http://i2p-projekt.i2p/nl/get-involved/develop/licenses">licentie beleid</a>.  Broncode voor I2P en
+href="http://i2p-projekt.i2p/nl/get-involved/develop/licenses">licentie beleid</a>. Broncode voor I2P en
 de meeste gebundelde client applicaties kan gevonden worden op onze <a
 href="http://i2p-projekt.i2p/nl/download">download pagina</a>.</p>
+</div>
 
+<div id="changelog">
 <h2>Release geschiedenis</h2>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "history.txt"); %>
@@ -199,6 +225,6 @@ href="http://i2p-projekt.i2p/nl/download">download pagina</a>.</p>
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
 
- <p>Een completere lijst met wijzigingen is te vinden
- in het history.txt bestand in je i2p directory.
- </p><hr></div></body></html>
+ <p id="fullhistory"><a href="/history.txt" target="_blank">Completere lijst met wijzigingen</a></p>
+</div>
+</div></body></html>

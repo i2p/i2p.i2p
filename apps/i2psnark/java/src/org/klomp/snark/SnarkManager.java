@@ -795,14 +795,17 @@ public class SnarkManager implements CompleteListener, ClientApp {
         updateConfig();
     }
 
+    public boolean getUniversalTheming() {
+        return _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
+    }
+
     /**
      * Get current theme.
      * @return String -- the current theme
      */
     public String getTheme() {
         String theme = _config.getProperty(PROP_THEME);
-        boolean universalTheming = _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
-        if (universalTheming) {
+        if (getUniversalTheming()) {
             // Fetch routerconsole theme (or use our default if it doesn't exist)
             theme = _context.getProperty(RC_PROP_THEME, DEFAULT_THEME);
             // Ensure that theme exists
@@ -1246,7 +1249,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         if (theme != null) {
             if(!theme.equals(_config.getProperty(PROP_THEME))) {
                 _config.setProperty(PROP_THEME, theme);
-                addMessage(_t("{0} theme loaded, return to main i2psnark page to view.", theme));
+                addMessage(_t("{0} theme loaded.", theme));
                 changed = true;
             }
         }

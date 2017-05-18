@@ -1,0 +1,51 @@
+body, p, li, a {
+     font-size: 12pt;
+     line-height: 160%;
+     font-weight: normal;
+     letter-spacing: 0.1em;
+     word-spacing: 0.1em;
+}
+
+.langbar, h1 {
+     line-height: 130%;
+}
+
+.langbar {
+     padding-bottom: 2px !important;
+}
+
+h2 {
+     font-size: 16pt;
+     font-weight: normal;
+}
+
+p {
+     padding: 0 15px;
+}
+
+li {
+     padding-right: 35px;
+     margin-left: 15px;
+     line-height: 180%;
+}
+
+li a {
+     white-space: nowrap;
+}
+
+code {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font-weight: normal;
+}
+
+.notify {
+     font-size: 14pt;
+     line-height: 150%;
+     font-weight: normal;
+     padding: 10px 15px !important;
+}
+
+.footnote {
+     font-size: 11pt !important;
+ }
+ 

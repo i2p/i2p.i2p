@@ -1,30 +1,156 @@
+/* Console Theme "Dark" - Mobile Override */
+
+body {
+     padding: 0 5px;
+     margin: 5px 0 !important;
+}
+
+div#xhr {
+     width: 617px;
+     margin: 0 auto;
+}
+
 div.routersummaryouter {
-     float: none;
-     margin: 0 5px 10px;
      position: relative;
+     float: none;
      width: auto;
+     margin: 0 0 5px;
 }
 
 div.routersummary {
      float: none;
-     width: auto;
+     width: 600px;
+     margin: 0 auto;
 }
 
-div.routersummary table {
-     width: 100% !important;
+div[style="height: 36px;"] {
+     height: auto !important;
+}
+
+div.routersummary img[src$="i2plogo.png"] {
+     width: 357px;
+     margin-top: 6px;
+}
+
+@media screen and (min-width: 1500px) {
+div.routersummary {
+     width: 600px !important;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 600px !important;
+}
+}
+
+div[style^='height'] + a {
+     display: inline-block;
+     padding-top: 8px !important;
+}
+
+.routersummary td,
+.routersummary a,
+.routersummary h4,
+.routersummary h4 a,
+.routersummary button {
+     font-size: 10pt !important;
+}
+
+.routersummary h3 a {
+     font-size: 11pt !important;
+     padding: 3px 1px;
+}
+
+div.routersummary table,
+.routersummary table[id^='sb_'] {
+     min-width: 100% !important;
+     min-width: calc(100% - 1px) !important;
+     margin-bottom: -7px !important;
+}
+
+#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+     margin-bottom: -8px !important;
+}
+
+#sb_localtunnels {
+     margin-top: -5px !important;
+}
+
+.routersummary tr:nth-child(odd) td {
+     padding: 3px;
+     background: #020;
+     background: rgba(0,34,0,.5);
+}
+
+.routersummary tr:nth-child(even) td {
+     padding: 3px;
+     background: #000;
+     background: rgba(0,0,0,.3);
+}
+
+.routersummary tr td {
+     border-top: 1px inset #000 !important;
+     border-bottom: 1px inset #000 !important;
+}
+
+.routersummary tr:hover td {
+     border-top: 1px solid #030 !important;
+     border-bottom: 1px solid #030 !important;
+}
+
+.routersummary tr:hover td {
+     background: #020;
+}
+
+.routersummary h3,
+.routersummary h4,
+.routersummary hr {
+     margin-right: 7px !important;
+     margin-left: -11px !important;
+}
+
+div.routersummary h4 {
+     margin: -6px 7px -8px -10px !important;
+}
+
+div.routersummary form {
+     margin: -2px 5px -4px -11px !important;
+}
+
+.routersummary button[type="submit"], .routersummary button[type="cancel"] {
+     margin: 5px 10px !important;
+     padding: 8px 5px !important;
+     min-width: 120px !important;
 }
 
 h1 {
-     margin: 0 5px !important;
-     min-width: 0;
+     min-width: 590px;
+     margin: 0 !important;
 }
 
 div.news {
-     margin: -1px 5px 0;
-     min-width: 0;
+     min-width: 590px;
+     margin: -1px 0 0;
 }
 
 div.main {
-     margin: -1px 5px 5px;
-     min-width: 0;
+     min-width: 590px;
+     margin: -1px 0 5px;
+}
+
+.sorry {
+     margin: -1px 0 0 !important;
+}
+
+@media screen and (min-width: 1500px) {
+div.news {
+     margin: -1px 0 0 !important;
+}
+
+div.main {
+     margin: -1px 0 5px !important;
+}
+
+.sorry {
+     margin: -1px 0 0 !important;
+}
 }

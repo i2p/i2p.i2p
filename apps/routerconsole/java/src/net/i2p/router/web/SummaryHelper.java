@@ -44,23 +44,24 @@ public class SummaryHelper extends HelperBase {
 
     static final String DEFAULT_FULL =
         "HelpAndFAQ" + S +
+        "ShortGeneral" + S +
+        "Bandwidth" + S +
+        "UpdateStatus" + S +
+        "FirewallAndReseedStatus" + S +
+        "NetworkReachability" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
-        "General" + S +
-        "NetworkReachability" + S +
-        "UpdateStatus" + S +
-        "RestartStatus" + S +
         "Peers" + S +
-        "FirewallAndReseedStatus" + S +
-        "Bandwidth" + S +
         "Tunnels" + S +
-        "Congestion" + S +
         "TunnelStatus" + S +
+        "Congestion" + S +
+        "RestartStatus" + S +
         "Destinations" + S +
         "";
 
     static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
+        "Bandwidth" + S +
         "NewsHeadings" + S +
         "UpdateStatus" + S +
         "NetworkReachability" + S +
@@ -76,7 +77,7 @@ public class SummaryHelper extends HelperBase {
      */
     public String getIdent() { 
         if (_context == null) return "[no router]";
-        
+
         if (_context.routerHash() != null)
             return _context.routerHash().toBase64().substring(0, 4);
         else
@@ -95,14 +96,14 @@ public class SummaryHelper extends HelperBase {
      */
     public String getUptime() { 
         if (_context == null) return "[no router]";
-        
+
         Router router = _context.router();
         if (router == null) 
             return "[not up]";
         else
             return DataHelper.formatDuration2(router.getUptime());
     }
-    
+
 /**
     this displayed offset, not skew - now handled in reachability()
 
@@ -117,17 +118,17 @@ public class SummaryHelper extends HelperBase {
         return " (" + DataHelper.formatDuration2(diff) + " " + _t("skew") + ")";
     }
 **/
-    
+
     /** allowReseed */
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
                (_context.netDb().getKnownRouters() < 30) ||
                 _context.getBooleanProperty("i2p.alwaysAllowReseed");
     }
-    
+
     /** subtract one for ourselves, so if we know no other peers it displays zero */
     public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
-    
+
     public String getReachability() {
         return reachability(); // + timeSkew();
         // testing
@@ -192,7 +193,7 @@ public class SummaryHelper extends HelperBase {
                 return _t(status.toStatusString());
 
             case DISCONNECTED:
-                return _t("Disconnected - check network cable");
+                return _t("Disconnected - check network connection");
 
             case HOSED:
                 return _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
@@ -214,7 +215,7 @@ public class SummaryHelper extends HelperBase {
                 return _t(status.toStatusString());
         }
     }
-    
+
     /**
      * Retrieve amount of used memory.
      *
@@ -227,7 +228,7 @@ public class SummaryHelper extends HelperBase {
         return integerFormatter.format(used) + "KB (" + usedPc + "%)"; 
     }
 ********/
-    
+
     /**
      * How many peers we are talking to now
      *
@@ -325,14 +326,14 @@ public class SummaryHelper extends HelperBase {
         return formatPair(_context.bandwidthLimiter().getReceiveBps(), 
                           _context.bandwidthLimiter().getSendBps());
     }
-    
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
     public String getFiveMinuteKBps() {
         if (_context == null) 
             return "0 / 0";
-        
+
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         double in = 0;
         if (receiveRate != null) {
@@ -349,14 +350,14 @@ public class SummaryHelper extends HelperBase {
         }
         return formatPair(in, out);
     }
-    
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
     public String getLifetimeKBps() { 
         if (_context == null) 
             return "0 / 0";
-        
+
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         double in;
         if (receiveRate == null)
@@ -371,7 +372,7 @@ public class SummaryHelper extends HelperBase {
             out = sendRate.getLifetimeAverageValue();
         return formatPair(in, out);
     }
-    
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
@@ -405,12 +406,12 @@ public class SummaryHelper extends HelperBase {
     public String getInboundTransferred() { 
         if (_context == null) 
             return "0";
-        
+
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
 
         return DataHelper.formatSize2(received) + 'B';
     }
-    
+
     /**
      * How much data have we sent since the router started (pretty printed
      * string with 2 decimal places and the appropriate units - GB/MB/KB/bytes)
@@ -419,11 +420,11 @@ public class SummaryHelper extends HelperBase {
     public String getOutboundTransferred() { 
         if (_context == null) 
             return "0";
-        
+
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         return DataHelper.formatSize2(sent) + 'B';
     }
-    
+
     /**
      * Client destinations connected locally.
      *
@@ -432,20 +433,20 @@ public class SummaryHelper extends HelperBase {
     public String getDestinations() {
         // convert the set to a list so we can sort by name and not lose duplicates
         List<Destination> clients = new ArrayList<Destination>(_context.clientManager().listClients());
-        
+
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3><a href=\"/i2ptunnelmgr\" target=\"_top\" title=\"")
            .append(_t("Add/remove/edit &amp; control your client and server tunnels"))
            .append("\">").append(_t("Local Tunnels"))
-           .append("</a></h3><hr class=\"b\"><div class=\"tunnels\">");
+           .append("</a></h3><hr class=\"b\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
-            buf.append("<table>");
-            
+            buf.append("<table id=\"sb_localtunnels\">");
+
             for (Destination client : clients) {
                 String name = getName(client);
                 Hash h = client.calculateHash();
-                
+
                 buf.append("<tr><td align=\"right\"><img src=\"/themes/console/images/");
                 if (_context.clientManager().shouldPublishLeaseSet(h))
                     buf.append("server.png\" alt=\"Server\" title=\"").append(_t("Hidden Service")).append("\">");
@@ -462,9 +463,9 @@ public class SummaryHelper extends HelperBase {
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {
                     long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                     if (timeToExpire < 0) {
-                        // red or yellow light                 
+                        // red or yellow light
                         buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Rebuilding")).append("&hellip;\" title=\"").append(_t("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
-                        buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
+                        buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");
                     } else {
                         // green light 
                         buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_t("Ready")).append("\"></td></tr>\n");
@@ -478,10 +479,9 @@ public class SummaryHelper extends HelperBase {
         } else {
             buf.append("<center><i>").append(_t("none")).append("</i></center>");
         }
-        buf.append("</div>\n");
         return buf.toString();
     }
-    
+
     /**
      *  Compare translated nicknames - put "shared clients" first in the sort
      *  Inner class, can't be Serializable
@@ -529,7 +529,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getFreeTunnelCount();
     }
-    
+
     /**
      * How many active outbound tunnels we have.
      *
@@ -540,7 +540,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getOutboundTunnelCount();
     }
-    
+
     /**
      * How many inbound client tunnels we have.
      *
@@ -551,7 +551,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getInboundClientTunnelCount();
     }
-    
+
     /**
      * How many active outbound client tunnels we have.
      *
@@ -562,7 +562,7 @@ public class SummaryHelper extends HelperBase {
         else
             return _context.tunnelManager().getOutboundClientTunnelCount();
     }
-    
+
     /**
      * How many tunnels we are participating in.
      *
@@ -591,7 +591,7 @@ public class SummaryHelper extends HelperBase {
     public String getJobLag() { 
         if (_context == null) 
             return "0";
-        
+
         RateStat rs = _context.statManager().getRate("jobQueue.jobLag");
         if (rs == null)
             return "0";
@@ -603,14 +603,14 @@ public class SummaryHelper extends HelperBase {
      * How long it takes us to pump out a message, averaged over the last minute 
      * (pretty printed with the units attached)
      *
-     */   
+     */
     public String getMessageDelay() { 
         if (_context == null) 
             return "0";
-        
+
         return DataHelper.formatDuration2(_context.throttle().getMessageDelay());
     }
-    
+
     /**
      * How long it takes us to test our tunnels, averaged over the last 10 minutes
      * (pretty printed with the units attached)
@@ -619,23 +619,23 @@ public class SummaryHelper extends HelperBase {
     public String getTunnelLag() { 
         if (_context == null) 
             return "0";
-        
+
         return DataHelper.formatDuration2(_context.throttle().getTunnelLag());
     }
-    
+
     public String getTunnelStatus() { 
         if (_context == null) 
             return "";
         return _context.throttle().getTunnelStatus();
     }
-    
+
     public String getInboundBacklog() {
         if (_context == null)
             return "0";
-        
+
         return String.valueOf(_context.tunnelManager().getInboundBuildQueueSize());
     }
-    
+
 /*******
     public String getPRNGStatus() {
         Rate r = _context.statManager().getRate("prng.bufferWaitTime").getRate(60*1000);
@@ -697,7 +697,7 @@ public class SummaryHelper extends HelperBase {
         String status = NewsHelper.getUpdateStatus();
         boolean needSpace = false;
         if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4>\n");
+            buf.append("<h4 class=\"sb_info\">").append(status).append("</h4>\n");
             needSpace = true;
         }
         String dver = NewsHelper.updateVersionDownloaded();
@@ -713,7 +713,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update downloaded")).append("<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update downloaded")).append("<br>");
             if (_context.hasWrapper())
                 buf.append(_t("Click Restart to install"));
             else
@@ -734,7 +734,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUpdateVersion())).append("<br>");
             buf.append(constraint).append("</b></h4>");
             avail = false;
@@ -746,7 +746,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUnsignedUpdateVersion())).append("<br>");
             buf.append(unsignedConstraint).append("</b></h4>");
             unsignedAvail = false;
@@ -758,7 +758,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getDevSU3UpdateVersion())).append("<br>");
             buf.append(devSU3Constraint).append("</b></h4>");
             devSU3Avail = false;
@@ -821,7 +821,7 @@ public class SummaryHelper extends HelperBase {
     public String getFirewallAndReseedStatus() {
         StringBuilder buf = new StringBuilder(256);
         if (showFirewallWarning()) {
-            buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
+            buf.append("<h4 id=\"sb_warning\"><a href=\"/help#configurationhelp\" target=\"_top\" title=\"")
                .append(_t("Help with firewall configuration"))
                .append("\">")
                .append(_t("Check network connection and NAT/firewall"))
@@ -833,7 +833,7 @@ public class SummaryHelper extends HelperBase {
         if (allowReseed()) {
             if (reseedInProgress) {
                 // While reseed occurring, show status message instead
-                buf.append("<i>").append(_context.netDb().reseedChecker().getStatus()).append("</i><br>");
+                buf.append("<div class=\"sb_notice\"><i>").append(_context.netDb().reseedChecker().getStatus()).append("</i></div>");
             } else {
                 // While no reseed occurring, show reseed link
                 long nonce = _context.random().nextLong();
@@ -843,14 +843,15 @@ public class SummaryHelper extends HelperBase {
                 String uri = getRequestURI();
                 buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
+                buf.append("<button type=\"submit\" title=\"").append(_t("Attempt to download router reference files (if automatic reseed has failed)"));
+                buf.append("\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
             }
         }
         // If a new reseed ain't running, and the last reseed had errors, show error message
         if (!reseedInProgress) {
             String reseedErrorMessage = _context.netDb().reseedChecker().getError();
             if (reseedErrorMessage.length() > 0) {
-                buf.append("<i>").append(reseedErrorMessage).append("</i><br>");
+                buf.append("<div class=\"sb_notice\"><i>").append(reseedErrorMessage).append("</i></div>");
             }
         }
         if (buf.length() <= 0)
@@ -929,7 +930,7 @@ public class SummaryHelper extends HelperBase {
         String imgPath = CSSHelper.BASE_THEME_PATH + theme + "/images/";
 
         StringBuilder buf = new StringBuilder(2048);
-        buf.append("<table class=\"sidebarconf\"><tr><th>")
+        buf.append("<table id=\"sidebarconf\"><tr><th title=\"Mark section for removal from the sidebar\">")
            .append(_t("Remove"))
            .append("</th><th>")
            .append(_t("Name"))
@@ -938,11 +939,15 @@ public class SummaryHelper extends HelperBase {
            .append("</th></tr>\n");
         for (String section : sections) {
             int i = sections.indexOf(section);
-            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" id=\"")
+               .append(sectionNames.get(section))
+               .append("\" name=\"delete_")
                .append(i)
-               .append("\"></td><td align=\"left\">")
+               .append("\"></td><td align=\"left\"><label for=\"")
+               .append(sectionNames.get(section))
+               .append("\">")
                .append(_t(sectionNames.get(section)))
-               .append("</td><td align=\"right\"><input type=\"hidden\" name=\"order_")
+               .append("</label></td><td align=\"right\"><input type=\"hidden\" name=\"order_")
                .append(i).append('_').append(section)
                .append("\" value=\"")
                .append(i)
@@ -997,9 +1002,8 @@ public class SummaryHelper extends HelperBase {
         buf.append("<tr><td align=\"center\">" +
                    "<input type=\"submit\" name=\"action\" class=\"delete\" value=\"")
            .append(_t("Delete selected"))
-           .append("\"></td><td align=\"left\"><b>")
-           .append(_t("Add")).append(":</b> " +
-                   "<select name=\"name\">\n" +
+           .append("\"></td><td align=\"left\">")
+           .append("<select name=\"name\">\n" +
                    "<option value=\"\" selected=\"selected\">")
            .append(_t("Select a section to add"))
            .append("</option>\n");
