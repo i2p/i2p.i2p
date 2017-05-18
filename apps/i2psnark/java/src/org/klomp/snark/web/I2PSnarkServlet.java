@@ -2380,9 +2380,9 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\"> KBps <td id=\"bwHelp\"><i>");
         out.write(_t("Half available bandwidth recommended."));
         if (_context.isRouterContext()) {
-            out.write(" <a href=\"/config.jsp\" target=\"blank\">[");
+            out.write("</i> <a href=\"/config.jsp\" target=\"blank\">[");
             out.write(_t("View or change router bandwidth"));
-            out.write("]</a></i>");
+            out.write("]</a>");
         }
         out.write("\n<tr><td><label for=\"useOpenTrackers\">");
         out.write(_t("Use open trackers also"));
