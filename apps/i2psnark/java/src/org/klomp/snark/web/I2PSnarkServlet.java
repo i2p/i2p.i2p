@@ -2276,11 +2276,15 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write(_t("Theme"));
         out.write(":<td colspan=\"2\">");
         if (_manager.getUniversalTheming()) {
-            out.write("<b>");
+            out.write("<select name='theme' disabled=\"disabled\" title=\"");
+            out.write(_t("To change themes manually, disable universal theming"));
+            out.write("\"><option>");
             out.write(_manager.getTheme());
-            out.write("</b> (<a href=\"/configui\">");
-            out.write(_t("Universal theming is enabled"));
-            out.write("</a>)");
+            out.write("</option></select><i>");
+            out.write(_t("Universal theming is enabled."));
+            out.write("</i> <a href=\"/configui\" target=\"_blank\">[");
+            out.write(_t("Configure"));
+            out.write("]</a>");
         } else {
             out.write("<select name='theme'>");
             String theme = _manager.getTheme();
