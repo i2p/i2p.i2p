@@ -44,6 +44,8 @@ import net.i2p.util.VersionComparator;
 /**
  * Coordinate the connection to a single peer.
  *
+ * Public only for UI peers page. Not a public API, not for external use.
+ *
  * The NTCP transport sends individual I2NP messages AES/256/CBC encrypted with
  * a simple checksum.  The unencrypted message is encoded as follows:
  *<pre>
@@ -66,7 +68,7 @@ import net.i2p.util.VersionComparator;
  *</pre>
  *
  */
-class NTCPConnection implements Closeable {
+public class NTCPConnection implements Closeable {
     private final RouterContext _context;
     private final Log _log;
     private SocketChannel _chan;

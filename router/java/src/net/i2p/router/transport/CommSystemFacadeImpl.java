@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedMap;
 import java.util.Vector;
 
 import net.i2p.data.Hash;
@@ -210,9 +211,23 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     @Deprecated
     public void recheckReachability() { _manager.recheckReachability(); }
 
+    /**
+     *  As of 0.9.31, only outputs UPnP status
+     *
+     *  Warning - blocking, very slow, queries the active UPnP router,
+     *  will take many seconds if it has vanished.
+     */
     @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException { 
         _manager.renderStatusHTML(out, urlBase, sortFlags); 
+    }
+    
+    /**
+     *  @return SortedMap of style to Transport (a copy)
+     *  @since 0.9.31
+     */
+    public SortedMap<String, Transport> getTransports() {
+        return _manager.getTransports();
     }
     
     /** @return non-null, possibly empty */

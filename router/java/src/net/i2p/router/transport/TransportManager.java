@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -342,6 +343,18 @@ public class TransportManager implements TransportEventListener {
     
     int getTransportCount() { return _transports.size(); }
     
+    /**
+     *  @return SortedMap of style to Transport (a copy)
+     *  @since 0.9.31
+     */
+    public SortedMap<String, Transport> getTransports() {
+        TreeMap<String, Transport> rv = new TreeMap<String, Transport>();
+        rv.putAll(_transports);
+        // TODO (also synch)
+        //rv.putAll(_pluggableTransports);
+        return rv;
+    }
+
     /**
      *  How many peers are we currently connected to, that we have
      *  sent a message to or received a message from in the last five minutes.
@@ -716,44 +729,12 @@ public class TransportManager implements TransportEventListener {
     }
     
     /**
+     *  As of 0.9.31, only outputs UPnP status
+     *
      *  Warning - blocking, very slow, queries the active UPnP router,
      *  will take many seconds if it has vanished.
      */
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
-        if (_context.getBooleanProperty(PROP_ADVANCED)) {
-            out.write("<p id=\"upnpstatus\"><b>");
-            out.write(_t("Status"));
-            out.write(": ");
-            out.write(_t(getReachabilityStatus().toStatusString()));
-            out.write("</b></p>");
-        }
-        TreeMap<String, Transport> transports = new TreeMap<String, Transport>();
-        for (Transport t : _transports.values()) {
-            transports.put(t.getStyle(), t);
-        }
-        for (Transport t : transports.values()) {
-            t.renderStatusHTML(out, urlBase, sortFlags);
-        }
-        
-        if (!_transports.isEmpty()) {
-            out.write(getTransportsLegend());
-        }
-
-        StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h3 id=\"transports\">").append(_t("Router Transport Addresses")).append("</h3><pre id=\"transports\">\n");
-        for (Transport t : _transports.values()) {
-            if (t.hasCurrentAddress()) {
-                for (RouterAddress ra : t.getCurrentAddresses()) {
-                    buf.append(ra.toString());
-                    buf.append("\n\n");
-                }
-            } else {
-                buf.append(_t("{0} is used for outbound connections only", t.getStyle()));
-                buf.append("\n\n");
-            }
-        }
-        buf.append("</pre>\n");
-        out.write(buf.toString());
         if (SystemVersion.isAndroid()) {
             // newer androids crash w/ network on IO thread
         } else if (_upnpManager != null) {
@@ -761,46 +742,7 @@ public class TransportManager implements TransportEventListener {
         } else {
             out.write("<h3 id=\"upnpstatus\"><a name=\"upnp\"></a>" + _t("UPnP is not enabled") + "</h3>\n");
         }
-        out.write("</p>\n");
-        out.flush();
     }
-
-
-    private final String getTransportsLegend() {
-        StringBuilder buf = new StringBuilder(1024);
-        buf.append("<p class=\"infohelp\">")
-           .append(_t("Your transport connection limits are automatically set based on your configured bandwidth."))
-           .append('\n')
-           .append(_t("To override these limits, add the settings i2np.ntcp.maxConnections=nnn and i2np.udp.maxConnections=nnn on the advanced configuration page."))
-           .append("</p>\n");
-        buf.append("<h3 class=\"tabletitle\">").append(_t("Definitions")).append("</h3>")
-           .append("<table id=\"peerdefs\">\n")
-           .append("<tr><td><b id=\"def.peer\">").append(_t("Peer")).append("</b></td><td>").append(_t("The remote peer, identified by router hash")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.dir\">").append(_t("Dir")).append("</b></td><td><img alt=\"Inbound\" src=\"/themes/console/images/inbound.png\"> ").append(_t("Inbound connection")).append("</td></tr>\n")
-           .append("<tr><td></td><td><img alt=\"Outbound\" src=\"/themes/console/images/outbound.png\"> ").append(_t("Outbound connection")).append("</td></tr>\n")
-           .append("<tr><td></td><td><img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"> ").append(_t("They offered to introduce us (help other peers traverse our firewall)")).append("</td></tr>\n")
-           .append("<tr><td></td><td><img src=\"/themes/console/images/outbound.png\" alt=\"^\" height=\"8\" width=\"12\"> ").append(_t("We offered to introduce them (help other peers traverse their firewall)")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.idle\">").append(_t("Idle")).append("</b></td><td>").append(_t("How long since a packet has been received / sent")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.rate\">").append(_t("In/Out")).append("</b></td><td>").append(_t("The smoothed inbound / outbound transfer rate (KBytes per second)")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.up\">").append(_t("Up")).append("</b></td><td>").append(_t("How long ago this connection was established")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.skew\">").append(_t("Skew")).append("</b></td><td>").append(_t("The difference between the peer's clock and your own")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.cwnd\">CWND</b></td><td>").append(_t("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" / </td></tr>\n")
-           .append("<tr><td></td><td>").append(_t("The number of sent messages awaiting acknowledgement")).append(" /</td></tr>\n")
-           .append("<tr><td></td><td>").append(_t("The maximum number of concurrent messages to send")).append(" /</td></tr>\n")
-           .append("<tr><td></td><td>").append(_t("The number of pending sends which exceed congestion window")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.ssthresh\">SST</b></td><td>").append(_t("The slow start threshold")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.rtt\">RTT</b></td><td>").append(_t("The round trip time in milliseconds")).append("</td></tr>\n")
-           //.append("<tr><td><b id=\"def.dev\">").append(_t("Dev")).append("</b></td><td>").append(_t("The standard deviation of the round trip time in milliseconds")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.rto\">RTO</b></td><td>").append(_t("The retransmit timeout in milliseconds")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.mtu\">MTU</b></td><td>").append(_t("Current maximum send packet size / estimated maximum receive packet size (bytes)")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.send\">").append(_t("TX")).append("</b></td><td>").append(_t("The total number of messages sent to the peer")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.recv\">").append(_t("RX")).append("</b></td><td>").append(_t("The total number of messages received from the peer")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.resent\">").append(_t("Dup TX")).append("</b></td><td>").append(_t("The total number of packets retransmitted to the peer")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.dupRecv\">").append(_t("Dup RX")).append("</b></td><td>").append(_t("The total number of duplicate packets received from the peer")).append("</td></tr>\n")
-           .append("</table>");
-        return buf.toString();
-    }
-
     
     /**
      *  Mark a string for extraction by xgettext and translation.
@@ -812,7 +754,6 @@ public class TransportManager implements TransportEventListener {
         return s;
     }
 
-
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /**
@@ -820,12 +761,5 @@ public class TransportManager implements TransportEventListener {
      */
     private final String _t(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
-    }
-
-    /**
-     *  Translate
-     */
-    private final String _t(String s, Object o) {
-        return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 }

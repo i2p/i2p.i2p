@@ -1,3 +1,6 @@
+2017-05-19 zzz
+ * Console: Move /peers page rendering from router to console (ticket #1879)
+
 2017-05-18 str4d
 Prop from i2p.i2p.str4d.ui:
  * Backend HTML changes to routerconsole and apps:
@@ -57,6 +60,7 @@ Prop from i2p.i2p.str4d.ui:
    - Consolidation of Hostname/host name/name referenced: now all "Hostname"
 
 2017-05-14 zzz
+ * Crypto: Fix AES NPE on 4-core RPi (ticket #1989)
  * i2psnark: Fix HTML double-escape (ticket #1992)
  * Router: New method to get bandwidth class
 

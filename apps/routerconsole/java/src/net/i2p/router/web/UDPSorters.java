@@ -1,17 +1,18 @@
-package net.i2p.router.transport.udp;
+package net.i2p.router.web;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 
 import net.i2p.data.DataHelper;
+import net.i2p.router.transport.udp.PeerState;
 
 /**
  *  Comparators for various columns
  *
- *  @since 0.9.18 moved from UDPTransport
+ *  @since 0.9.31 moved from udp; 0.9.18 moved from UDPTransport
  */
-class Sorters {
+class UDPSorters {
 
     static final int FLAG_ALPHA = 0;
     static final int FLAG_IDLE_IN = 1;

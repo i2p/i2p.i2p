@@ -26,8 +26,11 @@ import net.i2p.util.ConcurrentHashSet;
 /**
  * Contain all of the state about a UDP connection to a peer.
  * This is instantiated only after a connection is fully established.
+ *
+ * Public only for UI peers page. Not a public API, not for external use.
+ *
  */
-class PeerState {
+public class PeerState {
     private final RouterContext _context;
     private final Log _log;
     /**
