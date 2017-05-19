@@ -324,6 +324,8 @@ public class CommentSet extends AbstractSet<Comment> {
      *  due to additional deduping in the iterator.
      */
     public Iterator<Comment> iterator() {
+        if (size <= 0)
+            return Collections.<Comment>emptyList().iterator();
         List<Comment> list = new ArrayList<Comment>(size);
         for (List<Comment> l : map.values()) {
             int hc = l.get(0).hashCode();

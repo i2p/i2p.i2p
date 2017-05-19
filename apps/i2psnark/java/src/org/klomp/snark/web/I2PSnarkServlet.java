@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,6 +46,8 @@ import org.klomp.snark.Storage;
 import org.klomp.snark.Tracker;
 import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
+import org.klomp.snark.comments.Comment;
+import org.klomp.snark.comments.CommentSet;
 import org.klomp.snark.standalone.ConfigUIHelper;
 
 /**
@@ -2219,6 +2222,8 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
         //String openTrackers = _manager.util().getOpenTrackerString();
         boolean useDHT = _manager.util().shouldUseDHT();
+        boolean useRatings = _manager.util().ratingsEnabled();
+        boolean useComments = _manager.util().commentsEnabled();
         //int seedPct = 0;
 
         out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
@@ -2398,7 +2403,27 @@ public class I2PSnarkServlet extends BasicServlet {
                   + (useDHT ? "checked " : "")
                   + "title=\"");
         out.write(_t("Use DHT to find additional peers"));
-        out.write("\" ></td></tr>\n");
+        out.write("\" ></td></tr>\n" +
+        
+                  "<tr><td>");
+        out.write(_t("Enable Ratings"));
+        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"ratings\" value=\"true\" " 
+                  + (useRatings ? "checked " : "") 
+                  + "title=\"");
+        out.write(_t("Show ratings on torrent pages"));
+        out.write("\" ></td></tr>\n" +
+        
+                  "<tr><td>");
+        out.write(_t("Enable Comments"));
+        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"comments\" value=\"true\" " 
+                  + (useComments ? "checked " : "") 
+                  + "title=\"");
+        out.write(_t("Show comments on torrent pages"));
+        out.write("\"> ");
+        out.write(_t("Your commenter name"));
+        out.write(": <input type=\"text\" name=\"nofilter_commentsName\" spellcheck=\"false\" value=\"" 
+                      + DataHelper.escapeHTML(_manager.util().getCommentsName()) + "\" size=\"32\" maxlength=\"32\" > " +
+                  "</td></tr>\n");
 
         //          "<tr><td>");
         //out.write(_t("Open tracker announce URLs"));
@@ -2752,6 +2777,12 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (String.valueOf(_nonce).equals(nonce)) {
                     if (postParams.get("savepri") != null) {
                         savePriorities(snark, postParams);
+                    } else if (postParams.get("addComment") != null) {
+                        saveComments(snark, postParams);
+                    } else if (postParams.get("deleteComments") != null) {
+                        deleteComments(snark, postParams);
+                    } else if (postParams.get("setCommentsEnabled") != null) {
+                        saveCommentsSetting(snark, postParams);
                     } else if (postParams.get("stop") != null) {
                         _manager.stopTorrent(snark, false);
                     } else if (postParams.get("start") != null) {
@@ -2794,7 +2825,9 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
-        String directory = title;
+        final String directory = title;
+        final int dirSlash = directory.indexOf('/');
+        final boolean isTopLevel = dirSlash <= 0;
         title = _t("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
         buf.append("</TITLE>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
@@ -2817,7 +2850,11 @@ public class I2PSnarkServlet extends BasicServlet {
         if (parent)  // always true
             buf.append("<div class=\"page\">\n<div class=\"mainsection\">");
         // for stop/start/check
-        if (showStopStart || showPriority) {
+        final boolean er = isTopLevel && _manager.util().ratingsEnabled();
+        final boolean ec = isTopLevel && _manager.util().commentsEnabled(); // global setting
+        final boolean esc = ec && _manager.getSavedCommentsEnabled(snark); // per-torrent setting
+        final boolean includeForm = showStopStart || showPriority || er || ec;
+        if (includeForm) {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
             buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(_nonce).append("\" >\n");
             if (sortParam != null) {
@@ -3125,6 +3162,10 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (ls == null) {
             // We are only showing the torrent info section
+            if (er || ec)
+                displayComments(snark, er, ec, esc, buf);
+            if (includeForm)
+                buf.append("</form>");
             buf.append("</div></div></BODY></HTML>");
             return buf.toString();
         }
@@ -3176,8 +3217,7 @@ public class I2PSnarkServlet extends BasicServlet {
                             : tx + ": " + directory);
         if (showSort)
             buf.append("</a>");
-        int dirSlash = directory.indexOf('/');
-        if (dirSlash > 0) {
+        if (!isTopLevel) {
             buf.append("&nbsp;");
             buf.append(DataHelper.escapeHTML(directory.substring(dirSlash + 1)));
         }
@@ -3360,12 +3400,158 @@ public class I2PSnarkServlet extends BasicServlet {
                        "</th></tr></thead>\n");
         }
         buf.append("</table>\n");
+        if (er || ec)
+            displayComments(snark, er, ec, esc, buf);
         // for stop/start/check
-        if (showStopStart || showPriority)
+        if (includeForm)
             buf.append("</form>");
         buf.append("</div></div></BODY></HTML>\n");
 
         return buf.toString();
+    }
+
+    /**
+     * @param er ratings enabled globally
+     * @param ec comments enabled globally
+     * @param esc comments enabled this torrent
+     * @since 0.9.31
+     */
+    private void displayComments(Snark snark, boolean er, boolean ec, boolean esc, StringBuilder buf) {
+            Iterator<Comment> iter = null;
+            int myRating = 0;
+            CommentSet comments = snark.getComments();
+            buf.append("<table class=\"snarkCommentInfo\"><tr><th colspan=\"5\">")
+               .append(_t("Ratings and Comments"))
+               .append("</th><tr><td>");
+            if (comments != null) {
+                synchronized(comments) {
+                    // current rating
+                    if (er) {
+                        myRating = comments.getMyRating();
+                        if (myRating > 0) {
+                            buf.append(_t("My Rating")).append(": ");
+                            String img = toImg("itoopie_xxsm");
+                            for (int i = 0; i < myRating; i++) {
+                                buf.append(img);
+                            }
+                        }
+                    }
+                    buf.append("</td><td>");
+                    if (er) {
+                        int rcnt = comments.getRatingCount();
+                        if (rcnt > 0) {
+                            double avg = comments.getAverageRating();
+                            buf.append(_t("Average Rating")).append(": ").append(avg);  // todo format
+                            //buf.append(' ').append(_t("Total Ratings")).append(": ").append(rcnt);
+                        } else {
+                            buf.append(_t("No ratings for this torrent"));
+                        }
+                    }
+                    if (ec) {
+                        int sz = comments.size();
+                        if (sz > 0)
+                            iter = comments.iterator();
+                    }
+                }
+            } else {
+                buf.append("</td><td>");
+            }
+            buf.append("</td><td></td><td>");
+            buf.append(_t("Comments Enabled for this Torrent"));
+            buf.append(": <input type=\"checkbox\" class=\"optbox\" name=\"enableComments\" ");
+            if (esc)
+                buf.append("checked=\"checked\"");
+            else if (!ec)
+                buf.append("disabled=\"disabled\"");
+            buf.append("></td><td>");
+            if (ec) {
+                buf.append("&nbsp;&nbsp;&nbsp;<input type=\"submit\" name=\"setCommentsEnabled\" value=\"");
+                buf.append(_t("Save Comments Setting"));
+                buf.append("\" class=\"accept\">\n");
+            }
+            if (esc && _manager.util().getCommentsName().length() == 0) {
+                buf.append("<br><a href=\"").append(_contextPath).append("/configure\">");
+                buf.append(_t("Please configure your name for comments on the configuration page"));
+                buf.append("</a>");
+            }
+            buf.append("</td></tr><tr><td>");
+            // new rating / comment form
+            if (er) {
+                buf.append("&nbsp;&nbsp;&nbsp;<select name=\"myRating\">");
+                for (int i = 5; i >= 0; i--) {
+                    buf.append("<option value=\"").append(i).append("\" ");
+                    if (i == myRating)
+                        buf.append("selected=\"selected\"");
+                    buf.append('>');
+                    if (i != 0) {
+                        buf.append(ngettext("{0} toopie", "{0} toopies", i));
+                    } else {
+                        buf.append(_t("no rating"));
+                    }
+                    buf.append("</option>\n");
+                }
+                buf.append("</select></td><td></td><td>\n");
+            }
+            if (esc) {
+                buf.append("<textarea name=\"nofilter_newComment\" cols=\"44\" rows=\"4\"></textarea>");
+            }
+            buf.append("</td><td></td><td><input type=\"submit\" name=\"addComment\" value=\"");
+            if (er && esc)
+                buf.append(_t("Add Rating and Comment"));
+            else if (er)
+                buf.append(_t("Add Rating"));
+            else
+                buf.append(_t("Add Comment"));
+            buf.append("\" class=\"accept\">\n");
+            buf.append("</td></tr></table>");
+            // TODO  disable / enable comments for this torrent
+            // existing ratings / comments table
+            int ccount = 0;
+            if (iter != null) {
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+                buf.append("<table class=\"snarkComments\">");
+                while (iter.hasNext()) {
+                    Comment c = iter.next();
+                    buf.append("<tr><td>");
+                    // (c.isMine())
+                    //  buf.append(_t("me"));
+                    //else if (c.getName() != null)
+                    // TODO can't be hidden... hide if comments are hidden?
+                    if (c.getName() != null)
+                        buf.append(DataHelper.escapeHTML(c.getName()));
+                    buf.append("</td><td>");
+                    if (er) {
+                        int rt = c.getRating();
+                        if (rt > 0) {
+                            String img = toImg("itoopie_xxsm");
+                            for (int i = 0; i < rt; i++) {
+                                buf.append(img);
+                            }
+                        }
+                    }
+                    buf.append("</td><td>").append(fmt.format(new Date(c.getTime())));
+                    if (esc) {
+                        buf.append("</td><td>");
+                        if (c.getText() != null) {
+                            buf.append(DataHelper.escapeHTML(c.getText()));
+                            buf.append("</td><td><input type=\"checkbox\" class=\"optbox\" name=\"cdelete.")
+                               .append(c.getID()).append("\" title=\"").append(_t("Delete")).append("\">");
+                            ccount++;
+                        }
+                    }
+                    buf.append("</td></tr>\n");
+                }
+                if (esc && ccount > 0) {
+                    // TODO format better
+                    buf.append("<tr><td colspan=\"5\" align=\"right\"><input type=\"submit\" name=\"deleteComments\" value=\"");
+                    buf.append(_t("Delete Selected Comments"));
+                    buf.append("\" class=\"delete\"></td></tr>\n");
+                }
+                buf.append("</table>");
+            } else if (esc) {
+                //buf.append(_t("No comments for this torrent"));
+            } // iter != null
     }
 
     /**
@@ -3537,6 +3723,50 @@ public class I2PSnarkServlet extends BasicServlet {
         }
          snark.updatePiecePriorities();
         _manager.saveTorrentStatus(snark);
+    }
+
+    /** @since 0.9.31 */
+    private void saveComments(Snark snark, Map<String, String[]> postParams) {
+        String[] a = postParams.get("myRating");
+        String r = (a != null) ? a[0] : null;
+        a = postParams.get("nofilter_newComment");
+        String c = (a != null) ? a[0] : null;
+        if ((r == null || r.equals("0")) && (c == null || c.length() == 0))
+            return;
+        int rat = 0;
+        try {
+            rat = Integer.parseInt(r);
+        } catch (NumberFormatException nfe) {}
+        Comment com = new Comment(c, _manager.util().getCommentsName(), rat);
+        boolean changed = snark.addComments(Collections.singletonList(com));
+        if (!changed)
+            _log.warn("Add of comment ID " + com.getID() + " UNSUCCESSFUL");
+    }
+
+    /** @since 0.9.31 */
+    private void deleteComments(Snark snark, Map<String, String[]> postParams) {
+        CommentSet cs = snark.getComments();
+        if (cs == null)
+            return;
+        synchronized(cs) {
+            for (Map.Entry<String, String[]> entry : postParams.entrySet()) {
+                String key = entry.getKey();
+                if (key.startsWith("cdelete.")) {
+                    try {
+                        int id = Integer.parseInt(key.substring(8));
+                        boolean changed = cs.remove(id);
+                        if (!changed)
+                            _log.warn("Delete of comment ID " + id + " UNSUCCESSFUL");
+                    } catch (NumberFormatException nfe) {}
+                }
+            }
+        }
+    }
+
+    /** @since 0.9.31 */
+    private void saveCommentsSetting(Snark snark, Map<String, String[]> postParams) {
+        boolean yes = postParams.get("enableComments") != null;
+        _manager.setSavedCommentsEnabled(snark, yes);
     }
 
     /**

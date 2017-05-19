@@ -81,6 +81,7 @@ class PeerCheckerTask implements Runnable
                        " interested: " + coordinator.getInterestedUploaders() +
                        " limit: " + uploadLimit + " overBW? " + overBWLimit);
         DHT dht = _util.getDHT();
+        boolean fetchComments = _util.utCommentsEnabled();
         int i = 0;
         for (Peer peer : peerList) {
             i++;
@@ -232,7 +233,7 @@ class PeerCheckerTask implements Runnable
             if (((_runCount + i) % 17) == 0 && !peer.isCompleted())
                 coordinator.sendPeers(peer);
             // send Comment Request, about every 30 minutes
-            if ( /* comments enabled && */ ((_runCount + i) % 47) == 0)
+            if (fetchComments && ((_runCount + i) % 47) == 0)
                 coordinator.sendCommentReq(peer);
             // cheap failsafe for seeds connected to seeds, stop pinging and hopefully
             // the inactive checker (above) will eventually disconnect it

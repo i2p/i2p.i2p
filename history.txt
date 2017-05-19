@@ -1,5 +1,6 @@
 2017-05-19 zzz
  * Console: Move /peers page rendering from router to console (ticket #1879)
+ * i2psnark: Add ut_comment UI and per-torrent configuration
 
 2017-05-18 str4d
 Prop from i2p.i2p.str4d.ui:

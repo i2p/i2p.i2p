@@ -112,6 +112,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
     //private static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     //private static final String PROP_META_PRIORITY_SUFFIX = ".priority";
     private static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
+    /** @since 0.9.31 */
+    private static final String PROP_META_COMMENTS = "comments";
 
     private static final String CONFIG_FILE_SUFFIX = ".config";
     private static final String CONFIG_FILE = "i2psnark" + CONFIG_FILE_SUFFIX;
@@ -1924,6 +1926,31 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         return rv;
     }
+
+    /**
+     * Get setting for comments enabled from the config file.
+     * Caller must first check global I2PSnarkUtil.commentsEnabled()
+     * Default true.
+     * @since 0.9.31
+     */
+    public boolean getSavedCommentsEnabled(Snark snark) {
+        boolean rv = true;
+        Properties config = getConfig(snark);
+        if (config != null) {
+            String s = config.getProperty(PROP_META_COMMENTS);
+            if (s != null)
+                rv = Boolean.parseBoolean(s);
+        }
+        return rv;
+    }
+
+    /**
+     * Set setting for comments enabled in the config file.
+     * @since 0.9.31
+     */
+    public void setSavedCommentsEnabled(Snark snark, boolean yes) {
+        saveTorrentStatus(snark, Boolean.valueOf(yes));
+    }
     
     /**
      * Save the completion status of a torrent and other data in the config file
@@ -1932,13 +1959,24 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * @since 0.9.15
      */
     public void saveTorrentStatus(Snark snark) {
+        saveTorrentStatus(snark, null);
+    }
+
+    /**
+     * Save the completion status of a torrent and other data in the config file
+     * for that torrent. Does nothing for magnets.
+     *
+     * @param comments null for no change
+     * @since 0.9.31
+     */
+    private void saveTorrentStatus(Snark snark, Boolean comments) {
         MetaInfo meta = snark.getMetaInfo();
         Storage storage = snark.getStorage();
         if (meta == null || storage == null)
             return;
         saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities(),
                           storage.getBase(), storage.getPreserveFileNames(),
-                          snark.getUploaded(), snark.isStopped());
+                          snark.getUploaded(), snark.isStopped(), comments);
     }
 
     /**
@@ -1955,13 +1993,24 @@ public class SnarkManager implements CompleteListener, ClientApp {
      */
     private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
                                    File base, boolean preserveNames, long uploaded, boolean stopped) {
+        saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded, stopped, null);
+    }
+
+    /*
+     * @param comments null for no change
+     * @since 0.9.31
+     */
+    private void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
+                                   File base, boolean preserveNames, long uploaded, boolean stopped,
+                                   Boolean comments) {
         synchronized (_configLock) {
-            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded, stopped);
+            locked_saveTorrentStatus(metainfo, bitfield, priorities, base, preserveNames, uploaded, stopped, comments);
         }
     }
 
     private void locked_saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities,
-                                          File base, boolean preserveNames, long uploaded, boolean stopped) {
+                                          File base, boolean preserveNames, long uploaded, boolean stopped,
+                                          Boolean comments) {
         byte[] ih = metainfo.getInfoHash();
         Properties config = getConfig(ih);
         String now = Long.toString(System.currentTimeMillis());
@@ -1985,6 +2034,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
         config.setProperty(PROP_META_RUNNING, Boolean.toString(running));
         if (base != null)
             config.setProperty(PROP_META_BASE, base.getAbsolutePath());
+        if (comments != null)
+            config.setProperty(PROP_META_COMMENTS, comments.toString());
 
         // now the file priorities
         if (priorities != null) {
