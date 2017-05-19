@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import net.i2p.data.Hash;
 import net.i2p.data.router.RouterAddress;
 import net.i2p.data.router.RouterInfo;
@@ -115,6 +118,14 @@ public abstract class CommSystemFacade implements Service {
     public String getCountryName(String code) { return code; }
     public String renderPeerHTML(Hash peer) {
         return peer.toBase64().substring(0, 4);
+    }
+    
+    /**
+     *  @return SortedMap of style to Transport (a copy)
+     *  @since 0.9.31
+     */
+    public SortedMap<String, Transport> getTransports() {
+        return new TreeMap<String, Transport>();
     }
     
     /** @since 0.8.13 */
