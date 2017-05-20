@@ -252,6 +252,7 @@ pre {
      padding: 1px;
      border: none;
      box-shadow: none;
+     border-radius: 0;
 }
 
 table {
@@ -464,6 +465,7 @@ input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:
 
 input[type="text"], input[type="password"] {
      cursor: text;
+     font-family; "Droid Sans", "NotoSans", Ubuntu, "Bitstream Vera Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-size: 9pt;
 }
 
@@ -851,6 +853,7 @@ input[type="text"][disabled] {
 
 textarea {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font-size: 9pt;
 }
 
 #composemail {
