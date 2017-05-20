@@ -32,6 +32,9 @@
 <tr><th>router.buildHandlerThreads={n}</th></tr>
 <tr><td>Allocate number of processor threads for building tunnels. If your processor supports hyperthreading or simultaneous multithreading, you may multiply the number of processor cores by 2 to get the maximum number of threads to allocate, otherwise number of processor cores = maximum number of threads available. Note that you may wish to allocate less than the theoretical maximum to ensure you have headroom for other tasks.</td></tr>
 
+<tr><th>router.hideFloodfillParticipant={true|false}</th></tr>
+<tr><td>When set to true, if your router is serving as a floodfill for the network, your <a href="/configadvanced#ffconf">floodfill participation</a> will be hidden from other routers.</td></tr>
+
 <tr><th>router.maxParticipatingTunnels={n}</th></tr>
 <tr><td>Determines the maximum number of participating tunnels the router can build. To disable participation completely, set to 0.</td></tr>
 

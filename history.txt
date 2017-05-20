@@ -1,4 +1,6 @@
 2017-05-20 str4d
+ * Console:
+   - Add router.hideFloodfillParticipant to advanced settings help
  * i2psnark:
    - Make DHT debug section collapsible
    - Tooltips for downloading/finished torrents
