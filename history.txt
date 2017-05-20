@@ -1,3 +1,10 @@
+2017-05-20 str4d
+ * i2psnark:
+   - Make DHT debug section collapsible
+   - Tooltips for downloading/finished torrents
+   - Download bars for torrents, torrent parts and peer downloads
+   - Friendlier date format (with completed: <date> tooltip for finished torrents)
+
 2017-05-19 zzz
  * Console: Move /peers page rendering from router to console (ticket #1879)
  * i2psnark: Add ut_comment UI and per-torrent configuration

@@ -725,8 +725,14 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (showDebug) {
                     out.write("</tr>\n<tr class=\"dhtDebug\">");
                     out.write("<th colspan=\"11\">");
+                    out.write("<div id=\"dhtDebugPanel\">");
+                    out.write("<input class=\"toggle_input\" id=\"toggle_debug\" type=\"checkbox\"><label class=\"toggleview\" for=\"toggle_debug\">");
+                    out.write(toThemeImg("debug"));
+                    out.write(' ');
+                    out.write(_t("Dht Debug"));
+                    out.write("</label><div id=\"dhtDebugInner\">");
                     out.write(dht.renderStatusHTML());
-                    out.write("</th>");
+                    out.write("</div></div></th>");
                 }
             }
             out.write("</tr></tfoot>\n");
@@ -1710,10 +1716,26 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(DataHelper.formatDuration2(Math.max(remainingSeconds, 10) * 1000)); // (eta 6h)
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded\">");
-        if (remaining > 0)
+        if (remaining > 0) {
+            long percent = 100 * (total - remaining) / total;
+            out.write("<div class=\"percentBarOuter\">");
+            out.write("<div class=\"percentBarInner\" style=\"width: " + percent + "%;\">");
+            out.write("<div class=\"percentBarText\" tabindex=\"0\" title=\"");
+            out.write(percent + "% " + _t("complete") + " - " + DataHelper.formatSize2(remaining) + "B " + _t("remaining"));
+            out.write("\">");
             out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
-        else if (remaining == 0)
+            out.write("</div></div></div>");
+        } else if (remaining == 0) {
+            // needs locale configured for automatic translation
+            SimpleDateFormat fmt = new SimpleDateFormat("HH:mm, EEE dd MMM yyyy");
+            fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
+            long[] dates = _manager.getSavedAddedAndCompleted(snark);
+            String date = fmt.format(new Date(dates[1]));
+            out.write("<div class=\"percentBarComplete\" title=\"");
+            out.write(_t("Completed") + ": " + date + "\">");
             out.write(formatSize(total)); // 3GB
+            out.write("</div>");
+        }
         //else
         //    out.write("??");  // no meta size yet
         out.write("</td>\n\t");
@@ -1825,7 +1847,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     continue;
                 out.write("<tr class=\"peerinfo " + rowClass + "\"><td title=\"");
                 out.write(_t("Peer attached to swarm"));
-                out.write("\"></td><td colspan=\"4\" align=\"right\">");
+                out.write("\"></td><td colspan=\"4\">");
                 PeerID pid = peer.getPeerID();
                 String ch = pid != null ? pid.toString().substring(0, 4) : "????";
                 String client;
@@ -1867,7 +1889,10 @@ public class I2PSnarkServlet extends BasicServlet {
                         String ps = String.valueOf(pct);
                         if (ps.length() > 5)
                             ps = ps.substring(0, 5);
-                        out.write(ps + "%");
+                        out.write("<div class=\"percentBarOuter\">");
+                        out.write("<div class=\"percentBarInner\" style=\"width:" + ps + "%;\">");
+                        out.write("<div class=\"percentBarText\" tabindex=\"0\">" + ps + "%</div>");
+                        out.write("</div></div>");
                     }
                 } else {
                     pct = (float) 101.0;
@@ -2907,11 +2932,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (announce != null) {
                     announce = DataHelper.stripHTML(announce);
                     buf.append("<tr><td>");
-                    String trackerLink = getTrackerLink(announce, snark.getInfoHash());
-                    if (trackerLink != null)
-                        buf.append(trackerLink);
-                    else
-                        toThemeImg(buf, "details");
+                    toThemeImg(buf, "details");
                     buf.append("</td><td><b>").append(_t("Primary Tracker")).append(":</b> ");
                     buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
                     buf.append("</td></tr>");
@@ -2920,7 +2941,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 if (alist != null && !alist.isEmpty()) {
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
-                    buf.append("</td><td valign=\"top\"><b>")
+                    buf.append("</td><td><b>")
                        .append(_t("Tracker List")).append(":</b> ");
                     for (List<String> alist2 : alist) {
                         buf.append('[');
@@ -2951,7 +2972,8 @@ public class I2PSnarkServlet extends BasicServlet {
                        .append("</td></tr>\n");
                 }
                 long dat = meta.getCreationDate();
-                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                // needs locale configured for automatic translation
+                SimpleDateFormat fmt = new SimpleDateFormat("HH:mm, EEEE dd MMMM yyyy");
                 fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 if (dat > 0) {
                     String date = fmt.format(new Date(dat));
@@ -3306,19 +3328,21 @@ public class I2PSnarkServlet extends BasicServlet {
                                 status = toImg("cancel") + ' ' + _t("File not found in torrent?");
                             } else if (remaining == 0 || length <= 0) {
                                 complete = true;
-                                status = toImg("tick") + ' ' + _t("Complete");
+                                status = "<div class=\"priorityIndicator\">" + toImg("tick") + "</div>" + _t("Complete");
                             } else {
                                 priority = fai.priority;
                                 if (priority < 0)
-                                    status = toImg("cancel");
+                                    status = "<div class=\"priorityIndicator\">" + toImg("cancel") + "</div>";
                                 else if (priority == 0)
-                                    status = toImg("clock");
+                                    status = "<div class=\"priorityIndicator\">" + toImg("clock") + "</div>";
                                 else
-                                    status = toImg("clock_red");
-                                status += " " +
-                                         ("<span class=\"percentDownloaded\" title=\"") + _t("Percentage of file downloaded") + ("\">") +
-                                         (100 * (length - remaining) / length) + "% " + ("</span><span class=\"dirInfoComplete\">") + _t("complete") + ("</span>") +
-                                         " (" + DataHelper.formatSize2(remaining) + "B " + _t("remaining") + ")";
+                                    status = "<div class=\"priorityIndicator\">" + toImg("clock_red") + "</div>";
+                                long percent = 100 * (length - remaining) / length;
+                                status += " <div class=\"percentBarOuter\">" +
+                                         "<div class=\"percentBarInner\" style=\"width: " +
+                                         percent + "%;\"><div class=\"percentBarText\" tabindex=\"0\" title=\"" +
+                                         DataHelper.formatSize2(remaining) + "B " + _t("remaining") +
+                                         "\">" + percent + "%</div></div></div>";
                             }
 
                 }

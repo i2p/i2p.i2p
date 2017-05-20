@@ -41,6 +41,12 @@ body.iframed {
      outline: none;
 }
 
+.toggleview, .snarkConfigTitle, .snarknavbar, img, input[type="image"] {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 .page {
      font-size: 9pt !important;
      line-height: 160% !important;
@@ -335,11 +341,6 @@ th:first-child {
      text-align: left !important;
 }
 
-tfoot td:first-child {
-     padding-left: 0;
-     text-align: left !important;
-}
-
 th:first-child img {
      margin: 1px -2px 3px 1px !important;
 }
@@ -350,6 +351,15 @@ th:nth-child(2) img {
 
 tfoot th {
      padding-bottom: 4px !important;
+}
+
+tfoot tr:first-child th {
+     vertical-align: middle !important;
+}
+
+tfoot td:first-child {
+     padding-left: 0;
+     text-align: left !important;
 }
 
 tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) img, tfoot:nth-child(4) img {
@@ -403,7 +413,6 @@ tfoot tr:nth-child(n+1) {
 
 .snarkTorrents thead th:first-child {
      width: 36px;
-/*     padding-right: 0;*/
      text-align: center !important;
 }
 
@@ -498,6 +507,10 @@ tfoot tr:nth-child(n+1) {
      width: 16px !important;
      padding: 0 2px 0 0 !important;
      text-align: center !important;
+}
+
+.peerinfo td:nth-child(4) {
+     font-weight: bold;
 }
 
 .snarkTorrents td[colspan="10"] {
@@ -708,17 +721,18 @@ th.headerdownloaded {
      mix-blend-mode: luminosity;
 }
 
-td.snarkFileStatus {
+.snarkFileStatus {
      font-size: 8pt;
      text-align: left;
+     width: 140px;
 }
 
-td.snarkFileIcon {
+.snarkFileIcon {
      width: 16px;
      padding: 0;
 }
 
-td.snarkFileStatusIcon {
+.snarkFileStatusIcon {
      width: 24px;
      padding: 0 4px 0 0;
      text-align: center;
@@ -870,30 +884,18 @@ td.snarkTorrentDownloaded {
      mix-blend-mode: normal;
 }
 
-/*
-.ParentDir a, .ParentDir a:visited {
-     color: #7972d1 !important;
+tr:hover .percentBarText {
+     opacity: 0.9;
 }
-*/
 
 .snarkTorrents a {
      display: inline-block;
      width: 100%;
 }
 
-/*
-.snarkTorrents tr:hover a, .snarkDirInfo tr:hover a {
-     color: #a099ff;
+.snarkTorrents th a {
+     display: inline;
 }
-
-.snarkTorrents a:hover, td[onclick]:hover a, .snarkDirInfo a:hover {
-     color: #652787 !important;
-}
-
-td[onclick]:hover {
-     cursor: pointer !important;
-}
-*/
 
 .snarkTorrentEven {
      background: #010010;
@@ -946,6 +948,8 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      font-weight: normal;
      padding: 4px 2px;
      color: #7670c2 !important;
+     width: 1%;
+     white-space: nowrap;
 }
 
 .snarkFileStatus {
@@ -962,51 +966,89 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      text-align: center !important;
 }
 
-/*
-div.percentBarOuter {
-      background: #000 !important;
-      border: 1px solid #9f9;
-      border-bottom: 1px solid #474;
-      border-right: 1px solid #474;
-      border-radius: 0;
-      float: left;
-      box-shadow: none;
-      opacity: 1;
+/* download bars */
+
+.snarkTorrentDownloaded {
+     width: 110px !important;
+     text-align: center !important;
 }
 
-div.percentBarInner {
-      border: none;
-      height: 14px;
-      background: #1c943a;
-      background: linear-gradient(to bottom,  #1c943a 0%, #092f10 50%, #0d2707 50%, #091b05 50%, #091503 100%);
+.snarkDirInfo .snarkFileStatus img {
+     float: left;
+     margin: 0 10px 0 5px;
 }
 
-div.percentBarInner.percentBarComplete {
-      background: #001100;
-      background: linear-gradient(to bottom,  #001100 0%, #002200 52%, #000000 52%, #001100 100%);
+.snarkFileStatus img[src*="clock"] {
+     margin-top: 4px;
+}
+
+.percentBarOuter {
+     background: #000;
+     background: repeating-linear-gradient(135deg, #001 1px, #001 5px, #003 6px, #003 11px);
+     border: 1px solid #171c3f;
+     box-shadow: none;
+     box-shadow: 0 0 1px 1px rgba(0,0,0,0.8);
+     margin: 3px auto;
+}
+
+.peerinfo .percentBarOuter {
+     opacity: 0.8;
+}
+
+.percentBarInner {
+     border: none;
+     height: 100%;
+     background: #33a;
+     background: linear-gradient(to bottom,  #33a 0%, #226 50%, #003 50%, #000 100%);
+     box-shadow: inset 0 0 0 1px #000;
+     opacity: 0.8;
+}
+
+.snarkTorrentDownloaded .percentBarInner {
+     background: linear-gradient(to bottom, rgba(51, 51, 170, 0.6) 0%, rgba(34, 34, 102, 0.7) 50%, rgba(0, 0, 51, 0.8) 50%, rgba(0, 0, 0, 0.9) 100%), linear-gradient(to right, rgba(255, 255, 0, 0.5) 55px, rgba(0, 255, 0, 0.5));
+}
+
+.snarkDirInfo .percentBarInner {
+     background: linear-gradient(to bottom, rgba(51, 51, 170, 0.6) 0%, rgba(34, 34, 102, 0.7) 50%, rgba(0, 0, 51, 0.8) 50%, rgba(0, 0, 0, 0.9) 100%), linear-gradient(to right, rgba(255, 255, 0, 0.5) 40px, rgba(0, 255, 0, 0.5));
+}
+
+.snarkDirInfo .percentBarInner[style="width: 0%;"] .percentBarText {
+     opacity: 0.9;
 }
 
 .percentBarText, .percentBarOuter {
-      text-align: center;
-      height: 14px;
-      top: 0;
-      width: 80px;
+     text-align: center;
+     height: 16px;
+     vertical-align: middle;
+     width: 110px;
 }
 
-.percentBarText{
-      text-align: center;
-      font-weight: bold;
-      line-height: 140%;
-      text-shadow: 0 1px 1px #000;
+.snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter, .peerinfo .percentBarText, .peerinfo .percentBarOuter {
+     width: 80px;
 }
 
-.snarkTorrentDownloaded .percentBarText, .snarkTorrentDownloaded .percentBarOuter  {
-      width: 110px !important;
-      word-spacing: -0.2em;
-      font-size: 7.5pt;
+.percentBarText {
+     text-align: center;
+     font-weight: bold !important;
+     line-height: 16px;
+     white-space: nowrap;
+     display: block;
+     color: #00ecff;
+     text-shadow: 0 0 1px rgba(0,0,0,0.8);
+     opacity: 0;
+     transition: ease opacity 0.3s 0.5s;
 }
 
-*/
+.peerinfo .percentbartext {
+    color: #dff1ff;
+}
+
+.percentBarText:hover, .percentBarText:focus {
+     opacity: 0.9;
+     transition: ease opacity 0.3s;
+}
+
+/* end download bars */
 
 .choked {
      color: #900 !important;
@@ -1127,7 +1169,6 @@ div.percentBarInner.percentBarComplete {
      margin-right: -2px;
      margin-top: -1px;
      filter: drop-shadow(0 0 1px #000);
-/*     filter: sepia(100%) hue-rotate(150deg) drop-shadow(0 0 1px #000);*/
 }
 
 .snarkConfig {
@@ -1155,21 +1196,6 @@ hr {
      color: #3e3d4b;
      border: 0 solid #3e3d4b;
      background: #3e3d4b;
-}
-
-hr.debug {
-     width: 100%;
-     background: #120f35;
-     margin: 3px 0;
-}
-
-hr.debug:nth-child(n+7) {
-     margin: -10px 0 3px;
-}
-
-hr.debug:last-child {
-     background: #000;
-     margin-bottom: -5px;
 }
 
 .configsectionpanel hr {
@@ -1451,6 +1477,17 @@ select:hover, select:focus {
 
 select:hover {
      box-shadow: inset 0 1px 1px 0 #c9ceff;
+}
+
+select[disabled], select[disabled]:hover {
+     color: #4e47bf !important;
+     background: #000 url(images/dropdown.png) right 3px center no-repeat !important;
+     border: 1px solid #3e3f8f;
+     border-bottom-color: #14144f;
+     border-right-color: #14144f;
+     box-shadow: none !important;
+     opacity: 0.7;
+     cursor: not-allowed;
 }
 
 select option {
@@ -1778,11 +1815,11 @@ _:-ms-lang(x), #trackerselect tr:last-child {
      padding-left: 5px !important;
 }
 
-#bwHelp a {
+#configs a {
      display: inline-block;
      white-space: nowrap;
-     margin-left: 5px;
-     font-style: normal;
+     margin-left: 4px;
+     font-weight: bold;
 }
 
 .snarkConfig tr:nth-last-child(2) {
@@ -2038,6 +2075,90 @@ label.toggleview, .snarkConfigTitle a, .snarkConfigTitle a:visited {
      color: #c9ceff;
 }
 
+tfoot .dhtDebug th {
+     word-break: break-all;
+     padding: 0 10px 10px !important;
+}
+
+/* debug panel */
+
+#dhtDebugPanel {
+     background: linear-gradient(to bottom, #001, #000009);
+     border: 1px solid #443da0;
+     border-top: none;
+     box-shadow: inset 0 0 0 1px #000;
+     text-align: center;
+     padding-bottom: 13px;
+}
+
+#dhtDebugPanel .toggleview {
+     padding-bottom: 2px !important;
+}
+
+#dhtDebugInner {
+     text-align: left;
+     padding: 5px;
+     background: #000;
+     margin: -23px 0 -12px;
+}
+
+.dhtDebug th b:first-of-type, .dhtDebug th b:first-of-type + br + hr.debug {
+     display: none;
+}
+
+input#toggle_debug:not(checked) + label {
+     padding-bottom: 2px;
+}
+
+input#toggle_debug:not(checked) + label > img {
+     margin-right: -2px !important;
+}
+
+input#toggle_debug:not(checked) + label + #dhtDebugInner {
+     display: block;
+}
+
+input#toggle_debug:checked + label + #dhtDebugInner {
+     display: none;
+}
+
+.iframed input#toggle_debug:not(checked) + label + #dhtDebugInner {
+     display: block;
+}
+
+.iframed input#toggle_debug:checked + label + #dhtDebugInner {
+     display: none;
+}
+
+/* end debug panel */
+
+hr.debug {
+     width: 100%;
+     background: #120f35;
+     margin: 3px 0;
+}
+
+hr.debug:first-of-type {
+     background: transparent;
+     margin-bottom: -5px;
+     margin-top: -2px;
+}
+
+hr.debug + hr {
+     display: block;
+     background: transparent;
+     margin-bottom: -3px;
+}
+
+hr.debug:nth-child(n+7) {
+     margin: -10px 0 3px;
+}
+
+hr.debug:last-child {
+     background: #000;
+     margin-bottom: -5px;
+}
+
 /* end debug */
 
 /* Resource Errors */
@@ -2080,7 +2201,7 @@ label.toggleview, .snarkConfigTitle a, .snarkConfigTitle a:visited {
 }
 
 #NotFound {
-     border-bottom: 1px solid #443da0;
+     border: 1px solid #443da0;
 }
 
 /* end Resource Errors */
@@ -2257,6 +2378,26 @@ b.alwaysShow {
      width: 30px !important;
 }
 
+.peerinfo .percentBarText, .snarkDirInfo .percentBarText  {
+     line-height: 18px;
+}
+
+.percentBarText, .percentBarOuter {
+     width: 100px;
+}
+
+.snarkDirInfo .percentBarText, .snarkDirInfo .percentBarOuter, .peerinfo .percentBarText, .peerinfo .percentBarOuter {
+     width: 60px;
+}
+
+.snarkTorrentDownloaded .percentBarInner {
+     background: linear-gradient(to bottom, rgba(51, 51, 170, 0.6) 0%, rgba(34, 34, 102, 0.7) 50%, rgba(0, 0, 51, 0.8) 50%, rgba(0, 0, 0, 0.9) 100%), linear-gradient(to right, rgba(255, 255, 0, 0.5) 50px, rgba(0, 255, 0, 0.5));
+}
+
+.snarkDirInfo .percentBarInner {
+     background: linear-gradient(to bottom, rgba(51, 51, 170, 0.6) 0%, rgba(34, 34, 102, 0.7) 50%, rgba(0, 0, 51, 0.8) 50%, rgba(0, 0, 0, 0.9) 100%), linear-gradient(to right, rgba(255, 255, 0, 0.5) 30px, rgba(0, 255, 0, 0.5));
+}
+
 .configsectionpanel .snarkConfigTitle {
      font-size: 10.5pt !important;
 }
@@ -2298,6 +2439,10 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      font-size: 9pt !important;
 }
 
+.snarkRefresh {
+     font-size: 10.5pt !important;
+}
+
 .snarkConfigTitle, .snarkConfigTitle a, label.toggleview, .snarkRefresh:link {
      font-size: 11pt !important;
 }
@@ -2314,10 +2459,6 @@ code, textarea, .snarkMessages li, .snarkMessages a, input, tt {
 
 a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileName, code, textarea, input[name="nofilter_dataDir"], input, code {
      font-size: 10pt !important;
-}
-
-.snarkRefresh {
-     font-size: 10.5pt !important;
 }
 
 .snarkConfigTitle, .toggleview {
