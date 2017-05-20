@@ -243,7 +243,7 @@ h3#helpfaq {
 h3#helpfaq {
      margin-bottom: -10px;
 }
-}	
+}
 
 div.routersummary h4 {
      border: none;
@@ -608,10 +608,21 @@ div.warning {
 .warning:not(old) {
      background:  url("/themes/console/images/itoopie_sm.png") no-repeat scroll 10px center, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3)), url(images/noise.png) #fff;
      background-size: 54px auto, 100% 100%, 50px 50px;
+     background-position: 10px calc(50% + 16px);
 }
 
 .warning h3 {
      text-align: left;
+     margin: -9px -24px 20px !important;
+     border: none;
+     border-bottom: 1px solid #7789bf;
+     border-radius: 2px 2px 0 0;
+     padding: 10px 10px 8px;
+     font-size: 10.5pt;
+}
+
+#jumplinks {
+     margin-top: -15px;
 }
 
 #jumplinks h3 {
@@ -673,6 +684,18 @@ div.warning {
 }
 }
 
+@media screen and (min-width: 800px) {
+.warning h3 {
+     margin: -9px -24px 20px -74px !important;
+}
+}
+
+@media screen and (min-width: 1400px) {
+#jumplinks h4 {
+     font-size: 10.5pt;
+}
+}
+
 @media screen and (min-height: 700px) {
 .proxyfooter {
      position: absolute;
@@ -701,6 +724,85 @@ div.warning {
 .proxyfooter {
      display: none;
 }
+}
+
+.proxyfooter p {
+     text-align: right !important;
+     line-height: 115%;
+     color: #6b4612;
+}
+
+#proxyNewAddressHelper .warning {
+     padding-bottom: 5px !important;
+}
+
+#proxyNewHost {
+     margin-bottom: 20px;
+}
+
+#proxyNewHost td {
+     padding: 8px !important;
+     font-size: 10pt !important;
+}
+
+#proxyNewHost textarea {
+     white-space: pre-wrap;
+     word-break: break-all;
+     overflow: auto;
+     border: none;
+     resize: none;
+     background: none !important;
+     box-shadow: none !important;
+     width: 100% !important;
+     height: 6em;
+     margin: 0 !important;
+     padding: 0 !important;
+}
+
+#proxyNewHost textarea:focus {
+     filter: none;
+}
+
+#proxyNewHost + hr {
+     display: none;
+}
+
+#proxyNewHost a {
+     display: inline-block;
+     word-break: break-all;
+}
+
+#proxyNewHost td:first-child {
+     font-weight: bold;
+}
+
+.warning h4 {
+     box-shadow: none !important;
+     text-align: left;
+     font-size: 10pt;
+     margin-top: 20px;
+     text-transform: none;
+     letter-spacing: 0;
+     word-spacing: 0;
+     background: none;
+     border: none;
+     border-bottom: 1px solid #7778bf;
+     padding-left: 0;
+     margin-bottom: -5px;
+}
+
+#jumplinks h4 {
+     margin-bottom: 10px;
+     border-color: #113;
+     color: #333;
+}
+
+.warning p + .formaction {
+     margin: -5px -3px 10px 0;
+     padding: 0;
+     background: none !important;
+     border: none;
+     box-shadow: none;
 }
 
 /* end proxy error messages */

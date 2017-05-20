@@ -1,5 +1,6 @@
 2017-05-20 str4d
  * Console:
+   - Clarify choices on address helper save page (ticket #1940)
    - Add router.hideFloodfillParticipant to advanced settings help
  * i2psnark:
    - Make DHT debug section collapsible

@@ -319,7 +319,7 @@ input[type="submit"]:active, input[type="reset"]:active, button:active {
      box-shadow: inset 0 0 0 1px #000, inset 3px 3px 3px #000 !important;
 }
 
-input.accept, button.accept {
+input.accept, button.accept, button[type="submit"] {
      background: url(/themes/console/images/buttons/yes.png) 6px center no-repeat, linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
      background-size: 14px 14px, 100% 100% !important;
      padding: 5px 7px 5px 23px !important;
@@ -991,7 +991,7 @@ div.logo hr {
 
 .logo a:link {
      display: block;
-     padding: 2px;
+     padding: 4px;
 }
 
 .warning { /* proxy error messages */
@@ -1002,10 +1002,11 @@ div.logo hr {
      text-align: left;
      color: #c9ceff;
      text-align: justify;
-     background:url(/themes/console/images/itoopie_sm.png) 10px center no-repeat;
+     background: #000 url(/themes/console/images/itoopie_sm.png) 10px center no-repeat;
+     background-position: 10px calc(50% + 16px);
      box-shadow: inset 0 0 0 1px #44175f;
      word-wrap: break-word;
-     font-size: 9pt;
+     font-size: 10pt;
      min-width: 300px;
      box-shadow: inset 0 0 0 1px #44175f, inset 0 0 3px 3px #000, 0 0 0 2px #443da0;;
      border: 5px solid #443da0;
@@ -1016,15 +1017,17 @@ div.logo hr {
 
 .warning p, .warning a {
      font-size: 10pt
-}
-
-.warning a {
-     line-height: 150%;
+     line-height: 130%;
 }
 
 .warning h3 {
      text-align: left;
-     padding: 5px 10px;
+     font-size: 10pt;
+     padding: 7px 10px;
+     text-align: left;
+     margin: -13px -24px 15px -74px;
+     border: none;
+     border-bottom: 1px solid #44175f;
 }
 
 #jumplinks a {
@@ -1040,6 +1043,62 @@ div.logo hr {
      padding: 3px 0;
      vertical-align: sub;
      line-height: 16px;
+}
+
+#proxyNewAddressHelper .warning {
+     padding-bottom: 0 !important;
+}
+
+#proxyNewHost {
+     margin-bottom: 30px;
+}
+
+#proxyNewHost td {
+     padding: 8px !important;
+     font-size: 10pt !important;
+}
+
+#proxyNewHost td:first-child {
+     font-weight: bold;
+}
+
+#proxyNewHost textarea {
+     white-space: pre-wrap;
+     word-break: break-all;
+     overflow: auto;
+     border: none;
+     resize: none;
+     background: none !important;
+     box-shadow: none !important;
+     width: 100% !important;
+     height: 6em;
+     margin: 0 !important;
+     padding: 0 !important;
+}
+
+#proxyNewHost textarea:focus {
+     filter: none;
+}
+
+#proxyNewHost + hr {
+     display: none;
+}
+
+.warning h4 {
+     box-shadow: none !important;
+     text-align: left;
+     font-size: 10pt;
+     padding-bottom: 7px;
+}
+
+#proxyNewHost a {
+     display: inline-block;
+     word-break: break-all;
+}
+
+.warning p + .formaction {
+     margin: 0 0 20px;
+     padding: 0;
 }
 
 .proxyfooter {
@@ -1060,6 +1119,11 @@ div.logo hr {
      margin-left: 20px !important;
      background: #000 !important;
      padding-left: 25px !important;
+}
+
+.warning h3 {
+     margin: -4px -14px 10px;
+     padding: 7px 10px 5px;
 }
 
 .logo {
@@ -1750,6 +1814,10 @@ div.confignav {
 .tab:hover {
      background: #000 !important;
      box-shadow: inset 0 0 0 1px #404;
+}
+
+.tab:hover a {
+     color: #652787 !important;
 }
 
 .tab:active {
@@ -4721,6 +4789,7 @@ table#jardump { /* /jars */
 .main#webmail {
      padding: 0;
      background: #000 !important;
+     min-width: 736px;
 }
 
 .main#torrents, .main#tunnelmgr {
@@ -4730,8 +4799,13 @@ table#jardump { /* /jars */
      background-blend-mode: screen;
 }
 
+.main#torrents {
+     min-width: 640px;
+}
+
 .main#tunnelmgr {
      padding: 0 5px;
+     min-width: 1000px;
 }
 
 #i2ptunnelframe {
@@ -5048,7 +5122,7 @@ iframe.iframed {
 
 .main#dns {
      padding: 0;
-     min-width: 650px;
+     min-width: 640px;
      background: #000 !important;
 }
 
@@ -6256,7 +6330,7 @@ div[id^="config_"] .tab:first-child {
 .warning {
      margin-left: 20px !important;
      margin-top: 130px !important;
-     background: url(images/camotile2.png) !important;
+     background: #000 !important;
      padding: 5px 15px 15px !important;
 }
 

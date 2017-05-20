@@ -1347,38 +1347,57 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         Writer out = new BufferedWriter(new OutputStreamWriter(outs, "UTF-8"));
         String header = getErrorPage("ahelper-new", ERR_AHELPER_NEW);
         out.write(header);
-        out.write("<table><tr><td class=\"mediumtags\" align=\"right\">" + _t("Host") +
-                "</td><td class=\"mediumtags\">" + destination + "</td></tr>\n");
+        out.write("<table id=\"proxyNewHost\">\n<tr><td align=\"right\">" + _t("Host") +
+                "</td><td>" + destination + "</td></tr>\n");
         try {
             String b32 = Base32.encode(SHA256Generator.getInstance().calculateHash(Base64.decode(ahelperKey)).getData());
-            out.write("<tr><td class=\"mediumtags\" align=\"right\">" + _t("Base 32") + "</td>" +
+            out.write("<tr><td align=\"right\">" + _t("Base 32") + "</td>" +
                     "<td><a href=\"http://" + b32 + ".b32.i2p/\">" + b32 + ".b32.i2p</a></td></tr>");
         } catch(Exception e) {
         }
-        out.write("<tr><td class=\"mediumtags\" align=\"right\">" + _t("Destination") + "</td><td>" +
-                "<textarea rows=\"1\" style=\"height: 4em; min-width: 0; min-height: 0;\" cols=\"70\" wrap=\"off\" readonly=\"readonly\" >" +
-                ahelperKey + "</textarea></td></tr></table>\n" +
-                "<hr><div class=\"formaction\">" +
+        out.write("<tr><td align=\"right\">" + _t("Destination") + "</td><td>" +
+                  "<textarea rows=\"1\" style=\"height: 6em; min-width: 0; min-height: 0;\" cols=\"70\" wrap=\"off\" readonly=\"readonly\" >" + ahelperKey + "</textarea>" +
+                  "</td></tr>\n</table>\n" + "<hr>\n" +
+
                 // FIXME if there is a query remaining it is lost
-                "<form method=\"GET\" action=\"" + targetRequest + "\">" +
-                "<button type=\"submit\" class=\"go\">" + _t("Continue to {0} without saving", destination) + "</button>" +
-                "</form>\n<form method=\"GET\" action=\"http://" + LOCAL_SERVER + "/add\">" +
+                "<form method=\"GET\" action=\"" + targetRequest + "\">\n" +
+                "<h4>" + _t("Continue to {0} without saving", destination) + "</h4>\n<p>" +
+                _t("You can browse to the site without saving it to the address book. The address will be remembered until you restart your I2P router.") +
+                "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"go\">" + _t("Continue without saving") + "</button></div>" + "\n</form>\n" +
+
+                "<form method=\"GET\" action=\"http://" + LOCAL_SERVER + "/add\">\n" +
                 "<input type=\"hidden\" name=\"host\" value=\"" + destination + "\">\n" +
                 "<input type=\"hidden\" name=\"dest\" value=\"" + ahelperKey + "\">\n" +
                 "<input type=\"hidden\" name=\"nonce\" value=\"" + _proxyNonce + "\">\n" +
-                "<button type=\"submit\" class=\"accept\" name=\"router\" value=\"router\">" +
-                _t("Save {0} to router address book and continue to website", destination) + "</button><br>\n");
+
+                "<h4>" + _t("Save {0} to Router address book and continue to website", destination) + "</h4>\n<p>" +
+                _t("This address will be saved to your Router address book where your subscription-based addresses are stored."));
+        if(_context.namingService().getName().equals("BlockfileNamingService")) {
+            out.write(" " + _t("If you want to keep track of sites you have added manually, add to your Master or Private address book instead."));
+        }
+        out.write("</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"router\" value=\"router\">" +
+                  _t("Save & continue") + "</button></div>\n");
+
         if(_context.namingService().getName().equals("BlockfileNamingService")) {
             // only blockfile supports multiple books
-            out.write("<br><button type=\"submit\" name=\"master\" value=\"master\">" + _t("Save {0} to master address book and continue to website", destination) + "</button><br>\n");
-            out.write("<button type=\"submit\" name=\"private\" value=\"private\">" + _t("Save {0} to private address book and continue to website", destination) + "</button>\n");
+
+            out.write("<h4>" + _t("Save {0} to Master address book and continue to website", destination) + "</h4>\n<p>" +
+            _t("This address will be saved to your Master address book. Select this option for addresses you wish to keep separate from the main router address book, but don't mind publishing.") +
+            "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"master\" value=\"master\">" +
+            _t("Save & continue") + "</button></div>\n");
+
+            out.write("<h4>" + _t("Save {0} to Private address book and continue to website", destination) + "</h4>\n<p>" +
+            _t("This address will be saved to your Private address book, ensuring it is never published.") +
+            "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"private\" value=\"private\">" +
+            _t("Save & continue") + "</button></div>\n");
+
         }
         // Firefox (and others?) don't send referer to meta refresh target, which is
         // what the jump servers use, so this isn't that useful.
         if (referer != null)
             out.write("<input type=\"hidden\" name=\"referer\" value=\"" + referer + "\">\n");
         out.write("<input type=\"hidden\" name=\"url\" value=\"" + targetRequest + "\">\n" +
-                "</form></div></div>");
+                "</form>\n</div>\n");
         writeFooter(out);
     }
 

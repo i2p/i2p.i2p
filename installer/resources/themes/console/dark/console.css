@@ -127,9 +127,8 @@ div.warning {
      text-align: justify;
      background: #000 url(/themes/console/images/itoopie_sm.png) 10px center no-repeat;
      background: url(/themes/console/images/itoopie_sm.png) 10px center no-repeat, url(images/camotile2.png);
-     box-shadow: inset 0 0 0 1px #700;
-     box-shadow: inset 0 0 0 1px #700, inset 0 0 3px 3px #000;
-     box-shadow: inset 0 0 0 1px #700, inset 0 0 3px 3px #000, 0 0 0 2px #000;;
+     background-position: 10px calc(50% + 16px);
+     box-shadow: inset 0 0 0 1px #700, inset 0 0 3px 3px #000, 0 0 0 2px #000;
      word-wrap: break-word;
      font-size: 10pt;
      min-width: 300px;
@@ -141,19 +140,31 @@ div.warning {
 
 .warning p, .warning a {
      font-size: 10pt
-}
-
-.warning a {
-     line-height: 150%;
+     line-height: 130%;
 }
 
 .warning p {
+     margin: 0 0 10px;
 }
 
 .warning h3 {
      font-size: 10pt;
      padding: 7px 10px;
      text-align: left;
+     margin: -9px -24px 15px -74px;
+     border: none;
+     border-bottom: 1px solid #700;
+}
+
+.warning h4 {
+     font-size: 10pt;
+     box-shadow: none;
+     margin: 12px 0 5px;
+     padding: 0 0 5px;
+}
+
+#jumplinks h4 {
+     margin-bottom: 10px;
 }
 
 #jumplinks a {
@@ -171,8 +182,66 @@ div.warning {
      line-height: 16px;
 }
 
-/* end proxy errors */
+#proxyNewAddressHelper .proxyfooter {
+     display: none;
+}
 
+#proxyNewAddressHelper .warning {
+     padding-bottom: 0 !important;
+}
+
+#proxyNewHost {
+     margin-bottom: 20px;
+}
+
+#proxyNewHost td {
+     padding: 8px !important;
+     font-size: 10pt !important;
+}
+
+#proxyNewHost td:first-child {
+     font-weight: bold;
+}
+
+#proxyNewHost textarea {
+     white-space: pre-wrap;
+     word-break: break-all;
+     overflow: auto;
+     border: none;
+     resize: none;
+     background: none !important;
+     box-shadow: none !important;
+     width: 100% !important;
+     height: 6em;
+     margin: 0 !important;
+     padding: 0 !important;
+}
+
+#proxyNewHost textarea:focus {
+     filter: none;
+}
+
+#proxyNewHost + hr {
+     display: none;
+}
+
+.warning h4 {
+     box-shadow: none !important;
+     text-align: left;
+     font-size: 10pt;
+}
+
+#proxyNewHost a {
+     display: inline-block;
+     word-break: break-all;
+}
+
+.warning p + .formaction {
+     margin: 0 0 20px;
+     padding: 0;
+}
+
+/* end proxy errors */
 
 div.routersummaryouter {
      float: left;
@@ -4345,7 +4414,7 @@ button.search {
      max-height: 32px;
      max-width: 32px;
      padding: 10px 52px 38px;
-     margin: -8px 0 1px;
+     margin: -4px 0 1px;
 /*     filter: sepia(100%) hue-rotate(70deg); enable for green-tinted app icons */
 }
 
@@ -4384,7 +4453,7 @@ div.app:hover.app img, a:focus .app img {
      line-height: 95%;
      text-transform: lowercase;
      border: none;
-     width: 120px;
+     width: 136px;
      min-width: 72px;
      background: #001000;
      background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000);
@@ -5657,8 +5726,8 @@ td.optionsave {
      letter-spacing: -0.25em;
 }
 
-img.app, img.app2p {
-     padding: 14px 44px 40px;
+.app img {
+     padding: 10px 50px 40px;
 }
 
 .applabel {
@@ -5710,6 +5779,10 @@ div.app {
 }
 
 img.app, img.app2p {
+}
+
+.app img {
+     margin-top: -8px;
      padding: 10px 58px 38px;
 }
 
@@ -5887,6 +5960,10 @@ div[id^="config_"] .tab:first-child {
      margin-top: 130px !important;
      background: url(images/camotile2.png) !important;
      padding: 5px 15px 15px !important;
+}
+
+.warning h3 {
+     margin: -4px -14px 10px;
 }
 
 .logo {

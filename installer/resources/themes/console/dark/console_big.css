@@ -145,8 +145,13 @@ div.app {
      width: 138px;
 }
 
-img.app, img.app2p {
+.appimg {
+     padding: 5px 0 3px !important;
+}
+
+.app img {
      margin-top: -6px !important;
+     padding: 10px 50px 40px !important;
 }
 
 .confignav {
@@ -247,8 +252,3 @@ h3#webappconfig, h3#i2pclientconfig {
 }
 }
 
-@media screen and (min-width: 1500px) {
-img.app, img.app2p {
-     margin-top: -4px !important;
-}
-}

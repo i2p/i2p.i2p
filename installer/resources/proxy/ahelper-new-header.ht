@@ -6,12 +6,13 @@ Connection: close
 Proxy-Connection: close
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
+<html>
+<head>
 <title>_("Information: New Host Name")</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body id="proxyNewAddressHelper">
 <div class="logo">
  <a href="http://127.0.0.1:7657/" title="_("Router Console")"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="_("I2P Router Console")" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">_("Configuration")</a> <a href="http://127.0.0.1:7657/help.jsp">_("Help")</a> <a href="http://127.0.0.1:7657/susidns/index">_("Addressbook")</a>

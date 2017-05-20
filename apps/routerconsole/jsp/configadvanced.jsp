@@ -70,7 +70,7 @@
  </td></tr>
 <% } else { %>
  <tr><td>
-<%=intl._t("To make changes, edit the file {0}.", "<tt>" + advancedhelper.getConfigFileName() + "</tt>")%>
+<%=intl._t("To make changes, edit the file: {0}", "<tt>" + advancedhelper.getConfigFileName() + "</tt>")%>
  </td></tr>
 <% }  // isAdvanced %>
  <tr><td class="tabletextarea">
