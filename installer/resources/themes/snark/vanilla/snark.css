@@ -88,23 +88,24 @@ a:link, a:visited {
      text-decoration: none;
 }
 
-td a:link {
+th a:link, td a:link {
      color: #cf0f00;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
-td a:visited {
+th a:visited, td a:visited {
      color: #9F0B00 !important;
 }
 
+th a:hover, th a:visited:hover, th a:focus, th a:visited:focus,
 td a:hover, td a:visited:hover, td a:focus, td a:visited:focus {
      color: #df0067 !important;
      filter: none;
 }
 
-td a:active, td a:visited:active {
+th a:active, th a:visited:active, td a:active, td a:visited:active {
      color: #FF2F85 !important;
 }
 
@@ -2529,3 +2530,218 @@ tr#torrentInfoStats td {
 
 /* end responsive layout */
 
+/* Comments Section */
+/* TODO: merge with other rules where applicable */
+
+.snarkCommentInfo, .snarkComments {
+     margin: 10px 0 0 !important;
+     background: #270027 none repeat scroll 0 0;
+     border: 1px solid #6f533e;
+     box-shadow: 0 0 2px 1px rgba(77, 69, 62, 0.3);
+     border-collapse: separate;
+}
+
+.snarkCommentInfo, .snarkComments {
+     border-top: none;
+     border-bottom: none;
+}
+
+.snarkCommentInfo tr:last-child td, .snarkComments tr:last-child td {
+     border-bottom: 1px solid #6f533e;
+}
+
+.snarkCommentInfo tr:first-child th, .snarkComments tr:first-child td {
+     border-top: 1px solid #6f533e;
+}
+
+.snarkCommentInfo th, .snarkComments th {
+     background: linear-gradient(to bottom, #efefef, #cfc7c2);
+     padding: 8px 5px;
+}
+
+.snarkCommentInfo th {
+     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #efefef, #cfc7c2);
+     padding-left: 28px !important;
+}
+
+.snarkCommentInfo th:last-child {
+     text-align: right;
+}
+
+.snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(even) {
+     background: #dfd6d1;
+}
+
+.snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(odd) {
+     background: #efe6e0;
+}
+
+.snarkCommentInfo th {
+     padding: 8px 5px;
+}
+
+.snarkCommentInfo td, .snarkComments td {
+     padding: 8px 5px;
+     border-bottom: 1px outset #efe8e0;
+     border-top: 1px outset #fff5ef;
+}
+
+.snarkCommentInfo td:first-child {
+     white-space: nowrap;
+}
+
+.snarkCommentInfo td:first-child {
+     font-weight: bold;
+}
+
+.snarkCommentInfo td:first-child::after, .snarkComments td:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 32px;
+     vertical-align: middle;
+}
+
+.snarkCommentInfo input.accept {
+     float: right;
+     margin-right: 5px !important;
+}
+
+.snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
+     width: 100%;
+     min-height: 64px;
+     height: 64px;
+     resize: vertical;
+}
+
+.snarkComments th {
+     text-align: left;
+}
+
+.commentRating, .commentAuthor {
+     width: 1%;
+}
+
+#nameRequired {
+     float: right;
+}
+
+.commentRating {
+     padding-right: 10px !important;
+}
+
+.commentRating img {
+     margin: 0 0 3px;
+     padding: 0;
+     font-size: 14pt;
+     color: #FF7200;
+     text-shadow: 0 0 1px #900;
+     filter: none;
+}
+
+.commentDate {
+     width: 100px;
+     background: url(images/clock.png) left center no-repeat;
+     padding-left: 20px !important;
+}
+
+.snarkCommentInfo td:first-child, .snarkComments td:first-child {
+     width: 160px !important;
+     padding-right: 2px;
+}
+
+.snarkCommentInfo td:last-child, .snarkComments td:last-child:not(.commentText:empty) {
+     width: 1% !important;
+}
+
+.snarkComments td {
+     white-space: nowrap;
+}
+
+.commentAuthorName {
+     background: url(images/author.png) left center no-repeat;
+     padding-left: 20px;
+}
+
+td.commentText {
+     white-space: normal;
+     text-align: justify;
+     padding-right: 0;
+}
+
+.commentWrapper {
+     border: 1px solid #6f533e;
+     margin: 4px 2px;
+     padding: 8px 10px 8px 26px;
+     border-radius: 2px;
+     box-shadow: 0 0 0 1px #fff inset; /* 0 0 1px 0 rgba(77, 69, 62, 0.7);*/
+     background: url(images/comment.png) 6px center no-repeat #fff6df;
+     background-blend-mode: luminosity;
+}
+
+#commentsConfig .optbox {
+     vertical-align: middle;
+     margin-left: 0;
+}
+
+.snarkComments select {
+     margin-right: 0 !important;
+}
+
+#commentDeleteAction {
+     background: linear-gradient(to bottom, #efefef, #cfc7c2);
+/*     box-shadow: inset 0 0 0 1px #efe8e0;*/
+     border: 1px solid #6f533e;
+}
+
+#commentDeleteAction td {
+     box-shadow: 0 0 0 1px #efe8e0 inset;
+     padding-right: 6px;
+}
+
+.commentdelete, .commentAction {
+     width: 1%;
+     white-space: nowrap;
+     min-width: 180px;
+}
+
+.commentAction input[type="submit"] {
+     margin-top: 10px;
+     margin-bottom: 10px;
+}
+
+.commentDelete {
+     text-align: left;
+}
+
+#newRating td {
+     padding-top: 10px !important;
+     padding-bottom: 10px !important;
+}
+
+/*
+.commentText:empty {
+     width: 90% !important;
+}
+*/
+
+#myRating td:empty {
+     padding: 0 !important;
+     border-top: none !important;
+     border-bottom: none !important;
+}
+
+.snarkComments #myRating td:empty::after { /* hides My Ratings row when Ratings disabled  */
+     min-height: 0 !important;
+}
+
+/*
+select[name="myRating"] option::before, select[name="myRating"] option[selected]::before {
+     content: "★ ";
+}
+
+select[name="myRating"] option[value="0"]::before {
+     content: "☆ ";
+}
+*/
+
+/* end Comments section */

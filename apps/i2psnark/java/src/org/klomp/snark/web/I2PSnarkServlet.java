@@ -2429,25 +2429,29 @@ public class I2PSnarkServlet extends BasicServlet {
                   + "title=\"");
         out.write(_t("Use DHT to find additional peers"));
         out.write("\" ></td></tr>\n" +
-        
-                  "<tr><td>");
+
+                  "<tr><td><label for=\"ratings\">");
         out.write(_t("Enable Ratings"));
-        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"ratings\" value=\"true\" " 
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"ratings\" id=\"ratings\" value=\"true\" "
                   + (useRatings ? "checked " : "") 
                   + "title=\"");
         out.write(_t("Show ratings on torrent pages"));
         out.write("\" ></td></tr>\n" +
-        
-                  "<tr><td>");
+
+                  "<tr><td><label for=\"comments\">");
         out.write(_t("Enable Comments"));
-        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"comments\" value=\"true\" " 
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"comments\" id=\"comments\" value=\"true\" "
                   + (useComments ? "checked " : "") 
                   + "title=\"");
         out.write(_t("Show comments on torrent pages"));
-        out.write("\"> ");
-        out.write(_t("Your commenter name"));
-        out.write(": <input type=\"text\" name=\"nofilter_commentsName\" spellcheck=\"false\" value=\"" 
-                      + DataHelper.escapeHTML(_manager.util().getCommentsName()) + "\" size=\"32\" maxlength=\"32\" > " +
+        out.write("\"></td></tr><tr id=\"configureAuthor\"><td>");
+        out.write(_t("Comment Author"));
+        out.write(":</td><td colspan=\"2\"><input type=\"text\" name=\"nofilter_commentsName\" spellcheck=\"false\" value=\""
+                      + DataHelper.escapeHTML(_manager.util().getCommentsName()) + "\" size=\"32\" maxlength=\"32\" title=\"");
+            out.write(_t("Set the author name for your comments"));
+            out.write("\" placeholder=\"");
+            out.write(_t("required to post comments"));
+            out.write("\" >" +
                   "</td></tr>\n");
 
         //          "<tr><td>");
@@ -3444,32 +3448,62 @@ public class I2PSnarkServlet extends BasicServlet {
             Iterator<Comment> iter = null;
             int myRating = 0;
             CommentSet comments = snark.getComments();
-            buf.append("<table class=\"snarkCommentInfo\"><tr><th colspan=\"5\">")
-               .append(_t("Ratings and Comments"))
-               .append("</th><tr><td>");
+
+            buf.append("<table class=\"snarkCommentInfo\"><tr><th colspan=\"3\">")
+               .append(_t("Ratings and Comments"));
+            if (esc && _manager.util().getCommentsName().length() == 0) {
+                buf.append("&nbsp;&nbsp;&nbsp;<span id=\"nameRequired\">");
+                buf.append(_t("Author name required to post comments"));
+                buf.append("&nbsp;&nbsp;<a href=\"").append(_contextPath).append("/configure#configureAuthor\">");
+                buf.append(_t("[Configure]"));
+                buf.append("</a></span>");
+            }
+
+            buf.append("</th><tr id=\"commentsConfig\"><td>");
+            buf.append(_t("Comments"));
+            buf.append(":</td><td><label><input type=\"checkbox\" class=\"optbox\" name=\"enableComments\" id=\"enableComments\" ");
+            if (esc)
+                buf.append("checked=\"checked\"");
+            else if (!ec)
+                buf.append("disabled=\"disabled\"");
+            buf.append(">&nbsp;");
+            buf.append(_t("Enable viewing and posting comments for this torrent"));
+            buf.append("</label></td><td class=\"commentAction\">");
+            if (ec) {
+                buf.append("<input type=\"submit\" name=\"setCommentsEnabled\" value=\"");
+                buf.append(_t("Save Preference"));
+                buf.append("\" class=\"accept\">\n");
+            }
+            buf.append("</td></tr>");
+
             if (comments != null) {
                 synchronized(comments) {
                     // current rating
                     if (er) {
+                        buf.append("<tr id=\"myRating\"><td>");
                         myRating = comments.getMyRating();
                         if (myRating > 0) {
-                            buf.append(_t("My Rating")).append(": ");
-                            String img = toImg("itoopie_xxsm");
+                            buf.append(_t("My Rating")).append(":</td><td colspan=\"2\" class=\"commentRating\">");
+                            String img = toThemeImg("rateme", "★", "");
                             for (int i = 0; i < myRating; i++) {
                                 buf.append(img);
                             }
                         }
+                        buf.append("</td></tr>");
                     }
-                    buf.append("</td><td>");
                     if (er) {
+                        buf.append("<tr id=\"showRatings\"><td>");
                         int rcnt = comments.getRatingCount();
                         if (rcnt > 0) {
                             double avg = comments.getAverageRating();
-                            buf.append(_t("Average Rating")).append(": ").append(avg);  // todo format
+                            buf.append(_t("Average Rating")).append(":</td><td>").append(avg);  // todo format
                             //buf.append(' ').append(_t("Total Ratings")).append(": ").append(rcnt);
                         } else {
-                            buf.append(_t("No ratings for this torrent"));
+
+                            buf.append(_t("Average Rating")).append(":</td><td colspan=\"2\">");
+                            buf.append(_t("No community ratings currently available for this torrent"));
                         }
+                        buf.append("</td></tr>");
                     }
                     if (ec) {
                         int sz = comments.size();
@@ -3477,53 +3511,36 @@ public class I2PSnarkServlet extends BasicServlet {
                             iter = comments.iterator();
                     }
                 }
-            } else {
-                buf.append("</td><td>");
             }
-            buf.append("</td><td></td><td>");
-            buf.append(_t("Comments Enabled for this Torrent"));
-            buf.append(": <input type=\"checkbox\" class=\"optbox\" name=\"enableComments\" ");
-            if (esc)
-                buf.append("checked=\"checked\"");
-            else if (!ec)
-                buf.append("disabled=\"disabled\"");
-            buf.append("></td><td>");
-            if (ec) {
-                buf.append("&nbsp;&nbsp;&nbsp;<input type=\"submit\" name=\"setCommentsEnabled\" value=\"");
-                buf.append(_t("Save Comments Setting"));
-                buf.append("\" class=\"accept\">\n");
-            }
-            if (esc && _manager.util().getCommentsName().length() == 0) {
-                buf.append("<br><a href=\"").append(_contextPath).append("/configure\">");
-                buf.append(_t("Please configure your name for comments on the configuration page"));
-                buf.append("</a>");
-            }
-            buf.append("</td></tr><tr><td>");
+
             // new rating / comment form
+            buf.append("<tr id=\"newRating\"><td>");
             if (er) {
-                buf.append("&nbsp;&nbsp;&nbsp;<select name=\"myRating\">");
+                buf.append("<select name=\"myRating\">");
                 for (int i = 5; i >= 0; i--) {
                     buf.append("<option value=\"").append(i).append("\" ");
                     if (i == myRating)
                         buf.append("selected=\"selected\"");
                     buf.append('>');
                     if (i != 0) {
-                        buf.append(ngettext("{0} toopie", "{0} toopies", i));
+                        buf.append("★ ").append(ngettext("{0} star", "{0} stars", i));
                     } else {
-                        buf.append(_t("no rating"));
+                        buf.append("☆ ").append(_t("No rating"));
                     }
                     buf.append("</option>\n");
                 }
-                buf.append("</select></td><td></td><td>\n");
+                buf.append("</select></td>");
             }
             if (esc) {
-                buf.append("<textarea name=\"nofilter_newComment\" cols=\"44\" rows=\"4\"></textarea>");
+                buf.append("<td id=\"addCommentText\"><textarea name=\"nofilter_newComment\" cols=\"44\" rows=\"4\"></textarea></td>");
+            } else {
+                buf.append("<td></td>");
             }
-            buf.append("</td><td></td><td><input type=\"submit\" name=\"addComment\" value=\"");
+            buf.append("<td class=\"commentAction\"><input type=\"submit\" name=\"addComment\" value=\"");
             if (er && esc)
-                buf.append(_t("Add Rating and Comment"));
+                buf.append(_t("Rate and Comment"));
             else if (er)
-                buf.append(_t("Add Rating"));
+                buf.append(_t("Rate Torrent"));
             else
                 buf.append(_t("Add Comment"));
             buf.append("\" class=\"accept\">\n");
@@ -3535,41 +3552,61 @@ public class I2PSnarkServlet extends BasicServlet {
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                 fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
                 buf.append("<table class=\"snarkComments\">");
+
+                // TODO Make .commentText and .commentDelete columns display only when comments are enabled
+                // buf.append("<tr><th class=\"commentAuthor\">");
+                // buf.append(_t("Author"));
+                // buf.append("</th><th class=\"commentRating\">");
+                // buf.append(_t("Rating"));
+                // buf.append("</th><th class=\"commentDate\">");
+                // buf.append(_t("Date"));
+                // buf.append("</th><th class=\"commentText\">");
+                // buf.append(_t("Comment"));
+                // buf.append("</th><th class=\"commentDelete\" title=\"");
+                // buf.append(_t("Mark for deletion"));
+                // buf.append("\"></th></tr>");
+
                 while (iter.hasNext()) {
                     Comment c = iter.next();
-                    buf.append("<tr><td>");
+                    buf.append("<tr><td class=\"commentAuthor\">");
                     // (c.isMine())
                     //  buf.append(_t("me"));
                     //else if (c.getName() != null)
                     // TODO can't be hidden... hide if comments are hidden?
-                    if (c.getName() != null)
+                    if (c.getName() != null) {
+                        buf.append("<span class=\"commentAuthorName\">");
                         buf.append(DataHelper.escapeHTML(c.getName()));
-                    buf.append("</td><td>");
+                        buf.append("</span>");
+                    }
+                    buf.append("</td><td class=\"commentRating\">");
                     if (er) {
                         int rt = c.getRating();
                         if (rt > 0) {
-                            String img = toImg("itoopie_xxsm");
+                            String img = toThemeImg("rateme", "★", "");
                             for (int i = 0; i < rt; i++) {
                                 buf.append(img);
                             }
                         }
                     }
-                    buf.append("</td><td>").append(fmt.format(new Date(c.getTime())));
+                    buf.append("</td><td class=\"commentDate\">").append(fmt.format(new Date(c.getTime())));
+                    buf.append("</td><td class=\"commentText\">");
                     if (esc) {
-                        buf.append("</td><td>");
                         if (c.getText() != null) {
+                            buf.append("<div class=\"commentWrapper\">");
                             buf.append(DataHelper.escapeHTML(c.getText()));
-                            buf.append("</td><td><input type=\"checkbox\" class=\"optbox\" name=\"cdelete.")
-                               .append(c.getID()).append("\" title=\"").append(_t("Delete")).append("\">");
+                            buf.append("</div></td><td class=\"commentDelete\"><input type=\"checkbox\" class=\"optbox\" name=\"cdelete.")
+                               .append(c.getID()).append("\" title=\"").append(_t("Mark for deletion")).append("\">");
                             ccount++;
                         }
+                    } else {
+                        buf.append("</td><td class=\"commentDelete\">"); // insert empty named columns to maintain table layout
                     }
                     buf.append("</td></tr>\n");
                 }
                 if (esc && ccount > 0) {
                     // TODO format better
-                    buf.append("<tr><td colspan=\"5\" align=\"right\"><input type=\"submit\" name=\"deleteComments\" value=\"");
-                    buf.append(_t("Delete Selected Comments"));
+                    buf.append("<tr id=\"commentDeleteAction\"><td colspan=\"5\" class=\"commentAction\" align=\"right\"><input type=\"submit\" name=\"deleteComments\" value=\"");
+                    buf.append(_t("Delete Selected"));
                     buf.append("\" class=\"delete\"></td></tr>\n");
                 }
                 buf.append("</table>");

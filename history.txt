@@ -1,3 +1,6 @@
+2017-05-21 str4d
+ * i2psnark: Integrate ratings and comments into themes
+
 2017-05-20 str4d
  * Console:
    - Clarify choices on address helper save page (ticket #1940)
