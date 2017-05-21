@@ -23,12 +23,16 @@ package org.klomp.snark.bencode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import net.i2p.data.DataHelper;
 
 public class BEncoder
 {
@@ -155,6 +159,12 @@ public class BEncoder
     out.write(bs);
   }
 
+  /**
+   * Keys must be Strings or (supported as of 0.9.31) byte[]s
+   * A mix in the same Map is not supported.
+   *
+   * @throws IllegalArgumentException if keys are not all Strings or all byte[]s
+   */
   public static byte[] bencode(Map<?, ?> m)
   {
     try
@@ -169,31 +179,71 @@ public class BEncoder
       }
   }
 
+  /**
+   * Keys must be Strings or (supported as of 0.9.31) byte[]s
+   * A mix in the same Map is not supported.
+   *
+   * @throws IllegalArgumentException if keys are not all Strings or all byte[]s
+   */
   public static void bencode(Map<?, ?> m, OutputStream out)
     throws IOException, IllegalArgumentException
   {
     out.write('d');
 
-    // Keys must be sorted. XXX - But is this the correct order?
     Set<?> s = m.keySet();
-    List<String> l = new ArrayList<String>(s.size());
-    for (Object k : s) {
-      // Keys must be Strings.
-      if (String.class.isAssignableFrom(k.getClass()))
-        l.add((String) k);
-      else
-        throw new IllegalArgumentException("Cannot bencode map: contains non-String key of type " + k.getClass());
+    List<String> l = null;
+    List<byte[]> b = null;
+    try {
+        for (Object k : s) {
+            if (l != null) {
+                l.add((String) k);
+            } else if (b != null) {
+                b.add((byte[]) k);
+            } else if (String.class.isAssignableFrom(k.getClass())) {
+                l = new ArrayList<String>(s.size());
+                l.add((String) k);
+            } else if (byte[].class.isAssignableFrom(k.getClass())) {
+                b = new ArrayList<byte[]>(s.size());
+                b.add((byte[]) k);
+            } else {
+                throw new IllegalArgumentException("Cannot bencode map: contains key of type " + k.getClass());
+            }
+        }
+    } catch (ClassCastException cce) {
+        throw new IllegalArgumentException("Cannot bencode map: mixed keys", cce);
     }
-    Collections.sort(l);
 
-    Iterator<String> it = l.iterator();
-    while(it.hasNext())
-      {
-        String key = it.next();
-        bencode(key, out);
-        bencode(m.get(key), out);
-      }
+    if (l != null) {
+        // Keys must be sorted. XXX - This is not the correct order.
+        // Spec says to sort by bytes, not lexically
+        Collections.sort(l);
+        for (String key : l) {
+            bencode(key, out);
+            bencode(m.get(key), out);
+        }
+    } else if (b != null) {
+        // Works for arrays of equal lengths, otherwise is probably not
+        // what the bittorrent spec intends.
+        Collections.sort(b, new BAComparator());
+        for (byte[] key : b) {
+            bencode(key, out);
+            bencode(m.get(key), out);
+        }
+    }
 
     out.write('e');
+  }
+
+  /**
+   * Shorter arrays are less. See DataHelper.compareTo()
+   * Works for arrays of equal lengths, otherwise is probably not
+   * what the bittorrent spec intends.
+   *
+   * @since 0.9.31
+   */
+  private static class BAComparator implements Comparator<byte[]>, Serializable {
+      public int compare(byte[] l, byte[] r) {
+          return DataHelper.compareTo(l, r);
+      }
   }
 }

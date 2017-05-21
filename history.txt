@@ -1,3 +1,6 @@
+2017-05-21 zzz
+ * i2psnark: Fix bencoded scrape response for zzzot (ticket #1994)
+
 2017-05-21 str4d
  * i2psnark: Integrate ratings and comments into themes
 
