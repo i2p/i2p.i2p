@@ -745,6 +745,10 @@ div.warning {
      font-size: 10pt !important;
 }
 
+#proxyNewHost tr:last-child td:first-child {
+     vertical-align: top;
+}
+
 #proxyNewHost textarea {
      white-space: pre-wrap;
      word-break: break-all;
@@ -774,6 +778,10 @@ div.warning {
 
 #proxyNewHost td:first-child {
      font-weight: bold;
+}
+
+#proxyNewHost tr:last-child td:first-child {
+     vertical-align: top;
 }
 
 .warning h4 {

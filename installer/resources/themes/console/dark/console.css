@@ -203,6 +203,10 @@ div.warning {
      font-weight: bold;
 }
 
+#proxyNewHost tr:last-child td:first-child {
+     vertical-align: top;
+}
+
 #proxyNewHost textarea {
      white-space: pre-wrap;
      word-break: break-all;
