@@ -2617,17 +2617,14 @@ textarea[name="i2cpOpts"] {
      border: 1px solid #494;
      border-left: none;
      border-right: none;
-     background: #001100 url("/themes/console/dark/images/camotile2.png") repeat scroll center bottom;
+     background: #001100 url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom;
      filter: drop-shadow(0px 0 1px rgba(16, 8, 16, 0.7));
 }
 
 .snarkCommentInfo th, .snarkComments th {
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%)
+     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%);
      padding: 8px 5px;
-}
-
-.snarkCommentInfo th:last-child {
-     text-align: right;
+     white-space: normal;
 }
 
 .snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(even) {
@@ -2641,7 +2638,8 @@ textarea[name="i2cpOpts"] {
 }
 
 .snarkCommentInfo th {
-     padding: 8px 5px;
+     padding: 8px 5px 8px 30px;
+     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%);
 }
 
 .snarkCommentInfo td, .snarkComments td {
@@ -2669,10 +2667,12 @@ textarea[name="i2cpOpts"] {
 }
 
 .snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      width: 100%;
      min-height: 64px;
      height: 64px;
      resize: vertical;
+     opacity: 0.8;
 }
 
 .snarkComments th {
@@ -2685,6 +2685,7 @@ textarea[name="i2cpOpts"] {
 
 #nameRequired {
      float: right;
+     margin-right: 5px;
 }
 
 .commentRating {
@@ -2694,6 +2695,8 @@ textarea[name="i2cpOpts"] {
 .commentRating img {
      margin: 0;
      padding: 0;
+     height: 16px;
+     width: 16px;
 }
 
 .commentDate {
@@ -2720,9 +2723,10 @@ textarea[name="i2cpOpts"] {
      padding-left: 20px;
 }
 
-td.commentText {
+.commentText {
      white-space: normal;
      text-align: justify;
+     width: 90%;
 }
 
 .commentWrapper {
@@ -2761,7 +2765,7 @@ td.commentText {
 .commentAction, .commentDelete {
      width: 1%;
      white-space: nowrap;
-     min-width: 180px !important;
+/*     min-width: 180px !important;*/
      padding-left: 0;
 }
 

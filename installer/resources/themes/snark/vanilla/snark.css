@@ -2535,7 +2535,6 @@ tr#torrentInfoStats td {
 
 .snarkCommentInfo, .snarkComments {
      margin: 10px 0 0 !important;
-     background: #270027 none repeat scroll 0 0;
      border: 1px solid #6f533e;
      box-shadow: 0 0 2px 1px rgba(77, 69, 62, 0.3);
      border-collapse: separate;
@@ -2611,6 +2610,7 @@ tr#torrentInfoStats td {
      min-height: 64px;
      height: 64px;
      resize: vertical;
+     font-weight: normal;
 }
 
 .snarkComments th {
@@ -2623,6 +2623,7 @@ tr#torrentInfoStats td {
 
 #nameRequired {
      float: right;
+     margin-right: 5px;
 }
 
 .commentRating {
@@ -2636,6 +2637,8 @@ tr#torrentInfoStats td {
      color: #FF7200;
      text-shadow: 0 0 1px #900;
      filter: none;
+     width: 16px;
+     height: 16px;
 }
 
 .commentDate {
@@ -2673,7 +2676,7 @@ td.commentText {
      margin: 4px 2px;
      padding: 8px 10px 8px 26px;
      border-radius: 2px;
-     box-shadow: 0 0 0 1px #fff inset; /* 0 0 1px 0 rgba(77, 69, 62, 0.7);*/
+     box-shadow: 0 0 0 1px #fff inset, 0 0 1px 0 rgba(77, 69, 62, 0.7);
      background: url(images/comment.png) 6px center no-repeat #fff6df;
      background-blend-mode: luminosity;
 }
@@ -2689,7 +2692,7 @@ td.commentText {
 
 #commentDeleteAction {
      background: linear-gradient(to bottom, #efefef, #cfc7c2);
-/*     box-shadow: inset 0 0 0 1px #efe8e0;*/
+     box-shadow: inset 0 0 0 1px #efe8e0;
      border: 1px solid #6f533e;
 }
 
@@ -2718,12 +2721,6 @@ td.commentText {
      padding-bottom: 10px !important;
 }
 
-/*
-.commentText:empty {
-     width: 90% !important;
-}
-*/
-
 #myRating td:empty {
      padding: 0 !important;
      border-top: none !important;
@@ -2733,15 +2730,5 @@ td.commentText {
 .snarkComments #myRating td:empty::after { /* hides My Ratings row when Ratings disabled  */
      min-height: 0 !important;
 }
-
-/*
-select[name="myRating"] option::before, select[name="myRating"] option[selected]::before {
-     content: "★ ";
-}
-
-select[name="myRating"] option[value="0"]::before {
-     content: "☆ ";
-}
-*/
 
 /* end Comments section */

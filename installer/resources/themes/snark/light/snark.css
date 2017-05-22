@@ -886,6 +886,7 @@ tr:hover .percentBarText {
 .snarkTorrentInfo, .snarkDirInfo {
      margin: 10px 0 0 0 !important;
      background: #fff;
+     border-bottom: 1px solid #7778bf;
 }
 
 .snarkTorrentInfo td:first-child, .snarkDirInfo td:first-child {
@@ -2063,17 +2064,13 @@ input[type="submit"] {
 
 .snarkCommentInfo, .snarkComments {
      margin: 10px 0 0 !important;
-     border: 1px solid #bbf;
+     border: 1px solid #7778bf;
      border-left: none;
      border-right: none;
 }
 
 .snarkCommentInfo th, .snarkComments th {
      padding: 8px 5px;
-}
-
-.snarkCommentInfo th:last-child {
-     text-align: right;
 }
 
 .snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(even) {
@@ -2088,6 +2085,8 @@ input[type="submit"] {
 
 .snarkCommentInfo th {
      padding: 8px 5px;
+     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgb(240, 240, 255));
+     padding-left: 30px;
 }
 
 .snarkCommentInfo td, .snarkComments td {
@@ -2121,8 +2120,9 @@ input[type="submit"] {
      resize: vertical;
 }
 
-.snarkComments th {
+.snarkComments tr:first-child, .snarkComments tr:last-child {
      text-align: left;
+     border-top: 1px solid #7778bf !important;
 }
 
 .commentRating, .commentAuthor {
@@ -2131,6 +2131,7 @@ input[type="submit"] {
 
 #nameRequired {
      float: right;
+     margin-right: 5px;
 }
 
 .commentRating {
@@ -2140,6 +2141,8 @@ input[type="submit"] {
 .commentRating img {
      margin: 0;
      padding: 0;
+     width: 16px;
+     height: 16px;
 }
 
 .commentDate {
@@ -2166,9 +2169,10 @@ input[type="submit"] {
      padding-left: 20px;
 }
 
-td.commentText {
+.commentText {
      white-space: normal;
      text-align: justify;
+     width: 90%;
 }
 
 .commentWrapper {
@@ -2207,7 +2211,7 @@ td.commentText {
 .commentAction, .commentDelete {
      width: 1%;
      white-space: nowrap;
-     min-width: 180px !important;
+/*     min-width: 180px !important;*/
      padding-left: 0;
 }
 

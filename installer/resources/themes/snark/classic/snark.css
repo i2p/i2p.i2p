@@ -2336,6 +2336,10 @@ td#bwHelp {
      background: url(images/infocircle.png) left 10px center no-repeat;
      background-size: 14px auto !important;
 }
+
+.snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {
+     height: 9px;
+}
 }
 
 @media screen and (max-width: 1100px) {
@@ -2483,24 +2487,26 @@ td.snarkTorrentDownloaded {
      border: 1px solid #bbf;
      border-left: none;
      border-right: none;
+     background: #eef;
 }
 
 .snarkCommentInfo th, .snarkComments th {
      padding: 8px 5px;
 }
 
-.snarkCommentInfo th:last-child {
-     text-align: right;
+.snarkCommentInfo th {
+     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #fff, #eef) #fff;
+     padding-left: 30px !important;
 }
 
 .snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(even) {
      border-top: 1px solid #bbf;
-     background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fff;
+     background: rgba(240, 240, 255, 0.5) #fff;
 }
 
 .snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(odd) {
      border-top: 1px solid #bbf;
-     background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fff;
+     background: rgba(220, 220, 255, 0.5);
 }
 
 .snarkCommentInfo th {
@@ -2519,23 +2525,23 @@ td.snarkTorrentDownloaded {
      font-weight: bold;
 }
 
-.snarkCommentInfo td:first-child::after, .snarkComments td:first-child::after {
-     content: "";
-     display: inline-block;
-     min-height: 32px;
-     vertical-align: middle;
-}
-
 .snarkCommentInfo input.accept {
      float: right;
      margin-right: 5px !important;
 }
 
 .snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif !important;
+     font-weight: normal;
      width: 100%;
      min-height: 64px;
      height: 64px;
      resize: vertical;
+     opacity: 0.8;
+}
+
+.snarkCommentInfo textarea:focus {
+     opacity: 1;
 }
 
 .snarkComments th {
@@ -2548,6 +2554,11 @@ td.snarkTorrentDownloaded {
 
 #nameRequired {
      float: right;
+     margin-right: 5px;
+}
+
+#nameRequired a {
+     font-weight: bold;
 }
 
 .commentRating {
@@ -2557,6 +2568,14 @@ td.snarkTorrentDownloaded {
 .commentRating img {
      margin: 0;
      padding: 0;
+     height: 16px;
+     width: 16px;
+}
+
+.commentText {
+     white-space: normal;
+     text-align: justify;
+     width: 80%;
 }
 
 .commentDate {
@@ -2565,8 +2584,8 @@ td.snarkTorrentDownloaded {
      padding-left: 20px !important;
 }
 
-.snarkCommentInfo td:first-child, .snarkComments td:first-child {
-     width: 160px !important;
+.snarkCommentInfo td:first-child, .commentAuthor {
+     width: 180px !important;
      padding-right: 2px;
 }
 
@@ -2583,11 +2602,6 @@ td.snarkTorrentDownloaded {
      padding-left: 20px;
 }
 
-td.commentText {
-     white-space: normal;
-     text-align: justify;
-}
-
 .commentWrapper {
      border: 1px solid #bbf;
      margin: 2px 0;
@@ -2596,12 +2610,6 @@ td.commentText {
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 rgba(0,0,0,0.3);
      background: url(images/comment.png) 6px center no-repeat #eef;
      background-blend-mode: luminosity;
-}
-
-.commentText .optbox {
-     position: fixed;
-     right: 20px;
-     top: 10px;
 }
 
 #commentsConfig .optbox {
@@ -2613,12 +2621,13 @@ td.commentText {
 }
 
 #commentDeleteAction {
-     border-top: 1px solid #bbf;
-     background: linear-gradient(to bottom, #fff, #eef);
+     background: #fff;
 }
 
 #commentDeleteAction td {
-     padding-right: 6px;
+     padding: 0 6px;
+     border-top: 1px solid #89f;
+     border-bottom: 1px solid #89f;
 }
 
 .commentAction, .commentDelete {
@@ -2639,11 +2648,6 @@ td.commentText {
 
 .commentDelete {
      text-align: left;
-}
-
-#newRating td {
-     padding-top: 10px !important;
-     padding-bottom: 10px !important;
 }
 
 #myRating td:empty {
