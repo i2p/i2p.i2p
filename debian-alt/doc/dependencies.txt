@@ -8,7 +8,7 @@ improve our official packages and support other packagers.
 Our packages are available at https://deb.i2p2.de/ and
 instructions are at https://geti2p.net/debian
 
-This document is current as of release 0.9.28, 2016-12-12.
+This document is current as of release 0.9.30, 2017-05-03.
 
 
 Build-only Dependencies
@@ -44,15 +44,12 @@ Current Runtime Dependencies
 * libjetty9-java
   For /usr/share/java/jetty9-*.jar.
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
-  For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
-  which is 8.1.21, but there's no particular version that we need.
-  Jetty 8 is now EOL and we plan to migrate to Jetty 9.2 in late 2017.
-  Jetty 8 is NOT in Debian stretch.
-  Jetty 9 is NOT in Debian wheezy and is only in jessie backports and stretch.
-  Jetty 9.2.x is in recent Ubuntu and Debian.
-  Jetty 9 ticket is https://trac.i2p2.de/ticket/1512
-  Updating Jetty may break external plugins. Extensive testing is required.
-  Note that the libjetty9-java dependency brings in libservlet3.0-java which we require.
+
+* libtomcat8-java
+  For /usr/share/java/tomcat8-*.jar.
+  In non-Debian builds we bundle the jars as packaged in the Jetty 9.2 binary release,
+  which are different than the way they are packaged for Debian.
+  They are removed in the Debian source package.
 
 * glassfish-javaee
   We need jstl.jar and standard.jar version 1.2.
@@ -112,18 +109,6 @@ the binaries or sources.
   We bundle a large portion of the 1.6.0 source from https://github.com/OpenNMS/jrobin
   No package or not widely available.
   There is an old 1.5.9 Maven jrobin package at http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.jrobin%22
-
-* libtomcat6-java
-  We currently require Tomcat 6, which is EOL and not available in newer Debian/Ubuntu releases.
-  We plan to migrate to Tomcat 8 in mid-to-late 2017. It's not currently clear if we can
-  or will update Tomcat before we update to Jetty 9, or if we must couple the two.
-  Newer packages are libtomcat7-java and libtomcat8-java. We will probably skip over 7 and go straight to 8.
-  This page is quite helpful: http://tomcat.apache.org/whichversion.html
-  The Tomcat upgrade may also affect the glassfish/standard.jar/jstl.jar issue above.
-  See also the Java 9 ticket https://trac.i2p2.de/ticket/1870
-  Updating Tomcat may break external plugins, especially Bote. Extensive testing is required.
-  Tomcat 8 may not be available in older distributions.
-  Pretty sure we will have to pick 6 or 8, we can't leave it as either-or.
 
 * libhttpclient-java
   We only use a few classes from this large package.
