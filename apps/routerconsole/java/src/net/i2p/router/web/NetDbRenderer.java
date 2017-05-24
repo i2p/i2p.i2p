@@ -310,7 +310,8 @@ class NetDbRenderer {
                .append("<tr><th><b>").append(_t("LeaseSet")).append(":</b>&nbsp;<code>").append(key.toBase64()).append("</code></th>");
             if (_context.clientManager().isLocal(dest)) {
                 buf.append("<th><b><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
-                if (! _context.clientManager().shouldPublishLeaseSet(key))
+                boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(key);
+                if (unpublished)
                     buf.append(_t("Unpublished") + ' ');
                 buf.append("<b>").append(_t("Destination")).append(":</b> ");
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
@@ -321,12 +322,14 @@ class NetDbRenderer {
                 buf.append("</th></tr>\n<tr><td>");
                 String b32 = dest.toBase32();
                 buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
-                String host = _context.namingService().reverseLookup(dest);
-                if (host == null) {
-                    buf.append("<td>").append("<a title=\"").append(_t("Add to addressbook"))
-                       .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
-                       .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
-                }
+                if (!unpublished) {
+                    String host = _context.namingService().reverseLookup(dest);
+                    if (host == null) {
+                        buf.append("<td>").append("<a title=\"").append(_t("Add to addressbook"))
+                           .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
+                           .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
+                    }
+                } // else probably a client
             } else {
                 buf.append("<th><b>").append(_t("Destination")).append(":</b> ");
                 String host = _context.namingService().reverseLookup(dest);
