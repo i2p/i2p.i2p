@@ -208,7 +208,10 @@ public class GeoIP {
                                 // returns upper case or "--"
                                 String uc = ls.getCountryV6(ipv6).getCode();
                                 if (!uc.equals(UNKNOWN_COUNTRY_CODE)) {
-                                    String cached = _codeCache.get(uc.toLowerCase(Locale.US));
+                                    String lc = uc.toLowerCase(Locale.US);
+                                    String cached = _codeCache.get(lc);
+                                    if (cached == null)
+                                        cached = lc;
                                     _IPToCountry.put(search[i], cached);
                                 } else {
                                     _notFound.add(search[i]);
