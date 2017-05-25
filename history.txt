@@ -1,3 +1,9 @@
+2017-05-25 zzz
+ * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)
+
+2017-05-24 zzz
+ * GeoIP: Fix NPE
+
 2017-05-21 zzz
  * i2psnark: Fix bencoded scrape response for zzzot (ticket #1994)
 

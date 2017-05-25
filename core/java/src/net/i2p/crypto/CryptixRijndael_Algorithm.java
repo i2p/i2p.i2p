@@ -396,12 +396,13 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  in         The plaintext.
      * @param  result     The resulting ciphertext.
      * @param  inOffset   Index of in from which to start considering data.
-     * @param  sessionKey The session key to use for encryption. This is an array of two int[][].
-                          We use the first one, i.e. sessionKey[0], for encryption.
+     * @param  sessionKey The session key to use for encryption. This is a CryptixAESKeyCache.KeyCacheEntry.
+     *                    We use the Ke field for encryption.
+     *                    The actual parameter type is opaque, changed in 0.9.31, and is subject to change again.
      */
     public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
         //if (_RDEBUG) trace(_IN, "blockEncrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
-        int[][] Ke = (int[][]) ((Object[]) sessionKey)[0]; // extract encryption round keys
+        int[][] Ke = ((CryptixAESKeyCache.KeyCacheEntry) sessionKey).Ke; // extract encryption round keys
         int ROUNDS = Ke.length - 1;
         int[] Ker = Ke[0];
 
@@ -471,8 +472,9 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  in         The ciphertext.
      * @param  result     The resulting ciphertext
      * @param  inOffset   Index of in from which to start considering data.
-     * @param  sessionKey The session key to use for decryption. This is an array of two int[][].
-                          We use the second one, i.e. sessionKey[1], for decryption.
+     * @param  sessionKey The session key to use for decryption. This is a CryptixAESKeyCache.KeyCacheEntry.
+     *                    We use the Kd field, for decryption.
+     *                    The actual parameter type is opaque, changed in 0.9.31, and is subject to change again.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
         if (result.length - outOffset <= 15)
@@ -481,7 +483,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         if (in.length - inOffset <= 15)
             throw new IllegalArgumentException("data too small: " + in.length + " inOffset: " + inOffset);
         //if (_RDEBUG) trace(_IN, "blockDecrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
-        int[][] Kd = (int[][]) ((Object[]) sessionKey)[1]; // extract decryption round keys
+        int[][] Kd = ((CryptixAESKeyCache.KeyCacheEntry) sessionKey).Kd; // extract decryption round keys
         int ROUNDS = Kd.length - 1;
         int[] Kdr = Kd[0];
 
@@ -565,7 +567,8 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param k          The 128/192/256-bit user-key to use.
      * @param blockSize  The block size in bytes of this Rijndael, must be 16, 24, or 32.
      * @throws  InvalidKeyException  If the key is invalid.
-     * @return an array of two int[][] containing { Ke, Kd }
+     * @return a CryptixAESKeyCache.KeyCacheEntry containing { Ke, Kd }.
+     *         The actual return type is opaque, changed in 0.9.31, and is subject to change again.
      */
     public static final Object makeKey(byte[] k, int blockSize) throws InvalidKeyException {
         return makeKey(k, blockSize, null);
@@ -579,8 +582,8 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param blockSize  The block size in bytes of this Rijndael, must be 16, 24, or 32.
      * @param keyData a cached data structure to fill in, or null.
      * @throws  InvalidKeyException  If the key is invalid.
-     * @return an array of two int[][] containing { Ke, Kd }.
-     *         If keyData is non-null, this is keyData.key.
+     * @return a CryptixAESKeyCache.KeyCacheEntry containing { Ke, Kd }.
+     *         If keyData is non-null, this is keyData.
      *         If keyData is null, this is newly allocated.
      */
     public static final Object makeKey(byte[] k, int blockSize, CryptixAESKeyCache.KeyCacheEntry keyData) throws InvalidKeyException {
@@ -594,22 +597,14 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         int[][] Kd; // new int[ROUNDS + 1][BC]; // decryption round keys
         int ROUND_KEY_COUNT = (ROUNDS + 1) * BC;
         int KC = k.length / 4;
-        int[] tk; // new int[KC];
+        int[] tk = new int[KC];
         int i, j;
-        // the return value
-        Object[] sessionKey;
 
         if (keyData == null) {
-            Ke = new int[ROUNDS + 1][BC];
-            Kd = new int[ROUNDS + 1][BC];
-            tk = new int[KC];
-            sessionKey = new Object[] { Ke, Kd};
-        } else {
-            Ke = keyData.Ke;
-            Kd = keyData.Kd;
-            tk = keyData.tk;
-            sessionKey = keyData.key;
+            keyData = new CryptixAESKeyCache.KeyCacheEntry(ROUNDS, BC);
         }
+        Ke = keyData.Ke;
+        Kd = keyData.Kd;
 
         // copy user material bytes into temporary ints
         for (i = 0, j = 0; i < KC;) {
@@ -668,7 +663,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
                 Kd[r][j] = _U1[(tt >>> 24) & 0xFF] ^ _U2[(tt >>> 16) & 0xFF] ^ _U3[(tt >>> 8) & 0xFF] ^ _U4[tt & 0xFF];
             }
         }
-        return sessionKey;
+        return keyData;
     }
 
     /**
@@ -677,8 +672,9 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  in         The plaintext.
      * @param  result     The resulting ciphertext.
      * @param  inOffset   Index of in from which to start considering data.
-     * @param  sessionKey The session key to use for encryption. This is an array of two int[][].
-                          We use the first one, i.e. sessionKey[0], for encryption.
+     * @param  sessionKey The session key to use for encryption. This is a CryptixAESKeyCache.KeyCacheEntry.
+     *                    We use the Ke field for encryption.
+     *                    The actual parameter type is opaque, changed in 0.9.31, and is subject to change again.
      * @param  blockSize  The block size in bytes of this Rijndael.
      */
     public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey, int blockSize) {
@@ -687,8 +683,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
             return;
         }
         //if (_RDEBUG) trace(_IN, "blockEncrypt(" + in + ", " + inOffset + ", " + sessionKey + ", " + blockSize + ")");
-        Object[] sKey = (Object[]) sessionKey; // extract encryption round keys
-        int[][] Ke = (int[][]) sKey[0];
+        int[][] Ke = ((CryptixAESKeyCache.KeyCacheEntry) sessionKey).Ke; // extract encryption round keys
 
         int BC = blockSize / 4;
         int ROUNDS = Ke.length - 1;
@@ -738,8 +733,9 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  in         The ciphertext.
      * @param  result     The resulting ciphertext.
      * @param  inOffset   Index of in from which to start considering data.
-     * @param  sessionKey The session key to use for decryption. This is an array of two int[][].
-                          We use the second one, i.e. sessionKey[1], for decryption.
+     * @param  sessionKey The session key to use for decryption. This is a CryptixAESKeyCache.KeyCacheEntry.
+     *                    We use the Kd field, for decryption.
+     *                    The actual parameter type is opaque, changed in 0.9.31, and is subject to change again.
      * @param  blockSize  The block size in bytes of this Rijndael.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey, int blockSize) {
@@ -749,8 +745,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         }
 
         //if (_RDEBUG) trace(_IN, "blockDecrypt(" + in + ", " + inOffset + ", " + sessionKey + ", " + blockSize + ")");
-        Object[] sKey = (Object[]) sessionKey; // extract decryption round keys
-        int[][] Kd = (int[][]) sKey[1];
+        int[][] Kd = ((CryptixAESKeyCache.KeyCacheEntry) sessionKey).Kd; // extract decryption round keys
 
         int BC = blockSize / 4;
         int ROUNDS = Kd.length - 1;

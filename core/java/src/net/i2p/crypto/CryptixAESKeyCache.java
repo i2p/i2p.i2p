@@ -69,15 +69,16 @@ public final class CryptixAESKeyCache {
         final int[][] Ke;
         /** decryption round keys */
         final int[][] Kd;
-        final int[]   tk;
-        /** Ke, Kd */
-        final Object[] key;
 
         public KeyCacheEntry() {
             Ke = new int[ROUNDS + 1][BC];
             Kd = new int[ROUNDS + 1][BC];
-            tk = new int[KC];
-            key = new Object[] { Ke, Kd };
+        }
+
+        /** @since 0.9.31 */
+        public KeyCacheEntry(int rounds, int bc) {
+            Ke = new int[rounds + 1][bc];
+            Kd = new int[rounds + 1][bc];
         }
     }
 }
