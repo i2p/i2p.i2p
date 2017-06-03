@@ -2,7 +2,7 @@
 /* Author: dr|z3d */
 
 body {
-     margin: 0;
+     margin: 3px 0 12px;
      padding: 0;
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
@@ -13,6 +13,7 @@ body {
 
 body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
+     margin: 0;
      padding: 0;
      overflow: hidden;
 }
@@ -164,67 +165,63 @@ hr {
 }
 
 h2, h3 {
-     padding: 8px 10px;
+     padding: 8px 10px 8px 34px;
      border: 1px solid #494;
      background: linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
-     margin: 5px 0 -1px;
+     margin: 10px 0 -1px;
      color: #ee9;
      box-shadow: inset 0 0 0 1px #000;
 }
 
 /* title images */
 
-h2, h3 {
-     padding-left: 32px;
-}
-
 #messages h2 {
-     background: url(/themes/console/images/info/logs.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: url(/themes/console/images/info/logs.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #globalTunnelControl h2 {
-     background: url(/themes/console/images/info/control.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: url(/themes/console/images/info/control.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #servers h2 {
-     background: url(/themes/console/images/info/server.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: url(/themes/console/images/info/server.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #clients h2 {
-     background: url(/themes/console/images/info/client.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: url(/themes/console/images/info/client.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
-     background: url(/themes/console/images/info/configure.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: url(/themes/console/images/info/configure.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #wizardPanel h2 {
-     background: url(/themes/console/images/info/wizard.png) left 6px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: url(/themes/console/images/info/wizard.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 /* end title images */
 
 .iframed h2 {
-     margin: 10px 0 -1px;
+     margin: 14px 0 -1px;
 }
 
 h3 {
      border-radius: 0;
-     margin-top: 10px;
+     margin-top: 14px;
 }
 
 .iframed #globalTunnelControl h2 {
-     margin-top: 2px;
+     margin-top: 6px;
 }
 
 .panel table {
@@ -237,7 +234,7 @@ h3 {
 th {
      background: #000;
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
-     padding: 6px 5px;
+     padding: 7px 5px;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494;
      font-size: 9pt;
@@ -818,6 +815,7 @@ td.blankColumn {
 
 table {
      background: #000 url(images/camotile2.png);
+     background: linear-gradient(to bottom, rgba(0,0,0,0.5),rgba(0,0,0,0.7)), url(images/camotile2.png);
 }
 
 #tunnelMessages {
@@ -1092,8 +1090,8 @@ td.tunnelDestination, td.tunnelDescription {
 }
 
 @media screen and (max-width: 1400px) {
-h2,h3 {
-     font-size: 10.5pt;
+h2, h3 {
+     font-size: 11.5pt;
 }
 }
 
@@ -1102,4 +1100,133 @@ h2,h3 {
 body, td, a, button, input, .control, select, textarea#statusMessages, .freetext, textarea {
      font-size: 10pt;
 }
+
+h2, h3 {
+     font-size: 12pt;
 }
+}
+
+/* TO DO: merge with main classes */
+
+.panel {
+     min-width: 700px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
+select {
+     white-space: normal;
+}
+}
+
+label {
+     vertical-align: sub;
+}
+
+input[type="text"] + label {
+     white-space: nowrap;
+     vertical-align: unset;
+}
+
+#targetPort {
+     margin-right: 10px !important;
+}
+
+#privKeyFile {
+     min-width: 200px;
+     width: 200px;
+     width: calc(100% - 20px);
+}
+
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     width: calc(100% - 10px);
+     width: 290px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     word-break: break-all;
+     margin: 5px;
+     padding: 4px;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+     border: 1px solid #494;
+     background: #000;
+     background: linear-gradient(to bottom, #000 0%, #010 100%);
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.displayText:hover, .displayText:focus {
+     overflow: auto;
+     text-overflow: clip;
+     margin: 0.5px 5px;
+     padding: 2px 4px;
+     box-shadow: 0 0 1px #494;
+     background: #000;
+     color: #ff0;
+     outline: none;
+}
+
+.displayText:empty, .displayText:empty:hover, .displayText:empty:focus {
+     background: #000;
+     box-shadow: inset 0 0 0 1px #000;
+     color: #885;
+     opacity: 0.8;
+}
+
+.displayText:empty::before {
+     content: "";
+     display: inline-block;
+     min-height: 11px;
+}
+
+#registration .displayText {
+     width: 500px;
+}
+
+#registration .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#registration input[type="file"] {
+     margin-top: 5px;
+     margin-bottom: 5px;
+}
+
+#registration td {
+     padding: 8px;
+}
+
+#oldName, #altPrivKeyFile {
+     width: 45% !important;
+}
+
+@media screen and (max-width: 800px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 260px;
+     font-size: 8pt;
+}
+}
+
+@media screen and (min-width: 1000px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 386px;
+}
+
+#registration .displayText {
+     width: 600px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 552px;
+}
+
+#registration .displayText {
+     width: 800px;
+}
+}
+

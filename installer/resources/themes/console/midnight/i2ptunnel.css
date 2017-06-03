@@ -2,7 +2,7 @@
 /* Author: dr|z3d.  */
 
 body {
-     margin: 0;
+     margin: 5px 0 15px;
      padding: 0;
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
@@ -13,6 +13,7 @@ body {
 
 body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
+     margin: 0 5px;
      padding: 0;
      overflow: hidden;
 }
@@ -137,11 +138,11 @@ hr {
 }
 
 .iframed .panel.iframed {
-     margin: 0 auto -8px auto !important;
+     margin: 0 auto -8px !important;
 }
 
 .iframed .panel {
-     margin: 16px auto -8px auto !important;
+     margin: 16px auto -8px !important;
      width: 100%;
 }
 
@@ -158,24 +159,20 @@ hr {
 }
 
 h2, h3 {
-     padding: 7px 10px;
+     padding: 8px 10px;
      border: 1px solid #2d295f;
      background: linear-gradient(to bottom, #191729 50%, #000 50%) !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
-     margin: 5px 0 -1px;
+     margin: 12px 0 -1px;
      color: #c9ceff;
      box-shadow: inset 0 0 0 1px #000;
 }
 
-h3 {
-     margin-top: 10px;
-}
-
-.iframed h2 {
-     margin: 10px 0 -1px;
+.iframed h2, .iframed h3 {
+     margin: 14px 0 -1px;
 }
 
 /* title images */
@@ -222,7 +219,7 @@ h2, h3 {
 /* end title images */
 
 .iframed #globalTunnelControl h2 {
-     margin-top: 2px;
+     margin-top: 6px;
 }
 
 .panel table {
@@ -1033,6 +1030,12 @@ h2, h3 {
 }
 }
 
+@media screen and (min-width: 1000px) {
+th {
+     padding: 7px 5px;
+}
+}
+
 @media screen and (min-width: 1300px) {
 body, td, .control, select, input, textarea {
      font-size: 10pt !important;
@@ -1048,3 +1051,138 @@ td {
 }
 
 /* end responsive layout */
+
+/* TO DO: merge with main classes */
+
+.panel {
+     min-width: 600px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
+select {
+     white-space: normal;
+}
+}
+
+label {
+     vertical-align: sub;
+}
+
+input[type="text"] + label {
+     white-space: nowrap;
+     vertical-align: unset;
+}
+
+#targetPort {
+     margin-right: 10px !important;
+}
+
+#privKeyFile {
+     min-width: 200px;
+     width: 200px;
+     width: calc(100% - 20px);
+}
+
+#oldName, #altPrivKeyFile {
+     width: 45% !important;
+}
+
+.displayText {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     width: calc(100% - 10px);
+     width: 290px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     word-break: break-all;
+     margin: 5px;
+     padding: 4px;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+     border: 1px solid #443da0;
+     background: #000;
+     background: linear-gradient(to bottom, #000 0%, #000019 100%);
+     color: #7670c2;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.displayText:hover, .displayText:focus {
+     overflow: auto;
+     text-overflow: clip;
+     margin: 0.5px 5px;
+     padding: 2px 4px;
+     background: #000;
+     color: #dd0;
+     outline: none;
+}
+
+.displayText:focus {
+     box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
+     filter: drop-shadow(0px 0 1px #99f);
+     transition: ease filter 0.3s;
+}
+
+.displayText:empty, .displayText:empty:hover, .displayText:empty:focus {
+     margin: 5px;
+     padding: 4px;
+     background: #000;
+     box-shadow: inset 0 0 0 1px #000 !important;
+     filter: none !important;
+     color: #669;
+     opacity: 0.8;
+}
+
+.displayText:empty::before, .displayText:hover:empty::before, .displayText:focus:empty::before {
+     content: "";
+     display: inline-block;
+     min-height: 11px;
+     overflow: hidden;
+}
+
+#registration .displayText {
+     width: 500px;
+}
+
+#registration .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#registration input[type="file"] {
+     margin-top: 5px;
+     margin-bottom: 5px;
+}
+
+#registration td {
+     padding: 8px;
+}
+
+@media screen and (max-width: 800px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 260px;
+     font-size: 8pt;
+}
+}
+
+@media screen and (min-width: 1000px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 386px;
+}
+
+#registration .displayText {
+     width: 600px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 552px;
+}
+
+#registration .displayText {
+     width: 800px;
+}
+}
+

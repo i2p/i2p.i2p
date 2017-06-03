@@ -44,7 +44,25 @@
      - De-emphasise siderbar app icons with background-blend-mode: luminosity
      - Change sidebar snark icon to match homepage icon
      - Bump div.main text color from #222 to #333 (reduce contrast)
-   * i2ptunnel: Increase vertical spacing of H2/H3's
+   * i2ptunnel:
+     - Remove redundant labels and spans for keyaccess
+     - Edit Server:
+       - Shift Local Destination / Private Key file to share table row
+       - Move "Use SSL to connect to target" to Target Port column
+     - Add translation tagging for title tags
+     - Remove redundant title tags and provide enhanced strings for features
+       that benefit from clarification
+     - Move title tags to <label> where applicable
+     - Fixed Cancel button on registration so it now jumps back to the list page
+     - textareas for registration page and local destination on edit server page
+       changed to divs
+       - Scrollbars hidden until mouseover, 1 click to select content
+       - Responsive width, tabindex="0"
+     - Fix overflow issue on select dropdowns (edit server/client -> tunnel
+       options) in Chrome / Blink
+     - More generous vertical padding for th (responsive)
+     - Larger h2/h3s (responsive)
+     - Increase spacing between panels in iframe mode
    * SusiDNS: Change address helper icon to add book icon
    * i2psnark:
      - Remove font-adjust-size (ubergine/vanilla)

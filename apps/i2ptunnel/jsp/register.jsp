@@ -68,7 +68,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <input type="hidden" name="type" value="<%=tunnelType%>" />
                 <input type="submit" class="default" name="action" value="Save changes" />
 <%
-    if (!"new".equals(tunnelType)) {      
+    if (!"new".equals(tunnelType)) {
 %>
 
 <table>
@@ -83,7 +83,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </td>
     </tr>
 
-<%            
+<%
       if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
           %>
     <tr><td><b><%=intl._t("Website Name")%>:</b> <%=editBean.getSpoofedHost(curTunnel)%></td></tr>
@@ -131,7 +131,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
 </table>
@@ -143,7 +143,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                props.setProperty(HostTxtEntry.PROP_ACTION, HostTxtEntry.ACTION_REMOVE);
                he.signRemove(spk);
           %>
-          
+
 <table>
     <tr>
         <th>
@@ -152,7 +152,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.writeRemove(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.writeRemove(out); %></div>
         </td>
     </tr>
 
@@ -192,7 +192,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -225,7 +225,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -240,7 +240,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
                }
           %>
-          
+
 <%
                props.remove(HostTxtEntry.PROP_SIG);
                props.remove(HostTxtEntry.PROP_OLDNAME);
@@ -262,7 +262,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -283,7 +283,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                props.remove(HostTxtEntry.PROP_SIG);
                props.remove(HostTxtEntry.PROP_OLDSIG);
           %>
-          
+
     <tr>
         <th>
                     <%=intl._t("Authentication for adding alternate destination")%>
@@ -299,7 +299,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 %>
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -332,7 +332,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                        props2.setProperty(HostTxtEntry.PROP_OLDDEST, b64);
                        he2.signInner(spk);
                        he2.sign(spk3);
-                %><tr><td><textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Copy and paste this to the registration site" wrap="off" spellcheck="false"><% he2.write(out); %></textarea></td></tr>
+                %><tr><td><div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he2.write(out); %></div></td></tr>
                 <tr><td class="infohelp"><%=intl._t("This will add an alternate destination for {0}", name)%></td></tr>
 <%
                    } else {
@@ -363,10 +363,10 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                    he.signInner(spk2);
                    he.sign(spk);
                 %>
-                
+
     <tr>
         <td>
-            <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" title="Copy and paste this to the registration site" wrap="off" spellcheck="false" class="authentication"><% he.write(out); %></textarea>
+            <div class="displayText" tabindex="0" title="<%=intl._t("Copy and paste this to the registration site")%>"><% he.write(out); %></div>
         </td>
     </tr>
     <tr>
@@ -426,7 +426,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     <tr>
         <td>
             <b><%=intl._t("Old Hostname")%>:</b>
-            <input type="text" size="30" maxlength="50" name="oldname" id="oldName" title="Old Hostname" value="<%=oldname%>" class="freetext" />
+            <input type="text" size="30" maxlength="50" name="oldname" id="oldName" value="<%=oldname%>" class="freetext" />
         </td>
     </tr>
     <tr>
@@ -438,8 +438,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     <tr>
         <td class="buttons">
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._t("Cancel")%></button>
-                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="authenticate" title="Generate Authentication"><%=intl._t("Generate")%></button>
+                    <a class="control" href="list"><%=intl._t("Cancel")%></a>
+                    <button id="controlSave" class="control" type="submit" name="action" value="authenticate"  title="<%=intl._t("Generate Authentication")%>"><%=intl._t("Generate")%></button>
         </td>
     </tr>
 

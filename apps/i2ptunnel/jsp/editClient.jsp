@@ -88,7 +88,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td>
-                <input type="text" size="30" maxlength="50" name="name" title="Tunnel Name" value="<%=editBean.getTunnelName(curTunnel)%>" class="freetext tunnelName" />
+                <input type="text" size="30" maxlength="50" name="name" title="<%=intl._t("Name of tunnel to be displayed on Tunnel Manager home page and the router console sidebar")%>" value="<%=editBean.getTunnelName(curTunnel)%>" class="freetext tunnelName" />
             </td>
             <td>
                 <%=tunnelTypeName%>
@@ -107,11 +107,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <input type="text" size="60" maxlength="80" name="nofilter_description" title="Tunnel Description" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext tunnelDescription" />
+                <input type="text" size="60" maxlength="80" name="nofilter_description" title="<%=intl._t("Description of tunnel to be displayed on Tunnel Manager home page")%>" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext tunnelDescription" />
             </td>
 
             <td>
-                <label><input value="1" type="checkbox" name="startOnLoad" title="Start Tunnel Automatically"<%=(editBean.startAutomatically(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Enable this option to ensure this service is available when the router starts")%>"><input value="1" type="checkbox" name="startOnLoad"<%=(editBean.startAutomatically(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Automatically start tunnel when router starts")%></label>
             </td>
         </tr>
@@ -135,7 +135,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                            out.write(")</font></span>");
                        }
                      %>
-                <input type="text" size="6" maxlength="5" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" />
+                <input type="text" size="6" maxlength="5" name="port" title="<%=intl._t("Specify the local port this service should be accessible from")%>" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext port" placeholder="required" />
             </td>
 
          <%
@@ -151,14 +151,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                        }
           %>
 
-                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=targetHost%>" class="freetext host" placeholder="required" />
+                <input type="text" size="20" id="targetHost" name="targetHost" title="<%=intl._t("Hostname or IP address of the target server")%>" value="<%=targetHost%>" class="freetext host" placeholder="required" />
             </td>
          <% } else { %>
 
             <td>
                 <b><%=intl._t("Reachable by")%>:</b>
 
-                <select id="reachableBy" name="reachableBy" title="IP for Client Access" class="selectbox">
+                <select id="reachableBy" name="reachableBy" title="<%=intl._t("Local interface (ip address) the client tunnel will be reachable from")%>" class="selectbox")%>">
               <%
                     String clientInterface = editBean.getClientInterface(curTunnel);
                     for (String ifc : editBean.interfaceSet()) {
@@ -186,7 +186,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <label><input value="1" type="checkbox" name="useSSL" title="Clients use SSL to connect" <%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("If you are accessing a service on a remote I2P router, you may wish to connect with SSL to avoid traffic interception. The client application should be also be configured to use SSL.")%>"><input value="1" type="checkbox" name="useSSL" <%=(editBean.isSSLEnabled(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Clients use SSL to connect to tunnel")%></label>
             </td>
         </tr>
@@ -201,7 +201,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <input type="text" size="30" name="proxyList" title="List of Outproxy I2P destinations" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext proxyList" />&nbsp;(<%=intl._t("comma separated eg. proxy1.i2p,proxy2.i2p")%>)
+                <input type="text" size="30" name="proxyList" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the outproxy here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext proxyList" />
             </td>
         </tr>
 
@@ -214,7 +214,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                   <input type="text" size="30" name="sslProxies" title="List of Outproxy I2P destinations" value="<%=editBean.getSslProxies(curTunnel)%>" class="freetext proxyList" />
+                   <input type="text" size="30" name="sslProxies" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the outproxy here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getSslProxies(curTunnel)%>" class="freetext proxyList" />
             </td>
         </tr>
 
@@ -228,7 +228,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td colspan="2">
 
-                <label><input value="1" type="checkbox" name="useOutproxyPlugin" <%=(editBean.getUseOutproxyPlugin(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("If an outproxy plugin is installed (e.g. Orchid), use this instead of any configured outproxies to access websites outside of I2P")%>"><input value="1" type="checkbox" name="useOutproxyPlugin" <%=(editBean.getUseOutproxyPlugin(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
 <%=intl._t("Use plugin instead of above-listed proxies if available")%></label>
             </td>
         </tr>
@@ -249,7 +249,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                        }
                      %>
 
-                <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="required" />
+                <input type="text" size="30" id="targetDestination" name="targetDestination" title="<%=intl._t("Specify the .i2p address or destination (b32 or b64) of the tunnel here.")%>&nbsp;<%=intl._t("For a random selection from a pool, separate with commas e.g. server1.i2p,server2.i2p")%>" value="<%=editBean.getClientDestination(curTunnel)%>" class="freetext destination" placeholder="required" />
                 (<%=intl._t("name, name:port, or destination")%>
                      <% if ("streamrclient".equals(tunnelType)) { /* deferred resolution unimplemented in streamr client */ %>
                          - <%=intl._t("b32 not recommended")%>
@@ -267,7 +267,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <label><input value="true" type="checkbox" name="shared" title="Share tunnels with other clients"<%=(editBean.isSharedClient(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Traffic from all clients with this feature enabled will be routed over the same set of tunnels. This will make profiling the tunnels by an adversary more difficult, but will link the clients together.")%>"><input value="true" type="checkbox" name="shared"<%=(editBean.isSharedClient(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Share tunnels with other clients and irc/httpclients? (Change requires restart of client proxy tunnel)")%></label>
             </td>
         </tr>
@@ -282,7 +282,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <label><input value="1" type="checkbox" name="DCC" title="Enable DCC"<%=(editBean.getDCC(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Enables direct chat and file transfers, bypassing I2P")%>"><input value="1" type="checkbox" name="DCC"<%=(editBean.getDCC(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Enable Direct Client-to-Client protocol. Note that this will compromise your anonymity and is <i>not</i> recommended.")%></label>
             </td>
         </tr>
@@ -319,7 +319,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <select id="tunnelDepth" name="tunnelDepth" title="Length of each Tunnel" class="selectbox">
+                <select id="tunnelDepth" name="tunnelDepth" title="<%=intl._t("Length of each Tunnel")%>" class="selectbox">
                     <% int tunnelDepth = editBean.getTunnelDepth(curTunnel, 3);
                   %><option value="0"<%=(tunnelDepth == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop tunnel (no anonymity)")%></option>
                     <option value="1"<%=(tunnelDepth == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 hop tunnel (low anonymity)")%></option>
@@ -337,7 +337,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </td>
 
             <td>
-                <select id="tunnelVariance" name="tunnelVariance" title="Level of Randomization for Tunnel Length" class="selectbox">
+                <select id="tunnelVariance" name="tunnelVariance" title="<%=intl._t("Level of Randomization for Tunnel Length")%>" class="selectbox">
                     <% int tunnelVariance = editBean.getTunnelVariance(curTunnel, 0);
                   %><option value="0"<%=(tunnelVariance  ==  0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 hop variance (no randomization, consistent performance)")%></option>
                     <option value="1"<%=(tunnelVariance  ==  1 ? " selected=\"selected\"" : "") %>><%=intl._t("+ 0-1 hop variance (medium additive randomization, subtractive performance)")%></option>
@@ -362,13 +362,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <select id="tunnelQuantity" name="tunnelQuantity" title="Number of Tunnels in Group" class="selectbox">
+                <select id="tunnelQuantity" name="tunnelQuantity" title="<%=intl._t("Number of Tunnels in Group")%>" class="selectbox">
                     <%=editBean.getQuantityOptions(curTunnel)%>
                 </select>
             </td>
 
             <td>
-                <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="Number of Reserve Tunnels" class="selectbox">
+                <select id="tunnelBackupQuantity" name="tunnelBackupQuantity" title="<%=intl._t("Number of Reserve Tunnels")%>" class="selectbox">
                     <% int tunnelBackupQuantity = editBean.getTunnelBackupQuantity(curTunnel, 0);
                   %><option value="0"<%=(tunnelBackupQuantity == 0 ? " selected=\"selected\"" : "") %>><%=intl._t("0 backup tunnels (0 redundancy, no added resource usage)")%></option>
                     <option value="1"<%=(tunnelBackupQuantity == 1 ? " selected=\"selected\"" : "") %>><%=intl._t("1 backup tunnel each direction (low redundancy, low resource usage)")%></option>
@@ -396,7 +396,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <select id="connectionProfile" name="profile" title="Connection Profile" class="selectbox">
+                <select id="connectionProfile" name="profile" title="<%=intl._t("Connection Profile")%>" class="selectbox">
                     <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
                   %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._t("interactive connection")%> </option>
                     <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._t("bulk connection (downloads/websites/BT)")%> </option>
@@ -404,8 +404,8 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             </td>
 
             <td>
-                <label><input value="1000" type="checkbox" name="connectDelay" title="Delay Connection"<%=(editBean.shouldDelay(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
-                (<%=intl._t("for request/response connections")%>)</label>
+                <label title="<%=intl._t("Delay Connection")%>"><input value="1000" type="checkbox" name="connectDelay"<%=(editBean.shouldDelay(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                (<%=intl._t("for request/response connections")%>)</label> <% // TODO: Convey to users: Where is the (1s) delay introduced? What is the difference between delay connect and delay open? %>
             </td>
         </tr>
          <% } // !streamrclient %>
@@ -419,13 +419,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <b><%=intl._t("Host")%>:</b>
-                <input type="text" name="clientHost" size="20" title="I2CP Hostname or IP" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext host" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
+                <input type="text" name="clientHost" size="20" title="<%=intl._t("I2CP Hostname or IP")%>" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext host" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
             </td>
 
 
             <td>
                 <b><%=intl._t("Port")%>:</b>
-                <input type="text" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
+                <input type="text" name="clientport" size="20" title="<%=intl._t("I2CP Port Number")%>" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext port" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />
             </td>
         </tr>
 
@@ -439,7 +439,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <label><input value="1" type="checkbox" name="delayOpen" title="Delay Tunnel Open"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Conserve resources by only creating tunnels when required")%>"><input value="1" type="checkbox" name="delayOpen"<%=(editBean.getDelayOpen(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Delay opening client tunnel until activity is detected on the configured tunnel port")%></label>
             </td>
         </tr>
@@ -454,7 +454,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <label><input value="1" type="checkbox" name="reduce" title="Reduce Tunnels"<%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Reduce tunnel count when idle but keep tunnel open (to ensure immediate availability)")%>"><input value="1" type="checkbox" name="reduce"<%=(editBean.getReduce(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Reduce tunnel quantity when idle to conserve resources")%></label>
             </td>
         </tr>
@@ -462,12 +462,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <b><%=intl._t("Reduced tunnel count")%>:</b>
-                <input type="text" id="reducedTunnelCount" name="reduceCount" size="1" maxlength="1" title="Reduced Tunnel Count" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext quantity" />
+                <input type="text" id="reducedTunnelCount" name="reduceCount" size="1" maxlength="1" title="<%=intl._t("Reduced Tunnel Count")%>" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext quantity" />
             </td>
 
             <td>
                 <b><%=intl._t("Idle period")%>:</b>
-                <input type="text" name="reduceTime" size="4" maxlength="4" title="Reduced Tunnel Idle Time" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext period" />
+                <input type="text" name="reduceTime" size="4" maxlength="4" title="<%=intl._t("Reduced Tunnel Idle Time")%>" value="<%=editBean.getReduceTime(curTunnel)%>" class="freetext period" />
                 minutes
             </td>
         </tr>
@@ -480,13 +480,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <label><input value="1" type="checkbox" name="close" title="Close Tunnels"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("To conserve resources, close tunnels when not in use")%>"><input value="1" type="checkbox" name="close"<%=(editBean.getClose(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Close client tunnels after specified idle period")%></label>
             </td>
 
             <td>
                 <b><%=intl._t("Idle period")%>:</b>
-                <input type="text" name="closeTime" size="4" maxlength="4" title="Close Tunnel Idle Time" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext period" />
+                <input type="text" name="closeTime" size="4" maxlength="4" title="<%=intl._t("Close Tunnel Idle Time")%>" value="<%=editBean.getCloseTime(curTunnel)%>" class="freetext period" />
                 minutes
             </td>
         </tr>
@@ -495,12 +495,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
             <td colspan="2">
                 <b><%=intl._t("New Keys on Reopen")%>:</b>
                 <span class="multiOption">
-                    <label><input value="1" type="radio" name="newDest" title="New Destination"
+                    <label title="<%=intl._t("Change tunnel identity (destination) when tunnels reopen")%>"><input value="1" type="radio" name="newDest"
                         <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                     <%=intl._t("Enable")%></label>
                 </span>
                 <span class="multiOption">
-                    <label><input value="0" type="radio" name="newDest" title="New Destination"
+                    <label title="<%=intl._t("Retain tunnel identity (destination) when tunnels reopen")%>"><input value="0" type="radio" name="newDest"
                         <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />
                     <%=intl._t("Disable")%></label>
                 </span>
@@ -516,13 +516,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td>
-                <label><input value="2" type="radio" name="newDest" title="New Destination"
+                <label title="<%=intl._t("Enabling this feature will ensure your tunnel identity (destination) remains static, for services offering features based on destination e.g. IRC user authentication")%>"><input value="2" type="radio" name="newDest"
                      <%=(editBean.getPersistentClientKey(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Generate key to enable persistent client tunnel identity")%></label>
             </td>
             <td>
                 <b><%=intl._t("File")%>:</b>
-                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />
+                <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="<%=intl._t("Path to Private Key File")%>" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />
             </td>
         </tr>
          <%
@@ -537,7 +537,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                    <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=destb64%></textarea>
+                    <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="<%=intl._t("Read Only: Local Destination (if known)")%>" wrap="off" spellcheck="false"><%=destb64%></textarea>
             </td>
         </tr>
 
@@ -560,23 +560,23 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <label><input value="1" type="checkbox" name="allowUserAgent" title="Do not spoof user agent string when checked"<%=(editBean.getAllowUserAgent(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("When enabled, the user agent of your web browser or http client will not be spoofed, potentially reducing your anonymity")%>"><input value="1" type="checkbox" name="allowUserAgent"<%=(editBean.getAllowUserAgent(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Do not spoof User-Agent header")%></label>
             </td>
             <td>
-                <label><input value="1" type="checkbox" name="allowReferer" title="Do not block referer header when checked"<%=(editBean.getAllowReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("When enabled, the referer (originating page) of your web requests will not be filtered, potentially reducing your anonymity")%>"><input value="1" type="checkbox" name="allowReferer"<%=(editBean.getAllowReferer(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Do not block Referer header")%></label>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label><input value="1" type="checkbox" name="allowAccept" title="Do not block accept headers when checked"<%=(editBean.getAllowAccept(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("When enabled, the accept headers (mime types support) broadcast by your web browser will not be filtered, potentially reducing your anonymity")%>"><input value="1" type="checkbox" name="allowAccept"<%=(editBean.getAllowAccept(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
 <%=intl._t("Do not block Accept headers")%></label>
             </td>
 
             <td>
-                <label><input value="1" type="checkbox" name="allowInternalSSL" title="Allow SSL to I2P addresses when checked"<%=(editBean.getAllowInternalSSL(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Allow SSL to I2P addresses when enabled")%>"><input value="1" type="checkbox" name="allowInternalSSL"<%=(editBean.getAllowInternalSSL(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Allow SSL to I2P addresses")%></label>
             </td>
         </tr>
@@ -594,7 +594,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td colspan="2">
                 <span class="multiOption">
-                    <label><input value="0" type="radio" name="sigType" title="Default"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="0" type="radio" name="sigType"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     DSA-SHA1</label>
                 </span>
 
@@ -602,7 +602,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
            <% if (editBean.isSigTypeAvailable(1)) { %>
 
                 <span class="multiOption">
-                    <label><input value="1" type="radio" name="sigType" title="Advanced users only"<%=(currentSigType==1 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="1" type="radio" name="sigType"<%=(currentSigType==1 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     ECDSA-P256</label>
                 </span>
 
@@ -612,7 +612,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               if (editBean.isSigTypeAvailable(2)) { %>
 
                 <span class="multiOption">
-                    <label><input value="2" type="radio" name="sigType" title="Advanced users only"<%=(currentSigType==2 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="2" type="radio" name="sigType"<%=(currentSigType==2 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     ECDSA-P384</label>
                 </span>
 
@@ -620,7 +620,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               if (editBean.isSigTypeAvailable(3)) { %>
 
                 <span class="multiOption">
-                    <label><input value="3" type="radio" name="sigType" title="Advanced users only"<%=(currentSigType==3 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="3" type="radio" name="sigType"<%=(currentSigType==3 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     ECDSA-P521</label>
                 </span>
 
@@ -629,13 +629,13 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
               if (editBean.isSigTypeAvailable(7)) { %>
 
                 <span class="multiOption">
-                    <label><input value="7" type="radio" name="sigType" title="Advanced users only"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label><input value="7" type="radio" name="sigType"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     Ed25519-SHA-512</label>
                 </span>
             </td>
         </tr>
            <% }   // isAvailable %>
-         
+
          <% } // isAdvanced %>
 
          <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
@@ -646,7 +646,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <label><input value="1" type="checkbox" name="proxyAuth" title="Check to require authorization for this service"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Enable to require a username and password to access this local service (for example if hosting on a LAN)")%>"><input value="1" type="checkbox" name="proxyAuth"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Require local authorization for this service")%></label>
             </td>
         </tr>
@@ -654,11 +654,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <b><%=intl._t("Username")%>:</b>
-                <input type="text" name="proxyUsername" title="Set username for this service" value="" class="freetext username" />
+                <input type="text" name="proxyUsername" title="<%=intl._t("Set username required to access this service")%>" value="" class="freetext username" />
             </td>
             <td>
                 <b><%=intl._t("Password")%>:</b>
-                <input type="password" name="nofilter_proxyPassword" title="Set password for this service" value="" class="freetext password" />
+                <input type="password" name="nofilter_proxyPassword" title="<%=intl._t("Set password required to access this service")%>" value="" class="freetext password" />
             </td>
         </tr>
 
@@ -669,7 +669,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <label><input value="1" type="checkbox" id="startOnLoad" name="outproxyAuth" title="Check if the outproxy requires authorization"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
+                <label title="<%=intl._t("Enable if the outproxy a username and password to access")%>"><input value="1" type="checkbox" id="startOnLoad" name="outproxyAuth"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <%=intl._t("Outproxy requires authorization")%></label>
             </td>
         </tr>
@@ -677,12 +677,12 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <b><%=intl._t("Username")%>:</b>
-                <input type="text" name="outproxyUsername" title="Enter username required by outproxy" value="<%=editBean.getOutproxyUsername(curTunnel)%>" class="freetext username" />
+                <input type="text" name="outproxyUsername" title="<%=intl._t("Enter username required by outproxy")%>" value="<%=editBean.getOutproxyUsername(curTunnel)%>" class="freetext username" />
             </td>
 
             <td>
                 <b><%=intl._t("Password")%>:</b>
-                <input type="password" name="nofilter_outproxyPassword" title="Enter password required by outproxy" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext password" />
+                <input type="password" name="nofilter_outproxyPassword" title="<%=intl._t("Enter password required by outproxy")%>" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext password" />
             </td>
         </tr>
 
@@ -697,7 +697,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         </tr>
         <tr>
             <td colspan="2">
-                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="List of helper URLs to offer when a host is not found in your addressbook" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>
+                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="<%=intl._t("List of helper URLs to offer jumplinks from the web proxy error page when a host is not found in your addressbook")%>" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>
             </td>
         </tr>
 
@@ -711,16 +711,16 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="Custom Options" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" spellcheck="false"/>
+                <input type="text" id="customOptions" name="nofilter_customOptions" size="60" title="<%=intl._t("Advanced options to control tunnel priority etc")%>" value="<%=editBean.getCustomOptions(curTunnel)%>" class="freetext" spellcheck="false"/>
             </td>
         </tr>
 
         <tr>
             <td class="buttons" colspan="2">
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._t("Cancel")%></button>
-                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><%=intl._t("Delete")%></button>
-                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><%=intl._t("Save")%></button>
+                    <button id="controlCancel" class="control" type="submit" name="action" value=""><%=intl._t("Cancel")%></button>
+                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>class="control" type="submit" name="action" value="Delete this proxy" title="<%=intl._t("Delete this Proxy (cannot be undone)")%>"><%=intl._t("Delete")%></button>
+                    <button id="controlSave" class="control" type="submit" name="action" value="Save changes"><%=intl._t("Save")%></button>
             </td>
         </tr>
     </table>
@@ -730,7 +730,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <%
 
   } else {
-     %><div id="notReady"><%=intl._t("Tunnels are not initialized yet, please reload in two minutes.")%></div><%
+     %><div id="notReady"><%=intl._t("Tunnels not initialized yet; please retry in a few moments.")%></div><%
   }  // isInitialized()
 
 %>

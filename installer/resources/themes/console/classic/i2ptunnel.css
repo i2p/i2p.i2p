@@ -260,6 +260,10 @@ h2, h3 {
      position: relative;
 }
 
+.iframed h2, .iframed h3 {
+     margin-top: 12px;
+}
+
 /* title images */
 
 #messages h2 {
@@ -295,7 +299,7 @@ h2, h3 {
 /* end title images */
 
 .iframed #globalTunnelControl h2 {
-     margin-top: 2px;
+     margin-top: 4px;
 }
 
 .iframed #globalTunnelControl {
@@ -314,7 +318,7 @@ h2, h3 {
 th {
      background: #fff url(/themes/console/classic/images/tinytitle.png) repeat-x center center;
      background: linear-gradient(to bottom, #fff, #eff2ff) !important;
-     padding: 5px;
+     padding: 7px 5px;
      text-align: left;
      border-top: 1px solid #89f;
      border-bottom: 1px solid #89f;
@@ -966,3 +970,124 @@ _:-ms-lang(x), h2, h3 {
 }
 
 /* end Edge/IE tweaks */
+
+
+/* TO DO: merge with main classes */
+
+.panel {
+     min-width: 700px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
+select {
+     white-space: normal;
+}
+}
+
+label {
+     vertical-align: sub;
+}
+
+input[type="text"] + label {
+     white-space: nowrap;
+}
+
+#targetPort {
+     margin-right: 10px !important;
+}
+
+#privKeyFile {
+     min-width: 200px;
+     width: 200px;
+     width: calc(100% - 20px);
+}
+
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     width: calc(100% - 10px);
+     width: 290px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     word-break: break-all;
+     margin: 5px;
+     padding: 4px;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+     border: 1px solid #999;
+     background: #fff;
+     border-radius: 2px;
+     box-shadow: inset 1px 1px 1px #ddd;
+}
+
+.displayText:hover, .displayText:focus {
+     overflow: auto;
+     text-overflow: clip;
+     margin: 0.5px 5px;
+     padding: 2px 4px;
+     box-shadow: 0 0 1px #89f;
+     background: #ffe;
+     outline: none;
+}
+
+.displayText:empty, .displayText:empty:hover, .displayText:empty:focus {
+     background: #ddd;
+     box-shadow: inset 2px 2px 1px #ccc;
+}
+
+.displayText:empty::before {
+     content: "";
+     display: inline-block;
+     min-height: 9px;
+}
+
+#registration .displayText {
+     width: 500px;
+}
+
+#registration td {
+     padding: 8px;
+}
+
+#registration .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#registration input[type="file"] {
+     margin-top: 5px;
+     margin-bottom: 5px;
+}
+
+#oldName, #altPrivKeyFile {
+     width: 45% !important;
+}
+
+@media screen and (max-width: 800px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 260px;
+     font-size: 8pt;
+}
+}
+
+@media screen and (min-width: 1000px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 386px;
+}
+
+#registration .displayText {
+     width: 600px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 552px;
+}
+
+#registration .displayText {
+     width: 800px;
+}
+}
+

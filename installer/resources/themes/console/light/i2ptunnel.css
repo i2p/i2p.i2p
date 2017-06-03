@@ -15,7 +15,7 @@ body {
 
 body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
-     padding-top: 5px;
+     padding: 5px 5px 10px;
 }
 
 ::selection {
@@ -94,11 +94,6 @@ textarea {
 textarea:focus {
      box-shadow: inset 0 0 0 1px #89f;
      color: #111;
-     font-weight: bold;
-}
-
-textarea[readonly]:focus {
-     font-weight: normal;
 }
 
 textarea#statusMessages {
@@ -165,14 +160,12 @@ hr {
 .freetext:focus {
      box-shadow: 0 0 1px #89f;
      color: #111;
-     font-weight: bold;
 }
 
 .freetext[readonly], .freetext[readonly]:focus {
      background: #e9e9e9;
      box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
      color: #333;
-     font-weight: normal;
 }
 
 #clientHost {
@@ -333,13 +326,11 @@ input[type="hidden"], input.default {
 }
 
 h2, h3 {
-     padding: 6px 10px;
      padding: 9px 10px 7px 30px;
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
-     background: linear-gradient(to bottom, #fff 50%, #eef 50%) !important;
      background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8) 15%) #fff !important;
-     font-size: 11pt;
+     font-size: 11.5pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -349,46 +340,46 @@ h2, h3 {
      position: relative;
 }
 
-/* title images */
-
-h2, h3 {
-     padding-left: 30px;
+.iframed h2, .iframed h3 {
+     margin-top: 14px;
 }
+
+/* title images */
 
 #messages h2 {
      background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #globalTunnelControl h2 {
      background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #servers h2 {
      background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #clients h2 {
      background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
      background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #wizardPanel h2 {
-     background: url(/themes/console/images/info/wizard.png) left 6px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/wizard.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+}
+
+#messages h2, #globalTunnelControl h2, #servers h2, #clients h2, #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3, #wizardPanel h2 {
+     background-size: 18px auto, 100% 100%, 100% 100% !important;
+     background-position: 7px center, center center, center center !important;
+     background-position: 7px 60%, center center, center center !important;
 }
 
 /* end title images */
 
 .iframed #globalTunnelControl h2 {
-     margin-top: 2px;
+     margin-top: 6px;
 }
 
 .iframed #globalTunnelControl {
@@ -400,13 +391,14 @@ h2, h3 {
      border-collapse: collapse;
      border: 1px solid #7778bf;
      margin: 0;
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fff;
 }
 
 th {
      background: #eef url(images/header.png) center center repeat-x;
      background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) !important;
      color: #333;
-     padding: 5px;
+     padding: 6px 5px;
      text-align: left;
      border-top: 1px solid #7778bf;
      border-bottom: 1px solid #7778bf;
@@ -430,8 +422,8 @@ a:hover, a:focus, a:active, button:hover, button:focus, button:active, select:ho
      text-shadow: none;
 }
 
-.tunnelConfig tr, #wizardPanel tr {
-     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px);
+.tunnelConfig tr, #wizardPanel tr, #registration tr {
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fff;
 }
 
 #wizardPanel tr:first-child {
@@ -910,7 +902,7 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
 }
 
 td.tunnelDestination, td.tunnelDescription {
-     background: linear-gradient(to right, #fff 50%, #eef);
+     background: linear-gradient(to right, #fff, rgba(255,255,255,0.1) 50%, #eef);
 }
 
 #oldDestFile {
@@ -963,9 +955,26 @@ th {
 }
 }
 
-@media screen and (max-width: 1500px) {
+@media screen and (min-width: 1000px) {
+#messages h2, #globalTunnelControl h2, #servers h2, #clients h2, #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3, #wizardPanel h2 {
+     background-position: 7px 58%, center center, center center !important;
+}
+}
+
+@media screen and (min-width: 1200px) {
 h2, h3 {
-     font-size: 10.5pt !important;
+     padding: 10px 10px 8px 30px;
+     font-size: 12pt;
+}
+
+#messages h2, #globalTunnelControl h2, #servers h2, #clients h2, #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3, #wizardPanel h2 {
+     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     padding-left: 33px !important;
+}
+
+th {
+     padding-top: 7px;
+     padding-bottom: 7px;
 }
 }
 
@@ -975,7 +984,7 @@ body, select, .control, input, textarea, .freetext {
 }
 
 h2, h3 {
-     padding: 10px 10px 8px 30px;
+     font-size: 12.5pt;
 }
 
 th {
@@ -1008,3 +1017,119 @@ _:-ms-lang(x), td.tunnelDestination, td.tunnelDescription {
 }
 
 /* end Edge/IE tweaks */
+
+/* TO DO: merge with main classes */
+
+.panel {
+     min-width: 650px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
+select {
+     white-space: normal;
+}
+}
+
+label {
+     vertical-align: sub;
+}
+
+input[type="text"] + label {
+     white-space: nowrap;
+}
+
+#targetPort {
+     margin-right: 10px !important;
+}
+
+#privKeyFile {
+     min-width: 200px;
+     max-width: 400px;
+     width: 200px;
+     width: calc(100% - 100px);
+}
+
+#oldName, #altPrivKeyFile {
+     width: 45% !important;
+}
+
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     width: calc(100% - 10px);
+     width: 290px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     word-break: break-all;
+     margin: 5px;
+     padding: 4px;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+     border: 1px solid #999;
+     background: #fff;
+     border-radius: 2px;
+     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
+}
+
+.displayText:empty, .displayText:empty:hover, .displayText:empty:focus {
+     background: #e9e9e9;
+}
+
+.displayText:empty::before {
+     content: "";
+     display: inline-block;
+     min-height: 11px;
+}
+
+.displayText:hover, .displayText:focus {
+     overflow: auto;
+     text-overflow: clip;
+     margin: 0.5px 5px;
+     padding: 2px 4px;
+     box-shadow: 0 0 1px #89f;
+     background: #ffe;
+     outline: none;
+}
+
+#registration .displayText {
+     width: 500px;
+}
+
+#registration .infohelp {
+     padding-top: 15px !important;
+     padding-bottom: 15px !important;
+}
+
+#registration input[type="file"] {
+     margin-top: 5px;
+     margin-bottom: 5px;
+}
+
+@media screen and (max-width: 800px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 260px;
+     font-size: 8pt;
+}
+}
+
+@media screen and (min-width: 1000px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 386px;
+}
+
+#registration .displayText {
+     width: 600px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.displayText, .displayText:empty:hover, .displayText:empty:focus {
+     width: 552px;
+}
+
+#registration .displayText {
+     width: 800px;
+}
+}
+
