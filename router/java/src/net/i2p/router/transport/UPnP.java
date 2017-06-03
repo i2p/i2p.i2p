@@ -676,7 +676,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	/** warning - slow */
 	public String renderStatusHTML() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("<h3><a name=\"upnp\"></a>").append(_t("UPnP Status")).append("</h3>");
+		sb.append("<h3 id=\"upnp\">").append(_t("UPnP Status")).append("</h3><div id=\"upnpscan\">");
 		
 		synchronized(_otherUDNs) {
 			if (!_otherUDNs.isEmpty()) {
@@ -727,7 +727,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 			}
 		}
 		
-		sb.append("</p>");
+		sb.append("</p></div>");
 		return sb.toString();
 	}
 	

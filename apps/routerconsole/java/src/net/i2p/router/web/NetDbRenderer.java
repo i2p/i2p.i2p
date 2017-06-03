@@ -309,7 +309,7 @@ class NetDbRenderer {
             buf.append("<table class=\"leaseset\">\n")
                .append("<tr><th><b>").append(_t("LeaseSet")).append(":</b>&nbsp;<code>").append(key.toBase64()).append("</code></th>");
             if (_context.clientManager().isLocal(dest)) {
-                buf.append("<th><b><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
+                buf.append("<th><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
                 boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(key);
                 if (unpublished)
                     buf.append(_t("Unpublished") + ' ');
@@ -319,13 +319,13 @@ class NetDbRenderer {
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
-                buf.append("</th></tr>\n<tr><td>");
+                buf.append("</th></tr>\n<tr><td colspan=\"2\">");
                 String b32 = dest.toBase32();
                 buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
                 if (!unpublished) {
                     String host = _context.namingService().reverseLookup(dest);
                     if (host == null) {
-                        buf.append("<td>").append("<a title=\"").append(_t("Add to addressbook"))
+                        buf.append("<td class=\"addtobook\" colspan=\"2\">").append("<a title=\"").append(_t("Add to addressbook"))
                            .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                            .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
                     }
@@ -340,7 +340,7 @@ class NetDbRenderer {
                     buf.append("<code>").append(dest.toBase64().substring(0, 6)).append("</code></th>")
                        .append("</tr>\n<tr>")
                        .append("<td><a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>\n")
-                       .append("<td><a title=\"").append(_t("Add to addressbook"))
+                       .append("<td class=\"addtobook\"><a title=\"").append(_t("Add to addressbook"))
                        .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
                        .append(dest.toBase64()).append("#add\">").append(_t("Add to local addressbook")).append("</a></td>");
                 }
@@ -361,7 +361,7 @@ class NetDbRenderer {
                     if (c++ == medianCount)
                         median = dist;
                 }
-                buf.append(" <b>Distance: </b><span id=\"distance\">").append(fmt.format(biLog2(dist))).append("</span></b>");
+                buf.append(" <b>Distance: </b><span id=\"distance\">").append(fmt.format(biLog2(dist))).append("</span>");
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
                 buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());

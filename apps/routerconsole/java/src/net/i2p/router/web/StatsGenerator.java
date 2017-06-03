@@ -82,7 +82,7 @@ public class StatsGenerator {
             out.write(buf.toString());
             buf.setLength(0);
             for (String stat : stats) {
-                buf.append("<li><b><a name=\"");
+                buf.append("<li class=\"statsName\"><b><a name=\"");
                 buf.append(stat);
                 buf.append("\">");
                 buf.append(stat);
@@ -152,9 +152,9 @@ public class StatsGenerator {
         RateStat rate = _context.statManager().getRate(name);
         String d = rate.getDescription();
         if (! "".equals(d)) {
-            buf.append("<i>");
+            buf.append("<span class=\"statsLongName\"><i>");
             buf.append(d);
-            buf.append("</i><br>");
+            buf.append("</i></span><br>");
         }
         if (rate.getLifetimeEventCount() <= 0) {
             buf.append("<ul><li class=\"noevents\">").append(_t("No lifetime events")).append("</li></ul>\n");
@@ -177,14 +177,14 @@ public class StatsGenerator {
                 buf.append(_t("Highest average"));
                 buf.append(": ");
                 buf.append(num(curRate.getExtremeAverageValue()));
-                buf.append("; ");
+                buf.append(". ");
 
                 // This is rarely interesting
                 // Don't bother to translate
                 if (showAll) {
                     buf.append("Highest total in a period: ");
                     buf.append(num(curRate.getExtremeTotalValue()));
-                    buf.append("; ");
+                    buf.append(". ");
                 }
 
                 // Saturation stats, which nobody understands, even when it isn't meaningless
@@ -198,32 +198,34 @@ public class StatsGenerator {
                     buf.append(pct(curRate.getExtremeEventSaturation()));
                     buf.append("; Peak saturated limit: ");
                     buf.append(num(curRate.getExtremeSaturationLimit()));
-                    buf.append("; ");
+                    buf.append(". ");
                 }
 
+                buf.append("<span class=\"nowrap\">");
                 buf.append(ngettext("There was 1 event in this period.", "There were {0} events in this period.", (int)curRate.getLastEventCount()));
-                buf.append(' ');
+                buf.append("</span> <span class=\"nowrap\">");
                 buf.append(_t("The period ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
+                buf.append("</span>");
             } else {
-                buf.append(" <i>").append(_t("No events")).append("</i> ");
+                buf.append(" <i>").append(_t("No events")).append(" </i>");
             }
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
-                buf.append(" (").append(_t("Average event count")).append(": ");
+                buf.append("&nbsp;<span class=\"nowrap\">(").append(_t("Average event count")).append(": ");
                 buf.append(num(avgFrequency));
                 buf.append("; ").append(_t("Events in peak period")).append(": ");
                 // This isn't really the highest event count, but the event count during the period with the highest total value.
                 buf.append(curRate.getExtremeEventCount());
-                buf.append(")");
+                buf.append(")</span>");
             }
             if (curRate.getSummaryListener() != null) {
-                buf.append("<br><a href=\"graph?stat=").append(name)
+                buf.append("<br><span class=\"statsViewGraphs\"><a href=\"graph?stat=").append(name)
                    .append('.').append(periods[i]);
-                buf.append("\">").append(_t("Graph Data")).append("</a> - ");
+                buf.append("&amp;w=600&amp;h=200\">").append(_t("Graph Data")).append("</a> - ");
                 buf.append(" <a href=\"graph?stat=").append(name)
                    .append('.').append(periods[i]);
-                buf.append("&amp;showEvents=true\">").append(_t("Graph Event Count")).append("</a>");
+                buf.append("&amp;w=600&amp;h=200&amp;showEvents=true\">").append(_t("Graph Event Count")).append("</a></span>");
                 // This can really blow up your browser if you click on it
                 //buf.append(" - <a href=\"viewstat.jsp?stat=").append(name);
                 //buf.append("&amp;period=").append(periods[i]);

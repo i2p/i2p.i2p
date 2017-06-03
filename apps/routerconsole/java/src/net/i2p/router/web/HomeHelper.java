@@ -35,7 +35,7 @@ public class HomeHelper extends HelperBase {
         _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "support.png" + S +
         _x("Manage Plugins") + S + _x("Install and configure I2P plugins") + S + "/configplugins" + S + I + "plugin.png" + S +
         _x("Router Console") + S + _x("I2P Router Console") + S + "/console" + S + I + "info/console.png" + S +
-        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/i2psnark/" + S + I + "magnet.png" + S +
+        _x("Torrents") + S + _x("Built-in anonymous BitTorrent Client") + S + "/i2psnark/" + S + I + "i2psnark.png" + S +
         _x("Web Server") + S + _x("Local web server for hosting your own content on I2P") + S + "http://127.0.0.1:7658/" + S + I + "server_32x32.png" + S +
         "";
 
@@ -61,7 +61,7 @@ public class HomeHelper extends HelperBase {
         _x("Open4You") + S + _x("Free eepsite hosting with PHP and MySQL") + S + "http://open4you.i2p/" + S + I + "open4you-logo.png" + S +
         _x("Pastebin") + S + _x("Encrypted I2P Pastebin") + S + "http://zerobin.i2p/" + S + I + "paste_plain.png" + S +
         _x("Planet I2P") + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "world.png" + S +
-        _x("I2P Plugins") + S + _x("Add-on directory") + S + "http://i2pwiki.i2p/index.php?title=Plugins" + S + I + "plugin.png" + S +
+        _x("I2P Plugins") + S + _x("Add-on directory") + S + "http://i2pwiki.i2p/index.php?title=Plugins" + S + I + "info/plugin_link.png" + S +
         _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "magnet.png" + S +
         _x("Project Website") + S + _x("I2P home page") + S + "http://i2p-projekt.i2p/" + S + I + "info_rhombus.png" + S +
         //_x("lenta news [ru]") + S + _x("Russian News Feed") + S + "http://lenta.i2p/" + S + I + "lenta_main_logo.png" + S +

@@ -2040,7 +2040,6 @@ h3.stats {
 
 div.joblog li {
      word-wrap: break-word !important;
-     text-align: justify !important;
      line-height: 120% !important;
      margin: 2px 0 2px 30px;
      padding: 2px 20px 2px 0;
@@ -2048,7 +2047,6 @@ div.joblog li {
 
 div.joblog ul {
      word-wrap: break-word !important;
-     text-align: justify;
      margin: 5px 0 -10px;
 }
 
@@ -2143,6 +2141,15 @@ ul.statlist li li:last-child::before {
 
 .statlist a[href$="true"]::before {
      display: none;
+}
+
+.nowrap {
+     white-space: nowrap;
+}
+
+.statsLongName {
+     color: #dd0;
+     font-weight: bold;
 }
 
 .main#stats form {
@@ -4787,34 +4794,38 @@ div.debugcontainer {
      filter: none;
 }
 
-table#leasesetdebug, table#leasesetsummary {
+#leasesetdebug, #leasesetsummary {
      margin-bottom: 10px;
 }
 
-table.leaseset th {
+.leaseset th {
      font-weight: normal;
      padding: 5px;
      text-align: left;
 }
 
-table.leaseset th:last-child, table.leaseset td:nth-child(2) {
+.leaseset th:last-child, .leaseset td:nth-child(2) {
      text-align: right;
      padding-right: 5px;
 }
 
-.leaseset tr:nth-child(2) td:last-child a:not(old) {
+.addtobook {
+     text-align: right;
+}
+
+.addtobook a:not(old) {
      font-size: 0;
 }
 
-.leaseset tr:nth-child(2) td:last-child a::after {
+.addtobook a::after {
      content: url(/themes/console/images/buttons/add_address.png);
 }
 
-.leaseset tr:nth-child(2) td:last-child a:hover {
+.addtobook a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-table#leasesetdebug th, table#leasesetsummary th {
+#leasesetdebug th, #leasesetsummary th {
      font-weight: bold;
      text-transform: uppercase;
      font-size: 10pt;
@@ -4823,7 +4834,7 @@ table#leasesetdebug th, table#leasesetsummary th {
      padding: 5px 5px 5px 10px;
 }
 
-table#leasesetdebug th a, table#leasesetsummary a {
+#leasesetdebug th a, #leasesetsummary a {
      font-size: 9pt;
      text-transform: capitalize;
      letter-spacing: normal;
@@ -4836,33 +4847,33 @@ table#leasesetdebug th a, table#leasesetsummary a {
      padding-left: 10px;
 }
 
-table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
+#leasesetdebug th:first-child, #leasesetsummary th:first-child {
      text-align:left;
      white-space: nowrap;
 }
 
-table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+#leasesetdebug th:last-child, #leasesetsummary th:last-child {
      text-align:right;
      white-space: nowrap;
 }
 
-table#leasesetdebug td:nth-child(odd) {
+#leasesetdebug td:nth-child(odd) {
      width: 200px;
      white-space: nowrap;
      text-align: right;
      border-right: 1px inset #131;
 }
 
-table#leasesetdebug td:nth-child(even) {
+#leasesetdebug td:nth-child(even) {
      text-align: left;
      white-space: nowrap;
 }
 
-table#leasesetdebug td:nth-child(2) {
+#leasesetdebug td:nth-child(2) {
      width: 10px;
 }
 
-div#noleasesets {
+#noleasesets {
      background: #000 url(images/infohelp.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      border: 1px solid #494;
@@ -4870,7 +4881,7 @@ div#noleasesets {
      text-align: left;
 }
 
-div#sybilnav, div#sybils_summary {
+#sybilnav, #sybils_summary {
      border: 1px solid #494;
      padding: 10px;
      margin-bottom: 10px;
@@ -4878,7 +4889,7 @@ div#sybilnav, div#sybils_summary {
      background: #000;
 }
 
-div#sybilnav {
+#sybilnav {
      -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
      columns: 4 200px;
@@ -4941,7 +4952,7 @@ div#sybilnav {
      padding-bottom: 2px;
 }
 
-table.sybil_routerinfo {
+.sybil_routerinfo {
      margin-bottom: 10px;
 }
 
@@ -4954,7 +4965,7 @@ table.sybil_routerinfo {
      white-space: nowrap;
 }
 
-table.sybil_routerinfo:first-of-type th {
+.sybil_routerinfo:first-of-type th {
      padding: 8px 6px !important;
 }
 

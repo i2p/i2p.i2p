@@ -3084,7 +3084,6 @@ div.joblog li {
 
 div.joblog ul {
      word-wrap: break-word !important;
-     text-align: justify;
 }
 
 div.joblog li:first-child {
@@ -4236,12 +4235,12 @@ a.viewfullentry:hover {
      width: 10px;
 }
 
-table.leaseset {
+.leaseset {
      font-size: 9pt;
      margin: 5px 0 10px;
 }
 
-table.leaseset:last-child {
+.leaseset:last-child {
      margin-bottom: 5px;
 }
 
@@ -4256,19 +4255,23 @@ table.leaseset:last-child {
      padding-right: 5px;
 }
 
-.leaseset tr:nth-child(2) td:last-child a:not(old) {
+.addtobook {
+     text-align: right;
+}
+
+.addtobook a:not(old) {
      font-size: 0;
 }
 
-.leaseset tr:nth-child(2) td:last-child a::after {
+.addtobook a::after {
      content: url(/themes/console/images/buttons/add_address.png);
 }
 
-.leaseset tr:nth-child(2) td:last-child a:hover {
+.addtobook a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-div#noleasesets {
+#noleasesets {
      border: 1px solid #89f;
      padding: 20px;
      font-weight: bold;
@@ -4277,14 +4280,14 @@ div#noleasesets {
      text-align: center;
 }
 
-div#sybilnav, div#sybils_summary {
+#sybilnav, #sybils_summary {
      border: 1px solid #89f;
      padding: 10px;
      margin-bottom: 10px;
      background: #fff;
 }
 
-div#sybilnav {
+#sybilnav {
      padding: 5px 5px 0;
 }
 
@@ -4303,11 +4306,11 @@ div#sybilnav {
      line-height: 100%;
 }
 
-table.sybil_routerinfo {
+.sybil_routerinfo {
      margin-bottom: 10px;
 }
 
-table.sybil_routerinfo:last-child {
+.sybil_routerinfo:last-child {
      margin-bottom: 5px;
 }
 
@@ -4315,7 +4318,7 @@ table.sybil_routerinfo:last-child {
      padding: 1px 1px 1px 6px !important;
 }
 
-table.sybil_routerinfo:first-of-type th {
+.sybil_routerinfo:first-of-type th {
      padding: 6px !important;
 }
 
@@ -4351,7 +4354,7 @@ table.sybil_routerinfo:first-of-type th {
      font-weight: normal;
 }
 
-div#sybilnav {
+#sybilnav {
      background: #eff1ff;
      -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
@@ -4490,7 +4493,7 @@ h3.stats {
      border-radius: 0;
 }
 
-ul.statlist {
+.statlist {
      border: 1px solid #89f;
      padding: 0 10px 0 0;
      margin-left: 0 !important;
@@ -4498,11 +4501,11 @@ ul.statlist {
      background: #eff1ff;
 }
 
-ul.statlist:last-of-type {
+.statlist:last-of-type {
      margin-bottom: -22px !important;
 }
 
-ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover {
+.statlist a[name], .statlist b, .statlist li b, .statlist a[name]:hover {
      text-decoration: none;
      letter-spacing: normal;
      font-size: 9pt;
@@ -4513,35 +4516,33 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover 
      display: none !important;
 }
 
-ul.statlist li b, ul.statlist b a:hover, h3.stats a:hover  {
+.statlist li b, .statlist b a:hover, h3.stats a:hover  {
      color: #0c153d !important;
 }
 
-ul.statlist li::before {
+.statlist li::before {
      content: "\2B26\00A0";
      margin-left: 5px;
      font-size: 14pt;
      line-height: 60%;
      vertical-align: baseline;
      color: #0c153d;
-     filter: drop-shadow(0 0 1px #ccc);
 }
 
-ul.statlist li {
+.statlist li {
      margin-left: 5px;
      padding: 2px;
      list-style: none;
 }
 
-ul.statlist li li {
+.statlist li li {
      margin-left: 16px;
      margin-right: -20px;
      margin-top: 2px;
-     line-height: 130% !important;
+     line-height: 150% !important;
      list-style: none;
-     padding: 2px 0;
-     border-top: 1px dotted #89f;
-     text-align: justify;
+     padding: 2px 0 2px 5px;
+     text-align: left;
 }
 
 .statlist li li:first-child {
@@ -4550,7 +4551,7 @@ ul.statlist li li {
      padding-top: 2px;
 }
 
-ul.statlist li li::before {
+.statlist li li::before {
      content: "\279F\00A0";
      vertical-align: baseline;
      margin-left: 3px;
@@ -4561,7 +4562,6 @@ ul.statlist li li::before {
      color: #33a;
      font-size: 14pt;
      margin-left: 4px;
-     filter: drop-shadow(0 0 1px #ccc);
 }
 
 .main#stats a[href^="graph?"]:hover::before {
@@ -4572,27 +4572,33 @@ ul.statlist li li::before {
      display: none;
 }
 
-ul.statlist li li:last-child {
+.statlist li li:last-child {
      padding-bottom: 2px;
-     border: 1px dotted #89f;
+     padding-left: 5px;
+     border: 1px solid rgba(136, 153, 255, 0.3);
      background: #fff;
      background: linear-gradient(to right, #fff 0%, #eef 70%, #ddf 100%);
      box-shadow: inset 0 0 0 1px #fff;
 }
 
-ul.statlist li:last-child {
+.statlist li li.noevents {
+     margin-top: 15px !important;
+}
+
+.statlist li:last-child {
      padding-bottom: 15px;
      margin-top: 2px;
 }
 
-ul.statlist li:first-child {
+.statlist li:first-child {
      margin-top: -5px;
 }
 
-ul.statlist li li:last-child::before {
+.statlist li li:last-child::before {
      content: "\27A1\00A0";
      margin-left: 2px;
      vertical-align: text-top;
+     vertical-align: calc(20% - 3px);
 }
 
 .statlist a[href*="graph"] {
@@ -4605,6 +4611,15 @@ ul.statlist li li:last-child::before {
 
 .statlist a[href*="graph"]::after {
      content: "\00A0";
+}
+
+.statsViewGraphs {
+     margin-left: 20px;
+}
+
+.nowrap {
+     display: inline-block;
+     white-space: nowrap;
 }
 
 #gatherstats + form {
@@ -5625,8 +5640,8 @@ table.sybil_routerinfo:last-child {
 
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes, .routersummary button.download,
-#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, ul.statlist a[name],
-ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
+#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, .statlist a[name],
+.statlist b, .statlist li b, .statlist a[name]:hover, div.messages, th {
      font-size: 10pt !important;
 }
 

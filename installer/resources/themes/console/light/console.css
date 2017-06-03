@@ -574,10 +574,20 @@ div.logo {
      box-shadow: inset 0 0 0 1px #bbf;
 }
 
+div.logo:not(old) {
+     background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3)), url(images/noise.png) #fff;
+     background-size: 100% 100%, 50px 50px;
+}
+
 .logo hr {
      margin: 8px -10px;
      background: #7789bf;
      height: 1px
+}
+
+.warning hr {
+     background: #7789bf;
+     background: linear-gradient(to right, #7789bf, #c2c4ef);
 }
 
 .logo a {
@@ -606,7 +616,7 @@ div.warning {
 }
 
 .warning:not(old) {
-     background:  url("/themes/console/images/itoopie_sm.png") no-repeat scroll 10px center, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3)), url(images/noise.png) #fff;
+     background: url("/themes/console/images/itoopie_sm.png") no-repeat scroll 10px center, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3)), url(images/noise.png) #fff;
      background-size: 54px auto, 100% 100%, 50px 50px;
      background-position: 10px calc(50% + 16px);
 }
@@ -615,7 +625,7 @@ div.warning {
      text-align: left;
      margin: -9px -24px 20px !important;
      border: none;
-     border-bottom: 1px solid #7789bf;
+     border-bottom: 1px solid #447;
      border-radius: 2px 2px 0 0;
      padding: 10px 10px 8px;
      font-size: 10.5pt;
@@ -793,8 +803,9 @@ div.warning {
      letter-spacing: 0;
      word-spacing: 0;
      background: none;
+     border-radius: 0;
      border: none;
-     border-bottom: 1px solid #7778bf;
+     border-bottom: 1px solid #447 !important;
      padding-left: 0;
      margin-bottom: -5px;
 }
@@ -2544,6 +2555,8 @@ p#enablefullstats, p#gatherstats {
       background-size: 28px 28px !important;
 }
 
+/* stats page */
+
 p#gatherstats + form, ul.statlist {
      border: 1px solid #7778bf;
      padding: 10px;
@@ -2571,6 +2584,13 @@ ul.statlist {
      box-shadow: inset 0 0 0 1px #fff;
 }
 
+.joblog .statlist li {
+     line-height: 140% !important;
+     padding-top: 6px;
+     padding-bottom: 0;
+     margin-right: 5px;
+}
+
 .statlist li:not(old) {
      list-style: none !important;
 }
@@ -2578,18 +2598,18 @@ ul.statlist {
 .statlist li::before, .statlist li a[href^="graph"]::before {
      content: "";
      display: inline-block;
-     height: 5px;
-     width: 5px;
-     box-shadow: inset 0 0 0 1px #fff;
-     margin-left: -35px;
+     height: 4px !important;
+     width: 4px !important;
+     margin-left: -17px;
      margin-right: 10px;
-     margin-top: -2px;
+     margin-top: -4px;
      transform: rotate(45deg);
      vertical-align: middle;
+     opacity: 0.8;
 }
 
 .statlist li::before {
-     background: #335;
+     background: #779;
      border: 1px solid #335;
 }
 
@@ -2598,7 +2618,7 @@ ul.statlist {
      border: 1px solid #3b6bbf;
 }
 
-.statlist li a[href*="&"]::before  {
+.statlist li a[href$="&showEvents=true"]::before {
      display: none;
 }
 
@@ -2609,12 +2629,51 @@ ul.statlist {
      vertical-align: middle;
 }
 
+.statlist li.statsName::before {
+     background: #446;
+     box-shadow: inset 0 0 0 1px #fff !important;
+     height: 6px !important;
+     width: 6px !important;
+     opacity: 1;
+}
+
+.statlist li li:last-child::before {
+     background: #335;
+}
+
+.statsName i {
+     color: #050;
+     font-weight: bold;
+}
+
+.statsName li i {
+     color: inherit;
+     font-weight: normal;
+}
+
+.statsViewGraphs {
+     display: inline-block;
+     margin: 0 0 -5px 18px;
+}
+
+.statsLongName {
+     display: inline-block;
+}
+
+.statsLongName::first-letter {
+     text-transform: uppercase;
+}
+
+.nowrap {
+     display: inline-block;
+     white-space: nowrap;
+}
+
 .statlist > li::after {
      content: "";
      display: block;
      width: 100%;
      height: 1px;
-     margin-top: -5px;
      border-top: 1px dotted #ddf;
 }
 
@@ -2629,9 +2688,11 @@ li.noevents::after {
 }
 
 li.noevents {
-     margin: 5px 0 5px 15px !important;
+     margin: 0 0 5px 40px !important;
      font-style: italic;
 }
+
+/* end stats page */
 
 h1 {
      text-align: left;
@@ -3568,11 +3629,6 @@ h3 + .statusnotes {
 div.joblog {
      border: 0;
      margin-top: 5px;
- }
-
-div.joblog i {
-     color: #050;
-     font-weight: bold;
 }
 
 div.joblog ul {
@@ -4329,7 +4385,7 @@ table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
      text-transform: none;
      letter-spacing: normal;
      word-spacing: normal;
-     background: linear-gradient(to bottom, #fff 50%, #eef 50%) !important;
+     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)) #eef !important;
      background-size: 100% 100%;
      padding: 8px 5px;
      font-size: 9pt;
@@ -4366,11 +4422,11 @@ table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
      white-space: nowrap;
 }
 
-table#leasesetdebug, table.leaseset, table#leasesetsummary {
+#leasesetdebug, table.leaseset, #leasesetsummary {
      font-size: 9pt;
 }
 
-table#leasesetdebug td, table.leaseset td {
+#leasesetdebug td, table.leaseset td {
      padding: 5px !important;
 }
 
@@ -4378,19 +4434,19 @@ table#leasesetdebug td, table.leaseset td {
      margin-bottom: 10px;
 }
 
-table.leaseset th {
+.leaseset th {
      font-weight: normal;
      padding: 5px;
      text-align: left;
      font-size: 10pt;
 }
 
-table.leaseset th:last-child, table.leaseset td:nth-child(2) {
+.leaseset th:last-child, .leaseset td:nth-child(2) {
      text-align: right;
      padding-right: 5px;
 }
 
-table#leasesetdebug, table#leasesetsummary {
+#leasesetdebug, #leasesetsummary {
      margin-bottom: 14px !important;
 }
 
@@ -4398,7 +4454,7 @@ table#leasesetdebug, table#leasesetsummary {
      margin-bottom: 5px;
 }
 
-table#leasesetdebug th, table#leasesetsummary th {
+#leasesetdebug th, #leasesetsummary th {
      font-weight: bold;
      padding: 8px;
      text-align: left;
@@ -4408,49 +4464,52 @@ table#leasesetdebug th, table#leasesetsummary th {
      word-spacing: 0.1em;
 }
 
-table#leasesetdebug th a {
+#leasesetdebug th a {
      font-size: 9pt;
      text-transform: capitalize;
      letter-spacing: normal;
      word-spacing: normal;
 }
 
-table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+#leasesetdebug th:last-child, #leasesetsummary th:last-child {
      text-align:right;
      white-space: nowrap;
      font-size: 9pt;
 }
 
-table#leasesetdebug td:nth-child(odd) {
+#leasesetdebug td:nth-child(odd) {
      width: 200px;
      white-space: nowrap;
      text-align: right;
      border-right: 1px inset #cfd1ff;
 }
 
-table#leasesetdebug td:nth-child(even) {
+#leasesetdebug td:nth-child(even) {
      text-align: left;
      white-space: nowrap;
 }
 
-table#leasesetdebug td:nth-child(2) {
+#leasesetdebug td:nth-child(2) {
      width: 10px;
 }
 
-.leaseset tr:nth-child(2) td:last-child a:not(old) {
+.addtobook {
+     text-align: right;
+}
+
+.addtobook a:not(old) {
      font-size: 0;
 }
 
-.leaseset tr:nth-child(2) td:last-child a::after {
+.addtobook a::after {
      content: url(/themes/console/images/buttons/add_address.png);
-     filter: drop-shadow(0 0 1px #999);
 }
 
-.leaseset tr:nth-child(2) td:last-child a:hover {
+.addtobook a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-div#noleasesets {
+#noleasesets {
      border: 1px solid #7778bf;
      padding: 20px;
      font-weight: bold;
@@ -4460,7 +4519,7 @@ div#noleasesets {
      text-align: center;
 }
 
-div#sybilnav {
+#sybilnav {
      -moz-columns: 4;
      -webkit-columns: 4;
      columns: 4;
@@ -4470,7 +4529,7 @@ div#sybilnav {
      border-radius: 2px;
 }
 
-div#sybilnav, div#sybils_summary {
+#sybilnav, #sybils_summary {
      border: 1px solid #7778bf;
      padding: 10px;
      margin-bottom: 10px;
@@ -4507,7 +4566,7 @@ h3.sybils  {
      display: inline-block;
 }
 
-table.sybil_routerinfo {
+.sybil_routerinfo {
      margin-bottom: 10px;
 }
 
@@ -4515,7 +4574,7 @@ table.sybil_routerinfo {
      padding: 1px 1px 1px 6px !important;
 }
 
-table.sybil_routerinfo:first-of-type th {
+.sybil_routerinfo:first-of-type th {
      padding: 6px !important;
 }
 

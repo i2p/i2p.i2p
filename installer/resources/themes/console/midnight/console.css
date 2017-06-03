@@ -1588,7 +1588,7 @@ div.sorry hr {
 
 .main#news {
      background: #000 url(images/earth.jpg) no-repeat scroll bottom right !important;
-     background-size: auto 200px !important;
+     background-size: auto 180px !important;
      padding-bottom: 0;
 }
 
@@ -1604,14 +1604,6 @@ div.sorry hr {
      box-shadow: 0 1px 5px #000;
      min-width: 600px;
 }
-
-/*
-.newsentry font[size="-2"] {
-     letter-spacing: 0.15em;
-     font-style: italic;
-     text-transform: capitalize;
-}
-*/
 
 .main#news .newscontent {
      border: 1px solid #443da0;
@@ -1720,7 +1712,6 @@ div.sorry hr {
 
 .messages #newsDisplay {
      display: inline-block;
-     white-space: normal;
      margin-left: 45px;
 }
 
@@ -2453,7 +2444,6 @@ fieldset {
 
 div.joblog {
      border-radius: 2px 2px 0 0;
-     text-align: justify !important;
      overflow-y: hidden !important;
      margin-top: 10px !important;
  }
@@ -2472,7 +2462,6 @@ div.main li:last-child {
 
 div.joblog li {
      word-wrap: break-word !important;
-     text-align: justify !important;
      line-height: 120% !important;
      margin: 2px 0 2px 30px;
      padding: 2px 20px 2px 0;
@@ -2480,7 +2469,6 @@ div.joblog li {
 
 div.joblog ul {
      word-wrap: break-word !important;
-     text-align: justify;
      margin: 5px 0 -10px;
 }
 
@@ -3643,7 +3631,7 @@ h3.stats {
      border-radius: 0;
 }
 
-ul.statlist {
+.statlist {
      border: 1px solid #443da0;
      margin-bottom: -21px !important;
      margin-top: -11px !important;
@@ -3651,62 +3639,61 @@ ul.statlist {
      background: #000;
 }
 
-ul.statlist:last-of-type {
+div.main .statlist li:not(old) {
+     list-style: none !important;
+}
+
+.statlist:last-of-type {
      margin-bottom: -1px !important;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-ul.statlist {
+.statlist {
      margin-bottom: -25px !important;
 }
 
-ul.statlist:last-of-type {
+.statlist:last-of-type {
      margin-bottom: -6px !important;
 }
 }
 
-ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover {
-     color: #f3e8fc !important;
+.statlist a[name], .statlist b, .statlist li b, .statlist a[name]:hover {
      text-decoration: none;
      letter-spacing: normal;
 }
 
-ul.statlist li::before {
-     content: "\1F6C8\00A0";
+.statlist li::before {
      content: "\2B26\00A0";
      font-size: 14pt;
-     line-height: 50%;
      vertical-align: baseline;
-     color: #f3e8fc;
 }
 
-ul.statlist li {
-     line-height: 120% !important;
+.statlist li {
      list-style: none;
      margin-bottom: -3px;
 }
 
-ul.statlist li li {
+.statlist li li {
      margin-left: 16px;
      margin-right: -20px;
-     line-height: 120% !important;
+     line-height: 140% !important;
      list-style: none;
 }
 
-ul.statlist li li::before {
+.statlist li li::before {
      content: "\279F\00A0";
      vertical-align: baseline;
 }
 
-ul.statlist li li:last-child::before {
+.statlist li li:last-child::before {
      content: "\27A1\00A0";
 }
 
-ul.statlist li li:last-child {
+.statlist li li:last-child {
      padding-bottom: 5px !important;
 }
 
-.statlist a[href*="graph"]::before {
+.statlist a[href^="graph"]::before {
      content: "\27A1\00A0";
      font-size: 14pt;
 }
@@ -3725,9 +3712,32 @@ ul.statlist li li:last-child {
      margin-top: 10px;
 }
 
+.statlist li li b {
+     margin-right: 3px;
+}
+
 li.noevents {
      margin-top: 0 !important;
      margin-bottom: 10px !important;
+}
+
+.nowrap {
+     white-space: nowrap;
+}
+
+.statsViewGraphs {
+     display: inline-block;
+     margin: 5px 5px 0 20px;
+}
+
+.statsLongName {
+     color: #37a3df;
+     font-weight: bold;
+}
+
+p#gatherstats {
+     margin-top: 1px;
+     margin-bottom: 25px;
 }
 
 /* end stats */
@@ -3985,7 +3995,7 @@ table#externali2cp {
 }
 
 .infowarn#clientconf {
-     margin-bottom: -2px;
+     margin-bottom: 11px;
 }
 
 /* end /configclients */
@@ -5225,7 +5235,7 @@ span#distance {
      font-weight: bold;
 }
 
-table#leasesetdebug, table#leasesetsummary {
+#leasesetdebug, #leasesetsummary {
      margin-top: -4px;
      margin-bottom: 10px;
 }
@@ -5241,7 +5251,7 @@ table#leasesetdebug, table#leasesetsummary {
      padding-right: 5px;
 }
 
-table#leasesetdebug th, table#leasesetsummary th {
+#leasesetdebug th, #leasesetsummary th {
      font-weight: bold;
      text-transform: uppercase;
      font-size: 10pt;
@@ -5250,7 +5260,7 @@ table#leasesetdebug th, table#leasesetsummary th {
      padding: 8px 10px;
 }
 
-table#leasesetdebug th a, table#leasesetsummary a {
+#leasesetdebug th a, #leasesetsummary a {
      font-size: 9pt;
      text-transform: capitalize;
      letter-spacing: normal;
@@ -5263,47 +5273,51 @@ table#leasesetdebug th a, table#leasesetsummary a {
      padding-left: 10px;
 }
 
-table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
+#leasesetdebug th:first-child, #leasesetsummary th:first-child {
      text-align:left;
      white-space: nowrap;
 }
 
-table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+#leasesetdebug th:last-child, #leasesetsummary th:last-child {
      text-align:right;
      white-space: nowrap;
 }
 
-table#leasesetdebug td:nth-child(odd) {
+#leasesetdebug td:nth-child(odd) {
      width: 200px;
      white-space: nowrap;
      text-align: right;
      border-right: 1px inset #120f35;
 }
 
-table#leasesetdebug td:nth-child(even) {
+#leasesetdebug td:nth-child(even) {
      text-align: left;
      white-space: nowrap;
 }
 
-table#leasesetdebug td:nth-child(2) {
+#leasesetdebug td:nth-child(2) {
      width: 10px;
 }
 
-table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
+#leasesetdebug th a:not(old), #leasesetsummary th a:not(old) {
      font-size: 0;
 }
 
-table#leasesetdebug th a::after, table#leasesetsummary th a::after {
+#leasesetdebug th a::after, #leasesetsummary th a::after {
      content: url(/themes/console/images/buttons/floodfill.png);
      vertical-align: text-top;
      padding-right: 0;
 }
 
-.leaseset tr:nth-child(2) td:last-child a:not(old) {
+.addtobook {
+     text-align: right;
+}
+
+.addtobook a:not(old) {
      font-size: 0;
 }
 
-.leaseset tr:nth-child(2) td:last-child a::after {
+.addtobook a::after {
      content: url(/themes/console/images/buttons/add_address.png);
 }
 
@@ -5316,7 +5330,7 @@ a.viewfullentry::after {
      vertical-align: text-top;
 }
 
-div#noleasesets {
+#noleasesets {
      background: #000 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px !important;
      border: 1px solid #443da0;
@@ -5324,13 +5338,13 @@ div#noleasesets {
      text-align: left;
 }
 
-div#sybilnav, div#sybils_summary {
+#sybilnav, #sybils_summary {
      border: 1px solid #443da0;
      padding: 10px;
      margin-bottom: 10px;
 }
 
-div#sybilnav {
+#sybilnav {
      -moz-columns: 4 200px;
      -webkit-columns: 4 200px;
      columns: 4 200px;
@@ -5405,7 +5419,7 @@ div#sybilnav {
 
 /* end sybilnav */
 
-table.sybil_routerinfo {
+.sybil_routerinfo {
      margin-bottom: 10px;
 }
 
@@ -5417,7 +5431,7 @@ table.sybil_routerinfo {
      text-align: left;
 }
 
-table.sybil_routerinfo:first-of-type th {
+.sybil_routerinfo:first-of-type th {
      padding: 6px !important;
 }
 
@@ -5560,10 +5574,6 @@ p#debugmode, p#sybilinfo {
      margin-top: -4px;
 }
 
-p#gatherstats {
-     margin-top: 1px;
-}
-
 td.optionsave {
      text-align: right;
      border-top: 1px solid #443da0;
@@ -5621,7 +5631,7 @@ h3#webappconfig {
 }
 
 p#webappconfigtext {
-     margin: 1px 0 -2px 0;
+     margin: 1px 0 15px 0;
      background: #000 url(/themes/console/images/info/java_edit.png) 12px center no-repeat !important;
      background-size: 28px 28px !important;
 }
@@ -6191,7 +6201,7 @@ div.app {
      min-width: 138px;
 }
 
-.app:hover {
+div.app:hover {
      cursor: pointer;
 }
 

@@ -1,3 +1,15 @@
+2017-06-03 str4d
+ * Console:
+   - Add spans to /stats page to avoid summary info breaking mid-sentence, and
+     to aid presentation
+   - Adjust /stats CSS so information isn't over-dense
+   - Set graph size for generated graphs on /stats to 600x200
+   - Fix netdb leaseset tables
+     - Ensure we only iconify add to addressbook links and not b32 dests
+   - Individual icons for I2PSnark and I2P Plugins on /home
+   - Add div to upnpstatus on peers to comply with layout
+   - Fix various unclosed/erroneous tags
+
 2017-05-25 zzz
  * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)
 
