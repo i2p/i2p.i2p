@@ -29,6 +29,7 @@
    - Delete icon for delete comments td
    - Overhaul .snarkTorrents column widths
    - CSS tidyups
+ * Compress some of the larger image files by 40-60%
 
 2017-05-25 zzz
  * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)
