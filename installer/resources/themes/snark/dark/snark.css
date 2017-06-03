@@ -314,10 +314,6 @@ table {
      opacity: 1 !important;
 }
 
-tr {
-     opacity: 1;
-}
-
 thead, tfoot {
      background: #000;
 }
@@ -445,16 +441,12 @@ tfoot tr:nth-child(n+1) {
      margin-left: 20px !important;
 }
 
-.SnarkTorrents td:nth-child(6), .SnarkTorrents td:nth-child(7), .SnarkTorrents td:nth-child(8) {
+.snarkTorrentETA, .snarkTorrentDownloaded, .snarkTorrentUploaded {
      text-align: center !important;
 }
 
-table.SnarkTorrents {
+.SnarkTorrents {
      margin-top: -1px !important;
-}
-
-.snarkTorrents th {
-     text-align: left;
 }
 
 .snarkTorrents td {
@@ -463,18 +455,37 @@ table.SnarkTorrents {
      font-size: 8pt !important;
 }
 
-.snarkTorrents td:nth-child(1) {
+.snarkGraphicStatus {
      width: 24px !important;
 }
 
-.snarkTorrents td:nth-child(3), .SnarkTorrents td:nth-child(4) {
+.snarkTrackerDetails, .SnarkTorrentDetails {
      width: 16px !important;
      padding: 0 !important;
      text-align: center !important;
 }
 
-.snarkTorrents td:nth-child(3) {
+.snarkTrackerDetails {
      text-align: right !important;
+}
+
+.snarkGraphicStatus, .snarkTorrentStatus {
+     white-space: nowrap;
+     width: 1%;
+}
+
+th.snarkTorrentStatus {
+     text-align: center !important;
+}
+
+.snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
+     width: 5%;
+     min-width: 40px;
+     white-space: nowrap;
+}
+
+.snarkTorrents th:empty + th:empty, .snarkTorrents td:empty + td:empty, .snarkTorrents th:last-child:empty, .snarkTorrents td:last-child:empty {
+     width: 0 !important;
 }
 
 .snarkTorrents td[colspan="10"]{
@@ -546,7 +557,7 @@ table.SnarkTorrents {
      box-shadow: inset 0 0 0 1px #030;
 }
 
-table.SnarkTorrentInfo {
+.SnarkTorrentInfo {
      margin-bottom: 1px !important;
      background: url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom #001100;
      border-bottom: 1px solid #494;
@@ -563,10 +574,17 @@ table.SnarkTorrentInfo {
      color: #bb7;
 }
 
-table.SnarkDirInfo {
+.SnarkDirInfo {
      margin-top: 10px !important;
      margin-bottom: 0;
      border-bottom: 1px solid #494;
+}
+
+#infohash {
+     color: #cc0;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
 }
 
 .snarkDirInfo th img {
@@ -687,12 +705,12 @@ th.headerdownloaded {
      white-space: nowrap;
 }
 
-td.snarkFileIcon {
+.snarkFileIcon {
      width: 16px;
      padding: 0;
 }
 
-td.snarkFileStatusIcon {
+.snarkFileStatusIcon {
      width: 24px;
      padding: 0 4px 0 0;
      text-align: center;
@@ -712,11 +730,6 @@ td {
 
 td:first-child {
      text-align: right;
-     font-size: 9pt;
-}
-
-.center {
-     text-align: center !important;
 }
 
 .snarkTorrentName {
@@ -756,18 +769,14 @@ td:first-child {
      border-bottom: 1px solid #494;
 }
 
+.snarkGraphicStatus {
+     text-align: center !important;
+}
+
 .snarkTorrentStatus {
-     padding: 2px 2px 2px 0;
+     padding: 3px 5px 3px 0 !important;
      line-height: 90%;
      min-width: 0;
-}
-
-td.snarkTorrentStatus {
-     text-align: center !important;
-     padding: 3px 0;
-}
-
-td.snarkTorrentStatus:nth-child(2) {
      text-align: left !important;
 }
 
@@ -1345,6 +1354,15 @@ input[name="nofilter_dataDir"] {
      height: auto;
 }
 
+input[name="nofilter_commentsName"] {
+     width: 250px;
+     text-overflow: ellipsis;
+}
+
+input[name="nofilter_commentsName"]:focus::placeholder {
+     opacity: 0;
+}
+
 .configsectionpanel input[type=text], input.r, textarea[name="i2cpOpts"], input[name="nofilter_dataDir"], #configs select {
      margin-top: 4px;
      margin-bottom: 4px;
@@ -1359,8 +1377,8 @@ input[type=image], th a:link img, th a:visited img {
      opacity: 1;
 }
 
-input[type=text], input.r {
-     min-width: 100px;
+input[type=text], input.r, select {
+     min-width: 120px !important;
 }
 
 input[type=radio] {
@@ -1686,7 +1704,7 @@ _:-ms-lang(x), #trackerselect tr:last-child {
      border: 1px solid #494;
 }
 
-table.trackerconfig td:first-child {
+.trackerconfig td:first-child {
      padding: 5px 2px;
      width: 24px !important;
 }
@@ -2360,6 +2378,207 @@ input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked,
 
 /* end custom radios/checkboxes */
 
+/* Comments Section */
+/* TODO: merge with other rules where applicable */
+
+.snarkCommentInfo, .snarkComments {
+     margin: 10px 0 0 !important;
+     border: 1px solid #494;
+     border-left: none;
+     border-right: none;
+     background: #001100 url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom;
+     filter: drop-shadow(0px 0 1px rgba(16, 8, 16, 0.7));
+}
+
+.snarkComments {
+     margin-top: -1px !important;
+     border-top: none;
+}
+
+.snarkCommentInfo th, .snarkComments th {
+     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%);
+     padding: 8px 5px;
+     white-space: normal;
+}
+
+.snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(odd) {
+     background: #001000;
+     border-bottom: 1px inset #000;
+}
+
+.snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(even) {
+     background: #000800;
+     border-bottom: 1px inset #000;
+}
+
+.snarkCommentInfo th {
+     padding: 8px 5px 8px 30px;
+     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%);
+}
+
+.snarkCommentInfo td, .snarkComments td {
+     padding: 8px 5px;
+}
+
+.snarkCommentInfo td:first-child {
+     white-space: nowrap;
+}
+
+.snarkCommentInfo td:first-child {
+     font-weight: bold;
+}
+
+.snarkCommentInfo td:first-child::after, .snarkComments td:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 22px;
+     vertical-align: middle;
+}
+
+.snarkCommentInfo input.accept {
+     float: right;
+     margin-right: 5px !important;
+}
+
+#myRating {
+     border-top: 1px solid #050;
+}
+
+.snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     width: 100%;
+     min-height: 64px;
+     height: 64px;
+     resize: vertical;
+     opacity: 0.8;
+}
+
+.snarkComments th {
+     text-align: left;
+}
+
+.commentRating, .commentAuthor {
+     width: 1%;
+}
+
+#nameRequired {
+     float: right;
+     margin-right: 5px;
+}
+
+.commentRating {
+     width: 80px;
+     white-space: nowrap;
+}
+
+.commentRating img {
+     margin: 0;
+     padding: 0;
+     height: 16px;
+     width: 16px;
+}
+
+.commentDate {
+     width: 105px;
+     background: url(images/clock.png) left center no-repeat;
+     padding-left: 20px !important;
+}
+
+.snarkCommentInfo td:first-child, .snarkComments td:first-child {
+     min-width: 160px !important;
+     width: 160px !important;
+     padding-right: 2px;
+}
+
+.snarkCommentInfo td:last-child, .snarkComments td:last-child {
+     width: 1% !important;
+}
+
+.snarkComments td {
+     white-space: nowrap;
+}
+
+.commentAuthorName {
+     background: url(images/author.png) left center no-repeat;
+     padding-left: 20px;
+}
+
+.commentText {
+     white-space: normal;
+     text-align: justify;
+     width: 90%;
+}
+
+.commentWrapper {
+     border: 1px solid #030;
+     margin: 2px 0;
+     padding: 8px 10px 8px 26px;
+     border-radius: 3px;
+     box-shadow: inset 0 0 0 1px #393, 0 0 1px 0 rgba(0,0,0,0.3);
+     background: url(images/comment.png) 6px center no-repeat #010;
+     background-blend-mode: luminosity;
+}
+
+#commentsConfig .optbox {
+     vertical-align: middle !important;
+}
+
+.snarkComments select {
+     margin-right: 0 !important;
+}
+
+#commentDeleteAction {
+     border-top: 1px solid #050;
+     background: none;;
+}
+
+#commentDeleteAction td {
+     padding-right: 6px;
+}
+
+.commentAction, .commentDelete {
+     width: 1%;
+     white-space: nowrap;
+     padding-left: 0;
+}
+
+.addCommentText, .commentText {
+     padding-right: 0;
+}
+
+.commentDelete {
+     background: url(../ubergine/images/nuke.png) 2px center no-repeat;
+     text-align: left;
+     padding: 8px 6px 8px 24px !important;
+}
+
+#newRating td {
+     padding-top: 10px !important;
+     padding-bottom: 10px !important;
+     border-top: 1px solid #050;
+}
+
+#myRating td:empty {
+     padding: 0 !important;
+     border-top: none !important;
+     border-bottom: none !important;
+}
+
+#myRating td:empty::after { /* hides My Ratings row when Ratings disabled  */
+     min-height: 1px !important;
+}
+
+.commentRating img {
+     margin: 0 0 4px;
+     padding: 0;
+     font-size: 14pt;
+     color: #FF7200;
+     text-shadow: 0 0 1px #900;
+     filter: none;
+}
+
+/* end Comments section */
+
 /* responsive layout */
 
 @media screen and (max-width: 950px) {
@@ -2497,6 +2716,10 @@ body, .snarkTorrents td, .snarkAddInfo, th, td,  code, textarea, input, input[ty
      font-size: 12pt !important;
 }
 
+.snarkTorrentStatus {
+     padding-right: 10px !important;
+}
+
 .snarkTorrentDownloaded {
      white-space: nowrap;
      padding: 0 8px;
@@ -2609,201 +2832,3 @@ textarea[name="i2cpOpts"] {
 
 /* end responsive layout */
 
-/* Comments Section */
-/* TODO: merge with other rules where applicable */
-
-.snarkCommentInfo, .snarkComments {
-     margin: 10px 0 0 !important;
-     border: 1px solid #494;
-     border-left: none;
-     border-right: none;
-     background: #001100 url(/themes/console/dark/images/camotile2.png) repeat scroll center bottom;
-     filter: drop-shadow(0px 0 1px rgba(16, 8, 16, 0.7));
-}
-
-.snarkCommentInfo th, .snarkComments th {
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%);
-     padding: 8px 5px;
-     white-space: normal;
-}
-
-.snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(even) {
-     background: #001000;
-     border-bottom: 1px inset #000;
-}
-
-.snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(odd) {
-     background: #000800;
-     border-bottom: 1px inset #000;
-}
-
-.snarkCommentInfo th {
-     padding: 8px 5px 8px 30px;
-     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 50%, #000 100%);
-}
-
-.snarkCommentInfo td, .snarkComments td {
-     padding: 8px 5px;
-}
-
-.snarkCommentInfo td:first-child {
-     white-space: nowrap;
-}
-
-.snarkCommentInfo td:first-child {
-     font-weight: bold;
-}
-
-.snarkCommentInfo td:first-child::after, .snarkComments td:first-child::after {
-     content: "";
-     display: inline-block;
-     min-height: 32px;
-     vertical-align: middle;
-}
-
-.snarkCommentInfo input.accept {
-     float: right;
-     margin-right: 5px !important;
-}
-
-.snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
-     width: 100%;
-     min-height: 64px;
-     height: 64px;
-     resize: vertical;
-     opacity: 0.8;
-}
-
-.snarkComments th {
-     text-align: left;
-}
-
-.commentRating, .commentAuthor {
-     width: 1%;
-}
-
-#nameRequired {
-     float: right;
-     margin-right: 5px;
-}
-
-.commentRating {
-     padding-right: 10px !important;
-}
-
-.commentRating img {
-     margin: 0;
-     padding: 0;
-     height: 16px;
-     width: 16px;
-}
-
-.commentDate {
-     width: 100px;
-     background: url(images/clock.png) left center no-repeat;
-     padding-left: 20px !important;
-}
-
-.snarkCommentInfo td:first-child, .snarkComments td:first-child {
-     width: 160px !important;
-     padding-right: 2px;
-}
-
-.snarkCommentInfo td:last-child, .snarkComments td:last-child {
-     width: 1% !important;
-}
-
-.snarkComments td {
-     white-space: nowrap;
-}
-
-.commentAuthorName {
-     background: url(images/author.png) left center no-repeat;
-     padding-left: 20px;
-}
-
-.commentText {
-     white-space: normal;
-     text-align: justify;
-     width: 90%;
-}
-
-.commentWrapper {
-     border: 1px solid #030;
-     margin: 2px 0;
-     padding: 8px 10px 8px 26px;
-     border-radius: 3px;
-     box-shadow: inset 0 0 0 1px #393, 0 0 1px 0 rgba(0,0,0,0.3);
-     background: url(images/comment.png) 6px center no-repeat #010;
-     background-blend-mode: luminosity;
-}
-
-.commentText .optbox {
-     position: fixed;
-     right: 20px;
-     top: 10px;
-}
-
-#commentsConfig .optbox {
-     vertical-align: middle !important;
-}
-
-.snarkComments select {
-     margin-right: 0 !important;
-}
-
-#commentDeleteAction {
-     border-top: 1px solid #494;
-     background: none;;
-}
-
-#commentDeleteAction td {
-     padding-right: 6px;
-}
-
-.commentAction, .commentDelete {
-     width: 1%;
-     white-space: nowrap;
-/*     min-width: 180px !important;*/
-     padding-left: 0;
-}
-
-.addCommentText, .commentText {
-     padding-right: 0;
-}
-
-.commentAction input[type="submit"] {
-     margin-top: 10px;
-     margin-bottom: 10px;
-}
-
-.commentDelete {
-     text-align: left;
-}
-
-#newRating td {
-     padding-top: 10px !important;
-     padding-bottom: 10px !important;
-}
-
-#myRating td:empty {
-     padding: 0 !important;
-     border-top: none !important;
-     border-bottom: none !important;
-}
-
-#myRating td:empty::after { /* hides My Ratings row when Ratings disabled  */
-     min-height: 1px !important;
-}
-
-.commentRating img {
-     margin: 0 0 4px;
-     padding: 0;
-     font-size: 14pt;
-     color: #FF7200;
-     text-shadow: 0 0 1px #900;
-     filter: none;
-}
-
-/* end Comments section */

@@ -319,35 +319,42 @@ body.iframed {
      text-align: center;
 }
 
-.snarkTorrents th:nth-child(4),
-.snarkTorrents th:nth-child(5),
-.snarkTorrents th:nth-child(6),
-.snarkTorrents th:nth-child(7),
-.snarkTorrents th:nth-child(8),
-.snarkTorrents th:nth-child(9),
-.snarkTorrents th:last-child {
+#pagenav, .snarkTorrentETA, .snarkTorrentDownloaded, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp, .snarkTorrentAction {
      text-align: center;
 }
 
-.snarkTorrents td:nth-child(6),
-.snarkTorrents td:nth-child(7),
-.snarkTorrents td:nth-child(8) {
-     text-align: center !important;
+.snarkTorrentAction {
+     padding-right: 2px !important;
 }
 
-table.snarkTorrents {
+.snarkTorrents {
      margin-top: -1px !important;
 }
 
-.snarkTorrents td:nth-child(1) {
-     width: 24px !important;
-}
-
-.snarkTorrents td:nth-child(3),
-.snarkTorrents td:nth-child(4) {
+.snarkTrackerDetails, .snarkTorrentDetails {
      width: 16px !important;
      text-align: center !important;
      font-weight: bold;
+}
+
+.snarkGraphicStatus, .snarkTorrentStatus {
+     white-space: nowrap;
+     width: 1%;
+}
+
+.snarkGraphicStatus {
+     width: 24px !important;
+}
+
+
+.snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
+     width: 5%;
+     min-width: 40px;
+     white-space: nowrap;
+}
+
+.snarkTorrents th:empty + th:empty, .snarkTorrents td:empty + td:empty, .snarkTorrents th:last-child:empty, .snarkTorrents td:last-child:empty {
+     width: 0 !important;
 }
 
 pre {
@@ -522,7 +529,7 @@ tfoot tr:nth-child(n+1) {
      text-align: center !important;
 }
 
-table.snarkTorrents {
+.snarkTorrents {
      margin-top: -1px !important;
      border: none;
 }
@@ -605,7 +612,7 @@ tt {
 
 .snarkTorrentInfo td:first-child {
      width: 20px !important;
-     padding: 3px 4px 4px!important;
+     padding: 4px !important;
 }
 
 .snarkTorrentInfo input[type="submit"] {
@@ -627,7 +634,7 @@ tt {
      border-top: 1px solid #89f !important;
 }
 
-table.SnarkTorrentInfo {
+.SnarkTorrentInfo {
      margin-bottom: 1px !important;
      border-bottom: 1px solid #89f;
      background: #eef;
@@ -653,11 +660,18 @@ table.SnarkTorrentInfo {
      text-align: left;
 }
 
+#infohash {
+     color: #090;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
 /* end torrent info */
 
 /* torrent directory */
 
-table.SnarkDirInfo {
+.SnarkDirInfo {
      margin-top: 10px !important;
      margin-bottom: 0;
      border-bottom: 1px solid #89f;
@@ -721,7 +735,7 @@ table.SnarkDirInfo {
      margin: 5px;
 }
 
-table.SnarkDirInfo img {
+.SnarkDirInfo img {
      max-width: 16px;
      max-height: 16px;
 }
@@ -826,8 +840,9 @@ td:first-child {
 /* torrent control buttons */
 
 .snarkTorrentAction {
-     margin: 0 !important;
-     padding: 1px 1px 1px 1px !important;
+     width: 1%;
+     white-space: nowrap;
+     padding: 1px 2px 1px 1px !important;
      text-align: center !important;
 }
 
@@ -840,8 +855,7 @@ td:first-child {
      box-shadow: 0 0 1px 1px #f90;
 }
 
-.snarkTorrentAction input[type="image"],
-.snarkTorrents th:last-child input[type="image"] {
+.snarkTorrentAction input[type="image"] {
      padding: 3px !important;
      background: #339;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ddf 51%, #ddf 100%);
@@ -852,32 +866,15 @@ td:first-child {
      height: 10px;
 }
 
-.snarkTorrentAction input[type="image"]:hover,
-.snarkTorrentAction input[type="image"]:focus,
-.snarkTorrents th:last-child input[type="image"]:hover,
-.snarkTorrents th:last-child input[type="image"]:focus {
-     border: 1px solid #f60;
+.snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type="image"]:focus {
+     border: 1px solid #f60 !important;
      filter: drop-shadow(0 0 1px #f60);
 }
 
-.snarkTorrentAction input[type="image"]:active,
-.snarkTorrents th:last-child input[type="image"]:active {
+.snarkTorrentAction input[type="image"]:active {
      background: linear-gradient(to bottom, #ddf 0%, #ddf 50%, #99f 51%, #99f 100%);
      box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #333;
      filter: none !important;
-}
-
-.snarkTorrents th:last-child input[type="image"]:hover,
-.snarkTorrents td:last-child input[type="image"]:hover,
-.snarkTorrents th:last-child input[type="image"]:focus,
-.snarkTorrents td:last-child input[type="image"]:focus { /* borders on hover only for torrent control buttons, otherwise drop-shadow */
-     border: 1px solid #f60 !important;
-}
-
-td.snarkTorrentAction {
-     width: 1%;
-     padding-right: 2px !important;
-     white-space: nowrap;
 }
 
 /* end torrent control buttons */
@@ -1494,9 +1491,16 @@ input[size="85"] {
      margin-left: 5px !important;
 }
 
+select, input.r {
+     min-width: 120px;
+}
+
+input[name="nofilter_commentsName"] {
+     width: 250px;
+}
+
 select {
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif;
-     min-width: 100px;
      margin: 2px 4px 2px 0;
      padding: 4px 16px 4px 2px;
      cursor: pointer;
@@ -1737,7 +1741,7 @@ div.configsectionpanel td:first-child {
      border: 1px solid #89f;
 }
 
-table.trackerconfig td:first-child {
+.trackerconfig td:first-child {
      width: 24px !important;
      padding: 5px 2px;
 }
@@ -2272,6 +2276,7 @@ td#bwHelp a {
      white-space: nowrap;
      display: inline-block;
      margin-right: 7px;
+     vertical-align: middle;
 }
 
 #filecheck {
@@ -2285,8 +2290,212 @@ td#bwHelp a {
      margin: 8px;
 }
 
-
 /* end Resource Errors */
+
+/* Comments Section */
+
+.snarkCommentInfo, .snarkComments {
+     margin: 10px 0 0 !important;
+     border: 1px solid #bbf;
+     border-left: none;
+     border-right: none;
+     background: #eef;
+}
+
+.snarkComments {
+     margin-top: -1px !important;
+}
+
+.snarkCommentInfo th, .snarkComments th {
+     padding: 8px 5px;
+}
+
+.snarkCommentInfo th {
+     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #fff, #eef) #fff;
+     padding-left: 30px !important;
+}
+
+.snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(odd) {
+     border-top: 1px solid #bbf;
+     background: rgba(240, 240, 255, 0.5) #fff;
+}
+
+.snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(even) {
+     border-top: 1px solid #bbf;
+     background: rgba(220, 220, 255, 0.5);
+}
+
+.snarkCommentInfo th {
+     padding: 8px 5px;
+}
+
+.snarkCommentInfo td, .snarkComments td {
+     padding: 8px 5px;
+}
+
+.snarkCommentInfo td:first-child {
+     white-space: nowrap;
+}
+
+.snarkCommentInfo td:first-child {
+     font-weight: bold;
+}
+
+.snarkCommentInfo input.accept {
+     float: right;
+     margin-right: 5px !important;
+}
+
+.snarkCommentInfo textarea {
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif !important;
+     font-weight: normal;
+     width: 100%;
+     min-height: 64px;
+     height: 64px;
+     resize: vertical;
+     opacity: 0.8;
+}
+
+.snarkCommentInfo textarea:focus {
+     opacity: 1;
+}
+
+.snarkComments th {
+     text-align: left;
+}
+
+.commentRating, .commentAuthor {
+     width: 1%;
+}
+
+#nameRequired {
+     float: right;
+     margin-right: 5px;
+}
+
+#nameRequired a {
+     font-weight: bold;
+}
+
+.commentRating {
+     padding-right: 10px !important;
+}
+
+.commentRating img {
+     margin: 0;
+     padding: 0;
+     height: 16px;
+     width: 16px;
+}
+
+.commentText {
+     white-space: normal;
+     text-align: justify;
+     width: 90%;
+}
+
+.commentDate {
+     width: 100px;
+     background: url(images/clock.png) left center no-repeat;
+     padding-left: 20px !important;
+}
+
+.snarkCommentInfo td:first-child, .commentAuthor {
+     width: 160px !important;
+     min-width: 160px !important;
+     padding-right: 2px;
+}
+
+.snarkCommentInfo td:last-child, .snarkComments td:last-child {
+     width: 1% !important;
+}
+
+.snarkComments td {
+     white-space: nowrap;
+}
+
+.commentAuthorName {
+     background: url(images/author.png) left center no-repeat;
+     padding-left: 20px;
+}
+
+.commentWrapper {
+     border: 1px solid #bbf;
+     margin: 2px 0;
+     padding: 8px 10px 8px 26px;
+     border-radius: 3px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 rgba(0,0,0,0.3);
+     background: url(images/comment.png) 6px center no-repeat #eef;
+     background-blend-mode: luminosity;
+}
+
+#commentsConfig .optbox {
+     vertical-align: middle !important;
+}
+
+.snarkComments select {
+     margin-right: 0 !important;
+}
+
+#commentDeleteAction {
+     background: #fff;
+}
+
+#commentDeleteAction td {
+     padding: 8px 6px;
+     border-top: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+}
+
+.commentAction, .commentDelete {
+     width: 1%;
+     white-space: nowrap;
+     padding-left: 0;
+}
+
+.addCommentText, .commentText {
+     padding-right: 0;
+}
+
+.commentAction input[type="submit"] {
+     margin-top: 3px;
+     margin-bottom: 3px;
+}
+
+.commentDelete {
+     background: url(../ubergine/images/nuke.png) 2px center no-repeat;
+     text-align: left;
+     padding-left: 24px !important;
+}
+
+#newRating td:first-child {
+     text-align: right;
+}
+
+#newRating select {
+     width: 90%;
+}
+
+#myRating td:empty {
+     padding: 0 !important;
+     border-top: none !important;
+     border-bottom: none !important;
+}
+
+#myRating td:empty::after { /* hides My Ratings row when Ratings disabled  */
+     min-height: 1px !important;
+}
+
+.commentRating img {
+     margin: 0 0 4px;
+     padding: 0;
+     font-size: 14pt;
+     color: #FF7200;
+     text-shadow: 0 0 1px #900;
+     filter: none;
+}
+
+/* end Comments section */
 
 /* MS Edge fix */
 _:-ms-lang(x), * {
@@ -2380,7 +2589,7 @@ body {
      margin-bottom: 0 !important;
 }
 
-table.SnarkDirInfo {
+.SnarkDirInfo {
      margin-top: 4px !important;
 }
 
@@ -2448,7 +2657,7 @@ body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_
 }
 
 @media screen and (min-width: 1400px) {
-body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"], .snarkAddInfo, code {
+body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"], .snarkAddInfo, code, .snarkCommentInfo textarea {
      font-size: 10pt !important;
 }
 
@@ -2479,194 +2688,3 @@ td.snarkTorrentDownloaded {
 }
 /* end responsive layout */
 
-/* Comments Section */
-/* TODO: merge with other rules where applicable */
-
-.snarkCommentInfo, .snarkComments {
-     margin: 10px 0 0 !important;
-     border: 1px solid #bbf;
-     border-left: none;
-     border-right: none;
-     background: #eef;
-}
-
-.snarkCommentInfo th, .snarkComments th {
-     padding: 8px 5px;
-}
-
-.snarkCommentInfo th {
-     background: url(images/comment.png) 8px center no-repeat, linear-gradient(to bottom, #fff, #eef) #fff;
-     padding-left: 30px !important;
-}
-
-.snarkCommentInfo tr:nth-child(even), .snarkComments tr:nth-child(even) {
-     border-top: 1px solid #bbf;
-     background: rgba(240, 240, 255, 0.5) #fff;
-}
-
-.snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(odd) {
-     border-top: 1px solid #bbf;
-     background: rgba(220, 220, 255, 0.5);
-}
-
-.snarkCommentInfo th {
-     padding: 8px 5px;
-}
-
-.snarkCommentInfo td, .snarkComments td {
-     padding: 8px 5px;
-}
-
-.snarkCommentInfo td:first-child {
-     white-space: nowrap;
-}
-
-.snarkCommentInfo td:first-child {
-     font-weight: bold;
-}
-
-.snarkCommentInfo input.accept {
-     float: right;
-     margin-right: 5px !important;
-}
-
-.snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", Verdana, "Bitstream Vera Sans", "DejaVu Sans", "Lucida Grande", Helvetica, sans-serif !important;
-     font-weight: normal;
-     width: 100%;
-     min-height: 64px;
-     height: 64px;
-     resize: vertical;
-     opacity: 0.8;
-}
-
-.snarkCommentInfo textarea:focus {
-     opacity: 1;
-}
-
-.snarkComments th {
-     text-align: left;
-}
-
-.commentRating, .commentAuthor {
-     width: 1%;
-}
-
-#nameRequired {
-     float: right;
-     margin-right: 5px;
-}
-
-#nameRequired a {
-     font-weight: bold;
-}
-
-.commentRating {
-     padding-right: 10px !important;
-}
-
-.commentRating img {
-     margin: 0;
-     padding: 0;
-     height: 16px;
-     width: 16px;
-}
-
-.commentText {
-     white-space: normal;
-     text-align: justify;
-     width: 80%;
-}
-
-.commentDate {
-     width: 100px;
-     background: url(images/clock.png) left center no-repeat;
-     padding-left: 20px !important;
-}
-
-.snarkCommentInfo td:first-child, .commentAuthor {
-     width: 180px !important;
-     padding-right: 2px;
-}
-
-.snarkCommentInfo td:last-child, .snarkComments td:last-child {
-     width: 1% !important;
-}
-
-.snarkComments td {
-     white-space: nowrap;
-}
-
-.commentAuthorName {
-     background: url(images/author.png) left center no-repeat;
-     padding-left: 20px;
-}
-
-.commentWrapper {
-     border: 1px solid #bbf;
-     margin: 2px 0;
-     padding: 8px 10px 8px 26px;
-     border-radius: 3px;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 rgba(0,0,0,0.3);
-     background: url(images/comment.png) 6px center no-repeat #eef;
-     background-blend-mode: luminosity;
-}
-
-#commentsConfig .optbox {
-     vertical-align: middle !important;
-}
-
-.snarkComments select {
-     margin-right: 0 !important;
-}
-
-#commentDeleteAction {
-     background: #fff;
-}
-
-#commentDeleteAction td {
-     padding: 0 6px;
-     border-top: 1px solid #89f;
-     border-bottom: 1px solid #89f;
-}
-
-.commentAction, .commentDelete {
-     width: 1%;
-     white-space: nowrap;
-     min-width: 180px !important;
-     padding-left: 0;
-}
-
-.addCommentText, .commentText {
-     padding-right: 0;
-}
-
-.commentAction input[type="submit"] {
-     margin-top: 10px;
-     margin-bottom: 10px;
-}
-
-.commentDelete {
-     text-align: left;
-}
-
-#myRating td:empty {
-     padding: 0 !important;
-     border-top: none !important;
-     border-bottom: none !important;
-}
-
-#myRating td:empty::after { /* hides My Ratings row when Ratings disabled  */
-     min-height: 1px !important;
-}
-
-.commentRating img {
-     margin: 0 0 4px;
-     padding: 0;
-     font-size: 14pt;
-     color: #FF7200;
-     text-shadow: 0 0 1px #900;
-     filter: none;
-}
-
-/* end Comments section */

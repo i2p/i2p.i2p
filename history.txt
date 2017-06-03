@@ -15,6 +15,20 @@
    - Update fallback images for en and fr
    - Update overview text
    - added tabindex="0" to destination addresses, highlighted on :focus
+ * i2psnark:
+   - Reorder .snarkCommentInfo sections so my rating / average rating is located
+     directly above posted comments/ratings in .snarkComments
+   - If author name for comments is configured, display it in .snarkCommentInfo
+     table header
+   - Full status tooltips for status icons in .snarkTorrents
+   - Rework td/th classes for .snarkTorrents so each column (both th + td) now
+     belongs to a given class
+   - Stop .snarkTorrentStatus class being incorrectly applied to .peerinfo
+     columns
+   - Spans for DHT peers / Dest in #totals, .snarkTorrentInfo info hash
+   - Delete icon for delete comments td
+   - Overhaul .snarkTorrents column widths
+   - CSS tidyups
 
 2017-05-25 zzz
  * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)
