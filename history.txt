@@ -30,6 +30,25 @@
    - Overhaul .snarkTorrents column widths
    - CSS tidyups
  * Compress some of the larger image files by 40-60%
+ * UI feedback:
+   * Console:
+     - Increase contrast of table rows on profile/tunnels/peers tables
+     - Changed pink font to magenta in /logs to increase legibility
+     - Soften H3 headings in sidebar
+     - Single click to select I2P Version and Running Environment table text,
+       with table:hover color change and text cursor to better reflect selection
+       - Modify text above to indicate what exactly needs to be included in logs
+     - Reduce size of monospace dests in peers/profiles/tunnels, add additional
+       spacing (responsive)
+     - Fix resizing of sidebar reseed button
+     - De-emphasise siderbar app icons with background-blend-mode: luminosity
+     - Change sidebar snark icon to match homepage icon
+     - Bump div.main text color from #222 to #333 (reduce contrast)
+   * i2ptunnel: Increase vertical spacing of H2/H3's
+   * SusiDNS: Change address helper icon to add book icon
+   * i2psnark:
+     - Remove font-adjust-size (ubergine/vanilla)
+     - Add extra spacing to screenlogger bullets (ubergine)
 
 2017-05-25 zzz
  * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)

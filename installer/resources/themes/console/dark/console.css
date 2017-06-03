@@ -3792,32 +3792,45 @@ th > img[src^="/imagegen"] { /* scale down header images */
      display: none;
 }
 
-table#enviro, table#criticallogs, table#routerlogs, table#eventlogs, table#wrapperlogs {
+#enviro, #criticallogs, #routerlogs, #eventlogs, #wrapperlogs {
      margin-top: -11px;
 }
 
-table#bugreports {
+#bugreports {
      margin-top: 15px;
 }
 
-table#bugreports td {
+#bugreports td {
      background: url(images/infohelp.png) 12px center no-repeat !important;
      padding: 15px 10px 15px 50px;
 }
 
-table#enviro td {
+#enviro:hover {
+     -moz-user-select: all;
+     --webkit-user-select: all;
+     user-select: all;
+     cursor: text;
+}
+
+#enviro:hover td {
+     background: #010;
+     border: #010;
+     color: #ff0;
+}
+
+#enviro td {
      font-weight: normal !important;
      padding: 5px 10px;
 }
 
-table#enviro td:first-child {
+#enviro td:first-child {
      width: 100px;
      text-align: right;
      padding-right: 0;
      white-space: nowrap;
 }
 
-table#criticallogs td , table#routerlogs td, table#eventlogs td, table#wrapperlogs td {
+#criticallogs td , #routerlogs td, #eventlogs td, #wrapperlogs td {
      font-weight: normal !important;
      padding: 5px 10px;
      border-top: 1px solid #494;
@@ -3839,7 +3852,7 @@ table[id$="logs"] ul {
      margin: -5px 12px -5px -18px !important;
 }
 
-table#wrapperlogs {
+#wrapperlogs {
      width: 100%;
      table-layout: fixed;
      margin-bottom: 10px;
@@ -3928,11 +3941,11 @@ font[color="#ff3300"] {
      background: #990;
 }
 
-font[color="#ff00cc"] {
+font[color="#bf00df"] {
      color: #880 !important;
 }
 
-#logs li font[color="#ff00cc"]::before {
+#logs li font[color="#bf00df"]::before {
      background: #880;
 }
 
@@ -5121,7 +5134,7 @@ textarea#advancedsettings {
      background-size: 28px 28px !important;
 }
 
-table.logtable, table#enviro {
+table.logtable, #enviro {
      margin-top: -1px !important;
 }
 
@@ -5154,7 +5167,8 @@ td.optionsave {
      margin-bottom: 0;
 }
 
-h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils, #certs h3 {
+h3.tabletitle, h3#i2pclientconfig, h3#advancedclientconfig, h3#webappconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile,
+h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#upnpstatus, h3.sybils, #certs h3 {
      margin-bottom: 0 !important;
      border-radius: 0;
      border: 1px solid #494;
@@ -5186,6 +5200,17 @@ h3#transports {
 
 h3#upnpstatus {
      margin-bottom: 7px !important;
+}
+
+h3#upnp {
+     border: 1px solid #494;
+}
+
+#upnpscan {
+     border: 1px solid #494;
+     margin: -11px 0 10px;
+     padding: 5px 15px;
+     background: #000;
 }
 
 h3.ptitle {

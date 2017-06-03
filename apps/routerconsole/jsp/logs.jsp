@@ -14,7 +14,7 @@
 
 <table id="bugreports"><tbody>
   <tr><td class="infohelp">
-<%=intl._t("Please include this information in bug reports")%>.
+<%=intl._t("Please include your I2P version and running environment information in bug reports")%>.
 <%=intl._t("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%>
 <% /* note to translators - both parameters are URLs */
 %><%=intl._t("Please report bugs on {0} or {1}.",

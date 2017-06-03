@@ -246,7 +246,7 @@ input[type="hidden"], input.default {
 }
 
 h2, h3 {
-     padding: 6px 10px;
+     padding: 8px 10px 6px 30px;
      border: 1px solid #89f;
      background: #fff url(/themes/console/classic/images/tinytitle.png) repeat right center;
      background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
@@ -262,32 +262,28 @@ h2, h3 {
 
 /* title images */
 
-h2, h3 {
-     padding-left: 30px;
-}
-
 #messages h2 {
-     background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background: url(/themes/console/images/info/logs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #globalTunnelControl h2 {
-     background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background: url(/themes/console/images/info/control.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #servers h2 {
-     background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background: url(/themes/console/images/info/server.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #clients h2 {
-     background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background: url(/themes/console/images/info/client.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
 #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
-     background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
+     background: url(/themes/console/images/info/configure.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) #fff !important;
      background-size: 20px auto, 100% 100%, 100% 100% !important;
 }
 
@@ -944,8 +940,10 @@ th {
      font-size: 10.5pt;
 }
 
-h2, h3 {
+h2, h3, #messages h2, #globalTunnelControl h2, #servers h2, #clients h2, #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3, #wizardPanel h2 {
      font-size: 12pt;
+     padding: 10px 10px 8px 35px;
+     background-position: 8px center, 0 0 !important;
 }
 
 #localDestination, .authentication {

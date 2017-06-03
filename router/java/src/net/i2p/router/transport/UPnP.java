@@ -694,9 +694,11 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		}
 
 		if(isDisabled) {
+			sb.append("<p>");
 			sb.append(_t("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?"));
 			return sb.toString();
 		} else if(!isNATPresent()) {
+			sb.append("<p>");
 			sb.append(_t("UPnP has not found any UPnP-aware, compatible device on your LAN."));
 			return sb.toString();
 		}

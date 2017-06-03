@@ -334,6 +334,7 @@ input[type="hidden"], input.default {
 
 h2, h3 {
      padding: 6px 10px;
+     padding: 9px 10px 7px 30px;
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
      background: linear-gradient(to bottom, #fff 50%, #eef 50%) !important;
@@ -971,6 +972,10 @@ h2, h3 {
 @media screen and (min-width: 1500px) {
 body, select, .control, input, textarea, .freetext {
      font-size: 10pt !important;
+}
+
+h2, h3 {
+     padding: 10px 10px 8px 30px;
 }
 
 th {

@@ -198,8 +198,10 @@ div.routersummary a:active img[src$="i2plogo.png"] {
      margin: -9px -7px -2px;
      padding: 2px 0;
      text-transform: uppercase;
-     background: #ffe url(images/header.png) center center repeat-x;
+     background: #e7e7ff !important;
+     background: #e7e7ff url(images/header.png) center center repeat-x !important;
      background: linear-gradient(to bottom, #fff 50%, #eef 50%) !important;
+     background: #e7e7ff linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)) !important;
      border: 1px solid #99f;
      border-left: none;
      border-right: none;
@@ -214,6 +216,7 @@ div.routersummary a:active img[src$="i2plogo.png"] {
 
 .routersummary h3:hover {
      background: linear-gradient(to bottom, #fff 50%, #ffe8bf 50%, #efd9b3 100%) !important;
+     background: #fff linear-gradient(to bottom, #fff 50%, rgba(255, 232, 191, 0.6) 50%, rgba(239, 217, 179, 0.4) 100%) !important;
 }
 
 .routersummary h3:hover a {
@@ -405,6 +408,10 @@ p:empty + .sb_notice {
 
 /* experimental sidebar navigation for webapps */
 
+#sb_services td {
+     background: url(images/noise.png);
+}
+
 #sb_services a:link, #sb_services a:visited {
      display: inline-block;
      width: 100%;
@@ -424,48 +431,58 @@ p:empty + .sb_notice {
      padding-bottom: 2px;
 }
 
+#sb_services a {
+     background-blend-mode: luminosity, normal;
+}
+
+#sb_services a:hover {
+     background-blend-mode: normal;
+}
+
 #sb_services a[href="/susimail/susimail"] {
-     background: url(images/inbox.png) left center no-repeat;
+     background: #fbfbfe url(images/inbox.png) left center no-repeat;
 }
 
 #sb_services a[href="/susimail/susimail"]:hover {
-     background: url(images/inbox.png) left center no-repeat #ffe;
+     background: #ffe url(images/inbox.png) left center no-repeat;
      border-radius: 2px;
 }
 
 #sb_services a[href="/i2psnark/"] {
-     background: url(images/magnet.png) left center no-repeat;
+     background: #fbfbfe url(/themes/console/images/i2psnark.png) left center no-repeat;
+     background-size: 16px 16px;
 }
 
 #sb_services a[href="/i2psnark/"]:hover {
-     background: url(images/magnet.png) left center no-repeat #ffe;
+     background: #ffe url(/themes/console/images/i2psnark.png) left center no-repeat;
+     background-size: 16px 16px;
      border-radius: 2px;
 }
 
 #sb_services a[href="http://127.0.0.1:7658/"] {
-     background: url(images/server.png) left center no-repeat;
+     background: #fbfbfe url(images/server.png) left center no-repeat;
 }
 
 #sb_services a[href="http://127.0.0.1:7658/"]:hover {
-     background: url(images/server.png) left center no-repeat #ffe;
+     background: #ffe url(images/server.png) left center no-repeat;
      border-radius: 2px;
 }
 
 #sb_services a[href="/orchid/"] {
-     background: url(images/flower.png) left center no-repeat;
+     background: #fbfbfe url(images/flower.png) left center no-repeat;
 }
 
 #sb_services a[href="/orchid/"]:hover {
-     background: url(images/flower.png) left center no-repeat #ffe;
+     background: #ffe url(images/flower.png) left center no-repeat;
      border-radius: 2px;
 }
 
 #sb_services a[href*="bote"] {
-     background: url(images/mail_black.png) left center no-repeat;
+     background: #fbfbfe url(images/mail_black.png) left center no-repeat;
 }
 
 #sb_services a[href*="bote"]:hover {
-     background: url(images/mail_black.png) left center no-repeat #ffe;
+     background: #ffe url(images/mail_black.png) left center no-repeat;
      border-radius: 2px;
 }
 
@@ -854,7 +871,7 @@ div.main {
      margin: -12px 0 8px 207px;
      padding: 0 15px 10px 15px;
      text-align: left;
-     color: #222;
+     color: #333;
      width: auto;
      min-width: 546px;
      border: 1px solid #447;
@@ -1321,7 +1338,7 @@ h3#iptransport a:hover, h3#advancedconfig a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-h3#transports {
+h3#transports, h3#upnp {
      border: 1px solid #7789bf;
 }
 
@@ -1332,6 +1349,14 @@ pre#transports {
      padding: 10px 0 0 10px;
      width: calc(100% - 12px);
      margin: -16px 0 0;
+}
+
+#upnpscan {
+     border: 1px solid #7789bf;
+     margin: -16px 0 5px;
+     padding: 5px 10px;
+     background: #fff;
+     background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px);
 }
 
 /* confignet tidyup */
@@ -1833,31 +1858,43 @@ table#wrapperlogs {
      background: #ff3300;
 }
 
-#logs li font[color="#ff00cc"]::before {
-     background: #ff00cc;
+#logs li font[color="#bf00df"]::before {
+     background: #bf00df;
 }
 
 #logs li font[color="#000099"]::before {
      background: #000099;
 }
 
-table#bugreports {
+#bugreports {
      margin-top: 15px;
      padding: 10px;
      font-size: 9pt !important;
 }
 
-table#enviro, table[id$="logs"] {
+#enviro, table[id$="logs"] {
      font-size: 9pt !important;
      padding: 10px;
 }
 
-table#enviro td {
+#enviro {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+     cursor: text;
+}
+
+#enviro:hover td {
+     background: rgba(255,255,239,0.4);
+     border: rgba(255,255,239,0.4);
+}
+
+#enviro td {
      padding-top: 5px;
      padding-bottom: 5px;
 }
 
-table#enviro td:first-child {
+#enviro td:first-child {
      width: 100px;
      text-align: right;
      padding-right: 0;
@@ -2341,13 +2378,13 @@ p#profiles_overview {
      display: none;
 }
 
-table#bugreports {
+#bugreports {
     border-collapse: separate;
     border-radius: 2px;
     filter: drop-shadow(0 0 1px #ccc)
 }
 
-table#bugreports td.infohelp {
+#bugreports td.infohelp {
      background: #fff url(/themes/console/images/info/bugreport.png) no-repeat left center !important;
      padding: 10px 15px 10px 40px;
      background-size: 28px 28px;
@@ -2470,8 +2507,7 @@ p#pluginconfigtext {
      background-size: 28px 28px, 100% 100%, 100% 100% !important;
 }
 
-#plugininstall tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(3) td:nth-last-child(1),
-#manualreseed tr:nth-child(5) td:nth-last-child(1) {
+#plugininstall tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(3) td:nth-last-child(1), #manualreseed tr:nth-child(5) td:nth-last-child(1) {
      background: #fff;
 }
 
@@ -2642,7 +2678,7 @@ ul.statlist {
 }
 
 .statsName i {
-     color: #050;
+     color: #004f28;
      font-weight: bold;
 }
 
@@ -3390,11 +3426,12 @@ button.download.control:hover, button.download.control:focus {
      text-indent: 0;
      text-align: left;
      min-width: 0;
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
 }
 
 .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus {
-     background: url(/themes/console/images/buttons/download.png) center left 4px no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     padding: 5px 7px 5px 22px !important;
 }
 
 .routersummary .stop {
@@ -3418,7 +3455,9 @@ button.download.control:hover, button.download.control:focus {
 
 /* Show text on context specific buttons (eg deferred shutdown) */
 
-.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"] {
+.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"],
+.routersummary .reload[value="Reseed"], .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus {
+     background-size: 14px 14px, 100% 100% !important;
      text-indent: 0;
      text-align: left;
      min-width: 0 !important;
@@ -4267,6 +4306,19 @@ table#addkeyring tr:last-child td {
      background: url(/themes/console/images/info/interval.png) 12px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
      background-size: 28px 28px, 100% 100%, 100% 100% !important;
 }
+
+/* peers, profiles, tunnels */
+
+#ntcpconnections tr:nth-child(odd), #udpconnections tr:nth-child(odd), #profilelist tr:nth-child(odd), .tunneldisplay  tr:nth-child(odd) {
+     background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(201, 201, 255, 0.3) 3px, #fff 5px), #fff;
+}
+
+.cells tt, #profilelist tt {
+     font-size: 8pt !important;
+     margin-left: 2px !important;
+}
+
+/* end peers, profiles, tunnels dests */
 
 /* netdb */
 
@@ -5526,6 +5578,11 @@ input[name="pluginURL"] {
 .cells {
      padding: 3px 2px !important;
 }
+
+.cells tt, #profilelist tt {
+     margin-left: 2px !important;
+     margin-right: 2px !important;
+}
 }
 
 @media screen and (max-width: 1200px) {
@@ -5569,8 +5626,13 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.newss, pre, #jardump tt, #jardump td, div.news, #logs li {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.newss, pre, #jardump tt, #jardump td, div.news, #logs li, .cells tt, #profilelist tt {
      font-size: 9pt !important;
+}
+
+.cells tt, #profilelist tt {
+     margin-left: 3px !important;
+     margin-right: 3px !important;
 }
 
 .main[id^="config_"] th, h4#updateplugins {
@@ -5719,6 +5781,10 @@ button.control {
 
 .topness, .footnote {
      font-size: 9pt !important;
+}
+
+#ntcpconnections td:first-child, #udpconnections td:first-child {
+     min-width: 58px;
 }
 
 _:-ms-lang(x), #browseronstart {

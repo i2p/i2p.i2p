@@ -6,7 +6,7 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config stats")%>
-<noscript><style>.script {display: none;}</style></noscript>
+<noscript><style type="text/css">.script {display: none;}</style></noscript>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 <script type="text/javascript">

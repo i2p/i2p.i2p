@@ -1891,6 +1891,13 @@ tr.tablefooter:hover td {
      margin-top: 10px !important;
 }
 
+#upnpscan {
+     border: 1px solid #89f;
+     margin: -11px 0 5px;
+     padding: 0 10px 5px;
+     background: #fff;
+}
+
 .sortup, .sortdown, .sortupactive, .sortdownactive {
      padding: 1px 0;
      border: 1px solid #999;
@@ -2218,6 +2225,18 @@ pre#transports {
 
 #pluginconfig button, #webappconfig button, #clientconfig button {
      margin: 3px;
+}
+
+#enviro {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+     cursor: text;
+}
+
+#enviro:hover tr, #enviro:hover td {
+     background: #ffe;
+     border: #ffe;
 }
 
 #enviro td, #eventlogs td {
@@ -5216,13 +5235,22 @@ p#enablefullstats, p#gatherstats {
      background: #ff3300;
 }
 
-#logs li font[color="#ff00cc"]::before {
-     background: #ff00cc;
+#logs li font[color="#bf00df"]::before {
+     background: #bf00df;
 }
 
 #logs li font[color="#000099"]::before {
      background: #000099;
 }
+
+/* peers, profiles, tunnels */
+
+.cells tt, #profilelist tt {
+     font-size: 8pt !important;
+}
+
+/* end peers, profiles, tunnels dests */
+
 
 /* end logs */
 
@@ -5638,6 +5666,12 @@ table.sybil_routerinfo:last-child {
 }
 }
 
+@media screen and (min-width: 1200px) {
+.cells tt, #profilelist tt {
+     margin-left: 2px !important;
+}
+}
+
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes, .routersummary button.download,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, .statlist a[name],
@@ -5645,8 +5679,13 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li, .news #newsStatus, .news #ewsDisplay, .topness, .footnote {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li,
+.news #newsStatus, .news #ewsDisplay, .topness, .footnote, .cells tt, #profilelist tt {
      font-size: 9pt !important;
+}
+
+.cells tt, #profilelist tt {
+     margin-left: 3px !important;
 }
 
 .main, .news, h1 {

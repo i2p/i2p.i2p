@@ -8,7 +8,7 @@ Proxy-Connection: close
 <html>
 <head>
 <title>_("Outproxy Not Found")</title>
-<noscript><style>.script {display: none;}</style></noscript>
+<noscript><style type="text/css">.script {display: none;}</style></noscript>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>

@@ -174,7 +174,8 @@ public class LogsHelper extends HelperBase {
                 else if (msg.contains(_t("ERROR")))
                     color = "#ff3300";
                 else if (msg.contains(_t("WARN")))
-                    color = "#ff00cc";
+                   // color = "#ff00cc"; poor legibility on light backgrounds
+                    color = "#bf00df";
                 else if (msg.contains(_t("INFO")))
                     color = "#000099";
                 else

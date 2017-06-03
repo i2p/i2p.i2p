@@ -7,7 +7,7 @@ Proxy-Connection: close
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>_("Warning: Invalid Destination")</title>
-<noscript><style>.script {display: none;}</style></noscript>
+<noscript><style type="text/css">.script {display: none;}</style></noscript>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>

@@ -138,7 +138,6 @@ _:-ms-lang(x), .snarknavbar {
      box-shadow: 0 0 1px 0 #000, inset 0 0 0 1px rgba(16, 0, 16, 0.7);
      outline: none;
      border: 1px solid #730;
-     font-size-adjust: 0.56;
 }
 
 _:-ms-lang(x), .snarkRefresh:link, .snarkRefresh:visited {
@@ -301,6 +300,8 @@ _:-ms-lang(x), .snarkRefresh:last-child[href="/i2psnark/"] {
      width: 12px;
      height: 11px;
      background-size: 9px 9px;
+     margin-left: 2px;
+     margin-right: 2px;
 }
 
 .snarkMessages img {

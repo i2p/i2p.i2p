@@ -2862,7 +2862,7 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append(title);
         buf.append("</TITLE>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
            // hide javascript-dependent buttons when js is unavailable
-           .append("<noscript><style>.script {display: none;}</style></noscript>")
+           .append("<noscript><style type=\"text/css\">.script {display: none;}</style></noscript>")
            .append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
             buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");

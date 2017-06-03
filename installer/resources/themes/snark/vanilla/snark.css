@@ -161,7 +161,6 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
      text-shadow: 0 0 1px #fff5ef;
      box-shadow: inset 0 0 0 1px #efe6e0, 0 0 0 1px rgba(77, 69, 62, 0.1);
      border: 1px solid #2f1b0c;
-     font-size-adjust: 0.56;
 }
 
 _:-ms-lang(x), .snarkRefresh:link, .snarkRefresh:visited {

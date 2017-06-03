@@ -4353,43 +4353,56 @@ a[name="criticallogs"] + p + h3 + p + ul { /* tidy router logs ul */
      margin-bottom: 15px;
 }
 
-table#enviro, table#criticallogs, table#routerlogs, table#eventlogs, table#wrapperlogs {
+#enviro, #criticallogs, #routerlogs, #eventlogs, #wrapperlogs {
      margin-top: -11px;
 }
 
-table#wrapperlogs {
+#wrapperlogs {
      width: 100%;
      overflow-x: scroll;
      table-layout: fixed;
 }
 
-table#bugreports {
+#bugreports {
      margin-top: 10px;
 }
 
-table#bugreports td {
+#bugreports td {
      background: url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
      padding: 15px 10px 15px 50px;
 }
 
-table#enviro td {
+#enviro:hover {
+     -moz-user-select: all;
+     --webkit-user-select: all;
+     user-select: all;
+     cursor: text;
+}
+
+#enviro:hover td {
+     background: #001;
+     border: #001;
+     color: #dd0;
+}
+
+#enviro td {
      font-weight: normal !important;
      padding: 5px 10px;
 }
 
-table#enviro td:first-child {
+#enviro td:first-child {
      width: 100px;
      text-align: right;
      padding-right: 0;
 }
 
-table#criticallogs td , table#routerlogs td, table#eventlogs td, table#wrapperlogs td {
+#criticallogs td , #routerlogs td, #eventlogs td, #wrapperlogs td {
      font-weight: normal !important;
      padding: 5px 10px;
      border-top: 1px solid #443da0;
 }
 
-table#criticallogs td:empty {
+#criticallogs td:empty {
      display: none;
 }
 
@@ -4437,7 +4450,7 @@ font[color="#006600"] { /* debug */
      color: #090;
 }
 
-font[color="#ff00cc"] { /* warning */
+font[color="#bf00df"] { /* warning */
      color: #909;
 }
 
@@ -4507,7 +4520,7 @@ font[color="#000099"] { /* info */
      background: #d00;
 }
 
-#logs li font[color="#ff00cc"]::before {
+#logs li font[color="#bf00df"]::before {
      background: #909;
 }
 
@@ -5620,6 +5633,17 @@ h3#transports {
 
 h3#upnpstatus {
      margin-bottom: 10px !important;
+}
+
+h3#upnp {
+     border: 1px solid #443da0;
+}
+
+#upnpscan {
+     border: 1px solid #443da0;
+     margin: -11px 0 10px;
+     padding: 5px 15px;
+     background: #000;
 }
 
 h3.ptitle {
