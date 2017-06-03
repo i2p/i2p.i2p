@@ -540,11 +540,9 @@ p.messages {
      padding: 15px 15px 15px 52px;
 }
 
-div#content {
-}
-
 div#content p {
      padding: 0 30px;
+     line-height: 140%;
 }
 
 p.footer {
@@ -619,9 +617,9 @@ div#config + div#buttons, div#content + div#buttons {
 }
 
 .illustrate {
-     max-width: 90%;
+     max-width: 700px;
      height: auto;
-     margin: 20px 0 15px;
+     margin: 20px auto 15px;
      padding: 10px;
      border-radius: 2px;
      border: 1px solid #010011;
@@ -919,7 +917,7 @@ table.book, .iframed #buttons, .iframed .buttons, .iframed #messages + p, .ifram
      background: url(/themes/susidns/images/subs_24.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%);
 }
 
-.headline#config h3 {
+.headline#configure h3 {
      background: url(/themes/susidns/images/configure_24.png) 10px center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%);
 }
 
@@ -994,6 +992,11 @@ p.book {
 
 #host_details tr:hover {
      background: #ffd;
+}
+
+.destaddress:focus {
+     background: #003;
+     outline: none;
 }
 
 #host_details .destaddress {
@@ -1119,6 +1122,14 @@ td.destinations {
 /* end hostname list */
 
 /* responsive layout */
+
+@media screen and (max-width: 1000px) {
+.illustrate {
+     margin: 15px auto 10px;
+     min-width: 450px;
+     width: 90%;
+}
+}
 
 @media screen and (min-width: 1200px) {
 #filter a {

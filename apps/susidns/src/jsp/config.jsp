@@ -65,7 +65,7 @@
 <a id="config" href="config"><%=intl._t("Configuration")%></a>
 </div>
 <hr>
-<div class="headline" id="config">
+<div class="headline" id="configure">
 <h3><%=intl._t("Configuration")%></h3>
 <h4><%=intl._t("Location:")%> ${cfg.fileName}</h4>
 </div>

@@ -184,7 +184,7 @@ ${book.loadBookMessages}
 <td class="names"><span class="addrhlpr"><a href="http://${addr.b32}/" target="_blank" title="<%=intl._t("Base 32 address")%>">b32</a></span></td>
 <td class="helper"><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}" target="_blank" title="<%=intl._t("Helper link to share host address with option to add to addressbook")%>">link</a></td>
 <td class="names"><span class="addrhlpr"><a href="details?h=${addr.name}&amp;book=${book.book}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span></td>
-<td class="destinations"><div class="destaddress" name="dest_${addr.name}" width="200px">${addr.destination}</div></td>
+<td class="destinations"><div class="destaddress" name="dest_${addr.name}" width="200px" tabindex="0">${addr.destination}</div></td>
 
 <c:if test="${book.validBook}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._t("Mark for deletion")%>"></td>

@@ -144,7 +144,7 @@
 </tr>
 <tr class="list${book.trClass}">
 <td><%=intl._t("Destination")%></td>
-<td class="destinations"><div class="destaddress"><%=addr.getDestination()%></div></td>
+<td class="destinations"><div class="destaddress" tabindex="0"><%=addr.getDestination()%></div></td>
 </tr>
 </table>
 </div>

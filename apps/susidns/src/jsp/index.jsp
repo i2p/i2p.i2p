@@ -74,7 +74,7 @@
 <%=intl._t("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
 </p>
 <p>
-<%=intl._t("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_top\">the overview</a>.")%>
+<%=intl._t("For more information on naming in I2P, see <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">the overview</a>.")%>
 </p>
 <h3><%=intl._t("How does the addressbook application work?")%></h3>
 <p>
@@ -82,15 +82,19 @@
 <%=intl._t("Then it merges your \"master\" address book into the router address book as well.")%>
 <%=intl._t("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an eepsite.")%>
 </p><p>
-<%=intl._t("The router also uses a private address book (not shown in the picture), which is not merged or published.")%>
+<%=intl._t("The router also uses a private address book, which is not merged or published.")%>
 <%=intl._t("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
 <%=intl._t("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
-<center><img src="/themes/susidns/images/how.svg" height="367" width="600" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
+<div class="illustrate">
+<object type="image/svg+xml" data="/themes/susidns/images/how.svg">
+<img src="/themes/susidns/images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" />
+</object>
+</div>
 </div>
 <div id="footer">
 <hr>
-<p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_top">susi</a> 2005</p>
+<p class="footer">susidns v${version.version} &copy; <a href="${version.url}" target="_blank">susi</a> 2005</p>
 </div>
 </div>
 </body>

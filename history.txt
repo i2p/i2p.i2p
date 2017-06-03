@@ -9,6 +9,12 @@
    - Individual icons for I2PSnark and I2P Plugins on /home
    - Add div to upnpstatus on peers to comply with layout
    - Fix various unclosed/erroneous tags
+ * SusiDNS:
+   - Rework SVG image
+     - Now features interactive feedback when mouseover objects and hotlinks
+   - Update fallback images for en and fr
+   - Update overview text
+   - added tabindex="0" to destination addresses, highlighted on :focus
 
 2017-05-25 zzz
  * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)

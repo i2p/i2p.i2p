@@ -331,6 +331,10 @@ h3 {
      margin-bottom: 24px;
 }
 
+#content {
+     padding-bottom: 10px;
+}
+
 #content h3 {
      border: none;
      border-bottom: 1px dotted #494;
@@ -649,9 +653,9 @@ div#config + div#buttons, div#content + div#buttons {
 }
 
 .illustrate {
-     max-width: 90%;
+     max-width: 700px;
      height: auto;
-     margin: 20px 0 15px;
+     margin: 20px auto 10px;
      padding: 10px;
      border-radius: 4px;
      border: 1px solid #001;
@@ -891,7 +895,7 @@ input[name="search"]:focus {
      background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
 }
 
-.headline#config h3 {
+.headline#configure h3 {
      background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
 }
 
@@ -1060,19 +1064,27 @@ p.book {
      filter: drop-shadow(0 0 1px #f60);
 }
 
+.destaddress:focus {
+     background: #001a00;
+     outline: none;
+}
+
 #host_list .destaddress {
-     overflow: auto !important;
      white-space: nowrap;
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      font-weight: normal;
-     padding: 3px !important;
+     padding: 3px 10px !important;
      -moz-user-select: all;
      -webkit-user-select: all;
      user-select: all;
+     overflow: hidden;
+     text-overflow: ellipsis;
 }
 
 #host_list .destaddress:hover, #host_list .destaddress:focus {
      color: #bb0;
+     overflow: auto;
+     text-overflow: clip;
 }
 
 /* end hostname list */
@@ -1104,6 +1116,14 @@ _:-ms-lang(x), * {
 
 #navi a.abook:active, #navi a#overview:active, #navi a#subs:active, #navi a#config:active {
      background: #f60 !important;
+}
+}
+
+@media screen and (max-width: 1000px) {
+.illustrate {
+     margin: 15px auto 10px;
+     min-width: 450px;
+     width: 90%;
 }
 }
 
