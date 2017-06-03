@@ -470,11 +470,11 @@ tfoot tr:nth-child(n+1) {
 .snarkGraphicStatus {
      max-width: 32px !important;
      text-align: center !important;
-     padding-left: 2px;
 }
 
 .snarkTorrentStatus {
      padding-right: 5px;
+     padding-left: 0;
 }
 
 th.snarkTorrentStatus {
@@ -766,12 +766,12 @@ tr:hover .percentBarText {
      color: #005;
      text-shadow: 0 0 1px rgba(255,255,255,0.5);
      opacity: 0;
-     transition: ease opacity 0.3s 0.5s;
+     transition: ease opacity 0.2s;
 }
 
 .percentBarText:hover, .percentBarText:focus {
      opacity: 0.75;
-     transition: ease opacity 0.3s;
+     transition: ease opacity 0.2s;
 }
 
 .percentBarOuterComplete .percentBarText {
@@ -2197,10 +2197,6 @@ a.snarkRefresh:first-child {
 #configs tr:nth-last-child(n+4) td {
       padding-top: 3px;
       padding-bottom: 3px;
-}
-
-.snarkTorrentStatus {
-     padding-right: 10px;
 }
 
 .snarkTorrentName {

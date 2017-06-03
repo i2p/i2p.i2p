@@ -67,6 +67,12 @@
    * i2psnark:
      - Remove font-adjust-size (ubergine/vanilla)
      - Add extra spacing to screenlogger bullets (ubergine)
+     - (ubergine) speed up tr:hover events by optimizing css (remove latency)
+     - (all) remove fade activation delay for download bars, speed up fade-in /
+       fade-out
+     - Fix i2psnark link in navbar overflow issue in Arabic (ubergine/vanilla)
+     - (ubergine) change default font for screenlog from Noto Mono to Droid Sans
+       Mono to soften text/slightly reduce text size
 
 2017-05-25 zzz
  * Crypto: Fix AES NPE on 4-core RPi 2nd try (ticket #1989)

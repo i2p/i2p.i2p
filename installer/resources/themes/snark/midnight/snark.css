@@ -1052,7 +1052,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      color: #00ecff;
      text-shadow: 0 0 1px rgba(0,0,0,0.8);
      opacity: 0;
-     transition: ease opacity 0.3s 0.5s;
+     transition: ease opacity 0.2s;
 }
 
 .peerinfo .percentbartext {
@@ -1061,7 +1061,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
 
 .percentBarText:hover, .percentBarText:focus {
      opacity: 0.9;
-     transition: ease opacity 0.3s;
+     transition: ease opacity 0.2s;
 }
 
 /* end download bars */

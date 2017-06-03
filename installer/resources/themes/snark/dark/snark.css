@@ -995,12 +995,12 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
      color: #dfd137;
      opacity: 0;
      text-shadow: 0 0 1px rgba(0,0,0,0.8);
-     transition: ease opacity 0.3s 0.5s;
+     transition: ease opacity 0.2s;
 }
 
 .percentBarText:hover, .percentBarText:focus {
      opacity: 0.75;
-     transition: ease opacity 0.3s;
+     transition: ease opacity 0.2s;
 }
 
 .percentBarOuterComplete .percentBarText {

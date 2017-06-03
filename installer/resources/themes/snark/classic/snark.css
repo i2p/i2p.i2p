@@ -1090,13 +1090,13 @@ tr:hover .percentBarText {
      color: #005;
      text-shadow: 0 0 1px rgba(255,255,255,0.5);
      opacity: 0;
-     transition: ease opacity 0.3s 0.5s;
+     transition: ease opacity 0.2s;
      line-height: 14px;
 }
 
 .percentBarText:hover, .percentBarText:focus {
      opacity: 0.75;
-     transition: ease opacity 0.3s;
+     transition: ease opacity 0.2s;
 }
 
 .priorityIndicator {
