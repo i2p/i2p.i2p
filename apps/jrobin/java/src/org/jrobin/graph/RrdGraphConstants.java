@@ -161,12 +161,12 @@ public interface RrdGraphConstants {
 	/**
 	 * Default minor grid color
 	 */
-	Color DEFAULT_GRID_COLOR = new Color(171, 171, 171, 95);
+	Color DEFAULT_GRID_COLOR = new Color(100, 100, 100, 75);
 	// Color DEFAULT_GRID_COLOR = new Color(140, 140, 140);
 	/**
 	 * Default major grid color
 	 */
-	Color DEFAULT_MGRID_COLOR = new Color(255, 91, 91, 95);
+	Color DEFAULT_MGRID_COLOR = new Color(255, 91, 91, 110);
 	// Color DEFAULT_MGRID_COLOR = new Color(130, 30, 30);
 	/**
 	 * Default font color
@@ -251,7 +251,7 @@ public interface RrdGraphConstants {
 	 * Default font name, determined based on the current operating system
 	 */
 	String DEFAULT_FONT_NAME = System.getProperty("os.name").toLowerCase().contains("windows") ?
-			"Lucida Sans Typewriter" : "Monospaced";
+			"Lucida Console" : "Monospaced";
 
 	/**
 	 * Default graph small font
@@ -278,7 +278,7 @@ public interface RrdGraphConstants {
 	/**
 	 * Used internally
 	 */
-	double LEGEND_BOX = 0.9; // chars
+	double LEGEND_BOX = 0.7; // chars
 	/**
 	 * Used internally
 	 */
@@ -286,27 +286,27 @@ public interface RrdGraphConstants {
 	/**
 	 * Used internally
 	 */
-	int PADDING_LEFT = 10; // pix
+	int PADDING_LEFT = 5; // pix
 	/**
 	 * Used internally
 	 */
-	int PADDING_TOP = 12; // pix
+	int PADDING_TOP = 9; // pix
 	/**
 	 * Used internally
 	 */
-	int PADDING_TITLE = 6; // pix
+	int PADDING_TITLE = 7; // pix
 	/**
 	 * Used internally
 	 */
-	int PADDING_RIGHT = 16; // pix
+	int PADDING_RIGHT = 20; // pix
 	/**
 	 * Used internally
 	 */
-	int PADDING_PLOT = 2; //chars
+	double PADDING_PLOT = 1.7; //chars
 	/**
 	 * Used internally
 	 */
-	int PADDING_LEGEND = 2; // chars
+	double PADDING_LEGEND = 2.1; // chars
 	/**
 	 * Used internally
 	 */
@@ -320,10 +320,10 @@ public interface RrdGraphConstants {
 	 * Stroke used to draw grid
 	 */
 	// solid line
-	Stroke GRID_STROKE = new BasicStroke(1);
+	//Stroke GRID_STROKE = new BasicStroke(1);
 
 	// dotted line
-	// Stroke GRID_STROKE = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] {1, 1}, 0);
+	 Stroke GRID_STROKE = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] {1, 1}, 0);
 	/**
 	 * Stroke used to draw ticks
 	 */

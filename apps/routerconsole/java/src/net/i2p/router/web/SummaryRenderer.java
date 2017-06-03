@@ -35,7 +35,7 @@ class SummaryRenderer {
     private final Log _log;
     private final SummaryListener _listener;
     private final I2PAppContext _context;
-    private static final Color AREA_COLOR = new Color(100, 160, 200, 240);
+    private static final Color AREA_COLOR = new Color(100, 160, 200, 200);
     private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
     private static final Color RESTART_BAR_COLOR = new Color(223, 13, 13, 255);
 
@@ -135,7 +135,7 @@ class SummaryRenderer {
             } else {
             //    small = small.deriveFont(small.getSize2D() + 1.0f);
             // if specified font family is missing, jrobin will use fallback
-                  small = new Font("Droid Sans Mono", Font.PLAIN, 11);
+                  small = new Font("Droid Sans Mono", Font.PLAIN, 10);
             //    large = large.deriveFont(large.getSize2D() + 1.0f);
                   large = new Font("Droid Sans", Font.PLAIN, 13);
             }

@@ -44,6 +44,11 @@
      - De-emphasise siderbar app icons with background-blend-mode: luminosity
      - Change sidebar snark icon to match homepage icon
      - Bump div.main text color from #222 to #333 (reduce contrast)
+     - (light, dark, midnight) fix minor alignment issues with Arabic CSS
+     - JRobin (graphs):
+       - Fix font size issue for non-title text on graphs
+       - Optimise layout (tweaked padding, legend box size etc)
+       - Tweak graph lines (now dotted, slightly less opaque)
    * i2ptunnel:
      - Remove redundant labels and spans for keyaccess
      - Edit Server:

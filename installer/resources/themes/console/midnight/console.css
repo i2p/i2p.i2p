@@ -4832,11 +4832,11 @@ table#jardump { /* /jars */
 
 .main#tunnelmgr {
      padding: 0 5px;
-     min-width: 1000px;
+     min-width: 630px;
 }
 
 #i2ptunnelframe {
-     margin: -5px 0 -10px;
+     margin: -5px 0;
 }
 
 .main#debug th {

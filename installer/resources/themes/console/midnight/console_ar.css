@@ -306,6 +306,67 @@ td.optionsave {
      text-align: right;
 }
 
+.h3navlinks, h3#servicedebug a, h3#graphinfo a, #config_stats.main h3 a, #config_logging.main h3 a, #configstats th a {
+     float: left;
+}
+
+#i2pupdates .optbox {
+     margin-right: 10px;
+}
+
+#reseedconfig input {
+     margin-left: 8px !important;
+     margin-right: 0 !important;
+}
+
+#reseedconfig textarea {
+     width: calc(100% - 20px) !important
+}
+
+#configstats th {
+     text-align: right !important;
+}
+
+#configstats td:first-child {
+     text-align: center !important;
+}
+
+#configstats td.optionsave {
+     text-align: left !important;
+}
+
+#configstats td:nth-child(2) {
+     padding-right: 15px;
+}
+
+#clientconfig th:first-child, #clientconfig td:first-child, #loggingoptions td:first-child, #i2pupdates td:first-child, #tunnelconfig td:first-child,
+table#i2pupdates input[name*="URL"], table#i2pupdates textarea, #addkeyring td:first-child, #reseedconfig td:first-child {
+     text-align: left !important;
+}
+
+#config_logging p, #reseedconfig td.infohelp {
+     text-align: right !important;
+}
+
+#clientconfig td:nth-child(2) {
+     text-align: center !important;
+}
+
+#bannedips, #bannedips table {
+     direction: ltr !important;
+}
+
+table#addkeyring td.infohelp {
+     text-align: right !important;
+}
+
+p#helptranslate, #floodfillconfig tr:first-child .infohelp {
+     text-align: right !important;
+     padding-right: 50px !important;
+     background-image: url(/themes/console/images/info/infohelp.png);
+     background-position: right 12px center !important;
+}
+
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus,
 #consolepass input[name="name"], #externali2cp input[name="user"], #consolepass input[name="name"]:focus, #externali2cp input[name="user"]:focus {
      background-position: right 3px center, center center !important;

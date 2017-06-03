@@ -77,11 +77,11 @@ button.search:hover, input[type="submit"]:hover, input[type="reset"]:hover,
 button.search:focus, input[type="submit"]:focus, input[type="reset"]:focus,
 button.search:active, input[type="submit"]:active, input[type="reset"]:active {
     background-position: right 6px center !important;
-    padding: 5px 22px 5px 7px !important;
+    padding: 5px 24px 5px 7px !important;
 }
 
 select, select:hover, select:focus, select:active {
-     padding: 4px 4px 4px 16px;
+     padding: 4px 4px 4px 16px !important;
      background-position: left center !important;
      text-align: right !important;
 }
@@ -198,11 +198,28 @@ div.graphspanel form {
      text-align: right;
 }
 
+#graphs td.infohelp {
+     text-align: right;
+     padding-right: 40px !important;
+}
+
 .langbox {
      float: left;
      text-align: left;
      padding-left: 0;
      margin-left: 4px;
+}
+
+p#helptranslate {
+     padding-right: 50px !important;
+     text-align: right !important;
+     background-position: right 14px center !important;
+     background-image: url("/themes/console/images/info/infohelp.png");
+     background-size: 28px auto !important;
+}
+
+#loggingoptions p {
+     text-align: right;
 }
 
 .confignav {
@@ -432,6 +449,18 @@ textarea#advancedsettings, #i2pupdates textarea, #addkeyring textarea, #reseedco
      direction: ltr;
 }
 
+.main[id^="config_"] select, .main[id^="config_"] textarea, .main[id^="config_"] .optbox {
+     margin-right: 3px;
+}
+
+#i2pupdates input[type="text"]:not([readonly]), #i2pupdates textarea, .main[id^="config_"] textarea, input[name="newsURL"] {
+    width: calc(100% - 10px);
+}
+
+#i2pupdates td:first-child, #reseedconfig td:first-child {
+     text-align: left;
+}
+
 .homelinkedit th:first-child, .homelinkedit td:first-child {
      text-align: center;
 }
@@ -487,7 +516,7 @@ table#addkeyring tr:last-child td {
 }
 
 .tab, .tab2 {
-     font-size: 10pt;
+     font-size: 12pt !important;
      margin-top: -5px;
 }
 
@@ -648,12 +677,12 @@ table.netdbentry td:nth-child(2) {
      margin-right: 20px;
 }
 
-p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, ul#banlist {
+p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, #profiles #banlist {
      margin-right: -16px !important;
 }
 
-p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, ul#banlist {
-     margin-left: 16px;
+p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, #profiles #banlist {
+     margin-left: 16px !important;
 }
 
 #profiles_overview + .widescroll {
@@ -668,11 +697,15 @@ p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, ul#banlist {
      margin: 0 !important;
 }
 
-#profilelist th:last-child, #profilelist td:last-child {
+#profilelist th:last-child, #profilelist td:last-child, #addkeyring td:first-child {
      text-align: left;
 }
 
-#profiledefs td:last-child {
+#profile_defs td:first-child {
+     text-align: left !important;
+}
+
+#profile_defs td:last-child, td.infohelp {
      text-align: right !important;
 }
 
@@ -708,7 +741,7 @@ p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, ul#banlist {
 
 .logtable tr:first-child td {
      direction: ltr;
-} 
+}
 
 #wrapperlogs pre {
      text-align: left;
@@ -761,6 +794,19 @@ pre#transports {
      background-position: right 3px center, center center !important;
      padding: 4px 20px 4px 4px !important;
      margin: 5px 3px 5px 15px !important;
+}
+
+label {
+     text-align: right !important;
+     display: inline-block;
+}
+
+#graphs input {
+     margin-left: 8px !important;
+}
+
+#graphs td:first-child {
+     padding-right: 10px;
 }
 
 #consolepass tr:first-child td, p#clientconf.infohelp, p#webappconfigtext.infohelp, #floodfillconfig .infohelp, 

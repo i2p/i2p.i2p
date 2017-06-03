@@ -3296,7 +3296,7 @@ table#sidebarconf {
 }
 
 #sidebarconf td:nth-child(3), #sidebarconf td:nth-child(4) {
-     width: 75px;
+     width: 1%;
      padding: 0;
      white-space: nowrap;
 }
@@ -3307,7 +3307,7 @@ table#sidebarconf {
 
 #sidebarconf td:nth-child(4) {
      text-align: left;
-     padding-right: 0;
+     padding-right: 5px;
 }
 
 #sidebarconf tr:last-child {
@@ -3317,7 +3317,7 @@ table#sidebarconf {
 
 #sidebarconf tr:last-child td:last-child {
      padding: 0;
-     text-align: left;
+     text-align: center;
 }
 
 #sidebarconf select {
