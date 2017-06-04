@@ -1581,25 +1581,28 @@ public class I2PSnarkServlet extends BasicServlet {
             if (isRunning) {
                 String img;
                 String txt;
+                String tooltip;
                 if (remaining == 0) {
                     img = "seeding";
-                    txt = _t("Seeding to {0} of {1} peers in swarm", curPeers, knownPeers);
+                    txt = _t("Seeding");
+                    tooltip = _t("Seeding to {0} of {1} peers in swarm", curPeers, knownPeers);
                 } else {
                     // partial
                     img = "complete";
                     txt = _t("Complete");
+                    tooltip = txt;
                     if (curPeers > 0) {
-                        txt = txt + " (" + _t("Seeding to {0} of {1} peers in swarm", curPeers, knownPeers) + ")";
+                        tooltip = txt + " (" + _t("Seeding to {0} of {1} peers in swarm", curPeers, knownPeers) + ")";
                     }
                 }
                 if (curPeers > 0 && !showPeers) {
-                    statusString = toThemeImg(img, "", txt) + "</td>" +
+                    statusString = toThemeImg(img, "", tooltip) + "</td>" +
                                "<td class=\"snarkTorrentStatus\"><b>" + txt +
                                ":</b> <a href=\"" + uri + getQueryString(req, b64, null, null) + '#' + b64Short + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
                 } else {
-                    statusString = toThemeImg(img, "", txt) + "</td>" +
+                    statusString = toThemeImg(img, "", tooltip) + "</td>" +
                                "<td class=\"snarkTorrentStatus\"><b>" + txt +
                                ":</b> " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
