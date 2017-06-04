@@ -284,7 +284,7 @@ class SummaryBarRenderer {
         buf.append("<a title=\"")
            .append(_t("View active leasesets (debug mode)"))
            .append("\" href=\"/netdb?l=2\">")
-           .append(nbsp(_t("Leasesets")))
+           .append(nbsp(_t("LeaseSets")))
            .append("</a>\n")
 
            .append("<a title=\"")

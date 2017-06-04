@@ -3458,9 +3458,9 @@ public class I2PSnarkServlet extends BasicServlet {
             if (esc && _manager.util().getCommentsName().length() == 0) {
                 buf.append("&nbsp;&nbsp;&nbsp;<span id=\"nameRequired\">");
                 buf.append(_t("Author name required to rate or comment"));
-                buf.append("&nbsp;&nbsp;<a href=\"").append(_contextPath).append("/configure#configureAuthor\">");
-                buf.append(_t("[Configure]"));
-                buf.append("</a></span>");
+                buf.append("&nbsp;&nbsp;<a href=\"").append(_contextPath).append("/configure#configureAuthor\">[");
+                buf.append(_t("Configure"));
+                buf.append("]</a></span>");
             } else {
                 buf.append("&nbsp;&nbsp;&nbsp;<span id=\"nameRequired\"><span class=\"commentAuthorName\" title=\"")
                    .append(_t("Your author name for published comments and ratings"))

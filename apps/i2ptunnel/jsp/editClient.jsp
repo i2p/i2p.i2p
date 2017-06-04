@@ -290,7 +290,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
          <% } // ircclient %>
     </table>
 
-    <h3><%=intl._t("Advanced Networking Options")%></h3>
+    <h3><%=intl._t("Advanced networking options")%></h3>
 
     <table class="tunnelConfig">
 
@@ -462,7 +462,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td>
                 <b><%=intl._t("Reduced tunnel count")%>:</b>
-                <input type="text" id="reducedTunnelCount" name="reduceCount" size="1" maxlength="1" title="<%=intl._t("Reduced Tunnel Count")%>" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext quantity" />
+                <input type="text" id="reducedTunnelCount" name="reduceCount" size="1" maxlength="1" title="<%=intl._t("Reduced tunnel count")%>" value="<%=editBean.getReduceCount(curTunnel)%>" class="freetext quantity" />
             </td>
 
             <td>

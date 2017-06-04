@@ -295,7 +295,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
          %>
     </table>
 
-    <h3><%=intl._t("Advanced Networking Options")%></h3>
+    <h3><%=intl._t("Advanced networking options")%></h3>
 
     <table id="#advancedServerTunnelOptions" class="tunnelConfig">
         <tr>

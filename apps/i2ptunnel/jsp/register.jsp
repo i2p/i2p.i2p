@@ -79,14 +79,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
     </tr>
     <tr>
         <td>
-            <b><%=intl._t("Tunnel Name")%>:</b> <%=editBean.getTunnelName(curTunnel)%>
+            <b><%=intl._t("Tunnel name")%>:</b> <%=editBean.getTunnelName(curTunnel)%>
         </td>
     </tr>
 
 <%
       if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
           %>
-    <tr><td><b><%=intl._t("Website Name")%>:</b> <%=editBean.getSpoofedHost(curTunnel)%></td></tr>
+    <tr><td><b><%=intl._t("Website name")%>:</b> <%=editBean.getSpoofedHost(curTunnel)%></td></tr>
 <%
        }
 %>
@@ -425,7 +425,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
           %>
     <tr>
         <td>
-            <b><%=intl._t("Old Hostname")%>:</b>
+            <b><%=intl._t("Old hostname")%>:</b>
             <input type="text" size="30" maxlength="50" name="oldname" id="oldName" value="<%=oldname%>" class="freetext" />
         </td>
     </tr>
