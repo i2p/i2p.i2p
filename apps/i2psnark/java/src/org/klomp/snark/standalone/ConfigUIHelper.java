@@ -24,41 +24,39 @@ public class ConfigUIHelper {
      *  added to the top-level build.xml for the updater.
      *  As of 0.9.12, ISO 639-2 three-letter codes are supported also.
      *
-     *  Note: we don't currently _x the language strings,
-     *  we'll just rely on the JVM's translations for now.
      *  Country flag unused.
      */
     private static final String langs[][] = {
-        { "ar", "lang_ar", "Arabic", null },
-        { "cs", "cz", "Czech", null },
-        //{ "da", "dk", "Danish", null },
-        { "de", "de", "German", null },
-        //{ "et", "ee", "Estonian", null },
-        //{ "el", "gr", "Greek", null },
+        { "ar", "lang_ar", "Arabic ﻉﺮﺒﻳﺓ", null },
+        { "cs", "cz", "Čeština", null },
+        { "zh", "cn", "Chinese 中文", null },
+        //{ "zh_TW", "tw", "Chinese 中文", "Taiwan" },
+        //{ "da", "dk", "Dansk", null },
+        { "de", "de", "Deutsch", null },
+        //{ "et", "ee", "Eesti", null },
         { "en", "us", "English", null },
-        { "es", "es", "Spanish", null },
-        { "fi", "fi", "Finnish", null },
-        { "fr", "fr", "French", null },
-        //{ "gl", "lang_gl", "Galician", null },
-        { "hu", "hu", "Hungarian", null },
-        { "it", "it", "Italian", null },
-        { "ja", "jp", "Japanese", null },
-        { "ko", "kr", "Korean", null },
+        { "es", "es", "Español", null },
+        { "fr", "fr", "Français", null },
+        //{ "gl", "lang_gl", "Galego", null },
+        //{ "el", "gr", "Greek Ελληνικά", null },
+        { "it", "it", "Italiano", null },
+        { "ja", "jp", "Japanese 日本語", null },
+        { "ko", "kr", "Korean 한국어", null },
         //{ "mg", "mg", "Malagasy", null },
-        { "nl", "nl", "Dutch", null },
-        { "nb", "no", "Norwegian Bokmaal", null },
-        { "pl", "pl", "Polish", null },
-        { "pt", "pt", "Portuguese", null },
-        { "pt_BR", "br", "Portuguese", "Brazil" },
-        { "ro", "ro", "Romanian", null },
-        { "ru", "ru", "Russian", null },
-        { "sk", "sk", "Slovak", null },
-        { "sv", "se", "Swedish", null },
-        { "tr", "tr", "Turkish", null },
-        { "uk", "ua", "Ukrainian", null },
-        { "vi", "vn", "Vietnamese", null },
-        { "zh", "cn", "Chinese", null },
-        //{ "zh_TW", "tw", "Chinese", "Taiwan" },
+        { "hu", "hu", "Magyar", null },
+        { "nl", "nl", "Nederlands", null },
+        { "nb", "no", "Norsk (bokmål)", null },
+        { "pl", "pl", "Polski", null },
+        { "pt", "pt", "Português", null },
+        { "pt_BR", "br", "Português", "Brazil" },
+        { "ro", "ro", "Română", null },
+        { "ru", "ru", "Russian Русский", null },
+        { "sk", "sk", "Slovenčina", null },
+        { "fi", "fi", "Suomi", null },
+        { "sv", "se", "Svenska", null },
+        { "tr", "tr", "Türkçe", null },
+        { "uk", "ua", "Ukrainian Українська", null },
+        { "vi", "vn", "Vietnamese Tiếng Việt", null },
         { "xx", "a1", "Debug: Find untagged strings", null },
     };
 
@@ -107,16 +105,11 @@ public class ConfigUIHelper {
             buf.append("value=\"").append(lang).append("\">");
             int under = lang.indexOf('_');
             String slang = (under > 0) ? lang.substring(0, under) : lang;
-            // we don't actually have translations for these, see above
-            buf.append(Translate.getDisplayLanguage(slang, langs[i][2], ctx, BUNDLE_NAME));
+            buf.append(langs[i][2]);
             String name = langs[i][3];
             if (name != null) {
-                String cou = (under > 0) ? lang.substring(under + 1) : lang;
-                Locale cur = new Locale(current);
-                Locale loc = new Locale(slang, cou);
                 buf.append(" (")
-                   //.append(Translate.getString(name, ctx, COUNTRY_BUNDLE_NAME))
-                   .append(loc.getDisplayCountry(cur))
+                   .append(name)
                    .append(')');
             }
             buf.append("</option>\n");

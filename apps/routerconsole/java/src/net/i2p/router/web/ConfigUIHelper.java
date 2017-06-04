@@ -89,43 +89,43 @@ public class ConfigUIHelper extends HelperBase {
         // apps/routerconsole/jsp/home.jsp
         // .tx/config
         // New lang_xx flags: Add to top-level build.xml
+        // Names must be 18 chars or less (including country if specified)
         //
-        { "ar", "lang_ar", _x("Arabic"), null },
-        { "cs", "cz", _x("Czech"), null },
-        { "da", "dk", _x("Danish"), null },
-        { "de", "de", _x("German"), null },
-        { "et", "ee", _x("Estonian"), null },
-        { "el", "gr", _x("Greek"), null },
-        { "en", "us", _x("English"), null },
-        { "es", "es", _x("Spanish"), null },
-        { "fi", "fi", _x("Finnish"), null },
-        { "fr", "fr", _x("French"), null },
-        { "gl", "lang_gl", _x("Galician"), null },
-        { "hu", "hu", _x("Hungarian"), null },
-        { "it", "it", _x("Italian"), null },
-        { "ja", "jp", _x("Japanese"), null },
-        { "ko", "kr", _x("Korean"), null },
-        { "mg", "mg", _x("Malagasy"), null },
-        { "nl", "nl", _x("Dutch"), null },
-        { "nb", "no", _x("Norwegian Bokmaal"), null },
-        { "pl", "pl", _x("Polish"), null },
-        { "pt", "pt", _x("Portuguese"), null },
-        { "pt_BR", "br", _x("Portuguese"), "Brazil" },
-        { "ro", "ro", _x("Romanian"), null },
-        { "ru", "ru", _x("Russian"), null },
-        { "sk", "sk", _x("Slovak"), null },
-        { "sv", "se", _x("Swedish"), null },
-        { "tr", "tr", _x("Turkish"), null },
-        { "uk", "ua", _x("Ukrainian"), null },
-        { "vi", "vn", _x("Vietnamese"), null },
-        { "zh", "cn", _x("Chinese"), null },
-        { "zh_TW", "tw", _x("Chinese"), "Taiwan" },
+        { "en", "us", "English", null },
+        { "ar", "lang_ar", "Arabic ﻉﺮﺒﻳﺓ", null },
+        { "cs", "cz", "Čeština", null },
+        { "zh", "cn", "Chinese 中文", null },
+        { "zh_TW", "tw", "Chinese 中文", "Taiwan" },
+        { "da", "dk", "Dansk", null },
+        { "de", "de", "Deutsch", null },
+        { "et", "ee", "Eesti", null },
+        { "es", "es", "Español", null },
+        { "fr", "fr", "Français", null },
+        { "gl", "lang_gl", "Galego", null },
+        { "el", "gr", "Greek Ελληνικά", null },
+        { "it", "it", "Italiano", null },
+        { "ja", "jp", "Japanese 日本語", null },
+        { "ko", "kr", "Korean 한국어", null },
+        { "mg", "mg", "Malagasy", null },
+        { "hu", "hu", "Magyar", null },
+        { "nl", "nl", "Nederlands", null },
+        { "nb", "no", "Norsk (bokmål)", null },
+        { "pl", "pl", "Polski", null },
+        { "pt", "pt", "Português", null },
+        { "pt_BR", "br", "Português", "Brazil" },
+        { "ro", "ro", "Română", null },
+        { "ru", "ru", "Russian Русский", null },
+        { "sk", "sk", "Slovenčina", null },
+        { "fi", "fi", "Suomi", null },
+        { "sv", "se", "Svenska", null },
+        { "tr", "tr", "Türkçe", null },
+        { "uk", "ua", "Ukraine Українська", null },
+        { "vi", "vn", "Vietnam Tiếng Việt", null },
         { "xx", "a1", "Untagged strings", null },
     };
 
 
 
-    /** todo sort by translated string */
     public String getLangSettings() {
         String clang = Messages.getLanguage(_context);
         String current = clang;
@@ -167,11 +167,11 @@ public class ConfigUIHelper extends HelperBase {
                .append("<div class=\"ui_lang\">");
             int under = lang.indexOf('_');
             String slang = (under > 0) ? lang.substring(0, under) : lang;
-            buf.append(Messages.getDisplayLanguage(slang, langs[i][2], _context));
+            buf.append(langs[i][2]);
             String name = langs[i][3];
             if (name != null) {
                 buf.append(" (")
-                   .append(Messages.getString(name, _context, Messages.COUNTRY_BUNDLE_NAME))
+                   .append(name)
                    .append(')');
             }
             buf.append("</div></div>\n");

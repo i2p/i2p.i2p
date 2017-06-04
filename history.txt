@@ -2,6 +2,8 @@
  * De-duplicate strings for translation
  * Minor theme tweaks and bugfixes
  * SusiDNS: Update SVG image to use grouped objects for styling and hotlinks
+ * Hardcode language names in their native language (to make them easier for
+   users to identify)
 
 2017-06-03 str4d
  * Console:
