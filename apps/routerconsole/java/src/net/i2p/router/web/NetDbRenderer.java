@@ -319,11 +319,21 @@ class NetDbRenderer {
                     buf.append(in.getDestinationNickname());
                 else
                     buf.append(dest.toBase64().substring(0, 6));
-                buf.append("</th></tr>\n<tr><td colspan=\"2\">");
+                buf.append("</th></tr>\n<tr><td");
+                // If the dest is published but not in the addressbook, an extra
+                // <td> is appended with an "Add to addressbook" link, so this
+                // <td> should not span 2 columns.
+                String host = null;
+                if (!unpublished) {
+                    host = _context.namingService().reverseLookup(dest);
+                }
+                if (host != null) {
+                    buf.append(" colspan=\"2\"");
+                }
+                buf.append(">");
                 String b32 = dest.toBase32();
                 buf.append("<a href=\"http://").append(b32).append("\">").append(b32).append("</a></td>");
                 if (!unpublished) {
-                    String host = _context.namingService().reverseLookup(dest);
                     if (host == null) {
                         buf.append("<td class=\"addtobook\" colspan=\"2\">").append("<a title=\"").append(_t("Add to addressbook"))
                            .append("\" href=\"/susidns/addressbook.jsp?book=private&amp;destination=")
