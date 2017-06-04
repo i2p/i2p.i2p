@@ -67,7 +67,7 @@
 <hr>
 <div class="headline" id="configure">
 <h3><%=intl._t("Configuration")%></h3>
-<h4><%=intl._t("Location:")%> ${cfg.fileName}</h4>
+<h4><%=intl._t("File location")%>: ${cfg.fileName}</h4>
 </div>
 <div id="messages">${cfg.messages}</div>
 <form method="POST" action="config">

@@ -104,7 +104,7 @@
  </tr>
  <tr>
   <td class="infowarn">
-   <b><%=intl._t("Do not reveal your port numbers to anyone as they can be used to discover your ip address.")%></b>
+   <b><%=intl._t("Do not reveal your port numbers to anyone, as they can be used to discover your IP address.")%></b>
   </td>
  </tr>
  <tr>

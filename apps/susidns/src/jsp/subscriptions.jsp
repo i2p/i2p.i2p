@@ -65,7 +65,7 @@
 <hr>
 <div class="headline" id="subscriptions">
 <h3><%=intl._t("Subscriptions")%></h3>
-<h4><%=intl._t("Location:")%> ${subs.fileName}</h4>
+<h4><%=intl._t("File location")%>: ${subs.fileName}</h4>
 </div>
 <div id="messages">${subs.messages}</div>
 <form method="POST" action="subscriptions">
