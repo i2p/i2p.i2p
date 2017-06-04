@@ -580,6 +580,7 @@ th.snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type=
 }
 
 .snarkTorrents tfoot tr:first-child th {
+     color: #ddd !important;
      font-weight: bold;
      vertical-align: middle;
 }
