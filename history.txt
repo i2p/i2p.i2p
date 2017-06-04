@@ -1,6 +1,7 @@
 2017-06-04 str4d
  * De-duplicate strings for translation
  * Minor theme tweaks and bugfixes
+ * SusiDNS: Update SVG image to use grouped objects for styling and hotlinks
 
 2017-06-03 str4d
  * Console:
