@@ -380,10 +380,6 @@ li {
      line-height: 140%;
 }
 
-li b {
-     text-transform: capitalize;
-}
-
 tr.list1 {
      background-color: #f7f8ff;
      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff;
