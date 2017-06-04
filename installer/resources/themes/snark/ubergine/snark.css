@@ -550,8 +550,13 @@ th.snarkTorrentAction input[type="image"] {
      border: 1px solid #202;
 }
 
-th.snarkTorrentAction input[type="image"]:hover {
+th.snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type="image"]:focus {
      border: 1px solid #f60;
+}
+
+.snarkTorrentAction input[type="image"]:active {
+     border: 1px solid #f30 !important;
+     transform: scale(0.9);
 }
 
 .snarkTorrentAction img {
@@ -1291,7 +1296,8 @@ thead img:hover, thead img:focus, thead a:hover img, thead a:focus img {
 }
 
 thead a:active img {
-     filter: drop-shadow(0 0 1px #f90) !important;
+     filter: drop-shadow(0 0 1px #f30) !important;
+     transform: scale(0.9);
 }
 
 input[type="submit"]:disabled:active, a.control:disabled:active {
@@ -2395,11 +2401,12 @@ input#toggle_debug:checked + label + #dhtDebugInner {
 
 #commentDeleteAction {
      background: linear-gradient(to bottom, #202, #101);
-     box-shadow: inset 0 0 0 1px #303;
 }
 
 #commentDeleteAction td {
+     box-shadow: inset 0 0 0 1px #303;
      padding-right: 6px;
+     padding-bottom: 2px !important;
 }
 
 .commentAction, .commentDelete {
@@ -2673,6 +2680,10 @@ b.alwaysShow {
 
 .dirInfoComplete {
      display: none;
+}
+
+#commentDeleteAction td {
+    padding-top: 4px;
 }
 }
 

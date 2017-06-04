@@ -962,7 +962,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
      box-shadow: none;
      opacity: 1;
      box-shadow: 0 0 1px 1px rgba(0,0,0,0.8);
-     margin: auto;
+     margin: 1px auto;
 }
 
 .snarkDirInfo .percentBarOuter {
@@ -989,7 +989,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 .percentBarText {
      text-align: center;
      font-weight: bold;
-     padding: 1px 0;
+     padding: 0.5px 0 0;
      white-space: nowrap;
      display: block;
      color: #dfd137;
@@ -1001,6 +1001,16 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
 .percentBarText:hover, .percentBarText:focus {
      opacity: 0.75;
      transition: ease opacity 0.2s;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+.percentBarText {
+     padding: 0;
+}
+
+.iframed .percentBarText, .iframed .percentBarText:hover, .iframed .percentBarText:focus {
+     transition: none;
+}
 }
 
 .percentBarOuterComplete .percentBarText {
@@ -1285,6 +1295,10 @@ input[type="image"], a img {
 input[type="image"]:hover, a img:hover, input[type="image"]:focus, a:focus img {
      filter: saturate(200%) drop-shadow(0 0 1px #f90) !important;
      outline: none;
+}
+
+thead a:active img {
+     transform: scale(0.9);
 }
 
 .snarkTorrents thead th:last-child, .snarkTorrents td:last-child {
@@ -2444,6 +2458,10 @@ input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked,
      border-top: 1px solid #050;
 }
 
+#newRating select {
+     width: 90%;
+}
+
 .snarkCommentInfo textarea { /* remember to set 10pt @ > 1400px */
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      width: 100%;
@@ -2682,9 +2700,14 @@ body, .snarkTorrents td, .snarkAddInfo, th, td,  code, textarea, input, input[ty
      padding-bottom: 3px !important;
 }
 
-.snarkTorrentInfo td, .snarkDirInfo td, .snarkTorrents .peerinfo td {
+.snarkDirInfo td, .snarkTorrents .peerinfo td {
      padding-top: 4px !important;
      padding-bottom: 4px !important;
+}
+
+.snarkTorrentInfo td {
+     padding-top: 6px !important;
+     padding-bottom: 6px !important;
 }
 
 #configs td:first-child {

@@ -1342,6 +1342,10 @@ thead a img:hover, thead a img:focus, thead a:hover img, thead a:focus img {
      filter: saturate(200%) hue-rotate(80deg) drop-shadow(0 0 2px #652787) !important;
 }
 
+thead a:active img, .snarkTorrentAction input[type="image"]:active {
+     transform: scale(0.9);
+}
+
 input[type="checkbox"], .optbox, input[type="radio"] {
      background: none;
      min-width: 16px !important;
@@ -2552,15 +2556,15 @@ tfoot .snarkTorrentDownloaded, tfoot .snarkTorrentRateDown {
 .snarkMessages li:first-child::after {
      content: "minimode";
      display: inline-block;
-     font-size: 9pt !important;
+     font-size: 8pt !important;
      float: right;
      vertical-align: middle;
      position: relative;
-     bottom: -38px;
-     right: -16px;
-     background: rgba(0,0,48,0.3);
-     padding: 2px;
-     border-radius: 4px;
+     bottom: -42px;
+     right: -20px;
+     background: rgba(0,0,48,0.4);
+     padding: 1px 4px 2px;
+     border-radius: 4px 0 0 4px;
      z-index: 0;
 }
 
@@ -2712,12 +2716,16 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
 }
 
 @media screen and (min-width: 1400px) {
-code, textarea, .snarkMessages li, .snarkMessages a, input, tt {
+code, textarea, input, tt {
      font-size: 10pt !important;
 }
 
 a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileName, code, textarea, input[name="nofilter_dataDir"], input, code {
      font-size: 10pt !important;
+}
+
+.snarkMessages li, .snarkMessages a {
+     font-size: 9pt !important;
 }
 
 .snarkConfigTitle, .toggleview {

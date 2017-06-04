@@ -247,7 +247,7 @@ div.warning {
 
 /* end proxy errors */
 
-div.routersummaryouter {
+.routersummaryouter {
      float: left;
      width: 200px;
      margin: 0 0 10px 5px;
@@ -259,7 +259,7 @@ div.routersummaryouter {
      position: absolute; /* so no interference with /home app icons */
 }
 
-div.routersummary {
+.routersummary {
      width: 174px;
      padding: 8px 10px 8px;
      text-align: center;
@@ -274,18 +274,18 @@ div.routersummary {
      margin-bottom: 7px !important;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
      opacity: 0.9;
-     transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
+     transition: ease filter 0.3s, ease opacity 0.3s;
      margin-top: 1px;
      margin-left: -1px;
      width: 176px;
      height: auto;
 }
 
-div.routersummary img[src$="i2plogo.png"]:hover {
+.routersummary img[src$="i2plogo.png"]:hover {
      opacity: 1;
-     transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
+     transition: ease filter 0.3s, ease opacity 0.3s;
      filter: saturate(200%) drop-shadow(0 0 2px #f60);
 }
 
@@ -297,19 +297,19 @@ div.routersummary img[src$="i2plogo.png"]:hover {
      filter: drop-shadow(0 0 2px #f60) saturate(200%);
 }
 
-div.routersummary input[type="text"] {
+.routersummary input[type="text"] {
      text-align: right !important;
      box-shadow: inset 1px 1px 1px 0 #000;
 }
 
-div.routersummary hr {
+.routersummary hr {
      color: #494;
      background: #494;
      height: 1px;
      margin: 9px -10px 7px -10px;
 }
 
-div.routersummary h3 {
+.routersummary h3 {
      border: none;
      font-size: 9.5pt;
      letter-spacing: 0.08em;
@@ -344,7 +344,7 @@ div.routersummary h3 {
      box-shadow: inset 4px 4px 2px #000;
 }
 
-div.routersummary h4 {
+.routersummary h4 {
      border: 0;
      border-bottom: 0 !important;
      font-size: 8pt;
@@ -372,11 +372,11 @@ div.routersummary h4 {
      width: calc(100% - 5px);
 }
 
-div.routersummary ul {
+.routersummary ul {
      text-align: left !important;
 }
 
-div.routersummary table {
+.routersummary table {
      border: 0;
      text-align: center !important;
      margin: -5px -7px -6px -8px !important;
@@ -475,21 +475,21 @@ p:empty + .sb_notice {
      margin-top: 9px;
 }
 
-div.routersummary tr {
+.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
 }
 
-div.routersummary form {
+.routersummary form {
      margin: -4px -9px -6px;
 }
 
-div.routersummary form:first-child {
+.routersummary form:first-child {
      margin: 6px 0 -5px 0 !important;
 }
 
-div.routersummary p {
+.routersummary p {
      padding: 0;
 }
 
@@ -499,11 +499,11 @@ div.refresh {
      padding: 2px 0 0 0 !important;
 }
 
-div.routersummary a:link, div.routersummary a:visited {
+.routersummary a:link, .routersummary a:visited {
      word-spacing: 0.05em;
 }
 
-div.routersummary a:hover {
+.routersummary a:hover {
      color: #f60;
 }
 
@@ -588,7 +588,7 @@ div.routersummary a:hover {
 */
 /* end custom sidebar links */
 
-div.routersummary td {
+.routersummary td {
      padding: 0 2px 0 2px;
      background-image: none !important;
      border: 0 !important;
@@ -597,13 +597,13 @@ div.routersummary td {
      text-overflow: ellipsis; /* force ellipsis rather than truncate rare, overlong text strings eg. Swedish sidepanel */
 }
 
-div.routersummary td:first-child {
+.routersummary td:first-child {
      max-width: 90px;
      overflow: hidden;
      text-transform: capitalize;
 }
 
-div.routersummary hr:last-child {
+.routersummary hr:last-child {
      margin-top: 5px;
      margin-bottom: -5px !important;
 }
@@ -960,17 +960,19 @@ div.widepanel h3 {
      border: 1px solid #494;
 }
 
-#graphs .messages {
-     margin-top: 15px;
-}
-
 .main#events .messages {
      margin-top: 26px;
      margin-bottom: -13px;
      box-shadow: inset 0 0 0 1px #700 !important;
 }
 
-div.graphspanel {
+/* graphs */
+
+#graphs .messages {
+     margin-top: 15px;
+}
+
+.graphspanel {
      padding: 0;
      margin: 15px 0 -15px 0;
      background: none;
@@ -979,32 +981,32 @@ div.graphspanel {
      width: 100%;
 }
 
-div.graphspanel form {
+.graphspanel form {
      text-align: left;
      padding: 0 15px 0 15px;
      margin-bottom: 25px;
 }
 
-div.graphspanel a img {
+.graphspanel a img {
      border: 1px solid #494;
      padding: 3px;
      margin: 5px;
      text-align: center !important;
      opacity: 0.9;
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
 }
 
-div.graphspanel a img:hover {
+.graphspanel a img:hover {
      border: 1px solid #f60;
      padding: 3px;
      margin: 5px;
      text-align: center !important;
      opacity: 1;
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
 }
 
-div.graphspanel img {
+.graphspanel img {
      border: 1px solid #333;
      background: #000;
      padding: 2px;
@@ -1013,7 +1015,22 @@ div.graphspanel img {
      max-width: calc(100% - 18px);
 }
 
-div.graphspanel p {
+.graphspanel img:not(old) {
+     background: #fff;
+     border: #ccc;
+     filter: invert(1);
+     mix-blend-mode: lighten;
+}
+
+.graphspanel a img:not(old) {
+     border: 1px solid #bb66bb;
+}
+
+.graphspanel a img:hover:not(old) {
+     border: 1px solid #0099ff;
+}
+
+.graphspanel p {
      text-align: center;
      text-transform: capitalize;
      margin-top: 10px;
@@ -1034,7 +1051,7 @@ h3#graphinfo {
      border-radius: 0 !important;
 }
 
-div.graphspanel p:last-child {
+.graphspanel p:last-child {
      display: none;
 }
 
@@ -1125,7 +1142,7 @@ h3#graphdisplay a {
      min-width: 60px;
 }
 
-/* end new graphs optionbox */
+/* end graphs */
 
 table {
      border-collapse: collapse;
@@ -1383,7 +1400,6 @@ a:active {
 .links b {
      color: #bb0 !important;
      letter-spacing: 0.08em;
-     font-size: 8.5pt;
      line-height: 165%;
 }
 
@@ -1483,7 +1499,7 @@ h4 {
      font-size: 11pt;
 }
 
-h1, h2, h3:not([id*="help"]), h4.app, h4.app2, div.routersummary h3 {
+h1, h2, h3:not([id*="help"]), h4.app, h4.app2, .routersummary h3 {
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
 }
 
@@ -1799,7 +1815,7 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      color: #ee9 !important;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
-     transition: filter ease 0.3s 0s;
+     transition: filter ease 0.3s;
      font-weight: bold;
      outline: none;
 }
@@ -2284,11 +2300,11 @@ table#udpconnections table i {
       margin-top: 3px !important;
 }
 
-#udpconnections tr:hover, #ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #netdboverview table tr:hover, #portfaq tr:hover {
+#udpconnections tr:hover, #ntcpconnections tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #netdboverview table tr:hover, #portfaq tr:hover, .tunneldisplay tr:hover {
      background: #020;
 }
 
-#udpconnections tr td, #ntcpconnections tr td {
+#udpconnections td, #ntcpconnections td, .tunneldisplay td {
      color: #bb7;
 }
 
@@ -2298,7 +2314,7 @@ table#udpconnections table i {
      white-space: nowrap;
 }
 
-#udpconnections tr:hover td, #ntcpconnections tr:hover td {
+#udpconnections tr:hover td, #ntcpconnections tr:hover td, .tunneldisplay tr:hover td {
      color: #ee9;
 }
 
@@ -2336,8 +2352,13 @@ table#udpconnections table i {
      width: 100px;
 }
 
-table#ntcpconnections {
+#ntcpconnections {
      overflow-x: scroll !important;
+}
+
+#profilelist a[href^="viewprofile"] {
+     display: inline-block;
+     margin-bottom: 2px;
 }
 
 .backlogged {
@@ -2459,7 +2480,7 @@ div.themechoice {
 
 .themechoice:hover object {
      filter: drop-shadow(0 0 1px #f60);
-     transition: ease filter 0.3s 0s;
+     transition: ease filter 0.3s;
 }
 
 .themechoice:hover .themelabel {
@@ -2652,7 +2673,7 @@ td#themeselect {
 
 .langselect input:hover + img {
      box-shadow: 0 0 2px 1px #f60;
-     transition: ease box-shadow 0.3s 0s;
+     transition: ease box-shadow 0.3s;
 }
 
 .langselect input:hover + img + div.ui_lang {
@@ -4249,14 +4270,14 @@ ul#banlist + hr {
 
 /* end /configpeers banlist */
 
-div.footnote {
+.footnote {
      text-align: right;
      color: #494;
      font-size: 7pt;
      margin-bottom: 5px !important;
 }
 
-div.footnote hr {
+.footnote hr {
      margin: 10px 0 5px 0 !important;
      color: #494;
      background: #494;
@@ -4445,7 +4466,7 @@ button.search {
 div.app:hover.app img, a:focus .app img {
      filter: drop-shadow(0 0 1px #f60) saturate(200%);
      opacity: 1;
-     transition: filter ease 0.3s 0s;
+     transition: filter ease 0.3s;
 }
 
 .app table {
@@ -4545,7 +4566,7 @@ body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
 }
 
-.iframed div.routersummaryouter {
+.iframed .routersummaryouter {
      display: none !important;
 }
 
@@ -5636,6 +5657,10 @@ p#upnpstatus, .main#peers .infohelp {
      margin: 0;
 }
 
+#upnpscan {
+     margin-bottom: 5px;
+}
+
 .main#peers h3, #profiles h3, .main#peers .infohelp {
      margin-top: 5px !important;
 }
@@ -5785,6 +5810,12 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover,
      font-size: 10pt !important;
 }
 
+.cells tt, #profilelist tt, #floodfills tt {
+     font-size: 9pt !important;
+     margin-left: 1px !important;
+     margin-right: 2px !important;
+}
+
 .main button, .main input, select, textarea, div.news {
      font-size: 10pt !important;
 }
@@ -5886,7 +5917,7 @@ p#fullhistory {
      margin-top: -13px;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
      margin-left: -5px;
      transform: none;
      width: 210px;
@@ -5914,7 +5945,7 @@ table#permabanned {
      margin-bottom: 10px !important;
 }
 
-div.footnote, div.topness {
+.footnote, .topness {
      font-size: 9pt !important;
 }
 

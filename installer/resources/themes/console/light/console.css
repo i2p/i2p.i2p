@@ -145,7 +145,7 @@ pre {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-div.routersummary a:active img[src$="i2plogo.png"] {
+.routersummary a:active img[src$="i2plogo.png"] {
      filter: drop-shadow(0 0 2px #f30);
 }
 
@@ -248,7 +248,7 @@ h3#helpfaq {
 }
 }
 
-div.routersummary h4 {
+.routersummary h4 {
      border: none;
      border-radius: 0;
      font-size: 8.5pt;
@@ -488,28 +488,28 @@ p:empty + .sb_notice {
 
 /* end webapp navigation */
 
-div.routersummary tr {
+.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
 }
 
-div.routersummary a:hover {
+.routersummary a:hover {
      color: #f60;
 }
 
-div.routersummary td {
+.routersummary td {
      padding: 0 2px;
      background-image: none !important;
      border: 0 !important;
 }
 
-div.routersummary img:first-child  {
+.routersummary img:first-child  {
      margin-bottom: -2px !important;
      opacity: 0.7;
 }
 
-div.routersummary img:hover:first-child {
+.routersummary img:hover:first-child {
      margin-bottom: -2px !important;
      opacity: 1;
 }
@@ -566,7 +566,7 @@ div.tunnels td, div.tunnels img:first-child {
      padding: 4px 0 !important;
 }
 
-div.routersummary p {
+.routersummary p {
      padding: 0;
 }
 
@@ -1283,7 +1283,7 @@ div.configure {
      margin-bottom: 0;
 }
 
-div.configure h3, div.graphspanel h3 {
+div.configure h3, .graphspanel h3 {
      border: 1px solid #7778bf;
      border-left: 5px solid #7778bf;
      padding: 5px;
@@ -1293,7 +1293,7 @@ div.configure h3, div.graphspanel h3 {
      text-align: left;
 }
 
-div.graphspanel h3 {
+.graphspanel h3 {
      text-transform: capitalize;
      letter-spacing: normal;
      word-spacing: normal;
@@ -1521,12 +1521,12 @@ p#tunnelconfig {
      margin-bottom: -14px;
 }
 
-div.graphspanel {
+.graphspanel {
      text-align: center !important;
      margin: 15px 0 -15px;
 }
 
-div.graphspanel img {
+.graphspanel img {
      border: 1px solid #7778bf;
      padding: 2px;
      margin: 6px;
@@ -1537,11 +1537,12 @@ div.graphspanel img {
      max-width: 98%;
 }
 
-div.graphspanel a img:hover {
+.graphspanel a img:hover {
      box-shadow: inset 0 0 2px 1px #f60;
+     cursor: url(/themes/console/images/cursor_zoom.png), pointer;
 }
 
-div.graphspanel form {
+.graphspanel form {
      text-align: left;
 }
 
@@ -3902,7 +3903,7 @@ body.iframed {
      background: transparent url(/themes/console/images/transparent.gif) !important;
 }
 
-.iframed div.routersummaryouter {
+.iframed .routersummaryouter {
      display: none !important;
 }
 
@@ -4320,6 +4321,60 @@ table#addkeyring tr:last-child td {
 
 /* end peers, profiles, tunnels dests */
 
+/* /peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
+     text-align: right;
+     white-space: nowrap;
+}
+
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     text-align: right;
+}
+
+#udpconnections .tablefooter td:nth-child(9) {
+     text-align: center !important;
+}
+
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6) {
+     padding-left: 1vw !important;
+     padding-right: 1vw !important;
+}
+
+#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
+#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
+     white-space: nowrap;
+}
+
+#udpconnections .tablefooter td {
+     padding-left: 5px;
+     padding-right: 5px;
+}
+
+@media screen and (min-width: 1500px) {
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16),
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     padding-right: 10px !important;
+}
+
+.cells {
+     border-left: none;
+     border-right: none;
+}
+}
+
+/* end peers */
+
 /* netdb */
 
 .main#netdb, .main#events {
@@ -4382,18 +4437,18 @@ a.viewfullentry:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
+#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old) {
      font-size: 0;
 }
 
-table#leasesetdebug th a::after, table#leasesetsummary th a::after {
+#leasesetdebug th a::after, table#leasesetsummary th a::after {
      content: url(/themes/console/images/buttons/floodfill.png);
      vertical-align: text-top;
      padding-right: 0;
      filter: drop-shadow(0 0 1px #999);
 }
 
-table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
+#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
@@ -4496,6 +4551,15 @@ table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
 .leaseset th:last-child, .leaseset td:nth-child(2) {
      text-align: right;
      padding-right: 5px;
+}
+
+.leaseset td:first-child img {
+     margin: 0 3px 2px 5px;
+     vertical-align: middle;
+}
+
+.leaseset tt {
+     margin-right: 3px;
 }
 
 #leasesetdebug, #leasesetsummary {
@@ -4887,7 +4951,7 @@ ul#banlist {
 
 #profilelist tr:hover td, table#floodfills tr:hover td, #ntcpconnections tr:nth-last-child(n+2):hover td, #udpconnections tr:nth-last-child(n+2):hover td,
 #schedjobs tr:hover td, #jobstats tr:nth-last-child(n+2):hover td, #jardump tr:hover td, #sidebarconf tr:nth-last-child(n+2):hover td, #eventlog tr:hover td,
-#netdboverview table tr:hover td, #debug tr:hover td, #clientconfig tr:hover td, #webappconfig tr:hover td, #portfaq tr:hover td {
+#netdboverview table tr:hover td, #debug tr:hover td, #clientconfig tr:hover td, #webappconfig tr:hover td, #portfaq tr:hover td, .tunneldisplay tr:hover td {
      background: #ffd;
      color: #111;
 }
@@ -5590,7 +5654,7 @@ input[name="pluginURL"] {
      white-space: normal;
 }
 
-.main#help h3, #faq h3, table#leasesetdebug th, table#leasesetsummary th {
+.main#help h3, #faq h3, #leasesetdebug th, table#leasesetsummary th {
      font-size: 10pt !important;
 }
 }
@@ -5620,6 +5684,13 @@ input[name="pluginURL"] {
 }
 }
 
+@media screen and (min-width: 1000px) {
+.leaseset td:first-child img {
+     margin-bottom: 3px;
+     vertical-align: middle;
+}
+}
+
 @media screen and (min-width: 1200px) {
 #ntcpconnections td:first-child, #udpconnections td:first-child {
      padding-left: 5px !important;
@@ -5632,7 +5703,8 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.newss, pre, #jardump tt, #jardump td, div.news, #logs li, .cells tt, #profilelist tt {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.newss, pre,
+#jardump tt, #jardump td, div.news, #logs li, .cells tt, #profilelist tt, .leaseset tt {
      font-size: 9pt !important;
 }
 
@@ -5716,7 +5788,7 @@ h1 {
      font-size: 11pt !important;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
      margin-left: 0 !important;
      transform: none !important;
      width: 205px !important;
@@ -5827,59 +5899,4 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
-
-/* /peers */
-/* TODO: merge with main classes */
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
-     text-align: right;
-     white-space: nowrap;
-}
-
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
-#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
-#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
-     text-align: right;
-}
-
-#udpconnections .tablefooter td:nth-child(9) {
-     text-align: center !important;
-}
-
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6) {
-     padding-left: 1vw !important;
-     padding-right: 1vw !important;
-}
-
-#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
-#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
-     white-space: nowrap;
-}
-
-#udpconnections .tablefooter td {
-     padding-left: 5px;
-     padding-right: 5px;
-}
-
-@media screen and (min-width: 1500px) {
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16),
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
-#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
-#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
-     padding-right: 10px !important;
-}
-
-.cells {
-     border-left: none;
-     border-right: none;
-}
-}
-
-/* end peers */
 

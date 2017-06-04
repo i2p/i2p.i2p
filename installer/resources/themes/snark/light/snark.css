@@ -752,7 +752,7 @@ tr:hover .percentBarText {
 
 .percentBarText, .percentBarOuter {
      text-align: center;
-     height: 16px;
+     height: 14px;
      vertical-align: middle;
 }
 
@@ -760,13 +760,22 @@ tr:hover .percentBarText {
      text-align: center;
      font-weight: bold !important;
      line-height: 15px;
-     padding: 1px 0;
      white-space: nowrap;
      display: block;
      color: #005;
      text-shadow: 0 0 1px rgba(255,255,255,0.5);
      opacity: 0;
      transition: ease opacity 0.2s;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+.percentBarText {
+     line-height: 16px;
+}
+
+.iframed .percentBarText, .iframed .percentBarText:hover, .iframed .percentBarText:focus {
+     transition: none;
+}
 }
 
 .percentBarText:hover, .percentBarText:focus {
@@ -1115,6 +1124,11 @@ thead a:hover img, thead a img:hover {
      filter: hue-rotate(60deg) drop-shadow(0 0 1px #f60);
 }
 
+thead a:active img {
+     transform: scale(0.9);
+     filter: hue-rotate(45deg) drop-shadow(0 0 1px #f30) !important;
+}
+
 .addtorrentsection input[type="text"], .newtorrentsection input[type="text"] {
      width: 80%;
 }
@@ -1257,7 +1271,7 @@ img {
      vertical-align: middle;
      opacity: 1.0;
      line-height: 100%;
-     filter: drop-shadow(0 0 1px #999);
+     filter: drop-shadow(0 0 1px rgba(153, 153, 153, 0.5));
 }
 
 img:hover {

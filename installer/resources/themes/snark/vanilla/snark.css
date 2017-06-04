@@ -436,6 +436,11 @@ thead a:hover img, thead a:focus img {
      filter: drop-shadow(0 0 1px #f60);
 }
 
+thead a:active img {
+     transform: scale(0.9);
+     filter: drop-shadow(0 0 1px #f30);
+}
+
 th br {
      display: none;
 }
@@ -697,6 +702,12 @@ th.snarkTorrentStatus {
      font-weight: bold;
      text-align: center !important;
      color: #bbb !important;
+}
+
+.snarkTorrents th:empty + th:empty, .snarkTorrents td:empty + td:empty, .snarkTorrentETA:empty,
+.snarkTorrentRateDown:empty, .snarkTorrentRateUp:empty, .snarkTorrentAction:empty {
+     width: 0 !important;
+     min-width: 0 !important;
 }
 
 /* end main torrents listing */
@@ -2412,9 +2423,14 @@ td#bwHelp a {
      text-align: center;
 }
 
+#newRating td:first-child {
+     padding-right: 0 !important;
+}
+
 #newRating select {
      width: 90%;
      width: calc(100% - 10px);
+     margin-left: 8px;
 }
 
 #addCommentText {
@@ -2603,6 +2619,10 @@ _:-ms-lang(x), .snarkRefresh:link, .snarkRefresh:visited {
 .snarkDirInfo td:first-child::before {
      min-height: 20px;
 }
+
+.snarkCommentInfo td, .snarkComments td {
+     padding: 5px !important;
+}
 }
 
 @media screen and (max-width: 1400px) {
@@ -2690,12 +2710,12 @@ body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input
      padding-right: 10px !important;
 }
 
-.snarkTorrentRateUp {
-     padding-right: 15px !important;
-}
-
 thead a img, thead img {
      max-height: 21px;
+}
+
+.mainsection .snarkCommentInfo td, .mainsection .snarkComments td {
+     padding: 8px 5px !important;
 }
 }
 
@@ -2749,6 +2769,10 @@ select {
 
 .snarkTorrentUploaded {
      padding-left: 5px;
+}
+
+.snarkTorrentRateUp {
+     padding-right: 15px !important;
 }
 
 thead a img, thead img {

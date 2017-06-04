@@ -1010,7 +1010,7 @@ p.book {
      width: 20px;
      height: 20px;
      vertical-align: middle;
-     margin: 1px 10px 1px 1px;
+     margin: 5px 8px 5px 0;
      padding: 1px;
      border: 1px solid #17142f;
      border-radius: 2px;
@@ -1042,7 +1042,7 @@ p.book {
 }
 
 #host_list th:first-child {
-     padding-left: 39px !important;
+     padding-left: 37px !important;
 }
 
 #host_list td:last-child {
@@ -1103,7 +1103,8 @@ p.book {
 }
 
 #host_list .destaddress {
-     overflow: auto !important;
+     overflow: hidden !important;
+     text-overflow: ellipsis;
      white-space: nowrap;
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace !important;
      font-weight: normal;
@@ -1111,6 +1112,11 @@ p.book {
      -moz-user-select: all;
      -webkit-user-select: all;
      user-select: all;
+}
+
+#host_list .destaddress:hover, #host_list .destaddress:focus {
+     overflow: auto !important;
+     text-overflow: clip;
 }
 
 td.destinations {

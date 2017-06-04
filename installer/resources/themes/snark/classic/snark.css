@@ -1297,6 +1297,10 @@ input[type=image], thead img {
      border-radius: 3px;
 }
 
+thead a:active img {
+     transform: scale(0.9);
+}
+
 input[type="image"], a img {
      filter: drop-shadow(0 0 1px #ccc);
 }
@@ -2469,7 +2473,7 @@ td#bwHelp a {
 }
 
 #newRating td:first-child {
-     text-align: right;
+     text-align: center;
 }
 
 #newRating select {
