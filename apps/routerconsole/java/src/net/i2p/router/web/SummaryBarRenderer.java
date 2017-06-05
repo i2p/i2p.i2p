@@ -395,29 +395,48 @@ class SummaryBarRenderer {
     public String renderNetworkReachabilityHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h4><a href=\"/help#confignet\" target=\"_top\" title=\"")
+        SummaryHelper.NetworkStateMessage reachability = _helper.getReachability();
+        buf.append("<h4><span class=\"");
+        switch (reachability.getState()) {
+            case ERROR:
+                buf.append("error");
+                break;
+            case WARN:
+                buf.append("warn");
+                break;
+            case HIDDEN:
+                buf.append("hidden");
+                break;
+            case RUNNING:
+                buf.append("running");
+                break;
+            case TESTING:
+            default:
+                buf.append("testing");
+        }
+        buf.append("\"><a href=\"/help#confignet\" target=\"_top\" title=\"")
            .append(_t("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_t("Network"))
            .append(": ")
-           .append(_helper.getReachability())
-           .append("</a></h4>\n");
+           .append(reachability.getMessage())
+           .append("</a></span></h4>\n");
         if (!SigType.ECDSA_SHA256_P256.isAvailable()) {
-            buf.append("<hr>\n<h4><a href=\"http://trac.i2p2.i2p/wiki/Crypto/ECDSA");
+            buf.append("<hr>\n<h4><span class=\"warn\"><a href=\"http://trac.i2p2.i2p/wiki/Crypto/ECDSA");
             if ("ru".equals(Messages.getLanguage(_context)))
                 buf.append("-ru");
             buf.append("\" target=\"_top\" title=\"")
                .append(_t("See more information on the wiki"))
                .append("\">")
                .append(_t("Warning: ECDSA is not available. Update your Java or OS"))
-               .append("</a></h4>\n");
+               .append("</a></span></h4>\n");
         }
         if (!SystemVersion.isJava7()) {
-            buf.append("<hr><h4>")
+            buf.append("<hr><h4><span class=\"warn\">")
                .append(_t("Warning: Java version {0} is no longer supported by I2P.", System.getProperty("java.version")))
                .append(' ')
                .append(_t("Update Java to version {0} or higher to receive I2P updates.", "7"))
-               .append("</h4>\n");
+               .append("</span></h4>\n");
         }
         return buf.toString();
     }

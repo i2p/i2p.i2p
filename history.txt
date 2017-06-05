@@ -1,3 +1,6 @@
+2017-06-05 str4d
+ * Add state classes to network status messages in sidebar
+
 2017-06-04 str4d
  * De-duplicate strings for translation
  * Minor theme tweaks and bugfixes

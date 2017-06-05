@@ -129,7 +129,47 @@ public class SummaryHelper extends HelperBase {
     /** subtract one for ourselves, so if we know no other peers it displays zero */
     public int getAllPeers() { return Math.max(_context.netDb().getKnownRouters() - 1, 0); }
 
-    public String getReachability() {
+    public enum NetworkState {
+        HIDDEN,
+        TESTING,
+        RUNNING,
+        WARN,
+        ERROR;
+    }
+
+    /**
+     * State message to be displayed to the user in the summary bar.
+     *
+     * @since 0.9.31
+     */
+    public class NetworkStateMessage {
+        private NetworkState state;
+        private String msg;
+
+        NetworkStateMessage(NetworkState state, String msg) {
+            setMessage(state, msg);
+        }
+
+        public void setMessage(NetworkState state, String msg) {
+            this.state = state;
+            this.msg = msg;
+        }
+
+        public NetworkState getState() {
+            return state;
+        }
+
+        public String getMessage() {
+            return msg;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " (" + state + "; " + msg + ')';
+        }
+    }
+
+    public NetworkStateMessage getReachability() {
         return reachability(); // + timeSkew();
         // testing
         //return reachability() +
@@ -137,26 +177,27 @@ public class SummaryHelper extends HelperBase {
         //       " Slew: " + DataHelper.formatDuration(((RouterClock)_context.clock()).getDeltaOffset());
     }
 
-    private String reachability() {
+    private NetworkStateMessage reachability() {
         if (_context.commSystem().isDummy())
-            return "VM Comm System";
+            return new NetworkStateMessage(NetworkState.RUNNING, "VM Comm System");
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
-            return _t("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
+            return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Client Manager I2CP Error - check logs"));  // not a router problem but the user should know
         // Warn based on actual skew from peers, not update status, so if we successfully offset
         // the clock, we don't complain.
         //if (!_context.clock().getUpdatedSuccessfully())
         long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 30*1000)
-            return _t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)));
+            return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew))));
         if (_context.router().isHidden())
-            return _t("Hidden");
+            return new NetworkStateMessage(NetworkState.HIDDEN, _t("Hidden"));
         RouterInfo routerInfo = _context.router().getRouterInfo();
         if (routerInfo == null)
-            return _t("Testing");
+            return new NetworkStateMessage(NetworkState.TESTING, _t("Testing"));
 
         Status status = _context.commSystem().getStatus();
+        NetworkState state = NetworkState.RUNNING;
         switch (status) {
             case OK:
             case IPV4_OK_IPV6_UNKNOWN:
@@ -166,53 +207,54 @@ public class SummaryHelper extends HelperBase {
             case IPV4_SNAT_IPV6_OK:
                 RouterAddress ra = routerInfo.getTargetAddress("NTCP");
                 if (ra == null)
-                    return _t(status.toStatusString());
+                    return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
                 byte[] ip = ra.getIP();
                 if (ip == null)
-                    return _t("ERR-Unresolved TCP Address");
+                    return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Unresolved TCP Address"));
                 // TODO set IPv6 arg based on configuration?
                 if (TransportUtil.isPubliclyRoutable(ip, true))
-                    return _t(status.toStatusString());
-                return _t("ERR-Private TCP Address");
+                    return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
+                return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Private TCP Address"));
 
             case IPV4_SNAT_IPV6_UNKNOWN:
             case DIFFERENT:
-                return _t("ERR-SymmetricNAT");
+                return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-SymmetricNAT"));
 
             case REJECT_UNSOLICITED:
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
-                    return _t("WARN-Firewalled with Inbound TCP Enabled");
+                    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled with Inbound TCP Enabled"));
                 // fall through...
             case IPV4_FIREWALLED_IPV6_OK:
             case IPV4_FIREWALLED_IPV6_UNKNOWN:
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
-                    return _t("WARN-Firewalled and Floodfill");
+                    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Floodfill"));
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
-                //    return _t("WARN-Firewalled and Fast");
-                return _t(status.toStatusString());
+                //    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Fast"));
+                return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
 
             case DISCONNECTED:
-                return _t("Disconnected - check network connection");
+                return new NetworkStateMessage(NetworkState.TESTING, _t("Disconnected - check network connection"));
 
             case HOSED:
-                return _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
+                return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"));
 
             case UNKNOWN:
+                state = NetworkState.TESTING;
             case IPV4_UNKNOWN_IPV6_FIREWALLED:
             case IPV4_DISABLED_IPV6_UNKNOWN:
             default:
                 ra = routerInfo.getTargetAddress("SSU");
                 if (ra == null && _context.router().getUptime() > 5*60*1000) {
                     if (getActivePeers() <= 0)
-                        return _t("ERR-No Active Peers, Check Network Connection and Firewall");
+                        return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-No Active Peers, Check Network Connection and Firewall"));
                     else if (_context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME) == null ||
                         _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT) == null)
-                        return _t("ERR-UDP Disabled and Inbound TCP host/port not set");
+                        return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-UDP Disabled and Inbound TCP host/port not set"));
                     else
-                        return _t("WARN-Firewalled with UDP Disabled");
+                        return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled with UDP Disabled"));
                 }
-                return _t(status.toStatusString());
+                return new NetworkStateMessage(state, _t(status.toStatusString()));
         }
     }
 
