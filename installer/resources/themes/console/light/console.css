@@ -1164,7 +1164,7 @@ div.main, .routersummary, .logo {
 }
 
 /* top navigation bar */
-
+/*
 .confignav {
      padding: 12px 10px 0 !important;
      margin: 2px -14px 12px !important;
@@ -1271,7 +1271,7 @@ _:-ms-lang(x), .tab {
      margin-top: -5px !important;
      margin-bottom: -1px !important;
 }
-
+*/
 /* end topnav */
 
 .th_title a, .th_title a:hover {
@@ -5818,9 +5818,11 @@ h1 {
      min-height: 38px !important;
 }
 
+/*
 .confignav {
      padding-top: 12px !important;
 }
+*/
 
 .langbox img {
      margin: -1px 0 1px 1px;
@@ -5899,4 +5901,89 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
+
+
+/* top navigation */
+
+h1, .confignav {
+     position: relative;
+}
+
+h1 {
+     z-index: 999;
+     filter: none;
+}
+
+.confignav, .main#help div.confignav {
+     padding: 8px;
+     margin: -1px -16px 5px -16px;
+     border: 1px solid #7778bf;
+     box-shadow: inset 0 0 0 1px #bbf;
+     font-size: 9pt;
+     text-align: center;
+     font-weight: bold;
+     color: #000;
+     background: #efefff linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) !important;
+}
+
+.tab, .tab2 {
+     box-sizing: border-box;
+     display: inline-block;
+     border: 1px solid #7778bf;
+     margin: 0 -2px -1px -2px !important;
+     padding: 1px 0;
+     background: #fff;
+     min-width: 60px !important;
+     filter: drop-shadow(0 0 1px #ededed);
+}
+
+.tab a {
+     display: inline-block;
+     padding: 3px 14px;
+}
+
+.tab:hover a {
+     color: #f60 !important;
+}
+
+.tab {
+     background: linear-gradient(to bottom, #fff 50%, #efefff 50%);
+     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)) #e7e7ff;
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+.tab:hover {
+     background: #fff;
+     box-shadow: inset 0 0 0 1px #f90;
+}
+
+.tab:active {
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #5f2400;
+     background: #f60;
+}
+
+.tab:active a {
+     color: #fff !important;
+}
+
+.tab2 {
+     background: #89f;
+     background: #aaf;
+     background: #3b6bbf;
+     background: rgba(59, 107, 191, 0.8);
+     background: #6288cb;
+     box-shadow: inset 0 0 0 1px #fff;
+     color: #fff;
+     padding: 4px 12px;
+}
+
+@media screen and (min-width: 1400px) {
+#help .confignav {
+     position: sticky;
+     top: -1px;
+     z-index: 999;
+}
+}
+
+/* end topnav */
 
