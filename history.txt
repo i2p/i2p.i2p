@@ -1,5 +1,6 @@
 2017-06-05 str4d
  * Add state classes to network status messages in sidebar
+ * Switch light theme to the same top-nav style as the other themes
 
 2017-06-04 str4d
  * De-duplicate strings for translation
