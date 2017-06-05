@@ -5,7 +5,7 @@
   <defs>
     <linearGradient id="hover" x2="0" y2="1">
       <stop offset="50%" stop-color="#fff"/>
-      <stop offset="50%" stop-color="#efe"/>
+      <stop offset="50%" stop-color="#cfc"/>
     </linearGradient>
     <linearGradient id="hover2" x2="0" y2="1">
       <stop offset="50%" stop-color="#fff"/>

@@ -389,6 +389,7 @@ pre {
 
 .page {
      background: #eef url(/themes/console/classic/images/bg2.png);
+     background: linear-gradient(to bottom, rgba(255,255,255,0.7),rgba(255,255,255,0.2)), url(/themes/console/classic/images/bg2.png) #eef;
      color: #0c153d;
      margin: 0;
      padding: 0 10px 10px;
@@ -923,7 +924,7 @@ div#composemail {
 
 div#dologin {
      border: 1px solid #777;
-     padding: 10px 0 0;
+     padding: 20px 0 0;
      width: 500px;
      margin: 60px auto 40px;
      box-shadow: 0 0 0 1px #fff;
@@ -949,8 +950,10 @@ div#dologin {
      padding: 4px 5px 4px 26px !important;
 }
 
-#dologin input[name="host"] {
-     width: calc(65% + 26px) !important;
+#dologin input[name="user"], #dologin input[name="pass"], #dologin input[name="host"] {
+     width: 60% !important;
+     width: calc(60% + 26px) !important;
+     margin-right: 3px;
 }
 
 #dologin table {

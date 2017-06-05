@@ -642,22 +642,20 @@ td {
 
 .snarkTorrentEven {
      background: #eef;
-     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px);
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fff;
 }
 
 .snarkTorrentOdd {
      background: #e0e0ff;
-     background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px);
+     background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fff;
 }
 
 .snarkTorrentOdd td, .snarkTorrentEven td {
      border-top: 1px solid #bbf !important;
 }
 
-.snarkTorrents tr:hover, .snarkTorrents tr:hover td, .snarkDirInfo tr:hover, .snarkDirInfo tr:hover td {
+.snarkTorrents tr:hover, .snarkTorrents tr:hover td, .snarkDirInfo tr:hover {
      background: #ffd;
-     border-top: 1px solid #7778bf !important;
-     border-bottom: 1px solid #7778bf !important;
      box-shadow: none !important;
      color: #0c111f !important;
 }

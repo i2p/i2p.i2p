@@ -5812,7 +5812,8 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover,
 
 .cells tt, #profilelist tt, #floodfills tt {
      font-size: 9pt !important;
-     margin-left: 1px !important;
+     letter-spacing: 0.07em;
+     margin-left: 2px !important;
      margin-right: 2px !important;
 }
 
