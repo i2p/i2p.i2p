@@ -106,6 +106,8 @@ certificates/ssl/download.xxlspeed.com.crt
 certificates/ssl/uk.reseed.i2p2.no.crt
 certificates/ssl/us.reseed.i2p2.no.crt
 certificates/ssl/reseed.i2p.vzaws.com.crt
+certificates/reseed/parg_at_mail.i2p.crt
+certificates/ssl/reseed.i2p.vzaws.com2017.crt
 # vanished
 certificates/news/killyourtv_at_mail.i2p.crt
 certificates/router/killyourtv_at_mail.i2p.crt

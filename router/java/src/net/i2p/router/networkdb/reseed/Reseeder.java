@@ -108,14 +108,13 @@ public class Reseeder {
         //
         // https url:port, ending with "/"              // certificates/reseed/      // certificates/ssl/          // notes
         // ----------------------------------           ------------------------     -------------------------     ---------------
-        //"https://randomrng.ddns.net/"         + ',' +   // randomrng_at_mail.i2p.crt // CA                         // Java 7+
+        "https://i2pseed.creativecowpat.net:8443/" + ',' + // creativecowpat_at_mail.i2p.crt // i2pseed.creativecowpat.net.crt // Java 7+
         "https://itoopie.atomike.ninja/"      + ',' +   // atomike_at_mail.i2p.crt   // CA                         // Java 8+ only
         "https://reseed.onion.im/"            + ',' +   // lazygravy_at_mail.i2p     // reseed.onion.im.crt        // Java 8+ only
         "https://reseed.memcpy.io/"           + ',' +   // hottuna_at_mail.i2p.crt   // CA                         // SNI required
         "https://reseed.atomike.ninja/"       + ',' +   // atomike_at_mail.i2p.crt   // CA                         // SNI required, Java 8+ only
         "https://i2p.manas.ca:8443/"          + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
         "https://i2p-0.manas.ca:8443/"        + ',' +   // zmx_at_mail.i2p.crt       // CA                         // SNI required
-        "https://reseed.i2p.vzaws.com:8443/"  + ',' +   // parg_at_mail.i2p.crt      // reseed.i2p.vzaws.com.crt
         "https://i2p.mooo.com/netDb/"         + ',' +   // bugme_at_mail.i2p.crt     // i2p.mooo.com.crt
         "https://download.xxlspeed.com/"      + ',' +   // backup_at_mail.i2p.crt    // CA                         // Java 8+
         "https://netdb.i2p2.no/"              + ',' +   // meeh_at_mail.i2p.crt      // netdb.i2p2.no.crt          // SNI required
