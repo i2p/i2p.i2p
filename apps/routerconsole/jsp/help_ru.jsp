@@ -35,9 +35,6 @@
 <a href="http://i2p-projekt.i2p/ru/get-involved">как стать участником</a>. </p>
 
 <p>Дальнейшие инструкции доступны в <a href="http://i2p-projekt.i2p/ru/faq">FAQ на i2p-projekt.i2p</a></p>
-
-<p>Также, имеет смысл зайти на <a href="http://forum.i2p/">форум I2P</a> и IRC-каналы проекта.</p>
-
 </div>
 
 <div id="sidebarhelp">

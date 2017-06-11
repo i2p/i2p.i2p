@@ -7,7 +7,7 @@ I2PSnark web ui will be at http://127.0.0.1:8002/i2psnark/
 I2PSnark is GPL'ed software, based on Snark (http://www.klomp.org/) to run on top of I2P
 (https://geti2p.net/) within a webserver (such as the bundled Jetty from
 https://www.eclipse.org/jetty/).  For more information about I2PSnark, get in touch
-with the folks at http://forum.i2p2.de/
+with the folks at http://zzz.i2p/
 
 
 To add RPC support:

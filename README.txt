@@ -35,7 +35,6 @@ FAQ:
 
 Need help?
 	IRC irc.freenode.net #i2p
-	http://forum.i2p/
 
 Bug reports:
 	https://trac.i2p2.de/report/1

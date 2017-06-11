@@ -333,9 +333,9 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a>\n");
             sortedTrackers = _manager.getSortedTrackers();
             if (_context.isRouterContext()) {
-                out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
-                out.write(_t("Forum"));
-                out.write("</a>\n");
+                //out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
+                //out.write(_t("Forum"));
+                //out.write("</a>\n");
                 for (Tracker t : sortedTrackers) {
                     if (t.baseURL == null || !t.baseURL.startsWith("http"))
                         continue;

@@ -34,7 +34,6 @@ met andere aspecten van het project, zie dan de documentatie voor
 </p><p>Verdere ondersteuning is hier beschikbaar:</p>
 <ul class="links">
 <li class="tidylist"><a href="http://i2p-projekt.i2p/nl/faq">FAQ op i2p-projekt.i2p</a></li>
-<li class="tidylist">Je kunt ook het <a href="http://forum.i2p/">I2P forum</a> of IRC proberen.</li>
 </ul><br>
 </div>
 

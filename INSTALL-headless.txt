@@ -11,7 +11,7 @@ you may use:
   lynx http://localhost:7657/
 to configure the router.
 
-If you're having trouble, swing by http://forum.i2p/, check the
+If you're having trouble, check the
 website at https://geti2p.net/, or get on irc://irc.freenode.net/#i2p
 
 I2P will create and store files and configuration data in the user directory

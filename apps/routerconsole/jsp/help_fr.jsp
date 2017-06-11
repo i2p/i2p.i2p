@@ -35,7 +35,6 @@ la page consacrée aux <a href="http://i2p-projekt.i2p/fr/get-involved">volontai
 <ul class="links">
 <li class="tidylist"><a href="http://i2p-projekt.i2p/en/faq">FAQ en anglais sur i2p-projekt.i2p</a></li>
 <li class="tidylist"><a href="http://i2p-projekt.i2p/fr/faq">les FAQ en français</a>.</li>
-<li>Il y a aussi le <a href="http://forum.i2p/">forum I2P</a> et l'IRC.</li>
 </ul><br>
 </div>
 
