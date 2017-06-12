@@ -9,6 +9,7 @@
        center to separator for multi-value rows)
      - Enhance presentation of tables on /tunnels (reliable alignment of mixed
        content in rows, more prominence to bandwidth tiers)
+   - /netdb: Fix UI bug with unpublished LeaseSets
  * I2PSnark:
    - Usability: add tabindex="0" to screenlog
    - Update navbar link classes to allow easier targetting of button type

@@ -327,7 +327,7 @@ class NetDbRenderer {
                 if (!unpublished) {
                     host = _context.namingService().reverseLookup(dest);
                 }
-                if (host != null) {
+                if (unpublished || host != null) {
                     buf.append(" colspan=\"2\"");
                 }
                 buf.append(">");
