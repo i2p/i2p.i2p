@@ -24,8 +24,7 @@ b {
 
 button, input[type="submit"], input[type="reset"] {
     font-size: 10.5pt !important;
-    font-family: "Droid Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
-    padding: 5px 5px 5px 20px !important;
+    padding: 5px 5px 5px 22px !important;
 }
 
 button.control {
@@ -58,8 +57,8 @@ div.routersummary h3 a {
 
 div.routersummary h4, div.routersummary h4 a {
      font-size: 10.5pt !important;
-/*     letter-spacing: 0.1em;*/
 }
+
 div.routersummary b {
      font-size: 9.5pt;
      font-weight: normal !important;
@@ -71,12 +70,6 @@ div.routersummary a {
      line-height: 130%;
 }
 
-/*
-b {
-     color: #152 !important;
-}
-*/
-
 div.news {
      font-size: 9pt;
 }
@@ -87,10 +80,6 @@ input, input:visited, button {
 
 .smallhead {
      font-size: 8.5pt
-}
-
-table {
-     font: 10pt/130% "Droid Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
 }
 
 th {
@@ -132,10 +121,6 @@ code, tt, div {
      font-weight: normal;
 }
 
-.tab2 {
-     color: #222;
-}
-
 #config_service p.infohelp, #config_clients p.infohelp, #config_clients p.infowarn, #config_clients p#pluginconfig, #config_tunnels p.infohelp,
 p#enablefullstats {
      margin-top: 12px;
@@ -148,3 +133,11 @@ p#enablefullstats {
 #jardump td, #jardump td tt {
      font-size: 8.5pt !important;
 }
+
+
+@media screen and (min-width: 1500px) {
+.langbox {
+     line-height: 115% !important;
+}
+}
+

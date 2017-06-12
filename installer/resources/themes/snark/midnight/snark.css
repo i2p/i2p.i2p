@@ -100,16 +100,7 @@ body.iframed {
      position: static;
 }
 
-.snarkRefresh:link:first-child {
-     padding-left: 28px !important;
-     border-radius: 2px 0 0 2px;
-}
-
-.snarkRefresh:link:last-child {
-     margin-left: 3px;
-}
-
-.snarkRefresh:link, .snarkRefresh:visited {
+.snarkNav:link, .snarkNav:visited {
      font-size: 9pt;
      font-weight: bold;
      margin: 0 -1px 0 0 !important;
@@ -127,40 +118,49 @@ body.iframed {
      text-shadow: 0 0 1px #000;
 }
 
-.snarkRefresh:link:first-child {
+.snarkNav:link:first-child {
+     padding-left: 26px !important;
+     border-radius: 2px 0 0 2px;
+}
+
+.snarkNav:link:last-child {
+     margin-left: 3px;
+}
+
+.nav_main:link {
      background: #001 url(images/button_snark.png) 9px center no-repeat;
      background: url(images/button_snark.png) 9px center no-repeat, linear-gradient(to bottom, #181d4f 0%, #181d4f 50%, #001 50%, #001 100%);
 }
 
-.snarkRefresh:link:nth-child(2) {
+.nav_forum:link {
      background: #001 url(images/button_forum.png) 9px center no-repeat;
      background: url(images/button_forum.png) 9px center no-repeat, linear-gradient(to bottom, #181d4f 0%, #181d4f 50%, #001 50%, #001 100%);
 }
 
-.snarkRefresh:first-child:hover, .snarkRefresh:first-child:focus {
+.nav_main:link:hover, .nav_main:link:focus {
      background: #04091f url(images/button_snark_hover.png) 9px center no-repeat;
      background: url(images/button_snark_hover.png) 9px center no-repeat, linear-gradient(to bottom, #060e2f 0%, #060e2f 50%, #000 50%, #000 100%);
 }
 
-.snarkRefresh:hover:nth-child(2), .snarkRefresh:focus:nth-child(2) {
+.nav_forum:link:hover, .nav_forum:link:focus {
      background: #04091f url(images/button_forum_hover.png) 9px center no-repeat;
      background: url(images/button_forum_hover.png) 9px center no-repeat, linear-gradient(to bottom, #004, #004 50%, #002 50%);
 }
 
-.snarkRefresh:first-child:active {
+.nav_main:link:active {
      background: #652787 url(images/button_snark_active.png) !important;
      background-repeat: no-repeat !important;
      background-position: 9px center !important;
 }
 
-.snarkRefresh:active:nth-child(2) {
+.nav_forum:link:active {
      background: #652787 url(images/button_forum_active.png) !important;
      background-repeat: no-repeat !important;
      background-position: 9px center !important;
      box-shadow: inset 3px 3px 2px #1f002f;
 }
 
-.snarkRefresh:hover, .snarkRefresh:focus {
+.snarkNav:hover, .snarkNav:focus {
      text-decoration: none !important;
      border-radius: 0;
      background: #141c3f url(images/button_tracker_hover.png) 9px center no-repeat;
@@ -171,7 +171,7 @@ body.iframed {
      border-color: #652787;
 }
 
-.snarkRefresh:active {
+.snarkNav:active {
      text-decoration: none !important;
      color: #fff;
      border: 1px solid #fff;
@@ -182,25 +182,24 @@ body.iframed {
      text-shadow: none;
 }
 
-.snarkRefresh:link:last-of-type {
+.snarkNav:link:last-of-type {
      border-radius: 2px !important;
 }
 
-.snarkRefresh:link[target="_blank"]:last-child {
+.snarkNav:link[target="_blank"]:last-child {
      border-radius: 0 2px 2px 0 !important;
 }
 
-.snarkRefresh:last-child {
+.snarkNav:last-child {
      margin-top: -5px !important;
      border-radius: 0 2px 2px 0 !important;
 }
 
-.snarkRefresh:link, .snarkRefresh:hover, .snarkRefresh:focus {
+.snarkNav:link, .snarkNav:hover, .snarkNav:focus {
      background-size: 16px 16px, 100% 100% !important;
 }
 
-.snarkRefresh:active, .snarkRefresh:hover:active, .snarkRefresh:first-child:active, .snarkRefresh:first-child:hover:active,
-.snarkRefresh:nth-child(2):active, .snarkRefresh:nth-child(2):hover:active {
+.snarkNav:active, .snarkNav:link:active {
      background-size: 16px 16px !important;
 }
 
@@ -645,7 +644,6 @@ td.snarkTorrentAction input[type="image"] {
 }
 
 .snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type="image"]:focus {
-/* borders on hover only for torrent control buttons, otherwise drop-shadow */
      border: 1px solid #652787 !important;
 }
 
@@ -930,11 +928,11 @@ tr:hover .percentBarText {
 }
 
 .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkTorrentEven td {
-     border-top: 1px inset #12111f !important;
+     border-top: 1px inset #113 !important;
 }
 
 _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkTorrentEven td {
-     border-top: 1px solid #12111f !important;
+     border-top: 1px solid #113 !important;
 }
 
 .snarkTorrentOdd {
@@ -1111,25 +1109,25 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      text-align: center !important;
      letter-spacing: .15em;
      border: 1px solid #443da0;
-     background: #191729;
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%) !important;
+     background: #003;
+     background: linear-gradient(to bottom, #191729, #1f1e32 50%, #000 50%);
      box-shadow: inset 0 0 0 1px #000;
      text-shadow: 0 0 1px #000;
 }
 
-.snarkConfigtitle:hover, label.toggleview:hover {
+.snarkConfigTitle:hover, label.toggleview:hover {
      background: #002 !important;
-     background: linear-gradient(to bottom, #004, #004 50%, #002 50%) !important;
+     background: linear-gradient(to bottom, #004 50%, #002 50%) !important;
 }
 
-.snarkConfigtitle:active, label.toggleview:active {
+.snarkConfigTitle:active, label.toggleview:active {
      background: #003 !important;
-     background: linear-gradient(to bottom, #004, #004 50%, #002 50%) !important;
+     background: linear-gradient(to bottom, #004 50%, #002 50%) !important;
      box-shadow: inset 3px 3px 3px #000;
 }
 
-.configsectionpanel .snarkConfigtitle:hover, .configsectionpanel .snarkConfigtitle:active {
-     background: linear-gradient(to bottom, #191729 0%, #201f33 7%, #1f1e32 9%, #161525 21%, #090812 49%, #05050e 50%, #020206 51%, #010103 53%, #000 56%, #000 100%) !important;
+.configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
+     background: linear-gradient(to bottom, #05050e 50%, #000 50%) !important;
      box-shadow: inset 0 0 0 1px #000 !important;
 }
 
@@ -1178,7 +1176,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
 
 .snarkConfigTitle a:active img, .toggleview:active img {
      transform: rotate(90deg);
-     transition: ease transform 0.3s 0s;
+     transition: ease transform 0.3s;
 }
 
 .snarkConfigTitle img, label.toggleview img {
@@ -1301,6 +1299,10 @@ a.control img, a.controld img {
      padding: 0;
 }
 
+#configs input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"] {
+     text-transform: capitalize;
+}
+
 input[type="submit"]:hover, input[type="submit"]:focus, input[type="reset"]:hover, input[type="reset"]:focus, a.control:hover, a.control:focus {
      color: #652787 !important;
      border: 1px solid #652787 !important;
@@ -1377,7 +1379,7 @@ input[type=text]:focus, textarea:focus, input.r:focus, textarea[name="i2cpOpts"]
      background: #000;
      box-shadow: 0 0 0 1px rgba(101, 39, 135, 0.5);
      filter: drop-shadow(0px 0 1px #99f);
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
 }
 
 textarea[name="i2cpOpts"], input[name="nofilter_dataDir"] {
@@ -1943,8 +1945,8 @@ input.trackerannounce {
 }
 
 /* toggle create/add panel view */
+
 input.toggle_input {
-     /* hide checkbox and use label as faux panel heading */
      display: none;
 }
 
@@ -2280,9 +2282,13 @@ td#bwHelp a {
 }
 
 .knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover {
-     opacity: 0.5;
-     cursor: not-allowed;
+     opacity: 0.3;
+     cursor: default;
      filter: invert(100%) sepia(100%) hue-rotate(200deg) saturate(200%) !important;
+}
+
+.knownTracker input[type="radio"]:checked, .knownTracker input[type="radio"]:checked:hover {
+     opacity: 0.5;
 }
 
 #filecheck {
@@ -2402,7 +2408,7 @@ td#bwHelp a {
 }
 
 .snarkCommentInfo td:last-child, .snarkComments td:last-child {
-     width: 1% !important;
+/*     width: 1% !important;*/
 }
 
 .snarkComments td {
@@ -2418,6 +2424,10 @@ td#bwHelp a {
      white-space: normal;
      text-align: justify;
      width: 90%;
+}
+
+.commentText:empty + .commentDelete {
+     background: none;
 }
 
 .commentWrapper {
@@ -2541,6 +2551,10 @@ b.alwaysShow {
      min-width: 600px !important;
 }
 
+.snarkNav:link:first-child {
+     padding-left: 26px !important;
+}
+
 .snarkTorrentName {
      max-width: 260px;
 }
@@ -2615,16 +2629,15 @@ input.trackerhome, input.trackerannounce, .knownTracker a, #trackerselect a {
      display: none;
 }
 
-.snarkRefresh:link, .snarkRefresh:link:first-child {
+.snarkNav:link {
      padding-left: 24px !important;
 }
 
-.snarkRefresh:link, .snarkRefresh:hover, .snarkRefresh:focus {
+.snarkNav:link, .snarkNav:hover, .snarkNav:focus {
      background-size: 14px 14px, 100% 100% !important;
 }
 
-.snarkRefresh:active, .snarkRefresh:hover:active, .snarkRefresh:first-child:active, .snarkRefresh:first-child:hover:active,
-.snarkRefresh:nth-child(2):active, .snarkRefresh:nth-child(2):hover:active {
+.snarkNav:active, .snarkNav:link:active {
      background-size: 14px 14px !important;
 }
 
@@ -2698,11 +2711,11 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      font-size: 9pt !important;
 }
 
-.snarkRefresh {
+.snarkNav {
      font-size: 10.5pt !important;
 }
 
-.snarkConfigTitle, .snarkConfigTitle a, label.toggleview, .snarkRefresh:link {
+.snarkConfigTitle, .snarkConfigTitle a, label.toggleview, .snarkNav:link {
      font-size: 11pt !important;
 }
 
@@ -2728,12 +2741,21 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      font-size: 9pt !important;
 }
 
+.snarkNav:link:first-child {
+     padding-left: 28px !important;
+}
+
 .snarkConfigTitle, .toggleview {
      padding: 4px 25px 4px 22px;
 }
 
 .snarkConfigTitle, .snarkConfigTitle a, label.toggleview {
      font-size: 12.5pt !important;
+}
+
+.snarkConfigTitle a {
+     margin-top: -1px !important;
+     margin-bottom: 1px !important;
 }
 
 .toggleview {

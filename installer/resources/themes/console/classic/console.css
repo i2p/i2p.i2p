@@ -7,6 +7,7 @@ body {
      padding: 0;
      text-align: left;
      background: #bbf url(images/bg.png) center center fixed;
+     background-size: 120px 120px;
      color: #0c153d;
      font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
 }
@@ -22,7 +23,25 @@ body {
      url(/themes/console/images/buttons/search_hover.png) no-repeat,
      url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
      url(/themes/console/images/buttons/update_hover.png) no-repeat, #bbf;
-     background-size: 150px 150px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+     background-size: 120px 120px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
+::selection {
+     text-shadow: none;
+     background: #4a90d9;
+     color: white;
+}
+
+::-moz-selection {
+     text-shadow: none;
+     background: #4a90d9;
+     color: white;
+}
+
+.routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
 }
 
 .hide, .hideme {
@@ -322,7 +341,7 @@ img {
      margin: 10px 0;
 }
 
-/* Sidebar */
+/* sidebar */
 
 .routersummaryouter {
      float: left;
@@ -337,6 +356,7 @@ img {
 .routersummary {
      background: #eef url(images/bg0.png);
      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.2)), url(images/bg0.png);
+     background-size: 100% 100%, 120px 120px;
      width: 193px;
      color: inherit;
      margin: 0 0 5px;
@@ -353,11 +373,15 @@ img {
      margin-left: 0;
      width: 173px;
      height: auto;
-     filter: drop-shadow(0 0 1px #ccc);
+     box-shadow: 0 0 1px 1px rgba(180,180,180,0.7);
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
 }
 
 .routersummary a {
      padding: 2px;
+     vertical-align: middle;
 }
 
 .routersummary input[type=text] {
@@ -422,13 +446,13 @@ img {
      text-transform: capitalize;
      text-decoration: none !important;
      color: #1f7096;
-     line-height: 110%;
+     line-height: 108%;
      background: #fff url(images/bg2.png);
      background: linear-gradient(to right, #eff2ff 0%, #fff 50%, #eff2ff);
      box-shadow: inset 0 0 2px 1px #f2f7fa;
 }
 
-.routersummary h3 a, .routersummary h4 a {
+.routersummary h3 a {
      text-decoration: none;
      white-space: normal;
      display: inline-block;
@@ -582,25 +606,39 @@ p:empty + .sb_notice {
      margin: -2px 0;
 }
 
-div.newsheadings {
+.newsheadings {
      text-align: right;
      margin: -1px 5px -5px -23px;
      padding: 0;
      font-size: 8pt;
 }
 
-div.newsheadings li {
-     list-style: none outside url(images/newsbullet_mini.png);
-     margin: 0 -4px 2px 8px;
+.newsheadings ul {
+     margin: 2px 5px -1px 38px;
+     padding: 0;
+     display: inline-block;
+     width: 171px;
 }
 
-div.newsheadings li:first-child {
+.newsheadings li {
+     list-style: none outside url(images/newsbullet_mini.png);
+     margin: 2px -4px 2px 8px;
+     vertical-align: middle;
+     line-height: 110%;
+}
+
+.newsheadings li a {
+     margin-top: -2px;
+     margin-left: -3px;
+     display: inline-block;
+}
+
+.newsheadings li:first-child {
      margin-top: -3px;
 }
 
-div.newsheadings ul {
-     margin: 0 5px -3px 38px;
-     padding: 0;
+.newsheadings li:last-child {
+     margin-bottom: 0;
 }
 
 div.refresh {
@@ -625,6 +663,7 @@ div.refresh {
 .routersummary a img:first-child:hover, .routersummary a img:first-child:active {
      opacity: 1;
      filter: drop-shadow(0 0 1px #89f);
+     box-shadow: none;
 }
 
 .routersummary a[href="/"], .routersummary a[href="/console"] {
@@ -635,7 +674,7 @@ div.refresh {
      filter: drop-shadow(0 0 1px #f60) saturate(200%);
 }
 
-/* end Sidebar */
+/* end sidebar */
 
 a:link {
      color: #33a;
@@ -1349,7 +1388,9 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      min-width: 540px;
      background: #eef url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom !important;
      background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, url(images/bg0.png) repeat scroll top left !important;
-     background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right bottom, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)), url(images/bg0.png) !important;
+     background: url(/themes/snark/ubergine/images/hat.png) no-repeat scroll right -3px bottom -5px, linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)) top -1px center, url(images/bg0.png) top -3px center !important;
+     background-size: auto 180px, 100% 100%, 120px 120px !important;
+     box-shadow: inset 0 0 0 1px #e8e8f5;
 }
 
 .main#news h3 {
@@ -1481,6 +1522,7 @@ div.news {
      margin: -1px 1px 0 200px;
      background: #f9f9ea url(images/bg1.png);
      background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.5)), url(images/bg1.png) #efefe0;
+     background-size: 100% 100%, 120px 120px;
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
      border-right: 1px solid #89f;
@@ -2004,6 +2046,10 @@ tr:hover th {
      width: auto !important;
 }
 
+#thresholds tr:last-child td {
+     background: #fff;
+}
+
 #profile_defs td:nth-child(2)::first-letter {
      text-transform: uppercase;
 }
@@ -2236,7 +2282,8 @@ pre#transports {
 
 #enviro:hover tr, #enviro:hover td {
      background: #ffe;
-     border: #ffe;
+     border-top: 1px inset transparent;
+     border-bottom: 1px inset transparent;
 }
 
 #enviro td, #eventlogs td {
@@ -2245,7 +2292,7 @@ pre#transports {
 
 #enviro td:first-child {
      text-align: right;
-     width: 120px;
+     width: 1%;
      white-space: nowrap;
      padding-right: 0;
 }
@@ -2667,7 +2714,7 @@ h4#updateplugins {
      margin-top: -13px;
 }
 
-.routersummary h2, .routersummary h3, div.confignav, th {
+.routersummary h2, .routersummary h3, div.confignav {
      background: url(images/tinytitle.png) center center repeat-x;
      background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
@@ -2696,7 +2743,8 @@ table tt {
 }
 
 th {
-     background-color: #fff;
+     background: #fff;
+     background: linear-gradient(to bottom, #fff, #eff2ff);
      padding: 5px;
      text-align: center;
      border-bottom: 1px solid #89f;
@@ -3083,57 +3131,58 @@ h3 + .statusnotes {
      border: 1px solid #89f !important;
      border-top: 0;
      padding: 5px 0;
-     background: #fff url(images/tinytitle.png) center center repeat-x;
-     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     background: #fff;
+     background: linear-gradient(to right, #eff2ff, #fff, #eff2ff);
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 .statusnotes + .statusnotes {
      margin-top: -8px !important;
 }
 
-div.joblog {
+.joblog {
      margin: 10px 0;
      line-height: 130% !important;
 }
 
-div.joblog li {
+.joblog li {
      word-wrap: break-word !important;
      line-height: 105% !important;
 }
 
-div.joblog ul {
+.joblog ul {
      word-wrap: break-word !important;
 }
 
-div.joblog li:first-child {
+.joblog li:first-child {
      margin-top: -5px;
 }
 
-div.joblog li:last-child {
+.joblog li:last-child {
      margin-bottom: -5px;
 }
 
-div.joblog form:first-child {
+.joblog form:first-child {
      margin-top: 10px;
 }
 
-div.joblog table {
+.joblog table {
      margin-top: 15px;
 }
 
-div.joblog p {
+.joblog p {
      line-height: 130%;
 }
 
-div.joblog h3 {
+.joblog h3 {
      margin: 10px 0 20px 0;
 }
 
-div.joblog h3:first-child {
+.joblog h3:first-child {
      margin: -10px 0 15px 0;
 }
 
-div.joblog hr {
+.joblog hr {
      margin: 15px 0 15px;
 }
 
@@ -3141,7 +3190,7 @@ h2#jobrunners {
      margin-top: -10px;
 }
 
-div.joblog ol {
+.joblog ol {
      margin-bottom: 5px !important;
      margin-top: -21px;
      -moz-column-count: 2;
@@ -3262,7 +3311,7 @@ h3#totaljobstats {
 }
 
 .homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff, #eff2ff);
      font-size: 0 !important;
      width: 5%;
 }
@@ -3748,7 +3797,7 @@ body.iframed {
      vertical-align: text-bottom;
 }
 
-div.themechoice {
+.themechoice {
      width: 115px;
      min-height: 78px;
      overflow: hidden;
@@ -3873,7 +3922,7 @@ p#helptranslate {
      vertical-align: sub;
 }
 
-div.themelabel {
+.themelabel {
      border-top: 1px solid #89f !important;
      margin: -25px -4px 0;
      padding: 3px 2px;
@@ -3884,7 +3933,7 @@ div.themelabel {
      white-space: nowrap;
 }
 
-div#themesettings {
+#themesettings {
      clear: both;
      border: 1px solid #89f;
      padding: 4px 5px 0;
@@ -3892,7 +3941,7 @@ div#themesettings {
      background: #eff1ff;
 }
 
-div#langsettings {
+#langsettings {
      border: 1px solid #89f;
      padding: 4px 5px 0;
      background: #eff1ff;
@@ -3907,7 +3956,7 @@ div#langsettings {
      height: 1px;
 }
 
-div.langselect { /* containing box for lang selection */
+.langselect {
      width: 115px;
      float: left;
      margin: 4px;
@@ -4003,15 +4052,15 @@ div.flagradio {
      margin-top: 2px;
 }
 
-div.langselect + br {
+.langselect + br {
      display: none !important;
 }
 
-div.langselect br {
+.langselect br {
      display: block;
 }
 
-div.ui_lang { /* lang text label */
+.ui_lang {
      text-align: center;
      background: #eef url(images/tinytitle.png) center center;
      background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
@@ -5673,7 +5722,7 @@ table.sybil_routerinfo:last-child {
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes, .routersummary button.download,
+body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, .joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes, .routersummary button.download,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, .statlist a[name],
 .statlist b, .statlist li b, .statlist a[name]:hover, div.messages, th {
      font-size: 10pt !important;
@@ -5738,6 +5787,7 @@ div.app {
 
 .applabel a {
      height: 16px !important;
+     padding-top: 3px;
 }
 
 .footnote {
@@ -5746,6 +5796,10 @@ div.app {
 
 h3, h3.ptitle, h3.tabletitle, th.th_title {
      font-size: 11pt;
+}
+
+.newsheadings ul {
+     width: 202px;
 }
 
 .newsentry h3, .newsentry h3 a, #news.main h3, .newsDate {
@@ -5822,7 +5876,7 @@ div.news {
      margin-left: 232px !important;
 }
 
-div.joblog h3 {
+.joblog h3 {
      margin-top: 8px;
 }
 
@@ -5861,6 +5915,26 @@ div.joblog h3 {
 .homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
      font-size: 0 !important;
 }
+
+.themechoice, .langselect {
+     width: 140px !important;
+}
+
+.themechoice .optbox, .langselect .optbox {
+     width: 144px !important;
+}
+
+.themechoice .optbox {
+     margin-left: -48px !important;
+}
+
+.langselect .optbox {
+     margin-left: -64px !important;
+}
+
+.langselect img[src^="/flags"] {
+     margin-left: -81px !important;
+}
 }
 
 /* end responsive layout */
@@ -5883,3 +5957,137 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
+
+/* network status */
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid #88f;
+     border-radius: 2px;
+     padding: 6px 3px;
+     width: calc(100% - 10px);
+     margin: -5px 0 -6px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
+     text-shadow: 0 1px 1px #fff;
+}
+
+.routersummary .firewalled {
+     background: rgba(255,220,255,0.3);
+     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.5) 2px, rgba(110,255,110,0.1) 3px, rgba(220,255,220,0.5) 5px);
+}
+
+.routersummary .error {
+     background: rgba(255,110,110,0.1);
+     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     background: rgba(255,255,200,0.4);
+     box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96,96,96,0.5);
+}
+
+.routersummary .testing {
+     background: rgba(255,220,110,0.1);
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     background: rgba(220,220,220,0.4);
+}
+
+.routersummary .running {
+     background: rgba(220,255,220,0.2);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding-right: 2px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
+/* welcome */
+
+div[lang="ar"] li {
+     margin: 0 10px 0 30px;
+}
+
+div[lang="ar"] h3, div[lang="ar"] li {
+     text-align: right;
+}
+
+.main#console li:first-child {
+     padding-top: 10px;
+}
+
+#console .links {
+     margin-left: 0;
+}
+
+.twocol {
+     columns: 2 400px;
+     column-gap: 20px !important;
+     display: block;
+     margin: 10px 0 !important;
+}
+
+p + .twocol {
+     margin: 10px 30px !important;
+}
+
+.twocol li {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-break-inside: avoid;
+}
+
+.twocol li:first-child {
+     margin-top: 0 !important
+     padding-top: 0 !important;
+     padding-bottom: 0 !important;
+}
+
+.main#console p {
+     padding-top: 0;
+     padding-bottom: 0;
+}
+
+/* end welcome */
+
+

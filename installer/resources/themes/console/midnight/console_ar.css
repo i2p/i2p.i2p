@@ -388,10 +388,11 @@ table#bugreports td.infohelp {
 
 div[lang="ar"] ul li {
      list-style-image: url("images/link.png") !important;
-     list-style-position: inside;
+     list-style-position: outside;
      margin-left: 0 !important;
      padding-left: 0 !important;
-     margin-top: 15px !important;]
+     margin-top: 15px !important;
+     margin-right: 50px !important;
 }
 
 div[lang="ar"] ul, div[lang="ar"] p {

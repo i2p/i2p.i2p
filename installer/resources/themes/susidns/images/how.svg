@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 960 587">
   <style>
-    .a, .subs { fill: #fff; stroke-linejoin: round; stroke-width: 1.5; stroke: #000; } .b, .c, .d, .e, .f, .g { font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif; font-feature-settings: normal; font-variant-caps: normal; font-variant-ligatures: normal; font-variant-numeric: normal; text-align: center; text-anchor: middle; } .b, .c, .f, .g { font-size: 20px; } .d, .e { font-size: 30px; } .d, .f { font-weight: bold; } #space { fill: #edffff; stroke-linejoin: round; stroke-width: 1; stroke: #999; } text.tooltip:hover { fill: #090; } path.tooltip, rect.tooltip { fill: #F9FFEF; } .book:hover rect, .subscriptions:hover rect { fill: url(#hover); } .private:hover { fill: url(#hover2); } .pbook:hover rect { fill: url(#hover2); } path.tooltip:hover { fill: url(#arrow); } .private { fill: #ffffee; } .privatezone { stroke: #f00; fill: #efefd7; stroke-dasharray: 5,5; stroke-width: 1; stroke-linejoin: round; } .subs { stroke-dasharray: 3,3; stroke-width: 1; } a:hover text { cursor: pointer; fill: #f60; } a:active text { fill: #d30; } .a { filter: drop-shadow(0 0 2px rgba(64,64,64,0.5)); } .book rect:active, .pbook rect:active { filter: none; } a { outline: none; }
+    .a, .subs { fill: #fff; stroke-linejoin: round; stroke-width: 1.5; stroke: #000; } .b, .c, .d, .e, .f, .g { font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif; font-feature-settings: normal; font-variant-caps: normal; font-variant-ligatures: normal; font-variant-numeric: normal; text-align: center; text-anchor: middle; } .b, .c, .f, .g { font-size: 20px; } .d, .e { font-size: 30px; } .d, .f { font-weight: bold; } #space { fill: #edffff; stroke-linejoin: round; stroke-width: 1; stroke: #999; } text.tooltip:hover { fill: #090; } path.tooltip, rect.tooltip { fill: #F9FFEF; } .book:hover rect, .subscriptions:hover rect { fill: url(#hover); } .private:hover { fill: url(#hover2); } .pbook:hover rect { fill: url(#hover2); } path.tooltip:hover { fill: url(#arrow); } .private { fill: #ffffee; } .privatezone { stroke: #f00; fill: #efefd7; stroke-dasharray: 5,5; stroke-width: 1; stroke-linejoin: round; } .subs { stroke-dasharray: 3,3; stroke-width: 1; } a:hover text { cursor: pointer; fill: #f60; } a:active text { fill: #d30; } .a { filter: drop-shadow(0 0 2px rgba(64,64,64,0.5)); } .book rect:active, .pbook rect:active, #sublist:active rect { filter: none; } a { outline: none; } .hideonhover:hover #hoverhide, .hideonhover:active #hoverhide { fill: none; } .hideonhover:hover #hovershow { fill: #f60; } .hideonhover:active #hovershow { fill: #d30; } #hovershow { fill: none; }
   </style>
   <defs>
     <linearGradient id="hover" x2="0" y2="1">
@@ -56,7 +56,8 @@
       <tspan class="e" x="716" y="51">SUBSCRIPTIONS</tspan>
     </text>
   </a>
-  <g class="subscriptions">
+  <g class="subscriptions hideonhover">
+  <a id="sublist" xlink:href="/susidns/subscriptions" target="_parent">
     <title>Hosts sourced from your subscriptions are added to your Router address book, and are automatically synced (by default every 12 hours).</title>
     <rect class="subs" width="419" height="66" x="506" y="230" ry="10"/>
     <rect class="subs" width="419" height="66" x="506" y="204" ry="10"/>
@@ -65,8 +66,10 @@
     <rect class="subs" width="419" height="66" x="506" y="122" ry="10"/>
     <rect class="a tooltip" width="419" height="62" x="506" y="95" ry="10"/>
     <text class="b" x="715" y="132">
-      <tspan class="c" x="715" y="132">http://i2p-projekt.i2p/hosts.txt</tspan> 
+      <tspan class="c" id="hoverhide" x="715" y="132">http://i2p-projekt.i2p/hosts.txt</tspan>
+      <tspan class="c" id="hovershow" x="715" y="132">Configure Subscriptions</tspan>
     </text>
+  </a>
   </g>
   <a xlink:href="/susidns/addressbook?book=master" target="_parent" class="book">
     <title>If you manually add hosts here, they will be included your Published address book (if configured).</title>
@@ -80,10 +83,12 @@
     <tspan class="g" x="817" y="389">SEARCHABLE BY</tspan> <tspan class="g" x="817" y="416">I2P APPLICATIONS</tspan>
     <title>The Master, Router and Private address books collectively serve as the DNS authority for I2P applications.</title>
   </text>
-  <text class="f tooltip" x="817" y="518">
-    <tspan class="g" x="817" y="518">OPTIONAL, FOR</tspan> <tspan class="g" x="817" y="545">EEPSITES</tspan>
-    <title>If you configure SusiDNS to publish your Router address book, it will export a hosts.txt file containing all the hosts (by default to the root of your eepsite).</title>
-  </text>
+  <a xlink:href="/susidns/config" target="_parent">
+    <text class="f" x="817" y="518">
+      <tspan class="g" x="817" y="518">OPTIONAL, FOR</tspan> <tspan class="g" x="817" y="545">EEPSITES</tspan>
+      <title>If you configure SusiDNS to publish your Router address book, it will export a hosts.txt file containing all the hosts (by default to the root of your eepsite).</title>
+    </text>
+  </a>
   <path class="a tooltip" d="M382 164v133h-21l22 31 22 31 23-31 22-31h-19V164h-49z">
     <title>Addresses manually added to your Master address book will merge with your Router address book.</title>
   </path>

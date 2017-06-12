@@ -18,13 +18,15 @@ body.iframed {
 }
 
 ::selection {
-     background: #030 !important;
-     color: white;
+     background: rgba(0,187,0,0.99) !important;
+     color: #000;
+     text-shadow: none;
 }
 
 ::-moz-selection {
-     background: #030 !important;
-     color: white;
+     background: #0b0 !important;
+     color: #000;
+     text-shadow: none;
 }
 
 .page {
@@ -32,7 +34,6 @@ body.iframed {
      margin: 10px 0;
      padding: 0 5px;
      font-size: 9pt !important;
-/*     background: #000;*/
 }
 
 .iframed .page {

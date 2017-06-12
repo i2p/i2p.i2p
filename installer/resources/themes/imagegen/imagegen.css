@@ -3,6 +3,8 @@
 
 body {
      background: #eef url(/themes/console/classic/images/bg0.png);
+     background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.2)), url(/themes/console/classic/images/bg0.png);
+     background-size: 100% 100%, 120px 120px;
      font: 10pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "DejaVu Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
      margin: 18px 20px 10px;
      color: #333;
@@ -33,12 +35,11 @@ h1, h2 {
      background: linear-gradient(to bottom, #fff 50%, #eef 50%);
      color: #0c153d;
      margin-bottom: 10px;
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
      text-shadow: 1px 1px 1px #fff;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
-     filter: drop-shadow(0 0 1px #aaa);
 }
 
 p {
@@ -78,7 +79,7 @@ img {
      border-radius: 2px;
      padding: 1px;
      background: #fff;
-     filter: drop-shadow(0 0 1px #aaa);
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
 }
 
 table {
@@ -92,9 +93,9 @@ th {
      border: 1px solid #77789f;
      border-radius: 2px;
      text-align: center;
-     filter: drop-shadow(0 0 1px #aaa);
      font-weight: normal;
      height: 16px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
 }
 
 th.title {
@@ -103,7 +104,6 @@ th.title {
      white-space: nowrap;
      padding: 5px;
      background: linear-gradient(to right, #efefff, #fff 10%, #fff 90%, #efefff);
-     box-shadow: inset 0 0 0 1px #fff;
 }
 
 td {
@@ -113,9 +113,10 @@ td {
 }
 
 hr {
-     height: 1px;
+     height: 2px;
      background: #7778bf;
      border: none;
+     border-bottom: 1px solid #fff;
      margin-top: 10px;
 }
 
@@ -129,7 +130,7 @@ iframe {
 }
 
 iframe pre {
-     font-size: 20pt !important;;
+     font-size: 20pt !important;
 }
 
 #qr, #randomart, #identicon {
@@ -164,9 +165,8 @@ form > * {
      width: 400px;
      background: #fff; 
      background: linear-gradient(to right, #efefff, #fff 10%, #fff 90%, #efefff);
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
      border-radius: 0 0 2px 2px;
-     filter: drop-shadow(0 1px 1px #999);
      text-rendering: optimizeLegibility;
 }
 
@@ -176,7 +176,7 @@ input, button, select {
 }
 
 button, select {
-     filter: drop-shadow(0 0 1px #fff);
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #aaa;
 }
 
 button::-moz-focus-inner {

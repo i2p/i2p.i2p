@@ -316,7 +316,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + "/\" title=\"");
             out.write(_t("Torrents"));
-            out.write("\" class=\"snarkRefresh\">");
+            out.write("\" class=\"snarkNav nav_main\">");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_t("I2PSnark"));
             else
@@ -325,7 +325,7 @@ public class I2PSnarkServlet extends BasicServlet {
         } else {
             out.write("<div class=\"snarknavbar\"><a href=\"" + _contextPath + '/' + peerString + "\" title=\"");
             out.write(_t("Refresh page"));
-            out.write("\" class=\"snarkRefresh\">");
+            out.write("\" class=\"snarkNav nav_main\">");
             if (_contextName.equals(DEFAULT_NAME))
                 out.write(_t("I2PSnark"));
             else
@@ -333,7 +333,7 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write("</a>\n");
             sortedTrackers = _manager.getSortedTrackers();
             if (_context.isRouterContext()) {
-                //out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
+                //out.write("<a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkNav nav_forum\" target=\"_blank\">");
                 //out.write(_t("Forum"));
                 //out.write("</a>\n");
                 for (Tracker t : sortedTrackers) {
@@ -341,7 +341,7 @@ public class I2PSnarkServlet extends BasicServlet {
                         continue;
                     if (_manager.util().isKnownOpenTracker(t.announceURL))
                         continue;
-                    out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + t.name + "</a>");
+                    out.write(" <a href=\"" + t.baseURL + "\" class=\"snarkNav nav_tracker\" target=\"_blank\">" + t.name + "</a>");
                 }
             }
         }
@@ -394,7 +394,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
-            out.write("\n<div class=\"snarkMessages\">");
+            out.write("\n<div class=\"snarkMessages\" tabindex=\"0\">");
             out.write("<a href=\"" + _contextPath + '/');
             if (isConfigure)
                 out.write("configure");
@@ -2873,7 +2873,7 @@ public class I2PSnarkServlet extends BasicServlet {
         if (showPriority)
             buf.append(" onload=\"setupbuttons()\"");
         buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\">");
+        buf.append(" class=\"snarkNav nav_main\">");
         if (_contextName.equals(DEFAULT_NAME))
             buf.append(_t("I2PSnark"));
         else

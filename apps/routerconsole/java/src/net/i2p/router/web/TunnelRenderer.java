@@ -27,15 +27,15 @@ class TunnelRenderer {
     private RouterContext _context;
 
     private static final int DISPLAY_LIMIT = 200;
-    
+
     public TunnelRenderer(RouterContext ctx) {
         _context = ctx;
     }
-    
+
     public void renderStatusHTML(Writer out) throws IOException {
         out.write("<h3 class=\"tabletitle\" id=\"exploratorytunnels\"><a name=\"exploratory\" ></a>" + _t("Exploratory tunnels") + " <a href=\"/configtunnels#exploratory\" title=\"" + _t("Configure tunnels") + "\">[" + _t("configure") + "]</a></h3>\n");
         renderPool(out, _context.tunnelManager().getInboundExploratoryPool(), _context.tunnelManager().getOutboundExploratoryPool());
-        
+
         List<Hash> destinations = null;
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         Map<Hash, TunnelPool> clientOutboundPools = _context.tunnelManager().getOutboundClientPools();
@@ -62,7 +62,7 @@ class TunnelRenderer {
                 out.write(" (" + _t("dead") + ")</h3>\n");
             renderPool(out, in, outPool);
         }
-        
+
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
         out.write("<h3 class=\"tabletitle\"><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h3>\n");
         if (!participating.isEmpty()) {
@@ -137,7 +137,7 @@ class TunnelRenderer {
         out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
     }
-    
+
     private static class TunnelComparator implements Comparator<HopConfig>, Serializable {
          public int compare(HopConfig l, HopConfig r) {
              return (r.getProcessedMessagesCount() - l.getProcessedMessagesCount());
@@ -152,10 +152,10 @@ class TunnelRenderer {
             tunnels = in.listTunnels();
         if (outPool != null)
             tunnels.addAll(outPool.listTunnels());
-        
+
         long processedIn = (in != null ? in.getLifetimeProcessed() : 0);
         long processedOut = (outPool != null ? outPool.getLifetimeProcessed() : 0);
-        
+
         int live = 0;
         int maxLength = 1;
         for (int i = 0; i < tunnels.size(); i++) {
@@ -183,28 +183,33 @@ class TunnelRenderer {
                 continue; // don't display tunnels in their grace period
             live++;
             if (info.isInbound())
-                out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"></td>");
+                out.write("<tr><td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"></td>");
             else
-                out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"></td>");
-            out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
+                out.write("<tr><td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"></td>");
+            out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
             int count = info.getProcessedMessagesCount();
-            out.write(" <td class=\"cells\" align=\"center\">" + count + " KB</td>\n");
+            out.write("<td class=\"cells\" align=\"center\">" + count + " KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
                 if (_context.routerHash().equals(peer)) {
-                    out.write(" <td class=\"cells\" align=\"center\">" + (id == null ? "" : "" + id) + "</td>");
+                    // Add empty content placeholders to force alignment
+                    out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\"></span><span class=\"tunnel_id\">" +
+                             (id == null ? "" : "" + id) + "</span></span><b class=\"tunnel_cap\"></b></span></td>");
                 } else {
                     String cap = getCapacity(peer);
-                    out.write(" <td class=\"cells\" align=\"center\">" + netDbLink(peer) + (id == null ? "" : " " + id) + cap + "</td>");                
+                    // TODO Add tooltips for network cap / tunnel id
+                    out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(peer) +
+                              "</span>&nbsp;<span class=\"nowrap\"><span class=\"tunnel_id\">" + (id == null ? "" : " " + id) +
+                              "</span><b class=\"tunnel_cap\">" + cap + "</b></span></td>");
                 }
                 if (info.getLength() < maxLength && (info.getLength() == 1 || j == info.getLength() - 2)) {
                     for (int k = info.getLength(); k < maxLength; k++)
-                        out.write(" <td class=\"cells\" align=\"center\">&nbsp;</td>");
+                        out.write("<td class=\"cells\" align=\"center\">&nbsp;</td>");
                 }
             }
             out.write("</tr>\n");
-            
+
             if (info.isInbound()) 
                 processedIn += count;
             else
@@ -233,7 +238,7 @@ class TunnelRenderer {
                   DataHelper.formatSize2(processedIn*1024) + "B " + _t("in") + ", " +
                   DataHelper.formatSize2(processedOut*1024) + "B " + _t("out") + "</b></center></div>");
     }
-    
+
 /****
     private void renderPeers(Writer out) throws IOException {
         // count up the peers in the local pools
@@ -320,15 +325,15 @@ class TunnelRenderer {
             // get both countries
             String lc = this.comm.getCountry(l);
             String rc = this.comm.getCountry(r);
-            
+
             // make them non-null
             lc = (lc == null) ? "zzzz" : lc;
             rc = (rc == null) ? "zzzz" : rc;
-            
+
             // let String handle the rest
             return lc.compareTo(rc);
         }
-        
+
         private CommSystemFacade comm;
     }
 ****/

@@ -106,7 +106,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      position: static;
 }
 
-.snarkRefresh:link,.snarkRefresh:visited {
+.snarkNav:link, .snarkNav:visited {
      text-decoration: none !important;
      text-transform: uppercase !important;
      padding: 4px 10px 4px 24px !important;
@@ -115,8 +115,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      font-weight: bold;
      font-size: 9pt;
      color: #559;
-     background: #fff url(images/button_tracker.png) 8px center no-repeat;
-     background: url(images/button_tracker.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
      border-radius: 0;
      border: 1px solid #7778bf;
      box-shadow: inset 0 0 0 1px #fff;
@@ -125,64 +123,71 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      filter: drop-shadow(0 0 1px #ccc);
 }
 
-.snarkRefresh:hover, .snarkRefresh:focus {
-     color: #f60;
-     background: #eef url(images/button_tracker_hover.png) 8px center no-repeat;
-     background: url(images/button_tracker_hover.png) 8px center no-repeat, linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%);
-     border-radius: 0;
-     box-shadow: inset 0 0 0 1px #fff;
+.snarkNav:link, .snarkNav:hover, .snarkNav:focus, .snarkNav:active {
+     background-size: 14px auto, 100% 100% !important;
+     background-position: 8px center;
 }
 
-.snarkRefresh:active {
-     background: #f60 url(images/button_tracker_active.png) 8px center no-repeat;
-     color: #fff !important;
-     box-shadow: inset 3px 3px 3px #333;
-     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #333;
-}
-
-.snarkRefresh:last-child {
+.snarkNav:last-child {
      border-radius: 0 2px 2px 0;
 }
 
-.snarkRefresh:first-child {
-     border-radius: 2px 0 0 2px;
-     background: #fff url(images/button_snark.png) 10px center no-repeat;
-     background: url(images/button_snark.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
+.snarkNav[href="/i2psnark/"]:last-of-type {
+     border-radius: 2px !important;
 }
 
-.snarkRefresh:first-child:hover, .snarkRefresh:first-child:focus {
-     background: #eef url(images/button_snark_hover.png) 10px center no-repeat;
-     background: url(images/button_snark_hover.png) 10px center no-repeat, linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%);
-     color: #f60;
+.nav_main {
+     border-radius: 2px 0 0 2px !important;
+     background: #fff url(images/button_snark.png) 8px center no-repeat;
+     background: url(images/button_snark.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
 }
 
-.snarkRefresh:first-child:active {
-     background: #f60 url(images/button_snark_active.png) 10px center no-repeat;
-}
-
-.snarkRefresh:nth-child(2) {
+.nav_forum {
      background: #fff url(images/button_forum.png) 8px center no-repeat;
      background: url(images/button_forum.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
 }
 
-.snarkRefresh:nth-child(2):hover, .snarkRefresh:nth-child(2):focus {
+.nav_tracker {
+     background: #fff url(images/button_tracker.png) 8px center no-repeat;
+     background: url(images/button_tracker.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
+}
+
+.snarkNav:hover, .snarkNav:focus {
+     color: #f60;
+     border: 1px solid #f60;
+}
+
+.nav_main:hover, .nav_main:focus {
+     background: #eef url(images/button_snark_hover.png) 8px center no-repeat;
+     background: url(images/button_snark_hover.png) 8px center no-repeat, linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%);
+}
+
+.nav_forum:hover, .nav_forum:focus {
      background: #eef url(images/button_forum_hover.png) 8px center no-repeat;
      background: url(images/button_forum_hover.png) 8px center no-repeat, linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%);
 }
 
-.snarkRefresh:nth-child(2):active {
+.nav_tracker:hover, .nav_tracker:focus {
+     background: #eef url(images/button_tracker_hover.png) 8px center no-repeat;
+     background: url(images/button_tracker_hover.png) 8px center no-repeat, linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%);
+}
+
+.snarkNav:active {
+     color: #fff !important;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #333 !important;
+     border: 1px solid #7778bf;
+}
+
+.nav_main:active {
+     background: #f60 url(images/button_snark_active.png) 8px center no-repeat;
+}
+
+.nav_forum:active {
      background: #f60 url(images/button_forum_active.png) 8px center no-repeat;
-     color: #fff;
 }
 
-.snarkRefresh:last-child[href="/i2psnark/"] {
-     border-radius: 2px;
-}
-
-.snarkRefresh:link, .snarkRefresh:hover, .snarkRefresh:focus, .snarkRefresh:active, .snarkRefresh:visited,
-.snarkRefresh:link:first-child, .snarkRefresh:hover:first-child, .snarkRefresh:focus:first-child, .snarkRefresh:active:first-child, .snarkRefresh:visited:first-child,
-.snarkRefresh:link:nth-child(2), .snarkRefresh:hover:nth-child(2), .snarkRefresh:focus:nth-child(2), .snarkRefresh:active:nth-child(2), .snarkRefresh:visited:nth-child(2) {
-     background-size: 14px auto, 100% 100% !important;
+.nav_tracker:active {
+     background: #f60 url(images/button_tracker_active.png) 8px center no-repeat;
 }
 
 /* end top nav */
@@ -192,7 +197,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 .snarkMessages {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-size: 8pt;
-     font-weight: bold;
      text-align: left;
      margin: -2px 0 0;
      padding: 3px 5px 3px 5px;
@@ -211,7 +215,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 }
 
 .snarkMessages a:link, .snarkMessages a:visited {
-     color: #505 !important;
+     color: #3b77bf !important;
      font-size: 8pt;
 }
 
@@ -1031,6 +1035,10 @@ input[name="savepri"] {
      float: right;
 }
 
+#configs input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"] {
+     text-transform: capitalize;
+}
+
 input {
      font-size: 9pt;
      font-weight: bold;
@@ -1188,6 +1196,14 @@ input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
 input[type="checkbox"][disabled]:focus, input[type="radio"][disabled]:focus {
      filter: none;
      box-shadow: none;
+}
+
+.knownTracker input[type="radio"], .knownTracker input[type="radio"]:hover, .knownTracker input[type="radio"]:focus {
+     opacity: 0.3 !important;
+}
+
+.knownTracker input[type="radio"]:checked, .knownTracker input[type="radio"]:checked:hover {
+     opacity: 0.5 !important;
 }
 
 label {
@@ -1624,12 +1640,16 @@ input#toggle_debug:checked + label + #dhtDebugInner {
 hr.debug {
      width: 100%;
      margin: 3px 0;
+     height: 2px;
+     border-bottom: 1px solid #fff;
 }
 
 hr.debug:first-of-type {
      background: transparent;
      margin-top: -5px;
      margin-bottom: -5px;
+     height: 1px;
+     border: none;
 }
 
 hr.debug:nth-child(n+7) {
@@ -1919,7 +1939,7 @@ hr.debug:last-child {
 }
 
 .snarkCommentInfo td:last-child, .snarkComments td:last-child {
-     width: 1% !important;
+/*     width: 1% !important;*/
 }
 
 .snarkComments td {
@@ -1935,6 +1955,10 @@ hr.debug:last-child {
      white-space: normal;
      text-align: justify;
      width: 90%;
+}
+
+.commentText:empty + .commentDelete {
+     background: none;
 }
 
 .commentWrapper {
@@ -2116,7 +2140,7 @@ body, td, .snarkMessages li, .snarkMessages a, button, input, select, .snarkAddI
      font-size: 8pt !important;
 }
 
-.snarkRefresh:link {
+.snarkNav:link, .snarkNav:visited {
      font-size: 9pt !important;
 }
 
@@ -2150,7 +2174,7 @@ th.snarkTorrentStatus {
 }
 
 .percentBarOuter, .percentBarText {
-     line-height: 11px !important;
+     line-height: 12px !important;
      height: 12px !important;
 }
 
@@ -2170,7 +2194,7 @@ b.alwaysShow {
      display: none;
 }
 
-a.snarkRefresh:first-child {
+.nav_main {
      padding-left: 26px !important;
 }
 
@@ -2190,12 +2214,8 @@ a.snarkRefresh:first-child {
 }
 
 @media screen and (min-width: 1200px) {
-a.snarkRefresh {
+.snarkNav:link, .snarkNav:visited {
      font-size: 10pt !important;
-}
-
-a.snarkRefresh:first-child {
-     padding-left: 26px !important;
 }
 
 .percentDownloaded {
@@ -2230,21 +2250,19 @@ body, td, button, input, select, .snarkAddInfo, code, tt, th, a, a:link, textare
      line-height: 130%;
 }
 
-a.snarkRefresh {
+.snarkNav:link, .snarkNav:visited {
      font-size: 11pt !important;
 }
 
-a.snarkRefresh:first-child {
-     padding-left: 28px !important;
+.nav_main:link, .nav_main:visited, .nav_main:hover, .nav_main:focus, .nav_main:active {
+     padding-left: 26px !important;
 }
 
-.snarkRefresh:link, .snarkRefresh:hover, .snarkRefresh:focus, .snarkRefresh:active, .snarkRefresh:visited,
-.snarkRefresh:link:first-child, .snarkRefresh:hover:first-child, .snarkRefresh:focus:first-child, .snarkRefresh:active:first-child, .snarkRefresh:visited:first-child,
-.snarkRefresh:link:nth-child(2), .snarkRefresh:hover:nth-child(2), .snarkRefresh:focus:nth-child(2), .snarkRefresh:active:nth-child(2), .snarkRefresh:visited:nth-child(2) {
+.snarkNav:link, .snarkNav:hover, .snarkNav:focus {
      background-size: 16px auto, 100% 100% !important;
 }
 
-.configsectionpanel .snarkConfigTitle:hover, .snark {
+.configsectionpanel .snarkConfigTitle:hover {
      font-size: 12pt !important;
      padding: 3px 15px !important;
 }

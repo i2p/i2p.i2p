@@ -4,6 +4,8 @@
 body {
      font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", "Segoe UI", Verdana, Helvetica, sans-serif;
      background: #eef;
+     background: #eef url(/themes/console/classic/images/bg0.png);
+     background-size: 120px 120px;
      color: #0c153d;
      min-width: 700px;
 }
@@ -311,6 +313,7 @@ p.help {
      margin: 0;
      background: #ffe url(/themes/console/images/info/infohelp.png) 8px center no-repeat;
      line-height: 120%;
+     background-size: 28px 28px;
 }
 
 p.book, #messages + p {

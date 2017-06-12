@@ -7,15 +7,6 @@ h1, h2, h3, h4 {
      font-weight: normal !important;
 }
 
-h1 {
-     font-size: 20pt;
-     padding: 11px 15px;
-}
-
-h3 {
-     font-size: 14pt !important;
-}
-
 body {
      font-family: "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
      font-size: 12pt;
@@ -84,20 +75,6 @@ b, a, a:link, a:hover, a:visited {
      font-size: 11pt !important;
 }
 
-h2 {
-     font-size: 16pt;
-     text-shadow: none;
-     font-weight: normal;
-}
-
-h3 {
-     font-size: 15pt;
-}
-
-h4, h4.app, h4.app2 {
-     font-size: 14pt;
-}
-
 p, div.main {
      font-size: 11pt;
 }
@@ -118,8 +95,13 @@ button.reload, button.stop {
 }
 
 code, pre, tt {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-size: 11pt;
      font-weight: normal;
+}
+
+.cells tt, .cells tt a {
+     font-size: 9pt !important;
 }
 
 #changelog pre {
@@ -202,8 +184,69 @@ td.optionsave {
      font-size: 11pt !important;
 }
 
+#console div[lang="zh"], #console li, #console p {
+     line-height: 170%;
+     letter-spacing: 0.1em;
+     word-spacing: 0.15em;
+     font-size: 10.5pt !important;
+}
+
+#console code {
+     letter-spacing: normal;
+     word-spacing: normal;
+}
+
+.twocol {
+     column-gap: 0 !important;
+     background: rgba(0,32,0,0.4);
+     border: 1px solid #000;
+     border-radius: 4px;
+     padding: 10px;
+}
+
+li .twocol {
+     margin-top: 15px !important;
+     margin-bottom: -15px !important;
+}
+
+.twocol li {
+     margin-left: 40px !important;
+}
+
+#console ul li {
+     list-style: none;
+     margin-left: 10px;
+}
+
+#console div[lang="zh"] a {
+     background: rgba(0,64,0,0.3);
+     padding: 0 3px;
+     border-radius: 2px;
+     line-height: 180%;
+}
+
 @media screen and (min-width: 0) {
-p, .main {
+h1 {
+     font-size: 20pt !important;
+     padding: 11px 15px;
+}
+
+h2 {
+     font-size: 16pt !important;
+     text-shadow: none;
+     font-weight: normal;
+}
+
+h3 {
+     font-size: 15pt !important;
+     padding: 8px 10px;
+}
+
+h4, h4.app, h4.app2 {
+     font-size: 14pt;
+}
+
+p, .main, #console code {
      font-size: 11pt !important;
 }
 
@@ -236,6 +279,12 @@ div.routersummary img[src$="i2plogo.png"] {
 }
 }
 
+@media screen and (max-width: 1000px) {
+#console div[lang="zh"], #console p, #console li {
+     font-size: 10.5pt !important;
+}
+}
+
 @media screen and (max-width: 1500px) {
 .tab, .tab2 {
      font-size: 10.5pt !important;
@@ -247,7 +296,8 @@ h3#webappconfig, h3#i2pclientconfig {
 }
 
 .langbox {
-     margin-top: 6px !important;
+     margin-top: 5px !important;
+     margin-right: 5px !important;
      line-height: 17px;
 }
 }

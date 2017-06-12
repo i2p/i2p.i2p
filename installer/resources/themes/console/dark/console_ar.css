@@ -49,6 +49,14 @@ h1,h2,h3,h4 {
      text-align: right;
 }
 
+h3, h3.welcome {
+     border-width: 1px 5px 1px 1px;
+}
+
+#news h3 {
+     border-width: 1px 1px 1px 5px;
+}
+
 h4.app, h4.app2 {
      text-align: right;
 }

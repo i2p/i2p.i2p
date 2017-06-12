@@ -54,6 +54,12 @@ div.clearer {
      color: white;
 }
 
+.routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 /* standard buttons and inputs */
 
 button, input[type="submit"], input[type="reset"], select {
@@ -1247,8 +1253,6 @@ div.logo hr {
      text-decoration: none !important;
      color: #2a1fbe;
      line-height: 120%;
-     text-shadow: 0 0 1px #000;
-     box-shadow: inset 0 0 0 1px #005;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -2255,6 +2259,8 @@ a:active {
 
 .links li {
      list-style-image: url(images/link.png) !important;
+     text-align: justify! important;
+     line-height: 150%;
 }
 
 .links b {
@@ -2400,6 +2406,8 @@ h2, h3, h4, .confignav {
      margin: 0 0 10px 0;
 }
 
+/* welcome */
+
 .langbox {
      margin: 5px 4px 2px 5px;
      padding: 0;
@@ -2421,6 +2429,50 @@ h2, h3, h4, .confignav {
      opacity: 1;
      transform: scale(1.1);
 }
+
+.twocol {
+     columns: 2 400px;
+     column-gap: 0 !important;
+     display: block;
+     margin: 5px 0;
+}
+
+div[lang="de"] .twocol, div[lang="pt"] .twocol, div[lang="es"] .twocol, div[lang="sv"] .twocol {
+     background: rgba(0,0,48,0.3);
+     border: 1px solid #002;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #000;
+     padding: 10px 10px 0;
+     margin: 10px -5px 5px !important;
+}
+
+p + .twocol, div[lang="de"] p + .twocol {
+     margin: 10px 25px !important;
+}
+
+.twocol li {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-break-inside: avoid;
+}
+
+.twocol li:first-child {
+     margin-top: 0 !important;
+}
+
+.main#console p {
+   margin: 5px 20px 10px;
+}
+
+div[lang="de"] ul.links {
+     margin: 0 30px -10px 20px;
+}
+
+div[lang] li {
+   line-height: 160% !important;
+}
+
+/* end welcome */
 
 hr {
      color: #443da0;
@@ -3791,7 +3843,7 @@ table#tunnelconfig td:first-child {
 /* /configupdate */
 
 table#i2pupdates {
-     margin-top: 11px;
+     margin-top: -1px;
      margin-bottom: -3px !important;
 }
 
@@ -3872,10 +3924,10 @@ table#sidebarconf {
 
 #sidebarconf button {
      margin: 2px;
-     padding: 4px 3px;
+     padding: 4px 3px !important;
      min-width: 0;
      background: #000;
-     background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%);
+     background: linear-gradient(to bottom, #1f1e32, #090812 50%, #000 50%) !important;
 }
 
 #sidebarconf button:active {
@@ -4395,7 +4447,8 @@ a[name="criticallogs"] + p + h3 + p + ul { /* tidy router logs ul */
 
 #enviro:hover td {
      background: #001;
-     border: #001;
+     border-top: 1px inset transparent;
+     border-bottom: 1px inset transparent;
      color: #dd0;
 }
 
@@ -4405,9 +4458,10 @@ a[name="criticallogs"] + p + h3 + p + ul { /* tidy router logs ul */
 }
 
 #enviro td:first-child {
-     width: 100px;
+     width: 1%;
      text-align: right;
      padding-right: 0;
+     white-space: nowrap;
 }
 
 #criticallogs td , #routerlogs td, #eventlogs td, #wrapperlogs td {
@@ -6225,8 +6279,7 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 216px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after, #sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 18px;
 }
 
@@ -6273,6 +6326,10 @@ img.app, img.app2p {
      margin-top: -5px;
 }
 
+h3#themeheading, h3#langheading, h3#passwordheading {
+     font-size: 12pt !important;
+}
+
 h3#i2pclientconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile, #clientconf.infohelp, h3#pluginmanage, h3#webappconfig {
      margin-bottom: -15px !important;
 }
@@ -6297,7 +6354,6 @@ h4#updateplugins {
      min-height: 30px;
 }
 
-
 div.joblog h3 {
      margin-top: 8px !important;
 }
@@ -6312,7 +6368,8 @@ div.joblog h3 {
 }
 
 .langbox {
-     margin-top: 5px;
+     margin-top: 6px;
+     line-height: 16px;
 }
 
 button.control, button.control:hover, button.control:focus {
@@ -6344,6 +6401,49 @@ button.control, button.control:hover, button.control:focus {
 
 table#reseedconfig input[type="text"], table#reseedconfig input[type="password"] {
      width: 250px;
+}
+
+.themechoice, .langselect {
+     width: 134px !important;
+}
+
+.ui_lang {
+     width: 138px;
+}
+
+.themechoice .optbox, .langselect .optbox {
+     min-width: 138px !important;
+     outline: 1px dotted #f00;
+     opacity: 0;
+}
+
+.themechoice .optbox {
+     margin-left: -42px !important;
+}
+
+.langselect .optbox {
+     margin: -7px 0 -34px -2px;
+     min-height: 64px;
+}
+
+.langselect img {
+    margin-left: -78px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+    margin-left: -79px !important;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
+.langselect img, .langselect input[name="lang"]:checked + img {
+     margin-left: -10px !important;
+     margin-top: -16px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-left: -11px !important;
+     margin-top: -18px !important;
 }
 }
 
@@ -6467,3 +6567,98 @@ _:-ms-lang(x), table + .statusnotes {
 }
 
 /* end IE/Edge tweaks */
+
+/* network status */
+
+.routersummary h4 a {
+     width: auto !important;
+     vertical-align: middle;
+     display: inline;
+}
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid #342f7f;
+     border-radius: 2px;
+     padding: 6px 3px;
+     width: 100%;
+     margin: -3px -1px;
+     box-shadow: inset 0 0 0 1px #000;
+     text-shadow: 0 1px 1px #000;
+     box-sizing: border-box;
+}
+
+.routersummary .firewalled {
+     border: 1px dotted #342f7f;
+}
+
+.routersummary .error {
+     border: 1px dotted #700;
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     border: 1px solid #550;
+}
+
+.routersummary .testing {
+     border: 1px dotted #4F4B1D;
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     border: 1px dotted #777;
+}
+
+.routersummary .running {
+     border: 1px solid #342f7f;
+     border: 1px solid rgba(52, 47, 127, 0.6);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding: 0 2px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(220,220,220,0.7));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+     padding: 0 3px;
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
+#sb_services, #sb_internals, #sb_advanced {
+     margin-top: -2px !important;
+}
+

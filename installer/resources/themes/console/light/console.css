@@ -51,6 +51,12 @@ div.clearer {
      text-shadow: none;
 }
 
+.routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 * {
      outline: none;
 }
@@ -236,6 +242,7 @@ pre {
      width: calc(100% - 4px);
      padding: 2px 0;
      color: #2c4e8f;
+     line-height: 110%;
 }
 
 h3#helpfaq {
@@ -281,7 +288,7 @@ h3#helpfaq {
 }
 
 .routersummary h4 a {
-     display: inline-block;
+/*     display: inline-block;*/
      vertical-align: middle;
 }
 
@@ -991,6 +998,15 @@ textarea[name="reseedURL"] {
 
 #config_reseed input[type="text"], #config_reseed input[type="password"] {
      min-width: 300px;
+}
+
+#reseedconfig tr:nth-child(2) br {
+     display: none;
+}
+
+#reseedconfig tr:nth-child(2) label {
+     white-space: nowrap;
+     margin-right: 10px;
 }
 
 /* news */
@@ -1885,22 +1901,23 @@ table#wrapperlogs {
      cursor: text;
 }
 
-#enviro:hover td {
-     background: rgba(255,255,239,0.4);
-     border: rgba(255,255,239,0.4);
-}
-
 #enviro td {
      padding-top: 5px;
      padding-bottom: 5px;
 }
 
+#enviro:hover td {
+     background: rgba(255,255,239,0.4);
+     border-top: 1px inset transparent;
+     border-bottom: 1px inset transparent;
+}
+
 #enviro td:first-child {
-     width: 100px;
+     width: 1%;
      text-align: right;
      padding-right: 0;
      white-space: nowrap;
-     padding-left: 10px
+     padding-left: 10px;
 }
 
 table[id$="logs"] td {
@@ -2336,7 +2353,7 @@ a:active {
 
 .links li {
      list-style: url(images/link.png) !important;
-     text-align: justify;
+     text-align: justify !important;
      line-height: 140% !important;
      margin-right: 10px !important;
 }
@@ -2999,8 +3016,10 @@ h4 {
      margin: 0 0 10px 0;
 }
 
+/* welcome section */
+
 .langbox {
-     margin:3px 1px 0 5px;
+     margin: 3px 1px 0 5px;
      padding: 2px 3px;
      color: #001;
      font-size: 7pt;
@@ -3032,6 +3051,30 @@ h4 {
 .langbox a:active img {
      transform: scale(1.0);
 }
+
+.twocol {
+     columns: 2 400px;
+     column-gap: 0 !important;
+     display: block;
+     margin: 10px 0;
+}
+
+.twocol li {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-break-inside: avoid;
+}
+
+.twocol li:first-child {
+     margin-top: 0 !important;
+}
+
+.main#console p {
+   margin-left: 10px;
+   margin-right: 10px;
+}
+
+/* end welcome section */
 
 input[type="submit"], input[type="reset"], button, .optbox, select {
      cursor: pointer;
@@ -3839,7 +3882,7 @@ h3#scheduledjobs + ol li:before {
 div.footnote {
      text-align: right;
      color: #447;
-     font-size: 7pt;
+     font-size: 8pt;
      margin-bottom: -5px !important;
 }
 
@@ -3847,8 +3890,14 @@ div.footnote hr {
      margin: 24px 0 5px 0 !important;
      background: #447;
      background: linear-gradient(to right, #77a, #669, #77a);
+     height: 2px;
+     border-bottom: 1px solid #fff;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+div.footnote hr {
      height: 1px;
-     box-shadow: 0 0 0 1px #eef;
+}
 }
 
 .topness {
@@ -3937,11 +3986,11 @@ body.iframed {
      padding: 15px 15px 15px 50px;
 }
 
-.themechoice .optbox, .langselect .optbox {
+.main#config_ui .themechoice .optbox, .main#config_ui .langselect .optbox {
      vertical-align: text-bottom;
 }
 
-div.themechoice {
+.themechoice {
      width: 115px;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -3981,12 +4030,12 @@ div.themechoice {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-.main[id^="config_"] .themechoice .optbox {
-     min-height: 82px !important;
-     min-width: 118px !important;
+.main#config_ui .themechoice .optbox {
+     min-height: 88px !important;
+     min-width: 123px !important;
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
-     margin-left: -36px !important;
-     margin-top: 4px;
+     margin-left: -38px !important;
+     margin-top: 0;
      z-index: 999 !important;
      outline: 1px dotted #f00;
      position: absolute;
@@ -4031,15 +4080,6 @@ p#helptranslate {
      border-top: 1px solid #7778bf;
      background: url(/themes/console/images/info/notice.png) left 14px center no-repeat, #fff;
      background-size: 28px 28px;
-}
-
-#reseedconfig tr:nth-child(2) br {
-     display: none;
-}
-
-#reseedconfig tr:nth-child(2) label {
-     white-space: nowrap;
-     margin-right: 10px;
 }
 
 #themeoptions input {
@@ -4131,10 +4171,9 @@ div#langsettings {
      background: #fff;
 }
 
-.langselect .optbox, .langselect .optbox:hover, .langselect .optbox:focus {
-     min-width: 118px !important;
-     min-height: 50px !important;
+.main#config_ui .langselect .optbox, .main#config_ui .langselect .optbox:hover, .main#config_ui .langselect .optbox:focus {
      width: 118px !important;
+     min-height: 56px !important;
      height: 56px !important;
      margin-left: -2px;
      margin-bottom: 6px;
@@ -4207,10 +4246,6 @@ div#langsettings {
 .langselect input[name="lang"]:checked:active + img + .ui_lang {
      color: #f60 !important;
      background: linear-gradient(to right, #eef, #fff, #eef) !important;
-}
-
-div.flagradio {
-     margin-top: 2px;
 }
 
 div.langselect + br {
@@ -4341,36 +4376,22 @@ table#addkeyring tr:last-child td {
      text-align: center !important;
 }
 
+/*
 #ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
 #ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6) {
      padding-left: 1vw !important;
      padding-right: 1vw !important;
 }
+*/
 
 #ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
 #udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
      white-space: nowrap;
 }
 
-#udpconnections .tablefooter td {
+#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
      padding-left: 5px;
      padding-right: 5px;
-}
-
-@media screen and (min-width: 1500px) {
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16),
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
-#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
-#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
-     padding-right: 10px !important;
-}
-
-.cells {
-     border-left: none;
-     border-right: none;
-}
 }
 
 /* end peers */
@@ -4767,6 +4788,7 @@ p:empty { /* empty paragraph nuke */
 /* Advanced lookup */
 
 #netdblookup {
+     margin-top: 15px;
      margin-bottom: -8px;
 }
 
@@ -5695,6 +5717,11 @@ input[name="pluginURL"] {
 #ntcpconnections td:first-child, #udpconnections td:first-child {
      padding-left: 5px !important;
 }
+
+#ntcpconnections .cells {
+     border-left: none;
+     border-right: none;
+}
 }
 
 @media screen and (min-width: 1500px) {
@@ -5706,6 +5733,11 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.newss, pre,
 #jardump tt, #jardump td, div.news, #logs li, .cells tt, #profilelist tt, .leaseset tt {
      font-size: 9pt !important;
+}
+
+#udpconnections .cells {
+     border-left: none;
+     border-right: none;
 }
 
 .cells tt, #profilelist tt {
@@ -5767,7 +5799,7 @@ h3#pconfig, h3#webappconfig, h3#i2pclientconfig, h3#pluginmanage, p#clientconf.i
 }
 
 .routersummary .reload, .routersummary .stop {
-     min-width: 96px;
+     min-width: 95px;
      margin: 0 3px -5px;
 }
 
@@ -5823,9 +5855,13 @@ h1 {
      padding-top: 12px !important;
 }
 */
+.langbox {
+     line-height: 120%;
+     margin: 4px 2px 0 5px;
+}
 
 .langbox img {
-     margin: -1px 0 1px 1px;
+     margin: -1px 0 2px 2px;
 }
 
 .th_title a  {
@@ -5867,6 +5903,25 @@ button.control {
      min-width: 58px;
 }
 
+.themechoice, .langselect {
+     width: 140px !important;
+}
+
+.main#config_ui .themechoice .optbox, .main#config_ui .langselect .optbox,
+.main#config_ui .themechoice .optbox:hover, .main#config_ui .langselect .optbox:hover,
+.main#config_ui .themechoice .optbox:focus, .main#config_ui .langselect .optbox:focus {
+     width: 144px !important;
+}
+
+.main#config_ui .themechoice .optbox {
+     margin-left: -49px !important;
+     min-height: 92px !important;
+}
+
+.main#config_ui .langselect .optbox, .main#config_ui .langselect .optbox:hover, .main#config_ui .langselect .optbox:focus {
+     margin-left: -2px !important;
+}
+
 _:-ms-lang(x), #browseronstart {
      margin-bottom: -15px !important;
 }
@@ -5902,7 +5957,7 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 
 /* end Edge/IE tweaks */
 
-
+/* TODO: Merge with main classes above */
 /* top navigation */
 
 h1, .confignav {
@@ -5923,7 +5978,11 @@ h1 {
      text-align: center;
      font-weight: bold;
      color: #000;
-     background: #efefff linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) !important;
+     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) #efefff !important;
+     background: linear-gradient(to right, rgba(255,255,255,0.7), rgba(255,255,255,0) 5%, rgba(255,255,255,0) 95%, rgba(255,255,255,0.7)), linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) #efefff !important;
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
 }
 
 .tab, .tab2 {
@@ -5987,3 +6046,279 @@ h1 {
 
 /* end topnav */
 
+/* network status */
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid #88f;
+     border-radius: 2px;
+     padding: 6px 3px;
+     width: calc(100% - 10px);
+     width: 100%;
+     margin: -4px -1px;
+     box-sizing: border-box;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
+     text-shadow: 0 1px 1px #fff;
+}
+
+.routersummary .firewalled {
+     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.3) 2px, rgba(255,255,220,0.3) 3px, rgba(220,255,220,0.3) 5px);
+}
+
+.routersummary .error {
+     background: rgba(255,110,110,0.1);
+     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
+     background: repeating-linear-gradient(135deg, rgba(255,100,100,0.1) 2px, rgba(255,200,200,0.3) 3px,  rgba(255,100,100,0.1) 5px);
+     border: 1px dotted #d33;
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     background: rgba(255,255,200,0.25);
+     box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96,96,96,0.5);
+}
+
+.routersummary .testing {
+     background: rgba(255,220,110,0.1);
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     background: rgba(220,220,220,0.4);
+}
+
+.routersummary .vmcomm {
+     border: 1px dotted #999;
+}
+
+.routersummary .running {
+     background: rgba(220,255,220,0.15);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding-right: 3px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+     padding-right: 4px;
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
+/* tunnel build status */
+
+.tunnelBuildStatus {
+     background: rgba(220,255,220,0.15);
+     color: #070;
+}
+
+.tunnelStatusAccept {
+     background: rgba(220,255,220,0.15);
+     color: #070;
+}
+
+.tunnelStatusReject {
+     background: rgba(255,110,110,0.1);
+     color: #070;
+}
+
+.tunnelStatusRejectHidden {
+     background: rgba(220,220,220,0.4);
+     color: #777;
+}
+
+.tunnelBuildStatus::before, .tunnelStatusAccept::before, .tunnelStatusReject::before, .tunnelStatusRejectHidden::before {
+     margin-bottom: 1px;
+     padding-right: 1px;
+     vertical-align: -30%;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+}
+
+.tunnelBuildStatus::before {
+     content: url(/themes/console/images/info/network_status/accepting.png);
+}
+
+.tunnelStatusAccept::before {
+     content: url(/themes/console/images/info/network_status/accepting.png);
+}
+
+.tunnelStatusReject::before {
+     content: url(/themes/console/images/info/network_status/rejecting.png);
+}
+
+.tunnelStatusRejectHidden::before {
+     content: url(/themes/console/images/info/network_status/rejecting_hidden.png);
+}
+
+/* end tunnel build status */
+
+/* peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1%;
+}
+
+/* end peers */
+
+/* /tunnels */
+
+tt a {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,0,64,0.3);
+     color: #fff;
+     border: 1px solid rgba(0,0,64,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 6px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #555;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 74px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     margin-right: -3px;
+     min-width: 0;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 56px;
+     text-align: right;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+.tunnel_peer:empty::before {
+     // TODO: Find a way of indicating that these entries represent the local router
+     content: "";
+     display: inline-block;
+     height: 12px;
+     width: 18px;
+     //background: rgba(192,192,192,0.35);
+     margin-right: 6px;
+     border-radius: 1px;
+     text-align: center;
+     font-size: 7pt;
+     font-weight: bold;
+     line-height: 12px;
+     padding: 1px 2px;
+}
+
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+@media screen and (min-width: 1500px) {
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 10px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+}
+
+/* end tunnels */

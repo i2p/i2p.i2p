@@ -681,9 +681,9 @@ class SummaryBarRenderer {
     public String renderTunnelStatusHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(50);
-        buf.append("<h4>")
+        buf.append("<h4><span class=\"tunnelBuildStatus\">")
            .append(_t(_helper.getTunnelStatus()))
-           .append("</h4>\n");
+           .append("</span></h4>\n");
         return buf.toString();
     }
 

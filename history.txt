@@ -1,3 +1,25 @@
+2017-06-12 str4d
+ * Console:
+   - /logs: fixed environment/running info table resize on focus (ticket #1996)
+   - Scale theme/language divs so we don't truncate language display
+   - Arabic (light) adjust font size for sidebar elements
+   - Sidebar network status display (ticket #1996)
+   - Usability:
+     - Enhance presentation of tables on /peers (improve header/column alignment,
+       center to separator for multi-value rows)
+     - Enhance presentation of tables on /tunnels (reliable alignment of mixed
+       content in rows, more prominence to bandwidth tiers)
+ * I2PSnark:
+   - Usability: add tabindex="0" to screenlog
+   - Update navbar link classes to allow easier targetting of button type
+   - Remove disabled cursor for known tracker radio icons (ticket #1996)
+   - Fix alignment issue for comments (ticket #1996)
+   - ubergine: further optimize theme to reduce scroll lag (ticket #1996)
+   - ubergine/vanilla:
+     - Add mini-mode at <=800px
+     - Small size reduction to navbar links (ticket #1996)
+ * Imagegen: Theme tweaks
+
 2017-06-05 str4d
  * Add state classes to network status messages in sidebar
  * Switch light theme to the same top-nav style as the other themes

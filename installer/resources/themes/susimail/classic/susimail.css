@@ -3,6 +3,7 @@
 
 body {
      background: #eef url(/themes/console/classic/images/bg0.png);
+     background-size: 120px 120px;
      color: #0c153d;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-size: 9pt;
@@ -390,6 +391,7 @@ pre {
 .page {
      background: #eef url(/themes/console/classic/images/bg2.png);
      background: linear-gradient(to bottom, rgba(255,255,255,0.7),rgba(255,255,255,0.2)), url(/themes/console/classic/images/bg2.png) #eef;
+     background-size: 100% 100%, 120px 120px;
      color: #0c153d;
      margin: 0;
      padding: 0 10px 10px;
@@ -933,6 +935,7 @@ div#dologin {
 
 .iframed #dologin {
      margin: 18px auto 15px;
+     padding-top: 10px;
 }
 
 #dologin input[type="text"] {

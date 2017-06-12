@@ -223,8 +223,9 @@ p#helptranslate {
 }
 
 .confignav {
-     margin-left: -19px !important;
-     margin-right: -19px !important;
+     margin-left: -21px !important;
+     margin-right: -21px !important;
+     margin-top: -5px !important;
      direction: ltr;
 }
 
@@ -257,28 +258,41 @@ div[lang="ar"] p, div[lang="ar"] ul {
      font-size: 11pt;
 }
 
-div[lang="ar"] li.tidylist {
+div[lang="ar"] .links li {
      list-style: none;
-     margin-bottom: 15px; 
+     margin-bottom: 15px;
 }
 
-ul.links li:first-child {
+div[lang="ar"] ul li {
+     list-style-image: url("images/link.png") !important;
+     list-style-position: outside;
+     margin-left: 0 !important;
+     padding-left: 0 !important;
+     margin-top: 15px !important;
+     margin-right: 50px !important;
+}
+
+div[lang="ar"] ul, div[lang="ar"] p {
+     margin: 10px;
+}
+
+.links li:first-child {
      margin-top: 15px !important;
 }
 
-.main#help ul.links li:first-child {
+.main#help .links li:first-child {
      margin-top: -10px !important;
 }
 
-.main#help ul.links li {
+.main#help .links li {
      margin-right: 70px !important;
 }
 
-.main#help .tidylist {
+.main#help .links li {
     margin: 5px 50px 5px 20px;
 }
 
-.tidylist code {
+.links li code {
      text-align: right;
 }
 
@@ -819,6 +833,18 @@ p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #
 table#bugreports td.infohelp {
      background-position: right 12px center !important;
      padding: 15px 50px 15px 15px !important;
+}
+
+.routersummary h4, .routersummary h4 span, .routersummary h4 span a {
+     font-size: 11pt !important;
+}
+
+.routersummary td:first-child, .routersummary td:nth-last-child(n+2), .routersummary td a {
+     font-size: 10.5pt !important;
+}
+
+.routersummary h4 span::before {
+     padding: 0 0 0 5px;
 }
 
 @media screen and (min-width: 1500px) {

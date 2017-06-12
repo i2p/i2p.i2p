@@ -388,12 +388,7 @@ textarea:focus {
      filter: drop-shadow(0 0 1px #880);
      transition: ease filter 0.3s 0s;
      box-shadow: inset 0 0 1px #880;
-     font-weight: bold;
      outline: none;
-}
-
-textarea[readonly]:focus {
-     font-weight: normal;
 }
 
 textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus {
@@ -429,7 +424,6 @@ _:-ms-lang(x), textarea#statusMessages, textarea#statusMessages:active, textarea
 .freetext:focus {
      box-shadow: 0 0 1px #f60;
      color: #111;
-     font-weight: bold;
      outline: none;
 }
 
@@ -440,7 +434,6 @@ _:-ms-lang(x), textarea#statusMessages, textarea#statusMessages:active, textarea
      cursor: default;
      border: 1px solid #494 !important;
      opacity: 0.8;
-     font-weight: normal;
 }
 
 input[type="hidden"], input.default {
@@ -997,7 +990,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .tunnelConfig td, td {
      border-top: 1px inset #1c3f1b;
-     padding: 5px;
+     padding: 8px 5px;
 }
 
 input[type="checkbox"], input[type="radio"] {
