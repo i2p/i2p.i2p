@@ -50,11 +50,12 @@ public class RouterAddress extends DataStructureImpl {
     private String _transportStyle;
     private final Properties _options;
     // cached values
-    private byte[] _ip;
+    private byte[] _ip = NOT_LOOKED_UP;
     private int _port;
 
     public static final String PROP_HOST = "host";
     public static final String PROP_PORT = "port";
+    private static final byte[] NOT_LOOKED_UP = new byte[0];
 
     public RouterAddress() {
         _options = new OrderedProperties();
@@ -213,26 +214,23 @@ public class RouterAddress extends DataStructureImpl {
     
     /**
      *  Caching version of InetAddress.getByName(getOption("host")).getAddress(), which is slow.
-     *  Caches numeric host names only.
-     *  Will resolve but not cache resolution of DNS host names.
+     *  Caches numeric host names AND DNS host names, and negative caches also.
      *
      *  @return IP or null
      *  @since 0.9.3
      */
-    public byte[] getIP() {
-        if (_ip != null)
-            return _ip;
-        byte[] rv = null;
-        String host = getHost();
-        if (host != null) {
-            rv = Addresses.getIP(host);
-            if (rv != null &&
-                (InetAddressUtils.isIPv4Address(host) ||
-                 InetAddressUtils.isIPv6Address(host))) {
-                _ip = rv;
-            }
+    public synchronized byte[] getIP() {
+        if (_ip == NOT_LOOKED_UP) {
+            // Only look up once, even if it fails, so we don't generate excessive DNS lookups.
+            // The lifetime of a RouterAddress object is a few hours at most,
+            // it will get republished or expired, so it's OK even for host names.
+            String host = getHost();
+            if (host != null)
+                _ip = Addresses.getIP(host);
+            else
+                _ip = null;
         }
-        return rv;
+        return _ip;
     }
     
     /**

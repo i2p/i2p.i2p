@@ -1,3 +1,9 @@
+2017-06-15 zzz
+ * Data: Cache hostname lookups in RouterAddress (ticket #1998)
+ * Job Queue: Make search jobs droppable (ticket #1998)
+ * Router: Increase JVM DNS cache time (ticket #1998)
+ * Util: Add negative DNS lookup cache, increase cache size (ticket #1998)
+
 2017-06-12 str4d
  * Console:
    - /logs: fixed environment/running info table resize on focus (ticket #1996)

@@ -54,9 +54,11 @@ import net.i2p.util.VersionComparator;
  * Halves search traffic for successful searches, as this doesn't do
  * two sesarches in parallel like FOSJ does.
  *
+ * Public only for JobQueue, not a public API, not for external use.
+ *
  * @since 0.8.9
  */
-class IterativeSearchJob extends FloodSearchJob {
+public class IterativeSearchJob extends FloodSearchJob {
     /** peers not sent to yet, sorted closest-to-the-routing-key */
     private final SortedSet<Hash> _toTry;
     /** query sent, no reply yet */
@@ -557,6 +559,15 @@ class IterativeSearchJob extends FloodSearchJob {
     long timeSent(Hash peer) {
         Long rv = _sentTime.get(peer);
         return rv == null ? -1 : rv.longValue();
+    }
+
+    /**
+     *  Dropped by the job queue
+     *  @since 0.9.31
+     */
+    @Override
+    public void dropped() {
+        failed();
     }
 
     /**

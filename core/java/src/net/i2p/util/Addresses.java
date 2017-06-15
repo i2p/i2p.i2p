@@ -293,6 +293,8 @@ public abstract class Addresses {
      *  @since 0.9.3
      */
     private static final Map<String, byte[]> _IPAddress;
+    private static final Map<String, Long> _negativeCache;
+    private static final long NEG_CACHE_TIME = 60*60*1000L;
 
     static {
         int size;
@@ -301,12 +303,13 @@ public abstract class Addresses {
             long maxMemory = SystemVersion.getMaxMemory();
             long min = 256;
             long max = 4096;
-            // 1024 nominal for 128 MB
-            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (128*1024))));
+            // 2048 nominal for 128 MB
+            size = (int) Math.max(min, Math.min(max, 1 + (maxMemory / (64*1024))));
         } else {
             size = 32;
         }
         _IPAddress = new LHMCache<String, byte[]>(size);
+        _negativeCache = new LHMCache<String, Long>(128);
     }
 
     /**
@@ -329,6 +332,14 @@ public abstract class Addresses {
             rv = _IPAddress.get(host);
         }
         if (rv == null) {
+            synchronized(_negativeCache) {
+                Long when = _negativeCache.get(host);
+                if (when != null) {
+                    if (when.longValue() > System.currentTimeMillis() - NEG_CACHE_TIME)
+                        return null;
+                    _negativeCache.remove(host);
+                }
+            }
             try {
                 rv = InetAddress.getByName(host).getAddress();
                 if (InetAddressUtils.isIPv4Address(host) ||
@@ -337,7 +348,12 @@ public abstract class Addresses {
                         _IPAddress.put(host, rv);
                     }
                 }
-            } catch (UnknownHostException uhe) {}
+                // else we do not cache hostnames here, we rely on the JVM
+            } catch (UnknownHostException uhe) {
+                synchronized(_negativeCache) {
+                    _negativeCache.put(host, Long.valueOf(System.currentTimeMillis()));
+                }
+            }
         }
         return rv;
     }
@@ -357,6 +373,14 @@ public abstract class Addresses {
             return null;
         if (InetAddressUtils.isIPv4Address(host) || InetAddressUtils.isIPv6Address(host))
             return getIP(host);
+        synchronized(_negativeCache) {
+            Long when = _negativeCache.get(host);
+            if (when != null) {
+                if (when.longValue() > System.currentTimeMillis() - NEG_CACHE_TIME)
+                    return null;
+                _negativeCache.remove(host);
+            }
+        }
         byte[] rv = null;
         try {
             InetAddress[] addrs = InetAddress.getAllByName(host);
@@ -372,7 +396,11 @@ public abstract class Addresses {
                         break;
                 }
             }
-        } catch (UnknownHostException uhe) {}
+        } catch (UnknownHostException uhe) {
+            synchronized(_negativeCache) {
+                _negativeCache.put(host, Long.valueOf(System.currentTimeMillis()));
+            }
+        }
         return rv;
     }
 
@@ -402,6 +430,14 @@ public abstract class Addresses {
                 return null;
             return Collections.singletonList(brv);
         }
+        synchronized(_negativeCache) {
+            Long when = _negativeCache.get(host);
+            if (when != null) {
+                if (when.longValue() > System.currentTimeMillis() - NEG_CACHE_TIME)
+                    return null;
+                _negativeCache.remove(host);
+            }
+        }
         try {
             InetAddress[] addrs = InetAddress.getAllByName(host);
             if (addrs == null || addrs.length == 0)
@@ -411,7 +447,11 @@ public abstract class Addresses {
                 rv.add(addrs[i].getAddress());
             }
             return rv;
-        } catch (UnknownHostException uhe) {}
+        } catch (UnknownHostException uhe) {
+            synchronized(_negativeCache) {
+                _negativeCache.put(host, Long.valueOf(System.currentTimeMillis()));
+            }
+        }
         return null;
     }
 
@@ -551,6 +591,9 @@ public abstract class Addresses {
     public static void clearCaches() {
         synchronized(_IPAddress) {
             _IPAddress.clear();
+        }
+        synchronized(_negativeCache) {
+            _negativeCache.clear();
         }
         if (_ifCache != null) {
             synchronized(_ifCache) {

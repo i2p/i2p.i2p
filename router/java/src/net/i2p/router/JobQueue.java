@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.i2p.data.DataHelper;
 import net.i2p.router.message.HandleGarlicMessageJob;
 import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
+import net.i2p.router.networkdb.kademlia.IterativeSearchJob;
 import net.i2p.router.RouterClock;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
@@ -316,10 +317,13 @@ public class JobQueue {
             // Garlic added in 0.9.19, floodfills were getting overloaded
             // with encrypted lookups
             //
+            // ISJ added in 0.9.31, can get backed up due to DNS
+            //
             // Obviously we can only drop one-shot jobs, not those that requeue
             //
             if (cls == HandleFloodfillDatabaseLookupMessageJob.class ||
-                cls == HandleGarlicMessageJob.class) {
+                cls == HandleGarlicMessageJob.class ||
+                cls == IterativeSearchJob.class) {
                 // this tail drops based on the lag at the tail, which
                 // makes no sense...
                 //JobTiming jt = job.getTiming();

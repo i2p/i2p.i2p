@@ -117,7 +117,6 @@ public class Router implements RouterClock.ClockShiftListener {
     private final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public static final String PROP_IB_RANDOM_KEY = TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
     public static final String PROP_OB_RANDOM_KEY = TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + TunnelPoolSettings.PROP_RANDOM_KEY;
-    private final static String DNS_CACHE_TIME = "" + (5*60);
     private static final String EVENTLOG = "eventlog.txt";
     private static final String PROP_JBIGI = "jbigi.loadedResource";
     public static final String UPDATE_FILE = "i2pupdate.zip";
@@ -133,10 +132,12 @@ public class Router implements RouterClock.ClockShiftListener {
         if (System.getProperty("I2P_DISABLE_DNS_CACHE_OVERRIDE") == null) {
             // grumble about sun's java caching DNS entries *forever* by default
             // so lets just keep 'em for a short time
+            String DNS_CACHE_TIME = Integer.toString(2*60*60);
+            String DNS_NEG_CACHE_TIME = Integer.toString(30*60);
             System.setProperty("sun.net.inetaddr.ttl", DNS_CACHE_TIME);
-            System.setProperty("sun.net.inetaddr.negative.ttl", DNS_CACHE_TIME);
+            System.setProperty("sun.net.inetaddr.negative.ttl", DNS_NEG_CACHE_TIME);
             System.setProperty("networkaddress.cache.ttl", DNS_CACHE_TIME);
-            System.setProperty("networkaddress.cache.negative.ttl", DNS_CACHE_TIME);
+            System.setProperty("networkaddress.cache.negative.ttl", DNS_NEG_CACHE_TIME);
         }
         if (System.getProperty("I2P_DISABLE_HTTP_AGENT_OVERRIDE") == null) {
             System.setProperty("http.agent", "I2P");
