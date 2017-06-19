@@ -85,24 +85,25 @@ class TunnelRenderer {
                 continue;
             }
             // everything that isn't 'recent' is already in the tunnel.participatingMessageCount stat
+            // TODO translation tag "Tunnel identity" tooltips
             processed += cfg.getRecentMessagesCount();
             if (++displayed > DISPLAY_LIMIT)
                 continue;
             out.write("<tr>");
             if (cfg.getReceiveTunnel() != null)
-                out.write("<td class=\"cells\" align=\"center\">" + cfg.getReceiveTunnel().getTunnelId() +"</td>");
+                out.write("<td class=\"cells\" align=\"center\" title=\"Tunnel identity\"><span class=\"tunnel_id\">" + cfg.getReceiveTunnel().getTunnelId() +"</span></td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">n/a</td>");
             if (cfg.getReceiveFrom() != null)
-                out.write("<td class=\"cells\" align=\"center\">" + netDbLink(cfg.getReceiveFrom()) +"</td>");
+                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(cfg.getReceiveFrom()) +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
             if (cfg.getSendTunnel() != null)
-                out.write("<td class=\"cells\" align=\"center\">" + cfg.getSendTunnel().getTunnelId() +"</td>");
+                out.write("<td class=\"cells\" align=\"center\" title=\"Tunnel identity\"><span class=\"tunnel_id\">" + cfg.getSendTunnel().getTunnelId() +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
             if (cfg.getSendTo() != null)
-                out.write("<td class=\"cells\" align=\"center\">" + netDbLink(cfg.getSendTo()) +"</td>");
+                out.write("<td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(cfg.getSendTo()) +"</span></td>");
             else
                 out.write("<td class=\"cells\">&nbsp;</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
@@ -136,6 +137,24 @@ class TunnelRenderer {
             out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         //renderPeers(out);
+
+        //out.write("<h3 class=\"tabletitle\">" + "Bandwidth Tiers" + "</h3>\n"); TODO: replace "definitions" with tagged "bandwidth tiers" post 0.9.31 release
+        out.write("<h3 class=\"tabletitle\">" + _t("Definitions") + "</h3>\n");
+        out.write("<table id=\"tunnel_defs\"><tbody>");
+        out.write("<tr><td>&nbsp;</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>L</b></span></td><td>" + _t("{0} shared bandwidth", "12 - 32KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>M</b></span></td><td>" + _t("{0} shared bandwidth", "32 - 64KBps") + "</td>"
+                  + "<td>&nbsp;</td></tr>");
+        out.write("<tr><td>&nbsp;</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>N</b></span></td><td>" + _t("{0} shared bandwidth", "64 - 128KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>O</b></span></td><td>" + _t("{0} shared bandwidth", "128 - 256KBps") + "</td>"
+                  + "<td>&nbsp;</td></tr>");
+        out.write("<tr><td>&nbsp;</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>P</b></span></td><td>" + _t("{0} shared bandwidth", "256 - 2000KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>X</b></span></td><td>" + _t("Over {0} shared bandwidth", "2000KBps") + "</td>"
+                  + "<td>&nbsp;</td></tr>");
+        out.write("</tbody></table>");
+
     }
 
     private static class TunnelComparator implements Comparator<HopConfig>, Serializable {
@@ -193,15 +212,16 @@ class TunnelRenderer {
                 Hash peer = info.getPeer(j);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
                 if (_context.routerHash().equals(peer)) {
-                    // Add empty content placeholders to force alignment
-                    out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\"></span><span class=\"tunnel_id\">" +
-                             (id == null ? "" : "" + id) + "</span></span><b class=\"tunnel_cap\"></b></span></td>");
+                    // Add empty content placeholders to force alignment. TODO tag "local" + tooltips for bandwidth tier / tunnel id for translation
+                    out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer tunnel_local\" title=\"Locally hosted tunnel\">local</span>&nbsp;"
+                              + "<span class=\"tunnel_id\" title=\"Tunnel identity\">" +
+                             (id == null ? "" : "" + id) + "</span><b class=\"tunnel_cap\" title=\"Bandwidth tier\"></b></td>");
                 } else {
                     String cap = getCapacity(peer);
-                    // TODO Add tooltips for network cap / tunnel id
+                    // TODO Tag for translation tooltips for network cap / tunnel id / bandwidth tier
                     out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer\">" + netDbLink(peer) +
-                              "</span>&nbsp;<span class=\"nowrap\"><span class=\"tunnel_id\">" + (id == null ? "" : " " + id) +
-                              "</span><b class=\"tunnel_cap\">" + cap + "</b></span></td>");
+                              "</span>&nbsp;<span class=\"nowrap\"><span class=\"tunnel_id\" title=\"Tunnel identity\">" + (id == null ? "" : " " + id) +
+                              "</span><b class=\"tunnel_cap\" title=\"Bandwidth tier\">" + cap + "</b></span></td>");
                 }
                 if (info.getLength() < maxLength && (info.getLength() == 1 || j == info.getLength() - 2)) {
                     for (int k = info.getLength(); k < maxLength; k++)

@@ -167,12 +167,12 @@ public class EventLogHelper extends FormHandler {
         if (events.isEmpty()) {
             if (isAll) {
                 if (_age == 0)
-                    return _t("No events found");
-                return _t("No events found in previous {0}", DataHelper.formatDuration2(_age));
+                    return ("<table id=\"eventlog\"><tr><td class=\"infohelp\">") + _t("No events found") + ("</td></tr></table>");;
+                return ("<table id=\"eventlog\"><tr><td>") + _t("No events found in previous {0}", DataHelper.formatDuration2(_age)) + ("</td></tr></table>");
             }
             if (_age == 0)
-                return _t("No \"{0}\" events found", xev);
-            return _t("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age));
+                return ("<table id=\"eventlog\"><tr><td  class=\"infohelp\">") + _t("No \"{0}\" events found", xev) + ("</td></tr></table>");
+            return ("<table id=\"eventlog\"><tr><td class=\"infohelp\">") + _t("No \"{0}\" events found in previous {1}", xev, DataHelper.formatDuration2(_age)) + ("</td></tr></table>");
         }
         StringBuilder buf = new StringBuilder(2048);
         buf.append("<table id=\"eventlog\"><tr><th>");

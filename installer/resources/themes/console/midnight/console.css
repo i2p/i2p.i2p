@@ -1156,7 +1156,7 @@ div.logo hr {
 }
 
 .routersummary {
-     width: 173px;
+     width: 184px;
      padding: 8px 10px 8px;
      text-align: center;
      border: 1px solid #443da0;
@@ -1173,9 +1173,9 @@ div.logo hr {
 .routersummary img[src*="i2plogo"] {
      opacity: 0.7;
      transition: ease-out opacity 0.3s, ease filter 0.3s;
-     margin-top: 1px;
-     margin-left: -3px;
-     width: 176px;
+     margin-top: -1px;
+     margin-left: -5px;
+     width: 190px;
      height: auto;
      filter: sepia(100%) hue-rotate(180deg) drop-shadow(0 0 1px #652787);
 }
@@ -1269,7 +1269,7 @@ div.logo hr {
      border: 0;
      text-align: center !important;
      margin: -4px -7px -5px -8px !important;
-     width: 189px !important;
+     width: 200px !important;
      overflow: hidden;
      font-size: 8pt;
      background-image: none !important;
@@ -1290,7 +1290,7 @@ div.logo hr {
 }
 
 #sb_localtunnels {
-     width: 189px !important;
+     width: 200px !important;
      border-collapse: separate;
      border-spacing: 0;
      margin-top: -5px !important;
@@ -1331,7 +1331,7 @@ div.logo hr {
 
 #sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
      word-break: break-all;
-     max-width: 182px;
+     max-width: 190px;
      overflow: hidden;
      white-space: nowrap;
      text-overflow: ellipsis;
@@ -1547,7 +1547,7 @@ div.tunnels {
 /* console error messages */
 
 .sorry {
-     margin: -1px 5px 10px 205px;
+     margin: -1px 5px 10px 215px;
      padding: 20px 20px 20px 75px;
      background: #020022;
      border: 1px solid #443da0;
@@ -1574,7 +1574,7 @@ div.sorry hr {
 /* end error msgs */
 
 .main {
-     margin: -1px 5px 5px 205px;
+     margin: -1px 5px 5px 215px;
      padding: 0 10px 1px 10px;
      text-align: left;
      color: #c9ceff;
@@ -1595,7 +1595,7 @@ div.sorry hr {
 }
 
 .news {
-     margin: -1px 5px 0 205px;
+     margin: -1px 5px 0 215px;
      padding: 6px 20px 5px;
      border: 1px solid #443da0;
      background: #000 url(images/earth.jpg) no-repeat scroll bottom right;
@@ -2293,7 +2293,7 @@ h1 {
      text-align: left;
      color: #c9ceff;
      padding: 13px 15px;
-     margin: 0 5px 0 205px !important;
+     margin: 0 5px 0 215px !important;
      font-size: 17pt;
      font-weight: bold;
      font-style: normal;
@@ -2434,7 +2434,7 @@ h2, h3, h4, .confignav {
      columns: 2 400px;
      column-gap: 0 !important;
      display: block;
-     margin: 5px 0;
+     margin: 5px 0 -5px;
 }
 
 div[lang="de"] .twocol, div[lang="pt"] .twocol, div[lang="es"] .twocol, div[lang="sv"] .twocol {
@@ -3013,7 +3013,7 @@ div.themechoice {
 }
 
 .themechoice .optbox {
-     min-width: 114px !important;
+     min-width: 120px !important;
      min-height: 80px !important;
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
      margin-left: -33px;
@@ -3145,7 +3145,7 @@ td#themeselect {
      opacity: 0;
      outline: 1px dotted !important;
      min-height: 60px;
-     min-width: 111px !important;
+     min-width: 125px !important;
      margin: -5px 0 -30px -2px;
      vertical-align: text-bottom;
      text-align: center;
@@ -3155,7 +3155,7 @@ td#themeselect {
 .langselect img {
      border: 1px solid #241f69;
      margin-bottom: 0;
-     margin-left: -65px;
+     margin-left: -72px;
      margin-top: 7px !important;
      position: absolute;
 }
@@ -3165,7 +3165,7 @@ td#themeselect {
      height: 13px;
      border: 1px solid #652787;
      margin-top: 6px !important;
-     margin-left: -67px;
+     margin-left: -73px;
 }
 
 .langselect input[name="lang"]:hover + img {
@@ -3201,6 +3201,18 @@ td#themeselect {
      border-top: 1px solid #652787;
      background: #000;
      color: #652787;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.langselect img {
+     margin-left: -8px !important;
+     margin-top: -16px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-left: -10px !important;
+     margin-top: -18px !important;
+}
 }
 
 /* end flag as radio icons */
@@ -4614,8 +4626,8 @@ font[color="#000099"] { /* info */
      text-align: left;
 }
 
-#profilelist td:first-child, #profilelist th:first-child {
-     width: 52px;
+#profilelist td:first-child {
+     width: 1%;
      text-align: right;
 }
 
@@ -4629,17 +4641,22 @@ font[color="#000099"] { /* info */
      text-align: center;
 }
 
+#profilelist td:nth-child(3) {
+     letter-spacing: 0.1em;
+}
+
 #profilelist th:last-child {
      text-align: center;
+     padding-right: 8px;
 }
 
 #profilelist td:last-child {
-     text-align: right;
-     width: 60px;
+     text-align: center;
+     width: 1%;
      white-space: nowrap;
 }
 
-#profilelist td[colspan="8"] { /* profile class separator */
+#profilelist td[colspan="9"] { /* profile class separator */
      background: #050044;
      padding: 1px;
      border: 1px inset #000;
@@ -5407,11 +5424,11 @@ span#distance {
      content: url(/themes/console/images/buttons/add_address.png);
 }
 
-a.viewfullentry:not(old) {
+a.viewfullentry:not(old), a[href^="viewprofile"]:not(old) {
      font-size: 0;
 }
 
-a.viewfullentry::after {
+a.viewfullentry::after, a[href^="viewprofile"]::after {
      content: url(/themes/console/images/buttons/fullview.png);
      vertical-align: text-top;
 }
@@ -6233,6 +6250,10 @@ table#i2pupdates td:first-child {
 .main#help h3, #faq h3 {
      font-size: 10.5pt !important;
 }
+
+.cells {
+     border: none;
+}
 }
 
 @media screen and (min-width: 1500px) {
@@ -6269,10 +6290,10 @@ h1 {
 }
 
 div.routersummary img[src$="i2plogo.png"] {
-     margin-left: -5px;
+     margin-left: -4px;
      transform: none;
-     width: 207px;
-     margin-top: -3px;
+     width: 204px;
+     margin-top: -2px;
 }
 
 .routersummary table[id^="sb_"], #sb_localtunnels {
@@ -6339,7 +6360,8 @@ h4#updateplugins {
 }
 
 #profilelist td:first-child, #profilelist th:first-child, #floodfills td:first-child, #floodfills th:first-child {
-     width: 56px !important;
+     width: 1% !important;
+     white-space: nowrap;
 }
 
 .sorry {
@@ -6577,10 +6599,10 @@ _:-ms-lang(x), table + .statusnotes {
 }
 
 .routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
-.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew {
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
      display: inline-block;
      vertical-align: middle;
-     border: 1px solid #342f7f;
+     border: 1px solid rgba(52, 47, 127, 0.6);
      border-radius: 2px;
      padding: 6px 3px;
      width: 100%;
@@ -6662,3 +6684,192 @@ _:-ms-lang(x), table + .statusnotes {
      margin-top: -2px !important;
 }
 
+/* /tunnels */
+
+tt a {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,0,140,0.4);
+     color: #c9ceff;
+     border: 1px solid rgba(0,0,64,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 8px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #000;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 78px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 56px;
+     text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     background: rgba(0,0,96,0.3);
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+#tunnel_defs {
+     margin-top: -1px;
+     margin-bottom: 10px;
+}
+
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 14px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+}
+
+/* end tunnels */
+
+/* /peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
+     text-align: right;
+     white-space: nowrap;
+}
+
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     text-align: right;
+}
+
+#udpconnections .tablefooter td:nth-child(9) {
+     text-align: center !important;
+}
+
+#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
+#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
+     white-space: nowrap;
+}
+
+#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
+     padding-left: 5px;
+     padding-right: 5px;
+}
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections th:nth-child(n+13), #udpconnections .tablefooter th:nth-child(n+10),
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1% !important;
+}
+
+#peerdefs {
+     line-height: 140%;
+}
+
+.peer_arrow {
+     display: inline-block;
+     width: 18px;
+     text-align: center;
+     margin-right: 3px;
+}
+
+/* end peers */

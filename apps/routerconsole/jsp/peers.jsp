@@ -18,4 +18,4 @@
  <jsp:setProperty name="peerHelper" property="urlBase" value="peers.jsp" />
  <jsp:setProperty name="peerHelper" property="sort" value="<%=request.getParameter(\"sort\") != null ? request.getParameter(\"sort\") : \"\"%>" />
  <jsp:getProperty name="peerHelper" property="peerSummary" />
-</div></body></html>
+</div></div></body></html>

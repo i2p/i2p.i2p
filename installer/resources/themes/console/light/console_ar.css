@@ -24,7 +24,7 @@ td {
      text-align: right;
 }
 
-h1,h2,h3,h4 {
+h1, h2 ,h3, h4 {
      direction: rtl;
      text-align: right !important;
 }
@@ -38,7 +38,7 @@ h2, h3 {
 }
 
 h1 {
-     margin: 0 205px -15px 0;
+     margin: 0 212px -15px 0;
      padding: 20px 20px 20px 10px;
 }
 
@@ -161,10 +161,12 @@ div.tunnels td:first-child {
 
 div.messages li, .messages li:first-child, .error li:first-child, .error li {
      padding: 0 24px 0 0 !important;
+     font-size: 12pt;
 }
 
-.error li {
+.error li, .notice li {
      background-position: right center !important;
+     font-size: 12pt;
 }
 
 div.warning {
@@ -172,8 +174,14 @@ div.warning {
 }
 
 div.main {
-     margin: 10px 205px 0 0;
+     margin: 10px 212px 0 0;
      padding: 7px 20px 30px 20px;
+}
+
+div.sorry {
+     margin: 14px 212px 0 0;
+     padding: 20px 70px 20px 20px !important;
+     background: url(/themes/console/images/info/errortriangle.png) right 15px center no-repeat #fff;
 }
 
 div.main li {
@@ -185,7 +193,7 @@ div.main li {
 }
 
 div.news {
-     margin: 10px 205px -12px 0;
+     margin: 10px 212px -12px 0;
      padding: 7px 20px 10px 20px;
      direction: ltr;
 }
@@ -386,6 +394,12 @@ p#enablefullstats, p#gatherstats, #config_family .infohelp,
 
 div.themechoice, div.langselect {
      float: right;
+}
+
+.themelabel {
+     padding: 3px !important;
+     font-size: 11.5pt !important;
+     font-weight: bold;
 }
 
 .h3navlinks {
@@ -847,9 +861,30 @@ table#bugreports td.infohelp {
      padding: 0 0 0 5px;
 }
 
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding-left: 6px !important;
+     padding-right: 0 !important;
+}
+
+#config_ui.main .themechoice .optbox {
+    margin-left: 0;
+    margin-right: -38px;
+}
+
+#config_ui.main .langselect .optbox, #config_ui.main .langselect .optbox:hover, #config_ui.main .langselect .optbox:focus {
+     margin-left: 0;
+     margin-right: -2px;
+}
+
 @media screen and (min-width: 1500px) {
-.main, .news, h1 {
+.main, .news, h1, .sorry {
      margin-right: 232px !important;
      margin-left: 0 !important;
+}
+
+#config_ui.main .themechoice .optbox {
+    margin-left: 0;
+    margin-right: -49px;
 }
 }

@@ -1,6 +1,31 @@
 2017-06-19 str4d
- * Console: cleanup & formatting tidyups for welcome page readmes, remove
-   unneeded classes
+ * Console:
+   - Welcome page readmes:
+     - Responsive 2 column layout for eepsite section
+     - Minor formatting corrections
+     - Ensure urls in Arabic display correctly
+     - Fix commenting out of forum.i2p where it impacts surrounding text
+     - Cleanup unneeded CSS classes
+     - Enhance Chinese legibility
+   - Add untagged strings for /tunnels tooltips and local tunnel indicator (to
+     be tagged for translation post .31 release)
+   - classic: reduce color contrast of main display font
+   - classic/dark/midnight: alignment on /peers and /tunnels
+   - /tunnels:
+     - Add bandwidth tiers definitions
+     - Indicator for local tunnels
+   - /profiles:
+     - Split capabilities and version
+     - Minimize wrapping at narrow viewport width
+     - Iconify view profile link
+     - Add "OK" status indication for functional peers
+   - /peers: merge Dir and CWND rows in definitions table
+   - /events: when no events found, place result in table
+   - All themes: marginally increased width of sidebar to better accommodate
+     extra long strings
+   - Chinese: ensure buttons do not deviate in height (ticket #1996)
+   - Arabic: fix alignment issues on /configui; presentational enhancements
+   - Misc: remove erroneous tags
  * i2ptunnel: consistent tooltips and Destinations for editClient and editServer
  * I2PSnark:
    - Disable JavaScript td:onclick (handled by css)

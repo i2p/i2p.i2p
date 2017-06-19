@@ -268,7 +268,7 @@ div.warning {
 }
 
 .routersummary {
-     width: 174px;
+     width: 184px;
      padding: 8px 10px 8px;
      text-align: center;
      border: 1px solid #494;
@@ -285,9 +285,9 @@ div.warning {
 .routersummary img[src$="i2plogo.png"] {
      opacity: 0.9;
      transition: ease filter 0.3s, ease opacity 0.3s;
-     margin-top: 1px;
-     margin-left: -1px;
-     width: 176px;
+     margin-top: -2px;
+     margin-left: -4px;
+     width: 193px;
      height: auto;
 }
 
@@ -388,7 +388,7 @@ div.warning {
      border: 0;
      text-align: center !important;
      margin: -5px -7px -6px -8px !important;
-     width: 190px !important;
+     width: 200px !important;
      overflow: hidden;
      font-size: 8pt;
      background-image: none !important;
@@ -467,7 +467,7 @@ div.warning {
 
 #sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
      word-break: break-all;
-     max-width: 182px;
+     max-width: 192px;
      overflow: hidden;
      white-space: nowrap;
      text-overflow: ellipsis;
@@ -605,8 +605,6 @@ div.refresh {
      background-image: none !important;
      border: 0 !important;
      word-spacing: -0.1em;
-     max-width: 180px;
-     text-overflow: ellipsis; /* force ellipsis rather than truncate rare, overlong text strings eg. Swedish sidepanel */
 }
 
 .routersummary td:first-child {
@@ -670,7 +668,7 @@ div.tunnels td:last-child {
 /* console error messages */
 
 div.sorry {
-     margin: -1px 5px 10px 206px;
+     margin: -1px 5px 10px 216px;
      padding: 20px 20px 20px 75px;
      background: #020;
      border: 1px solid #494;
@@ -697,7 +695,7 @@ div.sorry {
 /* main section */
 
 .main {
-     margin: -1px 5px 5px 206px;
+     margin: -1px 5px 5px 216px;
      padding: 0 15px 5px 15px;
      text-align: left;
      color: #EE9;
@@ -769,7 +767,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: -1px 5px 0 206px;
+     margin: -1px 5px 0 216px;
      padding: 6px 20px 5px;
      border: 1px solid #494;
      background: #000 url(images/news.png) no-repeat scroll bottom right;
@@ -1217,6 +1215,11 @@ td img {
      padding: 0;
 }
 
+#udpconnections tr:last-child td, #ntcpconnections tr:last-child td {
+     padding-top: 6px;
+     padding-bottom: 6px;
+}
+
 /* peers - sort icons */
 
 #udpconnections th {
@@ -1484,7 +1487,7 @@ h1 {
      text-align: left;
      color: #EE9;
      padding: 13px 15px;
-     margin: 0 5px 0 206px !important;
+     margin: 0 5px 0 216px !important;
      font-size: 17pt;
      font-weight: bold;
      font-style: normal;
@@ -2269,10 +2272,6 @@ form[action="events"] {
      background: #000;
 }
 
-th.smallhead {
-     border: 1px inset #131;
-}
-
 .smallhead {
      font-size: 8pt
 }
@@ -2305,8 +2304,6 @@ th.smallhead {
 }
 
 .cells {
-     border: 1px inset #131;
-     /*border-left: 1px outset #141;*/
      text-align: center;
 }
 
@@ -4056,6 +4053,10 @@ font[color="#000099"] {
      color: #ee9;
 }
 
+#profilelist td:last-child {
+     text-align: center !important;
+}
+
 #profilelist th, #profilelist td {
      text-align: right;
      padding-left: 5px;
@@ -4083,6 +4084,10 @@ font[color="#000099"] {
      text-align: center;
 }
 
+#profilelist td:nth-child(3) {
+     letter-spacing: 0.1em;
+}
+
 #profilelist th:last-child {
      padding-right: 10px;
 }
@@ -4093,7 +4098,7 @@ font[color="#000099"] {
      white-space: nowrap;
 }
 
-#profilelist td[colspan="8"] { /* profile class separator */
+#profilelist td[colspan="9"] { /* profile class separator */
      background: #040;
      padding: 1px;
      border: 1px inset #000;
@@ -4710,11 +4715,11 @@ table.netdbentry td b, table.leaseset td b, table#leasesetdebug td b, .sybil_rou
      color: #ee9 !important;
 }
 
-a.viewfullentry:not(old) {
+a.viewfullentry:not(old), a[href^="viewprofile"]:not(old) {
      font-size: 0;
 }
 
-a.viewfullentry::after {
+a.viewfullentry::after, a[href^="viewprofile"]::after {
      content: url(/themes/console/images/buttons/fullview.png);
      vertical-align: text-top;
 }
@@ -5702,15 +5707,6 @@ table#floodfills td {
 }
 
 @media screen and (max-width: 1240px) {
-#udpconnections td, #ntcpconnections td {
-     padding: 3px 2px;
-}
-
-#udpconnections tr.tablefooter td, #ntcpconnections tr.tablefooter td {
-     border: 1px inset #131 !important;
-     border-top: 1px solid #494 !important;
-}
-
 .main#profiles, .main#peers {
      padding: 5px 5px 0;
 }
@@ -5818,6 +5814,10 @@ td.optionsave {
 #faq h3 {
      font-size: 10pt !important;
 }
+
+#udpconnections .cells {
+     border: 1px inset #131;
+}
 }
 
 @media screen and (max-width: 1220px) {
@@ -5888,7 +5888,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover,
 }
 
 .main, .news, h1 {
-     margin-left: 232px !important;
+     margin-left: 242px !important;
 }
 
 pre, #logs li, .smallhead {
@@ -5896,11 +5896,11 @@ pre, #logs li, .smallhead {
 }
 
 .routersummary {
-     width: 200px !important;
+     width: 210px !important;
 }
 
 .routersummary table[id^="sb_"] {
-     width: 216px !important;
+     width: 226px !important;
 }
 
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a,
@@ -5987,14 +5987,18 @@ p#fullhistory {
 }
 
 .routersummary img[src$="i2plogo.png"] {
-     margin-left: -5px;
+     margin-left: -8px;
      transform: none;
-     width: 210px;
-     margin-top: -3px;
+     width: 225px;
+     margin-top: -6px;
 }
 
 .routersummary h3::after {
      min-height: 19px;
+}
+
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+     max-width: 216px !important;
 }
 
 #banlist + h3.tabletitle {
@@ -6207,11 +6211,12 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 .routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
-.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew {
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
      display: inline-block;
      vertical-align: middle;
      border: 1px solid #316f30;
      box-sizing: border-box;
+     border: 1px solid rgba(49, 111, 48, 0.6);
      padding: 6px 3px;
      width: 100%;
      margin: -5px 0;
@@ -6291,4 +6296,189 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end network status */
+
+/* /tunnels */
+
+tt a {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,96,0,0.3);
+     color: #bb7;
+     border: 1px solid rgba(0,64,0,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 8px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #555;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 78px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 56px;
+     text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     background: rgba(0,96,0,0.3);
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+#tunnel_defs {
+     margin-top: -1px;
+     margin-bottom: 10px;
+}
+
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
+@media screen and (max-width: 1200px) {
+#tunnel_defs {
+     margin-bottom: 5px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 14px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+}
+
+/* end tunnels */
+
+/* /peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
+     text-align: right;
+     white-space: nowrap;
+}
+
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     text-align: right;
+}
+
+#udpconnections .tablefooter td:nth-child(9) {
+     text-align: center !important;
+}
+
+#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
+#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
+     white-space: nowrap;
+}
+
+#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
+     padding-left: 5px;
+     padding-right: 5px;
+}
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections th:nth-child(n+13), #udpconnections .tablefooter th:nth-child(n+10),
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1% !important;
+}
+
+/* end peers */
 

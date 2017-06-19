@@ -319,6 +319,21 @@ p, #helpconfig {
      border-radius: 0;
 }
 
+#helpconfig ul {
+     -moz-columns: 2 400px;
+     -webkit-columns: 2 400px;
+     columns: 2 400px;
+     -moz-column-gap: 50px;
+     -webkit-column-gap: 50px;
+     column-gap: 50px;
+}
+
+#helpconfig ul li {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-break-inside: avoid;
+}
+
 span.addrhlpr {
      font-size: 9pt;
 }

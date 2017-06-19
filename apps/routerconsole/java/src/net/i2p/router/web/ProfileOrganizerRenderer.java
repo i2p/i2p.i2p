@@ -90,6 +90,7 @@ class ProfileOrganizerRenderer {
                    buf.append("<th>").append(_t("Peer")).append("</th>");
                    buf.append("<th>").append(_t("Groups")).append("</th>");
                    buf.append("<th>").append(_t("Caps")).append("</th>");
+                   buf.append("<th>").append(_t("Version")).append("</th>");
                    buf.append("<th>").append(_t("Speed")).append("</th>");
                    buf.append("<th>").append(_t("Capacity")).append("</th>");
                    buf.append("<th>").append(_t("Integration")).append("</th>");
@@ -120,7 +121,7 @@ class ProfileOrganizerRenderer {
             }
 
             if (tier != prevTier)
-                buf.append("<tr><td colspan=\"8\"><hr></td></tr>\n");
+                buf.append("<tr><td colspan=\"9\"><hr></td></tr>\n");
             prevTier = tier;
 
             buf.append("<tr><td align=\"center\" nowrap>");
@@ -141,12 +142,13 @@ class ProfileOrganizerRenderer {
             if (info != null) {
                 // prevent HTML injection in the caps and version
                 buf.append("<td align=\"right\">").append(DataHelper.stripHTML(info.getCapabilities()));
-                String v = info.getOption("router.version");
-                if (v != null)
-                    buf.append(' ').append(DataHelper.stripHTML(v));
             } else {
                 buf.append("<td align=\"right\"><i>").append(_t("unknown")).append("</i></td>");
             }
+            buf.append("<td align=\"right\">");
+            String v = info.getOption("router.version");
+            if (v != null)
+                buf.append(DataHelper.stripHTML(v));
             buf.append("</td><td align=\"right\">").append(num(prof.getSpeedValue()));
             long bonus = prof.getSpeedBonus();
             if (bonus != 0) {
@@ -173,6 +175,7 @@ class ProfileOrganizerRenderer {
             RateAverages ra = RateAverages.getTemp();
             Rate failed = prof.getTunnelHistory().getFailedRate().getRate(30*60*1000);
             long fails = failed.computeAverages(ra, false).getTotalEventCount();
+            if (fails == 0) buf.append(_t("OK"));
             if (fails > 0) {
                 Rate accepted = prof.getTunnelCreateResponseTime().getRate(30*60*1000);
                 long total = fails + accepted.computeAverages(ra, false).getTotalEventCount();
@@ -207,13 +210,13 @@ class ProfileOrganizerRenderer {
         buf.append("<th class=\"smallhead\">").append(_t("Integ. Value")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("Last Heard About")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("Last Heard From")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Good Send")).append("</th>");        
+        buf.append("<th class=\"smallhead\">").append(_t("Last Good Send")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("Last Bad Send")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("10m Resp. Time")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("1h Resp. Time")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("1d Resp. Time")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Good Lookup")).append("</th>"); 
-        buf.append("<th class=\"smallhead\">").append(_t("Last Bad Lookup")).append("</th>");        
+        buf.append("<th class=\"smallhead\">").append(_t("Last Good Lookup")).append("</th>");
+        buf.append("<th class=\"smallhead\">").append(_t("Last Bad Lookup")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("Last Good Store")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("Last Bad Store")).append("</th>");
         buf.append("<th class=\"smallhead\">").append(_t("1h Fail Rate")).append("</th>");

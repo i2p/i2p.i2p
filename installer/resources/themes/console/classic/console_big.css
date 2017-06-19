@@ -13,8 +13,11 @@
 
 input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel {
      font-size: 11pt !important;
-     padding-top: 5px;
-     padding-bottom: 5px;
+     padding-top: 3px;
+     padding-bottom: 3px;
+     line-height: 140% !important;
+     display: inline-block;
+     letter-spacing: 0.05em;
 }
 
 input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel, div.app, .themelabel, .ui_lang, .tab a, label, a, li {
@@ -113,6 +116,16 @@ h1, h2, h3, h4 {
      word-spacing: 0.1em !important;
 }
 
+.infohelp, .infowarn, .infowarn b, #helptranslate {
+     letter-spacing: 0.1em !important;
+     word-spacing: 0.2em !important;
+}
+
+.suboption {
+     display: inline-block;
+     margin-bottom: 5px !important;
+}
+
 /* end global overrides */
 
 div.tunnels a {
@@ -135,8 +148,8 @@ div.main, div.main p, div.news p {
      line-height: 140%;
 }
 
-div.main, div.news, h1 {
-     margin-left: 226px;
+div.main, div.news, h1, .sorry {
+     margin-left: 227px;
 }
 
 .langbox {
@@ -171,8 +184,11 @@ table code {
      font-weight: normal !important;
      overflow: hidden;
      text-overflow: hidden;
-     margin-bottom: -2px;
      padding-bottom: 4px !important;
+}
+
+.ui_lang {
+     font-size: 9pt !important;
 }
 
 #themeui.formaction {
@@ -180,7 +196,7 @@ table code {
 }
 
 div.themechoice, div.langselect {
-     width: 128px;
+     width: 140px;
 }
 
 h3.ptitle, h3#i2pclientconfig {
@@ -312,6 +328,66 @@ h3#iptransport a::after, h3#advancedconfig a::after {
      margin-left: 5px;
 }
 
+#console p, #console li {
+     letter-spacing: 0.15em !important;
+     line-height: 160% !important;
+}
+
+#console li {
+     list-style-type: none;
+     margin: 10px 25px 10px 10px;
+     text-align: justify;
+}
+
+.twocol {
+     background: #eef;
+     margin-top: 15px !important;
+     margin-bottom: -20px !important;
+     padding: 10px 10px 5px;
+     border-radius: 4px;
+}
+
+.twocol li {
+     margin-left: 35px !important;
+     margin-right: 0;
+     margin-top: 0;
+     margin: 0 0 0 35px !important;
+     padding: 0 0 10px !important;
+}
+
+.twocol li:first-child {
+     margin-top: 0 !important;
+     margin-bottom: 10px !important;
+     padding-top: 0 !important;
+     padding-left: 0 !important;
+}
+
+div[lang="zh"] a {
+     background: #ddf;
+     border-radius: 2px;
+     display: inline-block;
+     padding: 0 4px;
+}
+
+a:hover code {
+     color: #f60 !important;
+}
+
+#reseedconfig td:first-child, #loggingoptions td:first-child {
+     white-space: nowrap;
+}
+
+#logs li font, #logs pre, #enviro td, #enviro td b {
+     font-size: 10pt !important;
+     letter-spacing: normal !important;
+     word-spacing: normal !important;
+}
+
+#enviro td {
+     padding-top: 3px !important;
+     padding-bottom: 3px !important;
+}
+
 /* responsive layout */
 
 @media screen and (max-width: 1200px) {
@@ -339,7 +415,8 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 210px;
 }
 
-.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"], .routersummary .reload[value="Reseed"], .routersummary button[name="updateAction"] {
+.routersummary .reload[value="restartImmediate"], .routersummary .stop[value="shutdownImmediate"],
+.routersummary .reload[value="Reseed"], .routersummary button[name="updateAction"] {
      font-size: 11pt !important;
 }
 
@@ -358,10 +435,6 @@ div.routersummary img[src$="i2plogo.png"] {
 
 .langselect .optbox {
      margin: -4px 0 8px -54px !important;
-}
-
-#console h2 {
-     margin-bottom: -5px !important;
 }
 
 #console h2 a[name], #console h2 a[name]:hover {
@@ -426,7 +499,7 @@ div.news h3, .newsDate, div.news a {
 }
 
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes,
+body, .main, .main td, .news p, #news p, .main li b, div.joblog li, .themelabel, .applabel a, .statusnotes,
 #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre,
 .netdbentry th, .configtable th, ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, div.messages, th {
      font-size: 12pt !important;
@@ -455,6 +528,16 @@ div.app {
 div.applabel {
      padding: 3px 2px 4px !important;
      width: 160px !important;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.langselect img[src^="/flags"] {
+    margin-left: -92px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+    margin-left: -93px !important;
 }
 }
 

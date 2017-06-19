@@ -1,6 +1,5 @@
-/* I2P Theme: Camo aka Dark - Arabic override */
-/* Description: Military Grade. */
-/* Comment: Thanks to Florian Kuhlmann for the hatface images. [http://www.flickr.com/photos/floriankuhlmann/] */
+/* I2P Theme: Midnight - Arabic override */
+/* Description: Dark blue with chrome highlights */
 /* Author: dr|z3d */
 
 body {
@@ -39,7 +38,7 @@ h1 {
      margin: 0 205px 0 5px !important;
 }
 
-h1,h2,h3,h4 {
+h1, h2, h3, h4 {
      direction: rtl;
      text-align: right;
 }
@@ -48,30 +47,35 @@ button.search {
      margin-right: 30px;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
-     width: 173px;
-     margin: 0 -2px 0 0;
+.routersummary img[src$="i2plogo.png"] {
+     width: 190px;
+     margin: -1px -5px 0 0;
 }
 
-div.routersummary h3, div.routersummary h4, .routersummary a, .routersummary b {
+.routersummary h3, .routersummary h4, .routersummary a, .routersummary b {
      text-align: center;
      font-weight: normal;
 }
 
-div.routersummary h3, div.routersummary h4 {
-     font-size: 10pt;
+.routersummary h3, .routersummary h3 a {
+     font-weight: bold !important;
+     padding: 3px 2px !important;
 }
 
-div.routersummary td {
+.routersummary h3, .routersummary h4 {
+     font-size: 11pt;
+}
+
+.routersummary td {
      text-align: right;
 }
 
-div.routersummary td:last-child {
+.routersummary td:last-child {
      text-align: left;
      margin-left: 3px;
 }
 
-div.routersummary td:first-child {
+.routersummary td:first-child {
      text-align: right;
 }
 
@@ -85,6 +89,10 @@ div.routersummary td:first-child {
 
 #sb_localtunnels td:last-child {
      text-align: left;
+}
+
+.routersummary td a, .routersummary td:first-child {
+     font-size: 10pt;
 }
 
 div.tunnels {
@@ -108,7 +116,7 @@ form {
     text-align: right;
 }
 
-div.routersummary form {
+.routersummary form {
     text-align: center;
 }
 
@@ -135,11 +143,27 @@ span.newtab {
 /* lang selection */
 
 .langselect img {
-     margin-right: -61px;
+     margin-left: 0;
+     margin-right: -70px;
 }
 
 .langselect .optbox:checked + img {
-     margin-right: -63px;
+     margin-right: -71px;
+     margin-left: 0;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.langselect img {
+     margin-left: 0;
+     margin-right: -8px;
+     margin-top: -18px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-right: -10px;
+     margin-left: 0;
+     margin-top: -18px !important;
+}
 }
 
 /* theme selection */
@@ -157,7 +181,8 @@ span.newtab {
      outline: 1px dotted #f00;
      position: absolute;
      padding: 2px;
-     margin-right: -27px;
+     margin-right: -33px;
+     margin-left: 0;
      min-height: 78px !important;
 }
 
@@ -169,6 +194,8 @@ span.newtab {
      margin: 5px;
      padding: 0 !important;
 }
+
+/* end theme selection */
 
 h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_logging h3 a, h3#graphdisplay a, #logs h3 a, h3#advancedconfig a {
      float: left;
@@ -340,7 +367,7 @@ td.optionsave {
 }
 
 #clientconfig th:first-child, #clientconfig td:first-child, #loggingoptions td:first-child, #i2pupdates td:first-child, #tunnelconfig td:first-child,
-table#i2pupdates input[name*="URL"], table#i2pupdates textarea, #addkeyring td:first-child, #reseedconfig td:first-child {
+table#i2pupdates textarea, #addkeyring td:first-child, #reseedconfig td:first-child {
      text-align: left !important;
 }
 
@@ -365,6 +392,21 @@ p#helptranslate, #floodfillconfig tr:first-child .infohelp {
      padding-right: 50px !important;
      background-image: url(/themes/console/images/info/infohelp.png);
      background-position: right 12px center !important;
+}
+
+textarea[name="trustedKeys"] {
+     direction: ltr !important;
+}
+
+input[type="submit"], input[type="reset"], input[type="submit"]:hover, input[type="reset"]:hover,
+input[type="submit"]:focus, input[type="reset"]:focus, input[type="submit"]:active, input[type="reset"]:active {
+     background-position: right 6px center !important;
+     padding: 5px 23px 5px 7px !important;
+}
+
+select, select:hover, select:focus, select:active {
+     background-position: left center !important;
+     padding: 4px 4px 4px 16px !important;
 }
 
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus,
@@ -403,7 +445,17 @@ div[lang="ar"] ul, div[lang="ar"] p {
      margin: 12px 0 -2px;
 }
 
+h4.app, h4.app2 {
+     text-align: right;
+}
+
 /* responsive layout */
+
+@media screen and (max-width: 1500px) {
+body {
+     margin: 5px 10px 0 0;
+}
+}
 
 @media screen and (min-width: 1500px) {
 .main, .news, h1 {
@@ -411,14 +463,13 @@ div[lang="ar"] ul, div[lang="ar"] p {
      margin-left: 0 !important;
 }
 
-div.routersummaryouter {
+.routersummaryouter {
      margin-right: 27px !important;
 }
 
-
-div.routersummary img[src$="i2plogo.png"] {
-     width: 196px;
-     margin: -2px 0 0;
+.routersummary img[src$="i2plogo.png"] {
+     width: 204px !important;
+     margin: -2px -4px 0 0 !important;
 }
 
 .routersummary h4 {
@@ -432,6 +483,36 @@ div.routersummary img[src$="i2plogo.png"] {
 div[lang="ar"], div[lang="ar"] code, div[lang="ar"] b {
      font-size: 11pt !important;
 }
+
+.langselect .optbox {
+      margin-left: 0;
+      margin-right: -2px;
+}
+
+.langselect img {
+     margin-left: 0;
+     margin-right: -78px;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-left: 0;
+     margin-right: -79px;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
+.langselect img {
+     margin-left: 0;
+     margin-right: -8px;
+     margin-top: -14px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-right: -10px;
+     margin-left: 0;
+     margin-top: -15px !important;
+}
 }
 
 /* end responsive layout */
+

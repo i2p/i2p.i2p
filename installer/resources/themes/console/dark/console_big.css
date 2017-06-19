@@ -7,30 +7,6 @@ h1, h2, h3, h4 {
      font-weight: normal !important;
 }
 
-body {
-     font-family: "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
-     font-size: 12pt;
-     line-height: 130%;
-}
-
-div.news {
-     font-size: 10pt;
-     font-style: normal !important;
-}
-
-div.main, div.news, h1 {
-     margin-left: 232px !important;
-}
-
-div.routersummary {
-     width: 200px;
-}
-
-div.routersummary table, table#sb_localtunnels {
-    font-size: 10pt;
-    width: 215px !important;
-}
-
 div.routersummary table td {
      padding: 2px 1px;
 }
@@ -141,14 +117,21 @@ div.app {
 }
 
 input[type="submit"], input[type="reset"], .cancel, .accept {
-     padding: 5px 8px !important;
+     padding: 2px 8px !important;
      font-size: 12pt !important;
      min-width: 80px;
      font-weight: normal;
+     line-height: 140% !important;
+     display: inline-block;
+     letter-spacing: 0.05em;
 }
 
-.langselect, .themechoice {
+.themechoice {
      font-size: 11pt !important;
+}
+
+.langselect {
+     font-size: 9pt !important;
 }
 
 .langselect .optbox {
@@ -156,11 +139,12 @@ input[type="submit"], input[type="reset"], .cancel, .accept {
 }
 
 .langselect img {
-     margin-top: 12px !important;
+     margin-top: 8px !important;
 }
 
 .langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
-     margin-top: 10px !important;
+     margin-top: 6px !important;
+     margin-left: -66px !important;
 }
 
 table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old),
@@ -226,9 +210,41 @@ li .twocol {
 }
 
 @media screen and (min-width: 0) {
+body {
+     font-family: "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+     font-size: 12pt;
+     line-height: 130%;
+}
+
+div.news {
+     font-size: 10pt;
+     font-style: normal !important;
+}
+
+div.main, div.news, h1, .sorry {
+     margin-left: 232px !important;
+}
+
+.sorry {
+     font-size: 12pt !important;
+}
+
+div.routersummary {
+     width: 200px !important;
+}
+
+div.routersummary table, table#sb_localtunnels {
+    font-size: 10pt;
+    width: 215px !important;
+}
+
+#sb_internals a, #sb_services a, #sb_advanced a {
+     padding: 1px 3px !important;
+}
+
 h1 {
      font-size: 20pt !important;
-     padding: 11px 15px;
+     padding: 10px 15px 11px;
 }
 
 h2 {
@@ -299,6 +315,29 @@ h3#webappconfig, h3#i2pclientconfig {
      margin-top: 5px !important;
      margin-right: 5px !important;
      line-height: 17px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.langselect img {
+    margin-left: -81px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-top: 6px !important;
+     margin-left: -83px !important;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
+.langselect img {
+     margin-left: -8px !important;
+     margin-top: -18px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-left: -10px !important;
+     margin-top: -20px !important;
 }
 }
 

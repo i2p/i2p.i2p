@@ -127,18 +127,18 @@ public class PeerHelper extends HelperBase {
         buf.append("<h3 class=\"tabletitle\">").append(_t("Definitions")).append("</h3>")
            .append("<table id=\"peerdefs\">\n")
            .append("<tr><td><b id=\"def.peer\">").append(_t("Peer")).append("</b></td><td>").append(_t("The remote peer, identified by router hash")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.dir\">").append(_t("Dir")).append("</b></td><td><img alt=\"Inbound\" src=\"/themes/console/images/inbound.png\"> ").append(_t("Inbound connection")).append("</td></tr>\n")
-           .append("<tr><td></td><td><img alt=\"Outbound\" src=\"/themes/console/images/outbound.png\"> ").append(_t("Outbound connection")).append("</td></tr>\n")
-           .append("<tr><td></td><td><img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"> ").append(_t("They offered to introduce us (help other peers traverse our firewall)")).append("</td></tr>\n")
-           .append("<tr><td></td><td><img src=\"/themes/console/images/outbound.png\" alt=\"^\" height=\"8\" width=\"12\"> ").append(_t("We offered to introduce them (help other peers traverse their firewall)")).append("</td></tr>\n")
+           .append("<tr><td><b id=\"def.dir\">").append(_t("Dir")).append("</b></td><td><span class=\"peer_arrow\"><img alt=\"Inbound\" src=\"/themes/console/images/inbound.png\"></span> ").append(_t("Inbound connection")).append("<br>\n")
+           .append("<span class=\"peer_arrow\"><img alt=\"Outbound\" src=\"/themes/console/images/outbound.png\"></span> ").append(_t("Outbound connection")).append("<br>\n")
+           .append("<span class=\"peer_arrow\"><img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"></span> ").append(_t("They offered to introduce us (help other peers traverse our firewall)")).append("<br>\n")
+           .append("<span class=\"peer_arrow\"><img src=\"/themes/console/images/outbound.png\" alt=\"^\" height=\"8\" width=\"12\"></span> ").append(_t("We offered to introduce them (help other peers traverse their firewall)")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.idle\">").append(_t("Idle")).append("</b></td><td>").append(_t("How long since a packet has been received / sent")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.rate\">").append(_t("In/Out")).append("</b></td><td>").append(_t("The smoothed inbound / outbound transfer rate (KBytes per second)")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.up\">").append(_t("Up")).append("</b></td><td>").append(_t("How long ago this connection was established")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.skew\">").append(_t("Skew")).append("</b></td><td>").append(_t("The difference between the peer's clock and your own")).append("</td></tr>\n")
-           .append("<tr><td><b id=\"def.cwnd\">CWND</b></td><td>").append(_t("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" / </td></tr>\n")
-           .append("<tr><td></td><td>").append(_t("The number of sent messages awaiting acknowledgement")).append(" /</td></tr>\n")
-           .append("<tr><td></td><td>").append(_t("The maximum number of concurrent messages to send")).append(" /</td></tr>\n")
-           .append("<tr><td></td><td>").append(_t("The number of pending sends which exceed congestion window")).append("</td></tr>\n")
+           .append("<tr><td><b id=\"def.cwnd\">CWND</b></td><td>").append(_t("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" /<br>\n")
+           .append(_t("The number of sent messages awaiting acknowledgement")).append(" /<br>\n")
+           .append(_t("The maximum number of concurrent messages to send")).append(" /<br>\n")
+           .append(_t("The number of pending sends which exceed congestion window")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.ssthresh\">SST</b></td><td>").append(_t("The slow start threshold")).append("</td></tr>\n")
            .append("<tr><td><b id=\"def.rtt\">RTT</b></td><td>").append(_t("The round trip time in milliseconds")).append("</td></tr>\n")
            //.append("<tr><td><b id=\"def.dev\">").append(_t("Dev")).append("</b></td><td>").append(_t("The standard deviation of the round trip time in milliseconds")).append("</td></tr>\n")
@@ -267,8 +267,8 @@ public class PeerHelper extends HelperBase {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
             buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
                .append(ngettext("{0} peer", "{0} peers", peers.size()));
-            buf.append("</b></td><td align=\"center\" nowrap><b><span class=\"right\">").append(formatRate(bpsRecv/1024)).append("</span>");
-            buf.append(THINSP).append("<span class=\"left\">").append(formatRate(bpsSend/1024)).append("</b></span>");
+            buf.append("</b></td><td align=\"center\" nowrap><span class=\"right\"><b>").append(formatRate(bpsRecv/1024)).append("</b></span>");
+            buf.append(THINSP).append("<span class=\"left\"><b>").append(formatRate(bpsSend/1024)).append("</b></span>");
             buf.append("</td><td align=\"right\"><b>").append(DataHelper.formatDuration2(totalUptime/peers.size()));
             buf.append("</b></td><td align=\"right\"><b>").append(DataHelper.formatDuration2(offsetTotal*1000/peers.size()));
             buf.append("</b></td><td align=\"right\"><b>").append(totalSend).append("</b></td><td align=\"right\"><b>").append(totalRecv);
@@ -486,7 +486,7 @@ public class PeerHelper extends HelperBase {
             buf.append("K");
             buf.append("</span>").append(THINSP).append("<span class=\"right\">").append(peer.getConcurrentSends());
             buf.append("</span>").append(THINSP).append("<span class=\"right\">").append(peer.getConcurrentSendWindow());
-            buf.append("</span>").append(THINSP).append("</span><span class=\"left\">").append(peer.getConsecutiveSendRejections());
+            buf.append("</span>").append(THINSP).append("<span class=\"left\">").append(peer.getConsecutiveSendRejections());
             if (peer.isBacklogged())
                 buf.append(' ').append(_t("backlogged"));
             buf.append("</span></td>");
@@ -573,11 +573,11 @@ public class PeerHelper extends HelperBase {
         buf.append("<tr class=\"tablefooter\"><td colspan=\"4\" align=\"left\"><b>")
            .append(ngettext("{0} peer", "{0} peers", peers.size()))
            .append("</b></td>" +
-                   "<td align=\"center\" nowrap><b><span class=\"right\">");
-        buf.append(formatKBps(bpsIn)).append("</span>").append(THINSP);
-        buf.append("<span class=\"left\">").append(formatKBps(bpsOut));
+                   "<td align=\"center\" nowrap><span class=\"right\"><b>");
+        buf.append(formatKBps(bpsIn)).append("</b></span>").append(THINSP);
+        buf.append("<span class=\"left\"><b>").append(formatKBps(bpsOut));
         long x = uptimeMsTotal/numPeers;
-        buf.append("</span></b></td>" +
+        buf.append("</b></span></td>" +
                    "<td align=\"right\"><b>").append(DataHelper.formatDuration2(x));
         x = offsetTotal/numPeers;
         buf.append("</b></td><td align=\"right\"><b>").append(DataHelper.formatDuration2(x)).append("</b></td>\n" +

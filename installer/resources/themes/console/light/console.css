@@ -51,7 +51,8 @@ div.clearer {
      text-shadow: none;
 }
 
-.routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after {
+.routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after, div.app, .themechoice, .langselect, .langbox,
+.newsAuthor, #netdbcountrylist img, .viewfullentry, .sybil_routerinfo th img, .graphspanel {
      -moz-user-select: none;
      -webkit-user-select: none;
      user-select: none;
@@ -109,7 +110,7 @@ pre {
 }
 
 .routersummary {
-     width: 182px;
+     width: 190px;
      padding: 8px 8px 10px;
      margin-bottom: 8px;
      text-align: center !important;
@@ -138,9 +139,9 @@ pre {
 .routersummary img[src$="i2plogo.png"] {
      opacity: 0.9;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
-     margin-top: 0;
-     margin-left: 0 !important;
-     width: 179px;
+     margin-top: -1px;
+     margin-left: -1px !important;
+     width: 192px;
      height: auto;
      filter: drop-shadow(0 0 1px #ccc);
 }
@@ -309,7 +310,7 @@ h4.sb_info + hr + form {
      border: 0;
      text-align: center !important;
      margin: -8px -5px -5px -5px;
-     width: 192px !important;
+     width: 200px !important;
      overflow: hidden;
      font-size: 8pt;
      background-image: none !important;
@@ -853,7 +854,7 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: -11px 0 10px 207px;
+     margin: -11px 0 10px 214px;
      padding: 20px 25px 20px 70px;
      border: 1px solid #447;
      border-radius: 0 0 2px 2px;
@@ -875,7 +876,7 @@ div.sorry hr {
 }
 
 div.main {
-     margin: -12px 0 8px 207px;
+     margin: -12px 0 8px 214px;
      padding: 0 15px 10px 15px;
      text-align: left;
      color: #333;
@@ -1012,7 +1013,7 @@ textarea[name="reseedURL"] {
 /* news */
 
 div.news {
-     margin: -12px 0 5px 207px;
+     margin: -12px 0 5px 214px;
      padding: 5px 15px 12px;
      border: 1px solid #447;
      color: #224;
@@ -1758,7 +1759,7 @@ td.optionsave, .formaction, form[action="configpeer"] tr:last-child td, table#ad
      border-top: 1px solid #7778bf !important;
 }
 
-td.infohelp, #help tr:hover td.infohelp {
+td.infohelp, #help tr:hover td.infohelp, #eventlog tr:hover .infohelp {
      background: #fff url(/themes/console/images/info/infohelp.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      border-bottom: 1px solid #7778bf !important;
@@ -2292,7 +2293,6 @@ div.main li b, .statlist b a:hover {
 }
 
 ol {
-
      margin: 0 0 10px;
      padding: 0;
 }
@@ -2364,6 +2364,10 @@ a:active {
 
 .links ul {
      margin-top: -5px !important;
+}
+
+.links code, #console code {
+     color: #910;
 }
 
 p {
@@ -2752,7 +2756,7 @@ h1 {
      text-align: left;
      color: #31334f;
      padding: 17px 15px 14px;
-     margin: 0 0 10px 207px;
+     margin: 0 0 10px 214px;
      font-size: 18pt;
      line-height: 90%;
      letter-spacing: 0.12em;
@@ -4349,7 +4353,7 @@ table#addkeyring tr:last-child td {
      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(201, 201, 255, 0.3) 3px, #fff 5px), #fff;
 }
 
-.cells tt, #profilelist tt {
+.cells tt, #profilelist tt, tt a {
      font-size: 8pt !important;
      margin-left: 2px !important;
 }
@@ -4375,14 +4379,6 @@ table#addkeyring tr:last-child td {
 #udpconnections .tablefooter td:nth-child(9) {
      text-align: center !important;
 }
-
-/*
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6) {
-     padding-left: 1vw !important;
-     padding-right: 1vw !important;
-}
-*/
 
 #ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
 #udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
@@ -4444,14 +4440,18 @@ table.netdbentry td:nth-child(2) {
      margin: 1px 0 0 0;
 }
 
-a.viewfullentry:not(old) {
+a.viewfullentry:not(old), #profilelist a[href^="viewprofile"]:not(old) {
      font-size: 0;
 }
 
-a.viewfullentry::after {
+a.viewfullentry::after, #profilelist a[href^="viewprofile"]::after {
      content: url(/themes/console/images/buttons/fullview.png);
      vertical-align: text-top;
      filter: drop-shadow(0 0 1px #999);
+}
+
+ #profilelist a[href^="viewprofile"]::after {
+     vertical-align: bottom;
 }
 
 a.viewfullentry:hover {
@@ -4897,8 +4897,12 @@ ul#banlist {
      text-align: right;
 }
 
-#profiles th:nth-child(7) {
+#profiles th:nth-child(8) {
      text-align: center;
+}
+
+#profilelist {
+     margin-bottom: 10px;
 }
 
 #profilelist td:first-child {
@@ -4911,9 +4915,15 @@ ul#banlist {
      text-align: left;
 }
 
-#profilelist td[colspan="8"] {
+#profilelist td[colspan="9"] {
      background: #77f;
      padding: 0;
+}
+
+#view_profile h2 {
+     text-transform: none !important;
+     letter-spacing: normal;
+     word-spacing: normal;
 }
 
 #thresholds p {
@@ -4971,7 +4981,7 @@ ul#banlist {
      text-transform: none !important;
 }
 
-#profilelist tr:hover td, table#floodfills tr:hover td, #ntcpconnections tr:nth-last-child(n+2):hover td, #udpconnections tr:nth-last-child(n+2):hover td,
+#profilelist tr:hover td, #floodfills tr:hover td, #ntcpconnections tr:nth-last-child(n+2):hover td, #udpconnections tr:nth-last-child(n+2):hover td,
 #schedjobs tr:hover td, #jobstats tr:nth-last-child(n+2):hover td, #jardump tr:hover td, #sidebarconf tr:nth-last-child(n+2):hover td, #eventlog tr:hover td,
 #netdboverview table tr:hover td, #debug tr:hover td, #clientconfig tr:hover td, #webappconfig tr:hover td, #portfaq tr:hover td, .tunneldisplay tr:hover td {
      background: #ffd;
@@ -5144,9 +5154,15 @@ h3#ntcpcon, h3#udpcon {
 #profilelist td:last-child {
      text-align: right;
      padding-right: 5px;
+     width: 1%;
+     white-space: nowrap;
 }
 
-table#floodfills th {
+#floodfills {
+     margin-top: 8px;
+}
+
+#floodfills th {
      text-align: center !important;
      border-right: 1px solid #7778bf;
 }
@@ -5155,10 +5171,18 @@ table#floodfills th {
      text-align: right;
      padding-left: 3px;
      padding-right: 3px;
+     width: 1%;
+     white-space: nowrap;
 }
 
 #floodfills td:first-child img {
      margin-right: 2px;
+     margin-left: 4px;
+}
+
+#floodfills td:nth-child(2), #profilelist td:nth-child(3) {
+     text-align: right;
+     letter-spacing: 0.15em;
 }
 
 #i2pupdates input[type="text"]:not([readonly]), #i2pupdates textarea, .main[id^="config_"] textarea, input[name="newsURL"] {
@@ -5669,6 +5693,14 @@ input[name="pluginURL"] {
      margin-left: 2px !important;
      margin-right: 2px !important;
 }
+
+#profilelist th {
+     font-size: 8pt;
+}
+
+#profilelist th:last-child {
+     font-size: 0;
+}
 }
 
 @media screen and (max-width: 1200px) {
@@ -5682,6 +5714,9 @@ input[name="pluginURL"] {
 }
 
 @media screen and (max-width: 1500px) {
+body {
+     margin: 5px 4px;
+}
 
 #sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
 #sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
@@ -5689,7 +5724,7 @@ input[name="pluginURL"] {
 }
 
 #sb_internals a, #sb_advanced a {
-     max-width: 188px;
+     max-width: 200px;
 }
 
 .tunnels_client th:first-child:not(old) {
@@ -5726,12 +5761,12 @@ input[name="pluginURL"] {
 
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li, .themelabel, .ui_lang, .applabel a, #changelog pre, .routersummary button.download,
-#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, #configinfo th, tt, code, th, .statusnotes {
+#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, #configinfo th, code, th, .statusnotes {
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.newss, pre,
-#jardump tt, #jardump td, div.news, #logs li, .cells tt, #profilelist tt, .leaseset tt {
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, pre,
+#jardump tt, #jardump td, div.news, #logs li, tt, .cells tt, #profilelist tt, .leaseset tt {
      font-size: 9pt !important;
 }
 
@@ -5740,9 +5775,11 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      border-right: none;
 }
 
-.cells tt, #profilelist tt {
+tt a, .cells tt, #profilelist tt, .cells tt a, #profilelist tt a {
      margin-left: 3px !important;
      margin-right: 3px !important;
+     font-size: 9pt !important;
+     letter-spacing: 0.1em !important;
 }
 
 .main[id^="config_"] th, h4#updateplugins {
@@ -6141,10 +6178,12 @@ h1 {
 /* tunnel build status */
 
 .tunnelBuildStatus {
-     background: rgba(220,255,220,0.15);
-     color: #070;
+     padding: 7px 2px;
 }
 
+/* TO DO: activate this when we have build status specific spans */
+
+/*
 .tunnelStatusAccept {
      background: rgba(220,255,220,0.15);
      color: #070;
@@ -6184,7 +6223,7 @@ h1 {
 .tunnelStatusRejectHidden::before {
      content: url(/themes/console/images/info/network_status/rejecting_hidden.png);
 }
-
+*/
 /* end tunnel build status */
 
 /* peers */
@@ -6233,6 +6272,17 @@ h1 {
      padding-right: 1%;
 }
 
+#peerdefs td {
+     line-height: 130%;
+}
+
+.peer_arrow {
+     display: inline-block;
+     width: 22px;
+     text-align: center;
+     margin: 2px 1px;
+}
+
 /* end peers */
 
 /* /tunnels */
@@ -6249,7 +6299,7 @@ tt a {
      min-width: 12px;
      padding: 0 2px;
      display:inline-block;
-     margin: 1px 2px 1px 6px;
+     margin: 1px 2px 1px 8px;
      text-align: center !important;
      text-shadow: 0 1px 1px #555;
 }
@@ -6260,45 +6310,70 @@ tt a {
 
 .tunnel_id {
      display: inline-block;
-     min-width: 74px;
+     min-width: 78px;
      text-align: right;
 }
 
 .tunnel_id:empty {
-     margin-right: -3px;
      min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
 }
 
 .tunnel_peer {
      display: inline-block;
-     min-width: 56px;
+     min-width: 64px;
      text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     background: rgba(187, 187, 255, 0.3);
+     background: #dfdfff;
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
 }
 
 .tunnel_peer:empty {
      vertical-align: top;
 }
 
-.tunnel_peer:empty::before {
-     // TODO: Find a way of indicating that these entries represent the local router
-     content: "";
-     display: inline-block;
-     height: 12px;
-     width: 18px;
-     //background: rgba(192,192,192,0.35);
-     margin-right: 6px;
-     border-radius: 1px;
-     text-align: center;
-     font-size: 7pt;
-     font-weight: bold;
-     line-height: 12px;
-     padding: 1px 2px;
+#tunnel_defs td {
+     padding: 4px;
+}
+
+#tunnel_defs td:nth-child(even) {
+     text-align: right;
+     padding-right: 0;
+     width: 1%;
+}
+
+#tunnel_defs td:nth-child(3) {
+    border-right: 1px inset #ddf;
+}
+
+#tunnel_defs td:first-child, #tunnel_defs td:last-child {
+     font-size: 0;
+     width: 0;
+     padding: 0;
 }
 
 @media screen and (max-width: 1100px) {
 .tunnel_id, .tunnel_peer {
      min-width: 0 !important;
      text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
 }
 
 .tunnel_peer:empty {
@@ -6309,11 +6384,16 @@ tt a {
      margin: 1px 6px 1px 2px;
 }
 
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
 @media screen and (min-width: 1500px) {
 .tunnel_cap {
      margin-left: 10px;
      padding: 0 1px;
-     min-width: 10px;
+     min-width: 14px;
 }
 
 .tunnel_id:empty {
@@ -6322,3 +6402,4 @@ tt a {
 }
 
 /* end tunnels */
+

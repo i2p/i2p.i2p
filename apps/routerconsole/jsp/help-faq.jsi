@@ -75,6 +75,6 @@
 <tr><td colspan="3">Outbound TCP from random high ports to arbitrary remote TCP ports.</td></tr>
 <tr><td colspan="3">Inbound UDP to the <a href="/confignet#udpconfig">port</a> noted on the Network Configuration page from arbitrary locations (optional, but recommended).</td></tr>
 <tr><td colspan="3">Inbound TCP to the <a href="/confignet#externaltcp">port</a> noted on the Network Configuration page from arbitrary locations (optional, but recommended). <a href="/confignet#tcpconfig">Inbound TCP</a> may be disabled on the Network Configuration page.</td></tr>
-<tr><td colspan="3">Outbound UDP on port 123, allowing replies: this is necessary for I2P's internal time sync (via SNTP - querying a random SNTP host in <code>pool.ntp.org</code> or another server you specify).</td></tr></td></tr>
+<tr><td colspan="3">Outbound UDP on port 123, allowing replies: this is necessary for I2P's internal time sync (via SNTP - querying a random SNTP host in <code>pool.ntp.org</code> or another server you specify).</td></tr>
 </table>
 

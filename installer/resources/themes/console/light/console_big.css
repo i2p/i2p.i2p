@@ -24,54 +24,69 @@ b {
 
 button, input[type="submit"], input[type="reset"] {
     font-size: 10.5pt !important;
-    padding: 5px 5px 5px 22px !important;
+    padding: 3px 5px 3px 22px !important;
+    line-height: 140% !important;
+    display: inline-block;
+    letter-spacing: 0.1em;
+}
+
+button.reload[value="restart"], button.stop[value="shutdown"] {
+     padding-top: 5px !important;
+     padding-bottom: 5px !important;
 }
 
 button.control {
      padding: 12px 11px !important;
 }
 
-input.cancel {
-     padding: 5px 5px 6px 20px !important;
-}
-
 #sidebarconf button {
      padding: 3px !important;
 }
 
-div.routersummary table {
+.routersummary table {
     font-size: 8.5pt;
 }
 
-div.routersummary a {
+.routersummary a {
     font-size: 10pt !important;
 }
 
-div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
+.routersummary h3, .routersummary h4, .routersummary p, .routersummary h3 a, .routersummary a {
      text-shadow: none !important;
 }
 
-div.routersummary h3 a {
+.routersummary h3 a {
      font-size: 11pt !important;
 }
 
-div.routersummary h4, div.routersummary h4 a {
+.routersummary h4, .routersummary h4 a {
      font-size: 10.5pt !important;
 }
 
-div.routersummary b {
+.routersummary b {
      font-size: 9.5pt;
      font-weight: normal !important;
 }
 
-div.routersummary a {
+.routersummary a {
      word-spacing: 0.1em !important;
      font-size: 10pt;
      line-height: 130%;
 }
 
-div.news {
-     font-size: 9pt;
+div.news, .newscontent p {
+     font-size: 10pt !important;
+}
+
+#newsStatus, #newsDisplay {
+     font-size: 10.5pt !important;
+     letter-spacing: 0.05em;
+}
+
+.applabel a {
+     font-size: 11pt !important;
+     display: inline-block;
+     vertical-align: middle;
 }
 
 input, input:visited, button {
@@ -86,13 +101,17 @@ th {
      font-size: 10pt;
 }
 
+.tunneldisplay th {
+     font-size: 10.5pt !important;
+}
+
 td, .mediumtags {
      font-size: 10pt !important;
      font-weight: normal !important;
 }
 
 .statusnotes {
-     font-size: 10pt;
+     font-size: 10.5pt !important;
      letter-spacing: 0.2em !important;
      text-shadow: none !important;
 }
@@ -121,6 +140,19 @@ code, tt, div {
      font-weight: normal;
 }
 
+.ui_lang {
+     font-size: 9pt !important;
+}
+
+#externali2cp td label + br {
+     display: none;
+}
+
+#externali2cp td label {
+     margin-right: 8px;
+     white-space: nowrap;
+}
+
 #config_service p.infohelp, #config_clients p.infohelp, #config_clients p.infowarn, #config_clients p#pluginconfig, #config_tunnels p.infohelp,
 p#enablefullstats {
      margin-top: 12px;
@@ -134,10 +166,82 @@ p#enablefullstats {
      font-size: 8.5pt !important;
 }
 
+#console p, #console li, #console b {
+     font-size: 10.5pt !important;
+     letter-spacing: 0.1em;
+     word-spacing: 0.1em;
+     line-height: 160%;
+}
+
+#console code, #console a {
+     letter-spacing: normal;
+     word-spacing: normal;
+     font-size: 10.5pt !important;
+}
+
+#console p a, #console li a {
+     background: rgba(220,220,255,0.5);
+     border-radius: 2px;
+     display: inline-block;
+     padding: 1px 4px;
+}
+
+#console .links {
+     margin-bottom: -15px;
+     background: rgba(220,220,255,0.3);
+     padding: 15px 10px;
+     border-radius: 4px;
+}
+
+#console .twocol {
+     margin-bottom: -20px !important;
+}
+
+#console li {
+     text-align: justify;
+     list-style: none;
+     margin-left: 20px;
+     margin-top: 10px;
+     margin-bottom: 10px;
+}
+
+#console .links li {
+     margin-left: 35px;
+}
+
+#console a:hover code {
+     color: #f60 !important;
+}
+}
+
+.tunnel_cap b, b.tunnel_cap {
+     color: #fff !important;
+     font-weight: bold !important;
+}
+
+.cells tt, #profilelist tt, tt a {
+     font-weight: bold !important;
+}
 
 @media screen and (min-width: 1500px) {
 .langbox {
      line-height: 115% !important;
+}
+
+#console p, #console li, #console code, #console a {
+     font-size: 11pt !important;
+}
+
+#console .twocol {
+     margin-bottom: -30px !important;
+}
+
+.ui_lang {
+     font-size: 10pt !important;
+}
+
+.themelabel {
+     font-size: 11pt !important;
 }
 }
 

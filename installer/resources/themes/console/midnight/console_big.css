@@ -41,12 +41,15 @@ div.tunnels table {
      font-size: 13pt !important;
 }
 
+/* end sidepanel */
+
 #newsDisplay, #newsStatus {
      font-size: 11pt !important;
 }
 
 .langbox {
      margin-top: 4px !important;
+     margin-right: 5px !important;
 }
 
 .applabel, .themechoice, .langselect {
@@ -70,8 +73,14 @@ div.tunnels table {
      padding: 4px 2px;
 }
 
-.applabel a, .applabel a:hover, .ui_lang, .themelabel {
+.applabel a, .applabel a:hover, .themelabel {
      font-size: 12pt !important;
+}
+
+/* configui */
+
+.ui_lang {
+     font-size: 10pt;
 }
 
 .themechoice .optbox {
@@ -86,6 +95,20 @@ div.tunnels table {
 .langselect img {
      margin-left: -87px !important;
 }
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.langselect img {
+     margin-left: -8px !important;
+     margin-top: -18px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-left: -10px !important;
+     margin-top: -18px !important;
+}
+}
+
+/* end configui */
 
 label, select, select option, #configstats th b, .infohelp, .infowarn {
      font-size: 11pt !important;
@@ -104,11 +127,16 @@ label, select, select option, #configstats th b, .infohelp, .infowarn {
      margin-right: -4px !important;
 }
 
+/* welcome */
+
+div[lang="zh"], div[lang="zh"] a, ul li, div[lang="zh"] p {
+     letter-spacing: 0.1em !important;
+     word-spacing: 0.1em !important;
+     line-height: 160% !important;
+}
+
 div[lang="zh"], div[lang="zh"] a {
      font-size: 11pt !important;
-     line-height: 150% !important;
-     letter-spacing: 0.05em;
-     word-spacing: 0.1em;
 }
 
 div[lang="zh"] p {
@@ -119,6 +147,22 @@ div[lang="zh"] p {
 ul.links li {
      text-align: justify;
 }
+
+.twocol {
+     margin-top: 15px !important;
+     margin-bottom: -15px !important;
+}
+
+#externali2cp td label + br {
+     display: none;
+}
+
+#externali2cp td label {
+     margin-right: 8px;
+     white-space: nowrap;
+}
+
+/* end welcome */
 
 /* global overrides */
 
@@ -162,6 +206,11 @@ p, div[id^="config_"] th {
 input[type="submit"], input[type="reset"] {
      font-size: 12pt !important;
      font-weight: normal !important;
+     line-height: 140% !important;
+     display: inline-block;
+     letter-spacing: 0.05em;
+     padding-top: 2px !important;
+     padding-bottom: 2px !important;
 }
 }
 
@@ -185,11 +234,26 @@ input[type="text"], input[type="password"], textarea {
 }
 }
 
-
 @media screen and (min-width: 1500px) {
 .langbox {
      margin-top: 6px !important;
      line-height: 16px;
+}
+
+.langselect input[name="lang"]:checked + img {
+    margin-left: -88px !important;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
+.langselect img {
+     margin-left: -8px !important;
+     margin-top: -18px !important;
+}
+
+.langselect input[name="lang"]:checked + img {
+     margin-left: -10px !important;
+     margin-top: -18px !important;
 }
 }
 
