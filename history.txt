@@ -2,6 +2,17 @@
  * Console: cleanup & formatting tidyups for welcome page readmes, remove
    unneeded classes
  * i2ptunnel: consistent tooltips and Destinations for editClient and editServer
+ * I2PSnark:
+   - Disable JavaScript td:onclick (handled by css)
+   - Fix minimode bug in vanilla/ubergine
+   - Minimode for dark/classic
+   - ubergine:
+     - Further optimizations to reduce lag/cpu load
+     - New hidpi details.png to bypass mix-blend mode in .snarkTorrents
+   - Usability:
+     - Tab navigation now works for toggle panels
+     - Touch target for configure button now extends entire length
+   - All themes: cleanups and optimizations
 
 2017-06-15 zzz
  * Data: Cache hostname lookups in RouterAddress (ticket #1998)

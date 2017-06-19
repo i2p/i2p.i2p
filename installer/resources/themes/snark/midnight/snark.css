@@ -1098,14 +1098,14 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      display: inline-block;
 }
 
-.snarkConfigTitle, label.toggleview {
+.snarkConfigTitle, .toggleview {
      font-size: 10pt;
      font-weight: bold;
      font-variant: small-caps !important;
      display: inline-block;
-     min-width: 200px;
+     min-width: 260px;
      margin: -1px 0 -5px 0;
-     padding: 3px 25px 3px 22px;
+     padding: 3px 1px 3px 1px;
      text-align: center !important;
      letter-spacing: .15em;
      border: 1px solid #443da0;
@@ -1115,12 +1115,12 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      text-shadow: 0 0 1px #000;
 }
 
-.snarkConfigTitle:hover, label.toggleview:hover {
+.snarkConfigTitle:hover, .toggleview:hover, input.toggle_input:focus + .toggleview {
      background: #002 !important;
      background: linear-gradient(to bottom, #004 50%, #002 50%) !important;
 }
 
-.snarkConfigTitle:active, label.toggleview:active {
+.snarkConfigTitle:active, .toggleview:active {
      background: #003 !important;
      background: linear-gradient(to bottom, #004 50%, #002 50%) !important;
      box-shadow: inset 3px 3px 3px #000;
@@ -1179,7 +1179,7 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      transition: ease transform 0.3s;
 }
 
-.snarkConfigTitle img, label.toggleview img {
+.snarkConfigTitle img, .toggleview img {
      margin-right: -2px;
      margin-top: -1px;
      filter: drop-shadow(0 0 1px #000);
@@ -1947,11 +1947,16 @@ input.trackerannounce {
 /* toggle create/add panel view */
 
 input.toggle_input {
-     display: none;
+      position: absolute;
+      opacity: 0;
+      z-index: -1;
+      height: 0 !important;
+      width: 0 !important;
 }
 
-label.toggleview:hover {
+.toggleview:hover, .toggleview:hover, input.toggle_input:focus + .toggleview, .snarkConfigTitle a:focus, .snarkConfigTitle a:visited:focus {
      cursor: pointer;
+     color: #652787 !important;
 }
 
 input#toggle_addtorrent:not(checked) + label + hr + table,
@@ -1991,7 +1996,7 @@ input#toggle_createtorrent:checked + label + hr + table {
      display: none;
 }
 
-label.toggleview, .snarkConfigTitle a, .snarkConfigTitle a:visited {
+.toggleview, .snarkConfigTitle a, .snarkConfigTitle a:visited {
      color: #7972d1 !important;
 }
 
@@ -2559,7 +2564,7 @@ b.alwaysShow {
      max-width: 260px;
 }
 
-.snarkTorrentStatus, .snarkTorrentUploaded, .snarkTorrentRateUp, tfoot .snarkTorrentAction {
+.snarkTorrentStatus, .snarkTorrentUploaded, .snarkTorrentRateUp, tfoot .snarkTorrentAction, .peerinfo, .debuginfo {
      display: none;
 }
 
@@ -2715,7 +2720,7 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      font-size: 10.5pt !important;
 }
 
-.snarkConfigTitle, .snarkConfigTitle a, label.toggleview, .snarkNav:link {
+.snarkConfigTitle, .snarkConfigTitle a, .toggleview, .snarkNav:link {
      font-size: 11pt !important;
 }
 
@@ -2745,11 +2750,7 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      padding-left: 28px !important;
 }
 
-.snarkConfigTitle, .toggleview {
-     padding: 4px 25px 4px 22px;
-}
-
-.snarkConfigTitle, .snarkConfigTitle a, label.toggleview {
+.snarkConfigTitle, .snarkConfigTitle a, .toggleview {
      font-size: 12.5pt !important;
 }
 
@@ -2762,8 +2763,8 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
      padding-bottom: 5px !important;
 }
 
-.snarkConfigTitle, label.toggleview {
-     min-width: 240px !important;
+.snarkConfigTitle, .toggleview {
+     min-width: 300px !important;
 }
 
 .snarkMessages {

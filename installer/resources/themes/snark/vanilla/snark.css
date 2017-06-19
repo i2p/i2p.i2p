@@ -1,10 +1,6 @@
 /* I2PSnark theme "Vanilla" by dr|z3d */
 /* Now with 100% more chocolate */
 
-html {
-     min-height: 100%;
-}
-
 body {
      background: #2f231a;
      background: repeating-linear-gradient(to bottom, #9f948b 1px, #6f5b4c 1px, #bfa285 3px);
@@ -44,8 +40,22 @@ body.iframed:not(old) {
      outline: none;
 }
 
-td *:focus {
-     filter: drop-shadow(0 0 1px #df0067);
+form {
+     margin-bottom: 0;
+}
+
+p {
+     line-height: 150%;
+}
+
+hr {
+     color: #6f533e;
+     background:#6f533e;
+     height: 1px;
+     border: none;
+     width: 0%;
+     margin: 5px 0 7px 0;
+     text-align: center;
 }
 
 ::selection {
@@ -155,6 +165,8 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
      font-size: 10pt;
      color: #3f271b;
      background-size: 17px auto, 100% 100%, 100% 100% !important;
+     background-position: 12px center, center center, center center !important;
+     background-repeat: no-repeat !important;
      border-radius: 0;
      border: 1px solid #efe6e0;
      text-shadow: 0 0 1px #fff5ef;
@@ -186,54 +198,52 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 
 .nav_main:link {
-     background: #fff7ef url(images/button_snark.png) 11px center no-repeat;
-     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
+     background: #fff7ef url(images/button_snark.png) 11px center no-repeat !important;
+     background: url(images/button_snark.png) 11px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604e 1px, #a09286 1px, #bfafa2 2px) !important;
      background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
 .nav_forum:link {
-     background: #fff7ef url(images/button_forum.png) 12px center no-repeat;
-     background: url(images/button_forum.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
+     background: #fff7ef url(images/button_forum.png);
+     background: url(images/button_forum.png), linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(45deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
 }
 
 .nav_tracker:link {
-     background: #fff7ef url(images/button_tracker.png) 12px center no-repeat;
-     background: url(images/button_tracker.png) 12px center no-repeat, linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(135deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
+     background: #fff7ef url(images/button_tracker.png);
+     background: url(images/button_tracker.png), linear-gradient(to bottom, #fff7ef 47%, rgba(207, 193, 181, 0.6) 50%), repeating-linear-gradient(135deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
+     background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
 .nav_main:hover, .nav_main:focus {
-     background: #ffeadf url(images/button_snark_hover.png) 11px center no-repeat;
-     background: url(images/button_snark_hover.png) 11px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
+     background: #ffeadf url(images/button_snark_hover.png) 11px center no-repeat !important;
+     background: url(images/button_snark_hover.png) 11px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%) !important;
+     background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
 .nav_forum:hover, .nav_forum:focus {
-     background: #ffeadf url(images/button_forum_hover.png) 12px center no-repeat;
-     background: url(images/button_forum_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
-     background-size: 17px auto, 100% 100%, 100% 100%;
+     background: #ffeadf url(images/button_forum_hover.png);
+     background: url(images/button_forum_hover.png), linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
 }
 
 .nav_tracker:hover, .nav_tracker:focus {
-     background: #ffeadf url(images/button_tracker_hover.png) 12px center no-repeat;
-     background: url(images/button_tracker_hover.png) 12px center no-repeat, linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
-     background-size: 17px auto, 100% 100%, 100% 100%;
+     background: #ffeadf url(images/button_tracker_hover.png);
+     background: url(images/button_tracker_hover.png), linear-gradient(to bottom, #ffeadf 47%, #cfb6a8 50%, #cfb6a8 100%);
 }
 
 .nav_main:active {
-     background: #dfb899 url(images/button_snark_active.png) 11px center no-repeat;
-     background: url(images/button_snark_active.png) 11px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
-     background-size: 18px auto, 100% 100%, 100% 100%;
+     background: #dfb899 url(images/button_snark_active.png) 11px center no-repeat !important;
+     background: url(images/button_snark_active.png) 11px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%) !important;
+     background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 
 .nav_forum:active {
-     background: #dfb899 url(images/button_forum_active.png) 12px;
-     background: url(images/button_forum_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
-     background-size: 17px auto, 100% 100%, 100% 100%;
+     background: #dfb899 url(images/button_forum_active.png);
+     background: url(images/button_forum_active.png), linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
 }
 
 .nav_tracker:active {
-     background: #dfb899 url(images/button_tracker_active.png) 12px center no-repeat;
-     background: url(images/button_tracker_active.png) 12px center no-repeat, linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
-     background-size: 17px auto, 100% 100%, 100% 100%;
+     background: #dfb899 url(images/button_tracker_active.png);
+     background: url(images/button_tracker_active.png), linear-gradient(to bottom, #dfb899 47%, #af9178 50%, #af9178 100%);
 }
 
 .snarkNav:last-child {
@@ -267,7 +277,6 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      text-align: left;
      margin: 0 0 10px;
      padding: 0 3px;
-     border-spacing: 0;
      border: 1px solid #6f533e;
      border-radius: 2px;
      box-shadow: inset 0 0 6px 0 #3f2307;
@@ -285,7 +294,6 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 
 .snarkMessages:focus {
-     box-shadow: inset 0 0 6px 0 #3f2307, 0 0 1px #f60;
      box-shadow: inset 0 0 6px 0 #3f2307, 0 0 1px #df0067;
      filter: drop-shadow(0 0 2px rgba(200, 80, 0, 0.3));
 }
@@ -328,12 +336,6 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 
 .snarkMessages a:link:active, .snarkMessages a:visited:active  {
      color: #f30 !important;
-}
-
-.snarkMessages p {
-     font-style: italic;
-     margin: 0;
-     text-align: right;
 }
 
 .snarkMessages img {
@@ -395,16 +397,6 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 
 /* end pagenav */
-
-pre {
-     width: 100%;
-     font: 8pt "DejaVu Sans Mono", "Droid Sans Mono", "Lucida Console", monospace !important;
-     padding: 0;
-     text-align: left !important;
-     height: 8px;
-     color: #731;
-     font-weight: bold !important;
-}
 
 table {
      margin: 0 0 10px 0;
@@ -476,11 +468,6 @@ tfoot tr:first-child th {
      color: #2f1500 !important;
 }
 
-tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) img, tfoot:nth-child(4) img {
-     margin: 0 2px 3px 0 !important;
-     padding-right: 0 !important;
-}
-
 .headerstatus {
      text-align: left;
 }
@@ -519,15 +506,6 @@ tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) im
 .snarkTorrents thead th {
      border-top: 0;
      border-bottom: 1px solid #6f533e;
-}
-
-.snarkTorrents thead th > * {
-     vertical-align: middle !important;
-}
-
-.snarkTorrents thead th:nth-child(2) {
-     text-align: left;
-     min-width: 50px;
 }
 
 .snarkTorrents tfoot th {
@@ -619,10 +597,6 @@ th.snarkTorrentStatus {
      padding: 0 3px !important;
 }
 
-.snarkTorrentDetails {
-     font-weight: bold;
-}
-
 .snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
      width: 5%;
      min-width: 40px;
@@ -699,7 +673,6 @@ th.snarkTorrentStatus {
 }
 
 .snarkTorrents tt {
-     background: #313;
      background: #7F654F;
      color: #fff;
      padding: 2px 3px;
@@ -889,11 +862,10 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 
 #torrentInfoControl {
      border-top: 1px solid #6f533e;
-     background: linear-gradient(to bottom, #efefef, #cfc7c2);
 }
 
 #torrentInfoControl td {
-     border-bottom: none !important;;
+     border-bottom: none !important;
      background: linear-gradient(to bottom, #efefef, #cfc7c2);
      text-align: right !important;
      padding-right: 8px !important;
@@ -1164,32 +1136,41 @@ thead img.disable, img.disable:hover {
      text-transform: capitalize;
 }
 
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
-     font-size: 11pt !important;
-     font-weight: bold;
+/* panel titles */
+
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
+     font: bold 11pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-variant: small-caps !important;
-     padding: 4px 15px 2px 12px;
+     padding: 4px 1px 2px;
      margin: 0 0 -3px !important;
      letter-spacing: 0.1em;
      border: 1px solid #111;
      border-top: 0;
      background: #fff7ef;
      background: linear-gradient(to bottom, #fff7ef 0%, #fff7ef 51%, rgba(207, 193, 181, 0.6) 52%), repeating-linear-gradient(135deg, #75604e 1px, #a09286 1px, #bfafa2 2px);
-     color: #444039;
+     color: #444039 !important;
      box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #efe6e0;
      display: inline-block;
-     min-width: 220px;
+     min-width: 280px;
      vertical-align: middle;
      text-shadow: 0 0 1px #fff5ef;
 }
 
-.snarkConfigTitle:hover, label.toggleview:hover {
+.snarkConfigTitle:hover, .toggleview:hover, input.toggle_input:focus + .toggleview {
      background: #ffeadf;
      background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%);
+     color: #930 !important;
 }
 
-.snarkConfigTitle:active, label.toggleview:active {
+input.toggle_input:focus + .toggleview img, .snarkConfigTitle a:focus {
+     mix-blend-mode: normal;
+}
+
+.snarkConfigTitle a:focus img {
+     filter: drop-shadow(0px 0 1px #7f6c5f);
+}
+
+.snarkConfigTitle:active, .toggleview:active {
      box-shadow:  0 0 2px #4d453e, inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #59513b;
 }
 
@@ -1226,66 +1207,52 @@ thead img.disable, img.disable:hover {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 12pt !important;
 }
 }
 
 /* MS Edge fix */
-_:-ms-lang(x), .snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
+_:-ms-lang(x), .snarkConfigTitle, .snarkConfigTitle a, .toggleview,
 .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      padding: 3px 15px 4px;
      font-size: 12pt !important;
 }
 
-.snarkConfigTitle a, label.toggleview {
-     color: #930 !important;
-     color: #3F271B !important;
+.snarkConfigTitle a {
+     display: inline-block;
+     width: 100%;
+}
+
+.snarkConfigTitle a, .toggleview {
+     color: #3f271b !important;
      text-shadow: 0 0 1px #fff5ef;
 }
 
-.snarkConfigTitle a:hover, label.toggleview:hover, .snarkConfigTitle a:focus, label.toggleview:focus {
-     color: #df0072 !important;
+.snarkConfigTitle a:hover, .toggleview:hover, .snarkConfigTitle a:focus, .toggleview:focus {
      color: #930 !important;
 }
 
-
-.snarkConfigTitle a:active, .snarkConfigTitle a:visited:active, label.toggleview:active {
+.snarkConfigTitle a:active, .snarkConfigTitle a:visited:active, .toggleview:active {
      color: #603110 !important;
 }
 
-.snarkConfigTitle img, label.toggleview img {
+.snarkConfigTitle img, .toggleview img {
      margin: 1px -2px 3px 0;
      filter: drop-shadow(0 0 1px #7f6c5f) !important;
      mix-blend-mode: luminosity;
 }
 
-.snarkConfigTitle:hover img, label.toggleview:hover img, .snarkConfigTitle:focus img, label.toggleview:focus img {
+.snarkConfigTitle:hover img, .toggleview:hover img, .snarkConfigTitle:focus img, .toggleview:focus img {
      mix-blend-mode: normal;
 }
+
+/* end panel titles */
 
 .snarkConfig {
      font-size: 8pt;
      width: 100%;
-}
-
-form {
-     margin-bottom: 0;
-}
-
-p {
-     line-height: 150%;
-}
-
-hr {
-     color: #6f533e;
-     background:#6f533e;
-     height: 1px;
-     border: none;
-     width: 0%;
-     margin: 5px 0 7px 0;
-     text-align: center;
 }
 
 /* buttons & inputs */
@@ -1839,8 +1806,10 @@ code, tt {
 
 /* toggle create/add panel view */
 
-.toggle_input { /* hide checkbox and use label as faux panel heading */
-     display: none !important;
+input.toggle_input { /* hide checkbox and use label as faux panel heading */
+      position: absolute;
+      opacity: 0;
+      z-index: -1;
 }
 
 .toggleview:hover {
@@ -1912,6 +1881,8 @@ code, tt {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
+/*
+
 .from, .to {
      font-family: sans-serif;
      font-size: 12pt;
@@ -1947,6 +1918,8 @@ code, tt {
      font-weight: bold;
      margin: 2px 3px !important;
 }
+
+*/
 
 .dhtDebug th {
      padding: 0 10px 10px;
@@ -2255,7 +2228,6 @@ td#bwHelp a {
      border: 1px solid #6f533e;
      border-top: none;
      border-bottom: none;
-/*     box-shadow: 0 0 2px 1px rgba(77, 69, 62, 0.3);*/
      border-collapse: separate;
 }
 
@@ -2386,6 +2358,10 @@ td#bwHelp a {
 .commentAuthorName {
      background: url(images/author.png) left center no-repeat;
      padding-left: 20px;
+}
+
+.commentAuthorName:empty {
+     display: none;
 }
 
 .commentText {
@@ -2528,9 +2504,8 @@ b.alwaysShow {
      display: inline;
 }
 
-.lowersection .snarkConfigTitle, .lowersection .snarkConfigTitle:hover,  label.toggleview, .snarkConfigTitle a {
+.lowersection .snarkConfigTitle, .lowersection .snarkConfigTitle:hover,  .toggleview, .snarkConfigTitle a {
      font-size: 11pt !important;
-     max-width: 220px !important
 }
 
 .configsectionpanel .snarkConfigTitle {
@@ -2541,9 +2516,11 @@ td.snarkGraphicStatus img {
      max-height: 16px;
 }
 
+/*
 .from, .to {
      font-size: 11pt !important;
 }
+*/
 
 .snarkTorrentOdd td, .snarkTorrentEven td {
      padding-top: 3px;
@@ -2613,7 +2590,7 @@ td.snarkGraphicStatus img {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 1000px) {
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 12pt !important;
      letter-spacing: 0.1em !important;
@@ -2684,7 +2661,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 1200px) {
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 11pt !important;
      letter-spacing: 0.1em !important;
@@ -2694,7 +2671,6 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      line-height: normal;
 }
 }
-
 
 @media screen and (min-width: 1000px) {
 body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input[type="submit"], input[type="reset"], select, button {
@@ -2784,6 +2760,10 @@ body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input
      padding-right: 10px !important;
 }
 
+#totals {
+     word-spacing: 0.15em;
+}
+
 thead a img, thead img {
      max-height: 21px;
 }
@@ -2802,7 +2782,7 @@ thead a img, thead img {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1200px) {
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 13pt !important;
      letter-spacing: 0.1em !important;
@@ -2877,8 +2857,8 @@ thead a img, thead img {
 }
 
 .snarkConfigTitle, .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle,
-.configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active, label.toggleview {
-     min-width: 240px !important;
+.configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active, .toggleview {
+     min-width: 300px !important;
      font-size: 12pt !important;
 }
 
@@ -2924,7 +2904,7 @@ tr#torrentInfoStats td {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1400px) {
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 14pt !important;
      letter-spacing: 0.1em !important;
@@ -2959,7 +2939,7 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
      max-height: 18px;
 }
 
-.snarkTorrentUploaded, .snarkTorrentRateUp {
+.snarkTorrentUploaded, .snarkTorrentRateUp, .peerinfo, .debuginfo {
      display: none;
 }
 
@@ -3048,6 +3028,10 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
 .snarkComments .commentDelete {
      background: none !important;
      padding-left: 0 !important;
+}
+
+#dhtDebugInner {
+     margin-top: -24px !important;
 }
 }
 

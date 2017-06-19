@@ -20,6 +20,7 @@ body {
      url(images/button_tracker_active.png) no-repeat,
      url(images/button_forum_hover.png) no-repeat,
      url(images/button_forum_active.png) no-repeat, #a4a4cb;
+     background-size: 32px 32px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
 }
 
 body.iframed {
@@ -47,7 +48,8 @@ body.iframed {
      user-select: none;
 }
 
-a:focus img, input[type="image"]:focus, a.control:focus, input[type="radio"]:focus, input[type="checkbox"]:focus, select:focus, input[type="text"]:focus, input.r:focus, input[name="nofilter_dataDir"]:focus, textarea:focus {
+a:focus img, input[type="image"]:focus, a.control:focus, input[type="radio"]:focus, input[type="checkbox"]:focus, select:focus,
+input[type="text"]:focus, input.r:focus, input[name="nofilter_dataDir"]:focus, textarea:focus {
      filter: drop-shadow(0 0 1px #6f072b) !important;
 }
 
@@ -344,15 +346,6 @@ tfoot th {
      padding-bottom: 4px !important;
 }
 
-tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) img, tfoot:nth-child(4) img {
-     margin: 0 2px 3px 0 !important;
-     padding-right: 0 !important;
-}
-
-tfoot tr:nth-child(n+1) {
-     text-align: left;
-}
-
 #pagenav {
      font-size: 8.5pt;
      color: #272e3f;
@@ -376,9 +369,9 @@ tfoot tr:nth-child(n+1) {
 }
 
 #pagenav a:active img {
-     background: #f60;
      box-shadow: inset 3px 3px 3px #333;
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #333;
+     filter: none;
 }
 
 #pagenav img.disable, #pagenav img.disable:hover, #pagenav a:active img.disable {
@@ -825,19 +818,21 @@ tr:hover .percentBarText {
      min-height: 16px;
 }
 
-.snarkConfigTitle:hover, .toggleview:hover {
+.snarkConfigTitle:hover, .toggleview:hover, input.toggle_input:focus + .toggleview {
      background: linear-gradient(to bottom, #fcfaf7 50%, #ffe8bf 50%, #efd9b3 100%);
 }
 
 .snarkConfigTitle a {
      font-size: 11pt !important;
+     display: inline-block;
+     width: 100%;
 }
 
 .snarkConfigTitle:hover a, .snarkConfigTitle:focus a {
      color: #f60 !important;
 }
 
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 11pt;
      font-weight: bold;
      padding: 3px 15px;
@@ -850,7 +845,7 @@ tr:hover .percentBarText {
      font-variant: small-caps !important;
      box-shadow: 0 1px 2px #ddd;
      display: inline-block;
-     min-width: 220px;
+     min-width: 260px;
      color: #559 !important;
 }
 
@@ -859,7 +854,7 @@ tr:hover .percentBarText {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-.snarkConfigTitle, .snarkConfigTitle a, label.toggleview,
+.snarkConfigTitle, .snarkConfigTitle a, .toggleview,
 .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 14pt !important;
      padding: 3px 15px 4px;
@@ -870,7 +865,7 @@ tr:hover .percentBarText {
      color: #559;
 }
 
-.snarkConfigTitle a:hover, .toggleview:hover {
+.snarkConfigTitle a:hover, .snarkConfigTitle a:focus, .toggleview:hover, input.toggle_input:focus + .toggleview {
      color: #f60 !important;
      cursor: pointer;
 }
@@ -885,8 +880,8 @@ tr:hover .percentBarText {
      vertical-align: middle;
 }
 
-.snarkConfigTitle:hover img, .toggleview:hover img {
-     filter: drop-shadow(0 0 1px #f60);
+.snarkConfigTitle:hover img, .toggleview:hover img, input.toggle_input:focus + .toggleview img, .snarkConfigTitle a:focus img {
+     filter: drop-shadow(0 0 1px #f60) !important;
 }
 
 .snarkConfigTitle:active a img, .toggleview:active img {
@@ -1488,7 +1483,11 @@ input.trackerannounce {
 /* toggle create/add panel view */
 
 input.toggle_input { /* hide checkbox and use label as faux panel heading */
-     display: none;
+      position: absolute;
+      opacity: 0;
+      z-index: -1;
+      height: 0 !important;
+      width: 0 !important;
 }
 
 input#toggle_addtorrent:not(checked) + label + hr + table, input#toggle_createtorrent:not(checked) + label + hr + table {
@@ -1604,7 +1603,7 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
      padding: 5px;
      background: #efefff;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 rgba(160,160,160,0.5);
-     margin: -26px 0 -12px;
+     margin: -19px 0 -12px;
 }
 
 .dhtDebug th b:first-of-type, .dhtDebug th b:first-of-type + br + hr.debug {
@@ -1644,6 +1643,12 @@ hr.debug {
      border-bottom: 1px solid #fff;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+hr.debug {
+     height: 1px;
+}
+}
+
 hr.debug:first-of-type {
      background: transparent;
      margin-top: -5px;
@@ -1658,7 +1663,9 @@ hr.debug:nth-child(n+7) {
 
 hr.debug:last-child {
      background: transparent;
-     margin-bottom: -4px;
+     border: none;
+     height: 0;
+     margin-bottom: -8px;
 }
 
 /* end debug */
@@ -2144,7 +2151,7 @@ body, td, .snarkMessages li, .snarkMessages a, button, input, select, .snarkAddI
      font-size: 9pt !important;
 }
 
-.snarkConfigTitle a, .snarkConfigTitle, label.toggleview {
+.snarkConfigTitle a, .snarkConfigTitle, .toggleview {
      font-size: 10pt !important;
 }
 
@@ -2184,7 +2191,7 @@ b.alwaysShow {
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 1000px) {
-.snarkConfigTitle a, label.toggleview, .configsectionpanel .snarkConfigTitle {
+.snarkConfigTitle a, .toggleview, .configsectionpanel .snarkConfigTitle {
      font-size: 12pt !important;
 }
 }
@@ -2207,9 +2214,9 @@ b.alwaysShow {
 }
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (min-width: 1000px) {
 #dhtDebugInner {
-    margin-top: -22px !important;
+    margin-top: -21px !important;
 }
 }
 
@@ -2267,7 +2274,7 @@ body, td, button, input, select, .snarkAddInfo, code, tt, th, a, a:link, textare
      padding: 3px 15px !important;
 }
 
-.snarkConfigTitle, .snarkConfigTitle a, label.toggleview {
+.snarkConfigTitle, .snarkConfigTitle a, .toggleview {
      font-size: 12pt !important;
 }
 
@@ -2279,9 +2286,10 @@ input[type="submit"] {
      height: 58px;
 }
 
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
+.snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 12pt !important;
-     padding: 4px 15px !important;
+     padding: 4px 1px !important;
+     min-width: 300px;
 }
 
 .snarkTorrentStatus b {
@@ -2296,8 +2304,8 @@ input[type="submit"] {
      padding: 4px !important;
 }
 
-.snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
-     min-width: 240px;
+#dhtDebugInner {
+    margin-top: -25px !important;
 }
 
 .debuginfo td {
@@ -2306,7 +2314,7 @@ input[type="submit"] {
      padding-top: 4px !important;
      padding-bottom: 4px !important;
 }
-
+/*
 .debugConnection {
      background: #337;
      border-radius: 2px;
@@ -2317,13 +2325,15 @@ input[type="submit"] {
      font-size: 9pt !important;
      display: inline-block;
 }
+*/
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1400px) {
-.snarkConfigTitle a, label.toggleview,
+.snarkConfigTitle a, .toggleview,
 .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 14pt !important;
-     padding: 3px 15px 4px !important;
+     padding: 3px 1px 4px !important;
+     min-width: 300px;
 }
 }
 
