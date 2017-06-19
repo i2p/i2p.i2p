@@ -1,6 +1,7 @@
 2017-06-19 str4d
  * Console: cleanup & formatting tidyups for welcome page readmes, remove
    unneeded classes
+ * i2ptunnel: consistent tooltips and Destinations for editClient and editServer
 
 2017-06-15 zzz
  * Data: Cache hostname lookups in RouterAddress (ticket #1998)

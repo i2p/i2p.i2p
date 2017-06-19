@@ -535,18 +535,20 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                 <b><%=intl._t("Local destination")%></b>
             </td>
         </tr>
+
         <tr>
             <td colspan="2">
-                    <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="<%=intl._t("Read Only: Local Destination (if known)")%>" wrap="off" spellcheck="false"><%=destb64%></textarea>
+                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0"><%=destb64%></div>
             </td>
         </tr>
 
         <tr>
             <td colspan="2">
-                <b><%=intl._t("Local Base 32")%>:</b>
+                <b><%=intl._t("Local Base 32")%>:</b>&nbsp;
                 <%=editBean.getDestHashBase32(curTunnel)%>
             </td>
         </tr>
+
          <% } // if destb64  %>
          <% } %>
 
@@ -594,10 +596,9 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
         <tr>
             <td colspan="2">
                 <span class="multiOption">
-                    <label><input value="0" type="radio" name="sigType"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label title="<%=intl._t("Legacy option (deprecated), provided for backward compatibility")%>"><input value="0" type="radio" name="sigType"<%=(currentSigType==0 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     DSA-SHA1</label>
                 </span>
-
 
            <% if (editBean.isSigTypeAvailable(1)) { %>
 
@@ -605,7 +606,6 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     <label><input value="1" type="radio" name="sigType"<%=(currentSigType==1 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     ECDSA-P256</label>
                 </span>
-
 
            <% }
 
@@ -624,12 +624,11 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
                     ECDSA-P521</label>
                 </span>
 
-
            <% }
               if (editBean.isSigTypeAvailable(7)) { %>
 
                 <span class="multiOption">
-                    <label><input value="7" type="radio" name="sigType"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
+                    <label title="<%=intl._t("This is the default, recommended option")%>"><input value="7" type="radio" name="sigType"<%=(currentSigType==7 ? " checked=\"checked\"" : "")%> class="tickbox" />
                     Ed25519-SHA-512</label>
                 </span>
             </td>
