@@ -1,3 +1,7 @@
+2017-06-19 str4d
+ * Console: cleanup & formatting tidyups for welcome page readmes, remove
+   unneeded classes
+
 2017-06-15 zzz
  * Data: Cache hostname lookups in RouterAddress (ticket #1998)
  * Job Queue: Make search jobs droppable (ticket #1998)
