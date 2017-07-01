@@ -1,4 +1,11 @@
 <%
+/*
+ * USE CAUTION WHEN EDITING
+ * Trailing whitespace OR NEWLINE on the last line will cause
+ * IllegalStateExceptions !!!
+ *
+ * Do not tag this file for translation.
+ */
 try {
     net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
     String family = ctx.getProperty("netdb.family.name");
@@ -31,5 +38,4 @@ try {
         throw ioe;
     }
 }
-// don't worry about a newline after this
 %>
