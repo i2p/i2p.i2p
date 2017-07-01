@@ -1058,6 +1058,7 @@ h3#config {
 .topbuttons input.firstpage, .topbuttons input[name="firstpage"], .topbuttons input.lastpage, .topbuttons input[name="lastpage"],
 .topbuttons input.list {
      height: 26px;
+     width: 26px;
      margin: 2px;
 }
 
