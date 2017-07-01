@@ -15,7 +15,12 @@
    - /tunnels:
      - Tag "Local" for translation (and convert to lowercase in CSS)
      - Arabic: ensure our tunnel tables display correctly
- * I2PSnark: Fix unclosed <label>
+ * I2PSnark:
+   - Fix unclosed <label>
+   - Standalone:
+     - Better target the per-theme resources
+     - List all available themes in config section
+   - Themes: tidyups & further optimizations to reduce lag
 
 2017-06-19 str4d
  * Console:

@@ -209,7 +209,7 @@ body.iframed {
 
 .snarkMessages {
      font: normal 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
-     overflow: auto;
+     overflow: hidden;
      width: auto;
      height: 55px;
      margin: 0;
@@ -226,6 +226,14 @@ body.iframed {
 
 .iframed .snarkMessages {
      margin-top: -5px;
+}
+
+.snarkMessages:hover, .snarkMessages:focus {
+     overflow: auto;
+}
+
+.snarkMessages:focus {
+     box-shadow: inset 0 0 0 1px #930;
 }
 
 .snarkMessages a:active {
@@ -517,8 +525,12 @@ th.snarkTorrentStatus {
      text-align: center !important;
      font-weight: bold;
      color: #c9ceff !important;
-     padding: 10px;
      background: #001;
+}
+
+.snarkTorrentNoneLoaded i {
+     display: inline-block;
+     padding: 10px;
 }
 
 .snarkTorrentStatus {

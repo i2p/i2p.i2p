@@ -425,11 +425,9 @@ tfoot td:first-child {
      padding-top: 3px !important;
 }
 
-.snarkTorrents thead th {
-     border-top: 1px solid transparent !important;
-}
-
 .snarkTorrents thead th  {
+     border-top: 1px solid transparent !important;
+     border-bottom: 1px solid #313 !important;
      padding-top: 3px;
      padding-bottom: 6px;
      border-bottom: 1px solid #313;
@@ -461,12 +459,14 @@ th.snarkTorrentStatus {
 }
 
 .snarkTrackerDetails, .SnarkTorrentDetails {
-     width: 16px;
+     width: 1%;
      padding: 2px 0;
 }
 
 .snarkTrackerDetails {
      text-align: right;
+     padding-right: 2px;
+     min-width: 36px;
 }
 
 .snarkTorrentName {
@@ -563,19 +563,40 @@ th.snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type=
      white-space: nowrap;
 }
 
-.snarkTorrentNoneLoaded {
-     padding: 10px;
-     background: #323;
-     font-size: 8.5pt;
-     font-weight: bold;
-     text-align: center !important;
-     color: #bbb !important;
-     border-radius: 0 0 2px 2px;
-}
-
 .snarkTorrents th:empty + th:empty, .snarkTorrents td:empty + td:empty, .snarkTorrentETA:empty, .snarkTorrentAction:empty, .snarkTorrentRateDown:empty {
      width: 0 !important;
      min-width: 0 !important;
+}
+
+.snarkTorrentNoneLoaded, .snarkTorrentNoneLoaded:hover td {
+     background: #212 !important;
+     background: linear-gradient(to bottom, #313, #101) !important;
+     font-size: 8.5pt;
+     font-weight: bold;
+     border-radius: 0 0 2px 2px;
+}
+
+.snarkTorrentNoneLoaded td {
+     text-align: center !important;
+     color: #ddd !important;
+}
+
+.snarkTorrentNoneLoaded i {
+     display: inline-block;
+     padding: 10px;
+}
+
+.choked {
+     color: #f00000 !important;
+}
+
+.unchoked {
+     color: #34cf19 !important;
+}
+
+.choked, .unchoked {
+     font-weight: bold;
+     font-style: italic;
 }
 
 /* end main torrents listing */
@@ -584,10 +605,6 @@ td {
      padding: 2px 4px;
      color: #ddd !important;
      font-size: 8pt;
-}
-
-.mainsection td {
-     color: #111;
 }
 
 td:first-child {
@@ -892,29 +909,11 @@ _:-ms-lang(x), .snarkDirInfo img, .snarkTorrents img {
      transition: ease opacity 0.2s;
 }
 
-.percentBarText:hover, .percentBarText:focus {
-     opacity: 1;
-     transition: ease opacity 0.2s;
-}
-
 .iframed .percentBarText, .iframed .percentBarText:hover, .iframed .percentBarText:focus {
      transition: none;
 }
 
 /* end download bars */
-
-.choked {
-     color: #f00000 !important;
-}
-
-.unchoked {
-     color: #34CF19 !important;
-}
-
-.choked, .unchoked {
-     font-weight: bold;
-     font-style: italic;
-}
 
 .thumb {
      max-width: 16px;
@@ -1105,7 +1104,7 @@ label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle:hover 
 
 label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle:active a img {
      transform: rotate(90deg);
-     transition: ease transform 0.3s 0s;
+     transition: ease transform 0.3s;
 }
 
 .configsection a, label.toggleview {
@@ -1132,7 +1131,7 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle:acti
 /* buttons & inputs */
 
 input, a.control {
-     font: 8pt "Droid Sans", "Noto Sans", "DejaVu Sans", Verdana, Helvetica, sans-serif;
+     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, sans-serif;
      font-weight: bold;
 }
 
@@ -1244,7 +1243,7 @@ input[type="text"], input.r, input[name="nofilter_dataDir"] {
      letter-spacing: 0.03em;
      background: url(images/graytile.png) #212;
      background-size: 96px 96px;
-     transition: ease box-shadow 0.15s 0s, ease color 0.15s 0s;
+     transition: ease box-shadow 0.15s, ease color 0.15s;
 }
 
 textarea[name="i2cpOpts"] {
@@ -1264,7 +1263,7 @@ input[type=text]:active, input[type=text]:focus, input.r:focus, input[name="nofi
      background: linear-gradient(to bottom, #d60, #c50);
      color: #fff;
      box-shadow: inset 0 0 0 1px #ffffcf;
-     transition: ease box-shadow 0.15s 0s;
+     transition: ease box-shadow 0.15s;
      outline: none;
 }
 
@@ -1575,7 +1574,7 @@ textarea {
      border: 1px solid #000;
      font-size: 8pt;
      box-shadow: inset 1px 1px 2px 1px #101;
-     transition: ease box-shadow 0.15s 0s;
+     transition: ease box-shadow 0.15s;
 }
 
 /* end buttons & inputs */
