@@ -675,7 +675,211 @@ div.refresh {
      filter: drop-shadow(0 0 1px #f60) saturate(200%);
 }
 
+/* network status */
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid #88f;
+     border-radius: 2px;
+     padding: 6px 3px;
+     width: calc(100% - 10px);
+     margin: -5px 0 -6px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
+     text-shadow: 0 1px 1px #fff;
+}
+
+.routersummary .firewalled {
+     background: rgba(255,220,255,0.3);
+     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.5) 2px, rgba(110,255,110,0.1) 3px, rgba(220,255,220,0.5) 5px);
+}
+
+.routersummary .error {
+     background: rgba(255,110,110,0.1);
+     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     background: rgba(255,255,200,0.4);
+     box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96,96,96,0.5);
+}
+
+.routersummary .testing {
+     background: rgba(255,220,110,0.1);
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     background: rgba(220,220,220,0.4);
+}
+
+.routersummary .running {
+     background: rgba(220,255,220,0.2);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding-right: 2px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
 /* end sidebar */
+
+/* welcome */
+
+div[lang="ar"] li {
+     margin: 0 10px 0 30px;
+}
+
+div[lang="ar"] h3, div[lang="ar"] li {
+     text-align: right;
+}
+
+div[lang="de"] .twocol {
+     margin-left: 50px !important;
+}
+
+#console .links {
+     margin-left: 0;
+}
+
+#console li:first-child {
+     padding-top: 10px;
+}
+
+.langbox {
+     margin: 3.5px 2px 0;
+     color: #001;
+     font-size: 7pt;
+     width: 360px;
+     text-align: right;
+     float: right;
+     padding: 1px;
+     overflow: hidden;
+}
+
+.langbox img {
+     padding: 0 !important;
+     margin: 0 1px -1px;
+     opacity: 0.9;
+     border: 1px solid #999;
+     transform: none !important;
+}
+
+.langbox img:hover, .langbox a:focus img {
+     opacity: 1;
+     transform: scale(1.1) !important;
+}
+
+.links {
+     padding-bottom: 0;
+     text-align: justify;
+     margin-top: 5px !important;
+}
+
+.links li {
+     list-style-image: url(images/link.png) !important;
+     padding: 5px 10px 0 !important;
+}
+
+.links li:first-child {
+     padding: 14px 10px 5px !important;
+}
+
+.links li:last-child {
+     margin-bottom: 0 !important;
+     margin-top: 0;
+}
+
+.links b {
+     font-size: 10pt;
+     line-height: 150%;
+     letter-spacing: 0.02em;
+}
+
+.twocol {
+     -moz-columns: 2 400px;
+     -webkit-columns: 2 400px;
+     columns: 2 400px;
+     -moz-column-gap: 20px !important;
+     -webkit-column-gap: 20px !important;
+     column-gap: 20px !important;
+     display: block;
+     margin: 10px 0 !important;
+}
+
+p + .twocol {
+     margin: 10px 30px !important;
+}
+
+.twocol li {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+#console .twocol {
+     margin-left: -20px !important;
+}
+
+#console div[lang="de"] .twocol {
+     margin-left: 30px !important;
+}
+
+.twocol li {
+     margin-left: 20px;
+}
+}
+
+.twocol li:first-child {
+     margin-top: 0 !important
+     padding-top: 0 !important;
+     padding-bottom: 0 !important;
+}
+
+.main#console p {
+     padding-top: 0;
+     padding-bottom: 0;
+}
+
+/* end welcome */
 
 a:link {
      color: #33a;
@@ -1279,7 +1483,7 @@ button.download.control:hover, button.download.control:focus {
      background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
 }
 
-button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
      outline: none;
      border: none;
 }
@@ -1515,7 +1719,7 @@ div.wideload h3 {
      margin-bottom: 0 !important;
 }
 
-div.wideload p  {
+div.wideload p {
      margin-top: 5px !important;
 }
 
@@ -1761,8 +1965,9 @@ table.configtable, #permabanned, #loggingoptions, #configstats, ul#banlist {
      text-transform: none;
 }
 
-#configstats td:first-child:empty + td > label { /* remove pointer from inert labels */
+#configstats td:first-child:empty + td > label, #configstats td:first-child:empty + td > label:hover { /* remove pointer from inert labels */
      cursor: default;
+     color: #2c354f;
 }
 
 #configstats td:last-child { /* epiphany fix */
@@ -2443,7 +2648,7 @@ div.configure h2:first-child {
      border-bottom: 1px solid #89f;
 }
 
-#sidebarconf tr:last-child, #sidebarconf tr:last-child:hover  {
+#sidebarconf tr:last-child, #sidebarconf tr:last-child:hover {
      border-top: 1px solid #89f;
      background: #eff1ff;
 }
@@ -3417,7 +3622,7 @@ p#pluginconfigtext {
      padding-right: 3px !important;
 }
 
-.configtable tr:last-child, #addkeyring tr:last-child, #loggingoptions tr:last-child  {
+.configtable tr:last-child, #addkeyring tr:last-child, #loggingoptions tr:last-child {
      background: #fff;
      border-top: 1px solid #89f;
 }
@@ -3448,7 +3653,7 @@ p#enablefullstats {
      padding-right: 3px !important;
 }
 
-.configtable tr:last-child, #addkeyring tr:last-child, #loggingoptions tr:last-child  {
+.configtable tr:last-child, #addkeyring tr:last-child, #loggingoptions tr:last-child {
      background: #fff;
      border-top: 1px solid #89f;
 }
@@ -3514,56 +3719,6 @@ p#enablefullstats {
 
 .formaction#langui {
      margin: 0 -5px;
-}
-
-.langbox {
-     margin: 3.5px 2px 0;
-     color: #001;
-     font-size: 7pt;
-     width: 360px;
-     text-align: right;
-     float: right;
-     padding: 1px;
-     overflow: hidden;
-}
-
-.langbox img {
-     padding: 0 !important;
-     margin: 0 1px -1px;
-     opacity: 0.9;
-     border: 1px solid #999;
-     transform: none !important;
-}
-
-.langbox img:hover, .langbox a:focus img {
-     opacity: 1;
-     transform: scale(1.1) !important;
-}
-
-.links {
-     padding-bottom: 0;
-     text-align: justify;
-     margin-top: 5px !important;
-}
-
-.links li {
-     list-style-image: url(images/link.png) !important;
-     padding: 5px 10px 0 !important;
-}
-
-.links li:first-child {
-     padding: 14px 10px 5px !important;
-}
-
-.links li:last-child {
-     margin-bottom: 0 !important;
-     margin-top: 0;
-}
-
-.links b {
-     font-size: 10pt;
-     line-height: 150%;
-     letter-spacing: 0.02em;
 }
 
 .main#logs code {
@@ -3753,7 +3908,7 @@ p#graphopts + p {
      border-right: none;
      background-size: 20px 20px !important;
      padding: 5px 5px 5px 40px !important;
-     background: url(/themes/console/images/info/infohelp.png) 15px center no-repeat #eaeaff;
+     background: url(/themes/console/images/info/infohelp.png) 15px center no-repeat #f1f3ff;
      text-align: left;
 }
 
@@ -3831,7 +3986,7 @@ body.iframed {
      border-radius: 2px;
      background: #fff;
      background: linear-gradient(to bottom, #fff, #ddf);
-     transition: all 0.3s ease 0s;
+     transition: ease all 0.3s;
      box-shadow: 0 0 1px #fff;
 }
 
@@ -3843,7 +3998,7 @@ body.iframed {
 .themechoice:hover > object ~ .themelabel {
      border-top: 1px solid #f60 !important;
      background: #fff;
-     transition: all 0.1s ease 0s;
+     transition: ease all 0.1s;
 }
 
 .themechoice:hover > object {
@@ -3986,14 +4141,14 @@ p#helptranslate {
      border-radius: 2px;
      background: #fff;
      background: linear-gradient(to bottom, #fff, #ddf);
-     transition: all 0.3s ease 0s;
+     transition: ease all 0.3s;
      box-shadow: 0 0 1px #fff;
 }
 
 .langselect:hover {
      border: 1px solid #f60;
      background: #fff;
-     transition: ease all 0.3s 0s;
+     transition: ease all 0.3s;
 }
 
 .langselect .optbox {
@@ -4034,7 +4189,7 @@ p#helptranslate {
      border-top: 1px solid #f60;
      font-weight: bold;
      background: #fff !important;
-     transition: all 0.1s ease 0s;
+     transition: ease all 0.1s;
 }
 
 .langselect input[name="lang"]:checked + img + .ui_lang {
@@ -4066,10 +4221,6 @@ p#helptranslate {
 .langselect input[name="lang"]:active + img + .ui_lang {
      color: #fff !important;
      background: #f60 !important;
-}
-
-div.flagradio {
-     margin-top: 2px;
 }
 
 .langselect + br {
@@ -4235,13 +4386,13 @@ a.viewfullentry:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-.netdbentry th:first-child, .netdbentry td:first-child  {
+.netdbentry th:first-child, .netdbentry td:first-child {
      white-space: nowrap;
      padding: 4px 6px !important;
      text-align: left;
 }
 
-.netdbentry td:first-child  {
+.netdbentry td:first-child {
      width: 80px;
 }
 
@@ -4360,39 +4511,13 @@ a.viewfullentry:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-#noleasesets {
+#noleasesets, #notinitialized, .netdbnotfound {
      border: 1px solid #89f;
      padding: 20px;
      font-weight: bold;
      background: #eff1ff;
      margin: 10px 0 7px;
      text-align: center;
-}
-
-#sybilnav, #sybils_summary {
-     border: 1px solid #89f;
-     padding: 10px;
-     margin-bottom: 10px;
-     background: #fff;
-}
-
-#sybilnav {
-     padding: 5px 5px 0;
-}
-
-#sybilnav ul li:first-child {
-     margin-top: -10px;
-}
-
-#sybilnav ul li:last-child {
-     margin-bottom: 0;
-}
-
-#sybilnav li a {
-     display: inline-block;
-     width: calc(100% - 34px);
-     vertical-align: middle;
-     line-height: 100%;
 }
 
 .sybil_routerinfo {
@@ -4443,12 +4568,27 @@ a.viewfullentry:hover {
      font-weight: normal;
 }
 
+#sybilnav, #sybils_summary {
+     border: 1px solid #89f;
+     padding: 10px;
+     margin-bottom: 10px;
+     background: #fff;
+}
+
 #sybilnav {
      background: #eff1ff;
-     -moz-columns: 4 200px;
-     -webkit-columns: 4 200px;
-     columns: 4 200px;
-     padding: 10px 0 0 5px;
+     padding-bottom: 8px;
+     -moz-columns: 4 250px;
+     -webkit-columns: 4 250px;
+     columns: 4 250px;
+     -moz-column-gap: 10px;
+     -webkit-column-gap: 10px;
+     column-gap: 10px;
+}
+
+#sybilnav ul {
+     margin: 0;
+     padding: 0;
 }
 
 #sybilnav li {
@@ -4456,23 +4596,34 @@ a.viewfullentry:hover {
      border-bottom: 2px solid #ccf;
      list-style: none;
      margin-bottom: 5px;
-     margin-left: -15px;
+     margin-left: 0;
+     margin-right: 0;
      padding: 3px;
      background: #fff;
      background: linear-gradient(to bottom, #fff 0%, #eef 100%);
      border-radius: 2px 2px 0 0;
-     min-width: 170px;
      box-sizing: border-box;
      break-inside: avoid;
-     page-break-before: right;
+     page-break-inside: avoid;
      -webkit-column-break-inside: avoid;
 }
 
 #sybilnav li:first-child {
-     margin-top: 10px !important;
+     margin-top: 0 !important;
 }
 
-#sybilnav ul li::before {
+#sybilnav li:last-child {
+     margin-bottom: 0;
+}
+
+#sybilnav li a {
+     display: inline-block;
+     vertical-align: middle;
+     line-height: 100%;
+     width: calc(100% - 30px);
+}
+
+#sybilnav li::before {
      content: '\00A0\1F441\00A0';
      content: url(images/eye.png);
      padding: 0 5px;
@@ -4481,7 +4632,7 @@ a.viewfullentry:hover {
      vertical-align: middle;
 }
 
-p.sybil_info, p.family, p.threatpoints, p.hashdist, p.notfound {
+p.sybil_info, p.family, p.threatpoints, p.hashdist, p.notfound, p#sybil_totals {
      border: 1px solid #89f;
      padding: 5px 5px 5px 30px;
      margin: 3px 0;
@@ -4489,6 +4640,10 @@ p.sybil_info, p.family, p.threatpoints, p.hashdist, p.notfound {
      text-align: left;
      background: #ffe url(images/eye.png) 8px center no-repeat;
      background: url(images/eye.png) 8px center no-repeat, linear-gradient(to right, #fff 40%, #dde1ff);
+}
+
+p#sybil_totals {
+     font-weight: normal;
 }
 
 p.family a {
@@ -4499,7 +4654,7 @@ p.family + p.family, p.sybil_info + p.sybil_info {
      margin-top: -4px;
 }
 
-p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
+p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo {
      margin-top: 10px !important;
 }
 
@@ -4523,10 +4678,8 @@ p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sy
      margin-bottom: 6px;
 }
 
-p#sybil_totals {
-     padding: 15px;
-     border: 1px solid #89f;
-     background: #fff;
+.sybil_routerinfo + .threatpoints + ul + a[name] + table {
+     margin-top: -11px;
 }
 
 p:empty { /* empty paragraph nuke */
@@ -4604,7 +4757,7 @@ h3.stats {
      display: none !important;
 }
 
-.statlist li b, .statlist b a:hover, h3.stats a:hover  {
+.statlist li b, .statlist b a:hover, h3.stats a:hover {
      color: #2c354f !important;
 }
 
@@ -5232,6 +5385,7 @@ p#enablefullstats, p#gatherstats {
       background-size: 28px 28px;
       margin-bottom: -1px !important;
 }
+
 /* end informational images */
 
 /* login inputs */
@@ -5312,6 +5466,8 @@ p#enablefullstats, p#gatherstats {
      background: #000099;
 }
 
+/* end logs */
+
 /* peers, profiles, tunnels */
 
 .cells tt, #profilelist tt {
@@ -5320,8 +5476,453 @@ p#enablefullstats, p#gatherstats {
 
 /* end peers, profiles, tunnels dests */
 
+/* /tunnels */
 
-/* end logs */
+tt a, .cells tt {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,0,64,0.3);
+     color: #fff;
+     border: 1px solid rgba(0,0,64,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 8px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #555;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 78px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 56px;
+     text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     text-transform: lowercase;
+     background: rgba(187, 187, 255, 0.3);
+     background: #d5d5ff;
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+.tunneldisplay td {
+     padding-top: 4px;
+     padding-bottom: 4px;
+}
+
+#tunnel_defs td:nth-child(even), #tunnel_defs td:first-child {
+     width: 1%;
+}
+
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 14px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+}
+
+/* end tunnels */
+
+/* /peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
+     text-align: right;
+     white-space: nowrap;
+}
+
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     text-align: right;
+}
+
+#udpconnections .tablefooter td:nth-child(9) {
+     text-align: center !important;
+}
+
+#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
+#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
+     white-space: nowrap;
+}
+
+#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
+     padding-left: 5px;
+     padding-right: 5px;
+}
+
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1% !important;
+}
+
+#peerdefs {
+     line-height: 140%;
+     padding: 5px;
+}
+
+.peer_arrow {
+     display: inline-block;
+     width: 18px;
+     text-align: center;
+     margin-right: 3px;
+}
+
+/* end peers */
+
+/* netdb router address info */
+
+.leasesets_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     -moz-column-gap: 10px;
+     -webkit-column-gap: 10px;
+     column-gap: 10px;
+}
+
+th code {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+@media screen and (min-width: 1634px) {
+.leasesets_container {
+     margin-bottom: 2px;
+}
+
+th code {
+     font-size: 9pt !important;
+}
+}
+
+.leasesets_container table:first-child {
+     margin-top: 0;
+}
+
+.leasesets_container table {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.netdb_addresses br:first-child, .sybil_routerinfo tr:last-child td br:first-child {
+     display: none;
+}
+
+.netdbentry th:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 20px;
+     vertical-align: middle;
+}
+
+.netdbentry th:last-child > *, .sybil_routerinfo th:nth-child(2) > * {
+     display: inline-block;
+     vertical-align: middle !important;
+}
+
+.netdbentry th a img, .sybil_routerinfo th a img {
+     display: inline-block;
+     vertical-align: middle;
+     margin-right: 5px;
+}
+
+.netdbentry a.viewfullentry::after {
+     display: inline-block;
+     vertical-align: middle !important;
+     margin-left: 3px;
+}
+
+.netdbentry td:first-child {
+     text-align: right;
+}
+
+.netdbentry .netdb_addresses {
+     padding-left: 40px;
+}
+
+b.netdb_transport {
+     display: inline-block;
+     width: 50px;
+     text-align: right;
+     margin-left: -50px;
+     margin-right: 5px;
+}
+
+#netdb code {
+    font-weight: normal !important;
+}
+
+.netdb_name {
+     color: #335;
+     text-transform: capitalize;
+     font-weight: bold;
+}
+
+.netdb_info {
+     margin-right: 1px;
+}
+
+.netdb_expiry {
+     margin-left: 5px;
+}
+
+.sybil_routerinfo th img[src^="/flags"] {
+     height: 11px;
+     width: 16px;
+}
+
+.sybil_routerinfo b.netdb_transport {
+     margin-left: -13px;
+     margin-right: 0;
+}
+
+.sybil_routerinfo td:first-child, .netdbentry td:first-child {
+     text-align: right !important;
+     padding-right: 0;
+}
+
+.sybil_routerinfo td[colspan="3"] {
+     white-space: normal;
+}
+
+.sybil_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     margin: 10px 0;
+}
+
+.sybil_container p {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybil_container p:first-child {
+     margin-top: 0;
+}
+
+.sybil_container p:last-child {
+     margin-bottom: 0;
+}
+
+/* end netdb router address */
+
+/* sybils */
+
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child, .sybil_routerinfo td:last-child {
+     border-right: 1px solid #89f !important;
+}
+
+.sybil_routerinfo table td:last-child {
+     border-right: none !important;
+}
+
+.sybilinfo_params {
+     padding: 0;
+     border-bottom: 1px solid #89f;
+}
+
+.sybilinfo_container {
+     columns: 240px auto;
+     -moz-columns: 240px auto;
+     -webkit-columns: 240px auto;
+     -moz-column-gap: 0;
+     -webkit-column-gap: 0;
+     column-gap: 0;
+     background: rgba(255, 255, 255, 0.5);
+     padding: 4px 5px;
+}
+
+.sybilinfo_container b {
+     color: #335;
+}
+
+.sybil_routerinfo tr:last-child {
+     border-top: none;
+}
+
+.sybil_routerinfo p {
+     margin: 0;
+     padding: 1px 0;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybilinfo_familyname {
+     display: inline-block;
+     vertical-align: top;
+     max-width: 150px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+.sybil_addresses td:first-child {
+     max-width: 155px;
+     font-weight: bold;
+     padding-right: 9px;
+}
+
+.sybil_addresses table {
+     width: 100%;
+     margin: 0;
+}
+
+.sybil_addresses {
+     padding: 0;
+     border-bottom: 1px solid #89f;
+}
+
+.sybil_addresses table, .sybil_addresses td {
+     border: none;
+}
+
+.threatpoints + ul {
+     -moz-columns: auto 500px;
+     -webkit-columns: auto 500px;
+     columns: auto 500px;
+     -moz-column-gap: 55px;
+     -webkit-column-gap: 55px;
+     column-gap: 55px;
+     -moz-column-rule: 1px solid #89f;
+     -webkit-column-rule: 1px solid #89f;
+     column-rule: 1px solid #89f;
+     padding-top: 3px;
+     padding-bottom: 3px;
+}
+
+.threatpoints + ul li:first-child {
+     margin-top: 0 !important;
+     padding-top: 0 !important;
+}
+
+.threatpoints + ul li:last-child {
+     margin-bottom: 0 !important;
+     padding-bottom: 0 !important;
+}
+
+.threatpoints + ul li {
+     list-style: none;
+     margin-left: -15px;
+     line-height: 120%;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.threatpoints + ul li a {
+     white-space: nowrap;
+}
+
+/* end sybils */
 
 /* responsive layout */
 
@@ -5981,346 +6582,4 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
-
-/* network status */
-
-.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
-.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
-     display: inline-block;
-     vertical-align: middle;
-     border: 1px solid #88f;
-     border-radius: 2px;
-     padding: 6px 3px;
-     width: calc(100% - 10px);
-     margin: -5px 0 -6px;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
-     text-shadow: 0 1px 1px #fff;
-}
-
-.routersummary .firewalled {
-     background: rgba(255,220,255,0.3);
-     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.5) 2px, rgba(110,255,110,0.1) 3px, rgba(220,255,220,0.5) 5px);
-}
-
-.routersummary .error {
-     background: rgba(255,110,110,0.1);
-     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
-}
-
-.routersummary .warn, .routersummary .clockskew {
-     background: rgba(255,255,200,0.4);
-     box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96,96,96,0.5);
-}
-
-.routersummary .testing {
-     background: rgba(255,220,110,0.1);
-}
-
-.routersummary .hidden, .routersummary .vmcomm {
-     background: rgba(220,220,220,0.4);
-}
-
-.routersummary .running {
-     background: rgba(220,255,220,0.2);
-}
-
-.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
-.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding-right: 2px;
-     vertical-align: middle;
-     display: inline-block;
-     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
-}
-
-.routersummary .error::before, .routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_error.png);
-}
-
-.routersummary .warn::before {
-     content: url(/themes/console/images/info/network_status/network_warning.png);
-}
-
-.routersummary .testing::before {
-     content: url(/themes/console/images/info/network_status/network_testing.png);
-}
-
-.routersummary .hidden::before {
-     content: url(/themes/console/images/info/network_status/network_hidden.png);
-}
-
-.routersummary .running::before {
-     content: url(/themes/console/images/info/network_status/network_ok.png);
-}
-
-.routersummary .firewalled::before {
-     content: url(/themes/console/images/info/network_status/network_firewalled.png);
-}
-
-.routersummary .vmcomm::before {
-     content: url(/themes/console/images/info/network_status/network_vm.png);
-}
-
-.routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_clockskew.png);
-}
-
-/* end network status */
-
-/* welcome */
-
-div[lang="ar"] li {
-     margin: 0 10px 0 30px;
-}
-
-div[lang="ar"] h3, div[lang="ar"] li {
-     text-align: right;
-}
-
-div[lang="de"] .twocol {
-     margin-left: 50px !important;
-}
-
-.main#console li:first-child {
-     padding-top: 10px;
-}
-
-#console .links {
-     margin-left: 0;
-}
-
-.twocol {
-     columns: 2 400px;
-     column-gap: 20px !important;
-     display: block;
-     margin: 10px 0 !important;
-}
-
-p + .twocol {
-     margin: 10px 30px !important;
-}
-
-.twocol li {
-     break-inside: avoid;
-     page-break-inside: avoid;
-     -webkit-break-inside: avoid;
-}
-
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-#console .twocol {
-     margin-left: -20px !important;
-}
-
-#console div[lang="de"] .twocol {
-     margin-left: 30px !important;
-}
-
-.twocol li {
-     margin-left: 20px;
-}
-}
-
-.twocol li:first-child {
-     margin-top: 0 !important
-     padding-top: 0 !important;
-     padding-bottom: 0 !important;
-}
-
-.main#console p {
-     padding-top: 0;
-     padding-bottom: 0;
-}
-
-/* end welcome */
-
-/* /tunnels */
-
-tt a, .cells tt {
-     letter-spacing: 0.07em;
-}
-
-.tunnel_cap {
-     background: rgba(0,0,64,0.3);
-     color: #fff;
-     border: 1px solid rgba(0,0,64,0.2);
-     border-radius: 2px;
-     min-width: 12px;
-     padding: 0 2px;
-     display:inline-block;
-     margin: 1px 2px 1px 8px;
-     text-align: center !important;
-     text-shadow: 0 1px 1px #555;
-}
-
-.tunnel_cap:empty {
-     border: none;
-}
-
-.tunnel_id {
-     display: inline-block;
-     min-width: 78px;
-     text-align: right;
-}
-
-.tunnel_id:empty {
-     min-width: 0;
-}
-
-.tunnel_id:empty + .tunnel_cap {
-     margin-left: 12px !important;
-     display: inline-block;
-}
-
-.tunnel_peer {
-     display: inline-block;
-     min-width: 56px;
-     text-align: right;
-}
-
-.tunnel_local {
-     font-size: 8pt;
-     background: rgba(187, 187, 255, 0.3);
-     background: #d5d5ff;
-     border-radius: 2px;
-     text-align: center;
-     padding: 2px 0;
-     margin-left: -4px;
-     margin-right: 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: top;
-}
-
-.tunneldisplay td {
-     padding-top: 4px;
-     padding-bottom: 4px;
-}
-
-@media screen and (max-width: 1100px) {
-.tunnel_id, .tunnel_peer {
-     min-width: 0 !important;
-     text-align: center !important;
-}
-
-.tunnel_local {
-     margin-right: 5px;
-     margin-left: 2px;
-     padding: 2px 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: middle;
-}
-
-.tunnel_peer:empty::before {
-     margin: 1px 6px 1px 2px;
-}
-
-.tunnel_cap {
-     margin-left: 5px !important;
-}
-}
-
-@media screen and (min-width: 1500px) {
-.tunnel_cap {
-     margin-left: 10px;
-     padding: 0 1px;
-     min-width: 14px;
-}
-
-.tunnel_id:empty {
-     margin-right: -10px;
-}
-}
-
-/* end tunnels */
-
-/* /peers */
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
-     text-align: right;
-     white-space: nowrap;
-}
-
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
-#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
-#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
-     text-align: right;
-}
-
-#udpconnections .tablefooter td:nth-child(9) {
-     text-align: center !important;
-}
-
-#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
-#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
-     white-space: nowrap;
-}
-
-#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
-     padding-left: 5px;
-     padding-right: 5px;
-}
-
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(12) {
-     text-align: center;
-}
-
-.peersort {
-     text-align: center;
-     display: inline-block;
-}
-
-.right {
-     text-align: right;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.left {
-     text-align: left;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.peeripv6:empty {
-     padding: 0;
-     width: 0;
-}
-
-.cwnd .left, .cwnd .right {
-     width: auto;
-}
-
-#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
-     padding-right: 1% !important;
-}
-
-#peerdefs {
-     line-height: 140%;
-     padding: 5px;
-}
-
-.peer_arrow {
-     display: inline-block;
-     width: 18px;
-     text-align: center;
-     margin-right: 3px;
-}
-
-/* end peers */
 

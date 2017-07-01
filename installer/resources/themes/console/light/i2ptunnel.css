@@ -460,7 +460,7 @@ td.infohelp {
 }
 
 .tunnelConfig td > b {
-     margin-left: 5px;
+     margin: 2px 0 2px 5px;
      min-width: 30px;
      display: inline-block;
 }

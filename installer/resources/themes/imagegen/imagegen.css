@@ -120,6 +120,12 @@ hr {
      margin-top: 10px;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+hr {
+     height: 1px;
+}
+}
+
 iframe {
      border: none;
      margin: 40px 20px 0 60px;

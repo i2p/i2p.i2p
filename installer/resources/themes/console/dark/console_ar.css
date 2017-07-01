@@ -106,14 +106,6 @@ div.routersummary td:first-child {
      text-align: left;
 }
 
-div.tunnels {
-     padding: -3px 0 !important;
-}
-
-div.tunnels table {
-     margin: 0 -7px 0 5px !important;
-}
-
 .langbox {
      float: left;
      text-align: left;
@@ -154,25 +146,37 @@ span.newtab {
 /* lang selection */
 
 .langselect img {
-     margin-right: -61px;
+     margin-right: -71px;
 }
 
 .langselect .optbox:checked + img {
-     margin-right: -63px;
+     margin-right: -73px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.langselect img {
+     margin-right: -9px;
+     margin-top: -17px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-right: -10px;
+     margin-top: -18px !important;
+}
 }
 
 /* theme selection */
 
 .themechoice, .langselect {
      float: right !important;
-} 
+}
 
 .themechoice {
      padding: 5px;
 }
 
 .themechoice .optbox {
-     opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
+     opacity: 0;
      outline: 1px dotted #f00;
      position: absolute;
      padding: 2px;
@@ -188,6 +192,8 @@ span.newtab {
      margin: 5px;
      padding: 0 !important;
 }
+
+/* end theme selection */
 
 h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_logging h3 a, h3#graphdisplay a, #logs h3 a, h3#advancedconfig a {
      float: left;
@@ -210,31 +216,31 @@ h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_l
      padding: 1px 3px 1px 1px !important;
 }
 
-table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
+#leasesetdebug th:first-child, #leasesetsummary th:first-child {
      text-align: right;
 }
 
-table#leasesetdebug th:last-child, table#leasesetsummary th:last-child {
+#leasesetdebug th:last-child, #leasesetsummary th:last-child {
      text-align: left;
 }
 
-table#leasesetdebug th, table#leasesetsummary th {
+#leasesetdebug th, #leasesetsummary th {
       padding: 5px;
 }
 
-table.leaseset th {
+.leaseset th {
      text-align: right;
 }
 
-table.leaseset th:first-child b {
+.leaseset th:first-child b {
      float: right;
 }
 
-table.leaseset th:last-child, table.leaseset td:nth-child(2) {
+.leaseset th:last-child, .leaseset td:nth-child(2) {
      text-align: left;
 }
 
-#netdboverview th, table.netdbentry th, table#leasesetdebug td:nth-child(2n) {
+#netdboverview th, table.netdbentry th, #leasesetdebug td:nth-child(2n) {
      text-align: right;
 }
 
@@ -250,7 +256,7 @@ table.leaseset th:last-child, table.leaseset td:nth-child(2) {
      text-align: center;
 }
 
-table.netdbentry th:last-child, table#leasesetdebug td:nth-child(2n+1) {
+table.netdbentry th:last-child, #leasesetdebug td:nth-child(2n+1) {
      text-align: left;
 }
 
@@ -258,11 +264,11 @@ table.netdbentry th:last-child, table#leasesetdebug td:nth-child(2n+1) {
      float: left;
 }
 
-table#enviro td {
+#enviro td {
      padding: 5px 10px 5px 5px !important;
 }
 
-table#enviro td:first-child {
+#enviro td:first-child {
      text-align: left;
 }
 
@@ -451,6 +457,37 @@ div[lang="ar"] ul, div[lang="ar"] p {
      padding: 0;
 }
 
+.tunnel_local {
+     margin-right: -4px;
+     margin-left: 4px;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 12px;
+}
+
+.sybil_routerinfo th img[src^="/flags"], .netdbentry th a img {
+     margin-left: 5px;
+}
+
+.sybil_routerinfo th:last-child {
+     padding: 1px !important;
+}
+
+.sybil_info, .family {
+     direction: ltr;
+}
+
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child, .sybil_routerinfo td:last-child {
+     border-right: none !important;
+}
+
+a.viewfullentry::after, a[href^="viewprofile"]::after {
+     margin-left: 3px !important;
+}
+
 @media screen and (min-width: 1500px) {
 .main, .news, h1, .sorry {
      margin-right: 232px !important;
@@ -496,5 +533,17 @@ div[lang="ar"], div[lang="ar"] code, div[lang="ar"] b {
 .langselect input[name="lang"]:checked + img {
     margin-left: 0;
     margin-right: -82px;
+}
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
+.langselect img {
+     margin-right: -9px;
+     margin-top: -18px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-right: -10px;
+     margin-top: -19px !important;
 }
 }
