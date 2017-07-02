@@ -25,7 +25,6 @@ public class BaseBean
     private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
 
     public static final String RC_PROP_THEME_NAME = "routerconsole.theme";
-    public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME_NAME = "theme";
     public static final String DEFAULT_THEME = "light";
     public static final String BASE_THEME_PATH = "/themes/susidns/";
@@ -90,21 +89,19 @@ public class BaseBean
     public String getTheme() {
         loadConfig();
         String url = BASE_THEME_PATH;
-        String theme = properties.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
-        boolean universalTheming = _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
-        if (universalTheming) {
-            // Fetch routerconsole theme (or use our default if it doesn't exist)
-            theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
-            // Ensure that theme exists
-            String[] themes = getThemes();
-            boolean themeExists = false;
-            for (int i = 0; i < themes.length; i++) {
-                if (themes[i].equals(theme))
-                    themeExists = true;
-            }
-            if (!themeExists)
-                theme = DEFAULT_THEME;
+        // Fetch routerconsole theme (or use our default if it doesn't exist)
+        String theme = _context.getProperty(RC_PROP_THEME_NAME, DEFAULT_THEME);
+        // Apply any override
+        theme = properties.getProperty(PROP_THEME_NAME, theme);
+        // Ensure that theme exists
+        String[] themes = getThemes();
+        boolean themeExists = false;
+        for (int i = 0; i < themes.length; i++) {
+            if (themes[i].equals(theme))
+                themeExists = true;
         }
+        if (!themeExists)
+            theme = DEFAULT_THEME;
         url += theme + "/";
         return url;
     }

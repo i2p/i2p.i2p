@@ -1,3 +1,7 @@
+2017-07-02 str4d
+ * Console: Show correct icon for "Firewalled" network status
+ * SusiDNS: Default to the console theme
+
 2017-07-01 str4d
  * Console:
    - /netdb:
@@ -15,7 +19,6 @@
    - /tunnels:
      - Tag "Local" for translation (and convert to lowercase in CSS)
      - Arabic: ensure our tunnel tables display correctly
-   - Show correct icon for "Firewalled" network status
  * I2PSnark:
    - Fix unclosed <label>
    - Standalone:
