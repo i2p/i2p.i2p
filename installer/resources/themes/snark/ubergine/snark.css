@@ -421,10 +421,6 @@ tfoot td:first-child {
      border-top: 1px solid #202 !important;
 }
 
-.snarkTorrents tr:first-child td {
-     padding-top: 3px !important;
-}
-
 .snarkTorrents thead th  {
      border-top: 1px solid transparent !important;
      border-bottom: 1px solid #313 !important;
