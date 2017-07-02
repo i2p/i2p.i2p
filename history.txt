@@ -15,6 +15,7 @@
    - /tunnels:
      - Tag "Local" for translation (and convert to lowercase in CSS)
      - Arabic: ensure our tunnel tables display correctly
+   - Show correct icon for "Firewalled" network status
  * I2PSnark:
    - Fix unclosed <label>
    - Standalone:

@@ -407,6 +407,9 @@ class SummaryBarRenderer {
             case HIDDEN:
                 buf.append("hidden");
                 break;
+            case FIREWALLED:
+                buf.append("firewalled");
+                break;
             case RUNNING:
                 buf.append("running");
                 break;

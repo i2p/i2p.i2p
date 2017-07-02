@@ -132,6 +132,7 @@ public class SummaryHelper extends HelperBase {
     public enum NetworkState {
         HIDDEN,
         TESTING,
+        FIREWALLED,
         RUNNING,
         WARN,
         ERROR;
@@ -221,6 +222,7 @@ public class SummaryHelper extends HelperBase {
                 return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-SymmetricNAT"));
 
             case REJECT_UNSOLICITED:
+                state = NetworkState.FIREWALLED;
             case IPV4_DISABLED_IPV6_FIREWALLED:
                 if (routerInfo.getTargetAddress("NTCP") != null)
                     return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled with Inbound TCP Enabled"));
@@ -231,7 +233,7 @@ public class SummaryHelper extends HelperBase {
                     return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Floodfill"));
                 //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
                 //    return new NetworkStateMessage(NetworkState.WARN, _t("WARN-Firewalled and Fast"));
-                return new NetworkStateMessage(NetworkState.RUNNING, _t(status.toStatusString()));
+                return new NetworkStateMessage(state, _t(status.toStatusString()));
 
             case DISCONNECTED:
                 return new NetworkStateMessage(NetworkState.TESTING, _t("Disconnected - check network connection"));
