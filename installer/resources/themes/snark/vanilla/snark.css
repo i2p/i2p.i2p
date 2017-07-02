@@ -1,6 +1,10 @@
 /* I2PSnark theme "Vanilla" by dr|z3d */
 /* Now with 100% more chocolate */
 
+html {
+     height: 100%;
+}
+
 body {
      background: #2f231a;
      background: repeating-linear-gradient(to bottom, #9f948b 1px, #6f5b4c 1px, #bfa285 3px);
@@ -672,8 +676,16 @@ th.snarkTorrentStatus {
      width: 0 !important;
 }
 
+.snarkTorrents thead th:nth-child(n+2) img {
+     display: none;
+}
+
+.snarkTorrents thead th a img, .snarkTorrents thead th input[type="image"] {
+     display: inline-block !important;
+}
+
 .snarkTorrents tt {
-     background: #7F654F;
+     background: #7f654f;
      color: #fff;
      padding: 2px 3px;
      border-radius: 2px;
@@ -685,17 +697,28 @@ th.snarkTorrentStatus {
      margin: 0 1px;
 }
 
-.snarkTorrentNoneLoaded {
-     background: #5f4e41;
-     font-weight: bold;
-     text-align: center !important;
-     color: #bbb !important;
-}
-
 .snarkTorrents th:empty + th:empty, .snarkTorrents td:empty + td:empty, .snarkTorrentETA:empty,
 .snarkTorrentRateDown:empty, .snarkTorrentRateUp:empty, .snarkTorrentAction:empty {
      width: 0 !important;
      min-width: 0 !important;
+}
+
+.snarkTorrentNoneLoaded, .snarkTorrentNoneLoaded:hover td {
+     background: #5f4e41 !important;
+}
+
+.mainsection .snarkTorrentNoneLoaded td {
+     font-weight: bold;
+     text-align: center !important;
+     color: #cfc7c2 !important;
+     padding: 10px !important;
+}
+
+.snarkTorrentNoneLoaded i::before {
+     content: url(images/bullet.png);
+     display: inline-block;
+     vertical-align: top;
+     margin: 1px 3px 0 0;
 }
 
 /* end main torrents listing */
@@ -2737,7 +2760,7 @@ body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input
 
 .snarkNav:link {
      padding: 4px 8px 4px 26px !important;
-     background-size: 16px auto, 100% 100%, 100% 100% !important !important;
+     background-size: 16px auto, 100% 100%, 100% 100% !important;
      background-position: 8px center, center center, center center !important;
 }
 

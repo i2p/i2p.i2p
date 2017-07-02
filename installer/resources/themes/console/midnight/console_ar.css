@@ -218,6 +218,10 @@ h3#iptransport a, th#upnpconfig a, h3#bwlimiter a, #config_stats h3 a, #config_l
      padding: 1px 3px 1px 1px !important;
 }
 
+.sybil_routerinfo th img[src^="/flags"], .netdbentry th a img {
+     margin-left: 5px;
+}
+
 table#leasesetdebug th:first-child, table#leasesetsummary th:first-child {
      text-align: right;
 }
@@ -240,6 +244,10 @@ table.leaseset th:first-child b {
 
 table.leaseset th:last-child, table.leaseset td:nth-child(2) {
      text-align: left;
+}
+
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child, .sybil_routerinfo td:last-child {
+     border-right: none !important;
 }
 
 #netdboverview th, table.netdbentry th, table#leasesetdebug td:nth-child(2n) {
@@ -447,6 +455,21 @@ div[lang="ar"] ul, div[lang="ar"] p {
 
 h4.app, h4.app2 {
      text-align: right;
+}
+
+.netdbentry th a img {
+     margin-left: 6px;
+}
+
+.tunnel_local {
+     margin-right: -4px;
+     margin-left: 4px;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 12px;
 }
 
 /* responsive layout */

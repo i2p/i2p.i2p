@@ -203,6 +203,7 @@ class NetDbRenderer {
                 }
             }
             if (notFound) {
+                buf.append("<div class=\"netdbnotfound\">");
                 buf.append(_t("Router")).append(' ');
                 if (routerPrefix != null)
                     buf.append(routerPrefix);
@@ -213,6 +214,7 @@ class NetDbRenderer {
                 else if (family != null)
                     buf.append(_t("Family")).append(' ').append(family);
                 buf.append(' ').append(_t("not found in network database"));
+                buf.append("</div>");
             }
         }
         out.write(buf.toString());
@@ -303,6 +305,7 @@ class NetDbRenderer {
           }
 
           long now = _context.clock().now();
+          buf.append("<div class=\"leasesets_container\">");
           for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
@@ -312,7 +315,7 @@ class NetDbRenderer {
                 buf.append("<th><a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _t("Local") + "</a> ");
                 boolean unpublished = ! _context.clientManager().shouldPublishLeaseSet(key);
                 if (unpublished)
-                    buf.append(_t("Unpublished") + ' ');
+                    buf.append("<b>").append(_t("Unpublished")).append("</b> ");
                 buf.append("<b>").append(_t("Destination")).append(":</b> ");
                 TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(key);
                 if (in != null && in.getDestinationNickname() != null)
@@ -365,17 +368,17 @@ class NetDbRenderer {
             if (debug) {
                 buf.append("<tr><td colspan=\"2\">");
                 buf.append("<b>RAP?</b> ").append(ls.getReceivedAsPublished());
-                buf.append(" <b>RAR?</b> ").append(ls.getReceivedAsReply());
+                buf.append("&nbsp;&nbsp;<b>RAR?</b> ").append(ls.getReceivedAsReply());
                 BigInteger dist = HashDistance.getDistance(ourRKey, ls.getRoutingKey());
                 if (ls.getReceivedAsPublished()) {
                     if (c++ == medianCount)
                         median = dist;
                 }
-                buf.append(" <b>Distance: </b><span id=\"distance\">").append(fmt.format(biLog2(dist))).append("</span>");
+                buf.append("&nbsp;&nbsp;<b>Distance: </b>").append(fmt.format(biLog2(dist)));
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 //buf.append(dest.toBase32()).append("<br>");
                 buf.append("<b>Signature type:</b> ").append(dest.getSigningPublicKey().getType());
-                buf.append(" <b>Encryption Key:</b> ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("&hellip;");
+                buf.append("&nbsp;&nbsp;<b>Encryption Key:</b> ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("&hellip;");
                 buf.append("</td></tr>\n<tr><td colspan=\"2\">");
                 buf.append("<b>Routing Key:</b> ").append(ls.getRoutingKey().toBase64());
                 buf.append("</td></tr>");
@@ -390,9 +393,9 @@ class NetDbRenderer {
                 if (debug) {
                     long exl = lease.getEndDate().getTime() - now;
                     if (exl > 0)
-                        buf.append("<b>").append(_t("Expires in {0}", DataHelper.formatDuration2(exl))).append("</b>");
+                        buf.append("<b class=\"netdb_expiry\">").append(_t("Expires in {0}", DataHelper.formatDuration2(exl))).append("</b>");
                     else
-                        buf.append("<b>").append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exl))).append("</b>");
+                        buf.append("<b class=\"netdb_expiry\">").append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exl))).append("</b>");
                 }
                 buf.append("</td></tr>\n");
             }
@@ -400,6 +403,7 @@ class NetDbRenderer {
             out.write(buf.toString());
             buf.setLength(0);
           } // for each
+          buf.append("</div>");
         }  // !empty
         out.write(buf.toString());
         out.flush();
@@ -427,18 +431,20 @@ class NetDbRenderer {
      */
     public void renderStatusHTML(Writer out, int mode) throws IOException {
         if (!_context.netDb().isInitialized()) {
+            out.write("<div id=\"notinitialized\">");
             out.write(_t("Not initialized"));
+            out.write("</div>");
             out.flush();
             return;
         }
         Log log = _context.logManager().getLog(NetDbRenderer.class);
         long start = System.currentTimeMillis();
-        
+
         boolean full = mode == 1;
         boolean shortStats = mode == 2;
         boolean showStats = full || shortStats;  // this means show the router infos
         Hash us = _context.routerHash();
-        
+
         StringBuilder buf = new StringBuilder(8192);
         if (showStats) {
             RouterInfo ourInfo = _context.router().getRouterInfo();
@@ -446,11 +452,11 @@ class NetDbRenderer {
             out.write(buf.toString());
             buf.setLength(0);
         }
-        
+
         ObjectCounter<String> versions = new ObjectCounter<String>();
         ObjectCounter<String> countries = new ObjectCounter<String>();
         int[] transportCount = new int[TNAMES.length];
-        
+
         Set<RouterInfo> routers = new TreeSet<RouterInfo>(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
         for (RouterInfo ri : routers) {
@@ -475,7 +481,7 @@ class NetDbRenderer {
         if (log.shouldWarn())
             log.warn("part 1 took " + (end - start));
         start = end;
-            
+
      //
      // don't bother to reindent
      //
@@ -506,7 +512,7 @@ class NetDbRenderer {
         if (log.shouldWarn())
             log.warn("part 2 took " + (end - start));
         start = end;
-            
+
         // transports table
         buf.append("<table id=\"netdbtransports\">\n");
         buf.append("<tr><th align=\"left\">" + _t("Transports") + "</th><th>" + _t("Count") + "</th></tr>\n");
@@ -591,6 +597,7 @@ class NetDbRenderer {
      *  Be careful to use stripHTML for any displayed routerInfo data
      *  to prevent vulnerabilities
      */
+
     private void renderRouterInfo(StringBuilder buf, RouterInfo info, boolean isUs, boolean full) {
         String hash = info.getIdentity().getHash().toBase64();
         buf.append("<table class=\"netdbentry\">")
@@ -599,6 +606,13 @@ class NetDbRenderer {
             buf.append("<a name=\"our-info\" ></a><b>" + _t("Our info") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
         } else {
             buf.append("<b>" + _t("Peer info for") + ":</b>&nbsp;<code>").append(hash).append("</code></th><th>");
+            String country = _context.commSystem().getCountry(info.getIdentity().getHash());
+            if (country != null) {
+                buf.append("<a href=\"/netdb?c=").append(country).append("\">");
+                buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
+                buf.append(" title=\"").append(getTranslatedCountry(country)).append('\"');
+                buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ").append("</a>");
+            }
             if (!full) {
                 buf.append("<a title=\"").append(_t("View extended router info"))
                    .append("\" class=\"viewfullentry\" href=\"netdb?r=").append(hash.substring(0, 6))
@@ -609,43 +623,36 @@ class NetDbRenderer {
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden()) {
             buf.append("<td><b>").append(_t("Hidden")).append(", ").append(_t("Updated")).append(":</b></td>")
-               .append("<td colspan=\"2\">")
+               .append("<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
-               .append("</td>");
+               .append("</span>&nbsp;&nbsp;");
         } else if (age > 0) {
             buf.append("<td><b>").append(_t("Published")).append(":</b></td>")
-               .append("<td colspan=\"2\">")
+               .append("<td colspan=\"2\"><span class=\"netdb_info\">")
                .append(_t("{0} ago", DataHelper.formatDuration2(age)))
-               .append("</td>");
+               .append("</span>&nbsp;&nbsp;");
         } else {
             // shouldnt happen
-            buf.append("<td colspan=\"2\"><b>").append(_t("Published")).append(":</b> in ").append(DataHelper.formatDuration2(0-age)).append("???</td>");
+            buf.append("<td><b>").append(_t("Published")).append("</td><td colspan=\"2\">:</b> in ")
+               .append(DataHelper.formatDuration2(0-age)).append("<span class=\"netdb_info\">???</span>&nbsp;&nbsp;");
         }
-        buf.append("</tr>\n<tr><td>");
         buf.append("<b>").append(_t("Signing Key")).append(":</b> ")
-           .append("</td><td colspan=\"2\">")
            .append(info.getIdentity().getSigningPublicKey().getType().toString());
         buf.append("</td></tr>\n<tr>")
            .append("<td><b>" + _t("Address(es)") + ":</b></td>")
-           .append("<td colspan=\"2\">");
-        String country = _context.commSystem().getCountry(info.getIdentity().getHash());
-        if(country != null) {
-            buf.append("<a href=\"/netdb?c=").append(country).append("\">");
-            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
-            buf.append(" title=\"").append(getTranslatedCountry(country)).append('\"');
-            buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ").append("</a>");
-        }
+           .append("<td colspan=\"2\" class=\"netdb_addresses\">");
         for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();
-            buf.append("<b>").append(DataHelper.stripHTML(style)).append(":</b> ");
+            buf.append("<br><b class=\"netdb_transport\">").append(DataHelper.stripHTML(style)).append(":</b>");
             int cost = addr.getCost();
             if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
-                buf.append('[').append(_t("cost")).append('=').append("" + cost).append("] ");
+                buf.append("&nbsp;<span class=\"netdb_name\">").append(_t("cost")).append("</span>: <span class=\"netdb_info\">").append("" + cost).append("</span>&nbsp;");
             Map<Object, Object> p = addr.getOptionsMap();
             for (Map.Entry<Object, Object> e : p.entrySet()) {
                 String name = (String) e.getKey();
                 String val = (String) e.getValue();
-                buf.append('[').append(_t(DataHelper.stripHTML(name))).append('=').append(DataHelper.stripHTML(val)).append("] ");
+                buf.append(" <span class=\"nowrap\"><span class=\"netdb_name\">").append(_t(DataHelper.stripHTML(name)))
+                   .append(":</span> <span class=\"netdb_info\">").append(DataHelper.stripHTML(val)).append("</span></span>&nbsp;");
             }
         }
         buf.append("</td></tr>\n");

@@ -241,7 +241,7 @@ pre {
      display: inline-block;
      width: 100%;
      width: calc(100% - 4px);
-     padding: 2px 0;
+     padding: 3px 0 2px;
      color: #2c4e8f;
      line-height: 110%;
 }
@@ -289,7 +289,6 @@ h3#helpfaq {
 }
 
 .routersummary h4 a {
-/*     display: inline-block;*/
      vertical-align: middle;
 }
 
@@ -357,6 +356,10 @@ h4.sb_info + hr + form {
      background: #fffff0 !important;
 }
 
+#sb_internals, #sb_advanced {
+     margin: -9px -6px -6px;
+}
+
 #sb_internals a, #sb_advanced a {
      padding: 2px;
      display: inline-block;
@@ -372,7 +375,7 @@ h4.sb_info + hr + form {
 }
 
 #sb_general, #sb_shortgeneral {
-     margin-top: -7px !important; 
+     margin-top: -7px !important;
 }
 
 #sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
@@ -512,7 +515,7 @@ p:empty + .sb_notice {
      border: 0 !important;
 }
 
-.routersummary img:first-child  {
+.routersummary img:first-child {
      margin-bottom: -2px !important;
      opacity: 0.7;
 }
@@ -522,8 +525,167 @@ p:empty + .sb_notice {
      opacity: 1;
 }
 
+/* sidebar network status */
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid #88f;
+     border-radius: 2px;
+     padding: 6px 3px;
+     width: calc(100% - 10px);
+     width: 100%;
+     margin: -4px -1px;
+     box-sizing: border-box;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
+     text-shadow: 0 1px 1px #fff;
+}
+
+.routersummary .firewalled {
+     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.3) 2px, rgba(255,255,220,0.3) 3px, rgba(220,255,220,0.3) 5px);
+}
+
+.routersummary .error {
+     background: rgba(255,110,110,0.1);
+     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
+     background: repeating-linear-gradient(135deg, rgba(255,100,100,0.1) 2px, rgba(255,200,200,0.3) 3px,  rgba(255,100,100,0.1) 5px);
+     border: 1px dotted #d33;
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     background: rgba(255,255,200,0.25);
+     box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96,96,96,0.5);
+}
+
+.routersummary .testing {
+     background: rgba(255,220,110,0.1);
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     background: rgba(220,220,220,0.4);
+}
+
+.routersummary .vmcomm {
+     border: 1px dotted #999;
+}
+
+.routersummary .running {
+     background: rgba(220,255,220,0.15);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding-right: 3px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+     padding-right: 4px;
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
+/* tunnel build status */
+
+.tunnelBuildStatus {
+     padding: 7px 2px;
+}
+
+/* TO DO: activate this when we have build status specific spans */
+
+/*
+.tunnelStatusAccept {
+     background: rgba(220,255,220,0.15);
+     color: #070;
+}
+
+.tunnelStatusReject {
+     background: rgba(255,110,110,0.1);
+     color: #070;
+}
+
+.tunnelStatusRejectHidden {
+     background: rgba(220,220,220,0.4);
+     color: #777;
+}
+
+.tunnelBuildStatus::before, .tunnelStatusAccept::before, .tunnelStatusReject::before, .tunnelStatusRejectHidden::before {
+     margin-bottom: 1px;
+     padding-right: 1px;
+     vertical-align: -30%;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+}
+
+.tunnelBuildStatus::before {
+     content: url(/themes/console/images/info/network_status/accepting.png);
+}
+
+.tunnelStatusAccept::before {
+     content: url(/themes/console/images/info/network_status/accepting.png);
+}
+
+.tunnelStatusReject::before {
+     content: url(/themes/console/images/info/network_status/rejecting.png);
+}
+
+.tunnelStatusRejectHidden::before {
+     content: url(/themes/console/images/info/network_status/rejecting_hidden.png);
+}
+*/
+/* end tunnel build status */
+
+.newsheadings {
+     text-align: right;
+     margin: -5px 0 -3px 8px;
+}
+
+.newsheadings li {
+     list-style: none outside url(images/newsbullet_mini.png);
+     margin: 4px -4px 2px 10px;
+     line-height: 120%;
+}
+
+.newsheadings li:first-child {
+     margin-top: 0;
+}
+
 /* end sidebar */
 
+/*
 div.tunnels td:first-child {
      width: 16px;
      text-align: left;
@@ -537,21 +699,6 @@ div.tunnels td:last-child {
 
 div.tunnels img, div.tunnels img:hover {
      opacity: 1 !important;
-}
-
-div.newsheadings {
-     text-align: right;
-     margin: -5px 0 -3px 8px;
-}
-
-div.newsheadings li {
-     list-style: none outside url(images/newsbullet_mini.png);
-     margin: 4px -4px 2px 10px;
-     line-height: 120%;
-}
-
-div.newsheadings li:first-child {
-     margin-top: 0;
 }
 
 div.tunnels {
@@ -574,19 +721,21 @@ div.tunnels td, div.tunnels img:first-child {
      padding: 4px 0 !important;
 }
 
-.routersummary p {
-     padding: 0;
-}
-
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
      padding: 2px 0 0 0 !important;
 }
 
+*/
+
+.routersummary p {
+     padding: 0;
+}
+
 /* proxy error messages */
 
-div.logo {
+.logo {
      float: left;
      padding: 10px;
      text-align: center;
@@ -599,7 +748,7 @@ div.logo {
      box-shadow: inset 0 0 0 1px #bbf;
 }
 
-div.logo:not(old) {
+.logo:not(old) {
      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3)), url(images/noise.png) #fff;
      background-size: 100% 100%, 50px 50px;
 }
@@ -624,8 +773,8 @@ div.logo:not(old) {
      margin: 3px 2px;
 }
 
-div.warning {
-     margin: 20px 20px 30px 240px;
+.warning {
+     margin: 16px 12px 30px 232px;
      padding: 10px 25px 20px 75px;
      background: #fff;
      border: 1px solid #447;
@@ -692,8 +841,7 @@ div.warning {
 
 @media screen and (max-width: 800px) {
 .warning {
-     margin-top: 115px !important;
-     margin: 115px 5px 0 0 !important;
+     margin: 114px 5px 0 !important;
      background: #fff !important;
      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.3)), url(images/noise.png) #fff !important;
      background-size: 100% 100%, 50px 50px !important;
@@ -707,9 +855,9 @@ div.warning {
 .logo {
      position: absolute;
      top: 0;
-     width: calc(100% - 39px) !important;
+     width: calc(100% - 40px) !important;
      min-width: 430px;
-     margin: 10px 0 0 !important;
+     margin: 10px 5px 0 !important;
 }
 
 .logo a:link:not(img) {
@@ -853,7 +1001,7 @@ div.warning {
 
 /* console error messages */
 
-div.sorry {
+.sorry {
      margin: -11px 0 10px 214px;
      padding: 20px 25px 20px 70px;
      border: 1px solid #447;
@@ -867,7 +1015,7 @@ div.sorry {
      min-width: 455px;
 }
 
-div.sorry hr {
+.sorry hr {
      color: #531;
      background: #531;
      height: 1px;
@@ -875,7 +1023,7 @@ div.sorry hr {
      margin: 10px 0 !important;
 }
 
-div.main {
+.main {
      margin: -12px 0 8px 214px;
      padding: 0 15px 10px 15px;
      text-align: left;
@@ -891,11 +1039,11 @@ div.main {
      filter: drop-shadow(0 1px 1px #999);
 }
 
-div.main[id^="config_"] {
+.main[id^="config_"] {
      padding-bottom: 5px !important;
 }
 
-div.main li:first-child {
+.main li:first-child {
      margin-top: 10px;
 }
 
@@ -950,7 +1098,7 @@ div.main li:first-child {
      display: none;
 }
 
-div.main hr, hr {
+.main hr, hr {
      color: #113;
      background: #113;
      height: 1px;
@@ -962,7 +1110,7 @@ hr:last-child {
      margin-top: 20px !important;
 }
 
-div.main textarea {
+.main textarea {
      background: #fff;
      color: #001;
      font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
@@ -1175,132 +1323,101 @@ div.newscontent h6 {
      min-width: 576px;
 }
 
-div.main, .routersummary, .logo {
+.main, .routersummary, .logo {
      background: #fff url(images/noise.png) 0 0 / 50px 50px !important;
      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)) 0 0 / 100% 100%, #fff url("images/noise.png") 0 0 / 50px 50px !important;
 }
 
-/* top navigation bar */
-/*
-.confignav {
-     padding: 12px 10px 0 !important;
-     margin: 2px -14px 12px !important;
-     font-size: 9pt !important;
-     line-height: 160% !important;
-     min-width: 400px;
-     vertical-align: middle;
+/* top navigation */
+
+h1, .confignav {
+     position: relative;
+}
+
+.confignav, .main#help div.confignav {
+     padding: 8px;
+     margin: -1px -16px 5px -16px;
+     border: 1px solid #7778bf;
+     box-shadow: inset 0 0 0 1px #bbf;
+     font-size: 9pt;
      text-align: center;
-     border-bottom: 1px solid #447;
-     box-shadow: 0 1px 1px rgba(221, 221, 255, 0.5);
-     background: #fff;
+     font-weight: bold;
+     color: #000;
+     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) #efefff !important;
+     background: linear-gradient(to right, rgba(255,255,255,0.7), rgba(255,255,255,0) 15%, rgba(255,255,255,0) 85%, rgba(255,255,255,0.7)), linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) #efefff !important;
 }
 
 .tab, .tab2 {
-     min-width: 50px;
-     padding: 3px 6px;
-}
-
-.tab {
-     padding: 3px 6px;
-     margin: -5px -1px -1px -3px !important;
-     background: #eef;
-     background: linear-gradient(to bottom, #fff, #eef);
-     box-shadow: inset 0 0 0 1px #fff;
-     border: 1px solid #447;
+     box-sizing: border-box;
      display: inline-block;
-     vertical-align: bottom;
-     text-align: center;
-     font-weight: normal !important;
-     text-decoration: none;
-     z-index: 999 !important;
-     position: relative;
-}
-
-.tab2 {
-     color: #31334f;
-     padding-bottom: 4px;
-     margin: -11px -1px -1px -3px;
+     border: 1px solid #7778bf;
+     margin: 0 -2px -1px -2px !important;
+     padding: 1px 0;
      background: #fff;
-     border: 1px solid #447;
-     border-top-color: #558;
-     border-top-width: 3px;
-     display: inline-block;
-     vertical-align: bottom;
-     text-align: center;
-     font-weight: bold;
-     border-radius: 2px 2px 0 0;
-     filter: drop-shadow(0 0 1px #ccc);
-     position: relative;
-     z-index: 999 !important;
-}
-
-_:-ms-lang(x), .tab {
-     margin-left: -4px !important;
-     margin-right: -2px !important;
-}
-
-.tab:hover, .tab:hover a {
-     background: #558;
-     background: linear-gradient(to bottom, #eef, #fff);
-     color: #f60;
-}
-
-.tab:hover {
-     border-top: 3px solid #77a;
-     border-radius: 2px 2px 0 0 !important;
-     margin-top: -9px !important;
-}
-
-.tab:active {
-     box-shadow: inset 0 0 0 1px #fff;
-}
-
-.tab:active, .tab:active a {
-     background: #f60 !important;
-     color: #fff !important;
-     border-top-width: 1px;
-}
-
-.tab:first-child {
-     border-radius: 2px 0 0 0;
-}
-
-.tab:last-child {
-     border-radius: 0 2px 0 0;
-     padding-right: 6px;
+     min-width: 60px !important;
+     filter: drop-shadow(0 0 1px #ededed);
 }
 
 .tab a {
-     font-weight: normal !important;
-     text-decoration: none !important;
      display: inline-block;
-     width: 100%;
-     padding-top: 0;
-     padding-bottom: 0;
+     padding: 3px 14px;
 }
 
-.tab:last-child:hover {
-     margin-top: -7px !important;
-     margin-bottom: -1px !important;
+.tab:hover a {
+     color: #f60 !important;
 }
 
-.tab:last-child:active {
-     margin-top: -5px !important;
-     margin-bottom: -1px !important;
+.tab {
+     background: linear-gradient(to bottom, #fff 50%, #efefff 50%);
+     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)) #e7e7ff;
+     box-shadow: inset 0 0 0 1px #fff;
 }
-*/
+
+.tab:hover {
+     background: #fff;
+     box-shadow: inset 0 0 0 1px #f90;
+}
+
+.tab:active {
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #5f2400;
+     background: #f60;
+}
+
+.tab:active a {
+     color: #fff !important;
+}
+
+.tab2 {
+     background: #89f;
+     background: #aaf;
+     background: #3b6bbf;
+     background: rgba(59, 107, 191, 0.8);
+     background: #6288cb;
+     box-shadow: inset 0 0 0 1px #fff;
+     color: #fff;
+     padding: 4px 12px;
+}
+
+@media screen and (min-width: 1400px) {
+#help .confignav {
+     position: sticky;
+     top: -1px;
+     z-index: 999;
+}
+}
+
 /* end topnav */
 
 .th_title a, .th_title a:hover {
      color: #31334f !important;
 }
 
-div.configure {
+.configure {
      min-width: 400px;
      margin-bottom: 0;
 }
 
-div.configure h3, .graphspanel h3 {
+.configure h3, .graphspanel h3 {
      border: 1px solid #7778bf;
      border-left: 5px solid #7778bf;
      padding: 5px;
@@ -1653,7 +1770,7 @@ h3#graphdisplay {
 
 /* end new graphs optionbox */
 
-div.messages {
+.messages {
      padding: 15px;
      margin: 15px 0;
      border-radius: 2px;
@@ -1681,11 +1798,11 @@ div.messages {
      margin-bottom: 0;
 }
 
-div.error {
+.error {
      color: #900;
 }
 
-div.notice {
+.notice {
      font-style: italic;
      margin: 0;
      padding: 0;
@@ -1696,7 +1813,7 @@ div.notice {
      margin: 0;
 }
 
-div.messages li, .messages li:first-child, .error li:first-child, .error li {
+.messages li, .messages li:first-child, .error li:first-child, .error li {
      text-align: justify !important;
      font-weight: bold;
      list-style: none;
@@ -2120,7 +2237,7 @@ div.app:active .applabel {
      box-shadow: inset 0 0 0 1px #fff;
 }
 
-div.app:active .applabel, div.app:active .applabel a  {
+div.app:active .applabel, div.app:active .applabel a {
      background: #f60 !important;
      color: #fff !important;
 }
@@ -2260,7 +2377,7 @@ tt::-moz-selection {
      background: #030 !important;
 }
 
-div.main li {
+.main li {
      text-align: left;
      list-style: square;
      margin: 2px 20px 0 40px;
@@ -2269,7 +2386,7 @@ div.main li {
      word-wrap: break-word;
 }
 
-div.main li b, .statlist b a:hover {
+.main li b, .statlist b a:hover {
      color: #335 !important;
 }
 
@@ -2318,7 +2435,7 @@ a, h1, h2, h3, h4, th, input[type="submit"], input[type="reset"], button, select
      text-shadow: 0 1px 1px #fff;
 }
 
-a:hover, a:focus, a:active, .app:hover a, .app:focus a, .app:active a, 
+a:hover, a:focus, a:active, .app:hover a, .app:focus a, .app:active a,
 input[type="submit"]:hover, input[type="submit"]:focus, input[type="submit"]:active,
 input[type="reset"]:hover, input[type="reset"]:focus, input[type="reset"]:active,
 button:hover, button:focus, button:active, select:hover, select:focus, select:active, .graphspanel a {
@@ -2769,7 +2886,7 @@ h1 {
      border: 1px solid #447;
      border-radius: 2px;
      min-width: 546px;
-     filter: drop-shadow(0 0 1px #999);
+     z-index: 999;
 }
 
 span.newtab {
@@ -3057,7 +3174,11 @@ h4 {
 }
 
 .twocol {
+     -moz-columns: 2 400px;
+     -webkit-columns: 2 400px;
      columns: 2 400px;
+     -moz-column-gap: 0 !important;
+     -webkit-column-gap: 0 !important;
      column-gap: 0 !important;
      display: block;
      margin: 10px 0;
@@ -3066,7 +3187,7 @@ h4 {
 .twocol li {
      break-inside: avoid;
      page-break-inside: avoid;
-     -webkit-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
 }
 
 .twocol li:first-child {
@@ -3120,7 +3241,7 @@ input, input:visited, button, button:visited {
      filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
 }
 
-button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
      outline: none;
      border: none;
 }
@@ -3964,7 +4085,7 @@ body.iframed {
      margin: 0 10px 10px 7px !important;
 }
 
-.iframed div.sorry {
+.iframed .sorry {
      margin: 5px 10px 10px 7px !important;
 }
 
@@ -4260,7 +4381,7 @@ div.langselect br {
      display: block;
 }
 
-div.ui_lang { /* lang text label */
+div.ui_lang {
      text-align: center;
      background: #eef url(images/tinytitle.png) center center !important;
      background: linear-gradient(to bottom, #fff 50%, #eef 50%) !important;
@@ -4366,7 +4487,7 @@ table#addkeyring tr:last-child td {
 #ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
 #udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
 #udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
-     text-align: right;
+     text-align: right !important;
      white-space: nowrap;
 }
 
@@ -4390,7 +4511,144 @@ table#addkeyring tr:last-child td {
      padding-right: 5px;
 }
 
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right !important;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right !important;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center !important;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1%;
+}
+
+#peerdefs td {
+     line-height: 130%;
+}
+
+.peer_arrow {
+     display: inline-block;
+     width: 22px;
+     text-align: center;
+     margin: 2px 1px;
+}
+
 /* end peers */
+
+/* /tunnels */
+
+tt a {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,0,64,0.3);
+     color: #fff;
+     border: 1px solid rgba(0,0,64,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 8px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #555;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 78px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 64px;
+     text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     background: rgba(187, 187, 255, 0.3);
+     background: #dfdfff;
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
+     text-transform: lowercase;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+#tunnel_defs td {
+     padding: 4px;
+}
+
+#tunnel_defs td:nth-child(even) {
+     text-align: right;
+     padding-right: 0;
+     width: 1%;
+}
+
+#tunnel_defs td:nth-child(3) {
+    border-right: 1px inset #ddf;
+}
+
+#tunnel_defs td:first-child, #tunnel_defs td:last-child {
+     font-size: 0;
+     width: 0;
+     padding: 0;
+}
+
+/* end tunnels */
 
 /* netdb */
 
@@ -4411,28 +4669,28 @@ table#addkeyring tr:last-child td {
      margin-top: 15px !important;
 }
 
-table.netdbentry th {
+.netdbentry th {
      font-weight: normal;
 }
 
-table.netdbentry th:last-child {
+.netdbentry th:last-child {
      text-align: right;
      padding: 5px;
      white-space: nowrap;
      width: 50px;
 }
 
-table.netdbentry th:first-child, table.netdbentry td:first-child  {
+.netdbentry th:first-child, .netdbentry td:first-child {
      white-space: nowrap;
      padding: 4px 6px !important;
      text-align: left;
 }
 
-table.netdbentry td:first-child  {
+.netdbentry td:first-child {
      width: 80px;
 }
 
-table.netdbentry td:nth-child(2) {
+.netdbentry td:nth-child(2) {
      word-wrap: break-word;
 }
 
@@ -4477,7 +4735,7 @@ a.viewfullentry:hover {
      margin-top: 10px;
 }
 
-#netdboverview th, #netdblookup th  {
+#netdboverview th, #netdblookup th {
      text-transform: uppercase;
      font-size: 11pt !important;
      letter-spacing: 0.08em;
@@ -4646,7 +4904,7 @@ a.viewfullentry:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-#noleasesets {
+#noleasesets, #notinitialized, .netdbnotfound {
      border: 1px solid #7778bf;
      padding: 20px;
      font-weight: bold;
@@ -4654,6 +4912,10 @@ a.viewfullentry:hover {
      margin-top: -6px;
      margin-bottom: 5px;
      text-align: center;
+}
+
+#notinitialized, .netdbnotfound {
+     margin-top: 15px !important;
 }
 
 #sybilnav {
@@ -4673,7 +4935,7 @@ a.viewfullentry:hover {
      background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px), #fff;
 }
 
-h3.sybils  {
+h3.sybils {
      margin-bottom: 9px;
 }
 
@@ -4741,6 +5003,10 @@ p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals, p.notfound {
      font-weight: bold;
      text-align: left;
      background: url(images/eye.png) 8px center no-repeat, repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px), #fff;
+}
+
+p#sybil_totals {
+     font-weight: normal;
 }
 
 p.family + p.family, p.sybil_info + p.sybil_info {
@@ -5152,7 +5418,7 @@ h3#ntcpcon, h3#udpcon {
 }
 
 #profilelist td:last-child {
-     text-align: right;
+     text-align: center;
      padding-right: 5px;
      width: 1%;
      white-space: nowrap;
@@ -5294,10 +5560,6 @@ h3#ntcpcon, h3#udpcon {
      background: linear-gradient(to bottom, #fff, rgba(250,250,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fff !important;
      margin-bottom: 13px;
      box-shadow: inset 0 0 0 1px #fff;
-}
-
-.main#help div.confignav {
-     background: #fff !important;
 }
 
 .main#console {
@@ -5543,6 +5805,7 @@ a[href^="configpeer?peer"] {
 a[href^="configpeer?peer"]::after {
      content: url(/themes/console/images/buttons/edit.png);
      vertical-align: bottom;
+     margin: 0 0 0 3px;
 }
 
 a[href^="configpeer?peer"]:hover {
@@ -5553,13 +5816,274 @@ a[href^="configpeer?peer"]:hover {
      overflow: auto;
 }
 
-#webappconfigactions, #externali2cp  {
+#webappconfigactions, #externali2cp {
      margin-bottom: 5px !important;
 }
 
 #pluginupdater {
      margin-bottom: 10px !important;
 }
+
+/* netdb router address info */
+
+.leasesets_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     -moz-column-gap: 10px;
+     -webkit-column-gap: 10px;
+     column-gap: 10px;
+}
+
+th code {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+@media screen and (min-width: 1634px) {
+.leasesets_container {
+     margin-bottom: 2px;
+}
+
+th code {
+     font-size: 9pt !important;
+}
+}
+
+.leasesets_container table:first-child {
+     margin-top: 0;
+}
+
+.leasesets_container table {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.netdb_addresses br:first-child, .sybil_routerinfo tr:last-child td br:first-child {
+     display: none;
+}
+
+.netdbentry th:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 20px;
+     vertical-align: middle;
+}
+
+.netdbentry th:last-child > *, .sybil_routerinfo th:nth-child(2) > * {
+     vertical-align: middle !important;
+}
+
+.netdbentry th a img {
+     display: inline-block;
+     vertical-align: middle;
+     margin-right: 1px;
+     margin-top: -2px;
+}
+
+.netdbentry a.viewfullentry::after {
+     display: inline-block;
+     vertical-align: middle !important;
+     margin-left: 3px;
+}
+
+.netdbentry td:first-child {
+     text-align: right;
+}
+
+.netdbentry .netdb_addresses {
+     padding-left: 40px;
+}
+
+b.netdb_transport {
+     display: inline-block;
+     width: 50px;
+     text-align: right;
+     margin-left: -50px;
+     margin-right: 5px;
+}
+
+#netdb code {
+    font-weight: normal !important;
+}
+
+.netdb_name {
+     color: #335;
+     text-transform: capitalize;
+     font-weight: bold;
+}
+
+.netdb_info {
+     margin-right: 1px;
+}
+
+.netdb_expiry {
+     margin-left: 5px;
+}
+
+.sybil_routerinfo th img[src^="/flags"] {
+     height: 11px;
+     width: 16px;
+     margin-right: 3px;
+}
+.sybil_routerinfo b.netdb_transport {
+     margin-left: -13px;
+     margin-right: 0;
+}
+
+.sybil_routerinfo td:first-child, .netdbentry td:first-child {
+     text-align: right !important;
+     padding-right: 0;
+}
+
+.sybil_routerinfo td[colspan="3"] {
+     white-space: normal;
+}
+
+.sybil_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     margin: 10px 0;
+}
+
+.sybil_container p {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybil_container p:first-child {
+     margin-top: 0;
+}
+
+.sybil_container p:last-child {
+     margin-bottom: 0;
+}
+
+/* end netdb router address */
+
+/* sybils */
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child {
+     border-right: 1px solid #7778bf !important;
+}
+}
+
+.sybilinfo_params {
+     padding: 0;
+     border: 1px solid #7778bf;
+}
+
+.sybilinfo_container {
+     columns: 240px auto;
+     -moz-columns: 240px auto;
+     -webkit-columns: 240px auto;
+     -moz-column-gap: 0;
+     -webkit-column-gap: 0;
+     column-gap: 0;
+     background: #efefff;
+     background: rgba(240,240,255,0.5);
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px), #fff;
+     padding: 4px 5px;
+}
+
+.sybilinfo_container b {
+     color: #335;
+}
+
+.sybil_routerinfo p {
+     margin: 0;
+     padding: 1px 0;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybilinfo_familyname {
+     display: inline-block;
+     vertical-align: top;
+     max-width: 150px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+.sybil_routerinfo, .sybil_routerinfo tr:nth-child(2) td, .sybil_routerinfo tr:last-child td {
+     border-bottom: none !important;
+}
+
+.sybil_routerinfo tr:last-child td {
+     border-top: none !important;
+}
+
+.sybil_addresses td:first-child {
+     max-width: 155px;
+     font-weight: bold;
+     padding-right: 9px;
+}
+
+.sybil_addresses table {
+     width: 100%;
+     margin: 0;
+     border-top: 1px solid #7778bf !important;
+     border-bottom: 1px solid #7778bf !important;
+}
+
+.sybil_addresses {
+     padding: 0;
+     border-bottom: 1px solid #7778bf;
+}
+
+.sybil_addresses table, .sybil_addresses td {
+     border: none;
+}
+
+.threatpoints + ul {
+     -moz-columns: auto 500px;
+     -webkit-columns: auto 500px;
+     columns: auto 500px;
+     -moz-column-rule: 1px solid #7778bf;
+     -webkit-column-rule: 1px solid #7778bf;
+     column-rule: 1px solid #7778bf;
+     padding-top: 3px;
+     padding-bottom: 3px;
+}
+
+.threatpoints + ul li:first-child {
+     margin-top: 0;
+}
+
+.threatpoints + ul li:last-child {
+     margin-bottom: 0;
+}
+
+.threatpoints + ul li {
+     list-style: none;
+     margin-left: 0;
+     line-height: 120%;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.threatpoints + ul li a {
+     white-space: nowrap;
+     font-size: 8pt !important;
+     background: #eef;
+     margin-left: 2px;
+     border-radius: 1px;
+     padding: 0 2px;
+}
+
+.sybil_routerinfo + .threatpoints + ul + a[name] + table {
+     margin-top: -11px !important;
+}
+
+/* end sybils */
 
 /* responsive layout */
 
@@ -5703,6 +6227,31 @@ input[name="pluginURL"] {
 }
 }
 
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
 @media screen and (max-width: 1200px) {
 #portfaq td:nth-child(2) {
      white-space: normal;
@@ -5775,11 +6324,15 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      border-right: none;
 }
 
-tt a, .cells tt, #profilelist tt, .cells tt a, #profilelist tt a {
-     margin-left: 3px !important;
+tt a, .cells tt, #profilelist tt, .cells tt a, #profilelist tt a, .leaseset td tt {
+     margin-left: 0 !important;
      margin-right: 3px !important;
      font-size: 9pt !important;
      letter-spacing: 0.1em !important;
+}
+
+.tunnel_peer tt {
+     margin-left: 3px !important;
 }
 
 .main[id^="config_"] th, h4#updateplugins {
@@ -5795,7 +6348,7 @@ tt a, .cells tt, #profilelist tt, .cells tt a, #profilelist tt a {
 }
 
 .routersummary {
-     width: 207px !important;
+     width: 208px !important;
 }
 
 .routersummary div[style="height: 36px;"] {
@@ -5804,14 +6357,14 @@ tt a, .cells tt, #profilelist tt, .cells tt a, #profilelist tt a {
 }
 
 .routersummary table[id^="sb_"] {
-     width: 216px !important;
+     width: 218px !important;
 }
 
 .routersummary h3::after {
      content: "";
      display: inline-block;
      min-height: 18px;
-     vertical-align: middle
+     vertical-align: middle;
      box-sizing: border-box;
 }
 
@@ -5853,8 +6406,9 @@ h1 {
      font-size: 19pt;
 }
 
-.routersummary h3 a  {
+.routersummary h3 a {
      font-size: 11pt !important;
+     padding: 4px 0 2px;
 }
 
 .routersummary img[src$="i2plogo.png"] {
@@ -5865,7 +6419,7 @@ h1 {
 }
 
 #sb_internals a, #sb_advanced a {
-     max-width: 210px;
+     max-width: 212px;
 }
 
 #sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
@@ -5887,11 +6441,6 @@ h1 {
      min-height: 38px !important;
 }
 
-/*
-.confignav {
-     padding-top: 12px !important;
-}
-*/
 .langbox {
      line-height: 120%;
      margin: 4px 2px 0 5px;
@@ -5901,7 +6450,7 @@ h1 {
      margin: -1px 0 2px 2px;
 }
 
-.th_title a  {
+.th_title a {
      font-size: 11pt !important;
 }
 
@@ -5959,6 +6508,16 @@ button.control {
      margin-left: -2px !important;
 }
 
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 14px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+
 _:-ms-lang(x), #browseronstart {
      margin-bottom: -15px !important;
 }
@@ -5993,413 +6552,4 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
-
-/* TODO: Merge with main classes above */
-/* top navigation */
-
-h1, .confignav {
-     position: relative;
-}
-
-h1 {
-     z-index: 999;
-     filter: none;
-}
-
-.confignav, .main#help div.confignav {
-     padding: 8px;
-     margin: -1px -16px 5px -16px;
-     border: 1px solid #7778bf;
-     box-shadow: inset 0 0 0 1px #bbf;
-     font-size: 9pt;
-     text-align: center;
-     font-weight: bold;
-     color: #000;
-     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) #efefff !important;
-     background: linear-gradient(to right, rgba(255,255,255,0.7), rgba(255,255,255,0) 5%, rgba(255,255,255,0) 95%, rgba(255,255,255,0.7)), linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 52%, rgba(240, 240, 240, 0.4)) #efefff !important;
-     -moz-user-select: none;
-     -webkit-user-select: none;
-     user-select: none;
-}
-
-.tab, .tab2 {
-     box-sizing: border-box;
-     display: inline-block;
-     border: 1px solid #7778bf;
-     margin: 0 -2px -1px -2px !important;
-     padding: 1px 0;
-     background: #fff;
-     min-width: 60px !important;
-     filter: drop-shadow(0 0 1px #ededed);
-}
-
-.tab a {
-     display: inline-block;
-     padding: 3px 14px;
-}
-
-.tab:hover a {
-     color: #f60 !important;
-}
-
-.tab {
-     background: linear-gradient(to bottom, #fff 50%, #efefff 50%);
-     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)) #e7e7ff;
-     box-shadow: inset 0 0 0 1px #fff;
-}
-
-.tab:hover {
-     background: #fff;
-     box-shadow: inset 0 0 0 1px #f90;
-}
-
-.tab:active {
-     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #5f2400;
-     background: #f60;
-}
-
-.tab:active a {
-     color: #fff !important;
-}
-
-.tab2 {
-     background: #89f;
-     background: #aaf;
-     background: #3b6bbf;
-     background: rgba(59, 107, 191, 0.8);
-     background: #6288cb;
-     box-shadow: inset 0 0 0 1px #fff;
-     color: #fff;
-     padding: 4px 12px;
-}
-
-@media screen and (min-width: 1400px) {
-#help .confignav {
-     position: sticky;
-     top: -1px;
-     z-index: 999;
-}
-}
-
-/* end topnav */
-
-/* network status */
-
-.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
-.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
-     display: inline-block;
-     vertical-align: middle;
-     border: 1px solid #88f;
-     border-radius: 2px;
-     padding: 6px 3px;
-     width: calc(100% - 10px);
-     width: 100%;
-     margin: -4px -1px;
-     box-sizing: border-box;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
-     text-shadow: 0 1px 1px #fff;
-}
-
-.routersummary .firewalled {
-     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.3) 2px, rgba(255,255,220,0.3) 3px, rgba(220,255,220,0.3) 5px);
-}
-
-.routersummary .error {
-     background: rgba(255,110,110,0.1);
-     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
-     background: repeating-linear-gradient(135deg, rgba(255,100,100,0.1) 2px, rgba(255,200,200,0.3) 3px,  rgba(255,100,100,0.1) 5px);
-     border: 1px dotted #d33;
-}
-
-.routersummary .warn, .routersummary .clockskew {
-     background: rgba(255,255,200,0.25);
-     box-shadow: inset 0 0 0 1px #ff0, 0 0 1px rgba(96,96,96,0.5);
-}
-
-.routersummary .testing {
-     background: rgba(255,220,110,0.1);
-}
-
-.routersummary .hidden, .routersummary .vmcomm {
-     background: rgba(220,220,220,0.4);
-}
-
-.routersummary .vmcomm {
-     border: 1px dotted #999;
-}
-
-.routersummary .running {
-     background: rgba(220,255,220,0.15);
-}
-
-.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
-.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding-right: 3px;
-     vertical-align: middle;
-     display: inline-block;
-     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
-}
-
-.routersummary .error::before, .routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_error.png);
-}
-
-.routersummary .warn::before {
-     content: url(/themes/console/images/info/network_status/network_warning.png);
-}
-
-.routersummary .testing::before {
-     content: url(/themes/console/images/info/network_status/network_testing.png);
-}
-
-.routersummary .hidden::before {
-     content: url(/themes/console/images/info/network_status/network_hidden.png);
-}
-
-.routersummary .running::before {
-     content: url(/themes/console/images/info/network_status/network_ok.png);
-}
-
-.routersummary .firewalled::before {
-     content: url(/themes/console/images/info/network_status/network_firewalled.png);
-     padding-right: 4px;
-}
-
-.routersummary .vmcomm::before {
-     content: url(/themes/console/images/info/network_status/network_vm.png);
-}
-
-.routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_clockskew.png);
-}
-
-/* end network status */
-
-/* tunnel build status */
-
-.tunnelBuildStatus {
-     padding: 7px 2px;
-}
-
-/* TO DO: activate this when we have build status specific spans */
-
-/*
-.tunnelStatusAccept {
-     background: rgba(220,255,220,0.15);
-     color: #070;
-}
-
-.tunnelStatusReject {
-     background: rgba(255,110,110,0.1);
-     color: #070;
-}
-
-.tunnelStatusRejectHidden {
-     background: rgba(220,220,220,0.4);
-     color: #777;
-}
-
-.tunnelBuildStatus::before, .tunnelStatusAccept::before, .tunnelStatusReject::before, .tunnelStatusRejectHidden::before {
-     margin-bottom: 1px;
-     padding-right: 1px;
-     vertical-align: -30%;
-     vertical-align: middle;
-     display: inline-block;
-     filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
-}
-
-.tunnelBuildStatus::before {
-     content: url(/themes/console/images/info/network_status/accepting.png);
-}
-
-.tunnelStatusAccept::before {
-     content: url(/themes/console/images/info/network_status/accepting.png);
-}
-
-.tunnelStatusReject::before {
-     content: url(/themes/console/images/info/network_status/rejecting.png);
-}
-
-.tunnelStatusRejectHidden::before {
-     content: url(/themes/console/images/info/network_status/rejecting_hidden.png);
-}
-*/
-/* end tunnel build status */
-
-/* peers */
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(12) {
-     text-align: center;
-}
-
-.peersort {
-     text-align: center;
-     display: inline-block;
-}
-
-.right {
-     text-align: right;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.left {
-     text-align: left;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.peeripv6:empty {
-     padding: 0;
-     width: 0;
-}
-
-.cwnd .left, .cwnd .right {
-     width: auto;
-}
-
-#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
-     padding-right: 1%;
-}
-
-#peerdefs td {
-     line-height: 130%;
-}
-
-.peer_arrow {
-     display: inline-block;
-     width: 22px;
-     text-align: center;
-     margin: 2px 1px;
-}
-
-/* end peers */
-
-/* /tunnels */
-
-tt a {
-     letter-spacing: 0.07em;
-}
-
-.tunnel_cap {
-     background: rgba(0,0,64,0.3);
-     color: #fff;
-     border: 1px solid rgba(0,0,64,0.2);
-     border-radius: 2px;
-     min-width: 12px;
-     padding: 0 2px;
-     display:inline-block;
-     margin: 1px 2px 1px 8px;
-     text-align: center !important;
-     text-shadow: 0 1px 1px #555;
-}
-
-.tunnel_cap:empty {
-     border: none;
-}
-
-.tunnel_id {
-     display: inline-block;
-     min-width: 78px;
-     text-align: right;
-}
-
-.tunnel_id:empty {
-     min-width: 0;
-}
-
-.tunnel_id:empty + .tunnel_cap {
-     margin-left: 12px !important;
-     display: inline-block;
-}
-
-.tunnel_peer {
-     display: inline-block;
-     min-width: 64px;
-     text-align: right;
-}
-
-.tunnel_local {
-     font-size: 8pt;
-     background: rgba(187, 187, 255, 0.3);
-     background: #dfdfff;
-     border-radius: 2px;
-     text-align: center;
-     padding: 2px 0;
-     margin-left: -4px;
-     margin-right: 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: top;
-}
-
-#tunnel_defs td {
-     padding: 4px;
-}
-
-#tunnel_defs td:nth-child(even) {
-     text-align: right;
-     padding-right: 0;
-     width: 1%;
-}
-
-#tunnel_defs td:nth-child(3) {
-    border-right: 1px inset #ddf;
-}
-
-#tunnel_defs td:first-child, #tunnel_defs td:last-child {
-     font-size: 0;
-     width: 0;
-     padding: 0;
-}
-
-@media screen and (max-width: 1100px) {
-.tunnel_id, .tunnel_peer {
-     min-width: 0 !important;
-     text-align: center !important;
-}
-
-.tunnel_local {
-     margin-right: 5px;
-     margin-left: 2px;
-     padding: 2px 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: middle;
-}
-
-.tunnel_peer:empty::before {
-     margin: 1px 6px 1px 2px;
-}
-
-.tunnel_cap {
-     margin-left: 5px !important;
-}
-}
-
-@media screen and (min-width: 1500px) {
-.tunnel_cap {
-     margin-left: 10px;
-     padding: 0 1px;
-     min-width: 14px;
-}
-
-.tunnel_id:empty {
-     margin-right: -10px;
-}
-}
-
-/* end tunnels */
 

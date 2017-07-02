@@ -161,7 +161,7 @@ textarea[cols="70"], textarea[name="levels"] {
      width: calc(100% - 20px);
 }
 
-button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
      outline: none;
      border: none;
 }
@@ -217,7 +217,7 @@ label {
      cursor: default;
 }
 
-input[type="file"]  {
+input[type="file"] {
      box-shadow: none;
      border: none;
      background: none;
@@ -834,7 +834,7 @@ button.download.control:active {
      background: #652787 url(/themes/console/images/buttons/download.png) center center no-repeat !important;
 }
 
-button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
+button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
      outline: none;
      border: none;
 }
@@ -2431,7 +2431,11 @@ h2, h3, h4, .confignav {
 }
 
 .twocol {
+     -moz-columns: 2 400px;
+     -webkit-columns: 2 400px;
      columns: 2 400px;
+     -moz-column-gap: 0 !important;
+     -webkit-column-gap: 0 !important;
      column-gap: 0 !important;
      display: block;
      margin: 5px 0 -5px;
@@ -2453,7 +2457,7 @@ p + .twocol, div[lang="de"] p + .twocol {
 .twocol li {
      break-inside: avoid;
      page-break-inside: avoid;
-     -webkit-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
 }
 
 .twocol li:first-child {
@@ -2618,7 +2622,7 @@ table#schedjobs {
      padding-right: 8px !important;
 }
 
-#schedjobs th:first-child, #schedjobs td:first-child, #jobstats th:first-child, #jobstats td:first-child  {
+#schedjobs th:first-child, #schedjobs td:first-child, #jobstats th:first-child, #jobstats td:first-child {
      text-align: left;
      padding-left: 10px;
      font-weight: bold;
@@ -4752,7 +4756,7 @@ table#profile_defs + hr {
      display: none;
 }
 
-#floodfills th, #floodfills td  {
+#floodfills th, #floodfills td {
      text-align: right !important;
 }
 
@@ -4761,11 +4765,11 @@ table#profile_defs + hr {
      text-align: center !important;
 }
 
-#floodfills td  {
+#floodfills td {
      padding: 3px !important;
 }
 
-#floodfills th:first-child, #floodfills td:first-child  {
+#floodfills th:first-child, #floodfills td:first-child {
      text-align: center !important;
      width: 52px;
      white-space: nowrap;
@@ -4836,6 +4840,7 @@ table#jardump { /* /jars */
 
 .main#jardump {
      padding: 0;
+     overflow: auto;
 }
 
 .main#jardump tt {
@@ -5312,11 +5317,11 @@ span#distance {
      width: 50px;
 }
 
-.netdbentry th:first-child  {
+.netdbentry th:first-child {
      white-space: nowrap;
 }
 
-.netdbentry td:first-child  {
+.netdbentry td:first-child {
      width: 80px;
 }
 
@@ -5433,10 +5438,11 @@ a.viewfullentry::after, a[href^="viewprofile"]::after {
      vertical-align: text-top;
 }
 
-#noleasesets {
+#noleasesets, #notinitialized, .netdbnotfound {
      background: #000 url(/themes/console/images/info/infohelp.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px !important;
      border: 1px solid #443da0;
+     margin-top: -4px;
      margin-bottom: 10px;
      text-align: left;
 }
@@ -5567,6 +5573,10 @@ p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals, p.notfound {
      box-shadow: inset 0 0 0 1px #080077;
 }
 
+p#sybil_totals {
+     font-weight: normal;
+}
+
 p.sybil_info, p.hashdist, p.family {
      margin-top: -1px;
 }
@@ -5575,7 +5585,7 @@ p.sybil_info + p.sybil_info, p.family + p.family {
      margin-top: -4px;
 }
 
-p.sybil_info + a[name] + .sybil_routerinfo, p.hashdist + a[name] + .sybil_routerinfo  {
+p.sybil_info + a[name] + .sybil_routerinfo, p.hashdist + a[name] + .sybil_routerinfo {
      margin-top: 10px !important;
 }
 
@@ -5587,6 +5597,14 @@ p.sybil_info + a[name] + .sybil_routerinfo, p.hashdist + a[name] + .sybil_router
 }
 .threatpoints + ul li:last-child {
      margin-bottom: -5px;
+}
+
+.sybil_routerinfo + .threatpoints + ul + a[name] + table {
+     margin-top: -11px !important;
+}
+
+.sybil_routerinfo + .threatpoints + ul {
+     margin-bottom: 10px;
 }
 
 /* end netdb */
@@ -5702,6 +5720,10 @@ h3#pluginfromfile, h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle,
 
 h3#pluginmanage {
      margin-bottom: -13px !important;
+}
+
+.sybils#samefamily {
+     margin-bottom: 10px !important;
 }
 
 h3.tabletitle a {
@@ -6153,6 +6175,548 @@ form[action="events"] {
      background-size: 28px 28px;
 }
 
+/* network status */
+
+.routersummary h4 a {
+     width: auto !important;
+     vertical-align: middle;
+     display: inline;
+}
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid rgba(52, 47, 127, 0.6);
+     border-radius: 2px;
+     padding: 6px 3px;
+     width: 100%;
+     margin: -3px -1px;
+     box-shadow: inset 0 0 0 1px #000;
+     text-shadow: 0 1px 1px #000;
+     box-sizing: border-box;
+}
+
+.routersummary .firewalled {
+     border: 1px dotted #342f7f;
+}
+
+.routersummary .error {
+     border: 1px dotted #700;
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     border: 1px solid #550;
+}
+
+.routersummary .testing {
+     border: 1px dotted #4F4B1D;
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     border: 1px dotted #777;
+}
+
+.routersummary .running {
+     border: 1px solid #342f7f;
+     border: 1px solid rgba(52, 47, 127, 0.6);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding: 0 2px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(220,220,220,0.7));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+     padding: 0 3px;
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
+#sb_services, #sb_internals, #sb_advanced {
+     margin-top: -3px !important;
+     margin-bottom: -5px !important;
+}
+
+/* /tunnels */
+
+tt a {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,0,140,0.4);
+     color: #c9ceff;
+     border: 1px solid rgba(0,0,64,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 8px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #000;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 78px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 56px;
+     text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     text-transform: lowercase;
+     background: rgba(0,0,96,0.3);
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+#tunnel_defs {
+     margin-top: -1px;
+     margin-bottom: 10px;
+}
+
+#tunnel_defs td:first-child, #tunnel_defs td:nth-child(even) {
+     width: 1%;
+     white-space: nowrap;
+}
+
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 14px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+}
+
+/* end tunnels */
+
+/* /peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
+     text-align: right;
+     white-space: nowrap;
+}
+
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     text-align: right;
+}
+
+#udpconnections .tablefooter td:nth-child(9) {
+     text-align: center !important;
+}
+
+#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
+#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
+     white-space: nowrap;
+}
+
+#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
+     padding-left: 5px;
+     padding-right: 5px;
+}
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections th:nth-child(n+13), #udpconnections .tablefooter th:nth-child(n+10),
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1% !important;
+}
+
+#peerdefs {
+     line-height: 140%;
+}
+
+.peer_arrow {
+     display: inline-block;
+     width: 18px;
+     text-align: center;
+     margin-right: 3px;
+}
+
+/* end peers */
+
+/* netdb router address info */
+
+.leasesets_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     -moz-column-gap: 10px;
+     -webkit-column-gap: 10px;
+     column-gap: 10px;
+}
+
+th code {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+@media screen and (min-width: 1634px) {
+.leasesets_container {
+     margin-bottom: 8px;
+}
+
+th code {
+     font-size: 9pt !important;
+}
+}
+
+.leasesets_container table:first-child {
+     margin-top: 0;
+}
+
+.leasesets_container table {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.netdb_addresses br:first-child, .sybil_routerinfo tr:last-child td br:first-child {
+     display: none;
+}
+
+.netdbentry th:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 20px;
+     vertical-align: middle;
+}
+
+.netdbentry th:last-child > *, .sybil_routerinfo th:nth-child(2) > * {
+     display: inline-block;
+     vertical-align: middle !important;
+}
+
+.netdbentry th a img {
+     display: inline-block;
+     vertical-align: middle;
+     margin-right: 1px;
+     margin-bottom: 2px;
+}
+
+.netdbentry a.viewfullentry::after {
+     display: inline-block;
+     vertical-align: middle !important;
+     margin-left: 3px;
+}
+
+.netdbentry td:first-child {
+     text-align: right;
+     min-width: 100px;
+     padding-right: 5px !important
+}
+
+b.netdb_transport {
+     display: inline-block;
+     width: 50px;
+     text-align: right;
+     margin-right: 5px;
+}
+
+#netdb code {
+    font-weight: normal !important;
+}
+
+.netdb_name {
+     color: #dfe2ff;
+     text-transform: capitalize;
+     font-weight: bold;
+}
+
+.netdb_info {
+     margin-right: 1px;
+}
+
+.netdb_expiry {
+     margin-left: 5px;
+}
+
+.sybil_routerinfo th img[src^="/flags"] {
+     height: 11px;
+     width: 16px;
+     margin-right: 5px;
+}
+
+.sybil_routerinfo b.netdb_transport {
+     margin-left: -13px;
+     margin-right: 0;
+}
+
+.sybil_routerinfo td:first-child, .netdbentry td:first-child {
+     text-align: right !important;
+     padding-right: 0;
+}
+
+.sybil_routerinfo td[colspan="3"] {
+     white-space: normal;
+}
+
+.sybil_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     margin: 10px 0;
+}
+
+.sybil_container p {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybil_container p:first-child {
+     margin-top: 0;
+}
+
+.sybil_container p:last-child {
+     margin-bottom: 0;
+}
+
+/* end netdb router address */
+
+/* sybils */
+
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child, .sybil_routerinfo td:last-child {
+     border-right: 1px solid #443da0 !important;
+}
+
+.sybil_routerinfo table td:last-child {
+     border-right: none !important;
+}
+
+.sybilinfo_params {
+     padding: 0;
+     border-bottom: 1px solid #443da0;
+}
+
+.sybilinfo_container {
+     columns: 240px auto;
+     -moz-columns: 240px auto;
+     -webkit-columns: 240px auto;
+     -moz-column-gap: 0;
+     -webkit-column-gap: 0;
+     column-gap: 0;
+     background: #00001a;
+     padding: 4px 5px;
+}
+
+.sybilinfo_container b {
+     color: #bb3;
+}
+
+.sybil_routerinfo tr:last-child {
+     border-top: none;
+}
+
+.sybil_routerinfo p {
+     margin: 0;
+     padding: 0;
+     line-height: 120%;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+#sybils_summary {
+     line-height: 140%;
+}
+
+.sybilinfo_familyname {
+     display: inline-block;
+     vertical-align: top;
+     max-width: 150px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+.sybil_addresses td:first-child {
+     max-width: 155px;
+     font-weight: bold;
+     padding-right: 9px;
+}
+
+.sybil_addresses table {
+     width: 100%;
+     margin: 0;
+}
+
+.sybil_addresses {
+     padding: 0;
+     border-bottom: 1px solid #443da0
+}
+
+.sybil_addresses table, .sybil_addresses td {
+     border: none;
+}
+
+.threatpoints + ul {
+     -moz-columns: auto 600px;
+     -webkit-columns: auto 600px;
+     columns: auto 600px;
+     -moz-column-rule: 1px solid #443da0;
+     -webkit-column-rule: 1px solid #443da0;
+     column-rule: 1px solid #443da0;
+     padding-top: 3px;
+     padding-bottom: 3px;
+}
+
+.threatpoints + ul li:first-child {
+     margin-top: 0 !important;
+     padding-top: 0 !important;
+}
+
+.threatpoints + ul li:last-child {
+     padding-bottom: 0 !important;
+}
+
+.threatpoints + ul li {
+     list-style: none;
+     margin-left: 5px;
+     line-height: 120%;
+     break-inside: avoid !important;
+     page-break-inside: avoid !important;
+     -webkit-column-break-inside: avoid !important;
+}
+
+.threatpoints + ul li a {
+     white-space: nowrap;
+}
+
+/* end sybils */
+
 /* responsive layout */
 
 @media screen and (max-width: 900px) {
@@ -6590,286 +7154,3 @@ _:-ms-lang(x), table + .statusnotes {
 
 /* end IE/Edge tweaks */
 
-/* network status */
-
-.routersummary h4 a {
-     width: auto !important;
-     vertical-align: middle;
-     display: inline;
-}
-
-.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
-.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
-     display: inline-block;
-     vertical-align: middle;
-     border: 1px solid rgba(52, 47, 127, 0.6);
-     border-radius: 2px;
-     padding: 6px 3px;
-     width: 100%;
-     margin: -3px -1px;
-     box-shadow: inset 0 0 0 1px #000;
-     text-shadow: 0 1px 1px #000;
-     box-sizing: border-box;
-}
-
-.routersummary .firewalled {
-     border: 1px dotted #342f7f;
-}
-
-.routersummary .error {
-     border: 1px dotted #700;
-}
-
-.routersummary .warn, .routersummary .clockskew {
-     border: 1px solid #550;
-}
-
-.routersummary .testing {
-     border: 1px dotted #4F4B1D;
-}
-
-.routersummary .hidden, .routersummary .vmcomm {
-     border: 1px dotted #777;
-}
-
-.routersummary .running {
-     border: 1px solid #342f7f;
-     border: 1px solid rgba(52, 47, 127, 0.6);
-}
-
-.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
-.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding: 0 2px;
-     vertical-align: middle;
-     display: inline-block;
-     filter: drop-shadow(0 0 1px rgba(220,220,220,0.7));
-}
-
-.routersummary .error::before, .routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_error.png);
-}
-
-.routersummary .warn::before {
-     content: url(/themes/console/images/info/network_status/network_warning.png);
-}
-
-.routersummary .testing::before {
-     content: url(/themes/console/images/info/network_status/network_testing.png);
-}
-
-.routersummary .hidden::before {
-     content: url(/themes/console/images/info/network_status/network_hidden.png);
-     padding: 0 3px;
-}
-
-.routersummary .running::before {
-     content: url(/themes/console/images/info/network_status/network_ok.png);
-}
-
-.routersummary .firewalled::before {
-     content: url(/themes/console/images/info/network_status/network_firewalled.png);
-}
-
-.routersummary .vmcomm::before {
-     content: url(/themes/console/images/info/network_status/network_vm.png);
-}
-
-.routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_clockskew.png);
-}
-
-/* end network status */
-
-#sb_services, #sb_internals, #sb_advanced {
-     margin-top: -2px !important;
-}
-
-/* /tunnels */
-
-tt a {
-     letter-spacing: 0.07em;
-}
-
-.tunnel_cap {
-     background: rgba(0,0,140,0.4);
-     color: #c9ceff;
-     border: 1px solid rgba(0,0,64,0.2);
-     border-radius: 2px;
-     min-width: 12px;
-     padding: 0 2px;
-     display:inline-block;
-     margin: 1px 2px 1px 8px;
-     text-align: center !important;
-     text-shadow: 0 1px 1px #000;
-}
-
-.tunnel_cap:empty {
-     border: none;
-}
-
-.tunnel_id {
-     display: inline-block;
-     min-width: 78px;
-     text-align: right;
-}
-
-.tunnel_id:empty {
-     min-width: 0;
-}
-
-.tunnel_id:empty + .tunnel_cap {
-     margin-left: 12px !important;
-     display: inline-block;
-}
-
-.tunnel_peer {
-     display: inline-block;
-     min-width: 56px;
-     text-align: right;
-}
-
-.tunnel_local {
-     font-size: 8pt;
-     background: rgba(0,0,96,0.3);
-     border-radius: 2px;
-     text-align: center;
-     padding: 2px 0;
-     margin-left: -4px;
-     margin-right: 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: top;
-}
-
-#tunnel_defs {
-     margin-top: -1px;
-     margin-bottom: 10px;
-}
-
-@media screen and (max-width: 1100px) {
-.tunnel_id, .tunnel_peer {
-     min-width: 0 !important;
-     text-align: center !important;
-}
-
-.tunnel_local {
-     margin-right: 5px;
-     margin-left: 2px;
-     padding: 2px 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: middle;
-}
-
-.tunnel_peer:empty::before {
-     margin: 1px 6px 1px 2px;
-}
-
-.tunnel_cap {
-     margin-left: 5px !important;
-}
-}
-
-@media screen and (min-width: 1500px) {
-.tunnel_cap {
-     margin-left: 10px;
-     padding: 0 1px;
-     min-width: 14px;
-}
-
-.tunnel_id:empty {
-     margin-right: -10px;
-}
-}
-
-/* end tunnels */
-
-/* /peers */
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
-     text-align: right;
-     white-space: nowrap;
-}
-
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
-#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
-#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
-     text-align: right;
-}
-
-#udpconnections .tablefooter td:nth-child(9) {
-     text-align: center !important;
-}
-
-#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
-#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
-     white-space: nowrap;
-}
-
-#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
-     padding-left: 5px;
-     padding-right: 5px;
-}
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(12) {
-     text-align: center;
-}
-
-.peersort {
-     text-align: center;
-     display: inline-block;
-}
-
-.right {
-     text-align: right;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.left {
-     text-align: left;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.peeripv6:empty {
-     padding: 0;
-     width: 0;
-}
-
-.cwnd .left, .cwnd .right {
-     width: auto;
-}
-
-#udpconnections th:nth-child(n+13), #udpconnections .tablefooter th:nth-child(n+10),
-#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
-     padding-right: 1% !important;
-}
-
-#peerdefs {
-     line-height: 140%;
-}
-
-.peer_arrow {
-     display: inline-block;
-     width: 18px;
-     text-align: center;
-     margin-right: 3px;
-}
-
-/* end peers */

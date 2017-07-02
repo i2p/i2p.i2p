@@ -850,7 +850,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 themes = new String[0];
             }
         } else {
-            themes = new String[] { "light", "ubergine", "vanilla" };
+            themes = new String[] { "classic", "dark", "light", "midnight", "ubergine", "vanilla" };
         }
         return themes;
     }

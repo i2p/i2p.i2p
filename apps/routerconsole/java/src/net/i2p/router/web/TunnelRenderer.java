@@ -212,8 +212,8 @@ class TunnelRenderer {
                 Hash peer = info.getPeer(j);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));
                 if (_context.routerHash().equals(peer)) {
-                    // Add empty content placeholders to force alignment. TODO tag "local" + tooltips for bandwidth tier / tunnel id for translation
-                    out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer tunnel_local\" title=\"Locally hosted tunnel\">local</span>&nbsp;"
+                    // Add empty content placeholders to force alignment. TODO tag tooltips for bandwidth tier / tunnel id for translation
+                    out.write(" <td class=\"cells\" align=\"center\"><span class=\"tunnel_peer tunnel_local\" title=\"Locally hosted tunnel\">" + _t("Local") + "</span>&nbsp;"
                               + "<span class=\"tunnel_id\" title=\"Tunnel identity\">" +
                              (id == null ? "" : "" + id) + "</span><b class=\"tunnel_cap\" title=\"Bandwidth tier\"></b></td>");
                 } else {

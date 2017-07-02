@@ -203,7 +203,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      margin: -2px 0 0;
      padding: 3px 5px 3px 5px;
      border-spacing: 0;
-     overflow: auto;
+     overflow: hidden;
      color: #339;
      height: 52px;
      width: auto;
@@ -214,6 +214,14 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      border-bottom: 1px solid #7778bf;
      box-shadow: inset 0 0 1px #fff;
      background-size: auto 100%, 100% 100%;
+}
+
+.snarkMessages:hover, .snarkMessages:focus {
+     overflow: auto;
+}
+
+.snarkMessages:focus {
+     box-shadow: inset 0 0 0 1px #f90;
 }
 
 .snarkMessages a:link, .snarkMessages a:visited {
@@ -562,11 +570,15 @@ th.snarkTorrentStatus {
      background: linear-gradient(to right, #eef, #fff, #eef) !important;
      box-shadow: inset 0 0 1px #fff;
      border-bottom: 1px solid #7778bf !important;
-     padding: 10px !important;
-     font-size: 9pt;
      font-weight: bold;
      text-align: center !important;
      color: #272e3f !important;
+     font-size: 9pt;
+}
+
+.snarkTorrentNoneLoaded i {
+     display: inline-block;
+     padding: 10px;
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {

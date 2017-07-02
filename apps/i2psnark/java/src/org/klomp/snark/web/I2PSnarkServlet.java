@@ -2560,7 +2560,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append("<tr class=\"knownTracker\"><td><input type=\"checkbox\" class=\"optbox\" id=\"").append(name).append("\" name=\"delete_")
                .append(name).append("\" title=\"").append(_t("Mark tracker for deletion")).append("\">" +
                        "</td><td><label for=\"").append(name).append("\">").append(name)
-               .append("</td><td>").append(urlify(homeURL, 35))
+               .append("</label></td><td>").append(urlify(homeURL, 35))
                .append("</td><td><input type=\"radio\" class=\"optbox\" value=\"0\" tabindex=\"-1\" name=\"ttype_")
                .append(announceURL).append("\"");
             if (!(isOpen || isPrivate))

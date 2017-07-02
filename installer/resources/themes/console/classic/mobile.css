@@ -1,27 +1,21 @@
 /* Console Theme "Classic" - Mobile Override */
 
-div.routersummaryouter {
+body {
+     margin: 2px 1px !important;
+}
+
+.routersummaryouter {
      float: none;
      margin: 0 !important;
      position: relative;
      width: auto;
 }
 
-div.routersummary {
+.routersummary {
      float: none;
      width: auto;
      max-width: 600px;
      margin: 0 auto -6px;
-}
-
-@media screen and (min-width: 1500px) {
-div.routersummary {
-     width: 600px !important;
-}
-
-.routersummary table[id^="sb_"] {
-     width: 600px !important;
-}
 }
 
 #xhr {
@@ -49,7 +43,11 @@ div.routersummary {
      font-size: 9pt !important;
 }
 
-div.routersummary table, table[id^="sb_"] {
+.routersummary h3, .routersummary h3 a {
+     font-size: 10.5pt !important;
+}
+
+.routersummary table, table[id^="sb_"] {
      width: 100% !important;
      margin: -6px 0 -7px !important;
 }
@@ -151,5 +149,17 @@ div.main {
 
 .sorry {
      margin: -1px 0 0 !important;
+}
+
+.routersummary {
+     width: 600px !important;
+}
+
+.routersummary div[style="height: 36px;"] {
+     margin-top: 2px !important;
+}
+
+.routersummary table[id^="sb_"] {
+     width: 600px !important;
 }
 }

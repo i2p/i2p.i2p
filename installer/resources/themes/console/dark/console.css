@@ -45,7 +45,7 @@ img {
      border: none;
 }
 
-a img:hover, a:focus img  {
+a img:hover, a:focus img {
      filter: drop-shadow(0 0 1px #f60);
 }
 
@@ -1415,7 +1415,11 @@ a:active {
 /* welcome */
 
 .twocol {
+     -moz-columns: 2 400px;
+     -webkit-columns: 2 400px;
      columns: 2 400px;
+     -moz-column-gap: 0 !important;
+     -webkit-column-gap: 0 !important;
      column-gap: 0 !important;
      display: block;
 }
@@ -1423,7 +1427,7 @@ a:active {
 .twocol li {
      break-inside: avoid;
      page-break-inside: avoid;
-     -webkit-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
 }
 
 .twocol li:first-child {
@@ -1761,7 +1765,7 @@ label {
      cursor: default;
 }
 
-input[type="file"]  {
+input[type="file"] {
      box-shadow: none;
      border: none !important;
      background: #000;
@@ -2086,7 +2090,7 @@ table#schedjobs {
      font-weight: bold;
 }
 
-#schedjobs th:first-child, #schedjobs td:first-child, #jobstats th:first-child, #jobstats td:first-child  {
+#schedjobs th:first-child, #schedjobs td:first-child, #jobstats th:first-child, #jobstats td:first-child {
      text-align: left;
      padding-left: 10px;
      font-weight: bold;
@@ -2498,7 +2502,7 @@ tr#addnew, tr#addnew:hover {
 .themechoice {
      background: #000;
      background: linear-gradient(to bottom, #010 0%, #000 100%);
-     width: 110px;
+     width: 120px;
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -2571,11 +2575,11 @@ tr#addnew, tr#addnew:hover {
 }
 
 .themechoice .optbox {
-     min-width: 114px !important;
+     min-width: 124px !important;
      min-height: 80px !important;
      outline: 1px !important; /* placement guide */
      opacity: 0; /* hide the radio icon so we can use thumbnail img instead */
-     margin-left: -33px;
+     margin-left: -38px;
      z-index: 999;
      position: absolute;
 }
@@ -2633,7 +2637,7 @@ p#helptranslate {
      min-height: 16px;
 }
 
-div.themelabel {
+.themelabel {
      border-top: 1px solid #262 !important;
      margin-left: -4px;
      margin-right: -4px;
@@ -2658,7 +2662,7 @@ h3#themeheading, h3#langheading, h3#passwordheading {
      background: linear-gradient(to right, #000 0%, #001000 70%, #001300 90%);
 }
 
-div#themesettings {
+#themesettings {
      clear: both;
      border: 1px solid #494;
      padding: 8px 7px 0;
@@ -2680,7 +2684,7 @@ td#themeselect {
 .langselect { /* containing box for lang selection */
      background: #000;
      background: linear-gradient(to bottom, #010 0%, #000 80%);
-     width: 110px;
+     width: 120px;
      float: left;
      margin: 4px;
      text-align: center;
@@ -2705,7 +2709,7 @@ td#themeselect {
 .langselect .optbox {
      opacity: 0;
      outline: 1px dotted !important;
-     min-width: 111px !important;
+     min-width: 124px !important;
      margin: -7px 0 -34px -2px;
      min-height: 66px;
      vertical-align: text-bottom;
@@ -2716,7 +2720,7 @@ td#themeselect {
 .langselect img {
      border: 1px solid #002000;
      margin-bottom: 0;
-     margin-left: -65px;
+     margin-left: -71px;
      margin-top: 7px !important;
      position: absolute;
 }
@@ -2765,13 +2769,25 @@ td#themeselect {
      border: 1px solid #f60;
      box-shadow: 0 0 1px #f30;
      margin-top: 6px !important;
-     margin-left: -67px;
+     margin-left: -72px;
 }
 
 .langselect input[name="lang"]:checked + img + div.ui_lang {
      background: #030 !important;
      color: #ee9;
      font-weight: bold;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.langselect img {
+     margin-left: -9px;
+     margin-top: -17px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-left: -10px;
+     margin-top: -18px !important;
+}
 }
 
 /* end flag as radio icons */
@@ -4189,7 +4205,7 @@ table#floodfills th {
      padding: 3px 6px;
 }
 
-table#floodfills td  {
+table#floodfills td {
      color: #bb7;
      padding: 3px 4px !important;
      vertical-align: middle;
@@ -4197,7 +4213,7 @@ table#floodfills td  {
      white-space: nowrap;
 }
 
-table#floodfills th:first-child, table#floodfills td:first-child  {
+table#floodfills th:first-child, table#floodfills td:first-child {
      width: 52px;
      white-space: nowrap;
      padding: 3px 3px 3px 0 !important;
@@ -4682,11 +4698,11 @@ table.netdbentry th:last-child {
      width: 50px;
 }
 
-table.netdbentry th:first-child  {
+table.netdbentry th:first-child {
      white-space: nowrap;
 }
 
-table.netdbentry td:first-child  {
+table.netdbentry td:first-child {
      width: 80px;
 }
 
@@ -4900,7 +4916,7 @@ div.debugcontainer {
 }
 
 #leasesetdebug, #leasesetsummary {
-     margin-bottom: 10px;
+     margin-bottom: 14px;
 }
 
 .leaseset th {
@@ -4978,7 +4994,7 @@ div.debugcontainer {
      width: 10px;
 }
 
-#noleasesets {
+#noleasesets, #notinitialized, .netdbnotfound {
      background: #000 url(images/infohelp.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      border: 1px solid #494;
@@ -5105,6 +5121,10 @@ p.sybil_info, p.family, p.threatpoints, p.hashdist, p#sybil_totals, p.notfound {
      box-shadow: inset 0 0 0 1px #300;
 }
 
+p#sybil_totals {
+     font-weight: normal;
+}
+
 p.family + p.family, p.sybil_info + p.sybil_info {
      margin-top: -4px;
 }
@@ -5113,17 +5133,23 @@ p#sybilinfo {
      line-height: 140%;
 }
 
-p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo  {
+p.sybil_info + a[name] + table.sybil_routerinfo, p.hashdist + a[name] + table.sybil_routerinfo {
      margin-top: 10px !important;
 }
 
 .threatpoints + ul {
+     background: #000;
      border: 1px solid #494;
      padding: 5px 5px 0;
      margin: -4px 0 10px;
 }
+
 .threatpoints + ul li:last-child {
      margin-bottom: 5px;
+}
+
+.sybil_routerinfo + .threatpoints + ul + a[name] + table {
+     margin-top: -11px;
 }
 
 h3#known {
@@ -5738,6 +5764,538 @@ p#profiles_overview {
 
 /* end profiles/peers */
 
+/* network status */
+
+.routersummary h4 a {
+     width: auto !important;
+     vertical-align: middle;
+     display: inline;
+}
+
+.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
+.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
+     display: inline-block;
+     vertical-align: middle;
+     border: 1px solid #316f30;
+     box-sizing: border-box;
+     border: 1px solid rgba(49, 111, 48, 0.6);
+     padding: 6px 3px;
+     width: 100%;
+     margin: -5px 0;
+     box-shadow: inset 0 0 0 1px #000;
+     text-shadow: 0 1px 1px #000;
+}
+
+.routersummary .firewalled {
+     border: 1px dotted #316f30;
+     border: 1px dotted rgba(49, 111, 48, 0.6);
+}
+
+.routersummary .error {
+     border: 1px solid #900;
+     border: 1px solid rgba(153, 0, 0, 0.6);
+}
+
+.routersummary .warn, .routersummary .clockskew {
+     border: 1px solid #aa0;
+     border: 1px solid rgba(170, 170, 0, 0.6);
+}
+
+.routersummary .testing {
+     border: 1px solid #fa0;
+     border: 1px solid rgba(255, 170, 0, 0.6);
+}
+
+.routersummary .hidden, .routersummary .vmcomm {
+     border: 1px dotted #777;
+     border: 1px solid rgba(119, 119, 119, 0.6);
+}
+
+.routersummary .running {
+     border: 1px solid #316f30;
+     border: 1px solid rgba(49, 111, 48, 0.6);
+}
+
+.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
+.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
+     padding: 0 2px;
+     vertical-align: middle;
+     display: inline-block;
+     filter: drop-shadow(0 0 1px rgba(192,192,192,0.5));
+}
+
+.routersummary .error::before, .routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_error.png);
+}
+
+.routersummary .warn::before {
+     content: url(/themes/console/images/info/network_status/network_warning.png);
+}
+
+.routersummary .testing::before {
+     content: url(/themes/console/images/info/network_status/network_testing.png);
+}
+
+.routersummary .hidden::before {
+     content: url(/themes/console/images/info/network_status/network_hidden.png);
+     padding: 0 3px;
+}
+
+.routersummary .running::before {
+     content: url(/themes/console/images/info/network_status/network_ok.png);
+}
+
+.routersummary .firewalled::before {
+     content: url(/themes/console/images/info/network_status/network_firewalled.png);
+}
+
+.routersummary .vmcomm::before {
+     content: url(/themes/console/images/info/network_status/network_vm.png);
+}
+
+.routersummary .clockskew::before {
+     content: url(/themes/console/images/info/network_status/network_clockskew.png);
+}
+
+/* end network status */
+
+/* /tunnels */
+
+tt a {
+     letter-spacing: 0.07em;
+}
+
+.tunnel_cap {
+     background: rgba(0,96,0,0.3);
+     color: #bb7;
+     border: 1px solid rgba(0,64,0,0.2);
+     border-radius: 2px;
+     min-width: 12px;
+     padding: 0 2px;
+     display:inline-block;
+     margin: 1px 2px 1px 8px;
+     text-align: center !important;
+     text-shadow: 0 1px 1px #555;
+}
+
+.tunnel_cap:empty {
+     border: none;
+}
+
+.tunnel_id {
+     display: inline-block;
+     min-width: 78px;
+     text-align: right;
+}
+
+.tunnel_id:empty {
+     min-width: 0;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+     margin-left: 12px !important;
+     display: inline-block;
+}
+
+.tunnel_peer {
+     display: inline-block;
+     min-width: 56px;
+     text-align: right;
+}
+
+.tunnel_local {
+     font-size: 8pt;
+     text-transform: lowercase;
+     background: rgba(0,96,0,0.3);
+     border-radius: 2px;
+     text-align: center;
+     padding: 2px 0;
+     margin-left: -4px;
+     margin-right: 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: top;
+}
+
+#tunnel_defs {
+     margin-top: -1px;
+     margin-bottom: 10px;
+}
+
+#tunnel_defs td:first-child, #tunnel_defs td:nth-child(even) {
+     width: 1%;
+     white-space: nowrap;
+}
+
+@media screen and (max-width: 1100px) {
+.tunnel_id, .tunnel_peer {
+     min-width: 0 !important;
+     text-align: center !important;
+}
+
+.tunnel_local {
+     margin-right: 5px;
+     margin-left: 2px;
+     padding: 2px 4px;
+}
+
+.tunnel_peer:empty {
+     vertical-align: middle;
+}
+
+.tunnel_peer:empty::before {
+     margin: 1px 6px 1px 2px;
+}
+
+.tunnel_cap {
+     margin-left: 5px !important;
+}
+}
+
+@media screen and (max-width: 1200px) {
+#tunnel_defs {
+     margin-bottom: 5px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+.tunnel_cap {
+     margin-left: 10px;
+     padding: 0 1px;
+     min-width: 14px;
+}
+
+.tunnel_id:empty {
+     margin-right: -10px;
+}
+}
+
+/* end tunnels */
+
+/* /peers */
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
+#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
+#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
+#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
+     text-align: right;
+     white-space: nowrap;
+}
+
+#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
+#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
+#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
+     text-align: right;
+}
+
+#udpconnections .tablefooter td:nth-child(9) {
+     text-align: center !important;
+}
+
+#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
+#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
+     white-space: nowrap;
+}
+
+#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
+     padding-left: 5px;
+     padding-right: 5px;
+}
+
+#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
+     text-align: right;
+}
+
+#udpconnections th:nth-child(12) {
+     text-align: center;
+}
+
+.peersort {
+     text-align: center;
+     display: inline-block;
+}
+
+.right {
+     text-align: right;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.left {
+     text-align: left;
+     margin: 0 1px;
+     display: inline-block;
+     width: 40%
+}
+
+.peeripv6:empty {
+     padding: 0;
+     width: 0;
+}
+
+.cwnd .left, .cwnd .right {
+     width: auto;
+}
+
+#udpconnections th:nth-child(n+13), #udpconnections .tablefooter th:nth-child(n+10),
+#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
+     padding-right: 1% !important;
+}
+
+/* end peers */
+
+/* netdb router address info */
+
+.leasesets_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     -moz-column-gap: 10px;
+     -webkit-column-gap: 10px;
+     column-gap: 10px;
+}
+
+th code {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+@media screen and (min-width: 1634px) {
+.leasesets_container {
+     margin-bottom: 8px;
+}
+
+th code {
+     font-size: 9pt !important;
+}
+}
+
+.leasesets_container table:first-child {
+     margin-top: 0;
+}
+
+.leasesets_container table {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.netdb_addresses br:first-child, .sybil_routerinfo tr:last-child td br:first-child {
+     display: none;
+}
+
+.netdbentry th:first-child::after {
+     content: "";
+     display: inline-block;
+     min-height: 20px;
+     vertical-align: middle;
+}
+
+.netdbentry th:last-child > *, .sybil_routerinfo th:nth-child(2) > * {
+     display: inline-block;
+     vertical-align: middle !important;
+}
+
+.netdbentry th a img {
+     display: inline-block;
+     vertical-align: middle;
+     margin-right: 1px;
+     margin-bottom: 2px;
+}
+
+.netdbentry a.viewfullentry::after {
+     display: inline-block;
+     vertical-align: middle !important;
+     margin-left: 3px;
+}
+
+.netdbentry td:first-child {
+     text-align: right;
+     min-width: 100px;
+     padding-right: 5px !important
+}
+
+b.netdb_transport {
+     display: inline-block;
+     width: 50px;
+     text-align: right;
+     margin-right: 5px;
+}
+
+#netdb code {
+    font-weight: normal !important;
+}
+
+.netdb_name {
+     color: #bb3;
+     text-transform: capitalize;
+     font-weight: bold;
+}
+
+.netdb_info {
+     margin-right: 1px;
+}
+
+.netdb_expiry {
+     margin-left: 5px;
+}
+
+.sybil_routerinfo th img[src^="/flags"] {
+     height: 11px;
+     width: 16px;
+     margin-right: 5px;
+}
+
+.sybil_routerinfo b.netdb_transport {
+     margin-left: -13px;
+     margin-right: 0;
+}
+
+.sybil_routerinfo td:first-child, .netdbentry td:first-child {
+     text-align: right !important;
+     padding-right: 0;
+}
+
+.sybil_routerinfo td[colspan="3"] {
+     white-space: normal;
+}
+
+.sybil_container {
+     -moz-columns: 680px 2;
+     -webkit-columns: 680px 2;
+     columns: 680px 2;
+     margin: 10px 0;
+}
+
+.sybil_container p {
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybil_container p:first-child {
+     margin-top: 0;
+}
+
+.sybil_container p:last-child {
+     margin-bottom: 0;
+}
+
+/* end netdb router address */
+
+/* sybils */
+
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child, .sybil_routerinfo td:last-child {
+     border-right: 1px solid #494 !important;
+}
+
+.sybil_routerinfo table td:last-child {
+     border-right: none !important;
+}
+
+.sybilinfo_params {
+     padding: 0;
+     border-bottom: 1px solid #494
+}
+
+.sybilinfo_container {
+     columns: 240px auto;
+     -moz-columns: 240px auto;
+     -webkit-columns: 240px auto;
+     -moz-column-gap: 0;
+     -webkit-column-gap: 0;
+     column-gap: 0;
+     background: #010;
+     padding: 4px 5px;
+}
+
+.sybilinfo_container b {
+     color: #bb3;
+}
+
+.sybil_routerinfo tr:last-child {
+     border-top: none;
+}
+
+.sybil_routerinfo p {
+     margin: 0;
+     padding: 0;
+     line-height: 140%;
+     break-inside: avoid;
+     page-break-inside: avoid;
+     -webkit-column-break-inside: avoid;
+}
+
+.sybilinfo_familyname {
+     display: inline-block;
+     vertical-align: top;
+     max-width: 150px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+.sybil_addresses td:first-child {
+     max-width: 155px;
+     font-weight: bold;
+     padding-right: 9px;
+}
+
+.sybil_addresses table {
+     width: 100%;
+     margin: 0;
+}
+
+.sybil_addresses {
+     padding: 0;
+     border-bottom: 1px solid #494
+}
+
+.sybil_addresses table, .sybil_addresses td {
+     border: none;
+}
+
+.threatpoints + ul {
+     -moz-columns: auto 600px;
+     -webkit-columns: auto 600px;
+     columns: auto 600px;
+     -moz-column-rule: 1px solid #2a5f29;
+     -webkit-column-rule: 1px solid #2a5f29;
+     column-rule: 1px solid #2a5f29;
+     padding-top: 3px;
+     padding-bottom: 3px;
+}
+
+.threatpoints + ul li:first-child {
+     margin-top: 0 !important;
+}
+
+.threatpoints + ul li:last-child {
+     margin-bottom: 0 !important;
+}
+
+.threatpoints + ul li {
+     list-style: none;
+     margin-left: 5px;
+     line-height: 100%;
+     break-inside: avoid !important;
+     page-break-inside: avoid !important;
+     -webkit-column-break-inside: avoid !important;
+}
+
+.threatpoints + ul li a {
+     white-space: nowrap;
+}
+
+/* end sybils */
+
 /* responsive layout */
 
 @media screen and (max-width: 900px) {
@@ -5821,7 +6379,7 @@ td.optionsave {
 }
 
 @media screen and (max-width: 1220px) {
-#udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2)  {
+#udpconnections tr:nth-last-child(n+3):hover td:nth-child(n+2) {
      transform: scale(1.05);
      text-align: center !important;
 }
@@ -6201,284 +6759,4 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
-
-/* network status */
-
-.routersummary h4 a {
-     width: auto !important;
-     vertical-align: middle;
-     display: inline;
-}
-
-.routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
-.routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
-     display: inline-block;
-     vertical-align: middle;
-     border: 1px solid #316f30;
-     box-sizing: border-box;
-     border: 1px solid rgba(49, 111, 48, 0.6);
-     padding: 6px 3px;
-     width: 100%;
-     margin: -5px 0;
-     box-shadow: inset 0 0 0 1px #000;
-     text-shadow: 0 1px 1px #000;
-}
-
-.routersummary .firewalled {
-     border: 1px dotted #316f30;
-     border: 1px dotted rgba(49, 111, 48, 0.6);
-}
-
-.routersummary .error {
-     border: 1px solid #900;
-     border: 1px solid rgba(153, 0, 0, 0.6);
-}
-
-.routersummary .warn, .routersummary .clockskew {
-     border: 1px solid #aa0;
-     border: 1px solid rgba(170, 170, 0, 0.6);
-}
-
-.routersummary .testing {
-     border: 1px solid #fa0;
-     border: 1px solid rgba(255, 170, 0, 0.6);
-}
-
-.routersummary .hidden, .routersummary .vmcomm {
-     border: 1px dotted #777;
-     border: 1px solid rgba(119, 119, 119, 0.6);
-}
-
-.routersummary .running {
-     border: 1px solid #316f30;
-     border: 1px solid rgba(49, 111, 48, 0.6);
-}
-
-.routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
-.routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding: 0 2px;
-     vertical-align: middle;
-     display: inline-block;
-     filter: drop-shadow(0 0 1px rgba(192,192,192,0.5));
-}
-
-.routersummary .error::before, .routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_error.png);
-}
-
-.routersummary .warn::before {
-     content: url(/themes/console/images/info/network_status/network_warning.png);
-}
-
-.routersummary .testing::before {
-     content: url(/themes/console/images/info/network_status/network_testing.png);
-}
-
-.routersummary .hidden::before {
-     content: url(/themes/console/images/info/network_status/network_hidden.png);
-     padding: 0 3px;
-}
-
-.routersummary .running::before {
-     content: url(/themes/console/images/info/network_status/network_ok.png);
-}
-
-.routersummary .firewalled::before {
-     content: url(/themes/console/images/info/network_status/network_firewalled.png);
-}
-
-.routersummary .vmcomm::before {
-     content: url(/themes/console/images/info/network_status/network_vm.png);
-}
-
-.routersummary .clockskew::before {
-     content: url(/themes/console/images/info/network_status/network_clockskew.png);
-}
-
-/* end network status */
-
-/* /tunnels */
-
-tt a {
-     letter-spacing: 0.07em;
-}
-
-.tunnel_cap {
-     background: rgba(0,96,0,0.3);
-     color: #bb7;
-     border: 1px solid rgba(0,64,0,0.2);
-     border-radius: 2px;
-     min-width: 12px;
-     padding: 0 2px;
-     display:inline-block;
-     margin: 1px 2px 1px 8px;
-     text-align: center !important;
-     text-shadow: 0 1px 1px #555;
-}
-
-.tunnel_cap:empty {
-     border: none;
-}
-
-.tunnel_id {
-     display: inline-block;
-     min-width: 78px;
-     text-align: right;
-}
-
-.tunnel_id:empty {
-     min-width: 0;
-}
-
-.tunnel_id:empty + .tunnel_cap {
-     margin-left: 12px !important;
-     display: inline-block;
-}
-
-.tunnel_peer {
-     display: inline-block;
-     min-width: 56px;
-     text-align: right;
-}
-
-.tunnel_local {
-     font-size: 8pt;
-     background: rgba(0,96,0,0.3);
-     border-radius: 2px;
-     text-align: center;
-     padding: 2px 0;
-     margin-left: -4px;
-     margin-right: 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: top;
-}
-
-#tunnel_defs {
-     margin-top: -1px;
-     margin-bottom: 10px;
-}
-
-@media screen and (max-width: 1100px) {
-.tunnel_id, .tunnel_peer {
-     min-width: 0 !important;
-     text-align: center !important;
-}
-
-.tunnel_local {
-     margin-right: 5px;
-     margin-left: 2px;
-     padding: 2px 4px;
-}
-
-.tunnel_peer:empty {
-     vertical-align: middle;
-}
-
-.tunnel_peer:empty::before {
-     margin: 1px 6px 1px 2px;
-}
-
-.tunnel_cap {
-     margin-left: 5px !important;
-}
-}
-
-@media screen and (max-width: 1200px) {
-#tunnel_defs {
-     margin-bottom: 5px;
-}
-}
-
-@media screen and (min-width: 1500px) {
-.tunnel_cap {
-     margin-left: 10px;
-     padding: 0 1px;
-     min-width: 14px;
-}
-
-.tunnel_id:empty {
-     margin-right: -10px;
-}
-}
-
-/* end tunnels */
-
-/* /peers */
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10),
-#ntcpconnections td:nth-child(6), #ntcpconnections td:nth-child(7), #ntcpconnections td:nth-child(8), #ntcpconnections td:nth-child(9), #ntcpconnections td:nth-child(10),
-#udpconnections td:nth-child(6), #udpconnections td:nth-child(7), #udpconnections td:nth-child(9), #udpconnections td:nth-child(10), #udpconnections td:nth-child(11),
-#udpconnections td:nth-child(13), #udpconnections td:nth-child(14), #udpconnections td:nth-child(15), #udpconnections td:nth-child(16) {
-     text-align: right;
-     white-space: nowrap;
-}
-
-#ntcpconnections .tablefooter td:nth-child(3), #ntcpconnections .tablefooter td:nth-child(4), #ntcpconnections .tablefooter td:nth-child(5), #ntcpconnections .tablefooter td:nth-child(6),
-#udpconnections .tablefooter td:nth-child(3), #udpconnections .tablefooter td:nth-child(4), #udpconnections .tablefooter td:nth-child(7), #udpconnections .tablefooter td:nth-child(8),
-#udpconnections .tablefooter td:nth-child(10), #udpconnections .tablefooter td:nth-child(11), #udpconnections .tablefooter td:nth-child(12), #udpconnections .tablefooter td:nth-child(13) {
-     text-align: right;
-}
-
-#udpconnections .tablefooter td:nth-child(9) {
-     text-align: center !important;
-}
-
-#ntcpconnections td:nth-child(4), #ntcpconnections td:nth-child(5), #udpconnections td:nth-child(4),
-#udpconnections td:nth-child(5), #udpconnections td:nth-child(8), #udpconnections td:nth-child(12) {
-     white-space: nowrap;
-}
-
-#udpconnections .tablefooter td, #ntcpconnections .tablefooter td {
-     padding-left: 5px;
-     padding-right: 5px;
-}
-
-#ntcpconnections th:nth-child(6), #ntcpconnections th:nth-child(7), #ntcpconnections th:nth-child(8), #ntcpconnections th:nth-child(9), #ntcpconnections th:nth-child(10) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(6), #udpconnections th:nth-child(7), #udpconnections th:nth-child(n+9) {
-     text-align: right;
-}
-
-#udpconnections th:nth-child(12) {
-     text-align: center;
-}
-
-.peersort {
-     text-align: center;
-     display: inline-block;
-}
-
-.right {
-     text-align: right;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.left {
-     text-align: left;
-     margin: 0 1px;
-     display: inline-block;
-     width: 40%
-}
-
-.peeripv6:empty {
-     padding: 0;
-     width: 0;
-}
-
-.cwnd .left, .cwnd .right {
-     width: auto;
-}
-
-#udpconnections th:nth-child(n+13), #udpconnections .tablefooter th:nth-child(n+10),
-#udpconnections td:nth-child(n+13), #udpconnections .tablefooter td:nth-child(n+10) {
-     padding-right: 1% !important;
-}
-
-/* end peers */
 

@@ -1,3 +1,27 @@
+2017-07-01 str4d
+ * Console:
+   - /netdb:
+     - All Routers/Leasesets/Sybil sections:
+       - Each transport instance on own line
+       - Better presentation of address characteristics
+       - Place flag in table header
+     - Container div for leasesets to allow 2 column display at wider viewport width
+     - Increased spacing of lease information in leaseset tables
+     - Add div for "not initialized" message
+     - Reorganize content display in sybil database to reduce horizontal whitespace:
+       - Conditional 2-column display of sybil families
+       - Sybil router characteristics & threatpoints presented in multi-column view
+       - Added empty (n/a) fields to maintain visual consistency in column view
+   - /tunnels:
+     - Tag "Local" for translation (and convert to lowercase in CSS)
+     - Arabic: ensure our tunnel tables display correctly
+ * I2PSnark:
+   - Fix unclosed <label>
+   - Standalone:
+     - Better target the per-theme resources
+     - List all available themes in config section
+   - Themes: tidyups & further optimizations to reduce lag
+
 2017-07-01 zzz
  * Fix family key export (ticket #2011)
 

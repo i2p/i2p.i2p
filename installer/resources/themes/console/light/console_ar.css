@@ -661,7 +661,7 @@ td.subheading {
      text-align: left;
 }
 
-table.leaseset:last-child, table.netdbentry:last-child, #profile_defs {
+table.leaseset:last-child, .netdbentry:last-child, #profile_defs {
      margin-bottom: -10px;
 }
 
@@ -684,16 +684,24 @@ table#leasesetdebug td:first-child, table#leasesetsummary td:first-child {
      padding-right: 5px !important;
 }
 
-table.netdbentry th:first-child {
-     text-align: right;
+.netdbentry th:first-child {
+     text-align: right !important;
 }
 
-table.netdbentry th:last-child {
+.netdbentry th:last-child {
      text-align: left;
 }
 
-table.netdbentry td:nth-child(2) {
+.netdbentry td:nth-child(2) {
      direction: ltr;
+}
+
+.netdbentry th:last-child {
+     border-left: 1px solid #7778bf !important;
+}
+
+.netdbentry th a img {
+     margin-left: 6px;
 }
 
 #sybilnav li {
@@ -703,6 +711,10 @@ table.netdbentry td:nth-child(2) {
 
 .threatpoints + ul li {
      margin-right: 20px;
+}
+
+.leaseset th:last-child, .leaseset td:last-child, .sybil_routerinfo th:last-child, .sybil_routerinfo td:last-child {
+     border-right: none !important;
 }
 
 p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, #profiles #banlist {
@@ -743,6 +755,10 @@ p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, #profiles #ba
 
 #thresholds p {
      padding-right: 10px;
+}
+
+.sybil_routerinfo th img[src^="/flags"], .netdbentry th a img {
+     margin-left: 5px;
 }
 
 .wideload .confignav {
@@ -875,6 +891,25 @@ table#bugreports td.infohelp {
 #config_ui.main .langselect .optbox, #config_ui.main .langselect .optbox:hover, #config_ui.main .langselect .optbox:focus {
      margin-left: 0;
      margin-right: -2px;
+}
+
+.tunnel_local {
+     margin-right: 0;
+     margin-left: 4px;
+}
+
+.tunnel_id:empty + .tunnel_cap {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 12px;
+}
+
+#tunnel_defs td:nth-child(3) {
+     border-right: none;
+}
+
+#tunnels .cells {
+     text-align: center !important;
 }
 
 @media screen and (min-width: 1500px) {
