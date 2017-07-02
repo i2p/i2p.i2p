@@ -461,9 +461,14 @@ h4.app, h4.app2 {
      margin-left: 6px;
 }
 
+.tunnel_peer {
+     text-align: left;
+}
+
 .tunnel_local {
      margin-right: -4px;
      margin-left: 4px;
+     text-align: center;
 }
 
 .tunnel_id:empty + .tunnel_cap {

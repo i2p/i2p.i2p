@@ -867,9 +867,10 @@ _:-ms-lang(x), .snarkTorrentOdd, .SnarkTorrentEven {
      border-bottom: 1px solid #494;
 }
 
-.snarkTorrentNoneLoaded td {
+.snarkTorrentNoneLoaded td, .snarkTorrentNoneLoaded:hover td {
      text-align: center !important;
      color: #ee9 !important;
+     background: #000 !important;
 }
 
 .snarkTorrentNoneLoaded i {

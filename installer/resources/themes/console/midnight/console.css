@@ -6253,6 +6253,9 @@ form[action="events"] {
 
 .routersummary .firewalled::before {
      content: url(/themes/console/images/info/network_status/network_firewalled.png);
+     opacity: 0.7;
+     filter: drop-shadow(0 1px 1px rgba(255,120,120,0.8));
+     mix-blend-mode: luminosity;
 }
 
 .routersummary .vmcomm::before {

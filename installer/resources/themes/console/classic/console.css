@@ -692,7 +692,7 @@ div.refresh {
 
 .routersummary .firewalled {
      background: rgba(255,220,255,0.3);
-     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.5) 2px, rgba(110,255,110,0.1) 3px, rgba(220,255,220,0.5) 5px);
+     background: repeating-linear-gradient(135deg, rgba(220,255,220,0.3) 2px, rgba(255,255,220,0.3) 3px, rgba(220,255,220,0.3) 5px);
 }
 
 .routersummary .error {
@@ -747,6 +747,7 @@ div.refresh {
 
 .routersummary .firewalled::before {
      content: url(/themes/console/images/info/network_status/network_firewalled.png);
+     opacity: 0.8;
 }
 
 .routersummary .vmcomm::before {

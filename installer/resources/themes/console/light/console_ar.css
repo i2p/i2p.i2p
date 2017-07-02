@@ -893,9 +893,14 @@ table#bugreports td.infohelp {
      margin-right: -2px;
 }
 
+.tunnel_peer {
+     text-align: left;
+}
+
 .tunnel_local {
      margin-right: 0;
      margin-left: 4px;
+     text-align: center;
 }
 
 .tunnel_id:empty + .tunnel_cap {

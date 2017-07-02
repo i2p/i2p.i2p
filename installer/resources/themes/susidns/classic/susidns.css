@@ -521,6 +521,10 @@ _:-ms-lang(x), img.illustrate {
      text-align: right;
 }
 
+#content + #buttons {
+     margin-top: -10px;
+}
+
 p.buttons {
      border: 1px solid #89f;
      padding: 10px;

@@ -1,6 +1,11 @@
 2017-07-02 str4d
- * Console: Show correct icon for "Firewalled" network status
+ * Console:
+   - Show correct icon for "Firewalled" network status
+   - Cosmetic changes to new firewalled network status in sidebar
+   - Arabic: ensure the destinations correctly align on /tunnels
  * SusiDNS: Default to the console theme
+ * I2PSnark: Ensure .snarkNoneLoaded background color remains constant on
+   mouseover in dark theme
 
 2017-07-01 str4d
  * Console:

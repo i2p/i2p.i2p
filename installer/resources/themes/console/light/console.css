@@ -605,6 +605,7 @@ p:empty + .sb_notice {
 .routersummary .firewalled::before {
      content: url(/themes/console/images/info/network_status/network_firewalled.png);
      padding-right: 4px;
+     opacity: 0.8;
 }
 
 .routersummary .vmcomm::before {
@@ -683,55 +684,15 @@ p:empty + .sb_notice {
      margin-top: 0;
 }
 
-/* end sidebar */
-
-/*
-div.tunnels td:first-child {
-     width: 16px;
-     text-align: left;
-     padding-right: 1px;
+.refresh {
+     padding: 1px 0 0 0 !important;
 }
-
-div.tunnels td:last-child {
-     text-align: right;
-     padding-right: 1px;
-}
-
-div.tunnels img, div.tunnels img:hover {
-     opacity: 1 !important;
-}
-
-div.tunnels {
-     margin-top: 6px !important;
-     margin-left: -2px !important;
-     margin-bottom: 3px !important;
-     padding-top: 3px !important;
-}
-
-div.tunnels table {
-     margin: -7px 0 -5px -4px !important;
-}
-
-div.tunnels td, div.tunnels img:first-child {
-     margin: 0 !important;
-    text-transform: capitalize;
-}
-
-.tunnels tr {
-     padding: 4px 0 !important;
-}
-
-div.refresh {
-     margin-top: 10px !important;
-     margin-bottom: 10px !important;
-     padding: 2px 0 0 0 !important;
-}
-
-*/
 
 .routersummary p {
      padding: 0;
 }
+
+/* end sidebar */
 
 /* proxy error messages */
 

@@ -457,9 +457,14 @@ div[lang="ar"] ul, div[lang="ar"] p {
      padding: 0;
 }
 
+.tunnel_peer {
+     text-align: left;
+}
+
 .tunnel_local {
      margin-right: -4px;
      margin-left: 4px;
+     text-align: center;
 }
 
 .tunnel_id:empty + .tunnel_cap {

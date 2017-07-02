@@ -6,7 +6,7 @@ body {
      line-height: 120%;
      background: #000;
      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.45)), url(/themes/console/dark/images/camotile2.png) top left fixed;
-     color:#ee9;
+     color: #ee9;
      padding-top: 5px;
      margin: 0 10px;
      min-width: 650px;
@@ -15,6 +15,7 @@ body {
 body.iframed {
 /*     background: transparent !important;*/
      margin: 0;
+     background: transparent !important;
 }
 
 ::selection {
@@ -653,6 +654,10 @@ div#config + div#buttons, div#content + div#buttons {
      background: #000;
 }
 
+div#content + div#buttons {
+     margin-top: -13px;
+}
+
 .illustrate {
      max-width: 700px;
      height: auto;
@@ -844,25 +849,11 @@ textarea[cols="70"] {
      height: 40px;
 }
 
-/*
-.destinations textarea {
-     width: 100%;
-     padding: 1px !important;
-     height: 32px;
-     resize: none;
-     border: none;
-     border-left: 1px solid #2a5f29;
-     border-right: 1px solid #2a5f29;
-     margin: 0 !important;
-     border-radius: 0;
-}
-*/
-
 input:focus, textarea:focus {
      color: #ee9;
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
-     transition: ease filter 0.3s 0s;
+     transition: ease filter 0.3s;
      outline: none;
 }
 
@@ -930,6 +921,7 @@ p.book {
 }
 
 /* hide export button on published addressbook if empty */
+
 #messages + form[action="export"] {
      display: none;
 }
@@ -988,7 +980,7 @@ p.book {
 
 .names a:active img, .names a:focus img {
      transform: rotate(45deg) scale(0.8);
-     transition: ease all 0.1s 0s;
+     transition: ease all 0.1s;
 }
 
 /* hostname list */
