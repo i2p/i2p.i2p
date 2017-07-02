@@ -5387,6 +5387,10 @@ table#jardump {
      border-left: 1px solid #7778bf;
 }
 
+.threatpoints + ul + a[name] + .sybil_routerinfo th img {
+     margin-top: 1px;
+}
+
 .main#tunnels th, .main#peers th, #ntcpconnections td, #udpconnections td {
      text-align: center;
 }
