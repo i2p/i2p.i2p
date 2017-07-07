@@ -1549,14 +1549,25 @@ public class DataHelper {
             default: return bytes + "";
         }
     }
-    
+
     /**
      * Like formatSize but with a non-breaking space after the number
      * This seems consistent with most style guides out there.
-     * Use only in HTML
-     * @since 0.7.14
+     * Use only in HTML, and not inside form values (use
+     * formatSize2(bytes, false) there instead).
+     * @since 0.7.14, uses thin non-breaking space since 0.9.31
      */
     public static String formatSize2(long bytes) {
+        return formatSize2(bytes, true);
+    }
+
+    /**
+     * Like formatSize but with a space after the number
+     * This seems consistent with most style guides out there.
+     * @param nonBreaking use an HTML thin non-breaking space (&#8239;)
+     * @since 0.9.31
+     */
+    public static String formatSize2(long bytes, boolean nonBreaking) {
         double val = bytes;
         int scale = 0;
         while (val >= 1024) {
@@ -1568,17 +1579,18 @@ public class DataHelper {
 
         // Replace &nbsp; with thin non-breaking space &#8239; (more consistent/predictable width between fonts & point sizes)
 
-        String str = fmt.format(val);
+        String space = nonBreaking ? "&#8239;" : " ";
+        String str = fmt.format(val) + space;
         switch (scale) {
-            case 1: return str + "&#8239;K";
-            case 2: return str + "&#8239;M";
-            case 3: return str + "&#8239;G";
-            case 4: return str + "&#8239;T";
-            case 5: return str + "&#8239;P";
-            case 6: return str + "&#8239;E";
-            case 7: return str + "&#8239;Z";
-            case 8: return str + "&#8239;Y";
-            default: return bytes + "&#8239;";
+            case 1: return str + "K";
+            case 2: return str + "M";
+            case 3: return str + "G";
+            case 4: return str + "T";
+            case 5: return str + "P";
+            case 6: return str + "E";
+            case 7: return str + "Z";
+            case 8: return str + "Y";
+            default: return bytes + space;
         }
     }
     
