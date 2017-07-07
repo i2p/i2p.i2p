@@ -59,6 +59,24 @@ public class SummaryHelper extends HelperBase {
         "Destinations" + S +
         "";
 
+    static final String DEFAULT_FULL_ADVANCED =
+        "HelpAndFAQ" + S +
+        "ShortGeneral" + S +
+        "Bandwidth" + S +
+        "UpdateStatus" + S +
+        "FirewallAndReseedStatus" + S +
+        "NetworkReachability" + S +
+        "I2PServices" + S +
+        "I2PInternals" + S +
+        "Advanced" + S +
+        "Peers" + S +
+        "Tunnels" + S +
+        "TunnelStatus" + S +
+        "Congestion" + S +
+        "RestartStatus" + S +
+        "Destinations" + S +
+        "";
+
     static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
         "Bandwidth" + S +
@@ -916,7 +934,7 @@ public class SummaryHelper extends HelperBase {
         } else {
             config = _context.getProperty(PROP_SUMMARYBAR + page);
             if (config == null)
-                config = _context.getProperty(PROP_SUMMARYBAR + "default", DEFAULT_FULL);
+                config = _context.getProperty(PROP_SUMMARYBAR + "default", isAdvanced() ? DEFAULT_FULL_ADVANCED : DEFAULT_FULL);
         }
         return Arrays.asList(DataHelper.split(config, SS));
     }

@@ -36,7 +36,7 @@ public class ConfigSummaryHandler extends FormHandler {
                 return;
             }
         } else if (_action.equals(_t("Restore full default"))) {
-            _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", SummaryHelper.DEFAULT_FULL);
+            _context.router().saveConfig(SummaryHelper.PROP_SUMMARYBAR + "default", isAdvanced() ? SummaryHelper.DEFAULT_FULL_ADVANCED : SummaryHelper.DEFAULT_FULL);
             addFormNotice(_t("Full summary bar default restored.") + " " +
                           _t("Summary bar will refresh shortly."));
         } else if (_action.equals(_t("Restore minimal default"))) {
