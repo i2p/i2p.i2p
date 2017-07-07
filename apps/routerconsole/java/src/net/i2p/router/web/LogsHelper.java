@@ -37,7 +37,7 @@ public class LogsHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(128);
         for (SigType t : SigType.values()) {
             if (!t.isAvailable()) {
-                buf.append("<b>Crypto:</b> ").append(t.toString()).append(" unavailable<br>");
+                buf.append("<tr><td><b>Crypto:</b></td><td>").append(t.toString()).append(" unavailable</td></tr>");
             }
         }
         return buf.toString();

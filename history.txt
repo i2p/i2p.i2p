@@ -1,5 +1,7 @@
 2017-07-06 str4d
- * Console: Fix log file size config bug on /configlogging bug (ticket #1996)
+ * Console:
+   - /configlogging: Fix log file size config bug (ticket #1996)
+   - /logs: Correctly format unavailable crypto warnings (ticket #1996)
 
 2017-07-02 str4d
  * Console:
