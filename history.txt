@@ -1,3 +1,6 @@
+2017-07-08 zzz
+ * GeoIP, blocklist, translations update
+
 2017-07-06 str4d
  * Console:
    - /configlogging: Fix log file size config bug (ticket #1996)

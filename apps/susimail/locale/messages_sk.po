@@ -4,6 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# ondy, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
@@ -11,17 +12,17 @@ msgstr ""
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
 "PO-Revision-Date: 2017-06-30 21:32+0000\n"
 "Last-Translator: zzzi2p\n"
-"Language-Team: Arabic (http://www.transifex.com/otf/I2P/language/ar/)\n"
+"Language-Team: Slovak (http://www.transifex.com/otf/I2P/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: src/src/i2p/susi/webmail/MailPart.java:207
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
-msgstr ""
+msgstr "Nebol nájdený enkóder pre kódovanie \\''{0}\\''."
 
 #: src/src/i2p/susi/webmail/WebMail.java:330
 #: src/src/i2p/susi/webmail/WebMail.java:344
@@ -37,7 +38,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:607
 msgid "unknown"
-msgstr "غير معروف"
+msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:628
 msgid "Warning: no charset found, fallback to US-ASCII."
@@ -182,9 +183,6 @@ msgid_plural "{0} messages deleted."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1505
 #, java-format
@@ -212,9 +210,6 @@ msgid_plural "{0} Messages"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1768
 msgid "Show Message"
@@ -226,7 +221,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1772
 msgid "Configuration"
-msgstr "تم حفظ تغيرات الاعدادات"
+msgstr "Konfigurácia"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1783
 msgid "SusiMail"
@@ -264,23 +259,23 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2131
 msgid "Send"
-msgstr "أرسل"
+msgstr "Poslať"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2132
 #: src/src/i2p/susi/webmail/WebMail.java:2342
 #: src/src/i2p/susi/webmail/WebMail.java:2479
 msgid "Cancel"
-msgstr "الغاء"
+msgstr "Zrušiť"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2175
 #: src/src/i2p/susi/webmail/WebMail.java:2269
 #: src/src/i2p/susi/webmail/WebMail.java:2427
 msgid "From"
-msgstr "من"
+msgstr "Od"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2176
 msgid "To"
-msgstr "إلى"
+msgstr "Komu"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2177
 msgid "Cc"
@@ -298,7 +293,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2270
 #: src/src/i2p/susi/webmail/WebMail.java:2429
 msgid "Subject"
-msgstr "عنوان"
+msgstr "Predmet"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2183
 msgid "Add Attachment"
@@ -306,7 +301,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2183
 msgid "Add another attachment"
-msgstr "أضف مرفق آخر"
+msgstr "Pridať ďalšiu prílohu"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2189
 msgid "Attachments"
@@ -327,11 +322,11 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2218
 msgid "Password"
-msgstr "كلمة السر"
+msgstr "Heslo"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2223
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2224
 msgid "POP3 Port"
@@ -348,7 +343,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2234
 #: src/src/i2p/susi/webmail/WebMail.java:2361
 msgid "Settings"
-msgstr "الإعدادات"
+msgstr "Nastavenia"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2236
 msgid "Create Account"
@@ -361,7 +356,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2249
 #: src/src/i2p/susi/webmail/WebMail.java:2406
 msgid "New"
-msgstr "جديد"
+msgstr ""
 
 #. In theory, these are valid and will apply to the first checked message,
 #. but that's not obvious and did it work?
@@ -371,7 +366,7 @@ msgstr "جديد"
 #. button( DELETE, _t("Delete") ) + spacer +
 #: src/src/i2p/susi/webmail/WebMail.java:2256
 msgid "Check Mail"
-msgstr "فحص البريد"
+msgstr "Skontrolovať maily"
 
 #. if (Config.hasConfigFile())
 #. out.println(button( RELOAD, _t("Reload Config") ) + spacer);
@@ -383,16 +378,16 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2268
 msgid "Mark for deletion"
-msgstr "اختر للحذف"
+msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2271
 #: src/src/i2p/susi/webmail/WebMail.java:2431
 msgid "Date"
-msgstr "تاريخ"
+msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2274
 msgid "Size"
-msgstr "الحجم"
+msgstr "Veľkosť"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2315
 msgid "Message is new"
@@ -421,7 +416,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2344
 msgid "Delete Selected"
-msgstr "حذف"
+msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2346
 msgid "Mark All"
@@ -434,13 +429,13 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2373
 #: src/src/i2p/susi/webmail/WebMail.java:2374
 msgid "First"
-msgstr ""
+msgstr "Prvé"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2373
 #: src/src/i2p/susi/webmail/WebMail.java:2374
 #: src/src/i2p/susi/webmail/WebMail.java:2417
 msgid "Previous"
-msgstr "السابق"
+msgstr "Predchádzajúce"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2376
 #, java-format
@@ -450,13 +445,13 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2379
 #: src/src/i2p/susi/webmail/WebMail.java:2380
 msgid "Last"
-msgstr ""
+msgstr "Posledné"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2379
 #: src/src/i2p/susi/webmail/WebMail.java:2380
 #: src/src/i2p/susi/webmail/WebMail.java:2419
 msgid "Next"
-msgstr "التالي"
+msgstr "Nasledujúce"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2394
 msgid "Really delete this message?"
@@ -468,7 +463,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2407
 msgid "Reply"
-msgstr "الرد"
+msgstr "Odpovedať"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2408
 msgid "Reply All"
@@ -485,7 +480,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2412
 #: src/src/i2p/susi/webmail/WebMail.java:2414
 msgid "Delete"
-msgstr "حذف"
+msgstr "Odstrániť"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2418
 msgid "Back to Folder"

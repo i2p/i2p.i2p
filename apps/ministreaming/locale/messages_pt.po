@@ -1,0 +1,95 @@
+# I2P
+# Copyright (C) 2014 The I2P Project
+# This file is distributed under the same license as the streaming package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# Translators:
+# Manuela Silva <manuela.silva@sky.com>, 2017
+# Manuela Silva <manuela.silva@sky.com>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-29 14:30+0000\n"
+"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"Last-Translator: Manuela Silva <manuela.silva@sky.com>\n"
+"Language-Team: Portuguese (http://www.transifex.com/otf/I2P/language/pt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
+msgid "Message timeout"
+msgstr "Mensagem expirou"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
+msgid "Failed delivery to local destination"
+msgstr "Não foi possível entregar no destino local."
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
+msgid "Local router failure"
+msgstr "Falha do roteador local"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
+msgid "Local network failure"
+msgstr "Falha da rede local"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
+msgid "Session closed"
+msgstr "Sessão fechada"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
+msgid "Invalid message"
+msgstr "Mensagem inválida"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
+msgid "Invalid message options"
+msgstr "Opções de mensagem inválidas"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
+msgid "Buffer overflow"
+msgstr "Memória intermédia cheia"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
+msgid "Message expired"
+msgstr "Mensagem expirou"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
+msgid "Local lease set invalid"
+msgstr ""
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
+msgid "No local tunnels"
+msgstr "Sem túneis locais"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:102
+msgid "Unsupported encryption options"
+msgstr "Opções de encripatção não suportadas"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:105
+msgid "Invalid destination"
+msgstr "Destino inválido"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
+msgid "Destination lease set expired"
+msgstr ""
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
+msgid "Destination lease set not found"
+msgstr ""
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
+msgid "Local destination shutdown"
+msgstr "Encerrar destino local"
+
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
+msgid "Connection was reset"
+msgstr "A ligação foi reiniciada"
+
+#. Translate this one here, can't do it later
+#: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
+msgid "Failure code"
+msgstr "Falha de código"
