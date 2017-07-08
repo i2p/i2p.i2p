@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2016-05-25 12:34+0000\n"
+"PO-Revision-Date: 2017-06-30 21:32+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Catalan (http://www.transifex.com/otf/I2P/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,7 @@ msgstr ""
 #. status translations are in the console bundle
 #: src/net/i2p/desktopgui/InternalTrayManager.java:370
 msgid "Network"
-msgstr ""
+msgstr "Xarxa"
 
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63

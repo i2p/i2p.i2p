@@ -2,22 +2,23 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the routerconsole package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
-#
+# 
 # Translators:
 # topdog101 <topdog101@free.fr>, 2014
+# topdog101 <topdog101@free.fr>, 2014
+# zzzi2p, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-30 19:59+0000\n"
-"PO-Revision-Date: 2014-03-15 08:13+0000\n"
-"Last-Translator: topdog101 <topdog101@free.fr>\n"
-"Language-Team: Malagasy (http://www.transifex.com/projects/p/I2P/language/"
-"mg/)\n"
-"Language: mg\n"
+"POT-Creation-Date: 2013-07-13 21:46+0000\n"
+"PO-Revision-Date: 2017-07-08 14:40+0000\n"
+"Last-Translator: zzzi2p\n"
+"Language-Team: Malagasy (http://www.transifex.com/otf/I2P/language/mg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: mg\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
@@ -28,23 +29,22 @@ msgstr "Tongasoa eto amin'i I2P!"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr ""
-"Azafady{0}miandrasa  kely{1}mbola mamelona tena sy mitady olona "
-"hifandraisana i I2P."
+msgstr "Azafady{0}miandrasa  kely{1}mbola mamelona tena sy mitady olona hifandraisana i I2P."
 
 #, java-format
-msgid "While you are waiting, please {0}adjust your bandwidth settings{1} on the {2} configuration page{3}."
-msgstr "Mandra-piandry, mba {0} amboary ny bandwidth{1} eo amin''ny {2} pejy fanitsiana{3}"
+msgid ""
+"While you are waiting, please {0}adjust your bandwidth settings{1} on the "
+"{2}configuration page{3}."
+msgstr "Mandra-piandry, mba{0}amboary ny bandwidth{1}eo amin''ny {2}pejy fanitsiana{3}"
 
-msgid "Also you can setup your browser to use the I2P proxy to reach eepsites."
+msgid ""
+"Also you can setup your browser to use the I2P proxy to reach eepsites."
 msgstr "Azonao atao koa ny manomana ny fiejerena tranonkala ny mba ampiasa ny proxy I2P rehefa hijery eepsites."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
-"Ampidiro fotsiny ny 127.0.0.1(na localhost) sy port 4444 mba ho proxy http "
-"ao anatin'ny fanitsiana ny firejena tranon-kalanao."
+msgstr "Ampidiro fotsiny ny 127.0.0.1(na localhost) sy port 4444 mba ho proxy http ao anatin'ny fanitsiana ny firejena tranon-kalanao."
 
 msgid "Do not use SOCKS for this."
 msgstr "Aza mampiasa SOCKS amin'ity."
@@ -52,21 +52,16 @@ msgstr "Aza mampiasa SOCKS amin'ity."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
-"Misy filazana hafa koa azo jerena ao amin''ny {0}Pejy fanitsian''ny proxy "
-"hoan''ny I2P{1}."
+msgstr "Misy filazana hafa koa azo jerena ao amin''ny {0}Pejy fanitsian''ny proxy hoan''ny I2P{1}."
 
 #, java-format
 msgid ""
-"Once you have a \"shared clients\" destination listed on the left, please {0}"
-"check out{1} our {2}FAQ{3}."
-msgstr ""
-"Rehefa mahita \"shared clients\" eo amin'ny  lisitra amin'ny ankavia , dia "
-"{0}jereo ny{1} misy ny {2}Fanontaniana mateti-pitranga{3}."
+"Once you have a \"shared clients\" destination listed on the left, please "
+"{0}check out{1} our {2}FAQ{3}."
+msgstr "Rehefa mahita \"shared clients\" eo amin'ny  lisitra amin'ny ankavia , dia {0}jereo ny{1} misy ny {2}Fanontaniana mateti-pitranga{3}."
 
 #, java-format
 msgid ""
-"Point your IRC client to {0}localhost:6668{1} and say hi to us on {2}#i2p{3}."
-msgstr ""
-"Tondroy ny fampiresahana IRC eo amin''ny {0}localhost:6668{1} dia miresaha "
-"aminay eo amin''ny {2}#i2p{3}."
+"Point your IRC client to {0}localhost:6668{1} and say hi to us on "
+"{2}#i2p{3}."
+msgstr "Tondroy ny fampiresahana IRC eo amin''ny {0}localhost:6668{1} dia miresaha aminay eo amin''ny {2}#i2p{3}."

@@ -5,14 +5,16 @@
 # Translators:
 # Leelium <bovas85@gmail.com>, 2012
 # Sparta83 <dlditalydownload@gmail.com>, 2012
-# Sebastiano Pistore <olatusrooc@virgilio.it>, 2016
+# Leelium <bovas85@gmail.com>, 2012
+# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2016
+# Sparta83 <dlditalydownload@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2016-09-15 08:54+0000\n"
-"Last-Translator: Sebastiano Pistore <olatusrooc@virgilio.it>\n"
+"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>\n"
 "Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +26,7 @@ msgstr ""
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "Avviare il router I2P all'avvio?"
+msgstr "Lanciare il router I2P all'avvio?"
 
 #. Type: boolean
 #. Description
@@ -32,13 +34,13 @@ msgstr "Avviare il router I2P all'avvio?"
 msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
-msgstr "Il router I2P può essere eseguito come daemon che si avvia al boot del computer. Questa è la configurazione raccomandata."
+msgstr "Il router I2P può essere eseguito come demone che si avvia all'apertura del sistema. Questa è la configurazione raccomandata."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
 msgid "I2P daemon user:"
-msgstr "Utente I2P Daemon: "
+msgstr "Utente demone I2P:"
 
 #. Type: string
 #. Description
@@ -48,7 +50,7 @@ msgid ""
 " a daemon. To use an **existing** I2P profile you may enter a different "
 "account name here. For example, if your previous I2P installation is at "
 "/home/user/i2p, you may enter 'user' here."
-msgstr "Di Default I2P è configurato in modo da essere eseguito sotto l'account i2psvc quando eseguito come daemon. Per usare un profilo I2P **esistente** puoi accedere con un diverso account qui. Per esempio, se la tua precedente installazione di I2P si trova in /casa/utente/i2p, dovresti inserire \"utente\" qui."
+msgstr "Di default I2P è configurato in modo da essere eseguito sotto l'account i2psvc quando eseguito come demone. Per usare un profilo I2P **già esistente** puoi accedere con un diverso account qui. Per esempio, se la tua precedente installazione di I2P si trova in /casa/utente/i2p, dovresti inserire \"utente\" qui."
 
 #. Type: string
 #. Description
@@ -56,7 +58,7 @@ msgstr "Di Default I2P è configurato in modo da essere eseguito sotto l'account
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Molto Importante: Se qui è inserito un nome utente diverso da quello base di \"i2psvc\", l'username scelto *DEVE* essere stato già inserito in precedenza."
+msgstr "Molto importante: Se qui è inserito un nome utente diverso da quello base di \"i2psvc\", l'username scelto *DEVE* essere stato già inserito in precedenza."
 
 #. Type: string
 #. Description
@@ -68,7 +70,7 @@ msgstr "Memoria che può essere allocata ad I2P:"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Di base I2P è abilitato ad usare fino a 128MB di RAM. "
+msgstr "Di default I2P è abilitato ad usare fino a 128MB di RAM."
 
 #. Type: string
 #. Description
@@ -76,13 +78,13 @@ msgstr "Di base I2P è abilitato ad usare fino a 128MB di RAM. "
 msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
-msgstr "Router con connessioni veloci, così come i router con molti torrent/plugin attivi, potrebbero necessitare l'aumento di questo valore."
+msgstr "Router con connessioni veloci, così come router con molti torrent / plugin attivi, potrebbero richiedere l'aumento di questo valore."
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
 msgid "Run I2P daemon confined with AppArmor"
-msgstr "Eseguire demone I2P confinato tramite AppArmor"
+msgstr "Eseguire demone I2P sandboxato tramite AppArmor"
 
 #. Type: boolean
 #. Description

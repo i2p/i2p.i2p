@@ -5,13 +5,14 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# Sebastiano Pistore <olatusrooc@virgilio.it>, 2017
+# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2017
+# Kereus <williamdicicco@protonmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Sebastiano Pistore <olatusrooc@virgilio.it>, 2017\n"
+"Last-Translator: Kereus <williamdicicco@protonmail.com>, 2017\n"
 "Language-Team: Italian (https://www.transifex.com/otf/teams/12694/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,6 +72,8 @@ msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
 msgstr ""
+"Scarica un file non interattivo via HTTP. I trasferimenti tramite I2P e il "
+"regolare internet è supportato."
 
 #. type: Plain text
 #: man/eepget.1:21
@@ -97,7 +100,7 @@ msgstr "B<-c>"
 #: man/eepget.1:25
 #, no-wrap
 msgid "Clearnet. Do not use a proxy. Same as B<-p> :0 ."
-msgstr ""
+msgstr "Clearnet. Non utilizzare un proxy. Uguale a <-p> :0 ."
 
 #. type: Plain text
 #: man/eepget.1:31
@@ -108,7 +111,7 @@ msgstr "B<-e> etag"
 #: man/eepget.1:31
 #, no-wrap
 msgid "Sets the etag value in the request headers."
-msgstr ""
+msgstr "Imposta il valore di etag nelle intestazioni di richiesta."
 
 #. type: Plain text
 #: man/eepget.1:37
@@ -120,6 +123,8 @@ msgstr "B<-h> nome=valore"
 #, no-wrap
 msgid "Adds an arbitrary request header with the given name and value."
 msgstr ""
+"Aggiunge un'intestazione di richiesta arbitraria con il nome e valore "
+"specificati."
 
 #. type: Plain text
 #: man/eepget.1:43
@@ -133,6 +138,8 @@ msgid ""
 "Controls the progress display. B<\\ lineLen > is the length of one progress "
 "line in characters. The default is 40."
 msgstr ""
+"Controlla il display di avanzamento. B<\\ lineLen > è la lunghezza di una "
+"linea di progresso in caratteri. L'impostazione predefinita è 40."
 
 #. type: Plain text
 #: man/eepget.1:49
@@ -186,6 +193,10 @@ msgid ""
 "eepget will use 4444. If this option is not specified, eepget will use "
 "127.0.0.1:4444. Specify B<-c> or B<-p> :0 to disable the eeproxy."
 msgstr ""
+"Specifica un server proxy I2P (eeproxy) da utilizzare. Se la porta non è "
+"specificata, eepget userà la porta 4444. Se questa opzione non è "
+"specificata, eepget userà 127.0.0.1:4444. Specifica B<-c> oppure B<-p> :0 to"
+" disable the eeproxy."
 
 #. type: Plain text
 #: man/eepget.1:73
@@ -197,6 +208,7 @@ msgstr "B<-t> secondi"
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
 msgstr ""
+"Imposta il tempo di inattività. L'impostazione predefinita è di 60 secondi."
 
 #. type: Plain text
 #: man/eepget.1:79
@@ -207,7 +219,7 @@ msgstr "B<-u> username"
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr ""
+msgstr "Imposta il nome utente per l'autorizzazione proxy, se necessario."
 
 #. type: Plain text
 #: man/eepget.1:85
@@ -221,6 +233,9 @@ msgid ""
 "Sets the password for proxy authorization, if required. If a username is "
 "specified but not a password, EepGet will prompt for the password."
 msgstr ""
+"Imposta la password per l'autorizzazione proxy, se necessario. se è "
+"specificato un nome utente ma non una password, EepGet richiederà la "
+"password."
 
 #. type: SH
 #: man/eepget.1:89
@@ -276,6 +291,8 @@ msgid ""
 "B<i2prouter> "
 "{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 msgstr ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 
 #. type: Plain text
 #: man/i2prouter.1:13
@@ -291,7 +308,7 @@ msgstr "B<console>"
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
-msgstr ""
+msgstr "Esegui I2P come applicazione di console sotto l'utente attuale."
 
 #. type: IP
 #: man/i2prouter.1:19
@@ -335,7 +352,7 @@ msgstr "B<condrestart>"
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr ""
+msgstr "Riavvia il servizio I2P solo se è già in esecuzione."
 
 #. type: IP
 #: man/i2prouter.1:35
@@ -346,7 +363,7 @@ msgstr "B<graceful>"
 #. type: Plain text
 #: man/i2prouter.1:37
 msgid "Stop I2P gracefully (may take up to 11 minutes)"
-msgstr ""
+msgstr "Ferma I2P graziosamente (può richiedere fino a 11 minuti)"
 
 #. type: IP
 #: man/i2prouter.1:39
@@ -358,6 +375,8 @@ msgstr "B<install>"
 #: man/i2prouter.1:41
 msgid "Install initscript to start I2P automatically when the system boots."
 msgstr ""
+"Installa initscript per avviare I2P automaticamente quando il sistema viene "
+"avviato."
 
 #. type: IP
 #: man/i2prouter.1:43
@@ -420,6 +439,10 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
+"Avvia il router I2P, senza il wrapper di servizio. Ciò significa che il "
+"router non si riavvierà se si dovesse bloccare. Inoltre, utilizzerà la "
+"dimensione di memoria predefinita, che potrebbe non essere sufficiente per "
+"I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23

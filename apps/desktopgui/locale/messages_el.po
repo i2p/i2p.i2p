@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2016-05-25 12:34+0000\n"
+"PO-Revision-Date: 2017-06-30 21:32+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +47,7 @@ msgstr ""
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
 msgid "Disable"
-msgstr ""
+msgstr "Απενεργοποίηση"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:93
 #: src/net/i2p/desktopgui/InternalTrayManager.java:245
@@ -77,16 +77,16 @@ msgstr ""
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format
 msgid "Shutdown in {0}"
-msgstr ""
+msgstr "Σβήσιμο σε {0}"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:365
 msgid "Shutdown imminent"
-msgstr ""
+msgstr "Επίκειται σβήσιμο"
 
 #. status translations are in the console bundle
 #: src/net/i2p/desktopgui/InternalTrayManager.java:370
 msgid "Network"
-msgstr ""
+msgstr "Δίκτυο "
 
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63

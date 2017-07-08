@@ -4,14 +4,14 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Yeon-Ung Choi <kqwe1859@gmail.com>, 2016
+# HelloKS <kqwe1859@gmail.com>, 2016
 # SEPT____ <xpressengine3@mail.beo.kr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2016-12-05 15:35+0000\n"
+"PO-Revision-Date: 2017-06-30 21:33+0000\n"
 "Last-Translator: SEPT____ <xpressengine3@mail.beo.kr>\n"
 "Language-Team: Korean (http://www.transifex.com/otf/I2P/language/ko/)\n"
 "MIME-Version: 1.0\n"

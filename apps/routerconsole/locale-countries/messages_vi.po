@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-17 01:08+0000\n"
-"PO-Revision-Date: 2015-07-17 01:31+0000\n"
+"POT-Creation-Date: 2015-07-17 01:33+0000\n"
+"PO-Revision-Date: 2017-06-30 21:33+0000\n"
 "Last-Translator: kytv <killyourtv@i2pmail.org>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/projects/p/I2P/language/vi/)\n"
+"Language-Team: Vietnamese (http://www.transifex.com/otf/I2P/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,10 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Anonymous Proxy"
-msgstr ""
+msgstr "Proxy ẩn danh"
 
 msgid "Satellite Provider"
-msgstr ""
+msgstr "Nhà cung cấp vệ tinh"
 
 msgid "Andorra"
 msgstr "Andorra"
@@ -74,7 +74,7 @@ msgid "Aruba"
 msgstr "Aruba"
 
 msgid "Åland Islands"
-msgstr ""
+msgstr "Åland Islands"
 
 msgid "Azerbaijan"
 msgstr "Azerbaijan"
@@ -116,7 +116,7 @@ msgid "Brunei Darussalam"
 msgstr "Brunei Darussalam"
 
 msgid "Bolivia"
-msgstr ""
+msgstr "Bô-li-vi-a"
 
 msgid "Bonaire"
 msgstr ""
@@ -146,7 +146,7 @@ msgid "Canada"
 msgstr "Canada"
 
 msgid "Cocos (Keeling) Islands"
-msgstr ""
+msgstr "Quần đảo Co-co-xợ (Khi-lịng)"
 
 msgid "Congo"
 msgstr "Congo"
@@ -188,10 +188,10 @@ msgid "Cape Verde"
 msgstr "Cape Verde"
 
 msgid "Curaçao"
-msgstr ""
+msgstr "Cu-ra-cao"
 
 msgid "Christmas Island"
-msgstr ""
+msgstr "Christmas Island"
 
 msgid "Cyprus"
 msgstr "Cyprus"
@@ -227,7 +227,7 @@ msgid "Egypt"
 msgstr "Ai Cập"
 
 msgid "Western Sahara"
-msgstr ""
+msgstr "Tây Sa-ha-ra"
 
 msgid "Eritrea"
 msgstr "Eritrea"
@@ -239,7 +239,7 @@ msgid "Ethiopia"
 msgstr "Ethiopia"
 
 msgid "European Union"
-msgstr ""
+msgstr "Liên minh châu Âu"
 
 msgid "Finland"
 msgstr "Phần Lan"
@@ -275,7 +275,7 @@ msgid "French Guiana"
 msgstr "Guiana thuộc Pháp"
 
 msgid "Guernsey"
-msgstr ""
+msgstr "Guernsey"
 
 msgid "Ghana"
 msgstr "Ghana"
@@ -341,7 +341,7 @@ msgid "Israel"
 msgstr "Do Thái"
 
 msgid "Isle of Man"
-msgstr ""
+msgstr "Đảo Man"
 
 msgid "India"
 msgstr "Ấn Độ"
@@ -362,7 +362,7 @@ msgid "Italy"
 msgstr "Ý"
 
 msgid "Jersey"
-msgstr ""
+msgstr "Jersey"
 
 msgid "Jamaica"
 msgstr "Jamaica"
@@ -449,10 +449,10 @@ msgid "Moldova"
 msgstr ""
 
 msgid "Montenegro"
-msgstr ""
+msgstr "Montenegro"
 
 msgid "Saint Martin"
-msgstr ""
+msgstr "Saint Martin"
 
 msgid "Madagascar"
 msgstr "Madagascar"
@@ -572,7 +572,7 @@ msgid "Saint Pierre and Miquelon"
 msgstr "Saint Pierre và Miquelon"
 
 msgid "Pitcairn Islands"
-msgstr ""
+msgstr "Quần đảo Pitcairn"
 
 msgid "Puerto Rico"
 msgstr "Puerto Rico"
@@ -626,13 +626,13 @@ msgid "Singapore"
 msgstr "Singapore"
 
 msgid "Saint Helena"
-msgstr ""
+msgstr "Saint Helena"
 
 msgid "Slovenia"
 msgstr "Slovenia"
 
 msgid "Svalbard and Jan Mayen"
-msgstr ""
+msgstr "Svalbard và Jan Mayen"
 
 msgid "Slovakia"
 msgstr "Slovakia"

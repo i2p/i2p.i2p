@@ -8,14 +8,14 @@
 # mkkid <jokjok@hotmail.it>, 2011
 # Leelium <bovas85@gmail.com>, 2012
 # mkkid <jokjok@hotmail.it>, 2011
-# Sebastiano Pistore <olatusrooc@virgilio.it>, 2016
+# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-03-29 09:21+0000\n"
-"Last-Translator: Sebastiano Pistore <olatusrooc@virgilio.it>\n"
+"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>\n"
 "Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,7 +61,7 @@ msgstr "Riavvia I2P"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:110
 #: src/net/i2p/desktopgui/InternalTrayManager.java:262
 msgid "Stop I2P"
-msgstr "Ferma I2P"
+msgstr "Arresta I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:126
 #: src/net/i2p/desktopgui/InternalTrayManager.java:278

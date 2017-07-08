@@ -36,7 +36,7 @@ msgstr "2017年1月26日"
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
 #, no-wrap
 msgid "I2P"
-msgstr ""
+msgstr "I2P"
 
 #. type: SH
 #: man/eepget.1:3 man/i2prouter.1:3 man/i2prouter-nowrapper.1:3
