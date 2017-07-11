@@ -1186,6 +1186,7 @@ public class I2PSnarkServlet extends BasicServlet {
             String lang = req.getParameter("lang");
             boolean ratings = req.getParameter("ratings") != null;
             boolean comments = req.getParameter("comments") != null;
+            // commentsName is filtered in SnarkManager.updateConfig()
             String commentsName = req.getParameter("nofilter_commentsName");
             _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
@@ -2555,8 +2556,6 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean isPrivate = privateTrackers.contains(t.announceURL);
             boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
             boolean isOpen = isKnownOpen || openTrackers.contains(t.announceURL);
-            // TODO: either disable all checkboxes in this section, or disable all checkboxes that cannot be configured, leaving only user-configured tracker checkboxes active
-            // Currently checked but fixed checkboxes are not marked as disabled, preventing styling by disabled status
             buf.append("<tr class=\"knownTracker\"><td><input type=\"checkbox\" class=\"optbox\" id=\"").append(name).append("\" name=\"delete_")
                .append(name).append("\" title=\"").append(_t("Mark tracker for deletion")).append("\">" +
                        "</td><td><label for=\"").append(name).append("\">").append(name)

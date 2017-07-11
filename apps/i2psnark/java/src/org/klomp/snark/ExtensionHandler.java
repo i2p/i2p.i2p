@@ -477,6 +477,7 @@ abstract class ExtensionHandler {
                      Map<String, BEValue> m = li.getMap();
                      String owner = m.get("owner").getString();
                      String text = m.get("text").getString();
+                     // 0-5 range for rating is enforced by Comment constructor
                      int rating = m.get("like").getInt();
                      long time = now - (Math.max(0, m.get("timestamp").getInt()) * 1000L);
                      Comment c = new Comment(text, owner, rating, time, false);
