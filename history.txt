@@ -1,4 +1,6 @@
 2017-07-11 str4d
+ * Console: Increase displayed changelog lines to help ensure at least one
+   whole release cycle is visible
  * I2PSnark: Fix I2PSnarkUtil.getCommentsName() to match its JavaDoc
  * Fix HTML tags across non-default conditional branches
 
