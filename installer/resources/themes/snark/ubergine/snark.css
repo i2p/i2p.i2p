@@ -2835,8 +2835,12 @@ code {
      width: 1%;
 }
 
-tt, .snarkMessages, input,  textarea {
+tt, input,  textarea {
      font-size: 9pt !important;
+}
+
+.snarkMessages {
+     font-size: 8pt !important;
 }
 
 input[type="text"], input.r, input[name="nofilter_dataDir"], .configsectionpanel textarea {
@@ -2900,6 +2904,10 @@ select {
 @media screen and (min-width: 1600px) {
 .snarkTorrentUploaded {
      padding-left: 6px;
+}
+
+.snarkMessages {
+     font-size: 9pt !important;
 }
 }
 

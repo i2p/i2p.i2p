@@ -1,7 +1,16 @@
 2017-07-11 str4d
- * Console: Increase displayed changelog lines to help ensure at least one
-   whole release cycle is visible
- * I2PSnark: Fix I2PSnarkUtil.getCommentsName() to match its JavaDoc
+ * Console:
+   - Increase displayed changelog lines to help ensure at least one whole
+     release cycle is visible
+   - /tunnels: Fix display issue with inbound/outbound glyph display in table
+     header (classic/light)
+   - light: Prevent routerlogs from causing horizontal page overflow
+ * I2PSnark:
+   - Fix I2PSnarkUtil.getCommentsName() to match its JavaDoc
+   - Reduce size of screenlog font at 1400-1600px viewport width to lessen
+     chance of text-wrapping (ticket #1996)
+   - classic: Fix a linespacing issue in the config section (options:) that only
+     triggers in foreign languages that force the options td to wrap
  * Fix HTML tags across non-default conditional branches
 
 2017-07-08 zzz

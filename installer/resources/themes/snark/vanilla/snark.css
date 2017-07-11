@@ -2817,8 +2817,12 @@ body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input
      font-size: 10pt !important;
 }
 
-tt, .snarkTorrents tt, .snarkMessages, textarea {
+tt, .snarkTorrents tt, textarea {
      font-size: 9pt !important;
+}
+
+.snarkMessages {
+     font-size: 8pt !important;
 }
 
 .snarkAddInfo, .configsectionpanel td, .snarkNewTorrent td, .configsectionpanel th,
@@ -2931,6 +2935,12 @@ tr#torrentInfoStats td {
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 14pt !important;
      letter-spacing: 0.1em !important;
+}
+}
+
+@media screen and (min-width: 1600px) {
+.snarkMessages {
+     font-size: 9pt !important;
 }
 }
 

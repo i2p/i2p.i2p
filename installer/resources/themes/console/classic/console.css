@@ -6319,6 +6319,7 @@ table.sybil_routerinfo:last-child {
 
 .tunnels_client th:first-child::after {
      content: "\21E9\21E7";
+     font-family: sans-serif;
      font-size: 12pt;
      line-height: 0;
      vertical-align: middle;

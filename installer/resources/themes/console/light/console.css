@@ -1903,7 +1903,7 @@ table#wrapperlogs {
 
 #logs ul {
      margin-left: 0;
-     margin-right: -28px;
+     margin-right: -26px;
      display: inline-block;
      word-break: break-all;
 }
@@ -6246,8 +6246,8 @@ body {
 }
 
 .tunnels_client th:first-child::after {
-     content: "\21F5";
      content: "\21E9\21E7";
+     font-family: sans-serif;
      font-size: 12pt;
      line-height: 0;
      vertical-align: middle;

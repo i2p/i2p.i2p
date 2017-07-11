@@ -381,12 +381,12 @@ textarea:focus {
      transition: ease filter 0.3s 0s;
 }
 
-textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus  {
+textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus {
      margin: 0;
      border: 0;
      box-shadow: none;
      height: 80px;
-     font-size: 9pt;
+     font-size: 8pt;
      width: 100%;
      border-radius: 0;
      padding: 2px 4px;
@@ -478,7 +478,7 @@ input[type="password"] {
      cursor: text;
 }
 
-input[type="text"], input[type="password"], textarea, textarea[readonly="readonly"]:focus  {
+input[type="text"], input[type="password"], textarea, textarea[readonly="readonly"]:focus {
      background: #000;
      background: linear-gradient(to bottom, #000 0%, #000019 100%);
      box-shadow: inset 0 0 3px 3px #000;
@@ -951,7 +951,7 @@ input[type="checkbox"], input[type="radio"] {
      margin: 5px 3px 5px 5px;
 }
 
-.freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField  {
+.freetext, .tunnelConfig textarea, #customOptions, #userAgents, #hostField {
      margin: 5px !important;
 }
 
@@ -998,7 +998,6 @@ td.tunnelDestination, td.tunnelDescription {
 
 /* end more space */
 
-
 /* responsive layout */
 
 @media screen and (max-width: 800px) {
@@ -1039,6 +1038,10 @@ th {
 @media screen and (min-width: 1300px) {
 body, td, .control, select, input, textarea {
      font-size: 10pt !important;
+}
+
+textarea#statusMessages, textarea#statusMessages:active, textarea#statusMessages:focus {
+     font-size: 9pt !important;
 }
 
 td {

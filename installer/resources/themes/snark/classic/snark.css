@@ -1788,13 +1788,6 @@ img:hover {
      display: none;
 }
 
-#configs td:first-child::before {
-     content: "";
-     min-height: 34px;
-     display: inline-block;
-     vertical-align: middle;
-}
-
 #configs a {
      font-weight: bold;
 }
@@ -2224,7 +2217,6 @@ hr.debug:last-child {
 /* end priorities */
 
 /* configs */
-
 
 #configs td:nth-child(2) {
      white-space: nowrap;
@@ -2661,7 +2653,7 @@ body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_
 }
 
 .snarkMessages li, .snarkTorrents tt {
-     font-size: 9pt;
+     font-size: 8pt !important;
 }
 
 .snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {
@@ -2683,6 +2675,12 @@ td.snarkTorrentDownloaded {
 
 #dhtDebugInner {
      margin-top: -26px !important;
+}
+}
+
+@media screen and (min-width: 1600px) {
+.snarkMessages li, .snarkTorrents tt {
+     font-size: 9pt !important;
 }
 }
 

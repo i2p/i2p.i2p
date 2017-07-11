@@ -1294,6 +1294,7 @@ div.logo hr {
      border-collapse: separate;
      border-spacing: 0;
      margin-top: -5px !important;
+     margin-bottom: -9px !important;
 }
 
 #sb_localtunnels a {
@@ -6210,11 +6211,11 @@ form[action="events"] {
 }
 
 .routersummary .testing {
-     border: 1px dotted #4F4B1D;
+     border: 1px dotted #4f4b1d;
 }
 
 .routersummary .hidden, .routersummary .vmcomm {
-     border: 1px dotted #777;
+     border: 1px solid #241f69;
 }
 
 .routersummary .running {
