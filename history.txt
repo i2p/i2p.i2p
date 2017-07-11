@@ -40,7 +40,7 @@
  * I2PSnark:
    - Fix unclosed <label>
    - Standalone:
-     - Better target the per-theme resources
+     - Better target the per-theme and imported console resources
      - List all available themes in config section
    - Themes: tidyups & further optimizations to reduce lag
 
@@ -96,7 +96,7 @@
 
 2017-06-12 str4d
  * Console:
-   - /logs: fixed environment/running info table resize on focus (ticket #1996)
+   - /logs: fixed environment/running info table resize on hover (ticket #1996)
    - Scale theme/language divs so we don't truncate language display
    - Arabic (light) adjust font size for sidebar elements
    - Sidebar network status display (ticket #1996)
@@ -171,7 +171,7 @@
      - Reduce size of monospace dests in peers/profiles/tunnels, add additional
        spacing (responsive)
      - Fix resizing of sidebar reseed button
-     - De-emphasise siderbar app icons with background-blend-mode: luminosity
+     - De-emphasise sidebar app icons with background-blend-mode: luminosity
      - Change sidebar snark icon to match homepage icon
      - Bump div.main text color from #222 to #333 (reduce contrast)
      - (light, dark, midnight) fix minor alignment issues with Arabic CSS
