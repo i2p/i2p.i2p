@@ -3506,6 +3506,8 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</option>\n");
                 }
                 buf.append("</select>\n</td>");
+            } else {
+                buf.append("<td></td>");
             }
             if (esc) {
                 buf.append("<td id=\"addCommentText\"><textarea name=\"nofilter_newComment\" cols=\"44\" rows=\"4\"></textarea></td>");
@@ -3599,9 +3601,11 @@ public class I2PSnarkServlet extends BasicServlet {
                             buf.append("</div></td><td class=\"commentDelete\"><input type=\"checkbox\" class=\"optbox\" name=\"cdelete.")
                                .append(c.getID()).append("\" title=\"").append(_t("Mark for deletion")).append("\">");
                             ccount++;
+                        } else {
+                            buf.append("</td><td class=\"commentDelete\">"); // insert empty named columns to maintain table layout
                         }
                     } else {
-                        buf.append("</td><td class=\"commentDelete\">"); // insert empty named columns to maintain table layout .. fails to catch uncommented row when comments also shown
+                        buf.append("</td><td class=\"commentDelete\">"); // insert empty named columns to maintain table layout
                     }
                     buf.append("</td></tr>\n");
                 }

@@ -757,9 +757,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
                     out.write(_t("{0} jump service", jumphost));
                     out.write("</a>\n");
                 }
+                if (!first) { // We wrote out the opening <div>
+                    out.write("</div>\n");
+                }
             }
         }
-        out.write("</div>\n</div>\n");
+        out.write("</div>\n");
         writeFooter(out);
     }
 

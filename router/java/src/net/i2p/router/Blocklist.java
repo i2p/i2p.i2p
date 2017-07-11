@@ -1014,13 +1014,13 @@ public class Blocklist {
     public void renderStatusHTML(Writer out) throws IOException {
         // move to the jsp
         //out.write("<h2>Banned IPs</h2>");
+        out.write("<table id=\"bannedips\"><tr><td>");
+        out.write("<table id=\"banneduntilrestart\"><tr><th align=\"center\"><b>");
+        out.write(_t("IPs Banned Until Restart"));
+        out.write("</b></th></tr>");
         Set<Integer> singles = new TreeSet<Integer>();
         singles.addAll(_singleIPBlocklist);
         if (!(singles.isEmpty() && _singleIPv6Blocklist.isEmpty())) {
-            out.write("<table id=\"bannedips\"><tr><td>");
-            out.write("<table id=\"banneduntilrestart\"><tr><th align=\"center\"><b>");
-            out.write(_t("IPs Banned Until Restart"));
-            out.write("</b></th></tr>");
             if (!singles.isEmpty()) {
                 out.write("<tr id=\"ipv4\" align=\"center\"><td><b>");
                 out.write(_t("IPv4 Addresses"));
@@ -1060,13 +1060,18 @@ public class Blocklist {
                      out.write("</td></tr>\n");
                 }
             }
-            out.write("</table>");
+        } else {
+            out.write("<tr><td><i>");
+            out.write(_t("none"));
+            out.write("</i></td></tr>");
         }
+        out.write("</table>");
+        out.write("</td><td>");
+        out.write("<table id=\"permabanned\"><tr><th align=\"center\" colspan=\"3\"><b>");
+        out.write(_t("IPs Permanently Banned"));
+        out.write("</b></th></tr>");
         if (_blocklistSize > 0) {
-            out.write("</td><td>");
-            out.write("<table id=\"permabanned\"><tr><th align=\"center\" colspan=\"3\"><b>");
-            out.write(_t("IPs Permanently Banned"));
-            out.write("</b></th></tr><tr><td align=\"center\" width=\"49%\"><b>");
+            out.write("<tr><td align=\"center\" width=\"49%\"><b>");
             out.write(_t("From"));
             out.write("</b></td><td></td><td align=\"center\" width=\"49%\"><b>");
             out.write(_t("To"));
@@ -1110,13 +1115,13 @@ public class Blocklist {
                 // very rare, don't bother translating
                 out.write("<tr><th colspan=2>First " + MAX_DISPLAY + " displayed, see the " +
                           BLOCKLIST_FILE_DEFAULT + " file for the full list</th></tr>");
-            out.write("</table>");
-            out.write("</td></tr></table>");
         } else {
-            out.write("<br><i>");
+            out.write("<tr><td><i>");
             out.write(_t("none"));
-            out.write("</i>");
+            out.write("</i></td></tr>");
         }
+        out.write("</table>");
+        out.write("</td></tr></table>");
         out.flush();
     }
 

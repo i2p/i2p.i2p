@@ -1,5 +1,6 @@
 2017-07-11 str4d
  * I2PSnark: Fix I2PSnarkUtil.getCommentsName() to match its JavaDoc
+ * Fix HTML tags across non-default conditional branches
 
 2017-07-08 zzz
  * GeoIP, blocklist, translations update
