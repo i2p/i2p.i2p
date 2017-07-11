@@ -679,7 +679,7 @@ public class I2PSnarkUtil {
      *  @since 0.9.31
      */
     public String getCommentsName() {
-        return _commentsName;
+        return _commentsName == null ? "" : _commentsName;
     }
 
     /** @since 0.9.31 */
