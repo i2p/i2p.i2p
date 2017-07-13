@@ -109,6 +109,7 @@ the binaries or sources.
   We bundle a large portion of the 1.6.0 source from https://github.com/OpenNMS/jrobin
   No package or not widely available.
   There is an old 1.5.9 Maven jrobin package at http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.jrobin%22
+  Jrobin is in Gentoo.
 
 * libhttpclient-java
   We only use a few classes from this large package.

@@ -1375,8 +1375,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if(_context.namingService().getName().equals("BlockfileNamingService")) {
             out.write(" " + _t("If you want to keep track of sites you have added manually, add to your Master or Private address book instead."));
         }
+        // FIXME wasn't escaped
+        String label = _t("Save & continue").replace("&", "&amp;");
         out.write("</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"router\" value=\"router\">" +
-                  _t("Save & continue") + "</button></div>\n");
+                  label + "</button></div>\n");
 
         if(_context.namingService().getName().equals("BlockfileNamingService")) {
             // only blockfile supports multiple books
@@ -1384,12 +1386,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             out.write("<h4>" + _t("Save {0} to master address book and continue to website", destination) + "</h4>\n<p>" +
             _t("This address will be saved to your Master address book. Select this option for addresses you wish to keep separate from the main router address book, but don't mind publishing.") +
             "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"master\" value=\"master\">" +
-            _t("Save & continue") + "</button></div>\n");
+            label + "</button></div>\n");
 
             out.write("<h4>" + _t("Save {0} to private address book and continue to website", destination) + "</h4>\n<p>" +
             _t("This address will be saved to your Private address book, ensuring it is never published.") +
             "</p>\n<div class=\"formaction\"><button type=\"submit\" class=\"accept\" name=\"private\" value=\"private\">" +
-            _t("Save & continue") + "</button></div>\n");
+            label + "</button></div>\n");
 
         }
         // Firefox (and others?) don't send referer to meta refresh target, which is

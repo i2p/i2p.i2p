@@ -228,7 +228,7 @@ public final class KeyGenerator {
     }
 
     /**
-     *  Generic signature type, supports DSA, ECDSA, EdDSA
+     *  Generic signature type, supports DSA, RSA, ECDSA, EdDSA
      *  @since 0.9.9
      */
     public SimpleDataStructure[] generateSigningKeys(SigType type) throws GeneralSecurityException {

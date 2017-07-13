@@ -29,7 +29,8 @@ public class HomeHelper extends HelperBase {
     static final String DEFAULT_SERVICES =
         _x("Addressbook") + S + _x("Manage your I2P hosts file here (I2P domain name resolution)") + S + "/dns" + S + I + "book_addresses.png" + S +
         _x("Configure Bandwidth") + S + _x("I2P Bandwidth Configuration") + S + "/config" + S + I + "info/bandwidth.png" + S +
-        _x("Configure UI") + S + _x("Select console theme & language & set optional console password") + S + "/configui" + S + I + "info/ui.png" + S +
+        // FIXME wasn't escaped
+        _x("Configure UI") + S + _x("Select console theme & language & set optional console password").replace("&", "&amp;") + S + "/configui" + S + I + "info/ui.png" + S +
         _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "home_page.png" + S +
         _x("Email") + S + _x("Anonymous webmail client") + S + "/susimail/susimail" + S + I + "email.png" + S +
         _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "support.png" + S +
@@ -229,7 +230,7 @@ public class HomeHelper extends HelperBase {
                .append(app.name)
                .append("\">")
                .append(DataHelper.escapeHTML(app.name))
-               .append("</td><td align=\"left\"><a href=\"");
+               .append("</label></td><td align=\"left\"><a href=\"");
             String url = DataHelper.escapeHTML(app.url);
             buf.append(url)
                .append("\">");

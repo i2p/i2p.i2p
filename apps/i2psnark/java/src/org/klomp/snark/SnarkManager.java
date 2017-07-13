@@ -797,6 +797,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
         updateConfig();
     }
 
+    /**
+     * @since 0.9.31
+     */
     public boolean getUniversalTheming() {
         return _context.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
     }

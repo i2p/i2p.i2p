@@ -88,8 +88,9 @@ public class NewsFeedHelper extends HelperBase {
                 if (entry.link != null)
                     buf.append("</a>");
                 if (entry.authorName != null) {
+                                                              // FIXME translate
                     buf.append(" <span class=\"newsAuthor\" title=\"Post author\"><i>")
-                       .append(Messages.getString("{0}", DataHelper.escapeHTML(entry.authorName), ctx))
+                       .append(DataHelper.escapeHTML(entry.authorName))
                        .append("</i></span>\n");
                 }
                 buf.append("</h3>\n<div class=\"newscontent\">\n")

@@ -70,7 +70,7 @@ public class Comment implements Comparable<Comment> {
                 name = name.substring(0, MAX_NAME_LEN);
         }
         this.name = name;
-        if (rating < 0 || rating > 5)
+        if (rating < 0)
             rating = 0;
         else if (rating > 5)
             rating = 5;

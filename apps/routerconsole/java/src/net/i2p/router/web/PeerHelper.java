@@ -84,7 +84,7 @@ public class PeerHelper extends HelperBase {
                 UDPTransport ut = (UDPTransport) t;
                 render(ut, out, urlBase, sortFlags);
             } else {
-                // pluggable (none yet_
+                // pluggable (none yet)
                 t.renderStatusHTML(out, urlBase, sortFlags);
             }
         }
@@ -152,7 +152,7 @@ public class PeerHelper extends HelperBase {
         return buf.toString();
     }
 
-    /// begin SSU
+    /// begin NTCP
 
     /**
      *  @since 0.9.31 moved from NTCPTransport

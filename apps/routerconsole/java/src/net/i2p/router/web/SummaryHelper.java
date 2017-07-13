@@ -161,7 +161,7 @@ public class SummaryHelper extends HelperBase {
      *
      * @since 0.9.31
      */
-    public class NetworkStateMessage {
+    public static class NetworkStateMessage {
         private NetworkState state;
         private String msg;
 
@@ -184,7 +184,7 @@ public class SummaryHelper extends HelperBase {
 
         @Override
         public String toString() {
-            return super.toString() + " (" + state + "; " + msg + ')';
+            return "(" + state + "; " + msg + ')';
         }
     }
 

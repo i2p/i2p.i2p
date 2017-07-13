@@ -1524,7 +1524,9 @@ class PeerCoordinator implements PeerListener
    * @since 0.9.31
    */
   public void gotCommentReq(Peer peer, int num) {
-      /* if disabled, return */
+      /* TODO cache per-torrent setting, use it instead */
+      if (!_util.utCommentsEnabled())
+          return;
       CommentSet comments = snark.getComments();
       if (comments != null) {
           int lastSent = peer.getTotalCommentsSent();
@@ -1547,7 +1549,9 @@ class PeerCoordinator implements PeerListener
    * @since 0.9.31
    */
   public void gotComments(Peer peer, List<Comment> comments) {
-      /* if disabled, return */
+      /* TODO cache per-torrent setting, use it instead */
+      if (!_util.utCommentsEnabled())
+          return;
       if (!comments.isEmpty())
           snark.addComments(comments);
   }
