@@ -17,6 +17,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAPrivateKeySpec;
@@ -444,10 +445,13 @@ public final class SigUtil {
     }
 
     /**
-     *
+     *  As of 0.9.31, if pk is a RSASigningPrivateCrtKey,
+     *  this will return a RSAPrivateCrtKey.
      */
     public static RSAPrivateKey toJavaRSAKey(SigningPrivateKey pk)
                               throws GeneralSecurityException {
+        if (pk instanceof RSASigningPrivateCrtKey)
+            return ((RSASigningPrivateCrtKey) pk).toJavaKey();
         KeyFactory kf = KeyFactory.getInstance("RSA");
         // private key is modulus (pubkey) + exponent
         BigInteger[] nd = split(pk.getData());
@@ -468,7 +472,8 @@ public final class SigUtil {
     }
 
     /**
-     *  @deprecated unused
+     *  As of 0.9.31, if pk is a RSAPrivateCrtKey,
+     *  this will return a RSASigningPrivateCrtKey.
      */
     public static SigningPrivateKey fromJavaKey(RSAPrivateKey pk, SigType type)
                               throws GeneralSecurityException {
@@ -476,6 +481,8 @@ public final class SigUtil {
         BigInteger n = pk.getModulus();
         BigInteger d = pk.getPrivateExponent();
         byte[] b = combine(n, d, type.getPrivkeyLen());
+        if (pk instanceof RSAPrivateCrtKey)
+            return RSASigningPrivateCrtKey.fromJavaKey((RSAPrivateCrtKey) pk);
         return new SigningPrivateKey(type, b);
     }
 
@@ -569,9 +576,9 @@ public final class SigUtil {
     /**
      *  Combine two BigIntegers of nominal length = len / 2
      *  @return array of exactly len bytes
-     *  @since 0.9.9
+     *  @since 0.9.9, package private since 0.9.31
      */
-    private static byte[] combine(BigInteger x, BigInteger y, int len)
+    static byte[] combine(BigInteger x, BigInteger y, int len)
                               throws InvalidKeyException {
         if ((len & 0x01) != 0)
             throw new InvalidKeyException("length must be even");

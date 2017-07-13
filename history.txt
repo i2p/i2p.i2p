@@ -1,3 +1,7 @@
+2017-07-13 zzz
+ * Crypto: Preserve CRT parameters for RSA private keys (ticket #2005)
+ * Various fixes after review
+
 2017-07-11 str4d
  * Console:
    - Increase displayed changelog lines to help ensure at least one whole
