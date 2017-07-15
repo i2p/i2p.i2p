@@ -118,6 +118,8 @@ public class RouterConsoleRunner implements RouterApp {
     private static final String JETTY_ROLE = "routerAdmin";
     public static final String PROP_CONSOLE_PW = "routerconsole.auth." + JETTY_REALM;
     public static final String PROP_PW_ENABLE = "routerconsole.auth.enable";
+    /** from Jetty Credential.java */
+    private static final String MD5_CREDENTIAL_TYPE = "MD5:";
 
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
@@ -883,7 +885,7 @@ public class RouterConsoleRunner implements RouterApp {
                 for (Map.Entry<String, String> e : userpw.entrySet()) {
                     String user = e.getKey();
                     String pw = e.getValue();
-                    Credential cred = Credential.getCredential(MD5.__TYPE + pw);
+                    Credential cred = Credential.getCredential(MD5_CREDENTIAL_TYPE + pw);
                     realm.putUser(user, cred, role);
                     Constraint constraint = new Constraint(user, JETTY_ROLE);
                     constraint.setAuthenticate(true);

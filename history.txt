@@ -1,3 +1,6 @@
+2017-07-15 zzz
+ * Console: Fix compile error with Jetty 9.2.22 (ticket #2019)
+
 2017-07-13 zzz
  * Crypto: Preserve CRT parameters for RSA private keys (ticket #2005)
  * Various fixes after review
