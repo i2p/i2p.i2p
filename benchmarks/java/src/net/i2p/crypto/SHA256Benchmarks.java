@@ -22,7 +22,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 /**
- * Test the GNU and the JVM's implementations for speed
+ * Test the JVM's implementation for speed
  *
  * Old results (2011-05):
  * <ul>
