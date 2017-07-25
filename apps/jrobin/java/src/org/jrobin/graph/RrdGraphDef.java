@@ -132,11 +132,11 @@ public class RrdGraphDef implements RrdGraphConstants {
             fontDir = new File(fontdirProperty);
         }
 
-        fonts[FONTTAG_DEFAULT]   = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10);
-        fonts[FONTTAG_TITLE]     = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10);
-        fonts[FONTTAG_AXIS]      = new Font("Droid Sans Mono", Font.PLAIN, 10);
-        fonts[FONTTAG_UNIT]      = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10);
-        fonts[FONTTAG_LEGEND]    = new Font("Droid Sans Mono", Font.PLAIN, 10);
+        fonts[FONTTAG_DEFAULT]   = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 8);
+        fonts[FONTTAG_TITLE]     = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 9);
+        fonts[FONTTAG_AXIS]      = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 7);
+        fonts[FONTTAG_UNIT]      = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 8);
+        fonts[FONTTAG_LEGEND]    = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 8);
         fonts[FONTTAG_WATERMARK] = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 1).deriveFont(5.5F);
     }
 
@@ -173,7 +173,7 @@ public class RrdGraphDef implements RrdGraphConstants {
             if (exception != null) {
                 System.err.println(exception.getLocalizedMessage());
             }
-            font = new Font("Monospaced", Font.PLAIN, 10);
+            font = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10);
         }
 
         if (font == null) {

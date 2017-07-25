@@ -1,3 +1,6 @@
+2017-07-25 str4d
+ * Console: Move JRobin default color and font changes into SummaryRenderer
+
 2017-07-15 zzz
  * Console: Fix compile error with Jetty 9.2.22 (ticket #2019)
 
