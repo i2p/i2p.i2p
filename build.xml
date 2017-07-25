@@ -58,6 +58,7 @@
         <!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
         <echo message="  poupdate: update the .po files for translators" />
         <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
+        <echo message="  bench: build the benchmarks" />
    </target>
     <target name="debianhowto">
             <echo message="To build debian packages, you must make sure that you have" />
@@ -1843,6 +1844,10 @@
     </target>
 
     <target name="testscripts-all" depends="testscripts,testscripts-net" />
+
+    <target name="bench" depends="buildCore, jbigi" >
+        <ant dir="benchmarks/java/" target="all" />
+    </target>
 
     <!-- <target name="syndie" >
         <ant dir="apps/syndie/java/" target="standalone" />

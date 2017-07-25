@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="benchmarks">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <!-- run from top level build.xml to get dependencies built -->
+    </target>
+    <condition property="depend.available">
+        <typefound name="depend" />
+    </condition>
+    <target name="depend" if="depend.available">
+        <depend
+            cache="../../build"
+            srcdir="./src" 
+            destdir="./build/obj" >
+            <!-- Depend on classes instead of jars where available -->
+            <classpath>
+                <pathelement location="../../core/java/build/obj" />
+            </classpath>
+        </depend>
+    </target>
+
+    <!-- only used if not set by a higher build.xml -->
+    <property name="javac.compilerargs" value="" />
+    <property name="javac.version" value="1.7" />
+
+    <target name="jmhLibCheck">
+        <!-- override to Ant home if not set -->
+        <property name="jmh.home" value="${ant.home}/lib" />
+        <fail message="Please set jmh.home to a directory containing the necessary JMH libraries. See build.properties for details.">
+            <condition>
+                <not>
+                    <and>
+                        <available file="${jmh.home}/jmh-core.jar" />
+                        <available file="${jmh.home}/jmh-generator-annprocess.jar" />
+                        <available file="${jmh.home}/jopt-simple.jar" />
+                        <available file="${jmh.home}/commons-math3.jar" />
+                    </and>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="compile" depends="depend, jmhLibCheck">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               debuglevel="lines,vars,source"
+               includeAntRuntime="false"
+               destdir="./build/obj" >
+            <classpath>
+                <pathelement location="${jmh.home}/jmh-core.jar" />
+                <pathelement location="${jmh.home}/jmh-generator-annprocess.jar" />
+                <pathelement location="../../core/java/build/i2p.jar" />
+            </classpath>
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="listChangedFiles" if="mtn.available" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+    </target>
+
+    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/benchmarks.jar" basedir="./build/obj" >
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Main-Class" value="org.openjdk.jmh.Main" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+            <zipfileset src="${jmh.home}/jmh-core.jar" excludes="**/META-INF/services/**" />
+            <zipfileset src="${jmh.home}/jopt-simple.jar" />
+            <zipfileset src="${jmh.home}/commons-math3.jar" />
+            <zipfileset src="../../core/java/build/i2p.jar" />
+        </jar>
+    </target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/benchmarks.jar" >
+            <srcfiles dir= "." includes="build/obj/**/*.class" />
+        </uptodate>
+    </target>
+
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+</project>
