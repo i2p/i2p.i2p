@@ -1811,10 +1811,10 @@ public class WebMail extends HttpServlet
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">");
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
-					out.println( "<div class=\"notifications\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
+					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
 				}
 				if( sessionObject.info != null && sessionObject.info.length() > 0 ) {
-					out.println( "<div class=\"notifications\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
+					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
 				}
 				/*
 				 * now write body

@@ -10,6 +10,7 @@
    - Migrate "view or change bandwidth" to [Configure] tooltip to standardize
      configuration links, allow for more space for option labels and lessen
      chance of option labels wrapping in translations
+ * SusiMail: Dismiss notifications on click
 
 2017-07-25 str4d
  * Console: Move JRobin default color and font changes into SummaryRenderer
