@@ -48,13 +48,13 @@
        - Each transport instance on own line
        - Better presentation of address characteristics
        - Place flag in table header
-     - Container div for leasesets to allow 2 column display at wider viewport width
+     - Container div for leasesets to allow responsive 2 column display
      - Increased spacing of lease information in leaseset tables
      - Add div for "not initialized" message
-     - Reorganize content display in sybil database to reduce horizontal whitespace:
+     - Reorganize content in sybil db to reduce horizontal whitespace:
        - Conditional 2-column display of sybil families
-       - Sybil router characteristics & threatpoints presented in multi-column view
-       - Added empty (n/a) fields to maintain visual consistency in column view
+       - Multi-column view for sybil router characteristics & threatpoints
+       - Empty (n/a) fields to maintain visual consistency in column view
    - /tunnels:
      - Tag "Local" for translation (and convert to lowercase in CSS)
      - Arabic: ensure our tunnel tables display correctly
@@ -77,8 +77,8 @@
      - Fix commenting out of forum.i2p where it impacts surrounding text
      - Cleanup unneeded CSS classes
      - Enhance Chinese legibility
-   - Add untagged strings for /tunnels tooltips and local tunnel indicator (to
-     be tagged for translation post .31 release)
+   - Add untagged strings for /tunnels tooltips and local tunnel indicator
+     (to be tagged for translation post .31 release)
    - classic: reduce color contrast of main display font
    - classic/dark/midnight: alignment on /peers and /tunnels
    - /tunnels:
@@ -122,7 +122,7 @@
    - Arabic (light) adjust font size for sidebar elements
    - Sidebar network status display (ticket #1996)
    - Usability:
-     - Enhance presentation of tables on /peers (improve header/column alignment,
+     - Enhance presentation of tables on /peers (header/column alignment,
        center to separator for multi-value rows)
      - Enhance presentation of tables on /tunnels (reliable alignment of mixed
        content in rows, more prominence to bandwidth tiers)
