@@ -1,4 +1,8 @@
 2017-07-26 str4d
+ * Console:
+   - /debug:
+     - Add container divs and styling markup
+     - Add top navigation menu
  * I2PSnark:
    - Mitigate truncation of ratings dropdown in comments section (translations)
    - light: Reduce contrast of display text
