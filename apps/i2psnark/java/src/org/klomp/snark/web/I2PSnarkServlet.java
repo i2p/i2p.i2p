@@ -395,7 +395,7 @@ public class I2PSnarkServlet extends BasicServlet {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
             out.write("\n<div class=\"snarkMessages\" tabindex=\"0\">");
-            out.write("<a href=\"" + _contextPath + '/');
+            out.write("<a id=\"closeLog\" href=\"" + _contextPath + '/');
             if (isConfigure)
                 out.write("configure");
             if (peerString.length() > 0)
@@ -407,6 +407,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(toThemeImg("delete", tx, tx));
             out.write("</a>" +
                       "\n<ul>\n");
+            out.write("<noscript><li class=\"noscriptWarning\">Warning! Javascript is disabled in your browser. If <a href=\"configure\">page refresh</a> is enabled, ");
+            out.write("you will lose any input in the add/create torrent sections when a refresh occurs.</li></noscript>");
             for (int i = msgs.size()-1; i >= 0; i--) {
                 String msg = msgs.get(i);
                 out.write("<li>" + msg + "</li>\n");
@@ -2202,34 +2204,43 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\" name=\"foo\" >");
         out.write("<tr><td>\n");
         out.write(_t("Trackers"));
-        out.write(":<td><table id=\"trackerselect\" style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
+        out.write(":<td><table id=\"trackerselect\"><tr><td>Name</td><td align=\"center\">");
         out.write(_t("Primary"));
         out.write("</td><td align=\"center\">");
         out.write(_t("Alternates"));
         out.write("</td><td>");
-        out.write(_t("Tracker URL"));
+        out.write(_t("Tracker Type"));
         out.write("</td></tr>\n");
 
         for (Tracker t : sortedTrackers) {
+            List<String> openTrackers = _manager.util().getOpenTrackers();
+            List<String> privateTrackers = _manager.getPrivateTrackers();
+            boolean isPrivate = privateTrackers.contains(t.announceURL);
+            boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
+            boolean isOpen = isKnownOpen || openTrackers.contains(t.announceURL);
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
             String homeURL = t.baseURL;
-            out.write("<tr><td>");
+            out.write("<tr><td><span class=\"trackerName\">");
             out.write(name);
-            out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
+            out.write("</span></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
             out.write(announceURL);
             out.write("\"");
             if (announceURL.equals(_lastAnnounceURL))
                 out.write(" checked");
             out.write("></td><td align=\"center\"><input type=\"checkbox\" name=\"backup_");
             out.write(announceURL);
-            out.write("\" value=\"foo\"></td><td><a href=\"");
-            out.write(homeURL);
-            out.write("\">");
-            out.write(homeURL);
-            out.write("</a></td></tr>\n");
+            out.write("\" value=\"foo\"></td><td>");
+
+            if (!(isOpen || isPrivate))
+                out.write(_t("Standard"));
+            if (isOpen)
+                out.write(_t("Open"));
+            if (isPrivate) {
+                out.write(_t("Private"));
+            }
         }
-        out.write("<tr><td><i>");
+        out.write("</td></tr><tr><td><i>");
         out.write(_t("none"));
         out.write("</i></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
         if (_lastAnnounceURL == null)
@@ -2419,8 +2430,10 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\"> KBps <td id=\"bwHelp\"><i>");
         out.write(_t("Half available bandwidth recommended."));
         if (_context.isRouterContext()) {
-            out.write("</i> <a href=\"/config.jsp\" target=\"blank\">[");
+            out.write("</i> <a href=\"/config.jsp\" target=\"blank\" title=\"");
             out.write(_t("View or change router bandwidth"));
+            out.write("\">[");
+            out.write(_t("Configure"));
             out.write("]</a>");
         }
         out.write("\n<tr><td><label for=\"useOpenTrackers\">");

@@ -1,3 +1,16 @@
+2017-07-26 str4d
+ * I2PSnark:
+   - Mitigate truncation of ratings dropdown in comments section (translations)
+   - light: Reduce contrast of display text
+   - light/classic: Increase contrast of download bars
+   - Create Torrent trackers table: Replace "Tracker URL" with "Tracker Type"
+     (ticket #1996)
+   - Add a persistent warning to the messagelog when JavaScript is disabled to
+     indicate potential loss of form data upon refresh (ticket #1996)
+   - Migrate "view or change bandwidth" to [Configure] tooltip to standardize
+     configuration links, allow for more space for option labels and lessen
+     chance of option labels wrapping in translations
+
 2017-07-25 str4d
  * Console: Move JRobin default color and font changes into SummaryRenderer
 
@@ -20,7 +33,7 @@
    - Reduce size of screenlog font at 1400-1600px viewport width to lessen
      chance of text-wrapping (ticket #1996)
    - classic: Fix a linespacing issue in the config section (options:) that only
-     triggers in foreign languages that force the options td to wrap
+     triggers in foreign languages that force the options labels to wrap
  * Fix HTML tags across non-default conditional branches
 
 2017-07-08 zzz

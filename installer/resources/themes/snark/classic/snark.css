@@ -175,7 +175,7 @@ body.iframed {
 .snarkMessages {
      overflow: hidden;
      width: auto;
-     height: 53px;
+     height: 56px;
      margin: 0;
      padding: 3px 5px;
      text-align: left;
@@ -202,16 +202,20 @@ body.iframed {
 
 .snarkMessages li {
      margin-left: -15px;
-     font: normal 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     color: #2c354f;
+     opacity: 0.95;
 }
 
 .snarkMessages li::before {
      content: "";
      display: inline-block;
-     background: url(images/bullet.png) left bottom no-repeat;
+     background: url(images/bullet.png) 1px bottom no-repeat;
      width: 13px;
      height: 11px;
+     margin: 1px 2px 0 1px;
      background-size: 9px 9px;
+     opacity: 0.7;
 }
 
 .snarkMessages a:link,
@@ -317,6 +321,11 @@ body.iframed {
      display: none;
 }
 
+.snarkTorrents img {
+     margin: 0 !important;
+     padding: 0 !important;
+}
+
 #totals {
      margin-left: 3px;
 }
@@ -350,6 +359,11 @@ body.iframed {
 
 .snarkGraphicStatus {
      width: 24px !important;
+}
+
+.snarkGraphicStatus img {
+     margin-top: 2px !important;
+     margin-bottom: 2px !important;
 }
 
 .snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
@@ -522,11 +536,6 @@ td.snarkTrackerDetails {
 
 .snarkTorrents td[colspan="10"] {
      padding: 4px 2px !important;
-}
-
-.snarkTorrents img {
-     margin: 0 !important;
-     padding: 0 !important;
 }
 
 tt {
@@ -793,7 +802,7 @@ td:first-child {
 }
 
 .snarkTorrentName {
-     line-height: 90%;
+     line-height: 110%;
      padding: 0;
 }
 
@@ -928,7 +937,7 @@ td:first-child {
 }
 
 tr:hover .percentBarText {
-     opacity: 0.75;
+     opacity: 0.85;
 }
 
 .snarkTorrentEven {
@@ -1039,7 +1048,7 @@ tr:hover .percentBarText {
      border: none;
      height: 14px;
      background: #bbf;
-     background: linear-gradient(to bottom, #fff 0%, #eef 50%, #ddf 50%, #bbf 100%);
+     background: linear-gradient(to bottom, #fff 0%, #eef 50%, #bbf 50%, #99f 100%);
      box-shadow: inset 0 0 0 1px #ddf;
      opacity: 0.8;
 }
@@ -1103,8 +1112,8 @@ tr:hover .percentBarText {
      margin-left: -5px;
      font-weight: normal;
      background: url(images/infocircle.png) left 10px center no-repeat;
-     background-size: 14px auto;
-     padding-left: 30px;
+     background-size: 13px auto;
+     padding-left: 26px;
 }
 
 .snarkConfigTitle:hover, label.toggleview:hover, input.toggle_input:focus + .toggleview {
@@ -1121,7 +1130,7 @@ input.toggle_input:focus + .toggleview img {
 }
 
 .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
-     font-size: 13pt;
+     font-size: 12pt;
      font-weight: bold;
      font-variant: small-caps !important;
      display: inline-block;
@@ -1141,6 +1150,7 @@ input.toggle_input:focus + .toggleview img {
 .snarkConfigTitle a {
      display: inline-block;
      width: 100%;
+     margin-bottom: -1px;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -1158,7 +1168,7 @@ _:-ms-lang(x), .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkCo
 }
 
 .snarkConfigTitle img, label.toggleview img {
-     margin-right: -2px;
+     margin-right: -1px;
      margin-top: -2px;
 }
 
@@ -1645,19 +1655,16 @@ img:hover {
 #trackerselect tr:first-child td {
      padding: 5px 10px;
      border-bottom: 1px solid #89f;
+     font-weight: bold !important;
 }
 
 #trackerselect td {
      padding: 3px 10px;
 }
 
-#trackerselect td:first-child {
-     width: 20%;
+#trackerselect td:first-child, #trackerselect td:last-child {
+     width: 40%;
      font-weight: normal;
-}
-
-#trackerselect td:nth-child(4) {
-     width: 70%;
 }
 
 #trackerselect input {
@@ -1897,7 +1904,7 @@ img:hover {
 }
 
 code {
-     font: bold 9pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
      padding: 0 2px;
      color: #050;
 }
@@ -2224,6 +2231,7 @@ hr.debug:last-child {
 
 #configs td:first-child {
      min-width: 180px !important;
+     width: 25%;
      padding-left: 15px !important;
 }
 
@@ -2626,7 +2634,7 @@ body {
 }
 
 @media screen and (min-width: 1100px) {
-body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"], .snarkAddInfo, code, .snarkMessages li {
+body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"], .snarkAddInfo {
      font-size: 9pt !important;
 }
 
@@ -2648,12 +2656,12 @@ body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_
 }
 
 @media screen and (min-width: 1400px) {
-body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"], .snarkAddInfo, code, .snarkCommentInfo textarea {
+body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_dataDir"], select, textarea, textarea[name="i2cpOpts"], .snarkAddInfo, .snarkCommentInfo textarea {
      font-size: 10pt !important;
 }
 
-.snarkMessages li, .snarkTorrents tt {
-     font-size: 8pt !important;
+code, .snarkTorrents tt, #ourDest tt {
+     font-size: 9pt;
 }
 
 .snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {

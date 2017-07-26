@@ -1129,7 +1129,15 @@ thead img.disable, img.disable:hover {
 }
 
 #trackerselect {
+     margin: 10px 0 5px 0;
      width: 100% !important;
+     width: calc(100% - 202px) !important;
+     border: 1px solid #6f533e;
+     margin-left: 5px;
+     border-collapse: separate;
+     border-spacing: 0;
+     border-radius: 2px;
+     box-shadow: 0 0 2px 1px rgba(77, 69, 62, 0.3);
 }
 
 #trackerselect tr:first-child td {
@@ -1140,10 +1148,21 @@ thead img.disable, img.disable:hover {
 
 #trackerselect td {
      white-space: nowrap !important;
+     text-align: center;
+}
+
+#trackerselect tr:nth-child(n+2) td {
+     border-right: 1px solid #6f533e;
+     border-right: 1px solid rgba(111, 83, 62, 0.5);
+}
+
+#trackerselect tr:nth-child(n+2) td:last-child {
+     border-right: none;
 }
 
 #trackerselect td:nth-child(2), #trackerselect td:nth-child(3) {
      min-width: 60px !important;
+     max-width: 200px !important;
 }
 
 .trackerconfig tr:first-child {
@@ -1151,11 +1170,25 @@ thead img.disable, img.disable:hover {
      filter: drop-shadow(0 0 1px #aaa);
 }
 
-#trackerselect td:first-child {
-     font-weight: normal;
+#trackerselect tr:first-child td {
+     background: linear-gradient(to bottom, #efefef, #cfc7c2);
+     border-bottom: 1px solid #6f533e;
 }
 
-#configs input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"] {
+#trackerselect tr:nth-child(n+2):hover td {
+     background: #f9efcf !important;
+}
+
+#trackerselect td:first-child, #trackerselect td:last-child {
+     font-weight: normal;
+     width: 20%;
+}
+
+#trackerselect input[type="radio"], #trackerselect input[type="checkbox"] {
+     margin: 4px !important;
+}
+
+#configs, input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"] {
      text-transform: capitalize;
 }
 
@@ -2097,11 +2130,11 @@ input#toggle_debug:checked + label + #dhtDebugInner {
      font-size: 10pt !important;
 }
 
-.resourceError tr:nth-child(odd) {
+.resourceError tr:nth-child(odd), #trackerselect tr:nth-child(odd) {
      background: #dfd6d1;
 }
 
-.resourceError tr:nth-child(even) {
+.resourceError tr:nth-child(even), #trackerselect tr:nth-child(even) {
      background: #efe6e0;
 }
 
@@ -2166,6 +2199,7 @@ input#toggle_debug:checked + label + #dhtDebugInner {
 
 #configs td:first-child {
      min-width: 240px !important;
+     width: 25%;
      font-weight: bold;
      text-align: right;
 }
@@ -2457,6 +2491,7 @@ td#bwHelp a {
      width: 90%;
      width: calc(100% - 10px);
      margin-left: 8px;
+     text-overflow: ellipsis;
 }
 
 #addCommentText {
@@ -2817,11 +2852,11 @@ body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input
      font-size: 10pt !important;
 }
 
-tt, .snarkTorrents tt, textarea {
+textarea {
      font-size: 9pt !important;
 }
 
-.snarkMessages {
+tt, .snarkTorrents tt, .snarkMessages {
      font-size: 8pt !important;
 }
 
@@ -2831,8 +2866,8 @@ tt, .snarkTorrents tt, textarea {
 }
 
 .snarkNav:link {
-     font-size: 12pt;
-     background-size: 18px auto, 100% 100%, 100% 100% !important;
+     font-size: 11.5pt;
+     background-size: 17px auto, 100% 100%, 100% 100% !important;
 }
 
 .nav_main:link, .nav_forum:link {
@@ -2939,8 +2974,14 @@ tr#torrentInfoStats td {
 }
 
 @media screen and (min-width: 1600px) {
-.snarkMessages {
+
+tt, .snarkTorrents tt, .snarkMessages {
      font-size: 9pt !important;
+}
+
+.snarkNav:link {
+     font-size: 12pt;
+     background-size: 18px auto, 100% 100%, 100% 100% !important;
 }
 }
 
@@ -2951,8 +2992,8 @@ tr#torrentInfoStats td {
      min-width: 650px !important;
 }
 
-.snarkNav:link, .snarkNav:visited {
-     font-size: 9pt !important;
+.snarkNav:link, .snarkNav:visited, #configs td, #configs input, #configs select {
+     font-size: 8pt !important;
 }
 
 th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img {
@@ -2970,6 +3011,17 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
 
 .snarkTorrents th img {
      max-height: 18px;
+}
+
+.snarkTorrents th:nth-child(2) img {
+     display: none !important;
+}
+
+.snarkTorrentName a {
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis !important;
+     max-width: 360px;
 }
 
 .snarkTorrentUploaded, .snarkTorrentRateUp, .peerinfo, .debuginfo {
