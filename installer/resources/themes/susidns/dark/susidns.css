@@ -30,6 +30,12 @@ body.iframed {
      text-shadow: none;
 }
 
+#navi, .buttons, #buttons, #host_list tr:first-child, #host_list img, #host_list td:nth-child(n+2) a {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 .page {
      color:#ee9;
      margin: 10px 0;
@@ -249,7 +255,7 @@ div#filter + div#search > form {
      border: 1px solid #2a5f29;
      margin: 1px 0 3px;
      padding: 1px 8px;
-     min-width: 18px;
+     min-width: 12px;
      border-radius: 2px;
      background: #000;
      background: linear-gradient(to bottom, #010 0%, #000 100%);
@@ -257,6 +263,7 @@ div#filter + div#search > form {
      text-transform: uppercase;
      white-space: nowrap;
      display: inline-block;
+     line-height: 160%;
 }
 
 #filter a:hover {
@@ -546,6 +553,10 @@ td > img[width="320"], td > img[src^="/imagegen"] {
      padding: 5px;
      margin: 10px 3px;
      background: #000;
+}
+
+img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
+     opacity: 0; /* hide broken identicons but ensure hostlist remains intact */
 }
 
 ol, ul {
@@ -1074,8 +1085,7 @@ p.book {
      text-overflow: ellipsis;
 }
 
-#host_list .destaddress:hover, #host_list .destaddress:focus {
-     color: #bb0;
+#host_list .destaddress:focus {
      overflow: auto;
      text-overflow: clip;
 }
@@ -1086,6 +1096,10 @@ td.destinations {
      max-width: 50px !important;
      border-left: 1px solid #121;
      border-right: 1px solid #121;
+}
+
+tr:hover .destinations {
+     color: #bb0;
 }
 
 /* MS Edge fix */
@@ -1117,6 +1131,22 @@ _:-ms-lang(x), * {
      margin: 15px auto 10px;
      min-width: 450px;
      width: 90%;
+}
+}
+
+@media screen and (max-width: 1200px) {
+#filter {
+     padding: 0 5px;
+}
+
+#filter p {
+     margin-left: 0;
+     margin-right: 0;
+}
+
+#filter a {
+     min-width: 6px;
+     padding: 0 6px;
 }
 }
 

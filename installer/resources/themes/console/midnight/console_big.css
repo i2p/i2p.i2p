@@ -5,45 +5,51 @@
 
 /* sidepanel */
 
-div.routersummary {
+.routersummary {
      font: 9.5pt/125%;
 }
 
-div.routersummary h3, div.routersummary h3 a {
+.routersummary h3, .routersummary h3 a {
      font-size: 12.5pt !important;
 }
 
-div.routersummary h4, div.routersummary h4 a {
+.routersummary h4, .routersummary h4 a {
      font-size: 11.5pt !important;
      letter-spacing: 0;
 }
 
-div.routersummary table {
+.routersummary table {
      font-size: 9pt;
-     margin: -5px 0px -5px 1px;
-     width: 188px !important;
+     margin: -5px 0 -5px 1px;
+     width: 200px !important;
 }
 
-div.routersummary table a:link, div.routersummary table a:visited {
+.routersummary table a:link, .routersummary table a:visited {
      font-size: 11pt !important;
-}
-
-div.tunnels a {
-     font-size: 9pt !important;
-}
-
-div.tunnels table {
-     margin: -2px -0px -4px 2px !important;
-     width: 185px;
 }
 
 #sb_internals a, #sb_services a, #sb_advanced a {
      font-size: 13pt !important;
 }
 
+.newsheadings li, .newsheadings li a {
+     letter-spacing: 0;
+     word-spacing: 0;
+     font-size: 10pt !important;
+}
+
+#sb_notice, #sb_notice a {
+     font-size: 10pt !important;
+}
+
 /* end sidepanel */
 
-#newsDisplay, #newsStatus {
+button.search {
+     white-space: nowrap;
+     font-size: 11pt !important;
+}
+
+#newsDisplay, #newsDisplay a, #newsStatus {
      font-size: 11pt !important;
 }
 
@@ -167,7 +173,7 @@ ul.links li {
 /* global overrides */
 
 @media screen and (min-width: 0) {
-a, b, div.routersummary h3 a, div.routersummary h4 {
+a, b, .routersummary h3 a, .routersummary h4 {
     font-weight: normal !important;
     font-size: 100%;
 }

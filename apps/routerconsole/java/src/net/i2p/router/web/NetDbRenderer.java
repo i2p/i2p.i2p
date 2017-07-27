@@ -384,12 +384,15 @@ class NetDbRenderer {
                 buf.append("</td></tr>");
 
             }
+            buf.append("<tr><td colspan=\"2\"><ul class=\"netdb_leases\">");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 Lease lease = ls.getLease(i);
-                buf.append("<tr><td colspan=\"2\">");
-                buf.append("<b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> ").append(_t("Gateway")).append(' ');
+                buf.append("<li><b>").append(_t("Lease")).append(' ').append(i + 1).append(":</b> <span class=\"netdb_gateway\" title=\"")
+                   .append(_t("Gateway")).append("\"><img src=\"themes/console/images/info/gateway.png\" alt=\"")
+                   .append(_t("Gateway")).append("\"></span> <span class=\"tunnel_peer\">");
                 buf.append(_context.commSystem().renderPeerHTML(lease.getGateway()));
-                buf.append(' ').append(_t("Tunnel")).append(' ').append(lease.getTunnelId().getTunnelId()).append(' ');
+                buf.append("</span> <span class=\"netdb_tunnel\">").append(_t("Tunnel")).append(" <span class=\"tunnel_id\">")
+                   .append(lease.getTunnelId().getTunnelId()).append("</span></span> ");
                 if (debug) {
                     long exl = lease.getEndDate().getTime() - now;
                     if (exl > 0)
@@ -397,8 +400,9 @@ class NetDbRenderer {
                     else
                         buf.append("<b class=\"netdb_expiry\">").append(_t("Expired {0} ago", DataHelper.formatDuration2(0-exl))).append("</b>");
                 }
-                buf.append("</td></tr>\n");
+                buf.append("</li>");
             }
+            buf.append("</ul></td></tr>\n");
             buf.append("</table>\n");
             out.write(buf.toString());
             buf.setLength(0);

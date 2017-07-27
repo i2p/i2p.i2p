@@ -94,7 +94,7 @@ div.routersummary td:last-child {
      margin-left: 3px;
 }
 
-div.routersummary td:first-child {
+.routersummary td:first-child {
      text-align: right;
 }
 
@@ -104,6 +104,15 @@ div.routersummary td:first-child {
 
 #sb_localtunnels td:last-child {
      text-align: left;
+}
+
+#sb_localtunnels a {
+     display: inline-block;
+     width: 100%:
+}
+
+#sb_localtunnels td:nth-child(2) {
+     text-align: right !important;
 }
 
 .langbox {
@@ -127,7 +136,7 @@ div.routersummary form {
     text-align: center;
 }
 
-div.joblog li, div.newsheadings li {
+div.joblog li {
     text-align: left;
     direction: ltr;
 }
@@ -493,6 +502,35 @@ a.viewfullentry::after, a[href^="viewprofile"]::after {
      margin-left: 3px !important;
 }
 
+.sb_newsheadings td, .sb_newsheadings tr:hover td {
+     background-position: right 4px center !important;
+     padding-right: 22px !important;
+     padding-left: 8px !important;
+     text-align: right !important;
+}
+
+.sb_newsheadings td a {
+     font-size: 9pt !important;
+     font-weight: bold;
+}
+
+.main#console .twocol {
+     margin: 5px 35px 5px 0 !important;
+     background: rgba(0, 32, 0, 0.5);
+     border-radius: 3px;
+     padding-top: 10px;
+     padding-bottom: 10px;
+     line-height: 120% !important;
+}
+
+.twocol li {
+     list-style-position: inside !important;
+     padding-right: 0 !important;
+     margin-right: 0 !important;
+}
+
+/* responsive layout */
+
 @media screen and (min-width: 1500px) {
 .main, .news, h1, .sorry {
      margin-right: 232px !important;
@@ -552,3 +590,6 @@ div[lang="ar"], div[lang="ar"] code, div[lang="ar"] b {
      margin-top: -19px !important;
 }
 }
+
+/* end responsive layout */
+

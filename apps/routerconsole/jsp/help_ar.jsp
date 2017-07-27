@@ -32,7 +32,7 @@
 <p>اذا رغبت في المساعدة أو ترجمة الوثائق، أو المساعدة في أشياء أخرى، انظر اسفله <a href="http://i2p-projekt.i2p/ar/get-involved">تطوع</a></p>
 <p>المزيد من المساعدة هنا:</p>
 <ul class="links">
-<li class="tidylist"><a href="http://i2p-projekt.i2p/ar/faq">ابئلة شائعة i2p-projekt.i2p</a></li>
+<li><a href="http://i2p-projekt.i2p/ar/faq">ابئلة شائعة i2p-projekt.i2p</a></li>
 <li>او بالدردشة على IRC.</li></ul>
 </div>
 

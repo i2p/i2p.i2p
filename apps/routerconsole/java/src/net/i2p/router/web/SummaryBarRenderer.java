@@ -709,7 +709,7 @@ class SummaryBarRenderer {
             //buf.append("<h3><a href=\"/configupdate\">")
             buf.append("<h3><a href=\"/news\">")
                .append(_t("News &amp; Updates"))
-               .append("</a></h3><hr class=\"b\"><div class=\"newsheadings\">\n");
+               .append("</a></h3><hr class=\"b\"><div class=\"sb_newsheadings\">\n");
             // Get news content.
             List<NewsEntry> entries = Collections.emptyList();
             ClientAppManager cmgr = _context.clientAppManager();
@@ -719,7 +719,7 @@ class SummaryBarRenderer {
                     entries = nmgr.getEntries();
             }
             if (!entries.isEmpty()) {
-                buf.append("<ul>\n");
+                buf.append("<table>\n");
                 DateFormat fmt = DateFormat.getDateInstance(DateFormat.SHORT);
                 // the router sets the JVM time zone to UTC but saves the original here so we can get it
                 fmt.setTimeZone(SystemVersion.getSystemTimeZone(_context));
@@ -731,29 +731,30 @@ class SummaryBarRenderer {
                     if (i >= min && entry.updated > 0 &&
                         entry.updated < _context.clock().now() - 60*24*60*60*1000L)
                         break;
-                    buf.append("<li><a href=\"/?news=1&amp;consoleNonce=")
+                    buf.append("<tr><td><a href=\"/?news=1&amp;consoleNonce=")
                        .append(consoleNonce)
-                       .append("\">");
+                       .append("\"");
                     if (entry.updated > 0) {
                         Date date = new Date(entry.updated);
-                        buf.append(fmt.format(date))
-                           .append(": ");
+                        // tooltip to tag for translation post 0.9.31 release
+                        buf.append(" title=\"Published: ").append(fmt.format(date)).append("\"");
                     }
+                    buf.append(">");
                     buf.append(entry.title)
-                       .append("</a></li>\n");
+                       .append("</a></td></tr>\n");
                     if (++i >= max)
                         break;
                 }
-                buf.append("</ul>\n");
-                //buf.append("<a href=\"/news\">")
-                //   .append(_t("Show all news"))
-                //   .append("</a>\n");
+                buf.append("</table>\n");
             } else {
                 buf.append("<center><i>")
                    .append(_t("none"))
                    .append("</i></center>");
             }
             // Add post-headings stuff.
+            //buf.append("<a href=\"/news\">")
+                //.append(_t("Show all news"))
+                //.append("</a>\n");
             buf.append("</div>\n");
         }
         return buf.toString();

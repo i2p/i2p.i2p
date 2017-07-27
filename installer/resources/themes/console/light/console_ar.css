@@ -48,6 +48,7 @@ h2 {
 
 h3 {
      font-size: 14pt;
+     padding-right: 10px;
 }
 
 form {
@@ -57,6 +58,11 @@ form {
 
 #stats form {
      margin: 0;
+}
+
+.routersummary img[src$="i2plogo.png"] {
+     margin-left: 0 !important;
+     margin-right: -1px !important;
 }
 
 table.search td:nth-child(2) {
@@ -70,6 +76,15 @@ table.search td:nth-child(3) {
 input.search[type="text"] {
      background-position: right 4px center;
      padding: 5px 24px 5px 5px;
+}
+
+button, input[type="submit"], input[type="reset"] {
+     display: inline-block;
+}
+
+#config_homepage.main input.delete {
+     float: right;
+     margin-top: 5px !important;
 }
 
 button.search, input[type="submit"], input[type="reset"],
@@ -123,7 +138,7 @@ form[action="configpeer"] > h3.tabletitle {
      margin-right: 0;
 }
 
-div.routersummary form {
+.routersummary form {
     text-align: center;
 }
 
@@ -133,33 +148,53 @@ div.wideload {
 }
 
 .routersummary h3 a {
-     font-size: 140% !important;
+     font-size: 120% !important;
 }
 
 .routersummary h3, .routersummary h4 {
      text-align: center !important;
 }
 
+.sb_newsheadings {
+     margin: 5px -8px 0 0 !important;
+}
+ 
+.sb_newsheadings:hover {
+     margin: 5px -5px 0 0 !important;
+}
+
+.sb_newsheadings table {
+     margin: -12px 0 -8px -10px;
+     border-collapse: separate;
+     border-spacing: 0;
+}
+
+.sb_newsheadings table:hover {
+     padding-right: 3px;
+}
+
+.sb_newsheadings tr td, .sb_newsheadings tr:hover td {
+     padding-right: 24px !important;
+     padding-left: 6px !important;
+     background-position: right 6px center !important;
+     background-color: none !important;
+}
+
 #sb_services a {
      text-align: right !important;
-     padding-right: 20px !important;
-     background-position: right center !important;
+     padding-right: 24px !important;
+     background-position: right 2px center !important;
 }
 
-div.routersummary td:last-child {
+.routersummary td:last-child {
      text-align: left;
-     margin-left: 3px;
 }
 
-div.logo {
+.logo {
      float:right;
 }
 
-div.tunnels td:first-child {
-     text-align: right;
-}
-
-div.messages li, .messages li:first-child, .error li:first-child, .error li {
+.messages li, .messages li:first-child, .error li:first-child, .error li {
      padding: 0 24px 0 0 !important;
      font-size: 12pt;
 }
@@ -169,22 +204,22 @@ div.messages li, .messages li:first-child, .error li:first-child, .error li {
      font-size: 12pt;
 }
 
-div.warning {
+.warning {
      text-align: right;
 }
 
-div.main {
+.main {
      margin: 10px 212px 0 0;
      padding: 7px 20px 30px 20px;
 }
 
-div.sorry {
+.sorry {
      margin: 14px 212px 0 0;
      padding: 20px 70px 20px 20px !important;
      background: url(/themes/console/images/info/errortriangle.png) right 15px center no-repeat #fff;
 }
 
-div.main li {
+.main li {
      text-align: right;
 }
 
@@ -193,7 +228,7 @@ div.main li {
 }
 
 div.news {
-     margin: 10px 212px -12px 0;
+     margin: 10px 212px -12px 0 !important;
      padding: 7px 20px 10px 20px;
      direction: ltr;
 }
@@ -202,7 +237,7 @@ div.news {
      direction: ltr;
 }
 
-div.graphspanel form {
+.graphspanel form {
      text-align: right;
 }
 
@@ -231,8 +266,8 @@ p#helptranslate {
 }
 
 .confignav {
-     margin-left: -21px !important;
-     margin-right: -21px !important;
+     margin-left: -20px !important;
+     margin-right: -20px !important;
      margin-top: -5px !important;
      direction: ltr;
 }
@@ -269,6 +304,7 @@ div[lang="ar"] p, div[lang="ar"] ul {
 div[lang="ar"] .links li {
      list-style: none;
      margin-bottom: 15px;
+     padding-right: 5px !important;
 }
 
 div[lang="ar"] ul li {
@@ -312,11 +348,15 @@ th {
      text-align:right;
 }
 
+.links code, #console code {
+     font-size: 10pt !important;
+}
+
 th a.script {
      float: left;
 }
 
-div.joblog li, div.newsheadings li {
+div.joblog li {
     text-align: left;
     direction: ltr;
 }
@@ -544,8 +584,16 @@ table#addkeyring tr:last-child td {
 }
 
 .tab, .tab2 {
+     display: inline-block;
      font-size: 12pt !important;
      margin-top: -5px;
+     padding-top: 6px !important;
+     padding-bottom: 6px !important;
+}
+
+.tab a {
+     padding: 0 5px;
+     display: inline;
 }
 
 table.search {
@@ -567,9 +615,13 @@ h4.app2 {
 }
 
 h4.app, h4.app2, #news h3, .news h3 {
-     background-position: right 10px center, right center, right center !important;
-     padding: 6px 32px 6px 10px;
+     background-position: right 7px center, right center, right center !important;
+     padding: 6px 30px 6px 10px;
      direction: ltr !important;
+}
+
+.applabel a {
+    font-size: 11pt;
 }
 
 div.news h3, #news h3 {
@@ -605,6 +657,15 @@ div.news h3, #news h3 {
 
 #sb_internals td, #sb_advanced td {
      text-align: center;
+}
+
+#sb_localtunnels td {
+     vertical-align: top; !important;
+}
+
+#sb_localtunnels td:last-child {
+     text-align: left !important;
+     padding-left: 1px;
 }
 
 table#leasesetdebug th:last-child, table#leasesetsummary th:last-child,
@@ -865,8 +926,12 @@ table#bugreports td.infohelp {
      padding: 15px 50px 15px 15px !important;
 }
 
-.routersummary h4, .routersummary h4 span, .routersummary h4 span a {
+.routersummary h4 {
      font-size: 11pt !important;
+}
+
+.routersummary h4 span, .routersummary h4 span a {
+     font-size: 10pt !important;
 }
 
 .routersummary td:first-child, .routersummary td:nth-last-child(n+2), .routersummary td a {
@@ -881,6 +946,17 @@ table#bugreports td.infohelp {
 .routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
      padding-left: 6px !important;
      padding-right: 0 !important;
+}
+
+.sb_newsheadings td, .sb_newsheadings tr:hover td {
+     background-position: right center !important;
+     padding-right: 18px !important;
+     padding-left: 8px !important;
+     text-align: right !important;
+}
+
+.sb_newsheadings td a {
+     font-size: 9pt !important;
 }
 
 #config_ui.main .themechoice .optbox {
@@ -915,6 +991,12 @@ table#bugreports td.infohelp {
 
 #tunnels .cells {
      text-align: center !important;
+}
+
+@media screen and (min-width: 800px) {
+.main#console {
+     overflow: hidden;
+}
 }
 
 @media screen and (min-width: 1500px) {

@@ -20,6 +20,23 @@ body.iframed {
      outline: none;
 }
 
+::selection {
+     background: #22296f !important;
+     background: rgba(34, 41, 111, 0.9) !important;
+     color: white;
+}
+
+::-moz-selection {
+     background: #22296f !important;
+     color: white;
+}
+
+#navi, .buttons, #buttons, #host_list tr:first-child, #host_list img, #host_list td:nth-child(n+2) a {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 #logo {
      display: none;
 }
@@ -29,7 +46,7 @@ body.iframed {
 div#navi  {
      border: 1px solid #2d295f;
      padding: 3px 0 2px;
-     background: #002 url(/themes/console/midnight/images/header.png) repeat-x scroll center center !important;
+     background: #002 url(/themes/console/midnight/images/titles.png) repeat-x scroll center center !important;
      background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      margin: -11px 0 27px;
      box-shadow: inset 0 0 0 1px #000;
@@ -248,7 +265,7 @@ p#filtered {
      white-space: nowrap;
      margin: -1px auto;
      box-shadow: inset 0 0 0 1px #000;
-     background: url(/themes/console/midnight/images/header.png) repeat-x scroll center center #000;
+     background: url(/themes/console/midnight/images/titles.png) repeat-x scroll center center #000;
      background-image: linear-gradient(to bottom, #010010 0%, #020019 50%, #060051%, #0100100%) !important;
 }
 
@@ -317,7 +334,7 @@ h3 {
      border: 1px solid #2d295f;
      padding: 7px 10px;
      border-radius: 2px;
-     background: #000 url(/themes/console/midnight/images/header.png) repeat-x scroll center center;
+     background: #000 url(/themes/console/midnight/images/titles.png) repeat-x scroll center center;
      background: linear-gradient(to bottom, #191729 0%, #000 50%);
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -444,12 +461,6 @@ th {
      border-bottom: 1px solid #2d295f;
 }
 
-.book th:last-child {
-     background: #000 url(/themes/console/images/buttons/delete.png) center center no-repeat !important;
-     font-size: 0;
-     padding: 0 !important;
-}
-
 table.book td:first-child {
      font-weight: bold;
 }
@@ -477,6 +488,10 @@ td > img[width="320"], td > img[src^="/imagegen"] {
      padding: 5px;
      margin: 10px 3px;
      background: #000;
+}
+
+img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
+     opacity: 0; /* hide broken identicons but ensure hostlist remains intact */
 }
 
 ol, ul {
@@ -642,18 +657,28 @@ div#book {
 #book table {
      width: 100%;
      border: 1px solid #2d295f !important;
-/*     margin-top: -10px;*/
 }
 
 .iframed #book table {
      border: none !important;
 }
 
+.iframed #book #host_details {
+     border-top: 1px solid #2d295f !important;
+}
+
 #book table th {
      padding: 5px 0;
-     background: url(/themes/console/midnight/images/header.png) repeat-x scroll center center #000;
-     background-image: linear-gradient(to bottom, #010010 0%, #020019 50%, #060051%, #0100100%) !important;
+     background: url(/themes/console/midnight/images/titles.png) repeat-x scroll center center #000;
+     background: linear-gradient(to bottom, #191729 0%, #000 50%) !important;
      border-bottom: 1px solid #2d295f;
+}
+
+#book th:last-child {
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, url(/themes/console/midnight/images/titles.png) repeat-x scroll center center #000 !important;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #191729 0%, #000 50%) !important;
+     font-size: 0;
+     padding: 0 !important;
 }
 
 #book td {
@@ -1114,7 +1139,7 @@ p.book {
      user-select: all;
 }
 
-#host_list .destaddress:hover, #host_list .destaddress:focus {
+#host_list .destaddress:focus {
      overflow: auto !important;
      text-overflow: clip;
 }
@@ -1123,6 +1148,10 @@ td.destinations {
      max-width: 50px !important;
      border-left: 1px solid #2d295f;
      border-right: 1px solid #2d295f;
+}
+
+tr:hover .destinations {
+     color: #aa0;
 }
 
 /* end hostname list */
@@ -1134,6 +1163,22 @@ td.destinations {
      margin: 15px auto 10px;
      min-width: 450px;
      width: 90%;
+}
+}
+
+@media screen and (max-width: 1200px) {
+#filter {
+     padding: 0 5px;
+}
+
+#filter p {
+     margin-left: 0;
+     margin-right: 0;
+}
+
+#filter a {
+     min-width: 6px;
+     padding: 0 6px;
 }
 }
 

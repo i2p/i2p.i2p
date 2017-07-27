@@ -124,7 +124,7 @@ form {
     text-align: center;
 }
 
-div.joblog li, div.newsheadings li {
+div.joblog li {
     text-align: left;
     direction: ltr;
 }
@@ -475,6 +475,18 @@ h4.app, h4.app2 {
     display: inline-block;
     margin-left: 0;
     margin-right: 12px;
+}
+
+.sb_newsheadings td, .sb_newsheadings tr:hover td {
+     background-position: right 4px center !important;
+     padding-right: 22px !important;
+     padding-left: 8px !important;
+     text-align: right !important;
+}
+
+.sb_newsheadings td a {
+     font-size: 9pt !important;
+     font-weight: bold;
 }
 
 /* responsive layout */

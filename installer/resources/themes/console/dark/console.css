@@ -8,7 +8,7 @@ body {
      padding: 0;
      text-align: center;
      background: #010 url(images/camotile.png) top left fixed;
-     color: #EE9;
+     color: #ee9;
      font: 8.5pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
@@ -68,7 +68,7 @@ pre {
      overflow-x: auto;
      text-align: left;
      font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
-     color: #EE9;
+     color: #ee9;
 }
 
 /* proxy errors */
@@ -77,7 +77,7 @@ div.logo { /* proxy error "fake" sidebar */
      float: left;
      padding: 10px;
      text-align: center;
-     color: #EE9;
+     color: #ee9;
      margin: -1px 20px 0;
      border: 1px solid #494;
      background: #000 url(images/camotile2.png);
@@ -255,6 +255,8 @@ div.warning {
 
 /* end proxy errors */
 
+/* sidebar */
+
 .routersummaryouter {
      float: left;
      width: 200px;
@@ -406,6 +408,14 @@ div.warning {
    min-height: 14px;
 }
 
+#sb_general td, #sb_shortgeneral td {
+     white-space: nowrap;
+}
+
+#sb_general td:first-child, #sb_shortgeneral td:first-child {
+     max-width: 130px;
+}
+
 #sb_localtunnels {
      margin: -4px -7px -7px -8px !important;
 }
@@ -426,6 +436,11 @@ div.warning {
 
 #sb_localtunnels a {
      display: inline-block;
+     width: 100%;
+     max-width: 156px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
 }
 
 #sb_localtunnels td:last-child {
@@ -479,8 +494,22 @@ div.warning {
      border: 1px solid #262;
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px #000;
-     margin: -2px -5px -4px;
+     margin: -4px -7px -6px;
      padding: 5px 3px;
+}
+
+#sb_warning {
+     border-bottom: 1px solid #494 !important;
+     margin-left: -10px !important;
+     margin-right: -10px !important;
+}
+
+#sb_warning + .sb_notice {
+     margin-top: 11px;
+}
+
+#sb_warning + hr {
+     margin-top: 7px !important;
 }
 
 p:empty + .sb_notice {
@@ -618,78 +647,117 @@ div.refresh {
      margin-bottom: -5px !important;
 }
 
-div.newsheadings {
-     text-align: center;
-     margin: -3px 0 -5px 10px;
-     word-spacing: 0;
-}
+/* sidebar news */
 
-div.newsheadings li {
-     list-style: none outside url(images/newsbullet_mini.png);
-     margin: 0 -6px 2px 4px;
-     line-height: 110%;
-     text-transform: capitalize;
-}
-
-div.newsheadings li b {
-     font-weight: normal !important;
-}
-
-div.newsheadings button {
-     margin: 4px 0 2px;
-}
-
-div.tunnels {
-     padding-top: 3px !important;
-     margin-left: -4px;
-     text-align: center;
-}
-
-div.tunnels table {
-     margin: -5px 0 -5px -3px !important;
-}
-
-div.tunnels td {
-     padding: 1px 0 1px 0;
-     text-transform: capitalize;
-}
-
-div.tunnels td:first-child {
-     width: 16px;
-     text-align: left;
-     padding-right: 2px;
-}
-
-div.tunnels td:last-child {
+.sb_newsheadings {
+     width: 192px;
+     margin-left: 0;
+     margin-bottom: -7px !important;
      text-align: right;
-     padding-right: 1px;
 }
+
+.sb_newsheadings table {
+     margin-bottom: 3px !important;
+}
+
+.sb_newsheadings a {
+     display: inline-block;
+     padding: 0 3px 0 0;
+
+}
+
+.sb_newsheadings td {
+     padding: 4px 5px 4px 24px;
+     text-align: left;
+     background: url(images/newsbullet_mini.png) 4px center no-repeat !important;
+     border-bottom: 1px solid #131 !important;
+}
+
+.sb_newsheadings tr:last-child td {
+     border-bottom: none !important;
+}
+
+/* end sidebar news */
+/* end sidebar */
 
 /* console error messages */
 
-div.sorry {
+img[src="/themes/console/images/i2plogo.png"] {
+     margin-top: 2px !important;
+     margin-left: -1px !important;
+     width: 180px !important;
+     filter: invert(1) sepia(100%) hue-rotate(70deg) !important;
+}
+
+img[src="/themes/console/images/i2plogo.png"]:hover,
+img[src="/themes/console/images/i2plogo.png"]:focus {
+     filter: invert(1) sepia(100%) hue-rotate(70deg) drop-shadow(0 0 2px #930) !important;
+}
+
+a:active img[src="/themes/console/images/i2plogo.png"] {
+     filter: invert(1) sepia(100%) hue-rotate(70deg) drop-shadow(0 0 3px #f60) !important;
+}
+
+.sorry {
      margin: -1px 5px 10px 216px;
-     padding: 20px 20px 20px 75px;
-     background: #020;
+     padding: 20px 20px 20px 70px;
+     background: #010;
      border: 1px solid #494;
      border-radius: 0 0 4px 4px;
      text-align: justify;
-     background-image:url(/themes/console/images/info/errortriangle.png);
-     background-position:15px center;
-     background-repeat:no-repeat;
-     box-shadow: inset 0 0 0 1px #d00;
+     background: url(/themes/console/images/info/errortriangle.png) 15px 45% no-repeat #010;
+     box-shadow: inset 0 0 0 1px #700;
      word-wrap: break-word;
-     min-width: 555px;
-     color: #EE9;
+     min-width: 560px;
+     color: #ee9;
      font-size: 10pt;
 }
 
+.sorry p {
+     line-height: 130% !important;
+}
+
+#warning2 {
+     min-width: 610px;
+     margin-top: -14px;
+     margin-bottom: 5px;
+     background: #010;
+     padding: 10px 20px 5px;
+}
+
+#warning2 h3 {
+     border-width: 1px;
+     border-radius: 0;
+     border-left: none;
+     border-right: none;
+     margin: -21px -20px 0;
+     padding: 10px;
+     box-shadow: inset 0 0 0 1px #700;
+}
+
+#warning2 p {
+     font-size: 9pt;
+}
+
+#warning2 p + h3 {
+     margin-top: -5px;
+}
+
+#warning2 b {
+     display: inline-block;
+     min-width: 140px;
+     text-align: right;
+     margin-right: 5px;
+     line-height: 150%;
+}
+
 .sorry hr {
-     color: #EE9;
-     background: #EE9;
+     color: #ee9;
+     background: #ee9;
      height: 1px;
-     border: 1px solid #EE9;
+     border-top: 1px solid #ee9;
      margin: 10px 0;
+     opacity: 0.7;
 }
 
 /* main section */
@@ -698,19 +766,19 @@ div.sorry {
      margin: -1px 5px 5px 216px;
      padding: 0 15px 5px 15px;
      text-align: left;
-     color: #EE9;
+     color: #ee9;
      width: auto;
      border: 1px solid #494;
      border-radius: 0 0 2px 2px;
-     background:  #000 url("images/camotile2.png") !important;
+     background:  #000 url(images/camotile2.png) !important;
      min-width: 620px;
      box-shadow: 0 1px 5px #000;
      font-size: 9pt;
 }
 
 .main, .routersummary {
-     background:  #000 url("images/camotile2.png") !important;
-     background:  linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.45)), url("images/camotile2.png") #000 !important;
+     background:  #000 url(images/camotile2.png) !important;
+     background:  linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.45)), url(images/camotile2.png) #000 !important;
      box-shadow: inset 0 0 0 1px #000, 0 1px 5px #000;
 }
 
@@ -735,7 +803,7 @@ div.sorry {
      background-size: 3px 3px, 175px 175px;
 }
 
-div.main#news {
+.main#news {
      background: #000 url(images/news.png) no-repeat scroll bottom right !important;
 }
 
@@ -759,25 +827,29 @@ div.news h3, #newspage h3 {
      color: #ee9;
 }
 
-div.main textarea {
+.news .newsentry:first-child {
+     margin-top: -3px;
+}
+
+.main textarea {
      background: #000;
-     color: #EE9;
+     color: #ee9;
      font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      resize: none;
 }
 
 div.news {
      margin: -1px 5px 0 216px;
-     padding: 6px 20px 5px;
+     padding: 6px 15px 8px;
      border: 1px solid #494;
      background: #000 url(images/news.png) no-repeat scroll bottom right;
-     background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url("images/news.png") no-repeat scroll right bottom,  url("images/camotile2.png") #000 !important;
+     background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(images/news.png) no-repeat scroll right bottom, url(images/camotile2.png) #000 !important;
      background-blend-mode: lighten;
      color: #ee9;
      font-size: 8pt;
      text-align: right;
      box-shadow: 0 1px 5px #000;
-     min-width: 610px !important;
+     min-width: 620px !important;
 }
 
 /* MS Edge 14+ fix (no support for blend-mode) */
@@ -814,7 +886,7 @@ div.news h4 {
 
 div.news p, div.newscontent p {
      font-size: 9pt;
-     color: #EE9;
+     color: #ee9;
      margin: 0 !important;
 }
 
@@ -823,7 +895,7 @@ div.news p:nth-child(n+2), div.newscontent p:nth-child(n+2) {
 }
 
 div.news hr {
-     margin: 8px 0 3px 0;
+     margin: 8px 0 5px 0;
 }
 
 #newsStatus {
@@ -833,6 +905,11 @@ div.news hr {
 #newsDisplay {
      white-space: nowrap;
      margin-left: 10px;
+}
+
+.news #newsDisplay, .news #newsStatus {
+     margin-top: 3px !important;
+     display: inline-block;
 }
 
 .newsAuthor {
@@ -869,7 +946,7 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 .confignav {
      background: url(images/header.png) repeat-x scroll center center #000;
      background: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
-     padding: 7px 5px !important;
+     padding: 7px !important;
      margin: -1px -16px 15px;
      border: 1px solid #494;
      font-weight: bold !important;
@@ -1176,7 +1253,7 @@ table hr {
 
 th {
      padding: 7px 2px;
-     color: #EE9;
+     color: #ee9;
      text-align: center;
      font-size: 9pt;
      background: #000 url(images/header.png) center center repeat-x;
@@ -1304,7 +1381,7 @@ td img {
 /* end peer sort */
 
 tt {
-     font: bold 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font: bold 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #FF0;
 }
 
@@ -1442,6 +1519,14 @@ div[lang="de"] .twocol, div[lang="pt"] .twocol, div[lang="es"] .twocol, div[lang
      margin: 10px -5px 5px !important;
 }
 
+div[lang="es"] li, div[lang="pt"] li, div[lang="sv"] li {
+     list-style: none;
+}
+
+div[lang="sv"] li::first-letter {
+     text-transform: uppercase !important;
+}
+
 p + .twocol, div[lang="de"] p + .twocol {
      margin: 10px 25px !important;
 }
@@ -1489,7 +1574,7 @@ p:empty { /* kills empty paragraphs that are likely erroneous eg. see top of /pr
 
 h1 {
      text-align: left;
-     color: #EE9;
+     color: #ee9;
      padding: 13px 15px;
      margin: 0 5px 0 216px !important;
      font-size: 17pt;
@@ -1546,7 +1631,7 @@ h2 a:hover {
 h3, h3.welcome {
      border: 1px solid #494;
      border-left: 5px solid #494;
-     padding: 6px 10px;
+     padding: 7px 10px;
      margin: 12px 0 10px 0;
      border-radius: 0 2px 2px 0;
      background: #000 url(images/header.png) center center ;
@@ -1573,7 +1658,7 @@ h2, h3, h4 {
 }
 
 h1, h4.app, h4.app2 {
-     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url("images/camotile2.png") #000 !important;
+     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(images/camotile2.png) #000 !important;
      background-blend-mode: exclusion;
      box-shadow: inset 0 0 0 1px #000;
      text-shadow: 0 1px 1px #000;
@@ -1590,7 +1675,6 @@ button, button:visited {
      padding: 4px 2px !important;
      text-decoration: none;
      border-radius: 2px;
-     font-size: 8pt;
      font-weight: bold;
      margin: 2px 3px;
      text-align: center;
@@ -1690,7 +1774,7 @@ input {
      background: #000;
      color: #494;
      margin: 5px;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      padding: 4px 2px;
      text-decoration: none;
      min-width: 110px;
@@ -1724,8 +1808,8 @@ input[type="text"], input[type="password"] {
      background: linear-gradient(to bottom, #000 0%, #010 100%);
      color: #ee9;
      margin: 5px 10px;
-     padding: 4px 3px;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     padding: 5px;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      border: 1px solid #494 !important;
      text-decoration: none;
      border-radius: 2px;
@@ -1819,7 +1903,7 @@ select {
      border: 1px outset #191;
      border-radius: 2px;
      min-width: 110px;
-     font: 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
      padding: 4px 16px 4px 4px !important;
      cursor: pointer;
@@ -1901,12 +1985,13 @@ textarea[readonly]:focus {
      font-weight: normal;
 }
 
-input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix for oversaturated colors */
+input[type="submit"], input[type="reset"], select, button {
      border: 1px solid #8b8;
      border-bottom: 1px solid #171;
      border-right: 1px solid #171;
      background: linear-gradient(to bottom, #020 0%, #000 20%, #000 80%, #010 100%);
      filter: drop-shadow(0 0 1px #131);
+     font-size: 8pt;
 }
 
 input[type="submit"], input[type="reset"], button {
@@ -1916,8 +2001,8 @@ input[type="submit"], input[type="reset"], button {
 
 .statusnotes {
      font-style: italic;
-     font-size: 8pt;
-     color: #EE9;
+     font-size: 9pt;
+     color: #ee9;
      text-align: center;
      border: 1px solid #494 !important;
      margin: -2px 0 5px 0;
@@ -2276,7 +2361,7 @@ form[action="events"] {
      background: #000;
 }
 
-.smallhead {
+.smallhead th {
      font-size: 8pt
 }
 
@@ -2514,15 +2599,6 @@ tr#addnew, tr#addnew:hover {
      border-radius: 2px;
 }
 
-/* fixes weird height variation */
-/*
-@-moz-document url-prefix() {
-.themechoice {
-     min-height: 75px;
-}
-}
-*/
-
 .themechoice:hover {
      border: 1px solid #f60;
      background: #000;
@@ -2653,7 +2729,7 @@ p#helptranslate {
 h3#themeheading, h3#langheading, h3#passwordheading {
      border-radius: 0;
      border: 1px solid #494;
-     padding: 6px 10px;
+     padding: 8px 10px;
      font-size: 10.5pt;
      word-spacing: 0.1em;
      letter-spacing: 0.08em;
@@ -3000,6 +3076,11 @@ table#reseedconfig textarea, #i2pupdates textarea {
 
 ul#banlist {
      margin-top: -2px;
+}
+
+#profiles #banlist {
+     border: none;
+     margin: 0;
 }
 
 /* /confignet */
@@ -3459,6 +3540,10 @@ h3#servicedebug a, h3#graphinfo a {
      letter-spacing: normal;
 }
 
+/* end /configservice */
+
+/* /tunnels */
+
 .main#tunnels h3 {
      padding-right: 5px;
 }
@@ -3475,13 +3560,14 @@ h3#servicedebug a, h3#graphinfo a {
      content: url(/themes/console/images/buttons/configure.png);
      float: right;
      padding: 0;
-
 }
 
 .main#tunnels h3 a[href^="/configtunnels#"]:hover, h3.tabletitle a:hover::after,
 .main#tunnels h3 a[href^="/configtunnels#"]:focus, h3.tabletitle a:focus::after {
      filter: drop-shadow(0 0 1px #f60);
 }
+
+/* end /tunnels */
 
 /* configclients */
 
@@ -3874,6 +3960,83 @@ th > img[src^="/imagegen"] { /* scale down header images */
      margin-bottom: 8px;
 }
 
+/* leasesets */
+
+.netdb_leases, .netdb_leases li, .netdb_leases li:first-child {
+     margin: 0 !important;
+}
+
+.netdb_leases {
+     columns: auto 420px !important;
+     column-rule: 1px solid #131;
+     column-gap: 1em;
+}
+
+.netdb_leases li {
+     list-style: none;
+     display: inline-block;
+     padding: 1px 20px 1px 0;
+     margin: 1px 0;
+     min-width: 400px;
+}
+
+.netdb_leases li b:first-child {
+     display: inline-block;
+     min-width: 80px !important;
+     text-align: right;
+     margin: 0 !important;
+     padding: 0 !important;
+}
+
+.netdb_gateway {
+     margin-left: 0 !important;
+     margin-right: -10px !important;
+     vertical-align: bottom;
+}
+
+.netdb_gateway img {
+     vertical-align: bottom;
+}
+
+.netdb_tunnel {
+     display: inline-block;
+     background: #030;
+     padding: 0 4px;
+     margin-left: 4px;
+     margin-right: -4px;
+     border-radius: 2px;
+}
+
+.netdb_leases .tunnel_id {
+     min-width: 74px;
+}
+
+.netdb_leases .tunnel_peer, .tunneldisplay .tunnel_peer {
+     min-width: 64px;
+}
+
+.netdb_leases .tunnel_peer tt, .netdb_leases .tunnel_peer tt a {
+     font-size: 8pt !important;
+     font-weight: bold !important;
+}
+
+.netdb_leases .tunnel_peer tt, .netdb_leases .tunnel_peer a {
+     letter-spacing: 0.1em !important;
+     margin: 0 !important;
+     padding: 0 !important;
+}
+
+.main li .netdb_expiry {
+     font-weight: normal;
+     text-transform: lowercase;
+     font-style: italic;
+}
+
+img.unknownflag {
+     opacity: 0.8;
+}
+
+/* end leasesets */
 /* end netdb */
 
 /* logs */
@@ -4178,6 +4341,17 @@ table#profile_defs td, table#thresholds td {
      width: 16px;
 }
 
+#capabilities_key b {
+     text-transform: none !important;
+     display: inline-block;
+     min-width: 16px;
+     background: #002000;
+     text-align: center;
+     text-shadow: 0 1px 1px #000;
+     border-radius: 2px;
+     padding: 1px 2px;
+}
+
 #profile_defs b {
      text-transform: capitalize;
 }
@@ -4244,26 +4418,26 @@ h3#bannedpeers {
 ul#banlist {
      border: 1px solid #494;
      background: #000;
-     padding: 10px 10px 10px 0;
+     padding: 10px 5px 10px 0;
      margin: -1px 0 13px;
      -moz-column-count: auto;
-     -moz-column-width: 300px;
-     -moz-column-gap: 10px;
+     -moz-column-width: 280px;
+     -moz-column-gap: 5px;
      -moz-column-rule: 1px dotted #494;
      -webkit-column-count: auto;
-     -webkit-column-width: 300px;
-     -webkit-column-gap: 10px;
+     -webkit-column-width: 280px;
+     -webkit-column-gap: 5px;
      -webkit-column-rule: 1px dotted #494;
      column-count: auto;
-     column-width: 300px;
-     column-gap: 10px;
-     column-rule: 1px dotted #494;
+     column-width: 280px;
+     column-gap: 5px;
+     column-rule: 1px dotted #151;
 }
 
 #banlist li {
      list-style: none !important;
-     border-bottom: 1px dotted #494;
-     margin: 0 10px 3px;
+     border-bottom: 1px dotted #151;
+     margin: 0 8px 3px;
      padding-top: 3px;
      min-width: 250px;
      width: 88%;
@@ -4758,53 +4932,6 @@ table#leasesetdebug th a:hover, table#leasesetsummary th a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-.main#debug {
-     line-height: 140%;
-     padding-bottom: 0;
-}
-
-.main#debug table {
-     margin-top: -13px;
-}
-
-.main#debug th, .main#debug td {
-     text-align: left;
-     padding: 5px 10px;
-}
-
-.main#debug th:last-child {
-     text-align: right;
-}
-
-.main#debug td:last-child {
-     vertical-align: top;
-     text-align: right;
-}
-
-.main#debug li:last-child {
-     padding-bottom: 2px;
-}
-
-.main#debug h2 {
-     border-radius: 0;
-     padding: 5px 10px;
-     font-size: 11pt;
-}
-
-.main#debug h3 {
-     border-radius: 0;
-     padding: 3px 10px;
-     font-size: 10pt;
-}
-
-.main#debug h2 + hr {
-     display: none;
-}
-
-div.debugcontainer {
-     border: 1px solid #f00;
-}
-
 .main#certs {
      padding-top: 3px;
 }
@@ -4840,64 +4967,6 @@ div.debugcontainer {
 .main#certs textarea {
      margin: -1px 0 11px 0;
      width: 100%;
-}
-
-.main#jardump {
-     overflow: auto !important;
-     padding: 0;
-/*     display: inline-table;*/
-     min-width: 650px !important;
-}
-
-.main#jardump table {
-     margin: -1px 0 0;
-     border: 0;
-     border-collapse: collapse;
-     font-size: 8pt;
-     color: #bb7;
-}
-
-.main#jardump th {
-     padding: 9px 5px;
-}
-
-.main#jardump th:nth-child(1), .main#jardump th:nth-child(3), .main#jardump th:nth-child(6), .main#jardump th:nth-child(7) {
-     text-align: left;
-}
-
-.main#jardump tr:hover, .main#jardump tr:hover td {
-     background: #020;
-     color: #ee9;
-}
-
-.main#jardump td {
-     vertical-align: top;
-     padding: 2px 5px;
-     color: #bb7;
-}
-
-.main#jardump td:first-child {
-     color: #eea;
-}
-
-.main#jardump th:nth-child(4), .main#jardump th:nth-child(5) {
-     white-space: nowrap !important;
-}
-
-.main#jardump tt {
-     letter-spacing: -0.03em;
-}
-
-.main#jardump font[color="red"] {
-     color: #d00;
-}
-
-@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes column wrapping on webkit */
-.main#jardump td {
-     word-break: break-word !important;
-     word-break: break-all !important;
-     max-width: 230px;
-}
 }
 
 .main#proof {
@@ -5238,6 +5307,7 @@ textarea#advancedsettings {
      white-space: pre-wrap;
      border: 0 none transparent;
      border-radius: 0;
+     word-break: break-all;
 }
 
 .configtable td.infohelp, p.infohelp, td.infohelp, p.infowarn, td.infowarn, p#debugmode, p#sybilinfo {
@@ -5292,7 +5362,7 @@ h3#updateplugins, h3#pluginmanage, h3#bannedpeers, h3.ptitle, h3#transports, h3#
      border: 1px solid #494;
      text-transform: uppercase;
      letter-spacing: 0.08em;
-     padding: 7px 10px;
+     padding: 8px 10px;
 }
 
 h3#pluginmanage {
@@ -5384,7 +5454,7 @@ table#externali2cp th {
 }
 
 th.th_title {
-     padding: 10px;
+     padding: 8px 10px !important;
      text-align: left;
      background: linear-gradient(to bottom, #1a261a 0%,#223022 7%,#212f21 9%,#172317 21%,#091109 49%,#050d05 50%,#020602 51%,#010301 53%,#000000 56%,#000000 100%) !important;
 }
@@ -5607,6 +5677,14 @@ p#sybilinfo {
      background: #000 url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat !important;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px !important;
+}
+
+#floodfillconfig tr:nth-child(2) td {
+     padding: 8px 10px 8px 18px;
+}
+
+#floodfillconfig tr:nth-child(2) b {
+     margin-right: 10px;
 }
 
 p#clientconf.infohelp, p#webappconfigtext.infohelp {
@@ -5864,7 +5942,7 @@ p#profiles_overview {
 
 /* /tunnels */
 
-tt a {
+tt a, .tunnel_peer tt {
      letter-spacing: 0.07em;
 }
 
@@ -5904,6 +5982,14 @@ tt a {
      display: inline-block;
      min-width: 56px;
      text-align: right;
+}
+
+.tunnel_peer img {
+     margin-right: 2px;
+}
+
+.tunnel_peer tt {
+     margin-left: 0;
 }
 
 .tunnel_local {
@@ -6299,6 +6385,329 @@ b.netdb_transport {
 
 /* end sybils */
 
+/* debug */
+
+#debug {
+     line-height: 140%;
+     padding-bottom: 0;
+}
+
+#debug table {
+     margin-top: -13px;
+}
+
+#debug th, #debug td {
+     text-align: left;
+     padding: 5px 10px;
+}
+
+#debug th {
+     padding: 7px 10px;
+}
+
+#debug th:last-child, #debug td:last-child {
+     text-align: right;
+}
+
+#debug td:last-child {
+     vertical-align: top;
+}
+
+#debug h2, #debug h3 {
+     border-radius: 0;
+}
+
+#debug h2 {
+     padding: 8px 10px;
+     font-size: 11.5pt;
+     background: url(/themes/console/images/info/debug.png) right 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+     background-size: 20px 20px, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+}
+
+#debug h2 + hr, .buckets hr {
+     display: none;
+}
+
+#debug h3 {
+     border-width: 1px !important;
+     padding: 5px 10px !important;
+     font-size: 10pt;
+}
+
+.debug_container {
+     margin-top: -11px;
+     border: 1px solid #494;
+     padding: 10px 15px;
+     background: #000800;
+}
+
+.debug_container:empty::after {
+     content: "None";
+     display: inline-block;
+     font-style: italic;
+}
+
+.buckets {
+     margin-top: -13px;
+     margin-bottom: 15px;
+     max-height: 600px;
+     overflow: auto;
+     word-break: break-all;
+}
+
+.debug_container + h3, .debug_outboundsessions {
+     margin-top: -1px;
+}
+
+.debug_outboundsessions {
+     margin-top: -2px;
+}
+
+#debug h2 + h3, .buckets {
+     margin-top: -13px;
+}
+
+#debug ul, #debug li {
+     margin: 0 !important;
+     text-align: left !important;
+}
+
+#debug li:last-child {
+     padding-bottom: 2px;
+}
+
+#debug li {
+     display: inline-block;
+     padding: 2px 0 !important;
+     min-width: 400px !important;
+}
+
+#debug ul, .debug_targetinfo {
+     columns: 400px 2;
+     column-rule: 1px solid #131;
+     column-gap: 30px;
+}
+
+.debug_targetinfo {
+     line-height: 140%;
+}
+
+.debug_targetinfo b {
+     margin-right: 3px;
+}
+
+#debug h3.debug_outboundsessions, #debug h3.debug_inboundsessions {
+     padding: 6px 10px 6px 28px !important;
+     background-blend-mode: luminosity, normal;
+}
+
+#debug h3.debug_outboundsessions {
+     margin-top: -6px !important;
+     background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000 56%) !important;
+}
+
+#debug h3.debug_inboundsessions {
+     background: url(/themes/console/images/inbound.png) 6px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000 56%) !important;
+}
+
+.debug_version {
+     color: #aa0;
+     font-weight: bold;
+}
+
+#portmapper td:first-child {
+     font-weight: bold;
+}
+
+#portmapper th:last-child, #portmapper td:last-child {
+     text-align: left !important;
+}
+
+/* end debug */
+
+/* jardump */
+
+#jardump {
+     overflow: auto !important;
+     padding: 0;
+     min-width: 650px !important;
+}
+
+#jardump table {
+     margin: -1px 0 0;
+     border: 0;
+     border-collapse: collapse;
+     font-size: 8pt;
+     color: #bb7;
+}
+
+#jardump th {
+     padding: 9px 5px;
+}
+
+#jardump th:nth-child(4), #jardump th:nth-child(5) {
+     white-space: nowrap !important;
+}
+
+#jardump th {
+     border-right: none;
+     border-left: none;
+}
+
+#jardump th, #jardump td {
+     vertical-align: middle !important;
+     text-align: center !important;
+}
+
+#jardump th:first-child, #jardump td:first-child {
+     text-align: left !important;
+}
+
+#jardump td {
+     border-right: 1px inset #131;
+     vertical-align: top;
+     padding: 2px 5px;
+     color: #bb7;
+}
+
+#jardump td:first-child, #jardump tr:hover td:first-child {
+     padding-left: 24px;
+     padding-right: 0 !important;
+     background-image: url(/themes/console/images/info/box.png) !important;
+     background-position: 6px center;
+     background-repeat: no-repeat;
+     background-size: 16px 16px;
+}
+
+#jardump td:first-child {
+     color: #eea;
+}
+
+#jardump td:first-child b {
+     display: inline-block;
+     padding: 4px;
+     border-radius: 2px;
+     margin-right: 4px;
+}
+
+#jardump td:nth-child(2) {
+     text-align: right !important;
+     font-style: italic;
+}
+
+#jardump td:last-child {
+     word-break: break-all;
+     text-align: left !important;
+     border-right: none;
+     padding: 0;
+}
+
+#jardump tr:hover td {
+     background: #020;
+     color: #ee9;
+     border: 1px solid #151;
+     border-left: 1px solid transparent;
+     border-right: 1px solid transparent;
+}
+
+#jardump tr:hover .unsignedmod:not(:empty) {
+     background: #600;
+     color: #fff;
+     border-radius: 2px;
+}
+
+#jardump tr:hover td:first-child b {
+     background: #030;
+     border: 1px solid #010;
+     margin-right: 0;
+     box-shadow: 0 0 1px 0 #010;
+     width: 95%;
+     width: calc(100% - 10px);
+}
+
+#jardump tr:hover hr {
+     background: transparent;
+}
+
+#jardump tr:hover td:first-child {
+     padding-left: 26px !important;
+     padding-right: 0 !important;
+}
+
+#jardump tt {
+     letter-spacing: -0.03em;
+}
+
+#jardump font[color="red"] {
+     color: #d00;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes column wrapping on webkit */
+#jardump td {
+     word-break: break-word !important;
+     word-break: break-all !important;
+     max-width: 230px;
+}
+}
+
+.revision, .sha256, .unsignedmod {
+     display: inline-block;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+.unsignedmod {
+     padding: 2px 2px 2px 4px;
+     margin: 0;
+}
+
+#jardump hr {
+     margin: 1px 0;
+     width: 100%;
+     height: 1px;
+     background: #131;
+     display: block !important;
+}
+
+#jardump .subheading {
+     padding-top: 6px !important;
+     padding-bottom: 6px !important
+}
+
+.subheading.routerfiles {
+     background: url(/themes/console/images/eepsite.png) right 5px center no-repeat, linear-gradient(to right, #000, #001000 40%) !important;
+     background-size: 16px auto, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+}
+
+.subheading.pluginfiles {
+     background: url(/themes/console/images/plugin.png) right 5px center no-repeat, linear-gradient(to right, #000, #001000 40%) !important;
+     background-size: 16px auto, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+}
+
+.unsignedmod {
+     display: inline-block;
+     word-break: break-all;
+}
+
+@media screen and (max-width: 1400px) {
+.revision, .sha256 {
+     display: inline-block;
+     max-width: 100px !important;
+     overflow: hidden;
+     text-overflow: ellipsis
+}
+
+.revision:hover, .sha256:hover {
+     overflow: auto;
+     text-overflow: clip;
+}
+}
+/* end jardump */
+
 /* responsive layout */
 
 @media screen and (max-width: 900px) {
@@ -6431,9 +6840,33 @@ td.optionsave {
 }
 }
 
+@media screen and (min-width: 1400px) {
+#profiles #banlist {
+     border: none;
+     margin: -15px -15px -5px;
+     padding: 10px 5px;
+}
+
+.main#help #changelog pre:not(old) {
+     columns: 550px auto;
+     column-gap: 40px;
+     column-rule: 1px dotted #151;
+     margin-left: 0;
+     padding-left: 10px;
+     width: calc(100% - 22px) !important;
+     overflow-y: hidden;
+}
+}
+
+@media screen and (min-width: 1460px) {
+input[type="submit"], input[type="reset"], select, button {
+     font-size: 9pt;
+}
+}
+
 @media screen and (min-width: 1500px) {
 body, .main, .main td, .news p, #news p, textarea, .main textarea, code, tt, #changelog pre,
-ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, .confignav {
+ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover, .confignav, th, #configinfo th {
      font-size: 10pt !important;
 }
 
@@ -6452,7 +6885,7 @@ ul.statlist a[name], ul.statlist b, ul.statlist li b, ul.statlist a[name]:hover,
      margin-left: 242px !important;
 }
 
-pre, #logs li, .smallhead {
+pre, #logs li, .smallhead th {
      font-size: 9pt !important;
 }
 
@@ -6496,8 +6929,8 @@ div.app {
      font-size: 10pt !important;
 }
 
-th, #configinfo th, code, tt {
-     font-size: 10pt;
+code, tt {
+     font-size: 9pt !important;
 }
 
 table#floodfills th:first-child, table#floodfills td:first-child {
@@ -6522,7 +6955,7 @@ h4#updateplugins {
 }
 
 .sorry {
-     margin-left: 232px !important;
+     margin-left: 242px !important;
 }
 
 div.joblog h3 {
@@ -6629,11 +7062,24 @@ table#reseedconfig input[type="text"], table#reseedconfig input[type="password"]
 .langselect .optbox {
      min-width: 144px !important;
 }
+
 .langselect img {
      margin-left: -81px !important;
 }
+
 .langselect input[name="lang"]:checked + img {
      margin-left: -82px !important;
+}
+
+ul#banlist {
+     -moz-column-width: 300px;
+     -webkit-column-width: 300px;
+     column-width: 300px;
+}
+
+img[src="/themes/console/images/i2plogo.png"] {
+     margin-top: 3px !important;
+     width: 200px !important;
 }
 }
 
@@ -6762,4 +7208,32 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
+
+/* TODO: can we simplify sidebar element positioning by getting a handle on the #xhr div? */
+/*
+#xhr {
+     width: 204px;
+     background: rgba(255,255,0,0.1);
+     margin: 0 0 0 -10px;
+     text-align: center !important;
+}
+
+.routersummary table, #sb_localtunnels {
+     width: 200px !important;
+     margin-left: 2px !important;
+     margin-right: 2px !important;
+}
+
+.routersummary h4 {
+     width: 198px !important;
+     margin: 0 0 0 2px; !important;
+     display: inline-block;
+}
+
+.routersummary h3, .routersummary hr {
+     width: 100% !important;
+     margin-left: 0 !important;
+     margin-right: 0 !important;
+}
+*/
 

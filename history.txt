@@ -1,14 +1,56 @@
 2017-07-26 str4d
+ * Themes:
+   - 'light' theme (console & apps):
+     - Rework to reduce contrast (ticket #1996)
+     - Add custom radio/checkbox icons for Chrome/Blink
  * Console:
    - Add JavaScript snippet to reset dest address scroll position onblur (fixes
      Chrome/Blink disappearing text bugs in i2ptunnel and susidns)
+   - Fix reseed failure notice overlap when "check connection" message shown
+   - Enhance presentation of console "error 500" messages
+   - Cosmetic tweaks to welcome page presentation, arabic welcome page tidyup
+   - Migrate .smallhead th class to tr to simplify markup
+   - Sidebar:
+     - Remove "Congestion" from default sidebar (still present in default
+       advanced sidebar)
+     - Fix label wrapping issue with translations
+     - Migrate sidepanel news section to tables to permit better control over
+       wrapping and placement (ticket #1996)
+     - Move news item dates to tooltips to lessen chance of headlines wrapping
+       and cleanup presentation
+     - Increase maximum length of local tunnel links in the sidebar (and handle
+       overflow with CSS) to minimize chance of default tunnels display
+       truncating in translations
+     - Add the power off icon to sidebar restart button on hover to clarify
+       button function (ticket #1996)
+   - /configadvanced: Move floodfill status to row above to remove unnecessary
+     whitespace and cleanup UI
    - /debug:
      - Add container divs and styling markup
      - Add top navigation menu
+     - Add debug icon to h2 headers to aid navigation
+   - /graphs: Improve presentation of graph images by removing rendered border
+     and setting background color to better integrate with themes
+   - /home: Widen div.app to lessen chance of truncation (classic/midnight)
    - /jars:
      - JARs, WARs & individual plugins separated with headers
      - Filenames stripped of path info (path indicated on headers and tooltips)
      - Add container divs and styling markup
+     - Minimize table overflow with conditional scaling of content
+     - One-click select for revision, sha256 & unsigned mods
+   - /logs:
+     - Reduce line/entry spacing for router and critical logs (#ticket 1996)
+     - Multi-column view for changelog at >=1400px to address horizontal
+       whitespace issue
+   - /netdb:
+     - Multi-column display of Leases in LeaseSet tables
+     - Better alignment of Lease elements, iconify gateway
+     - Placeholder flag for unknown/unresolved peers for [flag+dest] combos to
+       improve presentation / fix deadspace issue
+   - Chinese:
+     - Fix alignment of table contents in /tunnels (classic)
+     - Fix sidebar content display width (midnight)
+     - Cosmetic fixes (all themes)
  * I2PSnark:
    - Mitigate truncation of ratings dropdown in comments section (translations)
    - light: Reduce contrast of display text
@@ -20,7 +62,18 @@
    - Migrate "view or change bandwidth" to [Configure] tooltip to standardize
      configuration links, allow for more space for option labels and lessen
      chance of option labels wrapping in translations
- * SusiMail: Dismiss notifications on click
+ * I2PTunnel:
+   - Ensure message log font scales proportionately
+   - Fix overflow issue with dropdowns in Chrome/blink (dark/midnight)
+ * SusiDNS
+   - Reduce width of filter buttons to lessen chance of wrapping (ticket #1996)
+   - Add non-selectable items to improve copy/paste of hosts in address books
+   - Make dest addresses in host list only display scrollbar on focus to reduce
+     screen clutter
+   - Hide broken imagegen images
+ * SusiMail:
+   - Dismiss notifications on click
+   - Enhance presentation of 'postman' links on login panel
 
 2017-07-25 str4d
  * Console: Move JRobin default color and font changes into SummaryRenderer

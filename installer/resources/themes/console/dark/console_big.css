@@ -7,31 +7,31 @@ h1, h2, h3, h4 {
      font-weight: normal !important;
 }
 
-div.routersummary table td {
+.routersummary table td {
      padding: 2px 1px;
 }
 
-div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
+.routersummary h3, .routersummary h4, .routersummary p, .routersummary h3 a, .routersummary a {
      text-shadow: none !important;
 }
 
-div.routersummary h3 a {
+.routersummary h3 a {
      font-size: 14pt !important;
      text-transform: uppercase !important;
      letter-spacing: 0.15em !important;
 }
 
-div.routersummary h4, .routersummary h4 a {
+.routersummary h4, .routersummary h4 a {
      font-size: 11pt !important;
      font-weight: normal;
 }
 
-div.routersummary b {
+.routersummary b {
      font-size: 10pt;
      font-weight: normal;
 }
 
-div.routersummary a {
+.routersummary a {
      font-size: 10pt;
      font-weight: normal;
 }
@@ -41,7 +41,7 @@ div.routersummary a {
      padding-bottom: 10px;
 }
 
-div.messages, div.error, .error ul li {
+.messages, .messages li, div.error, .error ul li {
      font-size: 11pt;
      font-weight: normal !important;
 }
@@ -134,19 +134,6 @@ input[type="submit"], input[type="reset"], .cancel, .accept {
      font-size: 9pt !important;
 }
 
-.langselect .optbox {
-     min-height: 68px;
-}
-
-.langselect img {
-     margin-top: 8px !important;
-}
-
-.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
-     margin-top: 6px !important;
-     margin-left: -66px !important;
-}
-
 table#leasesetdebug th a:not(old), table#leasesetsummary th a:not(old), #tunnels.main h3 a:not(old), #logs h3 a:not(old),
 a[href^="configpeer?peer"], h3#iptransport a:not(old), h3#iptransport a:not(old) {
      font-size: 0 !important;
@@ -209,6 +196,20 @@ li .twocol {
      line-height: 180%;
 }
 
+.sb_notice, .sb_notice a {
+     font-size: 10pt !important;
+     line-height: 120% !important;
+}
+
+.sb_newsheadings td, .sb_newsheadings tr:hover td {
+     background-position: 4px center !important;
+     padding-left: 24px !important;
+}
+
+.search select, .search button, .search input[type="text"] {
+     font-size: 10pt !important;
+}
+
 @media screen and (min-width: 0) {
 body {
      font-family: "Droid Sans", "Noto Sans", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
@@ -229,11 +230,11 @@ div.main, div.news, h1, .sorry {
      font-size: 12pt !important;
 }
 
-div.routersummary {
+.routersummary {
      width: 200px !important;
 }
 
-div.routersummary table, table#sb_localtunnels {
+.routersummary table, table#sb_localtunnels {
     font-size: 10pt;
     width: 215px !important;
 }
@@ -279,7 +280,7 @@ p#fullhistory {
      margin-top: -13px !important;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
     margin-left: -5px;
     margin-top: -3px;
     width: 211px;

@@ -39,7 +39,7 @@ body {
 }
 
 .routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after, div.app, .themechoice, .langselect, .langbox,
-.newsAuthor, #netdbcountrylist img, .viewfullentry, .sybil_routerinfo th img, .graphspanel {
+.newsAuthor, #newsDisplay, #netdbcountrylist img, .viewfullentry, .sybil_routerinfo th img, .graphspanel {
      -moz-user-select: none;
      -webkit-user-select: none;
      user-select: none;
@@ -320,12 +320,16 @@ img {
 
 /* console error messages */
 
+img[src="/themes/console/images/i2plogo.png"] {
+     box-shadow: none !important;
+}
+
 .sorry {
-     padding: 20px 20px 20px 60px;
-     background: #fff url(/themes/console/images/info/errortriangle.png) 10px center no-repeat;
-     background: url(/themes/console/images/info/errortriangle.png) 10px center no-repeat, linear-gradient(to bottom, #fff, #ffe);
+     padding: 20px 20px 20px 75px;
+     background: #fff url(/themes/console/images/info/errortriangle.png) 20px 40% no-repeat;
+     background: url(/themes/console/images/info/errortriangle.png) 20px 40% no-repeat, linear-gradient(to bottom, #fff, #ffe);
      margin: -1px 0 0 211px;
-     min-width: 490px;
+     min-width: 475px;
      border: 1px solid #89f;
      box-shadow: inset 0 0 0 1px #ff9;
      text-align: justify;
@@ -340,6 +344,39 @@ img {
      height: 1px;
      border: 0 solid #89f;
      margin: 10px 0;
+}
+
+.sorry p {
+    padding: 0 !important;
+}
+
+#warning2 {
+     min-width: 540px;
+     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2)) repeat scroll 0 0 / 100% 100%, rgba(0, 0, 0, 0) url(images/bg0.png) repeat scroll 0 0 / 120px 120px;
+     margin-top: -15px;
+     padding: 0 15px 5px;
+     box-shadow: inset 0 0 0 1px #f99;
+     font-weight: normal;
+     color: #2c354f;
+}
+
+#warning2 h3 {
+     margin: -1px -16px 15px;
+     color: #2c354f;
+     box-shadow: inset 0 0 0 1px #f99;
+     padding: 8px 10px;
+}
+
+#warning2 b {
+     margin-right: 3px;
+     display: inline-block;
+     min-width: 140px;
+     text-align: right;
+}
+
+#warning2 p {
+     margin-left: 10px;
+     margin-right: 10px;
 }
 
 /* sidebar */
@@ -441,7 +478,7 @@ img {
      border: 0;
      border-bottom: 0 !important;
      font-size: 8.5pt;
-     letter-spacing: 0.05em;
+/*     letter-spacing: 0.05em;*/
      margin: -7px -1px -7px -1px !important;
      padding: 8px 2px;
      text-transform: capitalize;
@@ -561,9 +598,13 @@ img {
 }
 
 #sb_localtunnels a {
-     text-transform: capitalize;
+     text-transform: none;
      display: inline-block;
      width: 100%;
+     max-width: 180px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
 }
 
 #sb_localtunnels td:first-child {
@@ -594,9 +635,15 @@ img {
      background: #fff;
      border: 1px solid #89f;
      border-radius: 2px;
-     box-shadow: 0 0 1px #bbb;
-     margin: -5px 1px -6px;
-     padding: 5px 3px;
+     box-shadow: 0 0 1px #bbb, inset 0 0 0 1px #fbb;
+     margin: -4px 2px -5px;
+     padding: 6px 5px;
+     line-height: 110%;
+     font-size: 8pt;
+}
+
+#sb_warning + .sb_notice {
+     margin-top: 10px;
 }
 
 p:empty + .sb_notice {
@@ -607,40 +654,66 @@ p:empty + .sb_notice {
      margin: -2px 0;
 }
 
-.newsheadings {
+/* sidebar news */
+
+.sb_newsheadings {
      text-align: right;
-     margin: -1px 5px -5px -23px;
+     margin: -1px 5px -5px 0;
+     margin: -3px 0 -7px 0;
      padding: 0;
      font-size: 8pt;
 }
 
-.newsheadings ul {
-     margin: 2px 5px -1px 38px;
-     padding: 0;
-     display: inline-block;
-     width: 171px;
+.sb_newsheadings table {
+     margin: -6px 0 2px !important;
+     width: 100%;
+     table-layout: auto;
+     background: #fff;
 }
 
-.newsheadings li {
-     list-style: none outside url(images/newsbullet_mini.png);
-     margin: 2px -4px 2px 8px;
-     vertical-align: middle;
+.sb_newsheadings td {
+     text-align: left;
+     border: none;
+     padding: 5px 3px;
+     border-collapse: collapse;
+     border-bottom: 1px solid #fff !important;
+     line-height: 100%;
+}
+
+.sb_newsheadings table tr:last-child td {
+     border-bottom: none !important;
+     padding-bottom: 3px !important;
+}
+
+.sb_newsheadings td {
+     background: #eff2ff;
+     padding-left: 20px;
+     padding-right: 8px;
+     text-align: left;
+     background: url(images/link.png) 4px 4px no-repeat !important;
+     background-size: 12px auto !important;
+     background-blend-mode: luminosity;
+     vertical-align: middle !important;
+     transition: ease background 0.2s;
+     word-spacing: 0.1em;
+}
+
+.sb_newsheadings tr:hover td {
+     background: url(images/link.png) 4px 4px no-repeat #ffd !important;
+     background-size: 12px auto !important;
+     background-blend-mode: normal;
+     transition: ease background 0.2s;
+}
+
+.sb_newsheadings td a {
      line-height: 110%;
-}
-
-.newsheadings li a {
-     margin-top: -2px;
-     margin-left: -3px;
      display: inline-block;
+     margin: 0;
+     padding: 0;
+     width: 100%;
 }
 
-.newsheadings li:first-child {
-     margin-top: -3px;
-}
-
-.newsheadings li:last-child {
-     margin-bottom: 0;
-}
+/* end sidebar news */
 
 div.refresh {
      margin-top: 10px !important;
@@ -764,6 +837,14 @@ div.refresh {
 
 /* welcome */
 
+div[lang="es"] li, div[lang="pt"] li, div[lang="sv"] li, div[lang="zh"] li {
+     list-style: none;
+}
+
+div[lang="sv"] li::first-letter {
+     text-transform: uppercase !important;
+}
+
 div[lang="ar"] li {
      margin: 0 10px 0 30px;
 }
@@ -774,6 +855,33 @@ div[lang="ar"] h3, div[lang="ar"] li {
 
 div[lang="de"] .twocol {
      margin-left: 50px !important;
+     margin-top: -8px !important;
+}
+
+div[lang="sv"] .twocol {
+     margin-top: 2px !important;
+}
+
+div[lang="es"] li {
+    list-style-type: none;
+    margin-left: -10px;
+}
+
+div[lang="es"] .twocol {
+     background: #eff2ff;
+     border-radius: 1px;
+     box-shadow: 0 0 0 1px #bbf;
+     padding: 5px 0 8px 48px;
+     margin-top: 15px !important;
+}
+
+div[lang="es"] .twocol:not(old) {
+     margin-left: 0 !important;
+     margin-right: 0 !important;
+}
+
+div[lang="pt"] li br {
+     display: none;
 }
 
 #console .links {
@@ -782,6 +890,11 @@ div[lang="de"] .twocol {
 
 #console li:first-child {
      padding-top: 10px;
+}
+
+#console li {
+     line-height: 140%;
+     text-align: justify;
 }
 
 .langbox {
@@ -799,13 +912,17 @@ div[lang="de"] .twocol {
      padding: 0 !important;
      margin: 0 1px -1px;
      opacity: 0.9;
-     border: 1px solid #999;
+     border: 1px solid #bbf;
      transform: none !important;
 }
 
 .langbox img:hover, .langbox a:focus img {
      opacity: 1;
      transform: scale(1.1) !important;
+}
+
+.langbox img:hover:active {
+     transform: none !important;
 }
 
 .links {
@@ -819,8 +936,36 @@ div[lang="de"] .twocol {
      padding: 5px 10px 0 !important;
 }
 
+.links:not(old) {
+     margin-left: -15px !important;
+     margin-right: -15px !important;
+}
+
+.links li:not(old) {
+     list-style: url(/themes/console/images/transparent.gif) !important;
+     list-style-position: outside;
+     padding: 5px 10px 0 !important;
+}
+
+.links li::before {
+     content: "";
+     display: inline-block;
+     width: 16px;
+     height: 18px;
+     background: url(images/link.png) left top 4px no-repeat !important;
+     background-size: 14px 14px !important;
+     margin-right: 4px;
+     margin-left: -20px;
+}
+
+div[lang="ar"] .links li::before {
+     background-position: right top 4px !important;
+     margin-right: -20px;
+     margin-left: 4px;
+}
+
 .links li:first-child {
-     padding: 14px 10px 5px !important;
+     padding: 15px 10px 5px !important;
 }
 
 .links li:last-child {
@@ -838,9 +983,9 @@ div[lang="de"] .twocol {
      -moz-columns: 2 400px;
      -webkit-columns: 2 400px;
      columns: 2 400px;
-     -moz-column-gap: 20px !important;
-     -webkit-column-gap: 20px !important;
-     column-gap: 20px !important;
+     -moz-column-gap: 40px !important;
+     -webkit-column-gap: 40px !important;
+     column-gap: 40px !important;
      display: block;
      margin: 10px 0 !important;
 }
@@ -862,6 +1007,10 @@ p + .twocol {
 
 #console div[lang="de"] .twocol {
      margin-left: 30px !important;
+}
+
+#console div[lang="es"] .twocol {
+     margin-left: 0 !important;
 }
 
 .twocol li {
@@ -922,8 +1071,7 @@ pre {
 }
 
 tt, code {
-     font-size: 9pt;
-     font-weight: bold !important;
+     font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
      color: darkgreen;
 }
 
@@ -945,6 +1093,12 @@ select {
      text-overflow: ellipsis;
      color: #333;
      cursor: pointer;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+select {
+     padding: 5px 16px 5px 8px !important;
+}
 }
 
 select option {
@@ -1084,6 +1238,8 @@ input.search[type="text"] {
 
 input[name="refreshInterval"] {
      text-align: right;
+     min-width: 80px;
+     width: 80px;
 }
 
 input[type="submit"], input[type="reset"], button, .optbox {
@@ -1509,6 +1665,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 
 .routersummary .reload:hover, .routersummary .reload:focus {
      background: url(/themes/console/images/buttons/restart_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(/themes/console/images/buttons/shutdown_hover.png) 37% center no-repeat, url(/themes/console/images/buttons/restart_hover.png) 63% center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
      border: 1px solid #89f;
 }
 
@@ -1678,12 +1835,6 @@ div.welcome {
      min-width: 570px;
 }
 
-.main#jardump {
-     padding: 0;
-     overflow-y: hidden !important;
-     min-width: 570px;
-}
-
 .main#proof {
      padding: 0;
      min-width: 570px;
@@ -1767,6 +1918,10 @@ div.news h3 {
      letter-spacing: 0.1em;
 }
 
+.newsentry:first-child {
+     margin-top: -6px;
+}
+
 .newsentry h3 {
      letter-spacing: 0.1em;
      box-shadow: none;
@@ -1794,25 +1949,31 @@ div.news p:last-child {
      margin-bottom: 10px;
 }
 
-div.news a {
-     color: #663;
+div.news a, #warning a {
+     color: #7f560f !important;
 }
 
-div.news a:hover, div.news a:visited:hover {
+div.news a:hover, div.news a:focus, div.news a:visited:hover, div.news a:visited:focus, #warning a:hover, #warning a:focus {
      color: #f60 !important;
 }
 
-div.news a:visited {
-     color: #773 !important;
+div.news a:visited, #warning a:visited {
+     color: #5f4312 !important;
 }
 
 div.news hr {
      color: #cc7;
      background: #775628;
-     height: 1px;
-     border: 0 solid #cc7;
-     margin: 10px 0 2px !important;
+     height: 2px;
+     border-bottom: 1px solid #fff9ef;
+     margin: 10px 0 1px !important;
      opacity: 0.7;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+div.news hr {
+     height: 1px;
+}
 }
 
 div.news hr:last-child {
@@ -1869,7 +2030,7 @@ div.news hr:last-child {
 /* top navigation */
 
 div.confignav {
-     padding: 6px 5px;
+     padding: 5px;
      margin: -16px -16px 5px -16px;
      border: 1px solid #89f;
      font-size: 9pt;
@@ -2115,8 +2276,8 @@ table.configtable, #permabanned, #loggingoptions, #configstats, ul#banlist {
      display: none;
 }
 
-#profilelist tr:hover, #floodfills tr:hover,  #ntcpconnections tr:hover, #udpconnections tr:hover,
-.homelinkedit tr:hover, .main#debug table:first-of-type tr:hover td {
+#profilelist tr:hover td, #floodfills tr:hover td,  #ntcpconnections tr:hover td, #udpconnections tr:hover td,
+.homelinkedit tr:hover td, #portmapper tr:hover td {
      background: #ffe;
      background: linear-gradient(to bottom, #fff, #ffe);
      color: #104e99;
@@ -2296,6 +2457,17 @@ tr:hover th {
      width: 16px;
 }
 
+#capabilities_key b {
+     text-transform: none !important;
+     display: inline-block;
+     min-width: 16px;
+     background: #dfe4ff;
+     text-align: center;
+     text-shadow: 0 1px 1px #fff;
+     border-radius: 2px;
+     padding: 1px 2px;
+}
+
 #thresholds tr:hover td, #profile_defs tr:hover td {
      background: none;
 }
@@ -2358,6 +2530,7 @@ ul#banlist + h3.tabletitle {
      -webkit-column-break-inside: avoid;
      display: table;
      padding: 3px !important;
+     line-height: 100%;
 }
 
 #banlist li img {
@@ -2631,9 +2804,9 @@ div.configure h2:first-child {
      vertical-align: middle;
 }
 
-#addkeyring tr, #loggingoptions tr, #profilelist tr:hover, #floodfills tr:hover, #jardump tr {
-     border-top: 1px inset #cfd6ff !important;
-     border-bottom: 1px inset #cfd6ff !important;
+#addkeyring tr td, #loggingoptions tr td, #profilelist tr:hover, #floodfills tr:hover {
+     border-top: 1px solid #cfd6ff !important;
+     border-bottom: 1px solid #cfd6ff !important;
 }
 
  tr.tablefooter {
@@ -2641,15 +2814,13 @@ div.configure h2:first-child {
      border-bottom: 1px solid #89f !important;
 }
 
-#sidebarconf tr:hover, #eventlog tr:hover, .tunneldisplay tr:hover, #jobstats tr:hover, #schedjobs tr:hover, #jardump tr:hover {
+#sidebarconf tr:hover td, #eventlog tr:hover td, .tunneldisplay tr:hover td, #jobstats tr:hover td, #schedjobs tr:hover td, #jardump tr:hover td {
      background: #ffd;
      background: linear-gradient(to bottom, #fff, #ffe);
      color: #104e99;
-     border-top: 1px solid #89f !important;
-     border-bottom: 1px solid #89f;
 }
 
-#sidebarconf tr:last-child, #sidebarconf tr:last-child:hover {
+#sidebarconf tr:last-child td, #sidebarconf tr:last-child:hover td {
      border-top: 1px solid #89f;
      background: #eff1ff;
 }
@@ -2991,6 +3162,10 @@ th.th_title {
      line-height: normal;
 }
 
+.smallhead th {
+     font-size: 8pt;
+}
+
 td {
      padding: 3px 5px;
 }
@@ -3098,11 +3273,19 @@ h4.app, h4.app2 {
 
 h4.app {
      margin-top: -5px;
+     background: url(/themes/console/images/eepsite.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     background-size: 16px 16px, 100% 100%;
+     background-blend-mode: luminosity, normal;
+     padding-left: 32px;
 }
 
 h4.app2 {
      clear: left;
      margin-top: 5px !important;
+     background: url(/themes/console/images/info/globe.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     background-size: 16px 16px, 100% 100%;
+     background-blend-mode: luminosity, normal;
+     padding-left: 32px;
 }
 
 div.ag2 {
@@ -3112,7 +3295,7 @@ div.ag2 {
 div.app {
      float: left;
      padding: 0;
-     min-width: 104px;
+     width: 140px;
      text-align: center !important;
      border: none;
      margin: 3px ;
@@ -3137,14 +3320,14 @@ div.app:hover a {
      vertical-align: middle;
 }
 
-div.applabel {
+.applabel {
      background: url(images/tinytitle.png) center center repeat-x;
      background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      font-size: 9pt;
      margin: 0;
      padding: 4px 2px;
      text-align: center;
-     width: 120px;
+     width: 136px;
      line-height: 110%;
      text-transform: lowercase;
      font-size: 8pt;
@@ -3165,7 +3348,7 @@ div.applabel {
      text-overflow: ellipsis;
 }
 
-.app:hover div.applabel {
+.app:hover .applabel {
      border-top: 1px solid #f60;
      background: #fff;
 }
@@ -3270,7 +3453,7 @@ table.search {
      padding: 0;
 }
 
-div.applabel:hover {
+.applabel:hover {
      box-shadow: none;
 }
 
@@ -3325,27 +3508,6 @@ h3#servicedebug a, h3#graphinfo a {
 
 .main#tunnels h3 a[href^="/configtunnels#"]:hover {
      filter: drop-shadow(0 0 1px #f60);
-}
-
-.main#debug h2 {
-     padding: 6px 10px;
-     font-size: 12pt;
-}
-
-.main#debug h3 {
-     padding: 4px 10px;
-}
-
-.main#debug th:last-child, .main#debug td:last-child {
-     text-align: right;
-}
-
-.main#debug td[colspan="2"] {
-     text-align: left;
-}
-
-.main#debug h2 + hr {
-     display: none;
 }
 
 h3 + .statusnotes {
@@ -3779,29 +3941,30 @@ p#enablefullstats {
      font-weight: bold;
 }
 
-div.graphspanel {
+.graphspanel {
      padding: 15px 5px 0;
      margin: -16px -16px -11px -16px;
      text-align: center !important;
      overflow: hidden;
 }
 
-div.graphspanel img {
+.graphspanel img {
      margin: 5px;
-     border: 1px solid #777;
+     padding: 1px;
+     background: #f6f6ff;
+     border: 1px solid #89f;
+     box-shadow: 0 0 1px #aaa;
      max-width: 95%;
      max-width: calc(100% - 50px);
 }
 
-div.graphspanel a img {
-     border: 1px solid #77f;
-     padding: 2px;
-     background: #ccf;
+.graphspanel a img {
+     background: #fff;
      opacity: 0.9;
      vertical-align: top;
 }
 
-div.graphspanel a img:hover {
+.graphspanel a img:hover {
      border: 1px solid #f60;
      text-align: center !important;
      background: #ccf;
@@ -3809,16 +3972,16 @@ div.graphspanel a img:hover {
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
 }
 
-div.graphspanel hr {
+.graphspanel hr {
      margin: 10px 0;
 }
 
-div.graphspanel form:last-child {
+.graphspanel form:last-child {
      text-align: left;
      margin: 0 20px;
 }
 
-div.graphspanel h3 {
+.graphspanel h3 {
      text-align: left;
      margin: 10px 20px 10px 20px;
 }
@@ -3924,14 +4087,14 @@ p#graphopts + p {
 
 /* end new graphs optionbox */
 
-div.footnote {
+.footnote {
      text-align: right;
      color: #339;
-     font-size: 7pt;
+     font-size: 8pt;
      margin-bottom: -4px !important;
 }
 
-div.footnote hr {
+.footnote hr {
      margin: 10px 0 5px 0 !important;
      color: #99f;
      background: #99f;
@@ -4290,44 +4453,6 @@ td#pw_adduser input {
 }
 
 /* end configui */
-
-.main#jardump {
-     overflow: auto;
-}
-
-#jardump table {
-     border-left: none;
-     border-right: none;
-     margin-top: -1px;
-     margin-bottom: -1px;
-     font-size: 8pt;
-}
-
-#jardump th {
-     padding: 5px;
-     font-size: 9pt;
-}
-
-#jardump td {
-     vertical-align: top;
-}
-
-.main#jardump th:nth-child(1), .main#jardump th:nth-child(3), .main#jardump th:nth-child(6), .main#jardump th:nth-child(7) {
-     text-align: left;
-}
-
-#jardump tt {
-     letter-spacing: -0.05em;
-}
-
-#jardump a tt {
-     color: #006 !important;
-}
-
-#jardump a:hover tt {
-     color: #f60 !important;
-}
-
 
 .main#netdb > .confignav {
      margin-bottom: 15px;
@@ -4721,6 +4846,80 @@ p:empty { /* empty paragraph nuke */
      font-size: 10pt !important;
 }
 
+/* leasesets */
+
+.netdb_leases, .netdb_leases li {
+     margin: -1px 0 0 !important;
+     padding: 0 !important;
+     columns: 400px auto;
+     column-rule: 1px solid #ccdeff;
+}
+
+.netdb_leases li {
+     line-height: 140%;
+     list-style: none;
+     vertical-align: middle;
+     border-bottom: 1px solid #ccdeff;
+     padding: 2px 0 3px !important;
+}
+
+.netdb_leases b:first-child {
+    display: inline-block;
+    min-width: 80px;
+    margin-right: 2px;
+    text-align: right;
+}
+
+.netdb_leases .tunnel_peer img {
+     margin-bottom: -1px;
+}
+
+.netdb_gateway img {
+     vertical-align: middle;
+}
+
+.netdb_tunnel {
+     display: inline-block;
+     background: #ddf;
+     padding: 0 4px;
+     margin-right: -4px;
+     border-radius: 2px;
+}
+
+.netdb_leases .tunnel_peer {
+     margin-left: 2px;
+}
+
+.netdb_leases .tunnel_peer tt, .netdb_leases .tunnel_peer tt a {
+     letter-spacing: 0.1em;
+}
+
+.netdb_leases .tunnel_id {
+     min-width: 74px;
+}
+
+.netdb_leases .tunnel_peer tt {
+     margin: 0 3px;
+}
+
+.main li .netdb_expiry {
+     font-weight: normal;
+     text-transform: lowercase;
+     color: #2c354f !important;
+     font-style: italic;
+}
+
+#console h2, #console h3 {
+     border-radius: 2px;
+     box-shadow: 0 0 2px rgba(200,200,200,0.5);
+}
+
+img.unknownflag {
+     opacity: 0.8;
+}
+
+/* end leasesets */
+
 /* end netdb */
 
 /* /stats */
@@ -4971,6 +5170,10 @@ h3.stats {
      padding: 2px 0 !important;
 }
 
+#volunteer .links:not(old) {
+     margin: -10px 10px 0 !important;
+}
+
 #sidebarhelp h2 {
      margin-bottom: 5px !important;
 }
@@ -5037,9 +5240,20 @@ p#fullhistory {
      text-align: right;
      margin-bottom: -5px;
      margin: -5px -1px -6px !important;
-     border: 1px solid #89f;
-     padding: 5px 10px 5px 5px !important;
      background: #fff;
+     background: linear-gradient(to right, #eff2ff 50%, #fff);
+     border: 1px solid #89f;
+     padding: 7px 10px 4px 5px !important;
+}
+
+#fullhistory::before {
+     content: "";
+     display: inline-block;
+     vertical-align: middle;
+     width: 18px;
+     height: 20px;
+     background: url(/themes/console/images/buttons/fullview.png) left 45% no-repeat;
+     background-size: 14px auto;
 }
 
 .main#help td.infohelp, .main#help td.infowarn, .main#help td.infohelp, .main#help p.infohelp {
@@ -5148,41 +5362,6 @@ p#fullhistory {
      background: none;
 }
 
-#debug h2 + table {
-     margin-top: -11px;
-}
-
-#debug th {
-     text-align: left;
-}
-
-#debug tr {
-     border-bottom: 1px solid #89f;
-}
-
-#debug td {
-     padding: 2px 5px;
-}
-
-#debug ul {
-      line-height: 120%;
-}
-
-#debug li:first-child {
-     padding: 10px 0 0;
-}
-
-#debug li:last-child {
-     padding-bottom: 0;
-     margin-bottom: -9px;
-}
-
-#debug li {
-     padding-bottom: 0;
-     margin-left: -5px;
-     margin-bottom: -2px;
-}
-
 #certs p {
      margin: 3px 0;
      padding: 10px 5px;
@@ -5208,13 +5387,6 @@ p#fullhistory {
      margin: -1px 0;
 }
 
-#advancedsettings td.infowarn {
-     padding: 10px 10px 10px 40px !important;
-     border: 1px solid #89f;
-     background: #fffff5 url(/themes/console/images/info/infowarn.png) 10px center no-repeat !important;
-     background-size: 22px 22px !important;
-}
-
 #configinfo th {
      text-align: left;
      font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
@@ -5227,6 +5399,13 @@ p#fullhistory {
      padding: 5px 15px;
      background: #eff1ff;
      background: rgba(230,230,255,0.5);
+}
+
+.main#help #configinfo td.infowarn {
+     padding: 10px 10px 10px 38px !important;
+     border: 1px solid #89f;
+     background: #fffff5 url(/themes/console/images/info/infowarn.png) 10px center no-repeat !important;
+     background-size: 20px 20px !important;
 }
 
 /* informational images */
@@ -5294,6 +5473,14 @@ p.infowarn {
      background: #fff url(/themes/console/images/info/floodfill_32x32.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
      background-size: 28px 28px;
+}
+
+#floodfillconfig tr:nth-child(2) td {
+     padding: 8px 10px 8px 18px;
+}
+
+#floodfillconfig tr:nth-child(2) b {
+     margin-right: 8px;
 }
 
 p#clientconf.infohelp, p#webappconfigtext.infohelp {
@@ -5925,6 +6112,309 @@ b.netdb_transport {
 
 /* end sybils */
 
+/* debug */
+
+.main#debug h2 {
+     padding: 8px 10px;
+     font-size: 12pt;
+}
+
+.main#debug h3 {
+     padding: 5px 10px;
+}
+
+.main#debug td[colspan="2"] {
+     text-align: left;
+}
+
+.main#debug h2 + hr {
+     display: none;
+}
+
+#debug h2 + table {
+     margin-top: -11px;
+}
+
+#debug th {
+     text-align: left;
+}
+
+#debug tr {
+     border-bottom: 1px solid #89f;
+}
+
+#debug td {
+     padding: 2px 5px;
+}
+
+#debug .expiry ul {
+     margin: 3px 0 10px -35px !important;
+}
+
+#debug li:first-child {
+     padding: 10px 0 0;
+}
+
+#debug li:last-child {
+     padding-bottom: 0;
+     margin-bottom: -9px;
+}
+
+#debug li {
+     list-style: none;
+     line-height: 150%;
+     padding-bottom: 0;
+     margin-left: -5px;
+     margin-bottom: -2px;
+}
+
+.debug_container {
+     background: #eef;
+     border: 1px solid #89f;
+     padding: 10px 15px;
+     margin-top: -16px;
+}
+
+.debug_container:empty, #debug ul:empty {
+     display: none;
+}
+
+.debug_container, #debug td {
+     line-height: 140%;
+}
+
+.main#debug h3 + table {
+     margin-top: -11px;
+}
+
+#debug td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#debug h2 {
+     margin: 12px 0 0;
+     background: url(/themes/console/images/info/debug.png) right 6px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%) !important;
+     background-size: 20px 20px, 100% 100% !important;
+     background-blend-mode: luminosity, normal, normal;
+}
+
+h2#debug_portmapper {
+     margin-top: 14px !important;
+}
+
+#debug h3 {
+     padding-left: 10px;
+}
+
+.debug_container + h3 {
+     margin-top: -1px;
+}
+
+.debug_section h2 + h3, .debug_container:empty + h3, h3 + .debug_container, .debug_section table + h3, .debug_container.buckets {
+     margin-top: -11px !important;
+}
+
+.expiry td {
+     padding-left: 3% !important;
+}
+
+.debug_container.buckets {
+     word-break: break-all;
+     margin-bottom: 5px;
+     padding-bottom: 0;
+     max-height: 600px;
+     overflow: auto;
+}
+
+.buckets hr {
+     display: none;
+}
+
+#debug th:first-child, #debug td:first-child {
+     padding-left: 10px;
+}
+
+#debug td:last-child {
+     text-align: right;
+     vertical-align: top;
+     padding-right: 10px;
+}
+
+.debug_outboundtarget td:first-child {
+     padding-left: 3% !important;
+}
+
+#portmapper td:first-child {
+     font-weight: bold;
+}
+
+#portmapper th:last-child, #portmapper td:last-child {
+     text-align: left !important;
+}
+
+#debug h3.debug_outboundsessions, #debug h3.debug_inboundsessions {
+     padding: 6px 10px 6px 28px;
+     background-blend-mode: luminosity, normal;
+}
+
+#debug h3.debug_outboundsessions {
+     margin-top: -6px !important;
+     background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%) !important;
+}
+
+#debug h3.debug_inboundsessions {
+     background: url(/themes/console/images/inbound.png) 6px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%) !important;
+}
+
+.debug_version {
+     color: #070;
+}
+
+/* end debug */
+
+/* jar dump */
+
+#jardump {
+     padding: 0;
+     overflow-x: auto;
+     overflow-y: hidden;
+     min-width: 570px;
+}
+
+#jardump table {
+     border-left: none;
+     border-right: none;
+     margin-top: -1px;
+     margin-bottom: -1px;
+     font-size: 8pt;
+}
+
+#jardump th {
+     padding: 5.5px 5px;
+     font-size: 9pt;
+     text-align: center;
+     border-left: none !important;
+     border-right: none !important;
+}
+
+#jardump th:first-child {
+     text-align: left;
+}
+
+#jardump tr td {
+     border-top: 1px solid #cfd6ff !important;
+}
+
+#jardump td {
+     vertical-align: top;
+}
+
+#jardump td:nth-child(2) {
+     font-style: italic;
+}
+
+#jardump tt {
+     letter-spacing: -0.05em;
+}
+
+#jardump a tt {
+     color: #006 !important;
+}
+
+#jardump a:hover tt {
+     color: #f60 !important;
+}
+
+.sha256 tt, .revision tt {
+     font-weight: normal !important;
+}
+
+.revision, .sha256, .unsignedmod {
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+.subheading.routerfiles {
+     background: url(/themes/console/images/eepsite.png) right 5px center no-repeat, linear-gradient(to right, #fff, #eef) !important;
+     background-size: 16px auto, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+}
+
+.subheading.pluginfiles {
+     background: url(/themes/console/images/plugin.png) right 5px center no-repeat, linear-gradient(to right, #fff, #eef) !important;
+     background-size: 16px auto, 100% 100% !important;
+     background-blend-mode: luminosity, normal;
+}
+
+.subheading.pluginfiles {
+     border-top: 1px solid #89f !important;
+}
+
+#jardump td {
+     border-left: 1px inset #cfd6ff !important;
+     vertical-align: middle;
+     text-align: center;
+}
+
+#jardump td:first-child, #jardump td:last-child {
+     text-align: left;
+}
+
+#jardump td:nth-child(2) {
+     text-align: right;
+}
+
+#jardump td:first-child {
+     border-left: none;
+     transition: ease padding 0.05s;
+}
+
+#jardump td:last-child {
+     padding: 1px 0;
+}
+
+.unsignedmod {
+     display: inline-block;
+     padding: 1px 2px;
+     word-break: break-all;
+     -moz-user-select: all;
+     -webkit-user-select: all;
+     user-select: all;
+}
+
+#jardump hr {
+     margin: 2px 0 !important;
+     background: #cfd6ff;
+}
+
+.unsignedmod:empty {
+     display: none;
+}
+
+#jardump td:first-child {
+     padding-left: 26px;
+     background-image: url(/themes/console/images/info/box.png);
+     background-position: 5px center;
+     background-repeat: no-repeat;
+     background-size: 16px 16px;
+}
+
+#jardump tr:hover td:first-child {
+     background: url(/themes/console/images/info/box.png) 5px center no-repeat, linear-gradient(to bottom, #fff, #ffe);
+     background: url(/themes/console/images/info/box.png) 5px center no-repeat #ffe;
+     background-size: 16px 16px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+#jardump td:last-child {
+     word-break: break-all;
+}
+}
+
+/* end jardump */
+
 /* responsive layout */
 
 @media screen and (max-width: 900px) {
@@ -6344,15 +6834,26 @@ table.sybil_routerinfo:last-child {
 }
 }
 
+@media screen and (min-width: 1400px) {
+.main#help #changelog pre:not(old) {
+     columns: 560px auto;
+     column-gap: 40px;
+     column-rule: 1px dotted #abf;
+     margin-left: 0;
+     padding-left: 10px;
+}
+}
+
 @media screen and (min-width: 1500px) {
-body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, .joblog li, .themelabel, .ui_lang, .applabel a, .statusnotes, .routersummary button.download,
-#peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn, button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, .statlist a[name],
+body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, .joblog li, .themelabel, .ui_lang, .applabel a,
+.statusnotes, .routersummary button.download, #peerdefs, #profile_defs, #thresholds, #configinfo, .infohelp, .infowarn,
+button, input, select, textarea, code, tt, pre, .netdbentry th, .configtable th, .statlist a[name],
 .statlist b, .statlist li b, .statlist a[name]:hover, div.messages, th {
      font-size: 10pt !important;
 }
 
 .routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, #banlist li,
-.news #newsStatus, .news #ewsDisplay, .topness, .footnote, .cells tt, #profilelist tt {
+.news #newsStatus, .news #newsDisplay, .topness, .footnote, .cells tt, #profilelist tt, .sb_notice {
      font-size: 9pt !important;
 }
 
@@ -6394,13 +6895,14 @@ tt a, .cells tt, #profilelist tt {
 #sb_internals a, #sb_services a, #sb_advanced a {
      max-width: 212px;
 }
+
 .routersummary button[type="submit"] {
      min-width: 100px;
      margin: 2px 4px 1px;
 }
 
 div.app {
-     width: 154px;
+     width: 160px !important;
 }
 
 .app img {
@@ -6408,7 +6910,7 @@ div.app {
 }
 
 .applabel {
-     width: 150px !important;
+     width: 156px !important;
      padding: 4px 2px 2px !important;
 }
 
@@ -6425,8 +6927,8 @@ h3, h3.ptitle, h3.tabletitle, th.th_title {
      font-size: 11pt;
 }
 
-.newsheadings ul {
-     width: 202px;
+.sb_newsheadings ul {
+     width: 193px;
 }
 
 .newsentry h3, .newsentry h3 a, #news.main h3, .newsDate {
@@ -6561,6 +7063,14 @@ div.news {
 
 .langselect img[src^="/flags"] {
      margin-left: -81px !important;
+}
+
+.sb_newsheadings table {
+     width: 224px !important;
+}
+
+.sb_newsheadings td:last-child, .sb_newsheadings tr:hover td:last-child {
+     background-position: 4px 5px !important;
 }
 }
 

@@ -2233,7 +2233,7 @@ public class WebMail extends HttpServlet
 			 spacer +
 			 button(CONFIGURE, _t("Settings")) +
 			"</td></tr>\n" +
-			"<tr><td align=\"center\" colspan=\"2\"><hr><a href=\"http://hq.postman.i2p/?page_id=14\">" + _t("Learn about I2P mail") + "</a> | <a href=\"http://hq.postman.i2p/?page_id=16\">" + _t("Create Account") + "</a></td></tr>\n" +
+			"<tr><td align=\"center\" colspan=\"2\"><hr><a href=\"http://hq.postman.i2p/?page_id=14\" target=\"_blank\">" + _t("Learn about I2P mail") + "</a> | <a href=\"http://hq.postman.i2p/?page_id=16\" target=\"_blank\">" + _t("Create Account") + "</a></td></tr>\n" +
 			"</table></div>");
 	}
 
