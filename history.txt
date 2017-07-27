@@ -3,6 +3,10 @@
    - /debug:
      - Add container divs and styling markup
      - Add top navigation menu
+   - /jars:
+     - JARs, WARs & individual plugins separated with headers
+     - Filenames stripped of path info (path indicated on headers and tooltips)
+     - Add container divs and styling markup
  * I2PSnark:
    - Mitigate truncation of ratings dropdown in comments section (translations)
    - light: Reduce contrast of display text
