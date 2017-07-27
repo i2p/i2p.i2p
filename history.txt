@@ -1,5 +1,7 @@
 2017-07-26 str4d
  * Console:
+   - Add JavaScript snippet to reset dest address scroll position onblur (fixes
+     Chrome/Blink disappearing text bugs in i2ptunnel and susidns)
    - /debug:
      - Add container divs and styling markup
      - Add top navigation menu
