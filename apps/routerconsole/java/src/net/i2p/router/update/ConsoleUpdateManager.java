@@ -1303,7 +1303,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         }
         return Collections.emptyList();
     }
-    
+
     /**
      *  Is there a reason we can't download the update?
      *  @return translated contraint or null
@@ -1573,7 +1573,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
         @Override
         public String toString() {
-            return "RegisteredUpdater " + updater.getClass().getName() + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredUpdater " + updater.getClass().getName() + " for " + type + " (" + method + ") @pri " + priority;
         }
     }
 
@@ -1614,7 +1614,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
 
         @Override
         public String toString() {
-            return "RegisteredChecker " + checker.getClass().getName() + " for " + type + ' ' + method + " @pri " + priority;
+            return "RegisteredChecker " + checker.getClass().getName() + " for " + type + " (" + method + ") @pri " + priority;
         }
     }
 
@@ -1723,19 +1723,33 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h2>Update Manager</h2>");
         buf.append("<h3>Installed</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _installed);
+        buf.append("</div>");
         buf.append("<h3>Available</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _available);
+        buf.append("</div>");
         buf.append("<h3>Downloaded</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _downloaded);
+        buf.append("</div>");
         buf.append("<h3>Registered Checkers</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _registeredCheckers);
+        buf.append("</div>");
         buf.append("<h3>Registered Updaters</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _registeredUpdaters);
+        buf.append("</div>");
         buf.append("<h3>Active Checkers</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _activeCheckers);
+        buf.append("</div>");
         buf.append("<h3>Active Updaters</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString(buf, _downloaders);
+        buf.append("</div>");
         out.write(buf.toString());
     }
 
@@ -1757,7 +1771,7 @@ public class ConsoleUpdateManager implements UpdateManager, RouterApp {
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             String key = entry.getKey().toString();
             String val = entry.getValue().toString();
-            list.add("[" + key + "] = [" + val + "]<br>");
+            list.add("[" + key + "] = " + val + "<br>");
         }
         Collections.sort(list);
         for (String e : list) {
