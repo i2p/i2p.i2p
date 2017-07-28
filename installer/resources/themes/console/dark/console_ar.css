@@ -42,7 +42,6 @@ div.news {
 
 div.main {
      margin: -1px 205px 5px 5px;
-     background: url("images/scarface.jpg") no-repeat scroll left bottom #000000 !important;
 }
 
 h1 {
@@ -52,6 +51,15 @@ h1 {
 h1, h2, h3, h4 {
      direction: rtl;
      text-align: right;
+}
+
+#debug h2 {
+     background-position: 8px center !important;
+}
+
+#debug h3.debug_inboundsessions, #debug h3.debug_outboundsessions {
+     background-position: right 5px center !important;
+     padding-right: 26px !important;
 }
 
 h3, h3.welcome {
@@ -70,6 +78,11 @@ button.search {
      margin-right: 30px;
 }
 
+input.search, input.search:focus {
+     padding: 4px 24px 4px 3px !important;
+     background-position: right 4px center !important;
+}
+
 .routersummary img[src$="i2plogo.png"] {
      margin-top: -2px !important;
      margin-left: 0 !important;
@@ -81,7 +94,11 @@ div.routersummary h3, div.routersummary h4, .routersummary a, .routersummary b {
      font-weight: normal;
 }
 
-div.routersummary h3, div.routersummary h4 {
+div.routersummary h3 {
+     font-size: 11pt;
+}
+
+div.routersummary h4 {
      font-size: 10pt;
 }
 
@@ -107,8 +124,9 @@ div.routersummary td:last-child {
 }
 
 #sb_localtunnels a {
-     display: inline-block;
-     width: 100%:
+     display: inline;
+     margin-right: 2px;
+     font-size: 9pt;
 }
 
 #sb_localtunnels td:nth-child(2) {
@@ -515,7 +533,7 @@ a.viewfullentry::after, a[href^="viewprofile"]::after {
 }
 
 .main#console .twocol {
-     margin: 5px 35px 5px 0 !important;
+     margin: 15px 35px 5px 0 !important;
      background: rgba(0, 32, 0, 0.5);
      border-radius: 3px;
      padding-top: 10px;

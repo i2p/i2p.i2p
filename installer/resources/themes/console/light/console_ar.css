@@ -33,6 +33,19 @@ h2, h3 {
      background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
 }
 
+#debug h2 {
+     background: url(/themes/console/images/info/debug.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to left, #fcfcff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
+     background-size: 20px 20px, 100% 100%, 100% 100% !important;
+}
+
+#portmapper th:last-child, #portmapper td:last-child {
+     text-align: center !important;
+}
+
+.buckets {
+     margin-bottom: -10px !important;
+}
+
 .routersummary h4 {
      text-align: center;
 }
@@ -40,6 +53,7 @@ h2, h3 {
 h1 {
      margin: 0 212px -15px 0;
      padding: 20px 20px 20px 10px;
+     background: linear-gradient(to left, #fcfcff, rgba(252,252,255,0) 600px), linear-gradient(to bottom, #fcfcff 50%, rgba(248,248,255,0.6) 50%), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
 }
 
 h2 {
@@ -47,7 +61,7 @@ h2 {
 }
 
 h3 {
-     font-size: 14pt;
+     font-size: 13pt;
      padding-right: 10px;
 }
 
@@ -73,13 +87,14 @@ table.search td:nth-child(3) {
      padding: 0 2px 0 8px;
 }
 
-input.search[type="text"] {
-     background-position: right 4px center;
-     padding: 5px 24px 5px 5px;
+input.search[type="text"], input.search[type="text"]:focus {
+     background-position: right 4px center !important;
+     padding: 5px 24px 5px 5px !important;
 }
 
 button, input[type="submit"], input[type="reset"] {
      display: inline-block;
+     line-height: 120%;
 }
 
 #config_homepage.main input.delete {
@@ -119,7 +134,7 @@ input[name="refreshInterval"] {
       text-align: right;
 }
 
-#statsForm, #joinfamily, #newfamily, table#permabanned {
+#statsForm, #joinfamily, #newfamily, #permabanned {
      margin-left: 0;
      margin-right: 0;
 }
@@ -182,8 +197,8 @@ div.wideload {
 
 #sb_services a {
      text-align: right !important;
-     padding-right: 24px !important;
-     background-position: right 2px center !important;
+     padding-right: 28px !important;
+     background-position: right 6px center !important;
 }
 
 .routersummary td:last-child {
@@ -282,8 +297,17 @@ p#helptranslate {
      margin-bottom: 15px !important;
 }
 
+#clientconfig, #webappconfig {
+     margin-right: -32px;
+}
+
+#clientconfig td:nth-child(2), #clientconfig td:nth-child(3) {
+     text-align: center;
+}
+
+#clientconfig th:first-child, #clientconfig td:first-child,
 #webappconfig th:first-child, #webappconfig td:first-child {
-     text-align: right;
+     text-align: left !important;
 }
 
 #webappconfig th:nth-child(2), #webappconfig td:nth-child(2),
@@ -401,12 +425,12 @@ span.newtab {
      overflow: hidden;
 }
 
-td.optionsave {
+td.optionsave, #peerdefs td:first-child {
      text-align: left;
 }
 
 p.infohelp, p.infowarn, td.infohelp, td.infowarn,
-table#bugreports td.infohelp, p#debugmode, p#sybilinfo,
+#bugreports td.infohelp, p#debugmode, p#sybilinfo,
 #bandwidthconfig tr:first-child .infohelp,
 #addkeyring td.infohelp, #joinfamily tr:nth-child(3) td:first-child,
 #newfamily tr:last-child td:first-child,
@@ -454,7 +478,24 @@ div.themechoice, div.langselect {
      text-align: right;
 }
 
-table#manualreseed, #config_keyring .configtable { 
+#sidebarconf th:last-child {
+     text-align: center !important;
+}
+
+#sidebarconf th {
+     text-align: right !important;
+}
+
+#sidebarconf td:last-child {
+     text-align: right !important;
+     padding-left: 10px !important;
+}
+
+#sidebarconf td:nth-last-child(2) {
+     text-align: left !important;
+}
+
+#manualreseed, #config_keyring .configtable { 
      margin-right: 0 !important;
 }
 
@@ -463,23 +504,11 @@ table#manualreseed, #config_keyring .configtable {
      margin-left: 16px;
 }
 
-#clientconfig, #webappconfig {
-     margin-right: -32px;
-}
-
-#clientconfig th:first-child {
-     text-align: left;
-}
-
-#clientconfig td:nth-child(2), #clientconfig td:nth-child(3) {
-     text-align: center;
-}
-
-table#plugininstall {
+#plugininstall {
      margin-right: 0 !important;
 }
 
-table#pluginconfig {
+#pluginconfig {
      margin-right: -32px !important;
 }
 
@@ -505,15 +534,11 @@ table#pluginconfig {
      padding-right: 10px;
 }
 
-#configstats tr:last-child td {
+#i2pupdates td:first-child, #reseedconfig td:first-child, #configstats tr:last-child td, textarea[name="levels"] {
      text-align: left !important;
 }
 
-textarea[name="levels"] {
-     text-align: left;
-}
-
-textarea#advancedsettings, #i2pupdates textarea, #addkeyring textarea, #reseedconfig textarea {
+textarea#advancedsettings, #i2pupdates textarea, #addkeyring textarea, #reseedconfig textarea, #enviro {
      direction: ltr;
 }
 
@@ -523,10 +548,6 @@ textarea#advancedsettings, #i2pupdates textarea, #addkeyring textarea, #reseedco
 
 #i2pupdates input[type="text"]:not([readonly]), #i2pupdates textarea, .main[id^="config_"] textarea, input[name="newsURL"] {
     width: calc(100% - 10px);
-}
-
-#i2pupdates td:first-child, #reseedconfig td:first-child {
-     text-align: left;
 }
 
 .homelinkedit th:first-child, .homelinkedit td:first-child {
@@ -547,7 +568,7 @@ textarea#advancedsettings, #i2pupdates textarea, #addkeyring textarea, #reseedco
      direction: ltr !important;
 }
 
-.mediumtags {
+.mediumtags, #enviro td {
      text-align: left;
 }
 
@@ -574,7 +595,7 @@ h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, 
      padding-right: 50px;
 }
 
-table#addkeyring tr:last-child td {
+#addkeyring tr:last-child td {
      text-align: left;
 }
 
@@ -599,6 +620,11 @@ table#addkeyring tr:last-child td {
 table.search {
      margin-top: -26px;
      margin-bottom: 15px;
+}
+
+.search td {
+     padding-top: 4px !important;
+     padding-bottom: 0 !important;
 }
 
 h4.app {
@@ -635,11 +661,11 @@ div.news h3, #news h3 {
 }
 
 #newsDisplay {
-     float: left;
      margin-left: 0 !important;
 }
 
-#newsStatus, #newsDisplay {
+#news #newsStatus, #newsDisplay {
+     margin-top: 6px;
      margin-bottom: -2px !important;
 }
 
@@ -668,12 +694,12 @@ div.news h3, #news h3 {
      padding-left: 1px;
 }
 
-table#leasesetdebug th:last-child, table#leasesetsummary th:last-child,
+#leasesetdebug th:last-child, #leasesetsummary th:last-child,
 table.leaseset th:last-child, table.leaseset td:nth-child(2) {
      text-align: left;
 }
 
-table#leasesetdebug th, table#leasesetsummary th, table.leaseset th {
+#leasesetdebug th, #leasesetsummary th, table.leaseset th {
      text-align: right;
 }
 
@@ -686,15 +712,15 @@ table#leasesetdebug th, table#leasesetsummary th, table.leaseset th {
      padding-right: 5px;
 }
 
-table#leasesetdebug td:nth-child(2n+1) {
+#leasesetdebug td:nth-child(2n+1) {
      text-align: left;
 }
 
-table#leasesetdebug td:nth-child(2n) {
+#leasesetdebug td:nth-child(2n) {
      text-align: right;
 }
 
-table#leasesetdebug, table#leasesetsummary, table.leaseset, table.sybil_routerinfo, #netdboverview, .netdbentry {
+#leasesetdebug, #leasesetsummary, table.leaseset, table.sybil_routerinfo, #netdboverview, .netdbentry {
      margin-right: 0;
 }
 
@@ -726,7 +752,7 @@ table.leaseset:last-child, .netdbentry:last-child, #profile_defs {
      margin-bottom: -10px;
 }
 
-table#leasesetdebug td:first-child, table#leasesetsummary td:first-child {
+#leasesetdebug td:first-child, #leasesetsummary td:first-child {
      text-align: left;
 }
 
@@ -839,18 +865,32 @@ p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, #profiles #ba
      margin-right: 0 !important;
 }
 
+#bugreports {
+     padding: 10px 10px 10px 0;
+}
+
+#logs #bugreports td.infohelp {
+     padding: 5px 65px 5px 0 !important;
+}
+
 #logs table td:first-child {
-     text-align: left;
      padding-right: 15px;
 }
 
 .logtable tr:first-child td {
      direction: ltr;
+     text-align: right !important;
 }
 
 #wrapperlogs pre {
      text-align: left;
      direction: ltr;
+     width: 100%;
+     margin-right: -15px;
+}
+
+#wrapperlogs {
+     margin-bottom: -10px !important;
 }
 
 #pluginconfigactions {
@@ -912,16 +952,17 @@ label {
 
 #graphs td:first-child {
      padding-right: 10px;
+     text-align: left;
 }
 
 #consolepass tr:first-child td, p#clientconf.infohelp, p#webappconfigtext.infohelp, #floodfillconfig .infohelp, 
 #bandwidthconfig tr:first-child .infohelp, h3#shutdownrouter + p.infohelp, h3#restartrouter + p.infohelp, h3#systray + p.infohelp, 
-h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, table#addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
+h3#servicedebug + p.infohelp, h3#browseronstart + p.infohelp, #addkeyring td:first-child, #config_peers tr:nth-child(3) td.infohelp, 
 #config_reseed.main p.infohelp, #plugininstall tr:nth-child(3) td:nth-last-child(2), #manualreseed tr:nth-child(3) td:nth-last-child(2), 
 #manualreseed tr:nth-child(5) td:nth-last-child(2), #plugininstall tr:nth-child(5) td:nth-last-child(2), #manualreseed tr:nth-last-child(2) td.infohelp, 
 p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #plugininstall .infohelp, #config_family .infohelp, 
 #joinfamily tr:nth-child(3) td:first-child, #newfamily tr:last-child td:first-child, #config_summarybar .configtable td:not(.optionsave),
-table#bugreports td.infohelp {
+#bugreports td.infohelp {
      background-position: right 12px center !important;
      padding: 15px 50px 15px 15px !important;
 }
@@ -996,6 +1037,12 @@ table#bugreports td.infohelp {
 @media screen and (min-width: 800px) {
 .main#console {
      overflow: hidden;
+}
+}
+
+@media screen and (min-width: 1000px) {
+body {
+     overflow-x: hidden;
 }
 }
 

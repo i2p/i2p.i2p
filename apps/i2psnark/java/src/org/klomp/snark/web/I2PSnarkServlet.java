@@ -2761,7 +2761,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" >\n" +
                                                "<thead>\n";
 
-    private static final String FOOTER = "</div></center></body></html>";
+    private static final String FOOTER = "</div></center>\n</body>\n</html>";
 
 
     /**
@@ -2870,7 +2870,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                r.isDirectory();
 
         StringBuilder buf=new StringBuilder(4096);
-        buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
+        buf.append(DOCTYPE).append("<html><head><title>");
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         final String directory = title;
@@ -2878,13 +2878,13 @@ public class I2PSnarkServlet extends BasicServlet {
         final boolean isTopLevel = dirSlash <= 0;
         title = _t("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
-        buf.append("</TITLE>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
+        buf.append("</title>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
            // hide javascript-dependent buttons when js is unavailable
            .append("<noscript><style type=\"text/css\">.script {display: none;}</style></noscript>")
            .append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
             buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
-        buf.append("</HEAD><BODY");
+        buf.append("</head><body");
         if (showPriority)
             buf.append(" onload=\"setupbuttons()\"");
         buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
@@ -2893,7 +2893,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append(_t("I2PSnark"));
         else
             buf.append(_contextName);
-        buf.append("</a></div></center>\n");
+        buf.append("</a></div>\n");
 
         if (parent)  // always true
             buf.append("<div class=\"page\">\n<div class=\"mainsection\">");
@@ -3196,7 +3196,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
                .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(torrentName)
-               .append("</td></tr></table></div></div></BODY></HTML>");
+               .append("</td></tr></table></div></div></center>\n</body>\n</html>");
             return buf.toString();
         }
 
@@ -3211,7 +3211,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 displayComments(snark, er, ec, esc, buf);
             if (includeForm)
                 buf.append("</form>");
-            buf.append("</div></div></BODY></HTML>");
+            buf.append("</div></div>\n</body>\n</html>");
             return buf.toString();
         }
 
@@ -3452,7 +3452,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // for stop/start/check
         if (includeForm)
             buf.append("</form>");
-        buf.append("</div></div></BODY></HTML>\n");
+        buf.append("</div></div>\n</body>\n</html>\n");
 
         return buf.toString();
     }

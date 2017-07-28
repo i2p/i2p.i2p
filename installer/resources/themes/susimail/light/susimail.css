@@ -1004,7 +1004,7 @@ div#mailheader {
 
 #dologin h1 {
      background: #fafaff;
-     background: linear-gradient(to bottom, #fafaff 50%, #f2f2ff 50%);
+     background: linear-gradient(to bottom, #fff 50%, #f2f2ff 50%);
      border-bottom: 1px solid #77789f;
      color: #4c526f;
      text-transform: uppercase;

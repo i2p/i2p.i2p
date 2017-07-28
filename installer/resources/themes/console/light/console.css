@@ -1305,7 +1305,34 @@ div.newscontent p {
 }
 
 #newsStatus, .news #newsDisplay {
-     padding-top: 3px !important;
+     padding-top: 6px !important;
+     padding-bottom: 3px !important;
+}
+
+.news #newsdisplay, #graphopts {
+     color: transparent;
+}
+
+.news #newsdisplay a, #graphopts a {
+     border: 1px solid #8b8edf;
+     padding: 2px 10px;
+     border-radius: 15px;
+     background: #f8f8ff;
+     background: rgba(248,248,255,0.3);
+     margin-left: -3px;
+     box-shadow: 0 0 0 1px #ddf;
+     box-shadow: 0 0 0 1px rgba(220,220,255,0.6);
+}
+
+.news #newsdisplay a:hover, .news #newsdisplay a:focus, #graphopts a:hover, #graphopts a:focus {
+     border: 1px solid #7778bf;
+     background: #e2e2ff;
+     background: linear-gradient(to bottom, #f8f8ff 50%, #e2e2ff 50%);
+     box-shadow: 0 0 0 1px rgba(220,220,255,0.6), inset 0 0 0 1px #fff;
+}
+
+.news #newsdisplay a:active, #graphopts a:active {
+     box-shadow: inset 2px 2px 3px #335;
 }
 
 .newsentry + hr + #newsStatus, .newsentry + hr + #newsStatus + #newsDisplay {
@@ -1720,18 +1747,30 @@ p#tunnelconfig {
 }
 
 .graphspanel img {
-     padding: 2px;
-     margin: 6px;
+     padding: 1px;
+     margin: 6px 5px;
      text-align: center !important;
      vertical-align: top !important;
-     background: #41465f;
-     box-shadow: inset 0 0 0 1px #ccf;
+     background: #fff;
+     border: 1px solid #6b6c8f;
+     box-shadow: 0 0 0 1px #ccc;
      max-width: 98%;
 }
 
+.graphspanel a img {
+     box-shadow: 0 0 1px #ccf;
+}
+
 .graphspanel a img:hover {
-     box-shadow: inset 0 0 2px 1px #f60;
+     box-shadow: inset 0 0 1px 1px #f60;
+     filter: none !important;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+     mix-blend-mode: multiply;
+}
+
+.graphspanel a img:active {
+     box-shadow: inset 0 0 1px 1px #f90;
+     border: 1px solid #f90;
 }
 
 .graphspanel form {
@@ -1746,7 +1785,17 @@ p#tunnelconfig {
      text-align: center;
      margin-top: 20px;
      margin-bottom: 15px;
+     padding: 3px 0 5px;
      text-transform: capitalize;
+     line-height: 220%;
+}
+
+#graphopts a {
+     margin: 0 -2px !important;
+}
+
+#graphopts a:empty {
+     display: none;
 }
 
 #graphopts + p {
@@ -1848,8 +1897,8 @@ h3#graphdisplay {
      background-size: 28px 28px, auto 100%, 100% 100% !important;
 }
 
-.main#graphs .messages { /* "graphing not supported" error */
-     margin-bottom: 20px;
+.main#graphs .messages {
+     margin-bottom: -5px;
 }
 
 .main#events .messages {
@@ -2348,15 +2397,16 @@ table.search {
      border-collapse: separate;
      border-spacing: 0;
      border-radius: 0 0 2px 2px;
-     border: 1px solid #7778bf;
-     background: none;
+     border: 1px solid #595a8f;
+     border-top: 1px solid #447;
+     background: #fafaff !important;
      background: linear-gradient(to bottom, #fafaff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
      padding: 8px;
      width: 70%;
      margin-left:auto;
      margin-right:auto;
      margin-top: -19px;
-     box-shadow: 0 1px 1px 1px rgba(210, 210, 255, 0.3);
+     box-shadow: 0 1px 1px 1px rgba(210, 210, 255, 0.3), inset 0 0 0 1px #bbf;
 }
 
 .search tr {
@@ -2528,7 +2578,7 @@ button:hover, button:focus, button:active, select:hover, select:focus, select:ac
      text-shadow: none;
 }
 
-a:link {
+a:link, #graphopts a:visited {
      color: #3b6bbf;
      text-decoration: none;
      font-weight: bold;
@@ -4923,7 +4973,7 @@ a.viewfullentry:hover {
      text-transform: none;
      letter-spacing: normal;
      word-spacing: normal;
-     background: linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)) #eef !important;
+     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4)) !important;
      background-size: 100% 100%;
      padding: 8px 5px;
      font-size: 9pt;
@@ -5357,7 +5407,7 @@ ul#banlist {
 #profiles #banlist {
     border: none;
     background: none;
-    padding: 5px 0;
+    padding: 0;
 }
 
 #config_peers #banlist {
@@ -5395,8 +5445,12 @@ ul#banlist {
      vertical-align: top;
 }
 
-.main#profiles #banlist li {
-     margin-bottom: 0;
+#profiles #banlist li {
+     margin: 0;
+}
+
+#banlist tt {
+     margin-left: 2px;
 }
 
 #tunnelconfig th[colspan="3"] {
@@ -5955,7 +6009,7 @@ h3#ntcpcon, h3#udpcon {
 .homelinkedit th:first-child, #sidebarconf th:first-child, #consolepass th:first-child {
      text-align: center;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, url(images/header.png) center center repeat-x #eef;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) #fff !important;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fafaff 50%, rgba(252, 252, 255, 0.8) 50%, #e2e2ff 100%) #fafaff !important;
      font-size: 0 !important;
      width: 5%;
 }
@@ -6540,13 +6594,13 @@ b.netdb_transport {
 
 .subheading.routerfiles {
      padding-left: 10px !important;
-     background: url(/themes/console/images/eepsite.png) right 5px center no-repeat, linear-gradient(to right, #7778bf 5px, #fafaff 5px, #eef) !important;
+     background: url(/themes/console/images/eepsite.png) right 7px center no-repeat, linear-gradient(to right, #7778bf 5px, #fafaff 5px, #eef) !important;
      background-size: 16px auto, 100% 100% !important;
 }
 
 .subheading.pluginfiles {
      padding-left: 10px !important;
-     background: url(/themes/console/images/plugin.png) right 5px center no-repeat, linear-gradient(to right, #7778bf 5px, #fafaff 5px, #eef) !important;
+     background: url(/themes/console/images/plugin.png) right 7px center no-repeat, linear-gradient(to right, #7778bf 5px, #fafaff 5px, #eef) !important;
      background-size: 16px auto, 100% 100% !important;
 }
 

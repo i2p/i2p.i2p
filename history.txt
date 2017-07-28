@@ -1,3 +1,20 @@
+2017-07-28 str4d
+ * Console:
+   - Enhance presentation of show/hide news links on home page
+   - Fix some issues with Arabic CSS (light/dark)
+   - Further tweaks to graphs display and fixes for borderless single graphs
+     in midnight/dark themes
+   - Fix minor coloring issues with light theme post-rework
+   - Misc theme fixes
+ * I2PSnark:
+   - Move </center> tag in fileinfo view that prevented sticky navbar from
+     working
+   - ubergine:
+     - Alternative panel tabs for embedded view
+     - Tighten .snarkTorrents thead/tfoot spacing
+     - Tweak embedded navbar coloring
+     - Reduce height of download bars
+
 2017-07-26 str4d
  * Themes:
    - 'light' theme (console & apps):

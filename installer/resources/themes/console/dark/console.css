@@ -287,7 +287,7 @@ div.warning {
 .routersummary img[src$="i2plogo.png"] {
      opacity: 0.9;
      transition: ease filter 0.3s, ease opacity 0.3s;
-     margin-top: -2px;
+     margin-top: -1px;
      margin-left: -4px;
      width: 193px;
      height: auto;
@@ -466,7 +466,7 @@ div.warning {
 }
 
 #sb_internals a, #sb_services a, #sb_advanced a {
-     padding: 1px 2px;
+     padding: 1px 3px;
      display: inline-block;
      vertical-align: middle;
 }
@@ -900,11 +900,42 @@ div.news hr {
 
 #newsStatus {
      float: left;
+     padding-top: 3px;
+     padding-bottom: 1px;
 }
 
 #newsDisplay {
      white-space: nowrap;
      margin-left: 10px;
+}
+
+#news #newsDisplay, #graphopts {
+     color: transparent;
+}
+
+#newsStatus, #news #newsDisplay, #news #newsDisplay a {
+     display: inline-block;
+}
+
+#news #newsDisplay a, #graphopts a {
+     border: 1px solid #010;
+     margin: 0 -2px;
+     padding: 1px 10px;
+     background: #020;
+     background: rgba(0,48,0,0.6);
+     border-radius: 15px;
+     filter: drop-shadow(0 0 1px rgba(0,16,0,0.4));
+}
+
+#news #newsDisplay a:hover, #news #newsDisplay a:focus, #graphopts a:hover, #graphopts a:focus {
+     background: #030;
+     background: linear-gradient(to bottom, #030 50%, #010 50%);
+     border: 1px solid #020;
+}
+
+#news #newsDisplay a:active, #graphopts a:active {
+     background: #020;
+     box-shadow: inset 2px 2px 2px #000;
 }
 
 .news #newsDisplay, .news #newsStatus {
@@ -1038,7 +1069,7 @@ div.messages li {
 
 div.widepanel h3 {
      text-align: left !important;
-     padding: 6px 10px;
+     padding: 8px 10px;
      text-transform: uppercase;
      font-size: 10.5pt;
      letter-spacing: 0.08em;
@@ -1055,8 +1086,13 @@ div.widepanel h3 {
 
 /* graphs */
 
+#graphs {
+     padding-left: 10px;
+     padding-right: 10px;
+}
+
 #graphs .messages {
-     margin-top: 15px;
+     margin: 15px 5px -5px;
 }
 
 .graphspanel {
@@ -1077,7 +1113,7 @@ div.widepanel h3 {
 .graphspanel a img {
      border: 1px solid #494;
      padding: 3px;
-     margin: 5px;
+     margin: 5px 3px;
      text-align: center !important;
      opacity: 0.9;
      transition: ease all 0.3s;
@@ -1086,7 +1122,6 @@ div.widepanel h3 {
 .graphspanel a img:hover {
      border: 1px solid #f60;
      padding: 3px;
-     margin: 5px;
      text-align: center !important;
      opacity: 1;
      transition: ease all 0.3s;
@@ -1109,8 +1144,12 @@ div.widepanel h3 {
      mix-blend-mode: lighten;
 }
 
+.graphspanel img:not(old) {
+     border: 1px solid #fcf;
+}
+
 .graphspanel a img:not(old) {
-     border: 1px solid #bb66bb;
+     border: 1px solid #b6b;
 }
 
 .graphspanel a img:hover:not(old) {
@@ -1125,11 +1164,22 @@ div.widepanel h3 {
      padding: 10px 10px 15px;
 }
 
-p#graphopts {
+#graphopts {
      margin: 30px 0 5px !important;
+     line-height: 220%;
 }
 
-p#graphopts + p {
+#graphopts a {
+     filter: none;
+     border: 1px solid #030;
+     padding: 2px 10px;
+}
+
+#graphopts a:empty {
+     display: none;
+}
+
+#graphopts + p {
      display: none;
 }
 
@@ -1452,7 +1502,7 @@ code {
      color: #dd0;
 }
 
-a:link, h2 a:link {
+a:link, h2 a:link, #graphopts a:visited {
      color: #494;
      text-decoration: none;
      font-weight: bold;
@@ -4112,7 +4162,7 @@ table[id$="logs"] tr:nth-child(even){
 }
 
 table[id$="logs"] ul {
-     margin: -5px 12px -5px -18px !important;
+     margin: -6px 12px -5px -18px !important;
 }
 
 #wrapperlogs {
@@ -4143,7 +4193,7 @@ table[id$="logs"] ul {
 #logs li {
      list-style: none;
      font: bold 8pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", monospace;
-     line-height: 130%;
+     line-height: 115%;
      text-align: left;
      display: inline-block;
      width: 100%;
@@ -4153,15 +4203,15 @@ table[id$="logs"] ul {
 #criticallogs li {
      width: auto;
      width: calc(100% - 15px);
-     margin: 2px -10px 0 7px;
+     margin: 2px -10px 2px 7px;
 }
 
 #logs li::after {
      content: "";
      display: block;
-     border-top: 1px dotted #030;
+     border-top: 1px dashed #001000;
      width: 100%;
-     margin: 5px 0 -3px;
+     margin: 3px 0 -6px;
 }
 
 #logs li:last-child::after {
@@ -5896,10 +5946,11 @@ p#profiles_overview {
 
 .routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
 .routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding: 0 2px;
+     margin-right: 2px;
      vertical-align: middle;
      display: inline-block;
      filter: drop-shadow(0 0 1px rgba(192,192,192,0.5));
+     transform: scale(0.8);
 }
 
 .routersummary .error::before, .routersummary .clockskew::before {
@@ -5916,7 +5967,7 @@ p#profiles_overview {
 
 .routersummary .hidden::before {
      content: url(/themes/console/images/info/network_status/network_hidden.png);
-     padding: 0 3px;
+     margin-right: 3px;
 }
 
 .routersummary .running::before {
@@ -5926,7 +5977,7 @@ p#profiles_overview {
 .routersummary .firewalled::before {
      content: url(/themes/console/images/info/network_status/network_firewalled.png);
      filter: drop-shadow(0 1px 1px rgba(255,120,120,0.8));
-     padding: 0 4px;
+     margin-right: 4px;
      opacity: 0.7;
 }
 
@@ -6460,10 +6511,6 @@ b.netdb_transport {
      margin-top: -1px;
 }
 
-.debug_outboundsessions {
-     margin-top: -2px;
-}
-
 #debug h2 + h3, .buckets {
      margin-top: -13px;
 }
@@ -6503,7 +6550,7 @@ b.netdb_transport {
 }
 
 #debug h3.debug_outboundsessions {
-     margin-top: -6px !important;
+     margin-top: -2px !important;
      background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000 56%) !important;
 }
 

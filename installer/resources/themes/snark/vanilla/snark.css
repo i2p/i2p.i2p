@@ -1160,6 +1160,10 @@ thead img.disable, img.disable:hover {
      border-right: none;
 }
 
+#trackerselect td:first-child, #trackerselect td:last-child {
+     width: 30% !important;
+}
+
 #trackerselect td:nth-child(2), #trackerselect td:nth-child(3) {
      min-width: 60px !important;
      max-width: 200px !important;
