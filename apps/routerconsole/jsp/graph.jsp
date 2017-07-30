@@ -28,8 +28,6 @@
     }
 %>
 <h1><%=intl._t("I2P Performance Graphs")%></h1>
-<div class="main" id="main">
- <div class="graphspanel">
- <div class="widepanel">
+<div class="main" id="graph_single">
  <jsp:getProperty name="graphHelper" property="singleStat" />
-</div></div></div></body></html>
+</div></body></html>

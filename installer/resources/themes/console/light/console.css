@@ -56,7 +56,7 @@ div.clearer {
 }
 
 .routersummary img[src$="i2plogo.png"], .routersummary h3, .confignav, *::before, *::after, div.app, .themechoice, .langselect, .langbox,
-.newsAuthor, #netdbcountrylist img, .viewfullentry, .sybil_routerinfo th img, .graphspanel, #themeoptions {
+.newsAuthor, #netdbcountrylist img, .viewfullentry, .sybil_routerinfo th img, .graphspanel, #themeoptions, #graphopts, #newsDisplay {
      -moz-user-select: none;
      -webkit-user-select: none;
      user-select: none;
@@ -148,6 +148,12 @@ pre {
      width: 192px;
      height: auto;
      filter: drop-shadow(0 0 1px #ccf);
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+.routersummary img[src$="i2plogo.png"] {
+     margin-top: -2px !important;
+}
 }
 
 .routersummary img[src$="i2plogo.png"]:hover {
@@ -560,7 +566,7 @@ p:empty + .sb_notice {
      vertical-align: middle;
      border: 1px solid #88f;
      border-radius: 2px;
-     padding: 6px 3px;
+     padding: 5px 6px;
      width: calc(100% - 10px);
      width: 100%;
      margin: -4px -1px;
@@ -602,13 +608,14 @@ p:empty + .sb_notice {
 
 .routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
 .routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding-right: 3px;
+     padding-right: 2px;
      vertical-align: middle;
      display: inline-block;
      filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+     transform: scale(0.9);
 }
 
-.routersummary .error::before, .routersummary .clockskew::before {
+.routersummary .error::before {
      content: url(/themes/console/images/info/network_status/network_error.png);
 }
 
@@ -767,13 +774,13 @@ p:empty + .sb_notice {
 
 .logo hr {
      margin: 8px -10px;
-     background: #7789bf;
+     background: #7778bf;
      height: 1px
 }
 
 .warning hr {
-     background: #7789bf;
-     background: linear-gradient(to right, #7789bf, #c2c4ef);
+     background: #7778bf;
+     background: linear-gradient(to right, #7778bf, #c2c4ef);
 }
 
 .logo a {
@@ -1265,8 +1272,8 @@ textarea[name="reseedURL"] {
 }
 
 .newscontent {
-     background-color: rgba(220,220,255,0.6);
-     background: linear-gradient(to bottom, #eef, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
+     background: #eef !important;
+     background: linear-gradient(to bottom, rgba(240,240,255,0.8), rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
      border: 1px solid #7778bf;
      border-radius: 0 0 2px 2px;
      margin: 0 0 14px;
@@ -1318,21 +1325,29 @@ div.newscontent p {
      padding: 2px 10px;
      border-radius: 15px;
      background: #f8f8ff;
-     background: rgba(248,248,255,0.3);
+     background: rgba(248,248,255,0.5);
      margin-left: -3px;
      box-shadow: 0 0 0 1px #ddf;
      box-shadow: 0 0 0 1px rgba(220,220,255,0.6);
 }
 
-.news #newsdisplay a:hover, .news #newsdisplay a:focus, #graphopts a:hover, #graphopts a:focus {
+.news #newsdisplay a:hover, .news #newsdisplay a:focus,
+#graphopts a:hover, #graphopts a:visited:hover, #graphopts a:focus, #graphopts a:visited:focus {
+     color: #4f8fff;
      border: 1px solid #7778bf;
      background: #e2e2ff;
      background: linear-gradient(to bottom, #f8f8ff 50%, #e2e2ff 50%);
-     box-shadow: 0 0 0 1px rgba(220,220,255,0.6), inset 0 0 0 1px #fff;
+     box-shadow: 0 0 0 1px rgba(220,220,255,0.6), inset 0 0 0 1px #efefff;
 }
 
-.news #newsdisplay a:active, #graphopts a:active {
-     box-shadow: inset 2px 2px 3px #335;
+.news #newsdisplay a:focus, #graphopts a:focus, #graphopts a:visited:focus {
+     border: 1px solid #f60;
+}
+
+.news #newsdisplay a:active, #graphopts a:active, #graphopts a:visited:active {
+     box-shadow: inset 3px 3px 3px rgba(41,61,95,0.8);
+     color: #559 !important;
+     border: 1px solid #7778bf;
 }
 
 .newsentry + hr + #newsStatus, .newsentry + hr + #newsStatus + #newsDisplay {
@@ -1376,7 +1391,7 @@ div.news h3, #news h3 {
      background: url(images/news.png) 8px center no-repeat #fcfcff !important;
      background: url(images/news.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to right, #fafaff 5%, rgba(231, 231, 255, 0.8)) 15% !important;
      text-align: left;
-     padding: 5px 10px 5px 30px;
+     padding: 6px 10px 5px 30px;
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
      font-size: 10pt !important;
@@ -1385,6 +1400,12 @@ div.news h3, #news h3 {
      text-transform: uppercase !important;
      margin-bottom: -1px;
      filter: none;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+div.news h3, #news h3 {
+     padding: 7px 10px 5px 30px;
+}
 }
 
 div.newscontent h4 {
@@ -1508,7 +1529,6 @@ h1, .confignav {
      border-left: 5px solid #7778bf;
      margin: 15px 0 15px 0;
      border-radius: 0 2px 2px 0;
-     background: #ffe;
      text-align: left;
 }
 
@@ -1559,12 +1579,12 @@ h3#iptransport a:hover, h3#advancedconfig a:hover {
 }
 
 h3#transports, h3#upnp {
-     border: 1px solid #7789bf;
+     border: 1px solid #7778bf;
 }
 
 pre#transports {
      display: inline-block;
-     border: 1px solid #7789bf;
+     border: 1px solid #7778bf;
      background: #fafaff;
      padding: 10px 0 0 10px;
      width: calc(100% - 12px);
@@ -1572,7 +1592,7 @@ pre#transports {
 }
 
 #upnpscan {
-     border: 1px solid #7789bf;
+     border: 1px solid #7778bf;
      margin: -16px 0 5px;
      padding: 5px 10px;
      background: #fafaff;
@@ -1611,18 +1631,22 @@ b.suboption {
 
 /* end confignet tidyup */
 
-.main#tunnels h3 a:not(old), #criticallogs + h3.tabletitle a:not(old) {
+h3#exploratorytunnels {
+     margin-top: 15px;
+}
+
+#tunnels h3 a:not(old), #criticallogs + h3.tabletitle a:not(old) {
      font-size: 0;
 }
 
-.main#tunnels h3 a[href^="/configtunnels#"]::after, #criticallogs + h3.tabletitle a::after {
+#tunnels h3 a[href^="/configtunnels#"]::after, #criticallogs + h3.tabletitle a::after {
      content: url(/themes/console/images/buttons/configure.png);
      float: right;
      padding: 0;
      filter: drop-shadow(0 0 1px #999daf);
 }
 
-.main#tunnels h3 a[href^="/configtunnels#"]:hover, #criticallogs + h3.tabletitle a:hover {
+#tunnels h3 a[href^="/configtunnels#"]:hover, #criticallogs + h3.tabletitle a:hover {
      filter: drop-shadow(0 0 1px #f60);
 }
 
@@ -1741,9 +1765,19 @@ p#tunnelconfig {
      margin-bottom: -14px;
 }
 
+/* graphs */
+
 .graphspanel {
      text-align: center !important;
      margin: 15px 0 -15px;
+}
+
+#graph_single h3 {
+     margin: 15px 0 0 !important;
+}
+
+#graph_single .graphspanel {
+     margin: 9px -9px -20px;
 }
 
 .graphspanel img {
@@ -1752,18 +1786,18 @@ p#tunnelconfig {
      text-align: center !important;
      vertical-align: top !important;
      background: #fff;
-     border: 1px solid #6b6c8f;
-     box-shadow: 0 0 0 1px #ccc;
+     border: 1px solid #7778bf;
+     box-shadow: 0 0 1px #ccc;
      max-width: 98%;
 }
 
 .graphspanel a img {
      box-shadow: 0 0 1px #ccf;
+     filter: none !important;
 }
 
 .graphspanel a img:hover {
      box-shadow: inset 0 0 1px 1px #f60;
-     filter: none !important;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
      mix-blend-mode: multiply;
 }
@@ -1783,15 +1817,21 @@ p#tunnelconfig {
 
 #graphopts {
      text-align: center;
-     margin-top: 20px;
-     margin-bottom: 15px;
-     padding: 3px 0 5px;
      text-transform: capitalize;
-     line-height: 220%;
+     padding: 10px 0 9px;
+     margin: 30px -14px -9px;
+     border-top: 1px solid #77789f;
+     box-shadow: inset 0 0 0 1px #fff;
+     background: #e8e8ff;
+     background: repeating-linear-gradient(135deg, rgba(248,248,255,0.6) 2px, rgba(220, 220, 255, 0.3) 3px, #f8f8ff 5px), #f8f8ff;
+     filter: drop-shadow(0 0 1px #ccc);
 }
 
 #graphopts a {
-     margin: 0 -2px !important;
+     margin: 3px -2px !important;
+     display: inline-block;
+     padding: 1px 10px !important;
+     line-height: 140%;
 }
 
 #graphopts a:empty {
@@ -1876,6 +1916,7 @@ h3#graphdisplay {
 }
 
 /* end new graphs optionbox */
+/* end graphs */
 
 .messages {
      padding: 15px;
@@ -2387,6 +2428,8 @@ div.appgroup {
      width: auto;
 }
 
+/* optional homepage search */ 
+
 div.search {
      margin: 10px 10px 0 0;
      padding: 8px 8px 0 8px;
@@ -2401,12 +2444,12 @@ table.search {
      border-top: 1px solid #447;
      background: #fafaff !important;
      background: linear-gradient(to bottom, #fafaff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
-     padding: 8px;
+     padding: 4px 6px;
      width: 70%;
-     margin-left:auto;
-     margin-right:auto;
+     margin-left: auto;
+     margin-right: auto;
      margin-top: -19px;
-     box-shadow: 0 1px 1px 1px rgba(210, 210, 255, 0.3), inset 0 0 0 1px #bbf;
+     box-shadow: 0 1px 1px 1px rgba(210, 210, 255, 0.3), inset 0 0 1px 1px #bbf;
 }
 
 .search tr {
@@ -2447,6 +2490,8 @@ table.search select {
      width: 100%;
      text-overflow: ellipsis;
 }
+
+/* end optional homepage search */
 
 .app img {
      width: auto;
@@ -2578,7 +2623,7 @@ button:hover, button:focus, button:active, select:hover, select:focus, select:ac
      text-shadow: none;
 }
 
-a:link, #graphopts a:visited {
+a:link, #graphopts a:visited, .news #newsdisplay a {
      color: #3b6bbf;
      text-decoration: none;
      font-weight: bold;
@@ -3121,8 +3166,8 @@ h2 img {
 }
 
 h3 {
-     border: 1px solid #7789bf;
-     border-left: 5px solid #7789bf;
+     border: 1px solid #7778bf;
+     border-left: 5px solid #7778bf;
      padding: 7px 5px 6px 7px;
      margin: 12px 0 15px 0;
      border-radius: 0 2px 2px 0;
@@ -3403,11 +3448,12 @@ input[type="submit"], input[type="reset"], button, .optbox, select {
 
 button.search {
      background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
-     padding: 5px 7px 5px 22px;
+     padding: 5px 7px 5px 24px;
 }
 
-button.search:hover {
-     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+button.search:hover, button.search:focus, button.search:active {
+     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff) !important;
+     background-size: 14px 14px, 100% 100% !important;
 }
 
 input.search[type="text"] {
@@ -5395,10 +5441,10 @@ ul#banlist {
      border: 1px solid #7778bf;
      border-radius: 2px;
      display: block;
-     padding: 5px 1px;
-     -moz-columns: 300px auto;
-     -webkit-columns: 300px auto;
-     columns: 300px auto;
+     padding: 2px 0;
+     -moz-columns: auto;
+     -webkit-columns: auto;
+     columns: auto;
      -moz-column-gap: 0;
      -webkit-column-gap: 0;
      column-gap: 0;
@@ -5407,30 +5453,25 @@ ul#banlist {
 #profiles #banlist {
     border: none;
     background: none;
-    padding: 0;
-}
-
-#config_peers #banlist {
-     padding-bottom: 0;
 }
 
 #banlist li {
      display: inline-block;
+     min-width: 300px;
+     line-height: 120%;
+     margin: 3px 0 3px 5px !important;
+     padding: 8px 10px 0 35px;
      list-style: none;
-     margin: 5px 3px 5px 0;
      border: 1px solid #7778bf;
      border-radius: 2px;
-     padding: 8px 10px 0 35px;
-     line-height: 120%;
+     box-shadow: inset 0 0 0 1px #fff;
      background: #eef url(/themes/console/images/buttons/ban.png) 10px center no-repeat;
      background: url(/themes/console/images/buttons/ban.png) 10px center no-repeat, repeating-linear-gradient(135deg, rgba(252,252,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fafaff;
+     font-size: 9pt;
+     filter: drop-shadow(0 0 1px #f8f8ff);
      -webkit-break-inside: avoid;
      break-inside: avoid;
      page-break-inside: avoid;
-     font-size: 9pt;
-     box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px #f8f8ff);
-     min-width: 300px;
 }
 
 #config_peers #banlist li {
@@ -5443,10 +5484,6 @@ ul#banlist {
 
 #banlist a[href^="configpeer?peer"]::after {
      vertical-align: top;
-}
-
-#profiles #banlist li {
-     margin: 0;
 }
 
 #banlist tt {
@@ -5963,7 +6000,7 @@ h3#ntcpcon, h3#udpcon {
      background: linear-gradient(135deg, #fafaff, rgba(240,240,255,0.5));
      border: 1px solid #99b;
      border-radius: 2px;
-     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #557;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccf;
 }
 
 #oldconsole b {
@@ -6464,7 +6501,7 @@ b.netdb_transport {
      padding: 10px 15px;
      margin-top: -16px;
      background: linear-gradient(to bottom, #fafaff, rgba(250,250,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #efefff !important;
-     border: 1px solid #7789bf;
+     border: 1px solid #7778bf;
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0px 0 1px #ccf);
 }

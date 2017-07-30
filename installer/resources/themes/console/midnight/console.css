@@ -2119,8 +2119,12 @@ div.widepanel h3 {
 }
 
 #graphopts {
-     margin-top: 30px !important;
-     padding: 12px 0;
+     margin: 30px -10px 0 !important;
+     padding: 10px 0 8px;
+     text-align: center;
+     background: #001;
+     background: rgba(0,0,16,0.5);
+     border-top: 1px solid #443da0;
 }
 
 #graphopts a {
@@ -2128,6 +2132,7 @@ div.widepanel h3 {
      background: #001;
      border-color: #003;
      padding: 0 10px !important;
+     text-transform: capitalize;
 }
 
 #graphopts a, #graphopts a:visited {
@@ -2143,14 +2148,14 @@ div.widepanel h3 {
 }
 
 h3#graphinfo {
-     margin-top: 0;
+     margin-top: 10px;
      border-radius: 0 !important;
      text-transform: capitalize;
      letter-spacing: normal;
      word-spacing: normal;
 }
 
-.graphspanel p:last-child {
+#graphopts + p {
      display: none;
 }
 
@@ -5273,6 +5278,49 @@ table#jardump {
      line-height: 180%;
 }
 
+#proof p {
+     margin: 15px 5px;
+     padding: 30px 15px 0;
+     border: 1px solid #000;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #225, 0 0 1px #000;
+     background: url(/themes/console/images/info/rosette.png) right 8px top 8px no-repeat #002;
+     background: url(/themes/console/images/info/rosette.png) right 8px top 8px no-repeat rgba(0,0,32,0.4);
+     background-blend-mode: color-burn;
+}
+
+#proof textarea {
+     line-height: 160%;
+     font-size: 9pt;
+     overflow: hidden;
+     word-break: break-all;
+     white-space: pre-wrap;
+     height: 200px;
+}
+
+#proof textarea:focus {
+     outline: none;
+}
+
+#oldconsole p {
+     margin: 17px 6px 15px;
+     padding: 10px 20px;
+     line-height: 200%;
+     border: 1px solid #000;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #225, 0 0 1px #000;
+     background: #002;
+     background: rgba(0,0,32,0.4);
+}
+
+#oldconsole b {
+     display: inline-block;
+     min-width: 120px;
+     margin-right: 8px;
+     text-align: right;
+}
+
+
 .main#webmail {
      padding: 0;
      background: #000 !important;
@@ -6717,6 +6765,7 @@ form[action="events"] {
      vertical-align: middle;
      display: inline-block;
      filter: drop-shadow(0 0 1px rgba(220,220,220,0.7));
+     transform: scale(0.9);
 }
 
 .routersummary .error::before, .routersummary .clockskew::before {

@@ -52,7 +52,7 @@ h2, h3 {
 
 h1 {
      margin: 0 212px -15px 0;
-     padding: 20px 20px 20px 10px;
+     padding: 15px 20px 15px 10px;
      background: linear-gradient(to left, #fcfcff, rgba(252,252,255,0) 600px), linear-gradient(to bottom, #fcfcff 50%, rgba(248,248,255,0.6) 50%), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
 }
 
@@ -95,6 +95,8 @@ input.search[type="text"], input.search[type="text"]:focus {
 button, input[type="submit"], input[type="reset"] {
      display: inline-block;
      line-height: 120%;
+     font-size: 10pt;
+     font-weight: bold;
 }
 
 #config_homepage.main input.delete {
@@ -532,6 +534,7 @@ div.themechoice, div.langselect {
 
 #configstats td:nth-child(2) {
      padding-right: 10px;
+     direction: ltr;
 }
 
 #i2pupdates td:first-child, #reseedconfig td:first-child, #configstats tr:last-child td, textarea[name="levels"] {
@@ -606,7 +609,7 @@ h3#advancedconfig a, h3#bwlimiter a, h3.tabletitle a, h3.ptitle a, th a.script, 
 
 .tab, .tab2 {
      display: inline-block;
-     font-size: 12pt !important;
+     font-size: 11pt !important;
      margin-top: -5px;
      padding-top: 6px !important;
      padding-bottom: 6px !important;
@@ -976,7 +979,7 @@ p#enablefullstats, p#gatherstats, #oldhome td:first-child, p#pluginconfigtext, #
 }
 
 .routersummary td:first-child, .routersummary td:nth-last-child(n+2), .routersummary td a {
-     font-size: 10.5pt !important;
+     font-size: 10pt !important;
 }
 
 .routersummary h4 span::before {

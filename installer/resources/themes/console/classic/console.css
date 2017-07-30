@@ -756,9 +756,9 @@ div.refresh {
      vertical-align: middle;
      border: 1px solid #88f;
      border-radius: 2px;
-     padding: 6px 3px;
-     width: calc(100% - 10px);
-     margin: -5px 0 -6px;
+     padding: 6px 5px;
+     width: calc(100% - 12px);
+     margin: -6px 0 -7px;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(96,96,96,0.5);
      text-shadow: 0 1px 1px #fff;
 }
@@ -792,10 +792,11 @@ div.refresh {
 
 .routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
 .routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding-right: 2px;
+     padding-right: 1px;
      vertical-align: middle;
      display: inline-block;
      filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
+     transform: scale(0.9);
 }
 
 .routersummary .error::before, .routersummary .clockskew::before {
@@ -1038,7 +1039,7 @@ a:link {
      word-wrap: break-word;
 }
 
-a:visited {
+a:visited, #graphopts a, #graphopts a:visited {
      color: #448 !important;
      text-decoration: none;
      font-weight: bold;
@@ -1832,11 +1833,6 @@ div.welcome {
 
 .main#dns, .main#webmail, .main#torrents {
      padding: 0 !important;
-     min-width: 570px;
-}
-
-.main#proof {
-     padding: 0;
      min-width: 570px;
 }
 
@@ -3941,25 +3937,36 @@ p#enablefullstats {
      font-weight: bold;
 }
 
+/* graphs */
+
 .graphspanel {
-     padding: 15px 5px 0;
+     padding: 15px 5px 1px;
      margin: -16px -16px -11px -16px;
      text-align: center !important;
      overflow: hidden;
 }
 
+#graphs .graphspanel {
+     margin: -16px;
+}
+
+h3#graphdisplay {
+     margin: 12px -16px 10px;
+}
+
 .graphspanel img {
-     margin: 5px;
+     margin: 5px 4px;
      padding: 1px;
-     background: #f6f6ff;
-     border: 1px solid #89f;
-     box-shadow: 0 0 1px #aaa;
+     background: #fff;
+     border: 1px solid #9af;
+     box-shadow: 0 0 1px 0 #abf;
      max-width: 95%;
      max-width: calc(100% - 50px);
 }
 
 .graphspanel a img {
      background: #fff;
+     border: 1px solid #89f;
      opacity: 0.9;
      vertical-align: top;
 }
@@ -3970,6 +3977,10 @@ p#enablefullstats {
      background: #ccf;
      opacity: 1;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+}
+
+.graphspanel a:active img {
+     border: 1px solid #f90;
 }
 
 .graphspanel hr {
@@ -3993,6 +4004,10 @@ form[action="graphs"] {
      background: #eef;
 }
 
+#graphs form[action="graphs"] {
+     margin: -11px -16px;
+}
+
 form[action="graphs"] hr {
      margin: 5px -11px 3px;
      height: 1px;
@@ -4002,34 +4017,11 @@ form[action="graphs"] input[type="text"] {
      min-width: 80px !important;
 }
 
-p#graphopts {
-     text-align: center;
-     border: 1px solid #89f;
-     background: rgba(255,255,255,0.8);
-     margin: 25px -5px 0;
-     padding: 10px;
-     text-transform: capitalize;
-}
-
-h3#graphinfo {
-     margin: 5px 10px 15px;
-     text-transform: capitalize;
-}
-
-p#graphopts + p {
-     text-align: right;
-     background: #fff;
-     margin: -1px -5px 0;
-     padding: 10px;
-     border: 1px solid #89f;
-     display: none;
-}
-
 .formaction#graphing {
      margin: -3px -10px -5px;
 }
 
-/* new graphs optionbox */
+/* graphs optionbox */
 
 #graphs form {
      padding: 0 !important;
@@ -4057,9 +4049,10 @@ p#graphopts + p {
 
 #graphs td:first-child {
      text-align: right;
-     width: 85px;
+     min-width: 100px;
      white-space: nowrap;
      padding: 13px 3px 13px 5px;
+     font-weight: bold;
 }
 
 #graphs td:nth-child(2) {
@@ -4085,7 +4078,78 @@ p#graphopts + p {
      min-width: 60px;
 }
 
-/* end new graphs optionbox */
+/* end graphs optionbox */
+
+/* single view */
+
+#graph_single {
+     padding-left: 0;
+     padding-right: 0;
+}
+
+#graph_single .graphspanel {
+     margin: 0 -1px -13px;
+     padding: 3px 0 0 !important;
+}
+
+#graph_single .graphspanel img {
+     margin: 10px 0;
+}
+
+#graphopts {
+     text-align: center;
+     border: 1px solid #89f;
+     background: rgba(255,255,255,0.8);
+     margin: 25px -1px -11px;
+     padding: 10px 10px 9px;
+     text-transform: capitalize;
+     color: transparent;
+}
+
+h3#graphinfo {
+     margin: 0 15px 9px;
+     text-transform: capitalize;
+}
+
+#graphopts + p {
+     text-align: right;
+     background: #fff;
+     margin: -1px -5px 0;
+     padding: 10px;
+     border: 1px solid #89f;
+     display: none;
+}
+
+#graphopts a {
+     display: inline-block;
+     border: 1px solid #8b8edf;
+     padding: 1px 10px;
+     border-radius: 15px;
+     background: #f8f8ff;
+     background: rgba(248,248,255,0.3);
+     margin: 3px -2px;
+     box-shadow: 0 0 0 1px #ddf;
+     box-shadow: 0 0 0 1px rgba(220,220,255,0.6);
+}
+
+#graphopts a:empty {
+     display: none;
+}
+
+#graphopts a:hover, #graphopts a:focus {
+     border: 1px solid #7778bf;
+     background: #e2e2ff;
+     background: linear-gradient(to bottom, #fff 50%, #d8d4ff 50%);
+     box-shadow: 0 0 0 1px rgba(220,220,255,0.6), inset 0 0 0 1px #d8d4ff;
+}
+
+#graphopts a:active {
+     box-shadow: inset 3px 3px 3px rgba(41,61,95,0.8);
+     color: #557 !important;
+}
+
+/* end single view */
+/* end graphs */
 
 .footnote {
      text-align: right;
@@ -5347,19 +5411,51 @@ p#fullhistory {
      text-align: left;
 }
 
+.main#proof {
+     padding: 10px;
+     min-width: 570px;
+}
+
 #proof p {
      margin: 0;
-     padding: 0;
+     padding: 20px 10px 10px;
+     border: 1px solid #89f;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+     background: url(/themes/console/images/info/rosette.png) right 8px top 8px no-repeat #eeeffb;
+     background: url(/themes/console/images/info/rosette.png) right 8px top 8px no-repeat rgba(220,225,252,0.3);
+     background-blend-mode: luminosity;
 }
 
 #proof textarea, #proof textarea:focus {
-     border: none;
+     line-height: 180%;
      margin: 0;
+     border: none;
      padding: 15px 20px;
      width: 100%;
      box-shadow: none;
      color: #333;
      background: none;
+     height: 200px;
+     overflow: hidden;
+     white-space: pre-wrap;
+     word-break: break-all;
+}
+
+#oldconsole p {
+     margin: 0 0 5px;
+     padding: 10px 20px;
+     line-height: 200%;
+     border: 1px solid #89f;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
+     background: #eeeffb;
+     background: rgba(220,225,252,0.3);
+}
+
+#oldconsole b {
+     display: inline-block;
+     min-width: 120px;
+     margin-right: 8px;
+     text-align: right;
 }
 
 #certs p {

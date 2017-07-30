@@ -1,3 +1,13 @@
+2017-07-30 str4d
+ * Console
+   - light theme:
+     - Fix spacing issue with banned peers list
+     - Tweak font sizes for Arabic
+   - Shrink icons in sidepanel network status span
+   - Add single graph view buttons to classic theme
+   - Better separation of graphing controls in single graph view
+   - Enhance presentation of /oldconsole and /proof
+
 2017-07-28 str4d
  * Console:
    - Enhance presentation of show/hide news links on home page
