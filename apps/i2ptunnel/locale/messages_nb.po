@@ -4,7 +4,7 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
-# Allan Nordhøy <epost@anotheragency.no>, 2016
+# Allan Nordhøy <epost@anotheragency.no>, 2016-2017
 # Mikal <mikalv@mikalv.net>, 2013
 # Shpetim <shpetim@privacysolutions.no>, 2014
 # zzzi2p, 2015
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:35+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-07-16 17:47+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -164,7 +164,7 @@ msgstr "Ugyldig adresse"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:140
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/register_jsp.java:158
 msgid "Hidden Services Manager"
-msgstr ""
+msgstr "Behandler for skjulte tjenester"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:139
 msgid "Edit Client Tunnel"
@@ -647,7 +647,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:629
 msgid "New Keys on Reopen"
-msgstr "Nye nøkler ved gjennåpning"
+msgstr "Nye nøkler ved gjenåpning"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:631
 msgid "Change tunnel identity (destination) when tunnels reopen"
@@ -745,7 +745,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:702
 msgid "Allow SSL to I2P addresses"
-msgstr ""
+msgstr "Tillat SSL til I2P-adresser"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:709
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:864
@@ -881,7 +881,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:278
 msgid "Use SSL to connect to target"
-msgstr ""
+msgstr "Bruk SSL til å koble til målet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:296
 msgid ""

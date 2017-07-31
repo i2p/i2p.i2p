@@ -25,7 +25,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:42+0000\n"
+"PO-Revision-Date: 2017-07-13 15:53+0000\n"
 "Last-Translator: YF <yfdyh000@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/otf/I2P/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -1506,17 +1506,17 @@ msgstr "日志设置已保存"
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:46
 #, java-format
 msgid "Add additional logging statements above (e.g. {0})."
-msgstr ""
+msgstr "添加上述额外日志（例如 {0}）。"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:48
 #, java-format
 msgid "Alternatively, put entries in the file {0} (e.g. {1})."
-msgstr ""
+msgstr "或者，将条目放入文件 {0}（例如 {1}）。"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:50
 #, java-format
 msgid "Valid log levels are {0}."
-msgstr ""
+msgstr "有效的日志级别：{0}。"
 
 #. Homeland Security Advisory System
 #. http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
@@ -2804,7 +2804,7 @@ msgstr "配置 UI"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:32
 msgid "Select console theme & language & set optional console password"
-msgstr ""
+msgstr "选择控制台主题、语言和设置可选的控制台密码"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:33
 msgid "Customize Home Page"
@@ -3188,7 +3188,7 @@ msgstr "配置参与播种"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:294
 msgid "No Leasesets currently active."
-msgstr ""
+msgstr "目前无租契活动。"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:310
 msgid "LeaseSet"
@@ -3611,7 +3611,7 @@ msgstr "积压？"
 
 #: ../java/src/net/i2p/router/web/PeerHelper.java:198
 msgid "Is peer backlogged?"
-msgstr ""
+msgstr "目前对等端积压？"
 
 #: ../java/src/net/i2p/router/web/PeerHelper.java:268
 #: ../java/src/net/i2p/router/web/PeerHelper.java:571
@@ -3759,7 +3759,7 @@ msgstr[0] "已隐藏{0}个标准摘要。"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:91
 msgid "Groups"
-msgstr ""
+msgstr "群组"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:92
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:206
@@ -3826,7 +3826,7 @@ msgstr "摘要"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:188
 msgid "Configure peer"
-msgstr ""
+msgstr "配置对等端"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:207
 msgid "Integ. Value"
@@ -3920,11 +3920,11 @@ msgstr "容量"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:289
 msgid "SSU Testing"
-msgstr ""
+msgstr "SSU 测试"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:290
 msgid "SSU Introducer"
-msgstr ""
+msgstr "SSU 引导器"
 
 #. 0
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:293
@@ -4020,7 +4020,7 @@ msgstr "统计主要用于I2P的开发和调试。"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:44
 msgid "Jump to section"
-msgstr ""
+msgstr "跳转"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:67
 msgid "GO"
@@ -4205,11 +4205,11 @@ msgstr "高级配置"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:257
 msgid "Review active encryption certificates used in console"
-msgstr ""
+msgstr "查看控制台中使用的加密证书"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:259
 msgid "Certs"
-msgstr ""
+msgstr "证书"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:263
 msgid "View full changelog"
@@ -4237,7 +4237,7 @@ msgstr "Jar"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:285
 msgid "View active leasesets (debug mode)"
-msgstr ""
+msgstr "查看活动租契（调试模式）"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:291
 msgid "Network database search tool"
@@ -4249,7 +4249,7 @@ msgstr "网络数据库搜索"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:297
 msgid "Signed proof of ownership of this router"
-msgstr ""
+msgstr "此路由器所有权的签名证明"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:299
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/proof_jsp.java:218
@@ -4266,7 +4266,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:311
 msgid "Sybils"
-msgstr ""
+msgstr "Sybils"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:324
 msgid "General"
@@ -4626,7 +4626,7 @@ msgstr "检查网络连接和NAT/防火墙"
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:888
 msgid ""
 "Attempt to download router reference files (if automatic reseed has failed)"
-msgstr ""
+msgstr "尝试下载路由器引用文件（如果自动播种失败）"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:889
 msgid "Reseed"
@@ -4706,7 +4706,7 @@ msgstr "客户隧道 - "
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:60
 msgid "Configure tunnels for session"
-msgstr ""
+msgstr "配置会话隧道"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:62
 msgid "dead"
@@ -4774,7 +4774,7 @@ msgstr "本次运行带宽使用量"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:166
 msgid "Inbound or outbound?"
-msgstr ""
+msgstr "入站或出站？"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:167
 msgid "Expiry"
@@ -5273,7 +5273,7 @@ msgstr "这个路由器目前不参与播种。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:509
 msgid "Enrollment"
-msgstr ""
+msgstr "注册"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:515
 msgid "Automatic"
@@ -5298,7 +5298,7 @@ msgstr "某些设置需要程序重启后生效。"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:547
 #, java-format
 msgid "To make changes, edit the file: {0}"
-msgstr ""
+msgstr "要做更改，编辑文件：{0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:220
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configi2cp_jsp.java:220
@@ -6214,7 +6214,7 @@ msgstr "统计文件"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:532
 msgid "Toggle section graphing options"
-msgstr ""
+msgstr "切换板块图形选项"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:544
 msgid "Log"
@@ -6222,7 +6222,7 @@ msgstr "日志"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:552
 msgid "Select stats for visualization on /graphs"
-msgstr ""
+msgstr "选择图表可视化统计信息"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:555
 msgid "Graph"
@@ -6418,7 +6418,7 @@ msgid ""
 "(e.g. i2psnark), front-ends to another client or application which must be "
 "separately enabled (e.g. susidns, i2ptunnel), or have no web interface at "
 "all (e.g. addressbook)."
-msgstr ""
+msgstr "下面列出的 Java Web 应用程序由 webConsole 客户端启动，并在与路由器相同的 JVM 中运行。它们通常是通过路由器控制台访问的 Web 应用程序。它们可以是完整的应用程序（例如 i2psnark），对另一必须单独启用客户端或应用程序的前端（例如 susidns、i2ptunnel），或完全没有 Web 界面（例如地址簿）。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configwebapps_jsp.java:539
 msgid ""
@@ -6604,7 +6604,7 @@ msgid ""
 "Most of the options on the Network Configuration page are for special "
 "situations, for example where UPnP does not work correctly, or a firewall "
 "not under your control is doing harm."
-msgstr ""
+msgstr "“网络配置”页面上的大多数选项适用于特殊情况，例如 UPnP 无法正常工作，或者您无法控制的防火墙造成损害。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:410
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:409
@@ -6688,7 +6688,7 @@ msgstr "UPnP设备变化、重置或地址变更"
 msgid ""
 "UPnP may be enabled or disabled on the Network Configuration page, but a "
 "change requires a router restart to take effect."
-msgstr ""
+msgstr "可以在“网络配置”页面上启用或禁用 UPnP，但更改需要重启路由器才能生效。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:430
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:429
@@ -6706,7 +6706,7 @@ msgstr "在这里检查UPnP状态。"
 msgid ""
 "Hostnames entered on the Network Configuration page will be published in the"
 " network database."
-msgstr ""
+msgstr "网络配置页面上输入的主机名将被发布在网络数据库。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:434
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:433
@@ -7057,7 +7057,7 @@ msgstr "您不能发布一个公网无法访问的 IP 地址，例如127.0.0.1�
 msgid ""
 "Correct the address or disable inbound TCP on the Network Configuration "
 "page."
-msgstr ""
+msgstr "在网络配置页面上更正地址或禁用入站 TCP。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:519
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:518
@@ -7150,7 +7150,7 @@ msgstr "错误 - UDP已禁用，且TCP入站主机与端口未设置"
 msgid ""
 "You have not configured inbound TCP with a hostname and port on the Network "
 "Configuration page, however you have disabled UDP."
-msgstr ""
+msgstr "您尚未在“网络配置”页面上配置带有主机名和端口的入站 TCP，但是您已禁用 UDP。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:538
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:537
@@ -7168,7 +7168,7 @@ msgstr "因此您的路由器无法接收入站连接。"
 msgid ""
 "Please configure a TCP host and port on the Network Configuration page or "
 "enable UDP."
-msgstr ""
+msgstr "请在“网络配置”页面上配置 TCP 主机和端口，或启用 UDP。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:542
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:541
@@ -7200,7 +7200,7 @@ msgstr "您是否已经运行了另一个 I2P 实例？请关掉冲突的程序�
 msgid ""
 "Click a flag to select a language. Click 'Configure UI' below to change it "
 "later."
-msgstr ""
+msgstr "单击一个标志来选择一种语言。以后点击下面的“配置用户界面”进行更改。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/home_jsp.java:456
 msgid "Search"

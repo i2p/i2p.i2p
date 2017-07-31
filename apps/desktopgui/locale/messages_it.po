@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-07-30 07:04+0000\n"
 "Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>\n"
 "Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -46,7 +46,7 @@ msgstr "Lancia il browser I2P"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr "Configura l'icona di I2P nella Barra di notifica"
+msgstr "Configura icona di I2P nella Barra di notifica"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
@@ -76,16 +76,16 @@ msgstr "Arresta subito I2P"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:157
 #: src/net/i2p/desktopgui/InternalTrayManager.java:309
 msgid "Cancel I2P Shutdown"
-msgstr "Annulla l'arresto di I2P"
+msgstr "Annulla arresto di I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format
 msgid "Shutdown in {0}"
-msgstr "Spegnimento in {0}"
+msgstr "Arresto in {0}"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:365
 msgid "Shutdown imminent"
-msgstr "Spegnimento imminente"
+msgstr "Arresto imminente"
 
 #. status translations are in the console bundle
 #: src/net/i2p/desktopgui/InternalTrayManager.java:370

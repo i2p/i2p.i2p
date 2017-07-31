@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-07-04 12:12+0000\n"
+"PO-Revision-Date: 2017-07-13 21:06+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -70,7 +70,7 @@ msgstr "Mémoire qui peut être allouée à I2P :"
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Par défaut, I2P ne sera autorisé à utiliser que jusqu'à 128 Mo de RAM."
+msgstr "Par défaut, I2P ne sera autorisé à utiliser que jusqu'à 128 Mo de mémoire vive."
 
 #. Type: string
 #. Description

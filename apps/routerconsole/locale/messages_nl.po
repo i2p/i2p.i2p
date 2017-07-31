@@ -18,7 +18,7 @@
 # Nathan Follens, 2015
 # Nathan Follens, 2015
 # attesor <random901@zoho.com>, 2012
-# skoning <skoning@onenetbeyond.org>, 2014
+# skoning <skoning@onenetbeyond.org>, 2014,2017
 # skoning <skoning@onenetbeyond.org>, 2014
 # susbarbatus <susbarbatus@i2pmail.org>, 2014
 msgid ""
@@ -26,8 +26,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:42+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-07-22 11:20+0000\n"
+"Last-Translator: skoning <skoning@onenetbeyond.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -144,11 +144,11 @@ msgstr "IPs verbannen tot herstart"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1026
 msgid "IPv4 Addresses"
-msgstr ""
+msgstr "IPv4 adressen"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1050
 msgid "IPv6 Addresses"
-msgstr ""
+msgstr "IPv6 adressen"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:1068
 msgid "IPs Permanently Banned"
@@ -1516,7 +1516,7 @@ msgstr "Log configuratie opgeslagen"
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:46
 #, java-format
 msgid "Add additional logging statements above (e.g. {0})."
-msgstr ""
+msgstr "Voeg additionele logging regels boven toe (bijvoorbeeld {0})."
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:48
 #, java-format
@@ -1672,7 +1672,7 @@ msgstr "Statistieken"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:29
 msgid "I2CP"
-msgstr ""
+msgstr "I2CP"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:29
 msgid "Plugins"
@@ -1680,7 +1680,7 @@ msgstr "Plugins"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:29
 msgid "Web Apps"
-msgstr ""
+msgstr "Web-applicaties"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:30
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:251
@@ -2746,15 +2746,15 @@ msgstr "minuten"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:362
 msgid "Plot type"
-msgstr ""
+msgstr "Plot type"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:363
 msgid "Averages"
-msgstr ""
+msgstr "Gemiddelden"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:364
 msgid "Events"
-msgstr ""
+msgstr "Gebeurtenissen"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:365
 msgid "Graph size"
@@ -2762,7 +2762,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:366
 msgid "pixels wide"
-msgstr ""
+msgstr "pixels breed"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:367
 msgid ""
@@ -2771,7 +2771,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:367
 msgid "pixels high"
-msgstr ""
+msgstr "pixels hoog"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:368
 msgid "Refresh delay"
@@ -2851,11 +2851,11 @@ msgstr "I2P Router Hulp"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:36
 msgid "Install and configure I2P plugins"
-msgstr ""
+msgstr "I2P pligins installeren en configureren"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:36
 msgid "Manage Plugins"
-msgstr ""
+msgstr "Beheer plugins"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:37
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:231
@@ -2880,7 +2880,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/HomeHelper.java:179
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:166
 msgid "Web Server"
-msgstr ""
+msgstr "Webserver"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:44
 msgid "The Anoncoin project"
@@ -2927,7 +2927,7 @@ msgstr "Vaak gestelde vragen"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:51
 msgid "I2P FAQ"
-msgstr ""
+msgstr "I2P FAQ"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:52
 msgid "Community forum"
@@ -2935,7 +2935,7 @@ msgstr "Community forum"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:52
 msgid "I2P Forum"
-msgstr ""
+msgstr "I2P Forum"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:53
 msgid ""
@@ -2993,7 +2993,7 @@ msgstr "Add-on map"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:64
 msgid "I2P Plugins"
-msgstr ""
+msgstr "I2P plugins"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:65
 msgid "Postman's Tracker"
@@ -3017,7 +3017,7 @@ msgstr "I2P Netwerkstatistieken"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:70
 msgid "I2P Technical Docs"
-msgstr ""
+msgstr "I2P technische documenten"
 
 #: ../java/src/net/i2p/router/web/HomeHelper.java:70
 msgid "Technical documentation"
@@ -3224,7 +3224,7 @@ msgstr "Bestemming"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:338
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:353
 msgid "Add to addressbook"
-msgstr ""
+msgstr "Toevoegen aan adresboek"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:340
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:355
@@ -3404,7 +3404,7 @@ msgstr "IPv6 Only NTCP, SSU, aanbieders"
 #: ../java/src/net/i2p/router/web/NewsFeedHelper.java:92
 #, java-format
 msgid "{0}"
-msgstr ""
+msgstr "{0}"
 
 #: ../java/src/net/i2p/router/web/NewsHelper.java:293
 #, java-format
@@ -3778,7 +3778,7 @@ msgstr[1] "{0} standaard profielen verborgen."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:91
 msgid "Groups"
-msgstr ""
+msgstr "Groepen"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:92
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:206
@@ -3804,7 +3804,7 @@ msgstr "Integratie"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:97
 msgid "View/Edit"
-msgstr ""
+msgstr "Bekijken/bewerken"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:134
 msgid "Fast, High Capacity"
@@ -3939,17 +3939,17 @@ msgstr "caps"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:289
 msgid "SSU Testing"
-msgstr ""
+msgstr "SSU testen"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:290
 msgid "SSU Introducer"
-msgstr ""
+msgstr "SSU aanbieder"
 
 #. 0
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:293
 #: ../java/src/net/i2p/router/web/ProfilesHelper.java:12
 msgid "Floodfill"
-msgstr ""
+msgstr "Floodfill"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:297
 #, java-format
@@ -4039,7 +4039,7 @@ msgstr "Deze statistieken worden primair gebruikt voor ontwikkeling en debugging
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:44
 msgid "Jump to section"
-msgstr ""
+msgstr "Ga naar sectie"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:67
 msgid "GO"
@@ -4230,7 +4230,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:259
 msgid "Certs"
-msgstr ""
+msgstr "Certificaten"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:263
 msgid "View full changelog"
@@ -4266,7 +4266,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:293
 msgid "NetDB Search"
-msgstr ""
+msgstr "NetDB zoeken"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:297
 msgid "Signed proof of ownership of this router"
@@ -4714,7 +4714,7 @@ msgstr "Adressen"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:36
 msgid "Configure tunnels"
-msgstr ""
+msgstr "Configureer tunnels"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:36
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:60
@@ -5409,7 +5409,7 @@ msgstr "Selecteer geheime sleutel bestand"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:551
 msgid "Join Family"
-msgstr ""
+msgstr "Familie bijwonen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:557
 msgid "Family Name"
@@ -5417,7 +5417,7 @@ msgstr "Familie naam"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:559
 msgid "Create Family"
-msgstr ""
+msgstr "Familie aanmaken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:569
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:573
@@ -5445,7 +5445,7 @@ msgstr "Je bent niet langer lid van familie {0}."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configfamily_jsp.java:594
 msgid "Leave Family"
-msgstr ""
+msgstr "Familie verlaten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/confighome_jsp.java:220
 msgid "config home"
