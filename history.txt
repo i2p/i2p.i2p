@@ -1,3 +1,6 @@
+2017-07-31 zzz
+ * Translations update, Debian patch refresh
+
 2017-07-31 str4d
  * Console: fix router family page form (ticket #2022)
 
@@ -107,6 +110,9 @@
 
 2017-07-25 str4d
  * Console: Move JRobin default color and font changes into SummaryRenderer
+
+2017-07-16 zzz
+ * Imagegen: Test page text fixups
 
 2017-07-15 zzz
  * Console: Fix compile error with Jetty 9.2.22 (ticket #2019)
