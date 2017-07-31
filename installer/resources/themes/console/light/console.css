@@ -461,7 +461,8 @@ p:empty + .sb_notice {
      padding: 4px 2px 4px 24px;
      text-align: left;
      border-bottom: 1px dotted #ddf;
-     background: url(images/application.png) left center no-repeat;
+     background: #f8f8ff url(/themes/console/images/plugin.png) 3px center no-repeat;
+     background: rgba(248, 248, 255, 0.8) url(/themes/console/images/plugin.png) 3px center no-repeat;
      background-size: 14px 14px;
 }
 
@@ -476,57 +477,58 @@ p:empty + .sb_notice {
 
 #sb_services a:hover {
      background-blend-mode: normal;
+     background-color: #ffe;
 }
 
 #sb_services a[href="/susimail/susimail"] {
-     background: #f8f8ff url(images/inbox.png) 2px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/inbox.png) 2px center no-repeat;
+     background: #f8f8ff url(images/inbox.png) 3px center no-repeat;
+     background: rgba(248, 248, 255, 0.8) url(images/inbox.png) 3px center no-repeat;
 }
 
 #sb_services a[href="/susimail/susimail"]:hover {
-     background: #ffe url(images/inbox.png) 2px center no-repeat;
+     background: #ffe url(images/inbox.png) 3px center no-repeat;
      border-radius: 2px;
 }
 
 #sb_services a[href="/i2psnark/"] {
-     background: #f8f8ff url(/themes/console/images/i2psnark.png) 2px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(/themes/console/images/i2psnark.png) 2px center no-repeat;
+     background: #f8f8ff url(/themes/console/images/i2psnark.png) 3px center no-repeat;
+     background: rgba(248, 248, 255, 0.8) url(/themes/console/images/i2psnark.png) 3px center no-repeat;
      background-size: 16px 16px;
 }
 
 #sb_services a[href="/i2psnark/"]:hover {
-     background: #ffe url(/themes/console/images/i2psnark.png) 2px center no-repeat;
+     background: #ffe url(/themes/console/images/i2psnark.png) 3px center no-repeat;
      background-size: 16px 16px;
      border-radius: 2px;
 }
 
 #sb_services a[href="http://127.0.0.1:7658/"] {
-     background: #f8f8ff url(images/server.png) 2px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/server.png) 2px center no-repeat;
+     background: #f8f8ff url(images/server.png) 3px center no-repeat;
+     background: rgba(248, 248, 255, 0.8) url(images/server.png) 3px center no-repeat;
 }
 
 #sb_services a[href="http://127.0.0.1:7658/"]:hover {
-     background: #ffe url(images/server.png) 2px center no-repeat;
+     background: #ffe url(images/server.png) 3px center no-repeat;
      border-radius: 2px;
 }
 
 #sb_services a[href="/orchid/"] {
-     background: #f8f8ff url(images/flower.png) 2px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/flower.png) 2px center no-repeat;
+     background: #f8f8ff url(images/flower.png) 3px center no-repeat;
+     background: rgba(248, 248, 255, 0.8) url(images/flower.png) 3px center no-repeat;
 }
 
 #sb_services a[href="/orchid/"]:hover {
-     background: #ffe url(images/flower.png) 2px center no-repeat;
+     background: #ffe url(images/flower.png) 3px center no-repeat;
      border-radius: 2px;
 }
 
 #sb_services a[href*="bote"] {
-     background: #f8f8ff url(images/mail_black.png) 2px center no-repeat;
-     background: rgba(248, 248, 255, 0.8) url(images/mail_black.png) 2px center no-repeat;
+     background: #f8f8ff url(images/mail_black.png) 3px center no-repeat;
+     background: rgba(248, 248, 255, 0.8) url(images/mail_black.png) 3px center no-repeat;
 }
 
 #sb_services a[href*="bote"]:hover {
-     background: #ffe url(images/mail_black.png) 2px center no-repeat;
+     background: #ffe url(images/mail_black.png) 3px center no-repeat;
      border-radius: 2px;
 }
 
@@ -2623,7 +2625,7 @@ button:hover, button:focus, button:active, select:hover, select:focus, select:ac
      text-shadow: none;
 }
 
-a:link, #graphopts a:visited, .news #newsdisplay a {
+a:link, #graphopts a:visited, .news #newsdisplay a, .news #newsdisplay a:visited {
      color: #3b6bbf;
      text-decoration: none;
      font-weight: bold;
