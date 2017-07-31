@@ -1,3 +1,6 @@
+2017-07-31 str4d
+ * Console: fix router family page form (ticket #2022)
+
 2017-07-30 str4d
  * Console
    - light theme:
