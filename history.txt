@@ -1,3 +1,5 @@
+* 2017-08-07 0.9.31 released
+
 2017-07-31 zzz
  * Translations update, Debian patch refresh
 
