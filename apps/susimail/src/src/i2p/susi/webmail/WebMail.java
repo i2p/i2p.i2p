@@ -2049,7 +2049,7 @@ public class WebMail extends HttpServlet
 				ok = false;
 				sessionObject.error += e.getMessage();
 			}
-			String boundary = "_="+(int)(Math.random()*Integer.MAX_VALUE)+""+(int)(Math.random()*Integer.MAX_VALUE);
+			String boundary = "_=" + I2PAppContext.getGlobalContext().random().nextLong();
 			boolean multipart = false;
 			if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 				multipart = true;

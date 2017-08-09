@@ -146,7 +146,7 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\"><i>").append(_t("unknown")).append("</i></td>");
             }
             buf.append("<td align=\"right\">");
-            String v = info.getOption("router.version");
+            String v = info != null ? info.getOption("router.version") : null;
             if (v != null)
                 buf.append(DataHelper.stripHTML(v));
             buf.append("</td><td align=\"right\">").append(num(prof.getSpeedValue()));

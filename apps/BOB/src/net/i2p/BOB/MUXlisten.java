@@ -45,7 +45,7 @@ public class MUXlisten implements Runnable {
 	private ThreadGroup tg;
 	private final String N;
 	private ServerSocket listener;
-	private final int backlog = 50; // should this be more? less?
+	private static final int backlog = 50; // should this be more? less?
 	private final boolean go_out;
 	private final boolean come_in;
 	private final AtomicBoolean lock;

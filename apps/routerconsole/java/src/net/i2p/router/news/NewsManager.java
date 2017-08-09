@@ -190,7 +190,6 @@ public class NewsManager implements ClientApp {
     }
 
     private List<NewsEntry> parseInitialNews() {
-        NewsEntry entry = new NewsEntry();
         File file = new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml");
         Reader reader = null;
         try {

@@ -599,10 +599,10 @@ public final class KeyStoreUtil {
                 throw new IOException("Can't create directory " + dir);
         }
         Object[] rv = SelfSignedGenerator.generate(cname, ou, null, "I2P Anonymous Network", null, null, validDays, type);
-        PublicKey jpub = (PublicKey) rv[0];
+        //PublicKey jpub = (PublicKey) rv[0];
         PrivateKey jpriv = (PrivateKey) rv[1];
         X509Certificate cert = (X509Certificate) rv[2];
-        X509CRL crl = (X509CRL) rv[3];
+        //X509CRL crl = (X509CRL) rv[3];
         List<X509Certificate> certs = Collections.singletonList(cert);
         storePrivateKey(ks, ksPW, alias, keyPW, jpriv, certs);
         return rv;

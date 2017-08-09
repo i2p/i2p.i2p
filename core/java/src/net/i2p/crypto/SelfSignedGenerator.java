@@ -713,7 +713,7 @@ public final class SelfSignedGenerator {
 
     private static final void test(String name, SigType type) throws Exception {
             Object[] rv = generate("cname@example.com", "ou", "o", null, "st", "c", 3652, type);
-            PublicKey jpub = (PublicKey) rv[0];
+            //PublicKey jpub = (PublicKey) rv[0];
             PrivateKey jpriv = (PrivateKey) rv[1];
             X509Certificate cert = (X509Certificate) rv[2];
             X509CRL crl = (X509CRL) rv[3];

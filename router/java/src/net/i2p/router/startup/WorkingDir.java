@@ -462,7 +462,6 @@ public class WorkingDir {
         if (!src.exists()) return false;
         boolean rv = true;
 
-        byte buf[] = new byte[4096];
         FileInputStream in = null;
         FileOutputStream out = null;
         try {

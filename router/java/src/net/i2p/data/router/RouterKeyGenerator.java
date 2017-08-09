@@ -228,7 +228,7 @@ public class RouterKeyGenerator extends RoutingKeyGenerator {
         long now = System.currentTimeMillis();
         int st = 0;
         if (args.length > 1 && (args[0].startsWith("+") || args[0].startsWith("-"))) {
-            now += Integer.parseInt(args[0]) * 24*60*60*1000L;
+            now += Integer.parseInt(args[0]) * (24*60*60*1000L);
             st++;
         }
         RouterKeyGenerator rkg = new RouterKeyGenerator(I2PAppContext.getGlobalContext());
