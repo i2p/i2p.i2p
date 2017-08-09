@@ -554,7 +554,7 @@ Index: b/installer/resources/locale/po/messages_sv.po
 --- a/installer/resources/locale/po/messages_sv.po
 +++ b/installer/resources/locale/po/messages_sv.po
 @@ -187,13 +187,13 @@ msgid "Request a Java thread dump if run
-  -@msgstr "Fråga efter en Java thread dump vid drift."
+ msgstr "Fråga efter en Java thread dump vid drift."
  
  #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
