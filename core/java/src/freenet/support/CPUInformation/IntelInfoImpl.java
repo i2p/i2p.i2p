@@ -437,6 +437,8 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     // See reference link errata #SKD052 re: BMI
                     // ref: http://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/desktop-6th-gen-core-family-spec-update.pdf
                     // See Haswell notes above
+                    case 0x4e:
+                    case 0x55:
                     case 0x5e: {
                         CPUIDCPUInfo c = new CPUIDCPUInfo();
                         if (c.hasAVX2() && c.hasBMI1()  && c.hasBMI2() &&
