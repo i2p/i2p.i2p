@@ -1424,6 +1424,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         List<Hash> rv = new ArrayList<Hash>(max);
         for (BEValue bev : peers) {
             byte[] b = bev.getBytes();
+            if (b.length != Hash.HASH_LENGTH) {
+                if (_log.shouldWarn())
+                    _log.info("Bad peers entry from: " + nInfo);
+                continue;
+            }
             //Hash h = new Hash(b);
             Hash h = Hash.create(b);
             rv.add(h);

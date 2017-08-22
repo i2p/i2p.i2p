@@ -1864,14 +1864,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 String client;
                 if ("AwMD".equals(ch))
                     client = _t("I2PSnark");
-                else if ("BFJT".equals(ch))
-                    client = "I2PRufus";
-                else if ("TTMt".equals(ch))
-                    client = "I2P-BT";
                 else if ("LUFa".equals(ch))
                     client = "Vuze" + getAzVersion(pid.getID());
-                else if ("CwsL".equals(ch))
-                    client = "I2PSnarkXL";
+                else if ("LUJJ".equals(ch))
+                    client = "BiglyBT" + getAzVersion(pid.getID());
                 else if ("LVhE".equals(ch))
                     client = "XD" + getAzVersion(pid.getID());
                 else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
@@ -1880,6 +1876,12 @@ public class I2PSnarkServlet extends BasicServlet {
                     client = "Transmission" + getAzVersion(pid.getID());
                 else if ("LUtU".equals(ch))
                     client = "KTorrent" + getAzVersion(pid.getID());
+                else if ("CwsL".equals(ch))
+                    client = "I2PSnarkXL";
+                else if ("BFJT".equals(ch))
+                    client = "I2PRufus";
+                else if ("TTMt".equals(ch))
+                    client = "I2P-BT";
                 else
                     client = _t("Unknown") + " (" + ch + ')';
                 out.write(client + "&nbsp;<tt title=\"");
@@ -1981,7 +1983,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static String getAzVersion(byte[] id) {
         if (id[7] != '-')
             return "";
-        StringBuilder buf = new StringBuilder(16);
+        StringBuilder buf = new StringBuilder(8);
         buf.append(' ');
         for (int i = 3; i <= 6; i++) {
             int val = id[i] - '0';

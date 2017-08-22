@@ -126,11 +126,7 @@ class PeerConnectionOut implements Runnable
                               it.remove();
                               //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                               if (peer.supportsFast()) {
-                                  Message r = new Message();
-                                  r.type = Message.REJECT;
-                                  r.piece = nm.piece;
-                                  r.begin = nm.begin;
-                                  r.length = nm.length;
+                                  Message r = new Message(Message.REJECT, nm.piece, nm.begin, nm.length);
                                   if (_log.shouldLog(Log.DEBUG))
                                       _log.debug("Send " + peer + ": " + r);
                                    r.sendMessage(dout);
@@ -294,11 +290,7 @@ class PeerConnectionOut implements Runnable
                 it.remove();
                 removed = true;
                 if (type == Message.PIECE && peer.supportsFast()) {
-                    Message r = new Message();
-                    r.type = Message.REJECT;
-                    r.piece = m.piece;
-                    r.begin = m.begin;
-                    r.length = m.length;
+                    Message r = new Message(Message.REJECT, m.piece, m.begin, m.length);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Send " + peer + ": " + r);
                     try {
@@ -314,13 +306,12 @@ class PeerConnectionOut implements Runnable
 
   void sendAlive()
   {
-    Message m = new Message();
-    m.type = Message.KEEP_ALIVE;
-//  addMessage(m);
     synchronized(sendQueue)
       {
-        if(sendQueue.isEmpty())
+        if(sendQueue.isEmpty()) {
+          Message m = new Message(Message.KEEP_ALIVE);
           sendQueue.offer(m);
+        }
         sendQueue.notifyAll();
       }
   }
@@ -335,11 +326,7 @@ class PeerConnectionOut implements Runnable
                                  : Message.CHOKE;
         if (!removeMessage(inverseType))
           {
-            Message m = new Message();
-            if (choke)
-              m.type = Message.CHOKE;
-            else
-              m.type = Message.UNCHOKE;
+            Message m = new Message(choke ? Message.CHOKE : Message.UNCHOKE);
             addMessage(m);
           }
       }
@@ -353,11 +340,7 @@ class PeerConnectionOut implements Runnable
                                     : Message.INTERESTED;
         if (!removeMessage(inverseType))
           {
-            Message m = new Message();
-            if (interest)
-              m.type = Message.INTERESTED;
-            else
-              m.type = Message.UNINTERESTED;
+            Message m = new Message(interest ? Message.INTERESTED : Message.UNINTERESTED);
             addMessage(m);
           }
       }
@@ -365,9 +348,7 @@ class PeerConnectionOut implements Runnable
 
   void sendHave(int piece)
   {
-    Message m = new Message();
-    m.type = Message.HAVE;
-    m.piece = piece;
+    Message m = new Message(Message.HAVE, piece);
     addMessage(m);
   }
 
@@ -379,11 +360,7 @@ class PeerConnectionOut implements Runnable
     } else if (fast && bitfield.count() <= 0) {
         sendHaveNone();
     } else {
-       Message m = new Message();
-       m.type = Message.BITFIELD;
-       m.data = bitfield.getFieldBytes();
-       m.off = 0;
-       m.len = m.data.length;
+       Message m = new Message(bitfield.getFieldBytes());
        addMessage(m);
     }
   }
@@ -434,11 +411,7 @@ class PeerConnectionOut implements Runnable
               }
           }
       }
-    Message m = new Message();
-    m.type = Message.REQUEST;
-    m.piece = req.getPiece();
-    m.begin = req.off;
-    m.length = req.len;
+    Message m = new Message(Message.REQUEST, req.getPiece(), req.off, req.len);
     addMessage(m);
     req.sendTime = System.currentTimeMillis();
   }
@@ -482,14 +455,7 @@ class PeerConnectionOut implements Runnable
 
       // queue a fake message... set everything up,
       // except save the PeerState instead of the bytes.
-      Message m = new Message();
-      m.type = Message.PIECE;
-      m.piece = piece;
-      m.begin = begin;
-      m.length = length;
-      m.dataLoader = loader;
-      m.off = 0;
-      m.len = length;
+      Message m = new Message(piece, begin, length, loader);
       addMessage(m);
   }
 
@@ -498,21 +464,17 @@ class PeerConnectionOut implements Runnable
    *  Also add a timeout.
    *  We don't use this anymore.
    */
+/****
   void sendPiece(int piece, int begin, int length, byte[] bytes)
   {
-    Message m = new Message();
-    m.type = Message.PIECE;
-    m.piece = piece;
-    m.begin = begin;
-    m.length = length;
-    m.data = bytes;
-    m.off = 0;
-    m.len = length;
+    Message m = new Message(piece, begin, length, bytes);
     // since we have the data already loaded, queue a timeout to remove it
     // no longer prefetched
     addMessage(m);
   }
+****/
 
+  /** send cancel */
   void sendCancel(Request req)
   {
     // See if it is still in our send queue
@@ -531,11 +493,7 @@ class PeerConnectionOut implements Runnable
       }
 
     // Always send, just to be sure it it is really canceled.
-    Message m = new Message();
-    m.type = Message.CANCEL;
-    m.piece = req.getPiece();
-    m.begin = req.off;
-    m.length = req.len;
+    Message m = new Message(Message.CANCEL, req.getPiece(), req.off, req.len);
     addMessage(m);
   }
 
@@ -578,20 +536,13 @@ class PeerConnectionOut implements Runnable
 
   /** @since 0.8.2 */
   void sendExtension(int id, byte[] bytes) {
-    Message m = new Message();
-    m.type = Message.EXTENSION;
-    m.piece = id;
-    m.data = bytes;
-    m.off = 0;
-    m.len = bytes.length;
+    Message m = new Message(id, bytes);
     addMessage(m);
   }
 
   /** @since 0.8.4 */
   void sendPort(int port) {
-    Message m = new Message();
-    m.type = Message.PORT;
-    m.piece = port;
+    Message m = new Message(Message.PORT, port);
     addMessage(m);
   }
 
@@ -599,34 +550,28 @@ class PeerConnectionOut implements Runnable
    *  Unused
    *  @since 0.9.21
    */
+/****
   void sendSuggest(int piece) {
-    Message m = new Message();
-    m.type = Message.SUGGEST;
-    m.piece = piece;
+    Message m = new Message(Message.SUGGEST, piece);
     addMessage(m);
   }
+****/
 
   /** @since 0.9.21 */
   private void sendHaveAll() {
-    Message m = new Message();
-    m.type = Message.HAVE_ALL;
+    Message m = new Message(Message.HAVE_ALL);
     addMessage(m);
   }
 
   /** @since 0.9.21 */
   private void sendHaveNone() {
-    Message m = new Message();
-    m.type = Message.HAVE_NONE;
+    Message m = new Message(Message.HAVE_NONE);
     addMessage(m);
   }
 
   /** @since 0.9.21 */
   void sendReject(int piece, int begin, int length) {
-    Message m = new Message();
-    m.type = Message.REJECT;
-    m.piece = piece;
-    m.begin = begin;
-    m.length = length;
+    Message m = new Message(Message.REJECT, piece, begin, length);
     addMessage(m);
   }
 
@@ -634,10 +579,10 @@ class PeerConnectionOut implements Runnable
    *  Unused
    *  @since 0.9.21
    */
+/****
   void sendAllowedFast(int piece) {
-    Message m = new Message();
-    m.type = Message.ALLOWED_FAST;
-    m.piece = piece;
+    Message m = new Message(Message.ALLOWED_FAST, piece);
     addMessage(m);
   }
+****/
 }
