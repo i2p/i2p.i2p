@@ -1,8 +1,5 @@
 package net.i2p.crypto;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -20,6 +17,9 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import net.i2p.I2PAppContext;
+import net.i2p.data.Hash;
 
 /**
  * Test the JVM's implementation for speed
@@ -50,7 +50,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @Fork(1)
 @State(Scope.Benchmark)
 public class SHA256Bench {
-    MessageDigest md;
+    I2PAppContext ctx = I2PAppContext.getGlobalContext();
 
     @Param({"40", "387", "10240"})
     public int len;
@@ -58,17 +58,14 @@ public class SHA256Bench {
     byte[] data;
 
     @Setup
-    public void prepare() throws NoSuchAlgorithmException {
-        md = MessageDigest.getInstance("SHA-256");
+    public void prepare() {
         data = new byte[len];
-        Random r = new Random();
-        r.nextBytes(data);
+        ctx.random().nextBytes(data);
     }
 
     @Benchmark
-    public byte[] digest() {
-        md.reset();
-        return md.digest(data);
+    public Hash calculateHash() {
+        return ctx.sha().calculateHash(data);
     }
 
     public static void main(String args[]) throws RunnerException {

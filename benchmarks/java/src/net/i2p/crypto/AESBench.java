@@ -31,7 +31,6 @@ import net.i2p.data.SessionKey;
 public class AESBench {
     I2PAppContext ctx = I2PAppContext.getGlobalContext();
     SessionKey key;
-    CryptixAESEngine aes;
     byte[] iv = new byte[16];
     byte[] origPT = new byte[1024];
     byte[] origCT = new byte[1024];
@@ -46,18 +45,17 @@ public class AESBench {
         key = ctx.keyGenerator().generateSessionKey();
         ctx.random().nextBytes(iv);
         ctx.random().nextBytes(origPT);
-        aes = new CryptixAESEngine(ctx);
-        aes.encrypt(origPT, 0, origCT, 0, key, iv, len);
+        ctx.aes().encrypt(origPT, 0, origCT, 0, key, iv, len);
     }
 
     @Benchmark
     public void encrypt() {
-        aes.encrypt(origPT, 0, encrypted, 0, key, iv, len);
+        ctx.aes().encrypt(origPT, 0, encrypted, 0, key, iv, len);
     }
 
     @Benchmark
     public void decrypt() {
-        aes.decrypt(origCT, 0, decrypted, 0, key, iv, len);
+        ctx.aes().decrypt(origCT, 0, decrypted, 0, key, iv, len);
     }
 
     public static void main(String args[]) throws RunnerException {
