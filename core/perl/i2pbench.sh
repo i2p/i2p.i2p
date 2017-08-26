@@ -19,7 +19,7 @@ $javacommand = "$runtime -cp $classpath -Dlogger.shutdownDelay=0";
 
 print "\nBenchmark Suite #1: i2p/core/java/test/net/i2p/crypto/*\n\n";
 
-@testclasses = ( "AES256Bench", "DSABench", "ElGamalBench", "SHA256Bench" );
+@testclasses = ( "DSABench" );
 
 foreach $testclass (@testclasses) {
 	print "[BENCHMARK] $testclass:\n\n";
