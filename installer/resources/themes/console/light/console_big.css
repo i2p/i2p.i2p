@@ -31,8 +31,8 @@ button, input[type="submit"], input[type="reset"] {
 }
 
 button.reload[value="restart"], button.stop[value="shutdown"] {
-     padding-top: 5px !important;
-     padding-bottom: 5px !important;
+     padding-top: 3px !important;
+     padding-bottom: 3px !important;
 }
 
 button.control {

@@ -1151,7 +1151,7 @@ th.headerpriority br, .snarkTorrents thead th br {
      border: 1px solid #101;
      border-top: none;
      background: #101 url(images/snarknav.png) repeat-x scroll center center;
-     background: linear-gradient(to bottom, #4a3d49 0%, #3d303d 50%, #0d000d 50%, #0d000d 100%);
+     background: linear-gradient(to bottom, #4a3d49 0%, #3d303d 50%, #0d000d 50%, #0d000d 100%) !important;
      font-variant: small-caps !important;
      letter-spacing: 0.15em;
      color: #f7e3fc;
@@ -1701,7 +1701,6 @@ img[src$="magnet.png"] {
      word-wrap: break-word;
      background: #545;
      background: linear-gradient(to bottom, #545 0%, #434 100%);
-     background-position: top -1px center;
      overflow: auto;
 }
 
@@ -2063,10 +2062,19 @@ hr.debug + hr {
      white-space: normal;
      word-break: break-all;
      border-top: 1px solid #313;
+     border-bottom: none;
      background: #1f021f;
      padding: 0 10px 5px;
      padding: 0 0 4px;
      background: linear-gradient(to right, rgba(30,0,30,0.4) 0%, rgba(55,0,55,0.5) 50%, rgba(30,0,30,0.4) 100%), url(images/tile2.png);
+}
+
+.dhtdebug th:first-child {
+     border-radius: 0 0 0 4px;
+}
+
+.dhtdebug th:last-child {
+     border-radius: 0 0 4px 0;
 }
 
 .dhtDebug th > br:first-child {
@@ -2089,16 +2097,15 @@ hr.debug + hr {
 }
 
 #dhtDebugPanel label {
-     padding: 8px 4px 4px !important;
+     padding: 4px !important;
      display: block;
-     margin: 0 0 -12px !important;
+     margin: 0 0 -13px !important;
      border-radius: 0 0 4px 4px;
      background: #202;
      box-shadow: none;
 }
 
 input#toggle_debug:not(checked) + label {
-     border-radius: 0;
      background: #101;
      background: linear-gradient(to bottom, #212 50%, #101 50%);
      text-align: center;
@@ -2996,7 +3003,7 @@ select {
 }
 
 #dhtdebugInner {
-     margin-top: -34px;
+     margin-top: -29px;
 }
 }
 
@@ -3188,19 +3195,13 @@ th a img {
 }
 
 #dhtDebugInner {
-     margin-top: -28px !important;
+     margin-top: -25px !important;
 }
 
 .snarkTorrentStatus {
      -moz-user-select: none !important;
      -webkit-user-select: none;
      user-select: none;
-}
-}
-
-@media screen and (-webkit-min-device-pixel-ratio:0) and (max-width: 800px) {
-#dhtDebugInner {
-     margin-top: -29px !important;
 }
 }
 

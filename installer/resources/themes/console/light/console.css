@@ -114,7 +114,7 @@ pre {
 }
 
 .routersummary {
-     width: 190px;
+     width: 192px;
      padding: 8px 8px 10px;
      margin-bottom: 2px;
      text-align: center !important;
@@ -145,7 +145,7 @@ pre {
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
      margin-top: -1px;
      margin-left: -1px !important;
-     width: 192px;
+     width: 194px;
      height: auto;
      filter: drop-shadow(0 0 1px #ccf);
 }
@@ -175,8 +175,12 @@ pre {
 }
 
 .routersummary form {
-     margin: 0;
+     margin: 0 -7px;
      padding: 0 0 3px;
+}
+
+.routersummary form[action="/config"] {
+     margin: -2px -7px;
 }
 
 .routersummary form button.download {
@@ -319,7 +323,7 @@ h4.sb_info + hr + form {
      border: 0;
      text-align: center !important;
      margin: -8px -5px -5px -5px;
-     width: 200px !important;
+     width: 202px !important;
      overflow: hidden;
      font-size: 8pt;
      background-image: none !important;
@@ -423,6 +427,10 @@ h4.sb_info + hr + form {
      margin-top: 10px;
 }
 
+#sb_warning a {
+     line-height: 100%;
+}
+
 .sb_notice {
      background: #f2f2ff;
      border: 1px solid #89f;
@@ -447,7 +455,7 @@ p:empty + .sb_notice {
 
 #sb_services {
      margin: -15px -9px -11px -7px;
-     width: 204px !important;
+     width: 206px !important;
 }
 
 #sb_services td {
@@ -463,7 +471,7 @@ p:empty + .sb_notice {
      border-bottom: 1px dotted #ddf;
      background: #f8f8ff url(/themes/console/images/plugin.png) 3px center no-repeat;
      background: rgba(248, 248, 255, 0.8) url(/themes/console/images/plugin.png) 3px center no-repeat;
-     background-size: 14px 14px;
+     background-size: 16px 16px !important;
 }
 
 #sb_services a:link:last-child {
@@ -487,19 +495,15 @@ p:empty + .sb_notice {
 
 #sb_services a[href="/susimail/susimail"]:hover {
      background: #ffe url(images/inbox.png) 3px center no-repeat;
-     border-radius: 2px;
 }
 
 #sb_services a[href="/i2psnark/"] {
      background: #f8f8ff url(/themes/console/images/i2psnark.png) 3px center no-repeat;
      background: rgba(248, 248, 255, 0.8) url(/themes/console/images/i2psnark.png) 3px center no-repeat;
-     background-size: 16px 16px;
 }
 
 #sb_services a[href="/i2psnark/"]:hover {
      background: #ffe url(/themes/console/images/i2psnark.png) 3px center no-repeat;
-     background-size: 16px 16px;
-     border-radius: 2px;
 }
 
 #sb_services a[href="http://127.0.0.1:7658/"] {
@@ -509,7 +513,6 @@ p:empty + .sb_notice {
 
 #sb_services a[href="http://127.0.0.1:7658/"]:hover {
      background: #ffe url(images/server.png) 3px center no-repeat;
-     border-radius: 2px;
 }
 
 #sb_services a[href="/orchid/"] {
@@ -519,7 +522,6 @@ p:empty + .sb_notice {
 
 #sb_services a[href="/orchid/"]:hover {
      background: #ffe url(images/flower.png) 3px center no-repeat;
-     border-radius: 2px;
 }
 
 #sb_services a[href*="bote"] {
@@ -529,7 +531,6 @@ p:empty + .sb_notice {
 
 #sb_services a[href*="bote"]:hover {
      background: #ffe url(images/mail_black.png) 3px center no-repeat;
-     border-radius: 2px;
 }
 
 /* end webapp navigation */
@@ -1028,7 +1029,7 @@ p:empty + .sb_notice {
      border-radius: 0 0 2px 2px;
      text-align: justify;
      background: #fafaff url(/themes/console/images/info/errortriangle.png) 16px 40% no-repeat;
-     background: url(/themes/console/images/info/errortriangle.png) 16px 40% no-repeat, linear-gradient(to top, rgba(224, 224, 255, 0.5), #fafaff), repeating-linear-gradient(135deg, #fff 2px, rgba(221, 221, 255, 1) 3px, #fafaff 5px);
+     background: url(/themes/console/images/info/errortriangle.png) 16px 40% no-repeat, linear-gradient(to top, rgba(250, 250, 255, 0.5), #f8f8ff 40px), repeating-linear-gradient(135deg, #fafaff 2px, rgba(248, 248, 255, 0.8) 3px, #fafaff 5px) #f8f8ff;
      box-shadow: inset 0 0 1px #f00;
      word-wrap: break-word;
      font-weight: bold;
@@ -1038,8 +1039,8 @@ p:empty + .sb_notice {
 .sorry hr, .sorry hr:last-child {
      color: #558;
      background: #558;
+     background: linear-gradient(to right, #558, #77a);
      height: 1px;
-     border-top: 1px solid #558;
      margin: 10px 0 !important;
 }
 
@@ -3829,6 +3830,8 @@ button.download.control:hover, button.download.control:focus {
 .routersummary .reload, .routersummary .stop {
      text-indent: -99999px;
      background-size: 16px 16px, 100% 100% !important;
+     min-width: 93px;
+     margin: 0 2px -3px;
 }
 
 .routersummary .reload {
@@ -6571,6 +6574,11 @@ b.netdb_transport {
      padding-left: 3% !important;
 }
 
+.expiry ul {
+     display: block;
+     columns: auto 400px;
+}
+
 #debug h2, #debug h3 {
      position: relative;
      z-index: 100;
@@ -6594,11 +6602,11 @@ b.netdb_transport {
 }
 
 #debug h3.debug_outboundsessions {
-     background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
+     background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4)), linear-gradient(to right, #fcfcff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
 }
 
 #debug h3.debug_inboundsessions {
-     background: url(/themes/console/images/inbound.png) 6px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 240, 0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
+     background: url(/themes/console/images/inbound.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4)), linear-gradient(to right, #fcfcff 5%, rgba(231, 231, 255, 0.8) 25%) !important;
 }
 
 .debug_version {
@@ -7217,7 +7225,7 @@ h3#pconfig, h3#webappconfig, h3#i2pclientconfig, h3#pluginmanage, p#clientconf.i
 }
 
 .routersummary .reload, .routersummary .stop {
-     min-width: 95px;
+     min-width: 100px;
      margin: 0 3px -5px;
 }
 

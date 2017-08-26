@@ -1,3 +1,18 @@
+2017-08-26 str4d
+ * Console (light):
+   - Sidebar Restart/Shutdown buttons:
+     - Increase width to better occupy available space and increase width of
+       containing form to ensure browser scaling doesn't wrap buttons
+     - Reduce vertical padding
+     - Reduce height of buttons in console_big.css
+   - /debug:
+     - Multi-column view for Session Key Manager expiry IDs
+     - Fix color mismatch of inbound/outbound h3s
+ * I2PSnark (ubergine):
+   - Fix hover state for inert section headings
+   - Minor adjustments to DHT debug section
+ * Susimail (light): Minor adjustment of notifications in embedded view
+
 * 2017-08-07 0.9.31 released
 
 2017-07-31 zzz

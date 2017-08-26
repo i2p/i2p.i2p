@@ -1309,7 +1309,7 @@ tr.bottombuttons:empty {
      right: 0;
      text-align: center;
      margin: 0 -20px;
-     padding: 5px 10px;
+     padding: 3px 10px;
      z-index: 10;
      opacity: 0.85;
      border-top: 1px solid #fff;
@@ -1322,7 +1322,7 @@ tr.bottombuttons:empty {
      margin-bottom: 9px;
      border-radius: 4px 4px 0 0;
      border: none;
-     margin: 0 20% 9px;
+     margin: 0 3% 10px;
 }
 
 .notifications:hover {
