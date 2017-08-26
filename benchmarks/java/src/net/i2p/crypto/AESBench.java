@@ -19,8 +19,8 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.PrivateKey;
-import net.i2p.data.PublicKey;
+import net.i2p.data.DataHelper;
+import net.i2p.data.SessionKey;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -28,41 +28,41 @@ import net.i2p.data.PublicKey;
 @Measurement(iterations = 5, time = 2, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-public class ElGamalBenchmarks {
+public class AESBench {
     I2PAppContext ctx = I2PAppContext.getGlobalContext();
-    PublicKey pubkey;
-    PrivateKey privkey;
-    byte[] origPT;
-    byte[] origCT;
+    SessionKey key;
+    CryptixAESEngine aes;
+    byte[] iv = new byte[16];
+    byte[] origPT = new byte[1024];
+    byte[] origCT = new byte[1024];
+    byte[] encrypted = new byte[1024];
+    byte[] decrypted = new byte[1024];
+
+    @Param({"512", "768", "1024"})
+    public int len;
 
     @Setup
     public void prepare() {
-        Object pair[] = KeyGenerator.getInstance().generatePKIKeypair();
-        pubkey = (PublicKey) pair[0];
-        privkey = (PrivateKey) pair[1];
-        origPT = new byte[222];
+        key = ctx.keyGenerator().generateSessionKey();
+        ctx.random().nextBytes(iv);
         ctx.random().nextBytes(origPT);
-        origCT = ctx.elGamalEngine().encrypt(origPT, pubkey);
+        aes = new CryptixAESEngine(ctx);
+        aes.encrypt(origPT, 0, origCT, 0, key, iv, len);
     }
 
     @Benchmark
-    public Object[] keygen() {
-        return KeyGenerator.getInstance().generatePKIKeypair();
+    public void encrypt() {
+        aes.encrypt(origPT, 0, encrypted, 0, key, iv, len);
     }
 
     @Benchmark
-    public byte[] encrypt() {
-        return ctx.elGamalEngine().encrypt(origPT, pubkey);
-    }
-
-    @Benchmark
-    public byte[] decrypt() {
-        return ctx.elGamalEngine().decrypt(origCT, privkey);
+    public void decrypt() {
+        aes.decrypt(origCT, 0, decrypted, 0, key, iv, len);
     }
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(ElGamalBenchmarks.class.getSimpleName())
+                .include(AESBench.class.getSimpleName())
                 .build();
 
         new Runner(opt).run();

@@ -49,7 +49,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @Measurement(iterations = 5, time = 2, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @State(Scope.Benchmark)
-public class SHA256Benchmarks {
+public class SHA256Bench {
     MessageDigest md;
 
     @Param({"40", "387", "10240"})
@@ -73,7 +73,7 @@ public class SHA256Benchmarks {
 
     public static void main(String args[]) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(SHA256Benchmarks.class.getSimpleName())
+                .include(SHA256Bench.class.getSimpleName())
                 .build();
 
         new Runner(opt).run();
