@@ -153,6 +153,8 @@ public class Router implements RouterClock.ClockShiftListener {
             // just in case, lets make it explicit...
             TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         }
+        // Note: I2P_DISABLE_OUTPUT_OVERRIDE implemented in startup/WorkingDir.java
+
         // https://www.kb.cert.org/vuls/id/402580
         // http://docs.codehaus.org/display/JETTY/SystemProperties
         // Fixed in Jetty 5.1.15 but we are running 5.1.12
