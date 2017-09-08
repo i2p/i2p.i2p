@@ -100,4 +100,6 @@
     <target name="clean">
         <delete dir="./build" />
     </target>
+
+    <target name="distclean" depends="clean" />
 </project>
