@@ -438,7 +438,8 @@
 
     <target name="bench.jarUpToDate">
         <uptodate property="bench.jar.uptodate" targetfile="build/i2p-benchmarks.jar" >
-            <srcfiles dir= "." includes="build/obj_bench/**/*.class" />
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+            <srcfiles dir= "build/obj_bench" includes="**/*.class" />
         </uptodate>
     </target>
 
