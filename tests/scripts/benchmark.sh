@@ -8,11 +8,11 @@ fi
 
 if [ "x$BENCHMARKS" = 'x' ]
 then
-    BENCHMARKS="$CWD/benchmarks.jar"
+    BENCHMARKS="$CWD/i2p-benchmarks.jar"
     stat "$BENCHMARKS" >/dev/null 2>&1
     if [ "x$?" != 'x0' ]
     then
-        BENCHMARKS="$CWD/java/build/benchmarks.jar"
+        BENCHMARKS="$CWD/../../core/java/build/i2p-benchmarks.jar"
     fi
 fi
 
@@ -22,7 +22,7 @@ then
     stat "$JBIGI" >/dev/null 2>&1
     if [ "x$?" != 'x0' ]
     then
-        JBIGI="$CWD/../build/jbigi.jar"
+        JBIGI="$CWD/../../build/jbigi.jar"
     fi
 fi
 
@@ -33,4 +33,4 @@ then
     shift
 fi
 
-$JAVA -cp "$CLASSPATH" "$@"
+$JAVA -cp "$CLASSPATH" org.openjdk.jmh.Main "$@"

@@ -382,6 +382,66 @@
     <target name="fulltest" depends="test, test.report" />
     <!-- end unit tests -->
 
+    <!-- benchmarks -->
+    <target name="jmhLibCheck">
+        <!-- override to Ant home if not set -->
+        <property name="jmh.home" value="${ant.home}/lib" />
+        <fail message="Please set jmh.home to a directory containing the necessary JMH libraries. See build.properties for details.">
+            <condition>
+                <not>
+                    <and>
+                        <available file="${jmh.home}/jmh-core.jar" />
+                        <available file="${jmh.home}/jmh-generator-annprocess.jar" />
+                        <available file="${jmh.home}/jopt-simple.jar" />
+                        <available file="${jmh.home}/commons-math3.jar" />
+                    </and>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="bench.compile" depends="compile, jmhLibCheck">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj_bench" />
+        <javac srcdir="./bench" debug="true" source="${javac.version}" target="${javac.version}" deprecation="on"
+               debuglevel="lines,vars,source"
+               includeAntRuntime="false"
+               destdir="./build/obj_bench" >
+            <classpath>
+                <pathelement location="${jmh.home}/jmh-core.jar" />
+                <pathelement location="${jmh.home}/jmh-generator-annprocess.jar" />
+                <pathelement location="./build/obj" />
+            </classpath>
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+
+    <target name="bench.jar" depends="bench.compile, bench.jarUpToDate, listChangedFiles" unless="bench.jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/i2p-benchmarks.jar" basedir="./build/obj_bench" >
+            <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Main-Class" value="org.openjdk.jmh.Main" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+                <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
+                <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
+            </manifest>
+            <zipfileset src="${jmh.home}/jmh-core.jar" excludes="**/META-INF/services/**" />
+            <zipfileset src="${jmh.home}/jopt-simple.jar" />
+            <zipfileset src="${jmh.home}/commons-math3.jar" />
+            <fileset dir="./build/obj" includes="**/*.class" />
+        </jar>
+    </target>
+
+    <target name="bench.jarUpToDate">
+        <uptodate property="bench.jar.uptodate" targetfile="build/i2p-benchmarks.jar" >
+            <srcfiles dir= "." includes="build/obj_bench/**/*.class" />
+        </uptodate>
+    </target>
+
     <target name="clean">
         <delete dir="./build" />
     </target>

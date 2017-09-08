@@ -994,7 +994,6 @@
         <delete dir="core/c/jcpuid/lib" />
         <ant dir="installer/resources/locale" target="distclean" />
         <ant dir="installer/tools/java" target="distclean" />
-        <ant dir="benchmarks/java" target="distclean" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
@@ -1846,8 +1845,8 @@
 
     <target name="testscripts-all" depends="testscripts,testscripts-net" />
 
-    <target name="bench" depends="buildCore, jbigi" >
-        <ant dir="benchmarks/java/" target="all" />
+    <target name="bench" depends="jbigi" >
+        <ant dir="core/java/" target="bench.jar" />
     </target>
 
     <!-- <target name="syndie" >
