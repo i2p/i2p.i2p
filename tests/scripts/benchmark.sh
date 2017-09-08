@@ -1,5 +1,30 @@
 #!/bin/sh
 
+#
+# Benchmark runner
+#
+# Usage: benchmark.sh [--jbigi] [JMH_ARGS]
+#
+# To use:
+# 1) Set jmh.home in override.properties to a folder containing:
+#    - jmh-core.jar
+#    - jmh-generator-annprocess.jar
+#    - jopt-simple.jar
+#    - commons-math3.jar
+#    Fetch these from Maven Central. Tested using JMH 1.19 which requires
+#    jopt-simple 4.6 and commons-math3 3.2.
+# 2) Compile the benchmarks with "ant bench".
+# 3) Run the benchmarks:
+#    - To see underlying JMH options:
+#      - ./benchmark.sh -h
+#    - To run the benchmarks in pure-Java mode:
+#      - ./benchmark.sh
+#    - To run the benchmarks with jbigi.jar in the classpath:
+#      - ./benchmark.sh --jbigi
+#    - To run the benchmarks with a different JVM:
+#      - JAVA=/path/to/java ./benchmarks/benchmark.sh
+#
+
 CWD=$(dirname "$0")
 if [ "x$JAVA" = 'x' ]
 then
