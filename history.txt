@@ -1,3 +1,6 @@
+2017-09-12 str4d
+ * Core: New benchmarking framework based on JMH (ticket #2036)
+
 2017-09-02 zzz
  * Data: Prohibit excess key data in certs (ticket #2035)
  * i2psnark: New open trackers
