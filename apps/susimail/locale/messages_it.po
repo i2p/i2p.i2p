@@ -11,14 +11,15 @@
 # mkkid <jokjok@hotmail.it>, 2011
 # mkkid <jokjok@hotmail.it>, 2011
 # Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2016
+# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2016
 # Tristano Ajmone <tajmone@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-07-19 11:18+0000\n"
+"Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>\n"
 "Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -166,7 +167,7 @@ msgstr "Errore nella lettura del file inviato: {0}"
 #: src/src/i2p/susi/webmail/WebMail.java:1326
 #: src/src/i2p/susi/webmail/WebMail.java:1329
 msgid "Attachment not found."
-msgstr "Impossibile trovare l'allegato"
+msgstr "Impossibile trovare l'allegato."
 
 #. error if we get here
 #: src/src/i2p/susi/webmail/WebMail.java:1356
@@ -318,7 +319,7 @@ msgstr "Cancella gli allegati selezionati"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2215
 msgid "I2PMail Login"
-msgstr ""
+msgstr "Accesso a I2PMail"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:2217
@@ -493,7 +494,7 @@ msgstr "Torna alla Cartella"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2444
 msgid "Could not fetch mail."
-msgstr "Non è stato possibile recuperare la mail"
+msgstr "Non è stato possibile recuperare la mail."
 
 #: src/src/i2p/susi/webmail/WebMail.java:2462
 msgid "Folder Page Size"
@@ -530,7 +531,7 @@ msgstr "Errore nell'apertura della mailbox"
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1025
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:249
 msgid "Login failed"
-msgstr "Login fallito "
+msgstr "Autenticazione fallita"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:214
 msgid "Cannot connect"

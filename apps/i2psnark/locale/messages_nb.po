@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Allan Nordhøy <epost@anotheragency.no>, 2017
 # Mikal <mikalv@mikalv.net>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:36+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-07-28 23:27+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -188,7 +189,7 @@ msgstr "DHT skrudd av"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1216
 msgid "DHT change requires tunnel shutdown and reopen"
-msgstr "DHT endring krever tunnel avslutting og gjennåpning"
+msgstr "DHT-endring krever tunnelavslutting og gjenåpning"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1223
 msgid "Enabled Ratings."
@@ -1015,7 +1016,7 @@ msgstr "gjennstår"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1742
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3021
 msgid "Completed"
-msgstr ""
+msgstr "Fullført"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1780
 msgid "Stop the torrent"
@@ -1182,7 +1183,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2208
 msgid "Tracker URL"
-msgstr ""
+msgstr "Sporingsnettadresse"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2231
 msgid "none"
@@ -1226,7 +1227,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2305
 msgid "Language"
-msgstr ""
+msgstr "Språk"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2313
 msgid "Theme"
@@ -1279,7 +1280,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2378
 msgid "torrents"
-msgstr ""
+msgstr "torrenter"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2402
 msgid "Total uploader limit"
@@ -1467,7 +1468,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3012
 msgid "Added"
-msgstr ""
+msgstr "Lagt til"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3033
 msgid "Magnet link"
@@ -1662,7 +1663,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3597
 msgid "Mark for deletion"
-msgstr ""
+msgstr "Marker for sletting"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:3608
 msgid "Delete Selected"

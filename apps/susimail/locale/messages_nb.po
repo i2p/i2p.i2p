@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-07-27 01:20+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -376,7 +376,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2268
 msgid "Mark for deletion"
-msgstr ""
+msgstr "Marker for sletting"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2271
 #: src/src/i2p/susi/webmail/WebMail.java:2431
@@ -401,7 +401,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2328
 msgid "No messages"
-msgstr ""
+msgstr "Ingen meldinger"
 
 #. TODO ngettext
 #: src/src/i2p/susi/webmail/WebMail.java:2340
@@ -469,7 +469,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2409
 msgid "Forward"
-msgstr ""
+msgstr "Videresend"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2410
 msgid "Save As"
@@ -498,7 +498,7 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:2468
 msgid "Advanced Configuration"
-msgstr ""
+msgstr "Avansert oppsett"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2478
 msgid "Save Configuration"

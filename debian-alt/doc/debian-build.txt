@@ -75,8 +75,8 @@ reprepro -v update precise
 reprepro -v update trusty
 reprepro -v update vivid
 reprepro -v update xenial
-reprepro -v update yakkety
 reprepro -v update zesty
+reprepro -v update artful
 # todo when set up
 # To add or remove distributions, edit /var/www/debian/conf/distributions
 # and /var/www/debian/conf/updates
@@ -89,22 +89,25 @@ reprepro -v update zesty
 # Note that syntax is reprepro copysrc TO FROM package!
 reprepro -v copysrc wheezy precise i2p
 
-# To copy libjbigi-jni i386 (only) from trusty to jessie:
+# To copy trusty to jessie:
 # Note that syntax is reprepro copysrc TO FROM package!
-reprepro -v -A i386 copy jessie trusty libjbigi-jni
+reprepro -v copysrc jessie trusty i2p
 
-# To copy jessie to sid:
+# To copy xenial to stretch:
 # Note that syntax is reprepro copysrc TO FROM package!
-reprepro -v copysrc sid jessie i2p
+reprepro -v copysrc stretch xenial i2p
 
 # install in the architectures not copied from ubuntu
 # 'flood' should do this but forgot how, can't make it work any more
-reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p_0.9.xxp-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-doc_0.9.xxp-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-router_0.9.xxp-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p_0.9.xx-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-doc_0.9.xx-1ubuntu1_all.deb
-reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-router_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p_0.9.xxp-1precise1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-doc_0.9.xxp-1precise1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb wheezy i2p-router_0.9.xxp-1precise1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p_0.9.xxp-1trusty1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-doc_0.9.xxp-1trusty1_all.deb
+reprepro -v -A 'armel|armhf|powerpc' includedeb jessie i2p-router_0.9.xxp-1trusty1_all.deb
+reprepro -v -A 'armel|armhf' includedeb stretch i2p_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf' includedeb stretch i2p-doc_0.9.xx-1ubuntu1_all.deb
+reprepro -v -A 'armel|armhf' includedeb stretch i2p-router_0.9.xx-1ubuntu1_all.deb
 reprepro -v -A 'armel|armhf' includedeb sid i2p_0.9.xx-1ubuntu1_all.deb
 reprepro -v -A 'armel|armhf' includedeb sid i2p-doc_0.9.xx-1ubuntu1_all.deb
 reprepro -v -A 'armel|armhf' includedeb sid i2p-router_0.9.xx-1ubuntu1_all.deb

@@ -31,8 +31,8 @@ button, input[type="submit"], input[type="reset"] {
 }
 
 button.reload[value="restart"], button.stop[value="shutdown"] {
-     padding-top: 5px !important;
-     padding-bottom: 5px !important;
+     padding-top: 3px !important;
+     padding-bottom: 3px !important;
 }
 
 button.control {
@@ -72,6 +72,11 @@ button.control {
      word-spacing: 0.1em !important;
      font-size: 10pt;
      line-height: 130%;
+}
+
+.sb_newsheadings td, .sb_newsheadings tr:hover td {
+     background-position: 4px center !important;
+     padding-left: 22px !important;
 }
 
 div.news, .newscontent p {
@@ -194,7 +199,7 @@ p#enablefullstats {
 }
 
 #console .twocol {
-     margin-bottom: -20px !important;
+     margin-bottom: -25px !important;
 }
 
 #console li {
@@ -212,7 +217,6 @@ p#enablefullstats {
 #console a:hover code {
      color: #f60 !important;
 }
-}
 
 .tunnel_cap b, b.tunnel_cap {
      color: #fff !important;
@@ -222,6 +226,8 @@ p#enablefullstats {
 .cells tt, #profilelist tt, tt a {
      font-weight: bold !important;
 }
+
+/* responsive layout */
 
 @media screen and (min-width: 1500px) {
 .langbox {
@@ -245,3 +251,4 @@ p#enablefullstats {
 }
 }
 
+/* end responsive layout */

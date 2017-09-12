@@ -233,7 +233,7 @@ class SybilRenderer {
         buf.append("<h3 id=\"dest\" class=\"sybils\">Floodfills Close to Our Destinations</h3>");
         Map<Hash, TunnelPool> clientInboundPools = _context.tunnelManager().getInboundClientPools();
         List<Hash> destinations = new ArrayList<Hash>(clientInboundPools.keySet());
-        boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
+        //boolean debug = _context.getBooleanProperty(HelperBase.PROP_ADVANCED);
         for (Hash client : destinations) {
             boolean isLocal = _context.clientManager().isLocal(client);
             if (!isLocal)
@@ -318,7 +318,7 @@ class SybilRenderer {
             }
         }
 
-        double avg = total / (sz * sz / 2);
+        double avg = total / (sz * sz / 2d);
         buf.append("<h3 class=\"sybils\">Average Floodfill Distance is ").append(fmt.format(avg)).append("</h3>");
 
         buf.append("<h3 id=\"pairs\" class=\"sybils\">Closest Floodfill Pairs by Hash</h3>");

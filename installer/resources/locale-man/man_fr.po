@@ -74,7 +74,7 @@ msgid ""
 "the regular Internet are supported."
 msgstr ""
 "Télécharger un fichier de façon non interactive par HTTP. Les transferts "
-"sont pris en charge à la fois par I2P et l'Internet habituel."
+"sont pris en charge à la fois par I2P et l'Internet ordinaire."
 
 #. type: Plain text
 #: man/eepget.1:21

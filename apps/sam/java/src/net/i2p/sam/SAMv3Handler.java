@@ -173,8 +173,6 @@ class SAMv3Handler extends SAMv1Handler
 
 		try {
 			Socket socket = getClientSocket().socket();
-			InputStream in = socket.getInputStream();
-
 			StringBuilder buf = new StringBuilder(1024);
 			boolean gotFirstLine = false;
 			while (true) {

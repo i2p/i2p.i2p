@@ -161,12 +161,12 @@ public interface RrdGraphConstants {
 	/**
 	 * Default minor grid color
 	 */
-	Color DEFAULT_GRID_COLOR = new Color(100, 100, 100, 75);
+	Color DEFAULT_GRID_COLOR = new Color(171, 171, 171, 95);
 	// Color DEFAULT_GRID_COLOR = new Color(140, 140, 140);
 	/**
 	 * Default major grid color
 	 */
-	Color DEFAULT_MGRID_COLOR = new Color(255, 91, 91, 110);
+	Color DEFAULT_MGRID_COLOR = new Color(255, 91, 91, 95);
 	// Color DEFAULT_MGRID_COLOR = new Color(130, 30, 30);
 	/**
 	 * Default font color
@@ -251,7 +251,7 @@ public interface RrdGraphConstants {
 	 * Default font name, determined based on the current operating system
 	 */
 	String DEFAULT_FONT_NAME = System.getProperty("os.name").toLowerCase().contains("windows") ?
-			"Lucida Console" : "Monospaced";
+			"Lucida Sans Typewriter" : "Monospaced";
 
 	/**
 	 * Default graph small font

@@ -4,9 +4,8 @@
 body {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-size: 9pt;
-     background-color: #fff;
      background: #a4a4cb url(/themes/console/light/images/tile2.png) center center;
-     color: #333;
+     color: #33333f;
      margin: 0 5px;
 }
 
@@ -28,8 +27,18 @@ body.iframed {
      text-shadow: none;
 }
 
+#navi, .buttons, #buttons, #host_list tr:first-child, #host_list img, #host_list td:nth-child(n+2) a {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 * {
      outline: none;
+}
+
+b, td.search {
+     color: #41465f;
 }
 
 #logo {
@@ -41,6 +50,22 @@ body.iframed {
      background-size: auto 50px, 100% 100%;
      border: 1px solid #7778bf;
      box-shadow: inset 0 0 0 1px #fff;
+}
+
+#logo:not(old) {
+     background: linear-gradient(to bottom, #fff, #eef);
+}
+
+#logo::before {
+     content: "";
+     display: inline-block;
+     background: url(/themes/susidns/images/logo.png) center center no-repeat;
+     background-size: auto 50px;
+     height: 55px;
+     width: 100%;
+     opacity: 0.7;
+     filter: sepia(100%) hue-rotate(180deg);
+     mix-blend-mode: multiply;
 }
 
 #logo img {
@@ -73,7 +98,7 @@ code, tt, .destaddress {
      padding: 5px 3px;
      text-align: center;
      border: 1px solid #7778bf;
-     background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(239, 239, 255, 0.5) 50%, rgba(255, 255, 255, 1) 100%), linear-gradient(to bottom, #fff 0%, #fff 51%, #eef 51%, #ddf 100%);
+     background: linear-gradient(to bottom, #fafaff 51%, #f8f8ff 51%, #f2f2ff 100%);
      border-radius: 2px 2px 0 0;
      box-shadow: inset 0 0 0 1px #fff;
      z-index: 100;
@@ -92,7 +117,7 @@ code, tt, .destaddress {
 }
 
 #navi a, #navi a:visited {
-     border: 1px solid #77789f;
+     border: 1px solid #7778bf;
      border-radius: 2px;
      color: #3b6bbf;
      display: inline-block;
@@ -100,6 +125,7 @@ code, tt, .destaddress {
      text-transform: capitalize;
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     line-height: 110%;
 }
 
 #navi a:hover, #navi a:focus {
@@ -111,7 +137,7 @@ code, tt, .destaddress {
 }
 
 #navi a:active {
-     color: #555;
+     color: #5a5a6f;
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 2px #999;
      mix-blend-mode: luminosity;
 }
@@ -142,6 +168,7 @@ code, tt, .destaddress {
      padding: 8px 5px;
      background: #fff;
      background: linear-gradient(to right, #fff 70%, #eef);
+     background: linear-gradient(135deg, #fafaff, #f2f2ff);
 }
 
 .iframed .headline {
@@ -149,22 +176,36 @@ code, tt, .destaddress {
 }
 
 h3, h4, th, #filter span {
-     color: #31334f;
+     color: #41465f;
+}
+
+h3 {
+     font-size: 11pt !important;
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 .headline h3 {
-     margin: 0;
-     padding: 2px 5px 3px 30px;
-     background: url(/themes/susidns/images/addressbook.png) left center no-repeat;
-     font-size: 11pt;
+     font-size: 11.5pt !important;
+     background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat #fcfcff;
+     background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#subscriptions h3 {
-     background: url(/themes/susidns/images/subs_24.png) left center no-repeat;
+     background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat #fcfcff;
+     background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#configure h3 {
-     background: url(/themes/susidns/images/configure_24.png) left center no-repeat;
+     background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat #fcfcff;
+     background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background-size: 22px 22px, 100% 100%, 100% 100%;
+}
+
+.headline#subscriptions h3, .headline#configure h3, .headline#addressbook h3, .headline h3 {
+     margin: -8px -5px -5px;
+     padding: 9px 5px 8px 32px;
 }
 
 span.location {
@@ -178,7 +219,6 @@ span.location {
 .headline h4 {
      border-top: 1px solid #7778bf;
      margin: 5px -6px 0;
-     padding: 8px 10px 0;
      padding: 8px 10px 0 33px;
      background: url(/themes/susidns/images/drive.png) 9px 7px no-repeat;
 }
@@ -187,7 +227,7 @@ span.location {
      border: 1px solid #7778bf;
      padding: 0 15px;
      margin: -1px 0 0;
-     background: #fff;
+     background: #fafaff;
 }
 
 .iframed #content {
@@ -201,32 +241,19 @@ form[action="subscriptions"] #content {
      margin-top: 1px;
 }
 
-#content textarea  {
-     margin: 2px -15px;
-     padding: 5px 0;
-     border: none;
-     width: 100%;
-     resize: none;
-     filter: none;
-     box-shadow: none;
-}
-
-.iframed #content textarea {
-     border: 1px solid #7778bf;
-     margin: 0;
-}
-
 #content + #buttons {
      border: 1px solid #7778bf;
      margin: -1px 0 10px;
-     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 #content h3 {
-     border: 1px solid #77789f;
-     padding: 5px 8px;
+     border: 1px solid #7778bf;
+     padding: 5px 8px 5px 34px;
      border-radius: 2px;
-     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
+     background: url(/themes/console/images/info/question.png) 8px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
+     background-size: 20px 20px, 100% 100%, 100% 100% !important;
+     background-blend-mode: luminosity, normal, normal;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
      text-transform: none;
      letter-spacing: 0;
@@ -239,13 +266,14 @@ form[action="subscriptions"] #content {
 #content p {
      margin-left: 15px;
      margin-right: 15px;
+     line-height: 130%;
 }
 
 div#add {
      border: 1px solid #7778bf;
      margin-top: -1px;
      padding: 0 15px;
-     background: #fff;
+     background: #fafaff;
 }
 
 .iframed #add {
@@ -283,6 +311,7 @@ div.help {
      border: 1px solid #7778bf;
      padding: 0 15px;
      background: #eef;
+     background: linear-gradient(135deg, #fafaff, #f8f8ff);
      margin: -11px 0 0;
 }
 
@@ -292,15 +321,17 @@ div.help {
 
 .help#helpsubs {
      background: #eef url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
+     background: url(/themes/console/images/info/infohelp.png) 10px center no-repeat, linear-gradient(135deg, #fafaff, #f8f8ff);
      padding: 0 15px 0 45px;
      font-size: 10pt;
 }
 
-div.help h3 {
+div.help h3, #add h3 {
      border: 1px solid #7778bf;
      padding: 5px 10px;
      margin: -1px -16px 0;
-     background: #fff;
+     background: #fcfcff;
+     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
 }
 
 p#help {
@@ -438,7 +469,7 @@ p.messages {
 #footer {
      border: 1px solid #7778bf;
      background: #eef;
-     background: linear-gradient(to right, #eef, #fff, #eef);
+     background: linear-gradient(to right, #eef, #fafaff, #eef);
      margin: -1px 0 -5px;
      box-shadow: inset 0 0 0 1px #fff;
 }
@@ -465,8 +496,17 @@ p.footer {
      box-shadow: inset 0 0 0 1px #ccc;
      background: #fff;
      opacity: 0.85;
-     filter: drop-shadow(0 0 1px #999);
+     filter: drop-shadow(0 0 1px #ccc);
      text-align: center;
+}
+
+.iframed .illustrate {
+     background: #fafaff;
+     background: linear-gradient(to bottom, #fafaff 70%, rgba(220,220,255,0.1)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.6) 3px, #fff 5px) #fff;
+}
+
+.iframed .illustrate:hover {
+     background: #fff;
 }
 
 _:-ms-lang(x), img.illustrate {
@@ -493,49 +533,74 @@ _:-ms-lang(x), img.illustrate {
      min-width: 520px;
 }
 
+input[type="text"], input[type="password"], textarea {
+     padding: 5px !important;
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
+     border: 1px solid #999daf;
+     border-radius: 2px;
+     color: #33333f;
+     background: #f8f8ff;
+     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
+     filter: drop-shadow(0px 0 1px #ccf);
+}
+
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+     color: #19191f;
+     box-shadow: 0 0 1px #89f;
+     background: #fff !important;
+     border: 1px solid #676c7f;
+}
+
 textarea {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-size: 9pt;
      width: 100%;
      border-radius: 2px;
-     border: 1px solid #7778bf;
+     border: 1px solid #999daf;
      padding: 1px 3px;
-     color: #333;
+     color: #33333f;
      resize: none;
 }
 
-input[type="text"], input[type="password"], textarea {
-     padding: 5px !important;
-     box-shadow: inset 1px 1px 2px #bbb;
-     border: 1px solid #999;
-     border-radius: 2px;
-     color: #333;
-     background: #fff;
+#content textarea  {
+     margin: 0 0 0 -15px;
+     border: none;
+     width: 100%;
+     resize: none;
+     filter: none;
+     box-shadow: none;
 }
 
-input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
-     color: #111;
-     box-shadow: 0 0 1px #89f;
-     background: #fff !important;
+.iframed #content textarea {
+     border: 1px solid #7778bf;
+     margin: 0;
 }
 
-textarea[name="config"] {
+textarea[name="config"], textarea[name="content"] {
      border-radius: 0;
      box-shadow: none;
      border: 1px solid #7778bf;
+     background: #fafaff;
+     width: 100% !important;
+     padding: 3px 6px !important;
+     filter: none;
+}
+
+textarea[name="config"]:focus, textarea[name="content"]:focus {
+     background: #fff;
 }
 
 #config + #buttons {
      border: 1px solid #7778bf;
      margin: -2px 0 10px;
-     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 #filter, #search {
     border: 1px solid #7778bf;
     padding: 5px 15px;
     margin-bottom: -1px;
-    background: #fff;
+    background: #fafaff;
 }
 
 #search {
@@ -566,15 +631,16 @@ td.search:first-child {
      text-align: center;
 }
 
-#filter a {
-     border: 1px solid #7778bf;
-     padding: 4px 8px;
+#filter a, #filter a:visited {
      display: inline-block;
-     min-width: 20px;
-     text-align: center;
-     border-radius: 2px;
-     text-transform: capitalize;
+     min-width: 10px;
      margin: 2px 1px;
+     padding: 4px 8px;
+     border: 1px solid #7778bf;
+     border-radius: 2px;
+     color: #3b6bbf;
+     text-align: center;
+     text-transform: capitalize;
      background: #fff;
      filter: drop-shadow(0 0 1px #ccc);
 }
@@ -588,7 +654,7 @@ td.search:first-child {
      background: #f60;
      text-decoration: none;
      box-shadow: inset 0 0 0 1px #fff;
-     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #333;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #33333f;
 }
 
 #filter span {
@@ -598,14 +664,14 @@ td.search:first-child {
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      vertical-align: middle;
-     border: 1px solid #77789f;
+     border: 1px solid #7778bf;
      border-radius: 0 0 2px 2px;
      padding: 6px 10px;
      width: 40%;
      min-width: 300px;
      margin: -1px 10%;
      box-shadow: inset 0 0 0 1px #fff;
-     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
+     background: linear-gradient(to bottom, #fcfcff 50%, #eef 50%);
 }
 
 #filter span a {
@@ -617,9 +683,8 @@ td.search:first-child {
 
 #filter span b {
      font-size: 11pt;
-     margin: 0 5px;
+     margin: 0 3px 0 0;
      text-transform: uppercase;
-     color: #111;
      line-height: 80%;
 }
 
@@ -653,12 +718,12 @@ form {
 }
 
 th {
-     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
+     background: linear-gradient(to bottom, #fcfcff 50%, #eef 50%);
      font-size: 9pt;
 }
 
 table {
-     background: #fff;
+     background: #fafaff;
 }
 
 table.book {
@@ -671,7 +736,7 @@ table.book {
 
 .book th:last-child  {
      background: #fff url(/themes/console/images/buttons/delete.png) center center no-repeat;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 50%);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fcfcff 50%, #eef 50%);
      width: 16px;
 }
 
@@ -682,6 +747,10 @@ table.book {
 
 .book tr:hover td {
      background: #ffd;
+}
+
+tr:hover .destaddress {
+     color: #333 !important;
 }
 
 .book tr:first-child td, .book tr.head + .list1 td {
@@ -712,7 +781,7 @@ table.book {
 }
 
 #host_list td:last-child {
-     width: 16px;
+     width: 1%;
      white-space: nowrap;
      font-weight: bold;
 }
@@ -744,6 +813,7 @@ table.book {
 
 #host_list td:nth-child(3) a::after {
      content: url(/themes/console/images/buttons/helper.png);
+     filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
@@ -768,7 +838,7 @@ table.book {
      filter: drop-shadow(0 0 1px #f60);
 }
 
-.destaddress:focus {
+#host_list .destaddress:focus {
      background: #ffd;
 }
 
@@ -777,8 +847,21 @@ table.book {
      white-space: nowrap;
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-weight: normal;
-     color: #555;
+     color: #5a5a6f;
      padding: 3px !important;
+}
+
+#host_list .destaddress:not(old) {
+     overflow: hidden !important;
+     text-overflow: ellipsis;
+}
+
+#host_list .destaddress:not(old):focus {
+     overflow: auto !important;
+     text-overflow: clip;
+     padding: 1px 3px 3px !important;
+     margin-bottom: -2px;
+     color: #33333f;
 }
 
 td.destinations {
@@ -786,7 +869,6 @@ td.destinations {
      border-left: 1px solid #ddf;
      border-right: 1px solid #ddf;
      padding: 0;
-     background: #fff;
 }
 
 td.destinations textarea {
@@ -799,7 +881,7 @@ td.destinations textarea {
 /* host details page */
 
 #host_details td {
-     padding: 5px 10px !important;
+     padding: 5px !important;
 }
 
 #host_details td:first-child {
@@ -837,7 +919,7 @@ td.destinations textarea {
      border: 1px solid #7778bf !important;
      margin-top: -1px;
      border-radius: 2px;
-     background: #fff;
+     background: #fafaff;
      padding-top: 0;
 }
 
@@ -849,12 +931,13 @@ td.destinations textarea {
      border-bottom: 1px solid #7778bf;
      padding: 8px 10px 6px;
      margin-top: 0;
-     background: linear-gradient(to bottom, #fff 50%, #eef 50%);
+     background: linear-gradient(to bottom, #fcfcff 50%, #eef 50%);
      box-shadow: inset 0 0 0 1px #fff;
 }
 
 #idAddress {
      text-transform: none;
+     letter-spacing: 0;
 }
 
 #visualid table {
@@ -879,10 +962,10 @@ td.destinations textarea {
 
 #visualid td[colspan="2"] {
      text-align: right;
-     padding: 20px 5px;
+     padding: 17px 5px;
      border-top: 1px solid #7778bf;
      background: #fff;
-     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
 }
 
 img[src^="/imagegen"] {
@@ -893,6 +976,10 @@ img[src^="/imagegen"] {
      border-radius: 2px;
      background: #fff;
      filter: drop-shadow(0 0 1px #ccc);
+}
+
+img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
+     opacity: 0; /* hide broken identicons but ensure hostlist remains intact */
 }
 
 /* end host details */
@@ -941,7 +1028,7 @@ img[src^="/imagegen"] {
 div#book {
     padding: 8px;
     background: #efefff;
-    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.5) 3px, #fff 5px), #fff;
+    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(220, 220, 255, 0.5) 3px, #fff 5px) #fafaff;
     box-shadow: inset 0 0 0 1px #fff;
 }
 
@@ -950,15 +1037,15 @@ div#book {
 }
 
 p.book {
-     background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat;
-     padding: 5px 5px 5px 33px;
+     background: url(/themes/susidns/images/abook.png) 2px center no-repeat;
+     padding: 5px 5px 5px 24px;
 }
 
 #buttons {
      padding: 5px;
      text-align: right;
-     background: #fff;
-     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: #fafaff;
+     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
 }
 
 p.buttons {
@@ -989,10 +1076,11 @@ input[type="radio"], input[type="checkbox"] {
      cursor: pointer;
      min-width: 16px !important;
      min-height: 16px !important;
+     filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 1px #ccf);
 }
 
 input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
-     filter: drop-shadow(0 0 3px #89f);
+     filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 3px #89f);
 }
 
 input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner, button::-moz-focus-inner  {
@@ -1006,17 +1094,17 @@ input[type="submit"], input[type="reset"], .fakebutton {
      padding: 4px 3px;
      text-decoration: none;
      border-radius: 2px;
-     border: 1px solid #999;
+     border: 1px solid #999daf;
      box-shadow: inset 0 0 0 1px #fff;
      background: #eee;
      background: linear-gradient(to bottom, #fff, #ddd);
-     color: #333;
-     filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     color: #33333f;
+     filter: saturate(70%) drop-shadow(0 0 1px #ccf);
      cursor: pointer;
 }
 
 a.fakebutton {
-     color: #333;
+     color: #33333f;
      font-weight: normal;
 }
 
@@ -1140,7 +1228,7 @@ input.search {
      background: #eee url(/themes/console/images/buttons/search.png) no-repeat 6px center;
      background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
      background-size: 14px 14px, 100% 100%;
-     padding: 6px 8px 6px 22px;
+     padding: 5px 8px 5px 24px;
 }
 
 input.search:hover, input.search:focus {
@@ -1150,8 +1238,8 @@ input.search:hover, input.search:focus {
 }
 
 input.search[type="text"] {
-     background: #fff url(/themes/console/images/buttons/search.png) no-repeat 6px center;
-     padding: 5px 5px 5px 28px !important;
+     background: #f8f8ff url(/themes/console/images/buttons/search.png) no-repeat 6px center;
+     padding: 5px 5px 5px 26px !important;
      margin: 1px 5px 0;
 }
 
@@ -1197,6 +1285,81 @@ form[action="addressbook"] table {
      margin-top: -2px !important;
 }
 
+
+/* custom radios/checkboxes for chrome/blink  */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution:.001dpcm) {
+input[type="checkbox"], input[type="checkbox"]:checked, input[type="checkbox"][disabled], input[type="checkbox"][disabled]:checked {
+     background: #f8f8ff;
+     width: 19px !important;
+     height: 19px !important;
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
+     border-radius: 2px;
+     -webkit-appearance: inherit;
+     border: 1px solid #999daf !important;
+     position: relative;
+     box-sizing: border-box;
+     filter: drop-shadow(0 0 1px #ccf);
+     vertical-align: middle !important;
+}
+
+input[type="checkbox"]:checked::before {
+     position: absolute;
+     top: 1px;
+     left: 1px;
+     content: "\2714";
+     border-radius: 1px;
+     font-size: 15pt;
+     color: #41465f;
+     line-height: 80%;
+     font-family: sans-serif;
+     overflow: hidden;
+     width: 16px;
+     height: 16px;
+}
+
+input[type="radio"], input[type="radio"]:checked, input[type="radio"][disabled], input[type="radio"][disabled]:checked {
+     background: #f8f8ff;
+     width: 19px !important;
+     height: 19px !important;
+     box-shadow: inset 0 0 2px #7778bf;
+     border-radius: 50%;
+     -webkit-appearance: none;
+     border: 1px solid #999daf !important;
+     position: relative;
+     box-sizing: border-box;
+     filter: drop-shadow(0 0 1px #ccf);
+     vertical-align: middle !important;
+}
+
+input[type="radio"]:checked::before {
+     content: "";
+     position: absolute;
+     border-radius: 50%;
+     left: 25%;
+     top: 25%;
+     width: 9px;
+     height: 9px;
+     background: #41465f;
+}
+
+input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
+     background: #fff;
+     width: 19px !important;
+     height: 19px !important;
+     filter: drop-shadow(0 0 3px #89f) !important;
+}
+
+input[type="checkbox"][disabled], input[type="radio"][disabled], input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
+input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked, input[type="checkbox"][disabled]:checked:hover, input[type="radio"][disabled]:checked:hover {
+     filter: none !important;
+     box-shadow: none !important;
+     opacity: 0.5;
+}
+}
+
+/* end custom radios/checkboxes */
+
 /* responsive layout */
 
 @media screen and (max-width: 680px) {
@@ -1215,6 +1378,22 @@ form[action="addressbook"] table {
 }
 }
 
+@media screen and (max-width: 1200px) {
+#filter {
+     padding: 0 5px;
+}
+
+#filter p {
+     margin-left: 0;
+     margin-right: 0;
+}
+
+#filter a {
+     min-width: 6px;
+     padding: 2px 6px;
+}
+}
+
 @media screen and (min-width: 1400px) {
 body, p, td, textarea, input, button, li, a, th, h4 {
      font-size: 10pt !important;
@@ -1226,10 +1405,6 @@ code, tt, .destaddress {
 
 #navi a {
      font-size: 11pt;
-}
-
-h3 {
-     font-size: 12pt !important;
 }
 
 #export {
@@ -1256,7 +1431,7 @@ input.export {
 }
 
 .headline h4 {
-     background: rgba(0, 0, 0, 0) url(/themes/susidns/images/drive.png) no-repeat scroll 10px 8px;
+     background: url(/themes/susidns/images/drive.png) no-repeat scroll 10px 8px;
 }
 }
 

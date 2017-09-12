@@ -245,7 +245,7 @@ public class RandomArt {
 	if (mod != 0) {
 		//base += mod * 16;
 		//base += mod * 16 * 256;
-		base += mod * 5 * 256 * 256;
+		base += mod * (5 * 256 * 256L);
 	}
 	if (base > 0xffffff || base < 0)
 		base &= 0xffffff;

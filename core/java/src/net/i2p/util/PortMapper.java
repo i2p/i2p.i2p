@@ -179,7 +179,7 @@ public class PortMapper {
      */
     public void renderStatusHTML(Writer out) throws IOException {
         List<String> services = new ArrayList<String>(_dir.keySet());
-        out.write("<h2>Port Mapper</h2><table><tr><th>Service<th>Host<th>Port\n");
+        out.write("<h2 id=\"debug_portmapper\">Port Mapper</h2><table id=\"portmapper\"><tr><th>Service<th>Host<th>Port\n");
         Collections.sort(services);
         for (String s : services) {
             InetSocketAddress ia = _dir.get(s);

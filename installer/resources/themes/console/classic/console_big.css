@@ -11,6 +11,10 @@
      line-height: 140% !important;
 }
 
+b {
+     font-weight: normal !important;
+}
+
 input[type="submit"], input[type="cancel"], input[type="file"], button, button.search, input.cancel {
      font-size: 11pt !important;
      padding-top: 3px;
@@ -26,28 +30,30 @@ input[type="submit"], input[type="cancel"], input[type="file"], button, button.s
 
 .routersummary button {
      min-width: 100px !important;
+     padding-top: 3px !important;
+     padding-bottom: 3px !important;
 }
 
 /* sidepanel */
 
-div.routersummary h3, .routersummary h3 a  {
+.routersummary h3, .routersummary h3 a  {
      font-size: 13pt !important;
 }
 
-div.routersummary h4, .routersummary h4 a {
+.routersummary h4, .routersummary h4 a {
      font-size: 13pt !important;
      letter-spacing: 0;
 }
 
-div.routersummary td {
+.routersummary td {
      font-size: 11pt;
 }
 
-div.routersummary {
+.routersummary {
      width: 220px;
 }
 
-div.routersummary table {
+.routersummary table {
      width: 219px !important;
 }
 
@@ -64,7 +70,7 @@ div.routersummary table {
      font-size: 10pt !important;
 }
 
-div.routersummary table a:link, div.routersummary table a:visited {
+.routersummary table a:link, .routersummary table a:visited {
      font-size: 12pt;
      font-weight: normal;
      text-shadow: none;
@@ -74,7 +80,7 @@ div.routersummary table a:link, div.routersummary table a:visited {
 
 /* global overrides */
 
-a, b, div.routersummary h3 a, div.routersummary h4 {
+a, b, .routersummary h3 a, .routersummary h4 {
     font-weight: normal !important;
     font-size: 100%;
 }
@@ -158,11 +164,11 @@ div.main, div.news, h1, .sorry {
      margin-right: 8px;
 }
 
-div.joblog li i {
-     font-weight: normaL;
+.joblog li i {
+     font-weight: normal;
 }
 
-b, div.joblog b {
+.joblog b {
     color: #003;
     font-size: 110%;
 }
@@ -173,7 +179,7 @@ table code {
 
 .tab, .tab2 {
      font-size: 11pt;
-} 
+}
 
 .applabel a {
      padding: 0 2px 6px !important;
@@ -343,23 +349,25 @@ h3#iptransport a::after, h3#advancedconfig a::after {
      background: #eef;
      margin-top: 15px !important;
      margin-bottom: -20px !important;
-     padding: 10px 10px 5px;
+     padding: 10px;
      border-radius: 4px;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.twocol {
+     margin-top: 5px !important;
+}
+}
+
 .twocol li {
-     margin-left: 35px !important;
-     margin-right: 0;
-     margin-top: 0;
-     margin: 0 0 0 35px !important;
+     margin: 0 0 0 20px !important;
      padding: 0 0 10px !important;
 }
 
 .twocol li:first-child {
-     margin-top: 0 !important;
+     margin-top: 5px !important;
      margin-bottom: 10px !important;
      padding-top: 0 !important;
-     padding-left: 0 !important;
 }
 
 div[lang="zh"] a {
@@ -404,12 +412,11 @@ a:hover code {
 div.applabel {
      height: 22px !important;
      padding: 2px;
-     width: 140px;
 }
 }
 
 @media screen and (min-width: 0) {
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
      margin-top: -1px;
      transform: none;
      width: 210px;
@@ -486,6 +493,31 @@ div.news h3, .newsDate, div.news a {
 #netdboverview th {
      font-size: 12pt !important;
 }
+
+.sb_newsheadings td, .sb_newsheadings tr:hover td {
+     background-position: 4px center !important;
+}
+
+.sb_newsheadings td a {
+     font-size: 9pt !important;
+}
+
+.main#tunnels td, .tunnel_cap, .tunnel_id, #tunnels .cells, #tunnels tt a {
+     font-size: 10pt !important;
+     letter-spacing: 0 !important;
+     word-spacing: 0 !important;
+}
+
+.tunnel_peer {
+     min-width: 60px !important;
+}
+
+b.tunnel_cap, .tunnel_cap b {
+     min-width: 18px;
+     color: #fff !important;
+     font-size: 10pt !important;
+     text-shadow: 0 1px 1px #555 !important;
+}
 }
 
 @media screen and (min-width: 1200px) {
@@ -513,7 +545,7 @@ body, .main, .main td, .news p, #news p, .main li b, div.joblog li, .themelabel,
      margin-top: 2px !important;
 }
 
-div.routersummary img[src$="i2plogo.png"] {
+.routersummary img[src$="i2plogo.png"] {
      margin-left: 1px;
 }
 
@@ -521,23 +553,25 @@ div.routersummary img[src$="i2plogo.png"] {
      width: 225px !important;
 }
 
-div.app {
-     width: 164px;
-}
-
-div.applabel {
+.applabel {
      padding: 3px 2px 4px !important;
-     width: 160px !important;
-}
 }
 
-@media screen and (min-width: 1500px) {
 .langselect img[src^="/flags"] {
     margin-left: -92px !important;
 }
 
 .langselect input[name="lang"]:checked + img {
     margin-left: -93px !important;
+}
+
+.newsheadings {
+     margin-left: -2px !important;
+     margin-right: 0 !important;
+}
+
+.newsheadings ul {
+     width: 178px !important;
 }
 }
 

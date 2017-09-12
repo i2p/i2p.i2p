@@ -3,7 +3,7 @@
 /* Author: dr|z3d */
 
 body {
-     color: #333;
+     color: #33333f;
      font-family: "Droid Sans", "NotoSans", Ubuntu, "Bitstream Vera Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-size: 9pt;
      background: #a4a4cb url(/themes/console/light/images/tile2.png);
@@ -47,8 +47,33 @@ body.iframed {
      outline: none;
 }
 
+::selection {
+     background: #27377f !important;
+     color: white;
+     text-shadow: none;
+}
+
+::-moz-selection {
+     background: #27377f !important;
+     color: white;
+     text-shadow: none;
+}
+
+.footer, .bottombuttons, .topbuttons, th img, h3,
+#mailbox th:first-child, #mailbox th:nth-child(2), #mailbox th:nth-child(4), #mailbox th:nth-child(6), #mailbox th:nth-child(8),
+#mailbox td:first-child, #mailbox td:nth-child(2), #mailbox td:nth-child(4), #mailbox td:nth-child(6), #mailbox td:nth-child(8) {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
+b, h3, #pagenav td, th {
+     color: #41465f;
+     text-shadow: 0 1px 1px #fff;
+}
+
 li {
-     color: #333;
+     color: #33333f;
      line-height: 12pt;
      font-size: 8.5pt;
      margin-left: 5px;
@@ -56,7 +81,7 @@ li {
 }
 
 p {
-     color: #333;
+     color: #33333f;
      margin-left: 15px;
      margin-right: 15px;
      font-size: 8.5pt;
@@ -86,6 +111,7 @@ p.info {
 
 tr.mailbody, #message_full tr:first-child {
      box-shadow: inset 0 0 0 1px #fff;
+     background: #fafaff;
 }
 
 #mailhead tr {
@@ -126,7 +152,7 @@ div.footer {
      margin: -14px 0 10px;
      border: 1px solid #7778bf;
      background: #eef;
-     background: linear-gradient(to right, rgba(232,232,255,0.3) 35%, #fff 50%, rgba(232,232,255,0.3) 65%), repeating-linear-gradient(to bottom, #fff 1px, #ddf 2px, #fff 3px);
+     background: linear-gradient(to right, rgba(232,232,255,0.3) 35%, #fafaff 50%, rgba(232,232,255,0.3) 65%), repeating-linear-gradient(to bottom, #fff 1px, #ddf 2px, #fff 3px);
      box-shadow: inset 0 0 0 1px #fff;
 }
 
@@ -176,16 +202,16 @@ a:hover, a:focus, tr:hover td[onclick] a {
      color: #f60 !important;
 }
 
-a:active {
-     color: #f30;
-}
-
 a:visited {
      color: #6b97bf;
 }
 
+a:active, tr:hover td[onclick]:active a {
+     color: #f30 !important;
+}
+
 td {
-     color: #333;
+     color: #33333f;
      font-size:9pt;
      padding: 1px 3px;
 }
@@ -234,8 +260,8 @@ pre {
 }
 
 .page {
-     background-color: #fff;
-     color: #333;
+     background-color: #fcfcff;
+     color: #33333f;
      margin: 0;
      padding: 10px 10px 0;
      border-radius: 2px 2px 0 0;
@@ -251,7 +277,6 @@ pre {
      margin: 0;
      padding: 1px;
      border: none;
-     box-shadow: none;
      border-radius: 0;
 }
 
@@ -288,9 +313,8 @@ table#mailbox {
 }
 
 #mailbox th {
-     background: #fff;
-     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), #efefff;
-     color: #555;
+     background: #fafaff;
+     background: linear-gradient(to bottom, #fafaff 50%, #f2f2ff 50%);
      border-bottom: 1px solid #7778bf;
      white-space: nowrap;
      padding: 6px 5px !important;
@@ -298,22 +322,26 @@ table#mailbox {
 
 #mailbox th:first-child {
      background: #fff url(/themes/console/images/buttons/delete.png) center center no-repeat;
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), #efefff;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fafaff 50%, #f2f2ff 50%);
 }
 
 #mailbox th:nth-child(2) {
      background: #fff url(/themes/susimail/images/status.png) center center no-repeat;
-     background: url(/themes/susimail/images/status.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), #efefff;
+     background: url(/themes/susimail/images/status.png) center center no-repeat, linear-gradient(to bottom, #fafaff 50%, #f2f2ff 50%);
      background-blend-mode: luminosity, normal;
 }
 
 #mailbox th:nth-child(4) {
      background: #fff url(/susimail/icons/attach.png) center center no-repeat;
-     background: url(/susimail/icons/attach.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), #efefff;
+     background: url(/susimail/icons/attach.png) center center no-repeat, linear-gradient(to bottom, #fafaff 50%, #f2f2ff 50%);
 }
 
 #mailbox th:nth-child(5) {
      text-align: left;
+}
+
+#mailbox td {
+     color: #41465f !important;
 }
 
 #mailbox td:nth-child(5) {
@@ -353,7 +381,7 @@ table#mailbox {
 
 #mailbox td:nth-child(3) a, #mailbox td:nth-child(3) a:hover {
      font-weight: normal;
-     color: #333 !important;
+     color: #41465f !important;
 }
 
 #mailbox td[onclick]:last-child {
@@ -375,6 +403,10 @@ table#mailbox {
      display: none;
 }
 
+#mailbox tr:hover td, #mailbox tr:hover td:nth-child(3) a {
+     color: #33333f !important;
+}
+
 form {
      line-height: 160%
 }
@@ -382,8 +414,8 @@ form {
 .header + form {
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
-     background: #fff;
-     background: rgba(220,220,255,0.05);
+     background: #f4f4ff;
+     background: linear-gradient(to bottom, #f8f8ff, #f2f2ff);
      box-shadow: 0 0 0 1px #fff;
 }
 
@@ -436,6 +468,7 @@ form {
      width: 45px;
      white-space: nowrap;
      font-weight: bold;
+     color: #41465f;
 }
 
 button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner  {
@@ -457,10 +490,11 @@ input[type="radio"], input[type="checkbox"] {
      outline: none;
      min-width: 16px;
      min-height: 16px;
+     filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 1px #ccf);
 }
 
 input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
-     filter: drop-shadow(0 0 3px #89f);
+     filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 3px #89f);
 }
 
 input[type="text"], input[type="password"] {
@@ -470,11 +504,11 @@ input[type="text"], input[type="password"] {
 }
 
 input[type="submit"], input[type="reset"] {
-     border: 1px solid #999;
+     border: 1px solid #999daf;
      box-shadow: inset 0 0 0 1px #fff;
      background: #eee;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     color: #333;
+     color: #33333f;
      margin: 3px;
      font: 9pt "Droid Sans", "NotoSans", Ubuntu, "Bitstream Vera Sans", "Segoe UI", Verdana, "Lucida Grande", Helvetica, sans-serif;
      padding: 4px 5px;
@@ -483,7 +517,7 @@ input[type="submit"], input[type="reset"] {
      border-radius: 2px;
      opacity: 1;
      background-size: 14px auto, 100% 100% !important;
-     filter: saturate(70%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     filter: saturate(70%) drop-shadow(0 0 1px rgba(180, 180, 255, 0.6));
      cursor: pointer;
 }
 
@@ -504,7 +538,7 @@ input[type="submit"]:active, input[type="reset"]:active {
 input[disabled], input[disabled]:hover, input[disabled]:focus {
      opacity: 0.4;
      cursor: default;
-     border: 1px solid #999;
+     border: 1px solid #999daf;
 }
 
 input.cancel {
@@ -755,6 +789,10 @@ input.setpagesize, input.save {
      padding: 5px 7px 5px 24px;
 }
 
+input.setpagesize {
+     padding-right: 9px !important;
+}
+
 input.send {
      background: #eee url(/themes/susimail/images/send.png) no-repeat 6px center;
      background: url(/themes/susimail/images/send.png) no-repeat 6px center, linear-gradient(to bottom, #fff 0%, #ddd 100%);
@@ -809,7 +847,7 @@ a.sort {
 }
 
 img.sort {
-     border: 1px solid #999;
+     border: 1px solid #999daf;
      border-radius: 2px;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
      margin: 0;
@@ -835,25 +873,42 @@ input[type="file"] {
 
 input[type="text"], input[type="password"], textarea {
      padding: 5px !important;
-     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
-     border: 1px solid #999;
+     background: #fafaff;
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
+     border: 1px solid #999daf;
      border-radius: 2px;
-     color: #333;
+     color: #33333f;
+     filter: drop-shadow(0px 0 1px #ccf);
 }
 
 input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
-     color: #111;
+     color: #19191f;
      box-shadow: 0 0 1px #89f;
+     background: #fff;
+     border: 1px solid #676c7f;
 }
 
 input[type="text"][disabled] {
      opacity: 1;
      background: #e9e9e9;
+     color: #4d4d5f;
+     filter: none;
 }
 
 textarea {
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-size: 9pt;
+}
+
+hr {
+     color: #999daf;
+     background: #999daf;
+     height: 1px;
+     border: none;
+     width: 100%;
+     margin: 5px;
+     text-align: center;
+     opacity: 0.5;
 }
 
 #composemail {
@@ -908,17 +963,20 @@ div#mailheader {
 
 #newmail td:first-child {
      font-weight: bold;
+     color: #41465f;
 }
 
-div#dologin {
-     border: 1px solid #555;
-     padding: 10px 10px 0;
-     border-radius: 2px;
-     width: 600px;
+/* login panel */
+
+#dologin {
      margin: 40px auto 40px;
-     box-shadow: inset 0 0 2px 2px rgba(225, 225, 255, 0.5), 0 0 1px rgba(204, 204, 204, 0.6);
-     background: #fff;
-     background: linear-gradient(to bottom, #fff, rgba(232,232,255,0.5)), linear-gradient(to bottom, rgba(255,255,255,0.7) 5%, rgba(220,220,255,0.9)), linear-gradient(to right, #fff, #efefff, #fff);
+     padding: 10px 10px 0;
+     width: 600px;
+     border: 1px solid #77789f;
+     border-radius: 2px;
+     box-shadow: inset 0 0 2px 2px rgba(225, 225, 255, 0.5), 0 0 2px rgba(100, 100, 200, 0.6);
+     background: #fafaff;
+     background: linear-gradient(to bottom, #fafaff, rgba(232,232,255,0.5)), linear-gradient(to bottom, rgba(255,255,255,0.7) 5%, rgba(220,220,255,0.9)), linear-gradient(to right, #fff, #efefff, #fff);
      background-size: 100% 100%, auto 2px, 100%, 100%;
 }
 
@@ -926,10 +984,14 @@ div#dologin {
      margin: 30px auto 30px;
 }
 
+.iframed #dologin table {
+     margin-top: 30px;
+}
+
 #dologin td {
      padding: 3px;
      font-weight: bold;
-     color: #444;
+     color: #41465f;
 }
 
 #dologin td:first-child {
@@ -941,14 +1003,17 @@ div#dologin {
 }
 
 #dologin h1 {
-     border-bottom: 1px solid #999;
+     background: #fafaff;
+     background: linear-gradient(to bottom, #fff 50%, #f2f2ff 50%);
+     border-bottom: 1px solid #77789f;
+     color: #4c526f;
      text-transform: uppercase;
-     letter-spacing: 0.08em;
+     letter-spacing: 0.1em;
      word-spacing: 0.1em;
      font-size: 14pt;
      text-align: left;
-     padding: 0 10px 12px 15px;
-     margin: 5px -9px;
+     padding: 12px 10px 12px 15px;
+     margin: -9px -9px 5px;
 }
 
 .iframed #dologin h1 {
@@ -959,29 +1024,81 @@ div#dologin {
      text-align: left !important;
 }
 
-#dologin input[name="user"] {
-     background: #fff url(/themes/console/images/buttons/user.png) 5px 6px no-repeat;
+#dologin input[name="user"], #dologin input[name="pass"] {
      padding: 5px 5px 5px 26px !important;
+     background-blend-mode: luminosity;
+}
+
+#dologin input[name="user"] {
+     background: #fafaff url(/themes/console/images/buttons/user.png) 5px 6px no-repeat !important;
 }
 
 #dologin input[name="pass"] {
-     background: #fff url(/themes/console/images/buttons/password.png) 5px 5px no-repeat;
-     padding: 5px 5px 5px 26px !important;
+     background: #fafaff url(/themes/console/images/buttons/password.png) 5px 5px no-repeat !important;
+}
+
+#dologin input[name="user"]:focus, #dologin input[name="pass"]:focus {
+     background-color: #fff !important;
+     background-blend-mode: normal;
 }
 
 #dologin input[name="user"], #dologin input[name="pass"], #dologin input[name="host"] {
      width: 240px;
+     margin-right: 5px;
 }
 
-hr {
-     color: #999;
-     background: #999;
-     height: 1px;
-     border: 0 solid #999;
-     width: 100%;
-     margin: 5px 0;
-     text-align: center;
+#dologin hr {
+     margin: 0 0 4px;
+     background: #77789f;
+     background: linear-gradient(to right, rgba(119, 120, 159, 0), #1d1f4f, rgba(119, 120, 159, 0));
 }
+
+#dologin tr:last-child hr {
+     margin-top: 3px;
+}
+
+.iframed #dologin tr:nth-child(6) hr {
+     margin-top: 5px;
+}
+
+#dologin tr:last-child a {
+     display: inline-block;
+     margin: 8px -2px 6px;
+     padding: 3px 10px;
+     border: 1px solid rgba(255,255,255,0);
+     border: 1px solid rgba(119, 120, 159, 0.3);
+     border-radius: 25px;
+     background: #efefff;
+     background: linear-gradient(to right, rgba(252,252,255,0.3), #f6f6ff, rgba(252,252,255,0.3));
+     box-shadow: 0 0 1px rgba(255,255,255,0);
+     transition: ease all 0.1s;
+}
+
+#dologin tr:last-child a:hover {
+     border: 1px solid #77789f;
+     border: 1px solid rgba(119, 120, 159, 0.5);
+     background: #f2f2ff;
+     background: linear-gradient(to bottom, #fafaff 50%, #e8e8ff 50%) #f2f2ff;
+     box-shadow: 0 0 1px #ccf;
+     transition: ease all 0.1s;
+}
+
+#dologin tr:last-child a:active {
+     border: 1px solid rgba(119, 120, 159, 0.3);
+     background: #e2e2ff;
+     background: linear-gradient(to bottom, #eaeaff 50%, #d9d9ff 50%);
+     box-shadow: inset 3px 3px 3px #779;
+     transition: ease all 0.1s;
+     color: rgba(65, 70, 95, 0.8) !important;
+     color: #99a5df !important;
+}
+
+#dologin tr:last-child td {
+     color: transparent;
+     color: rgba(119, 120, 159, 0);
+}
+
+/* end login panel */
 
 textarea[name="config_text"] {
      margin-bottom: 15px;
@@ -995,7 +1112,6 @@ div#pagenav {
      font-size: 9.5pt;
      border-radius: 0 0 2px 2px;
 }
-
 
 h3#config {
      text-align: center;
@@ -1011,7 +1127,8 @@ h3#config {
      background: #efefff;
      box-shadow: inset 0 0 0 1px #fff;
      text-shadow: 0 1px 1px #fff;
-     background: linear-gradient(to right, #efefff, #fff, #efefff);
+     background: #fafaff;
+     background: linear-gradient(to right, rgba(240,240,255,0.1), rgba(252,252,252,0.5), rgba(240,240,255,0.1)), linear-gradient(to bottom, #fafaff 50%, #f2f2ff 50%);
 }
 
 .topbuttons {
@@ -1168,7 +1285,7 @@ _:-ms-lang(x), tr.bottombuttons, .topbuttons {
 }
 
 tr.bottombuttons:last-child {
-     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
+     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff !important;
 }
 
 tr.bottombuttons table#pagenav {
@@ -1192,23 +1309,31 @@ tr.bottombuttons:empty {
      right: 0;
      text-align: center;
      margin: 0 -20px;
-     padding: 5px 10px;
+     padding: 3px 10px;
      z-index: 10;
      opacity: 0.85;
      border-top: 1px solid #fff;
-     background: #113;
+     background: url(/themes/snark/light/images/delete.png) right 24px top 4px no-repeat #113;
+     background-blend-mode: luminosity;
 }
 
 .iframed .notifications {
+     background: url(/themes/snark/light/images/delete.png) right 6px top 5px no-repeat #113;
      margin-bottom: 9px;
      border-radius: 4px 4px 0 0;
      border: none;
-     margin: 0 20% 9px;
+     margin: 0 3% 10px;
 }
 
-.notifications p.info {
+.notifications:hover {
+     background-image: url(/themes/snark/light/images/delete_hover.png);
+     background-blend-mode: normal;
+}
+
+.notifications p.info, .notifications p.info b {
      font-size: 10pt !important;
      color: #fff;
+     text-shadow: none !important;
 }
 
 .notifications p {
@@ -1260,8 +1385,91 @@ td p.error {
 }
 
 #prefsave {
-     margin-bottom: 25px !important;
+     margin-top: 4px;
+     padding-top: 10px;
+     padding-bottom: 10px;
+     border-top: 1px solid #7778bf;
+     background: #f6f6ff;
+     box-shadow: inset 0 0 0 1px #fff;
 }
+
+.iframed #prefsave {
+     padding-bottom: 9px;
+}
+
+/* custom radios/checkboxes for chrome/blink  */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution:.001dpcm) {
+input[type="checkbox"], input[type="checkbox"]:checked, input[type="checkbox"][disabled], input[type="checkbox"][disabled]:checked {
+     background: #f8f8ff;
+     width: 19px !important;
+     height: 19px !important;
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
+     border-radius: 2px;
+     -webkit-appearance: inherit;
+     border: 1px solid #999daf !important;
+     position: relative;
+     box-sizing: border-box;
+     filter: drop-shadow(0 0 1px #ccf);
+     vertical-align: middle !important;
+}
+
+input[type="checkbox"]:checked::before {
+     position: absolute;
+     top: 1px;
+     left: 1px;
+     content: "\2714";
+     border-radius: 1px;
+     font-size: 15pt;
+     color: #41465f;
+     line-height: 80%;
+     font-family: sans-serif;
+     overflow: hidden;
+     width: 16px;
+     height: 16px;
+}
+
+input[type="radio"], input[type="radio"]:checked, input[type="radio"][disabled], input[type="radio"][disabled]:checked {
+     background: #f8f8ff;
+     width: 19px !important;
+     height: 19px !important;
+     box-shadow: inset 0 0 2px #7778bf;
+     border-radius: 50%;
+     -webkit-appearance: none;
+     border: 1px solid #999daf !important;
+     position: relative;
+     box-sizing: border-box;
+     filter: drop-shadow(0 0 1px #ccf);
+     vertical-align: middle !important;
+}
+
+input[type="radio"]:checked::before {
+     content: "";
+     position: absolute;
+     border-radius: 50%;
+     left: 25%;
+     top: 25%;
+     width: 9px;
+     height: 9px;
+     background: #41465f;
+}
+
+input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
+     background: #fff;
+     width: 19px !important;
+     height: 19px !important;
+     filter: drop-shadow(0 0 3px #89f) !important;
+}
+
+input[type="checkbox"][disabled], input[type="radio"][disabled], input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
+input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked, input[type="checkbox"][disabled]:checked:hover, input[type="radio"][disabled]:checked:hover {
+     filter: none !important;
+     box-shadow: none !important;
+     opacity: 0.5;
+}
+}
+
+/* end custom radios/checkboxes */
 
 /* responsive layout */
 

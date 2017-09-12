@@ -344,49 +344,49 @@ public class PeerHelper extends HelperBase {
         }
         buf.append(".</h3>\n");
         buf.append("<div class=\"widescroll\"><table id=\"udpconnections\">\n");
-        buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_t("Peer")).append("</a><br>");
+        buf.append("<tr class=\"smallhead\"><th nowrap><a href=\"#def.peer\">").append(_t("Peer")).append("</a><br>");
         if (sortFlags != FLAG_ALPHA)
             appendSortLinks(buf, urlBase, sortFlags, _t("Sort by peer hash"), FLAG_ALPHA);
-        buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dir\" title=\"")
+        buf.append("</th><th nowrap><a href=\"#def.dir\" title=\"")
            .append(_t("Direction/Introduction")).append("\">").append(_t("Dir"))
-           .append("</a></th><th class=\"smallhead\" nowrap>").append(_t("IPv6"))
-           .append("</th><th class=\"smallhead\" nowrap><a href=\"#def.idle\">").append(_t("Idle")).append("</a><br>");
+           .append("</a></th><th nowrap>").append(_t("IPv6"))
+           .append("</th><th nowrap><a href=\"#def.idle\">").append(_t("Idle")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle inbound"), FLAG_IDLE_IN);
         buf.append(" / ");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by idle outbound"), FLAG_IDLE_OUT);
         buf.append("</th>");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.rate\">").append(_t("In/Out")).append("</a><br>");
+        buf.append("<th nowrap><a href=\"#def.rate\">").append(_t("In/Out")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by inbound rate"), FLAG_RATE_IN);
         buf.append(" / ");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by outbound rate"), FLAG_RATE_OUT);
         buf.append("</th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.up\">").append(_t("Up")).append("</a><br>");
+        buf.append("<th nowrap><span class=\"peersort\"><a href=\"#def.up\">").append(_t("Up")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by connection uptime"), FLAG_UPTIME);
-        buf.append("</span></th><th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.skew\">").append(_t("Skew")).append("</a><br>");
+        buf.append("</span></th><th nowrap><span class=\"peersort\"><a href=\"#def.skew\">").append(_t("Skew")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by clock skew"), FLAG_SKEW);
         buf.append("</span></th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.cwnd\">CWND</a><br>");
+        buf.append("<th nowrap><a href=\"#def.cwnd\">CWND</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by congestion window"), FLAG_CWND);
-        buf.append("</th><th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.ssthresh\">SST</a><br>");
+        buf.append("</th><th nowrap><span class=\"peersort\"><a href=\"#def.ssthresh\">SST</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by slow start threshold"), FLAG_SSTHRESH);
         buf.append("</span></th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.rtt\">RTT</a><br>");
+        buf.append("<th nowrap><span class=\"peersort\"><a href=\"#def.rtt\">RTT</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by round trip time"), FLAG_RTT);
-        //buf.append("</th><th class=\"smallhead\" nowrap><a href=\"#def.dev\">").append(_t("Dev")).append("</a><br>");
+        //buf.append("</th><th nowrap><a href=\"#def.dev\">").append(_t("Dev")).append("</a><br>");
         //appendSortLinks(buf, urlBase, sortFlags, _t("Sort by round trip time deviation"), FLAG_DEV);
-        buf.append("</span></th><th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.rto\">RTO</a><br>");
+        buf.append("</span></th><th nowrap><span class=\"peersort\"><a href=\"#def.rto\">RTO</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by retransmission timeout"), FLAG_RTO);
         buf.append("</span></th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><a href=\"#def.mtu\">MTU</a><br>");
+        buf.append("<th nowrap><a href=\"#def.mtu\">MTU</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by outbound maximum transmit unit"), FLAG_MTU);
-        buf.append("</th><th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.send\">").append(_t("TX")).append("</a><br>");
+        buf.append("</th><th nowrap><span class=\"peersort\"><a href=\"#def.send\">").append(_t("TX")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets sent"), FLAG_SEND);
-        buf.append("</span></th><th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.recv\">").append(_t("RX")).append("</a><br>");
+        buf.append("</span></th><th nowrap><span class=\"peersort\"><a href=\"#def.recv\">").append(_t("RX")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets received"), FLAG_RECV);
         buf.append("</span></th>\n");
-        buf.append("<th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.resent\">").append(_t("Dup TX")).append("</a><br>");
+        buf.append("<th nowrap><span class=\"peersort\"><a href=\"#def.resent\">").append(_t("Dup TX")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets retransmitted"), FLAG_RESEND);
-        buf.append("</span></th><th class=\"smallhead\" nowrap><span class=\"peersort\"><a href=\"#def.dupRecv\">").append(_t("Dup RX")).append("</a><br>");
+        buf.append("</span></th><th nowrap><span class=\"peersort\"><a href=\"#def.dupRecv\">").append(_t("Dup RX")).append("</a><br>");
         appendSortLinks(buf, urlBase, sortFlags, _t("Sort by packets received more than once"), FLAG_DUP);
         buf.append("</span></th></tr>\n");
         out.write(buf.toString());

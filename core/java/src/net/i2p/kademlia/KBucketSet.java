@@ -730,13 +730,13 @@ public class KBucketSet<T extends SimpleDataStructure> {
         public void getEntries(SelectionCollector<T> collector) {
             throw new UnsupportedOperationException();
         }
-    
+
         public void clear() {}
 
         public boolean add(T peer) {
             throw new UnsupportedOperationException();
         }
-    
+
         public boolean remove(T peer) {
             return false;
         }
@@ -765,6 +765,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(1024);
+        buf.append("<div class=\"debug_container buckets\">");
         buf.append("<hr><b>Bucket set rooted on:</b> ").append(_us.toString())
            .append(" K=").append(BUCKET_SIZE)
            .append(" B=").append(B_VALUE)
@@ -779,6 +780,7 @@ public class KBucketSet<T extends SimpleDataStructure> {
                 buf.append(b.toString()).append("<br>\n");
             }
         } finally { releaseReadLock(); }
+        buf.append("</div>");
         return buf.toString();
     }
 }

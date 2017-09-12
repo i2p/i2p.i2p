@@ -25,7 +25,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:42+0000\n"
+"PO-Revision-Date: 2017-07-15 18:56+0000\n"
 "Last-Translator: Verdulo :-)\n"
 "Language-Team: Polish (http://www.transifex.com/otf/I2P/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -3424,7 +3424,7 @@ msgstr "IPv6 NTCP, SSU, przedstawiciele"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:672
 msgid "IPv6 Only NTCP, SSU, introducers"
-msgstr "IPv6 tylko NTCP, SSU, przedstawicieli"
+msgstr "IPv6 tylko NTCP, SSU, przedstawiciele"
 
 #: ../java/src/net/i2p/router/web/NewsFeedHelper.java:92
 #, java-format

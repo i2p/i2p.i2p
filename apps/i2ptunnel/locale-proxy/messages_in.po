@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Khairul Agasta <khairuldroids@gmail.com>, 2014
+# Robert Dafis <robertdafis@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-07-27 02:09+0000\n"
+"Last-Translator: Robert Dafis <robertdafis@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/otf/I2P/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgstr ""
 #: ../java/build/Proxy.java:42 ../java/build/Proxy.java:48
 #: ../java/build/Proxy.java:85 ../java/build/Proxy.java:91
 msgid "Website Unreachable"
-msgstr ""
+msgstr "Situs tidak dapat dibuka"
 
 #: ../java/build/Proxy.java:6 ../java/build/Proxy.java:18
 #: ../java/build/Proxy.java:31 ../java/build/Proxy.java:43
@@ -91,13 +92,13 @@ msgstr "Buku alamat"
 
 #: ../java/build/Proxy.java:12
 msgid "The website was not reachable."
-msgstr ""
+msgstr "Situs ini tidak dapat dibuka"
 
 #: ../java/build/Proxy.java:13
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr ""
+msgstr "Situsnya offline, ada kemacetan di jaringan, atau router anda belum terintegrasi dengan baik dengan peers."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:103 ../java/build/Proxy.java:116
@@ -108,7 +109,7 @@ msgstr "Anda mungkin ingin {0}mengulang{1}."
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:52
 #: ../java/build/Proxy.java:104 ../java/build/Proxy.java:117
 msgid "You may want to retry."
-msgstr ""
+msgstr "Silakan dicoba lagi."
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:29
 #: ../java/build/Proxy.java:53 ../java/build/Proxy.java:84
@@ -120,17 +121,17 @@ msgstr "Tidak dapat menemukan tujuan berikut:"
 #: ../java/build/Proxy.java:17 ../java/build/Proxy.java:23
 #: ../java/build/Proxy.java:148 ../java/build/Proxy.java:154
 msgid "Outproxy Not Found"
-msgstr ""
+msgstr "Outproxy tidak ditemukan"
 
 #: ../java/build/Proxy.java:24
 msgid ""
 "The HTTP outproxy was not reachable, because its lease set was not found."
-msgstr ""
+msgstr "HTTP outproxy tidak bisa ditemukan karena lease set-nya tidak ditemukan."
 
 #: ../java/build/Proxy.java:25
 msgid ""
 "The outproxy is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "Outproxynya mungkin tidak aktif, namun mungkin ada kemacetan di jaringan."
 
 #: ../java/build/Proxy.java:26 ../java/build/Proxy.java:157
 #: ../java/build/Proxy.java:183 ../java/build/Proxy.java:205
@@ -146,7 +147,7 @@ msgstr "Anda mungkin ingin {0}mengulang{1} karena ini akan secara acak memilih u
 msgid ""
 "You may want to retry as this will randomly reselect an outproxy from the "
 "pool you have defined {0}here{1} (if you have more than one configured)."
-msgstr ""
+msgstr "Silakan dicoba lagi karena ini akan secara acak memilih outproxy dari pool yang sudah anda buat {0}ini{1} (jika ada lebih dari satu outproxy yang dibuat)."
 
 #: ../java/build/Proxy.java:28 ../java/build/Proxy.java:159
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:207
@@ -193,12 +194,12 @@ msgstr "Jika Anda tidak ingin mengunjungi host ini, klik tombol \"kembali\" pada
 
 #: ../java/build/Proxy.java:49
 msgid "The website was not reachable, because its lease set was not found."
-msgstr ""
+msgstr "Situs ini tidak bisa dibuka karena lease set-nya tidak ditemukan."
 
 #: ../java/build/Proxy.java:50
 msgid ""
 "The website is probably down, but there could also be network congestion."
-msgstr ""
+msgstr "Situs ini mungkin tidak aktif, namun mungkin ada kemacetan di jaringan."
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:60
 msgid "Warning: Invalid Request URI"
@@ -234,15 +235,15 @@ msgstr "Jangan menggunakan proxy untuk mengakses konsol router, localhost, atau 
 
 #: ../java/build/Proxy.java:72
 msgid "Website Unknown"
-msgstr ""
+msgstr "Situs ini tidak diketahui"
 
 #: ../java/build/Proxy.java:78
 msgid "Website Not Found in Addressbook"
-msgstr ""
+msgstr "Situs ini tidak ada di buku alamat"
 
 #: ../java/build/Proxy.java:79
 msgid "The website was not found in your router's addressbook."
-msgstr ""
+msgstr "Situs ini tidak ada di buku alamat router anda."
 
 #: ../java/build/Proxy.java:80
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -270,26 +271,26 @@ msgstr "Sering melihat laman ini? Lihat {0}FAQ{1} untuk bantuan dalam {2}menamba
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr ""
+msgstr "Situs ini tidak bisa dibuka karena enkripsinya tidak didukung I2P atau versi Java yang anda gunakan."
 
 #: ../java/build/Proxy.java:93 ../java/build/Proxy.java:208
 msgid "Could not connect to the following destination:"
-msgstr ""
+msgstr "Tidak bisa tersambung ke tujuan berikut:"
 
 #: ../java/build/Proxy.java:94 ../java/build/Proxy.java:100
 #: ../java/build/Proxy.java:174 ../java/build/Proxy.java:180
 msgid "Connection Reset"
-msgstr ""
+msgstr "Sambungan terputus lalu tersambung lagi."
 
 #: ../java/build/Proxy.java:101
 msgid "The connection to the website was reset while the page was loading."
-msgstr ""
+msgstr "Sambungan ke situs ini terputus lalu tersambung lagi waktu halaman ini sedang memuat."
 
 #: ../java/build/Proxy.java:102
 msgid ""
 "The website could be temporarily unavailable, too busy, or it has blocked "
 "your access."
-msgstr ""
+msgstr "Situs ini mungkin sedang tidak bisa dibuka, terlalu sibuk, atau memblokir anda."
 
 #: ../java/build/Proxy.java:106 ../java/build/Proxy.java:112
 msgid "Warning: Invalid Destination"
@@ -299,7 +300,7 @@ msgstr "Peringatan: Tujuan Tidak Valid"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr ""
+msgstr "Situs yang anda masukkan tidak valid atau tidak bisa dibuka."
 
 #: ../java/build/Proxy.java:114
 msgid ""
@@ -333,20 +334,20 @@ msgstr "Peringatan: Kunci Tujuan Bermasalah"
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr ""
+msgstr "Tautan bantuan alamat yang anda gunakan menggunakan destination key yang berbeda dengan yang ada di buku alamat anda."
 
 #: ../java/build/Proxy.java:136
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr ""
+msgstr "Sebuah situs mungkin sedang berpura-pura menjadi situs yang ada tuju atau ada situs yang mempunyai nama yang sama."
 
 #: ../java/build/Proxy.java:137
 msgid ""
 "Resolve the conflict by deciding which key you trust, and then either ignore"
 " the address helper link, or delete the host entry from your address book "
 "and click the address helper link again."
-msgstr ""
+msgstr "Selesaikan konflik ini dengan memutuskan kunci yang anda percaya, lalu 1) abaikan tautan di bantuan alamat atau 2) hapus entry host yang ada di buku alamat anda lalu klik lagi tautan di bantuan alamat."
 
 #: ../java/build/Proxy.java:138 ../java/build/Proxy.java:144
 msgid "Warning: Bad Address Helper"
@@ -415,13 +416,13 @@ msgstr "Untuk menonaktifkan otorisasi, hapus konfigurasi {0}i2ptunnel.proxy.auth
 
 #: ../java/build/Proxy.java:181
 msgid "The connection to the proxy was reset."
-msgstr ""
+msgstr "Koneksi terhadap proxy tersambung ulang."
 
 #: ../java/build/Proxy.java:182
 msgid ""
 "The proxy could be temporarily unavailable, too busy, or it has blocked your"
 " access."
-msgstr ""
+msgstr "Proxy yang anda tuju mungkin sedang tidak bisa digunakan atau memblokir anda."
 
 #: ../java/build/Proxy.java:187 ../java/build/Proxy.java:193
 msgid "Warning: Non-HTTP Protocol"
@@ -441,13 +442,13 @@ msgstr "Protokol lainnya seperti FTP tidak diizinkan."
 
 #: ../java/build/Proxy.java:197 ../java/build/Proxy.java:203
 msgid "Outproxy Unreachable"
-msgstr ""
+msgstr "Outproxy tidak bisa tersambung"
 
 #: ../java/build/Proxy.java:204
 msgid ""
 "The HTTP outproxy was not reachable, because it uses encryption options that"
 " are not supported by your I2P or Java version."
-msgstr ""
+msgstr "HTTP outproxy tidak bisa tersambung karena menggunakan enkripsi yang tidak didukung I2P atau versi Java anda."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:643
 msgid "This seems to be a bad destination:"
@@ -463,16 +464,16 @@ msgid ""
 "To visit the destination in your address book, click <a "
 "href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
 "click <a href=\"{1}\">here</a>."
-msgstr ""
+msgstr "Untuk mengunjungi destinasi di buku alamat anda, klik <a href=\"{0}\">di sini</a>. Untuk mengunjungi destinasi addresshelper yang konflik, kilik <a href=\"{1}\">di sini</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:744
 #, java-format
 msgid "Destination for {0} in address book"
-msgstr ""
+msgstr "Destinasi untuk {0} di buku alamat"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:747
 msgid "Conflicting address helper destination"
-msgstr ""
+msgstr "destinasi addresshelper yang konflik"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1194
 msgid "Destination lease set not found"
@@ -499,58 +500,58 @@ msgstr "Melanjutkan ke {0} tanpa menyimpan"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr ""
+msgstr "Anda dapat mengunjungi sebuah situs tanpa menyimpannya ke dalam buku alamat. Alamat situs akan disimpan sampai anda memulai-ulang router I2P anda."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1366
 msgid "Continue without saving"
-msgstr ""
+msgstr "Lanjutkan tanpa menyimpan"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1373
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr ""
+msgstr "Simpan {0} ke dalam buku alamat router lalu lanjut ke situs yang anda tuju"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1374
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr ""
+msgstr "Alamat ini akan disimpan ke dalam buku alamat router anda di mana alamat subscription-based disimpan."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1376
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
-msgstr ""
+msgstr "JIka anda ingin melacak situs yang anda tambah secara manual, tambahkan alamat tersebut ke dalam buku alamat Master atau Private milik anda."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1379
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1387
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1392
 msgid "Save & continue"
-msgstr ""
+msgstr "Simpan & lanjutkan"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1384
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr ""
+msgstr "Simpan {0} ke dalam buku alamat Master kemudian lanjut ke situsnya."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1385
 msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr ""
+msgstr "Alamat ini akan disimpan ke dalam buku alamat Master. Pilih opsi ini untuk alamat yang anda pisahkan dari buku alamat utama di router anda namun tidak apa-apa diketahui orang lain."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1389
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr ""
+msgstr "Simpan {0} ke dalam buku alamat Private kemudian lanjut ke situsnya."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1390
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr ""
+msgstr "Alamat ini akan disimpan ke buku alamat Private untuk memastikan tidak pernah diketahui orang lain."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:175
 #, java-format

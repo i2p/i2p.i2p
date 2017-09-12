@@ -27,6 +27,18 @@ div[style="height: 36px;"] {
      height: auto !important;
 }
 
+div[style="height: 36px;"] + a, a[href="/summaryframe"] {
+     display: inline-block;
+     margin: 7px 0 0 !important;
+     padding: 4px 15px !important;
+     border-radius: 15px;
+     border: 1px solid #494;
+}
+
+a[href="/summaryframe"] {
+     margin: 3px 0 2px !important;
+}
+
 div.routersummary img[src$="i2plogo.png"] {
      width: 357px;
      margin-top: 6px;
@@ -40,11 +52,6 @@ div.routersummary {
 .routersummary table[id^="sb_"] {
      width: 600px !important;
 }
-}
-
-div[style^='height'] + a {
-     display: inline-block;
-     padding-top: 8px !important;
 }
 
 .routersummary td,

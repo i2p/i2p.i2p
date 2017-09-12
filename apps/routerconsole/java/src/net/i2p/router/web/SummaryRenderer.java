@@ -35,9 +35,16 @@ class SummaryRenderer {
     private final Log _log;
     private final SummaryListener _listener;
     private final I2PAppContext _context;
+    private static final Color BACK_COLOR = new Color(246, 246, 255);
+    private static final Color SHADEA_COLOR = new Color(246, 246, 255);
+    private static final Color SHADEB_COLOR = new Color(246, 246, 255);
+    private static final Color GRID_COLOR = new Color(100, 100, 100, 75);
+    private static final Color MGRID_COLOR = new Color(255, 91, 91, 110);
     private static final Color AREA_COLOR = new Color(100, 160, 200, 200);
     private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
     private static final Color RESTART_BAR_COLOR = new Color(223, 13, 13, 255);
+    private static final String DEFAULT_FONT_NAME = System.getProperty("os.name").toLowerCase().contains("windows") ?
+            "Lucida Console" : "Monospaced";
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -125,6 +132,19 @@ class SummaryRenderer {
         ImageOutputStream ios = null;
         try {
             RrdGraphDef def = new RrdGraphDef();
+
+            // Override defaults
+            def.setColor(RrdGraphDef.COLOR_BACK,   BACK_COLOR);
+            def.setColor(RrdGraphDef.COLOR_SHADEA, SHADEA_COLOR);
+            def.setColor(RrdGraphDef.COLOR_SHADEB, SHADEB_COLOR);
+            def.setColor(RrdGraphDef.COLOR_GRID,   GRID_COLOR);
+            def.setColor(RrdGraphDef.COLOR_MGRID,  MGRID_COLOR);
+            def.setFont(RrdGraphDef.FONTTAG_DEFAULT, new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10));
+            def.setFont(RrdGraphDef.FONTTAG_TITLE,   new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10));
+            def.setFont(RrdGraphDef.FONTTAG_AXIS,    new Font("Droid Sans Mono", Font.PLAIN, 10));
+            def.setFont(RrdGraphDef.FONTTAG_UNIT,    new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10));
+            def.setFont(RrdGraphDef.FONTTAG_LEGEND,  new Font("Droid Sans Mono", Font.PLAIN, 10));
+
             // improve text legibility
             String lang = Messages.getLanguage(_context);
             Font small = def.getSmallFont();

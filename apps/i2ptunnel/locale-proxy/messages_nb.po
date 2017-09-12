@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
+"PO-Revision-Date: 2017-07-16 14:45+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -476,7 +476,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1194
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Oppsatt målleie ikke funnet"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1350
 msgid "Host"

@@ -45,16 +45,15 @@ public class SummaryHelper extends HelperBase {
     static final String DEFAULT_FULL =
         "HelpAndFAQ" + S +
         "ShortGeneral" + S +
-        "Bandwidth" + S +
         "UpdateStatus" + S +
-        "FirewallAndReseedStatus" + S +
+        "Bandwidth" + S +
         "NetworkReachability" + S +
+        "FirewallAndReseedStatus" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
         "Peers" + S +
         "Tunnels" + S +
         "TunnelStatus" + S +
-        "Congestion" + S +
         "RestartStatus" + S +
         "Destinations" + S +
         "";
@@ -62,10 +61,10 @@ public class SummaryHelper extends HelperBase {
     static final String DEFAULT_FULL_ADVANCED =
         "HelpAndFAQ" + S +
         "ShortGeneral" + S +
-        "Bandwidth" + S +
         "UpdateStatus" + S +
-        "FirewallAndReseedStatus" + S +
+        "Bandwidth" + S +
         "NetworkReachability" + S +
+        "FirewallAndReseedStatus" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
         "Advanced" + S +
@@ -80,11 +79,11 @@ public class SummaryHelper extends HelperBase {
     static final String DEFAULT_MINIMAL =
         "ShortGeneral" + S +
         "Bandwidth" + S +
-        "NewsHeadings" + S +
         "UpdateStatus" + S +
+        "NewsHeadings" + S +
         "NetworkReachability" + S +
-        "RestartStatus" + S +
         "FirewallAndReseedStatus" + S +
+        "RestartStatus" + S +
         "Destinations" + S +
         "";
 
@@ -516,10 +515,11 @@ public class SummaryHelper extends HelperBase {
                     buf.append("client.png\" alt=\"Client\" title=\"").append(_t("Client")).append("\">");
                 buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
                 buf.append("\" target=\"_top\" title=\"").append(_t("Show tunnels")).append("\">");
-                if (name.length() <= 20)
+                // Increase permitted max length of tunnel name & handle overflow with css
+                if (name.length() <= 32)
                     buf.append(DataHelper.escapeHTML(name));
                 else
-                    buf.append(DataHelper.escapeHTML(name.substring(0,18))).append("&hellip;");
+                    buf.append(DataHelper.escapeHTML(name.substring(0,29))).append("&hellip;");
                 buf.append("</a></b></td>\n");
                 LeaseSet ls = _context.netDb().lookupLeaseSetLocally(h);
                 if (ls != null && _context.tunnelManager().getOutboundClientTunnelCount(h) > 0) {

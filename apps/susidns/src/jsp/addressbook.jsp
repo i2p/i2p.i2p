@@ -28,7 +28,7 @@
         request.setCharacterEncoding("UTF-8");
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
-    response.setHeader("Content-Security-Policy", "default-src 'self'");
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
     response.setHeader("X-XSS-Protection", "1; mode=block");
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -51,6 +51,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>${book.book} <%=intl._t("address book")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="<%=book.getTheme()%>susidns.css?<%=net.i2p.CoreVersion.VERSION%>">
+<script src="/js/resetScroll.js" type="text/javascript"></script>
 </head>
 <body>
 <div class="page">
@@ -184,7 +185,7 @@ ${book.loadBookMessages}
 <td class="names"><span class="addrhlpr"><a href="http://${addr.b32}/" target="_blank" title="<%=intl._t("Base 32 address")%>">b32</a></span></td>
 <td class="helper"><a href="http://${addr.name}/?i2paddresshelper=${addr.destination}" target="_blank" title="<%=intl._t("Helper link to share host address with option to add to addressbook")%>">link</a></td>
 <td class="names"><span class="addrhlpr"><a href="details?h=${addr.name}&amp;book=${book.book}" title="<%=intl._t("More information on this entry")%>"><%=intl._t("details")%></a></span></td>
-<td class="destinations"><div class="destaddress" name="dest_${addr.name}" width="200px" tabindex="0">${addr.destination}</div></td>
+<td class="destinations"><div class="destaddress" name="dest_${addr.name}" width="200px" tabindex="0" onblur="resetScrollLeft(this)">${addr.destination}</div></td>
 
 <c:if test="${book.validBook}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._t("Mark for deletion")%>"></td>

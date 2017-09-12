@@ -35,6 +35,12 @@ body.iframed {
      outline: none;
 }
 
+#navi, .buttons, #buttons, #host_list tr:first-child, #host_list img, #host_list td:nth-child(n+2) a {
+     -moz-user-select: none;
+     -webkit-user-select: none;
+     user-select: none;
+}
+
 hr {
      display: none;
 }
@@ -498,6 +504,10 @@ img[src*="imagegen"] {
      filter: drop-shadow(0 0 3px #ccc);
 }
 
+img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
+     opacity: 0; /* hide broken identicons but ensure hostlist remains intact */
+}
+
 .illustrate {
      max-width: 700px;
      height: auto;
@@ -585,7 +595,7 @@ td.destinations textarea, td.destinations textarea:focus {
 }
 
 .fakebutton, input[type="submit"], input[type="reset"] {
-     padding: 4px 8px !important;
+     padding: 5px 8px !important;
      border-radius: 2px;
      border: 1px solid #bbb;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px 0 #ddd;
@@ -609,6 +619,15 @@ td.destinations textarea, td.destinations textarea:focus {
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #999;
      border: 1px solid #bbb;
      color: #333;
+}
+
+.fakebutton {
+     margin: -4px 0 -4px 4px !important;
+     display: inline-block;
+}
+
+.iframed .fakebutton {
+     margin-bottom: -2px !important;
 }
 
 input[type="radio"], input[type="checkbox"] {
@@ -812,7 +831,7 @@ p.book {
      width: 20px;
      height: 20px;
      vertical-align: middle;
-     margin: 1px 10px 1px 1px;
+     margin: 3px 10px 3px 1px;
      padding: 1px;
      border: 1px solid #89f;
      border-radius: 2px;
@@ -877,6 +896,7 @@ p.book {
 #host_list td:nth-child(3) a::after {
      content: url(/themes/console/images/buttons/helper.png);
      cursor: pointer;
+     filter: drop-shadow(0 0 1px #555);
 }
 
 #host_list th:nth-child(4), #host_list td:nth-child(4) {
@@ -912,6 +932,19 @@ p.book {
      user-select: all;
 }
 
+#host_list .destaddress:not(old) {
+     overflow: hidden !important;
+     text-overflow: ellipsis;
+}
+
+#host_list .destaddress:not(old):focus {
+     padding-top: 0;
+     padding-bottom: 0;
+     overflow: auto !important;
+     text-overflow: clip;
+     margin: 1px 0 -1px;
+}
+
 /* end hostname list */
 
 .destaddress:focus {
@@ -931,6 +964,23 @@ td.destinations {
      margin: 10px auto 10px;
      min-width: 450px;
      width: 90%;
+}
+}
+
+@media screen and (max-width: 1200px) {
+#filter {
+     padding: 0 5px;
+}
+
+#filter p {
+     margin-left: 0;
+     margin-right: 0;
+}
+
+#filter a {
+     min-width: 6px;
+     padding: 0 6px !important;
+     line-height: 150%;
 }
 }
 

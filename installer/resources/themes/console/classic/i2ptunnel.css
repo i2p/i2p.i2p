@@ -512,6 +512,7 @@ textarea#statusMessages {
      border: none;
      margin: 0;
      font-family: "Droid Sans Mono", "Noto Mono", Consolas, "Lucida Console", "DejaVu Sans Mono", monospace;
+     font-size: 8pt;
 }
 
 textarea#statusMessages:focus {
@@ -662,7 +663,7 @@ td.blankColumn {
      background: rgba(240,240,255,0.5);
 }
 
-#throttler tr:nth-child(even),  #wizardTunnelTypes tr:nth-child(even), #wizardSummary tr:nth-child(even) {
+#throttler tr:nth-child(even), #wizardTunnelTypes tr:nth-child(even), #wizardSummary tr:nth-child(even) {
      background: #e7e7ff;
      background: rgba(220,220,255,0.5);
 }
@@ -785,7 +786,7 @@ input[type="file"] {
      border: none;
 }
 
-#wizardTunnelTypes select {
+#wizardTunnelTypes select, #wizardPanel .freetext {
      margin-left: 0 !important;
 }
 
@@ -850,6 +851,12 @@ input[type="file"] {
      margin: 0;
      padding: 0;
 }
+
+#tunnelWizardPage #targetDestination {
+     width: 50% !important;
+}
+
+/* end wizard specifics */
 
 /* more space */
 
@@ -932,6 +939,10 @@ div[class^="status"] {
 
 .control, .control:link, .control:visited {
      min-width: 60px !important;
+}
+
+#tunnelWizardPage #targetDestination {
+     width: 200px !important;
 }
 }
 
@@ -1084,6 +1095,10 @@ input[type="text"] + label {
 @media screen and (min-width: 1500px) {
 .displayText, .displayText:empty:hover, .displayText:empty:focus {
      width: 552px;
+}
+
+textarea#statusMessages {
+     font-size: 9pt;
 }
 
 #registration .displayText {

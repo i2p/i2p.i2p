@@ -8,13 +8,14 @@
 # foo <foo@bar>, 2009
 # Nathan Follens, 2015
 # attesor <random901@zoho.com>, 2012
+# skoning <skoning@onenetbeyond.org>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-07-22 11:00+0000\n"
+"Last-Translator: skoning <skoning@onenetbeyond.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -189,7 +190,7 @@ msgstr[1] "{0} berichten verwijderd."
 #: src/src/i2p/susi/webmail/WebMail.java:1505
 #, java-format
 msgid "Host unchanged. Edit configation file {0} to change host."
-msgstr ""
+msgstr "Host onveranderd. Pas het configuratiebestand {0} aan om de host aan te passen."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1520
 msgid "Configuration saved"
@@ -314,7 +315,7 @@ msgstr "Geselecteerde bijlagen verwijderen"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2215
 msgid "I2PMail Login"
-msgstr ""
+msgstr "I2PMail Login"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:2217

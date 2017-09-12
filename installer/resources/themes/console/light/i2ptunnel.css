@@ -7,7 +7,7 @@ body {
      padding: 0;
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
-     color: #333;
+     color: #33333f;
      font-size: 9pt;
      background: #a4a4cb url(images/tile2.png) fixed;
      background-size: 32px 32px;
@@ -36,6 +36,10 @@ div {
      box-sizing: border-box;
 }
 
+b {
+     color: #41465f;
+}
+
 a {
      text-decoration: none;
 }
@@ -50,12 +54,13 @@ input[type="checkbox"], input[type="radio"] {
      vertical-align: sub;
      min-width: 16px;
      min-height: 16px;
+     filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 1px #ccf);
 }
 
 input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"]:hover, input[type="radio"]:focus {
      box-shadow: 0 0 1px #89f;
-     filter: drop-shadow(0 0 2px #89f);
      outline: none;
+     filter: sepia(100%) hue-rotate(185deg) drop-shadow(0 0 3px #89f);
 }
 
 label {
@@ -63,7 +68,7 @@ label {
 }
 
 label:hover {
-     color: #000;
+     color: #19191f;
 }
 
 textarea, input, select, button {
@@ -82,18 +87,19 @@ button, input[type="submit"], input[type="reset"], a.control {
 }
 
 textarea {
+     background: #fafaff;
+     color: #33333f;
      font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
-     color: #333;
-     background: #fff;
-     border: 1px solid #999;
+     border: 1px solid #999daf;
      border-radius: 2px;
      resize: none;
-     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
 }
 
-textarea:focus {
-     box-shadow: inset 0 0 0 1px #89f;
-     color: #111;
+textarea:focus, textarea[name="accessList"]:focus {
+     background: #fff;
+     color: #19191f;
+     border: 1px solid #676c7f;
 }
 
 textarea#statusMessages {
@@ -105,6 +111,12 @@ textarea#statusMessages {
      border: none;
      box-shadow: none;
      font-family: "Droid Sans Mono", "Noto Mono", Consolas, "Lucida Console", "DejaVu Sans Mono", monospace;
+     font-size: 8pt;
+     filter: none;
+}
+
+textarea#statusMessages:focus {
+     background: #fafaff;
 }
 
 br {
@@ -136,36 +148,41 @@ br {
      font-size: 0 !important;
      text-align: center;
      overflow: hidden;
-     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     filter: drop-shadow(0 0 1px #ccf);
 }
 
 hr {
      display: none;
 }
 
-.freetext, textarea {
+.freetext, textarea, .displayText {
      font: 9pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     filter: drop-shadow(0 0 1px #ccf);
 }
 
 .freetext {
      width: 150px;
-     border: 1px solid #999;
+     border: 1px solid #999daf;
      padding: 4px;
-     background: #fff;
-     color: #333;
+     background: #fafaff;
+     color: #33333f;
      border-radius: 2px;
-     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
 }
 
-.freetext:focus {
+.freetext:focus, .displayText:focus, textarea:focus {
+     background: #fff;
+     color: #19191f;
+     border: 1px solid #676c7f;
      box-shadow: 0 0 1px #89f;
-     color: #111;
 }
 
 .freetext[readonly], .freetext[readonly]:focus {
      background: #e9e9e9;
-     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
-     color: #333;
+     color: #4d4d5f;
+     border: 1px solid #999daf;
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
+     filter: none;
 }
 
 #clientHost {
@@ -191,13 +208,13 @@ hr {
      text-decoration: none;
      font-style: normal;
      font-weight: normal;
-     color: #333;
-     border: 1px solid #999;
+     color: #33333f;
+     border: 1px solid #999daf;
      border-radius: 2px;
      background: #eee;
      background: linear-gradient(to bottom, #fff, #ddd);
      box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     filter: drop-shadow(0 0 1px #ccf);
      box-sizing: border-box;
      margin: 2px 4px !important;
      min-width: 70px !important;
@@ -210,7 +227,7 @@ button.control, input.control {
 
 .control:hover, .control:focus {
      text-decoration: none;
-     color: #111;
+     color: #19191f;
      border: 1px solid #f60 !important;
      background: #ddd;
      background: linear-gradient(to bottom, #ddd, #fff);
@@ -221,7 +238,7 @@ button.control, input.control {
 
 .control:active {
      box-shadow: inset 2px 2px 1px #999 !important;
-     color: #333;
+     color: #33333f;
 }
 
 a.control {
@@ -269,10 +286,11 @@ select {
      min-width: 140px;
      background: #fff;
      background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #ddd);
-     color: #333;
+     background-blend-mode: hard-light, normal;
+     color: #33333f;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
      font-size: 9pt;
-     border: 1px solid #999;
+     border: 1px solid #999daf;
      border-radius: 2px;
      box-shadow: inset 0 0 0 1px #fff;
      overflow: hidden;
@@ -280,11 +298,11 @@ select {
      -moz-appearance: none;
      -webkit-appearance: none;
      appearance: none;
-     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
+     filter: drop-shadow(0 0 1px #ccf);
 }
 
 select:hover {
-     color: #111;
+     color: #19191f;
 }
 
 select:hover, select:active, select:focus {
@@ -329,13 +347,14 @@ h2, h3 {
      padding: 9px 10px 7px 30px;
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
-     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 5%, rgba(231, 231, 255, 0.8) 15%) #fff !important;
+     background: #fcfcff;
+     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) #fff !important;
      font-size: 11.5pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      margin: 10px 0 -1px;
-     color: #31334f;
+     color: #41465f;
      box-shadow: inset 0 0 0 1px #fff;
      position: relative;
 }
@@ -347,27 +366,27 @@ h2, h3 {
 /* title images */
 
 #messages h2 {
-     background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #globalTunnelControl h2 {
-     background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #servers h2 {
-     background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #clients h2 {
-     background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
-     background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #wizardPanel h2 {
-     background: url(/themes/console/images/info/wizard.png) left 5px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to right, #fff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/wizard.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #messages h2, #globalTunnelControl h2, #servers h2, #clients h2, #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3, #wizardPanel h2 {
@@ -397,13 +416,12 @@ h2, h3 {
 th {
      background: #eef url(images/header.png) center center repeat-x;
      background: linear-gradient(to bottom, #fff 50%, rgba(238, 238, 255, 0.2) 50%, #eef 100%) !important;
-     color: #333;
      padding: 6px 5px;
      text-align: left;
      border-top: 1px solid #7778bf;
      border-bottom: 1px solid #7778bf;
      font-size: 10pt;
-     color: #31334f;
+     color: #41465f;
 }
 
 th::first-letter {
@@ -423,11 +441,11 @@ a:hover, a:focus, a:active, button:hover, button:focus, button:active, select:ho
 }
 
 .tunnelConfig tr, #wizardPanel tr, #registration tr {
-     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fff 5px) #fff;
+     background: repeating-linear-gradient(135deg, rgba(252,252,255,0.5) 2px, rgba(240, 240, 255, 0.3) 3px, #fafaff 5px) #fafaff;
 }
 
 #wizardPanel tr:first-child {
-     background: #fff;
+     background: #fafaff;
 }
 
 td {
@@ -466,7 +484,7 @@ td.infohelp {
 }
 
 .tunnelProperties {
-     background: #fff !important;
+     background: #fafaff !important;
 }
 
 .tunnelProperties td {
@@ -475,7 +493,7 @@ td.infohelp {
 
 .tunnelProperties:hover {
      background: #ffd !important;
-     color: #111;
+     color: #19191f;
 }
 
 .newTunnel {
@@ -549,8 +567,8 @@ th.tunnelControl {
      text-align: right;
      padding: 7px 5px;
      background: #fff;
-     background: linear-gradient(to bottom, #fff, #eef);
-     background: linear-gradient(to bottom, #fff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
+     background: linear-gradient(to bottom, #fafaff, #eef);
+     background: linear-gradient(to bottom, #fafaff 50%, rgba(220,220,255,0.3)), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) !important;
      border-top: 1px solid #7778bf !important;
      box-shadow: inset 0 0 0 1px #fff;
 }
@@ -691,7 +709,7 @@ td.blankColumn {
 }
 
 table {
-     background: #fff;
+     background: #fafaff;
 }
 
 table#statusMessages textarea, table#statusMessages textarea:active {
@@ -699,7 +717,6 @@ table#statusMessages textarea, table#statusMessages textarea:active {
      border: 0;
      box-shadow: none;
      height: 80px;
-     font-size: 9pt;
 }
 
 #tunnelMessages {
@@ -745,16 +762,28 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 
 .username, .password {
      width: 200px;
+     padding-left: 22px;
+     background-blend-mode: luminosity;
 }
 
 .username {
-     background: url(/themes/console/images/buttons/user.png) 3px center no-repeat #fff;
-     padding-left: 22px;
+     background: url(/themes/console/images/buttons/user.png) 3px center no-repeat #fafaff;
 }
 
 .password {
+     background: url(/themes/console/images/buttons/password.png) 3px center no-repeat #fafaff;
+}
+
+.username:focus, .password:focus {
+     background-blend-mode: normal;
+}
+
+.username:focus {
+     background: url(/themes/console/images/buttons/user.png) 3px center no-repeat #fff;
+}
+
+.password:focus {
      background: url(/themes/console/images/buttons/password.png) 3px center no-repeat #fff;
-     padding-left: 22px;
 }
 
 .proxyList {
@@ -796,6 +825,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      min-width: 150px;
      text-align: right;
      white-space: nowrap;
+     color: #41465f;
 }
 
 #wizardTunnelTypes td:last-child {
@@ -813,7 +843,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
 }
 
 #wizardTunnelTypes tr:last-child {
-     background: #fff;
+     background: #fafaff;
 }
 
 #wizardPanel #name, #wizardPanel #description {
@@ -848,6 +878,7 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      font-weight: bold;
      text-align: right;
      margin-right: 10px;
+     color: #41465f;
 }
 
 #wizardPanel select {
@@ -898,11 +929,11 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
 }
 
 .tunnelDestination b, .tunnelDescription b {
-     color: #444;
+     color: #41465f;
 }
 
 td.tunnelDestination, td.tunnelDescription {
-     background: linear-gradient(to right, #fff, rgba(255,255,255,0.1) 50%, #eef);
+     background: linear-gradient(to right, #fafaff, rgba(255,255,255,0.1) 50%, #eef);
 }
 
 #oldDestFile {
@@ -991,6 +1022,10 @@ th {
      font-size: 10.5pt;
 }
 
+textarea#statusMessages {
+     font-size: 9pt;
+}
+
 .statusNotRunning, .statusRunning, .statusStarting {
      background-size: auto 18px;
 }
@@ -1027,6 +1062,7 @@ _:-ms-lang(x), td.tunnelDestination, td.tunnelDescription {
 @media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
 select {
      white-space: normal;
+     padding: 5px 16px 5px 6px !important;
 }
 }
 
@@ -1066,10 +1102,10 @@ input[type="text"] + label {
      -moz-user-select: all;
      -webkit-user-select: all;
      user-select: all;
-     border: 1px solid #999;
-     background: #fff;
+     border: 1px solid #999daf;
+     background: #fafaff;
      border-radius: 2px;
-     box-shadow: inset 2px 2px 1px rgba(204, 204, 204, 0.6);
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
 }
 
 .displayText:empty, .displayText:empty:hover, .displayText:empty:focus {
@@ -1083,13 +1119,18 @@ input[type="text"] + label {
 }
 
 .displayText:hover, .displayText:focus {
+     box-shadow: 0 0 1px #89f;
+     background: #ffe;
+     outline: none;
+}
+
+.displayText:focus {
      overflow: auto;
      text-overflow: clip;
      margin: 0.5px 5px;
      padding: 2px 4px;
-     box-shadow: 0 0 1px #89f;
-     background: #ffe;
-     outline: none;
+     background: #fff;
+     border: 1px solid #676c7f;
 }
 
 #registration .displayText {
@@ -1132,4 +1173,83 @@ input[type="text"] + label {
      width: 800px;
 }
 }
+
+/* custom radios/checkboxes for chrome/blink  */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution:.001dpcm) {
+
+label {
+     vertical-align: middle !important;
+}
+
+input[type="checkbox"], input[type="checkbox"]:checked, input[type="checkbox"][disabled], input[type="checkbox"][disabled]:checked {
+     background: #f8f8ff;
+     width: 19px !important;
+     height: 19px !important;
+     box-shadow: inset 1px 1px 1px rgba(204, 204, 204, 0.6);
+     border-radius: 2px;
+     -webkit-appearance: inherit;
+     border: 1px solid #999daf !important;
+     position: relative;
+     box-sizing: border-box;
+     filter: drop-shadow(0 0 1px #ccf);
+     vertical-align: middle !important;
+}
+
+input[type="checkbox"]:checked::before {
+     position: absolute;
+     top: 1px;
+     left: 1px;
+     content: "\2714";
+     border-radius: 1px;
+     font-size: 15pt;
+     color: #41465f;
+     line-height: 80%;
+     font-family: sans-serif;
+     overflow: hidden;
+     width: 16px;
+     height: 16px;
+}
+
+input[type="radio"], input[type="radio"]:checked, input[type="radio"][disabled], input[type="radio"][disabled]:checked {
+     background: #f8f8ff;
+     width: 19px !important;
+     height: 19px !important;
+     box-shadow: inset 0 0 2px #7778bf;
+     border-radius: 50%;
+     -webkit-appearance: none;
+     border: 1px solid #999daf !important;
+     position: relative;
+     box-sizing: border-box;
+     filter: drop-shadow(0 0 1px #ccf);
+     vertical-align: middle !important;
+}
+
+input[type="radio"]:checked::before {
+     content: "";
+     position: absolute;
+     border-radius: 50%;
+     left: 4px !important;
+     top: 4px !important;
+     width: 9px;
+     height: 9px;
+     background: #41465f;
+}
+
+input[type="checkbox"]:hover, input[type="radio"]:hover, input[type="checkbox"]:focus, input[type="radio"]:focus {
+     background: #fff;
+     width: 19px !important;
+     height: 19px !important;
+     filter: drop-shadow(0 0 3px #89f) !important;
+}
+
+input[type="checkbox"][disabled], input[type="radio"][disabled], input[type="checkbox"][disabled]:hover, input[type="radio"][disabled]:hover,
+input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked, input[type="checkbox"][disabled]:checked:hover, input[type="radio"][disabled]:checked:hover {
+     filter: none !important;
+     box-shadow: none !important;
+     opacity: 0.5;
+}
+}
+
+/* end custom radios/checkboxes */
 

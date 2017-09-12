@@ -1396,7 +1396,8 @@ public class EepGet {
         if (  /* (!_shouldProxy) && */
             // This is kindof a hack, but if we are downloading a gzip file
             // we don't want to transparently gunzip it and save it as a .gz file.
-            (!path.endsWith(".gz")) && (!path.endsWith(".tgz")))
+            path == null ||
+            (!path.endsWith(".gz") && !path.endsWith(".tgz")))
             buf.append("gzip");
         buf.append("\r\n");
         if(!uaOverridden)

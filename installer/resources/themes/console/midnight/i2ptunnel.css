@@ -1061,9 +1061,9 @@ td {
      min-width: 600px;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blinkoverflow issue */
+@media screen and (-webkit-min-device-pixel-ratio:0) { /* fixes chrome/blink overflow issue */
 select {
-     white-space: normal;
+     white-space: normal !important;
 }
 }
 

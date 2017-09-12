@@ -14,6 +14,11 @@
      }
    }
 %>
+
+<%
+    response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+%>
+
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title><%=intl._t("Hidden Services Manager")%> - <%=intl._t("Edit Hidden Service")%></title>
@@ -29,6 +34,7 @@
 <style type='text/css'>
 input.default { width: 1px; height: 1px; visibility: hidden; }
 </style>
+<script src="/js/resetScroll.js" type="text/javascript"></script>
 </head>
 <body id="tunnelEditPage">
 
@@ -230,7 +236,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0"><%=editBean.getDestinationBase64(curTunnel)%></div>
+                <div class="displayText" title="<%=intl._t("Read Only: Local Destination (if known)")%>" tabindex="0" onblur="resetScrollLeft(this)"><%=editBean.getDestinationBase64(curTunnel)%></div>
             </td>
             <td>
                     <% String value3 = editBean.getPrivateKeyFile(curTunnel);
@@ -814,7 +820,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td colspan="2">
-                <div class="displayText" title="<%=intl._t("Read Only: Alternate Local Destination")%>"><%=ab64%></div>
+                <div class="displayText" title="<%=intl._t("Read Only: Alternate Local Destination")%>" onblur="resetScrollLeft(this)"><%=ab64%></div>
             </td>
         </tr>
 

@@ -221,6 +221,7 @@ public abstract class TransportUtil {
      *  Is this a valid port for us or a remote router?
      *
      *  ref: http://i2p-projekt.i2p/en/docs/ports
+     *  ref: https://cs.chromium.org/chromium/src/net/base/port_util.cc
      *
      *  @since 0.9.17 moved from logic in individual transports
      */
@@ -229,12 +230,19 @@ public abstract class TransportUtil {
         return port >= 1024 &&
                port <= 65535 &&
                port != 1900 &&  // UPnP SSDP
+               port != 2049 &&  // NFS
                port != 2827 &&  // BOB
+               port != 3659 &&  // Apple-sasl
+               port != 4045 &&  // lockd
                port != 4444 &&  // HTTP
                port != 4445 &&  // HTTPS
-               port != 6668 &&  // IRC
+               port != 6000 &&  // lockd
+               (!(port >= 6665 && port <= 6669)) && // IRC and alternates
+               port != 6697 &&  // IRC+TLS
                (!(port >= 7650 && port <= 7664)) && // standard I2P range
                port != 8998 &&  // mtn
+               port != 9100 &&  // network printer
+               // do not block anything in 9111 - 30777, this is the standard random selection range
                port != 31000 && // Wrapper
                port != 32000;   // Wrapper
     }

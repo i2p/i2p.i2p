@@ -260,6 +260,11 @@ body.iframed {
      filter: drop-shadow(0 0 1px #000);
 }
 
+.snarkMessages li, .snarkMessages a {
+     font-weight: bold;
+     font-size: 8pt !important;
+}
+
 .snarkMessages img {
      float: right;
      margin: -3px -4px 4px 4px;
@@ -276,7 +281,7 @@ body.iframed {
      z-index: 1;
 }
 
-.snarkMessages img:hover, .snarkMessages img:focus {
+.snarkMessages img:hover, .snarkMessages img:focus, .closeLog img:hover, .closeLog img:focus {
      mix-blend-mode: normal !important;
      border: 1px solid #443da0 !important;
      border-top: 0 none !important;
@@ -432,8 +437,9 @@ tfoot tr:nth-child(n+1) {
      border-top: 1px solid #443da0 !important;
 }
 
-.snarkTorrents tfoot th::first-line {
-     font-weight: bold;
+.snarkTorrents tfoot tr:first-child th {
+     font-weight: bold !important;
+     color: #c9ceff !important;
 }
 
 .snarkTorrents tfoot th:nth-child(n+2) {
@@ -1115,9 +1121,9 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      font-weight: bold;
      font-variant: small-caps !important;
      display: inline-block;
-     min-width: 260px;
+     min-width: 300px;
      margin: -1px 0 -5px 0;
-     padding: 3px 1px 3px 1px;
+     padding: 4px 1px 4px 1px;
      text-align: center !important;
      letter-spacing: .15em;
      border: 1px solid #443da0;
@@ -1125,6 +1131,15 @@ _:-ms-lang(x), .snarkTorrentOdd, .snarkTorrentOdd td, .SnarkTorrentEven, .SnarkT
      background: linear-gradient(to bottom, #191729, #1f1e32 50%, #000 50%);
      box-shadow: inset 0 0 0 1px #000;
      text-shadow: 0 0 1px #000;
+}
+
+.toggleview {
+     padding: 3px 1px 5px 1px;
+}
+
+.snarkConfigTitle a {
+     display: inline-block;
+     margin-top: -1px;
 }
 
 .snarkConfigTitle:hover, .toggleview:hover, input.toggle_input:focus + .toggleview {
@@ -1604,7 +1619,7 @@ img.thumb {
 #trackerselect {
      width: 100% !important;
      width: calc(100% - 150px) !important;
-     margin: 2px 5px 0 5px;
+     margin: 8px 5px 4px 5px;
      border: 1px solid #120f35;
 }
 
@@ -1625,14 +1640,14 @@ _:-ms-lang(x), #trackerselect tr:last-child {
      border-bottom: 1px solid #120f35;
 }
 
-#trackerselect tr:first-child {
+#trackerselect tr:first-child td {
      font-weight: bold;
      border-bottom: 1px solid #120f35;
      background: linear-gradient(to bottom, #010011, #000);
 }
 
 #trackerselect tr:first-child td {
-     padding: 3px 5px 3px 20px;
+     padding: 7px 5px 7px 20px;
 }
 
 #trackerselect td {
@@ -1640,13 +1655,9 @@ _:-ms-lang(x), #trackerselect tr:last-child {
      font-size: 9pt;
 }
 
-#trackerselect td:first-child {
-     width: 20%;
+#trackerselect td:first-child, #trackerselect td:last-child {
+     width: 40%;
      font-weight: normal;
-}
-
-#trackerselect td:nth-child(4) {
-     width: 70%;
 }
 
 #trackerselect input {
@@ -1789,6 +1800,7 @@ input[name="nofilter_commentsName"] {
 
 #configs td:first-child {
      min-width: 200px;
+     width: 25%;
      padding-left: 10px !important;
 }
 
@@ -2746,15 +2758,11 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
 }
 
 @media screen and (min-width: 1400px) {
-code, textarea, input, tt {
+a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileName, textarea, input[name="nofilter_dataDir"], input {
      font-size: 10pt !important;
 }
 
-a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileName, code, textarea, input[name="nofilter_dataDir"], input, code {
-     font-size: 10pt !important;
-}
-
-.snarkMessages li, .snarkMessages a {
+code, tt {
      font-size: 9pt !important;
 }
 
@@ -2776,7 +2784,11 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
 }
 
 .snarkConfigTitle, .toggleview {
-     min-width: 300px !important;
+     min-width: 340px !important;
+}
+
+.snarkConfigTitle a {
+     margin-bottom: 0 !important;
 }
 
 .snarkMessages {
@@ -2840,6 +2852,12 @@ a, th, thead th, tfoot th, td, select, select option, .snarkAddInfo, .snarkFileN
 
 #pagenav img {
      height: 16px;
+}
+}
+
+@media screen and (min-width: 1600px) {
+.snarkMessages li, .snarkMessages a {
+     font-size: 9pt !important;
 }
 }
 

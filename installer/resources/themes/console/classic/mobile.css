@@ -31,8 +31,19 @@ body {
 }
 
 .routersummary div[style="height: 36px;"] + a {
-     margin: -5px 0 -3px !important;
      display: inline-block;
+}
+
+div[style="height: 36px;"] + a, a[href="/summaryframe"] {
+     display: inline-block;
+     margin: -3px 0 !important;
+     padding: 2px 10px;
+     border-radius: 15px;
+     border: 1px solid #7778bf;
+}
+
+a[href="/summaryframe"] {
+     margin: 2px 0 !important;
 }
 
 .routersummary hr:first-child {

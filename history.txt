@@ -1,3 +1,141 @@
+2017-09-02 zzz
+ * Data: Prohibit excess key data in certs (ticket #2035)
+ * i2psnark: New open trackers
+ * Startup: Add property to disable output redirect (ticket #2037)
+
+2017-08-26 str4d
+ * Console (light):
+   - Sidebar Restart/Shutdown buttons:
+     - Increase width to better occupy available space and increase width of
+       containing form to ensure browser scaling doesn't wrap buttons
+     - Reduce vertical padding
+     - Reduce height of buttons in console_big.css
+   - /debug:
+     - Multi-column view for Session Key Manager expiry IDs
+     - Fix color mismatch of inbound/outbound h3s
+ * I2PSnark (ubergine):
+   - Fix hover state for inert section headings
+   - Minor adjustments to DHT debug section
+ * Susimail (light): Minor adjustment of notifications in embedded view
+
+* 2017-08-07 0.9.31 released
+
+2017-07-31 zzz
+ * Translations update, Debian patch refresh
+
+2017-07-31 str4d
+ * Console: fix router family page form (ticket #2022)
+
+2017-07-30 str4d
+ * Console
+   - light theme:
+     - Fix spacing issue with banned peers list
+     - Tweak font sizes for Arabic
+   - Shrink icons in sidepanel network status span
+   - Add single graph view buttons to classic theme
+   - Better separation of graphing controls in single graph view
+   - Enhance presentation of /oldconsole and /proof
+
+2017-07-28 str4d
+ * Console:
+   - Enhance presentation of show/hide news links on home page
+   - Fix some issues with Arabic CSS (light/dark)
+   - Further tweaks to graphs display and fixes for borderless single graphs
+     in midnight/dark themes
+   - Fix minor coloring issues with light theme post-rework
+   - Misc theme fixes
+ * I2PSnark:
+   - Move </center> tag in fileinfo view that prevented sticky navbar from
+     working
+   - ubergine:
+     - Alternative panel tabs for embedded view
+     - Tighten .snarkTorrents thead/tfoot spacing
+     - Tweak embedded navbar coloring
+     - Reduce height of download bars
+
+2017-07-26 str4d
+ * Themes:
+   - 'light' theme (console & apps):
+     - Rework to reduce contrast (ticket #1996)
+     - Add custom radio/checkbox icons for Chrome/Blink
+ * Console:
+   - Add JavaScript snippet to reset dest address scroll position onblur (fixes
+     Chrome/Blink disappearing text bugs in i2ptunnel and susidns)
+   - Fix reseed failure notice overlap when "check connection" message shown
+   - Enhance presentation of console "error 500" messages
+   - Cosmetic tweaks to welcome page presentation, arabic welcome page tidyup
+   - Migrate .smallhead th class to tr to simplify markup
+   - Sidebar:
+     - Remove "Congestion" from default sidebar (still present in default
+       advanced sidebar)
+     - Fix label wrapping issue with translations
+     - Migrate sidepanel news section to tables to permit better control over
+       wrapping and placement (ticket #1996)
+     - Move news item dates to tooltips to lessen chance of headlines wrapping
+       and cleanup presentation
+     - Increase maximum length of local tunnel links in the sidebar (and handle
+       overflow with CSS) to minimize chance of default tunnels display
+       truncating in translations
+     - Add the power off icon to sidebar restart button on hover to clarify
+       button function (ticket #1996)
+   - /configadvanced: Move floodfill status to row above to remove unnecessary
+     whitespace and cleanup UI
+   - /debug:
+     - Add container divs and styling markup
+     - Add top navigation menu
+     - Add debug icon to h2 headers to aid navigation
+   - /graphs: Improve presentation of graph images by removing rendered border
+     and setting background color to better integrate with themes
+   - /home: Widen div.app to lessen chance of truncation (classic/midnight)
+   - /jars:
+     - JARs, WARs & individual plugins separated with headers
+     - Filenames stripped of path info (path indicated on headers and tooltips)
+     - Add container divs and styling markup
+     - Minimize table overflow with conditional scaling of content
+     - One-click select for revision, sha256 & unsigned mods
+   - /logs:
+     - Reduce line/entry spacing for router and critical logs (#ticket 1996)
+     - Multi-column view for changelog at >=1400px to address horizontal
+       whitespace issue
+   - /netdb:
+     - Multi-column display of Leases in LeaseSet tables
+     - Better alignment of Lease elements, iconify gateway
+     - Placeholder flag for unknown/unresolved peers for [flag+dest] combos to
+       improve presentation / fix deadspace issue
+   - Chinese:
+     - Fix alignment of table contents in /tunnels (classic)
+     - Fix sidebar content display width (midnight)
+     - Cosmetic fixes (all themes)
+ * I2PSnark:
+   - Mitigate truncation of ratings dropdown in comments section (translations)
+   - light: Reduce contrast of display text
+   - light/classic: Increase contrast of download bars
+   - Create Torrent trackers table: Replace "Tracker URL" with "Tracker Type"
+     (ticket #1996)
+   - Add a persistent warning to the messagelog when JavaScript is disabled to
+     indicate potential loss of form data upon refresh (ticket #1996)
+   - Migrate "view or change bandwidth" to [Configure] tooltip to standardize
+     configuration links, allow for more space for option labels and lessen
+     chance of option labels wrapping in translations
+ * I2PTunnel:
+   - Ensure message log font scales proportionately
+   - Fix overflow issue with dropdowns in Chrome/blink (dark/midnight)
+ * SusiDNS
+   - Reduce width of filter buttons to lessen chance of wrapping (ticket #1996)
+   - Add non-selectable items to improve copy/paste of hosts in address books
+   - Make dest addresses in host list only display scrollbar on focus to reduce
+     screen clutter
+   - Hide broken imagegen images
+ * SusiMail:
+   - Dismiss notifications on click
+   - Enhance presentation of 'postman' links on login panel
+
+2017-07-25 str4d
+ * Console: Move JRobin default color and font changes into SummaryRenderer
+
+2017-07-16 zzz
+ * Imagegen: Test page text fixups
+
 2017-07-15 zzz
  * Console: Fix compile error with Jetty 9.2.22 (ticket #2019)
 
@@ -17,7 +155,7 @@
    - Reduce size of screenlog font at 1400-1600px viewport width to lessen
      chance of text-wrapping (ticket #1996)
    - classic: Fix a linespacing issue in the config section (options:) that only
-     triggers in foreign languages that force the options td to wrap
+     triggers in foreign languages that force the options labels to wrap
  * Fix HTML tags across non-default conditional branches
 
 2017-07-08 zzz
@@ -45,13 +183,13 @@
        - Each transport instance on own line
        - Better presentation of address characteristics
        - Place flag in table header
-     - Container div for leasesets to allow 2 column display at wider viewport width
+     - Container div for leasesets to allow responsive 2 column display
      - Increased spacing of lease information in leaseset tables
      - Add div for "not initialized" message
-     - Reorganize content display in sybil database to reduce horizontal whitespace:
+     - Reorganize content in sybil db to reduce horizontal whitespace:
        - Conditional 2-column display of sybil families
-       - Sybil router characteristics & threatpoints presented in multi-column view
-       - Added empty (n/a) fields to maintain visual consistency in column view
+       - Multi-column view for sybil router characteristics & threatpoints
+       - Empty (n/a) fields to maintain visual consistency in column view
    - /tunnels:
      - Tag "Local" for translation (and convert to lowercase in CSS)
      - Arabic: ensure our tunnel tables display correctly
@@ -74,8 +212,8 @@
      - Fix commenting out of forum.i2p where it impacts surrounding text
      - Cleanup unneeded CSS classes
      - Enhance Chinese legibility
-   - Add untagged strings for /tunnels tooltips and local tunnel indicator (to
-     be tagged for translation post .31 release)
+   - Add untagged strings for /tunnels tooltips and local tunnel indicator
+     (to be tagged for translation post .31 release)
    - classic: reduce color contrast of main display font
    - classic/dark/midnight: alignment on /peers and /tunnels
    - /tunnels:
@@ -119,7 +257,7 @@
    - Arabic (light) adjust font size for sidebar elements
    - Sidebar network status display (ticket #1996)
    - Usability:
-     - Enhance presentation of tables on /peers (improve header/column alignment,
+     - Enhance presentation of tables on /peers (header/column alignment,
        center to separator for multi-value rows)
      - Enhance presentation of tables on /tunnels (reliable alignment of mixed
        content in rows, more prominence to bandwidth tiers)

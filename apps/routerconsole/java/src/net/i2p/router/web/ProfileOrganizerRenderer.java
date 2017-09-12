@@ -146,7 +146,7 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"right\"><i>").append(_t("unknown")).append("</i></td>");
             }
             buf.append("<td align=\"right\">");
-            String v = info.getOption("router.version");
+            String v = info != null ? info.getOption("router.version") : null;
             if (v != null)
                 buf.append(DataHelper.stripHTML(v));
             buf.append("</td><td align=\"right\">").append(num(prof.getSpeedValue()));
@@ -205,23 +205,23 @@ class ProfileOrganizerRenderer {
         //buf.append("<h2><a name=\"flood\"></a>").append(_t("Floodfill and Integrated Peers"))
         //   .append(" (").append(integratedPeers.size()).append(")</h2>\n");
         buf.append("<div class=\"widescroll\"><table id=\"floodfills\">");
-        buf.append("<tr>");
-        buf.append("<th class=\"smallhead\">").append(_t("Peer")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Caps")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Integ. Value")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Heard About")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Heard From")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Good Send")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Bad Send")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("10m Resp. Time")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("1h Resp. Time")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("1d Resp. Time")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Good Lookup")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Bad Lookup")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Good Store")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("Last Bad Store")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("1h Fail Rate")).append("</th>");
-        buf.append("<th class=\"smallhead\">").append(_t("1d Fail Rate")).append("</th>");
+        buf.append("<tr class=\"smallhead\">");
+        buf.append("<th>").append(_t("Peer")).append("</th>");
+        buf.append("<th>").append(_t("Caps")).append("</th>");
+        buf.append("<th>").append(_t("Integ. Value")).append("</th>");
+        buf.append("<th>").append(_t("Last Heard About")).append("</th>");
+        buf.append("<th>").append(_t("Last Heard From")).append("</th>");
+        buf.append("<th>").append(_t("Last Good Send")).append("</th>");
+        buf.append("<th>").append(_t("Last Bad Send")).append("</th>");
+        buf.append("<th>").append(_t("10m Resp. Time")).append("</th>");
+        buf.append("<th>").append(_t("1h Resp. Time")).append("</th>");
+        buf.append("<th>").append(_t("1d Resp. Time")).append("</th>");
+        buf.append("<th>").append(_t("Last Good Lookup")).append("</th>");
+        buf.append("<th>").append(_t("Last Bad Lookup")).append("</th>");
+        buf.append("<th>").append(_t("Last Good Store")).append("</th>");
+        buf.append("<th>").append(_t("Last Bad Store")).append("</th>");
+        buf.append("<th>").append(_t("1h Fail Rate")).append("</th>");
+        buf.append("<th>").append(_t("1d Fail Rate")).append("</th>");
         buf.append("</tr>");
         RateAverages ra = RateAverages.getTemp();
         for (PeerProfile prof : order) {
@@ -290,31 +290,31 @@ class ProfileOrganizerRenderer {
            .append("</td></tr>");
         buf.append("<tr id=\"capabilities_key\"><td colspan=\"2\"><table><tbody>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>B:</b></td><td>").append(_t("SSU Testing")).append("</td>")
-           .append("<td><b>C:</b></td><td>").append(_t("SSU Introducer")).append("</td>")
+           .append("<td><b>B</b></td><td>").append(_t("SSU Testing")).append("</td>")
+           .append("<td><b>C</b></td><td>").append(_t("SSU Introducer")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>f:</b></td><td>").append(_t("Floodfill")).append("</td>")
-           .append("<td><b>H:</b></td><td>").append(_t("Hidden")).append("</td>")
+           .append("<td><b>f</b></td><td>").append(_t("Floodfill")).append("</td>")
+           .append("<td><b>H</b></td><td>").append(_t("Hidden")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>K:</b></td><td>").append(_t("Under {0} shared bandwidth", "12KBps")).append("</td>")
-           .append("<td><b>L:</b></td><td>").append(_t("{0} shared bandwidth", "12 - 32KBps")).append("</td>")
+           .append("<td><b>K</b></td><td>").append(_t("Under {0} shared bandwidth", "12KBps")).append("</td>")
+           .append("<td><b>L</b></td><td>").append(_t("{0} shared bandwidth", "12 - 32KBps")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>M:</b></td><td>").append(_t("{0} shared bandwidth", "32 - 64KBps")).append("</td>")
-           .append("<td><b>N:</b></td><td>").append(_t("{0} shared bandwidth", "64 - 128KBps")).append("</td>")
+           .append("<td><b>M</b></td><td>").append(_t("{0} shared bandwidth", "32 - 64KBps")).append("</td>")
+           .append("<td><b>N</b></td><td>").append(_t("{0} shared bandwidth", "64 - 128KBps")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>O:</b></td><td>").append(_t("{0} shared bandwidth", "128 - 256KBps")).append("</td>")
-           .append("<td><b>P:</b></td><td>").append(_t("{0} shared bandwidth", "256 - 2000KBps")).append("</td>")
+           .append("<td><b>O</b></td><td>").append(_t("{0} shared bandwidth", "128 - 256KBps")).append("</td>")
+           .append("<td><b>P</b></td><td>").append(_t("{0} shared bandwidth", "256 - 2000KBps")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>R:</b></td><td>").append(_t("Reachable")).append("</td>")
-           .append("<td><b>U:</b></td><td>").append(_t("Unreachable")).append("</td>")
+           .append("<td><b>R</b></td><td>").append(_t("Reachable")).append("</td>")
+           .append("<td><b>U</b></td><td>").append(_t("Unreachable")).append("</td>")
            .append("<td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td>")
-           .append("<td><b>X:</b></td><td>").append(_t("Over {0} shared bandwidth", "2000KBps")).append("</td>")
+           .append("<td><b>X</b></td><td>").append(_t("Over {0} shared bandwidth", "2000KBps")).append("</td>")
            .append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>");
         buf.append("<tr><td>&nbsp;</td><td colspan=\"5\">").append(_t("Note: For P and X bandwidth tiers, O is included for the purpose of backward compatibility in the NetDB."))
            .append("</tr>");

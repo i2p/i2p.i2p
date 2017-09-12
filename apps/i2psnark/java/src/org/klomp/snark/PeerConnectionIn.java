@@ -49,12 +49,11 @@ class PeerConnectionIn implements Runnable
     this.peer = peer;
     this.din = din;
     lastRcvd = System.currentTimeMillis();
-    quit = false;
   }
 
   void disconnect()
   {
-    if (quit == true)
+    if (quit)
       return;
 
     quit = true;

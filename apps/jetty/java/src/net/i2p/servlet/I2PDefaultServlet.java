@@ -248,9 +248,9 @@ public class I2PDefaultServlet extends DefaultServlet
      * Copied unchanged from Resource.java
      *
      * Encode any characters that could break the URI string in an HREF.
-     * Such as <a href="/path/to;<script>Window.alert("XSS"+'%20'+"here");</script>">Link</a>
+     * Such as &lt;a href="/path/to;&lt;script&gt;Window.alert("XSS"+'%20'+"here");&lt;/script&gt;"&gt;Link&lt;/a&gt;
      * 
-     * The above example would parse incorrectly on various browsers as the "<" or '"' characters
+     * The above example would parse incorrectly on various browsers as the "&lt;" or '"' characters
      * would end the href attribute value string prematurely.
      * 
      * @param raw the raw text to encode.

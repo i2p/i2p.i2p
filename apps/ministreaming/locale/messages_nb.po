@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Allan Nordhøy <epost@anotheragency.no>, 2014
+# Allan Nordhøy <epost@anotheragency.no>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2017-07-16 14:45+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
-msgstr "Meldingsfrist utløp"
+msgstr "Meldingsfristutløp"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
@@ -58,7 +59,7 @@ msgstr "Melding utløp"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
-msgstr ""
+msgstr "Lokalt oppsatt leie ugyldig"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:99
 msgid "No local tunnels"
@@ -74,11 +75,11 @@ msgstr "Ugyldig destinasjon"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:111
 msgid "Destination lease set expired"
-msgstr ""
+msgstr "Oppsatt målleie utløpt"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:114
 msgid "Destination lease set not found"
-msgstr ""
+msgstr "Oppsatt målleie ikke funnet"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:117
 msgid "Local destination shutdown"
@@ -86,7 +87,7 @@ msgstr "Nedstengning av lokal destinasjon"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
 msgid "Connection was reset"
-msgstr ""
+msgstr "Tilkobling tilbakestilt"
 
 #. Translate this one here, can't do it later
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127

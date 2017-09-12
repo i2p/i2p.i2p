@@ -132,10 +132,20 @@ public class SigningPublicKey extends SimpleDataStructure {
         if (newType == null)
             return new SigningPublicKey(null, _data);
         int newLen = newType.getPubkeyLen();
-        if (newLen == SigType.DSA_SHA1.getPubkeyLen())
+        int ctype = kcert.getCryptoTypeCode();
+        if (ctype == 0) {
+            // prohibit excess key data
+            // TODO non-zero crypto type if added
+            int sz = 7;
+            if (newLen > KEYSIZE_BYTES)
+                sz += newLen - KEYSIZE_BYTES;
+            if (kcert.size() != sz)
+                throw new IllegalArgumentException("Excess data in key certificate");
+        }
+        if (newLen == KEYSIZE_BYTES)
             return new SigningPublicKey(newType, _data);
         byte[] newData = new byte[newLen];
-        if (newLen < SigType.DSA_SHA1.getPubkeyLen()) {
+        if (newLen < KEYSIZE_BYTES) {
             // right-justified
             System.arraycopy(_data, _data.length - newLen, newData, 0, newLen);
         } else {
@@ -163,9 +173,9 @@ public class SigningPublicKey extends SimpleDataStructure {
         if (_type != SigType.DSA_SHA1)
             throw new IllegalStateException("Cannot convert " + _type + " to " + newType);
         int newLen = newType.getPubkeyLen();
-        if (newLen >= SigType.DSA_SHA1.getPubkeyLen())
+        if (newLen >= KEYSIZE_BYTES)
             return null;
-        int padLen = SigType.DSA_SHA1.getPubkeyLen() - newLen;
+        int padLen = KEYSIZE_BYTES - newLen;
         byte[] pad = new byte[padLen];
         System.arraycopy(_data, 0, pad, 0, padLen);
         return pad;

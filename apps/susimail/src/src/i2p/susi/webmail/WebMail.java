@@ -1811,10 +1811,10 @@ public class WebMail extends HttpServlet
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">");
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
-					out.println( "<div class=\"notifications\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
+					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
 				}
 				if( sessionObject.info != null && sessionObject.info.length() > 0 ) {
-					out.println( "<div class=\"notifications\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
+					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"info\"><b>" + quoteHTML(sessionObject.info).replace("\n", "<br>") + "</b></p></div>" );
 				}
 				/*
 				 * now write body
@@ -2049,7 +2049,7 @@ public class WebMail extends HttpServlet
 				ok = false;
 				sessionObject.error += e.getMessage();
 			}
-			String boundary = "_="+(int)(Math.random()*Integer.MAX_VALUE)+""+(int)(Math.random()*Integer.MAX_VALUE);
+			String boundary = "_=" + I2PAppContext.getGlobalContext().random().nextLong();
 			boolean multipart = false;
 			if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 				multipart = true;
@@ -2233,7 +2233,7 @@ public class WebMail extends HttpServlet
 			 spacer +
 			 button(CONFIGURE, _t("Settings")) +
 			"</td></tr>\n" +
-			"<tr><td align=\"center\" colspan=\"2\"><hr><a href=\"http://hq.postman.i2p/?page_id=14\">" + _t("Learn about I2P mail") + "</a> | <a href=\"http://hq.postman.i2p/?page_id=16\">" + _t("Create Account") + "</a></td></tr>\n" +
+			"<tr><td align=\"center\" colspan=\"2\"><hr><a href=\"http://hq.postman.i2p/?page_id=14\" target=\"_blank\">" + _t("Learn about I2P mail") + "</a> | <a href=\"http://hq.postman.i2p/?page_id=16\" target=\"_blank\">" + _t("Create Account") + "</a></td></tr>\n" +
 			"</table></div>");
 	}
 

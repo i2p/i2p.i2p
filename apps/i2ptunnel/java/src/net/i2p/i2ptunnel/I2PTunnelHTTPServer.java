@@ -361,6 +361,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (Boolean.parseBoolean(opts.getProperty(OPT_REJECT_INPROXY)) &&
                 (headers.containsKey("X-Forwarded-For") ||
                  headers.containsKey("X-Forwarded-Server") ||
+                 headers.containsKey("Forwarded") ||  // RFC 7239
                  headers.containsKey("X-Forwarded-Host"))) {
                 if (_log.shouldLog(Log.WARN)) {
                     StringBuilder buf = new StringBuilder();
@@ -374,6 +375,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     h = headers.get("X-Forwarded-Host");
                     if (h != null)
                         buf.append(" for: ").append(h.get(0));
+                    h = headers.get("Forwarded");
+                    if (h != null)
+                        buf.append(h.get(0));
                     _log.warn(buf.toString());
                 }
                 try {
@@ -946,6 +950,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     name = "X-Forwarded-Server";
                 else if ("x-forwarded-host".equals(lcName))
                     name = "X-Forwarded-Host";
+                else if ("forwarded".equals(lcName))
+                    name = "Forwarded";
                 else if ("user-agent".equals(lcName))
                     name = "User-Agent";
                 else if ("referer".equals(lcName))

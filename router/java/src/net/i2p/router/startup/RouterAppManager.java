@@ -23,7 +23,7 @@ import net.i2p.util.Log;
  *  @since 0.9.4
  */
 public class RouterAppManager extends ClientAppManagerImpl {
-    
+
     private final RouterContext _context;
     private final Log _log;
     // client to args
@@ -127,7 +127,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
             break;
         }
     }
-    
+
     /**
      *  Register with the manager under the given name,
      *  so that other clients may find it.
@@ -150,7 +150,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
         // TODO if old app in there is not running and != this app, allow replacement
         return super.register(app);
     }
-    
+
     /// end ClientAppManager interface
 
     /**
@@ -187,9 +187,13 @@ public class RouterAppManager extends ClientAppManagerImpl {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h2>App Manager</h2>");
         buf.append("<h3>Tracked</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString1(buf);
+        buf.append("</div>");
         buf.append("<h3>Registered</h3>");
+        buf.append("<div class=\"debug_container\">");
         toString2(buf);
+        buf.append("</div>");
         out.write(buf.toString());
     }
 
@@ -202,7 +206,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
         for (Map.Entry<ClientApp, String[]> entry : _clients.entrySet()) {
             ClientApp key = entry.getKey();
             String[] val = entry.getValue();
-            list.add("[" + key.getName() + "] = [" + key.getClass().getName() + ' ' + Arrays.toString(val) + "] " + key.getState() + "<br>");
+            list.add("[<b>" + key.getName() + "</b>] = [" + key.getClass().getName() + ' ' + Arrays.toString(val) + "] <i>" + key.getState() + "</i><br>");
         }
         Collections.sort(list);
         for (String e : list) {
@@ -219,7 +223,7 @@ public class RouterAppManager extends ClientAppManagerImpl {
         for (Map.Entry<String, ClientApp> entry : _registered.entrySet()) {
             String key = entry.getKey();
             ClientApp val = entry.getValue();
-            list.add("[" + key + "] = [" + val.getClass().getName() + "]<br>");
+            list.add("[<b>" + key + "</b>] = [" + val.getClass().getName() + "]<br>");
         }
         Collections.sort(list);
         for (String e : list) {

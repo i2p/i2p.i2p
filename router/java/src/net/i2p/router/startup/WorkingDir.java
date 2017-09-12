@@ -60,7 +60,8 @@ public class WorkingDir {
      * Only call this once on router invocation.
      * Caller should store the return value for future reference.
      *
-     * This also redirects stdout and stderr to a wrapper.log file if there is no wrapper present.
+     * This also redirects stdout and stderr to a wrapper.log file if there is no wrapper present,
+     * unless system property I2P_DISABLE_OUTPUT_OVERRIDE is set.
      *
      * @param migrateOldConfig whether to copy all data over from an existing install
      */
@@ -262,7 +263,8 @@ public class WorkingDir {
     }
 
     /**
-     *  Redirect stdout and stderr to a wrapper.log file if there is no wrapper.
+     *  Redirect stdout and stderr to a wrapper.log file if there is no wrapper,
+     *  unless system property I2P_DISABLE_OUTPUT_OVERRIDE is set.
      *
      *  If there is no -Dwrapper.log=/path/to/wrapper.log on the java command line
      *  to specify a log file, check for existence of wrapper.log in CWD,
@@ -275,7 +277,9 @@ public class WorkingDir {
      *  @since 0.8.13
      */
     private static void setupSystemOut(String dir) {
-        if (System.getProperty("wrapper.version") != null)
+        if (SystemVersion.hasWrapper())
+            return;
+        if (System.getProperty("I2P_DISABLE_OUTPUT_OVERRIDE") != null)
             return;
         String path = System.getProperty(PROP_WRAPPER_LOG);
         File logfile;
@@ -462,7 +466,6 @@ public class WorkingDir {
         if (!src.exists()) return false;
         boolean rv = true;
 
-        byte buf[] = new byte[4096];
         FileInputStream in = null;
         FileOutputStream out = null;
         try {

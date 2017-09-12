@@ -395,7 +395,7 @@ public class I2PSnarkServlet extends BasicServlet {
         List<String> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
             out.write("\n<div class=\"snarkMessages\" tabindex=\"0\">");
-            out.write("<a href=\"" + _contextPath + '/');
+            out.write("<a id=\"closeLog\" href=\"" + _contextPath + '/');
             if (isConfigure)
                 out.write("configure");
             if (peerString.length() > 0)
@@ -407,6 +407,8 @@ public class I2PSnarkServlet extends BasicServlet {
             out.write(toThemeImg("delete", tx, tx));
             out.write("</a>" +
                       "\n<ul>\n");
+            out.write("<noscript><li class=\"noscriptWarning\">Warning! Javascript is disabled in your browser. If <a href=\"configure\">page refresh</a> is enabled, ");
+            out.write("you will lose any input in the add/create torrent sections when a refresh occurs.</li></noscript>");
             for (int i = msgs.size()-1; i >= 0; i--) {
                 String msg = msgs.get(i);
                 out.write("<li>" + msg + "</li>\n");
@@ -1862,14 +1864,10 @@ public class I2PSnarkServlet extends BasicServlet {
                 String client;
                 if ("AwMD".equals(ch))
                     client = _t("I2PSnark");
-                else if ("BFJT".equals(ch))
-                    client = "I2PRufus";
-                else if ("TTMt".equals(ch))
-                    client = "I2P-BT";
                 else if ("LUFa".equals(ch))
                     client = "Vuze" + getAzVersion(pid.getID());
-                else if ("CwsL".equals(ch))
-                    client = "I2PSnarkXL";
+                else if ("LUJJ".equals(ch))
+                    client = "BiglyBT" + getAzVersion(pid.getID());
                 else if ("LVhE".equals(ch))
                     client = "XD" + getAzVersion(pid.getID());
                 else if ("ZV".equals(ch.substring(2,4)) || "VUZP".equals(ch))
@@ -1878,6 +1876,12 @@ public class I2PSnarkServlet extends BasicServlet {
                     client = "Transmission" + getAzVersion(pid.getID());
                 else if ("LUtU".equals(ch))
                     client = "KTorrent" + getAzVersion(pid.getID());
+                else if ("CwsL".equals(ch))
+                    client = "I2PSnarkXL";
+                else if ("BFJT".equals(ch))
+                    client = "I2PRufus";
+                else if ("TTMt".equals(ch))
+                    client = "I2P-BT";
                 else
                     client = _t("Unknown") + " (" + ch + ')';
                 out.write(client + "&nbsp;<tt title=\"");
@@ -1979,7 +1983,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static String getAzVersion(byte[] id) {
         if (id[7] != '-')
             return "";
-        StringBuilder buf = new StringBuilder(16);
+        StringBuilder buf = new StringBuilder(8);
         buf.append(' ');
         for (int i = 3; i <= 6; i++) {
             int val = id[i] - '0';
@@ -2202,34 +2206,43 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\" name=\"foo\" >");
         out.write("<tr><td>\n");
         out.write(_t("Trackers"));
-        out.write(":<td><table id=\"trackerselect\" style=\"width: 30%;\"><tr><td></td><td align=\"center\">");
+        out.write(":<td><table id=\"trackerselect\"><tr><td>Name</td><td align=\"center\">");
         out.write(_t("Primary"));
         out.write("</td><td align=\"center\">");
         out.write(_t("Alternates"));
         out.write("</td><td>");
-        out.write(_t("Tracker URL"));
+        out.write(_t("Tracker Type"));
         out.write("</td></tr>\n");
 
         for (Tracker t : sortedTrackers) {
+            List<String> openTrackers = _manager.util().getOpenTrackers();
+            List<String> privateTrackers = _manager.getPrivateTrackers();
+            boolean isPrivate = privateTrackers.contains(t.announceURL);
+            boolean isKnownOpen = _manager.util().isKnownOpenTracker(t.announceURL);
+            boolean isOpen = isKnownOpen || openTrackers.contains(t.announceURL);
             String name = t.name;
             String announceURL = t.announceURL.replace("&#61;", "=");
             String homeURL = t.baseURL;
-            out.write("<tr><td>");
+            out.write("<tr><td><span class=\"trackerName\">");
             out.write(name);
-            out.write("</td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
+            out.write("</span></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"");
             out.write(announceURL);
             out.write("\"");
             if (announceURL.equals(_lastAnnounceURL))
                 out.write(" checked");
             out.write("></td><td align=\"center\"><input type=\"checkbox\" name=\"backup_");
             out.write(announceURL);
-            out.write("\" value=\"foo\"></td><td><a href=\"");
-            out.write(homeURL);
-            out.write("\">");
-            out.write(homeURL);
-            out.write("</a></td></tr>\n");
+            out.write("\" value=\"foo\"></td><td>");
+
+            if (!(isOpen || isPrivate))
+                out.write(_t("Standard"));
+            if (isOpen)
+                out.write(_t("Open"));
+            if (isPrivate) {
+                out.write(_t("Private"));
+            }
         }
-        out.write("<tr><td><i>");
+        out.write("</td></tr><tr><td><i>");
         out.write(_t("none"));
         out.write("</i></td><td align=\"center\"><input type=\"radio\" name=\"announceURL\" value=\"none\"");
         if (_lastAnnounceURL == null)
@@ -2419,8 +2432,10 @@ public class I2PSnarkServlet extends BasicServlet {
         out.write("\"> KBps <td id=\"bwHelp\"><i>");
         out.write(_t("Half available bandwidth recommended."));
         if (_context.isRouterContext()) {
-            out.write("</i> <a href=\"/config.jsp\" target=\"blank\">[");
+            out.write("</i> <a href=\"/config.jsp\" target=\"blank\" title=\"");
             out.write(_t("View or change router bandwidth"));
+            out.write("\">[");
+            out.write(_t("Configure"));
             out.write("]</a>");
         }
         out.write("\n<tr><td><label for=\"useOpenTrackers\">");
@@ -2748,7 +2763,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" >\n" +
                                                "<thead>\n";
 
-    private static final String FOOTER = "</div></center></body></html>";
+    private static final String FOOTER = "</div></center>\n</body>\n</html>";
 
 
     /**
@@ -2857,7 +2872,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                r.isDirectory();
 
         StringBuilder buf=new StringBuilder(4096);
-        buf.append(DOCTYPE).append("<HTML><HEAD><TITLE>");
+        buf.append(DOCTYPE).append("<html><head><title>");
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         final String directory = title;
@@ -2865,13 +2880,13 @@ public class I2PSnarkServlet extends BasicServlet {
         final boolean isTopLevel = dirSlash <= 0;
         title = _t("Torrent") + ": " + DataHelper.escapeHTML(title);
         buf.append(title);
-        buf.append("</TITLE>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
+        buf.append("</title>\n").append(HEADER_A).append(_themePath).append(HEADER_B)
            // hide javascript-dependent buttons when js is unavailable
            .append("<noscript><style type=\"text/css\">.script {display: none;}</style></noscript>")
            .append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">\n");
         if (showPriority)
             buf.append("<script src=\"").append(_contextPath).append(WARBASE + "js/folder.js\" type=\"text/javascript\"></script>\n");
-        buf.append("</HEAD><BODY");
+        buf.append("</head><body");
         if (showPriority)
             buf.append(" onload=\"setupbuttons()\"");
         buf.append(">\n<center><div class=\"snarknavbar\"><a href=\"").append(_contextPath).append("/\" title=\"Torrents\"");
@@ -2880,7 +2895,7 @@ public class I2PSnarkServlet extends BasicServlet {
             buf.append(_t("I2PSnark"));
         else
             buf.append(_contextName);
-        buf.append("</a></div></center>\n");
+        buf.append("</a></div>\n");
 
         if (parent)  // always true
             buf.append("<div class=\"page\">\n<div class=\"mainsection\">");
@@ -3183,7 +3198,7 @@ public class I2PSnarkServlet extends BasicServlet {
                .append("</th></tr><tr><td><b>").append(_t("Resource")).append(":</b></td><td>").append(r.toString())
                .append("</td></tr><tr><td><b>").append(_t("Base")).append(":</b></td><td>").append(base)
                .append("</td></tr><tr><td><b>").append(_t("Torrent")).append(":</b></td><td>").append(torrentName)
-               .append("</td></tr></table></div></div></BODY></HTML>");
+               .append("</td></tr></table></div></div></center>\n</body>\n</html>");
             return buf.toString();
         }
 
@@ -3198,7 +3213,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 displayComments(snark, er, ec, esc, buf);
             if (includeForm)
                 buf.append("</form>");
-            buf.append("</div></div></BODY></HTML>");
+            buf.append("</div></div>\n</body>\n</html>");
             return buf.toString();
         }
 
@@ -3439,7 +3454,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // for stop/start/check
         if (includeForm)
             buf.append("</form>");
-        buf.append("</div></div></BODY></HTML>\n");
+        buf.append("</div></div>\n</body>\n</html>\n");
 
         return buf.toString();
     }

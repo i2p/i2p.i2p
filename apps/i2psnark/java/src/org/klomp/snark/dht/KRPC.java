@@ -846,6 +846,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @param nInfo who to send it to
      *  @return success
      */
+/****
     private boolean sendError(NodeInfo nInfo, MsgID msgID, int err, String msg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending error " + msg + " to: " + nInfo);
@@ -856,6 +857,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         map.put("e", error);
         return sendError(nInfo, msgID, map);
     }
+****/
 
     // Low-level send methods
 
@@ -1422,6 +1424,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         List<Hash> rv = new ArrayList<Hash>(max);
         for (BEValue bev : peers) {
             byte[] b = bev.getBytes();
+            if (b.length != Hash.HASH_LENGTH) {
+                if (_log.shouldWarn())
+                    _log.info("Bad peers entry from: " + nInfo);
+                continue;
+            }
             //Hash h = new Hash(b);
             Hash h = Hash.create(b);
             rv.add(h);

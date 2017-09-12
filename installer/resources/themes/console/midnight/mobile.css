@@ -33,9 +33,16 @@ div.routersummary {
 }
 }
 
-div[style^='height'] + a {
+div[style="height: 36px;"] + a, a[href="/summaryframe"] {
      display: inline-block;
-     padding-top: 8px !important;
+     margin: 12px 0 0 !important;
+     padding: 4px 15px !important;
+     border-radius: 15px;
+     border: 1px solid #241f69;
+}
+
+a[href="/summaryframe"] {
+     margin: 3px 0 2px !important;
 }
 
 .routersummary td,
@@ -73,8 +80,8 @@ div.routersummary table,
 }
 
 .routersummary tr td {
-     border-top: 1px inset #000 !important;
-     border-bottom: 1px inset #000 !important;
+     border-top: 1px solid #000 !important;
+     border-bottom: 1px solid #000 !important;
 }
 
 .routersummary tr:hover td {

@@ -523,6 +523,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             buf.append(countryName);
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
         }
+        else
+            buf.append("<img class=\"unknownflag\" height=\"11\" width=\"16\" alt=\"??\" src=\"/flags.jsp?c=a0\" title=\"").append(_t("unknown")).append("\"> ");
         buf.append("<tt>");
         boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
         if (found)
