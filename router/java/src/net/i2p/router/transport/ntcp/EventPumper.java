@@ -891,9 +891,12 @@ class EventPumper implements Runnable {
                 con.setKey(key);
                 RouterAddress naddr = con.getRemoteAddress();
                 try {
-                    if (naddr.getPort() <= 0)
+                    // no DNS lookups, do not use host names
+                    int port = naddr.getPort();
+                    byte[] ip = naddr.getIP();
+                    if (port <= 0 || ip == null)
                         throw new IOException("Invalid NTCP address: " + naddr);
-                    InetSocketAddress saddr = new InetSocketAddress(naddr.getHost(), naddr.getPort());
+                    InetSocketAddress saddr = new InetSocketAddress(InetAddress.getByAddress(ip), port);
                     boolean connected = con.getChannel().connect(saddr);
                     if (connected) {
                         // Never happens, we use nonblocking

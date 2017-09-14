@@ -205,6 +205,11 @@ class UDPAddress {
     
     public String getHost() { return _host; }
 
+    /**
+     *  As of 0.9.32, will NOT resolve host names.
+     *
+     *  @return InetAddress or null
+     */
     InetAddress getHostAddress() {
         if (_hostAddress == null)
             _hostAddress = getByName(_host);
@@ -224,6 +229,8 @@ class UDPAddress {
     int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
 
     /**
+     *  As of 0.9.32, will NOT resolve host names.
+     *
      *  @throws NullPointerException if getIntroducerCount() == 0
      *  @throws ArrayIndexOutOfBoundsException if i &lt; 0 or i &gt;= getIntroducerCount()
      *  @return null if invalid
@@ -314,13 +321,13 @@ class UDPAddress {
 
     /**
      *  Caching version of InetAddress.getByName(host), which is slow.
-     *  Caches numeric host names only.
-     *  Will resolve but not cache DNS host names.
+     *  Caches numeric IPs only.
+     *  As of 0.9.32, will NOT resolve host names.
      *
      *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
      *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
      *
-     *  @param host DNS or IPv4 or IPv6 host name; if null returns null
+     *  @param host literal IPv4 or IPv6; if null or hostname, returns null
      *  @return InetAddress or null
      *  @since IPv6
      */
@@ -332,15 +339,15 @@ class UDPAddress {
             rv = _inetAddressCache.get(host);
         }
         if (rv == null) {
-            try {
-                rv = InetAddress.getByName(host);
-                if (InetAddressUtils.isIPv4Address(host) ||
-                    InetAddressUtils.isIPv6Address(host)) {
+            if (InetAddressUtils.isIPv4Address(host) ||
+                InetAddressUtils.isIPv6Address(host)) {
+                try {
+                    rv = InetAddress.getByName(host);
                     synchronized (_inetAddressCache) {
                         _inetAddressCache.put(host, rv);
                     }
-                }
-            } catch (UnknownHostException uhe) {}
+                } catch (UnknownHostException uhe) {}
+            }
         }
         return rv;
     }

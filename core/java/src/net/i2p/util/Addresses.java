@@ -340,6 +340,7 @@ public abstract class Addresses {
                     _negativeCache.remove(host);
                 }
             }
+            //I2PAppContext.getGlobalContext().logManager().getLog(Addresses.class).error("lookup of " + host, new Exception("I did it"));
             try {
                 rv = InetAddress.getByName(host).getAddress();
                 if (InetAddressUtils.isIPv4Address(host) ||
@@ -353,6 +354,41 @@ public abstract class Addresses {
                 synchronized(_negativeCache) {
                     _negativeCache.put(host, Long.valueOf(System.currentTimeMillis()));
                 }
+            }
+        }
+        return rv;
+    }
+
+    /**
+     *  Caching version of InetAddress.getByName(host).getAddress(), which is slow.
+     *  Resolves literal IP addresses only, will not cause a DNS lookup.
+     *  Will return null for host names.
+     *
+     *  Unlike InetAddress.getByName(), we do NOT allow numeric IPs
+     *  of the form d.d.d, d.d, or d, as these are almost certainly mistakes.
+     *
+     *  @param host literal IPv4 or IPv6 address; if null returns null
+     *  @return IP or null
+     *  @since 0.9.32
+     */
+    public static byte[] getIPOnly(String host) {
+        if (host == null)
+            return null;
+        byte[] rv;
+        synchronized (_IPAddress) {
+            rv = _IPAddress.get(host);
+        }
+        if (rv == null) {
+            if (InetAddressUtils.isIPv4Address(host) ||
+                InetAddressUtils.isIPv6Address(host)) {
+                try {
+                    rv = InetAddress.getByName(host).getAddress();
+                    synchronized (_IPAddress) {
+                        _IPAddress.put(host, rv);
+                    }
+                } catch (UnknownHostException uhe) {}
+            //} else {
+            //    I2PAppContext.getGlobalContext().logManager().getLog(Addresses.class).warn("Not looking up " + host, new Exception("I did it"));
             }
         }
         return rv;
@@ -416,6 +452,8 @@ public abstract class Addresses {
      *  JVM options such as java.net.preverIPv4Stack and java.net.preferIPv6Addresses.
      *  Number of results may also change based on caching at various layers,
      *  even if the ultimate name server results did not change.
+     *
+     *  Note: Unused
      *
      *  @param host DNS or IPv4 or IPv6 host name; if null returns null
      *  @return non-empty list IPs, or null if none
