@@ -1,3 +1,19 @@
+QUICK START:
+
+$ i2prouter start
+
+(do NOT use sudo or run it as root!)
+
+Then your web browser will start and show http://localhost:7657 (or you may run it manually).
+
+You can configure i2p (run on boot, memory limit, using apparmor) via debconf:
+
+# dpkg-configure -plow i2p
+
+See also: https://geti2p.net/en/download/debian
+
+-----
+
 There are a few changes in this package from upstream.
 
 - eepget and i2prouter are installed to /usr/bin.

@@ -17,7 +17,7 @@ db_version 2.0
 case "$1" in
     configure|reconfigure)
         if [ ! -e $conffile ]; then
-            echo "# Defaults for i2p initscript (/etc/init.d/i2p" >> $conffile
+            echo "# Defaults for i2p initscript (/etc/init.d/i2p)" >> $conffile
             echo "# This is a posix shell fragment" >> $conffile
             echo >> $conffile
             echo "# [automatically edited by postinst, do not change line format ]" >> $conffile

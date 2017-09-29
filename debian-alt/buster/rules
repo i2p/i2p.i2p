@@ -38,7 +38,7 @@ export BITS := $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
-	dh $@ --with systemd,quilt,bash-completion
+	dh $@ --with systemd,bash-completion
 
 clean: createcopyright
 
@@ -76,7 +76,7 @@ else
 	@echo "Already found deb in version, not doing anything"
 endif
 	@# build options
-	@/bin/echo -e "javac.version=1.7" > $(CURDIR)/override.properties
+	@/bin/echo -e "javac.version=1.8" > $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "javac.compilerargs7=-bootclasspath $(JAVA_HOME)/jre/lib/rt.jar:$(JAVA_HOME)/jre/lib/jce.jar" >> $(CURDIR)/override.properties
 	@/bin/echo -e "build.built-by=debian" >> $(CURDIR)/override.properties
