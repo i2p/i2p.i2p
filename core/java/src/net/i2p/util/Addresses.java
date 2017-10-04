@@ -453,8 +453,6 @@ public abstract class Addresses {
      *  Number of results may also change based on caching at various layers,
      *  even if the ultimate name server results did not change.
      *
-     *  Note: Unused
-     *
      *  @param host DNS or IPv4 or IPv6 host name; if null returns null
      *  @return non-empty list IPs, or null if none
      *  @since 0.9.28

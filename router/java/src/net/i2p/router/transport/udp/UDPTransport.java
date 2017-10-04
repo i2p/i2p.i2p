@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import net.i2p.crypto.SigType;
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
@@ -2044,28 +2046,79 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /**
      *  Update our IPv4 address and optionally tell the router to rebuild and republish the router info.
      *
+     *  If PROP_EXTERNAL_HOST is set, use those addresses (comma/space separated).
+     *  If a hostname is configured in that property, use it.
+     *  As of 0.9.32, a hostname is resolved here into one or more addresses
+     *  and the IPs are published, to implement proposal 141.
+     *
+     *  A max of one v4 and one v6 address will be set. Significant changes both
+     *  here and in NTCP would be required to publish multiple v4 or v6 addresses.
+     *
      *  @param allowRebuildRouterInfo whether to tell the router
      *  @return the new address if changed, else null
      */
     private RouterAddress rebuildExternalAddress(boolean allowRebuildRouterInfo) {
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldDebug())
             _log.debug("REA2 " + allowRebuildRouterInfo);
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         int port = _context.getProperty(PROP_EXTERNAL_PORT, -1);
         
-        byte[] ip = null;
         String host = null;
         if (explicitAddressSpecified()) {
             host = _context.getProperty(PROP_EXTERNAL_HOST);
             if (host != null) {
                 String[] hosts = DataHelper.split(host, "[,; \r\n\t]");
                 RouterAddress rv = null;
+                // we only take one each of v4 and v6
+                boolean v4 = false;
+                boolean v6 = false;
                 for (int i = 0; i < hosts.length; i++) {
                     String h = hosts[i];
                     if (h.length() <= 0)
                         continue;
-                    rv = rebuildExternalAddress(h, port, allowRebuildRouterInfo);
+                    if (InetAddressUtils.isIPv4Address(h)) {
+                        if (v4)
+                            continue;
+                        v4 = true;
+                    } else if (InetAddressUtils.isIPv6Address(h)) {
+                        if (v6)
+                            continue;
+                        v6 = true;
+                    } else {
+                        int valid = 0;
+                        List<byte[]> ips = Addresses.getIPs(h);
+                        if (ips != null) {
+                            for (byte[] ip : ips) {
+                                if (!isValid(ip)) {
+                                    if (_log.shouldWarn())
+                                        _log.warn("REA2: skipping invalid " + Addresses.toString(ip) + " for " + h);
+                                    continue;
+                                }
+                                if ((v4 && ip.length == 4) || (v6 && ip.length == 16)) {
+                                    if (_log.shouldWarn())
+                                        _log.warn("REA2: skipping additional " + Addresses.toString(ip) + " for " + h);
+                                    continue;
+                                }
+                                if (ip.length == 4)
+                                    v4 = true;
+                                else if (ip.length == 16)
+                                    v6 = true;
+                                valid++;
+                                if (_log.shouldDebug())
+                                    _log.debug("REA2: adding " + Addresses.toString(ip) + " for " + h);
+                                RouterAddress trv = rebuildExternalAddress(ip, port, allowRebuildRouterInfo);
+                                if (trv != null)
+                                    rv = trv;
+                            }
+                        }
+                        if (valid == 0)
+                            _log.error("No valid IPs for configured hostname " + h);
+                        continue;
+                    }
+                    RouterAddress trv = rebuildExternalAddress(h, port, allowRebuildRouterInfo);
+                    if (trv != null)
+                        rv = trv;
                 }
                 return rv;
             }
@@ -2089,7 +2142,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *  @since IPv6
      */
     private RouterAddress rebuildExternalAddress(byte[] ip, int port, boolean allowRebuildRouterInfo) {
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldDebug())
             _log.debug("REA3 " + Addresses.toString(ip, port));
         if (ip == null)
             return rebuildExternalAddress((String) null, port, allowRebuildRouterInfo);
@@ -2115,7 +2168,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     private RouterAddress locked_rebuildExternalAddress(String host, int port, boolean allowRebuildRouterInfo) {
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldDebug())
             _log.debug("REA4 " + host + ':' + port);
         if (_context.router().isHidden())
             return null;

@@ -1,3 +1,10 @@
+2017-10-04 zzz
+ * Router: Convert configured hostnames to IP addresses
+   before publishing (proposal #141)
+
+2017-09-29 zzz
+ * Debian: Backport fixes from 0.9.30-4 package (ticket #2027)
+
 2017-09-14 zzz
  * Router: Don't lookup hostnames in addresses (proposal #141)
 
