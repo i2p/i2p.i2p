@@ -32,7 +32,7 @@
 <%=intl._t("Floodfill participation helps the network, but may use more of your computer's resources.")%>
 <%
     if (advancedhelper.isFloodfill()) {
-%> (<%=intl._t("This router is currently a floodfill participant.")%><%
+%> (<%=intl._t("This router is currently a floodfill participant.")%>)<%
     } else {
 %> (<%=intl._t("This router is not currently a floodfill participant.")%>)<%
     }
