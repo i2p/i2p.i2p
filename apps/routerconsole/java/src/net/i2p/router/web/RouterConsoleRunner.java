@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -140,7 +141,8 @@ public class RouterConsoleRunner implements RouterApp {
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
     public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
-    
+    static final String PROP_ALLOWED_HOSTS = "routerconsole.allowedHosts";
+
     /**
      *  <pre>
      *  non-SSL:
@@ -360,14 +362,15 @@ public class RouterConsoleRunner implements RouterApp {
      *<pre>
      *	Server
      *		HandlerCollection
-     *			ContextHandlerCollection
-     *				WebAppContext (i.e. ContextHandler)
-     *					SessionHandler
-     *					SecurityHandler
-     *					ServletHandler
-     *						servlets...
-     *				WebAppContext
-     *				...
+     *			HostCheckHandler
+     *				ContextHandlerCollection
+     *					WebAppContext (i.e. ContextHandler)
+     *						SessionHandler
+     *						SecurityHandler
+     *						ServletHandler
+     *							servlets...
+     *					WebAppContext
+     *					...
      *			DefaultHandler
      *			RequestLogHandler (opt)
      *</pre>
@@ -442,10 +445,12 @@ public class RouterConsoleRunner implements RouterApp {
 
         HandlerCollection hColl = new HandlerCollection();
         ContextHandlerCollection chColl = new ContextHandlerCollection();
+        HostCheckHandler chCollWrapper = new HostCheckHandler(_context);
+        chCollWrapper.setHandler(chColl);
         // gone in Jetty 7
         //_server.addHandler(hColl);
         _server.setHandler(hColl);
-        hColl.addHandler(chColl);
+        hColl.addHandler(chCollWrapper);
         hColl.addHandler(new DefaultHandler());
 
         String log = _context.getProperty("routerconsole.log");
@@ -480,6 +485,7 @@ public class RouterConsoleRunner implements RouterApp {
         if (!_webAppsDir.endsWith("/"))
             _webAppsDir += '/';
 
+        Set<String> listenHosts = new HashSet<String>(8);
         HandlerWrapper rootWebApp = null;
         ServletHandler rootServletHandler = null;
         List<Connector> connectors = new ArrayList<Connector>(4);
@@ -549,6 +555,7 @@ public class RouterConsoleRunner implements RouterApp {
                     Collections.sort(hosts, new HostComparator());
                     _context.portMapper().register(PortMapper.SVC_CONSOLE, hosts.get(0), lport);
                     // note that we could still fail in connector.start() below
+                    listenHosts.addAll(hosts);
                 }
             }
 
@@ -627,6 +634,7 @@ public class RouterConsoleRunner implements RouterApp {
                         Collections.sort(hosts, new HostComparator());
                         _context.portMapper().register(PortMapper.SVC_HTTPS_CONSOLE, hosts.get(0), sslPort);
                         // note that we could still fail in connector.start() below
+                        listenHosts.addAll(hosts);
                     }
                 } else {
                     System.err.println("Unable to create or access keystore for SSL: " + keyStore.getAbsolutePath());
@@ -669,6 +677,27 @@ public class RouterConsoleRunner implements RouterApp {
         } catch (Exception ioe) {
             ioe.printStackTrace();
         }
+
+        // fix up the allowed hosts set (see HostCheckHandler)
+        if (listenHosts.contains("0.0.0.0") ||
+            listenHosts.contains("::") ||
+            listenHosts.contains("0:0:0:0:0:0:0:0")) {
+            // empty set says all are valid
+            listenHosts.clear();
+        } else {
+            listenHosts.add("localhost");
+            listenHosts.add("127.0.0.1");
+            listenHosts.add("::1");
+            listenHosts.add("0:0:0:0:0:0:0:1");
+            String allowed = _context.getProperty(PROP_ALLOWED_HOSTS);
+            if (allowed != null) {
+                StringTokenizer tok = new StringTokenizer(allowed, " ,");
+                while (tok.hasMoreTokens()) {
+                    listenHosts.add(tok.nextToken());
+                }
+            }
+        }
+        chCollWrapper.setListenHosts(listenHosts);
 
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=364936
         // WARN:oejw.WebAppContext:Failed startup of context o.e.j.w.WebAppContext{/,jar:file:/.../webapps/routerconsole.war!/},/.../webapps/routerconsole.war

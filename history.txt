@@ -1,3 +1,8 @@
+2017-10-11 zzz
+ * Console: Validate host header (thx Kevin Froman)
+ * Router: Honor IPv6 setting when converting configured hostnames
+   to IP addresses (proposal #141)
+
 2017-10-04 zzz
  * Router: Convert configured hostnames to IP addresses
    before publishing (proposal #141)
