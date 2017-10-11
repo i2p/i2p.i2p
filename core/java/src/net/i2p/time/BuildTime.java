@@ -34,10 +34,10 @@ public class BuildTime {
     private static final long _latestTime;
     private static final long YEARS_25 = 25L*365*24*60*60*1000;
     /** update this periodically */
-    private static final String EARLIEST = "2017-03-27 12:00:00 UTC";
+    private static final String EARLIEST = "2017-10-11 12:00:00 UTC";
     // fallback if parse fails ticket #1976
     // date -d 201x-xx-xx +%s
-    private static final long EARLIEST_LONG = 1490587200 * 1000L;
+    private static final long EARLIEST_LONG = 1507694400 * 1000L;
 
     static {
         // this is the standard format of build.timestamp as set in the top-level build.xml
