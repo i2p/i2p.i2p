@@ -2073,6 +2073,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // we only take one each of v4 and v6
                 boolean v4 = false;
                 boolean v6 = false;
+                // prevent adding a type if disabled
+                TransportUtil.IPv6Config cfg = getIPv6Config();
+                if (cfg == IPV6_DISABLED)
+                    v6 = true;
+                else if (cfg == IPV6_ONLY)
+                    v4 = true;
                 for (int i = 0; i < hosts.length; i++) {
                     String h = hosts[i];
                     if (h.length() <= 0)
