@@ -21,6 +21,9 @@
   EARLIEST and EARLIEST_LONG values in ~/mtn/i2p/core/java/src/net/i2p/time/BuildTime.java
   to the current date, more or less.
 
+- Tickets: Check if any blocker or critical tickets for this release remain open;
+  get them fixed and closed, or reclassified.
+
 
 ## A day or two before
 
@@ -42,6 +45,9 @@
   - `mtn ci`
 
 3. Make announcement on Transifex asking for news translation
+
+4. Tickets: Check if any blocker or critical tickets for this release remain open;
+   get them fixed and closed, or reclassified.
 
 
 ## On release day
