@@ -1074,7 +1074,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _context.getBooleanProperty(PROP_LAPTOP_MODE) &&
                     now - lastChanged > 10*60*1000 &&
                     _context.router().getUptime() < 10*60*1000) {
-                    _log.log(Log.CRIT, "IP changed, restarting with a new identity and port");
+                    System.out.println("WARN: IP changed, restarting with a new identity and port");
+                    _log.logAlways(Log.WARN, "IP changed, restarting with a new identity and port");
                     // this removes the UDP port config
                     _context.router().killKeys();
                     // do we need WrapperManager.signalStopped() like in ConfigServiceHandler ???
