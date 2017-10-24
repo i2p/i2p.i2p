@@ -1,3 +1,10 @@
+2017-10-24 zzz
+ * NTCP: Convert configured NTCP hostname to IP address
+   before publishing (proposal #141)
+
+2017-10-21 zzz
+ * UDP: Reduce log level on IP change (ticket #2053)
+
 2017-10-11 zzz
  * Console: Validate host header (thx Kevin Froman)
  * Router: Honor IPv6 setting when converting configured hostnames

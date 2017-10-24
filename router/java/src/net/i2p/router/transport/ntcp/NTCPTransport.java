@@ -24,6 +24,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -88,6 +90,7 @@ public class NTCPTransport extends TransportImpl {
     private long _lastInboundIPv4;
     private long _lastInboundIPv6;
 
+    // note: SSU version is i2np.udp.host, not hostname
     public final static String PROP_I2NP_NTCP_HOSTNAME = "i2np.ntcp.hostname";
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
@@ -242,8 +245,8 @@ public class NTCPTransport extends TransportImpl {
                     RouterAddress addr = getTargetAddress(target);
                     if (addr != null) {
                         con = new NTCPConnection(_context, this, ident, addr);
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug("Send on a new con: " + con + " at " + addr + " for " + ih);
                         // Note that outbound conns go in the map BEFORE establishment
                         _conByIdent.put(ih, con);
                     } else {
@@ -369,8 +372,8 @@ public class NTCPTransport extends TransportImpl {
 
         boolean established = isEstablished(toAddress.getIdentity());
         if (established) { // should we check the queue size?  nah, if its valid, use it
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("fast bid when trying to send to " + peer + " as its already established");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("fast bid when trying to send to " + peer + " as its already established");
             return _fastBid;
         }
 
@@ -401,16 +404,16 @@ public class NTCPTransport extends TransportImpl {
         }
 
         if (!allowConnection()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("no bid when trying to send to " + peer + ", max connection limit reached");
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("no bid when trying to send to " + peer + ", max connection limit reached");
             return _transientFail;
         }
 
         //if ( (_myAddress != null) && (_myAddress.equals(addr)) )
         //    return null; // dont talk to yourself
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("slow bid when trying to send to " + peer);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("slow bid when trying to send to " + peer);
         if (haveCapacity()) {
             if (addr.getCost() > DEFAULT_COST)
                 return _slowCostBid;
@@ -599,8 +602,8 @@ public class NTCPTransport extends TransportImpl {
         if (skews.size() < 5 && _lastBadSkew != 0)
             skews.addElement(Long.valueOf(_lastBadSkew));
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("NTCP transport returning " + skews.size() + " peer clock skews.");
         return skews;
     }
 
@@ -808,7 +811,7 @@ public class NTCPTransport extends TransportImpl {
     }
 
     /**
-     *  @return configured host or null. Must be one of our local interfaces.
+     *  @return configured host (as an IP String) or null. Must be one of our local interfaces.
      *  @since IPv6 moved from bindAddress()
      */
     private String getFixedHost() {
@@ -916,6 +919,10 @@ public class NTCPTransport extends TransportImpl {
     /**
      *  Generally returns null
      *  caller must synch on this
+     *  Note this is only called from startListening()
+     *
+     *  TODO return a list of one or more
+     *  TODO only returns non-null if port is configured
      */
     private RouterAddress configureLocalAddress() {
             // this generally returns null -- see javadoc
@@ -940,24 +947,119 @@ public class NTCPTransport extends TransportImpl {
      * This only creates an address if the hostname AND port are set in router.config,
      * which should be rare.
      * Otherwise, notifyReplaceAddress() below takes care of it.
-     * Note this is called both from above and from NTCPTransport.startListening()
+     * Note this is only called from startListening() via configureLocalAddress()
+     *
+     * TODO return a list of one or more
+     * TODO unlike in UDP rebuildExternalAddress(), this only runs once, at startup,
+     * so we won't pick up IP changes.
+     * TODO only returns non-null if port is configured
      *
      * @since IPv6 moved from CSFI
      */
     private RouterAddress createNTCPAddress() {
-        // Fixme doesn't check PROP_BIND_INTERFACE
-        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
-        if ( (name == null) || (name.trim().length() <= 0) || ("null".equals(name)) )
-            return null;
         int p = _context.getProperty(PROP_I2NP_NTCP_PORT, -1);
         if (p <= 0 || p >= 64*1024)
             return null;
+
+        String name = getConfiguredIP();
+        if (name == null)
+            return null;
+
         OrderedProperties props = new OrderedProperties();
         props.setProperty(RouterAddress.PROP_HOST, name);
         props.setProperty(RouterAddress.PROP_PORT, Integer.toString(p));
         int cost = getDefaultCost(false);
         RouterAddress addr = new RouterAddress(STYLE, props, cost);
         return addr;
+    }
+
+    /**
+     * Return a single configured IP (as a String) or null if not configured or invalid.
+     * Resolves a hostname to an IP.
+     * Called at startup via createNTCPAddress() and later via externalAddressReceived()
+     *
+     * TODO return a list of one or more
+     *
+     * @since 0.9.32
+     */
+    private String getConfiguredIP() {
+        // Fixme doesn't check PROP_BIND_INTERFACE
+        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        if ( (name == null) || (name.trim().length() <= 0) || ("null".equals(name)) )
+            return null;
+        String[] hosts = DataHelper.split(name, "[,; \r\n\t]");
+        List<String> ipstrings = new ArrayList<String>(2);
+        // we only take one each of v4 and v6
+        boolean v4 = false;
+        boolean v6 = false;
+        // prevent adding a type if disabled
+        TransportUtil.IPv6Config cfg = getIPv6Config();
+        if (cfg == IPV6_DISABLED)
+            v6 = true;
+        else if (cfg == IPV6_ONLY)
+            v4 = true;
+        for (int i = 0; i < hosts.length; i++) {
+            String h = hosts[i];
+            if (h.length() <= 0)
+                continue;
+            if (InetAddressUtils.isIPv4Address(h)) {
+                if (v4)
+                    continue;
+                v4 = true;
+                ipstrings.add(h);
+            } else if (InetAddressUtils.isIPv6Address(h)) {
+                if (v6)
+                    continue;
+                v6 = true;
+                ipstrings.add(h);
+            } else {
+                int valid = 0;
+                List<byte[]> ips = Addresses.getIPs(h);
+                if (ips != null) {
+                    for (byte[] ip : ips) {
+                        if (!isValid(ip)) {
+                            if (_log.shouldWarn())
+                                _log.warn("skipping invalid " + Addresses.toString(ip) + " for " + h);
+                            continue;
+                        }
+                        if ((v4 && ip.length == 4) || (v6 && ip.length == 16)) {
+                            if (_log.shouldWarn())
+                                _log.warn("skipping additional " + Addresses.toString(ip) + " for " + h);
+                            continue;
+                        }
+                        if (ip.length == 4)
+                            v4 = true;
+                        else if (ip.length == 16)
+                            v6 = true;
+                        valid++;
+                        if (_log.shouldDebug())
+                            _log.debug("adding " + Addresses.toString(ip) + " for " + h);
+                        ipstrings.add(Addresses.toString(ip));
+                    }
+                }
+                if (valid == 0)
+                    _log.error("No valid IPs for configured hostname " + h);
+                continue;
+            }
+        }
+
+        if (ipstrings.isEmpty()) {
+            _log.error("No valid IPs for configuration: " + name);
+            return null;
+        }
+
+        // get first IPv4, if none then first IPv6
+        // TODO return both
+        String ip = null;
+        for (String ips : ipstrings) {
+            if (ips.contains(".")) {
+                ip = ips;
+                break;
+            }
+        }
+        if (ip == null)
+            ip = ipstrings.get(0);
+        return ip;
     }
     
     private int getDefaultCost(boolean isIPv6) {
@@ -1105,7 +1207,7 @@ public class NTCPTransport extends TransportImpl {
         //                          "true" was in 0.7.3
         String ohost = newProps.getProperty(RouterAddress.PROP_HOST);
         String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true").toLowerCase(Locale.US);
-        String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        String name = getConfiguredIP();
         // hostname config trumps auto config
         if (name != null && name.length() > 0)
             enabled = "false";
