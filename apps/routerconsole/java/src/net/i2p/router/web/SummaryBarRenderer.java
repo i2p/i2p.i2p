@@ -963,8 +963,8 @@ class SummaryBarRenderer {
                        .append("\"");
                     if (entry.updated > 0) {
                         Date date = new Date(entry.updated);
-                        // tooltip to tag for translation post 0.9.31 release
-                        buf.append(" title=\"Published: ").append(fmt.format(date)).append("\"");
+                        buf.append(" title=\"")
+                           .append(_t("Published")).append(": ").append(fmt.format(date)).append("\"");
                     }
                     buf.append(">");
                     buf.append(entry.title)
