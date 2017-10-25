@@ -22,7 +22,9 @@
      - Add additional reachability states for clockskew and vmcomm (with icons)
    - Homepage: Add 'Customize Sidebar' link to signpost the feature now that
      there are more optional sections available (ticket #1996)
-   - /configui: Add option to embed Susimail and I2PSnark in console
+   - /configui:
+     - Add option to embed Susimail and I2PSnark in console
+     - Use larger flags for language selection
  * I2PTunnel: Add hostname / destination (b32) information to server section on
    index page (for parity with client tunnels section)
  * I2PSnark

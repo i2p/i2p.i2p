@@ -172,7 +172,7 @@ public class ConfigUIHelper extends HelperBase {
             if (lang.equals(current))
                 buf.append(CHECKED);
             buf.append("value=\"").append(lang).append("\">")
-               .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(langs[i][1]).append("\">")
+               .append("<img height=\"48\" width=\"48\" alt=\"\" src=\"/flags.jsp?s=48&c=").append(langs[i][1]).append("\">")
                .append("<div class=\"ui_lang\">");
             int under = lang.indexOf('_');
             String slang = (under > 0) ? lang.substring(0, under) : lang;

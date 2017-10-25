@@ -1241,6 +1241,9 @@
         <copy todir="pkg-temp/docs/icons/flags" >
           <fileset dir="installer/resources/icons/flags" />
         </copy>
+        <copy todir="pkg-temp/docs/icons/flags48x48" >
+          <fileset dir="installer/resources/icons/flags48x48" />
+        </copy>
     </target>
 
     <target name="copyjetty" depends="copyjetty-unlesspkg" >
@@ -1396,6 +1399,8 @@
                im.png added in 0.8.12; cw.png added in 0.9.5; ap,bl,bq,ss,sx added in 0.9.21;
                lang_gl added in 0.9.28; a0.png added in 0.9.31 -->
           <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png icons/flags/cw.png icons/flags/ap.png icons/flags/bl.png icons/flags/bq.png icons/flags/ss.png icons/flags/sx.png icons/flags/lang_gl.png icons/flags/a0.png" />
+          <!-- flags48x48 added in 0.9.32 -->
+          <fileset dir="installer/resources/" includes="icons/flags48x48/*" />
         </copy>
     </target>
 
@@ -2507,6 +2512,9 @@
 			<!-- FLAGs for language icon (not for ip)-->
 			<copy todir="pkg-temp/docs/icons/flags" >
 				<fileset dir="installer/resources/icons/flags/" includes="cn.png,de.png,fr.png,nl.png,ru.png,se.png,us.png" />
+			</copy>
+			<copy todir="pkg-temp/docs/icons/flags48x48" >
+				<fileset dir="installer/resources/icons/flags48x48" />
 			</copy>
 		<mkdir dir="pkg-temp/webapps" />
 			<copy todir="pkg-temp/webapps/">

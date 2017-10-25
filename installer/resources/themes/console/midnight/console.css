@@ -3552,6 +3552,38 @@ td#themeselect {
 }
 }
 
+/* large flags */
+
+.langselect img {
+     width: 40px;
+     height: 40px;
+     border: none !important;
+     margin-top: -6px !important;
+     margin-left: -82px;
+     position: absolute;
+     box-shadow: none;
+     opacity: 0.75;
+     filter: drop-shadow(0 0 1px #000);
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     width: 32px !important;
+     height: 32px !important;
+     border: none !important;
+     margin-left: -78px;
+     margin-top: -2px !important;
+     margin-bottom: 0;
+     box-shadow: none !important;
+     opacity: 1;
+}
+
+.langselect input:hover + img {
+     box-shadow: none !important;
+     transition: none !important;
+     filter: drop-shadow(0 0 2px #652787);
+}
+
+/* end large flags */
 /* end flag as radio icons */
 
 .ui_lang { /* lang text label */

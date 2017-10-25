@@ -9,16 +9,22 @@
 
 /**
  *  flags.jsp?c=de => icons/flags/de.png
+ *  flags.jsp?c=de&s=48 => icons/flags48x48/de.png
  *  with headers set so the browser caches.
  */
 String c = request.getParameter("c");
 if (c != null &&
     (c.length() == 2 || c.length() == 7) &&
     c.replaceAll("[a-z0-9_]", "").length() == 0) {
+    String flagSet = "flags";
+    String s = request.getParameter("s");
+    if ("48".equals(s)) {
+        flagSet = "flags48x48";
+    }
     java.io.OutputStream cout = response.getOutputStream();
     String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
     String file = "docs" + java.io.File.separatorChar + "icons" + java.io.File.separatorChar +
-                  "flags" + java.io.File.separatorChar + c + ".png";
+                  flagSet + java.io.File.separatorChar + c + ".png";
     java.io.File ffile = new java.io.File(base, file);
     long lastmod = ffile.lastModified();
     if (lastmod > 0) {

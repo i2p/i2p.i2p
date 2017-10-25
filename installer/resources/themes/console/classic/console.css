@@ -4680,6 +4680,70 @@ p#helptranslate {
      margin: 0 -5px;
 }
 
+/* large flags */
+
+.langselect img {
+     margin-top: 2px !important;
+     margin-bottom: 34px !important;
+     margin-left: -70px !important;
+     width: 40px;
+     height: 40px;
+     border: none !important;
+     box-shadow: none;
+     opacity: 0.9 !important;
+     transform: none !important;
+     filter: drop-shadow(0 0 1px #77d);
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-top: 6px !important;
+     margin-bottom: 38px !important;
+     width: 32px !important;
+     height: 32px !important;
+     border: none !important;
+     box-shadow: none !important;
+     opacity: 1 !important;
+     transform: none !important;
+     animation: glow 20s 10s infinite;
+}
+
+.langselect input:hover + img {
+     box-shadow: none !important;
+     border: none !important;
+     transition: none !important;
+     filter: drop-shadow(0 0 2px #f60);
+}
+
+/*
+.langselect input[name="lang"]:checked + img + .ui_lang {
+     margin: -24px -4px 0;
+}
+*/
+
+@keyframes glow {
+0% {
+     filter: drop-shadow(0 0 1px rgba(256, 100, 0, 0.1));
+}
+
+20% {
+     filter: drop-shadow(0 0 1px #f60);
+}
+
+50% {
+     filter: drop-shadow(0 0 2px #930);
+}
+
+80% {
+     filter: drop-shadow(0 0 1px #d40);
+}
+
+100% {
+     filter: drop-shadow(0 0 1px rgba(256, 100, 0, 0.1));
+}
+}
+
+/* end large flags */
+
 /* configui password*/
 
 #consolepass th:nth-child(2) {
