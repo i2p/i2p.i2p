@@ -34,6 +34,17 @@ function ajaxDone(url, target, refresh) {
       document.getElementById(target).innerHTML = failMessage;
       //document.getElementByClassName("hideifdown").style.display="none";
     }
+
+    // conditionally load sidebar refreshGraph script
+    var graph = document.getElementById('sb_graphcontainer');
+    if (graph) {
+      var js_refreshGraph = document.createElement('script');
+      js_refreshGraph.type = "text/javascript";
+      js_refreshGraph.src = "/js/refreshGraph.js";
+      js_refreshGraph.async = true;
+      document.getElementsByTagName('head')[0].appendChild(js_refreshGraph);
+    }
+
     setTimeout(function() {ajax(url, target, refresh);}, refresh);
   }
 }

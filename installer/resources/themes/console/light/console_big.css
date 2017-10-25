@@ -74,9 +74,18 @@ button.control {
      line-height: 130%;
 }
 
+#sb_graphcontainer {
+     background-position: left -60px top -20px !important;
+}
+
 .sb_newsheadings td, .sb_newsheadings tr:hover td {
      background-position: 4px center !important;
      padding-left: 22px !important;
+}
+
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after,
+#sb_bandwidth td::after, #sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
+   min-height: 15px !important;
 }
 
 div.news, .newscontent p {

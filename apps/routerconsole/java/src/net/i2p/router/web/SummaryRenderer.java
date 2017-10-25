@@ -266,7 +266,7 @@ class SummaryRenderer {
                 def.area(dsNames[0], AREA_COLOR, _listener.getRate().getRateStat().getDescription());
                 def.line(dsNames[1], LINE_COLOR, "Events per period");
             */
-            if (hideLegend) 
+            if (hideLegend)
                 def.setNoLegend(true);
             if (hideGrid) {
                 def.setDrawXGrid(false);

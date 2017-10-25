@@ -46,6 +46,14 @@ h2, h3 {
      margin-bottom: -10px !important;
 }
 
+.routersummaryouter {
+     margin-right: -1px;
+}
+
+.routersummary {
+     margin-bottom: 4px;
+}
+
 .routersummary h4 {
      text-align: center;
 }
@@ -201,6 +209,40 @@ div.wideload {
      text-align: right !important;
      padding-right: 28px !important;
      background-position: right 6px center !important;
+}
+
+#sb_graphcontainer {
+     background-position: left -60px top -20px !important;
+     transform: scale(-1, +1);
+}
+
+#sb_bandwidthgraph {
+     margin: -5px -5px -5px 0;
+}
+
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+#sb_bandwidthgraph {
+     margin: -5px -5px -6px 0 !important;
+}
+}
+
+.percentBarOuter {
+     margin: -4px -3px -4px -5px;
+     background: linear-gradient(to left, rgba(0,255,0,0.05) 50%, rgba(255,255,0,0.05) 75%, rgba(255,128,0,0.05) 90%, rgba(255,0,0,0.1)), repeating-linear-gradient(to right, rgba(180, 180, 255,0.7) 1px, rgba(180, 180, 255, 0.7) 2px, rgba(221, 221, 255, 0.7) 2px, rgba(221, 221, 255, 0.7) 4px);
+}
+
+.sb_info .percentBarOuter {
+     margin: 3px 2px -19px -4px;
+}
+
+.sb_updatestatus, .sb_info .percentBarText {
+     font-size: 9pt;
+}
+
+.sb_info .percentBarText {
+     padding-top: 1px;
+     direction: ltr;
 }
 
 .routersummary td:last-child {

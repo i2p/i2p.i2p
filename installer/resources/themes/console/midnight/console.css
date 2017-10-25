@@ -1293,20 +1293,20 @@ div.logo hr {
      text-transform: capitalize;
 }
 
-#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
      margin-top: -6px !important;
      margin-bottom: -5px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
      content: "";
      display: inline-block;
      vertical-align: bottom;
      min-height: 16px !important;
 }
 
-#sb_general td, #sb_shortgeneral td {
+#sb_general td, #sb_shortgeneral td, #sb_advancedgeneral td {
      white-space: nowrap;
 }
 
@@ -1355,7 +1355,7 @@ div.logo hr {
      border-radius: 0 2px 2px 0;
 }
 
-#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link, #sb_help a:link {
      word-break: break-all;
      max-width: 190px;
      overflow: hidden;
@@ -1367,20 +1367,42 @@ div.logo hr {
      padding: 1px 3px;
 }
 
-#sb_services a:hover, #sb_internals a:hover, #sb_advanced a:hover, #sb_localtunnels tr:hover, #sb_localtunnels tr:hover a,
+#sb_services a:hover, #sb_internals a:hover, #sb_advanced a:hover, #sb_localtunnels tr:hover, #sb_localtunnels tr:hover a, #sb_help a:hover,
 .news a:hover, #console a:hover, tt a:hover {
      background: #652787;
      color: #fff !important;
      border-radius: 2px;
 }
 
-#sb_services a:active, #sb_internals a:active, #sb_advanced a:active, #sb_localtunnels tr:active, .news a:active, #console a:active, tt a:active {
+#sb_services a:active, #sb_internals a:active, #sb_advanced a:active, #sb_help a:active,
+#sb_localtunnels tr:active, .news a:active, #console a:active, tt a:active {
      background: #39144f;
      color: #c9ceff !important;
 }
 
 #sb_localtunnels tr:active a {
      color: #c9ceff !important;
+}
+
+#sb_peersadvanced a {
+     padding: 0;
+     color: #c9ceff;
+}
+
+#sb_peersadvanced a:hover, #sb_peersadvanced a:focus {
+     color: #652787;
+}
+
+#sb_peersadvanced .separator td::after {
+     min-height: 0 !important;
+}
+
+#sb_peersadvanced .separator hr, #sb_peersadvanced .separator hr:last-child {
+     display: block !important;
+     margin: 3px 0 2px !important;
+     color: transparent;
+     background: transparent;
+     border-bottom: 1px dashed #2d296f;
 }
 
 .sb_notice {
@@ -1570,6 +1592,170 @@ p:empty + .sb_notice {
 }
 
 /* end sidebar news */
+
+/* mini sidebar graph */
+
+#sb_bandwidthgraph {
+     width: 100%;
+     margin: -13px 0 0 -8px !important;
+     border-collapse: separate;
+     border-spacing: 0;
+     padding: 0;
+     border: 1px solid #5df;
+     box-shadow: 0 0 1px #ccf;
+}
+
+#sb_bandwidthgraph:hover {
+     border: 1px solid #f60;
+     cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+}
+
+a:active #sb_bandwidthgraph {
+     border: 1px solid #f30;
+}
+
+#sb_bandwidthgraph td {
+     background: linear-gradient(to top, #f3f3ff 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 89%, #f3f3ff 93%), linear-gradient(to right, #f3f3ff, rgba(255,255,255,0.0) 2%, rgba(255,255,255,0.0) 98%, #f3f3ff), repeating-linear-gradient(to right, rgba(255,255,255,0.0) 10px, rgba(120,120,255,0.8) 11px, rgba(255,255,255,0.0) 11px, rgba(255,255,255,0.0) 20px), repeating-linear-gradient(to top, rgba(255,255,255,0.0) 1px, rgba(120,120,255,0.8) 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 10px) !important;
+     background: linear-gradient(to top, #fff 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 89%, #fff 93%), repeating-linear-gradient(to right, rgba(255,255,255,0.0) 10px, rgba(120,120,255,0.8) 11px, rgba(255,255,255,0.0) 11px, rgba(255,255,255,0.0) 20px), repeating-linear-gradient(to top, rgba(255,255,255,0.0) 1px, rgba(120,120,255,0.8) 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 10px) !important;
+     padding: 0 1px;
+     box-shadow: inset 0 0 0 1px #fff;
+     height: 40px;
+     vertical-align: top;
+}
+
+#sb_graphstats {
+     display: inline-block;
+     padding: 2px 8px;
+     font-weight: bold;
+     background: #444;
+     border: 1px solid #999;
+     border-top: none;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #fff;
+     opacity: 0;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer:hover #sb_graphstats {
+     opacity: 1;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer {
+     background-color: #000;
+     background-position: left -72px top -26px !important;
+     background-size: 280px 90px !important;
+     background-repeat: no-repeat !important;
+     margin: -7px 0 -3px !important;
+     height: 40px;
+     filter: invert(1) sepia(1) hue-rotate(180deg);
+}
+
+@keyframes graphfadein {
+from {
+     opacity: 0;
+}
+
+to {
+     opacity: 1;
+}
+}
+
+#sb_graphcontainer {
+     animation: graphfadein 0.4s ease-in; /* attempt to mitigate strobe effect as image loads before filters are applied */
+}
+
+@media screen and (min-width: 1500px) {
+#sb_graphcontainer {
+     background-size: 300px 77px !important;
+     background-position: left -72px top -20px !important;
+}
+
+#sb_bandwidthgraph {
+     width: 100%;
+     margin: -15px 0 0 -8px !important;
+}
+}
+
+/* end mini sidebar graph */
+
+/* status bar */
+
+.percentBarOuter {
+     width: 194px;
+     background: #000;
+     background: repeating-linear-gradient(135deg, #001 1px, #001 5px, #003 6px, #003 11px);
+     background: repeating-linear-gradient(to right, #000 1px, #000 2px, #003 2px, #003 4px);
+     border: 1px solid #171c3f;
+     opacity: 1;
+     box-shadow: 0 0 1px 1px rgba(0,0,0,0.8);
+     margin: -3px 0 -5px -6px;
+}
+
+@media screen and (min-width: 1500px) {
+.percentBarOuter {
+     width: 210px;
+}
+}
+
+.percentBarOuter:hover .percentBarText {
+     opacity: 1;
+     transition: ease opacity 0.2s;
+}
+
+.percentBarInner {
+     height: 14px;
+     background: #0e5f00;
+     background: linear-gradient(to bottom,  #33a 0%, #226 50%, #003 50%, #000 100%);
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.percentBarText {
+     width: 100%;
+     font-weight: bold;
+     text-align: center;
+     vertical-align: middle;
+     float: left;
+     opacity: 0;
+     transition: ease opacity 0.2s;
+}
+
+/* update bar */
+
+.sb_updatestatus {
+     background: #000;
+     margin: -6px -4px -2px;
+     padding: 2px 0 4px;
+     border-bottom: 1px solid #443da0;
+     color: #c9ceff;
+}
+
+.sb_info .percentBarOuter {
+     margin: 5px -2px -4px 0;
+     box-shadow: none !important;
+     background: repeating-linear-gradient(135deg, #001 1px, #001 5px, #003 6px, #003 11px);
+     animation: downloadbar 3s infinite alternate;
+}
+.sb_info .percentBarText {
+     opacity: 1;
+     padding-top: 2px;
+     color: #c9ceff;
+}
+
+.sb_info .percentBarInner {
+     height: 16px;
+}
+
+@keyframes downloadbar {
+from {
+     background: repeating-linear-gradient(135deg, #001 1px, #001 5px, #003 6px, #003 11px);
+}
+
+to {
+     background: repeating-linear-gradient(135deg, #003 1px, #003 6px, #001 7px, #001 11px);
+}
+}
+
+/* end status bar */
 /* end sidebar */
 
 /* console error messages */
@@ -6806,7 +6992,7 @@ form[action="events"] {
 
 /* end network status */
 
-#sb_services, #sb_internals, #sb_advanced {
+#sb_services, #sb_internals, #sb_advanced, #sb_help {
      margin-top: -3px !important;
      margin-bottom: -5px !important;
 }
@@ -7334,8 +7520,8 @@ table#i2pupdates td:first-child {
 }
 
 @media screen and (max-width: 1500px) {
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 14px;
 }
 
@@ -7431,7 +7617,8 @@ h1 {
      width: 216px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after, #sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after,
+#sb_bandwidth td::after, #sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 18px;
 }
 
@@ -7511,11 +7698,11 @@ div.joblog h3 {
      margin-top: 8px !important;
 }
 
-#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link, #sb_help a:link {
      max-width: 207px;
 }
 
-#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
      margin-top: -4px !important;
      margin-bottom: -4px !important;
 }

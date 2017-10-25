@@ -527,24 +527,49 @@ img[src="/themes/console/images/i2plogo.png"] {
      border: 0 !important;
 }
 
-#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
      margin-bottom: -5px !important;
      margin-top: -6px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after, #sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
    min-height: 14px;
 }
 
-#sb_peers td:first-child, #sb_tunnels td:first-child, #sb_queue td:first-child, #sb_bandwidth td:first-child, #sb_general td:first-child, #sb_shortgeneral td:first-child {
+#sb_peers td:first-child, #sb_peersadvanced td:first-child, #sb_tunnels td:first-child, #sb_queue td:first-child,
+#sb_bandwidth td:first-child, #sb_general td:first-child, #sb_shortgeneral td:first-child, #sb_advancedgeneral td:first-child {
      white-space: nowrap;
 }
 
 #sb_bandwidth td:nth-child(2) {
      white-space: nowrap;
      width: 60%;
+}
+
+#sb_peersadvanced a {
+     padding: 0;
+}
+
+#sb_peersadvanced a b {
+     color: #2c354f;
+}
+
+#sb_peersadvanced a:hover b {
+     color: #f60;
+}
+
+#sb_peersadvanced .separator td::after {
+     min-height: 0;
+}
+
+#sb_peersadvanced .separator hr {
+     margin: 3px 0 2px !important;
+     color: transparent;
+     background: transparent;
+     border-bottom: 1px dashed #89f;
 }
 
 #sb_localid {
@@ -559,11 +584,11 @@ img[src="/themes/console/images/i2plogo.png"] {
      margin: -1px 0 -3px;
 }
 
-#sb_internals, #sb_services, #sb_advanced {
+#sb_internals, #sb_services, #sb_advanced, #sb_help {
      margin-top: -3px !important;
 }
 
-#sb_internals a, #sb_services a, #sb_advanced a {
+#sb_internals a, #sb_services a, #sb_advanced a, #sb_help a {
      display: inline-block;
      padding: 2px;
      max-width: 194px;
@@ -833,6 +858,179 @@ div.refresh {
 }
 
 /* end network status */
+
+/* mini sidebar graph */
+
+#sb_bandwidthgraph {
+     width: 202px !important;
+     margin: 0;
+     margin: -20px 0 0 0;
+     border-collapse: separate;
+     border-spacing: 0;
+     padding: 0;
+     border: 1px solid #89f;
+     border-radius: 2px;
+     box-shadow: 0 0 1px #ccf;
+}
+
+#sb_bandwidthgraph:hover {
+     border: 1px solid #f60;
+     cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+}
+
+a:active #sb_bandwidthgraph {
+     border: 1px solid #f30;
+}
+
+#sb_bandwidthgraph td {
+     background: linear-gradient(to top, #f3f3ff 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 89%, #f3f3ff 93%), linear-gradient(to right, #f3f3ff, rgba(255,255,255,0.0) 2%, rgba(255,255,255,0.0) 98%, #f3f3ff), repeating-linear-gradient(to right, rgba(255,255,255,0.0) 10px, rgba(120,120,255,0.8) 11px, rgba(255,255,255,0.0) 11px, rgba(255,255,255,0.0) 20px), repeating-linear-gradient(to top, rgba(255,255,255,0.0) 1px, rgba(120,120,255,0.8) 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 10px) !important;
+     padding: 0 1px;
+     box-shadow: inset 0 0 0 1px #fff;
+     height: 38px;
+     vertical-align: top;
+}
+
+#sb_graphstats {
+     display: inline-block;
+     padding: 2px 8px;
+     font-weight: bold;
+     background: #ddf;
+     background: linear-gradient(to right, #ddf, #efefff, #ddf);
+     border: 1px solid #89f;
+     border-top: none;
+     border-radius: 0 0 3px 3px;
+     box-shadow: inset 0 0 0 1px #fff;
+     opacity: 0;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer:hover #sb_graphstats {
+     opacity: 1;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer {
+     background-color: #f3f3ff;
+     background-position: left -60px top -35px !important;
+     background-position: left -60px top -29px !important;
+     background-size: 280px 92px !important;
+     background-size: 280px 77px !important;
+     background-repeat: no-repeat !important;
+     background-blend-mode: multiply;
+     margin: 0 2px -21px 1px !important;
+     padding: 0 5px 0 0;
+}
+
+@media screen and (min-width: 1500px) {
+#sb_bandwidthgraph {
+     width: 223px !important;
+     background-size: 300px 92px !important;
+}
+
+#sb_graphcontainer {
+     background-size: 300px 77px !important;
+}
+}
+/* end mini sidebar graph */
+
+/* status bars */
+
+.percentBarOuter {
+     width: 196px;
+     margin: -4px 0 -5px 3px;
+     text-align: center;
+     border: 1px solid #99f;
+     box-shadow: 0 0 1px rgba(200,200,200,0.8);
+     background: #eef;
+     background: repeating-linear-gradient(to right, rgba(180, 180, 255,0.7) 1px, rgba(180, 180, 255, 0.7) 2px, rgba(221, 221, 255, 0.7) 2px, rgba(221, 221, 255, 0.7) 4px);
+}
+
+@media screen and (min-width: 1500px) {
+.percentBarOuter {
+     width: 210px;
+}
+}
+
+.percentBarInner {
+     vertical-align: middle;
+     border: none;
+     height: 14px;
+     background: #bbf;
+     background: linear-gradient(to right, rgba(0,255,0,0.1) 65px, rgba(255,255,0,0.1) 110px, rgba(255,128,0,0.1) 175px, rgba(255,0,0,0.1)), linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(180, 180, 255, 0.7) 50%, rgba(140, 140, 255, 0.7) 100%);
+     box-shadow: inset 0 0 0 1px #ddf;
+}
+
+.percentBarText {
+     display: inline !important;
+     white-space: nowrap;
+     text-align: center !important;
+     font-weight: bold !important;
+     color: #2c354f;
+     text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+     float: left;
+     width: 100%;
+     height: 14px;
+     padding: 0;
+     opacity: 0;
+     transition: ease opacity 0.2s;
+}
+
+.percentBarOuter:hover .percentBarText {
+     opacity: 1;
+     transition: ease opacity 0.2s;
+}
+
+/* updates download bar */
+
+.sb_updatestatus {
+     display: block;
+     border: 1px solid #99f;
+     border-top: none;
+     color: #2c354f;
+     border-radius: 0 0 3px 3px;
+     box-sizing: border-box;
+     background: #ccf;
+     background: linear-gradient(to right, #eef, #eff2ff 30%, #eff2ff 60%, #eef);
+     box-shadow: inset 0 0 0 1px #fff;
+     margin: -8px 2px 5px !important;
+     padding: 3px 0 4px;
+     font-style: italic;
+}
+
+.sb_info .percentBarOuter {
+     margin: 3px -4px -5px 2px;
+     background: repeating-linear-gradient(135deg, rgba(238, 238, 255,0.7) 1px, rgba(238, 238, 255, 0.7) 5px, rgba(221, 221, 255, 0.7) 6px, rgba(221, 221, 255, 0.7) 11px);
+}
+
+@keyframes downloadbar {
+from {
+     background: repeating-linear-gradient(135deg, rgba(221, 221, 255, 0.7) 1px, rgba(221, 221, 255, 0.7) 6px, rgba(238, 238, 255,0.7) 7px, rgba(238, 238, 255,0.7) 11px);
+}
+
+to {
+     background: repeating-linear-gradient(135deg, rgba(238, 238, 255,0.7) 1px, rgba(238, 238, 255, 0.7) 5px, rgba(221, 221, 255, 0.7) 6px, rgba(221, 221, 255, 0.7) 11px);
+}
+}
+
+.sb_info .percentBarOuter {
+     animation: downloadbar 3s infinite;
+}
+
+.sb_info .percentBarInner {
+     height: 16px;
+     background: linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(180, 180, 255, 0.7) 50%, rgba(140, 140, 255, 0.7) 100%);
+
+}
+
+.sb_info .percentBarText {
+     opacity: 1;
+     padding-top: 2px;
+     mix-blend-mode: multiply;
+     color: #33f;
+
+}
+/* end updates download bar */
+/* end status bars */
 
 /* end sidebar */
 
@@ -6886,8 +7084,8 @@ table.sybil_routerinfo:last-child {
 }
 
 @media screen and (max-width: 1500px) {
-#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
-#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 12px;
 }
 
@@ -6988,13 +7186,17 @@ tt a, .cells tt, #profilelist tt {
      padding: 4.5px 0 !important;
 }
 
-#sb_internals a, #sb_services a, #sb_advanced a {
+#sb_internals a, #sb_services a, #sb_advanced a, #sb_help a {
      max-width: 212px;
 }
 
 .routersummary button[type="submit"] {
      min-width: 100px;
      margin: 2px 4px 1px;
+}
+
+.percentBarOuter {
+     width: 217px;
 }
 
 div.app {

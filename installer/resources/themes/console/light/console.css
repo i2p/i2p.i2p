@@ -14,6 +14,7 @@ body {
      background: #a4a4cb url(images/tile2.png) fixed;
      background-size: 32px 32px;
 }
+}
 
 /* preload button mouseovers */
 body {
@@ -130,7 +131,7 @@ pre {
 
 .routersummary div[style="height: 36px;"] {
      margin: 0;
-     padding: 0;
+     padding: 0 0 1px;
      text-align: center;
 }
 
@@ -141,19 +142,12 @@ pre {
 }
 
 .routersummary img[src$="i2plogo.png"] {
-     opacity: 0.9;
+     opacity: 0.7;
      transition: ease filter 0.3s 0s, ease opacity 0.3s 0s;
-     margin-top: -1px;
-     margin-left: -1px !important;
-     width: 194px;
+     margin: 0 !important;
+     width: 190px;
      height: auto;
      filter: drop-shadow(0 0 1px #ccf);
-}
-
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-.routersummary img[src$="i2plogo.png"] {
-     margin-top: -2px !important;
-}
 }
 
 .routersummary img[src$="i2plogo.png"]:hover {
@@ -162,25 +156,27 @@ pre {
      filter: drop-shadow(0 0 1px #f60);
 }
 
+.routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
+     filter: drop-shadow(0 0 1px #f60);
+}
+
 .routersummary a:active img[src$="i2plogo.png"] {
-     filter: drop-shadow(0 0 2px #f30);
+     filter: drop-shadow(0 0 2px #d30);
 }
 
 .routersummary a[href="/"], .routersummary a[href="/console"] {
      outline: none !important;
 }
 
-.routersummary a[href="/"]:focus img, .routersummary a[href="/console"]:focus img {
-     filter: drop-shadow(0 0 1px #f60);
-}
-
 .routersummary form {
-     margin: 0 -7px;
+     margin: -2px -7px;
      padding: 0 0 3px;
 }
 
-.routersummary form[action="/config"] {
-     margin: -2px -7px;
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.routersummary form {
+     margin: -1px -7px -3px !important;
+}
 }
 
 .routersummary form button.download {
@@ -331,8 +327,8 @@ h4.sb_info + hr + form {
 }
 
 #sb_version {
-     margin-top: 5px !important;
-     margin-bottom: 8px !important;
+     margin-top: 7px !important;
+     margin-bottom: 10px !important;
 }
 
 #sb_localtunnels td {
@@ -374,11 +370,12 @@ h4.sb_info + hr + form {
      background: #fffff0 !important;
 }
 
-#sb_internals, #sb_advanced {
-     margin: -9px -6px -6px;
+#sb_internals, #sb_advanced, #sb_help {
+     margin: -9px -6px -5px;
+     width: 204px !important;
 }
 
-#sb_internals a, #sb_advanced a {
+#sb_internals a, #sb_advanced a, #sb_help a {
      padding: 2px;
      display: inline-block;
      vertical-align: middle !important;
@@ -387,33 +384,236 @@ h4.sb_info + hr + form {
      text-overflow: ellipsis;
 }
 
-#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+#sb_internals a:hover, #sb_advanced a:hover, #sb_help a:hover {
+     background: #ffd;
+     border-radius: 3px;
+}
+
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
      margin-bottom: -4px !important;
      margin-top: -10px !important;
 }
 
-#sb_general, #sb_shortgeneral {
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
+     margin-bottom: -6px !important;
+}
+}
+
+#sb_shortgeneral {
      margin-top: -7px !important;
 }
 
-#sb_general td, #sb_shortgeneral td {
+#sb_general td, #sb_shortgeneral td, #sb_advancedgeneral td {
      white-space: nowrap;
 }
 
-#sb_general td:first-child, #sb_shortgeneral td:first-child {
+#sb_general td:first-child, #sb_shortgeneral td:first-child, #sb_advancedgeneral td:first-child {
      max-width: 130px;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
    min-height: 13px;
 }
 
-#sb_peers td:first-child, #sb_tunnels td:first-child, #sb_queue td:first-child, #sb_bandwidth td:first-child, #sb_general td:first-child, #sb_shortgeneral td:first-child {
+#sb_peers td:first-child, #sb_peersadvanced td:first-child, #sb_tunnels td:first-child, #sb_queue td:first-child, #sb_bandwidth td:first-child,
+#sb_general td:first-child, #sb_shortgeneral td:first-child, #sb_advancedgeneral td:first-child {
      text-transform: capitalize;
 }
+
+#sb_peersadvanced a:hover b, #sb_peersadvanced a:visited:hover b {
+     color: #f60 !important
+}
+
+#sb_peersadvanced a:active b, #sb_peersadvanced a:visited:active b {
+     color: #f90 !important
+}
+
+#sb_peersadvanced .separator td {
+     padding: 0;
+}
+
+.separator hr, .separator hr:last-child {
+     color: transparent;
+     background: transparent;
+     height: 1px;
+     border-bottom: 1px dashed #99f !important;
+     margin: 3px 0 -10px !important;
+     display: block !important;
+}
+
+/* mini sidebar graph */
+
+#sb_bandwidthgraph {
+     width: 100%;
+     margin: -5px 0 -5px -5px;
+     border-collapse: separate;
+     border-spacing: 0;
+     padding: 0;
+     border: 1px solid #89f;
+     border-radius: 2px;
+     box-shadow: 0 0 1px #ccf;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+#sb_bandwidthgraph {
+     margin: -5px 0 -6px -5px !important;
+}
+}
+
+#sb_bandwidthgraph:hover {
+     border: 1px solid #f60;
+     cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+}
+
+a:active #sb_bandwidthgraph {
+     border: 1px solid #f30;
+}
+
+#sb_bandwidthgraph td {
+     background: linear-gradient(to top, #f3f3ff 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 89%, #f3f3ff 93%), linear-gradient(to right, #f3f3ff, rgba(255,255,255,0.0) 2%, rgba(255,255,255,0.0) 98%, #f3f3ff), repeating-linear-gradient(to right, rgba(255,255,255,0.0) 10px, rgba(120,120,255,0.8) 11px, rgba(255,255,255,0.0) 11px, rgba(255,255,255,0.0) 20px), repeating-linear-gradient(to top, rgba(255,255,255,0.0) 1px, rgba(120,120,255,0.8) 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 10px) !important;
+     padding: 0 1px;
+     box-shadow: inset 0 0 0 1px #fff;
+     height: 40px;
+     vertical-align: top;
+}
+
+#sb_graphstats {
+     display: inline-block;
+     padding: 2px 8px;
+     font-weight: bold;
+     background: #ddf;
+     background: linear-gradient(to right, #ddf, #efefff, #ddf);
+     border: 1px solid #89f;
+     border-top: none;
+     border-radius: 0 0 3px 3px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #fff;
+     opacity: 0;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer:hover #sb_graphstats {
+     opacity: 1;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer {
+     background-color: #f3f3ff;
+     background-position: left -60px top -23px !important;
+     background-size: 280px 77px !important;
+     background-repeat: no-repeat !important;
+     background-blend-mode: multiply;
+}
+
+@media screen and (min-width: 1500px) {
+#sb_graphcontainer {
+     background-size: 300px 77px !important;
+}
+}
+/* end mini sidebar graph */
+
+/* status bars for memory usage and router/plugin updates */
+
+.percentBarOuter {
+     width: 196px;
+     margin: -4px -5px -4px -3px;
+     text-align: center;
+     border: 1px solid #99f;
+     box-shadow: 0 0 1px rgba(200,200,200,0.8);
+     background: #eef;
+     background: linear-gradient(to right, rgba(0,255,0,0.05) 50%, rgba(255,255,0,0.05) 75%, rgba(255,128,0,0.05) 90%, rgba(255,0,0,0.1)), repeating-linear-gradient(to right, rgba(180, 180, 255,0.7) 1px, rgba(180, 180, 255, 0.7) 2px, rgba(221, 221, 255, 0.7) 2px, rgba(221, 221, 255, 0.7) 4px);
+}
+
+@media screen and (min-width: 1500px) {
+.percentBarOuter {
+     width: 212px;
+}
+}
+
+.percentBarInner {
+     vertical-align: middle;
+     border: none;
+     height: 14px;
+     background: #bbf;
+     background: linear-gradient(to right, rgba(0,255,0,0.1) 65px, rgba(255,255,0,0.1) 110px, rgba(255,128,0,0.1) 175px, rgba(255,0,0,0.1)), linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(180, 180, 255, 0.7) 50%, rgba(140, 140, 255, 0.7) 100%);
+     background: linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(180, 180, 255, 0.7) 50%, rgba(140, 140, 255, 0.7) 100%);
+     box-shadow: inset 0 0 0 1px #ddf;
+}
+
+.percentBarText {
+     display: inline !important;
+     white-space: nowrap;
+     text-align: center !important;
+     font-weight: bold !important;
+     color: #41465f;
+     text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+     float: left;
+     width: 100%;
+     height: 14px;
+     padding: 0;
+     opacity: 0;
+     transition: ease opacity 0.2s;
+}
+
+.percentBarOuter:hover .percentBarText {
+     opacity: 1;
+     transition: ease opacity 0.2s;
+}
+
+/* updates download bar */
+
+.sb_update a {
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+.sb_updatestatus {
+     display: block;
+     font-style: italic;
+     border: 1px solid #99f;
+     border-top: none;
+     border-radius: 0 0 3px 3px;
+     background: #ccf;
+     background: linear-gradient(to right, #ddf, #efefff 30%, #efefff 60%, #ddf);
+     box-shadow: inset 0 0 0 1px #fff;
+     margin: -7px 2px 5px !important;
+     padding: 4px 0 3px;
+     filter: drop-shadow(0 0 1px #ccf);
+}
+
+.sb_info .percentBarOuter {
+     margin: 3px -4px -19px 2px;
+     background: repeating-linear-gradient(135deg, rgba(238, 238, 255,0.7) 1px, rgba(238, 238, 255, 0.7) 5px, rgba(221, 221, 255, 0.7) 6px, rgba(221, 221, 255, 0.7) 11px);
+}
+
+@keyframes downloadbar {
+from {
+     background: repeating-linear-gradient(135deg, rgba(221, 221, 255, 0.7) 1px, rgba(221, 221, 255, 0.7) 6px, rgba(238, 238, 255,0.7) 7px, rgba(238, 238, 255,0.7) 11px);
+}
+
+to {
+     background: repeating-linear-gradient(135deg, rgba(238, 238, 255,0.7) 1px, rgba(238, 238, 255, 0.7) 5px, rgba(221, 221, 255, 0.7) 6px, rgba(221, 221, 255, 0.7) 11px);
+}
+}
+
+.sb_info .percentBarOuter {
+     animation: downloadbar 3s infinite;
+}
+
+.sb_info .percentBarInner {
+     height: 16px;
+}
+
+.sb_info .percentBarText {
+     opacity: 1;
+     padding-top: 3px;
+     mix-blend-mode: multiply;
+}
+/* end updates download bar */
+/* end status bars */
 
 #sb_warning {
      border-bottom: 1px solid #99f;
@@ -549,16 +749,6 @@ p:empty + .sb_notice {
      padding: 0 2px;
      background-image: none !important;
      border: 0 !important;
-}
-
-.routersummary img:first-child {
-     margin-bottom: -2px !important;
-     opacity: 0.7;
-}
-
-.routersummary img:hover:first-child {
-     margin-bottom: -2px !important;
-     opacity: 1;
 }
 
 /* sidebar network status */
@@ -713,7 +903,7 @@ p:empty + .sb_notice {
 
 .sb_newsheadings table {
      table-layout: auto;
-     width: 202px !important;
+     width: 204px !important;
      margin: -12px 0 -8px -14px;
 }
 
@@ -1715,7 +1905,7 @@ p#enablefullstats {
 
 #sidebarconf button {
      margin: 2px 0 2px 3px !important;
-     padding: 2px;
+     padding: 2px 3px;
      min-width: 0;
      background-size: 100% 100% !important;
 }
@@ -3103,7 +3293,7 @@ h1 {
      background: #fcfcff;
      background: linear-gradient(135deg, #fcfcff, rgba(252,252,255,0) 600px), linear-gradient(to bottom, #fcfcff 50%, rgba(248,248,255,0.6) 50%), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
      border: 1px solid #447;
-     border-radius: 2px;
+     border-radius: 2px 2px 0 0;
      min-width: 546px;
      z-index: 999;
 }
@@ -7075,12 +7265,12 @@ body {
      margin: 5px 4px;
 }
 
-#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
-#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after,
+#sb_bandwidth td::after, #sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 12px;
 }
 
-#sb_internals a, #sb_advanced a {
+#sb_internals a, #sb_advanced a #sb_help a {
      max-width: 200px;
 }
 
@@ -7258,22 +7448,22 @@ h1 {
      margin-top: -2px !important;
 }
 
-#sb_internals a, #sb_advanced a {
+#sb_internals a, #sb_advanced a, #sb_help a {
      max-width: 212px;
 }
 
-#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
      margin-bottom: -4px !important;
      margin-top: -10px !important;
 }
 
-#sb_general, #sb_shortgeneral {
-     margin-top: -7px !important; 
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral {
+     margin-top: -7px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
-   min-height: 14px;
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
+     min-height: 14px;
 }
 
 #banlist li {

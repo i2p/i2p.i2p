@@ -32,6 +32,7 @@ public class HomeHelper extends HelperBase {
         // FIXME wasn't escaped
         _x("Configure UI") + S + _x("Select console theme & language & set optional console password").replace("&", "&amp;") + S + "/configui" + S + I + "info/ui.png" + S +
         _x("Customize Home Page") + S + _x("I2P Home Page Configuration") + S + "/confighome" + S + I + "home_page.png" + S +
+        _x("Customize Sidebar") + S + _x("Customize the sidebar by adding or removing or repositioning elements") + S + "/configsidebar" + S + I + "info/sidebar.png" + S +
         _x("Email") + S + _x("Anonymous webmail client") + S + "/susimail/susimail" + S + I + "email.png" + S +
         _x("Help") + S + _x("I2P Router Help") + S + "/help" + S + I + "support.png" + S +
         _x("Manage Plugins") + S + _x("Install and configure I2P plugins") + S + "/configplugins" + S + I + "plugin.png" + S +

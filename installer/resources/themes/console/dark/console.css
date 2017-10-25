@@ -397,22 +397,22 @@ div.warning {
      background-color: transparent !important;
 }
 
-#sb_general, #sb_shortgeneral, #sb_bandwidth, #sb_peers, #sb_tunnels, #sb_queue {
+#sb_general, #sb_shortgeneral, #sb_advancedgeneral, #sb_bandwidth, #sb_peers, #sb_peersadvanced, #sb_tunnels, #sb_queue {
      margin-bottom: -4px !important;
 }
 
-#sb_general td::after, #sb_shortgeneral td::after, #sb_bandwidth td::after,
-#sb_peers td::after, #sb_tunnels td::after, #sb_queue td::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    content: "";
    display: inline-block;
    min-height: 14px;
 }
 
-#sb_general td, #sb_shortgeneral td {
+#sb_general td, #sb_shortgeneral td, #sb_advancedgeneral td, #sb_peersadvanced td {
      white-space: nowrap;
 }
 
-#sb_general td:first-child, #sb_shortgeneral td:first-child {
+#sb_general td:first-child, #sb_shortgeneral td:first-child,  #sb_advancedgeneral td:first-child, #sb_peersadvanced td:first-child {
      max-width: 130px;
 }
 
@@ -457,15 +457,15 @@ div.warning {
      line-height: 120%;
 }
 
-#sb_internals td, #sb_services td, #sb_advanced td { /* color ellipsis */
+#sb_internals td, #sb_services td, #sb_advanced td, #sb_help td { /* color ellipsis */
      color: #595 !important;
 }
 
-#sb_services, #sb_internals, #sb_advanced {
+#sb_services, #sb_internals, #sb_advanced, #sb_help {
      margin-top: -4px !important;
 }
 
-#sb_internals a, #sb_services a, #sb_advanced a {
+#sb_internals a, #sb_services a, #sb_advanced a, #sb_help a {
      padding: 1px 3px;
      display: inline-block;
      vertical-align: middle;
@@ -480,13 +480,30 @@ div.warning {
      margin-bottom: -5px !important;
 }
 
-#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link, #sb_help a:link {
      word-break: break-all;
      max-width: 192px;
      overflow: hidden;
      white-space: nowrap;
      text-overflow: ellipsis;
      line-height: 140%;
+}
+
+#sb_peersadvanced a {
+     color: #ee9;
+}
+
+#sb_peersadvanced .separator td::after {
+     min-height: 0;
+}
+
+.routersummary .separator hr, .routersummary .separator hr:last-child {
+     display: block !important;
+     color: transparent;
+     background: transparent;
+     border-bottom: 1px dashed #141;
+     height: 1px;
+     margin: 4px 0 3px !important;
 }
 
 .sb_notice {
@@ -678,6 +695,168 @@ div.refresh {
 }
 
 /* end sidebar news */
+
+/* mini sidebar graph */
+
+#sb_bandwidthgraph {
+     width: 100%;
+     margin: -5px 0 -5px -5px;
+     border-collapse: separate;
+     border-spacing: 0;
+     padding: 0;
+     border: 1px solid #5df;
+     box-shadow: 0 0 1px #ccf;
+}
+
+#sb_bandwidthgraph:hover {
+     border: 1px solid #f60;
+     cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+}
+
+a:active #sb_bandwidthgraph {
+     border: 1px solid #f30;
+}
+
+#sb_bandwidthgraph td {
+     background: linear-gradient(to top, #fff 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 89%, #fff 93%), repeating-linear-gradient(to right, rgba(255,255,255,0.0) 10px, rgba(120,120,255,0.8) 11px, rgba(255,255,255,0.0) 11px, rgba(255,255,255,0.0) 20px), repeating-linear-gradient(to top, rgba(255,255,255,0.0) 1px, rgba(120,120,255,0.8) 2px, rgba(255,255,255,0.0) 2px, rgba(255,255,255,0.0) 10px) !important;
+     padding: 0 1px;
+     box-shadow: inset 0 0 0 1px #fff;
+     height: 40px;
+     vertical-align: top;
+}
+
+#sb_graphstats {
+     display: inline-block;
+     padding: 2px 8px;
+     font-weight: bold;
+     background: #ddf;
+     background: linear-gradient(to right, #ddf, #efefff, #ddf);
+     border: 1px solid #89f;
+     border-top: none;
+     border-radius: 0 0 3px 3px;
+     box-shadow: inset 0 0 0 1px #fff, 0 0 1px #fff;
+     opacity: 0;
+     transition: ease opacity 0.3s;
+     color: #89f;
+}
+
+#sb_graphcontainer:hover #sb_graphstats {
+     opacity: 1;
+     transition: ease opacity 0.3s;
+}
+
+#sb_graphcontainer {
+     background-color: #000;
+     background-position: left -72px top -23px !important;
+     background-size: 280px 77px !important;
+     background-repeat: no-repeat !important;
+     margin-bottom: -7px !important;
+     filter: invert(1) hue-rotate(90deg);
+}
+
+/* reduce flicker as graph image gets inverted and hue-rotated */
+
+@keyframes graphfadein {
+from {
+     filter: invert(1) hue-rotate(90deg) opacity(0);
+}
+
+to {
+     filter: invert(1) hue-rotate(90deg) opacity(1);
+}
+}
+
+#sb_graphcontainer {
+     animation: graphfadein 0.3s ease-in;
+}
+
+@media screen and (min-width: 1500px) {
+#sb_graphcontainer {
+     background-size: 300px 77px !important;
+}
+}
+/* end mini sidebar graph */
+
+/* status bar */
+
+.percentBarOuter {
+     width: 194px;
+     background: #000;
+     background: repeating-linear-gradient(135deg, #000 1px, #000 5px, #010 6px, #010 11px);
+     background: repeating-linear-gradient(to right, #000 1px, #000 2px, #010 2px, #010 4px);
+     border: 1px solid #040;
+     border-bottom: 1px solid #020;
+     border-right: 1px solid #020;
+     opacity: 1;
+     box-shadow: 0 0 1px 1px rgba(0,0,0,0.8);
+     margin: -3px 0 -5px -6px;
+}
+
+@media screen and (min-width: 1500px) {
+.percentBarOuter {
+     width: 220px;
+}
+}
+
+.percentBarOuter:hover .percentBarText {
+     opacity: 1;
+     transition: ease opacity 0.2s;
+}
+
+.percentBarInner {
+     height: 14px;
+     background: #0e5f00;
+     background: linear-gradient(to bottom, rgba(28, 148, 58, 0.6) 0%, rgba(9, 47, 16, 0.6) 50%, rgba(13, 39, 7, 0.6) 50%, rgba(9, 27, 5, 0.6) 50%, rgba(9, 21, 3, 0.6) 100%);
+     box-shadow: inset 0 0 0 1px #000;
+}
+
+.percentBarText {
+     width: 100%;
+     font-weight: bold;
+     text-align: center;
+     vertical-align: middle;
+     float: left;
+     opacity: 0;
+     transition: ease opacity 0.2s;
+}
+
+/* update bar */
+
+.sb_updatestatus {
+     background: #000;
+     background: linear-gradient(to right, #020, #000, #020);
+     margin: -6px -2px -2px;
+     padding: 2px 0 4px;
+     border-bottom: 1px solid #494;
+}
+
+.sb_info .percentBarOuter {
+     margin: 6px -2px -18px 2px;
+     box-shadow: none !important;
+     background: repeating-linear-gradient(135deg, #000 1px, #000 5px, #010 6px, #010 11px);
+     animation: downloadbar 3s infinite alternate;
+}
+
+.sb_info .percentBarText {
+     opacity: 1;
+     padding-top: 2px;
+}
+
+.sb_info .percentBarInner {
+     height: 16px;
+}
+
+@keyframes downloadbar {
+from {
+     background: repeating-linear-gradient(135deg, #000 1px, #000 5px, #010 6px, #010 11px);
+}
+
+to {
+     background: repeating-linear-gradient(135deg, #010 1px, #010 6px, #000 7px, #000 11px);
+}
+}
+
+/* end status bar */
 /* end sidebar */
 
 /* console error messages */
@@ -6896,8 +7075,8 @@ td.optionsave {
 }
 
 @media screen and (max-width: 1500px) {
-#sb_general td:first-child::after, #sb_shortgeneral td:first-child::after, #sb_bandwidth td:first-child::after,
-#sb_peers td:first-child::after, #sb_tunnels td:first-child::after, #sb_queue td:first-child::after {
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
    min-height: 12px;
 }
 
@@ -7081,7 +7260,7 @@ p#fullhistory {
      min-height: 19px;
 }
 
-#sb_services a:link, #sb_internals a:link, #sb_advanced a:link {
+#sb_services a:link, #sb_internals a:link, #sb_advanced a:link, #sb_help a:link {
      max-width: 216px !important;
 }
 

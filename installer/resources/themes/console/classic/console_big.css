@@ -66,7 +66,7 @@ input[type="submit"], input[type="cancel"], input[type="file"], button, button.s
      width: 80% !important;
 }
 
-#sb_bandwidth td:last-child, #sb_peers td:last-child, #sb_queue td:last-child,  #sb_tunnels td:last-child, #sb_general td:last-child, #sb_shortgeneral td:last-child {
+#sb_bandwidth td:last-child, #sb_peers td:last-child, #sb_peersadvanced td:last-child, #sb_queue td:last-child,  #sb_tunnels td:last-child, #sb_general td:last-child, #sb_shortgeneral td:last-child, #sb_advancedgeneral td:last-child {
      font-size: 10pt !important;
 }
 
@@ -74,6 +74,31 @@ input[type="submit"], input[type="cancel"], input[type="file"], button, button.s
      font-size: 12pt;
      font-weight: normal;
      text-shadow: none;
+}
+
+#sb_bandwidthgraph {
+     width: 218px !important;
+     margin: -25px 0 -6px !important;
+}
+
+#sb_graphstats {
+     font-size: 9pt !important;
+}
+
+#sb_graphcontainer {
+     background-position: left -66px top -30px !important;
+     background-size: 340px 80px !important;
+}
+
+.percentBarOuter {
+     width: 212px !important;
+     margin: -3px 0 -4px 3px;
+}
+
+.percentBarText {
+     font-size: 9pt !important;
+     padding: 0 !important;
+     margin-top: -1px;
 }
 
 /* end sidepanel */

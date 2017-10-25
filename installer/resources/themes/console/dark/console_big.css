@@ -201,6 +201,13 @@ li .twocol {
      line-height: 120% !important;
 }
 
+#sb_general td::after, #sb_shortgeneral td::after, #sb_advancedgeneral td::after, #sb_bandwidth td::after,
+#sb_peers td::after, #sb_peersadvanced td::after, #sb_tunnels td::after, #sb_queue td::after {
+   content: "";
+   display: inline-block;
+   min-height: 14px !important;
+}
+
 .sb_newsheadings td, .sb_newsheadings tr:hover td {
      background-position: 4px center !important;
      padding-left: 24px !important;
@@ -208,6 +215,16 @@ li .twocol {
 
 .search select, .search button, .search input[type="text"] {
      font-size: 10pt !important;
+}
+
+.percentBarOuter {
+     width: 206px;
+     margin: -1px 0 -2px -4px;
+}
+
+#sb_graphcontainer {
+     background-position: left -74px top -21px !important;
+     background-size: 300px 77px !important;
 }
 
 @media screen and (min-width: 0) {

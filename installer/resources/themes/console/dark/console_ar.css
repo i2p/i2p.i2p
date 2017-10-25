@@ -532,6 +532,20 @@ a.viewfullentry::after, a[href^="viewprofile"]::after {
      font-weight: bold;
 }
 
+.percentBarOuter {
+     margin: -3px -6px -5px 0;
+}
+
+.sb_info .percentBarOuter {
+     margin: 6px 2px -18px -2px;
+}
+
+.sb_info .percentBarText {
+     font-size: 9pt;
+     padding-top: 1px;
+     direction: ltr;
+}
+
 .main#console .twocol {
      margin: 15px 35px 5px 0 !important;
      background: rgba(0, 32, 0, 0.5);

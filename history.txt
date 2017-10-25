@@ -5,6 +5,23 @@
      - Adjust size of up/down bw graph to match other graphs (ticket #1996)
      - Modify image font color to better blend with themes
      - Tweak spacing of elements for non-Debian installs
+   - Sidebar:
+     - Adjust vertical spacing of general section
+     - Rename 'General' section to 'Router Info' and move ident info to h3
+       tooltip (ticket #1996)
+     - Replace 'Short Router Info' with a new 'Advanced Router Info' section in
+       default advanced sidebar (adds memory usage and clock skew)
+     - Add optional embedded bandwidth graph (experimental)
+     - Add optional memory usage bar
+     - Add optional Advanced Peers section (adds failing and banned peers)
+     - Add Help link to 'I2P Internals' section
+     - Add help page anchored links and troubleshooting to 'Help & FAQ' section
+     - Add download progress bar for router and plugin updates
+     - Add 'Advanced Minimal' sidebar configuration
+     - Add Jobs and Events links to Advanced section
+     - Add additional reachability states for clockskew and vmcomm (with icons)
+   - Homepage: Add 'Customize Sidebar' link to signpost the feature now that
+     there are more optional sections available (ticket #1996)
 
 2017-10-11 zzz
  * Console: Validate host header (thx Kevin Froman)

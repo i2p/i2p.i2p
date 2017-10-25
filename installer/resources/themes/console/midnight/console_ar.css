@@ -91,6 +91,35 @@ button.search {
      text-align: left;
 }
 
+#sb_bandwidthgraph {
+     margin: -13px -8px 0 0 !important;
+}
+
+#sb_graphcontainer {
+     background-position: left -72px top -24px !important;
+}
+
+.percentBarOuter {
+      margin: -3px -6px -5px 0;
+}
+
+.sb_info .percentBarOuter {
+     margin: 5px 0 -4px -2px;
+}
+
+.sb_updatestatus b {
+     font-weight: bold !important;
+}
+
+.sb_updatestatus, .sb_info .percentBarText {
+     font-size: 9pt;
+}
+
+.sb_info .percentBarText {
+     padding-top: 0;
+     direction: ltr;
+}
+
 .routersummary td a, .routersummary td:first-child {
      font-size: 10pt;
 }

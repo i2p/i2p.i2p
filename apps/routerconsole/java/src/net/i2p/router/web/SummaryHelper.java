@@ -30,7 +30,7 @@ import net.i2p.util.PortMapper;
 
 /**
  * Simple helper to query the appropriate router for data necessary to render
- * the summary sections on the router console.  
+ * the summary sections on the router console.
  *
  * For the full summary bar use renderSummaryBar()
  */
@@ -43,14 +43,14 @@ public class SummaryHelper extends HelperBase {
     static final String PROP_SUMMARYBAR = "routerconsole.summaryBar.";
 
     static final String DEFAULT_FULL =
-        "HelpAndFAQ" + S +
-        "ShortGeneral" + S +
+        "RouterInfo" + S +
         "UpdateStatus" + S +
         "Bandwidth" + S +
         "NetworkReachability" + S +
         "FirewallAndReseedStatus" + S +
         "I2PServices" + S +
         "I2PInternals" + S +
+        "HelpAndFAQ" + S +
         "Peers" + S +
         "Tunnels" + S +
         "TunnelStatus" + S +
@@ -59,8 +59,8 @@ public class SummaryHelper extends HelperBase {
         "";
 
     static final String DEFAULT_FULL_ADVANCED =
-        "HelpAndFAQ" + S +
-        "ShortGeneral" + S +
+        "AdvancedRouterInfo" + S +
+        "MemoryBar" + S +
         "UpdateStatus" + S +
         "Bandwidth" + S +
         "NetworkReachability" + S +
@@ -77,7 +77,20 @@ public class SummaryHelper extends HelperBase {
         "";
 
     static final String DEFAULT_MINIMAL =
-        "ShortGeneral" + S +
+        "ShortRouterInfo" + S +
+        "Bandwidth" + S +
+        "UpdateStatus" + S +
+        "NewsHeadings" + S +
+        "NetworkReachability" + S +
+        "FirewallAndReseedStatus" + S +
+        "RestartStatus" + S +
+        "Destinations" + S +
+        "";
+
+     /** @since 0.9.32 */
+    static final String DEFAULT_MINIMAL_ADVANCED =
+        "AdvancedRouterInfo" + S +
+        "MemoryBar" + S +
         "Bandwidth" + S +
         "UpdateStatus" + S +
         "NewsHeadings" + S +
@@ -152,7 +165,9 @@ public class SummaryHelper extends HelperBase {
         FIREWALLED,
         RUNNING,
         WARN,
-        ERROR;
+        ERROR,
+        CLOCKSKEW,
+        VMCOMM;
     }
 
     /**
@@ -197,7 +212,7 @@ public class SummaryHelper extends HelperBase {
 
     private NetworkStateMessage reachability() {
         if (_context.commSystem().isDummy())
-            return new NetworkStateMessage(NetworkState.RUNNING, "VM Comm System");
+            return new NetworkStateMessage(NetworkState.VMCOMM, "VM Comm System");
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
             return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Client Manager I2CP Error - check logs"));  // not a router problem but the user should know
@@ -207,7 +222,7 @@ public class SummaryHelper extends HelperBase {
         long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 30*1000)
-            return new NetworkStateMessage(NetworkState.ERROR, _t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew))));
+            return new NetworkStateMessage(NetworkState.CLOCKSKEW, _t("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew))));
         if (_context.router().isHidden())
             return new NetworkStateMessage(NetworkState.HIDDEN, _t("Hidden"));
         RouterInfo routerInfo = _context.router().getRouterInfo();
@@ -281,21 +296,37 @@ public class SummaryHelper extends HelperBase {
      * Retrieve amount of used memory.
      *
      */
-/********
+
     public String getMemory() {
         DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
-        long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024;
+        long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
         long usedPc = 100 - ((Runtime.getRuntime().freeMemory() * 100) / Runtime.getRuntime().totalMemory());
-        return integerFormatter.format(used) + "KB (" + usedPc + "%)"; 
+        long total = (Runtime.getRuntime().totalMemory())/1024/1024;
+        // long free = Runtime.getRuntime().freeMemory()/1024/1024;
+        // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
+        // return integerFormatter.format(used) + "MB / " + free + " MB";
+        return integerFormatter.format(used) + " / " + total + "MB";
     }
-********/
+
+    public String getMemoryBar() {
+        DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
+        long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
+        long usedPc = 100 - ((Runtime.getRuntime().freeMemory() * 100) / Runtime.getRuntime().totalMemory());
+        long total = (Runtime.getRuntime().totalMemory())/1024/1024;
+        // long free = Runtime.getRuntime().freeMemory()/1024/1024;
+        // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
+        // return integerFormatter.format(used) + "MB / " + free + " MB";
+        return "<div class=\"percentBarOuter\"><div class=\"percentBarText\">RAM: " + integerFormatter.format(used) + " / " + total + "MB" +
+        "</div><div class=\"percentBarInner\" style=\"width: " + integerFormatter.format(usedPc) +
+        "%;\"></div></div>";
+    }
 
     /**
      * How many peers we are talking to now
      *
      */
-    public int getActivePeers() { 
-        if (_context == null) 
+    public int getActivePeers() {
+        if (_context == null)
             return 0;
         else
             return _context.commSystem().countActivePeers();
@@ -305,7 +336,7 @@ public class SummaryHelper extends HelperBase {
      * Should we warn about a possible firewall problem?
      */
     public boolean showFirewallWarning() {
-        return _context != null && 
+        return _context != null &&
                _context.netDb().isInitialized() &&
                _context.router().getUptime() > 2*60*1000 &&
                (!_context.commSystem().isDummy()) &&
@@ -317,8 +348,8 @@ public class SummaryHelper extends HelperBase {
      * How many active identities have we spoken with recently
      *
      */
-    public int getActiveProfiles() { 
-        if (_context == null) 
+    public int getActiveProfiles() {
+        if (_context == null)
             return 0;
         else
             return _context.profileOrganizer().countActivePeers();
@@ -327,8 +358,8 @@ public class SummaryHelper extends HelperBase {
      * How many active peers the router ranks as fast.
      *
      */
-    public int getFastPeers() { 
-        if (_context == null) 
+    public int getFastPeers() {
+        if (_context == null)
             return 0;
         else
             return _context.profileOrganizer().countFastPeers();
@@ -337,8 +368,8 @@ public class SummaryHelper extends HelperBase {
      * How many active peers the router ranks as having a high capacity.
      *
      */
-    public int getHighCapacityPeers() { 
-        if (_context == null) 
+    public int getHighCapacityPeers() {
+        if (_context == null)
             return 0;
         else
             return _context.profileOrganizer().countHighCapacityPeers();
@@ -347,8 +378,8 @@ public class SummaryHelper extends HelperBase {
      * How many active peers the router ranks as well integrated.
      *
      */
-    public int getWellIntegratedPeers() { 
-        if (_context == null) 
+    public int getWellIntegratedPeers() {
+        if (_context == null)
             return 0;
         //return _context.profileOrganizer().countWellIntegratedPeers();
         return _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
@@ -357,34 +388,34 @@ public class SummaryHelper extends HelperBase {
      * How many peers the router ranks as failing.
      *
      */
-/********
-    public int getFailingPeers() { 
-        if (_context == null) 
+
+    public int getFailingPeers() {
+        if (_context == null)
             return 0;
         else
             return _context.profileOrganizer().countFailingPeers();
     }
-********/
+
     /**
      * How many peers totally suck.
      *
      */
-/********
-    public int getBanlistedPeers() { 
-        if (_context == null) 
+
+    public int getBanlistedPeers() {
+        if (_context == null)
             return 0;
         else
             return _context.banlist().getRouterCount();
     }
-********/
- 
+
+
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
-    public String getSecondKBps() { 
-        if (_context == null) 
+    public String getSecondKBps() {
+        if (_context == null)
             return "0 / 0";
-        return formatPair(_context.bandwidthLimiter().getReceiveBps(), 
+        return formatPair(_context.bandwidthLimiter().getReceiveBps(),
                           _context.bandwidthLimiter().getSendBps());
     }
 
@@ -392,7 +423,7 @@ public class SummaryHelper extends HelperBase {
      *    @return "x.xx / y.yy {K|M}"
      */
     public String getFiveMinuteKBps() {
-        if (_context == null) 
+        if (_context == null)
             return "0 / 0";
 
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
@@ -415,8 +446,8 @@ public class SummaryHelper extends HelperBase {
     /**
      *    @return "x.xx / y.yy {K|M}"
      */
-    public String getLifetimeKBps() { 
-        if (_context == null) 
+    public String getLifetimeKBps() {
+        if (_context == null)
             return "0 / 0";
 
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
@@ -464,8 +495,8 @@ public class SummaryHelper extends HelperBase {
      * string with 2 decimal places and the appropriate units - GB/MB/KB/bytes)
      *
      */
-    public String getInboundTransferred() { 
-        if (_context == null) 
+    public String getInboundTransferred() {
+        if (_context == null)
             return "0";
 
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
@@ -478,8 +509,8 @@ public class SummaryHelper extends HelperBase {
      * string with 2 decimal places and the appropriate units - GB/MB/KB/bytes)
      *
      */
-    public String getOutboundTransferred() { 
-        if (_context == null) 
+    public String getOutboundTransferred() {
+        if (_context == null)
             return "0";
 
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
@@ -529,7 +560,7 @@ public class SummaryHelper extends HelperBase {
                         buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_t("Rebuilding")).append("&hellip;\" title=\"").append(_t("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
                         buf.append(" ").append(_t("ago")).append(". ").append(_t("Rebuilding")).append("&hellip;\"></td></tr>\n");
                     } else {
-                        // green light 
+                        // green light
                         buf.append("<td><img src=\"/themes/console/images/local_up.png\" alt=\"Ready\" title=\"").append(_t("Ready")).append("\"></td></tr>\n");
                     }
                 } else {
@@ -585,8 +616,8 @@ public class SummaryHelper extends HelperBase {
      * How many free inbound tunnels we have.
      *
      */
-    public int getInboundTunnels() { 
-        if (_context == null) 
+    public int getInboundTunnels() {
+        if (_context == null)
             return 0;
         else
             return _context.tunnelManager().getFreeTunnelCount();
@@ -596,8 +627,8 @@ public class SummaryHelper extends HelperBase {
      * How many active outbound tunnels we have.
      *
      */
-    public int getOutboundTunnels() { 
-        if (_context == null) 
+    public int getOutboundTunnels() {
+        if (_context == null)
             return 0;
         else
             return _context.tunnelManager().getOutboundTunnelCount();
@@ -607,8 +638,8 @@ public class SummaryHelper extends HelperBase {
      * How many inbound client tunnels we have.
      *
      */
-    public int getInboundClientTunnels() { 
-        if (_context == null) 
+    public int getInboundClientTunnels() {
+        if (_context == null)
             return 0;
         else
             return _context.tunnelManager().getInboundClientTunnelCount();
@@ -618,8 +649,8 @@ public class SummaryHelper extends HelperBase {
      * How many active outbound client tunnels we have.
      *
      */
-    public int getOutboundClientTunnels() { 
-        if (_context == null) 
+    public int getOutboundClientTunnels() {
+        if (_context == null)
             return 0;
         else
             return _context.tunnelManager().getOutboundClientTunnelCount();
@@ -629,16 +660,16 @@ public class SummaryHelper extends HelperBase {
      * How many tunnels we are participating in.
      *
      */
-    public int getParticipatingTunnels() { 
-        if (_context == null) 
+    public int getParticipatingTunnels() {
+        if (_context == null)
             return 0;
         else
             return _context.tunnelManager().getParticipatingCount();
     }
  
     /** @since 0.7.10 */
-    public String getShareRatio() { 
-        if (_context == null) 
+    public String getShareRatio() {
+        if (_context == null)
             return "0";
         double sr = _context.tunnelManager().getShareRatio();
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -650,8 +681,8 @@ public class SummaryHelper extends HelperBase {
      * the units attached)
      *
      */
-    public String getJobLag() { 
-        if (_context == null) 
+    public String getJobLag() {
+        if (_context == null)
             return "0";
 
         RateStat rs = _context.statManager().getRate("jobQueue.jobLag");
@@ -666,8 +697,8 @@ public class SummaryHelper extends HelperBase {
      * (pretty printed with the units attached)
      *
      */
-    public String getMessageDelay() { 
-        if (_context == null) 
+    public String getMessageDelay() {
+        if (_context == null)
             return "0";
 
         return DataHelper.formatDuration2(_context.throttle().getMessageDelay());
@@ -678,15 +709,15 @@ public class SummaryHelper extends HelperBase {
      * (pretty printed with the units attached)
      *
      */
-    public String getTunnelLag() { 
-        if (_context == null) 
+    public String getTunnelLag() {
+        if (_context == null)
             return "0";
 
         return DataHelper.formatDuration2(_context.throttle().getTunnelLag());
     }
 
-    public String getTunnelStatus() { 
-        if (_context == null) 
+    public String getTunnelStatus() {
+        if (_context == null)
             return "";
         return _context.throttle().getTunnelStatus();
     }
@@ -722,30 +753,30 @@ public class SummaryHelper extends HelperBase {
     }
 ********/
 
-    private static boolean updateAvailable() { 
+    private static boolean updateAvailable() {
         return NewsHelper.isUpdateAvailable();
     }
 
-    private boolean unsignedUpdateAvailable() { 
+    private boolean unsignedUpdateAvailable() {
         return NewsHelper.isUnsignedUpdateAvailable(_context);
     }
 
     /** @since 0.9.20 */
-    private boolean devSU3UpdateAvailable() { 
+    private boolean devSU3UpdateAvailable() {
         return NewsHelper.isDevSU3UpdateAvailable(_context);
     }
 
-    private static String getUpdateVersion() { 
+    private static String getUpdateVersion() {
         return DataHelper.escapeHTML(NewsHelper.updateVersion());
     }
 
-    private static String getUnsignedUpdateVersion() { 
+    private static String getUnsignedUpdateVersion() {
         // value is a formatted date, does not need escaping
         return NewsHelper.unsignedUpdateVersion();
     }
 
     /** @since 0.9.20 */
-    private static String getDevSU3UpdateVersion() { 
+    private static String getDevSU3UpdateVersion() {
         return DataHelper.escapeHTML(NewsHelper.devSU3UpdateVersion());
     }
 
@@ -759,7 +790,7 @@ public class SummaryHelper extends HelperBase {
         String status = NewsHelper.getUpdateStatus();
         boolean needSpace = false;
         if (status.length() > 0) {
-            buf.append("<h4 class=\"sb_info\">").append(status).append("</h4>\n");
+            buf.append("<h4 class=\"sb_info sb_update\">").append(status).append("</h4>\n");
             needSpace = true;
         }
         String dver = NewsHelper.updateVersionDownloaded();
@@ -775,7 +806,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update downloaded")).append("<br>");
+            buf.append("<h4 class=\"sb_info sb_update\"><b>").append(_t("Update downloaded")).append("<br>");
             if (_context.hasWrapper())
                 buf.append(_t("Click Restart to install"));
             else
@@ -796,7 +827,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info sb_update\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUpdateVersion())).append("<br>");
             buf.append(constraint).append("</b></h4>");
             avail = false;
@@ -808,7 +839,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info sb_update\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getUnsignedUpdateVersion())).append("<br>");
             buf.append(unsignedConstraint).append("</b></h4>");
             unsignedAvail = false;
@@ -820,7 +851,7 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<hr>");
             else
                 needSpace = true;
-            buf.append("<h4 class=\"sb_info\"><b>").append(_t("Update available")).append(":<br>");
+            buf.append("<h4 class=\"sb_info sb_update\"><b>").append(_t("Update available")).append(":<br>");
             buf.append(_t("Version {0}", getDevSU3UpdateVersion())).append("<br>");
             buf.append(devSU3Constraint).append("</b></h4>");
             devSU3Avail = false;
@@ -930,7 +961,7 @@ public class SummaryHelper extends HelperBase {
     public List<String> getSummaryBarSections(String page) {
         String config = "";
         if ("home".equals(page)) {
-            config = _context.getProperty(PROP_SUMMARYBAR + page, DEFAULT_MINIMAL);
+            config = _context.getProperty(PROP_SUMMARYBAR + page, isAdvanced() ? DEFAULT_MINIMAL_ADVANCED : DEFAULT_MINIMAL);
         } else {
             config = _context.getProperty(PROP_SUMMARYBAR + page);
             if (config == null)
@@ -981,6 +1012,16 @@ public class SummaryHelper extends HelperBase {
         Map<String, String> sectionNames = SummaryBarRenderer.SECTION_NAMES;
         List<String> sections = getSummaryBarSections("default");
         TreeSet<String> sortedSections = new TreeSet<String>();
+
+        // Forward-convert old section names
+        int pos = sections.indexOf("General");
+        if (pos >= 0) {
+            sections.set(pos, "RouterInfo");
+        }
+        pos = sections.indexOf("ShortGeneral");
+        if (pos >= 0) {
+            sections.set(pos, "ShortRouterInfo");
+        }
 
         for (int i = 0; i < allSections.length; i++) {
             String section = allSections[i];
