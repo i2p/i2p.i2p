@@ -542,6 +542,13 @@ public class IndexBean {
         return false;
     }
 
+    /**
+     * @since 0.9.32 moved from EditBean
+     */
+    public String getSpoofedHost(int tunnel) {
+        return DataHelper.escapeHTML(_helper.getSpoofedHost(tunnel));
+    }
+
     ///
     /// bean props for form submission
     ///

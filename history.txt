@@ -22,6 +22,8 @@
      - Add additional reachability states for clockskew and vmcomm (with icons)
    - Homepage: Add 'Customize Sidebar' link to signpost the feature now that
      there are more optional sections available (ticket #1996)
+ * I2PTunnel: Add hostname / destination (b32) information to server section on
+   index page (for parity with client tunnels section)
 
 2017-10-11 zzz
  * Console: Validate host header (thx Kevin Froman)

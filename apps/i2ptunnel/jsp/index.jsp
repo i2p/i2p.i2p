@@ -22,11 +22,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title><%=intl._t("Hidden Services Manager")%></title>
-    
+
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-    
+
     <% if (indexBean.allowCSS()) {
   %><link rel="icon" href="<%=indexBean.getTheme()%>images/favicon.ico" />
     <link href="<%=indexBean.getTheme()%>i2ptunnel.css?<%=net.i2p.CoreVersion.VERSION%>" rel="stylesheet" type="text/css" /> 
@@ -79,7 +79,7 @@
 </div>
 
 <div class="panel" id="servers">
-    
+
     <h2><%=intl._t("I2P Hidden Services")%></h2>
 
 <table id="serverTunnels">
@@ -95,7 +95,6 @@
         <%
         for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
             if (indexBean.isClient(curServer)) continue;
-            
       %>
 
 
@@ -166,6 +165,28 @@
       %>
         </td>
     </tr>
+
+    <tr>
+        <td class="tunnelDestination" colspan="6">
+            <span class="tunnelDestinationLabel">
+         <%
+                String name = indexBean.getSpoofedHost(curServer);
+                    if (name == null || name.equals("")) {
+                        name = indexBean.getTunnelName(curServer);
+                        out.write("<b>");
+                        out.write(intl._t("Destination"));
+                        out.write(":</b></span> ");
+                        out.write(indexBean.getDestHashBase32(curServer));
+                   } else {
+                       out.write("<b>");
+                       out.write(intl._t("Hostname"));
+                       out.write(":</b></span> ");
+                       out.write(name);
+                   }
+          %>
+        </td>
+    </tr>
+
     <tr>
         <td class="tunnelDescription" colspan="6">
             <span class="tunnelDescriptionLabel"><b>Description:</b></span>
@@ -211,7 +232,7 @@
         <%
         for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
             if (!indexBean.isClient(curClient)) continue;
-      %>        
+      %>
 
 
     <tr class="tunnelProperties">

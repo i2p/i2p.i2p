@@ -63,10 +63,6 @@ public class EditBean extends IndexBean {
         return port > 0 ? "" + port : "";
     }
 
-    public String getSpoofedHost(int tunnel) {
-        return DataHelper.escapeHTML(_helper.getSpoofedHost(tunnel));
-    }
-
     public String getPrivateKeyFile(int tunnel) {
         return _helper.getPrivateKeyFile(tunnel);
     }
