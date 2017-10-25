@@ -2,32 +2,32 @@
 <p>The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with a few notable exceptions:</p>
 
 <ul>
-<li class="tidylist">ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
-<li class="tidylist">SHA256 and HMAC-SHA256, under the MIT license, written by the <a href="https://www.bouncycastle.org/" target="_blank">Legion of the Bouncycastle</a></li>
-<li class="tidylist">AES code, under the Cryptix (MIT) license, written by the <a href="http://www.cryptix.org/" target="_blank">Cryptix team</a></li>
-<li class="tidylist"><a href="http://support.ntp.org/bin/view/Support/JavaSntpClient" target="_blank">SNTP code</a>, under the BSD license, written by Adam Buckley</li>
-<li class="tidylist">The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo, ugha, duck, shendaras, and others.</li>
+<li>ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
+<li>SHA256 and HMAC-SHA256, under the MIT license, written by the <a href="https://www.bouncycastle.org/" target="_blank">Legion of the Bouncycastle</a></li>
+<li>AES code, under the Cryptix (MIT) license, written by the <a href="http://www.cryptix.org/" target="_blank">Cryptix team</a></li>
+<li><a href="http://support.ntp.org/bin/view/Support/JavaSntpClient" target="_blank">SNTP code</a>, under the BSD license, written by Adam Buckley</li>
+<li>The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo, ugha, duck, shendaras, and others.</li>
 </ul>
 
 <p>On top of the I2P router are a series of client applications, each with their own set of licenses and dependencies:
 
 <ul>
-<li class="tidylist"><a href="http://i2p-projekt.i2p/i2ptunnel" target="_blank">I2PTunnel</a> - a GPL'ed application written by mihi
+<li><a href="http://i2p-projekt.i2p/i2ptunnel" target="_blank">I2PTunnel</a> - a GPL'ed application written by mihi
 that lets you tunnel normal TCP/IP traffic over I2P (such as the http proxy and the irc proxy), with a <a href="/i2ptunnelmgr">browser-based front end.</a></li>
-<li class="tidylist"><a href="/webmail">Susimail</a>, a GPL'ed browser based mail client written by susi23.</li>
-<li class="tidylist">The <a href="http://i2p-projekt.i2p/en/docs/naming#addressbook" target="_blank">addressbook application</a>,
+<li><a href="/webmail">Susimail</a>, a GPL'ed browser based mail client written by susi23.</li>
+<li>The <a href="http://i2p-projekt.i2p/en/docs/naming#addressbook" target="_blank">addressbook application</a>,
 written by Ragnarok helps maintain your hosts.txt files, with a <a href="/dns">front end</a> written by susi23.</li>
-<li class="tidylist">The <a href="http://i2p-projekt.i2p/en/docs/api/samv3" target="_blank">SAM</a> bridge by human (public domain), an API
+<li>The <a href="http://i2p-projekt.i2p/en/docs/api/samv3" target="_blank">SAM</a> bridge by human (public domain), an API
 which other client applications (such the <a href="http://i2pwiki.i2p/index.php?title=Tahoe-LAFS" target="_blank">I2P Tahoe-LAFS cloud filesystem</a>) can use to interface with I2P.</li>
-<li class="tidylist"><a href="http://i2p-projekt.i2p/en/misc/jbigi" target="_blank">jbigi</a> - an optimized library for doing large number calculations which uses the
+<li><a href="http://i2p-projekt.i2p/en/misc/jbigi" target="_blank">jbigi</a> - an optimized library for doing large number calculations which uses the
 LGPL licensed <a href="http://swox.com/gmp/" target="_blank">GMP</a> library, tuned for various PC architectures.</li>
-<li class="tidylist">Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/" target="_blank">Launch4J</a>,
+<li>Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/" target="_blank">Launch4J</a>,
 and the installer is built with  <a href="http://www.izforge.com/izpack/" target="_blank">IzPack</a>.</li>
-<li class="tidylist">The <a href="/">I2P Router Console</a>, built from a streamlined <a href="http://jetty.mortbay.com/jetty/index.html" target="_blank">Jetty Web Server</a> instance
+<li>The <a href="/">I2P Router Console</a>, built from a streamlined <a href="http://jetty.mortbay.com/jetty/index.html" target="_blank">Jetty Web Server</a> instance
 which allows you to deploy standard JSP/Servlet web applications in your router.</li>
-<li class="tidylist">Jetty makes use of Apache's <a href="https://docs.oracle.com/javaee/7/api/javax/servlet/package-summary.html" target="_blank">javax.servlet</a>
+<li>Jetty makes use of Apache's <a href="https://docs.oracle.com/javaee/7/api/javax/servlet/package-summary.html" target="_blank">javax.servlet</a>
 (javax.servlet.jar) implementation. This product includes software developed by the <a href="http://www.apache.org/" target="_blank">Apache Software Foundation</a>.</li>
-<li class="tidylist">Source for the I2P code and most bundled client applications can be found on our <a href="http://i2p-projekt.i2p/download" target="_blank">download page</a>.</li>
+<li>Source for the I2P code and most bundled client applications can be found on our <a href="http://i2p-projekt.i2p/download" target="_blank">download page</a>.</li>
 </ul>
 
 <p>For details on other applications available, as well as their licenses, please see the <a href="http://i2p-projekt.i2p/licenses" target="_blank">

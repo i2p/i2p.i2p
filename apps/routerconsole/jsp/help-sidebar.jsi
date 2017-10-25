@@ -1,117 +1,111 @@
-<h2>Summary Bar Information</h2><p>
-Many of the stats on the summary bar may be
-<a href="configstats.jsp">configured</a> to be
-<a href="graphs.jsp">graphed</a> for further analysis.
-</p><h3>General</h3><ul>
-<li class="tidylist"><b>Local Identity:</b>
-The first four characters (24 bits) of your 44-character (256-bit) Base64 router hash.
-The full hash is shown on your <a href="netdb.jsp?r=.">router info page</a>.
-Never reveal this to anyone, as your router info contains your IP.</li>
-<li class="tidylist"><b>Version:</b>
-The version of the I2P software you are running.</li>
-<%
-/* <li class="tidylist"><b>Now:</b>
-The current time (UTC) and the skew, if any. I2P requires your computer's time be accurate.
-If the skew is more than a few seconds, please correct the problem by adjusting
-your computer's time.</li> */
-%>
-<li class="tidylist"><b>Reachability:</b>
-The router's view of whether it can be contacted by other routers.
-See <a href="#confignet">below</a> for more information.
-</li></ul><h3>Peers</h3><ul>
-<li class="tidylist"><b>Active:</b>
-The first number is the number of peers you've sent or received a message from in the last few minutes.
-This may range from 8-10 to several hundred, depending on your total bandwidth,
-shared bandwidth, and locally-generated traffic.
-The second number is the number of peers seen in the last hour or so.
-Do not be concerned if these numbers vary widely.
-<a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.</li>
-<li class="tidylist"><b>Fast:</b>
-This is the number of peers you use for building client tunnels. It is generally in the
-range 8-30. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.fastPeers">[Enable graphing]</a></li>
-<li class="tidylist"><b>High Capacity:</b>
-This is the number of peers you use for building some of your exploratory tunnels. It is generally in the
-range 8-75. The fast peers are included in the high capacity tier.
-Your high capacity peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.highCapacityPeers">[Enable graphing]</a></li>
-<li class="tidylist"><b>Well Integrated:</b>
-This is the number of peers you use for network database inquiries.
-These are usually the "floodfill" peers.
-Your well integrated peers are shown on the bottom of the <a href="profiles.jsp">profiles page</a>.</li>
-<li class="tidylist"><b>Known:</b>
-This is the total number of routers you know about.
-They are listed on the <a href="netdb.jsp">network database page</a>.
-This may range from under 100 to 1000 or more.
-This number is not the total size of the network;
-it may vary widely depending on your total bandwidth,
-shared bandwidth, and locally-generated traffic.
-I2P does not require a router to know every other router.</li>
-</ul><h3>Bandwidth in/out</h3>
-<p>Should be self-explanatory. All values are in bytes per second, not bits per second.
-Change your bandwidth limits on the <a href="config">configuration page</a>.
-Bandwidth is <a href="graphs.jsp">graphed</a> by default.</p>
-<h3>Local destinations</h3>
-<p>The local applications connecting through your router.
-These may be clients started through <a href="i2ptunnel/index.jsp">I2PTunnel</a>
-or external programs connecting through SAM, BOB, or directly to I2CP.</p>
+<h2>Summary Bar Information</h2>
 
-<h3>Tunnels in/out</h3>
-<p>The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</p>
-<ul><li class="tidylist"><b>Exploratory:</b>
-Tunnels built by your router and used for communication with the floodfill peers,
-building new tunnels, and testing existing tunnels.</li>
-<li class="tidylist"><b>Client:</b>
-Tunnels built by your router for each client's use.</li>
-<li class="tidylist"><b>Participating:</b>
-Tunnels built by other routers through your router.
-This may vary widely depending on network demand, your
-shared bandwidth, and amount of locally-generated traffic.
-The recommended method for limiting participating tunnels is
-to change your share percentage on the <a href="config">configuration page</a>.
-You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
-the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.</li>
-<li class="tidylist"><b>Share ratio:</b>
-The number of participating tunnels you route for others, divided by the total number of hops in
-all your exploratory and client tunnels.
-A number greater than 1.00 means you are contributing more tunnels to the network than you are using.</li>
+<p>Many of the stats on the summary bar may be <a href="configstats">configured</a> to be <a href="graphs">graphed</a> for further analysis. You may also customize the sections that appear on the Summary Bar and their positioning on the <a href="configsidebar">Summary Bar Configuration page</a>.
+</p>
+
+<h3>Router Info</h3>
+
+<ul>
+<li>
+<b>Local Identity:</b>
+If you hover over the <i>Router Info</i> heading, your truncated router identity will be shown (the first four characters (24 bits) of your 44-character (256-bit) Base64 router hash). The full hash is shown on your <a href="netdb?r=.">Network Database entry</a>. Never reveal this to anyone, as your router identity is uniquely linked to your IP address in the network database.</li>
+<li>
+<b>Version:</b>
+The version of the I2P software you are running. If a new version is available, you will be notified in the Summary Bar. It is recommended to keep your router up to date to ensure optimal performance and security. Router updates are usually made available on average every 2-3 months.
+</li>
+
+<li>
+<b>Clock Skew:</b>
+The skew (offset) of your computer's clock relative to the network-synced time (if known). I2P requires your computer's time be accurate. If the skew is more than a few seconds, please correct the problem by adjusting your computer's time. If I2P cannot connect to the internet, a reading of 0ms may be indicated. <b>Note:</b> This is only displayed in the <i>Router Information (advanced)</i> section. You may add this section to your Summary Bar on the <a href="configsidebar">Summary Bar Configuration page</a>.
+</li>
+
+<li>
+<b>Memory:</b>
+This indicates the amount of RAM I2P is using, and the total amount available, allocated by Java. The usage will likely vary considerably within a short timeframe, but if the usage is consistently high relative to the available RAM, this may indicate that you need to increase the ram allocated to the JVM. You can allocate more RAM by editing your <code>wrapper.config</code> file which is normally located in the I2P application directory. You will need to edit the <code>wrapper.java.maxmemory</code> parameter, which by default is set to 128(MB). <b>Note:</b> Memory usage is only displayed in the <i>Router Information (advanced)</i> section or on the <i>Memory Usage Bar</i>, both of which may be added to your Summary Bar on the <a href="configsidebar">Summary Bar Configuration page</a>.
+</li>
+
+<%
+/*
+<li>
+<b>Reachability:</b>
+The router's view of whether it can be contacted by other routers. See <a href="#confignet">below</a> for more information.</li>
+*/
+%>
+
+</ul>
+
+<h3>Peers</h3>
+
+<ul>
+<li>
+<b>Active:</b> The first number is the number of peers your router has sent or received a message from in the last few minutes. This may range from 8-10 to several hundred, depending on your total bandwidth, shared bandwidth, and locally-generated traffic. The second number is the number of peers seen in the last hour or so. Do not be concerned if these numbers vary widely. <a href="configstats#router.activePeers">[Enable graphing]</a>.
+</li>
+<li>
+<b>Fast:</b> This is the number of peers your router has available for building client tunnels. It is generally in the range 8-30. Your fast peers are shown on the <a href="profiles">Profiles page</a>. <a href="configstats#router.fastPeers">[Enable graphing]</a>
+</li>
+<li><b>High Capacity:</b>
+This is the number of peers your router has available for building your exploratory tunnels which are used to determine network performance. It is generally in the range 8-75. The fast peers are included in the high capacity tier.Your high capacity peers are shown on the <a href="profiles">Profiles page</a>. <a href="configstats#router.highCapacityPeers">[Enable graphing]</a>
+</li>
+<li>
+<b>Integrated:</b> This is the number of peers your router will use for network database inquiries. These are usually the "floodfill" routers which are responsible for maintaining network integrity. Your well integrated peers are shown on the bottom of the <a href="profiles">Profiles page</a>.
+</li>
+<li>
+<b>Known:</b> This is the total number of peers that are known by your router. They are listed on the <a href="netdb">Network Database page</a>. This may range from under 100 to 1000 or more. This number is not the total size of the network; it may vary widely depending on your total bandwidth, shared bandwidth, and locally-generated traffic. I2P does not require a router to know every other router in the network.
+</li>
+</ul>
+
+<h3>Bandwidth In/Out</h3>
+
+<p> This section indicates your average bandwidth speeds and total usage for the session. All values are in bytes per second, not bits per second. You may change your bandwidth limits on the <a href="config">Bandwidth Configuration page</a>. The more bandwidth you make available, the more you help the network and improve your own anonymity, so please take the time to review the settings. If you are unsure of your network's speed, using a service such as <a href="http://speedtest.net/">SpeedTest</a> or similar will give you a good indication of your bandwidth capability. Your upstream share amount (KBps Out) will determine your overall contribution to the network. Bandwidth is <a href="graphs">graphed</a> by default.</p>
+
+<h3>Local Destinations</h3>
+
+<p>These are the local services provided by your router. They may be clients started through the <a href="i2ptunnelmgr">Tunnel Manager</a> or external programs connecting through SAM, BOB, or directly to I2CP. By default, most of your client services (mail, http proxy, IRC) will share the same set of tunnels (for performance reasons) and be listed as <i>Shared Clients</i> and <i>Shared Clients(DSA)</i>. However, if you experience a tunnel failure, all your services will go offline at the same time, so in some scenarios you may wish to configure client services to use their own set of tunnels. This can be done by unchecking the <i>Share tunnels with other clients&hellip;</i> option listed under <i>Shared Clients</i> on the configuration page of the relevant client service in the Tunnel Manager, after which you will need to restart the client service from the <a href="i2ptunnelmgr">main Tunnel Manager page</a>.</p>
+
+<h3>Tunnels</h3>
+
+<p>The actual tunnels are shown on the <a href="tunnels">Tunnels page</a>.</p>
+
+<ul>
+<li>
+<b>Exploratory:</b> Tunnels built by your router and used for communication with the floodfill peers, building new tunnels, and testing existing tunnels.
+</li>
+<li>
+<b>Client:</b> Tunnels built by your router for each client's use.
+</li>
+<li>
+<b>Participating:</b> Tunnels built by other routers through your router. This may vary widely depending on network demand, your shared bandwidth, and amount of locally-generated traffic. The recommended method for limiting participating tunnels is to change your share percentage on the <a  href="config">Bandwidth Configuration page</a>. You may also limit the total number by setting <code>router.maxParticipatingTunnels=nnn</code> on the <a href="configadvanced">Advanced configuration page</a>. <a href="configstats#tunnel.participatingTunnels">[Enable graphing]</a>.
+</li>
+<li>
+<b>Share Ratio:</b> The number of participating tunnels you route for others, divided by the total number of hops in all your exploratory and client tunnels. A number greater than 1.00 means you are contributing more tunnels to the network than you are using.
+</li>
 </ul>
 
 <h3>Congestion</h3>
-<p>Some basic indications of router overload:</p><ul>
-<li class="tidylist"><b>Job lag:</b>
-How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
-Unfortunately, there are several other job queues in the router that may be congested,
-and their status is not available in the router console.
-The job lag should generally be zero.
-If it is consistently higher than 500ms, your computer is very slow, or the
-router has serious problems.
-<a href="configstats.jsp#jobQueue.jobLag">[Enable graphing]</a>.</li>
-<li class="tidylist"><b>Message delay:</b>
-How long an outbound message waits in the queue.
-This should generally be a few hundred milliseconds or less.
-If it is consistently higher than 1000ms, your computer is very slow,
-or you should adjust your bandwidth limits, or your (bittorrent?) clients
-may be sending too much data and should have their transmit bandwidth limit reduced.
-<a href="configstats.jsp#transport.sendProcessingTime">[Enable graphing]</a> (transport.sendProcessingTime).</li>
-<li class="tidylist"><b>Tunnel lag:</b>
-This is the round trip time for a tunnel test, which sends a single message
-out a client tunnel and in an exploratory tunnel, or vice versa.
-It should usually be less than 5 seconds.
-If it is consistently higher than that, your computer is very slow,
-or you should adjust your bandwidth limits, or there are network problems.
-<a href="configstats.jsp#tunnel.testSuccessTime">[Enable graphing]</a> (tunnel.testSuccessTime).</li>
-<li class="tidylist"><b>Handle backlog:</b>
-This is the number of pending requests from other routers to build a
-participating tunnel through your router.
-It should usually be close to zero.
-If it is consistently high, your computer is too slow,
-and you should reduce your share bandwidth limits.</li>
-<li class="tidylist"><b>Accepting/Rejecting:</b>
-Your router's status on accepting or rejecting
-requests from other routers to build a
-participating tunnel through your router.
-Your router may accept all requests, accept or reject a percentage of requests,
-or reject all requests for a number of reasons, to control
-the bandwidth and CPU demands and maintain capacity for
-local clients.</li></ul>
+<p><b>Note:</b> This section is not enabled by default. You may enable it on the <a href="configsidebar">Summary Bar Configuration page</a>.</p>
+<p>Some basic indications of router overload:</p>
+
+<ul>
+<li>
+<b>Job Lag:</b> How long jobs are waiting before execution. The job queue is listed on the <a href="jobs">Jobs page</a>. Unfortunately, there are several other job queues in the router that may be congested, and their status is not available in the router console. The job lag should generally be zero. If it is consistently higher than 500ms, your computer is very slow, your network is experiencing connectivity issues, or the router has serious problems. <a href="configstats#jobQueue.jobLag">[Enable graphing]</a>.
+</li>
+<li>
+<b>Message Delay:</b> How long an outbound message waits in the queue. This should generally be a few hundred milliseconds or less. If it is consistently higher than 1000ms, your computer is very slow, or you should adjust your bandwidth limits, or your (Bittorrent?) clients may be sending too much data and should have their transmit bandwidth limit reduced. <a href="configstats#transport.sendProcessingTime">[Enable graphing]</a> (transport.sendProcessingTime).
+</li>
+
+<%
+/*
+<li>
+<b>Tunnel lag:</b> This is the round trip time for a tunnel test, which sends a single message out a client tunnel and in an exploratory tunnel, or vice versa. It should usually be less than 5 seconds. If it is consistently higher than that, your computer is very slow, or you should adjust your bandwidth limits, or there are network problems. Problems may be indicated on the <a href="logs">Logs page</a>. <a href="configstats#tunnel.testSuccessTime">[Enable graphing]</a> (tunnel.testSuccessTime).
+</li>
+
+<li>
+<b>Handle backlog:</b> This is the number of pending requests from other routers to build a participating tunnel through your router. It should usually be close to zero. If it is consistently high, your computer is too slow, and you should reduce your share bandwidth limits.</li>
+*/
+%>
+
+<li>
+<b>Accepting/Rejecting:</b> Your router's status on accepting or rejecting requests from other routers to build a participating tunnel through your router. Your router may accept all requests, accept or reject a percentage of requests, or reject all requests for a number of reasons, to control the bandwidth and CPU demands and maintain capacity for local clients. <b>Note:</b> It will take at least 10 minutes from your router starting for it to accept building participating tunnels in order to ensure your router is stable and successfully bootstrapped to the network.
+</li>
+</ul>
+

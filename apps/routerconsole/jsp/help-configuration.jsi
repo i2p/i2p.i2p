@@ -13,12 +13,12 @@
   <%=intl._t("UPnP support is beta, and may not work for any number of reasons")%>:
 </p>
 <ul id="upnphelp">
-  <li class="tidylist"><%=intl._t("No UPnP-compatible device present")%></li>
-  <li class="tidylist"><%=intl._t("UPnP disabled on the device")%></li>
-  <li class="tidylist"><%=intl._t("Software firewall interference with UPnP")%></li>
-  <li class="tidylist"><%=intl._t("Bugs in the device's UPnP implementation")%></li>
-  <li class="tidylist"><%=intl._t("Multiple firewall/routers in the internet connection path")%></li>
-  <li class="tidylist"><%=intl._t("UPnP device change, reset, or address change")%></li>
+  <li><%=intl._t("No UPnP-compatible device present")%></li>
+  <li><%=intl._t("UPnP disabled on the device")%></li>
+  <li><%=intl._t("Software firewall interference with UPnP")%></li>
+  <li><%=intl._t("Bugs in the device's UPnP implementation")%></li>
+  <li><%=intl._t("Multiple firewall/routers in the internet connection path")%></li>
+  <li><%=intl._t("UPnP device change, reset, or address change")%></li>
 </ul>
 <p>
   <%=intl._t("UPnP may be enabled or disabled on the Network Configuration page, but a change requires a router restart to take effect.")%>&nbsp;

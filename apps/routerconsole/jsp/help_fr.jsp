@@ -33,8 +33,8 @@
 la page consacrée aux <a href="http://i2p-projekt.i2p/fr/get-involved">volontaires</a>.
 </p>D'autres détails sont disponibles ici:
 <ul class="links">
-<li class="tidylist"><a href="http://i2p-projekt.i2p/en/faq">FAQ en anglais sur i2p-projekt.i2p</a></li>
-<li class="tidylist"><a href="http://i2p-projekt.i2p/fr/faq">les FAQ en français</a>.</li>
+<li><a href="http://i2p-projekt.i2p/en/faq">FAQ en anglais sur i2p-projekt.i2p</a></li>
+<li><a href="http://i2p-projekt.i2p/fr/faq">les FAQ en français</a>.</li>
 </ul><br>
 </div>
 
@@ -44,37 +44,37 @@ Plusieurs des statistiques affichées dans le panneau de surveillance peuvent ê
 <a href="configstats.jsp">configurées</a> pour être affichées sous forme de <a href="graphs.jsp">graphiques</a> pour 
 analyse sur la durée.
 </p><h3>GÉNÉRAL</h3><ul>
-<li class="tidylist"><b>Identité locale:</b>
+<li><b>Identité locale:</b>
 Cliquez sur "Afficher" pour voir l'empreinte Base64 à 44 caractères (256 bits) de votre routeur. Le hachage 
 complet est affiché sur votre <a href="netdb.jsp?r=.">page d'infos routeur</a>. Ne la divulguez jamais à personne, 
 car l'info routeur contient votre adresse IP.</li>
-<li class="tidylist"><b>Version:</b>
+<li><b>Version:</b>
 La version d'I2P qui vous affiche actuellement cette page.</li>
-<li class="tidylist"><b>Lancé depuis:</b>
+<li><b>Lancé depuis:</b>
 Indique depuis combien de temps le routeur tourne.</li>
-<li class="tidylist"><b>Réseau:</b>
+<li><b>Réseau:</b>
 Statut de joignabilité du routeur par les autres routeurs.
 Plus d'infos sur la page de <a href="confignet#help">configuration</a>.
 </li></ul><h3>Pairs</h3><ul>
-<li class="tidylist"><b>Actifs:</b>
+<li><b>Actifs:</b>
 le premier nombre est celui des routeurs avec qui le votre a communiqué dans les dernières minutes. Ça peut varier de 
 8-10 à plusieurs centaines, selon votre bande passante et son rapport de partage, et le trafic généré localement. Le 
 second est celui des pairs vus dans les dernières heures. Ces nombres penvent varier sensiblement sans conséquence.
 <a href="configstats.jsp#router.activePeers">[Activer le graphique]</a></li>
-<li class="tidylist"><b>Rapides:</b>
+<li><b>Rapides:</b>
 le nombre de pairs que vous mettez à contribution pour construire vos tunnels clients. En général dans une tranche de 
 8 à 30. Vos pairs rapides sont détaillés sur la page <a href="profiles.jsp">profils</a>.
 <a href="configstats.jsp#router.fastPeers">[Activer le graphique]</a>.</li>
-<li class="tidylist"><b>Hautes capacités:</b>
+<li><b>Hautes capacités:</b>
 nombre des pairs que vous utilisez pour construire quelques uns de vos tunnels exploratoires. Habituellement de 8 à 75. 
 Les pairs rapides font partie du groupe des "Hautes capacités". Vos pairs à hautes capacités sont aussi listés sur 
 la page <a href="profiles.jsp">profils</a>.
 <a href="configstats.jsp#router.highCapacityPeers">[Activer le graphique]</a></li>
-<li class="tidylist"><b>Bien intégrés:</b>
+<li><b>Bien intégrés:</b>
 vous utilisez ce groupe pour vos requêtes à la base de données du réseau. Ils sont souvent des pairs de remplissage par 
 diffusion ("floodfill"). Vos pairs "bien intégrés" sont affichés en bas de la même page 
 <a href="profiles.jsp">profils</a>.</li>
-<li class="tidylist"><b>Connus:</b> c'est tous les routeurs dont vous connaissez l'existance. Il sont listés sur la 
+<li><b>Connus:</b> c'est tous les routeurs dont vous connaissez l'existance. Il sont listés sur la
 page <a href="netdb.jsp">base de données du réseau</a>. De moins de 100 à 1000 ou plus. Ce nombre ne représente pas la 
 taille totale du réseau; il varie en fonction de votre bande passante totale et son rapport de partage, et du trafic 
 local. I2P n'a pas besoin que chaque routeur connaisse tous les autres.
@@ -90,16 +90,16 @@ I2CP.</p>
 <h3>TUNNELS:</h3>
 <p>Les tunnels actuels sont affichés sur la page <a href="tunnels.jsp">tunnels</a>.</p>
 <ul>
-<li class="tidylist"><b>Exploratoires:</b> tunnels créés par votre routeur et utilisés avec les 
+<li><b>Exploratoires:</b> tunnels créés par votre routeur et utilisés avec les
 pairs diffuseurs pour la création des nouveaux tunnels et le test des tunnels existants.</li>
-<li class="tidylist"><b>Clients:</b> tunnels créés par votre routeur pour chaque utilisation cliente.</li>
-<li class="tidylist"><b>Participants:</b> les tunnels créés par d'autres routeurs et qui passent par le votre. Leur 
+<li><b>Clients:</b> tunnels créés par votre routeur pour chaque utilisation cliente.</li>
+<li><b>Participants:</b> les tunnels créés par d'autres routeurs et qui passent par le votre. Leur
 nombre dépend largement de la demande du réseau, de votre part de bande passante partagée, et du trafic local. 
 La méthode recommandée pour limiter leur nombre est de diminuer le rapport de bande passante partagée dans la 
 <a href="confignet#help">configuration</a>. Vous pouvez également limiter ce nombre en définissant la variable 
 <tt>router.maxParticipatingTunnels=nnn</tt> dans la <a href="configadvanced.jsp">configuration avancée</a>. 
 <a href="configstats.jsp#tunnel.participatingTunnels">[Activer le graphique]</a>.</li>
-<li class="tidylist"><b>Rapport de partage:</b> le nombre de tunnels participants que vous routez pour les autres, 
+<li><b>Rapport de partage:</b> le nombre de tunnels participants que vous routez pour les autres,
 divisé par le nombre total de sauts dans tous vos tunnels exploratoires et clients. S'il est supérieur à 1, cela 
 signifie que vous contribuez à plus de tunnels que vous n'en utilisez.
 </li>
@@ -108,24 +108,24 @@ signifie que vous contribuez à plus de tunnels que vous n'en utilisez.
 <h3>ENCOMBREMENT</h3>
 <p>Indications de base sur la charge du routeur:</p>
 <ul>
-<li class="tidylist"><b>Retard de tâches:</b> temps d'attente des tâches avant exécution. La file d'attente est 
+<li><b>Retard de tâches:</b> temps d'attente des tâches avant exécution. La file d'attente est
 présentée la pages des <a href="jobs.jsp">tâches</a>. Malheureusement, il y a dans le routeur plusieurs autres files 
 d'attentes qui ne peuvent être affichées dans la console. Le retard de tâches devrait rester à zéro en permamence. s'il 
 régulièrement supérieur à 500ms, soit votre PC est très lent, soit le routeur a de sérieux problèmes.
 <a href="configstats.jsp#jobQueue.jobLag">[Activer le graphique]</a>.</li>
-<li class="tidylist"><b>Retard de messages:</b> temps de rétention des messages en file d'attente d'envois, normalement 
+<li><b>Retard de messages:</b> temps de rétention des messages en file d'attente d'envois, normalement
 quelques centaines de ms ou moins. Au dessus d'une seconde, votre PC est très lent, vous devriez fignoler vos réglages 
 de bande passante, ou vos clients (bittorrent, iMule...?) envoient trop de données et il faudrait voir à leur tenir 
 la bride. <a href="configstats.jsp#transport.sendProcessingTime">[Activer le graphique]</a> 
 (transport.sendProcessingTime).</li>
-<li class="tidylist"><b>Retard de tunnels:</b> le temps d'aller-retour pour un test de tunnel (envoi d'un seul message 
+<li><b>Retard de tunnels:</b> le temps d'aller-retour pour un test de tunnel (envoi d'un seul message
 par un tunnel client et dans un tunnel exploratoire ou vice versa. Normalement inférieur à 5s. Si c'est constamment 
 supérieur, votre PC est très lent, vous devriez retoucher vos limites de bande passante, ou il y a un problème réseau.
 <a href="configstats.jsp#tunnel.testSuccessTime">[Activer le graphique]</a> (tunnel.testSuccessTime).</li>
-<li class="tidylist"><b>En attente:</b> nombre de requêtes de création de tunnels participants en attente provenant 
+<li><b>En attente:</b> nombre de requêtes de création de tunnels participants en attente provenant
 d'autres routeurs. Normalement proche de zéro. Sinon, votre ordinateur est trop lent et vous devriez diminuer votre 
 limite de bande passante partagée.</li>
-<li class="tidylist"><b>Accepte/Refuse:</b> c'est le statut de votre routeur au regard de son comportement vis à vis 
+<li><b>Accepte/Refuse:</b> c'est le statut de votre routeur au regard de son comportement vis à vis
 des demandes de création de tunnels participants provenant d'autres routeurs. Votre routeur peut accepter ou refuser 
 tout ou partie des requêtes, ou les refuser en totalité pour des raisons prévues telles que le contrôle de la bande 
 passante et des ressources CPU en vue de préserver les performances des clients locaux.</li></ul>
@@ -139,11 +139,11 @@ passante et des ressources CPU en vue de préserver les performances des clients
 <div id="legal">
 <h2>Informations légales</h2><p>Le routeur I2P (router.jar) et le SDK (i2p.jar) sont presque entièrement dans le 
 domaine public, à quelques notobles exceptions près:</p><ul>
-<li class="tidylist">Le code ElGamal et DSA, sous licence BSD, écrits par TheCrypto</li>
-<li class="tidylist">SHA256 et HMAC-SHA256, sous licence MIT, écrits par the Legion of the Bouncycastle</li>
-<li class="tidylist">Le code AES, sous licence Cryptix (MIT), écrit pas l'équipe the Cryptix</li>
-<li class="tidylist">Le code SNTP, sous licence BSD, écrit par Adam Buckley</li>
-<li class="tidylist">Le reste, directement issu du domaine public, est écrit par jrandom, mihi, hypercubus, oOo,
+<li>Le code ElGamal et DSA, sous licence BSD, écrits par TheCrypto</li>
+<li>SHA256 et HMAC-SHA256, sous licence MIT, écrits par the Legion of the Bouncycastle</li>
+<li>Le code AES, sous licence Cryptix (MIT), écrit pas l'équipe the Cryptix</li>
+<li>Le code SNTP, sous licence BSD, écrit par Adam Buckley</li>
+<li>Le reste, directement issu du domaine public, est écrit par jrandom, mihi, hypercubus, oOo,
     ugha, duck, shendaras, et d'autres.</li>
 </ul>
 

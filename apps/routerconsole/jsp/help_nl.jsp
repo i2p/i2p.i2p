@@ -33,7 +33,7 @@ met andere aspecten van het project, zie dan de documentatie voor
 <a href="http://i2p-projekt.i2p/nl/get-involved">vrijwilligers.</a>
 </p><p>Verdere ondersteuning is hier beschikbaar:</p>
 <ul class="links">
-<li class="tidylist"><a href="http://i2p-projekt.i2p/nl/faq">FAQ op i2p-projekt.i2p</a></li>
+<li><a href="http://i2p-projekt.i2p/nl/faq">FAQ op i2p-projekt.i2p</a></li>
 </ul><br>
 </div>
 
@@ -45,21 +45,21 @@ Veel van de statistieken op de summary bar kunnen
 </p>
 
 <h3>Algemeen</h3><ul>
-<li class="tidylist"><b>Lokale Identiteit:</b>
+<li><b>Lokale Identiteit:</b>
 De eerste vier karakters (24 bits) van je 44-karakter (256-bit) Base64 router hash.
 De volledige hash is getoond op je <a href="netdb.jsp?r=.">router info pagina</a>.
 Vertel deze aan niemand, want de router info bevat je IP.</li>
-<li class="tidylist"><b>Versie:</b>
+<li><b>Versie:</b>
 De versie van de I2P software die je nu gebruikt.</li>
-<li class="tidylist"><b>Uptime:</b>
+<li><b>Uptime:</b>
 Hoe lang je I2P router al draait.</li>
-<li class="tidylist"><b>Netwerk Bereikbaarheid:</b>
+<li><b>Netwerk Bereikbaarheid:</b>
 De bereikbaarheid van je router door andere routers.
 Meer informatie is te vinden op de <a href="confignet#help">configuratie pagina</a>.</li>
 </ul>
 
 <h3>Peers</h3><ul>
-<li class="tidylist"><b>Actief:</b>
+<li><b>Actief:</b>
 Het eerste nummer is het aantal peers waar je in de laatste paar minuten
 berichten naar verzonden of van ontvangen hebt.  Dit kan vari&euml;ren van 8-10 tot
 een paar honderd, afhankelijk van je totale bandbreedte, gedeelde bandbreedte
@@ -68,21 +68,21 @@ het laatste uur hebt gezien.  Wees niet ongerust wanneer deze aantallen erg
 vari&euml;ren.
 
 <a href="configstats.jsp#router.activePeers">[Grafieken inschakelen]</a>.</li>
-<li class="tidylist"><b>Snel:</b>
+<li><b>Snel:</b>
 Dit is het aantal peers dat je gebruikt om client tunnels mee te bouwen. Het ligt over
 het algemeen tussen 8 en 30.
 Je snelle peers worden getoond op de <a href="profiles.jsp">profielen pagina</a>.
 <a href="configstats.jsp#router.fastPeers">[Grafieken inschakelen]</a>.</li>
-<li class="tidylist"><b>Grote capaciteit:</b>
+<li><b>Grote capaciteit:</b>
 Dit is het aantal peers dat je gebruikt om sommige van de onderzoekende tunnels mee te maken.
 Het ligt over het algemeen tussen de 8 en 75. De snelle peers zijn inbegrepen in de categorie grote capaciteit.
 De grote capaciteits peers worden getoond op de <a href="profiles.jsp">profielen pagina</a>.
 <a href="configstats.jsp#router.highCapacityPeers">[Grafieken inschakelen]</a>.</li>
-<li class="tidylist"><b>Ge&iuml;ntegreerd:</b>
+<li><b>Ge&iuml;ntegreerd:</b>
 Dit is het aantal peers dat je gebruikt bij het opzoeken in de network database.
 Dit zijn gebruikelijk de "floodfill" peers.
 Je goed ge&iuml;ntegreerde peers worden getoond aan de onderkant van de <a href="profiles.jsp">profielen pagina</a>.</li>
-<li class="tidylist"><b>Bekend:</b>
+<li><b>Bekend:</b>
 Dit is het aantal routers dat bekend is bij je router.
 Ze worden getoond op de <a href="netdb.jsp">netwerk database pagina</a>.
 Dit kan liggen tussen onder de 100 en 1000 of meer.
@@ -100,12 +100,12 @@ Bandbreedte wordt standaard <a href="graphs.jsp">geplot</a>.</p>
 <h3>Tunnels</h3>
 <p>De tunnels zelf worden getoond op de <a href="tunnels.jsp">tunnels pagina</a>.</p>
 <ul>
-<li class="tidylist"><b>Onderzoekend:</b>
+<li><b>Onderzoekend:</b>
 Tunnels gebouwd door je router en gebruikt om te communiceren met de floodfill peers,
 voor het bouwen van nieuwe tunnels en testen van bestaande tunnels.</li>
-<li class="tidylist"><b>Client:</b>
+<li><b>Client:</b>
 Tunnels gebouwd door je router voor het gebruik door elke client.</li>
-<li class="tidylist"><b>Deelnemend:</b>
+<li><b>Deelnemend:</b>
 Tunnels gebouwd door andere routers die door je eigen router heen lopen.
 Dit kan erg vari&euml;ren afhankelijk van de vraag vanuit het netwerk,
 je gedeelde bandbreedte en hoeveelheid lokaal gegenereerd verkeer.
@@ -113,7 +113,7 @@ De aanbevolen methode om het aantal deelnemende tunnels te beperken
 is door het share percentage te wijzigen op de <a href="confignet#help">configuratie pagina</a>.
 Je kan het totale aantal ook beperken met de instelling <tt>router.maxParticipatingTunnels=nnn</tt> op
 de <a href="configadvanced.jsp">geavanceerde configuratie pagina</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Grafieken inschakelen]</a>.</li>
-<li class="tidylist"><b>Share rato:</b>
+<li><b>Share rato:</b>
 Het aantal deelnemende tunnels dat je voor andere routeert, gedeeld door het totale aantal hops in al je onderzoekende en client tunnels.
 Een aantal groter dan 1.00 betekent dat je meer tunnels aan het netwerk bijdraagt dan je gebruikt.
 </li>
@@ -122,7 +122,7 @@ Een aantal groter dan 1.00 betekent dat je meer tunnels aan het netwerk bijdraag
 <h3>Verstopping</h3>
 <p>Een aantal basis indicatoren voor een router overbelasting:</p>
 <ul>
-<li class="tidylist"><b>Taak vertraging:</b>
+<li><b>Taak vertraging:</b>
 Hoe lang taken moeten wachten voordat ze uitgevoerd worden. De taak wachtrij wordt getoond op de <a href="jobs.jsp">taken pagina</a>.
 Helaas zijn er ook verschillende andere taak wachtrijen in de router die verstopt kunnen raken,
 hun status is niet beschikbaar in de router console.
@@ -130,27 +130,27 @@ De taak vertraging zou over het algemeen nul moeten zijn.
 Indien dit consequent hoger is dan 500ms, dan is of je computer erg traag of
 heeft de router een serieus probleem.
 <a href="configstats.jsp#jobQueue.jobLag">[Grafieken inschakelen]</a>.</li>
-<li class="tidylist"><b>Bericht vertraging:</b>
+<li><b>Bericht vertraging:</b>
 Hoe lang een uitgaand bericht wacht in de wachtrij.
 Dit zou over het algemeen een aantal honderd milliseconden of minder moeten zijn.
 Indien dit consequent hoger is dan 1000ms, dan is of je computer erg traag
 of moet je je bandbreedte instellingen aanpassen, of je (bittorrent?) clients
 versturen mogelijk teveel data en moeten hun transmissie bandbreedte beperkt hebben.
 <a href="configstats.jsp#transport.sendProcessingTime">[Grafieken inschakelen]</a> (transport.sendProcessingTime).</li>
-<li class="tidylist"><b>Tunnel vertraging:</b>
+<li><b>Tunnel vertraging:</b>
 Dit is de rondgangstijd voor een tunnel test, welke een enkel bericht verstuurt
 vanuit een client tunnel dat dan bij een onderzoekende tunnel naar binnen gaat, of omgekeerd.
 Dit zou over het algemeen minder dan 5 seconden moeten zijn.
 Indien dit consequent hoger is, dan is of je computer erg traag of
 moet je je bandbreedte instellingen aanpassen of zijn er netwerk problemen.
 <a href="configstats.jsp#tunnel.testSuccessTime">[Grafieken inschakelen]</a> (tunnel.testSuccessTime).</li>
-<li class="tidylist"><b>Achterstand:</b>
+<li><b>Achterstand:</b>
 Dit is het aantal wachtende aanvragen van andere routers om een deelnemende
 tunnel door je eigen router te bouwen.
 Dit zou over het algemeen dicht bij de nul moeten zijn.
 Indien dit consequent hoog is, dan is of je computer te traag of
 moet je je bandbreedte instellingen aanpassen.</li>
-<li class="tidylist"><b>Accepteren / Weigeren:</b>
+<li><b>Accepteren / Weigeren:</b>
 De status van de router voor het accepteren of weigeren
 van verzoeken van andere routers om een deelnemende tunnel door je router te bouwen.
 Je router kan alle aanvragen accepteren, een percentage accepteren of weigeren,
@@ -172,11 +172,11 @@ of externe programma's die verbinden via SAM, BOB of direct met I2CP.</p>
 <h2>Juridische zaken</h2>
 <p>De I2P router (router.jar) en SDK (i2p.jar) zijn bijna geheel in het publieke domein, met een aantal noemenswaardige uitzonderingen:</p>
 <ul>
-<li class="tidylist">ElGamal en DSA code, valt onder de BSD licentie, geschreven door TheCrypto</li>
-<li class="tidylist">SHA256 en HMAC-SHA256, valt onder de MIT licentie, geschreven door the Legion of the Bouncycastle</li>
-<li class="tidylist">AES code, valt onder de MIT licentie, geschreven door het Cryptix team</li>
-<li class="tidylist">SNTP code, valt onder de BSD licentie, geschreven door Adam Buckley</li>
-<li class="tidylist">De rest is helemaal public domain, geschreven door jrandom, mihi, hypercubus, oOo, ugha, duck, shendaras, en anderen.</li>
+<li>ElGamal en DSA code, valt onder de BSD licentie, geschreven door TheCrypto</li>
+<li>SHA256 en HMAC-SHA256, valt onder de MIT licentie, geschreven door the Legion of the Bouncycastle</li>
+<li>AES code, valt onder de MIT licentie, geschreven door het Cryptix team</li>
+<li>SNTP code, valt onder de BSD licentie, geschreven door Adam Buckley</li>
+<li>De rest is helemaal public domain, geschreven door jrandom, mihi, hypercubus, oOo, ugha, duck, shendaras, en anderen.</li>
 </ul>
 
 <p>Bovenop de I2P router zijn een aantal client applicaties gemaakt, elk met

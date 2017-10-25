@@ -2,8 +2,8 @@
 <p>If you'd like to help improve or translate the documentation, or help with other aspects of the project, please see the documentation for <a href="http://i2p-projekt.i2p/en/get-involved" target="_blank">volunteers.</a></p>
 <p>Further assistance is available here:</p>
 <ul class="links">
-<li class="tidylist"><a href="http://i2p-projekt.i2p/en/faq" target="_blank">FAQ on i2p-projekt.i2p</a></li>
-<li class="tidylist"><a href="http://i2pwiki.i2p/" target="_blank">I2PWiki</a></li>
+<li><a href="http://i2p-projekt.i2p/en/faq" target="_blank">FAQ on i2p-projekt.i2p</a></li>
+<li><a href="http://i2pwiki.i2p/" target="_blank">I2PWiki</a></li>
 </ul>
 <p>You may also try <a href="http://zzz.i2p/" target="_blank">zzz's developer forum</a>,
 or <a href="irc://127.0.0.1:6668/i2p">I2P's IRC network</a>.</p>

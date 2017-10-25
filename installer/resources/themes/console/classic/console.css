@@ -2039,7 +2039,7 @@ div.welcome {
      min-width: 550px;
 }
 
-.main#help {
+#help {
      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.1)), url(images/bg0.png) !important;
 }
 
@@ -5504,26 +5504,26 @@ h3.stats {
      margin-bottom: 5px !important;
 }
 
-.main#help h2 {
+#help h2 {
      margin: -16px -16px 0;
 }
 
-.main#help h3 {
+#help h3 {
      margin: -5px -16px 3px;
 }
 
-.main#help p {
+#help p {
      padding: 5px 0 0;
      margin-top: 0;
 }
 
-.main#help ul {
+#help ul {
      margin-bottom: 5px;
      margin-top: -5px;
      padding-left: 15px;
 }
 
-.main#help ul li:first-child {
+#help ul li:first-child {
      padding-top: 0;
      margin-top: 10px !important;
 }
@@ -5535,6 +5535,12 @@ h3.stats {
 
 ul#reachability {
      padding-left: 15px;
+}
+
+#help li {
+     text-align: justify;
+     margin-left: 20px;
+     margin-right: 0;
 }
 
 #configinfo th {
@@ -5551,7 +5557,7 @@ ul#reachability {
      margin: -1px -1px 5px !important;
 }
 
-.main#help pre {
+#help pre {
      padding-left: 0;
      padding-bottom: 20px;
      margin: -5px 0 5px 10px;
@@ -5582,7 +5588,7 @@ p#fullhistory {
      background-size: 14px auto;
 }
 
-.main#help td.infohelp, .main#help td.infowarn, .main#help td.infohelp, .main#help p.infohelp {
+#help td.infohelp, #help td.infowarn, #help td.infohelp, #help p.infohelp {
      background-size: 24px 24px !important;
      padding-left: 46px !important;
 }
@@ -5759,7 +5765,7 @@ p#fullhistory {
      background: rgba(230,230,255,0.5);
 }
 
-.main#help #configinfo td.infowarn {
+#help #configinfo td.infowarn {
      padding: 10px 10px 10px 38px !important;
      border: 1px solid #89f;
      background: #fffff5 url(/themes/console/images/info/infowarn.png) 10px center no-repeat !important;
@@ -7138,7 +7144,7 @@ table.sybil_routerinfo:last-child {
 }
 /* end whitespace reduction */
 
-.main#help h3, #faq h3 {
+#help h3, #faq h3 {
      font-size: 10pt !important;
 }
 
@@ -7174,7 +7180,7 @@ table.sybil_routerinfo:last-child {
      letter-spacing: -0.3em;
 }
 
-.main#help h3, #faq h3 {
+#help h3, #faq h3 {
      font-size: 10.5pt !important;
 }
 }
@@ -7193,7 +7199,7 @@ table.sybil_routerinfo:last-child {
 }
 
 @media screen and (min-width: 1400px) {
-.main#help #changelog pre:not(old) {
+#help #changelog pre:not(old) {
      columns: 560px auto;
      column-gap: 40px;
      column-rule: 1px dotted #abf;

@@ -4447,7 +4447,7 @@ table#externali2cp {
 
 /* /help */
 
-.main#help h3 {
+#help h3 {
     padding: 7px 10px;
     font-size: 10pt;
 }
@@ -4555,17 +4555,21 @@ ul#upnphelp li:last-child, #legal ul li:last-child {
      padding-bottom: 0;
 }
 
-.main#help td.infohelp, .main#help td.infowarn {
+#help td.infohelp, #help td.infowarn {
      background-size: 24px 24px !important;
      padding-left: 46px !important;
 }
 
-.main#help #configinfo .infowarn {
+#help #configinfo .infowarn {
      border: none;
      border-bottom: 1px inset #010008;
      box-shadow: none;
      background-size: 20px 20px !important;
      padding: 7px 10px 7px 40px !important;
+}
+
+#help li {
+     text-align: justify;
 }
 
 /* mini faq */
@@ -7532,7 +7536,7 @@ table#i2pupdates td:first-child {
      white-space: normal;
 }
 
-.main#help h3, #faq h3 {
+#help h3, #faq h3 {
      font-size: 10pt !important;
 }
 }
@@ -7584,7 +7588,7 @@ table#i2pupdates td:first-child {
      margin-bottom: 5px;
 }
 
-.main#help h3, #faq h3 {
+#help h3, #faq h3 {
      font-size: 10.5pt !important;
 }
 
@@ -7594,7 +7598,7 @@ table#i2pupdates td:first-child {
 }
 
 @media screen and (min-width: 1400px) {
-.main#help #changelog pre:not(old) {
+#help #changelog pre:not(old) {
      columns: 550px auto;
      column-gap: 40px;
      column-rule: 1px dotted #443da0;

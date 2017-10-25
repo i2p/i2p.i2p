@@ -388,6 +388,10 @@ div[lang="ar"] ul, div[lang="ar"] p {
      margin: 10px;
 }
 
+#help li {
+     margin-left: 20px !important;
+}
+
 .links li:first-child {
      margin-top: 15px !important;
 }
@@ -397,11 +401,15 @@ div[lang="ar"] ul, div[lang="ar"] p {
 }
 
 .main#help .links li {
-     margin-right: 70px !important;
+    margin: 5px 50px 5px 20px;
 }
 
-.main#help .links li {
-    margin: 5px 50px 5px 20px;
+#fullhistory {
+     text-align: left;
+}
+
+#fullhistory::before {
+     margin-left: 10px;
 }
 
 .links li code {

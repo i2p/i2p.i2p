@@ -4013,6 +4013,10 @@ ul#upnphelp li:last-child, #legal ul li:last-child {
      padding: 7px 10px 7px 36px !important;
 }
 
+#help li {
+     text-align: justify;
+}
+
 /* mini faq */
 
 #faq h3 {

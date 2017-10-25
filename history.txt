@@ -25,6 +25,9 @@
    - /configui:
      - Add option to embed Susimail and I2PSnark in console
      - Use larger flags for language selection
+   - /help:
+     - Update sidebar help section (en)
+     - Remove redundant CSS class from all help section files (li.tidylist)
  * I2PTunnel: Add hostname / destination (b32) information to server section on
    index page (for parity with client tunnels section)
  * I2PSnark
