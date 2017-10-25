@@ -286,11 +286,11 @@ public interface RrdGraphConstants {
 	/**
 	 * Used internally
 	 */
-	int PADDING_LEFT = 5; // pix
+	int PADDING_LEFT = 0; // pix - absent vertical label provides padding here
 	/**
 	 * Used internally
 	 */
-	int PADDING_TOP = 9; // pix
+	int PADDING_TOP = 5; // pix -- additional top pixels added by frame border
 	/**
 	 * Used internally
 	 */
@@ -314,7 +314,7 @@ public interface RrdGraphConstants {
 	/**
 	 * Used internally
 	 */
-	int PADDING_VLABEL = 7; // pix
+	int PADDING_VLABEL = 8; // pix
 
 	/**
 	 * Stroke used to draw grid

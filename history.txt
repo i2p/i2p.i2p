@@ -1,3 +1,11 @@
+2017-10-25 str4d
+ * Console:
+   - /graphs:
+     - Add option to hide legends
+     - Adjust size of up/down bw graph to match other graphs (ticket #1996)
+     - Modify image font color to better blend with themes
+     - Tweak spacing of elements for non-Debian installs
+
 2017-10-11 zzz
  * Console: Validate host header (thx Kevin Froman)
  * Router: Honor IPv6 setting when converting configured hostnames

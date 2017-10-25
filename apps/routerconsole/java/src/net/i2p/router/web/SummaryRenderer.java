@@ -40,6 +40,8 @@ class SummaryRenderer {
     private static final Color SHADEB_COLOR = new Color(246, 246, 255);
     private static final Color GRID_COLOR = new Color(100, 100, 100, 75);
     private static final Color MGRID_COLOR = new Color(255, 91, 91, 110);
+    private static final Color FONT_COLOR = new Color(51, 51, 63);
+    private static final Color FRAME_COLOR = new Color(51, 51, 63);
     private static final Color AREA_COLOR = new Color(100, 160, 200, 200);
     private static final Color LINE_COLOR = new Color(0, 30, 110, 255);
     private static final Color RESTART_BAR_COLOR = new Color(223, 13, 13, 255);
@@ -139,6 +141,8 @@ class SummaryRenderer {
             def.setColor(RrdGraphDef.COLOR_SHADEB, SHADEB_COLOR);
             def.setColor(RrdGraphDef.COLOR_GRID,   GRID_COLOR);
             def.setColor(RrdGraphDef.COLOR_MGRID,  MGRID_COLOR);
+            def.setColor(RrdGraphDef.COLOR_FONT,   FONT_COLOR);
+            def.setColor(RrdGraphDef.COLOR_FRAME,  FRAME_COLOR);
             def.setFont(RrdGraphDef.FONTTAG_DEFAULT, new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10));
             def.setFont(RrdGraphDef.FONTTAG_TITLE,   new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10));
             def.setFont(RrdGraphDef.FONTTAG_AXIS,    new Font("Droid Sans Mono", Font.PLAIN, 10));

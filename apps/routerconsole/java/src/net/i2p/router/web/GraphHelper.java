@@ -24,6 +24,7 @@ public class GraphHelper extends FormHandler {
     private int _height;
     private int _refreshDelaySeconds;
     private boolean _persistent;
+    private boolean _graphHideLegend;
     private String _stat;
     private int _end;
 
@@ -32,6 +33,7 @@ public class GraphHelper extends FormHandler {
     private static final String PROP_REFRESH = "routerconsole.graphRefresh";
     private static final String PROP_PERIODS = "routerconsole.graphPeriods";
     private static final String PROP_EVENTS = "routerconsole.graphEvents";
+    private static final String PROP_LEGEND = "routerconsole.graphHideLegend";
     public static final int DEFAULT_X = 400;
     public static final int DEFAULT_Y = 100;
     private static final int DEFAULT_REFRESH = 5*60;
@@ -43,7 +45,7 @@ public class GraphHelper extends FormHandler {
     private static final int MIN_C = 20;
     private static final int MAX_C = SummaryListener.MAX_ROWS;
     private static final int MIN_REFRESH = 15;
-    
+
     /** set the defaults after we have a context */
     @Override
     public void setContextId(String contextId) {
@@ -53,8 +55,9 @@ public class GraphHelper extends FormHandler {
         _periodCount = _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS);
         _refreshDelaySeconds = _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
         _showEvents = _context.getBooleanProperty(PROP_EVENTS);
+        _graphHideLegend = _context.getBooleanProperty(PROP_LEGEND);
     }
-    
+
     /**
      *  This must be output in the jsp since *lt;meta&gt; must be in the &lt;head&gt;
      *  @since 0.8.7
@@ -78,14 +81,14 @@ public class GraphHelper extends FormHandler {
     }
 
     /** @since 0.9 */
-    public void setE(String str) { 
+    public void setE(String str) {
         try {
             _end = Math.max(0, Integer.parseInt(str));
         } catch (NumberFormatException nfe) {}
     }
 
     /** @since 0.9 shorter parameter */
-    public void setC(String str) { 
+    public void setC(String str) {
         try {
             _periodCount = Math.max(MIN_C, Math.min(Integer.parseInt(str), MAX_C));
         } catch (NumberFormatException nfe) {}
@@ -98,7 +101,7 @@ public class GraphHelper extends FormHandler {
     }
 
     /** @since 0.9 shorter parameter */
-    public void setH(String str) { 
+    public void setH(String str) {
         try {
             _height = Math.max(MIN_Y, Math.min(Integer.parseInt(str), MAX_Y));
         } catch (NumberFormatException nfe) {}
@@ -109,7 +112,7 @@ public class GraphHelper extends FormHandler {
     }
 
     /** @since 0.9 shorter parameter */
-    public void setW(String str) { 
+    public void setW(String str) {
         try {
             _width = Math.max(MIN_X, Math.min(Integer.parseInt(str), MAX_X));
         } catch (NumberFormatException nfe) {}
@@ -128,6 +131,9 @@ public class GraphHelper extends FormHandler {
     /** @since 0.8.7 */
     public void setPersistent(String foo) { _persistent = true; }
 
+    /** @since 0.9.32 */
+    public void setHideLegend(String foo) { _graphHideLegend = true; }
+
     /**
      *  For single stat page
      *  @since 0.9
@@ -135,7 +141,7 @@ public class GraphHelper extends FormHandler {
     public void setStat(String stat) {
         _stat = stat;
     }
-    
+
     public String getImages() { 
         if (StatSummarizer.isDisabled())
             return "";
@@ -162,12 +168,20 @@ public class GraphHelper extends FormHandler {
                 String title = _t("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\""
                            + " src=\"viewstat.jsp?stat=bw.combined"
-                           + "&amp;periodCount=" + _periodCount 
-                           + "&amp;width=" + _width
-                           + "&amp;height=" + (_height - 13)
+                           + "&amp;periodCount=" + _periodCount
+                           + "&amp;width=" + _width);
+                if (!_graphHideLegend) {
+                    // bw.combined graph has two entries in its legend
+                    // -26 pixels equalizes its height with the other images
+                    _out.write("&amp;height=" + (_height - 26));
+                } else {
+                    // no legend, no height difference needed
+                    _out.write("&amp;height=" + (_height));
+                }
+                _out.write("&amp;hideLegend=" + _graphHideLegend
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
-            
+
             for (SummaryListener lsnr : ordered) {
                 Rate r = lsnr.getRate();
                 // e.g. "statname for 60m"
@@ -184,11 +198,12 @@ public class GraphHelper extends FormHandler {
                            + " src=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
                            + "&amp;showEvents=" + _showEvents
-                           + "&amp;period=" + r.getPeriod() 
-                           + "&amp;periodCount=" + _periodCount 
+                           + "&amp;period=" + r.getPeriod()
+                           + "&amp;periodCount=" + _periodCount
                            + "&amp;width=" + _width
                            + "&amp;height=" + _height
-                           + "\" alt=\"" + title 
+                           + "&amp;hideLegend=" + _graphHideLegend
+                           + "\" alt=\"" + title
                            + "\" title=\"" + title + "\"></a>\n");
             }
 
@@ -243,10 +258,11 @@ public class GraphHelper extends FormHandler {
                        + name
                        + "&amp;showEvents=" + _showEvents
                        + "&amp;period=" + period
-                       + "&amp;periodCount=" + _periodCount 
-                       + "&amp;end=" + _end 
+                       + "&amp;periodCount=" + _periodCount
+                       + "&amp;end=" + _end
                        + "&amp;width=" + _width
                        + "&amp;height=" + _height
+                       + "&amp;hideLegend=" + _graphHideLegend
                        + "\"></div><p id=\"graphopts\">\n");
 
             if (_width < MAX_X && _height < MAX_Y) {
@@ -363,8 +379,13 @@ public class GraphHelper extends FormHandler {
             _out.write("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + ">" + _t("Averages") + "</label>&nbsp;&nbsp;&nbsp;");
             _out.write ("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + ">" + _t("Events") + "</label></td></tr><tr><td>\n");
             _out.write(_t("Graph size") + ":</td><td><input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
-                       + "\">" + _t("pixels wide") + "&nbsp;&nbsp;&nbsp;<input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
+                       + "\">" + _t("pixels wide") + "&nbsp;&nbsp;&nbsp;<input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height
                        + "\">" + _t("pixels high") + "</td><td class=\"infohelp\">" + _t("Note: Dimensions are for graph only (excludes title, labels and legend).") + "</td></tr><tr><td>\n");
+            _out.write(_t("Hide legend") + ":</td><td colspan=\"2\">");
+            _out.write("<label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"hideLegend\"");
+            if (_graphHideLegend)
+                _out.write(HelperBase.CHECKED);
+            _out.write(">" + _t("Do not show legend on graphs") + "</label></td></tr><tr><td>\n");
             _out.write(_t("Refresh delay") + ":</td><td colspan=\"2\"><select name=\"refreshDelay\">");
             for (int i = 0; i < times.length; i++) {
                 _out.write("<option value=\"");
@@ -432,6 +453,7 @@ public class GraphHelper extends FormHandler {
             _periodCount != _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS) ||
             _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
             _showEvents != _context.getBooleanProperty(PROP_EVENTS) ||
+            _graphHideLegend != _context.getBooleanProperty(PROP_LEGEND) ||
             _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
             Map<String, String> changes = new HashMap<String, String>();
             changes.put(PROP_X, "" + _width);
@@ -439,6 +461,7 @@ public class GraphHelper extends FormHandler {
             changes.put(PROP_PERIODS, "" + _periodCount);
             changes.put(PROP_REFRESH, "" + _refreshDelaySeconds);
             changes.put(PROP_EVENTS, "" + _showEvents);
+            changes.put(PROP_LEGEND, "" + _graphHideLegend);
             changes.put(SummaryListener.PROP_PERSISTENT, "" + _persistent);
             _context.router().saveConfig(changes, null);
             addFormNotice(_t("Graph settings saved"));
