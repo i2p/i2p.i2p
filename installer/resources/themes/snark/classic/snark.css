@@ -179,7 +179,6 @@ body.iframed {
      margin: 0;
      padding: 3px 5px;
      text-align: left;
-     color: #003;
      border-bottom: 1px solid #89f;
      background: url(images/hat.png) bottom right no-repeat #ddf;
      background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, #e3e3ff, #ddf);
@@ -203,8 +202,7 @@ body.iframed {
 .snarkMessages li {
      margin-left: -15px;
      font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
-     color: #2c354f;
-     opacity: 0.95;
+     color: #4b4b76;
 }
 
 .snarkMessages li::before {
@@ -2853,7 +2851,7 @@ th a img {
      overflow: hidden;
 }
 
-#configs tr:nth-child(n+16) {
+#configs tr:nth-child(n+17) {
      display: none;
 }
 

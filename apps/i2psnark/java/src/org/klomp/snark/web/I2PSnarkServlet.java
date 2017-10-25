@@ -268,6 +268,9 @@ public class I2PSnarkServlet extends BasicServlet {
             return;	
         }
 
+        boolean noCollapse = noCollapsePanels(req);
+        boolean collapsePanels = _manager.util().collapsePanels();
+
         setHTMLHeaders(resp);
         PrintWriter out = resp.getWriter();
         out.write(DOCTYPE + "<html>\n" +
@@ -295,7 +298,7 @@ public class I2PSnarkServlet extends BasicServlet {
                 String jsPfx = _context.isRouterContext() ? "" : ".resources";
                 String downMsg = _context.isRouterContext() ? _t("Router is down") : _t("I2PSnark has stopped");
                 // fallback to metarefresh when javascript is disabled
-                out.write("<noscript><meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\"></noscript>\n");
+                out.write("<noscript><meta http-equiv=\"refresh\" content=\"" + delay + ";" + _contextPath + "/" + peerString + "\"></noscript>\n");
                 out.write("<script src=\"" + jsPfx + "/js/ajax.js\" type=\"text/javascript\"></script>\n" +
                           "<script type=\"text/javascript\">\n"  +
                           "var failMessage = \"<div class=\\\"routerdown\\\"><b>" + downMsg + "<\\/b><\\/div>\";\n" +
@@ -306,7 +309,14 @@ public class I2PSnarkServlet extends BasicServlet {
                           "</script>\n");
             }
         }
-        out.write(HEADER_A + _themePath + HEADER_B + "</head>\n");
+        out.write(HEADER_A + _themePath + HEADER_B);
+
+        //  ...and inject CSS to display panels uncollapsed
+        if (noCollapse || !collapsePanels) {
+            out.write(HEADER_A + _themePath + HEADER_C);
+        }
+        out.write("</head>\n");
+
         if (isConfigure || delay <= 0)
             out.write("<body>");
         else
@@ -381,9 +391,10 @@ public class I2PSnarkServlet extends BasicServlet {
     private static void setHTMLHeaders(HttpServletResponse resp) {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
-        resp.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
+        // "no-store, max-age=0" forces all our images to be reloaded on ajax refresh
+        resp.setHeader("Cache-Control", "max-age=86400, no-cache, must-revalidate");
         resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
-        resp.setDateHeader("Expires", 0);
+        resp.setDateHeader("Expires", 86400);
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
@@ -1190,10 +1201,11 @@ public class I2PSnarkServlet extends BasicServlet {
             boolean comments = req.getParameter("comments") != null;
             // commentsName is filtered in SnarkManager.updateConfig()
             String commentsName = req.getParameter("nofilter_commentsName");
+            boolean collapsePanels = req.getParameter("collapsePanels") != null;
             _manager.updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDel, startupDel, pageSize,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
                                   upLimit, upBW, useOpenTrackers, useDHT, theme,
-                                  lang, ratings, comments, commentsName);
+                                  lang, ratings, comments, commentsName, collapsePanels);
             // update servlet
             try {
                 setResourceBase(_manager.getDataDir());
@@ -2271,9 +2283,12 @@ public class I2PSnarkServlet extends BasicServlet {
         boolean useDHT = _manager.util().shouldUseDHT();
         boolean useRatings = _manager.util().ratingsEnabled();
         boolean useComments = _manager.util().commentsEnabled();
+        boolean collapsePanels = _manager.util().collapsePanels();
         //int seedPct = 0;
 
-        out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
+        boolean noCollapse = noCollapsePanels(req);
+
+        out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\" target=\"_top\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
         writeHiddenInputs(out, req, "Save");
         out.write("<span class=\"snarkConfigTitle\">");
@@ -2309,10 +2324,23 @@ public class I2PSnarkServlet extends BasicServlet {
                   "<tr><td><label for=\"smartSort\">");
         out.write(_t("Smart torrent sorting"));
         out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"smartSort\" id=\"smartSort\" value=\"true\" "
-                  + (smartSort ? "checked " : "") 
+                  + (smartSort ? "checked " : "")
                   + "title=\"");
         out.write(_t("Ignore words such as 'a' and 'the' when sorting"));
-        out.write("\" >");
+        out.write("\" >" +
+
+                  "<tr><td><label for=\"collapsePanels\">");
+        out.write(_t("Collapsible panels"));
+        out.write(":</label><td colspan=\"2\"><input type=\"checkbox\" class=\"optbox\" name=\"collapsePanels\" id=\"collapsePanels\" value=\"true\" "
+                  + (collapsePanels ? "checked " : "")
+                  + "title=\"");
+        if (noCollapse) {
+            out.write(_t("Your browser does not support this feature."));
+            out.write("\" disabled=\"disabled");
+        } else {
+            out.write(_t("Allow the 'Add Torrent' and 'Create Torrent' panels to be collapsed, and collapse by default in non-embedded mode"));
+        }
+        out.write("\">");
 
         if (!_context.isRouterContext()) {
             try {
@@ -2744,7 +2772,7 @@ public class I2PSnarkServlet extends BasicServlet {
         buf.append("<a href=\"").append(link).append("\">").append(display).append("</a>");
         return buf.toString();
     }
-    
+
     /**
      * This is for a full URL. For a path only, use encodePath().
      * @since 0.8.13
@@ -2758,7 +2786,7 @@ public class I2PSnarkServlet extends BasicServlet {
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
     private static final String HEADER_A = "<link href=\"";
     private static final String HEADER_B = "snark.css?" + CoreVersion.VERSION + "\" rel=\"stylesheet\" type=\"text/css\" >";
-
+    private static final String HEADER_C = "nocollapse.css?" + CoreVersion.VERSION + "\" rel=\"stylesheet\" type=\"text/css\" >";
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" >\n" +
                                                "<thead>\n";
@@ -3849,6 +3877,14 @@ public class I2PSnarkServlet extends BasicServlet {
     private void saveCommentsSetting(Snark snark, Map<String, String[]> postParams) {
         boolean yes = postParams.get("enableComments") != null;
         _manager.setSavedCommentsEnabled(snark, yes);
+    }
+
+    private static boolean noCollapsePanels(HttpServletRequest req) {
+        // check for user agents that can't toggle the collapsible panels...
+        String ua = req.getHeader("user-agent");
+        return ua != null && (ua.contains("Konq") || ua.contains("konq") ||
+                              ua.contains("Qupzilla") || ua.contains("Dillo") ||
+                              ua.contains("Netsurf") || ua.contains("Midori"));
     }
 
     /**

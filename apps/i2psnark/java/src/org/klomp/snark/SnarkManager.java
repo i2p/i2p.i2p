@@ -131,6 +131,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String RC_PROP_UNIVERSAL_THEMING = "routerconsole.universal.theme";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
+    /** @since 0.9.32 */
+    public static final String PROP_COLLAPSE_PANELS = "i2psnark.collapsePanels";
     private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String PROP_PRIVATETRACKERS = "i2psnark.privatetrackers";
@@ -451,6 +453,17 @@ public class SnarkManager implements CompleteListener, ClientApp {
         String val = _config.getProperty(PROP_SMART_SORT);
         if (val == null)
             return true;
+        return Boolean.parseBoolean(val);
+    }
+
+    /**
+     *  @return default true
+     *  @since 0.9.32
+     */
+    public boolean isCollapsePanelsEnabled() {
+        String val = _config.getProperty(PROP_COLLAPSE_PANELS);
+        if (val == null)
+            return I2PSnarkUtil.DEFAULT_COLLAPSE_PANELS;
         return Boolean.parseBoolean(val);
     }
 
@@ -798,6 +811,9 @@ public class SnarkManager implements CompleteListener, ClientApp {
             _config.setProperty(PROP_COMMENTS, "true");
         if (!_config.containsKey(PROP_COMMENTS_NAME))
             _config.setProperty(PROP_COMMENTS_NAME, "");
+        if (!_config.containsKey(PROP_COLLAPSE_PANELS))
+            _config.setProperty(PROP_COLLAPSE_PANELS,
+                                Boolean.toString(I2PSnarkUtil.DEFAULT_COLLAPSE_PANELS));
         updateConfig();
     }
 
@@ -871,7 +887,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 _util.setMaxUpBW(limits[1]);
         }
     }
-    
+
     private void updateConfig() {
         String i2cpHost = _config.getProperty(PROP_I2CP_HOST);
         int i2cpPort = getInt(PROP_I2CP_PORT, 7654);
@@ -908,6 +924,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
         _util.setRatingsEnabled(Boolean.parseBoolean(_config.getProperty(PROP_RATINGS, "true")));
         _util.setCommentsEnabled(Boolean.parseBoolean(_config.getProperty(PROP_COMMENTS, "true")));
         _util.setCommentsName(_config.getProperty(PROP_COMMENTS_NAME, ""));
+        _util.setCollapsePanels(Boolean.parseBoolean(_config.getProperty(PROP_COLLAPSE_PANELS,
+                                          Boolean.toString(I2PSnarkUtil.DEFAULT_COLLAPSE_PANELS))));
         File dd = getDataDir();
         if (dd.isDirectory()) {
             if (!dd.canWrite())
@@ -918,7 +936,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         initTrackerMap();
     }
-    
+
     private int getInt(String prop, int defaultVal) {
         String p = _config.getProperty(prop);
         try {
@@ -929,29 +947,29 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         return defaultVal;
     }
-    
+
     /**
      *  all params may be null or need trimming
      */
     public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
-                             String startDelay, String pageSize, String seedPct, String eepHost, 
+                             String startDelay, String pageSize, String seedPct, String eepHost,
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
-                             String lang, boolean enableRatings, boolean enableComments, String commentName) {
+                             String lang, boolean enableRatings, boolean enableComments, String commentName, boolean collapsePanels) {
         synchronized(_configLock) {
-            locked_updateConfig(dataDir, filesPublic, autoStart, smartSort,refreshDelay,
-                                startDelay,  pageSize,  seedPct,  eepHost, 
-                                eepPort,  i2cpHost,  i2cpPort,  i2cpOpts,
-                                upLimit,  upBW, useOpenTrackers, useDHT,  theme,
-                                lang, enableRatings, enableComments, commentName);
+            locked_updateConfig(dataDir, filesPublic, autoStart, smartSort, refreshDelay,
+                                startDelay, pageSize, seedPct, eepHost,
+                                eepPort, i2cpHost, i2cpPort, i2cpOpts,
+                                upLimit, upBW, useOpenTrackers, useDHT, theme,
+                                lang, enableRatings, enableComments, commentName, collapsePanels);
         }
     }
 
     private void locked_updateConfig(String dataDir, boolean filesPublic, boolean autoStart, boolean smartSort, String refreshDelay,
-                             String startDelay, String pageSize, String seedPct, String eepHost, 
+                             String startDelay, String pageSize, String seedPct, String eepHost,
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, boolean useDHT, String theme,
-                             String lang, boolean enableRatings, boolean enableComments, String commentName) {
+                             String lang, boolean enableRatings, boolean enableComments, String commentName, boolean collapsePanels) {
         boolean changed = false;
         boolean interruptMonitor = false;
         //if (eepHost != null) {
@@ -996,7 +1014,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 }
             }
         }
-        
+
 	if (startDelay != null && _context.isRouterContext()) {
 		int minutes = _util.getStartupDelay();
                 try { minutes = Integer.parseInt(startDelay.trim()); } catch (NumberFormatException nfe) {}
@@ -1115,7 +1133,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 if (split > 0)
                     oldOpts.put(pair.substring(0, split), pair.substring(split+1));
             }
-            
+
             boolean reconnect = i2cpHost != null && i2cpHost.trim().length() > 0 && port > 0 &&
                                 (port != _util.getI2CPPort() || !oldI2CPHost.equals(i2cpHost));
             if (reconnect || !oldOpts.equals(opts)) {
@@ -1261,6 +1279,15 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 addMessage(_t("{0} theme loaded.", theme));
                 changed = true;
             }
+        }
+        if (_util.collapsePanels() != collapsePanels) {
+            _config.setProperty(PROP_COLLAPSE_PANELS, Boolean.toString(collapsePanels));
+            if (collapsePanels)
+                addMessage(_t("Collapsible panels enabled."));
+            else
+                addMessage(_t("Collapsible panels disabled."));
+            _util.setCollapsePanels(collapsePanels);
+            changed = true;
         }
         if (changed) {
             saveConfig();
@@ -1485,7 +1512,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                         fis.close();
                         fis = null;
                     } catch (IOException e) {}
-                    
+
                     // This test may be a duplicate, but not if we were called
                     // from the DirMonitor, which only checks for dup torrent file names.
                     Snark snark = getTorrentByInfoHash(info.getInfoHash());

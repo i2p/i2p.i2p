@@ -169,7 +169,6 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 
 .snarkNav:last-child[href="/i2psnark/"] {
-     border-radius: 2px;
      margin: -5px 0 !important;
      display: inline-block;
 }
@@ -186,7 +185,7 @@ _:-ms-lang(x), .snarkNav:last-child[href="/i2psnark/"] {
      color: #d2baff !important;
 }
 
-.nav_main:link:active {
+.nav_main:link:active, .snarkNav:last-child[href="/i2psnark/"]:active {
      background: #f60 url(images/button_snark_active.png) 11px center no-repeat;
      background-size: 18px auto, 100% 100%;
      color: #fff !important;
@@ -3163,7 +3162,7 @@ th a img {
      font-size: 0 !important;
 }
 
-#configs tr:nth-child(n+16) {
+#configs tr:nth-child(n+17) {
      display: none;
 }
 

@@ -1,0 +1,72 @@
+/* disable snark's collapsible panels and make section headings inert */
+
+input#toggle_addtorrent:not(checked) + label + hr + table, input#toggle_createtorrent:not(checked) + label + hr + table,
+input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent:checked + label + hr + table {
+     display: table !important;
+}
+
+label.toggleview:hover, label.toggleview:active, .toggle_input:focus + .toggleview {
+     border: 1px solid #101 !important;
+     border-top: none !important;
+     text-shadow: 0 0 1px #000 !important;
+     box-shadow: inset 0 0 1px 0 #313, 0 0 0 1px rgba(16, 0, 16, 0.4) !important;
+     cursor: default !important;
+}
+
+label.toggleview, label.toggleview:hover, label.toggleview:active, .toggle_input:focus + .toggleview {
+     background: #101 url(images/snarknav.png) repeat-x scroll center center !important;
+     background: linear-gradient(to bottom, #5f475d 0%, #4f3b4f 50%, #1f001f 50%, #1f001f 100%) !important;
+     color: #d2baff !important;
+}
+
+.toggle_input:focus + .toggleview img, .toggleview:hover img {
+     filter: drop-shadow(0 0 1px #000) !important;
+}
+
+label.toggleview img:active, label.toggleview:active img {
+     transform: none !important;
+}
+
+/* alternative iconified section tabs for iframed view */
+
+.iframed label.toggleview, .iframed label.toggleview:hover, .iframed label.toggleview:focus, .iframed .toggle_input:focus + .toggleview,
+.iframed .configsection .snarkConfigTitle {
+     min-width: 0;
+     width: 200px !important;
+     padding: 1px 5px !important;
+     font-size: 0;
+     border: 1px solid #878 !important;
+     border-bottom: 1px solid #767 !important;
+     border-top: none !important;
+     border-radius: 0 0 3px 3px;
+     background: linear-gradient(to bottom, #434, #656 48%, #434 52%, #212 54%, #101) !important;
+     filter: drop-shadow(0 1px 2px #101) !important;
+}
+
+.iframed .configsection .snarkConfigTitle {
+     background: linear-gradient(to bottom, #4a3d49 0%, #3d303d 50%, #0d000d 50%, #0d000d 100%) !important;
+}
+
+.iframed .configsection .snarkConfigTitle:hover {
+     background: linear-gradient(to bottom, #434, #656 48%, #434 52%, #212 54%, #101) !important;
+}
+
+.iframed .configsection .snarkConfigTitle img, .iframed .newtorrentsection .toggleview img, .iframed label.toggleview img,
+.iframed label.toggleview:hover img, .iframed .toggle_input:focus + .toggleview img, .iframed .addtorrentsection .toggleview img {
+     background: #323;
+     background: linear-gradient(to bottom, #878 50%, #434 50%);
+     border-radius: 50%;
+     padding: 3px !important;
+     margin: 0 !important;
+     border: 2px solid #101 !important;
+     box-shadow: none !important;
+     filter: none !important;
+     mix-blend-mode: normal !important;
+}
+
+.iframed .configsection .snarkConfigTitle:hover img, .iframed .configsection .snarkConfigTitle:focus img {
+     filter: drop-shadow(0 0 3px #730) !important;
+     box-shadow: none !important;
+     mix-blend-mode: normal !important;
+}
+

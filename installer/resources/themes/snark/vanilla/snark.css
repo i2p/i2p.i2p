@@ -1192,7 +1192,7 @@ thead img.disable, img.disable:hover {
      margin: 4px !important;
 }
 
-#configs, input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"] {
+input[type="submit"], .trackerconfig input[type="submit"], input[name="savepri"], select[name="theme"] {
      text-transform: capitalize;
 }
 
@@ -2216,6 +2216,12 @@ input#toggle_debug:checked + label + #dhtDebugInner {
      border-bottom: 1px solid #4f3d36 !important;
 }
 
+#configs input:disabled, #configs input:disabled:hover, #configs input:disabled:focus {
+     cursor: not-allowed;
+     filter: sepia(50%) invert(80%) hue-rotate(150deg) !important;
+     box-shadow: none;
+}
+
 td#bwHelp {
      background: url(images/infocircle.png) left 10px center no-repeat;
      background-size: 14px auto;
@@ -3086,7 +3092,7 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
      font-size: 0 !important;
 }
 
-#configs tr:nth-child(n+16) {
+#configs tr:nth-child(n+17) {
      display: none;
 }
 

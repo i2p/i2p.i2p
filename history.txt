@@ -25,6 +25,18 @@
    - /configui: Add option to embed Susimail and I2PSnark in console
  * I2PTunnel: Add hostname / destination (b32) information to server section on
    index page (for parity with client tunnels section)
+ * I2PSnark
+   - Fix broken collapsible panels issue for browsers that don't support the
+     feature by conditionally loading override CSS to expand panels by default
+     and disable hover/active states for panel headings (tickets #2002, #2026)
+   - Add UI option to configuration section to enable collapsible panels, and
+     disable the option if a non-compliant browser is detected
+   - Fix multiple instances of snark refreshing to the homepage (ticket #2028)
+     (patch supplied by mindless)
+   - Tentative fix for caching of images so ajax refresh doesn't reload all
+     image resources
+   - Standardize 'Save Configuration' action to return to top of the page
+     (so we can see message log entry)
  * SusiDNS:
    - Reinstate filter removal on addressbook navigation links (ticket #1996)
    - Reduce vertical padding for filter buttons section

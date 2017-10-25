@@ -1,0 +1,51 @@
+/* disable snark's collapsible panels */
+/* fixes a browser engine bug present in Konqueror, Midori, Qupzilla et al */
+
+input#toggle_addtorrent:not(checked) + label + hr + table, input#toggle_createtorrent:not(checked) + label + hr + table,
+input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent:checked + label + hr + table {
+     display: table !important;
+}
+
+label.toggleview, label.toggleview:hover, label.toggleview:active, .toggle_input:focus + label.toggleview {
+     background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;
+     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000 56%) !important;
+     box-shadow: inset 0 0 0 1px #000, 0 1px 1px #000 !important;
+     mix-blend-mode: normal !important;
+     cursor: default !important;
+}
+
+label.toggleview img, .toggle_input:focus + label.toggleview img, label.toggleview:hover img, label.toggleview img:active, label.toggleview:active img {
+     margin: 1px !important;
+     padding: 3px !important;
+     border-radius: 50%;
+     background: #020;
+     background: linear-gradient(to bottom, #000 50%, #020 50%);
+     transform: none !important;
+     filter: sepia(1) hue-rotate(70deg) !important;
+}
+
+.toggleview {
+     margin-bottom: -6px !important;
+     padding: 3px 0 !important;
+     min-width: 120px !important;
+     width: 120px !important;
+     font-size: 0 !important;
+}
+
+.configsection .snarkConfigTitle a {
+    padding: 2px 0 !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+    display: block;
+}
+
+.configsection .snarkConfigTitle a img {
+     margin: -4px -2px 0 0 !important;
+     padding: 0 !important;
+}
+
+.toggleview img, .configsection .snarkConfigTitle img {
+     margin: 0 !important;
+     padding: 0 !important;
+     text-align: center !important;
+}

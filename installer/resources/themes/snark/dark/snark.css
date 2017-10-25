@@ -2920,7 +2920,7 @@ th a img {
      font-size: 0 !important;
 }
 
-#configs tr:nth-child(n+16) {
+#configs tr:nth-child(n+17) {
      display: none;
 }
 

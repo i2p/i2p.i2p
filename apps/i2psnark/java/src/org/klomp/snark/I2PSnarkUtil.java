@@ -65,6 +65,7 @@ public class I2PSnarkUtil {
     private int _maxConnections;
     private final File _tmpDir;
     private int _startupDelay;
+    private boolean _collapsePanels;
     private boolean _shouldUseOT;
     private boolean _shouldUseDHT;
     private boolean _enableRatings, _enableComments;
@@ -77,6 +78,7 @@ public class I2PSnarkUtil {
     private static final int EEPGET_CONNECT_TIMEOUT = 45*1000;
     private static final int EEPGET_CONNECT_TIMEOUT_SHORT = 5*1000;
     public static final int DEFAULT_STARTUP_DELAY = 3;
+    public static final boolean DEFAULT_COLLAPSE_PANELS = true;
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
     public static final int MAX_CONNECTIONS = 24; // per torrent
     public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
@@ -106,6 +108,7 @@ public class I2PSnarkUtil {
         _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
         _openTrackers = Collections.emptyList();
         _shouldUseDHT = DEFAULT_USE_DHT;
+        _collapsePanels = DEFAULT_COLLAPSE_PANELS;
         _enableRatings = _enableComments = true;
         _commentsName = "";
         // This is used for both announce replies and .torrent file downloads,
@@ -685,6 +688,16 @@ public class I2PSnarkUtil {
     /** @since 0.9.31 */
     public boolean utCommentsEnabled() {
         return _enableRatings || _enableComments;
+    }
+
+    /** @since 0.9.32 */
+    public boolean collapsePanels() {
+        return _collapsePanels;
+    }
+
+    /** @since 0.9.32 */
+    public void setCollapsePanels(boolean yes) {
+        _collapsePanels = yes;
     }
 
     /**

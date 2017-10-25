@@ -1,0 +1,27 @@
+/* disable snark's collapsible panels */
+/* fixes a browser engine bug present in Konqueror, Midori, Qupzilla et al */
+
+input#toggle_addtorrent:not(checked) + label + hr + table, input#toggle_createtorrent:not(checked) + label + hr + table,
+input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent:checked + label + hr + table {
+     display: table !important;
+}
+
+label.toggleview, label.toggleview:hover, label.toggleview:active, .toggle_input:focus + .toggleview {
+     background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%) !important;
+     color: #930 !important;
+     cursor: default !important;
+     box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #efe6e0 !important;
+     font-size: 0 !important;
+     min-width: 120px !important;
+     width: 120px !important;
+}
+
+label.toggleview img, .toggle_input:focus + label.toggleview img, label.toggleview:hover img, label.toggleview img:active, label.toggleview:active img {
+     mix-blend-mode: luminosity !important;
+}
+
+label.toggleview img:active, label.toggleview:active img {
+     transform: none !important;
+     mix-blend-mode: luminosity !important;
+}
+
