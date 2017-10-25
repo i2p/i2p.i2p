@@ -202,41 +202,6 @@ div#filter + div#search > form {
      padding: 0;
 }
 
-#filter p, #search td {
-     font-weight: bold;
-}
-
-#search {
-     text-align: center;
-     background: #000900;
-}
-
-#search table {
-     margin: 0 auto;
-}
-
-#search td input[type="text"] {
-     margin-left: 5px;
-}
-
-#search td:first-child {
-     text-align: right;
-}
-
-#search input {
-     margin-left: 0;
-     padding-left: 0;
-}
-
-#filter p {
-     padding: 20px 20px 10px 17px;
-     text-align: center;
-}
-
-#filter p:first-child {
-     padding-bottom: 0;
-}
-
 #filter p + p {
      display: none;
 }
@@ -247,15 +212,26 @@ div#filter + div#search > form {
      margin-bottom: 15px;
 }
 
+#booksearch {
+     padding: 6px 5px 5px;
+     text-align: center;
+}
+
 #filter a:link {
      text-transform: capitalize;
+}
+
+#filter p:first-child {
+     padding-bottom: 0;
 }
 
 #filter p {
      line-height: 210%;
      word-spacing: 0.1em;
+     font-weight: bold;
+     text-align: center;
      text-transform: capitalize;
-     margin: 12px 0 0;
+     margin: 10px 0 -7px;
      padding: 0;
 }
 
@@ -701,9 +677,13 @@ _:-ms-lang(x), img.illustrate {
      max-width: 600px;
 }
 
-div#book {
+div#book, #emptybook {
      padding: 0;
      margin: -15px 0 -5px;
+}
+
+#emptybook {
+     margin-bottom: -7px;
 }
 
 #book table {
@@ -1185,7 +1165,7 @@ h3, #filter a, #filter span {
 
 #filter a {
      margin: 0 2px -2px !important;
-     min-width: 20px;
+     min-width: 14px;
 }
 
 div#filter {

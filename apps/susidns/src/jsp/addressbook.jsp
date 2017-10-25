@@ -61,10 +61,10 @@
 <hr>
 <div id="navi">
 <a id="overview" href="index"><%=intl._t("Overview")%></a>&nbsp;
-<a class="abook" href="addressbook?book=private"><%=intl._t("Private")%></a>&nbsp;
-<a class="abook" href="addressbook?book=master"><%=intl._t("Master")%></a>&nbsp;
-<a class="abook" href="addressbook?book=router"><%=intl._t("Router")%></a>&nbsp;
-<a class="abook" href="addressbook?book=published"><%=intl._t("Published")%></a>&nbsp;
+<a class="abook" href="addressbook?book=private&filter=none"><%=intl._t("Private")%></a>&nbsp;
+<a class="abook" href="addressbook?book=master&filter=none"><%=intl._t("Master")%></a>&nbsp;
+<a class="abook" href="addressbook?book=router&filter=none"><%=intl._t("Router")%></a>&nbsp;
+<a class="abook" href="addressbook?book=published&filter=none"><%=intl._t("Published")%></a>&nbsp;
 <a id="subs" href="subscriptions"><%=intl._t("Subscriptions")%></a>&nbsp;
 <a id="config" href="config"><%=intl._t("Configuration")%></a>
 </div>
@@ -140,12 +140,10 @@ ${book.loadBookMessages}
 <input type="hidden" name="book" value="${book.book}">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="49">
-<table>
-<tr>
-<td class="search"><%=intl._t("Search")%>: <input class="search" type="text" name="search" value="${book.search}" size="20" ></td>
-<td class="search"><input class="search" type="submit" name="submitsearch" value="<%=intl._t("Search")%>" ></td>
-</tr>
-</table>
+<div id="booksearch">
+<input class="search" type="text" name="search" value="${book.search}" size="20" >
+<input class="search" type="submit" name="submitsearch" value="<%=intl._t("Search")%>" >
+</div>
 </form>
 </div>
 </c:if>
@@ -212,7 +210,7 @@ ${book.loadBookMessages}
 </c:if><% /* book.notEmpty */ %>
 
 <c:if test="${book.isEmpty}">
-<div id="book">
+<div id="emptybook">
 <p class="book"><%=intl._t("This address book is empty.")%></p>
 </div>
 </c:if>

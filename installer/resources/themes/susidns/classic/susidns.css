@@ -7,11 +7,12 @@ body {
      background: #eef url(/themes/console/classic/images/bg0.png);
      background-size: 120px 120px;
      color: #0c153d;
+     color: #2c354f;
      min-width: 700px;
 }
 
 body.iframed {
-     background: #fff !important;
+     background: transparent !important;
      margin: 0;
 }
 
@@ -70,7 +71,7 @@ table.book th {
 }
 
 .book th:last-child {
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 table.book tr:hover textarea {
@@ -131,6 +132,10 @@ td.destinations {
      background: #fff;
 }
 
+.iframed #add {
+     background: transparent;
+}
+
 #add td:first-child {
      width: 100px;
      white-space: nowrap;
@@ -139,7 +144,7 @@ td.destinations {
 
 #navi {
      border: 1px solid #89f;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      margin: -1px -11px 0;
      padding: 0;
      position: sticky;
@@ -156,11 +161,18 @@ td.destinations {
      border-right: none !important;
 }
 
+#content h3 {
+     padding: 3px 10px 4px 30px !important;
+     background: #fafafa url(/themes/console/images/info/question.png) 4px center no-repeat;
+     background: url(/themes/console/images/info/question.png) 4px center no-repeat, linear-gradient(to right, #fafafa 28px, rgba(0,0,0,0) 28px);
+     background-size: 20px 20px, 100% 100%;
+     background-blend-mode: luminosity;
+}
+
 .iframed #content h3 {
      border: none;
      margin: 0;
      border-bottom: 1px dotted #89f;
-     background: none;
 }
 
 .iframed #content h3:first-child {
@@ -194,7 +206,9 @@ div.help {
 }
 
 .iframed #helpsubs {
-     margin: 0 0 -1px;
+     margin: 0 -11px -1px;
+     border-left: none;
+     border-right: none;
 }
 
 .iframed #helpconfig {
@@ -223,13 +237,14 @@ p {
 }
 
 h3 {
-     color: #0c153d;
+     color: #2c354f;
      font-size: 11pt;
      font-weight: bold;
      border: 1px solid #89f;
      margin: -1px -11px 10px;
      padding: 5px 10px;
      background: #fff;
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      text-transform: capitalize;
 }
 
@@ -267,7 +282,7 @@ th {
      line-height:12pt;
      padding:5px 10px;
      font-size:10pt;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
      border-bottom: 1px solid #89f;
 }
 
@@ -349,27 +364,43 @@ div#filter {
      word-spacing: 0.2em;
      background: #fff;
      text-align: center;
+     position: relative;
+     z-index: 10;
+}
+
+.iframed div#filter {
+     background: url(/themes/console/classic/images/bg0.png);
+     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(/themes/console/classic/images/bg0.png);
+     background-size: 120px 120px;
 }
 
 #filter p {
+     margin: 6px 0 5px;
      line-height: 220%;
      text-transform: capitalize;
      text-align: center;
 }
 
 #filter a, #filter a:visited {
-     border: 1px solid #ccc;
+     display: inline-block;
      margin: 2px 0;
      padding: 0 6px;
+     font-size: 10pt;
+     color: #555;
      border-radius: 2px;
+     text-transform: capitalize;
+     box-shadow: inset 0 0 0 1px #fff;
+     border: 1px solid #ccc;
+     min-width: 16px;
      background: #fff;
      background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
-     font-size: 10pt;
-     box-shadow: inset 0 0 0 1px #fff;
-     text-transform: capitalize;
-     color: #555;
-     display: inline-block;
-     min-width: 16px;
+     line-height: 180%;
+}
+
+#filter span a {
+     font-weight: normal;
+     color: #333 !important;
+     line-height: 140%;
 }
 
 #filter a:hover, #filter a:focus {
@@ -391,13 +422,14 @@ div#filter {
 }
 
 #filter span {
-     display: inline-block;
-     border: 1px solid #89f;
-     margin-top: -1px;
      min-width: 300px !important;
-     padding: 5px;
+     display: inline-block;
+     margin-top: -1px;
+     padding: 6px 5px;
+     border: 1px solid #89f;
+     font-size: 11pt;
      font-weight: bold;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 #filter span > * {
@@ -423,37 +455,31 @@ div#filter {
      text-align: center !important;
 }
 
-td.search:first-child {
-     text-align: right;
-     white-space: nowrap;
-     font-weight: bold;
-     width: 20%;
-}
-
-td.search:last-child {
-     text-align: left;
-     width: 20%;
-}
-
 #search form {
      text-align: center !important;
 }
 
-#search table {
+#booksearch {
+     min-width: 300px;
+     margin: -1px 0 -13px;
+     white-space: nowrap;
+     padding: 5px 5px 4px	;
      border: 1px solid #89f;
-     margin: -1px auto;
      background: #fff;
-     width: 400px;
 }
 
-#search td {
-     padding: 5px;
+#booksearch > * {
+     vertical-align: middle;
+}
+
+.iframed #booksearch {
+     background: #eff2ff;
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 #search input[type="text"] {
      width: 200px;
-     margin-left: 10px;
-     background: url(/themes/console/images/buttons/search.png) 5px center no-repeat;
+     background: #fff url(/themes/console/images/buttons/search.png) 5px center no-repeat;
      padding: 5px 5px 5px 25px;
 }
 
@@ -509,17 +535,27 @@ img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
 }
 
 .illustrate {
-     max-width: 700px;
-     height: auto;
      margin: 10px auto 20px;
      padding: 10px;
+     max-width: 700px;
+     height: auto;
+     border: 1px solid #56b;
      border-radius: 4px;
-     border: 1px solid #337;
      font-size: 10pt;
-     box-shadow: inset 0 0 1px #002;
-     background: #fff;
-     filter: drop-shadow(0 0 1px #999);
      text-align: center;
+     opacity: 0.9;
+     box-shadow: inset 0 0 1px #ccf, 0 0 1px #77a;
+     background: #f8f8ff;
+     background: linear-gradient(rgba(250,250,255,0.5), rgba(246,246,255,0.5)), url(/themes/console/classic/images/bg2.png);
+     background-size: 100% 100%, 120px 120px;
+     transition: ease all 0.2s;
+}
+
+.illustrate:hover {
+     opacity: 1;
+     border: 1px solid #337;
+     background: #fff;
+     transition: ease all 0.2s;
 }
 
 _:-ms-lang(x), img.illustrate {
@@ -531,8 +567,20 @@ _:-ms-lang(x), img.illustrate {
      text-align: right;
 }
 
-#content + #buttons {
-     margin-top: -10px;
+#content + #buttons, #config + #buttons {
+     margin: -21px -11px 0;
+     padding: 10px;
+     border: 1px solid #89f;
+}
+
+#config + #buttons {
+     padding-top: 21px;
+}
+
+.iframed #content + #buttons, .iframed #config + #buttons {
+     border-left: none;
+     border-right: none;
+     background: #fff;
 }
 
 p.buttons {
@@ -650,6 +698,21 @@ form[action="subscriptions"] textarea {
      height: 120px !important;
 }
 
+div#config, form[action="subscriptions"] div#content {
+     margin: -11px -11px 0;
+}
+
+textarea[name="config"], form[action="subscriptions"] textarea {
+     box-shadow: none;
+     border: 1px solid #89f;
+     padding: 2px 5px;
+}
+
+.iframed textarea[name="config"], .iframed form[action="subscriptions"] textarea {
+     border-left: none;
+     border-right: none;
+}
+
 /* topnav */
 
 #navi {
@@ -659,9 +722,10 @@ form[action="subscriptions"] textarea {
 
 #navi a, #navi a:visited {
      border: 1px solid #6b78bf;
+     border: 1px solid #89f;
      border-radius: 2px;
      margin: 3px 0 !important;
-     box-shadow: 0 0 1px 0 #ddd;
+     box-shadow: 0 0 1px 0 #ddd, inset 0 0 0 1px #fff;
      display: inline-block;
      outline: none;
      color: #448 !important;
@@ -686,7 +750,7 @@ form[action="subscriptions"] textarea {
 }
 
 #navi a.abook:hover {
-     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+     background: url(/themes/susidns/images/abook.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #ffd 50%);
 }
 
 #navi a#subs {
@@ -696,7 +760,7 @@ form[action="subscriptions"] textarea {
 }
 
 #navi a#subs:hover {
-     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+     background: url(/themes/susidns/images/subs.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #ffd 50%);
 }
 
 #navi a#config {
@@ -706,7 +770,7 @@ form[action="subscriptions"] textarea {
 }
 
 #navi a#config:hover {
-     background: url(/themes/console/images/buttons/configure_hover.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+     background: url(/themes/console/images/buttons/configure_hover.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #ffd 50%);
 }
 
 #navi a#overview {
@@ -716,11 +780,26 @@ form[action="subscriptions"] textarea {
 }
 
 #navi a#overview:hover {
-     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 0%, #fff 50%, #ffd 50%, #ffd 100%);
+     background: url(/themes/susidns/images/overview.png) 5px center no-repeat, linear-gradient(to bottom, #fff 50%, #ffd 50%);
 }
 
 .headline + #book > table {
      margin-top: 10px !important;
+}
+
+#book + #buttons {
+     margin: -12px 10px 23px;
+     border: 1px solid #89f;
+     border-top: none;
+     border-bottom: none;
+}
+
+.iframed #book + #buttons {
+     margin: -11px 0 0;
+}
+
+.iframed #book + #buttons p {
+     margin: 0;
 }
 
 /* page titles */
@@ -728,7 +807,8 @@ form[action="subscriptions"] textarea {
 .headline h3 {
      padding: 10px 5px 10px 40px;
      background: url(/themes/susidns/images/addressbook.png) 10px center no-repeat;
-     font-size: 11pt;
+     background: url(/themes/susidns/images/addressbook.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     font-size: 12pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
@@ -736,10 +816,12 @@ form[action="subscriptions"] textarea {
 
 .headline#subscriptions h3 {
      background: url(/themes/susidns/images/subs_24.png) 10px center no-repeat;
+     background: url(/themes/susidns/images/subs_24.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 .headline#configure h3 {
      background: url(/themes/susidns/images/configure_24.png) 10px center no-repeat;
+     background: url(/themes/susidns/images/configure_24.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 .headline h4 {
@@ -755,6 +837,10 @@ p#filtered {
 p.book {
      background: #fff url(/themes/susidns/images/abook.png) 18px center no-repeat;
      padding: 0 10px 0 38px !important;
+}
+
+.iframed p#filtered, .iframed p.book {
+     background: url(/themes/susidns/images/abook.png) 18px center no-repeat;
 }
 
 /* export hosts */
@@ -1006,8 +1092,8 @@ h3 {
 }
 
 #filter span, #filter a {
-     font-size: 11pt !important;
-     min-width: 24px !important;
+     font-size: 10pt !important;
+     min-width: 16px !important;
 }
 
 #filter span {

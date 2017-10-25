@@ -24,6 +24,11 @@
      there are more optional sections available (ticket #1996)
  * I2PTunnel: Add hostname / destination (b32) information to server section on
    index page (for parity with client tunnels section)
+ * SusiDNS:
+   - Reinstate filter removal on addressbook navigation links (ticket #1996)
+   - Reduce vertical padding for filter buttons section
+   - Migrate search section to div and reposition page elements to better
+     integrate with host list and minimize whitespace
 
 2017-10-11 zzz
  * Console: Validate host header (thx Kevin Froman)

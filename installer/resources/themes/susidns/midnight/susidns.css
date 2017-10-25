@@ -207,7 +207,8 @@ td.search > * {
 }
 
 #filter p {
-     padding: 15px 10px 0;
+     padding: 12px 10px 0;
+     margin: -3px 0 -3px;
 }
 
 #filter p:first-child {
@@ -258,7 +259,7 @@ p#filtered {
      vertical-align: middle;
      border: 1px solid #2d295f;
      border-radius: 0 0 2px 2px;
-     padding: 5px 10px !important;
+     padding: 5px 10px 8px !important;
      min-width: 300px;
      max-width: 500px;
      width: 40%;
@@ -274,7 +275,7 @@ p#filtered {
      word-spacing: normal;
      display: inline-block;
      border: none !important;
-     background: !important;
+     background: none !important;
      transform: none;
 }
 
@@ -296,8 +297,9 @@ p#filtered {
      text-align: center;
 }
 
-#search table {
-     margin: 0 auto;
+#booksearch {
+     padding: 7px 5px;
+     text-align: center;
 }
 
 p {
@@ -649,7 +651,7 @@ _:-ms-lang(x), img.illustrate {
      max-width: 600px;
 }
 
-div#book {
+div#book, #emptybook {
      padding: 0;
      margin: -15px 0 -10px;
 }

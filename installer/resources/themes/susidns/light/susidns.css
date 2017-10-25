@@ -346,6 +346,7 @@ p, #helpconfig {
 
 .iframed #helpconfig, .iframed #helpsubs {
      margin-top: 10px;
+     margin-bottom: 2px;
      box-shadow: inset 0 0 0 1px #fff;
      border-radius: 0;
 }
@@ -601,28 +602,15 @@ textarea[name="config"]:focus, textarea[name="content"]:focus {
     padding: 5px 15px;
     margin-bottom: -1px;
     background: #fafaff;
+    text-align: center;
 }
 
 #search {
      margin-bottom: -2px;
-     padding: 0;
-     text-align: center;
 }
 
-#search table {
-     margin: 0;
-     display: inline;
-     background: none;
-}
-
-td.search {
-     text-align: left;
-     padding: 0;
-     background: none;
-}
-
-td.search:first-child {
-     text-align: right;
+#booksearch {
+     padding: 2px 5px 0;
 }
 
 #filter {
@@ -690,6 +678,7 @@ td.search:first-child {
 
 #filter p {
      text-align: center;
+     margin: 7px 0 5px;
 }
 
 p#filtered {
@@ -698,18 +687,10 @@ p#filtered {
      padding: 10px 200px 10px 32px !important;
 }
 
-div#book, #messages + p {
-     border: 1px solid #7778bf;
-     padding: 10px;
-}
-
-div#book {
-     margin: 1px 0 -1px;
-     background: #fff;
-}
-
 #messages + p {
      margin: 1px 0 -1px;
+     padding: 10px;
+     border: 1px solid #7778bf;
 }
 
 form {
@@ -760,6 +741,15 @@ tr:hover .destaddress {
 .book td {
      border-top: 1px solid #ddf;
      padding: 3px;
+}
+
+#bookmessages {
+     width: 100%;
+     border: 1px solid #7778bf;
+}
+
+#bookmessages td:last-child {
+     text-align: right;
 }
 
 /* hostname list */
@@ -1025,15 +1015,21 @@ img[src="/imagegen/id?s=256&c="], img[src="/imagegen/id?s=20&c="] {
      background: none;
 }
 
-div#book {
-    padding: 8px;
-    background: #efefff;
-    background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(220, 220, 255, 0.5) 3px, #fff 5px) #fafaff;
-    box-shadow: inset 0 0 0 1px #fff;
+div#book, #emptybook {
+     margin: 1px 0 -1px;
+     padding: 8px 8px 60px;
+     border: 1px solid #7778bf;
+     box-shadow: inset 0 0 0 1px #fff;
+     background: #efefff;
+     background: repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(220, 220, 255, 0.5) 3px, #fff 5px) #fafaff;
 }
 
-.iframed div#book {
+.iframed div#book, .iframed #emptybook {
      margin-bottom: 10px;
+}
+
+#emptybook {
+     padding: 0 8px;
 }
 
 p.book {
@@ -1060,11 +1056,11 @@ table + p.buttons {
 
 #book + #buttons {
      border: 1px solid #7778bf;
-     margin-top: -1px;
+     margin: -62px 9px 8px;
 }
 
 .iframed #book + #buttons {
-     margin-top: -11px;
+     margin: -72px 9px -2px;
 }
 
 form[action="export"] {
@@ -1268,8 +1264,8 @@ form[action="addressbook"] table {
 /* export hosts */
 
 #export {
-     text-align: right;
      margin-top: -36px;
+     text-align: right;
 }
 
 .iframed #export {
