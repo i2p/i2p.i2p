@@ -65,7 +65,7 @@ class TunnelRenderer {
 
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
         out.write("<h3 class=\"tabletitle\" id=\"participating\">" + _t("Participating tunnels") + "</h3>\n");
-        int bwShare = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        int bwShare = getShareBandwidth();
         if (bwShare > 12) {
         // Don't bother re-indenting
         if (!participating.isEmpty()) {
@@ -382,6 +382,19 @@ class TunnelRenderer {
 
     private String netDbLink(Hash peer) {
         return _context.commSystem().renderPeerHTML(peer);
+    }
+
+    /**
+     * Copied from ConfigNetHelper.
+     * @return in KBytes per second
+     */
+    private int getShareBandwidth() {
+        int irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();
+        int orateKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        double pct = _context.router().getSharePercentage();
+        if (irateKBps < 0 || orateKBps < 0)
+            return ConfigNetHelper.DEFAULT_SHARE_KBPS;
+        return (int) (pct * Math.min(irateKBps, orateKBps));
     }
 
     /** translate a string */
