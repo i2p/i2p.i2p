@@ -208,13 +208,13 @@ class SummaryBarRenderer {
 
                    "<hr class=\"b\"><table id=\"sb_services\"><tr><td>" +
 
-                   "<a href=\"/susimail/susimail\" target=\"_blank\" title=\"")
+                   "<a href=\"/webmail\" target=\"_top\" title=\"")
            .append(_t("Anonymous webmail client"))
            .append("\">")
            .append(nbsp(_t("Email")))
            .append("</a>\n" +
 
-                   "<a href=\"/i2psnark/\" target=\"_blank\" title=\"")
+                   "<a href=\"/torrents\" target=\"_top\" title=\"")
            .append(_t("Built-in anonymous BitTorrent Client"))
            .append("\">")
            .append(nbsp(_t("Torrents")))

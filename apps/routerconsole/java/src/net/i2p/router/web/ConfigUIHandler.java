@@ -12,8 +12,9 @@ public class ConfigUIHandler extends FormHandler {
     private boolean _shouldSave;
     private boolean _universalTheming;
     private boolean _forceMobileConsole;
+    private boolean _embedApps;
     private String _config;
-    
+
     @Override
     protected void processForm() {
         if (_shouldSave) {
@@ -24,17 +25,19 @@ public class ConfigUIHandler extends FormHandler {
             addUser();
         }
     }
-    
+
     public void setShouldsave(String moo) { _shouldSave = true; }
 
     public void setUniversalTheming(String baa) { _universalTheming = true; }
 
     public void setForceMobileConsole(String baa) { _forceMobileConsole = true; }
 
+    public void setEmbedApps(String baa) { _embedApps = true; }
+
     public void setTheme(String val) {
         _config = val;
     }
-    
+
     /** note - lang change is handled in CSSHelper but we still need to save it here */
     private void saveChanges() {
         if (_config == null || _config.length() <= 0)
@@ -59,6 +62,10 @@ public class ConfigUIHandler extends FormHandler {
             changes.put(CSSHelper.PROP_FORCE_MOBILE_CONSOLE, "true");
         else
             removes.add(CSSHelper.PROP_FORCE_MOBILE_CONSOLE);
+        if (_embedApps)
+            changes.put(CSSHelper.PROP_EMBED_APPS, "true");
+        else
+            removes.add(CSSHelper.PROP_EMBED_APPS);
         boolean ok = _context.router().saveConfig(changes, removes);
         if (ok) {
             if (!oldTheme.equals(_config))

@@ -688,21 +688,21 @@ p:empty + .sb_notice {
      background-color: #ffe;
 }
 
-#sb_services a[href="/susimail/susimail"] {
+#sb_services a[href="/susimail/susimail"], #sb_services a[href="/webmail"] {
      background: #f8f8ff url(images/inbox.png) 3px center no-repeat;
      background: rgba(248, 248, 255, 0.8) url(images/inbox.png) 3px center no-repeat;
 }
 
-#sb_services a[href="/susimail/susimail"]:hover {
+#sb_services a[href="/susimail/susimail"]:hover, #sb_services a[href="/webmail"]:hover {
      background: #ffe url(images/inbox.png) 3px center no-repeat;
 }
 
-#sb_services a[href="/i2psnark/"] {
+#sb_services a[href="/i2psnark/"], #sb_services a[href="/torrents"] {
      background: #f8f8ff url(/themes/console/images/i2psnark.png) 3px center no-repeat;
      background: rgba(248, 248, 255, 0.8) url(/themes/console/images/i2psnark.png) 3px center no-repeat;
 }
 
-#sb_services a[href="/i2psnark/"]:hover {
+#sb_services a[href="/i2psnark/"]:hover, #sb_services a[href="/torrents"]:hover {
      background: #ffe url(/themes/console/images/i2psnark.png) 3px center no-repeat;
 }
 

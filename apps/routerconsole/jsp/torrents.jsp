@@ -6,7 +6,8 @@
 <%
     // CSSHelper is also pulled in by css.jsi below...
     boolean testIFrame = tester.allowIFrame(request.getHeader("User-Agent"));
-    if (!testIFrame) {
+    boolean embedApp = tester.embedApps();
+    if (!testIFrame || !embedApp) {
         response.setStatus(302);
         response.setHeader("Location", "/i2psnark/");
     } else {
