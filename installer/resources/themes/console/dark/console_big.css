@@ -196,6 +196,12 @@ li .twocol {
      line-height: 180%;
 }
 
+.routersummary button.reload, .routersummary button.stop {
+     min-width: 98px;
+     margin: 4px 3px !important;
+     padding: 4px 5px !important;
+}
+
 .sb_notice, .sb_notice a {
      font-size: 10pt !important;
      line-height: 120% !important;

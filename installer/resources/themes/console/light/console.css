@@ -14,7 +14,6 @@ body {
      background: #a4a4cb url(images/tile2.png) fixed;
      background-size: 32px 32px;
 }
-}
 
 /* preload button mouseovers */
 body {
@@ -183,7 +182,7 @@ pre {
      display: inline-block;
      vertical-align: middle;
      margin: -3px 0;
-     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100% !important;
      padding: 5px 7px 5px 22px !important;
 }
@@ -223,12 +222,8 @@ pre {
      border-left: none;
      border-right: none;
      border-radius: 0;
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 0 #fff;;
      filter: none;
-}
-
-.routersummary h3 a:hover {
-     color: #f60;
 }
 
 .routersummary h3:hover {
@@ -236,13 +231,11 @@ pre {
      background: #fff linear-gradient(to bottom, #fff 50%, rgba(255, 232, 191, 0.6) 50%, rgba(239, 217, 179, 0.4) 100%) !important;
 }
 
-.routersummary h3:hover a {
-     color: #f60 !important;
-     text-shadow: 0 0 1px #fff;
-}
-
 .routersummary h3:active {
-     box-shadow: inset 2px 2px 2px #777;
+     box-shadow: inset 2px 2px 3px 1px #6f5f45;
+     box-shadow: inset 0 0 0 1px #fff9ef, inset 2px 2px 3px 1px rgba(111,95,69, 0.8);
+     transition: ease box-shadow 0.05s;
+     background: #fff linear-gradient(to bottom, #fff3df, #fff9ef) !important;
 }
 
 .routersummary h3 a, .routersummary h3 a:visited {
@@ -254,6 +247,15 @@ pre {
      padding: 3px 0 2px;
      color: #2c4e8f;
      line-height: 110%;
+}
+
+.routersummary h3:hover a, .routersummary h3 a:hover {
+     color: #f60 !important;
+     text-shadow: 0 0 1px #fff;
+}
+
+.routersummary h3:active a, .routersummary h3 a:active {
+     color: #cf9233 !important;
 }
 
 /*
@@ -308,8 +310,12 @@ h4.sb_info {
      margin-top: -11px !important;
 }
 
+.sb_info a  {
+     vertical-align: baseline !important;
+}
+
 h4.sb_info + hr + form {
-     padding-top: 2px !important;
+     padding-top: 5px !important;
      margin-bottom: -1px;
 }
 
@@ -458,6 +464,7 @@ h4.sb_info + hr + form {
      border: 1px solid #89f;
      border-radius: 2px;
      box-shadow: 0 0 1px #ccf;
+     transition: ease border 0.7s;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -469,6 +476,7 @@ h4.sb_info + hr + form {
 #sb_bandwidthgraph:hover {
      border: 1px solid #f60;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
+     transition: ease border 0.7s;
 }
 
 a:active #sb_bandwidthgraph {
@@ -633,6 +641,11 @@ to {
      line-height: 100%;
 }
 
+#sb_warning + p:empty + form {
+     margin-top: 12px;
+     margin-bottom: -4px;
+}
+
 .sb_notice {
      background: #f2f2ff;
      border: 1px solid #89f;
@@ -759,6 +772,7 @@ p:empty + .sb_notice {
 .routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
      display: inline-block;
      vertical-align: middle;
+     line-height: 120%;
      border: 1px solid #88f;
      border-radius: 2px;
      padding: 5px 6px;
@@ -770,14 +784,18 @@ p:empty + .sb_notice {
      text-shadow: 0 1px 1px #fff;
 }
 
+.sb_netstatus a {
+     vertical-align: baseline;
+}
+
 .routersummary .firewalled {
      background: repeating-linear-gradient(135deg, rgba(220,255,220,0.3) 2px, rgba(255,255,220,0.3) 3px, rgba(220,255,220,0.3) 5px);
 }
 
 .routersummary .error {
      background: rgba(255,110,110,0.1);
-     box-shadow: inset 0 0 0 1px rgba(255,0,0,0.3), 0 0 1px rgba(96,96,96,0.5);
-     background: repeating-linear-gradient(135deg, rgba(255,100,100,0.1) 2px, rgba(255,200,200,0.3) 3px,  rgba(255,100,100,0.1) 5px);
+     box-shadow: inset 0 0 0 1px rgba(200,0,0,0.5), 0 0 1px rgba(96,96,96,0.5);
+     background: repeating-linear-gradient(135deg, rgba(255,100,100,0.05) 2px, rgba(255,200,200,0.2) 3px,  rgba(255,100,100,0.05) 5px);
 }
 
 .routersummary .warn, .routersummary .clockskew {
@@ -803,8 +821,9 @@ p:empty + .sb_notice {
 
 .routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
 .routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding-right: 2px;
-     vertical-align: middle;
+     margin-bottom: -1px;
+     padding-right: 1px;
+     vertical-align: text-bottom;
      display: inline-block;
      filter: drop-shadow(0 0 1px rgba(96,96,96,0.5));
      transform: scale(0.9);
@@ -1198,8 +1217,9 @@ p:empty + .sb_notice {
 
 #jumplinks h4 {
      margin-bottom: 10px;
-     border-color: #41465f;
+     border-color: #7778bf !important;
      color: #41465f;
+     padding-bottom: 10px;
 }
 
 .warning p + .formaction {
@@ -1226,6 +1246,10 @@ p:empty + .sb_notice {
      word-wrap: break-word;
      font-weight: bold;
      min-width: 481px;
+}
+
+.sorry {
+     color: #41465f;
 }
 
 .sorry hr, .sorry hr:last-child {
@@ -1546,7 +1570,8 @@ div.newscontent p {
 }
 
 .newsentry + hr + #newsStatus, .newsentry + hr + #newsStatus + #newsDisplay {
-     margin-top: -6px !important;
+     margin-top: -2px;
+     margin-bottom: 3px;
 }
 
 hr + #newsStatus, hr + #newsStatus + #newsDisplay {
@@ -1683,6 +1708,7 @@ h1, .confignav {
 .tab:active {
      box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #5f2400;
      background: #f60;
+     transition: ease box-shadow 0.05s;
 }
 
 .tab:active a {
@@ -1975,6 +2001,10 @@ p#tunnelconfig {
      margin: 9px -9px -20px;
 }
 
+.graphspanel a {
+     font-size: 0;
+}
+
 .graphspanel img {
      padding: 1px;
      margin: 6px 5px;
@@ -1989,6 +2019,7 @@ p#tunnelconfig {
 .graphspanel a img {
      box-shadow: 0 0 1px #ccf;
      filter: none !important;
+     white-space: nowrap;
 }
 
 .graphspanel a img:hover {
@@ -2085,7 +2116,9 @@ h3#graphdisplay {
      text-align: right;
      width: 10%;
      white-space: nowrap;
-     padding: 13px 3px 13px 5px;
+     padding: 13px 3px 13px 15px;
+     font-weight: bold;
+     color: #41465f;
 }
 
 #graphs td:nth-child(2) {
@@ -2900,6 +2933,10 @@ p#profiles_overview {
      margin-left: -6px;
 }
 
+#profiles .wideload {
+     text-align: center;
+}
+
 .infohelp + hr {
      display: none;
 }
@@ -3381,6 +3418,7 @@ h3.tabletitle, h3.ptitle, #config_advanced h3.tabletitle, h3#bannedpeers {
      border: 1px solid #7778bf;
      margin-bottom: -2px;
      box-shadow: inset 0 0 0 1px #fff;
+     text-align: left;
 }
 
 h3.ptitle {
@@ -3642,12 +3680,12 @@ input[type="submit"], input[type="reset"], button, .optbox, select {
 }
 
 button.search {
-     background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 24px;
 }
 
 button.search:hover, button.search:focus, button.search:active {
-     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff) !important;
      background-size: 14px 14px, 100% 100% !important;
 }
 
@@ -3665,9 +3703,9 @@ input.search[type="text"]:focus {
 
 input, input:visited, button, button:visited {
      border: 1px solid #999daf;
-     box-shadow: inset 0 0 0 1px #fff;
+     box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 1px #fff;
      background: #eee;
-     background: linear-gradient(to bottom, #fff, #ddd);
+     background: linear-gradient(to bottom, #fff, #efefff);
      color: #41465f;
      margin: 3px;
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", Verdana, Helvetica, sans-serif;
@@ -3683,8 +3721,8 @@ input[type="text"], textarea, input[type="password"] {
      filter: drop-shadow(0 0 1px #ccf);
 }
 
-input[type="submit"], input[type="reset"], button {
-     filter: saturate(70%) drop-shadow(0 0 1px #ccf);
+input[type="submit"], input[type="reset"], button, select {
+     filter: drop-shadow(0 0 1px #ccf);
 }
 
 button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="reset"]::-moz-focus-inner {
@@ -3693,90 +3731,92 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
 }
 
 button:hover, input[type="submit"]:hover, input[type="reset"]:hover, button:focus, input[type="submit"]:focus, input[type="reset"]:focus {
-     background: linear-gradient(to bottom, #ddd, #fff);
+     color: #19191f;
      border: 1px solid #f60;
+     background: linear-gradient(to bottom, #eee, #fff);
      filter: saturate(100%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
      transition: ease border 0.7s;
 }
 
 button:active, input[type="submit"]:active, input[type="reset"]:active {
+     color: #4c526f;
      box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #555;
      background-blend-mode: luminosity;
+     transition: ease box-shadow 0.05s;
 }
 
 input.accept, button.accept {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
-input.accept:hover, button.accept:hover,
-input.accept:focus, button.accept:focus {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+input.accept:hover, button.accept:hover, input.accept:focus, button.accept:focus {
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.accept[value^="Unban"], button.accept[value^="Unban"] {
-     background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.accept[value^="Unban"]:hover, button.accept[value^="Unban"]:hover,
 input.accept[value^="Unban"]:focus, button.accept[value^="Unban"]:focus {
-     background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/unban.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.accept[value^="Create"], button.accept[value^="Create"] {
-     background: url(/themes/console/images/buttons/create.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/create.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.accept[value^="Create"]:hover, button.accept[value^="Create"]:hover,
 input.accept[value^="Create"]:focus, button.accept[value^="Create"]:focus {
-     background: url(/themes/console/images/buttons/create.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/create.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.accept[value^="Filter"], button.accept[value^="Filter"] {
-     background: url(/themes/console/images/buttons/filter.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/filter.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.accept[value^="Filter"]:hover, button.accept[value^="Filter"]:hover,
 input.accept[value^="Filter"]:focus, button.accept[value^="Filter"]:focus {
-     background: url(/themes/console/images/buttons/filter.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/filter.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.add, button.add {
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.add:hover, button.add:hover,
 input.add:focus, button.add:focus {
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.add[value^="Adjust"], button.add[value^="Adjust"] {
-     background: url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.add[value^="Adjust"]:hover, button.add[value^="Adjust"]:hover,
 input.add[value^="Adjust"]:focus, button.add[value^="Adjust"]:focus {
-     background: url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.cancel, button.cancel {
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.cancel:hover, button.cancel:hover,
 input.cancel:focus, button.cancel:focus {
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.accept[value^="Show"], button.accept[value^="Show"],
 input.check[value^="View"], button.check[value^="View"] {
-     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
@@ -3784,12 +3824,12 @@ input.accept[value^="Show"]:hover, button.accept[value^="Show"]:hover,
 input.check[value^="View"]:hover, button.check[value^="View"]:hover,
 input.accept[value^="Show"]:focus, button.accept[value^="Show"]:focus,
 input.check[value^="View"]:focus, button.check[value^="View"]:focus {
-     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/show.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.cancel[value^="Hide"], button.cancel[value^="Hide"],
 input.delete[value^="Do not view"], button.delete[value^="Do not view"] {
-     background: url(/themes/console/images/buttons/hide.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/hide.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
@@ -3797,72 +3837,72 @@ input.cancel[value^="Hide"]:hover, button.cancel[value^="Hide"]:hover,
 input.delete[value^="Do not view"]:hover, button.delete[value^="Do not view"]:hover,
 input.cancel[value^="Hide"]:focus, button.cancel[value^="Hide"]:focus,
 input.delete[value^="Do not view"]:focus, button.delete[value^="Do not view"]:focus {
-     background: url(/themes/console/images/buttons/hide.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/hide.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.check, button.check {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.check:hover, button.check:hover,
 input.check:focus, button.check:focus {
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.check[value$="updates"], button.check[value$="updates"] {
-     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.check[value$="updates"]:hover, button.check[value$="updates"]:hover,
 input.check[value$="updates"]:focus, button.check[value$="updates"]:focus {
-     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.delete, button.delete {
-     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.delete:hover, button.delete:hover,
 input.delete:focus, button.delete:focus {
-     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.delete[value^="Ban"], button.delete[value^="Ban"] {
-     background: url(/themes/console/images/buttons/ban.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/ban.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.delete[value^="Ban"]:hover, button.delete[value^="Ban"]:hover,
 input.delete[value^="Ban"]:focus, button.delete[value^="Ban"]:focus {
-     background: url(/themes/console/images/buttons/ban.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/ban.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.download, button.download {
-     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.download:hover, button.download:hover,
 input.download:focus, button.download:focus {
-     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/download.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.download[value^="Join"], button.download[value^="Join"] {
-     background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.download[value^="Join"]:hover, button.download[value^="Join"]:hover,
 input.download[value^="Join"]:focus, button.download[value^="Join"]:focus {
-     background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/users.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.download[value$="from File"], button.download[value$="from File"],
 input.download[value$="from file"], button.download[value$="from file"] {
-     background: url(/themes/console/images/buttons/from-file.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/from-file.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
@@ -3870,87 +3910,87 @@ input.download[value$="from File"]:hover, button.download[value$="from File"]:ho
 input.download[value$="from file"]:hover, button.download[value$="from file"]:hover,
 input.download[value$="from File"]:focus, button.download[value$="from File"]:focus,
 input.download[value$="from file"]:focus, button.download[value$="from file"]:focus {
-     background: url(/themes/console/images/buttons/from-file.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/from-file.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.download[value^="Dump"], button.download[value^="Dump"] {
-     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.download[value^="Dump"]:hover, button.download[value^="Dump"]:hover,
 input.download[value^="Dump"]:focus, button.download[value^="Dump"]:focus {
-     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/dump-threads.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.go, button.go, input[value="GO"] {
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.go:hover, button.go:hover, input[value="GO"]:hover,
 input.go:focus, button.go:focus, input[value="GO"]:focus {
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.go[value^="Create"], button.go[value^="Create"] {
-     background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.go[value^="Create"]:hover, button.go[value^="Create"]:hover,
 input.go[value^="Create"]:focus, button.go[value^="Create"]:focus {
-     background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/create-file.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.reload, button.reload {
-     background: url(/themes/console/images/buttons/restore.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/restore.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.reload:hover, button.reload:hover,
 input.reload:focus, button.reload:focus {
-     background: url(/themes/console/images/buttons/restore_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/restore_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.reload[value$="restart"], button.reload[value$="restart"] {
-     background: url(/themes/console/images/buttons/restart.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/restart.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.reload[value$="restart"]:hover, button.reload[value$="restart"]:hover,
 input.reload[value$="restart"]:focus, button.reload[value$="restart"]:focus {
-     background: url(/themes/console/images/buttons/restart_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/restart_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.reload[value^="Update"], button.reload[value^="Update"] {
-     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.reload[value^="Update"]:hover, button.reload[value^="Update"]:hover,
 input.reload[value^="Update"]:focus, button.reload[value^="Update"]:focus {
-     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.reload[value="Force GC"], button.reload[value="Force GC"] {
-     background: url(/themes/console/images/buttons/clean.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/clean.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.reload[value="Force GC"]:hover, button.reload[value="Force GC"]:hover,
 input.reload[value="Force GC"]:focus, button.reload[value="Force GC"]:focus {
-     background: url(/themes/console/images/buttons/clean_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/clean_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 input.stop, button.stop {
-     background: url(/themes/console/images/buttons/shutdown.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/shutdown.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.stop:hover, button.stop:hover,
 input.stop:focus, button.stop:focus {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/shutdown_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 
 /* client config buttons aka project "X" */
@@ -3963,51 +4003,51 @@ button.control {
 }
 
 button.accept.control {
-     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 button.accept.control:hover, button.accept.control:focus {
-     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/Xstart.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
 }
 
 button.stop.control {
-     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 button.stop.control:hover, button.stop.control:focus {
-     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/Xstop.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
 }
 
 button.add.control {
-     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 button.add.control:hover, button.add.control:focus {
-     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/edit2.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
 }
 
 button.delete.control {
-     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 button.delete.control:hover, button.delete.control:focus {
-     background: url(/themes/console/images/buttons/delete_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/delete_hover.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
 }
 
 button.check.control {
-     background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/update.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 button.check.control:hover, button.check.control:focus {
-     background: url(/themes/console/images/buttons/update_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/update_hover.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
 }
 
 button.download.control {
-     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 button.download.control:hover, button.download.control:focus {
-     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/download.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
 }
 
 /* end project "X" */
@@ -4027,12 +4067,12 @@ button.download.control:hover, button.download.control:focus {
 }
 
 .routersummary .reload {
-     background: url(/themes/console/images/buttons/restart.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
+     background: url(/themes/console/images/buttons/restart.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff) !important;
 }
 
 .routersummary .reload:hover, .routersummary .reload:focus {
-     background: url(/themes/console/images/buttons/restart_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
-     background: url(/themes/console/images/buttons/shutdown_hover.png) 37% center no-repeat, url(/themes/console/images/buttons/restart_hover.png) 63% center no-repeat,  linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(/themes/console/images/buttons/restart_hover.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
+     background: url(/themes/console/images/buttons/shutdown_hover.png) 37% center no-repeat, url(/themes/console/images/buttons/restart_hover.png) 63% center no-repeat,  linear-gradient(to bottom, #eee, #fff) !important;
      border: 1px solid #f60;
 }
 
@@ -4044,25 +4084,25 @@ button.download.control:hover, button.download.control:focus {
      text-indent: 0;
      text-align: left;
      min-width: 0;
-     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #efefff) !important;
 }
 
 .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus {
-     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
      padding: 5px 7px 5px 22px !important;
 }
 
 .routersummary .stop {
-     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/shutdown.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 .routersummary .stop:hover, .routersummary .stop:focus {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
      border: 1px solid #f60;
 }
 
 .routersummary .download {
-     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100% !important;
      padding: 5px 7px 5px 22px !important;
 }
@@ -4088,37 +4128,37 @@ button.download.control:hover, button.download.control:focus {
 }
 
 .routersummary .reload[value="restartImmediate"] {
-     background: url(/themes/console/images/buttons/restart.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
+     background: url(/themes/console/images/buttons/restart.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #efefff) !important;
      background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .reload[value="restartImmediate"]:hover, .routersummary .reload[value="restartImmediate"]:focus, .routersummary .reload[value="restartImmediate"]:active {
-     background: url(/themes/console/images/buttons/restart_hover.png) center left 6px no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(/themes/console/images/buttons/restart_hover.png) center left 6px no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
      background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"] {
-     background: url(/themes/console/images/buttons/shutdown.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
+     background: url(/themes/console/images/buttons/shutdown.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #efefff) !important;
      background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .stop[value="shutdownImmediate"]:hover, .routersummary .stop[value="shutdownImmediate"]:focus, .routersummary .stop[value="shutdownImmediate"]:active {
-     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 6px no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(/themes/console/images/buttons/shutdown_hover.png) center left 6px no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
      background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .reload[value="Reseed"] {
-     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #fff, #efefff) !important;
      background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .reload[value="Reseed"]:hover, .routersummary .reload[value="Reseed"]:focus, .routersummary .reload[value="Reseed"]:active {
-     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/download.png) center left 6px no-repeat, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100% !important;
 }
 
 .routersummary .download:hover, .routersummary .download:focus, .routersummary .download:active {
-     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/download.png) 6px center no-repeat, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100% !important;
      padding: 5px 7px 5px 22px !important;
 }
@@ -4210,10 +4250,10 @@ select {
      -webkit-appearance: none;
      appearance: none;
      background: url(images/dropdown.png) right center no-repeat #fff;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #efefff);
      background-blend-mode: hard-light, normal;
      padding: 4px 16px 4px 4px !important;
-     color: #33333f;
+     color: #41465f;
      margin: 5px;
      border: 1px solid #999daf;
      min-width: 120px;
@@ -4230,9 +4270,8 @@ select {
 }
 }
 
-select:focus {
-     box-shadow: 0 0 0 1px #89f;
-     color: #19191f;
+select:-moz-focusring {
+     outline: 1px solid transparent;
 }
 
 select option {
@@ -4244,12 +4283,19 @@ select, input[type="text"] {
 }
 
 select:hover, select:active {
-     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     color: #19191f;
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
 }
 
 select:focus {
-     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
-     box-shadow: 0 0 0 1px #89f;
+     color: #19191f;
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
+     box-shadow: 0 0 1px #89f;
+}
+
+select::-moz-focus-inner {
+     outline: none !important;
+     border: none !important;
 }
 
 select::-ms-expand {
@@ -4615,6 +4661,11 @@ body.iframed {
      margin-bottom: 31px !important;
 }
 
+.themechoice .optbox:checked + object, .themechoice .optbox:checked + img {
+     transform: scale(0.9);
+     animation: glow 20s 10s infinite;
+}
+
 #themeoptions {
      clear: both;
      border-top: 1px solid #ddf;
@@ -4622,7 +4673,7 @@ body.iframed {
      margin: 0 -5px 5px;
      position: relative;
      top: 4px;
-     padding: 5px 10px 3px 5px;
+     padding: 5px 10px 5px 5px;
 }
 
 #themeoptions br {
@@ -4631,7 +4682,7 @@ body.iframed {
 
 #themeoptions label {
      white-space: nowrap;
-     margin: 4px 10px 4px 0 !important;
+     margin: 2px 10px 2px 0 !important;
      display: inline-block;
 }
 
@@ -4647,7 +4698,7 @@ p#helptranslate {
 }
 
 #themeoptions input {
-     margin-left: 5px;
+     margin: 2px 5px 2px 5px;
      vertical-align: sub;
 }
 
@@ -5909,11 +5960,11 @@ ul#banlist {
 }
 
 .sortup {
-     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 .sortup:hover {
-     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(images/sort_up.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
      border: 1px solid #f60;
      opacity: 1;
 }
@@ -5931,11 +5982,11 @@ ul#banlist {
 }
 
 .sortdown {
-     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #fff, #efefff);
 }
 
 .sortdown:hover {
-     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #ddd, #fff);
+     background: url(images/sort_down.png) center center no-repeat, linear-gradient(to bottom, #eee, #fff);
      border: 1px solid #f60;
      opacity: 1;
 }
@@ -6147,9 +6198,19 @@ h3#ntcpcon, h3#udpcon {
 
 #help td.infohelp, #help td.infowarn, #help td.infohelp:hover, #help td.infowarn:hover {
      background-size: 24px 24px !important;
-     padding-left: 46px !important;
+     padding-left: 50px !important;
      color: #33333f !important;
      padding-right: 15px !important;
+}
+
+#configinfo td.infowarn, #configinfo tr:hover td.infowarn {
+     padding-left: 46px !important;
+}
+
+#help code, #help tt {
+     font-size: 8pt;
+     font-weight: bold;
+     color: #050;
 }
 
 #sidebarhelp ul {
@@ -7404,7 +7465,7 @@ body, .main, .main td, .news p, #news p, .tab, .tab2, .main li b, div.joblog li,
      font-size: 10pt !important;
 }
 
-.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, pre,
+.routersummary td, .routersummary a, .routersummary button, .routersummary h4, .routersummary h4 a, div.news, pre, #help code, #help tt,
 #jardump tt, #jardump td, div.news, #logs li, tt, .cells tt, #profilelist tt, .leaseset tt, .links code, #console code {
      font-size: 9pt !important;
 }
@@ -7423,6 +7484,7 @@ tt a, .cells tt, #profilelist tt, .cells tt a, #profilelist tt a, .leaseset td t
 
 #tunnels .tunnel_peer tt {
      margin-left: 3px !important;
+     letter-spacing: 0.1em !important;
 }
 
 .main[id^="config_"] th, h4#updateplugins {

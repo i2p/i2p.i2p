@@ -172,7 +172,7 @@ input[type=text], input[type=password], textarea {
      background: linear-gradient(to bottom, #000, #000019);
      box-shadow: inset 0 0 3px 3px #000;
      border: 1px solid #3e3f8f;
-     padding: 4px;
+     padding: 5px;
 }
 
 input[type=text]:focus, input[type=password]:focus, textarea:focus {
@@ -855,6 +855,9 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      background-size: 16px 16px, 100% 100% !important;
      background-position: center center !important;
      padding: 5px !important;
+     min-width: 92px !important;
+     margin-top: 3px;
+     margin-bottom: 3px;
 }
 
 .routersummary .reload, .routersummary .reload[value$="restart"] {
@@ -1438,6 +1441,11 @@ p:empty + .sb_notice {
      margin-top: 10px;
 }
 
+#sb_warning + p:empty + form {
+     margin-top: 11px;
+     margin-bottom: -7px;
+}
+
 /* sidebar stacked tables fix */
 
 #sb_localid + #sb_version {
@@ -1642,7 +1650,7 @@ a:active #sb_bandwidthgraph {
 
 #sb_graphcontainer {
      background-color: #000;
-     background-position: left -72px top -26px !important;
+     background-position: left -72px top -24px !important;
      background-size: 280px 90px !important;
      background-repeat: no-repeat !important;
      margin: -7px 0 -3px !important;
@@ -1685,7 +1693,7 @@ to {
      background: #000;
      background: repeating-linear-gradient(135deg, #001 1px, #001 5px, #003 6px, #003 11px);
      background: repeating-linear-gradient(to right, #000 1px, #000 2px, #003 2px, #003 4px);
-     border: 1px solid #171c3f;
+     border: 1px solid #292b5f;
      opacity: 1;
      box-shadow: 0 0 1px 1px rgba(0,0,0,0.8);
      margin: -3px 0 -5px -6px;
@@ -1959,11 +1967,11 @@ div.sorry hr {
 }
 
 #news #newsDisplay a, #graphopts a {
-     border: 1px solid #005;
+     border: 1px solid #001;
      margin: 0 -2px;
      padding: 1px 10px !important;
      background: #002;
-     background: rgba(0,0,64,0.4);
+     background: rgba(0,0,48,0.4);
      border-radius: 15px;
      filter: drop-shadow(0 0 1px rgba(0,0,64,0.8));
 }
@@ -2296,6 +2304,9 @@ div.widepanel h3 {
      padding: 2px;
 }
 
+.graphspanel a {
+     font-size: 0;
+}
 .graphspanel p {
      text-align: center;
      text-transform: capitalize;
@@ -2322,7 +2333,7 @@ div.widepanel h3 {
 }
 
 #graphopts a, #graphopts a:visited {
-     color: #54508f;
+     color: #54508f !important;
 }
 
 #graphopts a:hover, #graphopts a:visited:hover, #graphopts a:focus {
@@ -2331,6 +2342,10 @@ div.widepanel h3 {
 
 #graphopts a:active {
      color: #2d277f !important;
+}
+
+#graphopts a:empty {
+     display: none;
 }
 
 h3#graphinfo {
@@ -2413,6 +2428,10 @@ h3#graphdisplay a {
 
 #graphs input[type="text"] {
      min-width: 60px;
+}
+
+#graph_single {
+     background-size: auto 100px !important;
 }
 
 /* end graphs */
@@ -2545,7 +2564,7 @@ code {
      color: #393;
 }
 
-a:link, h2 a:link {
+a:link, h2 a:link, #news #newsDisplay a:visited, #graphopts a:visited {
      color: #7972d1;
      text-decoration: none;
      font-weight: bold;
@@ -3342,11 +3361,13 @@ div.themechoice {
 
 .themechoice object, .themechoice img {
      padding: 3px 3px 4px;
+     opacity: 0.75;
 }
 
 .themechoice object img {
      padding: 3px 3px 0;
      margin-bottom: 0;
+     opacity: 0.75;
 }
 
 .themechoice .optbox {
@@ -3372,6 +3393,11 @@ div.themechoice {
      font-weight: bold;
 }
 
+.themechoice .optbox:checked + object, .themechoice .optbox:checked + img {
+     transform: scale(0.9);
+     opacity: 1;
+}
+
 .themechoice .optbox:focus + object ~ div.themelabel {
      color: #652787;
      box-shadow: inset 0 0 10px 3px #000;
@@ -3392,7 +3418,7 @@ div.themechoice {
 
 #themeoptions label {
      white-space: nowrap;
-     margin: 4px 10px 4px 0 !important;
+     margin: 1px 10px 1px 0 !important;
      display: inline-block;
 }
 
@@ -3409,7 +3435,7 @@ p#helptranslate {
 }
 
 #themeoptions input {
-     margin-left: 5px;
+     margin-left: 5px 1px;
 }
 
 #themeoptions input[type="checkbox"] {
@@ -3694,7 +3720,7 @@ table#consolepass input[type="password"] {
 #consolepass input[name="name"], #externali2cp input[name="user"] {
      background: #000 url(/themes/console/images/buttons/user.png) 5px center no-repeat;
      background: url(/themes/console/images/buttons/user.png) 5px center no-repeat, linear-gradient(to bottom, #000, #000019);
-     padding: 4px 5px 4px 26px !important;
+     padding: 5px 5px 5px 26px !important;
      background-size: 16px 16px, 100% 100% !important;
 }
 
@@ -3705,7 +3731,7 @@ table#consolepass input[type="password"] {
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"] {
      background: #000 url(/themes/console/images/buttons/password.png) 3px center no-repeat;
      background: url(/themes/console/images/buttons/password.png) 3px center no-repeat, linear-gradient(to bottom, #000, #000019);
-     padding: 4px 5px 4px 22px !important;
+     padding: 5px 5px 5px 22px !important;
      background-size: 16px 16px, 100% 100% !important;
 }
 #consolepass input[name="nofilter_pw"]:focus, #externali2cp input[name="nofilter_pw"]:focus {
@@ -5717,7 +5743,7 @@ table#jardump {
 
 .footnote {
      text-align: right;
-     font-size: 7pt;
+     font-size: 8pt;
      margin-bottom: 5px !important;
 }
 
@@ -6942,6 +6968,10 @@ form[action="events"] {
      display: inline;
 }
 
+.sb_netstatus, .sb_netstatus a {
+      vertical-align: baseline;
+}
+
 .routersummary .error, .routersummary .warn, .routersummary .testing, .routersummary .hidden,
 .routersummary .running, .routersummary .firewalled, .routersummary .vmcomm, .routersummary .clockskew, .tunnelBuildStatus {
      display: inline-block;
@@ -6983,7 +7013,7 @@ form[action="events"] {
 
 .routersummary .error::before, .routersummary .warn::before, .routersummary .testing::before, .routersummary .hidden::before,
 .routersummary .running::before, .routersummary .firewalled::before, .routersummary .vmcomm::before, .routersummary .clockskew::before {
-     padding: 0 2px;
+     padding: 0 1px 0 0;
      vertical-align: middle;
      display: inline-block;
      filter: drop-shadow(0 0 1px rgba(220,220,220,0.7));
@@ -7580,7 +7610,7 @@ table#i2pupdates td:first-child {
      padding-right: 5px !important;
 }
 
-.topness, .footnote, #newsStatus, #newsDisplay {
+.topness, #newsStatus, #newsDisplay {
      font-size: 9pt !important;
 }
 

@@ -1611,8 +1611,11 @@ public class WebMail extends HttpServlet
 	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response, boolean isPOST )
 	throws IOException, ServletException
 	{
-		String theme = Config.getProperty(CONFIG_THEME, DEFAULT_THEME);
 		I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		// Fetch routerconsole theme (or use our default if it doesn't exist)
+		String theme = ctx.getProperty(RC_PROP_THEME, DEFAULT_THEME);
+		// Apply any override
+		theme = Config.getProperty(CONFIG_THEME, theme);
 		boolean universalTheming = ctx.getBooleanProperty(RC_PROP_UNIVERSAL_THEMING);
 		if (universalTheming) {
 			// Fetch routerconsole theme (or use our default if it doesn't exist)

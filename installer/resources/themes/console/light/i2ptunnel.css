@@ -212,7 +212,7 @@ hr {
      border: 1px solid #999daf;
      border-radius: 2px;
      background: #eee;
-     background: linear-gradient(to bottom, #fff, #ddd);
+     background: linear-gradient(to bottom, #fff, #efefff);
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px #ccf);
      box-sizing: border-box;
@@ -230,15 +230,15 @@ button.control, input.control {
      color: #19191f;
      border: 1px solid #f60 !important;
      background: #ddd;
-     background: linear-gradient(to bottom, #ddd, #fff);
+     background: linear-gradient(to bottom, #eee, #fff);
      box-shadow: inset 0 0 0 1px #fff !important;
      filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
      transition: ease border 0.7s;
 }
 
 .control:active {
-     box-shadow: inset 2px 2px 1px #999 !important;
-     color: #33333f;
+     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #555 !important;
+     color: #4c526f;
 }
 
 a.control {
@@ -285,7 +285,7 @@ select {
      padding: 4px 16px 4px 4px !important;
      min-width: 140px;
      background: #fff;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #ddd);
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #efefff);
      background-blend-mode: hard-light, normal;
      color: #33333f;
      font-family: "Droid Sans", "Noto Sans", "Ubuntu", "Segoe UI", Verdana, Helvetica, sans-serif;
@@ -306,7 +306,7 @@ select:hover {
 }
 
 select:hover, select:active, select:focus {
-     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #eee, #fff) !important;
 }
 
 select:focus {
@@ -348,7 +348,7 @@ h2, h3 {
      border: 1px solid #7778bf;
      border-radius: 2px 2px 0 0;
      background: #fcfcff;
-     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) #fff !important;
+     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) #fff !important;
      font-size: 11.5pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -366,27 +366,27 @@ h2, h3 {
 /* title images */
 
 #messages h2 {
-     background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/logs.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #globalTunnelControl h2 {
-     background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/control.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #servers h2 {
-     background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/server.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #clients h2 {
-     background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/client.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
-     background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/configure.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #wizardPanel h2 {
-     background: url(/themes/console/images/info/wizard.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
+     background: url(/themes/console/images/info/wizard.png) left 5px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 15%, rgba(231, 231, 255, 0.8) 35%) #fff !important;
 }
 
 #messages h2, #globalTunnelControl h2, #servers h2, #clients h2, #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3, #wizardPanel h2 {
@@ -745,9 +745,9 @@ input:focus::-moz-placeholder {
      opacity: 0;
 }
 
-input.tunnelName, input.tunnelDescription, #userAgents {
+input.tunnelName, input.tunnelDescriptionText, #userAgents {
      width: 80%;
-     min-width: 280px;
+     min-width: 280px !important;
      text-overflow: ellipsis;
 }
 
@@ -924,7 +924,7 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
      border-bottom: 1px solid transparent !important;
 }
 
-#clientTunnels .tunnelDescription {
+.tunnelDescription {
      padding-top: 1px !important;
 }
 

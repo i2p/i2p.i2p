@@ -30,7 +30,7 @@ h1, h2 ,h3, h4 {
 }
 
 h2, h3 {
-     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
+     background: linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
 }
 
 #debug h2 {
@@ -60,7 +60,7 @@ h2, h3 {
 
 h1 {
      margin: 0 212px -15px 0;
-     padding: 15px 20px 15px 10px;
+     padding: 16px 20px 15px 10px;
      background: linear-gradient(to left, #fcfcff, rgba(252,252,255,0) 600px), linear-gradient(to bottom, #fcfcff 50%, rgba(248,248,255,0.6) 50%), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px) #fafaff !important;
 }
 
@@ -84,7 +84,6 @@ form {
 
 .routersummary img[src$="i2plogo.png"] {
      margin-left: 0 !important;
-     margin-right: -1px !important;
 }
 
 table.search td:nth-child(2) {
@@ -104,7 +103,6 @@ button, input[type="submit"], input[type="reset"] {
      display: inline-block;
      line-height: 120%;
      font-size: 10pt;
-     font-weight: bold;
 }
 
 #config_homepage.main input.delete {
@@ -316,7 +314,7 @@ p#helptranslate {
      padding-right: 50px !important;
      text-align: right !important;
      background-position: right 14px center !important;
-     background-image: url("/themes/console/images/info/infohelp.png");
+     background-image: url(/themes/console/images/info/infohelp.png);
      background-size: 28px auto !important;
 }
 
@@ -514,7 +512,7 @@ div.themechoice, div.langselect {
 
 .themelabel {
      padding: 3px !important;
-     font-size: 11.5pt !important;
+     font-size: 10pt !important;
      font-weight: bold;
 }
 
@@ -680,8 +678,13 @@ table.search {
      padding-bottom: 0 !important;
 }
 
+#eventlog {
+     margin-left: -16px !important;
+     margin-right: 0 !important;
+}
+
 h4.app {
-     background: url(/themes/console/images/eepsite.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
+     background: url(/themes/console/images/eepsite.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
      background-size: 16px 16px, 100% 100%, 100% 100% !important;
      margin-top: 15px;
 }
@@ -689,7 +692,7 @@ h4.app {
 h4.app2 {
      clear: left;
      margin-top: 10px !important;
-     background: url(images/globe.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
+     background: url(images/globe.png) 10px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
      background-size: 16px 16px, 100% 100%, 100% 100% !important;
 }
 
@@ -705,7 +708,7 @@ h4.app, h4.app2, #news h3, .news h3 {
 
 div.news h3, #news h3 {
      background: url(images/news.png) right 8px center no-repeat, linear-gradient(to left, #fff, #eef) !important;
-     background: url(images/news.png) right 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
+     background: url(images/news.png) right 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(to left, #fff 5%, rgba(231, 231, 255, 0.8) 15%) right center !important;
      padding: 5px 30px 5px 10px;
 }
 
@@ -717,9 +720,14 @@ div.news h3, #news h3 {
      margin-left: 0 !important;
 }
 
-#news #newsStatus, #newsDisplay {
+#news #newsStatus, #news #newsDisplay {
      margin-top: 6px;
      margin-bottom: -2px !important;
+}
+
+#news #newsStatus {
+     margin: -2px 0 0;
+     font-size: 9pt;
 }
 
 .newsAuthor {
@@ -952,6 +960,10 @@ p#profiles_overview, #profiles .widescroll + h3, #thresholds + h3, #profiles #ba
 
 #pluginupdater.formaction {
      margin: -16px 0;
+}
+
+#config_service .formaction {
+     margin-top: -13px;
 }
 
 pre#transports {

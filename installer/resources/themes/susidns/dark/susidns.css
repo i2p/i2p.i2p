@@ -60,26 +60,31 @@ body.iframed {
 /* topnav */
 
 #navi  {
-     border: 1px solid #2a5f29;
-     padding: 5px 3px;
-     background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;
-     background: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
      margin: -16px auto 30px;
+     padding: 5px 3px;
      position: sticky;
      top: -1px;
-     border-radius: 0 0 2px 2px;
      z-index: 999;
      text-align: center;
+     border: 1px solid #2a5f29;
+     border-radius: 0 1px 2px 2px;
+     box-shadow: inset 0 0 0 1px #000, 0 2px 2px 2px rgba(0,0,0,0.7);
+     background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center !important;
+     background: repeating-linear-gradient(135deg, #000 1px, #000 2px, #010 2px, #010 4px), repeating-linear-gradient(45deg, #000 1px, #000 2px, #010 2px, #010 4px), linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;
+     background-blend-mode: exclusion, exclusion, normal, normal;
 }
 
 .iframed #navi  {
      margin: -6px -15px 30px;
+     padding: 5px 0;
+     position: static;
      border: 1px solid #494;
      border-right: none;
      border-left: none;
-     padding: 5px 0;
      border-radius: 0;
-     position: static;
+     box-shadow: inset 0 0 0 1px #000;
+     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(/themes/console/dark/images/camotile2.png) top left !important;
+     background-blend-mode: exclusion, normal;
 }
 
 #navi a:link {
@@ -100,6 +105,7 @@ body.iframed {
      display: inline-block;
      margin: 1px -2px;
      box-shadow: inset 0 0 0 1px #000, 0 0 0 1px #000;
+     box-shadow: inset 0 0 0 1px #000, 0 0 0 1px rgba(0,8,0,0.5);
      padding: 2px 6px 3px 24px;
      position: relative;
      text-shadow: 0 1px 1px #000;
@@ -311,6 +317,7 @@ h3 {
      padding: 7px 10px;
      background: #000 url(/themes/console/dark/images/header.png) repeat-x scroll center center;
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
      text-shadow: 0 0 2px #001100;
@@ -414,21 +421,6 @@ div#book p, p.messages {
      padding: 2px 25px 2px 0 !important;
 }
 
-.book td:nth-child(3) a:not(old) {
-     font-size: 0 !important;
-}
-
-.book td:nth-child(3) .addrhlpr a::after {
-     content: url(/themes/console/images/buttons/fullview.png);
-     text-align: center;
-     padding: 0 10px !important;
-     filter: drop-shadow(0 0 1px #555);
-}
-
-.book td:nth-child(4) .addrhlpr:hover {
-     filter: drop-shadow(0 0 1px #f60);
-}
-
 h4 {
      font-size: 9pt;
      margin-top: -15px;
@@ -436,8 +428,7 @@ h4 {
      border: 1px solid #2a5f29;
      padding: 8px 10px 8px 35px;
      margin-bottom: 30px !important;
-     background: #000 url(/themes/susidns/drive.png) 9px center no-repeat;
-     background: url(/themes/susidns/images/drive.png) 9px center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
+     background: url(/themes/susidns/images/drive.png) 9px center no-repeat #000 !important;
 }
 
 a:link, #filter a:visited {
@@ -665,11 +656,19 @@ div#content + div#buttons {
      margin: 20px auto 10px;
      padding: 10px;
      border-radius: 4px;
-     border: 1px solid #001;
+     border: 1px solid #fff;
      font-size: 10pt;
-     box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #020;
      background: #fff;
+     background: rgba(255,255,255,0.3);
+     opacity: 0.8;
      filter: invert(1) sepia(100%) hue-rotate(30deg);
+}
+
+.illustrate:hover {
+     background: #fff;
+     border: 1px solid #000;
+     opacity: 1;
 }
 
 _:-ms-lang(x), img.illustrate {
@@ -692,12 +691,22 @@ div#book, #emptybook {
      border-collapse: separate;
 }
 
+#book tr.head {
+     background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%) !important;
+}
+
 #book table th {
      padding: 10px 0;
-     background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
-     background-image: linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
      border-bottom: 1px solid #2a5f29;
 }
+
+
+#book th:last-child {
+     background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
+     background: url(images/bin.png) center center no-repeat !important;
+}
+
 
 #book table td {
      border-bottom: 1px solid #121;
@@ -716,11 +725,6 @@ div#book, #emptybook {
 
 #book table tr:hover td textarea {
      color: #ee9;
-}
-
-#book th:last-child {
-     background: url(/themes/console/dark/images/header.png) repeat-x scroll center center #000;
-     background: url(images/bin.png) center center no-repeat, linear-gradient(to bottom, #001000 0%, #001900 50%, #000 51%, #000 100%) !important;
 }
 
 #book input[type="checkbox"] {
@@ -882,6 +886,7 @@ input[name="search"]:focus {
 .headline h3 {
      padding: 10px 5px 10px 35px;
      background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
+     background: url(/themes/susidns/images/addressbook.png) 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -890,10 +895,12 @@ input[name="search"]:focus {
 
 .headline#subscriptions h3 {
      background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
+     background: url(/themes/susidns/images/subs_24.png) 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
 }
 
 .headline#configure h3 {
      background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
+     background: url(/themes/susidns/images/configure_24.png) 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%);
 }
 
 /* export hosts button adjustments */
@@ -990,6 +997,17 @@ p.book {
 
 /* hostname list */
 
+.book td:nth-child(3) a:not(old) {
+     font-size: 0 !important;
+}
+
+.book td:nth-child(3) .addrhlpr a::after {
+     content: url(/themes/console/images/buttons/fullview.png);
+     text-align: center;
+     padding: 0 10px !important;
+     filter: drop-shadow(0 0 1px #555);
+}
+
 #host_list {
      margin-top: 28px;
 }
@@ -1021,6 +1039,10 @@ p.book {
      text-align: center;
 }
 
+#host_list td:nth-child(2) a, #host_list td:nth-child(3) a, #host_list td:nth-child(4) a {
+     filter: drop-shadow(0 0 1px #353);
+}
+
 #host_list td:nth-child(2) a:not(old) {
      font-size: 0 !important;
 }
@@ -1028,7 +1050,6 @@ p.book {
 #host_list td:nth-child(2) a::after {
      content: url(/themes/console/images/buttons/link.png);
      text-align: center;
-     filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 
@@ -1053,7 +1074,6 @@ p.book {
      content: url(/themes/console/images/buttons/fullview.png);
      text-align: center;
      padding: 0 10px !important;
-     filter: drop-shadow(0 0 1px #555);
      cursor: pointer;
 }
 

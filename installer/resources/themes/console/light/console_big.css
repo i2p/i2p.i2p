@@ -13,7 +13,7 @@ h3 {
      font-size: 12pt;
 }
 
-b, a, input, button, input[type="submit"], input[type="reset"], i, th, thead, tfoot, .mediumtags {
+b, a, input, button, input[type="submit"], input[type="reset"], i, th, thead, tfoot, .mediumtags, .themelabel {
      font-weight: normal !important;
      font-style: normal !important;
 }
@@ -234,6 +234,10 @@ p#enablefullstats {
 
 .cells tt, #profilelist tt, tt a {
      font-weight: bold !important;
+}
+
+.formaction {
+     margin-top: -16px;
 }
 
 /* responsive layout */

@@ -8,7 +8,7 @@ body {
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      background: #a4a4cb url(/themes/console/light/images/tile2.png) center top fixed;
      background-size: 32px 32px;
-     margin: 5px;
+     margin: 3px 4px;
 }
 
 /* preload top navigation mouseovers */
@@ -142,11 +142,13 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      outline: none;
      filter: drop-shadow(0 0 1px #ccf);
      position: relative;
+     transition: ease all 0.1s;
 }
 
 .snarkNav:link, .snarkNav:hover, .snarkNav:focus, .snarkNav:active {
      background-size: 14px auto, 100% 100% !important;
      background-position: 8px center;
+     transition: ease all 0.1s;
 }
 
 .snarkNav:hover, .snarkNav:focus {
@@ -167,14 +169,26 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      background: url(images/button_snark.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
 }
 
+.iframed .nav_main {
+     background: url(images/button_snark.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4)) #e7e7ff;
+}
+
 .nav_forum {
      background: #fff url(images/button_forum.png) 8px center no-repeat;
      background: url(images/button_forum.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
 }
 
+.iframed .nav_forum {
+     background: url(images/button_forum.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4)) #e7e7ff;
+}
+
 .nav_tracker {
      background: #fff url(images/button_tracker.png) 8px center no-repeat;
      background: url(images/button_tracker.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, #eef 51%, #eef 100%);
+}
+
+.iframed .nav_tracker {
+     background: url(images/button_tracker.png) 8px center no-repeat, linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4)) #e7e7ff;
 }
 
 .snarkNav:hover, .snarkNav:focus {
@@ -271,11 +285,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      font-weight: bold;
      background: rgba(255, 255, 255, 0.25);
      opacity: 0.9;
-     mix-blend-mode: darken;
-}
-
-.snarkMessages li:hover {
-     opacity: 1;
      mix-blend-mode: multiply;
 }
 
@@ -306,6 +315,11 @@ button::-moz-focus-inner, input::-moz-focus-inner {
      padding: 2px;
      filter: drop-shadow(0 0 1px #f60);
      mix-blend-mode: normal;
+}
+
+#closelog {
+     position: relative;
+     z-index: 999;
 }
 
 .logshim {
@@ -533,13 +547,34 @@ th.snarkGraphicStatus, th.snarkTorrentStatus {
      color: #f60;
 }
 
-.snarkTrackerDetails, .SnarkTorrentDetails {
+.snarkTrackerDetails, .snarkTorrentDetails {
      width: 16px !important;
-     padding: 2px 1px 2px 0;
+     text-align: center !important;
+     font-weight: bold;
+     padding-left: 0 !important;
+     padding-right: 0 !important;
 }
 
-.SnarkTorrentDetails {
-     text-align: center;
+.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkDirInfo td:first-child img {
+     margin: 0;
+     padding: 3px !important;
+     border: 1px solid transparent !important;
+}
+
+.snarkTrackerDetails a:hover img, .snarkTrackerDetails img:hover, .snarkTrackerDetails a:focus img,
+.snarkTorrentDetails a:hover img, .snarkTorrentDetails img:hover, .snarkTorrentDetails a:focus img,
+.snarkDirInfo td:first-child a:hover img, .snarkDirInfo td:first-child a:focus img {
+     border: 1px solid #f60 !important;
+     border-radius: 2px;
+     box-shadow: 0 0 1px #f60;
+     background: #ddf;
+     background: linear-gradient(to bottom, #fff 50%, #ddf 50%);
+     filter: none !important;
+     mix-blend-mode: normal;
+}
+
+.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:first-child a:active img {
+     box-shadow: inset 2px 2px 2px #99f;
 }
 
 .snarkTorrentName {
@@ -636,7 +671,6 @@ tr:hover .snarkTorrentName a, tr:hover .snarkFileName a {
 
 .snarkTorrentUploaded, .snarkTorrentRateUp {
      font-style: italic !important;
-     color: #59698f !important;
 }
 
 .snarkTorrentDownloaded {
@@ -704,7 +738,7 @@ td {
 .snarkTorrentOdd, .snarkTorrentInfo tr:nth-child(odd),
 .snarkCommentInfo tr:nth-child(odd), .snarkComments tr:nth-child(even) {
      background: #e0e0ff;
-     background: repeating-linear-gradient(45deg, rgba(255,255,255,0.8) 2px, rgba(196, 196, 255, 0.3) 3px, #fafaff 5px) #fafaff;
+     background: repeating-linear-gradient(45deg, rgba(240,240,255,0.8) 2px, rgba(196, 196, 255, 0.3) 3px, #f6f6ff 5px) #f6f6ff;
 }
 
 .snarkTorrentOdd td, .snarkTorrentEven td, .snarkCommentInfo tr, .snarkComments tr {
@@ -788,16 +822,26 @@ tr:hover .percentBarText {
      background: #eef;
      background: repeating-linear-gradient(135deg, rgba(238, 238, 255,0.7) 1px, rgba(238, 238, 255, 0.7) 5px, rgba(221, 221, 255, 0.7) 6px, rgba(221, 221, 255, 0.7) 11px);
      border: 1px solid #99f;
+     border-radius: 2px;
      box-shadow: 0 0 1px rgba(200,200,200,0.8);
      margin: 0 auto;
 }
 
 .percentBarInner {
      border: none;
+     border-radius: 2px;
      height: 100%;
-     background: #bbf;
-     background: linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(200, 200, 255, 0.7) 50%, rgba(160, 160, 255, 0.7) 100%);
      box-shadow: inset 0 0 0 1px #ddf;
+     background: #bbf;
+     background: linear-gradient(to right, rgba(255,255,0,0.1) 60px, rgba(0,255,0,0.1)), linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(200, 200, 255, 0.7) 50%, rgba(160, 160, 255, 0.7) 100%);
+}
+
+.peerinfo .percentBarInner {
+     background: linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(200, 200, 255, 0.7) 50%, rgba(160, 160, 255, 0.7) 100%);
+}
+
+.snarkDirInfo .percentBarInner {
+     background: linear-gradient(to right, rgba(255,255,0,0.1) 40px, rgba(0,255,0,0.1)), linear-gradient(to bottom, rgba(255, 255, 255,0.6) 0%, rgba(238, 238, 255, 0.6) 50%, rgba(200, 200, 255, 0.7) 50%, rgba(160, 160, 255, 0.7) 100%);
 }
 
 .percentBarInner.percentBarComplete {
@@ -886,10 +930,12 @@ tr:hover .percentBarText {
      display: inline-block;
      width: 100%;
      margin-top: -1px;
+     transition: ease all 0.1s;
 }
 
 .snarkConfigTitle:hover a, .snarkConfigTitle:focus a {
      color: #f60 !important;
+     transition: ease all 0.1s;
 }
 
 .snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle:hover {
@@ -900,13 +946,19 @@ tr:hover .percentBarText {
      letter-spacing: 0.15em;
      border: 1px solid #7778bf;
      border-top: 0;
+     border-radius: 0 0 3px 3px;
      background: #fff url(/themes/console/light/images/header.png) repeat-x scroll center center;
      background: linear-gradient(to bottom, #fff 50%, #eef 51%);
      font-variant: small-caps !important;
-     box-shadow: 0 1px 2px #ccf;
+     box-shadow: 0 1px 2px #ccf, inset 0 0 0 1px #fff, inset 0 0 0 1px #fff;
      display: inline-block;
      min-width: 260px;
      color: #559 !important;
+     transition: ease all 0.1s;
+}
+
+.iframed .snarkConfigTitle, .iframed .toggleview, .iframed .configsectionpanel .snarkConfigTitle:hover {
+     background: #e7e7ff linear-gradient(to bottom, #fff 50%, rgba(255, 255, 255, 0.6) 50%, rgba(240, 240, 255, 0.4));
 }
 
 .snarkConfigTitle img:hover { /* inert titles */
@@ -936,7 +988,8 @@ tr:hover .percentBarText {
 
 .snarkConfigTitle:active, .toggleview:active {
      color: #f30 !important;
-     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #558;
+     box-shadow: 0 0 0 0 #fff, inset 0 0 0 1px #fff, inset 2px 2px 3px 1px #558;
+     transition: ease all 0.1s;
 }
 
 .snarkConfigTitle img, .toggleview img {
@@ -1093,6 +1146,7 @@ input[type=submit], a.control, input.disabled {
      min-width: 90px;
      text-align: center;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ddd;
+     text-shadow: 0 1px 1px #fff;
      filter: drop-shadow(0px 0 1px #ccf);
 }
 
@@ -1102,6 +1156,7 @@ input[type=submit]:hover, input[type=submit]:focus, a.control:hover, a.control:f
      background: #eef;
      background: linear-gradient(#fff 50%, #ffe8bf 50%, #efd9b3 100%);
      box-shadow: inset 0 0 0 1px #fff;
+     text-shadow: none;
 }
 
 input[type=submit]:active, a.control:active {
@@ -1127,9 +1182,39 @@ a.controld {
      display: none;
 }
 
-a.control img {
-     filter: none;
+a.control img, a.control:hover img, a.control:focus img, a.control:active img {
+     filter: none !important;
 }
+
+/* sync iframe buttons with main console theme */
+
+.iframed input[type="submit"], .iframed a.control {
+     color: #41465f;
+     font-weight: normal;
+     border: 1px solid #999daf;
+     background: linear-gradient(to bottom, #fff, #efefff);
+     transition: ease border 0.7s;
+}
+
+.iframed input[type="submit"]:hover, .iframed input[type="submit"]:focus, .iframed a.control:hover, .iframed a.control:focus {
+     color: #19191f;
+     border: 1px solid #f60;
+     background: linear-gradient(to bottom, #eee, #fff);
+     transition: ease border 0.7s;
+}
+
+.iframed input[type="submit"]:active, .iframed a.control:active {
+     color: #4c526f !important;
+     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #555 !important;
+     background: linear-gradient(to bottom, #eee, #fff) !important;
+     background-blend-mode: luminosity;
+}
+
+.iframed a.control:active img {
+     mix-blend-mode: luminosity;
+}
+
+/* end iframed button sync */
 
 input[type=image], thead img {
      padding: 0 !important;
@@ -1367,8 +1452,7 @@ img[src$="details.png"] {
 .newtorrentsection, .addtorrentsection, .configsection, .configsectionpanel {
      padding: 0 10px;
      border: 1px solid #7778bf;
-     color: #001;
-     box-shadow: inset 0 0 0 1px #efefff;
+     box-shadow: inset 0 0 0 1px #fff;
      background-blend-mode: luminosity;
      text-align: center;
 }
@@ -1378,6 +1462,7 @@ img[src$="details.png"] {
      background: #fff url(images/snark_create.png) no-repeat right center;
      background: url(images/snark_create.png) no-repeat right center, linear-gradient(to bottom, #fafaff, #e0e0ef);
      background: url(images/snark_create.png) no-repeat scroll right center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #fafaff), repeating-linear-gradient(135deg, #fff 2px, rgba(221, 221, 255, 1) 3px, #fafaff 5px);
+     background: url(images/snark_create.png) no-repeat scroll right center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #f4f4ff 15%, #f4f4ff 85%, rgba(224, 224, 255, 0.5)), repeating-linear-gradient(135deg, #fff 2px, rgba(224, 224, 255, 0.5) 3px, #f4f4ff 5px);
      background-size: 80px 80px, 100% 100%;
 }
 
@@ -1385,7 +1470,7 @@ img[src$="details.png"] {
      margin: 10px 0;
      background: #fff url(images/snark_add.png) no-repeat right 15px center;
      background: url(images/snark_add.png) no-repeat right 15px center, linear-gradient(to bottom, #fafaff, #e0e0ef);
-     background: url(images/snark_add.png) no-repeat scroll right 15px center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #fafaff), repeating-linear-gradient(135deg, #fff 2px, rgba(221, 221, 255, 1) 3px, #fafaff 5px);
+     background: url(images/snark_add.png) no-repeat scroll right 15px center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #f4f4ff 15%, #f4f4ff 85%, rgba(224, 224, 255, 0.5)), repeating-linear-gradient(135deg, #fff 2px, rgba(224, 224, 255, 0.5) 3px, #f4f4ff 5px);
      background-size: 61px 61px, 100% 100%;
 }
 
@@ -1394,7 +1479,7 @@ img[src$="details.png"] {
      padding-bottom: 13px;
      background: #fff url(images/configuration.png) right -25px center no-repeat;
      background: url(images/configuration.png) right -25px center no-repeat, linear-gradient(to bottom, #fafaff, #e0e0ef);
-     background: url(images/configuration.png) no-repeat scroll right -25px center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #fafaff), repeating-linear-gradient(135deg, #fff 2px, rgba(221, 221, 255, 1) 3px, #fafaff 5px);
+     background: url(images/configuration.png) no-repeat scroll right -25px center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #f4f4ff 15%, #f4f4ff 85%, rgba(224, 224, 255, 0.5)), repeating-linear-gradient(135deg, #fff 2px, rgba(224, 224, 255, 0.5) 3px, #f4f4ff 5px);
      background-size: 84px 82px, 100% 100%;
 }
 
@@ -1402,12 +1487,13 @@ img[src$="details.png"] {
      margin: -12px 0 0;
      background: #fff url(images/configuration.png) no-repeat scroll right center;
      background: url(images/configuration.png) no-repeat scroll right center, linear-gradient(to bottom, #fafaff, #e0e0ef);
-     background: url(images/configuration.png) no-repeat scroll right center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #efefff 55px, #fafaff), repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 1) 3px, #efefef 5px);
+     background: url(images/configuration.png) no-repeat scroll right center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #f4f4ff 5%, #f4f4ff 95%, rgba(224, 224, 255, 0.5)), repeating-linear-gradient(135deg, #fff 2px, rgba(224, 224, 255, 0.5) 3px, #f4f4ff 5px);
      background-size: 84px 82px, 100% 100%, 100% 100%;
 }
 
 form:last-child .configsectionpanel {
      margin-top: 10px;
+     background: url(images/configuration.png) no-repeat scroll right center, linear-gradient(to top, rgba(224, 224, 255, 0.5), #f4f4ff 10%, #f4f4ff 90%, rgba(224, 224, 255, 0.5)), repeating-linear-gradient(135deg, #fff 2px, rgba(224, 224, 255, 0.5) 3px, #f4f4ff 5px);
 }
 
 .configsectionpanel table {
@@ -1441,6 +1527,7 @@ form:last-child .configsectionpanel {
 .newtorrentsection td:first-child, .addtorrentsection td:first-child {
      min-width: 140px;
      font-weight: bold;
+     color: #41465f;
 }
 
 /* new torrent -> tracker select */
@@ -1468,6 +1555,7 @@ form:last-child .configsectionpanel {
      text-overflow: ellipsis;
      font-weight: bold;
      text-align: center;
+     color: #41465f;
 }
 
 #trackerselect td {
@@ -2459,7 +2547,7 @@ input[type="submit"] {
 
 .snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
      font-size: 12pt !important;
-     padding: 4px 1px 5px !important;
+     padding: 4px 1px 3px !important;
      min-width: 300px;
 }
 

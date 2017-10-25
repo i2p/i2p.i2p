@@ -125,7 +125,7 @@ code, tt, .destaddress {
      text-transform: capitalize;
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.6));
-     line-height: 110%;
+     line-height: 120%;
 }
 
 #navi a:hover, #navi a:focus {
@@ -187,19 +187,19 @@ h3 {
 .headline h3 {
      font-size: 11.5pt !important;
      background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat #fcfcff;
-     background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(/themes/susidns/images/addressbook.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#subscriptions h3 {
      background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat #fcfcff;
-     background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(/themes/susidns/images/subs_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
 .headline#configure h3 {
      background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat #fcfcff;
-     background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: url(/themes/susidns/images/configure_24.png) 6px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
      background-size: 22px 22px, 100% 100%, 100% 100%;
 }
 
@@ -251,7 +251,7 @@ form[action="subscriptions"] #content {
      border: 1px solid #7778bf;
      padding: 5px 8px 5px 34px;
      border-radius: 2px;
-     background: url(/themes/console/images/info/question.png) 8px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
+     background: url(/themes/console/images/info/question.png) 8px center no-repeat, linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%) !important;
      background-size: 20px 20px, 100% 100%, 100% 100% !important;
      background-blend-mode: luminosity, normal, normal;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px #ccc;
@@ -331,7 +331,7 @@ div.help h3, #add h3 {
      padding: 5px 10px;
      margin: -1px -16px 0;
      background: #fcfcff;
-     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,240,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
+     background: linear-gradient(to bottom, #fcfcff 50%, rgba(255,255,255,0.6) 50%, rgba(240,240,255,0.4)), linear-gradient(135deg, #fcfcff 5%, rgba(231, 231, 255, 0.8) 15%);
 }
 
 p#help {
@@ -1093,9 +1093,9 @@ input[type="submit"], input[type="reset"], .fakebutton {
      border: 1px solid #999daf;
      box-shadow: inset 0 0 0 1px #fff;
      background: #eee;
-     background: linear-gradient(to bottom, #fff, #ddd);
+     background: linear-gradient(to bottom, #fff, #efefff);
      color: #33333f;
-     filter: saturate(70%) drop-shadow(0 0 1px #ccf);
+     filter: drop-shadow(0 0 1px #ccf);
      cursor: pointer;
 }
 
@@ -1114,11 +1114,11 @@ a.fakebutton:active {
 
 input[type=submit]:hover, input[type=reset]:hover, input[type=submit]:focus, input[type=reset]:focus, .fakebutton:hover, .fakebutton:focus {
      background: #eee;
-     background: linear-gradient(to bottom, #ddd, #fff);
+     background: linear-gradient(to bottom, #eee, #fff);
      color: #111;
      border: 1px solid #f60;
      box-shadow: inset 0px 0px 0px 1px #fff;
-     filter: saturate(100%) drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
+     filter: drop-shadow(0 0 1px rgba(204, 204, 204, 0.8));
      transition: ease border 0.7s;
 }
 
@@ -1130,72 +1130,72 @@ input[type="submit"]:active, input[type="reset"]:active, .fakebutton:active {
 
 input.accept {
      background: #eee url(/themes/console/images/buttons/yes.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 7px 5px 22px;
 }
 
 input.accept:hover, input.accept:focus {
      background: #fff url(/themes/console/images/buttons/yes.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/yes.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 /*
 input.accept[value="Replace"] {
      background: #eee url(/themes/console/images/buttons/edit2.png) no-repeat 6px center;
-     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      padding: 5px 7px 5px 22px;
 }
 
 input.accept[value="Replace"]:hover, input.accept[value="Replace"]:focus {
      background: #fff url(/themes/console/images/buttons/edit2.png) no-repeat 6px center;
-     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background:url(/themes/console/images/buttons/edit2.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
 }
 */
 
 input.add {
      background: #eee url(/themes/console/images/buttons/add.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 7px 5px 22px;
 }
 
 input.add:hover, input.add:focus {
      background: #fff url(/themes/console/images/buttons/add.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/add.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.cancel {
      background: #eee url(/themes/console/images/buttons/no.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 7px 5px 22px;
 }
 
 input.cancel:hover, input.cancel:focus {
      background: #fff url(/themes/console/images/buttons/no.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/no.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.delete {
      background: #eee url(/themes/console/images/buttons/delete.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/delete.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 7px 5px 22px;
 }
 
 input.delete:hover, input.delete:focus {
      background: #fff url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/delete_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.export {
      background: #eee url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 7px 5px 22px;
      margin-top: 5px;
@@ -1203,33 +1203,33 @@ input.export {
 
 input.export:hover, input.export:focus {
      background: #fff url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.reload {
      background: #eee url(/themes/console/images/buttons/update.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/update.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 7px 5px 22px;
 }
 
 input.reload:hover, input.reload:focus {
      background: #fff url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/update_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
 input.search {
      background: #eee url(/themes/console/images/buttons/search.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/search.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 5px 8px 5px 24px;
 }
 
 input.search:hover, input.search:focus {
      background: #fff url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/search_hover.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 
@@ -1245,14 +1245,14 @@ input.search[type="text"]:focus {
 
 #visualid .fakebutton {
      background: #eee url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #ddd);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #fff, #efefff);
      background-size: 14px 14px, 100% 100%;
      padding: 6px 8px 6px 22px;
 }
 
 #visualid .fakebutton:hover, #visualid .fakebutton:focus {
      background: #fff url(/themes/console/images/buttons/go.png) no-repeat 6px center;
-     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #ddd, #fff);
+     background: url(/themes/console/images/buttons/go.png) no-repeat 6px center, linear-gradient(to bottom, #eee, #fff);
      background-size: 14px 14px, 100% 100%;
 }
 

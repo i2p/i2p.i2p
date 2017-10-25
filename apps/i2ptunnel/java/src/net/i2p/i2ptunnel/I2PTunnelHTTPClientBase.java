@@ -698,10 +698,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
             out.write("<a href=\"");
             out.write(uri);
             out.write("\">");
-            if (targetRequest.length() > 80)
-                out.write(DataHelper.escapeHTML(targetRequest.substring(0, 75)) + "&hellip;");
-            else
-                out.write(uri);
+            // Long URLs are handled in CSS
+            out.write(uri);
             out.write("</a>");
             if (usingWWWProxy) {
                 out.write("<br><br><b>");

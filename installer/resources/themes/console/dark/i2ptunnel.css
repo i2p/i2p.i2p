@@ -168,6 +168,7 @@ h2, h3 {
      padding: 8px 10px 8px 34px;
      border: 1px solid #494;
      background: linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #004000, #000 75%), url(/themes/console/dark/images/camotile2.png) top left !important;
      font-size: 11pt;
      text-transform: uppercase;
      letter-spacing: 0.08em;
@@ -181,32 +182,44 @@ h2, h3 {
 
 #messages h2 {
      background: url(/themes/console/images/info/logs.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/logs.png) left 8px center no-repeat, linear-gradient(to right, #000, rgba(0,0,0,0) 30%), linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,16,0,0.2) 50%, rgba(0,0,0,0.6)), url(/themes/console/dark/images/camotile2.png) top left, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.8) 2px, rgba(0,32,0,0.8) 4px) !important;
+     background-size: 20px auto, 100% 100%, 100% 100%, 175px 175px, 100% 100%, 100% 100% !important;
+     background-blend-mode: normal, normal, normal, exclusion, normal, normal;
 }
 
 #globalTunnelControl h2 {
      background: url(/themes/console/images/info/control.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/control.png) left 8px center no-repeat, linear-gradient(to right, #000, rgba(0,0,0,0) 30%), linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,16,0,0.2) 50%, rgba(0,0,0,0.6)), url(/themes/console/dark/images/camotile2.png) top left, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.8) 2px, rgba(0,32,0,0.8) 4px) !important;
+     background-size: 20px auto, 100% 100%, 100% 100%, 175px 175px, 100% 100%, 100% 100% !important;
+     background-blend-mode: normal, normal, normal, exclusion, normal, normal;
 }
 
 #servers h2 {
      background: url(/themes/console/images/info/server.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/server.png) left 8px center no-repeat, linear-gradient(to right, #000, rgba(0,0,0,0) 30%), linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,16,0,0.2) 50%, rgba(0,0,0,0.6)), url(/themes/console/dark/images/camotile2.png) top left, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.8) 2px, rgba(0,32,0,0.8) 4px) !important;
+     background-size: 20px auto, 100% 100%, 100% 100%, 175px 175px, 100% 100%, 100% 100% !important;
+     background-blend-mode: normal, normal, normal, exclusion, normal, normal;
 }
 
 #clients h2 {
      background: url(/themes/console/images/info/client.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/client.png) left 8px center no-repeat, linear-gradient(to right, #000, rgba(0,0,0,0) 30%), linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,16,0,0.2) 50%, rgba(0,0,0,0.6)), url(/themes/console/dark/images/camotile2.png) top left, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.8) 2px, rgba(0,32,0,0.8) 4px) !important;
+     background-size: 20px auto, 100% 100%, 100% 100%, 175px 175px, 100% 100%, 100% 100% !important;
+     background-blend-mode: normal, normal, normal, exclusion, normal, normal;
 }
 
 #tunnelEditPage h2, #tunnelEditPage h3, #registration h2, #registration h3 {
      background: url(/themes/console/images/info/configure.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/configure.png) left 8px center no-repeat, linear-gradient(to right, #000, rgba(0,0,0,0) 30%), linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,16,0,0.2) 50%, rgba(0,0,0,0.6)), url(/themes/console/dark/images/camotile2.png) top left, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.5) 2px, rgba(0,32,0,0.8) 4px) !important;
+     background-size: 20px auto, 100% 100%, 100% 100%, 175px 175px, 100% 100%, 100% 100% !important;
+     background-blend-mode: normal, normal, normal, exclusion, normal, normal;
 }
 
 #wizardPanel h2 {
      background: url(/themes/console/images/info/wizard.png) left 8px center no-repeat, linear-gradient(to bottom, #1a261a 50%, #000 50%) !important;
-     background-size: 20px auto, 100% 100%, 100% 100% !important;
+     background: url(/themes/console/images/info/wizard.png) left 8px center no-repeat, linear-gradient(to right, #000, rgba(0,0,0,0) 30%), linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,16,0,0.2) 50%, rgba(0,0,0,0.6)), url(/themes/console/dark/images/camotile2.png) top left, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,32,0,0.8) 2px, rgba(0,32,0,0.8) 4px) !important;
+     background-size: 20px auto, 100% 100%, 100% 100%, 175px 175px, 100% 100%, 100% 100% !important;
+     background-blend-mode: normal, normal, normal, exclusion, normal, normal;
 }
 
 /* end title images */
@@ -234,6 +247,7 @@ h3 {
 th {
      background: #000;
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%);
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #002000, #000 75%);
      padding: 7px 5px;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494;
@@ -243,6 +257,10 @@ th {
      text-transform: uppercase;
      letter-spacing: 0.08em;
      word-spacing: 0.1em;
+}
+
+th:first-child {
+     padding-left: 10px;
 }
 
 td {
@@ -649,6 +667,7 @@ input, select, button {
 }
 
 button, input[type="submit"], input[type="reset"], a.control, select {
+     line-height: 120%;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
      filter: drop-shadow(0 0 1px #131);
@@ -659,6 +678,7 @@ button, input[type="submit"], input[type="reset"], a.control, select {
      padding: 7px 5px !important;
      background: #000;
      background: linear-gradient(to bottom, #010, #000);
+     background: linear-gradient(135deg, #000, rgba(0,0,0,0) 70%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #020, #000 75%);
      border-top: 1px solid #494 !important;
 }
 
@@ -841,7 +861,7 @@ input:focus::-moz-placeholder {
      opacity: 0;
 }
 
-input.tunnelName, input.tunnelDescription, #userAgents {
+input.tunnelName, input.tunnelDescriptionText, #userAgents {
      width: 80%;
      min-width: 280px;
      text-overflow: ellipsis;
@@ -954,6 +974,10 @@ input.tunnelName, input.tunnelDescription, #userAgents {
      text-align: justify;
 }
 
+#wizardPanel p, #wizardPanel td {
+     line-height: 140%;
+}
+
 #wizardPanel input::-moz-placeholder {
      color: #bb7;
      font-weight: normal;
@@ -1049,7 +1073,7 @@ _:-ms-lang(x), .tunnelProperties {
      border-bottom: 1px solid #010 !important;
 }
 
-#clientTunnels .tunnelDescription {
+.tunnelDescription {
      padding-top: 1px !important;
 }
 

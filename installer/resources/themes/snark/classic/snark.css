@@ -6,6 +6,7 @@ body {
      color: #2c354f;
      background: #eef url(/themes/console/classic/images/bg0.png) repeat scroll center bottom;
      background-size: 120px 120px;
+     margin: 3px 4px;
 }
 
 /* preload top navigation mouseovers */
@@ -50,19 +51,23 @@ body.iframed {
      line-height: 160% !important;
      min-width: 900px !important;
      margin: 5px 0 0 0;
-     padding: 10px;
+     padding: 9px;
      text-align: center;
      border: 1px solid #89f;
-     background: #eef;
-     box-shadow: inset 0 0 0 1px #ddf, 0 0 5px 1px #cfcfff inset;
+     border-radius: 0 0 3px 3px;
+     background: #dfe6ff;
+     background: repeating-linear-gradient(to right, #fff 1px, #cfd9ff 2px, #fff 4px);
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 .iframed .page {
      margin: 5px 0;
      padding: 0;
      border: none;
+     border-radius: 0;
      background: none;
-     background: linear-gradient(to right, #fff 0%, #ddf 50%, #fff 100%);
+     background: linear-gradient(to right, #fff, #ddf, #fff);
+     background: repeating-linear-gradient(to right, #fff 1px, #bbf 2px, #fff 4px);
      box-shadow: none;
 }
 
@@ -79,9 +84,10 @@ body.iframed {
      text-transform: uppercase !important;
      color: #000;
      border: 1px solid #89f;
+     border-radius: 3px 3px 0 0;
      background: #eff2ff !important;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #eff2ff 50%, #eff2ff 100%) !important;
-     box-shadow: 0 0 1px #fff;
+     background: linear-gradient(to bottom, #fff, #eff2ff) !important;
+     box-shadow: 0 0 1px #fff, inset 0 0 0 1px #fff;
      position: sticky;
      top: -1px;
      z-index: 999;
@@ -89,67 +95,81 @@ body.iframed {
 
 .iframed .snarknavbar {
      margin-top: -2px !important;
+     padding: 8px 0;
+     border-radius: 0;
      position: static;
+     background: linear-gradient(to bottom, #fff, #eff2ff 75%) !important;
 }
 
 .snarkNav:link, .snarkNav:visited {
      display: inline-block;
+     line-height: 110%;
      color: #444688;
      font-size: 9pt;
      font-weight: bold;
-     margin: -1px 0 !important;
+     margin: -1px -2px -1px -3px !important;
      padding: 5px 7px 5px 23px !important;
      text-decoration: none !important;
      letter-spacing: .1em;
      text-transform: uppercase !important;
-     border: 1px solid #ccf;
-     border-right: 1px solid #aaf;
-     border-bottom: 1px solid #aaf;
+     border: 1px solid #88f;
      box-shadow: inset 0 0 0 1px #fff, 0 0 1px rgba(200,200,200,0.5);
+     opacity: 0.85;
+     transition: ease all 0.1s;
 }
 
 .snarkNav:link:last-child {
      margin-left: 3px;
+     border-radius: 0 3px 3px 0;
 }
 
 .nav_main:link {
-     background: url(images/button_snark.png) 7px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(images/button_snark.png) 7px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+     border-radius: 3px 0 0 3px;
 }
 
 .nav_forum:link {
-     background: url(images/button_forum.png) 7px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(images/button_forum.png) 7px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
 
 .nav_tracker:link {
-     background: url(images/button_tracker.png) 7px center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(images/button_tracker.png) 7px center no-repeat, linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
+}
+
+.snarkNav.nav_main:last-child {
+     border-radius: 3px;
 }
 
 .snarkNav:hover, .snarkNav:focus {
      color: #f50;
      border: 1px solid #f50;
+     opacity: 1;
+     position: relative;
+     z-index: 999;
+     transition: ease all 0.1s;
 }
 
 .nav_main:hover, .nav_main:focus {
      background: url(images/button_snark_hover.png) 7px center no-repeat #eee !important;
-     background: url(images/button_snark_hover.png) 7px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(images/button_snark_hover.png) 7px center no-repeat, linear-gradient(to bottom, #eff2ff, #fff) !important;
 }
 
 .nav_forum:hover, .nav_forum:focus {
      background: url(images/button_forum_hover.png) 7px center no-repeat #eee !important;
-     background: url(images/button_forum_hover.png) 7px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(images/button_forum_hover.png) 7px center no-repeat, linear-gradient(to bottom, #eff2ff, #fff) !important;
 }
 
 .nav_tracker:hover, .nav_tracker:focus {
      background: url(images/button_tracker_hover.png) 7px center no-repeat #eee !important;
-     background: url(images/button_tracker_hover.png) 7px center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(images/button_tracker_hover.png) 7px center no-repeat, linear-gradient(to bottom, #eff2ff, #fff) !important;
 }
 
 .snarkNav:active {
      text-decoration: none !important;
      color: #fff !important;
-     border: 1px solid #aaa;
      text-shadow: none;
-     box-shadow: inset 0 0 0 1px #fff, inset 4px 4px 3px #824b1b !important;
+     box-shadow: inset 4px 4px 3px #824b1b, 0 0 0 0 rgba(0,0,0,0) !important;
+     transition: ease all 0.1s;
 }
 
 .nav_main:active {
@@ -181,8 +201,14 @@ body.iframed {
      text-align: left;
      border-bottom: 1px solid #89f;
      background: url(images/hat.png) bottom right no-repeat #ddf;
+     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, #eff3ff, #e9efff);
+     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, rgba(239, 243, 255, 0.7), rgba(233, 239, 255, 0.7));
+     box-shadow: inset 0 0 0 1px #f2f2ff;
+}
+
+.iframed .snarkMessages {
      background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, #e3e3ff, #ddf);
-     box-shadow: inset 0 0 0 1px #ddf;
+     background: url(images/hat.png) bottom right no-repeat, linear-gradient(to bottom, rgba(227, 227, 255, 0.7), rgba(221, 221, 255, 0.7));
 }
 
 .snarkMessages:hover, .snarkMessages:focus {
@@ -201,7 +227,7 @@ body.iframed {
 
 .snarkMessages li {
      margin-left: -15px;
-     font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font: bold 8pt "Droid Sans Mono", "Noto Sans Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #4b4b76;
 }
 
@@ -211,7 +237,7 @@ body.iframed {
      background: url(images/bullet.png) 1px bottom no-repeat;
      width: 13px;
      height: 11px;
-     margin: 1px 2px 0 1px;
+     margin: 1px 1px 0 0;
      background-size: 9px 9px;
      opacity: 0.7;
 }
@@ -258,7 +284,7 @@ body.iframed {
 
 .ParentDir {
      font-size: 8pt;
-     padding: 4px 0;
+     padding: 4px 0 0 6px;
      text-align: left !important;
      border: 1px solid #89f !important;
      border-right: 0 !important;
@@ -319,6 +345,14 @@ body.iframed {
      display: none;
 }
 
+.snarkTorrents thead img {
+     display: none;
+}
+
+.snarkTorrents thead a img {
+     display: inline;
+}
+
 .snarkTorrents img {
      margin: 0 !important;
      padding: 0 !important;
@@ -348,6 +382,28 @@ body.iframed {
      width: 16px !important;
      text-align: center !important;
      font-weight: bold;
+     padding-left: 0 !important;
+     padding-right: 0 !important;
+}
+
+.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkDirInfo td:first-child img {
+     padding: 3px !important;
+     border: 1px solid transparent !important;
+}
+
+.snarkTrackerDetails a:hover img, .snarkTrackerDetails img:hover, .snarkTrackerDetails a:focus img,
+.snarkTorrentDetails a:hover img, .snarkTorrentDetails img:hover, .snarkTorrentDetails a:focus img,
+.snarkDirInfo td:first-child a:hover img, .snarkDirInfo td:first-child a:focus img {
+     border: 1px solid #f60 !important;
+     border-radius: 2px;
+     box-shadow: 0 0 1px #f60;
+     background: #ddf;
+     background: linear-gradient(to bottom, #fff 50%, #ddf 50%);
+     filter: none !important;
+}
+
+.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:first-child a:active img {
+     box-shadow: inset 2px 2px 2px #99f;
 }
 
 .snarkGraphicStatus, .snarkTorrentStatus {
@@ -357,6 +413,8 @@ body.iframed {
 
 .snarkGraphicStatus {
      width: 24px !important;
+     text-align: center !important;
+     padding-left: 3px !Important;
 }
 
 .snarkGraphicStatus img {
@@ -394,16 +452,17 @@ thead {
 
 tfoot tr:first-child th {
      vertical-align: middle !important;
+     color: #3e4b6f !important;
 }
 
 th {
      font-size: 9pt;
      padding: 3px 2px;
-     color: #0c153d;
+     color: #3e4b6f;
      border-top: 1px solid #89f;
      border-bottom: 1px solid #89f;
      background: #fff;
-     background-image: linear-gradient(to bottom, #fff, #eef);
+     background: linear-gradient(to bottom, #fff, #eef);
 }
 
 th:first-child {
@@ -414,14 +473,6 @@ th:first-child {
 tfoot td:first-child {
      padding-left: 0;
      text-align: left !important;
-}
-
-th:first-child img {
-     margin: 1px -2px 3px 1px !important;
-}
-
-th:nth-child(2) img {
-     margin: 1px 5px 3px 2px !important;
 }
 
 tfoot th {
@@ -522,6 +573,8 @@ tfoot th {
 
 .snarkTorrents td {
      text-align: left;
+     padding-top: 4px;
+     padding-bottom: 4px;
 }
 
 .snarkGraphicStatus {
@@ -537,7 +590,7 @@ td.snarkTrackerDetails {
 }
 
 tt {
-     font-family: "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font-family: "Droid Sans Mono", "Noto Sans Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
 }
 
 .snarkTorrents tt {
@@ -601,14 +654,11 @@ tt {
      border-top: 1px solid #89f !important;
 }
 
-.snarkTorrentInfo tr:last-child {
-     background: none;
-}
-
-.snarkTorrentInfo tr:last-child td {
-     padding: 5px !important;
+#torrentInfoControl td {
+     padding: 7px 5px !important;
      text-align: right !important;
      border-top: 1px solid #89f !important;
+     background: linear-gradient(to bottom, #fff, #eef);
 }
 
 .SnarkTorrentInfo {
@@ -652,6 +702,7 @@ tt {
      margin-top: 10px !important;
      margin-bottom: 0;
      border-bottom: 1px solid #89f;
+     background: #eef;
 }
 
 .snarkDirInfo th img {
@@ -670,10 +721,6 @@ tt {
      padding-left: 5px;
 }
 
-.snarkDirInfo th a img, .snarkDirInfo th img  {
-     max-height: 20px;
-}
-
 .snarkDirInfo th img[alt="Directory"] {
      margin-right: 5px !important;
      margin-left: 1px !important;
@@ -683,13 +730,15 @@ tt {
      min-width: 0 !important;
 }
 
-.snarkDirInfo td:first-child {
-     padding-left: 4px;
+.snarkFileIcon {
+     width: 16px;
+     padding-left: 2px;
      padding-right: 2px;
      text-align: left;
 }
 
-.snarkDirInfo td:first-child img {
+.snarkFileIcon img {
+     filter: none;
      padding-right: 6px;
 }
 
@@ -723,26 +772,8 @@ tt {
      margin: 0 !important;
 }
 
-.snarkDirInfo .headerpriority {
-     text-align: center !important;
-     vertical-align: middle;
-}
-
-td.subHeaderPriority, td.priority {
-     width: 0;
-     min-width: 36px !important;
-     padding: 0 5px 0 0 !important;
-     text-align: center !important;
-}
-
-td.subHeaderPriority {
-     font-size: 7.5pt;
-     font-weight: bold;
-     padding: 0 1px !important;
-     text-align: center !important;
-     background: #020;
-     background: url("images/snarktopnav.png") repeat-x scroll center center #101;
-     background-image: linear-gradient(to bottom, #030 0%, #020 50%, #000 51%, #000 100%);
+.snarkDirInfo thead th:nth-child(2), .headerstatus, .headerpriority, .snarkFileStatus {
+     text-align: center;
 }
 
 .headerpriority br {
@@ -753,33 +784,9 @@ td.subHeaderPriority {
      padding: 4px !important;
 }
 
-tr.priority:last-child {
-     border-bottom: none !important;
-}
-
-th.headerdownloaded {
-     padding-left: 25px !important;
-}
-
 .snarkFileStatus {
-     text-align: center;
      white-space:nowrap;
      width: 120px;
-}
-
-.snarkFileIcon {
-     width: 16px;
-     padding: 0;
-}
-
-.snarkFileIcon img {
-     filter: none;
-}
-
-.snarkFileStatusIcon {
-     width: 24px;
-     padding: 0 4px 0 0;
-     text-align: center;
 }
 
 /* end torrent directory */
@@ -787,7 +794,7 @@ th.headerdownloaded {
 td {
      font-size: 9pt;
      padding: 2px;
-     color: #2c354f !important;
+     color: #3e4b6f !important;
 }
 
 td:first-child {
@@ -801,7 +808,7 @@ td:first-child {
 
 .snarkTorrentName {
      line-height: 110%;
-     padding: 0;
+     padding: 4px 3px;
 }
 
 .snarkTorrentName a,
@@ -825,43 +832,53 @@ td:first-child {
 .snarkTorrentAction input[type="image"] {
      padding: 3px !important;
      background: #339;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ddf 51%, #ddf 100%);
+     background: linear-gradient(to bottom, #fff 50%, #ddf 50%);
      border-radius: 2px;
-     border: 1px solid #89f !important;
+     border: 1px solid #bbf !important;
      margin: 2px 1px;
-     filter: drop-shadow(0 0 1px #bbb);
+     box-shadow: 0 0 1px #f2f2ff !important;
      height: 10px;
 }
 
 .snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type="image"]:focus {
      border: 1px solid #f60 !important;
-     filter: drop-shadow(0 0 1px #f60);
+     background: linear-gradient(to bottom, #fff 50%, #eef 50%) !important;
+     box-shadow: 0 0 1px #f60 !important;
+     filter: none !important;
 }
 
 .snarkTorrentAction input[type="image"]:active {
-     background: linear-gradient(to bottom, #ddf 0%, #ddf 50%, #99f 51%, #99f 100%);
-     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #333;
-     filter: none !important;
+     background: linear-gradient(to bottom, #eef 50%, #bbf 50%);
+     box-shadow: inset 0 0 0 1px #fff, inset 2px 2px 2px #559 !important;
 }
 
 /* end torrent control buttons */
 
-.snarkTorrentNoneLoaded {
-     font-size: 8.5pt;
-     font-weight: bold;
-     padding: 10px 5px;
-     color: #4f2 !important;
+.routerdown {
+     padding: 10px;
+     color: #363759;
      border-bottom: 1px solid #89f;
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
+.snarkTorrentNoneLoaded {
+     padding: 10px 5px;
      background: #fff;
+     background: linear-gradient(to right, #eef, #fff, #eef);
+     border-bottom: 1px solid #89f;
 }
 
 .snarkTorrentNoneLoaded td {
+     color: #0c153d !important;
      text-align: center !important;
+     font-weight: bold;
+     box-shadow: inset 0 0 0 1px #fff;
 }
 
 .snarkTorrentNoneLoaded i {
      display: inline-block;
      padding: 10px;
+     opacity: 0.85;
 }
 
 .snarkTorrentNoneLoaded i::before {
@@ -870,6 +887,7 @@ td:first-child {
      vertical-align: top;
      margin: 1px 4px 0 0 !important;
      transform: scale(0.95);
+     opacity: 0.85;
 }
 
 .snarkTorrentStatus {
@@ -929,9 +947,9 @@ td:first-child {
      vertical-align: middle;
 }
 
-.snarkTorrents tr:hover, .snarkDirInfo tr:hover {
+.snarkTorrents tr:hover, .snarkDirInfo tr:hover, #trackerselect tr:nth-child(n+2):hover td {
      background: #fff !important;
-     background: linear-gradient(to bottom, #fff 0%, #ffe 100%) !important;
+     background: linear-gradient(to bottom, #fff, #ffe) !important;
 }
 
 tr:hover .percentBarText {
@@ -1027,11 +1045,12 @@ tr:hover .percentBarText {
 }
 
 .percentBarOuter {
+     margin: 0 auto;
+     border: 1px solid #99f;
+     border-radius: 2px;
+     box-shadow: 0 0 1px 0 rgba(196,196,196,0.8);
      background: #eef;
      background: repeating-linear-gradient(135deg, #eef 1px, #eef 5px, #ddf 6px, #ddf 11px);
-     border: 1px solid #99f;
-     box-shadow: 0 0 1px 0 rgba(196,196,196,0.8);
-     margin: 0 auto;
 }
 
 .snarkTorrentDownloaded .percentBarOuter {
@@ -1043,12 +1062,22 @@ tr:hover .percentBarText {
 }
 
 .percentBarInner {
-     border: none;
      height: 14px;
-     background: #bbf;
-     background: linear-gradient(to bottom, #fff 0%, #eef 50%, #bbf 50%, #99f 100%);
+     border: none;
+     border-radius: 2px;
      box-shadow: inset 0 0 0 1px #ddf;
+     background: #bbf;
+     background: linear-gradient(to bottom, #fff, #eef 50%, #bbf 50%, #99f);
+     background: linear-gradient(to right, rgba(255,255,0,0.1) 60px, rgba(0,255,0,0.1)), linear-gradient(to bottom, #fff, #eef 50%, #bbf 50%, #99f);
      opacity: 0.8;
+}
+
+.peerinfo .percentBarInner {
+     background: linear-gradient(to bottom, #fff, #eef 50%, #bbf 50%, #99f);
+}
+
+.snarkDirInfo .percentBarInner {
+     background: linear-gradient(to right, rgba(255,255,0,0.1) 40px, rgba(0,255,0,0.1)), linear-gradient(to bottom, #fff, #eef 50%, #bbf 50%, #99f);
 }
 
 .percentBarText, .percentBarOuter {
@@ -1092,12 +1121,15 @@ tr:hover .percentBarText {
      transition: ease all 0.3s;
 }
 
-.thumb:hover {
+.snarkDirInfo td:first-child .thumb:hover, .snarkDirInfo td:first-child .thumb:focus {
      max-width: 96px;
      max-height: 64px;
      transition: ease all 0.3s;
-     margin: -6px 0 -6px -4px !important;
+     margin: -9px 0 -9px -5px !important;
      filter: none !important;
+     border: 1px solid transparent !important;
+     background: none !important;
+     box-shadow: none !important;
 }
 
 .snarkNewTorrent {
@@ -1105,17 +1137,18 @@ tr:hover .percentBarText {
 }
 
 .snarkAddInfo {
-     font-size: 9pt;
+     display: inline-block;
+     margin: 3px 0 -3px -5px !important;
+     padding-left: 26px;
      line-height: 130% !important;
-     margin-left: -5px;
+     font-size: 9pt;
      font-weight: normal;
      background: url(images/infocircle.png) left 10px center no-repeat;
      background-size: 13px auto;
-     padding-left: 26px;
 }
 
 .snarkConfigTitle:hover, label.toggleview:hover, input.toggle_input:focus + .toggleview {
-     background: linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background: linear-gradient(to bottom, #eff2ff, #fff) !important;
      color: #f60 !important;
 }
 
@@ -1124,7 +1157,7 @@ input.toggle_input:focus + .toggleview img {
 }
 
 .snarkConfigTitle:active, label.toggleview:active {
-     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #999;
+     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px #99a, 0 0 0 0 #fff;
 }
 
 .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover {
@@ -1139,16 +1172,20 @@ input.toggle_input:focus + .toggleview img {
      letter-spacing: .08em;
      border: 1px solid #89f;
      border-top: none;
+     border-radius: 0 0 4px 4px;
      background: #fff !important;
-     background: linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
-     box-shadow: inset 0 0 0 1px #fff;
-     filter: drop-shadow(0 1px 1px #ddd);
+     background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%) !important;
+     box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 0 #fff, 0 1px 1px #ddf;
+     transition: ease all 0.2s;
 }
 
 .snarkConfigTitle a {
      display: inline-block;
      width: 100%;
-     margin-bottom: -1px;
+}
+
+.iframed .snarkConfigTitle a {
+     padding-bottom: 0;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
@@ -1162,7 +1199,11 @@ _:-ms-lang(x), .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkCo
 }
 
 .configsectionpanel .snarkConfigTitle, .configsectionpanel .snarkConfigTitle:hover {
-     color: #444 !important;
+     color: #676788 !important;
+}
+
+.configsection .snarkConfigTitle {
+     margin-bottom: -2px !important;
 }
 
 .snarkConfigTitle img, label.toggleview img {
@@ -1171,15 +1212,18 @@ _:-ms-lang(x), .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkCo
 }
 
 .snarkConfigTitle a, .snarkConfigTitle a:visited, label.toggleview {
-     color: #444688 !important;
      outline: none;
+     color: #676799 !important;
+     text-shadow: 0 1px 1px #fff;
 }
 
 .snarkConfigTitle a:hover, .snarkConfigTitle a:focus, .toggleview:hover, .toggleview:focus {
      color: #f60 !important;
+     text-shadow: none;
+     transition: ease all 0.2s;
 }
 
-.snarkConfigTitle a:active, .toggleview:active {
+.snarkConfigTitle a:active, input:active + .toggleview {
      color: #f90 !important;
 }
 
@@ -1220,14 +1264,14 @@ a:link {
      text-decoration: none;
      word-wrap: break-word;
      opacity: 1;
-     color: #33a;
+     color: #4f509f;
      border-radius: 0;
 }
 
 a:visited {
      font-weight: normal;
      text-decoration: none;
-     color: #448;
+     color: #7d7edf;
 }
 
 a:hover, a:focus {
@@ -1288,7 +1332,7 @@ input[type="image"], a img {
 
 input[type="image"]:hover, a img:hover, input[type="image"]:focus, a img:focus {
      outline: none !important;
-     filter: drop-shadow(0 0 2px #f60) !important;
+     filter: drop-shadow(0 0 1px #f60) !important;
 }
 
 input::-moz-focus-inner {
@@ -1306,7 +1350,7 @@ input[type="submit"], input[type="reset"], a.control {
      border: 1px solid #999;
      border-radius: 2px;
      background: #eee;
-     background: linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: linear-gradient(to bottom, #fff, #ddd);
      box-shadow: inset 0 0 0 1px #fff;
      filter: drop-shadow(0 0 1px rgba(221, 221, 221, 0.8));
      cursor: pointer !important;
@@ -1315,7 +1359,7 @@ input[type="submit"], input[type="reset"], a.control {
 input[type="submit"]:hover, input[type="reset"]:hover, input[type="submit"]:focus, input[type="reset"]:focus, a.control:hover, a.control:focus {
      color: #111;
      background: #fff;
-     background: linear-gradient(to bottom, #ddd 0%, #fff 100%);
+     background: linear-gradient(to bottom, #ddd, #fff);
      border: 1px solid #89f;
 }
 
@@ -1394,6 +1438,7 @@ input[type="text"], input[type="password"], input.r, input[name="nofilter_dataDi
      border: 1px solid #bbb;
      border-radius: 2px;
      box-shadow: inset 1px 1px 1px #ddd;
+     background: #f8f8ff;
 }
 
 input[type="text"]:focus, input[type="password"]:focus, input.r:focus, input[name="nofilter_dataDir"]:focus, textarea[name="i2cpOpts"]:focus {
@@ -1498,7 +1543,7 @@ select {
      color: #333;
      border: 1px solid #bbb;
      border-radius: 2px;
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%);
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #ddd);
      -moz-appearance: none;
      -webkit-appearance: none;
      box-shadow: inset 0 0 0 1px #fff;
@@ -1511,11 +1556,11 @@ select option {
 }
 
 select:hover, select:active {
-     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
 }
 
 select:focus {
-     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd 0%, #fff 100%) !important;
+     background: url(images/dropdown_hover.png) right center no-repeat, linear-gradient(to bottom, #ddd, #fff) !important;
      box-shadow: 0 0 0 1px #89f;
      color: #000;
 }
@@ -1533,7 +1578,7 @@ select {
 }
 
 select[disabled], select[disabled]:hover {
-     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff 0%, #ddd 100%) !important;
+     background: url(images/dropdown.png) right center no-repeat, linear-gradient(to bottom, #fff, #ddd) !important;
      opacity: 0.7;
      cursor: not-allowed;
 }
@@ -1543,7 +1588,7 @@ select::-ms-expand {
 }
 
 textarea {
-     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font: 8pt "Droid Sans Mono", "Noto Sans Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      font-weight: bold;
      padding: 1px 4px 0;
      color: #006;
@@ -1581,7 +1626,7 @@ img:hover {
      border: 1px solid #349 !important;
      border-radius: 2px;
      background: #fff;
-     background: linear-gradient(to bottom, #fff 0%, #fff 50%, #ddf 51%);
+     background: linear-gradient(to bottom, #fff 50%, #ddf 50%);
      box-shadow: inset 0 0 1px 1px #fff;
      filter: drop-shadow(0 0 1px #aaa) !important;
      width: 8px;
@@ -1593,7 +1638,7 @@ img:hover {
 }
 
 #pagenav a:active img {
-     background: linear-gradient(to bottom, #ddf 0%, #ddf 50%, #99f 51%);
+     background: linear-gradient(to bottom, #ddf 50%, #99f 50%);
      box-shadow: inset 2px 2px 2px 1px #99f;
 }
 
@@ -1624,7 +1669,10 @@ img:hover {
      width: 100% !important;
      width: calc(100% - 150px) !important;
      margin: 2px 5px 0 5px;
+     border-collapse: separate;
      border: 1px solid #89f;
+     border-radius: 2px;
+     box-shadow: 0 0 1px #ccf;
      background: rgba(255,255,255,0.1);
 }
 
@@ -1647,13 +1695,13 @@ img:hover {
 #trackerselect tr:first-child {
      font-weight: bold;
      border-bottom: 1px #89f;
-     background: linear-gradient(to bottom, #eef, #fff);
 }
 
 #trackerselect tr:first-child td {
      padding: 5px 10px;
-     border-bottom: 1px solid #89f;
      font-weight: bold !important;
+     border-bottom: 1px solid #89f;
+     background: linear-gradient(to bottom, #fff, #eef);
 }
 
 #trackerselect td {
@@ -1661,8 +1709,12 @@ img:hover {
 }
 
 #trackerselect td:first-child, #trackerselect td:last-child {
-     width: 40%;
+     width: 35%;
      font-weight: normal;
+}
+
+#trackerselect td:nth-child(2), #trackerselect td:nth-child(3) {
+     width: 15%;
 }
 
 #trackerselect input {
@@ -1707,11 +1759,6 @@ img:hover {
 
 .knownTracker input[type="radio"]:checked, .knownTracker input[type="radio"]:checked:hover {
      opacity: 0.5;
-}
-
-.snarkTorrentNoneLoaded td {
-     color: #0c153d !important;
-     background: #fff;
 }
 
 .snarkNewTorrent td {
@@ -1825,36 +1872,48 @@ img:hover {
      text-align: center;
      color: #0c153d;
      border: 1px solid #89f;
-     box-shadow: inset 0 0 2px 0 #ccc, 0 0 1px #bbb;
      word-wrap: break-word;
      background: #fff;
+}
+
+.newtorrentsection, .addtorrentsection, .configsection {
+     border-radius: 3px;
+     box-shadow: inset 0 0 0 1px #fff;
+     background-blend-mode: luminosity;
+}
+
+.iframed .newtorrentsection, .iframed .addtorrentsection, .iframed .configsection {
+     border-radius: 0;
 }
 
 .mainsection {
      margin: 0;
      padding: 0;
      border-bottom: none;
-     background: repeating-linear-gradient(to right, #ddf 2px, #eef 2px, #ddf 4px);
+     background: none;
 }
 
 .newtorrentsection {
-     margin: 0 0 10px 0;
+     margin: 0 0 9px 0;
      padding: 0 10px;
-     background: url(images/snark_create.png) no-repeat scroll right center, linear-gradient(to bottom, #fff 0%, #eef 100%);
+     background: #eef url(images/snark_create.png) no-repeat scroll right center;
+     background: url(images/snark_create.png) no-repeat scroll right center, linear-gradient(to bottom, #f8f8ff, #eef);
      background-size: 68px 68px, 100% 100%;
 }
 
 .addtorrentsection {
-     margin: 10px 0;
+     margin: 9px 0;
      padding: 0 10px;
-     background: url(images/snark_add.png) no-repeat scroll 99.5% center, linear-gradient(to bottom, #fff 0%, #eef 100%);
+     background: #eef url(images/snark_add.png) no-repeat scroll 99.5% center;
+     background: url(images/snark_add.png) no-repeat scroll 99.5% center, linear-gradient(to bottom, #f8f8ff, #eef);
      background-size: 61px 61px, 100% 100%;
 }
 
 .configsection {
      margin: 0;
      padding: 0 10px 12px 10px;
-     background: url(images/configuration.png) no-repeat scroll 101% center, linear-gradient(to bottom, #fff 0%, #eef 100%);
+     background: #eef url(images/configuration.png) no-repeat scroll 101% center;;
+     background: url(images/configuration.png) no-repeat scroll 101% center, linear-gradient(to bottom, #f8f8ff, #eef);
      background-size: 68px 68px, 100% 100%;
 }
 
@@ -1865,7 +1924,7 @@ img:hover {
 .configsectionpanel {
      margin: 9px 0 0 0;
      padding: 0;
-     background: linear-gradient(to bottom, #fff 0%, #eef 40px, #fff 100%);
+     background: linear-gradient(to bottom, #fff, #eef 40px, #fff);
 }
 
 .iframed .configsectionpanel {
@@ -1902,7 +1961,7 @@ img:hover {
 }
 
 code {
-     font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font: bold 8pt "Droid Sans Mono", "Noto Sans Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      padding: 0 2px;
      color: #050;
 }
@@ -1911,13 +1970,6 @@ code {
      border-right: none !important;
      border-left: none !important;
      border-radius: 0;
-}
-
-.routerdown {
-     padding: 10px;
-     color: #0c153d;
-     border-bottom: 1px solid #89f;
-     box-shadow: inset 0 0 0 1px #fff;
 }
 
 input.trackername {
@@ -1955,21 +2007,6 @@ input#toggle_createtorrent:checked + label + hr + table {
      display: table;
 }
 
-/* display panels by default on webkit based browsers (midori fix) */
-/*
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-input#toggle_addtorrent:not(checked) + label + hr + table,
-input#toggle_createtorrent:not(checked) + label + hr + table {
-     display: table;
-}
-
-input#toggle_addtorrent:checked + label + hr + table,
-input#toggle_createtorrent:checked + label + hr + table {
-     display: none;
-}
-}
-*/
-
 /* display by default in iframe to avoid overflow issue */
 .iframed input#toggle_addtorrent:not(checked) + label + hr + table,
 .iframed input#toggle_createtorrent:not(checked) + label + hr + table {
@@ -1981,13 +2018,13 @@ input#toggle_createtorrent:checked + label + hr + table {
      display: none;
 }
 
-label.toggleview, .snarkConfigTitle a:visited {
-     color: #006;
+.toggleview img, .configsection img {
+     mix-blend-mode: luminosity;
 }
 
-label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle a:hover img {
-     color: #f90;
+label.toggleview img:hover, label.toggleview:hover img, .snarkConfigTitle a:hover img, input:focus + .toggleview img {
      filter: drop-shadow(0 0 1px #f60);
+     mix-blend-mode: normal;
 }
 
 label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:active img {
@@ -2066,7 +2103,7 @@ label.toggleview img:active, label.toggleview:active img, .snarkConfigTitle a:ac
 /* debug panel */
 
 #dhtdebugPanel {
-     background: linear-gradient(to bottom, #fff 0%, #eef 100%);
+     background: linear-gradient(to bottom, #fff, #eef);
      box-shadow: 0 0 2px 0 #ccc inset, 0 0 1px #bbb;
      border: 1px solid #89f;
      border-top: none;
@@ -2127,8 +2164,8 @@ hr.debug:first-of-type {
 
 hr.debug {
      width: 100%;
-     background: #89f;
-     background: linear-gradient(to right, #89f 40%, #eef);
+     background: #ccf;
+     background: linear-gradient(to right, #ccf 40%, #eef);
      color: #efefff;
      border: none;
 }
@@ -2625,9 +2662,14 @@ body {
 }
 
 @media screen and (max-width: 1400px) {
-
 .percentBarText {
      line-height: 15px;
+}
+}
+
+@media screen and (max-width: 1500px) {
+.snarkTorrents thead img, .snarkDirInfo th img {
+     max-height: 20px !important;
 }
 }
 
@@ -2660,6 +2702,11 @@ body, th, td, table a, input, input[type="text"], input.r, input[name="nofilter_
 
 code, .snarkTorrents tt, #ourDest tt {
      font-size: 9pt;
+}
+
+.snarkTorrentAction {
+     padding-left: 4px !important;
+     padding-right: 4px !important;
 }
 
 .snarkTorrentAction input[type="image"], .snarkTorrents th:last-child input[type="image"] {
@@ -2728,10 +2775,6 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img,
 
 .percentBarText {
      font-size: 8pt !important;
-}
-
-.snarkTorrentDetails {
-     padding-left: 8px;
 }
 
 .snarkTorrentStatus, .snarkTorrentETA, .snarkTrackerDetails {

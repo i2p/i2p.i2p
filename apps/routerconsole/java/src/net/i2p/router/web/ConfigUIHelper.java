@@ -13,16 +13,16 @@ public class ConfigUIHelper extends HelperBase {
         String current = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         Set<String> themes = themeSet();
         for (String theme : themes) {
-            buf.append("<div class=\"themechoice\">")
+            buf.append("<label for=\"").append(theme).append("\"><div class=\"themechoice\">")
                .append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
                 buf.append(CHECKED);
-            buf.append("value=\"").append(theme).append("\">")
+            buf.append("value=\"").append(theme).append("\" id=\"").append(theme).append("\">")
                .append("<object height=\"48\" width=\"48\" data=\"/themes/console/").append(theme).append("/images/thumbnail.png\">")
                .append("<img height=\"48\" width=\"48\" alt=\"\" src=\"/themes/console/images/thumbnail.png\">")
                .append("</object><br>")
                .append("<div class=\"themelabel\">").append(_t(theme)).append("</div>")
-               .append("</div>\n");
+               .append("</div></label>\n");
         }
         boolean universalTheming = _context.getBooleanProperty(CSSHelper.PROP_UNIVERSAL_THEMING);
         buf.append("</div><div id=\"themeoptions\">");
@@ -168,10 +168,10 @@ public class ConfigUIHelper extends HelperBase {
             if (lang.equals("xx") && !isAdvanced())
                 continue;
             // we use "lang" so it is set automagically in CSSHelper
-            buf.append("<div class=\"langselect\"><input type=\"radio\" class=\"optbox\" name=\"lang\" ");
+            buf.append("<label for=\"").append(lang).append("\"><div class=\"langselect\"><input type=\"radio\" class=\"optbox\" name=\"lang\" ");
             if (lang.equals(current))
                 buf.append(CHECKED);
-            buf.append("value=\"").append(lang).append("\">")
+            buf.append("value=\"").append(lang).append("\" id=\"").append(lang).append("\">")
                .append("<img height=\"48\" width=\"48\" alt=\"\" src=\"/flags.jsp?s=48&c=").append(langs[i][1]).append("\">")
                .append("<div class=\"ui_lang\">");
             int under = lang.indexOf('_');
@@ -183,7 +183,7 @@ public class ConfigUIHelper extends HelperBase {
                    .append(name)
                    .append(')');
             }
-            buf.append("</div></div>\n");
+            buf.append("</div></div></label>\n");
         }
         return buf.toString();
     }

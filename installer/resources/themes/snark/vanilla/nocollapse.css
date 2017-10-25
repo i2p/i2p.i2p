@@ -7,7 +7,7 @@ input#toggle_addtorrent:checked + label + hr + table, input#toggle_createtorrent
 }
 
 label.toggleview, label.toggleview:hover, label.toggleview:active, .toggle_input:focus + .toggleview {
-     background: linear-gradient(to bottom, #ffeadf 0%, #ffeadf 51%, #cfb6a8 52%, #cfb6a8 100%) !important;
+     background: linear-gradient(to bottom, #fff7ef, #cfc1b5) !important;
      color: #930 !important;
      cursor: default !important;
      box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #efe6e0 !important;

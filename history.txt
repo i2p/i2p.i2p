@@ -31,6 +31,19 @@
    - /tunnels:
      - Indicate that no participating tunnels will be built when shared bw is too low
      - Replace <a name> with id attribute for anchor links
+   - light:
+     - Lighten/tint buttons and dropdowns to better blend with reworked theme,
+       vary text color for different button states
+     - Increase vertical spacing for status/buttons in news section
+     - Fix minor rendering issue with h1's (remove bottom border-radius)
+     - Fix some mismatched heading coloring issues
+     - Fix alignment issue on /configservice in Arabic/Chinese (ticket #2024)
+     - Ensure spacing of sidebar elements is consistent in Chinese
+   - dark: Overhaul theme
+   - classic: Add fallback CSS to ensure browsers without CSS3 support can
+     display icons on buttons (tested with Netsurf)
+ * Proxy: Remove truncation of URLs in the error messages and handle with CSS to
+   avoid UI breakage
  * I2PTunnel: Add hostname / destination (b32) information to server section on
    index page (for parity with client tunnels section)
  * I2PSnark
@@ -45,11 +58,21 @@
      image resources
    - Standardize 'Save Configuration' action to return to top of the page
      (so we can see message log entry)
+   - Add button hoverstate for tracker details, torrent details and file icons
+   - light
+     - Sync buttons in embedded mode with console theme
+     - Fix non-functioning message log close icon
+   - dark: Overhaul theme and sync with console theme in embedded mode
+   - classic: refresh CSS
  * SusiDNS:
    - Reinstate filter removal on addressbook navigation links (ticket #1996)
    - Reduce vertical padding for filter buttons section
    - Migrate search section to div and reposition page elements to better
      integrate with host list and minimize whitespace
+ * Susimail:
+   - Overhaul dark theme
+   - Sync theme to console theme by default, override if user sets theme
+     (unless universal themeing is enabled)
 
 2017-10-11 zzz
  * Console: Validate host header (thx Kevin Froman)

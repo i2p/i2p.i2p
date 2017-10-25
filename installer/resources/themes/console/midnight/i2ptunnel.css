@@ -789,7 +789,7 @@ input:focus::-moz-placeholder {
      opacity: 0;
 }
 
-input.tunnelName, input.tunnelDescription, #userAgents {
+input.tunnelName, input.tunnelDescriptionText, #userAgents {
      width: 80%;
      min-width: 280px;
      text-overflow: ellipsis;
@@ -984,7 +984,7 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
      border-bottom: 1px solid transparent !important;
 }
 
-#clientTunnels .tunnelDescription {
+.tunnelDescription {
      padding-top: 1px !important;
 }
 

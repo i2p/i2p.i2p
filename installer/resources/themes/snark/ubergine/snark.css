@@ -107,6 +107,7 @@ _:-ms-lang(x), .snarknavbar {
 
 .snarkNav:link, .snarkNav:visited {
      display: inline-block;
+     line-height: 130%;
      text-decoration: none !important;
      text-transform: uppercase !important;
      text-shadow: 0 0 1px #000;
@@ -159,6 +160,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
      text-shadow: none;
      border: 1px solid #730;
      box-shadow: 0 0 1px 0 #000, inset 0 0 0 1px #000, inset 3px 3px 3px 1px #3f1900 !important;
+     transition: ease box-shadow 0.1s;
 }
 
 .snarkNav:link:first-child, .snarkNav:last-child[href="/i2psnark/"] {
@@ -465,11 +467,13 @@ th.snarkTorrentStatus {
      padding: 2px 0;
 }
 
+/*
 .snarkTrackerDetails {
      text-align: right;
      padding-right: 2px;
      min-width: 36px;
 }
+*/
 
 .snarkTorrentName {
      line-height: 110%;
@@ -581,6 +585,16 @@ th.snarkTorrentAction input[type="image"]:hover, .snarkTorrentAction input[type=
      min-width: 0 !important;
 }
 
+.snarkTorrents thead th:nth-child(3) {
+     max-width: 40px !important;
+     overflow: visible;
+     white-space: nowrap;
+}
+
+.snarkTorrents thead th:nth-child(3) img {
+     display: inline-block;
+}
+
 .snarkTorrentNoneLoaded, .snarkTorrentNoneLoaded:hover td {
      background: #212 !important;
      background: linear-gradient(to bottom, #313, #101) !important;
@@ -625,13 +639,47 @@ td:first-child {
 }
 
 .snarkTrackerDetails img {
-     width: 16px;
-     height: 16px;
      opacity: 0.75;
 }
 
 .snarkTrackerDetails a img:hover, .snarkTrackerDetails a img:focus {
      opacity: 1;
+}
+
+.snarkTrackerDetails, .snarkTorrentDetails {
+     width: 16px !important;
+     text-align: center !important;
+     font-weight: bold;
+     padding-left: 0 !important;
+     padding-right: 0 !important;
+}
+
+.snarkTrackerDetails img, .snarkTorrentDetails img, .snarkDirInfo td:first-child img {
+     padding: 3px !important;
+     margin: 0 1px !important;
+     width: 16px;
+     height: 16px;
+     border: 1px solid transparent !important;
+     transition: ease all 0.2s;
+}
+
+.snarkTrackerDetails a:hover img, .snarkTrackerDetails img:hover, .snarkTrackerDetails a:focus img,
+.snarkTorrentDetails a:hover img, .snarkTorrentDetails img:hover, .snarkTorrentDetails a:focus img,
+.snarkDirInfo td:first-child a:hover img, .snarkDirInfo td:first-child a:focus img {
+     border: 1px solid #f60 !important;
+     border-radius: 2px;
+     box-shadow: inset 0 0 0 1px #414;
+     background: #515;
+     background: linear-gradient(to bottom, #717 50%, #414 50%);
+     filter: none !important;
+     transition: ease all 0.2s;
+}
+
+.snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:first-child a:active img {
+     border: 1px solid #101 !important;
+     box-shadow: inset 3px 3px 3px #313;
+     mix-blend-mode: luminosity;
+     transition: none;
 }
 
 .snarkTorrentOdd {
@@ -947,6 +995,8 @@ tr:hover .percentBarInner {
 
 .thumb:hover {
      margin: 0;
+     width: auto !important;
+     height: auto !important;
      max-width: 80px;
      max-height: 80px;
      transition: ease all 0.3s;
@@ -1139,6 +1189,7 @@ th.headerpriority br, .snarkTorrents thead th br {
      background: linear-gradient(to bottom, #5f475d 0%, #4f3b4f 50%, #1f001f 50%, #1f001f 100%) !important;
      box-shadow: inset 0 0 1px #3f173f;
      color: #d2baff !important;
+     transition: ease all 0.1s;
 }
 
 .snarkConfigTitle, label.toggleview, .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
@@ -1159,6 +1210,7 @@ th.headerpriority br, .snarkTorrents thead th br {
      display: inline-block;
      margin: 0 0 -3px !important;
      min-width: 260px;
+     transition: ease all 0.1s;
 }
 
 .snarkConfigTitle:hover a img, a:focus .snarkConfigTitle img, .toggle_input:focus + .toggleview img {

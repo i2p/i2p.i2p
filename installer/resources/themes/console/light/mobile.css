@@ -65,7 +65,7 @@ a[href="/summaryframe"] {
      font-size: 9pt !important;
 }
 
-.routersummary table, table[id^="sb_"], #sb_services, #sb_internals, #sb_advanced {
+.routersummary table, table[id^="sb_"], #sb_services, #sb_internals, #sb_advanced, #sb_help {
      width: 100% !important;
      margin: -9px 0 -7px !important;
      border-radius: 4px;
@@ -73,8 +73,28 @@ a[href="/summaryframe"] {
      border-spacing: 0;
 }
 
+#sb_internals, #sb_advanced, #sb_help {
+     margin-top: -11px !important;
+}
+
+#sb_internals td, #sb_advanced td, #sb_help td {
+     padding: 3px 4px !important;
+}
+
+#sb_internals a, #sb_advanced a, #sb_help a {
+     margin: 3px 3px 4px;
+     padding: 3px 10px !important;
+     border-radius: 2px;
+     background: #ddf;
+     box-shadow: 0 0 1px #99f;
+}
+
+#sb_internals a:active, #sb_advanced a:active, #sb_help a:active {
+     box-shadow: inset 2px 2px 2px #aaa;
+}
+
 table[id^="sb_"] td, #sb_localtunnels td {
-     padding: 3px 6px !important;
+     padding: 2px 6px 0 !important;
 }
 
 table[id^="sb_"] tr:nth-child(even) td {
@@ -110,10 +130,19 @@ table[id^="sb_"] tr:nth-child(odd) td {
      background-color: transparent !important;
 }
 
+#sb_graphcontainer, #sb_graphcontainer + hr {
+     display: none;
+}
+
 .routersummary button[type="submit"], .routersummary button[type="cancel"] {
-     margin: 5px 5px 3px !important;
+     margin: 3px 5px 0 !important;
      padding: 8px 5px !important;
-     min-width: 120px !important;
+     min-width: 280px !important;
+}
+
+.percentBarOuter {
+     width: 590px;
+     margin: -4px 4px -4px 4px;
 }
 
 h1 {

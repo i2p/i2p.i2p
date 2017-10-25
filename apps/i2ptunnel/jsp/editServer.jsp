@@ -115,7 +115,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
         <tr>
             <td>
-                <input type="text" size="60" maxlength="80" name="nofilter_description" title="<%=intl._t("Description of tunnel to be displayed on Tunnel Manager home page")%>" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext tunnelDescription" />
+                <input type="text" size="60" maxlength="80" name="nofilter_description" title="<%=intl._t("Description of tunnel to be displayed on Tunnel Manager home page")%>" value="<%=editBean.getTunnelDescription(curTunnel)%>" class="freetext tunnelDescriptionText" />
             </td>
 
             <td>

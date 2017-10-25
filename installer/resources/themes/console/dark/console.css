@@ -171,7 +171,12 @@ div.warning {
      padding: 0 0 5px;
 }
 
+.warning hr {
+     margin-top: 10px !important;
+}
+
 #jumplinks h4 {
+     padding-bottom: 10px;
      margin-bottom: 10px;
 }
 
@@ -328,6 +333,7 @@ div.warning {
      text-transform: uppercase;
      border-radius: 0;
      mix-blend-mode: exclusion;
+     transition: ease all 0.2s;
 }
 
 .routersummary h3::after {
@@ -339,19 +345,22 @@ div.warning {
 
 .routersummary h3 a {
      vertical-align: middle;
+     transition: ease all 0.2s;
 }
 
 .routersummary h3:hover {
      background: #010 !important;
      box-shadow: inset 0 0 2px 2px #000;
+     transition: ease all 0.2s;
 }
 
 .routersummary h3:hover a {
      color: #f60;
+     transition: ease all 0.2s;
 }
 
 .routersummary h3:active {
-     box-shadow: inset 4px 4px 2px #000;
+     box-shadow: inset 4px 4px 4px #000;
 }
 
 .routersummary h4 {
@@ -455,6 +464,11 @@ div.warning {
      background-size: 22px 22px, 100% 100%;
      text-align: center;
      line-height: 120%;
+}
+
+#sb_warning + p:empty + form {
+     margin-top: 11px;
+     margin-bottom: -6px;
 }
 
 #sb_internals td, #sb_services td, #sb_advanced td, #sb_help td { /* color ellipsis */
@@ -705,16 +719,17 @@ div.refresh {
      border-spacing: 0;
      padding: 0;
      border: 1px solid #5df;
+     border: 1px solid rgba(85, 221, 255, 0.5);
      box-shadow: 0 0 1px #ccf;
 }
 
 #sb_bandwidthgraph:hover {
-     border: 1px solid #f60;
+     border: 1px solid #0f6;
      cursor: url(/themes/console/images/cursor_zoom.png), pointer;
 }
 
 a:active #sb_bandwidthgraph {
-     border: 1px solid #f30;
+     border: 1px solid #0f3;
 }
 
 #sb_bandwidthgraph td {
@@ -992,6 +1007,8 @@ a:active img[src="/themes/console/images/i2plogo.png"] {
      padding: 6px 8px 6px 10px;
      letter-spacing: 0.08em !important;
      word-spacing: normal !important;
+/*     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), url(/themes/console/dark/images/camotile2.png), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #003000, #000 75%) !important;
+     background-blend-mode: normal, exclusion, normal, normal;*/
 }
 
 #news h3 font {
@@ -1077,7 +1094,7 @@ div.news hr {
      margin: 8px 0 5px 0;
 }
 
-#newsStatus {
+#news #newsStatus {
      float: left;
      padding-top: 3px;
      padding-bottom: 1px;
@@ -1156,13 +1173,15 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 .confignav {
      background: url(images/header.png) repeat-x scroll center center #000;
      background: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
-     padding: 7px !important;
+     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) repeat scroll 0 0%, rgba(0, 0, 0, 0) url("/themes/console/dark/images/camotile2.png") !important;
+     padding: 7px 7px 8px !important;
      margin: -1px -16px 15px;
      border: 1px solid #494;
      font-weight: bold !important;
      line-height: 130% !important;
      text-align: center;
-     box-shadow: inset 0 0 0 1px #000, inset 0 0 3px 1px #030;
+     box-shadow: inset 0 0 0 1px #000;
+     background-blend-mode: exclusion, normal;
 }
 
 .tab, .tab2 {
@@ -1266,12 +1285,19 @@ div.widepanel h3 {
 /* graphs */
 
 #graphs {
-     padding-left: 10px;
-     padding-right: 10px;
+     padding: 0 10px
 }
 
 #graphs .messages {
      margin: 15px 5px -5px;
+}
+
+#graphs .widepanel {
+     margin: -4px 0 17px !important;
+}
+
+#graphdisplay {
+     margin-top: 14px !important;
 }
 
 .graphspanel {
@@ -1440,9 +1466,10 @@ form[action="graphs"] {
 
 #graphs td:first-child {
      text-align: right;
-     width: 85px;
+     width: 10%;
      white-space: nowrap;
-     padding: 13px 3px 13px 5px;
+     padding: 13px 3px 13px 15px;
+     font-weight: bold;
 }
 
 #graphs td:nth-child(2) {
@@ -1466,6 +1493,10 @@ form[action="graphs"] {
 
 #graphs input[type="text"] {
      min-width: 60px;
+}
+
+.graphspanel a {
+     font-size: 0;
 }
 
 /* end graphs */
@@ -1496,7 +1527,7 @@ th {
      text-align: center;
      font-size: 9pt;
      background: #000 url(images/header.png) center center repeat-x;
-     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
+     background: linear-gradient(to bottom, #002000, #000 75%) !important;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494 !important;
      line-height: 110%;
@@ -1890,13 +1921,19 @@ h4 {
 
 h1, h2, h3:not([id*="help"]), h4.app, h4.app2, .routersummary h3 {
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+     background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #005000, #000 75%) !important;
 }
 
 h2, h3, h4 {
      box-shadow: inset 0 0 0 1px #000;
 }
 
-h1, h4.app, h4.app2 {
+.routersummary h3 {
+     background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
+     transition: ease all 0.2s;
+}
+
+h1, h4.app, h4.app2, #news h3 {
      background: linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%), url(images/camotile2.png) #000 !important;
      background-blend-mode: exclusion;
      box-shadow: inset 0 0 0 1px #000;
@@ -1940,8 +1977,9 @@ button:active {
 }
 
 .routersummary button.reload, .routersummary button.stop {
-     min-width: 86px;
+     min-width: 92px;
      text-transform: capitalize;
+     margin: 3px 2px;
 }
 
 .underline {
@@ -2144,7 +2182,7 @@ select {
      min-width: 110px;
      font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-weight: bold;
-     padding: 4px 16px 4px 4px !important;
+     padding: 3px 16px 3px 4px !important;
      cursor: pointer;
      overflow: hidden;
      text-overflow: ellipsis;
@@ -2225,6 +2263,7 @@ textarea[readonly]:focus {
 }
 
 input[type="submit"], input[type="reset"], select, button {
+     line-height: 120%;
      border: 1px solid #8b8;
      border-bottom: 1px solid #171;
      border-right: 1px solid #171;
@@ -2635,9 +2674,9 @@ form[action="events"] {
      text-align: center;
 }
 
-.tablefooter tr, .tablefooter td {
+tr.tablefooter, .tablefooter td {
      background: #000 url(images/header.png) repeat-x center center !important;
-     background: linear-gradient(to bottom, #001400, #001000 50%, #000 100%) !important;
+     background: linear-gradient(to bottom, #002000, #000 75%) !important;
      border-top: 1px solid #494 !important;
      border-bottom: 1px solid #494 !important;
      line-height: 110%;
@@ -2854,7 +2893,7 @@ tr#addnew, tr#addnew:hover {
 
 .themechoice:hover object {
      filter: drop-shadow(0 0 1px #f60);
-     transition: ease filter 0.3s;
+     transition: ease transform 0.05s;
 }
 
 .themechoice:hover .themelabel {
@@ -2866,6 +2905,10 @@ tr#addnew, tr#addnew:hover {
      background: #f60 !important;
      color: #ee9 !important;
      box-shadow: inset 0 0 0 1px #000 !important;
+}
+
+.themechoice .optbox:checked + object, .themechoice .optbox:checked + img {
+     transform: scale(0.9);
 }
 
 .themechoice .optbox:hover + object ~ .themelabel {
@@ -2945,7 +2988,7 @@ p#helptranslate {
 }
 
 #themeoptions input {
-     margin-left: 5px;
+     margin: 1px 5px;
 }
 
 #themeoptions input[type="checkbox"] {
@@ -3045,9 +3088,15 @@ td#themeselect {
      height: 11px !important;
 }
 
+.langselect input + img {
+     opacity: 0.6;
+     transition: ease all 0.3s;
+}
+
 .langselect input:hover + img {
      box-shadow: 0 0 2px 1px #f60;
-     transition: ease box-shadow 0.3s;
+     transition: ease all 0.3s;
+     opacity: 1;
 }
 
 .langselect input:hover + img + div.ui_lang {
@@ -3780,6 +3829,7 @@ table#sidebarconf {
 #sidebarconf th:nth-child(1), .homelinkedit th:first-child, #consolepass th:first-child {
      text-align: center;
      background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
+     background: url(/themes/console/images/buttons/delete.png) center center no-repeat, linear-gradient(to bottom, #002000, #000 75%) !important;
      text-indent: -99999px;
 }
 
@@ -4015,6 +4065,15 @@ ul#upnphelp li:last-child, #legal ul li:last-child {
 
 #help li {
      text-align: justify;
+     line-height: 150%;
+}
+
+#help li:last-child {
+     padding-bottom: 10px;
+}
+
+#help #faq li:last-child {
+     padding-bottom: 0;
 }
 
 /* mini faq */
@@ -4419,7 +4478,7 @@ table[id$="logs"] ul {
 #logs li {
      list-style: none;
      font: bold 8pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", monospace;
-     line-height: 115%;
+     line-height: 120%;
      text-align: left;
      display: inline-block;
      width: 100%;
@@ -4457,11 +4516,11 @@ table[id$="logs"] ul {
 }
 
 font[color="#cc0000"] {
-     color: #c33 !important;
+     color: #900 !important;
 }
 
 #logs li font[color="#cc0000"]::before {
-     background: #c33;
+     background: #900;
 }
 
 font[color="#006600"] {
@@ -4800,7 +4859,7 @@ ul#banlist + hr {
 
 #ipv4, #ipv6, #permabanned tr:nth-child(2) {
      background: #000 url(images/header.png) center center repeat-x;
-     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
+     background: linear-gradient(to bottom, #002000, #000 75%) !important;
      border-top: 1px solid #494;
      border-bottom: 1px solid #494;
 }
@@ -5732,6 +5791,10 @@ table#pluginconfig, #i2pupdates, table.homelinkedit, table#peerdefs {
      margin-left: 2px;
 }
 
+#peerdefs td {
+     line-height: 140%;
+}
+
 h3#i2pclientconfig, h3#pconfig, h3#pluginfromurl, h3#pluginfromfile, h3#webappconfig {
      margin-bottom: -14px !important;
 }
@@ -5801,7 +5864,7 @@ input#hideme {
 h4.embeddedtitle#updateplugins {
      padding: 5px 10px;
      background: #000 url(images/header.png) center center repeat-x;
-     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000) !important;
+     background: linear-gradient(to bottom, #002000, #000 75%) !important;
      border: 1px solid #494;
      text-align: left;
      text-transform: uppercase;
@@ -6731,8 +6794,9 @@ b.netdb_transport {
      padding: 8px 10px;
      font-size: 11.5pt;
      background: url(/themes/console/images/info/debug.png) right 5px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000000 56%, #000000 100%) !important;
-     background-size: 20px 20px, 100% 100% !important;
-     background-blend-mode: luminosity, normal;
+     background: url(/themes/console/images/info/debug.png) right 5px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #005000, #000 75%) !important;
+     background-size: 20px 20px, 100% 100%, 100% 100%, 100% 100% !important;
+     background-blend-mode: luminosity, normal, normal, normal;
 }
 
 #debug h2 + hr, .buckets hr {
@@ -6804,17 +6868,19 @@ b.netdb_transport {
 }
 
 #debug h3.debug_outboundsessions, #debug h3.debug_inboundsessions {
-     padding: 6px 10px 6px 28px !important;
-     background-blend-mode: luminosity, normal;
+     padding: 6px 10px 8px 28px !important;
+     background-blend-mode: luminosity, normal, normal, normal;
 }
 
 #debug h3.debug_outboundsessions {
      margin-top: -2px !important;
      background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000 56%) !important;
+     background: url(/themes/console/images/outbound.png) 6px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #005000, #000 75%) !important;
 }
 
 #debug h3.debug_inboundsessions {
      background: url(/themes/console/images/inbound.png) 6px center no-repeat, linear-gradient(to bottom, #1a261a 0%, #223022 7%, #212f21 9%, #172317 21%, #091109 49%, #050d05 50%, #020602 51%, #010301 53%, #000 56%) !important;
+     background: url(/themes/console/images/inbound.png) 6px center no-repeat, linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000 50%), repeating-linear-gradient(to right, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px, rgba(0,16,0,0.5) 2px, rgba(0,16,0,0.5) 4px), linear-gradient(to bottom, #005000, #000 75%) !important;
 }
 
 .debug_version {
@@ -6872,8 +6938,7 @@ b.netdb_transport {
 
 #jardump td {
      border-right: 1px inset #131;
-     vertical-align: top;
-     padding: 2px 5px;
+     padding: 2px 5px 3px;
      color: #bb7;
 }
 
@@ -7161,6 +7226,11 @@ td.optionsave {
      padding-left: 10px;
      width: calc(100% - 22px) !important;
      overflow-y: hidden;
+}
+
+#help .confignav, #debug .confignav {
+     position: sticky;
+     top: 0;
 }
 }
 
