@@ -54,8 +54,8 @@ class TunnelRenderer {
                 name = outPool.getSettings().getDestinationNickname();
             if (name == null)
                 name = client.toBase64().substring(0,4);
-            out.write("<h3 class=\"tabletitle\"><a name=\"" + client.toBase64().substring(0,4)
-                      + "\" ></a>" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(name)));
+            out.write("<h3 class=\"tabletitle\" id=\"" + client.toBase64().substring(0,4)
+                      + "\" >" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(name)));
             if (isLocal)
                 out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
             else
@@ -64,7 +64,10 @@ class TunnelRenderer {
         }
 
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
-        out.write("<h3 class=\"tabletitle\"><a name=\"participating\"></a>" + _t("Participating tunnels") + "</h3>\n");
+        out.write("<h3 class=\"tabletitle\" id=\"participating\">" + _t("Participating tunnels") + "</h3>\n");
+        int bwShare = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
+        if (bwShare > 12) {
+        // Don't bother re-indenting
         if (!participating.isEmpty()) {
             Collections.sort(participating, new TunnelComparator());
             out.write("<table class=\"tunneldisplay tunnels_participating\"><tr><th>" + _t("Receive on") + "</th><th>" + _t("From") + "</th><th>"
@@ -136,6 +139,10 @@ class TunnelRenderer {
         else if (displayed <= 0)
             out.write("<div class=\"statusnotes\"><b>" + _t("none") + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _t("Lifetime bandwidth usage") + ":&nbsp;&nbsp;" + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
+        } else {
+            out.write("<div class=\"statusnotes noparticipate\"><b>" + _t("Not enough shared bandwidth to build participating tunnels.") +
+                      "</b> <a href=\"config\">[" + _t("Configure") + "]</a></div>\n");
+        }
         //renderPeers(out);
 
         //out.write("<h3 class=\"tabletitle\">" + "Bandwidth Tiers" + "</h3>\n"); TODO: replace "definitions" with tagged "bandwidth tiers" post 0.9.31 release
