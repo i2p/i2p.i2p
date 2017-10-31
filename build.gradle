@@ -1,0 +1,22 @@
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        jcenter()
+    }
+
+
+    dependencies {
+        testCompile 'junit:junit:4.+'
+        testCompile 'org.hamcrest:hamcrest-library:1.3'
+    }
+
+    sourceCompatibility = 1.7
+    jar {
+        manifest {
+            attributes 'Implementation-Version': '0.9.31-7'
+        }
+    }
+}
+
+//apply from: file('gradle/update.gradle')

@@ -1,0 +1,48 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+            include 'net/i2p/i2ptunnel/web/EditBean.java'
+            include 'net/i2p/i2ptunnel/web/IndexBean.java'
+        }
+    }
+    jar {
+        java {
+            srcDir 'java/src'
+            exclude 'net/i2p/i2ptunnel/web/EditBean.java'
+            exclude 'net/i2p/i2ptunnel/web/IndexBean.java'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+dependencies {
+    jarCompile project(':core')
+    jarCompile project(':apps:ministreaming')
+    providedCompile sourceSets.jar.output
+    providedCompile project(':apps:jetty')
+}
+
+task i2ptunnelJar(type: Jar) {
+    from sourceSets.jar.output
+    manifest {
+        attributes 'Main-Class': 'net.i2p.i2ptunnel.I2PTunnel'
+        attributes 'Class-Path': 'i2p.jar mstreaming.jar'
+    }
+}
+
+artifacts {
+    archives i2ptunnelJar
+}
+
+war {
+    from 'jsp'
+    exclude 'jsp/web.xml'
+    webXml = file('jsp/web.xml')
+}
