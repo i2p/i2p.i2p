@@ -14,6 +14,12 @@ sourceSets {
         java {
             srcDir 'java/test/junit'
         }
+        resources {
+            srcDir 'java/test/junit'
+            include 'net/i2p/crypto/eddsa/test.data'
+            include 'net/i2p/crypto/eddsa/math/baseDblPrecmp'
+            include 'net/i2p/crypto/eddsa/math/basePrecmp'
+        }
     }
 }
 
