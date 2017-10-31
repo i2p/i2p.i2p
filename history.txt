@@ -1,3 +1,6 @@
+2017-10-31 str4d
+ * I2PSnark: Use reflection to access ConfigUIHelper in standalone build
+
 2017-10-25 str4d
  * Console:
    - /graphs:

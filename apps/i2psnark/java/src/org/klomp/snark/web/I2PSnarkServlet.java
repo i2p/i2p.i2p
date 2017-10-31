@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.CoreVersion;
+import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -48,7 +51,6 @@ import org.klomp.snark.TrackerClient;
 import org.klomp.snark.dht.DHT;
 import org.klomp.snark.comments.Comment;
 import org.klomp.snark.comments.CommentSet;
-import org.klomp.snark.standalone.ConfigUIHelper;
 
 /**
  *  Refactored to eliminate Jetty dependencies.
@@ -2344,12 +2346,20 @@ public class I2PSnarkServlet extends BasicServlet {
 
         if (!_context.isRouterContext()) {
             try {
+                // class only in standalone builds
+                Class helper = Class.forName("org.klomp.snark.standalone.ConfigUIHelper");
+                Method getLangSettings = helper.getMethod("getLangSettings", I2PAppContext.class);
+                String langSettings = (String) getLangSettings.invoke(null, _context);
+                // If we get to here, we have the language settings
                 out.write("<tr><td>");
                 out.write(_t("Language"));
                 out.write(": <td colspan=\"2\">");
-                // class only in standalone builds
-                out.write(ConfigUIHelper.getLangSettings(_context));
-            } catch (Throwable t) {}
+                out.write(langSettings);
+            } catch (ClassNotFoundException e) {
+            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
         }
 
         out.write("<tr><td>");
