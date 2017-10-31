@@ -1,0 +1,22 @@
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    runtime files('lib/wrapper/all/wrapper.jar')
+}
+
+jar {
+    baseName 'utility'
+    from project(':core').sourceSets.main.output
+    include 'net/i2p/installer/**'
+    include 'net/i2p/util/FileUtil.class'
+    manifest {
+        attributes 'Main-Class': 'net.i2p.installer.Main'
+    }
+}

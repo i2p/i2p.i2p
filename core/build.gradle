@@ -1,0 +1,30 @@
+archivesBaseName = 'i2p'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+        resources {
+            srcDir 'java/src'
+            include 'gnu/getopt/*.properties'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+configurations {
+    tests
+}
+task testJar(type: Jar) {
+    baseName = 'i2p-test'
+    dependsOn classes
+    from sourceSets.test.output
+}
+artifacts {
+    tests testJar
+}

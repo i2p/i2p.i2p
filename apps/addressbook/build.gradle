@@ -1,0 +1,22 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    providedCompile project(':apps:jetty')
+}
+
+jar {
+    exclude { it.name == 'Servlet.class' }
+}
+
+war {
+    webXml = file('web.xml')
+}

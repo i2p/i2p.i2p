@@ -1,0 +1,12 @@
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':apps:ministreaming')
+}

@@ -1,0 +1,21 @@
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+
+    dependencies {
+        testCompile 'junit:junit:4.+'
+    }
+
+    sourceCompatibility = 1.6
+    jar {
+        manifest {
+            attributes 'Implementation-Version': '0.9.26-3'
+        }
+    }
+}
+
+//apply from: file('gradle/update.gradle')
