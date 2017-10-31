@@ -9,7 +9,8 @@ sourceSets {
 }
 
 dependencies {
-    ext.jettyVersion = '8.1.17.v20150415'
+    ext.jettyVersion = '9.2.21.v20170120'
+    ext.tomcatVersion = '8.0.33'
     compile project(':core')
     compile 'commons-logging:commons-logging:1.0.4'
     compile 'org.eclipse.jetty.orbit:javax.servlet.jsp:2.2.0.v201112011158'
@@ -17,14 +18,17 @@ dependencies {
     compile 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-security:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-server:' + ext.jettyVersion
+    compile 'org.eclipse.jetty:jetty-servlet:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-util:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-xml:' + ext.jettyVersion
+    runtime 'org.eclipse.jetty:apache-jsp:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-continuation:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-deploy:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-jmx:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-rewrite:' + ext.jettyVersion
-    runtime 'org.eclipse.jetty:jetty-servlet:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
+    runtime 'org.mortbay.jasper:apache-el:' + ext.tomcatVersion
+    runtime 'org.mortbay.jasper:apache-jsp:' + ext.tomcatVersion
 }
