@@ -15,7 +15,7 @@ dependencies {
     providedCompile project(':apps:desktopgui')
     providedCompile project(':apps:systray')
     providedCompile project(':apps:jetty')
-    providedCompile files('../jrobin/jrobin-1.5.9.1.jar')
+    providedCompile project(':apps:jrobin')
 }
 
 jar {

@@ -1,1 +1,1 @@
-include 'core', 'router', 'installer', 'apps:ministreaming', 'apps:streaming', 'apps:desktopgui', 'apps:systray', 'apps:jetty', 'apps:routerconsole', 'apps:addressbook', 'apps:susidns', 'apps:susimail', 'apps:i2psnark', 'apps:i2ptunnel', 'apps:BOB', 'apps:sam'
+include 'core', 'router', 'installer', 'apps:ministreaming', 'apps:streaming', 'apps:desktopgui', 'apps:systray', 'apps:jetty', 'apps:jrobin', 'apps:routerconsole', 'apps:addressbook', 'apps:susidns', 'apps:susimail', 'apps:i2psnark', 'apps:i2ptunnel', 'apps:BOB', 'apps:sam'
