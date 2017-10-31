@@ -10,6 +10,7 @@ sourceSets {
     jar {
         java {
             srcDir 'java/src'
+            exclude 'org/klomp/snark/standalone'
             exclude 'org/klomp/snark/web'
         }
     }
@@ -18,6 +19,7 @@ sourceSets {
 dependencies {
     jarCompile project(':core')
     jarCompile project(':apps:ministreaming')
+    jarCompile project(':apps:systray')
     providedCompile sourceSets.jar.output
     providedCompile project(':apps:ministreaming')
     providedCompile project(':apps:jetty')
