@@ -3,6 +3,12 @@
    - Sidebar:
      - Fix erratic display of sidebar graph
      - Add id to memory bar so we can target it for Chrome/blink display issue
+ * I2PSnark:
+   - Roll back target="_top" in config page to prevent embedded view from
+     breaking out of iframe
+   - Add target="_blank" to relevant links to avoid display in iframe in
+     embedded mode
+   - Enhance presentation of tracker links in TorrentInfo view
 
 2017-10-25 str4d
  * Console:
