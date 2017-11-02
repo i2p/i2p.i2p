@@ -25,6 +25,7 @@ sourceSets {
 dependencies {
     jarCompile project(':core')
     jarCompile project(':apps:ministreaming')
+    testCompile project(':apps:ministreaming')
     providedCompile sourceSets.jar.output
     providedCompile project(':apps:jetty')
 }
