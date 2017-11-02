@@ -316,7 +316,7 @@ public class SummaryHelper extends HelperBase {
         // long free = Runtime.getRuntime().freeMemory()/1024/1024;
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
         // return integerFormatter.format(used) + "MB / " + free + " MB";
-        return "<div class=\"percentBarOuter\"><div class=\"percentBarText\">RAM: " + integerFormatter.format(used) + " / " + total + "MB" +
+        return "<div class=\"percentBarOuter\" id=\"sb_memoryBar\"><div class=\"percentBarText\">RAM: " + integerFormatter.format(used) + " / " + total + "MB" +
         "</div><div class=\"percentBarInner\" style=\"width: " + integerFormatter.format(usedPc) +
         "%;\"></div></div>";
     }

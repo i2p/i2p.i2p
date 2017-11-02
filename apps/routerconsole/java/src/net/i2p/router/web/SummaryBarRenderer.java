@@ -802,7 +802,7 @@ class SummaryBarRenderer {
                .append("\"><td><span id=\"sb_graphstats\">")
                .append(_helper.getSecondKBps())
                .append("Bps</span></td></tr></table></a></div>\n");
-//               .append("<script src=\"/js/refreshGraph.js\" type=\"text/javascript\"></script>");
+        buf.append("<script src=\"/js/refreshGraph.js\" type=\"text/javascript\" id=\"refreshGraph\" async></script>");
         return buf.toString();
     }
 

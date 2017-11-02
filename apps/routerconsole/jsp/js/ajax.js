@@ -35,14 +35,10 @@ function ajaxDone(url, target, refresh) {
       //document.getElementByClassName("hideifdown").style.display="none";
     }
 
-    // conditionally load sidebar refreshGraph script
-    var graph = document.getElementById('sb_graphcontainer');
-    if (graph) {
-      var js_refreshGraph = document.createElement('script');
-      js_refreshGraph.type = "text/javascript";
-      js_refreshGraph.src = "/js/refreshGraph.js";
-      js_refreshGraph.async = true;
-      document.getElementsByTagName('head')[0].appendChild(js_refreshGraph);
+    // conditionally display graph so ajax call doesn't interfere with refreshGraph.js
+    var graph = document.getElementById("sb_graphcontainer");
+      if (graph) {
+      graph.style.backgroundImage = "url(/viewstat.jsp?stat=bw.combined&periodCount=20&width=220&height=50&hideLegend=true&hideGrid=true&time=" + new Date().getTime();
     }
 
     setTimeout(function() {ajax(url, target, refresh);}, refresh);

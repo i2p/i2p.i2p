@@ -1,3 +1,9 @@
+2017-11-02 str4d
+ * Console:
+   - Sidebar:
+     - Fix erratic display of sidebar graph
+     - Add id to memory bar so we can target it for Chrome/blink display issue
+
 2017-10-25 str4d
  * Console:
    - /graphs:
