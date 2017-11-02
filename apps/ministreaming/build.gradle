@@ -15,6 +15,8 @@ sourceSets {
 
 dependencies {
     compile project(':core')
+   
+    testCompile 'org.mockito:mockito-core:2.11.0'
 }
 
 configurations {
