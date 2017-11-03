@@ -23,7 +23,7 @@ msgstr ""
 #: man/eepget.1:1
 #, no-wrap
 msgid "EEPGET"
-msgstr ""
+msgstr "EEPGET"
 
 #. type: TH
 #: man/eepget.1:1 man/i2prouter.1:1 man/i2prouter-nowrapper.1:1
@@ -46,7 +46,7 @@ msgstr "NOME"
 #. type: Plain text
 #: man/eepget.1:5
 msgid "Eepget - I2P downloader"
-msgstr ""
+msgstr "Eepget - gerenciador de download da I2P"
 
 #. type: SH
 #: man/eepget.1:6 man/i2prouter.1:6 man/i2prouter-nowrapper.1:6
@@ -57,7 +57,7 @@ msgstr "SINOPSE"
 #. type: Plain text
 #: man/eepget.1:9
 msgid "B<eepget> [I<options>]I<URL>"
-msgstr ""
+msgstr "B<eepget> [I<options>]I<URL>"
 
 #. type: SH
 #: man/eepget.1:11 man/i2prouter.1:11 man/i2prouter-nowrapper.1:10
@@ -102,7 +102,7 @@ msgstr ""
 #. type: Plain text
 #: man/eepget.1:31
 msgid "B<-e> etag"
-msgstr ""
+msgstr "B<-e> etag"
 
 #. type: TP
 #: man/eepget.1:31
@@ -197,6 +197,8 @@ msgstr ""
 #, no-wrap
 msgid "Sets the inactivity timeout. The default is 60 seconds."
 msgstr ""
+"Especifique o intervalo de inatividade. O valor padrão, por omissão, é de 60"
+" segundos."
 
 #. type: Plain text
 #: man/eepget.1:79
@@ -226,7 +228,7 @@ msgstr ""
 #: man/eepget.1:89
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr ""
+msgstr "STATUS DE SAÍDA"
 
 #. type: Plain text
 #: man/eepget.1:93
@@ -257,7 +259,7 @@ msgstr "VER TAMBÉM"
 #. type: Plain text
 #: man/eepget.1:104
 msgid "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)  B<curl>(1)  B<wget>(1)"
 
 #. type: TH
 #: man/i2prouter.1:1
@@ -268,7 +270,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:5
 msgid "i2prouter - start and stop the I2P router"
-msgstr ""
+msgstr "i2prouter - iniciar e interromper o roteador I2P"
 
 #. type: Plain text
 #: man/i2prouter.1:9
@@ -276,72 +278,74 @@ msgid ""
 "B<i2prouter> "
 "{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 msgstr ""
+"B<i2prouter> "
+"{I<console>|I<start>|I<stop>|I<graceful>|I<restart>|I<condrestart>|I<status>|I<dump>|I<install>|I<remove>}"
 
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr ""
+msgstr "Controlar o serviço I2P."
 
 #. type: IP
 #: man/i2prouter.1:15
 #, no-wrap
 msgid "B<console>"
-msgstr ""
+msgstr "B<console>"
 
 #. type: Plain text
 #: man/i2prouter.1:17
 msgid "Runs I2P as a console application under the current user."
-msgstr ""
+msgstr "Executa a I2P como uma aplicação em modo console sob o usuário atual."
 
 #. type: IP
 #: man/i2prouter.1:19
 #, no-wrap
 msgid "B<start>"
-msgstr ""
+msgstr "B<start>"
 
 #. type: Plain text
 #: man/i2prouter.1:21
 msgid "Starts the I2P service."
-msgstr ""
+msgstr "Inicia o serviço I2P."
 
 #. type: IP
 #: man/i2prouter.1:23
 #, no-wrap
 msgid "B<stop>"
-msgstr ""
+msgstr "B<stop>"
 
 #. type: Plain text
 #: man/i2prouter.1:25
 msgid "Stops the I2P service."
-msgstr ""
+msgstr "Interrompe o serviço I2P."
 
 #. type: IP
 #: man/i2prouter.1:27
 #, no-wrap
 msgid "B<restart>"
-msgstr ""
+msgstr "B<restart>"
 
 #. type: Plain text
 #: man/i2prouter.1:29
 msgid "Stops the I2P service and then starts it."
-msgstr ""
+msgstr "Interrompe o serviço I2P e, em seguida, o inicia."
 
 #. type: IP
 #: man/i2prouter.1:31
 #, no-wrap
 msgid "B<condrestart>"
-msgstr ""
+msgstr "B<condrestart>"
 
 #. type: Plain text
 #: man/i2prouter.1:33
 msgid "Restart the I2P service only if it is already running."
-msgstr ""
+msgstr "Reiniciar o serviço I2P apenas se estiver em execução."
 
 #. type: IP
 #: man/i2prouter.1:35
 #, no-wrap
 msgid "B<graceful>"
-msgstr ""
+msgstr "B<graceful>"
 
 #. type: Plain text
 #: man/i2prouter.1:37
@@ -352,7 +356,7 @@ msgstr ""
 #: man/i2prouter.1:39
 #, no-wrap
 msgid "B<install>"
-msgstr ""
+msgstr "B<install>"
 
 #. type: Plain text
 #: man/i2prouter.1:41
@@ -363,7 +367,7 @@ msgstr ""
 #: man/i2prouter.1:43
 #, no-wrap
 msgid "B<remove>"
-msgstr ""
+msgstr "B<remove>"
 
 #. type: Plain text
 #: man/i2prouter.1:45
@@ -374,18 +378,18 @@ msgstr ""
 #: man/i2prouter.1:47
 #, no-wrap
 msgid "B<status>"
-msgstr ""
+msgstr "B<status>"
 
 #. type: Plain text
 #: man/i2prouter.1:49
 msgid "Prints whether the I2P service is running."
-msgstr ""
+msgstr "Imprime se o serviço I2P está em execução."
 
 #. type: IP
 #: man/i2prouter.1:51
 #, no-wrap
 msgid "B<dump>"
-msgstr ""
+msgstr "B<dump>"
 
 #. type: Plain text
 #: man/i2prouter.1:53
@@ -395,7 +399,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:61
 msgid "B<i2prouter-nowrapper>(1)"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>(1)"
 
 #. type: TH
 #: man/i2prouter-nowrapper.1:1
@@ -406,12 +410,12 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:5
 msgid "i2prouter-nowrapper - start the I2P router"
-msgstr ""
+msgstr "i2prouter-nowrapper - inicia o roteador I2P"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:8
 msgid "B<i2prouter-nowrapper>"
-msgstr ""
+msgstr "B<i2prouter-nowrapper>"
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:14
@@ -420,6 +424,9 @@ msgid ""
 "will not restart if it crashes.  Also, it will use the default memory size, "
 "which may not be enough for I2P."
 msgstr ""
+"Inicia o roteador I2P sem o invólucro do serviço. Isto significa que o "
+"roteador não reinicializará quando travar. Ademais, será usada a quantidade "
+"de memória padrão. que, talvez, não seja suficiente para a I2P."
 
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:23
@@ -432,4 +439,4 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter-nowrapper.1:31
 msgid "B<i2prouter>(1)"
-msgstr ""
+msgstr "B<i2prouter>(1)"

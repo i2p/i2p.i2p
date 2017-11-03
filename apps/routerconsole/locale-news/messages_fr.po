@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-07-18 14:51+0000\n"
+"PO-Revision-Date: 2017-10-25 17:50+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -26,14 +26,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Congratulations on getting I2P installed!"
-msgstr "Félicitations pour votre installation d'I2P !"
+msgstr "Félicitations pour votre installation d’I2P !"
 
 msgid "Welcome to I2P!"
 msgstr "Bienvenue à I2P !"
 
 #, java-format
 msgid "Please {0}have patience{1} as I2P boots up and finds peers."
-msgstr "Veuillez {0}patienter{1} pendant qu''I2P s''amorce et trouve des pairs."
+msgstr "Veuillez {0}patienter{1} pendant qu’I2P s’amorce et trouve des pairs."
 
 #, java-format
 msgid ""
@@ -43,7 +43,7 @@ msgstr "Pendant que vous patientez, veuillez {0}ajuster vos paramètres de bande
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr "Vous pouvez également configurer votre navigateur afin qu'il utilise le mandataire d'I2P pour consulter les sites eep."
+msgstr "Vous pouvez également configurer votre navigateur afin qu’il utilise le mandataire d’I2P pour consulter les sites eep."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
@@ -56,7 +56,7 @@ msgstr "Ne pas utiliser SOCKS pour cela."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr "Plus d''informations se trouvent sur la {0}page de configuration du mandataire d''I2P{1}."
+msgstr "Plus d’informations se trouvent sur la {0}page de configuration du mandataire d’I2P{1}."
 
 #, java-format
 msgid ""

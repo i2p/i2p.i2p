@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Gabriel Moura <gabriel.all@yandex.com>, 2017
 # blueboy, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-29 14:30+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: blueboy\n"
+"PO-Revision-Date: 2017-11-03 13:02+0000\n"
+"Last-Translator: Gabriel Moura <gabriel.all@yandex.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/otf/I2P/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,16 +22,16 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:69
 msgid "Message timeout"
-msgstr ""
+msgstr "Tempo de espera"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:72
 msgid "Failed delivery to local destination"
-msgstr ""
+msgstr "Falha na entrega ao destino local"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:75
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:108
 msgid "Local router failure"
-msgstr ""
+msgstr "Falha do roteador local"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:78
 msgid "Local network failure"
@@ -38,7 +39,7 @@ msgstr "Falha na rede local"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:81
 msgid "Session closed"
-msgstr ""
+msgstr "Sessão fechada"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:84
 msgid "Invalid message"
@@ -46,7 +47,7 @@ msgstr "Mensagem inválida"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:87
 msgid "Invalid message options"
-msgstr ""
+msgstr "Opções de mensagem inválidas"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:90
 msgid "Buffer overflow"
@@ -54,7 +55,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:93
 msgid "Message expired"
-msgstr ""
+msgstr "Mensagem expirada"
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:96
 msgid "Local lease set invalid"
@@ -86,9 +87,9 @@ msgstr ""
 
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:120
 msgid "Connection was reset"
-msgstr ""
+msgstr "A conexão foi reiniciada"
 
 #. Translate this one here, can't do it later
 #: ../java/src/net/i2p/client/streaming/I2PSocketException.java:127
 msgid "Failure code"
-msgstr ""
+msgstr "Código de falha"

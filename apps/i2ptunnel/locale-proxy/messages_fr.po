@@ -9,6 +9,7 @@
 # foo <foo@bar>, 2009
 # French language coordinator <french.coordinator@rbox.me>, 2017
 # Boxoa590, 2013
+# Stéphane Moureau, 2017
 # syl_, 2015-2016
 # Towinet, 2013-2017
 # zzzi2p, 2016-2017
@@ -17,8 +18,8 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-07-18 14:52+0000\n"
-"Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
+"PO-Revision-Date: 2017-10-27 13:31+0000\n"
+"Last-Translator: Stéphane Moureau\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -55,7 +56,7 @@ msgstr "Console du routeur"
 #: ../java/build/Proxy.java:163 ../java/build/Proxy.java:176
 #: ../java/build/Proxy.java:189 ../java/build/Proxy.java:199
 msgid "I2P Router Console"
-msgstr "Console du routeur d'I2P"
+msgstr "Console du routeur I2P"
 
 #: ../java/build/Proxy.java:8 ../java/build/Proxy.java:20
 #: ../java/build/Proxy.java:33 ../java/build/Proxy.java:45
@@ -94,17 +95,17 @@ msgstr "Aide"
 #: ../java/build/Proxy.java:192 ../java/build/Proxy.java:202
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:215
 msgid "Addressbook"
-msgstr "Carnet d'adresses"
+msgstr "Carnet d’adresses"
 
 #: ../java/build/Proxy.java:12
 msgid "The website was not reachable."
-msgstr "Le site Web n'était pas accessible."
+msgstr "Le site Web n’était pas accessible."
 
 #: ../java/build/Proxy.java:13
 msgid ""
 "The website is offline, there is network congestion, or your router is not "
 "yet well-integrated with peers."
-msgstr "Le site Web est hors service, il y a congestion du réseau ou votre routeur n'est pas encore bien intégré avec les pairs."
+msgstr "Le site Web est hors service, il y a congestion du réseau ou votre routeur n’est pas encore bien intégré avec les pairs."
 
 #: ../java/build/Proxy.java:14 ../java/build/Proxy.java:51
 #: ../java/build/Proxy.java:103 ../java/build/Proxy.java:116
@@ -145,7 +146,7 @@ msgstr "Le mandataire sortant est probablement hors service, mais il pourrait é
 msgid ""
 "You may want to {0}retry{1} as this will randomly reselect an outproxy from "
 "the pool you have defined {2}here{3} (if you have more than one configured)."
-msgstr "Vous pourriez {0}ressayer{1}, car cela resélectionnera un mandataire sortant au hasard dans la réserve que vous avez définie {2}ici{3} (si vous en avez configuré plus d'un)."
+msgstr "Vous pourriez {0}ressayer{1}, car cela resélectionnera un mandataire sortant au hasard dans la réserve que vous avez définie {2}ici{3} (si vous en avez configuré plus d’un)."
 
 #: ../java/build/Proxy.java:27 ../java/build/Proxy.java:158
 #: ../java/build/Proxy.java:184 ../java/build/Proxy.java:206
@@ -153,7 +154,7 @@ msgstr "Vous pourriez {0}ressayer{1}, car cela resélectionnera un mandataire so
 msgid ""
 "You may want to retry as this will randomly reselect an outproxy from the "
 "pool you have defined {0}here{1} (if you have more than one configured)."
-msgstr "Vous pourriez ressayer, car cela resélectionnera un mandataire sortant au hasard dans la réserve que vous avez définie {0}ici{1} (si vous en avez configuré plus d'un)."
+msgstr "Vous pourriez ressayer, car cela resélectionnera un mandataire sortant au hasard dans la réserve que vous avez définie {0}ici{1} (si vous en avez configuré plus d’un)."
 
 #: ../java/build/Proxy.java:28 ../java/build/Proxy.java:159
 #: ../java/build/Proxy.java:185 ../java/build/Proxy.java:207
@@ -165,32 +166,32 @@ msgstr "Si les problèmes persistent, vous pourriez modifier {0}ici{1} votre lis
 
 #: ../java/build/Proxy.java:30
 msgid "Information: New Host Name"
-msgstr "Information : nouveau nom d'hôte"
+msgstr "Information : nouveau nom d’hôte"
 
 #: ../java/build/Proxy.java:36
 msgid "Information: New Host Name with Address Helper"
-msgstr "Information : nouveau nom d'hôte avec assistant d'adresse"
+msgstr "Information : nouveau nom d’hôte avec assistant d’adresse"
 
 #: ../java/build/Proxy.java:37
 msgid ""
 "The address helper link you followed is for a new host name that is not in "
 "your address book."
-msgstr "Le lien d'assistant d'adresse que vous avez suivi est pour un nouveau nom d'hôte qui n'est pas dans votre carnet d'adresses."
+msgstr "Le lien d’assistant d’adresse que vous avez suivi est pour un nouveau nom d’hôte qui n’est pas dans votre carnet d’adresses."
 
 #: ../java/build/Proxy.java:38
 msgid "You may save this host name to your local address book."
-msgstr "Vous pouvez enregistrer ce nom d'hôte dans votre carnet d'adresses local."
+msgstr "Vous pouvez enregistrer ce nom d’hôte dans votre carnet d’adresses local."
 
 #: ../java/build/Proxy.java:39
 msgid ""
 "If you save it to your address book, you will not see this message again."
-msgstr "Si vous l'enregistrez dans votre carnet d'adresses, vous ne verrez plus ce message."
+msgstr "Si vous l’enregistrez dans votre carnet d’adresses, vous ne verrez plus ce message."
 
 #: ../java/build/Proxy.java:40
 msgid ""
 "If you do not save it, the host name will be forgotten after the next router"
 " restart."
-msgstr "Si vous ne l'enregistrez pas, le nom d'hôte sera oublié après redémarrage du routeur."
+msgstr "Si vous ne l’enregistrez pas, le nom d’hôte sera oublié après redémarrage du routeur."
 
 #: ../java/build/Proxy.java:41
 msgid ""
@@ -209,17 +210,17 @@ msgstr "Le site Web est probablement hors service, mais il pourrait également y
 
 #: ../java/build/Proxy.java:54 ../java/build/Proxy.java:60
 msgid "Warning: Invalid Request URI"
-msgstr "Avertissement : l'URI de la requête est invalide"
+msgstr "Avertissement : l’URI de la requête est invalide"
 
 #: ../java/build/Proxy.java:61
 msgid "The request URI is invalid, and probably contains illegal characters."
-msgstr "L'URI de la requête est invalide et contient probablement des caractères interdits."
+msgstr "L’URI de la requête est invalide et contient probablement des caractères interdits."
 
 #: ../java/build/Proxy.java:62
 msgid ""
 "If you clicked a link, check the end of the URI for any characters the "
 "browser has mistakenly added on."
-msgstr "Si vous avez cliqué sur un lien, vérifier si le navigateur n'aurait pas ajouté par erreur des caractères à la fin de l'URI."
+msgstr "Si vous avez cliqué sur un lien, vérifier si le navigateur n’aurait pas ajouté par erreur des caractères à la fin de l’URI."
 
 #: ../java/build/Proxy.java:63
 msgid "Error: Request Denied"
@@ -237,7 +238,7 @@ msgstr "Votre navigateur est mal configuré."
 msgid ""
 "Do not use the proxy to access the router console, localhost, or local LAN "
 "destinations."
-msgstr "Ne pas utiliser le mandataire pour accéder à la console du routeur, à l'hôte local, ni à des destinations de votre réseau local."
+msgstr "Ne pas utiliser le mandataire pour accéder à la console du routeur, à l’hôte local, ni à des destinations de votre réseau local."
 
 #: ../java/build/Proxy.java:72
 msgid "Website Unknown"
@@ -245,11 +246,11 @@ msgstr "Le site Web est inconnu"
 
 #: ../java/build/Proxy.java:78
 msgid "Website Not Found in Addressbook"
-msgstr "Le site Web est introuvable dans le carnet d'adresses"
+msgstr "Le site Web est introuvable dans le carnet d’adresses"
 
 #: ../java/build/Proxy.java:79
 msgid "The website was not found in your router's addressbook."
-msgstr "Le site Web n'a pas été trouvé dans le carnet d'adresses de votre routeur."
+msgstr "Le site Web n’a pas été trouvé dans le carnet d’adresses de votre routeur."
 
 #: ../java/build/Proxy.java:80
 msgid "Check the link or find a Base 32 or Base 64 address."
@@ -258,26 +259,26 @@ msgstr "Vérifier le lien ou trouver une adresse Base32 ou Base64."
 #: ../java/build/Proxy.java:81
 #, java-format
 msgid "If you have the Base 64 address, {0}add it to your addressbook{1}."
-msgstr "Si vous avez l''adresse Base64, {0}l''ajouter à votre carnet d''adresses{1}."
+msgstr "Si vous avez l’adresse Base64, {0}l’ajouter à votre carnet d’adresses{1}."
 
 #: ../java/build/Proxy.java:82
 msgid ""
 "Otherwise, find a Base 32 or address helper link, or use a jump service link"
 " below."
-msgstr "Sinon, trouver un lien Base32 ou un lien d'assistant d'adresse, ou encore utiliser un lien de service de saut ci-dessous."
+msgstr "Sinon, trouver un lien Base32 ou un lien d’assistant d’adresse, ou encore utiliser un lien de service de saut ci-dessous."
 
 #: ../java/build/Proxy.java:83
 #, java-format
 msgid ""
 "Seeing this page often? See {0}the FAQ{1} for help in {2}adding some "
 "subscriptions{3} to your addressbook."
-msgstr "Cette page apparaît souvent ? Consulter la {0}FAQ{1} pour obtenir de l''aide sur l''{2}ajout d''abonnements{3} à votre carnet d''adresses."
+msgstr "Cette page apparaît souvent ? Consulter la {0}FAQ{1} pour obtenir de l’aide sur l’{2}ajout d’abonnements{3} à votre carnet d’adresses."
 
 #: ../java/build/Proxy.java:92
 msgid ""
 "The website was not reachable, because it uses encryption options that are "
 "not supported by your I2P or Java version."
-msgstr "Le site Web était inaccessible, car il utilise des options de chiffrement qui ne sont pas prises en charge par vos versions d'I2P ou de Java."
+msgstr "Le site Web était inaccessible, car il utilise des options de chiffrement qui ne sont pas prises en charge par vos versions d’I2P ou de Java."
 
 #: ../java/build/Proxy.java:93 ../java/build/Proxy.java:208
 msgid "Could not connect to the following destination:"
@@ -306,7 +307,7 @@ msgstr "Avertissement : la destination est invalide"
 msgid ""
 "The website destination specified was not valid, or was otherwise "
 "unreachable."
-msgstr "La destination de site Web indiqué n'était pas valide ou était inaccessible."
+msgstr "La destination de site Web indiqué n’était pas valide ou était inaccessible."
 
 #: ../java/build/Proxy.java:114
 msgid ""
@@ -316,17 +317,17 @@ msgstr "Vous avez peut-être collé la mauvaise chaîne Base64 ou le lien que vo
 
 #: ../java/build/Proxy.java:115
 msgid "The I2P host could also be offline."
-msgstr "L'hôte I2P pourrait aussi être hors ligne."
+msgstr "L’hôte I2P pourrait aussi être hors ligne."
 
 #: ../java/build/Proxy.java:119 ../java/build/Proxy.java:125
 msgid "Warning: No Outproxy Configured"
-msgstr "Avertissement : aucun mandataire sortant n'est configuré"
+msgstr "Avertissement : aucun mandataire sortant n’est configuré"
 
 #: ../java/build/Proxy.java:126
 msgid ""
 "Your request was for a site outside of I2P, but you have no HTTP outproxy "
 "configured."
-msgstr "Votre requête concernait un site à l'extérieur d'I2P, mais vous n'avez aucun mandataire HTTP sortant configuré."
+msgstr "Votre requête concernait un site à l’extérieur d’I2P, mais vous n’avez aucun mandataire HTTP sortant configuré."
 
 #: ../java/build/Proxy.java:127
 msgid "Please configure an outproxy in I2PTunnel."
@@ -340,39 +341,39 @@ msgstr "Avertissement : il existe un conflit de clé de destination"
 msgid ""
 "The address helper link you followed specifies a different destination key "
 "than the entry in your address book."
-msgstr "Le lien d'assistant d'adresse que vous avez suivi indique une clé de destination différente de celle dans votre carnet d'adresses."
+msgstr "Le lien d’assistant d’adresse que vous avez suivi indique une clé de destination différente de celle dans votre carnet d’adresses."
 
 #: ../java/build/Proxy.java:136
 msgid ""
 "Someone could be trying to impersonate another website, or people have given"
 " two websites identical names."
-msgstr "Quelqu'un pourrait essayer d'imiter un autre site Web ou l'on a donné le même nom à deux sites Web."
+msgstr "Quelqu’un pourrait essayer d’imiter un autre site Web ou l’on a donné le même nom à deux sites Web."
 
 #: ../java/build/Proxy.java:137
 msgid ""
 "Resolve the conflict by deciding which key you trust, and then either ignore"
 " the address helper link, or delete the host entry from your address book "
 "and click the address helper link again."
-msgstr "Résoudre le conflit en décidant quelle clé est fiable, puis ignorer ensuite le lien d'assistant d'adresse ou supprimer de votre carnet d'adresses l'entrée concernant l'hôte et recliquer sur le lien d'assistant d'adresse."
+msgstr "Résoudre le conflit en décidant quelle clé est fiable, puis ignorer ensuite le lien d’assistant d’adresse ou supprimer de votre carnet d’adresses l’entrée concernant l’hôte et recliquer sur le lien d’assistant d’adresse."
 
 #: ../java/build/Proxy.java:138 ../java/build/Proxy.java:144
 msgid "Warning: Bad Address Helper"
-msgstr "Avertissement : mauvais assistant d'adresse"
+msgstr "Avertissement : mauvais assistant d’adresse"
 
 #: ../java/build/Proxy.java:145
 #, java-format
 msgid "The helper key in the URL ({0}i2paddresshelper={1}) is not resolvable."
-msgstr "La clé d''assistance de l''URL ({0}i2paddresshelper={1}) ne peut pas être résolue."
+msgstr "La clé d’assistance de l’URL ({0}i2paddresshelper={1}) ne peut pas être résolue."
 
 #: ../java/build/Proxy.java:146
 msgid "It seems to be garbage data, or a mistyped Base 32 address."
-msgstr "Cela semble être des données parasites ou une faute de frappe dans l'adresse Base32."
+msgstr "Cela semble être des données parasites ou une faute de frappe dans l’adresse Base32."
 
 #: ../java/build/Proxy.java:147
 msgid ""
 "Check your URL to try and fix the helper key to be a valid Base 32 hostname "
 "or Base 64 key."
-msgstr "Vérifier votre URL pour tenter de corriger la clé d'assistance en un nom d'hôte Base32 valide ou en une clé Base64."
+msgstr "Vérifier votre URL pour tenter de corriger la clé d’assistance en un nom d’hôte Base32 valide ou en une clé Base64."
 
 #: ../java/build/Proxy.java:155
 msgid "The HTTP Outproxy was not found."
@@ -382,7 +383,7 @@ msgstr "Le mandataire sortant HTTP est introuvable."
 msgid ""
 "It is offline, there is network congestion, or your router is not yet well-"
 "integrated with peers."
-msgstr "Il est hors, il y a congestion du réseau ou votre routeur n'est pas encore bien intégré avec les pairs."
+msgstr "Il est hors, il y a congestion du réseau ou votre routeur n’est pas encore bien intégré avec les pairs."
 
 #: ../java/build/Proxy.java:161 ../java/build/Proxy.java:167
 msgid "Warning: Request Denied"
@@ -398,19 +399,19 @@ msgstr "Une autorisation est exigée par le mandataire"
 
 #: ../java/build/Proxy.java:170
 msgid "I2P HTTP Proxy Authorization Required"
-msgstr "Une autorisation est exigée par le mandataire HTTP d'I2P"
+msgstr "Une autorisation est exigée par le mandataire HTTP d’I2P"
 
 #: ../java/build/Proxy.java:171
 msgid ""
 "This proxy is configured to require a username and password for access."
-msgstr "Ce mandataire est configuré pour exiger un nom d'utilisateur et un mot de passe pour y accéder."
+msgstr "Ce mandataire est configuré pour exiger un nom d’utilisateur et un mot de passe pour y accéder."
 
 #: ../java/build/Proxy.java:172
 #, java-format
 msgid ""
 "Please enter your username and password, or check your {0}router "
 "configuration{1} or {2}I2PTunnel configuration{3}."
-msgstr "Veuillez saisir vos nom d''utilisateur et mot de passe ou vérifier la {0}configuration de votre routeur{1} ou encore la {2}configuration d''I2PTunnel{3}."
+msgstr "Veuillez saisir vos nom d’utilisateur et mot de passe ou vérifier la {0}configuration de votre routeur{1} ou encore la {2}configuration d’I2PTunnel{3}."
 
 #: ../java/build/Proxy.java:173
 #, java-format
@@ -418,7 +419,7 @@ msgid ""
 "To disable authorization, remove the configuration "
 "{0}i2ptunnel.proxy.auth=basic{1}, then stop and restart the HTTP Proxy "
 "tunnel."
-msgstr "Pour désactiver l''autorisation, supprimer la configuration {0}i2ptunnel.proxy.auth=basic{1}, puis arrêter et redémarrer le tunnel du mandataire HTTP."
+msgstr "Pour désactiver l’autorisation, supprimer la configuration {0}i2ptunnel.proxy.auth=basic{1}, puis arrêter et redémarrer le tunnel du mandataire HTTP."
 
 #: ../java/build/Proxy.java:181
 msgid "The connection to the proxy was reset."
@@ -440,7 +441,7 @@ msgstr "La requête utilise un mauvais protocole."
 
 #: ../java/build/Proxy.java:195
 msgid "The I2P HTTP Proxy supports HTTP and HTTPS requests only."
-msgstr "Le mandataire HTTP d'I2P ne prend en charge que les requêtes HTTP et HTTPS."
+msgstr "Le mandataire HTTP d’I2P ne prend en charge que les requêtes HTTP et HTTPS."
 
 #: ../java/build/Proxy.java:196
 msgid "Other protocols such as FTP are not allowed."
@@ -454,7 +455,7 @@ msgstr "Le mandataire sortant est inaccessible"
 msgid ""
 "The HTTP outproxy was not reachable, because it uses encryption options that"
 " are not supported by your I2P or Java version."
-msgstr "Le mandataire HTTP sortant était inaccessible, car il utilise des options de chiffrement qui ne sont pas prises en charge par vos versions d'I2P ou de Java."
+msgstr "Le mandataire HTTP sortant était inaccessible, car il utilise des options de chiffrement qui ne sont pas prises en charge par vos versions d’I2P ou de Java."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:643
 msgid "This seems to be a bad destination:"
@@ -462,7 +463,7 @@ msgstr "Cette destination semble être mauvaise :"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:644
 msgid "i2paddresshelper cannot help you with a destination like that!"
-msgstr "L'assistant d'adresse d'I2P ne peut pas vous aider avec une telle destination !"
+msgstr "L’assistant d’adresse d’I2P ne peut pas vous aider avec une telle destination !"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:719
 #, java-format
@@ -470,16 +471,16 @@ msgid ""
 "To visit the destination in your address book, click <a "
 "href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, "
 "click <a href=\"{1}\">here</a>."
-msgstr "Pour visiter la destination de votre carnet d''adresses, cliquer <a href=\"{0}\">ici</a>. Pour visiter la destination contradictoire de l''assistant d''adresse, cliquer <a href=\"{1}\">ici</a>."
+msgstr "Pour visiter la destination de votre carnet d’adresses, cliquer <a href=\"{0}\">ici</a>. Pour visiter la destination contradictoire de l’assistant d’adresse, cliquer <a href=\"{1}\">ici</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:744
 #, java-format
 msgid "Destination for {0} in address book"
-msgstr "Destination pour {0} dans le carnet d'adresses"
+msgstr "Destination pour {0} dans le carnet d’adresses"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:747
 msgid "Conflicting address helper destination"
-msgstr "La destination de l'assistant d'adresse est contradictoire"
+msgstr "La destination de l’assistant d’adresse est contradictoire"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1194
 msgid "Destination lease set not found"
@@ -506,7 +507,7 @@ msgstr "Poursuivre vers {0} sans enregistrer"
 msgid ""
 "You can browse to the site without saving it to the address book. The "
 "address will be remembered until you restart your I2P router."
-msgstr "Vous pouvez naviguer vers le site sans l'enregistrer dans le carnet d'adresses. L'adresse sera mémorisée jusqu'à ce que vous redémarriez votre routeur d'I2P."
+msgstr "Vous pouvez naviguer vers le site sans l’enregistrer dans le carnet d’adresses. L’adresse sera mémorisée jusqu’au redémarrage du routeur I2P."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1366
 msgid "Continue without saving"
@@ -515,19 +516,19 @@ msgstr "Poursuivre sans enregistrer"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1373
 #, java-format
 msgid "Save {0} to router address book and continue to website"
-msgstr "Enregistrer {0} dans le carnet d''adresses du routeur et poursuivre vers le site Web"
+msgstr "Enregistrer {0} dans le carnet d’adresses du routeur et poursuivre vers le site Web"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1374
 msgid ""
 "This address will be saved to your Router address book where your "
 "subscription-based addresses are stored."
-msgstr "Cette adresse sera enregistrée dans le carnet d'adresses de votre routeur où vos adresses d'abonnement sont stockées."
+msgstr "Cette adresse sera enregistrée dans le carnet d’adresses de votre routeur où vos adresses d’abonnement sont stockées."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1376
 msgid ""
 "If you want to keep track of sites you have added manually, add to your "
 "Master or Private address book instead."
-msgstr "Si vous voulez garder une trace des sites vous avez ajoutés manuellement, ajoutez-les plutôt à votre carnet d'adresses maître ou privé."
+msgstr "Si vous voulez garder une trace des sites vous avez ajoutés manuellement, ajoutez-les plutôt à votre carnet d’adresses maître ou privé."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1379
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1387
@@ -539,34 +540,34 @@ msgstr "Enregistrer et continuer"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1384
 #, java-format
 msgid "Save {0} to master address book and continue to website"
-msgstr "Enregistrer {0} dans le carnet d'adresses maître et poursuivre vers le site Web"
+msgstr "Enregistrer {0} dans le carnet d’adresses maître et poursuivre vers le site Web"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1385
 msgid ""
 "This address will be saved to your Master address book. Select this option "
 "for addresses you wish to keep separate from the main router address book, "
 "but don't mind publishing."
-msgstr "Cette adresse sera enregistrée dans votre carnet d'adresses maître. Sélectionnez cette option pour les adresses que vous souhaitez garder séparées du carnet d'adresses principal du routeur, mais dont la publication ne vous dérange pas."
+msgstr "Cette adresse sera enregistrée dans votre carnet d’adresses maître. Sélectionnez cette option pour les adresses que vous souhaitez garder séparées du carnet d’adresses principal du routeur, mais dont la publication ne vous dérange pas."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1389
 #, java-format
 msgid "Save {0} to private address book and continue to website"
-msgstr "Enregistrer {0} dans le carnet d''adresses privé et poursuivre vers le site Web"
+msgstr "Enregistrer {0} dans le carnet d’adresses privé et poursuivre vers le site Web"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1390
 msgid ""
 "This address will be saved to your Private address book, ensuring it is "
 "never published."
-msgstr "Cette adresse sera enregistrée dans votre carnet d'adresses privé, garantissant qu'elle ne sera jamais publiée."
+msgstr "Cette adresse sera enregistrée dans votre carnet d’adresses privé, garantissant qu’elle ne sera jamais publiée."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:175
 #, java-format
 msgid "Added via address helper from {0}"
-msgstr "Ajouté par l''assistant d''adresse de {0}"
+msgstr "Ajouté par l’assistant d’adresse de {0}"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:177
 msgid "Added via address helper"
-msgstr "Ajouté par l'assistant d'adresse"
+msgstr "Ajouté par l’assistant d’adresse"
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:194
 msgid "router"
@@ -588,13 +589,13 @@ msgstr "Redirection vers {0}"
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:220
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
-msgstr "{0} a été enregistré dans le carnet d''adresses {1}. Redirection en cours."
+msgstr "{0} a été enregistré dans le carnet d’adresses {1}. Redirection en cours."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:221
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr "Échec d''enregistrement de {0} dans le carnet d''adresses {1}, redirection en cours."
+msgstr "Échec d’enregistrement de {0} dans le carnet d’adresses {1}, redirection en cours."
 
 #: ../java/src/net/i2p/i2ptunnel/localServer/LocalHTTPServer.java:223
 msgid "Click here if you are not redirected automatically."
-msgstr "Cliquer ici si la redirection n'est pas automatique."
+msgstr "Cliquer ici si la redirection n’est pas automatique."

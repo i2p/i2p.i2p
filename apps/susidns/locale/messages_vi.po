@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-09-22 06:20+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Vietnamese (http://www.transifex.com/otf/I2P/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -626,7 +626,7 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
 msgid "yes"
-msgstr ""
+msgstr "đồng ý"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:318
 msgid "Source"

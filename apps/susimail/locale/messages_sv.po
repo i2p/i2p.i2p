@@ -6,15 +6,16 @@
 # Translators:
 # Anders Nilsson <anders@devode.se>, 2016
 # cacapo <handelsehorisont@gmail.com>, 2015
-# Jony, 2017
+# Jonatan Nyberg, 2017
+# Jonatan Nyberg, 2017
 # Martin Svensson <digitalmannen@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-09-19 09:45+0000\n"
+"Last-Translator: Jonatan Nyberg\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -314,7 +315,7 @@ msgstr "Radera valda bilagor"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2215
 msgid "I2PMail Login"
-msgstr ""
+msgstr "I2PMail-inloggning"
 
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:2217
@@ -352,7 +353,7 @@ msgstr "Skapa konto"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2236
 msgid "Learn about I2P mail"
-msgstr "Lär mer om I2P e-post"
+msgstr "Lär dig mer om I2P e-post"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2249
 #: src/src/i2p/susi/webmail/WebMail.java:2406
@@ -521,7 +522,7 @@ msgstr "Fel vid uppkoppling mot server"
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:673
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:676
 msgid "Error opening mailbox"
-msgstr "Fel vid öppning av mailbox"
+msgstr "Fel vid öppning av mejlbox"
 
 #: src/src/i2p/susi/webmail/pop3/POP3MailBox.java:1025
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:249
@@ -540,9 +541,9 @@ msgstr "Server avvisade uppkoppling"
 #. TODO which recipient?
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:262
 msgid "Mail rejected"
-msgstr "Mail avvisat"
+msgstr "Post avvisad"
 
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:276
 #: src/src/i2p/susi/webmail/smtp/SMTPClient.java:279
 msgid "Error sending mail"
-msgstr "Fel vid sändning av mail"
+msgstr "Fel vid sändning av e-post"

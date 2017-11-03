@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-09-23 20:32+0000\n"
 "Last-Translator: 黃彥儒 <r1235613@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -412,7 +412,7 @@ msgstr "搜尋"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:552
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
 msgid "Hostname"
-msgstr ""
+msgstr "主機名"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:357
 msgid "Link (b32)"
@@ -621,11 +621,11 @@ msgstr ""
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
 msgid "no"
-msgstr ""
+msgstr "否"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:314
 msgid "yes"
-msgstr ""
+msgstr "是"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:318
 msgid "Source"

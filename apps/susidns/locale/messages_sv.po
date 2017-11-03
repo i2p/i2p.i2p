@@ -9,15 +9,16 @@
 # cacapo <handelsehorisont@gmail.com>, 2015
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
-# Jony, 2017
+# Jonatan Nyberg, 2017
+# Jonatan Nyberg, 2017
 # Martin Svensson <digitalmannen@gmail.com>, 2011, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-09-23 18:03+0000\n"
+"Last-Translator: Jonatan Nyberg\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -275,7 +276,7 @@ msgstr "Ladda om"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:104
 msgid "Configuration reloaded."
-msgstr "Inställningar laddade igen."
+msgstr "Inställningar omladdade."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:106
 #, java-format
@@ -536,7 +537,7 @@ msgstr "Uppdaterings intervall i timmar"
 msgid ""
 "Your public hosts.txt file (choose a path within your webserver document "
 "root)"
-msgstr "Din publika hosts.txt fil (välj en sökväg till din webbservers dokumentrot)"
+msgstr "Din offentliga hosts.txt fil (välj en sökväg till din webbservers dokumentrot)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:245
 msgid "Your hosts.txt (don't change)"
@@ -608,7 +609,7 @@ msgstr "länk"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:288
 msgid "Public Key"
-msgstr "Publik Nyckel"
+msgstr "Offentlig nyckel"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:290
 msgid "ElGamal 2048 bit"
@@ -719,7 +720,7 @@ msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
-msgstr "Om konfigurerad så skrivs router adressboken till \"published\" adressboken, som är tillgänglig om du kör en eepsite."
+msgstr "Om konfigurerad så skrivs router adressboken till \"published\" adressboken, som är tillgänglig om du kör en eepsida."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:215
 msgid ""
@@ -750,7 +751,7 @@ msgstr "Prenumerations-filen innehåller en lista av I2P URL:er."
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:224
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
-msgstr "Adressboks programet kontrollerar regelbundet listan för nya eepsites."
+msgstr "Adressboks programet kontrollerar regelbundet listan för nya eepsidor."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:226
 msgid "Those URLs refer to published hosts.txt files."
@@ -767,7 +768,7 @@ msgstr "Den förvalda prenumerationen är hosts.txt från {0}, som endast uppdat
 msgid ""
 "So it is a good idea to add additional subscriptions to sites that have the "
 "latest addresses."
-msgstr "Så det är bra idé att lägga till ytterligare prenumerationer till sajter som har de senaste adresserna."
+msgstr "Så det är bra idé att lägga till ytterligare prenumerationer till webbplatser som har de senaste adresserna."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:232
 msgid "See the FAQ for a list of subscription URLs."

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-09-19 11:40+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -331,7 +331,7 @@ msgstr "Επισκόπηση"
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:183
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:193
 msgid "Private"
-msgstr ""
+msgstr "Ιδιωτικό"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:206
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:198

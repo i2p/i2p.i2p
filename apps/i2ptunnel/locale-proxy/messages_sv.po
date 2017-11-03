@@ -9,15 +9,16 @@
 # cacapo <handelsehorisont@gmail.com>, 2015-2016
 # hottuna <i2p@robertfoss.se>, 2013
 # hottuna <i2p@robertfoss.se>, 2012
-# Jony, 2016-2017
+# Jonatan Nyberg, 2016-2017
+# Jonatan Nyberg, 2017
 # WinterFairy <winterfairy@riseup.net>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-09-23 19:04+0000\n"
+"Last-Translator: Jonatan Nyberg\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.com/otf/I2P/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -114,7 +115,7 @@ msgstr "Du kanske vill {0}försöka igen{1}."
 #: ../java/build/Proxy.java:15 ../java/build/Proxy.java:52
 #: ../java/build/Proxy.java:104 ../java/build/Proxy.java:117
 msgid "You may want to retry."
-msgstr ""
+msgstr "Du kanske vill försöka igen."
 
 #: ../java/build/Proxy.java:16 ../java/build/Proxy.java:29
 #: ../java/build/Proxy.java:53 ../java/build/Proxy.java:84
@@ -319,7 +320,7 @@ msgstr "I2P-värden kan också vara frånkopplad."
 
 #: ../java/build/Proxy.java:119 ../java/build/Proxy.java:125
 msgid "Warning: No Outproxy Configured"
-msgstr "Varning: Ingen Utproxy Inställd"
+msgstr "Varning: Ingen utproxy inställd"
 
 #: ../java/build/Proxy.java:126
 msgid ""
@@ -402,7 +403,7 @@ msgstr "I2P HTTP Proxy Tillstånd Krävs"
 #: ../java/build/Proxy.java:171
 msgid ""
 "This proxy is configured to require a username and password for access."
-msgstr "Denhär proxy är inställd till att kräva användarnamn och lösenord för åtkomst."
+msgstr "Denna proxy är inställd till att kräva användarnamn och lösenord för åtkomst."
 
 #: ../java/build/Proxy.java:172
 #, java-format
@@ -509,7 +510,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1366
 msgid "Continue without saving"
-msgstr ""
+msgstr "Fortsätt utan att spara"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1373
 #, java-format
@@ -532,7 +533,7 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1387
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1392
 msgid "Save & continue"
-msgstr ""
+msgstr "Spara & fortsätt"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1384

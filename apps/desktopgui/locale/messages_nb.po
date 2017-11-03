@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-07-17 16:52+0000\n"
+"PO-Revision-Date: 2017-09-19 14:52+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/otf/I2P/language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Kjør I2P-nettleser"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr "Sett opp I2P systemkruv"
+msgstr "Sett opp I2P-systemkruv"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229

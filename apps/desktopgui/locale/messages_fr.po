@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-07-04 12:05+0000\n"
+"PO-Revision-Date: 2017-10-25 17:51+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -44,12 +44,12 @@ msgstr "Démarrage"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:55
 #: src/net/i2p/desktopgui/InternalTrayManager.java:207
 msgid "Launch I2P Browser"
-msgstr "Lancer le navigateur d'I2P"
+msgstr "Lancer le navigateur d’I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr "Configurer la zone de notification d'I2P"
+msgstr "Configurer la zone de notification d’I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
@@ -79,7 +79,7 @@ msgstr "Arrêter I2P immédiatement"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:157
 #: src/net/i2p/desktopgui/InternalTrayManager.java:309
 msgid "Cancel I2P Shutdown"
-msgstr "Annuler la fermeture d'I2P"
+msgstr "Annuler la fermeture d’I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format

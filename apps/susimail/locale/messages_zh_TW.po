@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
+"PO-Revision-Date: 2017-09-21 17:13+0000\n"
 "Last-Translator: zzzi2p\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/otf/I2P/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -193,7 +193,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:1757
 #: src/src/i2p/susi/webmail/WebMail.java:2229
 msgid "Login"
-msgstr ""
+msgstr "登入"
 
 #. mailbox.getNumMails() forces a connection, don't use it
 #. Not only does it slow things down, but a failure causes all our messages to
@@ -288,7 +288,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2270
 #: src/src/i2p/susi/webmail/WebMail.java:2429
 msgid "Subject"
-msgstr ""
+msgstr "主旨"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2183
 msgid "Add Attachment"
@@ -313,7 +313,7 @@ msgstr ""
 #. current postman hq length limits 16/12, new postman version 32/32
 #: src/src/i2p/susi/webmail/WebMail.java:2217
 msgid "User"
-msgstr ""
+msgstr "用戶"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2218
 msgid "Password"
@@ -369,7 +369,7 @@ msgstr ""
 #: src/src/i2p/susi/webmail/WebMail.java:2415
 #: src/src/i2p/susi/webmail/WebMail.java:2481
 msgid "Logout"
-msgstr ""
+msgstr "登出"
 
 #: src/src/i2p/susi/webmail/WebMail.java:2268
 msgid "Mark for deletion"

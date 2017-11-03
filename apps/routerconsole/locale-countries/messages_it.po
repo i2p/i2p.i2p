@@ -12,6 +12,7 @@
 # mkkid <jokjok@hotmail.it>, 2011
 # danimoth <kronat@tiscali.it>, 2011
 # Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2015-2017
+# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2017
 # spawned76 <fswitch20@hotmail.com>, 2012
 # Tristano Ajmone <tajmone@gmail.com>, 2015
 msgid ""
@@ -19,7 +20,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-17 01:33+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
+"PO-Revision-Date: 2017-10-14 13:22+0000\n"
 "Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>\n"
 "Language-Team: Italian (http://www.transifex.com/otf/I2P/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -107,13 +108,13 @@ msgid "Bulgaria"
 msgstr "Bulgaria"
 
 msgid "Bahrain"
-msgstr "Bahrain"
+msgstr "Bahrein"
 
 msgid "Burundi"
 msgstr "Burundi"
 
 msgid "Benin"
-msgstr "Repubblica del Benin"
+msgstr "Benin"
 
 msgid "Saint Barthélemy"
 msgstr "Saint-Barthélemy"
@@ -179,7 +180,7 @@ msgid "Cameroon"
 msgstr "Camerun"
 
 msgid "China"
-msgstr "Cina"
+msgstr "Repubblica popolare di Cina"
 
 msgid "Colombia"
 msgstr "Colombia"
@@ -722,7 +723,7 @@ msgid "Tuvalu"
 msgstr "Tuvalu"
 
 msgid "Taiwan"
-msgstr "Taiwan"
+msgstr "Repubblica di Cina"
 
 msgid "Tanzania"
 msgstr "Tanzania"

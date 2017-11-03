@@ -5,13 +5,14 @@
 # 
 # Translators:
 # Gabriel Radev <gabosss@gmail.com>, 2015
+# Vitaly Zdorovenko <stenliterziev@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-09-20 20:31+0000\n"
+"Last-Translator: Vitaly Zdorovenko <stenliterziev@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/otf/I2P/language/bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +48,7 @@ msgstr ""
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
 msgid "Disable"
-msgstr ""
+msgstr "Деактивиране"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:93
 #: src/net/i2p/desktopgui/InternalTrayManager.java:245
@@ -62,7 +63,7 @@ msgstr "Спиране на I2P"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:126
 #: src/net/i2p/desktopgui/InternalTrayManager.java:278
 msgid "Restart I2P Immediately"
-msgstr ""
+msgstr "Рестартирайте Незабавно"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:143
 #: src/net/i2p/desktopgui/InternalTrayManager.java:295
@@ -77,7 +78,7 @@ msgstr ""
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format
 msgid "Shutdown in {0}"
-msgstr ""
+msgstr "Изключване в {0}"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:365
 msgid "Shutdown imminent"

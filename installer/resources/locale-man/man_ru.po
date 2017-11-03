@@ -8,12 +8,13 @@
 # yume <yumenokazu@gmail.com>, 2017
 # Mykola Demianko <nikdemqr@gmail.com>, 2017
 # Alexander Georgievskiy <galeksandrp@gmail.com>, 2017
+# Filipp Chertiev <f@fzfx.ru>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Alexander Georgievskiy <galeksandrp@gmail.com>, 2017\n"
+"Last-Translator: Filipp Chertiev <f@fzfx.ru>, 2017\n"
 "Language-Team: Russian (Russia) (https://www.transifex.com/otf/teams/12694/ru_RU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -73,6 +74,8 @@ msgid ""
 "Download a file non-interactively via HTTP. Transfers through both I2P and "
 "the regular Internet are supported."
 msgstr ""
+"Неинтерактивное скачивание файла через HTTP. Поддерживается передача как "
+"через I2P, так и через обычный Интернет."
 
 #. type: Plain text
 #: man/eepget.1:21
@@ -211,7 +214,7 @@ msgstr ""
 #: man/eepget.1:79
 #, no-wrap
 msgid "Sets the username for proxy authorization, if required."
-msgstr ""
+msgstr "Задайте имя пользователя для авторизации прокси, если требуется."
 
 #. type: Plain text
 #: man/eepget.1:85
@@ -230,7 +233,7 @@ msgstr ""
 #: man/eepget.1:89
 #, no-wrap
 msgid "EXIT STATUS"
-msgstr ""
+msgstr "СТАТУС ВЫХОДА"
 
 #. type: Plain text
 #: man/eepget.1:93
@@ -284,7 +287,7 @@ msgstr ""
 #. type: Plain text
 #: man/i2prouter.1:13
 msgid "Control the I2P service."
-msgstr ""
+msgstr "Контроль службы I2P"
 
 #. type: IP
 #: man/i2prouter.1:15

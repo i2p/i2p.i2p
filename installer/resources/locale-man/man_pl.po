@@ -5,13 +5,13 @@
 # zzz <zzz@mail.i2p>, 2017.
 # 
 # Translators:
-# Verdulo :-) <cybertomek@openmailbox.org>, 2017
+# Verdulo :-) <tomek@disroot.org>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P man pages\n"
 "POT-Creation-Date: 2017-01-26 15:24+0000\n"
 "PO-Revision-Date: 2017-01-26 15:24+0000\n"
-"Last-Translator: Verdulo :-) <cybertomek@openmailbox.org>, 2017\n"
+"Last-Translator: Verdulo :-) <tomek@disroot.org>, 2017\n"
 "Language-Team: Polish (https://www.transifex.com/otf/teams/12694/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

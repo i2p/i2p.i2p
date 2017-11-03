@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-05 23:01+0000\n"
-"PO-Revision-Date: 2017-07-14 18:45+0000\n"
+"PO-Revision-Date: 2017-11-03 12:21+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -33,32 +33,32 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:131
 #, java-format
 msgid "Host name \"{0}\" contains illegal character {1}"
-msgstr "Le nom d''hôte « {0} » contient le caractère illicite {1}"
+msgstr "Le nom d’hôte « {0} » contient le caractère illicite {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:144
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:146
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:153
 #, java-format
 msgid "Host name cannot start with \"{0}\""
-msgstr "Le nom d''hôte ne peut pas commencer par « {0} »"
+msgstr "Le nom d’hôte ne peut pas commencer par « {0} »"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:148
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:150
 #, java-format
 msgid "Host name cannot end with \"{0}\""
-msgstr "Le nom d''hôte ne peut pas finir par « {0} »"
+msgstr "Le nom d’hôte ne peut pas finir par « {0} »"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:155
 #, java-format
 msgid "Host name cannot contain \"{0}\""
-msgstr "Le nom d''hôte ne peut pas contenir « {0} »"
+msgstr "Le nom d’hôte ne peut pas contenir « {0} »"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:158
 #, java-format
 msgid ""
 "Host name \"{0}\" requires conversion to ASCII but the conversion library is"
 " unavailable in this JVM"
-msgstr "Le nom d''hôte « {0} » exige une conversion en ASCII, mais la bibliothèque de conversion n''est pas proposée dans cette machine virtuelle Java"
+msgstr "Le nom d’hôte « {0} » exige une conversion en ASCII, mais la bibliothèque de conversion n’est pas proposée dans cette machine virtuelle Java"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:223
 msgid "None"
@@ -117,8 +117,8 @@ msgstr[1] "{0} résultats de recherche."
 #, java-format
 msgid "Address book contains 1 entry."
 msgid_plural "Address book contains {0} entries."
-msgstr[0] "Le carnet d'adresses contient 1 entrée."
-msgstr[1] "Le carnet d''adresses contient {0} entrées."
+msgstr[0] "Le carnet d’adresses contient 1 entrée."
+msgstr[1] "Le carnet d’adresses contient {0} entrées."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:225
 #, java-format
@@ -143,7 +143,7 @@ msgstr "Remplacer"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:245
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
-msgstr "Le nom d''hôte {0} est déjà dans le carnet d''adresses. Pas de changement."
+msgstr "Le nom d’hôte {0} est déjà dans le carnet d’adresses. Pas de changement."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:249
@@ -151,7 +151,7 @@ msgstr "Le nom d''hôte {0} est déjà dans le carnet d''adresses. Pas de change
 msgid ""
 "Host name {0} is already in address book with a different destination. Click"
 " \"Replace\" to overwrite."
-msgstr "Le nom d''hôte {0} est déjà dans le carnet d''adresses avec une destination différente. Cliquer sur Remplacer pour le remplacer."
+msgstr "Le nom d’hôte {0} est déjà dans le carnet d’adresses avec une destination différente. Cliquer sur Remplacer pour le remplacer."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:272
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:278
@@ -168,7 +168,7 @@ msgstr "La destination a été modifiée pour {0}."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:276
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:282
 msgid "Warning - host name does not end with \".i2p\""
-msgstr "Avertissement - le nom d'hôte ne finit pas par « .i2p »"
+msgstr "Avertissement - le nom d’hôte ne finit pas par « .i2p »"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:281
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:290
@@ -179,12 +179,12 @@ msgstr "La destination Base64 est invalide."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:296
 #, java-format
 msgid "Invalid host name \"{0}\"."
-msgstr "Le nom d''hôte « {0} » est invalide."
+msgstr "Le nom d’hôte « {0} » est invalide."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:290
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:299
 msgid "Please enter a host name and destination"
-msgstr "Veuillez saisir un nom et une destination d'hôte"
+msgstr "Veuillez saisir un nom et une destination d’hôte"
 
 #. clear search when deleting
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:294
@@ -194,7 +194,7 @@ msgstr "Veuillez saisir un nom et une destination d'hôte"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:341
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:348
 msgid "Delete Entry"
-msgstr "Supprimer l'entrée"
+msgstr "Supprimer l’entrée"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:294
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:303
@@ -221,7 +221,7 @@ msgstr[1] "{0} destinations ont été supprimées."
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:338
 msgid "No entries selected to delete."
-msgstr "Aucune entrée n'a été sélectionnée pour suppression."
+msgstr "Aucune entrée n’a été sélectionnée pour suppression."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:317
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:234
@@ -236,11 +236,11 @@ msgstr "Ajouter un substitut"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:324
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:345
 msgid "Address book saved."
-msgstr "Le carnet d'adresses a été enregistré."
+msgstr "Le carnet d’adresses a été enregistré."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:327
 msgid "ERROR: Could not write addressbook file."
-msgstr "ERREUR : impossible d'écrire dans le fichier du carnet d'adresses."
+msgstr "ERREUR : impossible d’écrire dans le fichier du carnet d’adresses."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:332
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:108
@@ -249,7 +249,7 @@ msgstr "ERREUR : impossible d'écrire dans le fichier du carnet d'adresses."
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or "
 "\"reload\" button on your browser. Please resubmit."
-msgstr "L'envoi du formulaire est invalide, car vous avez probablement utilisé le bouton « Retour » ou « Recharger » de votre navigateur. Veuillez le renvoyer."
+msgstr "L’envoi du formulaire est invalide, car vous avez probablement utilisé le bouton « Retour » ou « Recharger » de votre navigateur. Veuillez le renvoyer."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:334
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:110
@@ -285,12 +285,12 @@ msgstr "La configuration a été rechargée."
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:106
 #, java-format
 msgid "{0} address book in {1} database"
-msgstr "{0} carnet d''adresses dans {1} base de données"
+msgstr "{0} carnet d’adresses dans {1} base de données"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:247
 #, java-format
 msgid "Host name {0} is not in  the address book."
-msgstr "Le nom d''hôte {0} n''est pas dans le carnet d''adresses."
+msgstr "Le nom d’hôte {0} n’est pas dans le carnet d’adresses."
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:261
 msgid "Manually added via SusiDNS"
@@ -299,7 +299,7 @@ msgstr "Ajouté manuellement par SusiDNS"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:287
 #, java-format
 msgid "Failed to add Destination for {0} to naming service {1}"
-msgstr "Échec d''ajout de destination pour {0} au système de noms {1}"
+msgstr "Échec d’ajout de destination pour {0} au système de noms {1}"
 
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:324
 #, java-format
@@ -309,7 +309,7 @@ msgstr "Échec de suppression de destination pour {0} du service de noms {1}"
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:148
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
-msgstr "Les abonnements ont été enregistrés. Le carnet d'adresses est maintenant mis à jour à partir des sources d'abonnement."
+msgstr "Les abonnements ont été enregistrés. Le carnet d’adresses est maintenant mis à jour à partir des sources d’abonnement."
 
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:153
 msgid "Subscriptions saved."
@@ -321,7 +321,7 @@ msgstr "Les abonnements ont été rechargés."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:192
 msgid "address book"
-msgstr "carnet d'adresses"
+msgstr "carnet d’adresses"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:200
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:202
@@ -388,7 +388,7 @@ msgstr "Configuration"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:216
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:200
 msgid "Address book"
-msgstr "Carnet d'adresses"
+msgstr "Carnet d’adresses"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:221
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:205
@@ -428,7 +428,7 @@ msgstr "Chercher"
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:552
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:236
 msgid "Hostname"
-msgstr "Nom d'hôte"
+msgstr "Nom d’hôte"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:357
 msgid "Link (b32)"
@@ -442,11 +442,11 @@ msgstr "Destination"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:371
 msgid "Select hosts for deletion from addressbook"
-msgstr "Sélectionner les hôtes à supprimer du carnet d'adresses"
+msgstr "Sélectionner les hôtes à supprimer du carnet d’adresses"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:406
 msgid "View larger version of identicon for this hostname"
-msgstr "Voir une version plus grande de l'identicône pour ce nom d'hôte"
+msgstr "Voir une version plus grande de l’identicône pour ce nom d’hôte"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:416
 msgid "Base 32 address"
@@ -454,11 +454,11 @@ msgstr "Adresse Base32"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:422
 msgid "Helper link to share host address with option to add to addressbook"
-msgstr "Lien d'assistant pour partager une adresse d'hôte, avec l'option de l'ajouter au carnet d'adresses"
+msgstr "Lien d’assistant pour partager une adresse d’hôte, avec l’option de l’ajouter au carnet d’adresses"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:428
 msgid "More information on this entry"
-msgstr "Plus d'informations sur cette entrée"
+msgstr "Plus d’informations sur cette entrée"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:431
 msgid "details"
@@ -475,7 +475,7 @@ msgstr "Annuler"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:533
 msgid "This address book is empty."
-msgstr "Ce carnet d'adresses est vide."
+msgstr "Ce carnet d’adresses est vide."
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:550
 msgid "Add new destination"
@@ -499,31 +499,31 @@ msgid ""
 "File and directory paths here are relative to the addressbook's working "
 "directory, which is normally ~/.i2p/addressbook/ (Linux) or "
 "%APPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr "Les chemins des fichiers et dossiers indiqués ici sont relatifs au répertoire de travail du carnet d'adresses, qui est normalement ~/.i2p/addressbook/ (Linux) ou %APPDATA%\\I2P\\addressbook\\ (Windows)."
+msgstr "Les chemins des fichiers et dossiers indiqués ici sont relatifs au répertoire de travail du carnet d’adresses, qui est normalement ~/.i2p/addressbook/ (Linux) ou %APPDATA%\\I2P\\addressbook\\ (Windows)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:229
 msgid ""
 "If you want to manually add lines to an addressbook, add them to the private"
 " or master addressbooks."
-msgstr "Si vous voulez ajouter manuellement des lignes dans un carnet d'adresses, faites-le dans le carnet d'adresses privé ou maître."
+msgstr "Si vous voulez ajouter manuellement des lignes dans un carnet d’adresses, faites-le dans le carnet d’adresses privé ou maître."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:231
 msgid ""
 "The router addressbook and the published addressbook are updated by the "
 "addressbook application."
-msgstr "Le carnet d'adresses du routeur et le carnet d'adresses publié sont mis à jour par l'application de carnet d'adresses."
+msgstr "Le carnet d’adresses du routeur et le carnet d’adresses publié sont mis à jour par l’application de carnet d’adresses."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:233
 msgid ""
 "When you publish your addressbook, ALL destinations from the master and "
 "router addressbooks appear there."
-msgstr "Quand vous publiez votre carnet d'adresses, TOUTES les destinations des carnet d'adresses maître et carnet d'adresses du routeur y apparaissent."
+msgstr "Quand vous publiez votre carnet d’adresses, TOUTES les destinations des carnet d’adresses maître et carnet d’adresses du routeur y apparaissent."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:235
 msgid ""
 "Use the private addressbook for private destinations, these are not "
 "published."
-msgstr "Utiliser le carnet d'adresses privé pour les destinations privées. Elles ne sont pas publiées."
+msgstr "Utiliser le carnet d’adresses privé pour les destinations privées. Elles ne sont pas publiées."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:237
 msgid "Options"
@@ -531,7 +531,7 @@ msgstr "Options"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:239
 msgid "File containing the list of subscriptions URLs (no need to change)"
-msgstr "Fichier contenant la liste des URL d'abonnement (inutile de le modifier)"
+msgstr "Fichier contenant la liste des URL d’abonnement (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:241
 msgid "Update interval in hours"
@@ -549,11 +549,11 @@ msgstr "Votre hosts.txt (ne pas modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:247
 msgid "Your personal addressbook, these hosts will be published"
-msgstr "Votre carnet d'adresses personnel, ces hôtes seront publiés"
+msgstr "Votre carnet d’adresses personnel, ces hôtes seront publiés"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:249
 msgid "Your private addressbook, it is never published"
-msgstr "Votre carnet d'adresses privé, il n'est jamais publié"
+msgstr "Votre carnet d’adresses privé, il n’est jamais publié"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:251
 msgid "Port for your eepProxy (no need to change)"
@@ -561,27 +561,27 @@ msgstr "Port de votre mandataire eep (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:253
 msgid "Hostname for your eepProxy (no need to change)"
-msgstr "Nom d'hôte de votre mandataire eep (inutile de le modifier)"
+msgstr "Nom d’hôte de votre mandataire eep (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:255
 msgid "Whether to update the published addressbook"
-msgstr "Le carnet d'adresses publié doit-il être mis à jour ou non"
+msgstr "Le carnet d’adresses publié doit-il être mis à jour ou non"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:257
 msgid ""
 "File containing the etags header from the fetched subscription URLs (no need"
 " to change)"
-msgstr "Fichier contenant les en-têtes etags des URL d'abonnement récupérées (inutile de le modifier)"
+msgstr "Fichier contenant les en-têtes etags des URL d’abonnement récupérées (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:259
 msgid ""
 "File containing the modification timestamp for each fetched subscription URL"
 " (no need to change)"
-msgstr "Fichier contenant l'estampille temporelle de modification de chaque URL d'abonnement récupérée (inutile de le modifier)"
+msgstr "Fichier contenant l’estampille temporelle de modification de chaque URL d’abonnement récupérée (inutile de le modifier)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:261
 msgid "File to log activity to (change to /dev/null if you like)"
-msgstr "Fichier vers lequel journaliser l'activité (modifier en /dev/null si vous le souhaitez)"
+msgstr "Fichier vers lequel journaliser l’activité (modifier en /dev/null si vous le souhaitez)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:263
 msgid "Name of the theme to use (defaults to 'light')"
@@ -589,7 +589,7 @@ msgstr "Nom du thème à utiliser (clair par défaut)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:176
 msgid "addressbook"
-msgstr "carnet d'adresses"
+msgstr "carnet d’adresses"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:250
 msgid "Encoded Name"
@@ -605,7 +605,7 @@ msgstr "Hachage Base64"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:278
 msgid "Address Helper"
-msgstr "Assistant d'adresse"
+msgstr "Assistant d’adresse"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:284
 msgid "link"
@@ -661,11 +661,11 @@ msgstr "Identification visuelle pour"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:362
 msgid "Create your own identification images"
-msgstr "Créez vos propres images d'identification"
+msgstr "Créez vos propres images d’identification"
 
 #: ../src/tmp/i2p/susi/dns/jsp/details_jsp.java:364
 msgid "Launch Image Generator"
-msgstr "Lancer le générateur d'images"
+msgstr "Lancer le générateur d’images"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:173
 msgid "Introduction"
@@ -673,11 +673,11 @@ msgstr "Présentation"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:195
 msgid "What is the addressbook?"
-msgstr "Qu'est-ce que le carnet d'adresses ?"
+msgstr "Qu’est-ce que le carnet d’adresses ?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:197
 msgid "The addressbook application is part of your I2P installation."
-msgstr "L'application de carnet d'adresses fait partie de votre installation d'I2P."
+msgstr "L’application de carnet d’adresses fait partie de votre installation d’I2P."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:199
 msgid ""
@@ -689,60 +689,60 @@ msgstr "Actualise régulièrement votre fichier hosts.txt à partir de sources d
 #, java-format
 msgid ""
 "In the default configuration, the address book is only subscribed to {0}."
-msgstr "Dans la configuration par défaut, le carnet d''adresses n''est qu''abonné à {0}."
+msgstr "Dans la configuration par défaut, le carnet d’adresses n’est qu’abonné à {0}."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:203
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a "
 "href=\"subscriptions\">subscriptions</a> file."
-msgstr "Il est facile de s'abonner à des sites supplémentaires. Il vous suffit de les ajouter à votre fichier <a href=\"subscriptions\">d'abonnements</a>."
+msgstr "Il est facile de s’abonner à des sites supplémentaires. Il vous suffit de les ajouter à votre fichier <a href=\"subscriptions\">d’abonnements</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:205
 msgid ""
 "For more information on naming in I2P, see <a href=\"http://i2p-"
 "projekt.i2p/naming.html\" target=\"_blank\">the overview</a>."
-msgstr "Pour plus d'informations sur le nommage dans I2P, consulter <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">la vue d'ensemble</a>."
+msgstr "Pour plus d’informations sur le nommage dans I2P, consulter <a href=\"http://i2p-projekt.i2p/naming.html\" target=\"_blank\">la vue d’ensemble</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:207
 msgid "How does the addressbook application work?"
-msgstr "Comment l'application de carnet d'adresses fonctionne-t-elle ?"
+msgstr "Comment l’application de carnet d’adresses fonctionne-t-elle ?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:209
 msgid ""
 "The addressbook application regularly polls your subscriptions and merges "
 "their content into your \"router\" address book."
-msgstr "L'application carnet d'adresses interroge régulièrement vos abonnements et fusionne leur contenu dans le carnet d'adresses de votre routeur."
+msgstr "L’application carnet d’adresses interroge régulièrement vos abonnements et fusionne leur contenu dans le carnet d’adresses de votre routeur."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:211
 msgid ""
 "Then it merges your \"master\" address book into the router address book as "
 "well."
-msgstr "Puis elle fusionne aussi votre carnet d'adresses « maître » dans le carnet d'adresses du routeur. "
+msgstr "Puis elle fusionne aussi votre carnet d’adresses « maître » dans le carnet d’adresses du routeur. "
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:213
 msgid ""
 "If configured, the router address book is now written to the \"published\" "
 "address book, which will be publicly available if you are running an "
 "eepsite."
-msgstr "Si configuré ainsi, le carnet d'adresses du routeur est alors écrit vers le carnet d'adresses « publié » qui sera proposé publiquement si vous faites tourner un site eep."
+msgstr "Si configuré ainsi, le carnet d’adresses du routeur est alors écrit vers le carnet d’adresses « publié » qui sera proposé publiquement si vous faites tourner un site eep."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:215
 msgid ""
 "The router also uses a private address book, which is not merged or "
 "published."
-msgstr "Le routeur utilise aussi un carnet d'adresses privé qui n'est ni fusionné ni publié"
+msgstr "Le routeur utilise aussi un carnet d’adresses privé qui n’est ni fusionné ni publié"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:217
 msgid ""
 "Hosts in the private address book can be accessed by you but their addresses"
 " are never distributed to others."
-msgstr "Vous pouvez accéder aux hôtes du carnet d'adresses privé, mais leurs adresses ne sont distribuées à personne."
+msgstr "Vous pouvez accéder aux hôtes du carnet d’adresses privé, mais leurs adresses ne sont distribuées à personne."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:219
 msgid ""
 "The private address book can also be used for aliases of hosts in your other"
 " address books."
-msgstr "Le carnet d'adresses privé peut aussi être utilisé pour les alias d'hôtes dans vos autres carnets d'adresses."
+msgstr "Le carnet d’adresses privé peut aussi être utilisé pour les alias d’hôtes dans vos autres carnets d’adresses."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:181
 msgid "subscriptions"
@@ -750,12 +750,12 @@ msgstr "abonnements"
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:222
 msgid "The subscription file contains a list of i2p URLs."
-msgstr "Le fichier d'abonnements contient une liste d'URL i2p."
+msgstr "Le fichier d’abonnements contient une liste d’URL i2p."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:224
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
-msgstr "L'application de carnet d'adresses vérifie régulièrement la présence de nouveaux sites eep sur cette liste."
+msgstr "L’application de carnet d’adresses vérifie régulièrement la présence de nouveaux sites eep sur cette liste."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:226
 msgid "Those URLs refer to published hosts.txt files."
@@ -766,14 +766,14 @@ msgstr "Ces URL renvoient aux fichiers hosts.txt publiés."
 msgid ""
 "The default subscription is the hosts.txt from {0}, which is updated "
 "infrequently."
-msgstr "L''abonnement par défaut est le hosts.txt de {0} qui n''est pas souvent mis à jour."
+msgstr "L’abonnement par défaut est le hosts.txt de {0} qui n’est pas souvent mis à jour."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:230
 msgid ""
 "So it is a good idea to add additional subscriptions to sites that have the "
 "latest addresses."
-msgstr "Il est souhaitable d'ajouter des abonnements supplémentaires à des sites qui disposent des adresses les plus récentes."
+msgstr "Il est souhaitable d’ajouter des abonnements supplémentaires à des sites qui disposent des adresses les plus récentes."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:232
 msgid "See the FAQ for a list of subscription URLs."
-msgstr "Voir la FAQ pour une liste d'URL d'abonnement."
+msgstr "Voir la FAQ pour une liste d’URL d’abonnement."

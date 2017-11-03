@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-10-06 13:42+0000\n"
-"PO-Revision-Date: 2017-07-07 12:41+0000\n"
+"PO-Revision-Date: 2017-10-25 17:50+0000\n"
 "Last-Translator: French language coordinator <french.coordinator@rbox.me>\n"
 "Language-Team: French (http://www.transifex.com/otf/I2P/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -23,13 +23,13 @@ msgstr ""
 
 #: ../i2prouter:223
 msgid "Failed to load the wrapper"
-msgstr "Échec de chargement de l'enveloppeur"
+msgstr "Échec de chargement de l’enveloppeur"
 
 #: ../i2prouter:988 ../i2prouter:1016 ../i2prouter:1090 ../i2prouter:1118
 #: ../i2prouter:1139
 #, sh-format
 msgid "$APP_LONG_NAME is already running."
-msgstr "$APP_LONG_NAME est déjà en cours d'exécution."
+msgstr "$APP_LONG_NAME est déjà en cours d’exécution."
 
 #: ../i2prouter:999
 #, sh-format
@@ -63,7 +63,7 @@ msgstr "Arrêt de $APP_LONG_NAME"
 #: ../i2prouter:1154 ../i2prouter:1222 ../i2prouter:1775
 #, sh-format
 msgid "$APP_LONG_NAME was not running."
-msgstr "$APP_LONG_NAME n'était pas en cours d'exécution."
+msgstr "$APP_LONG_NAME n’était pas en cours d’exécution."
 
 #: ../i2prouter:1167 ../i2prouter:1175 ../i2prouter:1237 ../i2prouter:1245
 #, sh-format
@@ -78,7 +78,7 @@ msgstr "En attente de fermeture de $APP_LONG_NAME."
 #: ../i2prouter:1207
 #, sh-format
 msgid "Failed to stop $APP_LONG_NAME."
-msgstr "Échec d'arrêt de $APP_LONG_NAME."
+msgstr "Échec d’arrêt de $APP_LONG_NAME."
 
 #: ../i2prouter:1210
 #, sh-format
@@ -93,17 +93,17 @@ msgstr "Fermeture respectueuse de $APP_LONG_NAME"
 #: ../i2prouter:1264
 #, sh-format
 msgid "$APP_LONG_NAME is not running."
-msgstr "$APP_LONG_NAME n'est pas en cours d'exécution."
+msgstr "$APP_LONG_NAME n’est pas en cours d’exécution."
 
 #: ../i2prouter:1269
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid"
-msgstr "$APP_LONG_NAME est en cours d'exécution : PID:$pid"
+msgstr "$APP_LONG_NAME est en cours d’exécution : PID:$pid"
 
 #: ../i2prouter:1272
 #, sh-format
 msgid "$APP_LONG_NAME is running: PID:$pid, Wrapper:$STATUS, Java:$JAVASTATUS"
-msgstr "$APP_LONG_NAME est en cours d'exécution: PID:$pid, Enveloppeur:$STATUS, Java:$JAVASTATUS"
+msgstr "$APP_LONG_NAME est en cours d’exécution: PID:$pid, Enveloppeur:$STATUS, Java:$JAVASTATUS"
 
 #: ../i2prouter:1325 ../i2prouter:1337 ../i2prouter:1356 ../i2prouter:1373
 #: ../i2prouter:1440 ../i2prouter:1460 ../i2prouter:1474 ../i2prouter:1488
@@ -122,7 +122,7 @@ msgstr "Installation du démon de $APP_LONG_NAME"
 #: ../i2prouter:1599
 #, sh-format
 msgid "Install not currently supported for $DIST_OS"
-msgstr "L'installation n'est actuellement pas prise en charge pour $DIST_OS"
+msgstr "L’installation n’est actuellement pas prise en charge pour $DIST_OS"
 
 #: ../i2prouter:1615 ../i2prouter:1628 ../i2prouter:1642 ../i2prouter:1651
 #: ../i2prouter:1661 ../i2prouter:1685 ../i2prouter:1698 ../i2prouter:1710
@@ -136,12 +136,12 @@ msgstr "Suppression du démon de $APP_LONG_NAME"
 #: ../i2prouter:1722 ../i2prouter:1735 ../i2prouter:1749 ../i2prouter:1760
 #, sh-format
 msgid "The $APP_LONG_NAME daemon is not currently installed."
-msgstr "Le démon de $APP_LONG_NAME n'est actuellement pas installé."
+msgstr "Le démon de $APP_LONG_NAME n’est actuellement pas installé."
 
 #: ../i2prouter:1764
 #, sh-format
 msgid "Remove not currently supported for $DIST_OS"
-msgstr "La suppression n'est actuellement pas prise en charge pour $DIST_OS"
+msgstr "La suppression n’est actuellement pas prise en charge pour $DIST_OS"
 
 #: ../i2prouter:1851
 msgid "Commands:"
@@ -161,7 +161,7 @@ msgstr "Arrêter si elle fonctionne comme démon ou dans une autre console."
 
 #: ../i2prouter:1855
 msgid "Stop gracefully, may take up to 11 minutes."
-msgstr "Arrêt respectueux, peut prendre jusqu'à 11 minutes."
+msgstr "Arrêt respectueux, peut prendre jusqu’à 11 minutes."
 
 #: ../i2prouter:1856
 msgid "Stop if running and then start."
@@ -169,11 +169,11 @@ msgstr "Arrêter si elle fonctionne et démarrer ensuite."
 
 #: ../i2prouter:1857
 msgid "Restart only if already running."
-msgstr "Redémarrer seulement si elle est déjà en cours d'exécution."
+msgstr "Redémarrer seulement si elle est déjà en cours d’exécution."
 
 #: ../i2prouter:1858
 msgid "Query the current status."
-msgstr "Demander l'état actuel."
+msgstr "Demander l’état actuel."
 
 #: ../i2prouter:1859
 msgid "Install to start automatically when system boots."
@@ -185,7 +185,7 @@ msgstr "Désinstaller."
 
 #: ../i2prouter:1861
 msgid "Request a Java thread dump if running."
-msgstr "Demander un vidage des fils d'exécution de Java si elle est en cours d'exécution."
+msgstr "Demander un vidage des fils d’exécution de Java si elle est en cours d’exécution."
 
 #: ../i2prouter:1874
 msgid "Please edit i2prouter and set the variable RUN_AS_USER"
@@ -193,7 +193,7 @@ msgstr "Veuillez modifier i2prouter et définir la variable RUN_AS_USER"
 
 #: ../i2prouter:1879
 msgid "Running I2P as the root user is *not* recommended."
-msgstr "Il n'est *pas* recommandé d'exécuter I2P en tant que root."
+msgstr "Il n’est *pas* recommandé d’exécuter I2P en tant que root."
 
 #: ../i2prouter:1882
 msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."

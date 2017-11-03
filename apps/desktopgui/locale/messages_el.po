@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Elektra M. <safiragon@yahoo.gr>, 2017
 # lixtetrax <lixtetrax@grhack.net>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-25 12:29+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: zzzi2p\n"
+"PO-Revision-Date: 2017-09-20 19:55+0000\n"
+"Last-Translator: Elektra M. <safiragon@yahoo.gr>\n"
 "Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,7 +43,7 @@ msgstr "Έναρξη φυλλομετρητή Ι2Ρ"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:76
 #: src/net/i2p/desktopgui/InternalTrayManager.java:228
 msgid "Configure I2P System Tray"
-msgstr ""
+msgstr "Ρύθμιση της γραμμής εργασιών του I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:77
 #: src/net/i2p/desktopgui/InternalTrayManager.java:229
@@ -62,17 +63,17 @@ msgstr "Τερματισμός Ι2Ρ"
 #: src/net/i2p/desktopgui/InternalTrayManager.java:126
 #: src/net/i2p/desktopgui/InternalTrayManager.java:278
 msgid "Restart I2P Immediately"
-msgstr ""
+msgstr "Άμεση επανεκκίνηση του Ι2Ρ"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:143
 #: src/net/i2p/desktopgui/InternalTrayManager.java:295
 msgid "Stop I2P Immediately"
-msgstr ""
+msgstr "Άμεση διακοπή του I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:157
 #: src/net/i2p/desktopgui/InternalTrayManager.java:309
 msgid "Cancel I2P Shutdown"
-msgstr ""
+msgstr "Ακύρωση τερματισμού λειτουργίας του I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:363
 #, java-format
@@ -91,4 +92,4 @@ msgstr "Δίκτυο "
 #. Windows typically has tooltips; Linux (at least Ubuntu) doesn't
 #: src/net/i2p/desktopgui/TrayManager.java:63
 msgid "I2P: Right-click for menu"
-msgstr ""
+msgstr "I2P: Κάντε δεξί κλικ για το μενού"

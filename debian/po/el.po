@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Elektra M. <safiragon@yahoo.gr>, 2017
 # lixtetrax <lixtetrax@grhack.net>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: kytv <killyourtv@i2pmail.org>\n"
+"PO-Revision-Date: 2017-09-20 19:48+0000\n"
+"Last-Translator: Elektra M. <safiragon@yahoo.gr>\n"
 "Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,7 +81,7 @@ msgstr "Δρομολογητές με υψηλό εύρος ζώνης, καθώ
 #. Description
 #: ../i2p.templates:5001
 msgid "Run I2P daemon confined with AppArmor"
-msgstr ""
+msgstr "Εκτέλεση I2P daemon περιορισμένο με AppArmor"
 
 #. Type: boolean
 #. Description
@@ -88,4 +89,4 @@ msgstr ""
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr ""
+msgstr "Με αυτήν την επιλογή, το I2P θα είναι φιλτραρισμένο με το AppArmor, περιορίζοντας σε ποια αρχεία και καταλόγους μπορεί να έχει πρόσβαση το I2P."

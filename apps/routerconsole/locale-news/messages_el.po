@@ -4,14 +4,15 @@
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
 # Translators:
+# Elektra M. <safiragon@yahoo.gr>, 2017
 # LOUKAS SKOUROLIAKOS, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-07-13 21:46+0000\n"
-"PO-Revision-Date: 2017-06-30 21:33+0000\n"
-"Last-Translator: LOUKAS SKOUROLIAKOS\n"
+"PO-Revision-Date: 2017-09-22 08:14+0000\n"
+"Last-Translator: Elektra M. <safiragon@yahoo.gr>\n"
 "Language-Team: Greek (http://www.transifex.com/otf/I2P/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,16 +34,16 @@ msgstr "Παρακαλώ {0}εχετε υπομονή{1} καθώς το I2P ε�
 msgid ""
 "While you are waiting, please {0}adjust your bandwidth settings{1} on the "
 "{2}configuration page{3}."
-msgstr ""
+msgstr "Ενώ περιμένετε, παρακαλούμε {0}προσαρμόσετε τις ρυθμίσεις εύρους ζώνης{1} στη {2}σελίδα διαμόρφωσης{3}."
 
 msgid ""
 "Also you can setup your browser to use the I2P proxy to reach eepsites."
-msgstr ""
+msgstr "Επίσης, μπορείτε να ρυθμίσετε το πρόγραμμα περιήγησης σας να χρησιμοποιεί τον διακομιστή μεσολάβησης I2P για να προσεγγίσετε τα eepsites."
 
 msgid ""
 "Just enter 127.0.0.1 (or localhost) port 4444 as a http proxy into your "
 "browser settings."
-msgstr ""
+msgstr "Απλά πληκτρολογήστε 127.0.0.1 (ή localhost) θύρα 4444 ως διακομιστή μεσολάβησης http στις ρυθμίσεις του προγράμματος περιήγησης σας."
 
 msgid "Do not use SOCKS for this."
 msgstr "Μη χρησιμοποιήσετε SOCKS για αυτό."
@@ -50,7 +51,7 @@ msgstr "Μη χρησιμοποιήσετε SOCKS για αυτό."
 #, java-format
 msgid ""
 "More information can be found on the {0}I2P browser proxy setup page{1}."
-msgstr ""
+msgstr "Περισσότερες πληροφορίες μπορείτε να βρείτε στη {0}σελίδα εγκατάστασης του διακομιστή προγράμματος περιήγησης του I2P{1}."
 
 #, java-format
 msgid ""
