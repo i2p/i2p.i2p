@@ -20,13 +20,12 @@ subprojects {
     }
 
     sourceCompatibility = 1.7
-    // Set bootClasspath=/path/to/rt.jar:/path/to/jce.jar in gradle.properties if needed
-// Please check if you forgot to check in gradle.properties --zab
-//    if (bootClasspath) {
-//        tasks.withType(AbstractCompile, { AbstractCompile ac ->
-//            ac.options.bootstrapClasspath = files(bootClasspath)
-//        })
-//    }
+    // Set i2pBootClasspath=/path/to/rt.jar:/path/to/jce.jar in ~/.gradle/gradle.properties if needed
+    if (i2pBootClasspath) {
+        tasks.withType(AbstractCompile, { AbstractCompile ac ->
+            ac.options.bootstrapClasspath = files(i2pBootClasspath)
+        })
+    }
 }
 
 //apply from: file('gradle/update.gradle')
