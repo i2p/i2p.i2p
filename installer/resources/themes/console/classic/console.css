@@ -6,7 +6,7 @@ body {
      margin: 3px;
      padding: 0;
      text-align: left;
-     background: #bbf url(images/bg.png) center center fixed;
+     background: #bbf url(images/bg.png) center center scroll;
      background-size: 120px 120px;
      color: #2c354f;
      font: 9pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
@@ -14,7 +14,7 @@ body {
 
 /* preload button mouseovers */
 body {
-     background: url(images/bg.png) fixed,
+     background: url(images/bg.png) scroll,
      url(/themes/console/images/buttons/clean_hover.png) no-repeat,
      url(/themes/console/images/buttons/configure_hover.png) no-repeat,
      url(/themes/console/images/buttons/delete_hover.png) no-repeat,
@@ -24,6 +24,12 @@ body {
      url(/themes/console/images/buttons/shutdown_hover.png) no-repeat,
      url(/themes/console/images/buttons/update_hover.png) no-repeat, #bbf;
      background-size: 120px 120px, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+
+@supports (text-justify: auto) { /* Firefox 55+ */
+body {
+     background-attachment: fixed;
+}
 }
 
 ::selection {
@@ -1261,7 +1267,7 @@ a:link {
      word-wrap: break-word;
 }
 
-a:visited, #graphopts a, #graphopts a:visited {
+a:visited, #graphopts a, #graphopts a:visited, .tab a, .tab a:visited {
      color: #448 !important;
      text-decoration: none;
      font-weight: bold;
@@ -1288,13 +1294,13 @@ a.script {
 pre {
      margin: 0 20px;
      overflow: auto;
-     font-size: 8pt !important;
+     font-size: 8.5pt;
      width: 95%;
      padding-top: 10px;
 }
 
 tt, code {
-     font: bold 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
+     font: bold 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
      color: darkgreen;
 }
 
@@ -1415,6 +1421,7 @@ label[for="0"] {
 
 input[type="file"] {
      margin: 3px 5px;
+     background: none;
 }
 
 input[type="text"], input[type="password"] {
@@ -2085,7 +2092,7 @@ button::-moz-focus-inner, input[type="submit"]::-moz-focus-inner, input[type="re
      padding-top: 15px;
 }
 
-.main li b {
+.links li b {
      color: #1f7096 !important;
 }
 
@@ -2330,14 +2337,14 @@ div.news hr:last-child {
 
 /* top navigation */
 
-.confignav {
-     padding: 5px 5px 6px;
+div.confignav {
+     padding: 5px 7px 6px;
      margin: -16px -16px 5px -16px;
      border: 1px solid #89f;
      font-size: 9pt;
      text-align: center;
      font-weight: bold;
-     color: #000;
+     background: linear-gradient(to bottom, #fff, #eff2ff);
 }
 
 .tab, .tab2 {
@@ -2352,7 +2359,7 @@ div.news hr:last-child {
 
 .tab a {
      display: inline-block;
-     padding: 4px 14px;
+     padding: 3px 15px;
 }
 
 .tab:hover a {
@@ -2370,7 +2377,7 @@ div.news hr:last-child {
 }
 
 .tab:active {
-     box-shadow: inset 0 0 0 1px #fff, inset 3px 3px 3px 1px #5f2400;
+     box-shadow: inset 0 0 0 1px #f90, inset 3px 3px 3px 1px #5f2400;
      background: #f60;
 }
 
@@ -2379,10 +2386,13 @@ div.news hr:last-child {
 }
 
 .tab2 {
-     background: #89f;
-     box-shadow: inset 0 0 0 1px #fff;
+     padding: 4px 14px;
      color: #fff;
-     padding: 5px 12px;
+     text-shadow: 0 1px 1px #225;
+     box-shadow: inset 3px 3px 2px #337;
+     background: #89f;
+     background: linear-gradient(to bottom, #89f 50%, #78f 50%);
+     vertical-align: top;
 }
 
 /* end topnav */
@@ -2513,6 +2523,7 @@ table.configtable, #permabanned, #loggingoptions, #configstats, ul#banlist {
 
 #manualreseed td:first-child {
      white-space: nowrap;
+     border-right: none;
 }
 
 #manualreseed .optionsave {
@@ -2534,6 +2545,24 @@ table.configtable, #permabanned, #loggingoptions, #configstats, ul#banlist {
 #reseedconfig tr:nth-child(2) label {
      white-space: nowrap;
      margin-right: 10px;
+}
+
+#reseedconfig td {
+     width: 50%;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+#reseedconfig .optbox[type="radio"] {
+     margin: 4px 4px 4px 15px !important;
+}
+
+#reseedconfig .optbox[type="checkbox"] {
+     vertical-align: sub !important;
+}
+
+#manualreseed th:last-child, #manualreseed td:last-child {
+     border-right: 1px solid #89f;
+}
 }
 
 #loggingoptions textarea {
@@ -2812,7 +2841,10 @@ ul#banlist {
      column-width: 270px;
      column-gap: 35px;
      column-rule: 1px dotted #89f;
-     font-size: 8pt;
+}
+
+#config_peers #banlist {
+     margin-bottom: 11px;
 }
 
 ul#banlist + h3.tabletitle {
@@ -2840,6 +2872,12 @@ ul#banlist + h3.tabletitle {
 
 #banlist li:first-child {
      margin-top: 0;
+}
+
+#banlist a[href^="configpeer?peer"] {
+     margin-top: -5px;
+     float: right;
+     line-height: 0;
 }
 
 /* /configpeers banlist */
@@ -3051,6 +3089,7 @@ pre#transports {
      padding-left: 0;
      padding-right: 8px;
 }
+
 div.configure tr, div.configure td {
      padding: 5px;
 }
@@ -3068,7 +3107,7 @@ div.configure h2:first-child {
 }
 
 #sidebarconf button {
-     margin: 2px;
+     margin: 2px !important;
      padding: 2px 3px;
      background-size: 100% 100% !important;
 }
@@ -3301,6 +3340,7 @@ h3#i2pclientconfig {
 }
 
 h3#bannedpeers {
+     margin-top: 16px;
      margin-bottom: -16px;
 }
 
@@ -3377,7 +3417,7 @@ h3#pluginmanage {
 }
 
 .configure > h3#pluginmanage {
-     margin-top: 15px;
+     margin-top: 11px;
 }
 
 h3#advancedclientconfig, h3#pconfig {
@@ -3416,7 +3456,7 @@ h4#updateplugins {
      margin-top: -13px;
 }
 
-.routersummary h2, .routersummary h3, div.confignav {
+.routersummary h2, .routersummary h3 {
      background: url(images/tinytitle.png) center center repeat-x;
      background: linear-gradient(to bottom, #fff 50%, #eff2ff 50%);
 }
@@ -3529,6 +3569,8 @@ td.tabletextarea {
      overflow: auto;
      border: 0;
      white-space: pre-wrap;
+     word-break: break-all;
+     font-size: 9pt;
      padding: 5px;
      box-shadow: 0 0 0 0 !important;
      border: none !important;
@@ -3774,7 +3816,7 @@ table.search {
 }
 
 tt, pre, textarea, code {
-     font: 8pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
+     font: 8.5pt "Droid Sans Mono", "Andale Mono", "DejaVu Sans Mono", "Lucida Console", monospace;
 }
 
 hr {
@@ -4145,6 +4187,10 @@ p#enablefullstats {
      margin-top: -6px;
 }
 
+.formaction#clientsconfig {
+     margin-bottom: -5px;
+}
+
 .formaction#pluginconfigactions {
      border: 1px solid #89f;
      margin-top: -1px;
@@ -4157,12 +4203,12 @@ p#enablefullstats {
      padding: 15px 15px 15px 50px;
 }
 
-.formaction#webappconfigactions, .formaction#clientsconfig {
+.formaction#webappconfigactions {
      margin-bottom: -5px;
 }
 
 .formaction#resetreseed {
-     margin: 0 -10px 0 0;
+     margin: 0 -3px 0 0;
      background: none;
 }
 
@@ -4174,7 +4220,7 @@ p#enablefullstats {
 
 .formaction#homeapps {
      margin-top: -6px;
-     margin-bottom: -5px;
+     margin-bottom: 0;
 }
 
 .formaction#homesites {
@@ -4708,7 +4754,6 @@ p#helptranslate {
 
 .langselect:hover > input + img {
      transform: scale(1.1);
-     border: 1px solid #f60 !important;
 }
 
 .langselect img[src^="/flags"] {
@@ -4910,6 +4955,11 @@ td#pw_adduser input {
 
 #clientconfig th:last-child, #webappconfig th:last-child, #pluginconfig th:last-child {
      text-align: left;
+}
+
+#clientconfig th:nth-child(2), #clientconfig th:nth-child(3),
+#webappconfig th:nth-child(2), #webappconfig th:nth-child(3) {
+     text-align: center;
 }
 
 #clientconfig td:nth-child(3) {
@@ -5671,6 +5721,10 @@ ul#reachability {
      line-height: 140%;
 }
 
+#portfaq tr {
+     box-shadow: none;
+}
+
 #configinfo th {
      box-shadow: inset 0 0 0 1px #fff;
 }
@@ -5694,6 +5748,7 @@ ul#reachability {
      height: 600px;
      overflow: auto;
      white-space: pre-wrap;
+     font-size: 9pt;
 }
 
 p#fullhistory {
@@ -5797,10 +5852,15 @@ p#fullhistory {
 }
 
 .eventspanel form {
-     border: 1px solid #89f;
-     padding: 10px;
      margin-top: -11px;
-     background: #fff;
+     padding: 10px 10px 10px 50px;
+     border: 1px solid #89f;
+     background: #fff url(/themes/console/images/info/logs.png) 12px center no-repeat;
+     background-size: 28px 28px;
+}
+
+.eventspanel select {
+     margin-right: 15px;
 }
 
 .eventspanel th {
@@ -5931,6 +5991,11 @@ p.infowarn {
      margin-top: 15px;
 }
 
+#tunnelconfig td:nth-child(n+2) {
+     text-align: left;
+     padding-left: 0;
+}
+
 #bandwidthconfig tr:first-child .infohelp {
      background: #fff url(/themes/console/images/info/bandwidth.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
@@ -6010,64 +6075,65 @@ p#pluginconfigtext {
 }
 
 #manualreseed tr:nth-last-child(2) td.infohelp {
-     background: #fff url(/themes/console/images/info/box.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/box.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 #config_peers tr:nth-child(3) td.infohelp {
-     background: #fff url(/themes/console/images/info/blocked.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     border-right: none;
+     background: #fff url(/themes/console/images/info/blocked.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 h3#shutdownrouter + p.infohelp {
-     background: #fff url(/themes/console/images/info/power.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/power.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 h3#restartrouter + p.infohelp, #config_family .infohelp.needrestart {
-     background: #fff url(/themes/console/images/info/reboot.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/reboot.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 h3#systray + p.infohelp {
-     background: #fff url(/themes/console/images/info/systray.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/systray.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 h3#servicedebug + p.infohelp {
-     background: #fff url(/themes/console/images/info/debug.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/debug.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 h3#browseronstart + p.infohelp {
-     background: #fff url(/themes/console/images/info/launch_browser.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/launch_browser.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 .main#config_reseed p.infohelp {
-     background: #fff url(/themes/console/images/info/connect.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/connect.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 p#enablefullstats, p#gatherstats {
-     background: #fff url(/themes/console/images/info/statistics.png) 12px center no-repeat;
      padding: 15px 15px 15px 50px;
+     background: #fff url(/themes/console/images/info/statistics.png) 12px center no-repeat;
      background-size: 28px 28px;
 }
 
 #config_family .infohelp {
-      background: #fff url(/themes/console/images/info/family.png) 12px center no-repeat;
-      padding: 15px 15px 15px 50px;
-      background-size: 28px 28px;
       margin-bottom: -1px !important;
+      padding: 15px 15px 15px 50px;
+      background: #fff url(/themes/console/images/info/family.png) 12px center no-repeat;
+      background-size: 28px 28px;
 }
 
 /* end informational images */
@@ -6098,7 +6164,7 @@ p#enablefullstats, p#gatherstats {
 
 #logs li {
      list-style: none;
-     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 130%;
      text-align: left;
      display: inline-block;
@@ -6110,12 +6176,12 @@ p#enablefullstats, p#gatherstats {
      display: block;
      border-top: 1px dotted #bbf;
      width: 100%;
-     margin: 4px 0 0;
+     margin: 2px 0 -4px;
 }
 
 #logs li:last-child::after {
      border: none;
-     margin: 0;
+     margin: -4px;
 }
 
 #logs font[color^="#"]::before {
@@ -6155,7 +6221,7 @@ p#enablefullstats, p#gatherstats {
 /* peers, profiles, tunnels */
 
 .cells tt, #profilelist tt {
-     font-size: 8pt !important;
+     font-size: 8.5pt !important;
 }
 
 /* end peers, profiles, tunnels dests */
@@ -6163,7 +6229,7 @@ p#enablefullstats, p#gatherstats {
 /* /tunnels */
 
 tt a, .cells tt {
-     letter-spacing: 0.07em;
+     letter-spacing: 0.1em;
 }
 
 .tunnel_cap {
@@ -6396,6 +6462,10 @@ th code {
 
 .netdb_addresses br:first-child, .sybil_routerinfo tr:last-child td br:first-child {
      display: none;
+}
+
+.netdb_addresses {
+     line-height: 150%;
 }
 
 .netdbentry th:first-child::after {
@@ -6686,6 +6756,14 @@ b.netdb_transport {
 #debug td {
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+#debug td ul {
+     margin: 0;
+}
+
+#debug td li {
+     padding: 0 0 -10px;
 }
 
 #debug h2 {
@@ -7274,6 +7352,7 @@ table.sybil_routerinfo:last-child {
 #upnpstatus + #ntcpcon {
      margin-top: 5px !important;
 }
+
 /* end whitespace reduction */
 
 #help h3, #faq h3 {
@@ -7282,6 +7361,15 @@ table.sybil_routerinfo:last-child {
 
 #portfaq td:nth-child(2) {
      white-space: normal;
+}
+
+.eventspanel form {
+     padding: 10px !important;
+     background: #fff !important;
+}
+
+.eventspanel select {
+     margin-right: 8px !important;
 }
 }
 
@@ -7598,4 +7686,136 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 
 /* end Edge/IE tweaks */
+
+
+/* TO DO: Merge with main classes */
+
+.optionlist {
+     columns: 500px auto;
+     padding-bottom: 1px;
+}
+
+.optionlist label {
+     min-width: 300px;
+     break-inside: avoid;
+     page-break-inside: avoid !important;
+     -webkit-column-break-inside: avoid;
+}
+
+th.options, table#externali2cp th {
+     padding: 7px 10px !important;
+}
+
+.options input[type="checkbox"], #i2pupdates .options .optbox {
+     margin: 0 3px 0 0;
+}
+
+#reseedconfig textarea {
+      min-height: 76px !important;
+      height: 76px !important;
+      margin: 6px 10px 6px 0 !important;
+      padding: 3px 5px;
+}
+
+#reseedconfig .nowrap b {
+     display: inline-block;
+     min-width: 100px;
+     text-align: right;
+     margin-right: 5px;
+}
+
+#manualreseed {
+     margin-bottom: -3px !important;
+}
+
+#resetreseed {
+     padding: 5px 5px 0 0;
+}
+
+/* /configui */
+
+#passwordheading {
+     margin-top: 0 !important;
+}
+
+#langsettings {
+     margin-bottom: -6px !important;
+}
+
+/* end /configui */
+
+#pluginconfigtext + form {
+     float: right;
+     margin: -42px 6px 0 0;
+}
+
+#externaltcp .nowrap:first-child {
+     margin: 5px 0 -18px !important;
+     display: inline-block;
+}
+
+#cputype {
+     display: inline-block;
+     margin: -2px 2px -2px 0;
+     padding: 2px 5px;
+     font-weight: bold;
+     text-transform: uppercase;
+     border-radius: 2px;
+     background: #ddf;
+}
+
+#wrapperlogs pre {
+     height: 400px;
+     resize: vertical;
+}
+
+/* graphs */
+
+.statimage {
+     animation: fadein 1s ease-in; /* prevent white background flicker on refresh */
+}
+
+@keyframes fadein {
+from {
+     background: #f7f7ff;
+}
+
+to {
+     background: #fff;
+}
+}
+
+#graphs td:first-child {
+     font-weight: normal;
+     text-align: left;
+     padding: 5px 0 0;
+}
+
+@media screen and (min-width: 1060px) {
+#graphs td:first-child {
+     padding: 5px 0;
+}
+}
+
+#graphs td b {
+     min-width: 150px;
+     text-align: right;
+     display: inline-block;
+     margin-right: 5px;
+}
+
+#graphs .nowrap {
+     line-height: 300%;
+     display: inline-block;
+}
+
+/* end graphs */
+
+.buckets br + br {
+     line-height: 5px;
+}
+
+#debug td div, #debug td ul {
+     columns: 400px auto;
+}
 

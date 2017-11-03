@@ -335,7 +335,7 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Debug")))
            .append("</a>\n")
 
-           .append("<a href=\"/events\" target=\"_top\" title=\"")
+           .append("<a href=\"/events?from=604800000\" target=\"_top\" title=\"")
            .append(_t("View historical log of router events"))
            .append("\">")
            .append(nbsp(_t("Events")))
@@ -802,7 +802,7 @@ class SummaryBarRenderer {
                .append("\"><td><span id=\"sb_graphstats\">")
                .append(_helper.getSecondKBps())
                .append("Bps</span></td></tr></table></a></div>\n");
-//               .append("<script src=\"/js/refreshGraph.js\" type=\"text/javascript\"></script>");
+        buf.append("<script src=\"/js/refreshGraph.js\" type=\"text/javascript\" id=\"refreshGraph\" async></script>");
         return buf.toString();
     }
 

@@ -7,9 +7,15 @@ body {
      margin: 5px 0 0 0;
      padding: 0;
      text-align: center;
-     background: #010 url(images/camotile.png) top left fixed;
+     background: #010 url(images/camotile.png) top left scroll;
      color: #ee9;
      font: 8.5pt/130% "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
+}
+
+@supports (text-justify: auto) { /* Firefox 55+ */
+body {
+     background-attachment: fixed;
+}
 }
 
 .hide, .hideme {
@@ -157,7 +163,7 @@ div.warning {
 
 .warning h3 {
      font-size: 10pt;
-     padding: 7px 10px;
+     padding: 9px 10px 7px;
      text-align: left;
      margin: -9px -24px 15px -74px;
      border: none;
@@ -333,7 +339,7 @@ div.warning {
      text-transform: uppercase;
      border-radius: 0;
      mix-blend-mode: exclusion;
-     transition: ease all 0.2s;
+     transition: none !important;
 }
 
 .routersummary h3::after {
@@ -345,22 +351,21 @@ div.warning {
 
 .routersummary h3 a {
      vertical-align: middle;
-     transition: ease all 0.2s;
 }
 
 .routersummary h3:hover {
      background: #010 !important;
      box-shadow: inset 0 0 2px 2px #000;
-     transition: ease all 0.2s;
 }
 
 .routersummary h3:hover a {
      color: #f60;
-     transition: ease all 0.2s;
+     transition: ease color 0.2s;
 }
 
 .routersummary h3:active {
-     box-shadow: inset 4px 4px 4px #000;
+     box-shadow: inset 4px 4px 3px #000;
+     transition: ease box-shadow 0.1s;
 }
 
 .routersummary h4 {
@@ -370,11 +375,10 @@ div.warning {
      margin: -6px -9px -8px !important;
      padding: 6px 1px;
      background: #000;
-     background: linear-gradient(to right, #001900, #001000 5%, #000 25%, #000 50%, #000 75%, #001000 95%, #001900);
+     background: linear-gradient(to right, #001900, #001000 5%, #000 50%, #001000 95%, #001900);
      text-decoration: none !important;
      color: #2b2;
      line-height: 120%;
-     box-shadow: inset 0 0 0 1px #121;
      box-shadow: inset 0 0 0 1px #121, inset 0 0 5px 2px #000;
 }
 
@@ -762,27 +766,33 @@ a:active #sb_bandwidthgraph {
 
 #sb_graphcontainer {
      background-color: #000;
-     background-position: left -72px top -23px !important;
+     background-position: left -72px top -22px !important;
      background-size: 280px 77px !important;
      background-repeat: no-repeat !important;
      margin-bottom: -7px !important;
      filter: invert(1) hue-rotate(90deg);
+     background-position: left -72px top -14px !important;
+     background-size: 280px 67px !important;
 }
 
 /* reduce flicker as graph image gets inverted and hue-rotated */
 
 @keyframes graphfadein {
-from {
+0% {
      filter: invert(1) hue-rotate(90deg) opacity(0);
 }
 
-to {
+30% {
+     filter: invert(1) hue-rotate(90deg) opacity(0);
+}
+
+50% {
      filter: invert(1) hue-rotate(90deg) opacity(1);
 }
 }
 
 #sb_graphcontainer {
-     animation: graphfadein 0.3s ease-in;
+     animation: graphfadein 0.3s ease-out;
 }
 
 @media screen and (min-width: 1500px) {
@@ -859,6 +869,10 @@ to {
 
 .sb_info .percentBarInner {
      height: 16px;
+}
+
+.sb_update {
+     padding: 3px 5px 0 !important;
 }
 
 @keyframes downloadbar {
@@ -1030,7 +1044,7 @@ div.news h3, #newspage h3 {
 .main textarea {
      background: #000;
      color: #ee9;
-     font: 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font: 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      resize: none;
 }
 
@@ -1196,7 +1210,7 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 
 .tab2 {
      background: #030;
-     box-shadow: inset 0 0 0 1px #000;
+     box-shadow: inset 0 0 0 1px #000, inset 3px 3px 2px #010;
      color: #ee9;
      padding: 5px 12px !important;
 }
@@ -1207,7 +1221,7 @@ div.widescroll { /* only scroll content, not entire page eg /peers */
 }
 
 .tab {
-     background: linear-gradient(to bottom, #001900, #002900 50%, #000 51%, #000) !important;
+     background: linear-gradient(to bottom, #001900, #002900 50%, #000 50%) !important;
      box-shadow: inset 0 0 0 1px #000;
 }
 
@@ -1651,13 +1665,13 @@ td img {
 /* end peer sort */
 
 tt {
-     font: bold 8pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
+     font: bold 8.5pt "Droid Sans Mono", "Noto Mono", "Lucida Console", "DejaVu Sans Mono", monospace;
      color: #FF0;
 }
 
 table tt {
-     color: #770;
-     font-size: 8pt;
+     color: #990;
+     font-size: 8.5pt;
 }
 
 a:link tt, a:visited tt {
@@ -2153,6 +2167,7 @@ input:disabled {
 
 input[type="text"]:disabled, input[type="text"]:disabled:active, input[readonly="readonly"] {
      color: #161 !important;
+     border: 1px solid #373 !important;
      background: #000 !important;
 }
 
@@ -2242,7 +2257,6 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
      background: #000 !important;
      filter: drop-shadow(0 0 1px #880);
      transition: filter ease 0.3s;
-     font-weight: bold;
      outline: none;
 }
 
@@ -3142,18 +3156,6 @@ td#themeselect {
      font-weight: bold;
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-.langselect img {
-     margin-left: -9px;
-     margin-top: -17px !important;
-}
-
-.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
-     margin-left: -10px;
-     margin-top: -18px !important;
-}
-}
-
 /* large flags */
 
 .langselect img {
@@ -3183,6 +3185,18 @@ td#themeselect {
      box-shadow: none !important;
      transition: none !important;
      filter: drop-shadow(0 0 1px #f60);
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.langselect img {
+     margin-left: -19px !important;
+     margin-top: -31px !important;
+}
+
+.langselect input[name="lang"]:checked + img, .langselect input[name="lang"]:checked + #config_ui img[src="/flags.jsp?c=a1"] {
+     margin-left: -15px !important;
+     margin-top: -27px !important;
+}
 }
 
 /* end large flags */
@@ -3560,6 +3574,14 @@ p#gatherstats {
 
 #webappconfig th:first-child {
      text-align: right;
+}
+
+#webappconfig th, #clientconfig th {
+     text-align: center;
+}
+
+.configtable#webappconfig tr:last-child, .configtable#clientconfig tr:last-child {
+     border-top: 1px inset #131;
 }
 
 p#availableplugins {
@@ -4329,16 +4351,12 @@ th > img[src^="/imagegen"] { /* scale down header images */
      vertical-align: bottom;
 }
 
-.netdb_gateway img {
-     vertical-align: bottom;
-}
-
 .netdb_tunnel {
      display: inline-block;
      background: #030;
-     padding: 0 4px;
-     margin-left: 4px;
-     margin-right: -4px;
+     padding: 2px 4px;
+     margin-left: 3px;
+     margin-right: -3px;
      border-radius: 2px;
 }
 
@@ -4351,7 +4369,7 @@ th > img[src^="/imagegen"] { /* scale down header images */
 }
 
 .netdb_leases .tunnel_peer tt, .netdb_leases .tunnel_peer tt a {
-     font-size: 8pt !important;
+     font-size: 8.5pt !important;
      font-weight: bold !important;
 }
 
@@ -4477,7 +4495,7 @@ table[id$="logs"] ul {
 
 #logs li {
      list-style: none;
-     font: bold 8pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", monospace;
+     font: bold 8.5pt "Droid Sans Mono",  "Lucida Console", "DejaVu Sans Mono", monospace;
      line-height: 120%;
      text-align: left;
      display: inline-block;
@@ -4933,6 +4951,14 @@ ul#banlist + hr {
 
 /* begin home page */
 
+#home .welcome h2 {
+     margin: 12px -5px !important;
+}
+
+#home .welcome .langbox {
+     margin-right: -2px !important;
+}
+
 #homepanel {
      margin: 0 -8px;
 }
@@ -5113,7 +5139,7 @@ div.app:hover.app img, a:focus .app img {
 
 .app td {
      background: none;
-     border: 0;
+     border: none;
      margin: 0;
      padding: 3px 0 0;
 }
@@ -5121,7 +5147,7 @@ div.app:hover.app img, a:focus .app img {
 .applabel {
      font-size: 8pt;
      margin: 2px 0 0;
-     padding: 4px 2px 6px;
+     padding: 3px 2px 4px;
      text-align: center;
      vertical-align: bottom;
      line-height: 95%;
@@ -5130,7 +5156,7 @@ div.app:hover.app img, a:focus .app img {
      width: 136px;
      min-width: 72px;
      background: #001000;
-     background-image: linear-gradient(to bottom, #001000, #001900 50%, #000 51%, #000);
+     background: linear-gradient(to bottom, #001000, #001900 50%, #000 50%);
      border-radius: 0 0 2px 2px;
      border-top: 1px solid #494;
      white-space: nowrap;
@@ -5652,14 +5678,10 @@ table#netconfig th, table#externali2cp th, table#plugininstall th, .configtable 
     word-spacing: 0.1em;
 }
 
-table.configtable td {
+.configtable td {
      padding: 6px 10px;
      background: #000;
      line-height: 180%;
-}
-
-#netconfig img[src*="itoo"] {
-     display: none;
 }
 
 .configtable td.tabletextarea {
@@ -5715,7 +5737,7 @@ td.optionsave {
      border-top: 1px solid #494;
      padding: 5px !important;
      white-space: nowrap;
-     width: 50px;
+/*     width: 50px;*/
      background: #000;
 }
 
@@ -5825,6 +5847,10 @@ table#externali2cp th {
      margin-bottom: -2px;
 }
 
+#tunnelconfig td:nth-child(n+2) {
+     text-align: left;
+}
+
 th.th_title {
      padding: 8px 10px !important;
      text-align: left;
@@ -5904,9 +5930,13 @@ table#configstats {
      margin-bottom: -2px;
 }
 
-#configstats th, #configstats tr.tablefooter td {
+#configstats th {
      padding: 8px 10px !important;
      text-align: left;
+}
+
+#configstats tr.tablefooter td {
+     padding: 5px 10px !important;
 }
 
 #configstats th a {
@@ -5922,7 +5952,7 @@ table#configstats {
 }
 
 #configstats td {
-     padding: 8px 5px;
+     padding: 6px 5px;
 }
 
 #configstats td:first-child {
@@ -6315,21 +6345,21 @@ p#profiles_overview {
 
 /* /tunnels */
 
-tt a, .tunnel_peer tt {
-     letter-spacing: 0.07em;
+tt a, img + tt {
+     letter-spacing: 0.1em;
 }
 
 .tunnel_cap {
-     background: rgba(0,96,0,0.3);
+     margin: 1px 2px 1px 8px;
+     padding: 0 2px;
+     display: inline-block;
+     min-width: 12px;
      color: #bb7;
      border: 1px solid rgba(0,64,0,0.2);
      border-radius: 2px;
-     min-width: 12px;
-     padding: 0 2px;
-     display:inline-block;
-     margin: 1px 2px 1px 8px;
      text-align: center !important;
      text-shadow: 0 1px 1px #555;
+     background: rgba(0,96,0,0.3);
 }
 
 .tunnel_cap:empty {
@@ -6547,6 +6577,10 @@ th code {
      break-inside: avoid;
      page-break-inside: avoid;
      -webkit-column-break-inside: avoid;
+}
+
+.netdb_addresses {
+     line-height: 150%;
 }
 
 .netdb_addresses br:first-child, .sybil_routerinfo tr:last-child td br:first-child {
@@ -7461,13 +7495,13 @@ img[src="/themes/console/images/i2plogo.png"] {
 
 @media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
 .langselect img, .langselect input[name="lang"]:checked + img {
-     margin-left: -10px !important;
-     margin-top: -18px !important;
+     margin-left: -20px !important;
+     margin-top: -31px !important;
 }
 
 .langselect input[name="lang"]:checked + img {
-     margin-left: -11px !important;
-     margin-top: -19px !important;
+     margin-left: -16px !important;
+     margin-top: -27px !important;
 }
 }
 
@@ -7613,3 +7647,178 @@ _:-ms-lang(x), .tunnels_client th:first-child::after {
 }
 */
 
+/* TO DO: Merge with main classes */
+
+.optionlist {
+     columns: 500px auto;
+     padding-bottom: 1px;
+}
+
+.optionlist label {
+     min-width: 300px;
+     break-inside: avoid;
+     page-break-inside: avoid !important;
+     -webkit-column-break-inside: avoid;
+}
+
+th.options, table#externali2cp th {
+     padding: 7px 10px !important;
+}
+
+.options input[type="checkbox"], #i2pupdates .options .optbox {
+     margin: 0 3px 0 0;
+}
+
+#i2pupdates textarea {
+      min-height: 76px !important;
+      height: 76px !important;
+      margin: 6px 0 6px 10px !important;
+      padding: 3px 5px;
+}
+
+#reseedconfig textarea {
+      min-height: 76px !important;
+      height: 76px !important;
+      margin: 6px 10px 6px 0 !important;
+      padding: 3px 5px;
+}
+
+#manualreseed {
+     margin-bottom: 10px !important;
+}
+
+#resetreseed {
+     padding: 5px 5px 0 0;
+}
+
+/* /configui */
+
+#passwordheading {
+     margin-top: 0 !important;
+}
+
+#langsettings {
+     margin-bottom: 10px !important;
+}
+
+/* end /configui */
+
+#pluginconfigtext + form {
+     float: right;
+     margin: -42px 6px 0 0;
+}
+
+#externaltcp .nowrap:first-child {
+     margin: 5px 0 -18px !important;
+     display: inline-block;
+}
+
+#cputype {
+     display: inline-block;
+     margin: -2px 2px -2px 0;
+     padding: 2px 5px;
+     font-weight: bold;
+     text-transform: uppercase;
+     border-radius: 2px;
+     background: #030;
+}
+
+#wrapperlogs pre {
+     height: 300px;
+     resize: vertical;
+}
+
+/* graphs */
+
+#graphs td:first-child {
+     font-weight: normal;
+     text-align: left;
+     padding: 5px 0 0;
+}
+
+@media screen and (min-width: 1060px) {
+#graphs td:first-child {
+     padding: 5px 0;
+}
+}
+
+#graphs td b {
+     min-width: 150px;
+     text-align: right;
+     display: inline-block;
+     margin-right: 5px;
+}
+
+#graphs .nowrap {
+     line-height: 300%;
+     display: inline-block;
+}
+
+/* end graphs */
+
+.buckets br + br {
+     line-height: 5px;
+}
+
+.routerid {
+     margin: 0;
+     padding: 0 2px;
+     display: inline-block;
+     min-width: 50px;
+     border: 1px solid #020;
+     background: #020;
+     text-align: center;
+}
+
+.routerid tt, .routerid a {
+     letter-spacing: 0.2em !important;
+}
+
+.routerid img {
+    margin: 1px 0 -1px;
+}
+
+.routerid tt, .routerid a {
+     margin-top: -3px !important;
+     display: inline-block;
+}
+
+.tunneldisplay .routerid {
+     min-width: 64px;
+     margin-right: 6px !important;
+     box-sizing: border-box;
+     border-radius: 2px;
+}
+
+.tunneldisplay .routerid, .tunnel_cap {
+     box-shadow: 0 0 0 1px #010;
+}
+
+.tunnel_cap:empty {
+     box-shadow: none;
+}
+
+#plugininstall, #reseedconfig, #oldhome {
+     margin-bottom: 10px !important;
+}
+
+#reseedconfig td {
+     width: 50%;
+}
+
+#reseedconfig td .optbox {
+     margin: 6px 5px 6px 10px;
+}
+
+#reseedconfig td .nowrap b {
+     margin-right: 8px;
+     min-width: 120px;
+     text-align: right;
+     display: inline-block;
+}
+
+.configtable th {
+     text-transform: none !important;
+     letter-spacing: 0 !important;
+     word-spacing: 0 !important;
+}

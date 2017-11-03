@@ -111,7 +111,7 @@ textarea#statusMessages {
      border: none;
      box-shadow: none;
      font-family: "Droid Sans Mono", "Noto Mono", Consolas, "Lucida Console", "DejaVu Sans Mono", monospace;
-     font-size: 8pt;
+     font-size: 8.5pt;
      filter: none;
 }
 
@@ -160,10 +160,10 @@ hr {
      filter: drop-shadow(0 0 1px #ccf);
 }
 
-.freetext {
+.freetext, .freetext.tunnelDescription {
      width: 150px;
      border: 1px solid #999daf;
-     padding: 4px;
+     padding: 4px !important;
      background: #fafaff;
      color: #33333f;
      border-radius: 2px;
@@ -273,7 +273,7 @@ a.control {
      padding: 0;
      margin: 16px auto -8px auto !important;
      width: 100%;
-     filter: drop-shadow(0 0 1px #ccc);
+     filter: drop-shadow(0 0 1px #ccf);
 }
 
 .iframed .panel#clients {
@@ -420,7 +420,7 @@ th {
      text-align: left;
      border-top: 1px solid #7778bf;
      border-bottom: 1px solid #7778bf;
-     font-size: 10pt;
+     font-size: 9.5pt;
      color: #41465f;
 }
 
@@ -745,7 +745,7 @@ input:focus::-moz-placeholder {
      opacity: 0;
 }
 
-input.tunnelName, input.tunnelDescriptionText, #userAgents {
+input.tunnelName, input.tunnelDescriptionText, #userAgents, .freetext.tunnelDescription {
      width: 80%;
      min-width: 280px !important;
      text-overflow: ellipsis;
@@ -907,8 +907,9 @@ input.tunnelName, input.tunnelDescriptionText, #userAgents {
 }
 
 textarea[name="accessList"], #hostField, #localDestination, .authentication {
-     width: calc(100% - 15px) !important;
+     width: calc(100% - 20px) !important;
      margin: 5px !important;
+     padding: 2px 4px;
 }
 
 .authentication {
@@ -1253,3 +1254,29 @@ input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked,
 
 /* end custom radios/checkboxes */
 
+/* chrome/blink overrides */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+textarea, input[type="text"], .displayText, *[readonly] {
+     filter: none !important;
+     box-shadow: 0 0 1px #ccf;
+}
+
+table {
+     background: #f0f0ff !important;
+}
+
+tr {
+     box-shadow: none !important;
+}
+
+#throttler tr:nth-child(even) {
+     background: #f0f0ff !important;
+}
+
+#throttler tr:nth-child(odd), .tunnelConfig tr, #wizardPanel tr, #registration tr {
+     background: #f8f8ff !important;
+}
+}
+
+/* end chrome overrides */

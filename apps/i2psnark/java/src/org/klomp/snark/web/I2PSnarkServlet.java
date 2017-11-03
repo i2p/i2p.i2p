@@ -2136,7 +2136,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     host = Base32.encode(h.getData()) + ".b32.i2p" + port;
                 }
             }
-            buf.append("<a href=\"http://").append(urlEncode(host)).append("/\">");
+            buf.append("<a href=\"http://").append(urlEncode(host)).append("/\" target=\"blank\">");
         }
         // strip port
         int colon = announce.indexOf(':');
@@ -2290,7 +2290,7 @@ public class I2PSnarkServlet extends BasicServlet {
 
         boolean noCollapse = noCollapsePanels(req);
 
-        out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\" target=\"_top\">\n" +
+        out.write("<form action=\"" + _contextPath + "/configure\" method=\"POST\">\n" +
                   "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
         writeHiddenInputs(out, req, "Save");
         out.write("<span class=\"snarkConfigTitle\">");
@@ -2996,9 +2996,9 @@ public class I2PSnarkServlet extends BasicServlet {
                     announce = DataHelper.stripHTML(announce);
                     buf.append("<tr><td>");
                     toThemeImg(buf, "details");
-                    buf.append("</td><td><b>").append(_t("Primary Tracker")).append(":</b> ");
+                    buf.append("</td><td><b>").append(_t("Primary Tracker")).append(":</b> <span class=\"info_tracker\">");
                     buf.append(getShortTrackerLink(announce, snark.getInfoHash()));
-                    buf.append("</td></tr>");
+                    buf.append("</span></td></tr>");
                 }
                 List<List<String>> alist = meta.getAnnounceList();
                 if (alist != null && !alist.isEmpty()) {
@@ -3007,7 +3007,7 @@ public class I2PSnarkServlet extends BasicServlet {
                     buf.append("</td><td><b>")
                        .append(_t("Tracker List")).append(":</b> ");
                     for (List<String> alist2 : alist) {
-                        buf.append('[');
+                        buf.append("<span class=\"info_tracker\">");
                         boolean more = false;
                         for (String s : alist2) {
                             if (more)
@@ -3016,7 +3016,7 @@ public class I2PSnarkServlet extends BasicServlet {
                                 more = true;
                             buf.append(getShortTrackerLink(DataHelper.stripHTML(s), snark.getInfoHash()));
                         }
-                        buf.append("] ");
+                        buf.append("</span> ");
                     }
                     buf.append("</td></tr>\n");
                 }
@@ -3416,14 +3416,16 @@ public class I2PSnarkServlet extends BasicServlet {
                 path=addPaths(path,"/");
             path = encodePath(path);
             String icon = toIcon(item);
+            String mime = getMimeType(path);
+            if (mime == null)
+                mime = "";
 
             buf.append("<td class=\"snarkFileIcon\">");
             if (complete) {
                 buf.append("<a href=\"").append(path).append("\">");
                 // thumbnail ?
                 String plc = item.toString().toLowerCase(Locale.US);
-                if (plc.endsWith(".jpg") || plc.endsWith(".jpeg") || plc.endsWith(".png") ||
-                    plc.endsWith(".gif") || plc.endsWith(".ico")) {
+                if (mime.startsWith("image/")) {
                     buf.append("<img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
                        .append(path).append("\"></a>");
                 } else {
@@ -3433,8 +3435,17 @@ public class I2PSnarkServlet extends BasicServlet {
                 buf.append(toImg(icon));
             }
             buf.append("</td><td class=\"snarkFileName\">");
-            if (complete)
-                buf.append("<a href=\"").append(path).append("\">");
+            if (complete) {
+                buf.append("<a href=\"").append(path);
+                // send browser-viewable files to new tab to avoid potential display in iframe
+                if (mime.startsWith("text/") ||
+                    mime.startsWith("image/") ||
+                    mime.startsWith("audio/") ||
+                    mime.startsWith("video/") ||
+                    mime.equals("application/ogg"))
+                    buf.append("\" target=\"_blank");
+                buf.append("\">");
+            }
             buf.append(DataHelper.escapeHTML(item.getName()));
             if (complete)
                 buf.append("</a>");

@@ -9,12 +9,19 @@ html {
 
 body {
      background: url(/themes/console/dark/images/camotile2.png) top left fixed #000;
-     background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(/themes/console/dark/images/camotile2.png) top left fixed #000;
+     background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(/themes/console/dark/images/camotile2.png) top left scroll #000;
      background-size: 100% 100%, 175px 175px !important;
      color: #ee9;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
      font-size: 9pt;
      margin: 8px 5px;
+}
+
+@supports (text-justify: auto) { /* only Firefox 55 or newer */
+body {
+     background-attachment: fixed;
+     will-change: scroll-position;
+}
 }
 
 body.iframed {
@@ -60,31 +67,31 @@ hr {
 }
 
 li {
-     color:#ee9;
-     line-height:12pt;
-     font-size:10pt;
-     margin-left:5mm;
-     margin-right:5mm;
+     color: #ee9;
+     line-height: 12pt;
+     font-size: 10pt;
+     margin-left: 5mm;
+     margin-right: 5mm;
 }
 
 p {
-     color:#ee9;
-     line-height:12pt;
-     margin-left:5mm;
-     margin-right:5mm;
-     font-size:9pt;
+     color: #ee9;
+     line-height: 12pt;
+     margin-left: 5mm;
+     margin-right: 5mm;
+     font-size: 9pt;
 }
 
 p.hl {
-     font-size:12pt;
-     letter-spacing:2pt;
-     line-height:18pt;
-     font-weight:bold;
+     font-size: 12pt;
+     letter-spacing: 2pt;
+     line-height: 18pt;
+     font-weight: bold;
 }
 
 p.text {
-     margin-left:10mm;
-     margin-right:10mm;
+     margin-left: 10mm;
+     margin-right: 10mm;
 }
 
 p.info, p.error {
@@ -112,23 +119,10 @@ p.error {
 }
 
 span.coloured {
-     color:#327BBF;
+     color: #327bbf;
 }
 
-p.footer {
-     margin-left:10mm;
-     margin-right:10mm;
-     font-size:8pt;
-     line-height:10pt;
-     display: none;
-}
-
-.footer hr {
-     margin-top: -12px;
-     display: none;
-}
-
-.iframed #footer {
+p.footer, .iframed #footer, .footer hr {
      display: none;
 }
 
@@ -386,7 +380,6 @@ tr.list0:hover td:nth-child(3) a, tr.list1:hover td:nth-child(3) a, #mailbox td:
 
 
 tr.list0:hover td:first-child, tr.list1:hover td:first-child {
-/*     background: url(images/highlight.png) left center repeat-y; */
       box-shadow: inset 3px 0 0 #900;
 }
 
@@ -448,10 +441,6 @@ table[id="mailbox"] th img:hover, table[id="mailbox"] th a:focus img {
 
 #mailbox .list0 td, #mailbox .list1 td {
      border-bottom: 1px solid #000;
-}
-
-#mailbox tr.bottombuttons td[colspan="9"] {
-/*     display: none; */
 }
 
 tr.bottombuttons td {
@@ -600,7 +589,7 @@ input {
      border: 1px solid #494;
      color: #494;
      margin: 3px;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
      min-width: 64px !important;
 }
 
@@ -629,7 +618,7 @@ input[type=submit], input.cancel {
      margin: 4px 5px;
      padding: 5px 8px !important;
      min-width: 95px !important;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Bitstream Vera Sans", "Lucida Grande", "DejaVu Sans", Lato, "Segoe UI", Verdana, Helvetica, sans-serif;
      color: #494;
      text-align: center;
      border: 1px outset #191;
@@ -734,7 +723,6 @@ input[type="submit"], input[type="reset"], select, button { /* webkit/blink fix 
 .page td[colspan="2"] {
      text-align: left;
      padding: 0 0 10px 0;
-/*     padding-left: 13%;*/
 }
 
 .page td[colspan="2"] hr {
@@ -1138,8 +1126,26 @@ div#prefsave {
 
 /* responsive layout */
 
-@media screen and (min-width: 1024px) {
-body, td, textarea, div, p.mailbody {
+@media screen and (min-width: 1300px) {
+.iframed body, .iframed td, .iframed textarea, .iframed input, .iframed div, .iframed p.mailbody, .iframed select, .iframed button, .iframed input[type="submit"], .iframed input[type="reset"] {
+     font-size: 10pt !important;
+}
+
+.iframed #pagenav input {
+     font-size: 0 !important;
+}
+
+.iframed .topbuttons input[type="submit"], .iframed .topbuttons input[type="reset"] {
+     margin: 3px 5px !important;
+}
+
+.iframed textarea[name="new_text"] {
+     width: 660px;
+}
+}
+
+@media screen and (min-width: 1500px) {
+body, td, textarea, input, div, p.mailbody, select, button, input[type="submit"], input[type="reset"] {
      font-size: 10pt !important;
 }
 
@@ -1149,16 +1155,6 @@ body, td, textarea, div, p.mailbody {
 
 .topbuttons input[type="submit"], .topbuttons input[type="reset"] {
      margin: 3px 5px !important;
-}
-}
-
-@media screen and (min-width: 1500px) {
-input, textarea {
-     font-size: 10pt !important;
-}
-
-select, button, input[type="submit"], input[type="reset"] {
-     font-size: 9pt;
 }
 
 textarea[name="new_text"] {

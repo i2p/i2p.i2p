@@ -12,8 +12,8 @@ label.toggleview, label.toggleview:hover, label.toggleview:active, .toggle_input
      cursor: default !important;
      box-shadow: 0 0 2px #4d453e, inset 0 0 0 1px #efe6e0 !important;
      font-size: 0 !important;
-     min-width: 120px !important;
-     width: 120px !important;
+     min-width: 200px !important;
+     width: 200px !important;
 }
 
 label.toggleview img, .toggle_input:focus + label.toggleview img, label.toggleview:hover img, label.toggleview img:active, label.toggleview:active img {
