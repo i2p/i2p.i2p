@@ -3,6 +3,7 @@
    - /graphs:
      - Reorganised config form
      - Fixed "hide legends" option
+   Sidebar: limit event logs to last 7 days, to avoid page freezes
 
 2017-11-02 str4d
  * Console:
