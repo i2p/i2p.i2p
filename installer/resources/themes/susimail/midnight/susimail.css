@@ -126,20 +126,7 @@ span.coloured {
      color: #382dc4;
 }
 
-p.footer {
-     margin-left: 10mm;
-     margin-right: 10mm;
-     font-size: 8pt;
-     line-height: 10pt;
-     display: none;
-}
-
-.footer hr {
-     margin-top: -12px;
-     display: none;
-}
-
-.iframed #footer {
+p.footer, .iframed #footer, .footer hr {
      display: none;
 }
 
@@ -595,8 +582,7 @@ input {
      border: 1px solid #443da0;
      color: #4e47bf;
      margin: 3px;
-     font: bold 8pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
-/*     min-width: 64px !important;*/
+     font: bold 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Bitstream Vera Sans", "DejaVu Sans", Verdana, "Lucida Grande", Helvetica, sans-serif;
 }
 
 input.optbox {
@@ -1340,19 +1326,27 @@ input[type=submit]:active, input.cancel:active {
 }
 }
 
-@media screen and (min-width: 1024px) {
-body, td, textarea, div, p.mailbody {
+@media screen and (min-width: 1300px) {
+.iframed body, .iframed td, .iframed textarea, .iframed div, .iframed p.mailbody, .iframed input, .iframed input[type="submit"], .iframed input[type="reset"], .iframed p.error {
+     font-size: 10pt !important;
+}
+
+.iframed .topbuttons input[type="submit"], .iframed .topbuttons input[type="reset"] {
+     margin: 3px 5px !important;
+}
+
+.iframed #pagenav input {
+     font-size: 0 !important;
+}
+}
+
+@media screen and (min-width: 1500px) {
+body, td, textarea, div, p.mailbody, input, input[type="submit"], input[type="reset"], p.error {
      font-size: 10pt !important;
 }
 
 .topbuttons input[type="submit"], .topbuttons input[type="reset"] {
      margin: 3px 5px !important;
-}
-}
-
-@media screen and (min-width: 1500px) {
-input, input[type="submit"], input[type="reset"], p.error {
-     font-size: 10pt !important;
 }
 
 #pagenav input {

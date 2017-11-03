@@ -593,6 +593,26 @@ tr.list0 {
      background: #000;
 }
 
+#helpconfig ul {
+     display: block;
+     -moz-columns: 2 500px;
+     -webkit-columns: 2 500px;
+     columns: 2 500px;
+     -moz-column-gap: 40px;
+     -webkit-column-gap: 40px;
+     column-gap: 40px;
+     margin: 0 0 -5px -40px;
+}
+
+#helpconfig li {
+     margin: 0 3px;
+}
+
+#helpconfig li b {
+     font-family: "Droid Sans Mono", "Noto Mono", "Lucida Console", monospace;
+     color: #990;
+}
+
 div#content p {
      padding: 0 10px;
 }

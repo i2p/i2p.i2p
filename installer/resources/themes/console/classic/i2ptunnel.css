@@ -6,7 +6,7 @@ body {
      padding: 0;
      text-align: center;
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "DejaVu Sans", Verdana, Helvetica, sans-serif;
-     color: #333;
+     color: #2c354f;
      font-size: 9pt;
      background: #a4a4cb url(images/bg.png);
 }
@@ -345,9 +345,10 @@ th:last-child, td:last-child {
 }
 
 td.infohelp {
+     padding: 10px 10px 10px 38px !important;
+     text-align: justify;
      background: url(/themes/console/images/info/infohelp.png) 10px center no-repeat;
      background-size: 20px 20px;
-     padding: 10px 10px 10px 38px !important;
 }
 
 .tunnelConfig td {
@@ -895,10 +896,6 @@ textarea[name="accessList"], #hostField, #localDestination, .authentication {
 
 .tunnelDescription {
      padding-top: 1px !important;
-}
-
-.tunnelDestination b, .tunnelDescription b {
-     color: #444;
 }
 
 td.tunnelDestination, td.tunnelDescription {

@@ -226,6 +226,10 @@ td[onclick] {
      cursor: pointer;
 }
 
+.list0, .list1 {
+     box-shadow: inset 0 0 0 1px #fff;
+}
+
 tr.list0 {
      background: #eef;
      background: repeating-linear-gradient(45deg, rgba(255,255,255,0.5) 2px, rgba(221, 221, 255, 0.3) 3px, #fff 5px), #fff;
@@ -361,6 +365,7 @@ table#mailbox {
 
 #mailbox tr td {
      border-top: 1px solid #bbf;
+     border-top: 1px solid rgba(220,220,255,0.8);
 }
 
 #mailbox tr:nth-child(3) td {
@@ -1328,7 +1333,7 @@ tr.bottombuttons:empty {
      margin-bottom: 9px;
      border-radius: 4px 4px 0 0;
      border: none;
-     margin: 0 3% 10px;
+     margin: 0 3% 8px;
 }
 
 .notifications:hover {
@@ -1367,13 +1372,13 @@ td p.error {
 }
 
 .attached {
-     text-align: left;
-     background: url(/themes/susimail/images/attach.png) 10px center no-repeat, rgba(220,220,255,0.2);
-     padding: 8px 5px 8px 35px;
-     border-top: 1px solid #7778bf;
      margin: 0;
-     box-shadow: inset 0 0 0 1px #fff;
+     padding: 15px 12px 15px 35px;
      overflow: auto !important;
+     text-align: left;
+     border-top: 1px solid #7778bf;
+     box-shadow: inset 0 0 0 1px #fff;
+     background: url(/themes/susimail/images/attach.png) 10px center no-repeat, rgba(220,220,255,0.2);
 }
 
 .attached img {
@@ -1383,7 +1388,7 @@ td p.error {
      background: #fff;
      text-align: center;
      max-width: 100%;
-     max-width: calc(100% - 5px);
+     max-width: calc(100% - 25px);
      filter: drop-shadow(0 0 1px #999);
 }
 
@@ -1480,7 +1485,17 @@ input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked,
 
 /* responsive layout */
 
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: 1300px) {
+.iframed body, .iframed td, .iframed textarea, .iframed input, .iframed div, .iframed p.mailbody, .iframed th, .iframed a {
+     font-size: 10pt !important;
+}
+
+.iframed td {
+     padding: 3px 5px;
+}
+}
+
+@media screen and (min-width: 1500px) {
 body, td, textarea, input, div, p.mailbody, th, a {
      font-size: 10pt !important;
 }

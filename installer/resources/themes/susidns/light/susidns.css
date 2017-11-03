@@ -85,7 +85,7 @@ hr {
 }
 
 code, tt, .destaddress {
-     font-size: 8pt;
+     font-size: 8.5pt;
 }
 
 #host_list .destaddress {
@@ -1390,7 +1390,7 @@ input[type="checkbox"][disabled]:checked, input[type="radio"][disabled]:checked,
 }
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 1500px) {
 body, p, td, textarea, input, button, li, a, th, h4 {
      font-size: 10pt !important;
 }
@@ -1459,3 +1459,31 @@ _:-ms-lang(x), * {
 }
 
 /* end Edge/IE tweaks */
+
+/* chrome/blink overrides */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+textarea, input[type="text"], .displayText, *[readonly] {
+     filter: none !important;
+     box-shadow: 0 0 1px #ccf;
+}
+
+tr {
+     box-shadow: none !important;
+}
+
+.book tr:nth-child(even) {
+     background: #f0f0ff !important;
+}
+
+.book tr:nth-child(odd), #book {
+     background: #f8f8ff !important;
+}
+
+#helpconfig ul {
+     -webkit-columns: 1;
+     columns: 1;
+}
+}
+
+/* end chrome overrides */

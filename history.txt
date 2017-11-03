@@ -3,7 +3,17 @@
    - /graphs:
      - Reorganised config form
      - Fixed "hide legends" option
-   Sidebar: limit event logs to last 7 days, to avoid page freezes
+   - Sidebar: limit event logs to last 7 days, to avoid page freezes
+   - Fix scrolling latency issue light theme in Chrome/blink and older Firefox
+     versions (ticket #2024)
+   - Various cosmetic tweaks, fixes and enhancements
+ * I2PSnark:
+   - Reduce scrolling and hover latency
+   - Add sort direction hover indicators to .snarkTorrents header icons
+     (dark/midnight)
+   - Various cosmetic tweaks, fixes and enhancements
+ * Susimail/SusiDNS:
+   - Various cosmetic tweaks, fixes and enhancements
 
 2017-11-02 str4d
  * Console:

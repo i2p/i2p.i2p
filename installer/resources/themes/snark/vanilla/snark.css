@@ -6,10 +6,10 @@ html {
 }
 
 body {
+     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
+     color: #2f1500;
      background: #2f231a;
      background: repeating-linear-gradient(to bottom, #9f948b 1px, #6f5b4c 1px, #bfa285 3px);
-     color: #2f1500;
-     font: 9pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
 }
 
 /* preload top navigation mouseovers */
@@ -25,19 +25,18 @@ body:not(old) {
 }
 
 body.iframed {
-     background: transparent url(/themes/console/images/transparent.gif) !important;
+     background: transparent !important;
      margin: 6px 0 !important;
 }
 
 body.iframed:not(old) {
-     background: url(/themes/console/images/transparent.gif),
-     url(images/button_snark_hover.png) no-repeat,
+     background: url(images/button_snark_hover.png) no-repeat,
      url(images/button_snark_active.png) no-repeat,
      url(images/button_tracker_hover.png) no-repeat,
      url(images/button_tracker_active.png) no-repeat,
      url(images/button_forum_hover.png) no-repeat,
      url(images/button_forum_active.png) no-repeat !important;
-     background-size: 100% 100%, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
+     background-size: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
 }
 
 * {
@@ -134,40 +133,39 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
 .snarknavbar {
      margin: -11px 0 10px 0 !important;
      padding: 13px 10px 12px;
+     position: sticky;
+     top: -2px;
+     z-index: 999;
+     min-width: 900px;
+     width: 70%;
      border: 1px solid #2f1b0c;
      border-radius: 0 0 2px 2px;
      box-shadow: inset 0 0 0 1px #fff5ef, 0 0 1px 0 #4f3d36;
      box-shadow: inset 0 0 0 1px #fff5ef, 0 0 0 1px rgba(111, 96, 90, 0.3), 0 0 1px 1px rgba(79, 61, 54, 0.5);
      background: #efefef;
      background: linear-gradient(to bottom, #efefef 50%, #cfc7c2 53%);
-     min-width: 900px;
-     width: 70%;
      text-align: center;
-     position: sticky;
-     top: -2px;
-     z-index: 999;
      transition: ease width 0.5s 0.5s;
 }
 
 .iframed .snarknavbar {
-     padding-top: 12px;
      margin: -6px 0 !important;
+     padding-top: 12px;
+     position: static;
      width: auto;
      border-radius: 0;
      box-shadow: 0 0 2px 0 #fff inset, 0 0 1px 0 #4f3d36;
-     position: static;
+     background: linear-gradient(to bottom, #efefef 49%, #cfc7c2 52%);
 }
 
 .snarkNav:link, .snarkNav:visited {
+     margin: -3px -4px -4px 0 !important;
+     padding: 4px 10px 4px 28px !important;
      display: inline-block;
      position: relative;
      z-index: 30;
-     margin: -3px -4px -4px 0 !important;
-     padding: 4px 10px 4px 28px !important;
      line-height: 130%;
-     font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
-     font-weight: bold;
-     font-size: 10pt;
+     font: bold 10pt "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      color: #3f271b;
      text-shadow: 0 0 1px #fff5ef;
      text-decoration: none !important;
@@ -179,7 +177,7 @@ th a:active, th a:visited:active, td a:active, td a:visited:active {
      background-size: 17px auto, 100% 100%, 100% 100% !important;
      background-position: 12px center, center center, center center !important;
      background-repeat: no-repeat !important;
-     transition: ease all 0.1s;
+     transition: ease border 0.1s;
 }
 
 _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
@@ -188,19 +186,20 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 
 .snarkNav:hover, .snarkNav:focus {
+     z-index: 10;
+     color: #930 !important;
      text-decoration: none !important;
      text-shadow: none !important;
-     color: #930 !important;
      box-shadow: inset 0 0 0 1px #fff5ef, inset 0 0 0 rgba(0,0,0,0), 0 0 0 1px rgba(77, 69, 62, 0.1);
      filter: drop-shadow(0 0 1px rgba(200,60,0,0.2));
-     z-index: 10;
-     transition: ease all 0.1s;
+     transition: ease border 0.1s;
 }
 
 .snarkNav:active {
      text-shadow: none !important;
      box-shadow: inset 0 0 0 1px #efe6e0, inset 2px 2px 3px 1px #59513b, 0 0 0 1px rgba(77, 69, 62, 0.1);
      filter: none;
+     transition: ease box-shadow 0.05s;
 }
 
 .nav_main:link {
@@ -280,7 +279,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 /* screenlog */
 
 .snarkMessages {
-     font: bold 8pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
+     font: bold 8.5pt "Droid Sans Mono", "Noto Mono", "DejaVu Sans Mono", "Lucida Console", monospace !important;
      text-align: left;
      margin: 0 0 10px;
      padding: 0 3px;
@@ -613,8 +612,8 @@ th.snarkTorrentStatus {
      margin: 0 2px !important;
 }
 
-.snarkTrackerDetails a:hover img, .snarkTrackerDetails img:hover, .snarkTrackerDetails a:focus img,
-.snarkTorrentDetails a:hover img, .snarkTorrentDetails img:hover, .snarkTorrentDetails a:focus img,
+.snarkTrackerDetails a:hover img, .snarkTrackerDetails a:focus img,
+.snarkTorrentDetails a:hover img, .snarkTorrentDetails a:focus img,
 .snarkDirInfo td:first-child a:hover img, .snarkDirInfo td:first-child a:focus img {
      border: 1px solid #f60 !important;
      border-radius: 2px;
@@ -626,6 +625,8 @@ th.snarkTorrentStatus {
 
 .snarkTrackerDetails a:active img, .snarkTorrentDetails a:active img, .snarkDirInfo td:first-child a:active img {
      box-shadow: inset 2px 2px 3px 1px #59513b;
+     transform: scale(0.9);
+     transition: none !important;
 }
 
 .snarkTorrentETA, .snarkTorrentUploaded, .snarkTorrentRateDown, .snarkTorrentRateUp {
@@ -857,6 +858,8 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      text-align: left;
      white-space: nowrap;
      width: 140px;
+     overflow: hidden;
+     text-overflow: ellipsis;
 }
 
 .snarkTorrentInfo img {
@@ -868,8 +871,7 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
      text-align: left !important;
      vertical-align: middle !important;
      background: #efe6e0;
-     padding-top: 3px !important;
-     padding-bottom: 3px !important;
+     padding: 4px 3px 4px 1px;
 }
 
 .snarkTorrentInfo tr:nth-child(even) td {
@@ -879,7 +881,7 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 .snarkTorrentInfo th {
      text-align: left;
      background: linear-gradient(to bottom, #efefef, #cfc7c2);
-     padding: 5px 4px 5px 0;
+     padding: 7px 4px 7px 0;
 }
 
 .snarkTorrentInfo th:first-child {
@@ -891,7 +893,8 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 .snarkTorrentInfo th:first-child, .snarkTorrentInfo td:first-child {
      width: 20px;
      text-align: left;
-     padding: 2px 3px 2px 5px !important;
+     padding-left: 5px !important;
+     padding-right: 3px !important;
 }
 
 .snarkTorrentInfo {
@@ -901,6 +904,10 @@ _:-ms-lang(x), .snarkTorrents tbody tr:hover, .snarkDirInfo tbody tr:hover {
 
 .snarkTorrentInfo tr:first-child th {
      border-top: none;
+}
+
+.snarkTorrentInfo b {
+     margin-right: 3px;
 }
 
 #infohash {
@@ -1126,7 +1133,7 @@ thead img.disable, img.disable:hover {
 }
 
 .thumb {
-     transition: ease all 0.3s;
+     transition: ease all 0.2s;
      max-width: 16px;
 }
 
@@ -1134,7 +1141,9 @@ thead img.disable, img.disable:hover {
      margin: -3px 0 -2px 2px !important;
      max-width: 80px;
      max-height: 80px;
-     transition: ease all 0.3s;
+     box-shadow: none !important;
+     background: #fff !important;
+     transition: ease all 0.3s 0.1s;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -1148,13 +1157,16 @@ thead img.disable, img.disable:hover {
 }
 
 .snarkAddInfo {
-     font-size: 8pt;
      display: inline-block;
      margin-top: 7px;
      background: url(images/infocircle.png) left center no-repeat;
      background-size: 14px auto;
      padding-left: 20px;
      min-height: 16px;
+}
+
+.snarkAddInfo code {
+     font-size: 9pt;
 }
 
 #trackerselect {
@@ -1702,6 +1714,24 @@ img[src$="details.png"] {
      mix-blend-mode: normal !important;
 }
 
+@keyframes fade-in {
+0% {
+     filter: opacity(0);
+}
+
+100% {
+     filter: opacity(1);
+}
+}
+
+.addtorrentsection table, .newtorrentsection table {
+      animation: fade-in 0.2s ease-in;
+}
+
+.snarkAddInfo code {
+      animation: fade-in 0.5s linear;
+}
+
 .newtorrentsection, .addtorrentsection, .configsection, .configsectionpanel, .section, .mainsection {
      background: #dfd7d1;
      background-blend-mode: luminosity;
@@ -1745,6 +1775,10 @@ img[src$="details.png"] {
      background-size: 84px 82px, 100% 100%;
 }
 
+.configsectionpanel table {
+     margin-bottom: 8px;
+}
+
 .configsectionpanel td, .snarkNewTorrent td, select, select option, input, textarea, input[name="nofilter_dataDir"], .configsectionpanel th {
      font-family: "Droid Sans", "Noto Sans", Ubuntu, "Segoe UI", "Lucida Grande", "Bitstream Vera Sans", Verdana, sans-serif;
      font-size: 9pt !important;
@@ -1779,7 +1813,7 @@ img[src$="details.png"] {
 }
 
 .snarkConfig tr:nth-last-child(4) td, .trackerconfig tr:nth-last-child(4) td {
-     padding-bottom: 15px;
+     padding-bottom: 10px;
 }
 
 .snarkConfig tr:nth-last-child(2) td, .trackerconfig tr:nth-last-child(2) td {
@@ -1804,7 +1838,7 @@ img[src$="details.png"] {
 }
 
 code, tt {
-     font-size: 8pt;
+     font-size: 8.5pt;
      color: #313;
      padding: 0 1px;
      font-weight: bold;
@@ -2743,7 +2777,7 @@ _:-ms-lang(x), .snarkNav:link, .snarkNav:visited {
 }
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1500px) {
 #dhtDebugInner {
      margin-top: -21px !important;
      padding-top: 15px;
@@ -2879,7 +2913,7 @@ thead a img, thead img {
 }
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 1500px) {
 body, .snarkTorrents td, .snarkAddInfo, th, td, .snarkFileName, a.control, input[type="submit"], input[type="reset"], select, button, code, #pagenav {
      font-size: 10pt !important;
 }
@@ -2889,7 +2923,7 @@ textarea {
 }
 
 tt, .snarkTorrents tt, .snarkMessages {
-     font-size: 8pt !important;
+     font-size: 8.5pt !important;
 }
 
 .snarkAddInfo, .configsectionpanel td, .snarkNewTorrent td, .configsectionpanel th,
@@ -3018,7 +3052,7 @@ tr#torrentInfoStats td {
 }
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1400px) {
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-width: 1500px) {
 .snarkConfigTitle, .toggleview, .configsectionpanel .snarkConfigTitle, .snarkConfigTitle a, .snarkConfigTitle a:hover,
 .configsectionpanel .snarkConfigTitle:hover, .configsectionpanel .snarkConfigTitle:active {
      font-size: 14pt !important;
@@ -3087,6 +3121,15 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
      min-width: 0 !important;
      width: 0 !important;
      padding: 0;
+}
+
+.snarkTorrentDetails {
+     padding-left: 5px !important;
+     padding-right: 0 !important;
+}
+
+.snarkTorrentName {
+     padding-left: 2px !important;
 }
 
 #configs td:first-child {
@@ -3176,4 +3219,44 @@ th.snarkTorrentStatus a img, .snarkTorrentETA a img, .snarkTrackerDetails a img 
 /* end mini-mode */
 
 /* end responsive layout */
+
+.info_tracker, .info_tracker a {
+     color: #3f271b !important;
+}
+
+.info_tracker {
+     margin: 0 4px 0 2px;
+     padding: 1px 6px 1px 18px;
+     display: inline-block;
+     vertical-align: middle;
+     background: #e8e8e8 url(images/button_tracker.png) left 3px center no-repeat;
+     background-size: 14px auto;
+     max-width: 155px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     box-shadow: 0 0 0 1px #cfc6c0;
+     border-radius: 3px;
+}
+
+.info_tracker:hover, .info_tracker:hover a {
+     color: #930 !important;
+}
+
+.info_tracker:hover {
+     box-shadow: 0 0 0 1px #bfb6b0;
+     background: url(images/button_tracker_hover.png) left 3px center no-repeat, linear-gradient(to bottom, #efefef 50%, #cfc7c2 50%);
+     background-size: 14px auto;
+}
+
+.info_tracker:active, .info_tracker:active a {
+     color: #fff !important;
+}
+
+.info_tracker:active {
+     color: #fff;
+     box-shadow: inset 3px 3px 3px #310;
+     background: #f60 url(images/button_tracker_active.png) left 3px center no-repeat;
+     background-size: 14px auto;
+}
 
