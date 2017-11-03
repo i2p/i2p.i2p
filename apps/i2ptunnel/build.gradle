@@ -48,7 +48,7 @@ task uiJar(type: Jar) {
 }
 
 artifacts {
-   archives i2ptunnelJar, tempBeansJar, uiJar
+    archives i2ptunnelJar, tempBeansJar, uiJar
 }
 
 war {
