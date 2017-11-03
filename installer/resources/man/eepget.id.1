@@ -1,0 +1,94 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH EEPGET 1 "26 Januari 2017" "" I2P
+
+.SH NAMA
+Eepget \- I2P downloader
+
+.SH SINOPSIS
+\fBeepget\fP\ [\fIoptions\fP]\fIURL\fP
+.br
+
+.SH DESKRIPSI
+.P
+Unduh file non\-interaktif via HTTP. Dapat melakukan transfer melalui I2P dan
+Internet biasa .
+.P
+Eepget mampu mengatasi koneksi jaringan yang lamban atau tidak stabil; Jika
+unduhan tidak berhasil karena masalah jaringan, unduhan akan terus dicoba
+sampai keseluruhan file diambil (jika opsi \-n disetel). Jika didukung oleh
+remote server, eepget akan menginstruksikan server untuk melanjutkan unduh
+dari titik interupsi.
+
+.SH OPSI
+\fB\-c\fP
+.TP 
+Clearnet. Internet biasa. Jangan gunakan proxy. Sama dengan \fB\-p\fP :0 .
+.TP 
+
+\fB\-e\fP etag
+.TP 
+Tentukan etag value di dalam request header.
+.TP 
+
+\fB\-h\fP name=value
+.TP 
+Menambahkan request header dengan nama dan nilai yang diberikan.
+.TP 
+
+\fB\-l\fP lineLen
+.TP 
+Mengontrol tampilan progress. \fB\ lineLen\fP adalah panjang satu baris progress dalam karakter. Default\-nya adalah 40.
+.TP 
+
+\fB\-m\fPmarkSize
+.TP 
+Mengontrol tampilan progress. \fB\ markSize\fP adalah jumlah byte yang ditunjukkan oleh karakter '#'. Default\-nya adalah 1024.
+.TP 
+
+\fB\-n\fP retries
+.TP 
+Mementukan berapa kali mencoba unduhan jika unduhan tidak berhasil. Jika opsi ini tidak ditentukan, eepget tidak akan mencoba lagi.
+.TP 
+
+\fB\-o\fP file
+.TP 
+Menetapkan file output untuk ditulis. Jika opsi ini tidak diberikan, nama file output akan ditentukan oleh URL.
+.TP 
+
+\fB\-p\fP proxy_host[:port]
+.TP 
+Tentukan server proxy I2P (eeproxy) untuk digunakan. Jika port tidak ditentukan, eepget akan menggunakan 4444. Jika opsi ini tidak ditentukan, eepget akan menggunakan 127.0.0.1:4444. Tentukan B atau B: 0 untuk menonaktifkan eeproxy.
+.TP 
+
+\fB\-t\fPseconds
+.TP 
+Menetapkan batas waktu tidak aktif. Default\-nya adalah 60 detik.
+.TP 
+
+\fB\-u\fP username
+.TP 
+Menetapkan nama pengguna untuk otorisasi proxy, jika diperlukan.
+.TP 
+
+\fB\-x\fP password
+.TP 
+Menetapkan password untuk otorisasi proxy, jika diperlukan. Jika nama pengguna ditentukan tapi password tidak, EepGet akan meminta password.
+
+.SH "EXIT STATUS"
+
+\fBeepget\fP keluar dengan status nol setelah berhasil transfer dan non\-nol
+jika ada masalah dengan unduhan.
+
+.SH "REPORTING BUGS"
+Masukkan tiket di
+.UR https://trac.i2p2.de/
+trafik I2P halaman
+.UE.
+
+.SH "SEE ALSO"
+\fBi2prouter\fP(1) \fBcurl\fP(1) \fBwget\fP(1)
+

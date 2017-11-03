@@ -1,0 +1,56 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH I2PROUTER 1 "26 Januari 2017" "" I2P
+
+.SH NAMA
+I2prouter \- mulai dan hentikan router I2P
+
+.SH SINOPSIS
+\fBi2prouter\fP
+{\fIconsole\fP|\fIstart\fP|\fIstop\fP|\fIgraceful\fP|\fIrestart\fP|\fIcondrestart\fP|\fIstatus\fP|\fIdump\fP|\fIinstall\fP|\fIremove\fP}
+.br
+
+.SH DESKRIPSI
+Mengontrol I2P service.
+
+.IP \fBconsole\fP
+Menjalankan I2P sebagai console application di bawah current user.
+
+.IP \fBstart\fP
+Mulai I2P service.
+
+.IP \fBstop\fP
+Hentikan I2P service.
+
+.IP \fBrestart\fP
+Menghentikan I2P service dan kemudian memulainya kembali.
+
+.IP \fBcondrestart\fP
+Restart layanan I2P hanya jika sudah berjalan.
+
+.IP \fBgraceful\fP
+Menghentikan I2P dengan anggun (mungkin memakan waktu hingga 11 menit)
+
+.IP \fBinstall\fP
+Install initscript untuk memulai I2P secara otomatis saat sistem boot.
+
+.IP \fBremove\fP
+Uninstall initscript yang terpasang dengan \fBinstall\fP
+
+.IP \fBstatus\fP
+Pemberitahukan apakah layanan I2P sedang berjalan.
+
+.IP \fBdump\fP
+Dumps current threads ke \fBwrapper.log\fP.
+
+.SH "REPORTING BUGS"
+Masukkan tiket di
+.UR https://trac.i2p2.de/
+trafik I2P halaman
+.UE.
+
+.SH "SEE ALSO"
+\fBi2prouter\-nowrapper\fP (1)
