@@ -4,34 +4,28 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
-            include 'org/klomp/snark/web/**'
-        }
-    }
-    jar {
-        java {
-            srcDir 'java/src'
-            exclude 'org/klomp/snark/standalone'
-            exclude 'org/klomp/snark/web'
         }
     }
 }
 
 dependencies {
-    jarCompile project(':core')
-    jarCompile project(':apps:ministreaming')
-    jarCompile project(':apps:systray')
-    providedCompile sourceSets.jar.output
+    compile project(':core')
+    compile project(':apps:systray')
     providedCompile project(':apps:ministreaming')
     providedCompile project(':apps:jetty')
 }
 
 task i2psnarkJar(type: Jar) {
-    from sourceSets.jar.output
+    from sourceSets.main.output
+    exclude 'org/klomp/snark/standalone/**'
+    exclude 'org/klomp/snark/web/**'
     manifest {
         attributes 'Main-Class': 'org.klomp.snark.Snark'
         attributes 'Class-Path': 'i2p.jar mstreaming.jar streaming.jar'
     }
 }
+
+// TODO: standalone jar.  This is rather involved!
 
 artifacts {
     archives i2psnarkJar
