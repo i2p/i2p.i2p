@@ -4,15 +4,6 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
-            include 'net/i2p/i2ptunnel/web/EditBean.java'
-            include 'net/i2p/i2ptunnel/web/IndexBean.java'
-        }
-    }
-    jar {
-        java {
-            srcDir 'java/src'
-            exclude 'net/i2p/i2ptunnel/web/EditBean.java'
-            exclude 'net/i2p/i2ptunnel/web/IndexBean.java'
         }
     }
     test {
@@ -23,23 +14,41 @@ sourceSets {
 }
 
 dependencies {
-    jarCompile project(':core')
-    jarCompile project(':apps:ministreaming')
-    testCompile project(':apps:ministreaming')
-    providedCompile sourceSets.jar.output
+    compile project(':core')
+    compile project(':apps:ministreaming')
     providedCompile project(':apps:jetty')
 }
 
 task i2ptunnelJar(type: Jar) {
-    from sourceSets.jar.output
+    from sourceSets.main.output 
+    exclude '**/ui/*.class'
+    exclude '**/EditBean.class'
+    exclude '**/IndexBean.class'
     manifest {
         attributes 'Main-Class': 'net.i2p.i2ptunnel.I2PTunnel'
         attributes 'Class-Path': 'i2p.jar mstreaming.jar'
     }
 }
 
+task tempBeansJar(type: Jar) {
+    from sourceSets.main.output
+    include '**/EditBean.class'
+    include '**/ui/*.class'
+    include '**/IndexBean.class'
+    baseName = 'temp-beans'
+}
+
+task uiJar(type: Jar) {
+    baseName = 'i2ptunnel-ui.jar'
+    from sourceSets.main.output
+    include '**/ui/*.class'
+    manifest {
+        attributes 'Class-Path' : 'i2p.jar mstreaming.jar i2ptunnel.jar'
+    }
+}
+
 artifacts {
-    archives i2ptunnelJar
+   archives i2ptunnelJar, tempBeansJar, uiJar
 }
 
 war {
@@ -47,3 +56,4 @@ war {
     exclude 'jsp/web.xml'
     webXml = file('jsp/web.xml')
 }
+
