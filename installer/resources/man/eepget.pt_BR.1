@@ -6,7 +6,7 @@
 .TH EEPGET 1 "26 de Janeiro de 2017" "" I2P
 
 .SH NOME
-Eepget \- I2P downloader
+Eepget \- gerenciador de download da I2P
 
 .SH SINOPSE
 \fBeepget\fP [\fIoptions\fP]\fIURL\fP
@@ -66,7 +66,7 @@ Specify an I2P proxy server (eeproxy) to use. If the port is not specified, eepg
 
 \fB\-t\fP seconds
 .TP 
-Sets the inactivity timeout. The default is 60 seconds.
+Especifique o intervalo de inatividade. O valor padrão, por omissão, é de 60 segundos.
 .TP 
 
 \fB\-u\fP username
@@ -78,7 +78,7 @@ Sets the username for proxy authorization, if required.
 .TP 
 Sets the password for proxy authorization, if required. If a username is specified but not a password, EepGet will prompt for the password.
 
-.SH "EXIT STATUS"
+.SH "STATUS DE SAÍDA"
 
 \fBeepget\fP exits with status zero upon successful transfer and non\-zero if
 there were problems with the download.

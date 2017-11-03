@@ -6,7 +6,7 @@
 .TH EEPGET 1 "26 janvier 2017" "" I2P
 
 .SH NOM
-Eepget \- Téléchargeur d'I2P
+Eepget \- Téléchargeur d’I2P
 
 .SH SYNOPSIS
 \fBeepget\fP [\fIoptions\fP]\fIURL\fP
@@ -15,19 +15,19 @@ Eepget \- Téléchargeur d'I2P
 .SH DESCRIPTION
 .P
 Télécharger un fichier de façon non interactive par HTTP. Les transferts
-sont pris en charge à la fois par I2P et l'Internet ordinaire.
+sont pris en charge à la fois par I2P et l’Internet ordinaire.
 .P
 Eepget peut faire face à des connexions réseau lentes ou instables ; si un
-téléchargement ne réussit pas à cause d'un problème de réseau, il ressayera
-jusqu'à ce que le fichier entier soit téléchargé (si l'option \-n est
-définie). S'il cela est pris en charge par le serveur distant, Eepget
+téléchargement ne réussit pas à cause d’un problème de réseau, il ressayera
+jusqu’à ce que le fichier entier soit téléchargé (si l’option \-n est
+définie). S’il cela est pris en charge par le serveur distant, Eepget
 demandera au serveur de continuer le téléchargement à partir du point
-d'interruption.
+d’interruption.
 
 .SH OPTIONS
 \fB\-c\fP
 .TP 
-Réseau visible. N'utilise aucun mandataire. Identique à \fB\-p\fP :0 .
+Réseau visible. N’utilise aucun mandataire. Identique à \fB\-p\fP :0 .
 .TP 
 
 \fB\-e\fP etag
@@ -42,52 +42,52 @@ Ajoute un en\-tête de requête arbitraire avec les nom et valeur donnés.
 
 \fB\-l\fP lineLen
 .TP 
-Contrôle l'affichage de la progression. \fB\ lineLen \fP est la longueur en caractères d'une ligne de progression. La valeur par défaut est 40.
+Contrôle l’affichage de la progression. \fB\ lineLen \fP est la longueur en caractères d’une ligne de progression. La valeur par défaut est 40.
 .TP 
 
 \fB\-m\fP markSize
 .TP 
-Contrôle l'affichage de la progression. \fB\ markSize \fP est le nombre d'octets qu'un caractère '#' représente. La valeur par défaut est 1024.
+Contrôle l’affichage de la progression. \fB\ markSize \fP est le nombre d’octets qu’un caractère '#' représente. La valeur par défaut est 1024.
 .TP 
 
 \fB\-n\fP relances
 .TP 
-Indiquer le nombre de relances du téléchargement si le téléchargement ne réussit pas. Si cette option n'est pas précisée, Eepget ne ressayera pas.
+Indiquer le nombre de relances du téléchargement si le téléchargement ne réussit pas. Si cette option n’est pas précisée, Eepget ne ressayera pas.
 .TP 
 
 \fB\-o\fP fichier
 .TP 
-Définit le fichier de sortie vers lequel écrire. Si cette option n'est pas renseignée, le nom du fichier de sortie sera déterminé par l'URL.
+Définit le fichier de sortie vers lequel écrire. Si cette option n’est pas renseignée, le nom du fichier de sortie sera déterminé par l’URL.
 .TP 
 
 \fB\-p\fP mandataire_hôte[:port]
 .TP 
-Spécifier un serveur mandataire d'I2P (eeproxy) à utiliser. Si le port n'est pas indiqué, eepget utilisera 4444. Si cette option n'est pas indiquée, eepget utilisera 127.0.0.1:444. Indiquer \fB\-c\fP ou \fB\-p\fP :0 pour désactiver le mandataire eeproxy.
+Spécifier un serveur mandataire d’I2P (eeproxy) à utiliser. Si le port n’est pas indiqué, eepget utilisera 4444. Si cette option n’est pas indiquée, eepget utilisera 127.0.0.1:444. Indiquer \fB\-c\fP ou \fB\-p\fP :0 pour désactiver le mandataire eeproxy.
 .TP 
 
 \fB\-t\fP secondes
 .TP 
-Définit la temporisation d'inactivité, 60 secondes par défaut.
+Définit la temporisation d’inactivité, 60 secondes par défaut.
 .TP 
 
-\fB\-u\fP nomd'utilisateur
+\fB\-u\fP nomd’utilisateur
 .TP 
-Définit le nom d'utilisateur pour l'autorisation du mandataire, si requise.
+Définit le nom d’utilisateur pour l’autorisation du mandataire, si requise.
 .TP 
 
 \fB\-x\fP motdepasse
 .TP 
-Définit le mot de passe pour l'autorisation du mandataire, si requise. Si un nom d'utilisateur est indiqué, mais pas un mot de passe, EepGet demandera le mot de passe.
+Définit le mot de passe pour l’autorisation du mandataire, si requise. Si un nom d’utilisateur est indiqué, mais pas un mot de passe, EepGet demandera le mot de passe.
 
 .SH "ÉTAT DE SORTIE"
 
 \fBeepget\fP quitte avec un état zéro si le transfert est réussi et différent
-de zéro s'il y a eu des problèmes de téléchargement.
+de zéro s’il y a eu des problèmes de téléchargement.
 
 .SH "SIGNALER DES BOGUES"
 Veuillez créer un billet sur
 .UR https://trac.i2p2.de/
-la page Trac d'I2P
+la page Trac d’I2P
 .UE .
 
 .SH "VOIR AUSSI"
