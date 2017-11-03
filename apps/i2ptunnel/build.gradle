@@ -39,7 +39,7 @@ task tempBeansJar(type: Jar) {
 }
 
 task uiJar(type: Jar) {
-    baseName = 'i2ptunnel-ui.jar'
+    baseName = 'i2ptunnel-ui'
     from sourceSets.main.output
     include '**/ui/*.class'
     manifest {
