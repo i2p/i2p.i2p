@@ -38,6 +38,7 @@ public class GraphHelper extends FormHandler {
     public static final int DEFAULT_Y = 100;
     private static final int DEFAULT_REFRESH = 5*60;
     private static final int DEFAULT_PERIODS = 60;
+    private static final boolean DEFAULT_LEGEND = false;
     static final int MAX_X = 2048;
     static final int MAX_Y = 1024;
     private static final int MIN_X = 200;
@@ -55,7 +56,6 @@ public class GraphHelper extends FormHandler {
         _periodCount = _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS);
         _refreshDelaySeconds = _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
         _showEvents = _context.getBooleanProperty(PROP_EVENTS);
-        _graphHideLegend = _context.getBooleanProperty(PROP_LEGEND);
     }
 
     /**
@@ -158,6 +158,7 @@ public class GraphHelper extends FormHandler {
                 if (title.equals("bw.sendRate")) hasTx = true;
                 else if (title.equals("bw.recvRate")) hasRx = true;
             }
+            boolean hideLegend = _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND);
 
             if (hasTx && hasRx && !_showEvents) {
                 _out.write("<a href=\"graph?stat=bw.combined"
@@ -170,7 +171,7 @@ public class GraphHelper extends FormHandler {
                            + " src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount
                            + "&amp;width=" + _width);
-                if (!_graphHideLegend) {
+                if (!hideLegend) {
                     // bw.combined graph has two entries in its legend
                     // -26 pixels equalizes its height with the other images
                     _out.write("&amp;height=" + (_height - 26));
@@ -178,7 +179,7 @@ public class GraphHelper extends FormHandler {
                     // no legend, no height difference needed
                     _out.write("&amp;height=" + (_height));
                 }
-                _out.write("&amp;hideLegend=" + _graphHideLegend
+                _out.write("&amp;hideLegend=" + hideLegend
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
 
@@ -202,7 +203,7 @@ public class GraphHelper extends FormHandler {
                            + "&amp;periodCount=" + _periodCount
                            + "&amp;width=" + _width
                            + "&amp;height=" + _height
-                           + "&amp;hideLegend=" + _graphHideLegend
+                           + "&amp;hideLegend=" + hideLegend
                            + "\" alt=\"" + title
                            + "\" title=\"" + title + "\"></a>\n");
             }
@@ -252,6 +253,7 @@ public class GraphHelper extends FormHandler {
             if (_end > 0)
                 _out.write(' ' + _t("ending {0} ago", DataHelper.formatDuration2(_end * period)));
 
+            boolean hideLegend = _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND);
             _out.write("&nbsp;<a href=\"graphs\">[" + _t("Return to main graphs page") + "]</a></h3>\n"
                        + "<div class=\"graphspanel\"><img class=\"statimage\" border=\"0\""
                        + " src=\"viewstat.jsp?stat="
@@ -262,7 +264,7 @@ public class GraphHelper extends FormHandler {
                        + "&amp;end=" + _end
                        + "&amp;width=" + _width
                        + "&amp;height=" + _height
-                       + "&amp;hideLegend=" + _graphHideLegend
+                       + "&amp;hideLegend=" + hideLegend
                        + "\"></div><p id=\"graphopts\">\n");
 
             if (_width < MAX_X && _height < MAX_Y) {
@@ -372,21 +374,18 @@ public class GraphHelper extends FormHandler {
         try {
             _out.write("<br><h3 id=\"graphdisplay\">" + _t("Configure Graph Display") + " <a href=\"configstats\">[" + _t("Select Stats") + "]</a></h3>");
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +
-                       "<table><tr><td><input type=\"hidden\" name=\"action\" value=\"save\">\n" +
+                       "<table><tr><td><div class=\"optionlist\"><input type=\"hidden\" name=\"action\" value=\"save\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_t("Display period") + ":</td><td colspan=\"2\"><input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\">" + _t("minutes") + "</td></tr><tr><td>\n");
-            _out.write(_t("Plot type") + ":</td><td colspan=\"2\">");
-            _out.write("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + ">" + _t("Averages") + "</label>&nbsp;&nbsp;&nbsp;");
-            _out.write ("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + ">" + _t("Events") + "</label></td></tr><tr><td>\n");
-            _out.write(_t("Graph size") + ":</td><td><input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
+            _out.write("<span class=\"nowrap\" title=\"" +
+                       _t("Note: Dimensions are for graph only (excludes title, labels and legend).") +"\"><b>");
+            _out.write(_t("Graph size") + ":</b> <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width
                        + "\">" + _t("pixels wide") + "&nbsp;&nbsp;&nbsp;<input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height
-                       + "\">" + _t("pixels high") + "</td><td class=\"infohelp\">" + _t("Note: Dimensions are for graph only (excludes title, labels and legend).") + "</td></tr><tr><td>\n");
-            _out.write(_t("Hide legend") + ":</td><td colspan=\"2\">");
-            _out.write("<label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"hideLegend\"");
-            if (_graphHideLegend)
-                _out.write(HelperBase.CHECKED);
-            _out.write(">" + _t("Do not show legend on graphs") + "</label></td></tr><tr><td>\n");
-            _out.write(_t("Refresh delay") + ":</td><td colspan=\"2\"><select name=\"refreshDelay\">");
+                       + "\">" + _t("pixels high") + "</span><br><span class=\"nowrap\">\n<b>");
+
+            _out.write(_t("Display period") + ":</b> <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\">" + _t("minutes") + "</span><br><span class=\"nowrap\">\n<b>");
+
+
+            _out.write(_t("Refresh delay") + ":</b> <select name=\"refreshDelay\">");
             for (int i = 0; i < times.length; i++) {
                 _out.write("<option value=\"");
                 _out.write(Integer.toString(times[i]));
@@ -400,12 +399,23 @@ public class GraphHelper extends FormHandler {
                     _out.write(_t("Never"));
                 _out.write("</option>\n");
             }
-            _out.write("</select></td></tr><tr><td>\n" + _t("Persistence") +
-                       ":</td><td colspan=\"2\"><label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
+            _out.write("</select></span><br><span class=\"nowrap\">\n<b>");
+
+            _out.write(_t("Plot type") + ":</b> ");
+            _out.write("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : HelperBase.CHECKED) + ">" + _t("Averages") + "</label>&nbsp;&nbsp;&nbsp;");
+            _out.write ("<label><input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? HelperBase.CHECKED : "") + ">" + _t("Events") + "</label></span><br><span class=\"nowrap\">\n<b>");
+            _out.write(_t("Hide legend") + ":</b> ");
+            _out.write("<label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"hideLegend\"");
+            boolean hideLegend = _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND);
+            if (hideLegend)
+                _out.write(HelperBase.CHECKED);
+            _out.write(">" + _t("Do not show legend on graphs") + "</label></span><br><span class=\"nowrap\">\n<b>");
+            _out.write(_t("Persistence") +
+                       ":</b> <label><input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             if (persistent)
                 _out.write(HelperBase.CHECKED);
-            _out.write(">" + _t("Store graph data on disk") + "</label></td></tr></table>" +
+            _out.write(">" + _t("Store graph data on disk") + "</label></span></div></td></tr></table>" +
                        "<hr><div class=\"formaction\" id=\"graphing\"><input type=\"submit\" class=\"accept\" value=\"" + _t("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -453,7 +463,7 @@ public class GraphHelper extends FormHandler {
             _periodCount != _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS) ||
             _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
             _showEvents != _context.getBooleanProperty(PROP_EVENTS) ||
-            _graphHideLegend != _context.getBooleanProperty(PROP_LEGEND) ||
+            _graphHideLegend != _context.getProperty(PROP_LEGEND, DEFAULT_LEGEND) ||
             _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
             Map<String, String> changes = new HashMap<String, String>();
             changes.put(PROP_X, "" + _width);
