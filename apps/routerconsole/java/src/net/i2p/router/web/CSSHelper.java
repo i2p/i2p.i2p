@@ -26,6 +26,7 @@ public class CSSHelper extends HelperBase {
     public static final String PROP_DISABLE_REFRESH = "routerconsole.summaryDisableRefresh";
     private static final String PROP_XFRAME = "routerconsole.disableXFrame";
     public static final String PROP_FORCE_MOBILE_CONSOLE = "routerconsole.forceMobileConsole";
+    /** @since 0.9.32 */
     public static final String PROP_EMBED_APPS = "routerconsole.embedApps";
 
     private static final String _consoleNonce = Long.toString(RandomSource.getInstance().nextLong());

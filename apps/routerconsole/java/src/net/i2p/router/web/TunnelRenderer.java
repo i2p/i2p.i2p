@@ -387,6 +387,7 @@ class TunnelRenderer {
     /**
      * Copied from ConfigNetHelper.
      * @return in KBytes per second
+     * @since 0.9.32
      */
     private int getShareBandwidth() {
         int irateKBps = _context.bandwidthLimiter().getInboundKBytesPerSecond();

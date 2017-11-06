@@ -294,9 +294,8 @@ public class SummaryHelper extends HelperBase {
 
     /**
      * Retrieve amount of used memory.
-     *
+     * @since 0.9.32 uncommented
      */
-
     public String getMemory() {
         DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
         long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
@@ -308,6 +307,7 @@ public class SummaryHelper extends HelperBase {
         return integerFormatter.format(used) + " / " + total + "MB";
     }
 
+    /** @since 0.9.32 */
     public String getMemoryBar() {
         DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
         long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
@@ -384,11 +384,11 @@ public class SummaryHelper extends HelperBase {
         //return _context.profileOrganizer().countWellIntegratedPeers();
         return _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
     }
+
     /**
      * How many peers the router ranks as failing.
-     *
+     * @since 0.9.32 uncommented
      */
-
     public int getFailingPeers() {
         if (_context == null)
             return 0;
@@ -397,10 +397,9 @@ public class SummaryHelper extends HelperBase {
     }
 
     /**
-     * How many peers totally suck.
-     *
+     * How many peers are banned.
+     * @since 0.9.32 uncommented
      */
-
     public int getBanlistedPeers() {
         if (_context == null)
             return 0;
@@ -959,7 +958,7 @@ public class SummaryHelper extends HelperBase {
     private static final String SS = Character.toString(S);
 
     public List<String> getSummaryBarSections(String page) {
-        String config = "";
+        String config;
         if ("home".equals(page)) {
             config = _context.getProperty(PROP_SUMMARYBAR + page, isAdvanced() ? DEFAULT_MINIMAL_ADVANCED : DEFAULT_MINIMAL);
         } else {

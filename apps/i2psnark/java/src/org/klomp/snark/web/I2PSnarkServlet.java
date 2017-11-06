@@ -2348,7 +2348,7 @@ public class I2PSnarkServlet extends BasicServlet {
             try {
                 // class only in standalone builds
                 Class helper = Class.forName("org.klomp.snark.standalone.ConfigUIHelper");
-                Method getLangSettings = helper.getMethod("getLangSettings", I2PAppContext.class);
+                Method getLangSettings = helper.getMethod("getLangSettings", new Class[] {I2PAppContext.class});
                 String langSettings = (String) getLangSettings.invoke(null, _context);
                 // If we get to here, we have the language settings
                 out.write("<tr><td>");
@@ -3900,6 +3900,7 @@ public class I2PSnarkServlet extends BasicServlet {
         _manager.setSavedCommentsEnabled(snark, yes);
     }
 
+    /** @since 0.9.32 */
     private static boolean noCollapsePanels(HttpServletRequest req) {
         // check for user agents that can't toggle the collapsible panels...
         String ua = req.getHeader("user-agent");

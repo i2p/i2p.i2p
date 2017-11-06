@@ -54,7 +54,7 @@ public class EventLogHelper extends FormHandler {
         EventLog.WATCHDOG, _x("Watchdog warning")
     };
     private static final long DAY = 24*60*60*1000L;
-    private static final long[] _times = { 0, DAY, 7*DAY, 30*DAY, 365*DAY };
+    private static final long[] _times = { 0, DAY, 7*DAY, 30*DAY, 90*DAY, 365*DAY };
 
     public EventLogHelper() {
         super();

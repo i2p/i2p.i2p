@@ -335,6 +335,7 @@ class SummaryBarRenderer {
            .append(nbsp(_t("Debug")))
            .append("</a>\n")
 
+           // 7 days
            .append("<a href=\"/events?from=604800000\" target=\"_top\" title=\"")
            .append(_t("View historical log of router events"))
            .append("\">")
@@ -491,8 +492,8 @@ class SummaryBarRenderer {
            .append(_t("Clock Skew"))
            .append(":</b></td>" +
                    "<td align=\"right\">")
-           .append(_context.clock().getOffset())
-           .append(" ms</td></tr>\n" +
+           .append(DataHelper.formatDuration2(_context.clock().getOffset()))
+           .append("</td></tr>\n" +
 
                    "<tr title=\"")
            .append(_t("How much RAM I2P is using / total RAM available to I2P (excludes RAM allocated to the JVM)"))
@@ -509,9 +510,7 @@ class SummaryBarRenderer {
     /** @since 0.9.32 */
     public String renderMemoryBarHTML() {
         if (_helper == null) return "";
-        StringBuilder buf = new StringBuilder(512);
-        buf.append(_helper.getMemoryBar());
-        return buf.toString();
+        return _helper.getMemoryBar();
     }
 
     public String renderNetworkReachabilityHTML() {
@@ -656,6 +655,7 @@ class SummaryBarRenderer {
         return buf.toString();
     }
 
+    /** @since 0.9.32 */
     public String renderPeersAdvancedHTML() {
         if (_helper == null) return "";
         StringBuilder buf = new StringBuilder(512);

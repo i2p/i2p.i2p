@@ -119,7 +119,7 @@ public class PasswordManager {
         System.arraycopy(shashBytes, 0, salt, 0, SALT_LENGTH);
         System.arraycopy(shashBytes, SALT_LENGTH, hash, 0, SessionKey.KEYSIZE_BYTES);
         byte[] pwHash = _context.keyGenerator().generateSessionKey(salt, DataHelper.getUTF8(pw)).getData();
-        return DataHelper.eq(hash, pwHash);
+        return DataHelper.eqCT(hash, 0, pwHash, 0, SessionKey.KEYSIZE_BYTES);
     }
     
     /**
