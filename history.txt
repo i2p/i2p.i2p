@@ -1,3 +1,5 @@
+* 2017-11-07 0.9.32 released
+
 2017-11-03 zzz
  * Update translations, add Indonesian as selection
  * GeoIP update
