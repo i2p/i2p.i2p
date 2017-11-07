@@ -22,6 +22,10 @@ b {
      color: #111;
 }
 
+.langbox {
+     width: 400px;
+}
+
 button, input[type="submit"], input[type="reset"] {
     font-size: 10.5pt !important;
     padding: 3px 5px 3px 22px !important;
