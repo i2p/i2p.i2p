@@ -192,7 +192,7 @@ override_dh_installdocs:
 	dh_installdocs -pi2p -plibjbigi-jni --link-doc=i2p-router
 	dh_installdocs --remaining-packages
 
-override_dh_dhlibdeps:
+override_dh_shlibdeps:
 	dh_shlibdeps -llibjbigi-jni debian/libjbigi-jni/usr/lib/jni/*.so
 
 #override_dh_installinit:

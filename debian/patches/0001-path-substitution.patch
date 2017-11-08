@@ -510,7 +510,7 @@ Index: b/installer/resources/locale/po/messages_fr.po
 --- a/installer/resources/locale/po/messages_fr.po
 +++ b/installer/resources/locale/po/messages_fr.po
 @@ -188,13 +188,13 @@ msgid "Request a Java thread dump if run
- msgstr "Demander un vidage des fils d'exécution de Java si elle est en cours d'exécution."
+ msgstr "Demander un vidage des fils d’exécution de Java si elle est en cours d’exécution."
  
  #: ../i2prouter:1874
 -msgid "Please edit i2prouter and set the variable RUN_AS_USER"
@@ -520,7 +520,7 @@ Index: b/installer/resources/locale/po/messages_fr.po
  
  #: ../i2prouter:1879
  msgid "Running I2P as the root user is *not* recommended."
- msgstr "Il n'est *pas* recommandé d'exécuter I2P en tant que root."
+ msgstr "Il n’est *pas* recommandé d’exécuter I2P en tant que root."
  
  #: ../i2prouter:1882
 -msgid "To run as root anyway, edit i2prouter and set ALLOW_ROOT=true."
@@ -531,7 +531,7 @@ Index: b/installer/resources/locale/po/messages_ru.po
 ===================================================================
 --- a/installer/resources/locale/po/messages_ru.po
 +++ b/installer/resources/locale/po/messages_ru.po
-@@ -191,13 +191,13 @@ msgid "Request a Java thread dump if run
+@@ -192,13 +192,13 @@ msgid "Request a Java thread dump if run
  msgstr "Запросить дамп нитей Java, если запущено."
  
  #: ../i2prouter:1874
