@@ -300,9 +300,15 @@ public class SummaryHelper extends HelperBase {
     public String getMemory() {
         DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
         long tot = SystemVersion.getMaxMemory();
-        long free = Runtime.getRuntime().freeMemory();
-        long used = (tot - free) / (1024*1024);
-        //long usedPc = 100 - ((free * 100) / tot);
+        // This reads much higher than the graph, possibly because it's right in
+        // the middle of a console refresh... so get it from the Rate instead.
+        //long free = Runtime.getRuntime().freeMemory();
+        long used = (long) _context.statManager().getRate("router.memoryUsed").getRate(60*1000).getAvgOrLifetimeAvg();
+        if (used <= 0) {
+            long free = Runtime.getRuntime().freeMemory();
+            used = tot - free;
+        }
+        used /= 1024*1024;
         long total = tot / (1024*1024);
         // long free = Runtime.getRuntime().freeMemory()/1024/1024;
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
@@ -314,9 +320,19 @@ public class SummaryHelper extends HelperBase {
     public String getMemoryBar() {
         DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
         long tot = SystemVersion.getMaxMemory();
-        long free = Runtime.getRuntime().freeMemory();
-        long used = (tot - free) / (1024*1024);
-        long usedPc = 100 - ((free * 100) / tot);
+        // This reads much higher than the graph, possibly because it's right in
+        // the middle of a console refresh... so get it from the Rate instead.
+        //long free = Runtime.getRuntime().freeMemory();
+        long used = (long) _context.statManager().getRate("router.memoryUsed").getRate(60*1000).getAvgOrLifetimeAvg();
+        long usedPc;
+        if (used <= 0) {
+            long free = Runtime.getRuntime().freeMemory();
+            usedPc = 100 - ((free * 100) / tot);
+            used = (tot - free) / (1024*1024);
+        } else {
+            usedPc = used * 100 / tot;
+            used /= 1024*1024;
+        }
         long total = tot / (1024*1024);
         // long free = Runtime.getRuntime().freeMemory()/1024/1024;
         // return integerFormatter.format(used) + "MB (" + usedPc + "%)";
