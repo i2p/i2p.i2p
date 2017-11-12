@@ -1,17 +1,19 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the i2p package.
 # 
 # Translators:
+# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2017
 # Jakob Wuhrer <pinoaffe@gmail.com>, 2016
+# Nathan Follens, 2015
 # Nathan Follens, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2015-02-18 22:14+0000\n"
-"PO-Revision-Date: 2017-06-30 21:32+0000\n"
-"Last-Translator: Jakob Wuhrer <pinoaffe@gmail.com>\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2017-11-12 14:01+0000\n"
+"PO-Revision-Date: 2017-11-12 14:17+0000\n"
+"Last-Translator: zzzi2p\n"
 "Language-Team: Dutch (http://www.transifex.com/otf/I2P/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,13 +63,13 @@ msgstr "Zeer belangrijk: als hier een gebruiker anders dan 'i2psvc' wordt ingege
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr "Geheugen dat aan I2P kan toegerekend worden:"
+msgstr "Geheugen dat aan I2P kan toegewezen worden:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr "Standaard is I2P toegestaan maximum 128MB van het RAM te gebruiken."
+msgstr "Standaard is het I2P toegestaan om maximum 128MB van het RAM te gebruiken."
 
 #. Type: string
 #. Description
@@ -80,8 +82,8 @@ msgstr "Voor hoge bandbreedte-routers, evenals routers met veel actieve torrents
 #. Type: boolean
 #. Description
 #: ../i2p.templates:5001
-msgid "Run I2P daemon confined with AppArmor"
-msgstr "Voer een I2P daemon uit met AppArmor"
+msgid "Should the I2P daemon be confined with AppArmor?"
+msgstr "Moet de I2P daemon met AppArmor begrensd worden?"
 
 #. Type: boolean
 #. Description
@@ -89,4 +91,4 @@ msgstr "Voer een I2P daemon uit met AppArmor"
 msgid ""
 "With this option enabled I2P will be sandboxed with AppArmor, restricting "
 "which files and directories may be accessed by I2P."
-msgstr "Als jde deze optie aanzet, dan zal I2P gesandboxt zijn met AppArmor. Dit beperkt welke bestanden en mappen door I2P bereikbaar zijn."
+msgstr "Als je deze optie aanzet, dan zal I2P gesandboxt zijn met AppArmor. Dit beperkt welke bestanden en mappen voor I2P bereikbaar zijn."
