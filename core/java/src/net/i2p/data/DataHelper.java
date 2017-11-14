@@ -1564,7 +1564,7 @@ public class DataHelper {
     /**
      * Like formatSize but with a space after the number
      * This seems consistent with most style guides out there.
-     * @param nonBreaking use an HTML thin non-breaking space (&#8239;)
+     * @param nonBreaking use an HTML thin non-breaking space (&amp;#8239;)
      * @since 0.9.31
      */
     public static String formatSize2(long bytes, boolean nonBreaking) {
