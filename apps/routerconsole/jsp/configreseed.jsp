@@ -92,6 +92,8 @@
 <%=intl._t("Change these only if HTTPS is blocked by a restrictive firewall and reseed has failed.")%>
   </td>
  </tr>
+
+<% if (reseedHelper.shouldShowSelect()) { %>
 <tr><td align="right"><b><%=intl._t("Reseed URL Selection")%>:</b></td>
 <td><label><input type="radio" class="optbox" name="mode" value="0" <%=reseedHelper.modeChecked(0) %> >
 <%=intl._t("Try SSL first then non-SSL")%></label><br>
@@ -99,11 +101,14 @@
 <%=intl._t("Use SSL only")%></label><br>
 <label><input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
 <%=intl._t("Use non-SSL only")%></label></td></tr>
+<% } // shouldShowSelect %>
+
 <tr><td align="right"><b><%=intl._t("Reseed URLs")%>:</b></td>
 <td><textarea wrap="off" name="reseedURL" cols="60" rows="7" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea>
 <div class="formaction" id="resetreseed"><input type="submit" name="action" class="reload" value="<%=intl._t("Reset URL list")%>" /></div>
 </td></tr>
 
+<% if (reseedHelper.shouldShowHTTPProxy()) { %>
 <tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable HTTP Proxy?")%></b></label></td>
 <td><input type="checkbox" class="optbox" name="enable" id="enableproxy" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTP Proxy Host")%>:</b></td>
@@ -117,8 +122,10 @@
 <td><input name="username" type="text" value="<jsp:getProperty name="reseedHelper" property="username" />" ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTP Proxy Password")%>:</b></td>
 <td><input name="nofilter_password" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_password" />" ></td></tr>
+<% } // shouldShowHTTPProxy %>
 
 <!-- TODO Need SSLEepGet support
+<% if (reseedHelper.shouldShowHTTPSProxy()) { %>
 <tr><td align="right"><b><%=intl._t("Enable HTTPS Proxy?")%></b></td>
 <td><input type="checkbox" class="optbox" name="senable" value="true" <jsp:getProperty name="reseedHelper" property="senable" /> ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTPS Proxy Host")%>:</b></td>
@@ -132,6 +139,7 @@
 <td><input name="susername" type="text" value="<jsp:getProperty name="reseedHelper" property="susername" />" ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTPS Proxy Password")%>:</b></td>
 <td><input name="nofilter_spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_spassword" />" ></td></tr>
+<% } // shouldShowHTTPSProxy %>
 -->
 
  <tr>

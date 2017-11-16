@@ -78,7 +78,7 @@ public class ConfigReseedHelper extends HelperBase {
         return getChecked(Reseeder.PROP_SPROXY_AUTH_ENABLE);
     }
 
-    public String getReseedURL() {
+    private List<String> reseedList() {
         String urls = _context.getProperty(Reseeder.PROP_RESEED_URL, Reseeder.DEFAULT_SEED_URL + ',' + Reseeder.DEFAULT_SSL_SEED_URL);
         StringTokenizer tok = new StringTokenizer(urls, " ,\r\n");
         List<String> URLList = new ArrayList<String>(16);
@@ -87,6 +87,11 @@ public class ConfigReseedHelper extends HelperBase {
             if (s.length() > 0)
                 URLList.add(s);
         }
+        return URLList;
+    }
+
+    public String getReseedURL() {
+        List<String> URLList = reseedList();
         Collections.sort(URLList);
         StringBuilder buf = new StringBuilder();
         for (String s : URLList) {
@@ -95,5 +100,50 @@ public class ConfigReseedHelper extends HelperBase {
              buf.append(s);
         }
         return buf.toString();
+    }
+
+    /**
+     *  @return true only if we have both http and https URLs
+     *  @since 0.9.33
+     */
+    public boolean shouldShowSelect() {
+        boolean http = false;
+        boolean https = false;
+        for (String u : reseedList()) {
+            if (u.startsWith("https://")) {
+                if (http)
+                    return true;
+                https = true;
+            } else if (u.startsWith("http://")) {
+                if (https)
+                    return true;
+                http = true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *  @return true only if we have a http URL
+     *  @since 0.9.33
+     */
+    public boolean shouldShowHTTPProxy() {
+        for (String u : reseedList()) {
+            if (u.startsWith("http://"))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     *  @return true only if we have a https URL
+     *  @since 0.9.33
+     */
+    public boolean shouldShowHTTPSProxy() {
+        for (String u : reseedList()) {
+            if (u.startsWith("https://"))
+                return true;
+        }
+        return false;
     }
 }
