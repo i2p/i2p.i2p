@@ -170,7 +170,24 @@ public class BitField
     return count >= size;
   }
 
-    @Override
+  /** @since 0.9.33 */
+  @Override
+  public int hashCode() {
+      return (count << 16) ^ size;
+  }
+
+  /** @since 0.9.33 */
+  @Override
+  public boolean equals(Object o) {
+      if (o == null || !(o instanceof BitField))
+          return false;
+      BitField bf = (BitField) o;
+      return count == bf.count() &&
+             size == bf.size() &&
+             Arrays.equals(bitfield, bf.getFieldBytes());
+  }
+
+  @Override
   public String toString()
   {
     // Not very efficient

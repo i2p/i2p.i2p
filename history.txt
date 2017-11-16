@@ -1,3 +1,7 @@
+2017-11-16 zzz
+ * i2psnark: Fix bad completion status after recheck (ticket #2046)
+ * Jetty 9.2.22
+
 2017-11-07 zzz
  * Utils: Constant-time password check
 

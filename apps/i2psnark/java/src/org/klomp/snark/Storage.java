@@ -892,9 +892,7 @@ public class Storage implements Closeable
    *  @since 0.9.23
    */
   public boolean recheck() throws IOException {
-      int previousNeeded = needed;
-      checkCreateFiles(true);
-      boolean changed = previousNeeded != needed;
+      boolean changed = checkCreateFiles(true);
       if (listener != null && changed)
           listener.setWantedPieces(this);
       return changed;
@@ -910,19 +908,23 @@ public class Storage implements Closeable
    * @param recheck if true, this is a check after we downloaded the
    *        last piece, and we don't modify the global bitfield unless
    *        the check fails.
+   * @return true if changed (only valid if recheck == true)
    */
-  private void checkCreateFiles(boolean recheck) throws IOException {
+  private boolean checkCreateFiles(boolean recheck) throws IOException {
       synchronized(this) {
           _isChecking = true;
           try {
-              locked_checkCreateFiles(recheck);
+              return locked_checkCreateFiles(recheck);
           } finally {
               _isChecking = false;
           }
       }
   }
 
-  private void locked_checkCreateFiles(boolean recheck) throws IOException
+  /**
+   *  @return true if changed (only valid if recheck == true)
+   */
+  private boolean locked_checkCreateFiles(boolean recheck) throws IOException
   {
     _checkProgress.set(0);
     // Whether we are resuming or not,
@@ -1033,9 +1035,11 @@ public class Storage implements Closeable
 
     // do this here so we don't confuse the user during checking
     needed = need;
-    if (recheck && need > 0) {
-        // whoops, recheck failed
+    boolean rv = false;
+    if (recheck) {
+        // FIXME bogus synch
         synchronized(bitfield) {
+            rv = !bfield.equals(bitfield);
             bitfield = bfield;
         }
     }
@@ -1045,6 +1049,7 @@ public class Storage implements Closeable
       if (needed <= 0)
         listener.storageCompleted(this);
     }
+    return rv;
   }
 
   /**
