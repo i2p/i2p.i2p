@@ -212,7 +212,7 @@ Applications:
      Zxing 3.3.0:
        See licenses/LICENSE-Apache2.0.txt
 
-   Jetty 9.2.21.v20170120:
+   Jetty 9.2.22.v20170606:
    See licenses/ABOUT-Jetty.html
    See licenses/NOTICE-Jetty.html
    See licenses/LICENSE-Apache2.0.txt
