@@ -71,6 +71,7 @@ import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
+import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.Translate;
 
 /**
@@ -1567,6 +1568,7 @@ public class WebMail extends HttpServlet
 	}
 
     /**
+     * Either mobile or text browser
      * Copied from net.i2p.router.web.CSSHelper
      * @param ua null ok
      * @since 0.9.7
@@ -1574,31 +1576,9 @@ public class WebMail extends HttpServlet
     private static boolean isMobile(String ua) {
         if (ua == null)
             return false;
-        return
-                               // text
-                              (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
-                               ua.startsWith("ELinks") || ua.startsWith("Links") ||
-                               ua.startsWith("Dillo") || ua.startsWith("Emacs-w3m") ||
-                               // mobile
-                               // http://www.zytrax.com/tech/web/mobile_ids.html
-                               // Android tablet UAs don't have "Mobile" in them
-                               (ua.contains("Android") && ua.contains("Mobile")) ||
-                               ua.contains("iPhone") ||
-                               ua.contains("iPod") || ua.contains("iPad") ||
-                               ua.contains("Kindle") || ua.contains("Mobile") ||
-                               ua.contains("Nintendo Wii") ||
-                               ua.contains("Opera Mini") || ua.contains("Opera Mobi") ||
-                               ua.contains("Palm") ||
-                               ua.contains("PLAYSTATION") || ua.contains("Playstation") ||
-                               ua.contains("Profile/MIDP-") || ua.contains("SymbianOS") ||
-                               ua.contains("Windows CE") || ua.contains("Windows Phone") ||
-                               ua.startsWith("BlackBerry") || ua.startsWith("DoCoMo") ||
-                               ua.startsWith("Nokia") || ua.startsWith("OPWV-SDK") ||
-                               ua.startsWith("MOT-") || ua.startsWith("SAMSUNG-") ||
-                               ua.startsWith("nook") || ua.startsWith("SCH-") ||
-                               ua.startsWith("SEC-") || ua.startsWith("SonyEricsson") ||
-                               ua.startsWith("Vodafone"));
+        return ServletUtil.isSmallBrowser(ua);
     }
+
 	/**
 	 * The entry point for all web page loads
 	 * 

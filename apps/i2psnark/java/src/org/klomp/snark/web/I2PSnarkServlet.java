@@ -33,6 +33,7 @@ import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SystemVersion;
@@ -450,9 +451,7 @@ public class I2PSnarkServlet extends BasicServlet {
         // Opera and text-mode browsers: no &thinsp; and no input type=image values submitted
         // Using a unique name fixes Opera, except for the buttons with js confirms, see below
         String ua = req.getHeader("User-Agent");
-        boolean isDegraded = ua != null && (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
-                                            ua.startsWith("ELinks") || ua.startsWith("Links") ||
-                                            ua.startsWith("Dillo") || ua.startsWith("Emacs-w3m"));
+        boolean isDegraded = ua != null && ServletUtil.isTextBrowser(ua);
         boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
 
         // pages
