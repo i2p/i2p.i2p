@@ -60,6 +60,18 @@ public class ConfigReseedHelper extends HelperBase {
         return "";
     }
 
+    /** @since 0.9.33 */
+    public String pmodeChecked(int mode) {
+        String c =  _context.getProperty(Reseeder.PROP_SPROXY_TYPE, "HTTP");
+        boolean disabled =  !_context.getBooleanProperty(Reseeder.PROP_SPROXY_ENABLE);
+        if ((mode == 0 && disabled) ||
+            (mode == 1 && !disabled && c.equals("HTTP")) ||
+            (mode == 2 && !disabled && c.equals("SOCKS4")) ||
+            (mode == 3 && !disabled && c.equals("SOCKS5")))
+            return CHECKED;
+        return "";
+    }
+
     public String getEnable() {
         return getChecked(Reseeder.PROP_PROXY_ENABLE);
     }
@@ -69,9 +81,11 @@ public class ConfigReseedHelper extends HelperBase {
         return getChecked(Reseeder.PROP_PROXY_AUTH_ENABLE);
     }
 
+/****
     public String getSenable() {
         return getChecked(Reseeder.PROP_SPROXY_ENABLE);
     }
+****/
 
     /** @since 0.8.9 */
     public String getSauth() {

@@ -153,7 +153,10 @@ public class ConfigReseedHandler extends FormHandler {
         changes.put(Reseeder.PROP_SSL_DISABLE,
                                            Boolean.toString(disabled));
         saveBoolean(Reseeder.PROP_PROXY_ENABLE, "enable");
-        saveBoolean(Reseeder.PROP_SPROXY_ENABLE, "senable");
+        String pmode = getJettyString("pmode");
+        boolean senable = pmode != null && pmode.length() > 0;
+        changes.put(Reseeder.PROP_SPROXY_ENABLE, Boolean.toString(senable));
+        saveString(Reseeder.PROP_SPROXY_TYPE, "pmode");
         if (_context.router().saveConfig(changes, removes))
             addFormNotice(_t("Configuration saved successfully."));
         else

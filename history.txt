@@ -1,5 +1,10 @@
-2017-11-16 zzz
+2017-11-18 zzz
+ * Reseed: Add SOCKS proxy support (ticket #1130)
+
+2017-11-17 zzz
+ * Addressbook: Fix adding alternates after importing an empty book (ticket #2072)
  * Reseed: Add HTTPS proxy support (ticket #423)
+ * SOCKS: Move code from i2ptunnel to core, in prep for SSLEepGet use (ticket #1130)
 
 2017-11-16 zzz
  * Console: Hide Reseed HTTP proxy options if no HTTP URLs (ticket #2007)

@@ -145,6 +145,8 @@ public class Reseeder {
     public static final String PROP_SPROXY_USERNAME = "router.reseedSSLProxy.username";
     public static final String PROP_SPROXY_PASSWORD = "router.reseedSSLProxy.password";
     public static final String PROP_SPROXY_AUTH_ENABLE = "router.reseedSSLProxy.authEnable";
+    /** @since 0.9.33 */
+    public static final String PROP_SPROXY_TYPE = "router.reseedSSLProxyType";
     /** @since 0.9 */
     public static final String PROP_DISABLE = "router.reseedDisable";
 
@@ -921,10 +923,11 @@ public class Reseeder {
             boolean ssl = url.toString().startsWith("https");
             if (ssl) {
                 boolean shouldProxy = _sproxyHost != null && _sproxyHost.length() > 0 && _sproxyPort > 0;
+                SSLEepGet.ProxyType ptype = getProxyType();
                 SSLEepGet sslget;
                 if (_sslState == null) {
                     if (shouldProxy)
-                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                        sslget = new SSLEepGet(_context, ptype, _sproxyHost, _sproxyPort,
                                                baos, url.toString());
                     else
                         sslget = new SSLEepGet(_context, baos, url.toString());
@@ -932,7 +935,7 @@ public class Reseeder {
                     _sslState = sslget.getSSLState();
                 } else {
                     if (shouldProxy)
-                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                        sslget = new SSLEepGet(_context, ptype, _sproxyHost, _sproxyPort,
                                                baos, url.toString(), _sslState);
                     else
                         sslget = new SSLEepGet(_context, baos, url.toString(), _sslState);
@@ -980,10 +983,11 @@ public class Reseeder {
             boolean ssl = url.toString().startsWith("https");
             if (ssl) {
                 boolean shouldProxy = _sproxyHost != null && _sproxyHost.length() > 0 && _sproxyPort > 0;
+                SSLEepGet.ProxyType ptype = getProxyType();
                 SSLEepGet sslget;
                 if (_sslState == null) {
                     if (shouldProxy)
-                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                        sslget = new SSLEepGet(_context, ptype, _sproxyHost, _sproxyPort,
                                                out.getPath(), url.toString());
                     else
                         sslget = new SSLEepGet(_context, out.getPath(), url.toString());
@@ -991,7 +995,7 @@ public class Reseeder {
                     _sslState = sslget.getSSLState();
                 } else {
                     if (shouldProxy)
-                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                        sslget = new SSLEepGet(_context, ptype, _sproxyHost, _sproxyPort,
                                                out.getPath(), url.toString(), _sslState);
                     else
                         sslget = new SSLEepGet(_context, out.getPath(), url.toString(), _sslState);
@@ -1060,6 +1064,19 @@ public class Reseeder {
             return true;
         }
 
+        /**
+         *  @throws IOException if unknown, default is HTTP
+         *  @return non-null
+         *  @since 0.9.33
+         */
+        private SSLEepGet.ProxyType getProxyType() throws IOException {
+            String sptype = _context.getProperty(PROP_SPROXY_TYPE, "HTTP").toUpperCase(Locale.US);
+            try {
+                return SSLEepGet.ProxyType.valueOf(sptype);
+            } catch (IllegalArgumentException iae) {
+                throw new IOException("Unsupported proxy type " + sptype);
+            }
+        }
     }
 
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";

@@ -108,6 +108,31 @@
 <div class="formaction" id="resetreseed"><input type="submit" name="action" class="reload" value="<%=intl._t("Reset URL list")%>" /></div>
 </td></tr>
 
+<% if (reseedHelper.shouldShowHTTPSProxy()) { %>
+<tr><td align="right"><b><%=intl._t("Reseed Proxy Type")%>:</b></td>
+<td><label><input type="radio" class="optbox" name="pmode" value="" <%=reseedHelper.pmodeChecked(0) %> >
+<%=intl._t("None")%></label><br>
+<label><input type="radio" class="optbox" name="pmode" value="HTTP" <%=reseedHelper.pmodeChecked(1) %> >
+<%=intl._t("HTTPS")%></label><br>
+<label><input type="radio" class="optbox" name="pmode" value="SOCKS4" <%=reseedHelper.pmodeChecked(2) %> >
+<%=intl._t("SOCKS 4/4a")%></label><br>
+<label><input type="radio" class="optbox" name="pmode" value="SOCKS5" <%=reseedHelper.pmodeChecked(3) %> >
+<%=intl._t("SOCKS 5")%></label></td></tr>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Host")%>:</b></td>
+<td><input name="shost" type="text" value="<jsp:getProperty name="reseedHelper" property="shost" />" ></td></tr>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Port")%>:</b></td>
+<td><input name="sport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="reseedHelper" property="sport" />" ></td></tr>
+
+<!-- not fully implemented, not necessary?
+<tr><td align="right"><b><%=intl._t("Use HTTPS Proxy Authorization?")%></b></td>
+<td><input type="checkbox" class="optbox" name="sauth" value="true" <jsp:getProperty name="reseedHelper" property="sauth" /> ></td></tr>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Username")%>:</b></td>
+<td><input name="susername" type="text" value="<jsp:getProperty name="reseedHelper" property="susername" />" ></td></tr>
+<tr><td align="right"><b><%=intl._t("HTTPS Proxy Password")%>:</b></td>
+<td><input name="nofilter_spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_spassword" />" ></td></tr>
+-->
+<% } // shouldShowHTTPSProxy %>
+
 <% if (reseedHelper.shouldShowHTTPProxy()) { %>
 <tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable HTTP Proxy?")%></b></label></td>
 <td><input type="checkbox" class="optbox" name="enable" id="enableproxy" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
@@ -123,24 +148,6 @@
 <tr><td align="right"><b><%=intl._t("HTTP Proxy Password")%>:</b></td>
 <td><input name="nofilter_password" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_password" />" ></td></tr>
 <% } // shouldShowHTTPProxy %>
-
-<% if (reseedHelper.shouldShowHTTPSProxy()) { %>
-<tr><td align="right"><b><%=intl._t("Enable HTTPS Proxy?")%></b></td>
-<td><input type="checkbox" class="optbox" name="senable" value="true" <jsp:getProperty name="reseedHelper" property="senable" /> ></td></tr>
-<tr><td align="right"><b><%=intl._t("HTTPS Proxy Host")%>:</b></td>
-<td><input name="shost" type="text" value="<jsp:getProperty name="reseedHelper" property="shost" />" ></td></tr>
-<tr><td align="right"><b><%=intl._t("HTTPS Proxy Port")%>:</b></td>
-<td><input name="sport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="reseedHelper" property="sport" />" ></td></tr>
-
-<!-- not fully implemented, not necessary?
-<tr><td align="right"><b><%=intl._t("Use HTTPS Proxy Authorization?")%></b></td>
-<td><input type="checkbox" class="optbox" name="sauth" value="true" <jsp:getProperty name="reseedHelper" property="sauth" /> ></td></tr>
-<tr><td align="right"><b><%=intl._t("HTTPS Proxy Username")%>:</b></td>
-<td><input name="susername" type="text" value="<jsp:getProperty name="reseedHelper" property="susername" />" ></td></tr>
-<tr><td align="right"><b><%=intl._t("HTTPS Proxy Password")%>:</b></td>
-<td><input name="nofilter_spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="nofilter_spassword" />" ></td></tr>
--->
-<% } // shouldShowHTTPSProxy %>
 
  <tr>
   <td class="optionsave" colspan="2">

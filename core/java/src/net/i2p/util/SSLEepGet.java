@@ -71,6 +71,8 @@ import net.i2p.I2PAppContext;
 import net.i2p.crypto.CertUtil;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
+import net.i2p.socks.SOCKS4Client;
+import net.i2p.socks.SOCKS5Client;
 
 /**
  * HTTPS only, no retries, no min and max size options, no timeout option
@@ -104,7 +106,7 @@ public class SSLEepGet extends EepGet {
      *  Not all may be supported.
      *  @since 0.9.33
      */
-    public enum ProxyType { NONE, HTTP, HTTPS, INTERNAL, SOCKS4, SOCKS5 }
+    public enum ProxyType { NONE, HTTP, HTTPS, INTERNAL, SOCKS4, SOCKS5, TRANSPARENT }
 
 
     /**
@@ -244,9 +246,10 @@ public class SSLEepGet extends EepGet {
         int saveCerts = 0;
         boolean noVerify = false;
         String proxyHost = "127.0.0.1";
-        int proxyPort = 80;
+        int proxyPort = 0;
+        ProxyType ptype = ProxyType.HTTP;
         boolean error = false;
-        Getopt g = new Getopt("ssleepget", args, "p:sz");
+        Getopt g = new Getopt("ssleepget", args, "p:y:sz");
         try {
             int c;
             while ((c = g.getopt()) != -1) {
@@ -262,6 +265,19 @@ public class SSLEepGet extends EepGet {
                     } else {
                         proxyHost = s;
                         // proxyPort remains default
+                    }
+                    break;
+
+                case 'y':
+                    String y = g.getOptarg().toUpperCase(Locale.US);
+                    if (y.equals("HTTP") || y.equals("HTTPS")) {
+                        // already set
+                    } else if (y.equals("SOCKS4")) {
+                        ptype = ProxyType.SOCKS4;
+                    } else if (y.equals("SOCKS5")) {
+                        ptype = ProxyType.SOCKS5;
+                    } else {
+                        error = true;
                     }
                     break;
 
@@ -294,10 +310,17 @@ public class SSLEepGet extends EepGet {
         String saveAs = suggestName(url);
 
         SSLEepGet get;
-        if (proxyHost != null)
-            get = new SSLEepGet(I2PAppContext.getGlobalContext(), ProxyType.HTTP, proxyHost, proxyPort, saveAs, url);
-        else
+        if (proxyHost != null) {
+            if (proxyPort == 0) {
+                if (ptype == ProxyType.HTTP)
+                    proxyPort = 8080;
+                else
+                    proxyPort = 1080;
+            }
+            get = new SSLEepGet(I2PAppContext.getGlobalContext(), ptype, proxyHost, proxyPort, saveAs, url);
+        } else {
             get = new SSLEepGet(I2PAppContext.getGlobalContext(), saveAs, url);
+        }
         if (saveCerts > 0)
             get._saveCerts = saveCerts;
         if (noVerify)
@@ -309,8 +332,9 @@ public class SSLEepGet extends EepGet {
     }
     
     private static void usage() {
-        System.err.println("Usage: SSLEepGet [-psz] https://url\n" +
-                           "  -p proxyHost[:proxyPort]    // default port 80\n" +
+        System.err.println("Usage: SSLEepGet [-psyz] https://url\n" +
+                           "  -p proxyHost[:proxyPort]    // default port 8080 for HTTPS and 1080 for SOCKS\n" +
+                           "  -y HTTPS|SOCKS4|SOCKS5      // proxy type, default HTTPS if proxyHost is set\n" +
                            "  -s save unknown certs\n" +
                            "  -s -s save all certs\n" +
                            "  -z bypass hostname verification");
@@ -667,9 +691,35 @@ public class SSLEepGet extends EepGet {
                     port = 443;
 
                 if (_shouldProxy) {
-                    if (_proxyType != ProxyType.HTTP)
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Connecting to " + _proxyType + " proxy");
+                    switch (_proxyType) {
+                      case HTTP:
+                        httpProxyConnect(host, port);
+                        break;
+
+                      case SOCKS4:
+                        socksProxyConnect(false, host, port);
+                        break;
+
+                      case SOCKS5:
+                        socksProxyConnect(true, host, port);
+                        break;
+
+                      case HTTPS:
+                      case INTERNAL:
+                      case TRANSPARENT:
+                      default:
                         throw new IOException("Unsupported proxy type " + _proxyType);
-                    httpProxyConnect(host, port);
+                    }
+
+                    // wrap the socket in an SSLSocket
+                    if (_sslContext != null)
+                        _proxy = _sslContext.getSocketFactory().createSocket(_proxy, host, port, true);
+                    else
+                        _proxy = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(_proxy, host, port, true);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(_proxyType + " proxy headers read completely");
                 } else {
                     // Warning, createSocket() followed by connect(InetSocketAddress)
                     // disables SNI, at least on Java 7.
@@ -735,9 +785,12 @@ public class SSLEepGet extends EepGet {
 
     /**
      *  Connect to a HTTP proxy.
+     *  Proxy address must be in _proxyHost and _proxyPort.
      *  Side effects: Sets _proxy, _proxyIn, _proxyOut,
      *  and other globals via readHeaders()
      *
+     *  @param host what the proxy should connect to
+     *  @param port what the proxy should connect to
      *  @since 0.9.33
      */
     private void httpProxyConnect(String host, int port) throws IOException {
@@ -777,20 +830,44 @@ public class SSLEepGet extends EepGet {
             throw new IOException("Timed out reading the proxy headers");
         if (_responseCode == 407) {
             // TODO
-            throw new IOException("Proxy auth unsupported");
+            throw new IOException("Authorization unsupported on HTTP Proxy");
         } else if (_responseCode != 200) {
             // readHeaders() will throw on most errors, but here we ensure it is 200
             throw new IOException("Invalid proxy response: " + _responseCode + ' ' + _responseText);
         }
         if (_redirectLocation != null)
             throw new IOException("Proxy redirect not allowed");
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("proxy headers read completely");
+    }
 
-        // wrap the socket in an SSLSocket
-        if (_sslContext != null)
-            _proxy = _sslContext.getSocketFactory().createSocket(_proxy, host, port, true);
-        else
-            _proxy = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(_proxy, host, port, true);
+    /**
+     *  Connect to a SOCKS proxy.
+     *  Proxy address must be in _proxyHost and _proxyPort.
+     *  Side effects: Sets _proxy, _proxyIn, _proxyOut,
+     *  and other globals via readHeaders()
+     *
+     *  @param host what the proxy should connect to
+     *  @param port what the proxy should connect to
+     *  @since 0.9.33
+     */
+    private void socksProxyConnect(boolean isSocks5, String host, int port) throws IOException {
+        if (_fetchHeaderTimeout > 0) {
+            _proxy = new Socket();
+            _proxy.setSoTimeout(_fetchHeaderTimeout);
+            _proxy.connect(new InetSocketAddress(_proxyHost, _proxyPort), _fetchHeaderTimeout);
+        } else {
+            _proxy = new Socket(_proxyHost, _proxyPort);
+        }
+        if (_authState != null) {
+            if (!isSocks5)
+                throw new IOException("Authorization unsupported on SOCKS 4");
+            SOCKS5Client.connect(_proxy, host, port, _authState.getUsername(), _authState.getPassword());
+        } else {
+            if (isSocks5)
+                SOCKS5Client.connect(_proxy, host, port);
+            else
+                SOCKS4Client.connect(_proxy, host, port);
+        }
+        _proxyIn = _proxy.getInputStream();
+        _proxyOut = _proxy.getOutputStream();
     }
 }

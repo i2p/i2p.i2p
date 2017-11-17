@@ -1737,6 +1737,12 @@ public class EepGet {
             rv.put("response", '"' + PasswordManager.md5Hex(kd) + '"');
             return rv;
         }
+
+        /** @since 0.9.33 */
+        public String getUsername() { return username; }
+
+        /** @since 0.9.33 */
+        public String getPassword() { return password; }
     }
 
     /**
