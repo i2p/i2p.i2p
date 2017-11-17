@@ -249,6 +249,7 @@ public class BlockfileNamingService extends DummyNamingService {
 
             int total = 0;
             for (String hostsfile : getFilenames(list)) {
+                _lists.add(hostsfile);
                 File file = new File(_context.getRouterDir(), hostsfile);
                 if ((!file.exists()) || !(file.canRead()))
                     continue;
@@ -288,7 +289,6 @@ public class BlockfileNamingService extends DummyNamingService {
                 }
                 total += count;
                 _log.logAlways(Log.INFO, "Migrating " + count + " hosts from " + file + " to new hosts database");
-                _lists.add(hostsfile);
             }
             if (_log.shouldLog(Log.INFO))
                 _log.info("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
