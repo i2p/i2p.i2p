@@ -160,13 +160,8 @@ public class EepHead extends EepGet {
     /** return true if the URL was completely retrieved */
     @Override
     protected void doFetch(SocketTimeout timeout) throws IOException {
-        _headersRead = false;
         _aborted = false;
-        try {
-            readHeaders();
-        } finally {
-            _headersRead = true;
-        }
+        readHeaders();
         if (_aborted)
             throw new IOException("Timed out reading the HTTP headers");
         

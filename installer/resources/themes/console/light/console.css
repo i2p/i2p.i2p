@@ -5016,14 +5016,14 @@ table#consolepass input[name="name"] {
      margin-right: 20px;
 }
 
-#consolepass input[name="name"], #externali2cp input[name="user"], #reseedconfig input[name="username"],
+#consolepass input[name="name"], #externali2cp input[name="user"], #reseedconfig input[name="username"], #reseedconfig input[name="susername"],
 #consolepass input[name="nofilter_pw"], #externali2cp input[name="nofilter_pw"], #reseedconfig input[type="password"] {
      padding: 4px 5px 4px 26px !important;
      background-size: 16px 16px !important;
      background-blend-mode: luminosity;
 }
 
-#consolepass input[name="name"], #externali2cp input[name="user"], #reseedconfig input[name="username"] {
+#consolepass input[name="name"], #externali2cp input[name="user"], #reseedconfig input[name="username"], #reseedconfig input[name="susername"] {
      background: #f8f8ff url(/themes/console/images/buttons/user.png) 5px center no-repeat;
 }
 

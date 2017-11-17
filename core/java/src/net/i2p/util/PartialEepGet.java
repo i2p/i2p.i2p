@@ -27,7 +27,7 @@ import net.i2p.I2PAppContext;
  * @author zzz
  */
 public class PartialEepGet extends EepGet {
-    long _fetchSize;
+    private final long _fetchSize;
 
     /**
      * Instantiate an EepGet that will fetch exactly size bytes when fetch() is called.

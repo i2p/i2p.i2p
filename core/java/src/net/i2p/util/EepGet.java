@@ -48,8 +48,8 @@ public class EepGet {
     protected final I2PAppContext _context;
     protected final Log _log;
     protected final boolean _shouldProxy;
-    private final String _proxyHost;
-    private final int _proxyPort;
+    protected final String _proxyHost;
+    protected final int _proxyPort;
     protected final int _numRetries;
     private final long _minSize; // minimum and maximum acceptable response size, -1 signifies unlimited,
     private final long _maxSize; // applied both against whole responses and chunks
@@ -85,7 +85,6 @@ public class EepGet {
     protected boolean _notModified;
     protected String _contentType;
     protected boolean _transferFailed;
-    protected boolean _headersRead;
     protected boolean _aborted;
     protected int _fetchHeaderTimeout;
     private long _fetchEndTime;
@@ -695,13 +694,8 @@ public class EepGet {
      *  @param timeout may be null
      */
     protected void doFetch(SocketTimeout timeout) throws IOException {
-        _headersRead = false;
         _aborted = false;
-        try {
-            readHeaders();
-        } finally {
-            _headersRead = true;
-        }
+        readHeaders();
         if (_aborted)
             throw new IOException("Timed out reading the HTTP headers");
         
@@ -1079,11 +1073,14 @@ public class EepGet {
 
         buf.setLength(0);
         byte lookahead[] = new byte[3];
+        // "prime" the lookahead buffer with a '\n',
+        // so it works if there's no header lines at all, like a HTTPS proxy
+        increment(lookahead, '\n');
         while (true) {
             int cur = _proxyIn.read();
             switch (cur) {
                 case -1: 
-                    throw new IOException("Headers ended too soon");
+                    throw new IOException("EOF reading headers");
                 case ':':
                     if (key == null) {
                         key = buf.toString();
@@ -1105,7 +1102,7 @@ public class EepGet {
                     increment(lookahead, cur);
                     if (isEndOfHeaders(lookahead)) {
                         if (!rcOk)
-                            throw new IOException("Invalid HTTP response code: " + _responseCode + ' ' + _responseText);
+                            throw new IOException("Invalid HTTP response: " + _responseCode + ' ' + _responseText);
                         if (_encodingChunked) {
                             _bytesRemaining = readChunkLength();
                         }
@@ -1501,6 +1498,8 @@ public class EepGet {
      *  As of 0.9.14, If name is If-None-Match or If-Modified-Since,
      *  this will replace the etag or last-modified value given in the constructor.
      *  Note that headers may be subsequently modified or removed in the I2PTunnel HTTP Client proxy.
+     *
+     *  In proxied SSLEepGet, these headers are sent to the remote server, NOT the proxy.
      *
      *  @since 0.8.8
      */

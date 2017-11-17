@@ -1,4 +1,8 @@
 2017-11-16 zzz
+ * Reseed: Add HTTPS proxy support (ticket #423)
+
+2017-11-16 zzz
+ * Console: Hide Reseed HTTP proxy options if no HTTP URLs (ticket #2007)
  * i2psnark: Fix bad completion status after recheck (ticket #2046)
  * Jetty 9.2.22
 

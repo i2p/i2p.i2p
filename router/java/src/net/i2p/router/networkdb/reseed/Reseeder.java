@@ -255,8 +255,8 @@ public class Reseeder {
 
     private class ReseedRunner implements Runnable, EepGet.StatusListener {
         private boolean _isRunning;
-        private String _proxyHost;
-        private int _proxyPort;
+        private String _proxyHost, _sproxyHost;
+        private int _proxyPort, _sproxyPort;
         private SSLEepGet.SSLState _sslState;
         private int _gotDate;
         private long _attemptStarted;
@@ -308,6 +308,10 @@ public class Reseeder {
                 _proxyHost = _context.getProperty(PROP_PROXY_HOST);
                 _proxyPort = _context.getProperty(PROP_PROXY_PORT, -1);
             }
+            if (_context.getBooleanProperty(PROP_SPROXY_ENABLE)) {
+                _sproxyHost = _context.getProperty(PROP_SPROXY_HOST);
+                _sproxyPort = _context.getProperty(PROP_SPROXY_PORT, -1);
+            }
             System.out.println("Reseed start");
             int total;
             if (_url != null) {
@@ -333,6 +337,10 @@ public class Reseeder {
                     System.out.println("Reseed failed, check network connection");
                     System.out.println("Ensure that nothing blocks outbound HTTP or HTTPS, check the logs, " +
                                        "and if nothing helps, read the FAQ about reseeding manually.");
+                    if (_sproxyHost != null && _sproxyPort > 0)
+                        System.out.println("Check HTTPS proxy setting - host: " + _sproxyHost + " port: " + _sproxyPort);
+                    else
+                        System.out.println("Consider enabling an HTTPS proxy on the reseed configuration page");
                 } // else < 0, no valid URLs
                 String old = _checker.getError();
                 _checker.setError(_t("Reseed failed.") + ' '  +
@@ -912,21 +920,35 @@ public class Reseeder {
             EepGet get;
             boolean ssl = url.toString().startsWith("https");
             if (ssl) {
+                boolean shouldProxy = _sproxyHost != null && _sproxyHost.length() > 0 && _sproxyPort > 0;
                 SSLEepGet sslget;
-                // TODO SSL PROXY
                 if (_sslState == null) {
-                    sslget = new SSLEepGet(I2PAppContext.getGlobalContext(), baos, url.toString());
+                    if (shouldProxy)
+                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                                               baos, url.toString());
+                    else
+                        sslget = new SSLEepGet(_context, baos, url.toString());
                     // save state for next time
                     _sslState = sslget.getSSLState();
                 } else {
-                    sslget = new SSLEepGet(I2PAppContext.getGlobalContext(), baos, url.toString(), _sslState);
+                    if (shouldProxy)
+                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                                               baos, url.toString(), _sslState);
+                    else
+                        sslget = new SSLEepGet(_context, baos, url.toString(), _sslState);
                 }
                 get = sslget;
-                // TODO SSL PROXY AUTH
+                if (shouldProxy && _context.getBooleanProperty(PROP_SPROXY_AUTH_ENABLE)) {
+                    String user = _context.getProperty(PROP_SPROXY_USERNAME);
+                    String pass = _context.getProperty(PROP_SPROXY_PASSWORD);
+                    if (user != null && user.length() > 0 &&
+                        pass != null && pass.length() > 0)
+                        get.addAuthorization(user, pass);
+                }
             } else {
                 // Do a (probably) non-proxied eepget into our ByteArrayOutputStream with 0 retries
                 boolean shouldProxy = _proxyHost != null && _proxyHost.length() > 0 && _proxyPort > 0;
-                get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, _proxyHost, _proxyPort, 0, 0, MAX_RESEED_RESPONSE_SIZE,
+                get = new EepGet(_context, shouldProxy, _proxyHost, _proxyPort, 0, 0, MAX_RESEED_RESPONSE_SIZE,
                                  null, baos, url.toString(), false, null, null);
                 if (shouldProxy && _context.getBooleanProperty(PROP_PROXY_AUTH_ENABLE)) {
                     String user = _context.getProperty(PROP_PROXY_USERNAME);
@@ -957,21 +979,35 @@ public class Reseeder {
             EepGet get;
             boolean ssl = url.toString().startsWith("https");
             if (ssl) {
+                boolean shouldProxy = _sproxyHost != null && _sproxyHost.length() > 0 && _sproxyPort > 0;
                 SSLEepGet sslget;
-                // TODO SSL PROXY
                 if (_sslState == null) {
-                    sslget = new SSLEepGet(I2PAppContext.getGlobalContext(), out.getPath(), url.toString());
+                    if (shouldProxy)
+                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                                               out.getPath(), url.toString());
+                    else
+                        sslget = new SSLEepGet(_context, out.getPath(), url.toString());
                     // save state for next time
                     _sslState = sslget.getSSLState();
                 } else {
-                    sslget = new SSLEepGet(I2PAppContext.getGlobalContext(), out.getPath(), url.toString(), _sslState);
+                    if (shouldProxy)
+                        sslget = new SSLEepGet(_context, SSLEepGet.ProxyType.HTTP, _sproxyHost, _sproxyPort,
+                                               out.getPath(), url.toString(), _sslState);
+                    else
+                        sslget = new SSLEepGet(_context, out.getPath(), url.toString(), _sslState);
                 }
                 get = sslget;
-                // TODO SSL PROXY AUTH
+                if (shouldProxy && _context.getBooleanProperty(PROP_SPROXY_AUTH_ENABLE)) {
+                    String user = _context.getProperty(PROP_SPROXY_USERNAME);
+                    String pass = _context.getProperty(PROP_SPROXY_PASSWORD);
+                    if (user != null && user.length() > 0 &&
+                        pass != null && pass.length() > 0)
+                        get.addAuthorization(user, pass);
+                }
             } else {
                 // Do a (probably) non-proxied eepget into file with 0 retries
                 boolean shouldProxy = _proxyHost != null && _proxyHost.length() > 0 && _proxyPort > 0;
-                get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, _proxyHost, _proxyPort, 0, 0, MAX_SU3_RESPONSE_SIZE,
+                get = new EepGet(_context, shouldProxy, _proxyHost, _proxyPort, 0, 0, MAX_SU3_RESPONSE_SIZE,
                                  out.getPath(), null, url.toString(), false, null, null);
                 if (shouldProxy && _context.getBooleanProperty(PROP_PROXY_AUTH_ENABLE)) {
                     String user = _context.getProperty(PROP_PROXY_USERNAME);
