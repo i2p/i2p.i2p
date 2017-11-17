@@ -669,58 +669,7 @@ public class SSLEepGet extends EepGet {
                 if (_shouldProxy) {
                     if (_proxyType != ProxyType.HTTP)
                         throw new IOException("Unsupported proxy type " + _proxyType);
-
-                    // connect to the proxy
-                    // _proxyPort validated in superconstrutor, no need to set default here
-                    if (_fetchHeaderTimeout > 0) {
-                        _proxy = new Socket();
-                        _proxy.setSoTimeout(_fetchHeaderTimeout);
-                        _proxy.connect(new InetSocketAddress(_proxyHost, _proxyPort), _fetchHeaderTimeout);
-                    } else {
-                        _proxy = new Socket(_proxyHost, _proxyPort);
-                    }
-                    _proxyIn = _proxy.getInputStream();
-                    _proxyOut = _proxy.getOutputStream();
-                    StringBuilder buf = new StringBuilder(64);
-                    buf.append("CONNECT ").append(host).append(':').append(port).append(" HTTP/1.1\r\n");
-                    // TODO if we need extra headers to the proxy, add a new method and list.
-                    // Standard extra headers go the server, not the proxy
-                    //if (_extraPHeaders != null) {
-                    //    for (String hdr : _extraPHeaders) {
-                    //        buf.append(hdr).append("\r\n");
-                    //}
-                    if (_authState != null && _authState.authMode != AUTH_MODE.NONE) {
-                        // TODO untested, is this right?
-                        buf.append("Proxy-Authorization: ");
-                        buf.append(_authState.getAuthHeader("CONNECT", host));
-                        buf.append("\r\n");
-                    }
-                    buf.append("\r\n");
-                    _proxyOut.write(DataHelper.getUTF8(buf.toString()));
-                    _proxyOut.flush();
-
-                    // read the proxy response
-                    _aborted = false;
-                    readHeaders();
-                    if (_aborted)
-                        throw new IOException("Timed out reading the proxy headers");
-                    if (_responseCode == 407) {
-                        // TODO
-                        throw new IOException("Proxy auth unsupported");
-                    } else if (_responseCode != 200) {
-                        // readHeaders() will throw on most errors, but here we ensure it is 200
-                        throw new IOException("Invalid proxy response: " + _responseCode + ' ' + _responseText);
-                    }
-                    if (_redirectLocation != null)
-                        throw new IOException("Proxy redirect not allowed");
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("proxy headers read completely");
-
-                    // wrap the socket in an SSLSocket
-                    if (_sslContext != null)
-                        _proxy = _sslContext.getSocketFactory().createSocket(_proxy, host, port, true);
-                    else
-                        _proxy = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(_proxy, host, port, true);
+                    httpProxyConnect(host, port);
                 } else {
                     // Warning, createSocket() followed by connect(InetSocketAddress)
                     // disables SNI, at least on Java 7.
@@ -782,5 +731,66 @@ public class SSLEepGet extends EepGet {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request flushed");
+    }
+
+    /**
+     *  Connect to a HTTP proxy.
+     *  Side effects: Sets _proxy, _proxyIn, _proxyOut,
+     *  and other globals via readHeaders()
+     *
+     *  @since 0.9.33
+     */
+    private void httpProxyConnect(String host, int port) throws IOException {
+        // connect to the proxy
+        // _proxyPort validated in superconstrutor, no need to set default here
+        if (_fetchHeaderTimeout > 0) {
+            _proxy = new Socket();
+            _proxy.setSoTimeout(_fetchHeaderTimeout);
+            _proxy.connect(new InetSocketAddress(_proxyHost, _proxyPort), _fetchHeaderTimeout);
+        } else {
+            _proxy = new Socket(_proxyHost, _proxyPort);
+        }
+        _proxyIn = _proxy.getInputStream();
+        _proxyOut = _proxy.getOutputStream();
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("CONNECT ").append(host).append(':').append(port).append(" HTTP/1.1\r\n");
+        // TODO if we need extra headers to the proxy, add a new method and list.
+        // Standard extra headers go the server, not the proxy
+        //if (_extraPHeaders != null) {
+        //    for (String hdr : _extraPHeaders) {
+        //        buf.append(hdr).append("\r\n");
+        //}
+        if (_authState != null && _authState.authMode != AUTH_MODE.NONE) {
+            // TODO untested, is this right?
+            buf.append("Proxy-Authorization: ");
+            buf.append(_authState.getAuthHeader("CONNECT", host));
+            buf.append("\r\n");
+        }
+        buf.append("\r\n");
+        _proxyOut.write(DataHelper.getUTF8(buf.toString()));
+        _proxyOut.flush();
+
+        // read the proxy response
+        _aborted = false;
+        readHeaders();
+        if (_aborted)
+            throw new IOException("Timed out reading the proxy headers");
+        if (_responseCode == 407) {
+            // TODO
+            throw new IOException("Proxy auth unsupported");
+        } else if (_responseCode != 200) {
+            // readHeaders() will throw on most errors, but here we ensure it is 200
+            throw new IOException("Invalid proxy response: " + _responseCode + ' ' + _responseText);
+        }
+        if (_redirectLocation != null)
+            throw new IOException("Proxy redirect not allowed");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("proxy headers read completely");
+
+        // wrap the socket in an SSLSocket
+        if (_sslContext != null)
+            _proxy = _sslContext.getSocketFactory().createSocket(_proxy, host, port, true);
+        else
+            _proxy = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(_proxy, host, port, true);
     }
 }
