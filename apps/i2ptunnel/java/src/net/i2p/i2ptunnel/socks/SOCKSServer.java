@@ -15,6 +15,7 @@ import net.i2p.app.ClientAppManager;
 import net.i2p.app.Outproxy;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.socks.SOCKSException;
 import net.i2p.util.Log;
 
 /**

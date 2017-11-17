@@ -4,14 +4,17 @@
  *
  * Copyright (c) 2004 by human
  */
-package net.i2p.i2ptunnel.socks;
+package net.i2p.socks;
+
+import java.io.IOException;
 
 /**
  * Exception thrown by socket methods
  *
  * @author human
+ * @since 0.9.33 moved from net.i2p.i2ptunnel.socks, and changed to extend IOException
  */
-public class SOCKSException extends Exception {
+public class SOCKSException extends IOException {
 
     public SOCKSException() {
         super();

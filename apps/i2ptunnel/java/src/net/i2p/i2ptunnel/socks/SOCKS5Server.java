@@ -9,10 +9,11 @@ package net.i2p.i2ptunnel.socks;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,11 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnel;
+import static net.i2p.socks.SOCKS5Constants.*;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
+import net.i2p.socks.SOCKS5Client;
+import net.i2p.socks.SOCKSException;
 
 /*
  * Class that manages SOCKS5 connections, and forwards them to
@@ -41,8 +45,6 @@ import net.i2p.util.Log;
  * @author human
  */
 class SOCKS5Server extends SOCKSServer {
-
-    private static final int SOCKS_VERSION_5 = 0x05;
 
     private boolean setupCompleted = false;
     private final boolean authRequired;
@@ -95,7 +97,7 @@ class SOCKS5Server extends SOCKSServer {
      * SOCKS5 connection initialization.  This method assumes that
      * SOCKS "VER" field has been stripped from the input stream.
      */
-    private void init(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
+    private void init(DataInputStream in, DataOutputStream out) throws IOException {
         int nMethods = in.readUnsignedByte();
         int method = Method.NO_ACCEPTABLE_METHODS;
 
@@ -129,7 +131,7 @@ class SOCKS5Server extends SOCKSServer {
      * Wait for the username/password message and verify or throw SOCKSException on failure
      * @since 0.8.2
      */
-    private void verifyPassword(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
+    private void verifyPassword(DataInputStream in, DataOutputStream out) throws IOException {
         int c = in.readUnsignedByte();
         if (c != AUTH_VERSION) {
             _log.logAlways(Log.WARN, "SOCKS proxy authentication failed");
@@ -171,7 +173,7 @@ class SOCKS5Server extends SOCKSServer {
      * initialization, integrity/confidentiality encapsulations, etc)
      * has been stripped out of the input/output streams.
      */
-    private int manageRequest(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
+    private int manageRequest(DataInputStream in, DataOutputStream out) throws IOException {
         int socksVer = in.readUnsignedByte();
         if (socksVer != SOCKS_VERSION_5) {
             _log.debug("error in SOCKS5 request (protocol != 5?)");
@@ -449,13 +451,6 @@ class SOCKS5Server extends SOCKSServer {
                 sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             } catch (IOException ioe) {}
             throw new SOCKSException("Error in destination format");
-        } catch (SocketException e) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("socks error", e);
-            try {
-                sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
-            } catch (IOException ioe) {}
-            throw new SOCKSException("Error connecting: " + e);
         } catch (IOException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("socks error", e);
@@ -480,7 +475,7 @@ class SOCKS5Server extends SOCKSServer {
      *  @return open socket or throws error
      *  @since 0.8.2
      */
-    private I2PSocket outproxyConnect(I2PSOCKSTunnel tun, String proxy) throws IOException, SOCKSException, DataFormatException, I2PException {
+    private I2PSocket outproxyConnect(I2PSOCKSTunnel tun, String proxy) throws IOException, I2PException {
         Properties overrides = new Properties();
         overrides.setProperty("option.i2p.streaming.connectDelay", "1000");
         I2PSocketOptions proxyOpts = tun.buildOptions(overrides);
@@ -488,10 +483,11 @@ class SOCKS5Server extends SOCKSServer {
         if (dest == null)
             throw new SOCKSException("Outproxy not found");
         I2PSocket destSock = tun.createI2PSocket(dest, proxyOpts);
-        DataOutputStream out = null;
-        DataInputStream in = null;
+        OutputStream out = null;
+        InputStream in = null;
         try {
-            out = new DataOutputStream(destSock.getOutputStream());
+            out = destSock.getOutputStream();
+            in = destSock.getInputStream();
             boolean authAvail = Boolean.parseBoolean(props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH));
             String configUser =  null;
             String configPW = null;
@@ -501,106 +497,10 @@ class SOCKS5Server extends SOCKSServer {
                 if (configUser == null || configPW == null) {
                     configUser =  props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER);
                     configPW = props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW);
-                    if (configUser == null || configPW == null)
-                        authAvail = false;
                 }
             }
-
-            // send the init
-            out.writeByte(SOCKS_VERSION_5);
-            if (authAvail) {
-                out.writeByte(2);
-                out.writeByte(Method.NO_AUTH_REQUIRED);
-                out.writeByte(Method.USERNAME_PASSWORD);
-            } else {
-                out.writeByte(1);
-                out.writeByte(Method.NO_AUTH_REQUIRED);
-            }
-            out.flush();
-
-            // read init reply
-            in = new DataInputStream(destSock.getInputStream());
-            // is this right or should we not try to do 5-to-4 conversion?
-            int hisVersion = in.readByte();
-            if (hisVersion != SOCKS_VERSION_5 /* && addrtype == AddressType.DOMAINNAME */ )
-                throw new SOCKSException("SOCKS Outproxy is not Version 5");
-            //else if (hisVersion != 4)
-            //    throw new SOCKSException("Unsupported SOCKS Outproxy Version");
-
-            int method = in.readByte();
-            if (method == Method.NO_AUTH_REQUIRED) {
-                // good
-            } else if (method == Method.USERNAME_PASSWORD) {
-                if (authAvail) {
-                    // send the auth
-                    out.writeByte(AUTH_VERSION);
-                    byte[] user = configUser.getBytes("UTF-8");
-                    byte[] pw = configPW.getBytes("UTF-8");
-                    out.writeByte(user.length);
-                    out.write(user);
-                    out.writeByte(pw.length);
-                    out.write(pw);
-                    out.flush();
-                    // read the auth reply
-                    if (in.readByte() != AUTH_VERSION)
-                        throw new SOCKSException("Bad auth version from outproxy");
-                    if (in.readByte() != AUTH_SUCCESS)
-                        throw new SOCKSException("Outproxy authorization failure");
-                } else {
-                    throw new SOCKSException("Outproxy requires authorization, please configure username/password");
-                }
-            } else {
-                throw new SOCKSException("Outproxy authorization failure");
-            }
-
-            // send the connect command
-            out.writeByte(SOCKS_VERSION_5);
-            out.writeByte(Command.CONNECT);
-            out.writeByte(0); // reserved
-            out.writeByte(addressType);
-            if (addressType == AddressType.IPV4) {
-                out.write(InetAddress.getByName(connHostName).getAddress());
-            } else if (addressType == AddressType.DOMAINNAME) {
-                byte[] d = connHostName.getBytes("ISO-8859-1");
-                out.writeByte(d.length);
-                out.write(d);
-            } else {
-                // shouldn't happen
-                throw new SOCKSException("Unknown address type for outproxy?");
-            }
-            out.writeShort(connPort);
-            out.flush();
-
-            // read the connect reply
-            hisVersion = in.readByte();
-            if (hisVersion != SOCKS_VERSION_5)
-                throw new SOCKSException("Outproxy response is not Version 5");
-            int reply = in.readByte();
-            in.readByte();  // reserved
-            int type = in.readByte();
-            int count = 0;
-            if (type == AddressType.IPV4) {
-                count = 4;
-            } else if (type == AddressType.DOMAINNAME) {
-                count = in.readUnsignedByte();
-            } else if (type == AddressType.IPV6) {
-                count = 16;
-            } else {
-                throw new SOCKSException("Unsupported address type in outproxy response");
-            }
-            byte[] addr = new byte[count];
-            in.readFully(addr);  // address
-            in.readUnsignedShort();  // port
-            if (reply != Reply.SUCCEEDED)
-                throw new SOCKSException("Outproxy rejected request, response = " + reply);
-            // throw away the address in the response
-            // todo pass the response through?
+            SOCKS5Client.connect(in, out, connHostName, connPort, configUser, configPW);
         } catch (IOException e) {
-            try { destSock.close(); } catch (IOException ioe) {}
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
-            if (out != null) try { out.close(); } catch (IOException ioe) {}
-            throw e;
-        } catch (SOCKSException e) {
             try { destSock.close(); } catch (IOException ioe) {}
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             if (out != null) try { out.close(); } catch (IOException ioe) {}
@@ -651,7 +551,6 @@ class SOCKS5Server extends SOCKSServer {
                 if (command != Command.UDP_ASSOCIATE)
                     break;
             } catch (IOException ioe) { break; }
-            catch (SOCKSException ioe) { break; }
         }
 
         for (Integer i : ports)
@@ -663,41 +562,4 @@ class SOCKS5Server extends SOCKSServer {
         //
         throw new SOCKSException("End of UDP Processing");
     }
-
-    /*
-     * Some namespaces to enclose SOCKS protocol codes
-     */
-    private static class Method {
-        private static final int NO_AUTH_REQUIRED = 0x00;
-        private static final int USERNAME_PASSWORD = 0x02;
-        private static final int NO_ACCEPTABLE_METHODS = 0xff;
-    }
-
-    private static class AddressType {
-        private static final int IPV4 = 0x01;
-        private static final int DOMAINNAME = 0x03;
-        private static final int IPV6 = 0x04;
-    }
-
-    private static class Command {
-        private static final int CONNECT = 0x01;
-        private static final int BIND = 0x02;
-        private static final int UDP_ASSOCIATE = 0x03;
-    }
-
-    private static class Reply {
-        private static final int SUCCEEDED = 0x00;
-        private static final int GENERAL_SOCKS_SERVER_FAILURE = 0x01;
-        private static final int CONNECTION_NOT_ALLOWED_BY_RULESET = 0x02;
-        private static final int NETWORK_UNREACHABLE = 0x03;
-        private static final int HOST_UNREACHABLE = 0x04;
-        private static final int CONNECTION_REFUSED = 0x05;
-        private static final int TTL_EXPIRED = 0x06;
-        private static final int COMMAND_NOT_SUPPORTED = 0x07;
-        private static final int ADDRESS_TYPE_NOT_SUPPORTED = 0x08;
-    }
-
-    private static final int AUTH_VERSION = 1;
-    private static final int AUTH_SUCCESS = 0;
-    private static final int AUTH_FAILURE = 1;
 }
