@@ -23,6 +23,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.transport.TransportUtil;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -153,7 +154,7 @@ public class SummaryHelper extends HelperBase {
     /** allowReseed */
     public boolean allowReseed() {
         return _context.netDb().isInitialized() &&
-               (_context.netDb().getKnownRouters() < 30) ||
+               (_context.netDb().getKnownRouters() < ReseedChecker.MINIMUM) ||
                 _context.getBooleanProperty("i2p.alwaysAllowReseed");
     }
 
@@ -942,13 +943,20 @@ public class SummaryHelper extends HelperBase {
                .append("</a></h4>");
         }
 
-        boolean reseedInProgress = _context.netDb().reseedChecker().inProgress();
-        // If showing the reseed link is allowed
-        if (allowReseed()) {
-            if (reseedInProgress) {
-                // While reseed occurring, show status message instead
-                buf.append("<div class=\"sb_notice\"><i>").append(_context.netDb().reseedChecker().getStatus()).append("</i></div>");
-            } else {
+        ReseedChecker checker = _context.netDb().reseedChecker();
+        String status = checker.getStatus();
+        if (status.length() > 0) {
+            // Show status message even if not running, timer in ReseedChecker should remove after 20 minutes
+            buf.append("<div class=\"sb_notice\"><i>").append(checker.getStatus()).append("</i></div>");
+        }
+        if (!checker.inProgress()) {
+            // If a new reseed isn't running, and the last reseed had errors, show error message
+            String reseedErrorMessage = checker.getError();
+            if (reseedErrorMessage.length() > 0) {
+                buf.append("<div class=\"sb_notice\"><i>").append(reseedErrorMessage).append("</i></div>");
+            }
+            // If showing the reseed link is allowed
+            if (allowReseed()) {
                 // While no reseed occurring, show reseed link
                 long nonce = _context.random().nextLong();
                 String prev = System.getProperty("net.i2p.router.web.ReseedHandler.nonce");
@@ -959,13 +967,6 @@ public class SummaryHelper extends HelperBase {
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
                 buf.append("<button type=\"submit\" title=\"").append(_t("Attempt to download router reference files (if automatic reseed has failed)"));
                 buf.append("\" class=\"reload\" value=\"Reseed\" >").append(_t("Reseed")).append("</button></form></p>\n");
-            }
-        }
-        // If a new reseed ain't running, and the last reseed had errors, show error message
-        if (!reseedInProgress) {
-            String reseedErrorMessage = _context.netDb().reseedChecker().getError();
-            if (reseedErrorMessage.length() > 0) {
-                buf.append("<div class=\"sb_notice\"><i>").append(reseedErrorMessage).append("</i></div>");
             }
         }
         if (buf.length() <= 0)

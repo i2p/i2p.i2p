@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.router.networkdb.reseed.Reseeder;
 
 /**
@@ -21,15 +22,18 @@ public class ConfigReseedHandler extends FormHandler {
     @Override
     protected void processForm() {
 
+        ReseedChecker checker = _context.netDb().reseedChecker();
         if (_action.equals(_t("Save changes and reseed now"))) {
             saveChanges();
-            if (!_context.netDb().reseedChecker().requestReseed()) {
+            if (!checker.requestReseed()) {
                 addFormError(_t("Reseeding is already in progress"));
+                addCheckerStatus(checker);
             } else {
                 // skip the nonce checking in ReseedHandler
                 addFormNotice(_t("Starting reseed process"));
             }
         } else if (_action.equals(_t("Reseed from URL"))) {
+            // threaded
             String val = getJettyString("url");
             if (val != null)
                 val = val.trim();
@@ -45,33 +49,31 @@ public class ConfigReseedHandler extends FormHandler {
                 return;
             }
             try {
-                if (!_context.netDb().reseedChecker().requestReseed(url)) {
+                if (!checker.requestReseed(url)) {
                     addFormError(_t("Reseeding is already in progress"));
+                    addCheckerStatus(checker);
                 } else {
                     // wait a while for completion but not forever
                     for (int i = 0; i < 40; i++) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException ie) {}
-                        if (!_context.netDb().reseedChecker().inProgress())
+                        if (!checker.inProgress())
                             break;
                     }
-                    String status = _context.netDb().reseedChecker().getStatus();
-                    String error = _context.netDb().reseedChecker().getError();
-                    if (error.length() > 0) {
-                        addFormErrorNoEscape(error);
-                    } else if (status.length() > 0) {
-                        addFormNoticeNoEscape(status);
-                    } else if (_context.netDb().reseedChecker().inProgress()) {
-                        addFormNotice(_t("Reseed in progress, check summary bar for status"));
-                    } else {
-                        addFormNotice(_t("Reseed complete, check summary bar for status"));
+                    if (!addCheckerStatus(checker)) {
+                        if (checker.inProgress()) {
+                            addFormNotice(_t("Reseed in progress, check summary bar for status"));
+                        } else {
+                            addFormNotice(_t("Reseed complete, check summary bar for status"));
+                        }
                     }
                 }
             } catch (IllegalArgumentException iae) {
                 addFormError(_t("Bad URL {0}", val) + " - " + iae.getMessage());
             }
         } else if (_action.equals(_t("Reseed from file"))) {
+            // inline
             InputStream in = _requestWrapper.getInputStream("file");
             try {
                 // non-null but zero bytes if no file entered, don't know why
@@ -79,9 +81,10 @@ public class ConfigReseedHandler extends FormHandler {
                     addFormError(_t("You must enter a file"));
                     return;
                 }
-                int count = _context.netDb().reseedChecker().requestReseed(in);
+                int count = checker.requestReseed(in);
                 if (count <= 0) {
                     addFormError(_t("Reseed from file failed"));
+                    addCheckerStatus(checker);
                 } else {
                     addFormNotice(ngettext("Reseed successful, loaded {0} router info from file",
                                            "Reseed successful, loaded {0} router infos from file",
@@ -89,6 +92,7 @@ public class ConfigReseedHandler extends FormHandler {
                 }
             } catch (IOException ioe) {
                 addFormError(_t("Reseed from file failed") + " - " + ioe);
+                addCheckerStatus(checker);
             } finally {
                 // it's really a ByteArrayInputStream but we'll play along...
                 if (in != null)
@@ -100,6 +104,24 @@ public class ConfigReseedHandler extends FormHandler {
             resetUrlList();
         }
         //addFormError(_t("Unsupported") + ' ' + _action + '.');
+    }
+
+    /**
+     *  @return true if anything was output
+     *  @since 0.9.33
+     */
+    private boolean addCheckerStatus(ReseedChecker checker) {
+        String error = checker.getError();
+        if (error.length() > 0) {
+            addFormErrorNoEscape(error);
+            return true;
+        }
+        String status = checker.getStatus();
+        if (status.length() > 0) {
+            addFormNoticeNoEscape(status);
+            return true;
+        }
+        return false;
     }
 
     private void resetUrlList() {
