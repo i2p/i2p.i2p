@@ -55,17 +55,21 @@ if [ -z $CC ]; then
 fi
 
 
-if [ $BITS -eq 32 ]; then
-  export ABI=32
-  export CFLAGS="-m32 -mtune=i686 -march=i686"
-  export LDFLAGS="-m32"
-elif [ $BITS -eq 64 ]; then
-  export ABI=64
-  export CFLAGS="-m64 -mtune=generic"
-  export LDFLAGS="-m64"
-else
-  printf "BITS value \"$BITS\" not valid, please select 32 or 64\n" >&2
-  exit 1
+# Debian builds are presumed to be native, we don't need the -mxx flag unless cross-compile,
+# and this breaks the x32 build
+if [ -z "$DEBIANVERSION" ] ; then
+    if [ $BITS -eq 32 ]; then
+      export ABI=32
+      export CFLAGS="-m32 -mtune=i686 -march=i686"
+      export LDFLAGS="-m32"
+    elif [ $BITS -eq 64 ]; then
+      export ABI=64
+      export CFLAGS="-m64 -mtune=generic"
+      export LDFLAGS="-m64"
+    else
+      printf "BITS value \"$BITS\" not valid, please select 32 or 64\n" >&2
+      exit 1
+    fi
 fi
 
 [ -z $ARCH ] && case `uname -m` in
@@ -125,11 +129,17 @@ case $TARGET in
             exit 1
         fi
 
-        LDFLAGS="${LDFLAGS} -shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
-        if [ $KFREEBSD -eq 1 ]; then
-            LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-kfreebsd.so"
+        # rename jcpuid, formerly 0003-rename-jcpuid.patch
+        if [ "$DEBIANVERSION" ] ; then
+            LDFLAGS="${LDFLAGS} -shared -Wl,-soname,libjcpuid.so"
+            LIBFILE="../jbigi/libjcpuid.so"
         else
-            LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
+            LDFLAGS="${LDFLAGS} -shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
+            if [ $KFREEBSD -eq 1 ]; then
+                LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-kfreebsd.so"
+            else
+                LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
+            fi
         fi
         CFLAGS="${CFLAGS} -fPIC -Wall"
         INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include -I${JAVA_HOME}/include/${UNIXTYPE}";;

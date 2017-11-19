@@ -1,5 +1,19 @@
+2017-11-19 zzz
+ * Debian:
+   - Fix builds for x32 (ticket #2076)
+   - Incorporate patches 2 and 3 into build scripts
+ * DTG: On OSX, set dock icon, and enable by default
+
 2017-11-18 zzz
- * Reseed: Add SOCKS proxy support (ticket #1130)
+ * Reseed:
+   - Add SOCKS proxy support (ticket #1130)
+   - Show proxy info, if applicable, in logs
+   - Show status in summary bar for manual reseed (previously hidden if more than 30 routers)
+   - Show status in summary bar after successul completion
+   - Show reseed button in summary bar if less than 50 known RIs (previously 30)
+   - Show current status on /configreseed if already running
+   - Consolidate proxy settings detection in ReseedRunner constructor
+   - Enhance help text on /configreseed (tickets #423, #1130)
 
 2017-11-17 zzz
  * Addressbook: Fix adding alternates after importing an empty book (ticket #2072)
