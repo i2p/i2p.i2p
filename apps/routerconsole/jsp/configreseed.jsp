@@ -29,13 +29,13 @@
 <ul><li>
 <%=intl._t("The proxy may be a remote public proxy, or may be running on your computer (localhost).")%>
 </li><li>
-<%=intl._t("If you running Tor Browser, you may use it by configuring SOCKS 5, localhost, port 9150.")%>
-</li><li>
-<%=intl._t("If you running command-line Tor, you may use it by configuring SOCKS 5, localhost, port 9050.")%>
-</li><li>
 <%=intl._t("To use a proxy, configure the type, hostname, and port below.")%>
 </li><li>
-<%=intl._t("Then, click 'save changes and reseed now'.")%>
+<%=intl._t("If you are running Tor Browser, reseed through it by configuring SOCKS 5, localhost, port 9150.")%>
+</li><li>
+<%=intl._t("If you are running command-line Tor, reseed through it by configuring SOCKS 5, localhost, port 9050.")%>
+</li><li>
+<%=intl._t("Then, click \"{0}\".", intl._t("Save changes and reseed now"))%>
 </li><li>
 <%=intl._t("The default settings will work for most people.")%>
 <%=intl._t("Change these only if HTTPS is blocked by a restrictive firewall and reseed has failed.")%>
@@ -43,9 +43,13 @@
 </li><li>
 <%=intl._t("If you know and trust somebody that runs I2P, ask them to send you a reseed file generated using this page on their router console.")%>
 <%=intl._t("Then, use this page to reseed using file you received.")%>
+<%=intl._t("First, select the file below.")%>
+<%=intl._t("Then, click \"{0}\".", intl._t("Reseed from file"))%>
 </li><li>
 <%=intl._t("If you know and trust somebody that publishes reseed files, ask them for the URL.")%>
 <%=intl._t("Then, use this page to reseed using the URL you received.")%>
+<%=intl._t("First, enter the URL below.")%>
+<%=intl._t("Then, click \"{0}\".", intl._t("Reseed from URL"))%>
 </li><li>
 <%=intl._t("See {0} for instructions on reseeding manually.", "<a href=\"https://geti2p.net/faq#manual_reseed\">" + intl._t("the FAQ") + "</a>")%>
 </li></ol>
