@@ -202,10 +202,7 @@ public class ConfigServiceHandler extends FormHandler {
     public boolean shouldShowSystray() {
         return !
             (SystemVersion.isLinuxService() ||
-             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()) ||
-             // headless=true is forced in i2prouter script to prevent useless dock icon;
-             // must fix this first
-             SystemVersion.isMac());
+             (SystemVersion.isWindows() && _context.hasWrapper() && WrapperManager.isLaunchedAsService()));
     }
 
     /**
@@ -214,10 +211,10 @@ public class ConfigServiceHandler extends FormHandler {
      *  @since 0.9.26
      */
     public boolean isSystrayEnabled() {
-        // default false for now, except on non-service windows
+        // default false for now, except on OSX and non-service windows
         String sdtg = _context.getProperty(RouterConsoleRunner.PROP_DTG_ENABLED);
         return Boolean.parseBoolean(sdtg) ||
-               (sdtg == null && SystemVersion.isWindows());
+               (sdtg == null && (SystemVersion.isWindows() || SystemVersion.isMac()));
     }
 
     @Override

@@ -298,10 +298,10 @@ public class RouterConsoleRunner implements RouterApp {
             return;
         }
         try {
-            // default false for now, except on non-service windows
+            // default false for now, except on OSX and non-service windows
             String sdtg = _context.getProperty(PROP_DTG_ENABLED);
             boolean desktopguiEnabled = Boolean.parseBoolean(sdtg) ||
-                                        (sdtg == null && SystemVersion.isWindows());
+                                        (sdtg == null && (SystemVersion.isWindows() || SystemVersion.isMac()));
             if (desktopguiEnabled) {
                 System.setProperty("java.awt.headless", "false");
                 net.i2p.desktopgui.Main dtg = new net.i2p.desktopgui.Main(_context, _mgr, null);    

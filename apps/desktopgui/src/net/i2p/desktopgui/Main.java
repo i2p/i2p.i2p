@@ -4,6 +4,12 @@ package net.i2p.desktopgui;
  * Main.java
  */
 
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+
 import javax.swing.SwingUtilities;
 
 import net.i2p.I2PAppContext;
@@ -24,7 +30,9 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
  */
 public class Main implements RouterApp {
 
+    // non-null
     private final I2PAppContext _appContext;
+    // warning, null in app context
     private final RouterContext _context;
     private final ClientAppManager _mgr;
     private final Log log;
@@ -106,6 +114,8 @@ public class Main implements RouterApp {
             changeState(START_FAILED, "Headless environment: not starting desktopgui!", null);
             return;
         }
+        if (SystemVersion.isMac())
+            setMacTrayIcon();
 
         // TODO process args with getopt if needed
         
@@ -127,6 +137,45 @@ public class Main implements RouterApp {
             
         });
 
+    }
+    
+    /**
+     *  Unless we do this, when we start DesktopGUI we get a Java coffee cup
+     *  in the tray.
+     *
+     *  Based on code from https://gist.github.com/bchapuis/1562406 , no apparent license.
+     *  See also https://stackoverflow.com/questions/6006173/how-do-you-change-the-dock-icon-of-a-java-program
+     *
+     *  TODO, if we wanted to add our own menu, see
+     *  https://stackoverflow.com/questions/1319805/java-os-x-dock-menu
+     *
+     *  TODO, if we want to make it bounce, see
+     *  https://stackoverflow.com/questions/15079783/how-to-make-my-app-icon-bounce-in-the-mac-dock
+     *
+     *  TODO, if we want to handle Quit, see
+     *  https://nakkaya.com/2009/04/19/java-osx-integration/
+     *
+     *  @since 0.9.33
+     */
+    @SuppressWarnings("unchecked")
+    private void setMacTrayIcon() {
+        File f = new File(_appContext.getBaseDir(), "docs/themes/console/images/itoopie_sm.png");
+        if (!f.exists())
+            return;
+        try {
+            Class util = Class.forName("com.apple.eawt.Application");
+            Method getApplication = util.getMethod("getApplication", new Class[0]);
+            Object application = getApplication.invoke(util);
+            Class params[] = new Class[1];
+            params[0] = Image.class;
+            Method setDockIconImage = util.getMethod("setDockIconImage", params);
+            URL url = f.toURI().toURL();
+            Image image = Toolkit.getDefaultToolkit().getImage(url);
+            setDockIconImage.invoke(application, image);
+        } catch (Exception e) {
+            if (log.shouldWarn())
+                log.warn("Can't set OSX Dock icon", e);
+        }
     }
     
     /**
