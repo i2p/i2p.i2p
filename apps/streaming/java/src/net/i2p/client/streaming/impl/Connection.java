@@ -1017,6 +1017,8 @@ class Connection {
     public void setChoking(boolean on) {
         if (on != _isChoking) {
             _isChoking = on;
+           if (_log.shouldWarn())
+               _log.warn("Choking changed to " + on + " on " + this);
            if (!on)
                _unchokesToSend.set(UNCHOKES_TO_SEND);
            ackImmediately();
@@ -1031,7 +1033,11 @@ class Connection {
      *  @since 0.9.29
      */
     public void setChoked(boolean on) {
-        _isChoked = on;
+        if (on != _isChoked) {
+           _isChoked = on;
+           if (_log.shouldWarn())
+               _log.warn("Choked changed to " + on + " on " + this);
+        }
         if (on) {
             congestionOccurred();
             // https://en.wikipedia.org/wiki/Transmission_Control_Protocol
