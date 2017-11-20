@@ -508,9 +508,16 @@ fi
 ECHOTEST=`echo -n "x"`
 if [ "$ECHOTEST" = "x" ]
 then
-    ECHOOPT="-n "
+    ECHO_MINUS_N="echo -n "
 else
-    ECHOOPT=""
+    # on OSX, sh builtin echo doesn't support -n, but /bin/echo does
+    ECHOTEST=`/bin/echo -n "x"`
+    if [ "$ECHOTEST" = "x" ]
+    then
+        ECHO_MINUS_N="/bin/echo -n "
+    else
+        ECHO_MINUS_N="echo "
+    fi
 fi
 
 
@@ -1020,12 +1027,12 @@ console() {
 
 waitforjavastartup() {
     getstatus
-    eval echo $ECHOOPT "`gettext 'Waiting for $APP_LONG_NAME'`..."
+    eval $ECHO_MINUS_N "`gettext 'Waiting for $APP_LONG_NAME'`..."
 
     # Wait until the timeout or we have something besides Unknown.
     counter=15
     while [ "$JAVASTATUS" = "Unknown" -a $counter -gt 0 -a -n "$JAVASTATUS" ] ; do
-        echo $ECHOOPT"."
+        $ECHO_MINUS_N "."
         sleep 1
         getstatus
         counter=`expr $counter - 1`
@@ -1037,12 +1044,12 @@ waitforjavastartup() {
         counter=120
     fi
     while [ "$JAVASTATUS" != "STARTED" -a "$JAVASTATUS" != "Unknown" -a $counter -gt 0 -a -n "$JAVASTATUS" ] ; do
-        echo $ECHOOPT"."
+        $ECHO_MINUS_N "."
         sleep 1
         getstatus
         counter=`expr $counter - 1`
     done
-    if [ "X$ECHOOPT" != "X" ] ; then
+    if [ "$ECHO_MINUS_N" != "echo " ] ; then
         echo ""
     fi
 }
@@ -1059,7 +1066,7 @@ startwait() {
     while [ $i -lt $WAIT_AFTER_STARTUP ]
     do
         sleep 1
-        echo $ECHOOPT"."
+        $ECHO_MINUS_N "."
         i=`expr $i + 1`
     done
     if [ $WAIT_AFTER_STARTUP -gt 0 -o $WAIT_FOR_STARTED_STATUS = true ]
