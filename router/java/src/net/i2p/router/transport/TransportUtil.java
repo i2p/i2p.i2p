@@ -241,7 +241,11 @@ public abstract class TransportUtil {
                port != 6697 &&  // IRC+TLS
                (!(port >= 7650 && port <= 7664)) && // standard I2P range
                port != 8998 &&  // mtn
+               port != 9001 &&  // Tor
+               port != 9030 &&  // Tor
+               port != 9050 &&  // Tor
                port != 9100 &&  // network printer
+               port != 9150 &&  // Tor browser
                // do not block anything in 9111 - 30777, this is the standard random selection range
                port != 31000 && // Wrapper
                port != 32000;   // Wrapper

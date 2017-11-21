@@ -100,7 +100,8 @@ class UDPEndpoint implements SocketListener {
     /** 8998 is monotone, and 31000 is the wrapper outbound, so let's stay between those */
     public static final String PROP_MIN_PORT = "i2np.udp.minPort";
     public static final String PROP_MAX_PORT = "i2np.udp.maxPort";
-    private static final int MIN_RANDOM_PORT = 9111;
+    /** Was 9111, increase to skip Tor browser at 9050 */
+    private static final int MIN_RANDOM_PORT = 9151;
     private static final int MAX_RANDOM_PORT = 30777;
     private static final int MAX_PORT_RETRIES = 20;
 
@@ -116,7 +117,7 @@ class UDPEndpoint implements SocketListener {
         if (port > 0 && !TransportUtil.isValidPort(port)) {
             _log.error("Specified UDP port " + port + " is not valid, selecting a new port");
             // See isValidPort() for list
-            _log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7664, 8998, 9100, 31000, 32000, 65536+");
+            _log.error("Invalid ports are: 0-1023, 1900, 2049, 2827, 3659, 4045, 4444, 4445, 6000, 6665-6669, 6697, 7650-7664, 8998, 9001, 9030, 9050, 9100, 9150, 31000, 32000, 65536+");
             port = -1;
         }
 
