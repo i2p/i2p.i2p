@@ -720,6 +720,8 @@ public class EepGet {
             try {
                 if (_redirectLocation.startsWith("http://")) {
                     _actualURL = _redirectLocation;
+                } else if (_redirectLocation.startsWith("https://")) {
+                    throw new IOException("Redirect to https unsupported");
                 } else { 
                     // the Location: field has been required to be an absolute URI at least since
                     // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
