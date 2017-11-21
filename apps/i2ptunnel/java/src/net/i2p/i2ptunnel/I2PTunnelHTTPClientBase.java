@@ -80,7 +80,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     protected final List<String> _proxyList;
 
     protected final static String ERR_NO_OUTPROXY =
-         "HTTP/1.1 503 Service Unavailable\r\n"+
+         "HTTP/1.1 503 No Outproxy Configured\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "Connection: close\r\n"+
@@ -88,7 +88,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
          "\r\n"+
          "<html><body><H1>I2P ERROR: No outproxy found</H1>"+
          "Your request was for a site outside of I2P, but you have no "+
-         "HTTP outproxy configured.  Please configure an outproxy in I2PTunnel";
+         "outproxy configured.  Please configure an outproxy in I2PTunnel";
     
     protected final static String ERR_DESTINATION_UNKNOWN =
             "HTTP/1.1 503 Service Unavailable\r\n" +
