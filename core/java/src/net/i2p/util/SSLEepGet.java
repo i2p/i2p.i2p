@@ -147,7 +147,10 @@ public class SSLEepGet extends EepGet {
     /**
      *  Use a proxy.
      *
-     *  @param proxyPort must be valid, -1 disallowed, no default
+     *  @param proxyHost Must be valid hostname or literal IPv4/v6.
+     *                   If type is INTERNAL, set to "localhost".
+     *  @param proxyPort Must be valid, -1 disallowed, no default.
+     *                   If type is INTERNAL, set to 4444.
      *  @since 0.9.33
      */
     public SSLEepGet(I2PAppContext ctx, ProxyType type, String proxyHost, int proxyPort,
@@ -158,7 +161,10 @@ public class SSLEepGet extends EepGet {
     /**
      *  Use a proxy.
      *
-     *  @param proxyPort must be valid, -1 disallowed, no default
+     *  @param proxyHost Must be valid hostname or literal IPv4/v6.
+     *                   If type is INTERNAL, set to "localhost".
+     *  @param proxyPort Must be valid, -1 disallowed, no default.
+     *                   If type is INTERNAL, set to 4444.
      *  @param state an SSLState retrieved from a previous SSLEepGet with getSSLState(), or null.
      *               This makes repeated fetches from the same host MUCH faster,
      *               and prevents repeated key store loads even for different hosts.
@@ -183,7 +189,10 @@ public class SSLEepGet extends EepGet {
     /**
      *  Use a proxy.
      *
-     *  @param proxyPort must be valid, -1 disallowed, no default
+     *  @param proxyHost Must be valid hostname or literal IPv4/v6.
+     *                   If type is INTERNAL, set to "localhost".
+     *  @param proxyPort Must be valid, -1 disallowed, no default.
+     *                   If type is INTERNAL, set to 4444.
      *  @since 0.9.33
      */
     public SSLEepGet(I2PAppContext ctx, ProxyType type, String proxyHost, int proxyPort,
@@ -194,7 +203,10 @@ public class SSLEepGet extends EepGet {
     /**
      *  Use a proxy.
      *
-     *  @param proxyPort must be valid, -1 disallowed, no default
+     *  @param proxyHost Must be valid hostname or literal IPv4/v6.
+     *                   If type is INTERNAL, set to "localhost".
+     *  @param proxyPort Must be valid, -1 disallowed, no default.
+     *                   If type is INTERNAL, set to 4444.
      *  @param state an SSLState retrieved from a previous SSLEepGet with getSSLState(), or null.
      *               This makes repeated fetches from the same host MUCH faster,
      *               and prevents repeated key store loads even for different hosts.
@@ -276,6 +288,10 @@ public class SSLEepGet extends EepGet {
                         ptype = ProxyType.SOCKS4;
                     } else if (y.equals("SOCKS5")) {
                         ptype = ProxyType.SOCKS5;
+                    } else if (y.equals("I2P")) {
+                        ptype = ProxyType.INTERNAL;
+                        proxyHost = "localhost";
+                        proxyPort = 4444;
                     } else {
                         error = true;
                     }
@@ -333,8 +349,8 @@ public class SSLEepGet extends EepGet {
     
     private static void usage() {
         System.err.println("Usage: SSLEepGet [-psyz] https://url\n" +
-                           "  -p proxyHost[:proxyPort]    // default port 8080 for HTTPS and 1080 for SOCKS\n" +
-                           "  -y HTTPS|SOCKS4|SOCKS5      // proxy type, default HTTPS if proxyHost is set\n" +
+                           "  -p proxyHost[:proxyPort]    // default port 8080 for HTTPS and 1080 for SOCKS; default localhost:4444 for I2P\n" +
+                           "  -y HTTPS|SOCKS4|SOCKS5|I2P  // proxy type, default HTTPS if proxyHost is set\n" +
                            "  -s save unknown certs\n" +
                            "  -s -s save all certs\n" +
                            "  -z bypass hostname verification");
@@ -698,6 +714,10 @@ public class SSLEepGet extends EepGet {
                         httpProxyConnect(host, port);
                         break;
 
+                      case INTERNAL:
+                        internalHttpProxyConnect(host, port);
+                        break;
+
                       case SOCKS4:
                         socksProxyConnect(false, host, port);
                         break;
@@ -707,7 +727,6 @@ public class SSLEepGet extends EepGet {
                         break;
 
                       case HTTPS:
-                      case INTERNAL:
                       case TRANSPARENT:
                       default:
                         throw new IOException("Unsupported proxy type " + _proxyType);
@@ -803,6 +822,35 @@ public class SSLEepGet extends EepGet {
         } else {
             _proxy = new Socket(_proxyHost, _proxyPort);
         }
+        httpProxyConnect(_proxy, host, port);
+    }
+
+    /**
+     *  Connect to a HTTP proxy.
+     *  Proxy address must be in _proxyHost and _proxyPort.
+     *  Side effects: Sets _proxy, _proxyIn, _proxyOut,
+     *  and other globals via readHeaders()
+     *
+     *  @param port what the proxy should connect to, probably 4444
+     *  @since 0.9.33
+     */
+    private void internalHttpProxyConnect(String host, int port) throws IOException {
+        // connect to the proxy
+        _proxy = InternalSocket.getSocket(_proxyHost, _proxyPort);
+        httpProxyConnect(_proxy, host, port);
+    }
+
+    /**
+     *  Connect to a HTTP proxy.
+     *  Proxy address must be in _proxyHost and _proxyPort.
+     *  Side effects: Sets _proxyIn, _proxyOut,
+     *  and other globals via readHeaders()
+     *
+     *  @param host what the proxy should connect to
+     *  @param port what the proxy should connect to
+     *  @since 0.9.33
+     */
+    private void httpProxyConnect(Socket proxy, String host, int port) throws IOException {
         _proxyIn = _proxy.getInputStream();
         _proxyOut = _proxy.getOutputStream();
         StringBuilder buf = new StringBuilder(64);

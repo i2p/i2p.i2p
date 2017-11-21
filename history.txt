@@ -1,3 +1,12 @@
+2017-11-21 zzz
+ * EepGet: Refuse attempted redirect to HTTPS, won't work
+ * Reseed: Add support for reseeding via outproxy or Orchid (ticket #1841)
+
+2017-11-20 zzz
+ * HTTP Proxy: Better HTTP status message when no outproxy configured
+ * i2prouter: Fix echo -n on OSX
+ * Reseed: Add outproxy and Orchid proxy support (ticket #1841)
+
 2017-11-19 zzz
  * Debian:
    - Fix builds for x32 (ticket #2076)

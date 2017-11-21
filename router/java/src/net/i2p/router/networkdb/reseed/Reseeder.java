@@ -32,6 +32,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
@@ -299,15 +300,25 @@ public class Reseeder {
                 _proxyPort = -1;
             }
             _shouldProxyHTTP = _proxyHost != null && _proxyHost.length() > 0 && _proxyPort > 0;
-            if (_context.getBooleanProperty(PROP_SPROXY_ENABLE)) {
-                _sproxyHost = _context.getProperty(PROP_SPROXY_HOST);
-                _sproxyPort = _context.getProperty(PROP_SPROXY_PORT, -1);
+
+            boolean shouldProxySSL = _context.getBooleanProperty(PROP_SPROXY_ENABLE);
+            SSLEepGet.ProxyType sproxyType;
+            if (shouldProxySSL) {
+                sproxyType = getProxyType();
+                if (sproxyType == SSLEepGet.ProxyType.INTERNAL) {
+                    _sproxyHost = "localhost";
+                    _sproxyPort = _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY, 4444);
+                } else {
+                    _sproxyHost = _context.getProperty(PROP_SPROXY_HOST);
+                    _sproxyPort = _context.getProperty(PROP_SPROXY_PORT, -1);
+                }
             } else {
+                sproxyType = SSLEepGet.ProxyType.NONE;
                 _sproxyHost = null;
                 _sproxyPort = -1;
             }
-            _shouldProxySSL = _sproxyHost != null && _sproxyHost.length() > 0 && _sproxyPort > 0;
-            _sproxyType = _shouldProxySSL ? getProxyType() : SSLEepGet.ProxyType.NONE;
+            _shouldProxySSL = shouldProxySSL && _sproxyHost != null && _sproxyHost.length() > 0 && _sproxyPort > 0;
+            _sproxyType = _shouldProxySSL ? sproxyType : SSLEepGet.ProxyType.NONE;
         }
 
         /*
@@ -353,14 +364,15 @@ public class Reseeder {
                 _checker.setStatus("");
             } else {
                 if (total == 0) {
-                    System.out.println("Reseed failed " + getDisplayString(_url) + ", check network connection");
+                    System.out.println("Reseed failed " + getDisplayString(_url) + "- check network connection");
                     System.out.println("Ensure that nothing blocks outbound HTTP or HTTPS, check the logs, " +
                                        "and if nothing helps, read the FAQ about reseeding manually.");
                     if (_url == null || "https".equals(_url.getScheme())) {
                         if (_sproxyHost != null && _sproxyPort > 0)
-                            System.out.println("Check HTTPS proxy setting - host: " + _sproxyHost + " port: " + _sproxyPort);
+                            System.out.println("Check current proxy setting! Type: " + getDisplayString(_sproxyType) +
+                                               " Host: " + _sproxyHost + " Port: " + _sproxyPort);
                         else
-                            System.out.println("Consider enabling an HTTPS proxy on the reseed configuration page");
+                            System.out.println("Consider enabling a proxy for https on the reseed configuration page");
                     } else {
                         if (_proxyHost != null && _proxyPort > 0)
                             System.out.println("Check HTTP proxy setting - host: " + _proxyHost + " port: " + _proxyPort);
@@ -1130,20 +1142,7 @@ public class Reseeder {
             boolean ssl = url.startsWith("https://");
             if (ssl && _shouldProxySSL) {
                 buf.append(" (using ");
-                switch(_sproxyType) {
-                  case HTTP:
-                    buf.append("HTTPS");
-                    break;
-                  case SOCKS4:
-                    buf.append("SOCKS 4/4a");
-                    break;
-                  case SOCKS5:
-                    buf.append("SOCKS 5");
-                    break;
-                  default:
-                    buf.append(_sproxyType.toString());
-                    break;
-                }
+                buf.append(getDisplayString(_sproxyType));
                 buf.append(" proxy ");
                 if (_sproxyHost.contains(":"))
                     buf.append('[').append(_sproxyHost).append(']');
@@ -1161,6 +1160,27 @@ public class Reseeder {
                 buf.append(')');
             }
             return buf.toString();
+        }
+
+        /**
+         *  Display string for what we're fetching.
+         *  Untranslated, for logs only.
+         *
+         *  @since 0.9.33
+         */
+        private String getDisplayString(SSLEepGet.ProxyType type) {
+            switch(type) {
+              case HTTP:
+                return "HTTPS";
+              case SOCKS4:
+                return "SOCKS 4/4a";
+              case SOCKS5:
+                return "SOCKS 5";
+              case INTERNAL:
+                return "I2P Outproxy";
+              default:
+                return type.toString();
+            }
         }
     }
 

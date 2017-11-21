@@ -35,6 +35,9 @@
 </li><li>
 <%=intl._t("If you are running command-line Tor, reseed through it by configuring SOCKS 5, localhost, port 9050.")%>
 </li><li>
+<%=intl._t("If you have some peers but need more, you may try the I2P Outproxy option. Leave the host and port blank.")%>
+<%=intl._t("This will not work for an initial reseed when you have no peers at all.")%>
+</li><li>
 <%=intl._t("Then, click \"{0}\".", intl._t("Save changes and reseed now"))%>
 </li><li>
 <%=intl._t("The default settings will work for most people.")%>
@@ -138,7 +141,7 @@
 </td></tr>
 
 <% if (reseedHelper.shouldShowHTTPSProxy()) { %>
-<tr><td align="right"><b><%=intl._t("Reseed Proxy Type")%>:</b></td>
+<tr><td align="right"><b><%=intl._t("Proxy type for https reseed URLs")%>:</b></td>
 <td><label><input type="radio" class="optbox" name="pmode" value="" <%=reseedHelper.pmodeChecked(0) %> >
 <%=intl._t("None")%></label><br>
 <label><input type="radio" class="optbox" name="pmode" value="HTTP" <%=reseedHelper.pmodeChecked(1) %> >
@@ -146,7 +149,11 @@
 <label><input type="radio" class="optbox" name="pmode" value="SOCKS4" <%=reseedHelper.pmodeChecked(2) %> >
 <%=intl._t("SOCKS 4/4a")%></label><br>
 <label><input type="radio" class="optbox" name="pmode" value="SOCKS5" <%=reseedHelper.pmodeChecked(3) %> >
-<%=intl._t("SOCKS 5")%></label></td></tr>
+<%=intl._t("SOCKS 5")%></label><br>
+<label><input type="radio" class="optbox" name="pmode" value="INTERNAL" <%=reseedHelper.pmodeChecked(4) %> >
+<%=intl._t("I2P Outproxy")%></label>
+(<%=intl._t("Not for initial reseed. Leave host and port blank.")%>)
+</td></tr>
 <tr><td align="right"><b><%=intl._t("HTTPS Proxy Host")%>:</b></td>
 <td><input name="shost" type="text" value="<jsp:getProperty name="reseedHelper" property="shost" />" ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTPS Proxy Port")%>:</b></td>
@@ -163,7 +170,7 @@
 <% } // shouldShowHTTPSProxy %>
 
 <% if (reseedHelper.shouldShowHTTPProxy()) { %>
-<tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable HTTP Proxy?")%></b></label></td>
+<tr><td align="right"><label for="enableproxy"><b><%=intl._t("Enable proxy for http reseed URLs?")%></b></label></td>
 <td><input type="checkbox" class="optbox" name="enable" id="enableproxy" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
 <tr><td align="right"><b><%=intl._t("HTTP Proxy Host")%>:</b></td>
 <td><input name="host" type="text" value="<jsp:getProperty name="reseedHelper" property="host" />" ></td></tr>
