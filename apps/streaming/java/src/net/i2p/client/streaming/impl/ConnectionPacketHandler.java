@@ -138,7 +138,7 @@ class ConnectionPacketHandler {
         boolean isNew;
         if (seqNum > 0 || isSYN) {
             isNew = con.getInputStream().messageReceived(seqNum, packet.getPayload()) &&
-                    !allowAck;
+                    allowAck;
         } else {
             isNew = false;
         }
