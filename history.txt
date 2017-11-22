@@ -1,6 +1,7 @@
 2017-11-22 zzz
  * Streaming: Fix bug causing loopback hangs and
    preventing desired ack behavior (ticket #1939)
+ * Tomcat 8.5.23
 
 2017-11-21 zzz
  * EepGet: Refuse attempted redirect to HTTPS, won't work

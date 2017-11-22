@@ -14,7 +14,8 @@
      -->
 
     <!-- Note: Please change all references in top-level build.xml if you update to a new Jetty! -->
-    <!-- unused until we go to 9.3 -->
+    <!--       Also change javadoc URL in top-level build.properties.                            -->
+    <!-- jetty.branch unused until we go to 9.3 -->
     <property name="jetty.branch" value="stable-9" />
     <property name="jetty.ver" value="9.2.22.v20170606" />
     <property name="jetty.base" value="jetty-distribution-${jetty.ver}" />
@@ -25,6 +26,15 @@
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
     <property name="javac.version" value="1.7" />
+
+    <!-- Note: Please change all references in top-level build.xml if you update to a new Tomcat! -->
+    <property name="tomcat.ver" value="8.5.23" />
+    <!-- everything we need is in the deployer package, except for tomcat-api.jar in the full package,
+         so we just use the full package instead.
+      <property name="tomcat.lib" value="apache-tomcat-${tomcat.ver}-deployer/lib" />
+     -->
+    <property name="tomcat.lib" value="apache-tomcat-${tomcat.ver}/lib" />
+    <property name="tomcat.bin" value="apache-tomcat-${tomcat.ver}/bin" />
 
     <target name="all" depends="build" />
 
@@ -180,20 +190,30 @@
         </jar>
     </target>
 
+    <!-- Make javax.servlet.jar -->
     <!-- If with-libtomcat8-java but not with-libjetty9-java, we don't do this -->
     <target name="copyJettylib2" depends="extractJettylib" unless="${with-libtomcat8-java}" >
         <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
+            <!-- all versions - Servlet API -->
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/servlet-api-3.1.jar" />
+
           <!--
             Jetty version - see below for why we don't use this one
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/javax.servlet.jsp-api-2.3.1.jar" />
            -->
-            <!-- Apache version -->
+
+            <!-- Apache in Jetty package version -->
             <!-- Also includes org.apache.*, this is copied into jasper-runtime.jar below -->
-            <zipfileset includes="javax/**/*" src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-8.0.33.jar"/>
             <!-- In Debian packages they are found in /usr/share/java/tomcat8-servlet-api.jar in the libtomcat8-java package -->
             <!-- javax/servlet/jsp/resources are dups of those in apache-jsp jar -->
+          <!--
+            <zipfileset includes="javax/**/*" src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-8.0.33.jar"/>
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties javax/servlet/jsp/resources/*" src="${jetty.base}/lib/jetty-schemas-3.1.jar" />
+           -->
+
+            <!-- Apache package version -->
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jsp-api.jar"/>
+            <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jetty-schemas-3.1.jar" />
         </jar>
       <!--
         <delete file="jetty.tar" />
@@ -230,6 +250,7 @@
     </target>
 
 
+    <!-- Make commons-el.jar and jasper-runtime.jar -->
     <target name="copyTomcatLib2" unless="${with-libtomcat-java}" >
         <!-- EL API and compiler libs.
              Tomcat 6 has EL 2.1.
@@ -240,17 +261,24 @@
          -->
         <!-- the javax.el API, AND the com.sun.el parser -->
         <!-- actually from jetty9, not tomcat8... this will fail unless we have the jetty files also -->
-        <jar destfile="jettylib/commons-el.jar" >
+        <jar destfile="jettylib/commons-el.jar" duplicate="preserve" filesetmanifest="mergewithoutmain">
           <!--
             Jetty version
             <zipfileset src="${jetty.base}/lib/jsp/javax.el-3.0.0.jar"/>
            -->
-            <!-- Apache version -->
-            <zipfileset src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-el-8.0.33.jar"/>
+
+            <!-- Apache in Jetty package version -->
+          <!--
+            <zipfileset src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-el-${tomcat.ver}.jar"/>
+           -->
+
+            <!-- Apache package version -->
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/el-api.jar"/>
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar"/>
         </jar>
 
         <!-- actually from jetty9, not tomcat8... this will fail unless we have the jetty files also -->
-        <jar destfile="jettylib/jasper-runtime.jar" >
+        <jar destfile="jettylib/jasper-runtime.jar" duplicate="preserve" filesetmanifest="mergewithoutmain" >
           <!--
             Jetty version
             <zipfileset src="${jetty.base}/lib/jsp/javax.servlet.jsp-2.3.2.jar"/>
@@ -261,11 +289,24 @@
             must use Apache (aka libtomcat8).
             <zipfileset excludes="about.html about_files about_files/* META-INF/ECLIPSEF.* META-INF/eclipse.inf plugin.properties" src="${jetty.base}/lib/jsp/jetty-jsp-${jetty.ver}.jar" />
            -->
-            <!-- Apache version -->
-            <!-- Also includes javax.servlet.jsp.*, this is copied into javax.servlet.jar above -->
-            <zipfileset includes="org/**/*" src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-8.0.33.jar"/>
+
+            <!-- For both Apache in Jetty package and Apache package versions -->
             <!-- required Jetty initializer (see RouterConsoleRunner) -->
             <zipfileset src="${jetty.base}/lib/apache-jsp/org.eclipse.jetty.apache-jsp-${jetty.ver}.jar"/>
+
+            <!-- Apache in Jetty package version -->
+            <!-- Also includes javax.servlet.jsp.*, this is copied into javax.servlet.jar above -->
+          <!--
+            <zipfileset src="${jetty.base}/lib/apache-jsp/org.mortbay.jasper.apache-jsp-${jetty.ver}.jar"/>
+           -->
+
+            <!-- Apache package version -->
+            <!-- we match what was bundled in the Jetty package version -->
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar"/>
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-api.jar"/>
+            <zipfileset includes="org/apache/juli/logging/**/*" src="${tomcat.bin}/tomcat-juli.jar"/>
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE org/apache/tomcat/util/codec/ org/apache/tomcat/util/compat/ org/apache/tomcat/util/threads/" src="${tomcat.lib}/tomcat-util.jar"/>
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-util-scan.jar"/>
         </jar>
 
         <jar destfile="jettylib/commons-logging.jar" update="true" >
