@@ -1022,7 +1022,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
                 	    _util.setStartupDelay(minutes);
 	                    changed = true;
         	            _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(minutes));
-                	    addMessage(_t("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * (60L * 1000))));
+                	    addMessageNoEscape(_t("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * (60L * 1000))));
                 }
 	}
 
@@ -1033,7 +1033,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
 	            changed = true;
 	            _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(secs));
                     if (secs >= 0)
-	                addMessage(_t("Refresh time changed to {0}", DataHelper.formatDuration2(secs * 1000)));
+	                addMessageNoEscape(_t("Refresh time changed to {0}", DataHelper.formatDuration2(secs * 1000)));
 	            else
 	                addMessage(_t("Refresh disabled"));
 	        }
