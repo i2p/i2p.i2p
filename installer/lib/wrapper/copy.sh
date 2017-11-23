@@ -1,7 +1,7 @@
 #
-# copy the files out of the delta pack
+# copy the files out of the unzipped delta pack
 #
-V=3.5.30
+V=3.5.34
 D=wrapper-delta-pack-$V
 B=$D/bin
 L=$D/lib
@@ -39,4 +39,5 @@ do
 	chmod -x $i/i2psvc $i/libwrapper.so
 done
 
+echo 'Windows binaries not copied, see README.txt'
 echo 'Now compile the armv6 binaries on a Raspberry Pi, see linux-armv6/README.txt'

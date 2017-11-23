@@ -29,8 +29,16 @@ Don't forget to strip the binaries and disable the execute bit.
 For macosx, combine (if possible) the universal-32 and universal-64 files
 from the delta pack (each is a 2-architecture fat file)
 into a "quad-fat" binary. Instructions can be found in
-macos/README.txt
+macosx/README.txt
 
-For windows, build from source following the instructions
+IF you have the ability to build for Windows,
+build from source following the instructions
 in win64/README-x64-win.txt.
 Don't forget to strip the binaries and disable the execute bit.
+Delete the old win-all/wrapper.jar, and change the top level
+build.xml to use the all/wrapper.jar for the Windows installer.
+
+If you DON'T have the ability to build for Windows,
+leave the files in win32, win64, and win-all unchanged.
+The Windows installer build in the top-level build.xml
+will use the win-all/wrapper.jar instead of all/wrapper.jar.
