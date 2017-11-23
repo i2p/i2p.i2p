@@ -87,7 +87,7 @@ class SOCKS5Server extends SOCKSServer {
             if (manageRequest(in, out) == Command.UDP_ASSOCIATE)
                 handleUDP(in, out);
         } catch (IOException e) {
-            throw new SOCKSException("Connection error: " + e);
+            throw new SOCKSException("Connection error", e);
         }
 
         setupCompleted = true;
@@ -267,7 +267,7 @@ class SOCKS5Server extends SOCKSServer {
 
             sendRequestReply(Reply.SUCCEEDED, AddressType.IPV4, InetAddress.getByName("127.0.0.1"), null, 1, out);
         } catch (IOException e) {
-            throw new SOCKSException("Connection error: " + e);
+            throw new SOCKSException("Connection error", e);
         }
     }
 
@@ -360,7 +360,7 @@ class SOCKS5Server extends SOCKSServer {
         try {
             out = new DataOutputStream(clientSock.getOutputStream());
         } catch (IOException e) {
-            throw new SOCKSException("Connection error: " + e);
+            throw new SOCKSException("Connection error", e);
         }
 
         // FIXME: here we should read our config file, select an
@@ -457,14 +457,14 @@ class SOCKS5Server extends SOCKSServer {
             try {
                 sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             } catch (IOException ioe) {}
-            throw new SOCKSException("Error connecting: " + e);
+            throw new SOCKSException("Connection error", e);
         } catch (I2PException e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("socks error", e);
             try {
                 sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
             } catch (IOException ioe) {}
-            throw new SOCKSException("Error connecting: " + e);
+            throw new SOCKSException("Connection error", e);
         }
 
         return destSock;

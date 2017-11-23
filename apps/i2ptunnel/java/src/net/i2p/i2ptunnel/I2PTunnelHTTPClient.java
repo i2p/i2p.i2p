@@ -393,6 +393,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         boolean shout = false;
 
         try {
+            s.setSoTimeout(INITIAL_SO_TIMEOUT);
             out = s.getOutputStream();
             InputReader reader = new InputReader(s.getInputStream());
             String line, method = null, protocol = null, host = null, destination = null;
@@ -1040,6 +1041,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         }
                     }
                     newRequest.append("Connection: close\r\n\r\n");
+                    s.setSoTimeout(0);
                     break;
                 } else {
                     newRequest.append(line).append("\r\n"); // HTTP spec

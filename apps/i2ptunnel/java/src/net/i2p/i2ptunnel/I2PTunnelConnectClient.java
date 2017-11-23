@@ -155,6 +155,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         Outproxy outproxy = null;
         long requestId = __requestId.incrementAndGet();
         try {
+            s.setSoTimeout(INITIAL_SO_TIMEOUT);
             out = s.getOutputStream();
             in = s.getInputStream();
             String line, method = null, host = null, destination = null, restofline = null;
@@ -283,6 +284,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         }
                     }
                     newRequest.append("\r\n"); // HTTP spec
+                    s.setSoTimeout(0);
                     // do it
                     break;
                 }

@@ -156,7 +156,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "<body><h2>431 Request header fields too large</h2>\n" +
          "</body></html>";
 
-    private final static String ERR_REQUEST_TIMEOUT =
+    /** @since protected since 0.9.33 for I2PTunnelHTTPClientBase, was private */
+    protected final static String ERR_REQUEST_TIMEOUT =
          "HTTP/1.1 408 Request timeout\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+

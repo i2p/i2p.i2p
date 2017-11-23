@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -61,6 +62,13 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
     private static final int MAX_NONCE_COUNT = 1024;
     /** @since 0.9.11, moved to Base in 0.9.29 */
     public static final String PROP_USE_OUTPROXY_PLUGIN = "i2ptunnel.useLocalOutproxy";
+    /**
+     *  This is a standard soTimeout, not a total timeout.
+     *  We have no slowloris protection on the client side.
+     *  See I2PTunnelHTTPServer or SAM's ReadLine if we need that.
+     *  @since 0.9.33
+     */
+    protected static final int INITIAL_SO_TIMEOUT = 15*1000;
 
     private static final String ERR_AUTH1 =
             "HTTP/1.1 407 Proxy Authentication Required\r\n" +
@@ -610,7 +618,9 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         if (out == null)
             return;
         String header;
-        if (usingWWWProxy)
+        if (ex instanceof SocketTimeoutException)
+            header = I2PTunnelHTTPServer.ERR_REQUEST_TIMEOUT;
+        else if (usingWWWProxy)
             header = getErrorPage(I2PAppContext.getGlobalContext(), "dnfp", ERR_DESTINATION_UNKNOWN);
         else
             header = getErrorPage(I2PAppContext.getGlobalContext(), "dnf", ERR_DESTINATION_UNKNOWN);

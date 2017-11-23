@@ -7,6 +7,7 @@
 package net.i2p.i2ptunnel.socks;
 
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,14 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
 
 public class I2PSOCKSTunnel extends I2PTunnelClientBase {
+
+    /**
+     *  This is a standard soTimeout, not a total timeout.
+     *  We have no slowloris protection on the client side.
+     *  See I2PTunnelHTTPServer or SAM's ReadLine if we need that.
+     *  @since 0.9.33
+     */
+    protected static final int INITIAL_SO_TIMEOUT = 15*1000;
 
     private HashMap<String, List<String>> proxies = null;  // port# + "" or "default" -> hostname list
 
@@ -49,8 +58,14 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
 
     protected void clientConnectionRun(Socket s) {
         try {
+            try {
+                s.setSoTimeout(INITIAL_SO_TIMEOUT);
+            } catch (SocketException ioe) {}
             SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(_context, s, getTunnel().getClientOptions());
             Socket clientSock = serv.getClientSocket();
+            try {
+                s.setSoTimeout(0);
+            } catch (SocketException ioe) {}
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             Thread t = new I2PTunnelRunner(clientSock, destSock, sockLock, null, null, mySockets,
                                            (I2PTunnelRunner.FailCallback) null);

@@ -7,6 +7,7 @@
 package net.i2p.i2ptunnel.socks;
 
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.client.streaming.I2PSocket;
@@ -48,8 +49,14 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
     protected void clientConnectionRun(Socket s) {
         try {
             //_log.error("SOCKS IRC Tunnel Start");
+            try {
+                s.setSoTimeout(INITIAL_SO_TIMEOUT);
+            } catch (SocketException ioe) {}
             SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(_context, s, getTunnel().getClientOptions());
             Socket clientSock = serv.getClientSocket();
+            try {
+                s.setSoTimeout(0);
+            } catch (SocketException ioe) {}
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             StringBuffer expectedPong = new StringBuffer();
             int id = __clientId.incrementAndGet();

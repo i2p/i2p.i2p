@@ -73,7 +73,7 @@ class SOCKSServerFactory {
             }
         } catch (IOException e) {
             //_log.debug("error reading SOCKS protocol version");
-            throw new SOCKSException("Connection error (" + e.getMessage() + ")");
+            throw new SOCKSException("Connection error", e);
         }
 
         return serv;

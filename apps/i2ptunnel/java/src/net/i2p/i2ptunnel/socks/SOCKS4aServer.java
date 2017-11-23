@@ -71,7 +71,7 @@ class SOCKS4aServer extends SOCKSServer {
 
             manageRequest(in, out);
         } catch (IOException e) {
-            throw new SOCKSException("Connection error (" + e.getMessage() + ")");
+            throw new SOCKSException("Connection error", e);
         }
 
         setupCompleted = true;
@@ -150,7 +150,7 @@ class SOCKS4aServer extends SOCKSServer {
 
             sendRequestReply(Reply.SUCCEEDED, InetAddress.getByName("127.0.0.1"), 1, out);
         } catch (IOException e) {
-            throw new SOCKSException("Connection error (" + e.getMessage() + ")");
+            throw new SOCKSException("Connection error", e);
         }
     }
 
@@ -201,7 +201,7 @@ class SOCKS4aServer extends SOCKSServer {
         try {
             out = new DataOutputStream(clientSock.getOutputStream());
         } catch (IOException e) {
-            throw new SOCKSException("Connection error (" + e.getMessage() + ")");
+            throw new SOCKSException("Connection error", e);
         }
 
         // FIXME: here we should read our config file, select an
@@ -286,19 +286,17 @@ class SOCKS4aServer extends SOCKSServer {
             try {
                 sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
             } catch (IOException ioe) {}
-            throw new SOCKSException("Error in destination format");
+            throw new SOCKSException("Error in destination format", e);
         } catch (IOException e) {
             try {
                 sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
             } catch (IOException ioe) {}
-            throw new SOCKSException("Error connecting ("
-                                     + e.getMessage() + ")");
+            throw new SOCKSException("Error connecting", e);
         } catch (I2PException e) {
             try {
                 sendRequestReply(Reply.CONNECTION_REFUSED, InetAddress.getByName("127.0.0.1"), 0, out);
             } catch (IOException ioe) {}
-            throw new SOCKSException("Error connecting ("
-                                     + e.getMessage() + ")");
+            throw new SOCKSException("Error connecting", e);
         }
 
         return destSock;
