@@ -81,12 +81,14 @@
             <echo message="to patch the source and build the packages." />
     </target>
 
+    <property name="gpg" value="gpg" />
+
     <macrodef name="gpgsign">
         <attribute name="file" />
         <sequential>
             <delete file="@{file}.sig" quiet="true" />
-            <exec executable="gpg" failonerror="true">
-                <arg value="--default-key" />
+            <exec executable="${gpg}" failonerror="true">
+                <arg value="-u" />
                 <arg value="${release.gpg.keyid}" />
                 <arg value="-b" />
                 <arg value="@{file}" />
@@ -103,8 +105,8 @@
         <attribute name="file" />
         <sequential>
             <delete file="@{file}.asc" quiet="true" />
-            <exec executable="gpg" failonerror="true">
-                <arg value="--default-key" />
+            <exec executable="${gpg}" failonerror="true">
+                <arg value="-u" />
                 <arg value="${release.gpg.keyid}" />
                 <arg value="-ab" />
                 <arg value="@{file}" />
