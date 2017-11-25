@@ -81,23 +81,9 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni, ttf-dejavu
-Suggests: tor
- ,apparmor
- ,i2p-messenger
- ,i2phex
- ,i2p-tahoe-lafs
- ,imule
- ,irc-client
- ,itoopie
- ,mail-client
- ,mail-reader
- ,news-reader
- ,polipo
+Suggests: apparmor
  ,privoxy
- ,robert
  ,syndie
- ,www-browser
- ,xul-ext-torbutton
 Description: Router for I2P
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
