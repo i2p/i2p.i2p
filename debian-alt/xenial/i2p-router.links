@@ -51,16 +51,10 @@ usr/share/java/tomcat8-jasper-el.jar usr/share/i2p/lib/jasper-el.jar
 usr/share/java/tomcat8-el-api.jar usr/share/i2p/lib/commons-el.jar
 
 
-# comment out if not building with libtaglibs-standard
-usr/share/java/taglibs-standard-spec.jar usr/share/i2p/lib/jstl.jar
-usr/share/java/taglibs-standard-impl.jar usr/share/i2p/lib/standard.jar
-usr/share/java/taglibs-standard-jstlel.jar usr/share/i2p/lib/jstlel.jar
-
-
 # comment out if not building with glassfish-javaee
 # glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
 #usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/jstl.jar
-#usr/share/java/glassfish-appserv-jstl.jar usr/share/i2p/lib/standard.jar
+usr/share/java/glassfish-appserv-jstl.jar usr/share/i2p/lib/standard.jar
 
 
 # comment out if not building with libjakarta-taglibs-standard-java

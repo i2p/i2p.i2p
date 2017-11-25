@@ -1274,17 +1274,29 @@
         </copy>
     </target>
 
-    <!-- todo handle alt package too -->
     <!--
-       glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
-    <target name="copyjstl-unlesspkg" unless="${with-glassfish-javaee}" >
+       jstl.jar
+       glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail,
+       and libjstl1.1-java isn't sufficient,
+       so we only skip it with libtaglibs-standard
     -->
-    <target name="copyjstl-unlesspkg" >
+    <target name="copyjstl-unlesspkg" unless="${with-libtaglibs-standard}" >
         <copy file="apps/susidns/src/lib/jstl.jar" todir="pkg-temp/lib/" />
     </target>
 
-    <!-- todo handle alt package too -->
-    <target name="copystandard-unlesspkg" unless="${with-glassfish-javaee}" >
+    <!-- standard.jar -->
+    <target name="copystandard-unlesspkg" depends="copystandard-unlesspkg1, copystandard-unlesspkg2" />
+    <target name="copystandard-unlesspkg1" >
+        <condition property="with-any-standard-pkg" >
+            <or>
+                <istrue value="${with-libtaglibs-standard}" />
+                <istrue value="${with-glassfish-javaee}" />
+                <istrue value="${libjakarta-taglibs-standard-java}" />
+            </or>
+
+        </condition>
+    </target>
+    <target name="copystandard-unlesspkg2" unless="${with-any-standard-pkg}" >
         <copy file="apps/susidns/src/lib/standard.jar" todir="pkg-temp/lib/" />
     </target>
 
@@ -2269,11 +2281,9 @@
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-9.2.22.v20170606" />
             <!-- libtomcat8-java -->
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-8.5.23" />
-            <!-- libjstl1.1-java or glassfish-javaee -->
-          <!--
+            <!-- libjstl1.1-java or glassfish-javaee or libtaglibs-standard -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
-           -->
-            <!-- libjakarta-taglibs-standard-java or glassfish-javaee -->
+            <!-- libjakarta-taglibs-standard-java or glassfish-javaee or libtaglibs-standard -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
             <!-- anything added above, add in debian-release-tarball also -->
         </delete>
@@ -2287,9 +2297,7 @@
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
                 <exclude name="apps/jetty/apache-tomcat-*/**"/>
-          <!--
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
-           -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
                 <!-- anything added above, add in debian-release-tarball also -->
             </tarfileset>
@@ -2415,9 +2423,7 @@
             <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-9.2.22.v20170606" />
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-8.5.23" />
-          <!--
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
-           -->
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
             <!-- anything added above, add in debian-tarball also -->
         </delete>
@@ -2431,9 +2437,7 @@
                 <exclude name="installer/resources/geoipv6.dat.gz"/>
                 <exclude name="apps/jetty/jetty-distribution-*/**"/>
                 <exclude name="apps/jetty/apache-tomcat-*/**"/>
-          <!--
                 <exclude name="apps/susidns/src/lib/jstl.jar" />
-           -->
                 <exclude name="apps/susidns/src/lib/standard.jar" />
                 <!-- anything added above, add in debian-tarball also -->
             </tarfileset>

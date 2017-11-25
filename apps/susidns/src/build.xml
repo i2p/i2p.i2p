@@ -23,6 +23,7 @@
                 <pathelement location="${lib}/tomcat-util.jar" />
                 <pathelement location="${lib}/tomcat-util-scan.jar" />
 		<pathelement location="${lib}/jasper-el.jar" />
+		<pathelement location="lib/jstlel.jar" />
 
 		<pathelement location="lib/jstl.jar" />
 		<pathelement location="lib/standard.jar" />

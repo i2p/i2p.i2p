@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,debconf
  ,openjdk-7-jdk
  ,libjetty9-java
- ,glassfish-javaee
+ ,libtaglibs-standard-jstlel-java
  ,libtomcat8-java
  ,dh-apparmor
  ,bash-completion
@@ -81,7 +81,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  gettext-base,
  libgetopt-java,
  libjetty9-java,
- glassfish-javaee,
+ libtaglibs-standard-jstlel-java,
  libtomcat8-java
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)

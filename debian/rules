@@ -52,6 +52,8 @@ override_dh_auto_clean:
 	rm -rf $(CURDIR)/debian/python-i2p
 	rm -f $(CURDIR)/override.properties
 	rm -f $(CURDIR)/apps/susidns/src/lib/standard.jar
+	rm -f $(CURDIR)/apps/susidns/src/lib/jstl.jar
+	rm -f $(CURDIR)/apps/susidns/src/lib/jstlel.jar
 	debconf-updatepo
 
 override_dh_auto_build:
@@ -119,11 +121,17 @@ endif
 	ln -sf /usr/share/java/tomcat8-util.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util.jar
 	ln -sf /usr/share/java/tomcat8-util-scan.jar $(CURDIR)/apps/jetty/jettylib/tomcat-util-scan.jar
 
+	@# debian and ubuntu: stretch+, zesty+
+	@/bin/echo -e "with-libtaglibs-standard=true" >> $(CURDIR)/override.properties
+	ln -sf /usr/share/java/taglibs-standard-spec.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
+	ln -sf /usr/share/java/taglibs-standard-impl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
+	ln -sf /usr/share/java/taglibs-standard-jstlel.jar $(CURDIR)/apps/susidns/src/lib/jstlel.jar
+
 	@# debian and ubuntu: everywhere
-	@/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
+	@#/bin/echo -e "with-glassfish-javaee=true" >> $(CURDIR)/override.properties
 	@# glassfish-javaee.jar has ancient and conflicting classes, e.g. javax.mail
 	@#ln -sf /usr/share/java/glassfish-javaee.jar $(CURDIR)/apps/susidns/src/lib/jstl.jar
-	ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
+	@#ln -sf /usr/share/java/glassfish-appserv-jstl.jar $(CURDIR)/apps/susidns/src/lib/standard.jar
 
 	@# debian and ubuntu: everywhere
 	@#/bin/echo -e "with-libjakarta-taglibs-standard-java=true" >> $(CURDIR)/override.properties

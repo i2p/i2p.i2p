@@ -73,7 +73,6 @@ reprepro includedsc stable i2p_0.9.XX-1.dsc
 # copy built packages from launchpad
 reprepro -v update precise
 reprepro -v update trusty
-reprepro -v update vivid
 reprepro -v update xenial
 reprepro -v update zesty
 reprepro -v update artful

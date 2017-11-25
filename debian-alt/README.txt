@@ -9,8 +9,9 @@ trusty may be copied to vivid.
 trusty may be used for jessie without libjetty9-java from backports.
 xenial may be copied to yakkety, zesty.
 
-tails-jessie and tails-wheezy are currently the same as
-jessie and wheezy, respectively. If they diverge, put the changes here.
+Not maintained:
+wheezy files are not maintained. Use the precise files instead.
+jessie files may not be maintained. Use the trusty files instead.
 
 Note on systemd:
 

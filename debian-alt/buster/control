@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 7.0.50~)
  ,debconf
  ,openjdk-8-jdk
  ,libjetty9-java (>= 9.2.22)
- ,glassfish-javaee
+ ,libtaglibs-standard-jstlel-java
  ,libtomcat8-java
  ,dh-apparmor
  ,dh-systemd
@@ -75,7 +75,7 @@ Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  openjdk-8-jre-headless | java8-runtime-headless,
  libjetty9-java,
- glassfish-javaee,
+ libtaglibs-standard-jstlel-java,
  libtomcat8-java,
  geoip-database,
  gettext-base,

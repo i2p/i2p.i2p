@@ -8,7 +8,7 @@ improve our official packages and support other packagers.
 Our packages are available at https://deb.i2p2.de/ and
 instructions are at https://geti2p.net/debian
 
-This document is current as of release 0.9.30, 2017-05-03.
+This document is current as of release 0.9.33, scheduled 2018-01
 
 
 Build-only Dependencies
@@ -51,7 +51,10 @@ Current Runtime Dependencies
   which are different than the way they are packaged for Debian.
   They are removed in the Debian source package.
 
-* glassfish-javaee
+* libtaglibs-standard-*-java (stretch and later, zesty and later only)
+  Provides JSTL 1.2, solves the glassfish-javaee problem described below.
+
+* glassfish-javaee (wheezy, jessie, xenial and earlier only)
   We need jstl.jar and standard.jar version 1.2.
   This is an ancient and terrible package, but it's the only place we've found version 1.2 jars.
   standard.jar classes are inside /usr/share/java/glassfish-appserv-jstl.jar
