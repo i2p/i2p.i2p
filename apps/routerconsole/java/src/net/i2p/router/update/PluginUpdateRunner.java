@@ -136,7 +136,8 @@ class PluginUpdateRunner extends UpdateRunner {
 
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
-            updateStatus("<b>" + _t("Plugin downloaded") + "</b>");
+            if (!(_xpi2pURL.startsWith("file:") || _method == UpdateMethod.FILE))
+                updateStatus("<b>" + _t("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
             File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
             if ((!appDir.exists()) && (!appDir.mkdir())) {

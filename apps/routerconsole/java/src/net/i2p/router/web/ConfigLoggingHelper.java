@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -42,7 +43,9 @@ public class ConfigLoggingHelper extends HelperBase {
         buf.append("<p>")
            .append(_t("Add additional logging statements above (e.g. {0}).", "<b>net.i2p.router.tunnel=WARN</b>"))
            .append("<br>")
-           .append(_t("Alternatively, put entries in the file {0} (e.g. {1}).", "<b>logger.config</b>", "<b>logger.record.net.i2p.router.tunnel=WARN</b>"))
+           .append(_t("Alternatively, put entries in the file {0} (e.g. {1}).",
+                      "<b>" + new File(_context.getConfigDir(), "logger.config") + "</b>",
+                      "<b>logger.record.net.i2p.router.tunnel=WARN</b>"))
            .append("<br>")
            .append(_t("Valid log levels are {0}.", "<b>DEBUG, INFO, WARN, ERROR, CRIT</b>"))
            .append("</p>\n");
