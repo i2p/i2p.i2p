@@ -63,6 +63,7 @@
   /usr/share/java/standard.jar                            r,
   /usr/share/java/standard-*.jar                          r,
   /usr/share/java/tomcat8-*.jar                           r,
+  /usr/share/java/taglibs-standard-*.jar                  r,
 
   # GeoIP data
   /usr/share/GeoIP/*                                      r,

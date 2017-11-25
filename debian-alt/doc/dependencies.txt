@@ -25,10 +25,6 @@ Current Runtime Dependencies
   We require openjdk-7-java to build, and any Java 7, 8, or 9 runtime to run.
   Java 9 may still have some issues; see https://trac.i2p2.de/ticket/1870 for status
 
-* libecj-java
-  This is for compilation on-the-fly of webapps, but we don't really support that,
-  not sure why it's in there, to be researched, candidate for removal.
-
 * geoip-database
   In non-Debian builds we bundle our own geoip data;
   for Debian builds we use the system data.

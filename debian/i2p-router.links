@@ -3,7 +3,6 @@ usr/share/common-licenses/LGPL-2.1 usr/share/doc/i2p-router/licenses/LICENSE-LGP
 usr/share/common-licenses/Apache-2.0 usr/share/doc/i2p-router/licenses/LICENSE-Apache2.0.txt
 usr/share/common-licenses/BSD usr/share/doc/i2p-router/licenses/LICENSE-BSD.txt
 
-usr/share/java/eclipse-ecj.jar usr/share/i2p/lib/eclipse-ecj.jar
 
 
 # comment out if not building with libjetty9-java
