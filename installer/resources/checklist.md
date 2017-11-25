@@ -24,6 +24,8 @@
 - Tickets: Check if any blocker or critical tickets for this release remain open;
   get them fixed and closed, or reclassified.
 
+- Review Google Play crash reports, fix any related issues
+
 
 ## A day or two before
 
