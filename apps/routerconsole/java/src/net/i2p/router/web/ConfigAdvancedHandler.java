@@ -3,6 +3,8 @@ package net.i2p.router.web;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -17,7 +19,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 public class ConfigAdvancedHandler extends FormHandler {
     //private boolean _forceRestart;
     private boolean _shouldSave;
-    private String _config;
+    private String _oldConfig, _config;
     private String _ff;
     
     @Override
@@ -44,17 +46,25 @@ public class ConfigAdvancedHandler extends FormHandler {
     public void setNofilter_config(String val) {
         _config = val;
     }
+
+    /** @since 0.9.33 */
+    public void setNofilter_oldConfig(String val) {
+        _oldConfig = val;
+    }
     
     /**
      * The user made changes to the config and wants to save them, so
      * lets go ahead and do so.
      *
+     * We saved the previous config in the form, so we do a diff between the two.
+     * This will reduce the chance of undoing some change that happened in-between.
      */
     private void saveChanges() {
-        Set<String> unsetKeys = new HashSet<String>(_context.router().getConfigSettings());
-        if (_config != null) {
+        if (_oldConfig != null && _config != null) {
+            Properties oldProps = new Properties();
             Properties props = new Properties();
             try {
+                DataHelper.loadProps(oldProps, new ByteArrayInputStream(DataHelper.getUTF8(_oldConfig)));
                 DataHelper.loadProps(props, new ByteArrayInputStream(DataHelper.getUTF8(_config)));
             } catch (IOException ioe) {
                 _log.error("Config error", ioe);
@@ -63,9 +73,19 @@ public class ConfigAdvancedHandler extends FormHandler {
                 return;
             }
 
-            for (String key : props.stringPropertyNames()) {
+            Set<String> unsetKeys = new HashSet<String>(oldProps.stringPropertyNames());
+            for (Iterator<Map.Entry<Object, Object>> iter = props.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry<Object, Object> e = iter.next();
+                String key = (String) e.getKey();
+                String nnew = (String) e.getValue();
+                String old = oldProps.getProperty(key);
                 unsetKeys.remove(key);
+                if (nnew.equals(old)) {
+                    // no change
+                    iter.remove();
+                }
             }
+            // what's remaining in unsetKeys will be deleted
 
             boolean saved = _context.router().saveConfig(props, unsetKeys);
             if (saved) 
