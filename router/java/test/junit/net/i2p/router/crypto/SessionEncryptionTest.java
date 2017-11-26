@@ -48,7 +48,7 @@ public class SessionEncryptionTest extends TestCase{
         
         byte[] msg = DataHelper.getASCII("msg 1");
         
-        byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64);
+        byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64); // encrypt(...) is Deprecated
         byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
         assertTrue(DataHelper.eq(dmsg, msg));
     }
@@ -62,7 +62,7 @@ public class SessionEncryptionTest extends TestCase{
         
         byte[] msg = DataHelper.getASCII("msg 2");
         
-        byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64);
+        byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, 64); // encrypt(...) is Deprecated
         byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
         assertTrue(DataHelper.eq(dmsg, msg));
     }
@@ -101,7 +101,7 @@ public class SessionEncryptionTest extends TestCase{
         byte[] msg4 = DataHelper.getASCII("msg 4");
         byte[] msg5 = DataHelper.getASCII("msg 5");
         
-        byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64);
+        byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64); // encrypt(...) is Deprecated
         
         byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey, skm);
         assertTrue(DataHelper.eq(dmsg1, msg1));
@@ -201,7 +201,7 @@ public class SessionEncryptionTest extends TestCase{
         byte[] msg4 = DataHelper.getASCII("msg 4");
         byte[] msg5 = DataHelper.getASCII("msg 5");
         
-        byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64);
+        byte emsg1[] = _context.elGamalAESEngine().encrypt(msg1, pubKey, curKey, firstTags, 64); // encrypt(...) is Deprecated
         
         byte dmsg1[] = _context.elGamalAESEngine().decrypt(emsg1, privKey, skm);
         assertTrue(DataHelper.eq(dmsg1, msg1));
@@ -216,7 +216,7 @@ public class SessionEncryptionTest extends TestCase{
         
         assertNotNull(curTag);
         
-        byte emsg2[] = _context.elGamalAESEngine().encrypt(msg2, pubKey, curKey, null, curTag, 64);
+        byte emsg2[] = _context.elGamalAESEngine().encrypt(msg2, pubKey, curKey, null, curTag, 64); // encrypt(...) is Deprecated
         
         byte dmsg2[] = _context.elGamalAESEngine().decrypt(emsg2, privKey, skm);
         assertTrue(DataHelper.eq(dmsg2, msg2));
@@ -229,7 +229,7 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg3[] = _context.elGamalAESEngine().encrypt(msg3, pubKey, curKey, secondTags, curTag, nextKey, 64);
+        byte emsg3[] = _context.elGamalAESEngine().encrypt(msg3, pubKey, curKey, secondTags, curTag, nextKey, 64); // encrypt(...) is Deprecated
         
         byte dmsg3[] = _context.elGamalAESEngine().decrypt(emsg3, privKey, skm);
         assertTrue(DataHelper.eq(dmsg3, msg3));
@@ -245,7 +245,7 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg4[] = _context.elGamalAESEngine().encrypt(msg4, pubKey, curKey, null, curTag, 64);
+        byte emsg4[] = _context.elGamalAESEngine().encrypt(msg4, pubKey, curKey, null, curTag, 64); // encrypt(...) is Deprecated
         
         byte dmsg4[] = _context.elGamalAESEngine().decrypt(emsg4, privKey, skm);
         assertTrue(DataHelper.eq(dmsg4, msg4));
@@ -258,7 +258,7 @@ public class SessionEncryptionTest extends TestCase{
         assertNotNull(curTag);
         assertNotNull(curKey);
         
-        byte emsg5[] = _context.elGamalAESEngine().encrypt(msg5, pubKey, curKey, null, curTag, 64);
+        byte emsg5[] = _context.elGamalAESEngine().encrypt(msg5, pubKey, curKey, null, curTag, 64); // encrypt(...) is Deprecated
         
         byte dmsg5[] = _context.elGamalAESEngine().decrypt(emsg5, privKey, skm);
         assertTrue(DataHelper.eq(dmsg5, msg5));
@@ -293,7 +293,7 @@ public class SessionEncryptionTest extends TestCase{
             
             byte[] msg = DataHelper.getASCII("msg " + i);
             
-            byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, tags, curTag, nextKey, 64);
+            byte emsg[] = _context.elGamalAESEngine().encrypt(msg, pubKey, curKey, tags, curTag, nextKey, 64); // encrypt(...) is Deprecated
             
             byte dmsg[] = _context.elGamalAESEngine().decrypt(emsg, privKey, skm);
             assertTrue(DataHelper.eq(dmsg, msg));

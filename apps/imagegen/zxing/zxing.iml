@@ -8,5 +8,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="tomcat-coyote-util" level="project" />
+    <orderEntry type="library" name="start" level="project" />
+    <orderEntry type="library" name="javax.servlet.jsp-2.2.0.v201112011158" level="project" />
   </component>
 </module>

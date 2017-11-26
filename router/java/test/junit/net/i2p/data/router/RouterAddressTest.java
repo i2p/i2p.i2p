@@ -31,8 +31,8 @@ public class RouterAddressTest extends StructureTest {
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
-        addr.setOptions(options);
-        addr.setTransportStyle("Blah");
+        addr.setOptions(options); // setOptions(...) is deprecated
+        addr.setTransportStyle("Blah"); // setTransportStyle(...) is also deprecated
         return addr; 
     }
     public DataStructure createStructureToRead() { return new RouterAddress(); }
@@ -41,7 +41,7 @@ public class RouterAddressTest extends StructureTest {
         RouterAddress addr = new RouterAddress();
         boolean error = false;
         try{
-            addr.setOptions(null);
+            addr.setOptions(null); // setOptions(...) is deprecated
         }catch(NullPointerException dfe){
             error = true;
         }
@@ -53,11 +53,11 @@ public class RouterAddressTest extends StructureTest {
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
-        addr.setOptions(options);
+        addr.setOptions(options); // setOptions(...) is deprecated
         options.setProperty("portnum", "2345");
         boolean error = false;
         try{
-            addr.setOptions(options);
+            addr.setOptions(options); // setOptions(...) is deprecated
         }catch(IllegalStateException dfe){
             error = true;
         }
@@ -85,8 +85,8 @@ public class RouterAddressTest extends StructureTest {
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
-        addr.setOptions(options);
-        addr.setTransportStyle("Blah");
+        addr.setOptions(options);  // setOptions(...) is deprecated
+        addr.setTransportStyle("Blah"); // setTransportStyle(...) is deprecated
         assertFalse(addr.equals(null));
         assertFalse(addr.equals(""));
     }
@@ -101,8 +101,8 @@ public class RouterAddressTest extends StructureTest {
         Properties options = new Properties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
-        addr.setOptions(options);
-        addr.setTransportStyle("Blah");
+        addr.setOptions(options);  // setOptions(...) is deprecated
+        addr.setTransportStyle("Blah"); // setTransportStyle(...) is deprecated
         String ret = addr.toString();
         //assertEquals("[RouterAddress: \n\tTransportStyle: Blah\n\tCost: 42\n\tExpiration: Fri Jan 02 00:00:00 UTC 1970\n\tOptions: #: 2\n\t\t[hostname] = [localhost]\n\t\t[portnum] = [1234]]", ret);
         assertEquals("[RouterAddress: \n\tType: Blah\n\tCost: 42\n\tOptions (2):\n\t\t[hostname] = [localhost]\n\t\t[portnum] = [1234]]", ret);
