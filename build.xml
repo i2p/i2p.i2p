@@ -432,8 +432,20 @@
 
     <!-- end of sub-build.xml targets -->
 
+    <!-- monotone targets -->
+
     <target name="checkForMtn" >
         <available property="mtn.available" file="_MTN" type="dir" />
+    </target>
+
+    <target name="failIfNoMtn" depends="checkForMtn">
+        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
+            <condition>
+                <not>
+                    <isset property="mtn.available" />
+                </not>
+            </condition>
+        </fail>
     </target>
 
     <target name="getMtnRev" depends="checkForMtn" if="mtn.available" >
@@ -490,6 +502,10 @@
             match='(^\s+public\s+final\s+static\s+long\s+BUILD\s+=\s+)[0-9]+;' replace='\1${new.i2p.build.number};'/>
     </target>
 
+    <!-- end monotone targets -->
+
+    <!-- launch4j targets -->
+
     <condition property="noExe">
         <not>
             <!-- We only have launch4j binaries for the following systems -->
@@ -533,6 +549,8 @@
                  classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
      </target>
 
+    <!-- end launch4j targets -->
+
      <!--
           the files are now copied to the build directory
           in the build* targets
@@ -545,6 +563,8 @@
         <copy file="apps/susidns/src/lib/jstl.jar" todir="build/" />
         <copy file="apps/susidns/src/lib/standard.jar" todir="build/" />
     </target>
+
+    <!-- jbigi targets -->
 
     <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available">
         <exec executable="mtn" outputproperty="workspace.changes.jbigi" errorproperty="mtn.error.jbigi" failifexecutionfails="false" >
@@ -676,6 +696,8 @@
             </manifest>
         </jar>
     </target>
+
+    <!-- end jbigi targets -->
 
     <!-- the apps need to compile the jsps to poupdate -->
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui, buildJrobin" >
@@ -932,7 +954,7 @@
             </fail>
     </target>
 
-    <target name="-pre-release" depends="-pre-sign">
+    <target name="-pre-release" depends="-pre-sign, failIfNoMtn">
             <echo message="================================================================" />
             <echo message="Did you update these files?" />
             <exec executable="ls" failonerror="true">
@@ -2031,17 +2053,27 @@
     </target>
 
     <target name="mavenCentral.deps" depends="buildRouter, buildStreaming">
-        <ant dir="core/java/" target="javadocJar" />
-        <ant dir="core/java/" target="sourcesJar" />
-        <ant dir="router/java/" target="javadocJar" />
-        <ant dir="router/java/" target="sourcesJar" />
-        <ant dir="apps/ministreaming/java/" target="javadocJar" />
-        <ant dir="apps/ministreaming/java/" target="sourcesJar" />
-        <ant dir="apps/streaming/java/" target="javadocJar" />
-        <ant dir="apps/streaming/java/" target="sourcesJar" />
-        <ant dir="apps/jetty/" target="servletJar" />
-        <ant dir="apps/jetty/" target="servletJavadocJar" />
-        <ant dir="apps/jetty/" target="servletSourcesJar" />
+        <ant dir="core/java/">
+            <target name="javadocJar" />
+            <target name="sourcesJar" />
+        </ant>
+        <ant dir="router/java/">
+            <target name="javadocJar" />
+            <target name="sourcesJar" />
+        </ant>
+        <ant dir="apps/ministreaming/java/">
+            <target name="javadocJar" />
+            <target name="sourcesJar" />
+        </ant>
+        <ant dir="apps/streaming/java/">
+            <target name="javadocJar" />
+            <target name="sourcesJar" />
+        </ant>
+        <ant dir="apps/jetty/">
+            <target name="servletJar" />
+            <target name="servletJavadocJar" />
+            <target name="servletSourcesJar" />
+        </ant>
     </target>
 
     <target name="mavenCentral" depends="verifyReleaseBuildNumbers, -pre-release, distclean, testscripts, mavenCentral.deps">
@@ -2242,15 +2274,9 @@
         <delete dir="./.pc" />
     </target>
 
-    <target name="debian-tarball" depends="getExtendedVersion">
+    <!-- stretch+, zesty+ -->
+    <target name="debian-tarball" depends="getExtendedVersion, failIfNoMtn">
         <!-- this will use the monotonerc file in the current workspace -->
-        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
-            <condition>
-                <not>
-                    <isset property="mtn.available" />
-                </not>
-            </condition>
-        </fail>
         <property name="debian.tarball.name" value="i2p_${Extended.Version}.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />
@@ -2312,15 +2338,7 @@
       -  We add a 'p' to the release name and tarball since the source package is different;
       -  Launchpad does not allow different source packages with the same name.
       -->
-    <target name="precise-release-tarball" depends="getExtendedVersion">
-        <!-- this will use the monotonerc file in the current workspace -->
-        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
-            <condition>
-                <not>
-                    <isset property="mtn.available" />
-                </not>
-            </condition>
-        </fail>
+    <target name="precise-release-tarball" depends="getExtendedVersion, failIfNoMtn">
         <property name="debian.tarball.name" value="i2p_${release.number}p.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />
@@ -2387,16 +2405,71 @@
         </tar>
     </target>
 
+    <!-- xenial/yakkety only -->
+    <!-- same as debian-release-tarball but with bundled jstl.jar
+         (there's no libtaglibs-standard-* packages)
+      -  We add a 'x' to the release name and tarball since the source package is different;
+      -  Launchpad does not allow different source packages with the same name.
+      -->
+    <target name="xenial-release-tarball" depends="getExtendedVersion, failIfNoMtn">
+        <property name="debian.tarball.name" value="i2p_${release.number}x.orig.tar.bz2" />
+        <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
+        <delete dir="../i2p-${Extended.Version}" />
+        <exec executable="mtn" failonerror="true">
+            <arg value="co" />
+            <!-- w: is the revision of the current workspace -->
+            <arg value="-r" />
+            <arg value="w:" />
+            <arg value="-b" />
+            <arg value="i2p.i2p" />
+            <arg value="../i2p-${Extended.Version}" />
+        </exec>
+        <delete includeemptydirs="true" quiet="false" failonerror="false">
+            <fileset dir="../i2p-${Extended.Version}/debian-alt/" />
+            <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
+            <fileset dir="../i2p-${Extended.Version}/Slackware" />
+            <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
+          <!--
+            <fileset dir="../i2p-${Extended.Version}/core/java/src/org/apache/http" />
+           -->
+            <file name="../i2p-${Extended.Version}/installer/resources/geoip.txt" />
+            <file name="../i2p-${Extended.Version}/installer/resources/geoipv6.dat.gz" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-distribution-9.2.22.v20170606" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-8.5.23" />
+          <!--
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
+           -->
+            <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
+            <!-- anything added above, add in debian-tarball also -->
+        </delete>
+        <tar longfile="gnu" destfile="../${debian.tarball.name}" compression="bzip2">
+            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}">
+                <include name="**/**" />
+                <exclude name="debian/**"/>
+                <exclude name="debian-alt/**"/>
+                <exclude name="**/*.sh"/>
+                <exclude name="installer/resources/geoip.txt"/>
+                <exclude name="installer/resources/geoipv6.dat.gz"/>
+                <exclude name="apps/jetty/jetty-distribution-*/**"/>
+                <exclude name="apps/jetty/apache-tomcat-*/**"/>
+              <!--
+                <exclude name="apps/susidns/src/lib/jstl.jar" />
+               -->
+                <exclude name="apps/susidns/src/lib/standard.jar" />
+                <!-- anything added above, add in debian-tarball also -->
+            </tarfileset>
+            <tarfileset dir="../i2p-${Extended.Version}" prefix="/i2p-${release.number}" filemode="755">
+                <exclude name="debian/**" />
+                <include name="**/*.sh" />
+            </tarfileset>
+        </tar>
+    </target>
+
+    <!-- stretch+, zesty+ -->
     <!-- same as debian-tarball but with a release tar.bz2 file name and tar prefix -->
-    <target name="debian-release-tarball" depends="getExtendedVersion">
-        <!-- this will use the monotonerc file in the current workspace -->
-        <fail message="This target cannot be used without Monotone! Use &quot;fakeroot debian/rules get-orig-source&quot; instead.">
-            <condition>
-                <not>
-                    <isset property="mtn.available" />
-                </not>
-            </condition>
-        </fail>
+    <target name="debian-release-tarball" depends="getExtendedVersion, failIfNoMtn">
         <property name="debian.tarball.name" value="i2p_${release.number}.orig.tar.bz2" />
         <echo message="Checking out fresh copy into ../i2p-${Extended.Version} for tarballing:" />
         <delete dir="../i2p-${Extended.Version}" />

@@ -1,4 +1,4 @@
-# Release checklist
+# Release checklist and process
 
 ## One week before
 
@@ -25,6 +25,11 @@
   get them fixed and closed, or reclassified.
 
 - Review Google Play crash reports, fix any related issues
+
+- Initial review: Review the complete diff from the last release, fix any issues
+
+- Trial Debian build: Build and test a preliminary Debian build
+  with 'ant debian' and fix any issues
 
 
 ## A day or two before
@@ -236,6 +241,15 @@
 2. Upload the bundles to Maven Central via https://oss.sonatype.org
 
 
+### Android build
+
+1. See branch i2p.android.base for build instructions
+
+2. Upload to Google Play, F-Droid, and website
+
+3. Announce on Twitter
+
+
 ### Notify release
 
 1. Upload files to launchpad release (download mirror)
@@ -256,15 +270,18 @@
 
 4. Announce on:
   - #i2p, #i2p-dev (also on Freenode side)
-  - forum.i2p
+  - IRC
   - Twitter
 
 5. Launchpad builds
    (see debian-alt/doc/launchpad.txt for instructions)
 
-6. Debian builds
+6. Copy launchpad files to our Debian repo,
+   or build Debian packages and upload them
    (see debian-alt/doc/debian-build.txt for instructions)
 
 7. Announce Launchpad and Debian builds on Twitter
 
-8. Notify Tails that new Debian builds are available
+8. Notify downstream Debian maintainer
+
+9. (if we get back into Tails) Notify Tails that new Debian builds are available
