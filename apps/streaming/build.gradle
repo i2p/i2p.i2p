@@ -1,3 +1,5 @@
+apply plugin: 'java-library'
+
 sourceSets {
     main {
         java {
@@ -12,7 +14,7 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':apps:ministreaming')
-    testCompile project(path: ':apps:ministreaming', configuration: 'tests')
+    api project(':core')
+    api project(':apps:ministreaming')
+    testImplementation project(path: ':apps:ministreaming', configuration: 'tests')
 }

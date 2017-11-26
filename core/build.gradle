@@ -1,3 +1,5 @@
+apply plugin: 'java-library'
+
 archivesBaseName = 'i2p'
 
 sourceSets {

@@ -1,3 +1,5 @@
+apply plugin: 'java-library'
+
 sourceSets {
     main {
         java {
@@ -12,8 +14,8 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
-    testCompile project(path: ':core', configuration: 'tests')
+    api project(':core')
+    testImplementation project(path: ':core', configuration: 'tests')
 }
 
 jar {

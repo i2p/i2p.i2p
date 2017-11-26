@@ -1,3 +1,5 @@
+apply plugin: 'java-library'
+
 archivesBaseName = 'mstreaming'
 
 sourceSets {
@@ -14,7 +16,7 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':core')
+    api project(':core')
 }
 
 configurations {
