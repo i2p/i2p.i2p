@@ -8,17 +8,6 @@ Prerequisites to build from source:
 	Build environment must use a UTF-8 locale.
 
 To build:
-	Full builds are not yet possible, but the command is:
-		./gradlew assemble
-
-	gradlew will download dependencies over the clearnet by default, including
-	Gradle itself. To download over Tor, create a gradle.properties file
-	containing:
-		systemProp.socksProxyHost=localhost
-		systemProp.socksProxyPort=9150
-
-Old build system:
-(This will be deprecated once the Gradle build system is fully functional)
 	On x86 systems do:
 		ant pkg
 
@@ -29,6 +18,16 @@ Old build system:
 
 	Run 'ant' with no arguments to see other build options.
 	See INSTALL.txt or https://geti2p.net/download for installation instructions.
+
+Gradle build system:
+	Full builds are not yet possible, but the command is:
+		./gradlew assemble
+
+	gradlew will download dependencies over the clearnet by default, including
+	Gradle itself. To download over Tor, create a gradle.properties file
+	containing:
+		systemProp.socksProxyHost=localhost
+		systemProp.socksProxyPort=9150
 
 Documentation:
 	https://geti2p.net/how
