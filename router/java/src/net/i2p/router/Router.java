@@ -308,7 +308,8 @@ public class Router implements RouterClock.ClockShiftListener {
         // i2p.dir.log defaults to i2p.dir.router
         // i2p.dir.pid defaults to i2p.dir.router
         // i2p.dir.base defaults to user.dir == $CWD
-        _context = new RouterContext(this, envProps);
+        _context = new RouterContext(this, envProps, false);
+        RouterContext.setGlobalContext(_context);
         _eventLog = new EventLog(_context, new File(_context.getRouterDir(), EVENTLOG));
 
         // This is here so that we can get the directory location from the context

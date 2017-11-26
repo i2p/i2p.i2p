@@ -150,6 +150,26 @@ public class I2PAppContext {
     }
     
     /**
+     * Sets the default context, unless there is one already.
+     * NOT a public API, for use by RouterContext only, NOT for external use.
+     *
+     * @param ctx context constructed with doInit = false
+     * @return success (false if previously set)
+     * @since 0.9.33
+     */
+    protected static boolean setGlobalContext(I2PAppContext ctx) {
+        synchronized (I2PAppContext.class) {
+            if (_globalAppContext == null) {
+                _globalAppContext = ctx;
+                return true;
+            }
+        }
+        System.out.println("Warning - New context not replacing old one, you now have a second one");
+        (new Exception("I did it")).printStackTrace();
+        return false;
+    }
+
+    /**
      * Pull the default context, WITHOUT creating a new one.
      * Use this in static methods used early in router initialization,
      * where creating a context messes things up.
@@ -190,10 +210,13 @@ public class I2PAppContext {
      * additional resources and threads, and may be the cause of logging
      * problems or hard-to-isolate bugs.
      *
+     * NOT a public API, for use by RouterContext only, NOT for external use.
+     *
      * @param doInit should this context be used as the global one (if necessary)?
      *               Will only apply if there is no global context now.
+     * @since protected since 0.9.33, NOT for external use
      */
-    private I2PAppContext(boolean doInit, Properties envProps) {
+    protected I2PAppContext(boolean doInit, Properties envProps) {
       synchronized (I2PAppContext.class) { 
         _overrideProps = new I2PProperties();
         if (envProps != null)
@@ -311,12 +334,9 @@ public class I2PAppContext {
         ******/
 
         if (doInit) {
-            if (_globalAppContext == null) {
-                _globalAppContext = this;
-            } else {
-                System.out.println("Warning - New context not replacing old one, you now have a second one");
-                (new Exception("I did it")).printStackTrace();
-            }
+            // Bad practice, sets a static field to this in constructor.
+            // doInit will be false when instantiated via Router.
+            setGlobalContext(this);
         }
       } // synch
     }

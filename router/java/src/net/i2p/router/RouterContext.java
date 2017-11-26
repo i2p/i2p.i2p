@@ -84,7 +84,20 @@ public class RouterContext extends I2PAppContext {
      *  Caller MUST call initAll() after instantiation.
      */
     public RouterContext(Router router, Properties envProps) { 
-        super(filterProps(envProps));
+        this(router, envProps, true);
+    }
+
+    /**
+     *  Caller MUST call initAll() after instantiation.
+     *  NOT a public API, for use by Router only, NOT for external use.
+     *
+     *  @param doInit should this context be used as the global one (if necessary)?
+     *                Will only apply if there is no global context now.
+     *                If false, caller should call setGlobalContext() afterwards.
+     *  @since 0.9.33
+     */
+    RouterContext(Router router, Properties envProps, boolean doInit) { 
+        super(doInit, filterProps(envProps));
         _router = router;
         // Disabled here so that the router can get a context and get the
         // directory locations from it, to do an update, without having
@@ -94,7 +107,24 @@ public class RouterContext extends I2PAppContext {
         if (!_contexts.isEmpty())
             System.err.println("Warning - More than one router in this JVM");
         _finalShutdownTasks = new CopyOnWriteArraySet<Runnable>();
-        _contexts.add(this);
+        if (doInit) {
+            // Bad practice, adding this to static List in constructor.
+            // doInit will be false when instantiated via Router.
+            _contexts.add(this);
+        }
+    }
+    
+    /**
+     * Sets the default context, unless there is one already.
+     * NOT a public API, for use by Router only, NOT for external use.
+     *
+     * @param ctx context constructed with doInit = false
+     * @return success (false if previously set)
+     * @since 0.9.33
+     */
+    static boolean setGlobalContext(RouterContext ctx) {
+        _contexts.add(ctx);
+        return I2PAppContext.setGlobalContext(ctx);
     }
 
     /**

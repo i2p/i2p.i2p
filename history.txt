@@ -1,4 +1,20 @@
+2017-11-26 zzz
+ * Context: Hopefully fix rare NPE on Android (ticket #2092)
+
+2017-11-25 zzz
+ * Console:
+   - Show full logger.config path on /configlogging
+   - Don't say 'Plugin downloaded' when installing from file
+ * Debian:
+   - Replace glassfish-javaee with libtaglibs-standard-* (ticket #2093)
+   - Remove libecj-java dependency (ticket #2094)
+
+2017-11-23 zzz
+ * i2ptunnel: Add timeout to header reads for CONNECT, HTTP, and SOCKS clients
+ * Wrapper 3.5.34
+
 2017-11-22 zzz
+ * i2psnark: Fix nbsp in logs on config change (ticket #2082)
  * Streaming: Fix bug causing loopback hangs and
    preventing desired ack behavior (ticket #1939)
  * Tomcat 8.5.23
