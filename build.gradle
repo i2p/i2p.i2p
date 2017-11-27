@@ -1,11 +1,11 @@
 subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
+    apply plugin: 'idea'
 
     repositories {
         jcenter()
     }
-
 
     dependencies {
         testCompile 'junit:junit:4.+'
