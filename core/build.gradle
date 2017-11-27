@@ -6,6 +6,8 @@ sourceSets {
     main {
         java {
             srcDir 'java/src'
+            exclude 'gnu/getopt'
+            exclude 'gnu/gettext'
         }
         resources {
             srcDir 'java/src'
@@ -23,6 +25,11 @@ sourceSets {
             include 'net/i2p/crypto/eddsa/math/basePrecmp'
         }
     }
+}
+
+dependencies {
+    implementation 'gnu.getopt:java-getopt:1.0.13'
+    implementation 'org.gnu.gettext:libintl:0.18.3'
 }
 
 configurations {

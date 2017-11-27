@@ -14,4 +14,5 @@ sourceSets {
 dependencies {
     compile project(':core')
     compile project(':apps:ministreaming')
+    compile 'gnu.getopt:java-getopt:1.0.13'
 }
