@@ -2292,6 +2292,17 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.idea" />
+            <fileset dir="../i2p-${Extended.Version}/.tx" />
+            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
+            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <!-- gradle files -->
+            <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
+            <fileset dir="../i2p-${Extended.Version}/gradle" />
+            <file name="../i2p-${Extended.Version}/gradlew.bat" />
+            <file name="../i2p-${Extended.Version}/gradle.properties" />
+            <file name="../i2p-${Extended.Version}/settings.gradle" />
             <!-- gettext-base -->
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <!-- libgetopt-java -->
@@ -2356,6 +2367,18 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.idea" />
+            <fileset dir="../i2p-${Extended.Version}/.tx" />
+            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
+            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <!-- gradle files -->
+            <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
+            <fileset dir="../i2p-${Extended.Version}/gradle" />
+            <file name="../i2p-${Extended.Version}/gradlew" />
+            <file name="../i2p-${Extended.Version}/gradlew.bat" />
+            <file name="../i2p-${Extended.Version}/gradle.properties" />
+            <file name="../i2p-${Extended.Version}/settings.gradle" />
             <!-- gettext-base -->
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <!-- libgetopt-java -->
@@ -2429,6 +2452,18 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.idea" />
+            <fileset dir="../i2p-${Extended.Version}/.tx" />
+            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
+            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <!-- gradle files -->
+            <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
+            <fileset dir="../i2p-${Extended.Version}/gradle" />
+            <file name="../i2p-${Extended.Version}/gradlew" />
+            <file name="../i2p-${Extended.Version}/gradlew.bat" />
+            <file name="../i2p-${Extended.Version}/gradle.properties" />
+            <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
           <!--
@@ -2487,6 +2522,18 @@
             <fileset dir="../i2p-${Extended.Version}/installer/lib/" />
             <fileset dir="../i2p-${Extended.Version}/Slackware" />
             <fileset dir="../i2p-${Extended.Version}/_MTN" />
+            <fileset dir="../i2p-${Extended.Version}/.idea" />
+            <fileset dir="../i2p-${Extended.Version}/.tx" />
+            <file name="../i2p-${Extended.Version}/.mtn-ignore" />
+            <fileset dir="../i2p-${Extended.Version}/" includes="Docker*" />
+            <file name="../i2p-${Extended.Version}/Makefile.gcj" />
+            <!-- gradle files -->
+            <fileset dir="../i2p-${Extended.Version}/" includes="**/build.gradle" />
+            <fileset dir="../i2p-${Extended.Version}/gradle" />
+            <file name="../i2p-${Extended.Version}/gradlew" />
+            <file name="../i2p-${Extended.Version}/gradlew.bat" />
+            <file name="../i2p-${Extended.Version}/gradle.properties" />
+            <file name="../i2p-${Extended.Version}/settings.gradle" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/gettext" />
             <fileset dir="../i2p-${Extended.Version}/core/java/src/gnu/getopt" />
           <!--
