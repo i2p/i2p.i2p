@@ -46,3 +46,12 @@ sloccount.sc
 
 # but allow debian/patches
 !/debian/patches/*.(patch|diff)
+
+# IDE project files
+# Eclipse
+.classpath
+.project
+.settings/
+# IDEA
+*.iml
+

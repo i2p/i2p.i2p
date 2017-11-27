@@ -53,3 +53,12 @@ override.properties
 # Reporting
 sloccount.sc
 ^reports/
+
+# IDE project files
+# Eclipse
+/.classpath$
+/.project$
+/.settings
+# IDEA
+\.iml$
+
