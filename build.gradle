@@ -1,4 +1,5 @@
-subprojects {
+// Exclude apps/ dir itself, but include its subdirs
+configure(subprojects - project(':apps')) {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
