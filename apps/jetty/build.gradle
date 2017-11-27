@@ -9,8 +9,8 @@ sourceSets {
 }
 
 dependencies {
-    ext.jettyVersion = '9.2.21.v20170120'
-    ext.tomcatVersion = '8.0.33'
+    ext.jettyVersion = '9.2.22.v20170606'
+    ext.tomcatVersion = '8.5.23'
     compile project(':core')
     compile 'commons-logging:commons-logging:1.0.4'
     compile 'org.eclipse.jetty.orbit:javax.servlet.jsp:2.2.0.v201112011158'
@@ -29,6 +29,12 @@ dependencies {
     runtime 'org.eclipse.jetty:jetty-servlets:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-start:' + ext.jettyVersion
     runtime 'org.eclipse.jetty:jetty-webapp:' + ext.jettyVersion
-    runtime 'org.mortbay.jasper:apache-el:' + ext.tomcatVersion
-    runtime 'org.mortbay.jasper:apache-jsp:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-api:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-el-api:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-jasper:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-jasper-el:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-jsp-api:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-juli:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-util:' + ext.tomcatVersion
+    runtime 'org.apache.tomcat:tomcat-util-scan:' + ext.tomcatVersion
 }
