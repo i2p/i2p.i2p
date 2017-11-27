@@ -1,3 +1,7 @@
+2017-11-27 str4d
+ * Build: Add Gradle build scripts for compiling the codebase and generating
+   IDE project files.
+
 2017-11-26 zzz
  * Context: Hopefully fix rare NPE on Android (ticket #2092)
 
