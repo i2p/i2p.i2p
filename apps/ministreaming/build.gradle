@@ -1,0 +1,32 @@
+apply plugin: 'java-library'
+
+archivesBaseName = 'mstreaming'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+dependencies {
+    api project(':core')
+}
+
+configurations {
+    tests
+}
+task testJar(type: Jar) {
+    baseName = 'mstreaming-test'
+    dependsOn classes
+    from sourceSets.test.output
+}
+artifacts {
+    tests testJar
+}

@@ -1,0 +1,39 @@
+apply plugin: 'war'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':router')
+    compile project(':installer')
+    providedCompile project(':apps:desktopgui')
+    providedCompile project(':apps:systray')
+    providedCompile project(':apps:jetty')
+    providedCompile project(':apps:jrobin')
+}
+
+jar {
+    manifest {
+        // Top level installer will rename to jrobin.jar
+        // DTG added in 0.8.4, not in the classpath for very old installs,
+        // before we changed wrapper.config to specify *
+        // very old installs don't have i2psnark,jstl,standard in the classpath...
+        // not added in WebAppConfiguration any more
+        // All new jetty 7 jars should have been in 0.9.6, added in 0.9.7
+        attributes 'Class-Path': 'i2p.jar router.jar jrobin.jar desktopgui.jar i2psnark.jar jstl.jar standard.jar jetty-continuation.jar jetty-http.jar jetty-io.jar jetty-security.jar jetty-servlet.jar jetty-servlets.jar jetty-util.jar jetty-webapp.jar'
+    }
+}
+
+war {
+    from 'jsp'
+    // Remove classes from the classpath, they are in the jar.
+    // If we return to precompiling jsps this needs to change.
+    classpath = []
+    webXml = file('jsp/web.xml')
+}

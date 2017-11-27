@@ -19,6 +19,16 @@ To build:
 	Run 'ant' with no arguments to see other build options.
 	See INSTALL.txt or https://geti2p.net/download for installation instructions.
 
+Gradle build system:
+	Full builds are not yet possible, but the command is:
+		./gradlew assemble
+
+	gradlew will download dependencies over the clearnet by default, including
+	Gradle itself. To download over Tor, create a gradle.properties file
+	containing:
+		systemProp.socksProxyHost=localhost
+		systemProp.socksProxyPort=9150
+
 Documentation:
 	https://geti2p.net/how
 	API: http://docs.i2p-projekt.de/javadoc/

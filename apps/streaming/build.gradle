@@ -1,0 +1,20 @@
+apply plugin: 'java-library'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+    }
+}
+
+dependencies {
+    api project(':core')
+    api project(':apps:ministreaming')
+    testImplementation project(path: ':apps:ministreaming', configuration: 'tests')
+}

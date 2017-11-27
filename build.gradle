@@ -1,0 +1,31 @@
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+
+    repositories {
+        jcenter()
+    }
+
+
+    dependencies {
+        testCompile 'junit:junit:4.+'
+        testCompile 'org.hamcrest:hamcrest-library:1.3'
+        testCompile 'org.mockito:mockito-core:2.11.0'
+    }
+
+    jar {
+        manifest {
+            attributes 'Implementation-Version': '0.9.31-7'
+        }
+    }
+
+    sourceCompatibility = 1.7
+    // Set i2pBootClasspath=/path/to/rt.jar:/path/to/jce.jar in ~/.gradle/gradle.properties if needed
+    if (i2pBootClasspath) {
+        tasks.withType(AbstractCompile, { AbstractCompile ac ->
+            ac.options.bootstrapClasspath = files(i2pBootClasspath)
+        })
+    }
+}
+
+//apply from: file('gradle/update.gradle')

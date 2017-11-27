@@ -1,0 +1,38 @@
+apply plugin: 'java-library'
+
+archivesBaseName = 'i2p'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+        resources {
+            srcDir 'java/src'
+            include 'gnu/getopt/*.properties'
+        }
+    }
+    test {
+        java {
+            srcDir 'java/test/junit'
+        }
+        resources {
+            srcDir 'java/test/junit'
+            include 'net/i2p/crypto/eddsa/test.data'
+            include 'net/i2p/crypto/eddsa/math/baseDblPrecmp'
+            include 'net/i2p/crypto/eddsa/math/basePrecmp'
+        }
+    }
+}
+
+configurations {
+    tests
+}
+task testJar(type: Jar) {
+    baseName = 'i2p-test'
+    dependsOn classes
+    from sourceSets.test.output
+}
+artifacts {
+    tests testJar
+}
