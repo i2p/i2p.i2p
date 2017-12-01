@@ -1,8 +1,19 @@
+2017-12-01 zzz
+ * Build: Split net.i2p.router.web into two packages
+ * Console: Move /configkeyring HTML to console, fix deletion,
+   don't truncate hashes, better form errors, tag for translation (ticket #2108)
+ * Streaming: Double the RTO on congestion (ticket #1939)
+
+2017-11-27 zzz
+ * Debian: Exclude gradle, IntelliJ, Docker, .tx, gcj files from source tarballs
+
 2017-11-27 str4d
  * Build: Add Gradle build scripts for compiling the codebase and generating
    IDE project files.
 
 2017-11-26 zzz
+ * Build: Add xenial build option
+ * Console: Safer processing of changes on /configadvanced
  * Context: Hopefully fix rare NPE on Android (ticket #2092)
 
 2017-11-25 zzz
