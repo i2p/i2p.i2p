@@ -490,7 +490,8 @@ public class LeaseSet extends DatabaseEntry {
         //    _log.warn("decrypting lease: " + _destination.calculateHash());
         int size = _leases.size();
         if (size < 2)
-            throw new DataFormatException("Bad number of leases for decryption");
+            throw new DataFormatException("Bad number of leases decrypting " + _destination.toBase32() +
+                                          " - is this destination encrypted?");
         int datalen = DATA_LEN * size;
         ByteArrayOutputStream baos = new ByteArrayOutputStream(datalen);
         for (int i = 0; i < size; i++) {
@@ -539,10 +540,12 @@ public class LeaseSet extends DatabaseEntry {
                 _decrypted = true;
             } catch (DataFormatException dfe) {
                 Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
-                log.error("Error decrypting lease: " + _destination.calculateHash(), dfe);
+                log.error("Error decrypting " + _destination.toBase32() +
+                          " - is this destination encrypted?", dfe);
             } catch (IOException ioe) {
                 Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
-                log.error("Error decrypting lease: " + _destination.calculateHash(), ioe);
+                log.error("Error decrypting " + _destination.toBase32() +
+                          " - is this destination encrypted?", ioe);
             }
         }
         _checked = true;
