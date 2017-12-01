@@ -16,11 +16,10 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.router.RouterContext;
-import net.i2p.router.web.ConfigClientsHelper;
 import net.i2p.router.web.ConfigUpdateHandler;
-import net.i2p.router.web.LogsHelper;
 import net.i2p.router.web.Messages;
 import net.i2p.router.web.PluginStarter;
+import net.i2p.router.web.RouterConsoleRunner;
 import net.i2p.update.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
@@ -387,7 +386,7 @@ class PluginUpdateRunner extends UpdateRunner {
             _appName = appName;
             _newVersion = version;
 
-            String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
+            String minVersion = PluginStarter.stripHTML(props, "min-i2p-version");
             if (minVersion != null &&
                 VersionComparator.comp(CoreVersion.VERSION, minVersion) < 0) {
                 to.delete();
@@ -395,7 +394,7 @@ class PluginUpdateRunner extends UpdateRunner {
                 return;
             }
 
-            minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
+            minVersion = PluginStarter.stripHTML(props, "min-java-version");
             if (minVersion != null &&
                 VersionComparator.comp(System.getProperty("java.version"), minVersion) < 0) {
                 to.delete();
@@ -436,22 +435,22 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _t("Downloaded plugin version {0} is not newer than installed plugin", version) + "</b>");
                     return;
                 }
-                minVersion = ConfigClientsHelper.stripHTML(props, "min-installed-version");
+                minVersion = PluginStarter.stripHTML(props, "min-installed-version");
                 if (minVersion != null &&
                     VersionComparator.comp(minVersion, oldVersion) > 0) {
                     to.delete();
                     statusDone("<b>" + _t("Plugin update requires installed plugin version {0} or higher", minVersion) + "</b>");
                     return;
                 }
-                String maxVersion = ConfigClientsHelper.stripHTML(props, "max-installed-version");
+                String maxVersion = PluginStarter.stripHTML(props, "max-installed-version");
                 if (maxVersion != null &&
                     VersionComparator.comp(maxVersion, oldVersion) < 0) {
                     to.delete();
                     statusDone("<b>" + _t("Plugin update requires installed plugin version {0} or lower", maxVersion) + "</b>");
                     return;
                 }
-                oldVersion = LogsHelper.jettyVersion();
-                minVersion = ConfigClientsHelper.stripHTML(props, "min-jetty-version");
+                oldVersion = RouterConsoleRunner.jettyVersion();
+                minVersion = PluginStarter.stripHTML(props, "min-jetty-version");
                 if (minVersion != null &&
                     VersionComparator.comp(minVersion, oldVersion) > 0) {
                     to.delete();
@@ -465,7 +464,7 @@ class PluginUpdateRunner extends UpdateRunner {
                     statusDone("<b>" + _t("Plugin requires Jetty version {0} or lower", "8.9999") + "</b>");
                     return;
                 }
-                maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
+                maxVersion = PluginStarter.stripHTML(props, "max-jetty-version");
                 if (maxVersion != null &&
                     VersionComparator.comp(maxVersion, oldVersion) < 0) {
                     to.delete();
@@ -536,10 +535,10 @@ class PluginUpdateRunner extends UpdateRunner {
                 // start everything unless it was disabled and not running before
                 try {
                     if (PluginStarter.startPlugin(_context, appName)) {
-                        String linkName = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(_context));
+                        String linkName = PluginStarter.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(_context));
                         if (linkName == null)
-                           linkName = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
-                        String linkURL = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
+                           linkName = PluginStarter.stripHTML(props, "consoleLinkName");
+                        String linkURL = PluginStarter.stripHTML(props, "consoleLinkURL");
                         String link;
                         if (linkName != null && linkURL != null)
                             link = "<a target=\"_blank\" href=\"" + linkURL + "\"/>" + linkName + ' ' + version + "</a>";

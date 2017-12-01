@@ -13,6 +13,7 @@ import java.util.concurrent.Semaphore;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import static net.i2p.router.web.GraphConstants.*;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.FileUtil;
@@ -79,8 +80,8 @@ public class StatSummarizer implements Runnable {
         }
     }
     
-    /** @since 0.8.7 */
-    static boolean isDisabled() {
+    /** @since 0.8.7, public since 0.9.33, was package private */
+    public static boolean isDisabled() {
         return _instance == null || _instance._isDisabled;
     }
     
@@ -96,10 +97,14 @@ public class StatSummarizer implements Runnable {
         }
     }
 
-    /** list of SummaryListener instances */
-    List<SummaryListener> getListeners() { return _listeners; }
+    /**
+     *  List of SummaryListener instances
+     *  @since public since 0.9.33, was package private
+     */
+    public List<SummaryListener> getListeners() { return _listeners; }
     
-    static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
+    /**  @since public since 0.9.33, was package private */
+    public static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
                                                     ",bw.recvRate.60000" +
 //                                                  ",tunnel.testSuccessTime.60000" +
 //                                                  ",udp.outboundActiveCount.60000" +
@@ -174,7 +179,7 @@ public class StatSummarizer implements Runnable {
     }
 
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
-        return renderPng(rate, out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
+        return renderPng(rate, out, DEFAULT_X, DEFAULT_Y,
                          false, false, false, false, -1, 0, true); 
     }
 
@@ -220,14 +225,14 @@ public class StatSummarizer implements Runnable {
     private boolean locked_renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend,
                                           boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount,
                                           int end, boolean showCredit) throws IOException {
-        if (width > GraphHelper.MAX_X)
-            width = GraphHelper.MAX_X;
+        if (width > MAX_X)
+            width = MAX_X;
         else if (width <= 0)
-            width = GraphHelper.DEFAULT_X;
-        if (height > GraphHelper.MAX_Y)
-            height = GraphHelper.MAX_Y;
+            width = DEFAULT_X;
+        if (height > MAX_Y)
+            height = MAX_Y;
         else if (height <= 0)
-            height = GraphHelper.DEFAULT_Y;
+            height = DEFAULT_Y;
         if (end < 0)
             end = 0;
         for (SummaryListener lsnr : _listeners) {
@@ -321,14 +326,14 @@ public class StatSummarizer implements Runnable {
         if (txLsnr == null || rxLsnr == null)
             throw new IOException("no rates for combined graph");
 
-        if (width > GraphHelper.MAX_X)
-            width = GraphHelper.MAX_X;
+        if (width > MAX_X)
+            width = MAX_X;
         else if (width <= 0)
-            width = GraphHelper.DEFAULT_X;
-        if (height > GraphHelper.MAX_Y)
-            height = GraphHelper.MAX_Y;
+            width = DEFAULT_X;
+        if (height > MAX_Y)
+            height = MAX_Y;
         else if (height <= 0)
-            height = GraphHelper.DEFAULT_Y;
+            height = DEFAULT_Y;
         txLsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount,
                          end, showCredit, rxLsnr, _t("Bandwidth usage"));
         return true;
@@ -337,8 +342,9 @@ public class StatSummarizer implements Runnable {
     /**
      * @param specs statName.period,statName.period,statName.period
      * @return list of Rate objects
+     * @since public since 0.9.33, was package private
      */
-    Set<Rate> parseSpecs(String specs) {
+    public Set<Rate> parseSpecs(String specs) {
         if (specs == null)
             return Collections.emptySet();
         StringTokenizer tok = new StringTokenizer(specs, ",");

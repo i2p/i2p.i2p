@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
-import net.i2p.router.web.HomeHelper.App;
+import net.i2p.router.web.App;
 
 public class NavHelper {
     private static final Map<String, String> _apps = new ConcurrentHashMap<String, String>(4);
@@ -91,12 +91,12 @@ public class NavHelper {
      *  For HomeHelper
      *  @param ctx unused
      *  @return non-null, possibly empty
-     *  @since 0.9
+     *  @since 0.9, public since 0.9.33, was package private
      */
-    static List<HomeHelper.App> getClientApps(I2PAppContext ctx) {
+    public static List<App> getClientApps(I2PAppContext ctx) {
         if (_apps.isEmpty())
             return Collections.emptyList();
-        List<HomeHelper.App> rv = new ArrayList<App>(_apps.size());
+        List<App> rv = new ArrayList<App>(_apps.size());
         for (Map.Entry<String, String> e : _apps.entrySet()) {
             String name = e.getKey();
             String path = e.getValue();
@@ -113,7 +113,7 @@ public class NavHelper {
                 icon = "/themes/console/images/email.png";
             else
                 icon = "/themes/console/images/plugin.png";
-            HomeHelper.App app = new HomeHelper.App(name, tip, path, icon);
+            App app = new App(name, tip, path, icon);
             rv.add(app);
         }
         return rv;

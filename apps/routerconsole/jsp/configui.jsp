@@ -19,7 +19,7 @@ input.default {
 
 <%@include file="summary.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigUIHelper" id="uihelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHelper" id="uihelper" scope="request" />
 <jsp:setProperty name="uihelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h1><%=uihelper._t("I2P UI Configuration")%></h1>
@@ -27,7 +27,7 @@ input.default {
 
  <%@include file="confignav.jsi" %>
 
- <jsp:useBean class="net.i2p.router.web.ConfigUIHandler" id="formhandler" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ConfigUIHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
 <h3 id="themeheading"><%=uihelper._t("Router Console Theme")%></h3>
  <form action="" method="POST">

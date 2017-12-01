@@ -12,13 +12,13 @@
 
 <%@include file="summary.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigNetHelper" id="nethelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigNetHelper" id="nethelper" scope="request" />
 <jsp:setProperty name="nethelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <h1><%=intl._t("I2P Bandwidth Configuration")%></h1>
 <div class="main" id="config_bandwidth">
  <%@include file="confignav.jsi" %>
 
- <jsp:useBean class="net.i2p.router.web.ConfigNetHandler" id="formhandler" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ConfigNetHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>">

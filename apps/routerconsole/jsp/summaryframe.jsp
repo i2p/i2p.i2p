@@ -43,7 +43,7 @@
                     } catch(InterruptedException ie) {}
                 }
             }
-            long timeleft = net.i2p.router.web.ConfigRestartBean.getRestartTimeRemaining();
+            long timeleft = net.i2p.router.web.helpers.ConfigRestartBean.getRestartTimeRemaining();
             long delay = 60;
             try { delay = Long.parseLong(d); } catch (NumberFormatException nfe) {}
             if (delay*1000 < timeleft + 5000)

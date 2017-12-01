@@ -9,7 +9,7 @@
 <script src="/js/ajax.js" type="text/javascript"></script>
 <%@include file="summaryajax.jsi" %>
 </head><body onload="initAjax()">
-<jsp:useBean class="net.i2p.router.web.ConfigLoggingHelper" id="logginghelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigLoggingHelper" id="logginghelper" scope="request" />
 <jsp:setProperty name="logginghelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <%@include file="summary.jsi" %>
@@ -17,7 +17,7 @@
 <div class="main" id="config_logging">
  <%@include file="confignav.jsi" %>
 
- <jsp:useBean class="net.i2p.router.web.ConfigLoggingHandler" id="formhandler" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ConfigLoggingHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >

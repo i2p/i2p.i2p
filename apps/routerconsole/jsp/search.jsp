@@ -5,7 +5,7 @@
    if (request.getCharacterEncoding() == null)
        request.setCharacterEncoding("UTF-8");
 %>
-<jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.SearchHelper" id="searchhelper" scope="request" />
 <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="searchhelper" property="engine" value="<%=request.getParameter(\"engine\")%>" />
 <jsp:setProperty name="searchhelper" property="query" value="<%=request.getParameter(\"query\")%>" />

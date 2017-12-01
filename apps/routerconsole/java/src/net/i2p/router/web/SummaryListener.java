@@ -28,8 +28,9 @@ import org.jrobin.core.Sample;
  *
  *  @since 0.6.1.13
  */
-class SummaryListener implements RateSummaryListener {
-    static final String PROP_PERSISTENT = "routerconsole.graphPersistent";
+public class SummaryListener implements RateSummaryListener {
+    /** @since public since 0.9.33, was package private */
+    public static final String PROP_PERSISTENT = "routerconsole.graphPersistent";
     /** note that .jrb files are NOT compatible with .rrd files */
     static final String RRD_DIR = "rrd";
     private static final String RRD_PREFIX = "rrd-";
@@ -51,7 +52,8 @@ class SummaryListener implements RateSummaryListener {
     
     static final int PERIODS = 60 * 24;  // 1440
     private static final int MIN_ROWS = PERIODS;
-    static final int MAX_ROWS = 91 * MIN_ROWS;
+    /** @since public since 0.9.33, was package private */
+    public static final int MAX_ROWS = 91 * MIN_ROWS;
     private static final long THREE_MONTHS = 91l * 24 * 60 * 60 * 1000;
     
     public SummaryListener(Rate r) {

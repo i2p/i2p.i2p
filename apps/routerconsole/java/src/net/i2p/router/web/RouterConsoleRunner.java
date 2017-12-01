@@ -288,6 +288,11 @@ public class RouterConsoleRunner implements RouterApp {
         return _server;
     }
 
+    /** @since 0.8.13, moved from LogsHelper in 0.9.33 */
+    public static String jettyVersion() {
+        return Server.getVersion();
+    }
+
     private void startTrayApp() {
         // if no permissions, don't even try
         // isLaunchedAsService() always returns true on Linux

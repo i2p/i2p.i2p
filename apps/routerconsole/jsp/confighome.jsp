@@ -21,9 +21,9 @@ input.default {
 <div class="main" id="config_homepage">
 <%@include file="confignav.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigHomeHandler" id="formhandler" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigHomeHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
-<jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h3 class="tabletitle"><%=intl._t("Default Home Page")%></h3>

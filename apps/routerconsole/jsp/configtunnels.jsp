@@ -11,12 +11,12 @@
 
 <%@include file="summary.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
 <jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <h1><%=intl._t("I2P Tunnel Configuration")%></h1>
 <div class="main" id="config_tunnels">
  <%@include file="confignav.jsi" %>
- <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ConfigTunnelsHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <p id="tunnelconfig" class="infowarn">
  <%=intl._t("The default settings work for most people.")%> 

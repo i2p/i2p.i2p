@@ -6,7 +6,7 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("events")%>
- <jsp:useBean class="net.i2p.router.web.EventLogHelper" id="eventHelper" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.EventLogHelper" id="eventHelper" scope="request" />
  <jsp:setProperty name="eventHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% /* GraphHelper sets the defaults in setContextId, so setting the properties must be after the context */ %>
  <jsp:setProperty name="eventHelper" property="*" />

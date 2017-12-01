@@ -52,8 +52,9 @@ public class WebAppStarter {
      *  Prior to 0.9.28, was not guaranteed to throw on failure.
      *
      *  @throws Exception just about anything, caller would be wise to catch Throwable
+     *  @since public since 0.9.33, was package private
      */
-    static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
+    public static void startWebApp(RouterContext ctx, ContextHandlerCollection server,
                             String appName, String warPath) throws Exception {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
          WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
@@ -138,8 +139,9 @@ public class WebAppStarter {
     /**
      *  Stop it and remove the context.
      *  Throws just about anything, caller would be wise to catch Throwable
+     *  @since public since 0.9.33, was package private
      */
-    static void stopWebApp(String appName) {
+    public static void stopWebApp(String appName) {
         ContextHandler wac = getWebApp(appName);
         if (wac == null)
             return;
@@ -156,7 +158,8 @@ public class WebAppStarter {
         } catch (IllegalStateException ise) {}
     }
 
-    static boolean isWebAppRunning(String appName) {
+    /** @since public since 0.9.33; was package private */
+    public static boolean isWebAppRunning(String appName) {
         ContextHandler wac = getWebApp(appName);
         if (wac == null)
             return false;
@@ -182,8 +185,11 @@ public class WebAppStarter {
         return null;
     }
 
-    /** see comments in ConfigClientsHandler */
-    static ContextHandlerCollection getConsoleServer() {
+    /**
+     *  See comments in ConfigClientsHandler
+     *  @since public since 0.9.33, was package private
+     */
+    public static ContextHandlerCollection getConsoleServer() {
         Server s = RouterConsoleRunner.getConsoleServer();
         if (s == null)
             return null;

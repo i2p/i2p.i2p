@@ -16,12 +16,12 @@
     <!-- precompiled servlets -->
 
     <servlet>
-      <servlet-name>net.i2p.router.web.CodedIconRendererServlet</servlet-name>
-      <servlet-class>net.i2p.router.web.CodedIconRendererServlet</servlet-class>
+      <servlet-name>net.i2p.router.web.helpers.CodedIconRendererServlet</servlet-name>
+      <servlet-class>net.i2p.router.web.helpers.CodedIconRendererServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-      <servlet-name>net.i2p.router.web.CodedIconRendererServlet</servlet-name>
+      <servlet-name>net.i2p.router.web.helpers.CodedIconRendererServlet</servlet-name>
       <url-pattern>/Plugins/*</url-pattern>
     </servlet-mapping>
 

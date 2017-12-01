@@ -17,14 +17,14 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 
 <%@include file="summary.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigClientsHelper" id="clientshelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigClientsHelper" id="clientshelper" scope="request" />
 <jsp:setProperty name="clientshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="clientshelper" property="edit" value="<%=request.getParameter(\"edit\")%>" />
 <h1><%=intl._t("Plugin Configuration")%></h1>
 <div class="main" id="config_plugins">
  <%@include file="confignav.jsi" %>
 
- <jsp:useBean class="net.i2p.router.web.ConfigClientsHandler" id="formhandler" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ConfigClientsHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <div class="configure">
 <%

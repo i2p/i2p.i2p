@@ -5,7 +5,7 @@ import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
-class ContextHelper {
+public class ContextHelper {
 
     /** @throws IllegalStateException if no context available */
     public static RouterContext getContext(String contextId) {

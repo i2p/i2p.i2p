@@ -21,12 +21,12 @@ input.default {
 <div class="main" id="config_summarybar">
 <%@include file="confignav.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigSummaryHandler" id="formhandler" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigSummaryHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
 <%
     formhandler.setMovingAction();
 %>
-<jsp:useBean class="net.i2p.router.web.SummaryHelper" id="summaryhelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.SummaryHelper" id="summaryhelper" scope="request" />
 <jsp:setProperty name="summaryhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h3 class="tabletitle"><%=intl._t("Refresh Interval")%></h3>

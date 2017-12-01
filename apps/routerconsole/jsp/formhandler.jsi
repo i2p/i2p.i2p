@@ -6,7 +6,7 @@
      *  Included ~15 times, keep whitespace to a minimum
      *
      *  Include this directly after the line:
-     *  <jsp:useBean class="net.i2p.router.web.xxxHandler" id="formhandler" scope="request" />
+     *  <jsp:useBean class="net.i2p.router.web.helpers.xxxHandler" id="formhandler" scope="request" />
      */
 
     // This initializes the RouterContext - must be the first thing

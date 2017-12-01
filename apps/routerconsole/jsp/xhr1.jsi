@@ -1,11 +1,11 @@
-<%@page import="net.i2p.router.web.SummaryHelper" %>
+<%@page import="net.i2p.router.web.helpers.SummaryHelper" %>
 <%
 /*
  * Note:
  * This is included on every refresh, so keep whitespace etc. to a minimum.
  */
 %>
-<jsp:useBean class="net.i2p.router.web.SummaryHelper" id="helper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.SummaryHelper" id="helper" scope="request" />
 <jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="helper" property="action" value="<%=request.getParameter(\"action\")%>" />
 <jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter(\"updateNonce\")%>" />
@@ -24,7 +24,7 @@
  * only need the reseedNonce property.
  */
 %>
-<jsp:useBean class="net.i2p.router.web.ReseedHandler" id="reseed" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ReseedHandler" id="reseed" scope="request" />
 <jsp:setProperty name="reseed" property="*" />
 <%
 /*

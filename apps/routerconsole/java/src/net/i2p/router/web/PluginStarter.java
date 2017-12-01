@@ -87,7 +87,10 @@ public class PluginStarter implements Runnable {
         _context = ctx;
     }
 
-    static boolean pluginsEnabled(I2PAppContext ctx) {
+    /**
+     *  @since public since 0.9.33, was package private
+     */
+    public static boolean pluginsEnabled(I2PAppContext ctx) {
          return ctx.getBooleanPropertyDefaultTrue("router.enablePlugins");
     }
 
@@ -106,9 +109,9 @@ public class PluginStarter implements Runnable {
 
     /**
      *  threaded
-     *  @since 0.8.13
+     *  @since 0.8.13, public since 0.9.33, was package private
      */
-    static void updateAll(RouterContext ctx) {
+    public static void updateAll(RouterContext ctx) {
         Thread t = new I2PAppThread(new PluginUpdater(ctx), "PluginUpdater", true);
         t.start();
     }
@@ -316,7 +319,7 @@ public class PluginStarter implements Runnable {
         // For the following, we use the exact same translated strings as in PluginUpdateRunner
         // to avoid duplication
 
-        String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
+        String minVersion = stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
             VersionComparator.comp(CoreVersion.VERSION, minVersion) < 0) {
             String foo = "Plugin " + appName + " requires I2P version " + minVersion + " or higher";
@@ -326,7 +329,7 @@ public class PluginStarter implements Runnable {
             throw new Exception(foo);
         }
 
-        minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
+        minVersion = stripHTML(props, "min-java-version");
         if (minVersion != null &&
             VersionComparator.comp(System.getProperty("java.version"), minVersion) < 0) {
             String foo = "Plugin " + appName + " requires Java version " + minVersion + " or higher";
@@ -336,8 +339,8 @@ public class PluginStarter implements Runnable {
             throw new Exception(foo);
         }
 
-        String jVersion = LogsHelper.jettyVersion();
-        minVersion = ConfigClientsHelper.stripHTML(props, "min-jetty-version");
+        String jVersion = RouterConsoleRunner.jettyVersion();
+        minVersion = stripHTML(props, "min-jetty-version");
         if (minVersion != null &&
             VersionComparator.comp(minVersion, jVersion) > 0) {
             String foo = "Plugin " + appName + " requires Jetty version " + minVersion + " or higher";
@@ -348,7 +351,7 @@ public class PluginStarter implements Runnable {
         }
 
         String blacklistVersion = jetty9Blacklist.get(appName);
-        String curVersion = ConfigClientsHelper.stripHTML(props, "version");
+        String curVersion = stripHTML(props, "version");
         if (blacklistVersion != null &&
             VersionComparator.comp(curVersion, blacklistVersion) <= 0) {
             String foo = "Plugin " + appName + " requires Jetty version 8.9999 or lower";
@@ -358,7 +361,7 @@ public class PluginStarter implements Runnable {
             throw new Exception(foo);
         }
 
-        String maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
+        String maxVersion = stripHTML(props, "max-jetty-version");
         if (maxVersion != null &&
             VersionComparator.comp(maxVersion, jVersion) < 0) {
             String foo = "Plugin " + appName + " requires Jetty version " + maxVersion + " or lower";
@@ -379,7 +382,7 @@ public class PluginStarter implements Runnable {
                 String name = tfiles[i].getName();
                 if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i]))) {
                     // deprecated
-                    ctx.router().setConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name, tfiles[i].getAbsolutePath());
+                    ctx.router().setConfigSetting(CSSHelper.PROP_THEME_PFX + name, tfiles[i].getAbsolutePath());
                     // we don't need to save
                 }
             }
@@ -438,7 +441,7 @@ public class PluginStarter implements Runnable {
                     }
                 }
                 // Check for iconfile in plugin.properties
-                String icfile = ConfigClientsHelper.stripHTML(props, "console-icon");
+                String icfile = stripHTML(props, "console-icon");
                 if (icfile != null && !icfile.contains("..")) {
                     StringBuilder buf = new StringBuilder(32);
                     buf.append('/').append(appName);
@@ -481,14 +484,14 @@ public class PluginStarter implements Runnable {
             }
         }
         // add summary bar link
-        String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
+        String name = stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
-            name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
-        String url = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
+            name = stripHTML(props, "consoleLinkName");
+        String url = stripHTML(props, "consoleLinkURL");
         if (name != null && url != null && name.length() > 0 && url.length() > 0) {
-            String tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
+            String tip = stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
             if (tip == null)
-                tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip");
+                tip = stripHTML(props, "consoleLinkTooltip");
             NavHelper.registerApp(name, url, tip, iconfile);
         }
 
@@ -546,9 +549,9 @@ public class PluginStarter implements Runnable {
 
         // remove summary bar link
         Properties props = pluginProperties(ctx, appName);
-        String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
+        String name = stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
-            name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
+            name = stripHTML(props, "consoleLinkName");
         if (name != null && name.length() > 0)
             NavHelper.unregisterApp(name);
 
@@ -557,8 +560,11 @@ public class PluginStarter implements Runnable {
         return true;
     }
 
-    /** @return true on success - caller should call stopPlugin() first */
-    static boolean deletePlugin(RouterContext ctx, String appName) throws Exception {
+    /**
+     *  @return true on success - caller should call stopPlugin() first
+     *  @since public since 0.9.33, was package private
+     */
+    public static boolean deletePlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getConfigDir(), PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
@@ -584,7 +590,7 @@ public class PluginStarter implements Runnable {
             for (int i = 0; i < tfiles.length; i++) {
                 String name = tfiles[i].getName();
                 if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i]))) {
-                    removes.add(ConfigUIHelper.PROP_THEME_PFX + name);
+                    removes.add(CSSHelper.PROP_THEME_PFX + name);
                     if (name.equals(current))
                         changes.put(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
                 }
@@ -1031,6 +1037,19 @@ public class PluginStarter implements Runnable {
         Method method = urlClass.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(urlClassLoader, new Object[]{u});
+    }
+
+    /**
+     *  Like in DataHelper but doesn't convert null to ""
+     *  There's a lot worse things a plugin could do but...
+     *  @since moved from ConfigClientsHelper in 0.9.33
+     */
+    public static String stripHTML(Properties props, String key) {
+        String orig = props.getProperty(key);
+        if (orig == null) return null;
+        String t1 = orig.replace('<', ' ');
+        String rv = t1.replace('>', ' ');
+        return rv;
     }
 
     /**

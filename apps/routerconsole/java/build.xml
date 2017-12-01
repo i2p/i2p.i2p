@@ -123,7 +123,7 @@
     <target name="jar1" depends="compile, bundle-news, bundle-countries, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.j.tr" value="" />
-        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" excludes="net/i2p/router/web/helpers/*">
             <manifest>
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <!-- very old installs don't have i2psnark,jstl,standard in the classpath... not added in WebAppConfiguration any more -->
@@ -169,7 +169,7 @@
             <compilerarg line="${javac.compilerargs}" />
         </javac>
         <!-- jar again to get the latest messages_*.class files -->
-        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/messages_*.class" update="true" />
     </target>
 
     <target name="jarUpToDate">
@@ -312,6 +312,7 @@
                 <attribute name="X-Compile-Source-JDK" value="${javac.version}" />
                 <attribute name="X-Compile-Target-JDK" value="${javac.version}" />
             </manifest>
+            <classes dir="./build/obj" includes="net/i2p/router/web/helpers/*" />
         </war>
     </target>
 
@@ -387,8 +388,7 @@
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
-                <pathelement location="build/routerconsole.jar" />
-                <pathelement location="build/" />
+                <pathelement location="build/obj/" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
@@ -427,8 +427,7 @@
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
-                <pathelement location="build/routerconsole.jar" />
-                <pathelement location="build" />
+                <pathelement location="build/obj/" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>

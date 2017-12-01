@@ -9,7 +9,8 @@ import net.i2p.util.Translate;
 public class Messages extends Translate {
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
-    static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
+    /** @since public since 0.9.33, was package private */
+    public static final String COUNTRY_BUNDLE_NAME = "net.i2p.router.countries.messages";
 
     /** lang in routerconsole.lang property, else current locale */
     public static String getString(String key, I2PAppContext ctx) {

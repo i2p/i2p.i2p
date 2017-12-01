@@ -12,7 +12,7 @@
 
 <%@include file="summary.jsi" %>
 
-<jsp:useBean class="net.i2p.router.web.ConfigAdvancedHelper" id="advancedhelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigAdvancedHelper" id="advancedhelper" scope="request" />
 <jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <h1><%=intl._t("I2P Advanced Configuration")%></h1>
@@ -20,7 +20,7 @@
 
  <%@include file="confignav.jsi" %>
 
- <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHandler" id="formhandler" scope="request" />
+ <jsp:useBean class="net.i2p.router.web.helpers.ConfigAdvancedHandler" id="formhandler" scope="request" />
 <%@include file="formhandler.jsi" %>
  <div class="configure">
  <div class="wideload">

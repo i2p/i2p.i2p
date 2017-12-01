@@ -4,6 +4,23 @@
 The router console user interface, implemented in routerconsole.jar, with these classes
 supporting the webapp in routerconsole.war.
 Entry point is RouterConsoleRunner, started from clients.config.
+</p><p>
+Most jsp pages in the console use a "Helper" or a "Renderer" class to
+assist in generating the HTML.
+For configuration pages that accept changes via POST, there
+is additionally a "Handler" class to process the POST data.
+Helpers usually extend <a href="HelperBase.html">HelperBase</a>,
+and Handlers usually extend <a href="FormHandler.html">FormHandler</a>.
+The base classes are in this package, but most Helpers, Handlers, and Renderers are in
+<a href="helpers/package-summary.html">the helpers package</a>.
+</p><p>
+This package was split in release 0.9.33, with most of the helpers and handlers
+moved to net.i2p.router.web.console,
+and moving them from routerconsole.war to routerconsole.jar.
+</p><p>
+No classes contained here are part of a public API.
+Subject to change.
+Not for public use.
 </p>
 </body>
 </html>

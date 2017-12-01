@@ -1,4 +1,4 @@
-<jsp:useBean class="net.i2p.router.web.ReseedGenerator" id="gen" scope="request" /><jsp:setProperty name="gen" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" /><%
+<jsp:useBean class="net.i2p.router.web.helpers.ReseedGenerator" id="gen" scope="request" /><jsp:setProperty name="gen" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" /><%
 /*
  * USE CAUTION WHEN EDITING
  * Trailing whitespace OR NEWLINE on the last line will cause

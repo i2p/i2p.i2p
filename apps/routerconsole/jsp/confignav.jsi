@@ -3,7 +3,7 @@
      *  Included ~10 times, keep whitespace to a minimum
      */
 %>
-<jsp:useBean class="net.i2p.router.web.ConfigNavHelper" id="navHelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.ConfigNavHelper" id="navHelper" scope="request" />
 <jsp:setProperty name="navHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% navHelper.storeWriter(out); %>
 <div class="confignav" id="confignav">

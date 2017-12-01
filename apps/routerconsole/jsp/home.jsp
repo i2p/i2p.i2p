@@ -54,7 +54,7 @@
 %>
 
 <div class="main" id="home">
-<jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
+<jsp:useBean class="net.i2p.router.web.helpers.HomeHelper" id="homehelper" scope="request" />
 <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% if (homehelper.shouldShowWelcome()) { %>
 <div class="welcome" title="<%=intl._t("Click a flag to select a language. Click 'Configure UI' below to change it later.")%>">
@@ -106,7 +106,7 @@
       </td><td align="left">
         <button type="submit" value="search" class="search"><%=intl._t("Search")%></button>
       </td><td align="left">
-        <jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
+        <jsp:useBean class="net.i2p.router.web.helpers.SearchHelper" id="searchhelper" scope="request" />
         <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
         <jsp:getProperty name="searchhelper" property="selector" />
       </td></tr></table>

@@ -18,6 +18,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.EventLog;
+import static net.i2p.router.web.GraphConstants.*;
 import net.i2p.util.Log;
 import net.i2p.util.SystemVersion;
 
@@ -74,8 +75,8 @@ class SummaryRenderer {
             RrdGraphDef def = template.getRrdGraphDef();
             def.setTimeSpan(start/1000, end/1000); // ignore the periods in the template
             // FIXME not clear how to get the height and width from the template
-            int width = GraphHelper.DEFAULT_X;
-            int height = GraphHelper.DEFAULT_Y;
+            int width = DEFAULT_X;
+            int height = DEFAULT_Y;
             def.setWidth(width);
             def.setHeight(height);
 
@@ -97,7 +98,7 @@ class SummaryRenderer {
 *****/
     }
 
-    public void render(OutputStream out) throws IOException { render(out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
+    public void render(OutputStream out) throws IOException { render(out, DEFAULT_X, DEFAULT_Y,
                                                                      false, false, false, false, -1, 0, false); }
 
     /**

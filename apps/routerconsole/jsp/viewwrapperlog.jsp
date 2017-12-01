@@ -7,7 +7,7 @@
  * Do not tag this file for translation.
  */
 net.i2p.I2PAppContext ctx = net.i2p.I2PAppContext.getGlobalContext();
-java.io.File f = net.i2p.router.web.LogsHelper.wrapperLogFile(ctx);
+java.io.File f = net.i2p.router.web.ConfigServiceHandler.wrapperLogFile(ctx);
 long length = f.length();
 if (length <= 0 || !f.isFile()) {
     response.sendError(404, "Not Found");
