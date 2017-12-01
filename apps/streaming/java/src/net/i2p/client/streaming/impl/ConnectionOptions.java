@@ -607,6 +607,19 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             _rto = (int)Connection.MAX_RESEND_DELAY;
     }
     
+    /** 
+     * Double the RTO (after congestion).
+     * See RFC 6298 section 5 item 5.5
+     *
+     * @since 0.9.33
+     */
+    synchronized void doubleRTO() {
+        // we don't need to switch on _initState, _rto is set in constructor
+        _rto *= 2;
+        if (_rto > Connection.MAX_RESEND_DELAY)
+            _rto = (int)Connection.MAX_RESEND_DELAY;
+    }
+    
     /**
      * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have
      * 3 consecutive rtt decreases, we are trending downwards (-1), else we're stable.

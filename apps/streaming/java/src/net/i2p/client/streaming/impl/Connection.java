@@ -1495,8 +1495,12 @@ class Connection {
                         if (newWindowSize <= 0)
                             newWindowSize = 1;
                         
-                        // setRTT has its own ceiling
-                        //getOptions().setRTT(getOptions().getRTT() + 10*1000);
+                        // The timeout for _this_ packet will be doubled below, but we also
+                        // need to double the RTO for the _next_ packets.
+                        // See RFC 6298 section 5 item 5.5
+                        // This prevents being stuck at a window size of 1, retransmitting every packet,
+                        // never updating the RTT or RTO.
+                        getOptions().doubleRTO();
                         getOptions().setWindowSize(newWindowSize);
 
                         if (_log.shouldLog(Log.INFO))
