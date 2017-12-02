@@ -75,6 +75,7 @@ class ConnectionPacketHandler {
                           + packet + " on " + con + "");
             // this is fine, half-close
             // Major bug before 0.9.9, packets were dropped here and a reset sent
+            // If we are fully closed, will handle that in the canAccept test below
         }
 
         if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
@@ -108,12 +109,20 @@ class ConnectionPacketHandler {
         }
         
         if (!con.getInputStream().canAccept(seqNum, packet.getPayloadSize())) {
-            if (_log.shouldWarn())
-                _log.warn("Inbound buffer exceeded on connection " + con +
-                          ", choking and dropping " + packet);
-            // this will call ackImmediately()
-            con.setChoking(true);
-            // TODO we could still process the acks for this packet before discarding
+            if (con.getInputStream().isLocallyClosed()) {
+                if (_log.shouldWarn())
+                    _log.warn("More data received after local close on connection " + con +
+                              ", sending reset and dropping " + packet);
+                // the following will send a RESET
+                con.disconnect(false);
+            } else {
+                if (_log.shouldWarn())
+                    _log.warn("Inbound buffer exceeded on connection " + con +
+                              ", choking and dropping " + packet);
+                // this will call ackImmediately()
+                con.setChoking(true);
+                // TODO we could still process the acks for this packet before discarding
+            }
             packet.releasePayload();
             return;
         } // else we will call setChoking(false) below
