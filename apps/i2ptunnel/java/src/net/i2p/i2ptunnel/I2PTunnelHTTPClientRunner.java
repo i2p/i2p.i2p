@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.util.List;
 
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.util.Log;
 
 /**
  * Override the response with a stream filtering the HTTP headers
@@ -52,42 +51,22 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
                          Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException {
         try { 
             i2pin.close();
-        } catch (IOException ioe) {
-            // ignore
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Unable to close the i2p socket input stream: " + i2pin, ioe);
-        }
+        } catch (IOException ioe) {}
         try { 
             i2pout.close();
-        } catch (IOException ioe) {
-            // ignore
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Unable to close the i2p socket output stream: " + i2pout, ioe);
-        }
+        } catch (IOException ioe) {}
         try { 
             in.close();
-        } catch (IOException ioe) { 
-            // ignore
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Unable to close the browser input stream: " + in, ioe);
-        }
+        } catch (IOException ioe) {}
         try { 
             out.close(); 
-        } catch (IOException ioe) { 
-            // ignore
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Unable to close the browser output stream: " + out, ioe);
-        }
+        } catch (IOException ioe) {}
         try { 
             i2ps.close();
-        } catch (IOException ioe) { 
-            // ignore
-        }
+        } catch (IOException ioe) {}
         try { 
             s.close();
-        } catch (IOException ioe) { 
-            // ignore
-        }
+        } catch (IOException ioe) {}
         t1.join(30*1000);
         // t2 = fromI2P now run inline
         //t2.join(30*1000);
