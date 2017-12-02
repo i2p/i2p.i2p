@@ -17,6 +17,9 @@ sourceSets {
     test {
         java {
             srcDir 'java/test/junit'
+            exclude 'net/i2p/AllCoreTests.java'
+            exclude 'net/i2p/data/DataTestSuite.java'
+            exclude 'net/i2p/data/i2cp/I2CPTestSuite.java'
         }
         resources {
             srcDir 'java/test/junit'

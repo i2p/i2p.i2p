@@ -8,6 +8,11 @@ package net.i2p.data;
  *
  */
 
+import static org.junit.Assert.*;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for loading / storing Lease objects
@@ -15,6 +20,10 @@ package net.i2p.data;
  * @author jrandom
  */
 public class LeaseSetTest extends StructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     public DataStructure createDataStructure() throws DataFormatException {
         LeaseSet leaseSet = new LeaseSet();
         leaseSet.setDestination((Destination)(new DestinationTest()).createDataStructure());
@@ -25,50 +34,48 @@ public class LeaseSetTest extends StructureTest {
         return leaseSet; 
     }
     public DataStructure createStructureToRead() { return new LeaseSet(); }
-    
-    public void testGetLeaseInvalid() {
+
+    @Test
+    public void failsToGetLeaseWhenEmpty() {
         // create test subject
         LeaseSet subj = new LeaseSet();
-        
-        // should contain no leases now..
-        try {
-            assertNull(subj.getLease(0));
-        } catch(RuntimeException exc) {
-            // all good
-        }
-        
-        // this shouldn't work either
-        try {
-            assertNull(subj.getLease(-1));
-        } catch(RuntimeException exc) {
-            // all good
-        }
+
+        // should contain no leases now.
+        exception.expect(IndexOutOfBoundsException.class);
+        exception.expectMessage("Index: 0, Size: 0");
+        subj.getLease(0);
     }
-    
+
+    @Test
+    public void failsToGetInvalidLease() {
+        // create test subject
+        LeaseSet subj = new LeaseSet();
+
+        // this shouldn't work either
+        exception.expect(IndexOutOfBoundsException.class);
+        exception.expectMessage("-1");
+        subj.getLease(-1);
+    }
+
+    @Test
     public void testAddLeaseNull() {
         // create test subject
         LeaseSet subj = new LeaseSet();
-        
+
         // now add an null lease
-        try {
-            subj.addLease(null);
-            fail("Failed at failing.");
-        } catch(IllegalArgumentException exc) {
-            // all good
-        }
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("erm, null lease");
+        subj.addLease(null);
     }
-    
+
+    @Test
     public void testAddLeaseInvalid() {
         // create test subject
         LeaseSet subj = new LeaseSet();
-        
+
         // try to add completely invalid lease(ie. no data)
-        try {
-            subj.addLease(new Lease());
-            fail("Failed at failing.");
-        } catch(IllegalArgumentException exc) {
-            // all good
-        }
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("erm, lease has no gateway");
+        subj.addLease(new Lease());
     }
-            
 }

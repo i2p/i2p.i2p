@@ -8,23 +8,19 @@ package net.i2p;
  *
  */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite;
+import org.junit.runner.RunWith;
 
 /**
- * @author Comwiz
+ * @author str4d
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    net.i2p.client.I2PClientTestSuite.class,
+    net.i2p.crypto.CryptoTestSuite.class,
+    net.i2p.data.DataTestSuite.class,
+    net.i2p.stat.StatTestSuite.class,
+    net.i2p.util.UtilTestSuite.class,
+})
 public class AllCoreTests {
-    
-    public static Test suite() {
-        TestSuite suite = new TestSuite("net.i2p.AllCoreTests");
-        
-        suite.addTest(net.i2p.client.I2PClientTestSuite.suite());
-        suite.addTest(net.i2p.crypto.CryptoTestSuite.suite());
-        suite.addTest(net.i2p.data.DataTestSuite.suite());
-        suite.addTest(net.i2p.stat.StatTestSuite.suite());
-        suite.addTest(net.i2p.util.UtilTestSuite.suite());
-        
-        return suite;
-    }
 }

@@ -8,32 +8,33 @@ package net.i2p.data;
  *
  */
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Test harness for the date structure
  *
  * @author jrandom
  */
-public class UnsignedIntegerTest extends TestCase{
-    
+public class UnsignedIntegerTest {
+    @Test
     public void testLong() throws Exception{
         byte[] temp = null;
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         DataHelper.writeLong(baos, 4, 42);
         temp = baos.toByteArray();
-        
-        
+
         long l;
         ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        
+
         l = DataHelper.readLong(bais, 4);
-        
+
         assertEquals(42, l);
     }
 }

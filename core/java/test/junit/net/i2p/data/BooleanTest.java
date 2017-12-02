@@ -8,34 +8,36 @@ package net.i2p.data;
  *
  */
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Test harness for the boolean structure
  *
  * @author jrandom
  */
-public class BooleanTest extends TestCase{
-    
+public class BooleanTest {
     @SuppressWarnings("deprecation")
+    @Test
     public void testBoolean() throws Exception{
         byte[] temp = null;
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         DataHelper.writeBoolean(baos, Boolean.TRUE);
         temp = baos.toByteArray();
-        
-        
+
+
         Boolean b = null;
         ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        
+
         b = DataHelper.readBoolean(bais);
-        
+
         assertEquals(Boolean.TRUE, b);
     }
-    
+
 }

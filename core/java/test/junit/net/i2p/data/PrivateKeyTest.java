@@ -8,8 +8,14 @@ package net.i2p.data;
  *
  */
  
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for loading / storing PrivateKey objects
@@ -17,6 +23,10 @@ import java.io.ByteArrayOutputStream;
  * @author jrandom
  */
 public class PrivateKeyTest extends StructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     public DataStructure createDataStructure() throws DataFormatException {
         PrivateKey privateKey = new PrivateKey();
         byte data[] = new byte[PrivateKey.KEYSIZE_BYTES];
@@ -26,69 +36,59 @@ public class PrivateKeyTest extends StructureTest {
         return privateKey; 
     }
     public DataStructure createStructureToRead() { return new PrivateKey(); }
-    
+
+    @Test
     public void testBase64Constructor() throws Exception{
         PrivateKey privateKey = new PrivateKey();
         byte data[] = new byte[PrivateKey.KEYSIZE_BYTES];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%56);
         privateKey.setData(data);
-        
+
         PrivateKey key2 = new PrivateKey(privateKey.toBase64());
         assertEquals(privateKey, key2);
     }
-    
+
+    @Test
     public void testNullEquals(){
         PrivateKey privateKey = new PrivateKey();
         byte data[] = new byte[PrivateKey.KEYSIZE_BYTES];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%56);
         privateKey.setData(data);
-        
+
         assertFalse(privateKey.equals(null));
     }
-    
+
+    @Test
     public void testNullData() throws Exception{
         PrivateKey privateKey = new PrivateKey();
         privateKey.toString();
-        
-        boolean error = false;
-        try{
-            privateKey.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("No data to write out");
+        privateKey.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testShortData() throws Exception{
         PrivateKey privateKey = new PrivateKey();
         byte data[] = new byte[56];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i);
-        
-        boolean error = false;
-        try{
-            privateKey.setData(data);
-            privateKey.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }catch(IllegalArgumentException exc) {
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Bad data length: 56; required: " + PrivateKey.KEYSIZE_BYTES);
+        privateKey.setData(data);
     }
-    
+
+    @Test
     public void testShortRead() throws Exception{
         PrivateKey privateKey = new PrivateKey();
         ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("six times nine equals forty-two"));
-        boolean error = false;
-        try{
-            privateKey.readBytes(in);
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("EOF reading PrivateKey, read: 31, required: " + PrivateKey.KEYSIZE_BYTES);
+        privateKey.readBytes(in);
     }
-    
 }

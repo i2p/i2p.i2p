@@ -8,33 +8,35 @@ package net.i2p.data;
  *
  */
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Test harness for the date structure
  *
  * @author jrandom
  */
-public class StringTest extends TestCase{
-    
+public class StringTest {
+    @Test
     public void testString() throws Exception{
         byte[] temp = null;
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         DataHelper.writeString(baos, "Hello, I2P");
         temp = baos.toByteArray();
-        
-        
+
+
         String s = null;
         ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        
+
         s = DataHelper.readString(bais);
-        
+
         assertEquals(s, "Hello, I2P");
     }
-    
+
 }

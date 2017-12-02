@@ -8,8 +8,14 @@ package net.i2p.data;
  *
  */
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for loading / storing Lease objects
@@ -17,6 +23,10 @@ import java.util.Date;
  * @author jrandom
  */
 public class LeaseTest extends StructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     public DataStructure createDataStructure() throws DataFormatException {
         Lease lease = new Lease();
         lease.setEndDate(new Date(1000*60*2));
@@ -24,7 +34,7 @@ public class LeaseTest extends StructureTest {
         lease.setGateway(new Hash(h));
         StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
-        
+
         return lease; 
     }
     public DataStructure createStructureToRead() { return new Lease(); }
@@ -37,54 +47,54 @@ public class LeaseTest extends StructureTest {
         lease.setGateway(new Hash(h));
         StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
-        
+
         lease.getNumSuccess();
         lease.getNumFailure();
     }
     */
 
+    @Test
     public void testExpiration() throws Exception{
         Lease lease = new Lease();
         assertTrue(lease.isExpired());
-        
+
         lease.setEndDate(new Date(1000*60*2));
         byte h[] = new byte[Hash.HASH_LENGTH];
         lease.setGateway(new Hash(h));
         StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
-        
+
         assertTrue(lease.isExpired());
     }
-    
-    public void testNullWrite() throws Exception{
+
+    @Test
+    public void failsWriteWithNullTunnelId() throws Exception{
         Lease lease = new Lease();
         lease.setEndDate(new Date(1000*60*2));
         byte h[] = new byte[Hash.HASH_LENGTH];
         lease.setGateway(new Hash(h));
         lease.setTunnelId(null);
-        boolean error = false;
-        try{
-            lease.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
-        
-        lease = new Lease();
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("Not enough data to write out a Lease");
+        lease.writeBytes(new ByteArrayOutputStream());
+    }
+
+    @Test
+    public void failsWriteWithNullGateway() throws Exception{
+        Lease lease = new Lease();
         lease.setEndDate(new Date(1000*60*2));
-        h = new byte[Hash.HASH_LENGTH];
+        byte h[] = new byte[Hash.HASH_LENGTH];
         lease.setGateway(null);
         StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
-        error = false;
-        try{
-            lease.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("Not enough data to write out a Lease");
+        lease.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testNullEquals() throws Exception{
         Lease lease = new Lease();
         lease.setEndDate(new Date(1000*60*2));
@@ -93,5 +103,4 @@ public class LeaseTest extends StructureTest {
         lease.setTunnelId(null);
         assertFalse(lease.equals(null));
     }
-    
 }

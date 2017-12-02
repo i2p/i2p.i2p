@@ -8,8 +8,14 @@ package net.i2p.data;
  *
  */
  
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for loading / storing SigningPrivateKey objects
@@ -17,6 +23,10 @@ import java.io.ByteArrayOutputStream;
  * @author jrandom
  */
 public class SigningPrivateKeyTest extends StructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     public DataStructure createDataStructure() throws DataFormatException {
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         byte data[] = new byte[SigningPrivateKey.KEYSIZE_BYTES];
@@ -26,70 +36,60 @@ public class SigningPrivateKeyTest extends StructureTest {
         return signingPrivateKey; 
     }
     public DataStructure createStructureToRead() { return new SigningPrivateKey(); }
-    
+
+    @Test
     public void testBase64Constructor() throws Exception{
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         byte data[] = new byte[SigningPrivateKey.KEYSIZE_BYTES];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%56);
         signingPrivateKey.setData(data);
-        
+
         SigningPrivateKey key2 = new SigningPrivateKey(signingPrivateKey.toBase64());
         assertEquals(signingPrivateKey, key2);
     }
-    
+
+    @Test
     public void testNullEquals(){
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         byte data[] = new byte[SigningPrivateKey.KEYSIZE_BYTES];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%56);
         signingPrivateKey.setData(data);
-        
+
         assertFalse(signingPrivateKey.equals(null));
     }
-    
+
+    @Test
     public void testNullData() throws Exception{
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         signingPrivateKey.toString();
-        
-        boolean error = false;
-        try{
-            signingPrivateKey.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("No data to write out");
+        signingPrivateKey.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testShortData() throws Exception{
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         byte data[] = new byte[56];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i);
-        
-        boolean error = false;
-        try{
-            signingPrivateKey.setData(data);
-            signingPrivateKey.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }catch(IllegalArgumentException exc) {
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Bad data length: 56; required: " + SigningPrivateKey.KEYSIZE_BYTES);
+        signingPrivateKey.setData(data);
+        signingPrivateKey.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testShortRead() throws Exception{
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("short"));
-        boolean error = false;
-        try{
-            signingPrivateKey.readBytes(in);
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("EOF reading SigningPrivateKey, read: 5, required: " + SigningPrivateKey.KEYSIZE_BYTES);
+        signingPrivateKey.readBytes(in);
     }
-    
-    
 }

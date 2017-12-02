@@ -8,49 +8,64 @@ package net.i2p.data;
  *
  */
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test harness for the simple data structure
  *
  * @author welterde
  */
-public class SimpleDataStructureTest extends TestCase {
-    
-    public void testSetDataImmutable() throws Exception {
+public class SimpleDataStructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void setDataThrowsOnNullAfterDataSet() throws Exception {
         // create new test subject
         TestStruct struct = new TestStruct();
-        
+
         // try to set null object.. should not fail..
         struct.setData(null);
-        
+
         // set data to something
         struct.setData(new byte[3]);
-        
+
         // now setting it to null should fail
-        try {
-            struct.setData(null);
-            fail("Should not have allowed us to change this..");
-        } catch(RuntimeException exc) {
-            // all good
-        }
-        
-        // setting it to something non-null should fail as well.
-        try {
-            struct.setData(new byte[3]);
-            fail("Should not have allowed us to change this..");
-        } catch(RuntimeException exc) {
-            // all good
-        }
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Data already set");
+        struct.setData(null);
     }
-    
+
+    @Test
+    public void setDataThrowsOnDataAfterDataSet() throws Exception {
+        // create new test subject
+        TestStruct struct = new TestStruct();
+
+        // try to set null object.. should not fail..
+        struct.setData(null);
+
+        // set data to something
+        struct.setData(new byte[3]);
+
+        // setting it to something non-null should fail.
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Data already set");
+        struct.setData(new byte[3]);
+    }
+
+    @Test
     public void testReadBytesImmutable() throws Exception {
         // create new test subject
         TestStruct struct = new TestStruct();
-        
+
         // load some data using setData
         struct.setData(new byte[3]);
-        
+
         // now try to load via readBytes
         try {
             struct.readBytes(null);
@@ -59,35 +74,37 @@ public class SimpleDataStructureTest extends TestCase {
             // all good
         }
     }
-    
+
+    @Test
     public void testToBase64Safe() throws Exception {
         // create new test subject
         TestStruct struct = new TestStruct();
-        
+
         // now try to get the Base64.. should not throw an exception, but should not be an empty string either
         assertNull(struct.toBase64());
     }
 
+    @Test
     public void testCalculateHashSafe() throws Exception {
         // create new test subject
         TestStruct struct = new TestStruct();
-        
+
         // now try to get the hash.. should not throw an exception
         assertNull(struct.calculateHash());
     }
-    
+
+    @Test
     public void testHashCodeSafe() throws Exception {
         // create new test subject
         TestStruct struct = new TestStruct();
-        
+
         // just make sure it doesn't explode in our face
         struct.hashCode();
     }
-    
+
     public class TestStruct extends SimpleDataStructure {
         public int length() {
             return 3;
         }
     }
-    
 }

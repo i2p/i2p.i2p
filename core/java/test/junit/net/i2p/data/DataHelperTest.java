@@ -1,5 +1,7 @@
 package net.i2p.data;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,18 +10,19 @@ import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * basic unit tests for the DataHelper
  *
  */
-public class DataHelperTest extends TestCase{
-    
+public class DataHelperTest {
+
     /**
      * Test to/from/read/writeLong with every 1, 2, and 4 byte value, as
      * well as some 8 byte values.
      */
+    @Test
     public void testLong() throws Exception{
         for (int i = 0; i <= 0xFF; i+=4)
             checkLong(1, i);
@@ -43,18 +46,19 @@ public class DataHelperTest extends TestCase{
         byte extract2[] = new byte[numBytes];
         DataHelper.toLong(extract2, 0, numBytes, value);
         assertTrue(DataHelper.eq(extract, extract2));
-        
+
         long read = DataHelper.fromLong(extract, 0, numBytes);
         assertTrue(read == value);
-        
+
         ByteArrayInputStream bais = new ByteArrayInputStream(written);
         read = DataHelper.readLong(bais, numBytes);
         assertTrue(read == value);
         read = DataHelper.fromLong(written, 0, numBytes);
         assertTrue(read == value);
-        
+
     }
 
+    @Test
     public void testDate() throws Exception{
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -65,10 +69,10 @@ public class DataHelperTest extends TestCase{
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         checkDate(cal.getTime());
-        
+
         cal.set(Calendar.SECOND, 1);
         checkDate(cal.getTime());
-        
+
         cal.set(Calendar.YEAR, 1999);
         cal.set(Calendar.MONTH, 11);
         cal.set(Calendar.DAY_OF_MONTH, 31);
@@ -76,7 +80,7 @@ public class DataHelperTest extends TestCase{
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         checkDate(cal.getTime());
-        
+
         cal.set(Calendar.YEAR, 2000);
         cal.set(Calendar.MONTH, 0);
         cal.set(Calendar.DAY_OF_MONTH, 1);
@@ -84,10 +88,10 @@ public class DataHelperTest extends TestCase{
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         checkDate(cal.getTime());
-        
+
         cal.setTimeInMillis(System.currentTimeMillis());
         checkDate(cal.getTime());
-        
+
         cal.set(Calendar.SECOND, cal.get(Calendar.SECOND)+10);
         checkDate(cal.getTime());
 
@@ -105,7 +109,7 @@ public class DataHelperTest extends TestCase{
         }
         assertTrue(error);
     }
-    
+
     @SuppressWarnings("deprecation")
     private void checkDate(Date when) throws Exception{
         byte buf[] = new byte[DataHelper.DATE_LENGTH];
@@ -115,7 +119,8 @@ public class DataHelperTest extends TestCase{
         Date time = DataHelper.fromDate(buf, 0);
         assertEquals(when.getTime(), time.getTime());
     }
-    
+
+    @Test
     public void testCompress() throws Exception{
         Random r = new Random();
         for (int size = 0; size < 32*1024; size+=32){   // Original had size++, changed value because
@@ -125,10 +130,10 @@ public class DataHelperTest extends TestCase{
             byte compressed[] = DataHelper.compress(data);
             byte decompressed[] = DataHelper.decompress(compressed);
             assertTrue(DataHelper.eq(data, decompressed));
-            
         }
     }
 
+    @Test
     public void testSkip() throws Exception {
         final int sz = 256;
         TestInputStream tis = new TestInputStream(sz);
@@ -137,9 +142,9 @@ public class DataHelperTest extends TestCase{
             DataHelper.skip(tis, 1);
             fail();
         } catch (IOException ioe) {}
-        
+
         DataHelper.skip(tis, 0);
-        
+
         try {
             DataHelper.skip(tis, -1);
             fail("skipped negative?");

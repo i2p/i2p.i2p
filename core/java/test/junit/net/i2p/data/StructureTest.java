@@ -8,10 +8,12 @@ package net.i2p.data;
  *
  */
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Utility class for wrapping data structure tests
@@ -19,32 +21,33 @@ import junit.framework.TestCase;
  * @author jrandom
  */
 
-public abstract class StructureTest extends TestCase{
-    
+public abstract class StructureTest {
+
     /** create a populated structure for writing */
     public abstract DataStructure createDataStructure() throws DataFormatException;
 
     /** create an unpopulated structure for reading */
     public abstract DataStructure createStructureToRead();
-    
+
+    @Test
     public void testStructure() throws Exception{
         byte[] temp = null;
-        
+
         DataStructure orig;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         orig = createDataStructure();
         orig.writeBytes(baos);
-        
-        
+
+
         temp = baos.toByteArray();
-        
+
         DataStructure ds;
         ByteArrayInputStream bais = new ByteArrayInputStream(temp);
-        
+
         ds = createStructureToRead();
         ds.readBytes(bais);
-        
+
 
         // I2CP message classes don't implement equals()
         if (!getClass().getName().startsWith("net.i2p.data.i2cp."))
@@ -56,5 +59,4 @@ public abstract class StructureTest extends TestCase{
         byte[] temp2 = baos2.toByteArray();
         assert(DataHelper.eq(temp, temp2));
     }
-    
 }
