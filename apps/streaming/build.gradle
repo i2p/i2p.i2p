@@ -9,6 +9,9 @@ sourceSets {
     test {
         java {
             srcDir 'java/test/junit'
+            exclude {
+                it.name.endsWith('IT.java')
+            }
         }
     }
 }
