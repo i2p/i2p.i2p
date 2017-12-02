@@ -20,6 +20,7 @@ import junit.framework.TestCase;
  */
 public class BooleanTest extends TestCase{
     
+    @SuppressWarnings("deprecation")
     public void testBoolean() throws Exception{
         byte[] temp = null;
         

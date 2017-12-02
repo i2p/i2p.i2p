@@ -72,7 +72,6 @@ public class Lease extends DataStructureImpl {
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease were successful.
      *
-     * @deprecated unused
      */
 /****
     public int getNumSuccess() {
@@ -80,7 +79,6 @@ public class Lease extends DataStructureImpl {
     }
 ****/
 
-    /** @deprecated unused */
 /****
     public void setNumSuccess(int num) {
         _numSuccess = num;
@@ -91,7 +89,6 @@ public class Lease extends DataStructureImpl {
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease failed.
      *
-     * @deprecated unused
      */
 /****
     public int getNumFailure() {
@@ -99,7 +96,6 @@ public class Lease extends DataStructureImpl {
     }
 ****/
 
-    /** @deprecated unused */
 /****
     public void setNumFailure(int num) {
         _numFailure = num;

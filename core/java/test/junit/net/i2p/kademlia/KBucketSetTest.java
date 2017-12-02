@@ -129,7 +129,7 @@ public class KBucketSetTest extends TestCase{
     /** @since 0.9.10 */
     public void testGenRandom() {
         int errors = 0;
-        for (KBucket b : set.getBuckets()) {
+        for (KBucket<Hash> b : set.getBuckets()) {
             for (int j = 0; j < 4000; j++) {
                 Hash rand = set.generateRandomKey(b);
                 int range = set.getRange(rand);

@@ -45,6 +45,7 @@ public class AES256Test extends TestCase{
         }
     }
     
+    @SuppressWarnings("deprecation")
     public void testLong(){
         I2PAppContext ctx = new I2PAppContext();
         SessionKey key = ctx.keyGenerator().generateSessionKey();

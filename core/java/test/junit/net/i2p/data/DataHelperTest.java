@@ -106,6 +106,7 @@ public class DataHelperTest extends TestCase{
         assertTrue(error);
     }
     
+    @SuppressWarnings("deprecation")
     private void checkDate(Date when) throws Exception{
         byte buf[] = new byte[DataHelper.DATE_LENGTH];
         DataHelper.toDate(buf, 0, when.getTime());

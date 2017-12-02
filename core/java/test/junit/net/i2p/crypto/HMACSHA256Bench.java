@@ -47,7 +47,8 @@ public class HMACSHA256Bench {
         }
         private static void runTest(I2PAppContext ctx) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
-		Hash asdfs = ctx.hmac().calculate(key, "qwerty".getBytes());
+        byte[] output = new byte[32];
+		ctx.hmac().calculate(key, "qwerty".getBytes(), 0, 6, output, 0);
 			
 		int times = 100000;
 		long shorttime = 0;
@@ -70,7 +71,7 @@ public class HMACSHA256Bench {
 		long minLong1 = 0;
 		long maxLong1 = 0;
         
-		byte[] smess = new String("abc").getBytes();
+		byte[] smess = "abc".getBytes();
 		StringBuilder buf = new StringBuilder();
 		for (int x = 0; x < 2*1024; x++) {
 			buf.append("a");
@@ -83,27 +84,27 @@ public class HMACSHA256Bench {
 		byte[] lmess = DataHelper.getASCII(buf.toString());
 
 		// warm up the engines
-        ctx.hmac().calculate(key, smess);
-        ctx.hmac().calculate(key, mmess);
-        ctx.hmac().calculate(key, lmess);
+        ctx.hmac().calculate(key, smess, 0, smess.length, output, 0);
+        ctx.hmac().calculate(key, mmess, 0, mmess.length, output, 0);
+        ctx.hmac().calculate(key, lmess, 0, lmess.length, output, 0);
         
         long before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, smess);
+            ctx.hmac().calculate(key, smess, 0, smess.length, output, 0);
         long after = System.currentTimeMillis();
         
         display(times, before, after, smess.length, "3 byte");
         
         before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, mmess);
+            ctx.hmac().calculate(key, mmess, 0, mmess.length, output, 0);
         after = System.currentTimeMillis();
 
         display(times, before, after, mmess.length, "2KB");
         
         before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, lmess);
+            ctx.hmac().calculate(key, lmess, 0, lmess.length, output, 0);
         after = System.currentTimeMillis();
 
         display(times, before, after, lmess.length, "10KB");

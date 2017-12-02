@@ -180,10 +180,10 @@ public class ElGamalTest extends TestCase{
         SessionKey key = _context.sessionKeyManager().getCurrentKey(pubKey);
         if (key == null)
             key = _context.sessionKeyManager().createSession(pubKey);
-        byte[] encrypted = _context.elGamalAESEngine().encrypt(DataHelper.getASCII(msg), pubKey, key, 64);
+        byte[] encrypted = _context.elGamalAESEngine().encrypt(DataHelper.getASCII(msg), pubKey, key, null, null, 64);
         byte[] decrypted = null;
         try{
-            decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey);
+            decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey, _context.sessionKeyManager());
         }catch(DataFormatException dfe){
             dfe.printStackTrace();
             fail();
@@ -267,10 +267,10 @@ public class ElGamalTest extends TestCase{
             if (key == null)
                 key = _context.sessionKeyManager().createSession(pubKey);
             
-            byte[] encrypted = _context.elGamalAESEngine().encrypt(msg, pubKey, key, 1024);
+            byte[] encrypted = _context.elGamalAESEngine().encrypt(msg, pubKey, key, null, null, 1024);
             byte[] decrypted = null;
             try{
-                decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey);
+                decrypted = _context.elGamalAESEngine().decrypt(encrypted, privKey, _context.sessionKeyManager());
             }catch(DataFormatException dfe){
                 dfe.printStackTrace();
                 fail();
@@ -343,8 +343,8 @@ public class ElGamalTest extends TestCase{
                 for (int j = 0; j < 5; j++)
                     tags.add(new SessionTag(true));
             }
-            byte encrypted[] = e.encrypt(DataHelper.getASCII("blah"), pubKey, sessionKey, tags, 1024);
-            byte decrypted[] = e.decrypt(encrypted, privKey);
+            byte encrypted[] = e.encrypt(DataHelper.getASCII("blah"), pubKey, sessionKey, tags, null, 1024);
+            byte decrypted[] = e.decrypt(encrypted, privKey, _context.sessionKeyManager());
             assertEquals("blah", new String(decrypted));
                 
             ctx.sessionKeyManager().tagsDelivered(pubKey, sessionKey, tags);

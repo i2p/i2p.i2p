@@ -19,6 +19,7 @@ public class SimpleStatDumper {
         _log.log(logLevel, buf.toString());
     }
 
+    @SuppressWarnings("deprecation")
     private static void dumpFrequencies(I2PAppContext ctx, StringBuilder buf) {
         Set<String> frequencies = new TreeSet<String>(ctx.statManager().getFrequencyNames());
         for (String name : frequencies) {

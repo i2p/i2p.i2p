@@ -28,7 +28,8 @@ public class HMACSHA256Test extends TestCase{
             size*=2;
             _context.random().nextBytes(message);
             
-            _context.hmac().calculate(key, message);
+            byte[] output = new byte[32];
+            _context.hmac().calculate(key, message, 0, message.length, output, 0);
         }
     }
 }
