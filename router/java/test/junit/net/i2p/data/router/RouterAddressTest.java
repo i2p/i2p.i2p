@@ -8,8 +8,14 @@ package net.i2p.data.router;
  *
  */
  
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -22,6 +28,10 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class RouterAddressTest extends StructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     public DataStructure createDataStructure() throws DataFormatException {
         //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         OrderedProperties options = new OrderedProperties();
@@ -33,44 +43,37 @@ public class RouterAddressTest extends StructureTest {
     public DataStructure createStructureToRead() { return new RouterAddress(); }
 
     @SuppressWarnings("deprecation")
+    @Test
     public void testSetNullOptions(){
         RouterAddress addr = new RouterAddress();
-        boolean error = false;
-        try{
-            addr.setOptions(null);
-        }catch(NullPointerException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(NullPointerException.class);
+        addr.setOptions(null);
     }
 
     @SuppressWarnings("deprecation")
+    @Test
     public void testSetOptionsAgain(){
         OrderedProperties options = new OrderedProperties();
         options.setProperty("hostname", "localhost");
         options.setProperty("portnum", "1234");
         RouterAddress addr = new RouterAddress("Blah", options, 42);
         options.setProperty("portnum", "2345");
-        boolean error = false;
-        try{
-            addr.setOptions(options);
-        }catch(IllegalStateException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(IllegalStateException.class);
+        addr.setOptions(options);
     }
 
+    @Test
     public void testBadWrite() throws Exception{
         RouterAddress addr = new RouterAddress();
-        boolean error = false;
-        try{
-            addr.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("uninitialized");
+        addr.writeBytes(new ByteArrayOutputStream());
     }
 
+    @Test
     public void testNullEquals(){
         //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         OrderedProperties options = new OrderedProperties();
@@ -81,6 +84,7 @@ public class RouterAddressTest extends StructureTest {
         assertFalse(addr.equals(""));
     }
 
+    @Test
     public void testToString(){
         //addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
         OrderedProperties options = new OrderedProperties();

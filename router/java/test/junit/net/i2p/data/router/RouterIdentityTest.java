@@ -8,7 +8,13 @@ package net.i2p.data.router;
  *
  */
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.CertificateTest;
@@ -26,6 +32,10 @@ import net.i2p.data.StructureTest;
  * @author jrandom
  */
 public class RouterIdentityTest extends StructureTest {
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     public DataStructure createDataStructure() throws DataFormatException {
         RouterIdentity ident = new RouterIdentity();
         Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
@@ -37,7 +47,8 @@ public class RouterIdentityTest extends StructureTest {
         return ident;
     }
     public DataStructure createStructureToRead() { return new RouterIdentity(); }
-    
+
+    @Test
     public void testNullCert() throws Exception{
         RouterIdentity ident = new RouterIdentity();
         ident.setCertificate(null);
@@ -45,16 +56,13 @@ public class RouterIdentityTest extends StructureTest {
         ident.setPublicKey(pk);
         SigningPublicKey k = (SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure();
         ident.setSigningPublicKey(k);
-        
-        boolean error = false;
-        try{
-            ident.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("Not enough data to format the router identity");
+        ident.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testNullPublicKey() throws Exception{
         RouterIdentity ident = new RouterIdentity();
         Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
@@ -62,17 +70,13 @@ public class RouterIdentityTest extends StructureTest {
         ident.setPublicKey(null);
         SigningPublicKey k = (SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure();
         ident.setSigningPublicKey(k);
-        
-        boolean error = false;
-        try{
-            ident.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
-        
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("Not enough data to format the router identity");
+        ident.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testNullSigningKey() throws Exception{
         RouterIdentity ident = new RouterIdentity();
         Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
@@ -80,21 +84,19 @@ public class RouterIdentityTest extends StructureTest {
         PublicKey pk = (PublicKey)(new PublicKeyTest()).createDataStructure();
         ident.setPublicKey(pk);
         ident.setSigningPublicKey(null);
-        
-        boolean error = false;
-        try{
-            ident.writeBytes(new ByteArrayOutputStream());
-        }catch(DataFormatException dfe){
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(DataFormatException.class);
+        exception.expectMessage("Not enough data to format the router identity");
+        ident.writeBytes(new ByteArrayOutputStream());
     }
-    
+
+    @Test
     public void testNullEquals() throws Exception{
         RouterIdentity ident = new RouterIdentity();
         assertFalse(ident.equals(null));
     }
-    
+
+    @Test
     public void testCalculatedHash() throws Exception{
         RouterIdentity ident = new RouterIdentity();
         Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
@@ -103,24 +105,20 @@ public class RouterIdentityTest extends StructureTest {
         ident.setPublicKey(pk);
         SigningPublicKey k = (SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure();
         ident.setSigningPublicKey(k);
-        
+
         ident.calculateHash();
         ident.calculateHash();
         ident.calculateHash();
         ident.calculateHash();
         ident.calculateHash();
     }
-    
+
+    @Test
     public void testBadHash() throws Exception {
         RouterIdentity ident = new RouterIdentity();
-        boolean error = false;
-        try {
-            ident.getHash();
-        } catch (IllegalStateException ise) {
-            error = true;
-        }
-        assertTrue(error);
+
+        exception.expect(IllegalStateException.class);
+        exception.expectMessage("KAC hash error");
+        ident.getHash();
     }
-    
-    
 }
