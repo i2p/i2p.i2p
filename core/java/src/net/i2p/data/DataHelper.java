@@ -1458,7 +1458,7 @@ public class DataHelper {
             // years
             t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
         } else {
-            return _t("n/a");
+            return t("n/a");
         }
         // Replace minus sign to work around
         // bug in Chrome (and IE?), line breaks at the minus sign
@@ -1505,7 +1505,7 @@ public class DataHelper {
             // years
             t = ngettext("1 year", "{0} years", (int) (ms / (365L * 24 * 60 * 60 * 1000)));
         } else {
-            return _t("n/a");
+            return t("n/a");
         }
         if (ms < 0)
             t = t.replace("-", "&minus;");
@@ -1514,7 +1514,7 @@ public class DataHelper {
     
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
-    private static String _t(String key) {
+    private static String t(String key) {
         return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
