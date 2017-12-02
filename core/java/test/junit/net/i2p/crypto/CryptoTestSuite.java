@@ -21,7 +21,6 @@ public class CryptoTestSuite {
         TestSuite suite = new TestSuite("net.i2p.crypto.CryptoTestSuite");
         
         suite.addTestSuite(AES256Test.class);
-        suite.addTestSuite(AESInputStreamTest.class);
         suite.addTestSuite(CryptixAESEngineTest.class);
         suite.addTestSuite(CryptixRijndael_AlgorithmTest.class);
         suite.addTestSuite(DSATest.class);
