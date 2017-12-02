@@ -20,6 +20,9 @@ sourceSets {
             exclude 'net/i2p/AllCoreTests.java'
             exclude 'net/i2p/data/DataTestSuite.java'
             exclude 'net/i2p/data/i2cp/I2CPTestSuite.java'
+            exclude {
+                it.name.endsWith('IT.java')
+            }
         }
         resources {
             srcDir 'java/test/junit'

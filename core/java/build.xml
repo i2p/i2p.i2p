@@ -326,6 +326,7 @@
             <batchtest todir="../../reports/core/junit/">
                 <fileset dir="./test/junit/">
                     <include name="**/*Test.java" />
+                    <include name="**/*IT.java" if="runIntegrationTests" />
                     <exclude name="**/ElGamalAESEngineTest.java" />
                     <exclude name="**/StructureTest.java" />
                     <!-- DataHelperTest is *very* slow with cobertura -->

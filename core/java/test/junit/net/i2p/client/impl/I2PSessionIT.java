@@ -28,7 +28,7 @@ import net.i2p.data.Destination;
  * @author Comwiz
  *
  */
-public class I2PSessionTest extends TestCase implements I2PSessionListener{
+public class I2PSessionIT extends TestCase implements I2PSessionListener {
     private Set<String> _s;
     
     

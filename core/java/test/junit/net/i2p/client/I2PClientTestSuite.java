@@ -11,7 +11,6 @@ package net.i2p.client;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.i2p.client.datagram.DatagramTest;
-import net.i2p.client.impl.I2PSessionTest;
 
 /**
  * @author Comwiz
@@ -22,7 +21,6 @@ public class I2PClientTestSuite {
         TestSuite suite = new TestSuite("net.i2p.client.I2PClientTestSuite");
         
         suite.addTestSuite(I2PClientTest.class);
-        suite.addTestSuite(I2PSessionTest.class);
         suite.addTestSuite(DatagramTest.class);
         
         return suite;
