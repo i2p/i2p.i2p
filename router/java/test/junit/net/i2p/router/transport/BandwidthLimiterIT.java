@@ -32,7 +32,7 @@ import net.i2p.router.RouterContext;
  * 10 concurrent threads is, well, slow.
  *
  */
-public class BandwidthLimiterTest {
+public class BandwidthLimiterIT {
     private static RouterContext _context;
     private final static int NUM_KB = 256;
     

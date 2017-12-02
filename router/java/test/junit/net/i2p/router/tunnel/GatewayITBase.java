@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public abstract class GatewayTestBase extends RouterTestBase {
+public abstract class GatewayITBase extends RouterITBase {
 
     
     private static TunnelGatewayPumper _pumper;

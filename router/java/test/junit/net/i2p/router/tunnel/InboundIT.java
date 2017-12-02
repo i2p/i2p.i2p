@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
  * operation
  *
  */
-public class InboundTest extends RouterTestBase {
+public class InboundIT extends RouterITBase {
     
     @Test
     @SuppressWarnings("deprecation")

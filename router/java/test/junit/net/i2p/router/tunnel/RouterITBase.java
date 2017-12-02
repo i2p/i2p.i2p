@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
  * 
  * @author zab
  */
-public abstract class RouterTestBase {
+public abstract class RouterITBase {
     
     protected static RouterContext _context;
     protected static TunnelCreatorConfig _config;

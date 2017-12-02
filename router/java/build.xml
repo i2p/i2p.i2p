@@ -279,6 +279,7 @@
             <batchtest todir="../../reports/router/junit/">
                 <fileset dir="./test/junit">
                     <include name="**/*Test.java" />
+                    <include name="**/*IT.java" if="runIntegrationTests" />
                 </fileset>
             </batchtest>
             <formatter type="xml"/>

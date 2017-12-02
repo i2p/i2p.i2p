@@ -12,7 +12,7 @@ package net.i2p.router.tunnel;
  * Quick unit test for base functionality of outbound tunnel 
  * operation
  */
-public class OutboundGatewayTest extends GatewayTestBase {
+public class OutboundGatewayIT extends GatewayITBase {
     
     @Override
     protected void setupSenderAndReceiver() {
