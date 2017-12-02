@@ -110,10 +110,6 @@ public class BuildTestMessageJob extends JobImpl {
         
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_ROUTER);
-        instructions.setDelayRequested(false);
-        instructions.setDelaySeconds(0);
-        instructions.setEncrypted(false);
-        instructions.setEncryptionKey(null);
         instructions.setRouter(_target.getIdentity().getHash());
         instructions.setTunnelId(null);
         
@@ -135,9 +131,6 @@ public class BuildTestMessageJob extends JobImpl {
         DeliveryInstructions ackInstructions = new DeliveryInstructions();
         ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_ROUTER);
         ackInstructions.setRouter(_replyTo); // yikes!
-        ackInstructions.setDelayRequested(false);
-        ackInstructions.setDelaySeconds(0);
-        ackInstructions.setEncrypted(false);
         
         DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
         msg.setArrival(getContext().clock().now());

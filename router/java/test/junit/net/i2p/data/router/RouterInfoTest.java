@@ -31,6 +31,8 @@ import net.i2p.util.Log;
  */
 public class RouterInfoTest extends StructureTest {
     private final static Log _log = new Log(RouterInfoTest.class);
+
+    @SuppressWarnings("deprecation")
     public DataStructure createDataStructure() throws DataFormatException {
         RouterInfo info = new RouterInfo();
         HashSet<RouterAddress> addresses = new HashSet<RouterAddress>();

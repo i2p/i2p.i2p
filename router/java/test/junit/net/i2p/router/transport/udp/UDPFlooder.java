@@ -75,7 +75,7 @@ class UDPFlooder implements Runnable {
             if (now >= nextSend) {
                 // peers always grows, so this is fairly safe
                 for (int i = 0; i < _peers.size(); i++) {
-                    PeerState peer = (PeerState)_peers.get(i);
+                    PeerState peer = _peers.get(i);
                     DataMessage m = new DataMessage(_context);
                     byte data[] = _floodData; // new byte[4096];
                     //_context.random().nextBytes(data);

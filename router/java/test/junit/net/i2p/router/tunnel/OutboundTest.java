@@ -25,6 +25,7 @@ public class OutboundTest extends TestCase{
         _context = new RouterContext(null);
     }
     
+    @SuppressWarnings("deprecation")
     public void testOutbound() {
         int numHops = 8;
         TunnelCreatorConfig config = prepareConfig(numHops);

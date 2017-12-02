@@ -219,6 +219,7 @@ public class SSUDemo {
      * Deal with an Foo message received
      */
     private class FooJobBuilder implements HandlerJobBuilder {
+        @SuppressWarnings("deprecation")
         public FooJobBuilder() {
             I2NPMessageImpl.registerBuilder(new FooBuilder(), FooMessage.MESSAGE_TYPE);
         }

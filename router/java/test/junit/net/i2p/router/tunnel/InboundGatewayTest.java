@@ -35,6 +35,7 @@ public class InboundGatewayTest extends GatewayTestBase {
         }
         
         @Override
+        @SuppressWarnings("deprecation")
         protected void handleAtEndpoint(byte []encrypted) {
             // now handle it at the endpoint
             InboundEndpointProcessor end = new InboundEndpointProcessor(_context, _config);

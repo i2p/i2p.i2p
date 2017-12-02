@@ -22,8 +22,8 @@ import net.i2p.data.TunnelId;
 public class DeliveryInstructionsTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         DeliveryInstructions instructions = new DeliveryInstructions();
-		instructions.setDelayRequested(true);
-		instructions.setDelaySeconds(42);
+		//instructions.setDelayRequested(true);
+		//instructions.setDelaySeconds(42);
 		instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
                 // encryption key read/write disabled
 		//instructions.setEncrypted(true);

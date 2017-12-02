@@ -25,6 +25,7 @@ import net.i2p.data.router.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Clock;
+import net.i2p.util.OrderedProperties;
 
 public class RouterGenerator {
     public static void main(String args[]) {
@@ -121,16 +122,12 @@ public class RouterGenerator {
     }
     
     private static RouterAddress createTCPAddress(int num) {
-	RouterAddress addr = new RouterAddress();
-	addr.setCost(10);
-	addr.setExpiration(null);
-	Properties props = new Properties();
+	OrderedProperties props = new OrderedProperties();
 	String name = "blah.random.host.org";
 	String port = "" + (1024+num);
 	props.setProperty("host", name);
 	props.setProperty("port", port);
-	addr.setOptions(props);
-	addr.setTransportStyle("TCP");
+	RouterAddress addr = new RouterAddress("TCP", props, 10);
 	return addr;
     }
     

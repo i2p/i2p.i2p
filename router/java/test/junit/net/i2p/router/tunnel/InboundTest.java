@@ -13,7 +13,7 @@ import org.junit.Test;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Quick unit test for base functionality of inbound tunnel 
@@ -23,6 +23,7 @@ import static junit.framework.Assert.assertTrue;
 public class InboundTest extends RouterTestBase {
     
     @Test
+    @SuppressWarnings("deprecation")
     public void testInbound() {
     	int numHops = 8;
     	

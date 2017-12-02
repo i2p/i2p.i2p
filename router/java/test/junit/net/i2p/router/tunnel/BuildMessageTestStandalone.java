@@ -56,7 +56,7 @@ public class BuildMessageTestStandalone extends TestCase {
         // populate and encrypt the message
         TunnelBuildMessage msg = new TunnelBuildMessage(ctx);
         for (int i = 0; i < order.size(); i++) {
-            int hop = ((Integer)order.get(i)).intValue();
+            int hop = order.get(i).intValue();
             PublicKey key = null;
             if (hop < _pubKeys.length)
                 key = _pubKeys[hop];
@@ -119,7 +119,7 @@ public class BuildMessageTestStandalone extends TestCase {
         boolean allAgree = true;
         for (int i = 0; i < cfg.getLength(); i++) {
             Hash peer = cfg.getPeer(i);
-            int record = ((Integer)order.get(i)).intValue();
+            int record = order.get(i).intValue();
             if (statuses[record] != 0)
                 allAgree = false;
             //else

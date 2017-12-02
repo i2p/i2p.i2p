@@ -10,7 +10,7 @@ package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 

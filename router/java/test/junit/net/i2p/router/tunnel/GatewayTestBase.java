@@ -1,6 +1,6 @@
 package net.i2p.router.tunnel;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,6 +154,8 @@ public abstract class GatewayTestBase extends RouterTestBase {
             _handler = new FragmentHandler(_context, TestReceiver.this);
             _received = new ArrayList<I2NPMessage>(1000);
         }
+
+        @SuppressWarnings("deprecation")
         public long receiveEncrypted(byte[] encrypted) {
             // fake all the hops...
             
