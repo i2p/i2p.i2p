@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,8 +89,8 @@ public class SigningPrivateKeyTest extends StructureTest {
         SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("short"));
 
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("EOF reading SigningPrivateKey, read: 5, required: " + SigningPrivateKey.KEYSIZE_BYTES);
+        exception.expect(EOFException.class);
+        exception.expectMessage("EOF after reading 5 bytes of " + SigningPrivateKey.KEYSIZE_BYTES + " byte value");
         signingPrivateKey.readBytes(in);
     }
 }

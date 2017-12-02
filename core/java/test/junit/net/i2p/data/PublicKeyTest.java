@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,8 +89,8 @@ public class PublicKeyTest extends StructureTest {
         PublicKey publicKey = new PublicKey();
         ByteArrayInputStream in = new ByteArrayInputStream(DataHelper.getASCII("six times nine equals forty-two"));
 
-        exception.expect(DataFormatException.class);
-        exception.expectMessage("EOF reading PublicKey, read: 31, required: " + PublicKey.KEYSIZE_BYTES);
+        exception.expect(EOFException.class);
+        exception.expectMessage("EOF after reading 31 bytes of " + PublicKey.KEYSIZE_BYTES + " byte value");
         publicKey.readBytes(in);
     }
 }

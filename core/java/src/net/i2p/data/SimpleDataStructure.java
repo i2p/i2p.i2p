@@ -80,10 +80,8 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
             throw new RuntimeException("Data already set");
         int length = length();
         _data = new byte[length];
-        int read = read(in, _data);
-        if (read != length)
-            throw new DataFormatException("EOF reading " + getClass().getSimpleName() +
-                                          ", read: " + read + ", required: " + length);
+        // Throws on incomplete read
+        read(in, _data);
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
