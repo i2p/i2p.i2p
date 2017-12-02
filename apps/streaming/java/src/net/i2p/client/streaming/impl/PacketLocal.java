@@ -11,6 +11,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
@@ -321,8 +322,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
                 if ( (timeRemaining <= 0) && (maxWaitMs > 0) ) break;
                 synchronized (this) {
                     if (_ackOn > 0) break;
-                    if (!_connection.getIsConnected())
+                    if (!_connection.getIsConnected()) {
+                        if (_connection.getResetReceived())
+                            throw new I2PSocketException(I2PSocketException.STATUS_CONNECTION_RESET);
                         throw new IOException("disconnected");
+                    }
                     if (_cancelledOn > 0)
                         throw new IOException("cancelled");
                     if (timeRemaining > 60*1000)

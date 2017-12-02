@@ -200,8 +200,11 @@ class Connection {
                 // no need to wait until the other side has ACKed us before sending the first few wsize
                 // packets through
 		// Incorrect assumption, the constructor defaults _connected to true --Sponge
-                if (!_connected.get())
+                if (!_connected.get()) {
+                    if (getResetReceived())
+                        throw new I2PSocketException(I2PSocketException.STATUS_CONNECTION_RESET);
                     throw new IOException("disconnected");
+                }
                 if (_outputStream.getClosed())
                     throw new IOException("output stream closed");
                 started = true;

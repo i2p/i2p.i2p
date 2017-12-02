@@ -24,6 +24,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.net.ssl.SSLException;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketException;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.ByteArray;
@@ -597,6 +598,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             OutputStream browserout = null;
             InputStream browserin = null;
             InputStream serverin = null;
+            Sender s = null;
+            IOException ioex = null;
             try {
                 serverout = _webserver.getOutputStream();
                 
@@ -642,7 +645,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 String modifiedHeaders = formatHeaders(headers, command);
                 compressedOut.write(DataHelper.getUTF8(modifiedHeaders));
 
-                Sender s = new Sender(compressedOut, serverin, "server: server to browser", _log);
+                s = new Sender(compressedOut, serverin, "server: server to browser", _log);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Before pumping the compressed response");
                 s.run(); // same thread
@@ -658,7 +661,46 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("error compressing", ioe);
+                 ioex = ioe;
             } finally {
+                if (ioex == null && s != null)
+                    ioex = s.getFailure();
+                if (ioex != null) {
+                    // Reset propagation, simplified from I2PTunnelRunner
+                    boolean i2pReset = false;
+                    if (ioex instanceof I2PSocketException) {
+                        I2PSocketException ise = (I2PSocketException) ioex;
+                        int status = ise.getStatus();
+                        i2pReset = status == I2PSocketException.STATUS_CONNECTION_RESET;
+                        if (i2pReset) {
+                            if (_log.shouldWarn())
+                                _log.warn("Server got I2P reset, resetting socket", ioex);
+                            try { 
+                                _webserver.setSoLinger(true, 0);
+                            } catch (IOException ioe) {}
+                            try { 
+                                _webserver.close();
+                            } catch (IOException ioe) {}
+                            try { 
+                                _browser.close();
+                            } catch (IOException ioe) {}
+                        }
+                    }
+                    if (!i2pReset && ioex instanceof SocketException) {
+                        String msg = ioex.getMessage();
+                        boolean sockReset = msg != null && msg.contains("reset");
+                        if (sockReset) {
+                            if (_log.shouldWarn())
+                                _log.warn("Server got socket reset, resetting I2P socket");
+                            try { 
+                                _browser.reset();
+                            } catch (IOException ioe) {}
+                            try { 
+                                _webserver.close();
+                            } catch (IOException ioe) {}
+                        }
+                    }
+                }
                 if (browserout != null) try { browserout.close(); } catch (IOException ioe) {}
                 if (serverout != null) try { serverout.close(); } catch (IOException ioe) {}
                 if (browserin != null) try { browserin.close(); } catch (IOException ioe) {}
@@ -673,6 +715,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         private final String _name;
         // shadows _log in super()
         private final Log _log;
+        private IOException _failure;
 
         public Sender(OutputStream out, InputStream in, String name, Log log) {
             _out = out;
@@ -691,11 +734,21 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 //_out.flush();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Error sending", ioe);
+                    _log.debug(_name + " Error sending", ioe);
+                synchronized(this) {
+                    _failure = ioe;
+                }
             } finally {
                 if (_out != null) try { _out.close(); } catch (IOException ioe) {}
                 if (_in != null) try { _in.close(); } catch (IOException ioe) {}
             }
+        }
+
+        /**
+         *  @since 0.9.33
+         */
+        public synchronized IOException getFailure() {
+            return _failure;
         }
     }
 
