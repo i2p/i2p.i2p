@@ -204,7 +204,7 @@ public class TunnelController implements Logging {
             String destStr = dest.toBase64();
             log("Private key created and saved in " + keyFile.getAbsolutePath());
             log("You should backup this file in a secure place.");
-            log("New alternate destination: " + destStr);
+            log("New destination: " + destStr);
             String b32 = dest.toBase32();
             log("Base32: " + b32);
             File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
@@ -294,7 +294,7 @@ public class TunnelController implements Logging {
             String destStr = d.toBase64();
             log("Alternate private key created and saved in " + altFile.getAbsolutePath());
             log("You should backup this file in a secure place.");
-            log("New destination: " + destStr);
+            log("New alternate destination: " + destStr);
             String b32 = d.toBase32();
             log("Base32: " + b32);
             File backupDir = new SecureFile(I2PAppContext.getGlobalContext().getConfigDir(), KEY_BACKUP_DIR);
