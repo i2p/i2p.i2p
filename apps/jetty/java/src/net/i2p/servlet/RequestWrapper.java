@@ -52,7 +52,9 @@ import org.mortbay.servlet.MultiPartRequest;
  *
  *  @author user
  *  @since 0.9.19 moved from susimail so it may be used by routerconsole too
+ *  @deprecated scheduled for removal in 0.9.34, see ticket #2109
  */
+@Deprecated
 public class RequestWrapper {
 
 	private final HttpServletRequest httpRequest;
