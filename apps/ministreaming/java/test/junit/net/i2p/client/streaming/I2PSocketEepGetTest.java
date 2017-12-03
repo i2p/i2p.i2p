@@ -117,8 +117,14 @@ public class I2PSocketEepGetTest {
 
     @Test
     public void testFetch_negPort() {
+        // Fails, because URI is stricter than URL
+        fetchFrom("http://" + STATS_HOST + ":-1", false);
+    }
+
+    @Test
+    public void testFetch_zeroPort() {
         // Gets rewritten to 80
-        fetchFrom("http://" + STATS_HOST + ":-1", true);
+        fetchFrom("http://" + STATS_HOST + ":0", true);
     }
 
     @Test
