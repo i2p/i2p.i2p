@@ -34,6 +34,7 @@ import net.i2p.i2ptunnel.ui.GeneralHelper;
 import net.i2p.i2ptunnel.ui.TunnelConfig;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
+import net.i2p.util.UIMessages;
 
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
@@ -54,6 +55,7 @@ public class IndexBean {
     //private long _prevNonce2;
     private String _curNonce;
     //private long _nextNonce;
+    private int _msgID = -1;
 
     private final TunnelConfig _config;
     private boolean _removeConfirmed;
@@ -72,6 +74,7 @@ public class IndexBean {
     private static final int MAX_NONCES = 8;
     /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
     private static final List<String> _nonces = new ArrayList<String>(MAX_NONCES + 1);
+    private static final UIMessages _messages = new UIMessages(100);
 
     public static final String PROP_THEME_NAME = "routerconsole.theme";
     public static final String DEFAULT_THEME = "light";
@@ -150,7 +153,18 @@ public class IndexBean {
             _tunnel = -1;
         }
     }
+
+    /** @since 0.9.33 */
+    public void setMsgid(String id) {
+        if (id == null) return;
+        try {
+            _msgID = Integer.parseInt(id);
+        } catch (NumberFormatException nfe) {
+            _msgID = -1;
+        }
+    }
     
+    /** @return non-null */
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
@@ -162,32 +176,43 @@ public class IndexBean {
             return _t("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.")
                    + ' ' +
                    _t("If the problem persists, verify that you have cookies enabled in your browser.");
-        if ("Stop all".equals(_action)) 
-            return stopAll();
-        else if ("Start all".equals(_action))
-            return startAll();
-        else if ("Restart all".equals(_action))
-            return restartAll();
-        else if ("Reload configuration".equals(_action))
+        // for any of these that call getMessage(msgs),
+        // we return "", as getMessage() will add them to the returned string.
+        if ("Stop all".equals(_action)) {
+            stopAll();
+            return "";
+        } else if ("Start all".equals(_action)) {
+            startAll();
+            return "";
+        } else if ("Restart all".equals(_action)) {
+            restartAll();
+            return "";
+        } else if ("Reload configuration".equals(_action)) {
             return reloadConfig();
-        else if ("stop".equals(_action))
+        } else if ("stop".equals(_action)) {
             return stop();
-        else if ("start".equals(_action))
+        } else if ("start".equals(_action)) {
             return start();
-        else if ("Save changes".equals(_action) || // IE workaround:
-                (_action.toLowerCase(Locale.US).indexOf("s</span>ave") >= 0))
-            return saveChanges();
-        else if ("Delete this proxy".equals(_action) || // IE workaround:
-                (_action.toLowerCase(Locale.US).indexOf("d</span>elete") >= 0))
-            return deleteTunnel();
-        else if ("Estimate".equals(_action))
+        } else if ("Save changes".equals(_action) || // IE workaround:
+                (_action.toLowerCase(Locale.US).indexOf("s</span>ave") >= 0)) {
+            saveChanges();
+            return "";
+        } else if ("Delete this proxy".equals(_action) || // IE workaround:
+                (_action.toLowerCase(Locale.US).indexOf("d</span>elete") >= 0)) {
+            deleteTunnel();
+            return "";
+        } else if ("Estimate".equals(_action)) {
             return PrivateKeyFile.estimateHashCashTime(_hashCashValue);
-        else if ("Modify".equals(_action))
+        } else if ("Modify".equals(_action)) {
             return modifyDestination();
-        else if ("Generate".equals(_action))
+        } else if ("Generate".equals(_action)) {
             return generateNewEncryptionKey();
-        else
+        } else if ("Clear".equals(_action)) {
+            _messages.clearThrough(_msgID);
+            return "";
+        } else {
             return "Action " + _action + " unknown";
+        }
     }
 
     private String stopAll() {
@@ -258,7 +283,7 @@ public class IndexBean {
      * Executes any action requested (start/stop/etc) and dump out the 
      * messages.
      *
-     * @return HTML escaped
+     * @return HTML escaped or "" if empty
      */
     public String getMessages() {
         if (_group == null)
@@ -267,14 +292,31 @@ public class IndexBean {
         StringBuilder buf = new StringBuilder(512);
         if (_action != null) {
             try {
-                buf.append(processAction()).append('\n');
+                String result = processAction();
+                if (result.length() > 0)
+                    buf.append(processAction()).append('\n');
             } catch (RuntimeException e) {
                 _log.log(Log.CRIT, "Error processing " + _action, e);
                 buf.append("Error: ").append(e.toString()).append('\n');
             }
         }
+        List<UIMessages.Message> msgs = _messages.getMessages();
+        if (!msgs.isEmpty()) {
+            for (UIMessages.Message msg : msgs) {
+                buf.append(msg.message).append('\n');
+            }
+        }
         getMessages(_group.clearAllMessages(), buf);
         return DataHelper.escapeHTML(buf.toString());
+    }
+    
+    /**
+     * The last stored message ID
+     *
+     * @since 0.9.33
+     */
+    public int getLastMessageID() {
+        return _messages.getLastMessageID();
     }
     
     ////
@@ -1151,7 +1193,9 @@ public class IndexBean {
     private static void getMessages(List<String> msgs, StringBuilder buf) {
         if (msgs == null) return;
         for (int i = 0; i < msgs.size(); i++) {
-            buf.append(msgs.get(i)).append("\n");
+            String msg = msgs.get(i);
+            _messages.addMessageNoEscape(msg);
+            buf.append(msg).append("\n");
         }
     }
 

@@ -22,9 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.app.ClientApp;
@@ -46,6 +44,7 @@ import net.i2p.util.SimpleTimer;
 import net.i2p.util.SimpleTimer2;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
+import net.i2p.util.UIMessages;
 
 import org.klomp.snark.comments.Comment;
 import org.klomp.snark.comments.CommentSet;
@@ -75,7 +74,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     private final String _contextPath;
     private final String _contextName;
     private final Log _log;
-    private final Queue<String> _messages;
+    private final UIMessages _messages;
     private final I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
@@ -156,6 +155,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
     public static final String CONFIG_DIR_SUFFIX = ".d";
     private static final String SUBDIR_PREFIX = "s";
     private static final String B64 = Base64.ALPHABET_I2P;
+    private static final int MAX_MESSAGES = 100;
 
     /**
      *  "name", "announceURL=websiteURL" pairs
@@ -246,7 +246,7 @@ public class SnarkManager implements CompleteListener, ClientApp {
         _contextPath = ctxPath;
         _contextName = ctxName;
         _log = _context.logManager().getLog(SnarkManager.class);
-        _messages = new LinkedBlockingQueue<String>();
+        _messages = new UIMessages(MAX_MESSAGES);
         _util = new I2PSnarkUtil(_context, ctxName);
         String cfile = ctxName + CONFIG_FILE_SUFFIX;
         File configFile = new File(cfile);
@@ -397,8 +397,6 @@ public class SnarkManager implements CompleteListener, ClientApp {
     /** hook to I2PSnarkUtil for the servlet */
     public I2PSnarkUtil util() { return _util; }
 
-    private static final int MAX_MESSAGES = 100;
-
     /**
      *  Use if it does not include a link.
      *  Escapes '&lt;' and '&gt;' before queueing
@@ -413,24 +411,27 @@ public class SnarkManager implements CompleteListener, ClientApp {
      * @since 0.9.14.1
      */
     public void addMessageNoEscape(String message) {
-        _messages.offer(message);
-        while (_messages.size() > MAX_MESSAGES) {
-            _messages.poll();
-        }
+        _messages.addMessageNoEscape(message);
         if (_log.shouldLog(Log.INFO))
             _log.info("MSG: " + message);
     }
     
     /** newest last */
-    public List<String> getMessages() {
-        if (_messages.isEmpty())
-            return Collections.emptyList();
-        return new ArrayList<String>(_messages);
+    public List<UIMessages.Message> getMessages() {
+        return _messages.getMessages();
     }
     
     /** @since 0.9 */
     public void clearMessages() {
             _messages.clear();
+    }
+    
+    /**
+     *  Clear through this id
+     *  @since 0.9.33
+     */
+    public void clearMessages(int id) {
+            _messages.clearThrough(id);
     }
     
     /**
@@ -2363,11 +2364,10 @@ public class SnarkManager implements CompleteListener, ClientApp {
             // don't bother delaying if auto start is false
             long delay = (60L * 1000) * getStartupDelayMinutes();
             if (delay > 0 && shouldAutoStart()) {
-                addMessageNoEscape(_t("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
+                int id = _messages.addMessageNoEscape(_t("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
                 try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                 // Remove that first message
-                if (_messages.size() == 1)
-                    _messages.poll();
+                _messages.clearThrough(id);
             }
 
             // here because we need to delay until I2CP is up

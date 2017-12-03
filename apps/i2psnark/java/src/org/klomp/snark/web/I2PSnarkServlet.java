@@ -38,6 +38,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SystemVersion;
 import net.i2p.util.Translate;
+import net.i2p.util.UIMessages;
 
 import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MagnetURI;
@@ -406,7 +407,7 @@ public class I2PSnarkServlet extends BasicServlet {
     }
 
     private void writeMessages(PrintWriter out, boolean isConfigure, String peerString) throws IOException {
-        List<String> msgs = _manager.getMessages();
+        List<UIMessages.Message> msgs = _manager.getMessages();
         if (!msgs.isEmpty()) {
             out.write("\n<div class=\"snarkMessages\" tabindex=\"0\">");
             out.write("<a id=\"closeLog\" href=\"" + _contextPath + '/');
@@ -416,15 +417,17 @@ public class I2PSnarkServlet extends BasicServlet {
                 out.write(peerString + "&amp;");
             else
                 out.write("?");
-            out.write("action=Clear&amp;nonce=" + _nonce + "\">");
+            int lastID = msgs.get(msgs.size() - 1).id;
+            out.write("action=Clear&amp;id=" + lastID + "&amp;nonce=" + _nonce + "\">");
             String tx = _t("clear messages");
             out.write(toThemeImg("delete", tx, tx));
             out.write("</a>" +
                       "\n<ul>\n");
-            out.write("<noscript><li class=\"noscriptWarning\">Warning! Javascript is disabled in your browser. If <a href=\"configure\">page refresh</a> is enabled, ");
-            out.write("you will lose any input in the add/create torrent sections when a refresh occurs.</li></noscript>");
+            // FIXME translate, only show once
+            //out.write("<noscript><li class=\"noscriptWarning\">Warning! Javascript is disabled in your browser. If <a href=\"configure\">page refresh</a> is enabled, ");
+            //out.write("you will lose any input in the add/create torrent sections when a refresh occurs.</li></noscript>");
             for (int i = msgs.size()-1; i >= 0; i--) {
-                String msg = msgs.get(i);
+                String msg = msgs.get(i).message;
                 out.write("<li>" + msg + "</li>\n");
             }
             out.write("</ul>\n</div>");
@@ -1340,7 +1343,13 @@ public class I2PSnarkServlet extends BasicServlet {
         } else if ("StartAll".equals(action)) {
             _manager.startAllTorrents();
         } else if ("Clear".equals(action)) {
-            _manager.clearMessages();
+            String sid = req.getParameter("id");
+            if (sid != null) {
+                try {
+                    int id = Integer.parseInt(sid);
+                    _manager.clearMessages(id);
+                } catch (NumberFormatException nfe) {}
+            }
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }

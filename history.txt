@@ -1,3 +1,9 @@
+2017-12-03 zzz
+ * i2ptunnel:
+   - Don't lose messages on refresh (ticket #2107)
+   - New clear messages button
+   - Hide message box if none
+
 2017-12-02 zzz
  * i2ptunnel: Propagate resets from streaming to Socket
    and vice versa (ticket #2071)

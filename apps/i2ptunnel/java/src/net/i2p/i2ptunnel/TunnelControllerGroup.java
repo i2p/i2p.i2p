@@ -330,6 +330,7 @@ public class TunnelControllerGroup implements ClientApp {
     /**
      * Stop all tunnels, reload config, and restart those configured to do so.
      * WARNING - Does NOT simply reload the configuration!!! This is probably not what you want.
+     * This does not return or clear the controller messages.
      *
      * @throws IllegalArgumentException if unable to reload config file
      */
@@ -380,7 +381,8 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Stop and remove the given tunnel
+     * Stop and remove the given tunnel.
+     * Side effect - clears all messages the controller.
      *
      * @return list of messages from the controller as it is stopped
      */
@@ -400,6 +402,7 @@ public class TunnelControllerGroup implements ClientApp {
     
     /**
      * Stop all tunnels. May be restarted.
+     * Side effect - clears all messages from all controllers.
      *
      * @return list of messages the tunnels generate when stopped
      */
@@ -436,7 +439,8 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Start all tunnels
+     * Start all tunnels.
+     * Side effect - clears all messages from all controllers.
      *
      * @return list of messages the tunnels generate when started
      */
@@ -459,7 +463,8 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Restart all tunnels
+     * Restart all tunnels.
+     * Side effect - clears all messages from all controllers.
      *
      * @return list of messages the tunnels generate when restarted
      */
@@ -481,7 +486,7 @@ public class TunnelControllerGroup implements ClientApp {
     }
     
     /**
-     * Fetch all outstanding messages from any of the known tunnels
+     * Fetch and clear all outstanding messages from any of the known tunnels.
      *
      * @return list of messages the tunnels have generated
      */

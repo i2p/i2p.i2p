@@ -35,6 +35,15 @@
 </head>
 <body id="tunnelListPage">
 
+<%
+  if (indexBean.isInitialized()) {
+      String nextNonce = net.i2p.i2ptunnel.web.IndexBean.getNextNonce();
+
+  // not synced, oh well
+  int lastID = indexBean.getLastMessageID();
+  String msgs = indexBean.getMessages();
+  if (msgs.length() > 0) {
+%>
 <div class="panel" id="messages">
     <h2><%=intl._t("Status Messages")%></h2>
     <table id="statusMessagesTable">
@@ -43,23 +52,17 @@
         <textarea id="statusMessages" rows="4" cols="60" readonly="readonly"><jsp:getProperty name="indexBean" property="messages" /></textarea>
             </td>
         </tr>
-
-
         <tr>
             <td class="buttons">
                 <a class="control" href="list"><%=intl._t("Refresh")%></a>
+                <a class="control" href="list?action=Clear&amp;msgid=<%=lastID%>&amp;nonce=<%=nextNonce%>"><%=intl._t("Clear")%></a>
             </td>
         </tr>
     </table>
 </div>
-
 <%
-
-  if (indexBean.isInitialized()) {
-      String nextNonce = net.i2p.i2ptunnel.web.IndexBean.getNextNonce();
-
+  }  // !msgs.isEmpty()
 %>
-
 <div class="panel" id="globalTunnelControl">
     <h2><%=intl._t("Global Tunnel Control")%></h2>
     <table>
