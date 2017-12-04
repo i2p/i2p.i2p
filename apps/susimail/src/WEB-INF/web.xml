@@ -16,6 +16,11 @@
   <servlet>
     <servlet-name>SusiMail</servlet-name>
     <servlet-class>i2p.susi.webmail.WebMail</servlet-class>
+    <multipart-config>
+      <max-file-size>67108864</max-file-size>
+      <max-request-size>67108864</max-request-size>
+      <file-size-threshold>262144</file-size-threshold>
+    </multipart-config>
   </servlet>
   <servlet-mapping>
     <servlet-name>SusiMail</servlet-name>
