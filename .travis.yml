@@ -24,6 +24,8 @@ cache:
 
 notifications:
   irc:
-    channels: "irc.oftc.net#i2p-dev"
+    channels:
+      - "chat.freenode.net#i2p-dev"
+      - "irc.oftc.net#i2p-dev"
     on_success: change
     on_failure: always
