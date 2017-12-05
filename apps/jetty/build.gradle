@@ -12,7 +12,6 @@ dependencies {
     ext.jettyVersion = '9.2.22.v20170606'
     ext.tomcatVersion = '8.5.23'
     compile project(':core')
-    compile 'org.eclipse.jetty.orbit:javax.servlet.jsp:2.2.0.v201112011158'
     compile 'org.eclipse.jetty:jetty-http:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-io:' + ext.jettyVersion
     compile 'org.eclipse.jetty:jetty-security:' + ext.jettyVersion
