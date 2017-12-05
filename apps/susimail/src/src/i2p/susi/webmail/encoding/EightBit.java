@@ -30,7 +30,7 @@ import net.i2p.data.DataHelper;
 /**
  * @author susi
  */
-public class EightBit implements Encoding {
+public class EightBit extends Encoding {
 
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#getName()
@@ -42,17 +42,15 @@ public class EightBit implements Encoding {
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
 	 */
-	public String encode(byte[] in) {
-		// TODO Auto-generated method stub
-		return null;
+	public String encode(byte[] in) throws EncodingException {
+		throw new EncodingException("unsupported");
 	}
 
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
 	 */
-	public String encode(String str) {
-		// TODO Auto-generated method stub
-		return null;
+	public String encode(String str) throws EncodingException {
+		throw new EncodingException("unsupported");
 	}
 
 	/* (non-Javadoc)

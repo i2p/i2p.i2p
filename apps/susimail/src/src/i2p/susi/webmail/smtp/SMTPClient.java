@@ -24,14 +24,18 @@
 package i2p.susi.webmail.smtp;
 
 import i2p.susi.debug.Debug;
+import i2p.susi.webmail.Attachment;
 import i2p.susi.webmail.Messages;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingException;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +48,6 @@ import net.i2p.data.DataHelper;
 public class SMTPClient {
 	
 	private Socket socket;
-	private final byte buffer[];
 	public String error;
 	private String lastResponse;
 	private boolean supportsPipelining;
@@ -57,7 +60,6 @@ public class SMTPClient {
 
 	public SMTPClient()
 	{
-		buffer = new byte[10240];
 		error = "";
 		lastResponse = "";
 	}
@@ -89,7 +91,7 @@ public class SMTPClient {
 			socket.getOutputStream().flush();
 			return getResult();
 		} catch (IOException e) {
-			error += "IOException occured.\n";
+			error += e + "\n";
 			return 0;
 		}
 	}
@@ -129,6 +131,7 @@ public class SMTPClient {
 				}
 				socket.getOutputStream().flush();
 			} catch (IOException ioe) {
+				error += ioe + "\n";
 				return 0;
 			}
 			for (SendExpect cmd : cmds) {
@@ -193,7 +196,7 @@ public class SMTPClient {
 				buf.setLength(0);
 			}
 		} catch (IOException e) {
-			error += "IOException occured.\n";
+			error += e + "\n";
 			result = 0;
 		}
 		lastResponse = fullResponse.toString();
@@ -201,17 +204,23 @@ public class SMTPClient {
 	}
 
 	/**
+	 *  @param body without the attachments
+	 *  @param attachments may be null
+	 *  @param boundary non-null if attachments is non-null
 	 *  @return success
 	 */
-	public boolean sendMail( String host, int port, String user, String pass, String sender, Object[] recipients, String body )
+	public boolean sendMail(String host, int port, String user, String pass, String sender,
+	                        Object[] recipients, StringBuilder body,
+	                        List<Attachment> attachments, String boundary)
 	{
 		boolean mailSent = false;
 		boolean ok = true;
+		Writer out = null;
 		
 		try {
 			socket = new Socket( host, port );
 		} catch (IOException e) {
-			error += _t("Cannot connect") + ": " + e.getMessage() + '\n';
+			error += _t("Cannot connect") + " (" + host + ':' + port + ") : " + e.getMessage() + '\n';
 			ok = false;
 		}
 		try {
@@ -222,7 +231,10 @@ public class SMTPClient {
 				socket.setSoTimeout(120*1000);
 				int result = sendCmd(null);
 				if (result != 220) {
-					error += _t("Server refused connection") + " (" + result +  ")\n";
+					if (result != 0)
+						error += _t("Server refused connection") + " (" + result + ")\n";
+					else
+						error += _t("Cannot connect") + " (" + host + ':' + port + ")\n";
 					ok = false;
 				}
 			}
@@ -234,7 +246,7 @@ public class SMTPClient {
 				if (r.result == 250) {
 					supportsPipelining = r.recv.contains("PIPELINING");
 				} else {
-					error += _t("Server refused connection") + " (" + r.result +  ")\n";
+					error += _t("Server refused connection") + " (" + r +  ")\n";
 					ok = false;
 				}
 			}
@@ -264,10 +276,46 @@ public class SMTPClient {
 				}
 			}
 			if (ok) {
-				if( body.indexOf( "\r\n.\r\n" ) != -1 )
-					body = body.replace( "\r\n.\r\n", "\r\n..\r\n" );
-				socket.getOutputStream().write(DataHelper.getUTF8(body));
-				socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
+				// in-memory replace, no copies
+				int oidx = 0;
+				while (true) {
+					int idx = body.indexOf("\r\n.\r\n", oidx);
+					if (idx < 0)
+						break;
+					body.replace(idx, idx + 5, "\r\n..\r\n");
+					oidx = idx;
+				}
+				//socket.getOutputStream().write(DataHelper.getUTF8(body));
+				//socket.getOutputStream().write(DataHelper.getASCII("\r\n.\r\n"));
+				// Do it this way so we don't double the memory
+				out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "ISO-8859-1"));
+				out.write(body.toString());
+				// moved from WebMail so we don't bring the attachments into memory
+				// Also TODO use the 250 service extension responses to pick the best encoding
+				// and check the max total size
+				if (attachments != null && !attachments.isEmpty()) {
+					for(Attachment attachment : attachments) {
+						String encodeTo = attachment.getTransferEncoding();
+						Encoding encoding = EncodingFactory.getEncoding(encodeTo);
+						if (encoding == null)
+							throw new EncodingException( _t("No Encoding found for {0}", encodeTo));
+						out.write("\r\n--" + boundary +
+						          "\r\nContent-type: " + attachment.getContentType() +
+						          "\r\nContent-Disposition: attachment; filename=\"" + attachment.getFileName() +
+						          "\"\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() +
+						          "\r\n\r\n");
+						InputStream in = null;
+						try {
+							in = attachment.getData();
+						 	encoding.encode(in, out);
+						} finally {
+							if (in != null) try { in.close(); } catch (IOException ioe) {}
+						}
+					}
+					out.write( "\r\n--" + boundary + "--\r\n" );
+				}
+				out.write("\r\n.\r\n");
+				out.flush();
 				socket.setSoTimeout(0);
 				int result = sendCmd(null);
 				if (result == 250)
@@ -277,9 +325,6 @@ public class SMTPClient {
 			}
 		} catch (IOException e) {
 			error += _t("Error sending mail") + ": " + e.getMessage() + '\n';
-
-		} catch (EncodingException e) {
-			error += e.getMessage();
 		}
 		if( !mailSent && lastResponse.length() > 0 ) {
 			String[] lines = DataHelper.split(lastResponse, "\r");
@@ -291,6 +336,7 @@ public class SMTPClient {
 			try {
 				socket.close();
 			} catch (IOException e1) {}
+			if (out != null) try { out.close(); } catch (IOException ioe) {}
 		}
 		return mailSent;
 	}
@@ -317,14 +363,30 @@ public class SMTPClient {
 		public final int result;
 		public final String recv;
 
+		/** @param t non-null */
 		public Result(int r, String t) {
 			result = r;
 			recv = t;
+		}
+
+		/** @since 0.9.33 */
+		@Override
+		public String toString() {
+			StringBuilder buf = new StringBuilder();
+			buf.append(result);
+			if (recv.length() > 0)
+				buf.append(' ').append(recv);
+			return buf.toString();
 		}
 	}
 
 	/** translate */
 	private static String _t(String s) {
 		return Messages.getString(s);
+	}
+
+	/** translate */
+	private static String _t(String s, Object o) {
+		return Messages.getString(s, o);
 	}
 }

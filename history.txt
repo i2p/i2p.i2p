@@ -1,3 +1,17 @@
+2017-12-05 zzz
+ * SusiMail:
+   - Don't store attachments of composed email in-memory (ticket #1668)
+   - Fix bug corrupting sent text and text attachments
+     larger than about 1000 chars
+   - Fix bug corrupting some sent text and text attachments
+     containing '.'
+   - Fix handling of unimplemented encoders
+   - Add test code for encoders
+   - Error message improvements
+
+2017-12-04 zzz
+ * Servlet: Refactor RequestWrapper to use Servlet 3.0 API (ticket #2109)
+
 2017-12-03 zzz
  * i2ptunnel:
    - Don't lose messages on refresh (ticket #2107)

@@ -29,13 +29,16 @@ import i2p.susi.util.ReadBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import net.i2p.data.DataHelper;
 
 /**
+ * ref: https://en.wikipedia.org/wiki/Quoted-printable
  * @author susi
  */
-public class QuotedPrintable implements Encoding {
+public class QuotedPrintable extends Encoding {
 	
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#getName()
@@ -49,24 +52,41 @@ public class QuotedPrintable implements Encoding {
 	public String encode(String text) throws EncodingException {
 		return encode( DataHelper.getUTF8(text) );
 	}
-	/**
-	 * 
-	 * @param in
-	 * @return
-	 */
+
 	private static int BUFSIZE = 2;
+
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
 	 */
 	public String encode( byte in[] ) throws EncodingException {
-		StringBuilder out = new StringBuilder();
+		try {
+			StringWriter strBuf = new StringWriter();
+			encode(new ByteArrayInputStream(in), strBuf);
+			return strBuf.toString();
+		} catch (IOException e) {
+			throw new EncodingException("encode error",  e);
+		}
+	}
+
+	/**
+	 * More efficient than super
+	 * 
+	 * @param in
+	 * @see Base64#encode(String)
+	 * @since since 0.9.33
+	 */
+	@Override
+	public void encode(InputStream in, Writer out) throws IOException
+	{
 		int buffered = 0, tmp[] = new int[BUFSIZE];
-		int read = in.length;
 		int index = 0;
+		int l = 0;
 		while( true ) {
-			while( read > 0 && buffered < BUFSIZE ) {
-				tmp[buffered++] = in[index++];
-				read--;
+			int read = 0;
+			int r;
+			while(buffered < BUFSIZE && (r = in.read()) >= 0) {
+				tmp[buffered++] = r;
+				read++;
 			}
 			if( read == 0 && buffered == 0 )
 				break;
@@ -76,31 +96,56 @@ public class QuotedPrintable implements Encoding {
 			for( int j = 1; j < BUFSIZE; j++ )
 				tmp[j-1] = tmp[j];
 			
-			if( c > 32 && c < 127 && c != 61 ) {
+			if (c == 46 && l == 0) {
+				// leading '.' seems to get eaten by SMTP,
+				// even if more chars after it
+				String s = HexTable.table[46];
+				l = s.length();
+				out.append(s);
+			} else if (c > 32 && c < 127 && c != 61) {
 				out.append( (char)c );
+				l++;
 			}
 			else if( ( c == 32 || c == 9 ) ) {
 				if( buffered > 0 && ( tmp[0] == 10 || tmp[0] == 13 ) ) {
 					/*
 					 * whitespace at end of line
 					 */
+					if (l >= 73) {
+						// soft line breaks
+						out.append("=\r\n");
+						l = 0;
+					}
 					out.append( c == 32 ? "=20" : "=09" );
+					l += 3;
 				}
 				else {
 					out.append( (char)c );
+					l++;
 				}
 			}
 			else if( c == 13 && buffered > 0 && tmp[0] == 10 ) {
 				out.append( "\r\n" );
+				l = 0;
 				buffered--;
 				for( int j = 1; j < BUFSIZE; j++ )
 					tmp[j-1] = tmp[j];
+			} else {
+				String s = HexTable.table[ c < 0 ? 256 + c : c ];
+				l += s.length();
+				if (l > 75) {
+					// soft line breaks
+					out.append("=\r\n");
+					l = s.length();
+				}
+				out.append(s);
 			}
-			else {
-				out.append( HexTable.table[ c < 0 ? 256 + c : c ] );
+			if (l >= 75) {
+				// soft line breaks
+				out.append("=\r\n");
+				l = 0;
 			}
 		}
-		return out.toString();
 	}
 
 	/* (non-Javadoc)

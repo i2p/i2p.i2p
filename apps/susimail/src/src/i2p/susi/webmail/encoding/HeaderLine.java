@@ -42,7 +42,7 @@ import net.i2p.data.DataHelper;
  *
  * @author susi
  */
-public class HeaderLine implements Encoding {
+public class HeaderLine extends Encoding {
 	public static final String NAME = "HEADERLINE";
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#getName()

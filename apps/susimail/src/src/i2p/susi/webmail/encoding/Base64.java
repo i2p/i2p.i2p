@@ -28,13 +28,15 @@ import i2p.susi.util.ReadBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import net.i2p.data.DataHelper;
 
 /**
  * @author susi
  */
-public class Base64 implements Encoding {
+public class Base64 extends Encoding {
 	
 	/* (non-Javadoc)
 	 * @see i2p.susi23.util.Encoding#getName()
@@ -42,6 +44,7 @@ public class Base64 implements Encoding {
 	public String getName() {
 		return "base64";
 	}
+
 	/**
 	 * @return Base64-encoded String.
 	 * @throws EncodingException 
@@ -49,30 +52,37 @@ public class Base64 implements Encoding {
 	public String encode( byte in[] ) throws EncodingException
 	{
 		try {
-			return encode( new ByteArrayInputStream( in ) );
+			StringWriter strBuf = new StringWriter();
+			encode(new ByteArrayInputStream(in), strBuf);
+			return strBuf.toString();
 		}catch (IOException e) {
-			throw new EncodingException( e.getMessage() );
+			throw new EncodingException("encode error",  e);
 		}
 	}
+
 	/**
 	 * @see Base64#encode(byte[])
 	 */
 	public String encode(String str) throws EncodingException {
 		try {
-			return encode( new ByteArrayInputStream( DataHelper.getUTF8(str) ) );
+			StringWriter strBuf = new StringWriter();
+			encode(new ByteArrayInputStream(DataHelper.getUTF8(str)), strBuf);
+			return strBuf.toString();
 		}catch (IOException e) {
-			throw new EncodingException( e.getMessage() );
+			throw new EncodingException("encode error",  e);
 		}
 	}
+
 	/**
+	 * More efficient than super
 	 * 
 	 * @param in
 	 * @see Base64#encode(String)
+	 * @since public since 0.9.33 with new params
 	 */
-	private String encode( InputStream in ) throws IOException, EncodingException
+	@Override
+	public void encode(InputStream in, Writer strBuf) throws IOException
 	{
-		StringBuilder strBuf = new StringBuilder();
-		
 		int buf[] = new int[3];
 		int out[] = new int[4];
 		int l = 0;
@@ -111,8 +121,6 @@ public class Base64 implements Encoding {
 				l -= 76;
 			}
 		}
-
-		return strBuf.toString();
 	}
 
 	/**

@@ -25,10 +25,15 @@ package i2p.susi.webmail.encoding;
 
 import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
+import i2p.susi.util.ReadBuffer;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import net.i2p.data.DataHelper;
+import net.i2p.util.HexDump;
 
 /**
  * Manager class to handle content transfer encodings.
@@ -60,7 +65,10 @@ public class EncodingFactory {
 				}
 			}
 		}
+		// TEST
+		//main(null);
 	}
+
 	/**
 	 * Retrieve instance of an encoder for a supported encoding (or null).
 	 * 
@@ -81,4 +89,45 @@ public class EncodingFactory {
 	{
 		return encodings.keySet();
 	}
+
+/****
+	public static void main(String[] args) {
+		String text = "Subject: test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test \r\n" +
+		              "From: UTF8 <smoerebroed@mail.i2p>\r\n" +
+		              "To: UTF8 <lalala@mail.i2p>\r\n";
+		byte[] test = DataHelper.getUTF8(text);
+		for (String s : availableEncodings()) {
+			Encoding e = getEncoding(s);
+			try {
+				String enc = e.encode(test);
+				if (enc == null) {
+					System.out.println(s + "\tFAIL - null encode result");
+					continue;
+				}
+				ReadBuffer rb = e.decode(enc);
+				if (rb == null) {
+					System.out.println(s + "\tFAIL - null decode result");
+					continue;
+				}
+				byte[] result = rb.content;
+				if (DataHelper.eq(test, 0, result, rb.offset, test.length)) {
+					System.out.println(s + "\tPASS");
+					System.out.println("encoding:");
+					System.out.println('"' + enc + '"');
+				} else {
+					System.out.println(s + "\tFAIL");
+					System.out.println("expected:");
+					System.out.println(HexDump.dump(test));
+					System.out.println("got:");
+					System.out.println(HexDump.dump(result, rb.offset, rb.length));
+					System.out.println("encoding:");
+					System.out.println('"' + enc + '"');
+				}
+			} catch (Exception ex) {
+				System.out.println(s + "\tFAIL");
+				ex.printStackTrace();
+			}
+		}
+	}
+****/
 }

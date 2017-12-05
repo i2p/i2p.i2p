@@ -23,36 +23,58 @@
  */
 package i2p.susi.webmail.encoding;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+
 import i2p.susi.util.ReadBuffer;
+
+import net.i2p.data.DataHelper;
 
 /**
  * Interface to encode/decode content transfer encodings like quoted-printable, base64 etc.
  * 
  * @author susi
  */
-public interface Encoding {
-	public String getName();
+public abstract class Encoding {
+	public abstract String getName();
 	/**
 	 * 
 	 * @param in
 	 * @return Encoded string.
 	 * @throws EncodingException 
 	 */
-	public String encode( byte in[] ) throws EncodingException;
+	public abstract String encode( byte in[] ) throws EncodingException;
 	/**
 	 * 
 	 * @param str
 	 * @see Encoding#encode(byte[])
 	 * @throws EncodingException 
 	 */
-	public String encode( String str ) throws EncodingException;
+	public abstract String encode( String str ) throws EncodingException;
+
+	/**
+	 *  This implementation just reads the whole stream into memory
+	 *  and then calls encode(byte[]).
+	 *  Subclasses should implement a more memory-efficient method
+	 *  if large inputs are expected.
+	 *
+	 *  @since 0.9.33
+	 */
+	public void encode(InputStream in, Writer out) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataHelper.copy(in, baos);
+		out.write(encode(baos.toByteArray()));
+	}
+
 	/**
 	 * 
 	 * @param in
 	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
 	 */
-	public ReadBuffer decode( byte in[] ) throws DecodingException;
+	public abstract ReadBuffer decode( byte in[] ) throws DecodingException;
 	/**
 	 * 
 	 * @param in
@@ -61,19 +83,19 @@ public interface Encoding {
 	 * @return Output buffer containing decoded String.
 	 * @throws DecodingException 
 	 */
-	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException;
+	public abstract ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException;
 	/**
 	 * 
 	 * @param str
 	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
 	 */
-	public ReadBuffer decode( String str ) throws DecodingException;
+	public abstract ReadBuffer decode( String str ) throws DecodingException;
 	/**
 	 * 
 	 * @param in
 	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
 	 */
-	public ReadBuffer decode( ReadBuffer in ) throws DecodingException;
+	public abstract ReadBuffer decode( ReadBuffer in ) throws DecodingException;
 }

@@ -42,6 +42,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -72,6 +73,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.Translate;
 
 /**
@@ -409,7 +411,7 @@ public class WebMail extends HttpServlet
 		String user, pass, host, error, info;
 		String replyTo, replyCC;
 		String subject, body, showUIDL;
-		public String sentMail;
+		public StringBuilder sentMail;
 		public ArrayList<Attachment> attachments;
 		public boolean reallyDelete;
 		String themePath, imgPath;
@@ -473,6 +475,16 @@ public class WebMail extends HttpServlet
 				return true;
 			synchronized(nonces) {
 				return nonces.contains(nonce);
+			}
+		}
+
+		/** @since 0.9.33 */
+		public void clearAttachments() {
+			if (attachments != null) {
+				for (Attachment a : attachments) {
+					a.deleteData();
+				}
+				attachments.clear();
 			}
 		}
 	}
@@ -914,15 +926,13 @@ public class WebMail extends HttpServlet
 			    buttonPressed( request, LIST )) {
 				sessionObject.state = STATE_LIST;
 				sessionObject.sentMail = null;	
-				if( sessionObject.attachments != null )
-					sessionObject.attachments.clear();
+				sessionObject.clearAttachments();
 			} else if (buttonPressed( request, PREV ) ||     // All these buttons are not shown but we could be lost
 			    buttonPressed( request, NEXT )  ||
 			    buttonPressed( request, DELETE )) {
 				sessionObject.state = STATE_SHOW;
 				sessionObject.sentMail = null;	
-				if( sessionObject.attachments != null )
-					sessionObject.attachments.clear();
+				sessionObject.clearAttachments();
 			}
 		}
 		/*
@@ -1205,41 +1215,38 @@ public class WebMail extends HttpServlet
 			if( i != -1 )
 				filename = filename.substring( i + 1 );
 			if( filename != null && filename.length() > 0 ) {
-				InputStream in = request.getInputStream( NEW_FILENAME );
-				int l;
+				InputStream in = null;
+				OutputStream out = null;
+				I2PAppContext ctx = I2PAppContext.getGlobalContext();
+				File f = new File(ctx.getTempDir(), "susimail-attachment-" + ctx.random().nextLong());
 				try {
-					l = in.available();
-					if( l > 0 ) {
-						byte buf[] = new byte[l];
-						in.read( buf );
-						String contentType = request.getContentType( NEW_FILENAME );
-						Encoding encoding;
-						String encodeTo;
-						if( contentType.toLowerCase(Locale.US).startsWith( "text/" ) )
-							encodeTo = "quoted-printable";
-						else
-							encodeTo = "base64";
-						encoding = EncodingFactory.getEncoding( encodeTo );
-						try {
-							if( encoding != null ) {
-								String data = encoding.encode(buf);
-								if( sessionObject.attachments == null )
-									sessionObject.attachments = new ArrayList<Attachment>();
-								sessionObject.attachments.add(
-									new Attachment(filename, contentType, encodeTo, data)
-								);
-							}
-							else {
-								sessionObject.error += _t("No Encoding found for {0}", encodeTo) + '\n';
-							}
-						}
-						catch (EncodingException e1) {
-							sessionObject.error += _t("Could not encode data: {0}", e1.getMessage());
-						}
+				        in = request.getInputStream( NEW_FILENAME );
+					if(in == null)
+						throw new IOException("no stream");
+					out = new SecureFileOutputStream(f);
+					DataHelper.copy(in, out);
+					String contentType = request.getContentType( NEW_FILENAME );
+					String encodeTo;
+					if( contentType.toLowerCase(Locale.US).startsWith( "text/" ) )
+						encodeTo = "quoted-printable";
+					else
+						encodeTo = "base64";
+					Encoding encoding = EncodingFactory.getEncoding(encodeTo);
+					if (encoding != null) {
+						if (sessionObject.attachments == null)
+							sessionObject.attachments = new ArrayList<Attachment>();
+						sessionObject.attachments.add(
+							new Attachment(filename, contentType, encodeTo, f)
+						);
+					} else {
+						sessionObject.error += _t("No Encoding found for {0}", encodeTo) + '\n';
 					}
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					sessionObject.error += _t("Error reading uploaded file: {0}", e.getMessage()) + '\n';
+					f.delete();
+				} finally {
+					if (in != null) try { in.close(); } catch (IOException ioe) {}
+					if (out != null) try { out.close(); } catch (IOException ioe) {}
 				}
 			}
 		}
@@ -2021,7 +2028,7 @@ public class WebMail extends HttpServlet
 		}
 
 		if( ok ) {
-			StringBuilder body = new StringBuilder();
+			StringBuilder body = new StringBuilder(1024);
 			body.append( "From: " + from + "\r\n" );
 			Mail.appendRecipients( body, toList, "To: " );
 			Mail.appendRecipients( body, ccList, "To: " );
@@ -2042,6 +2049,7 @@ public class WebMail extends HttpServlet
 				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
 			}
 			try {
+				// TODO pass the text separately to SMTP and let it pick the encoding
 				if( multipart )
 					body.append( "--" + boundary + "\r\nContent-type: text/plain; charset=\"utf-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n" );
 				body.append( qp.encode( text ) );
@@ -2050,28 +2058,18 @@ public class WebMail extends HttpServlet
 				sessionObject.error += e.getMessage();
 			}
 
-			if( multipart ) {
-				for( Attachment attachment : sessionObject.attachments ) {
-					body.append( "\r\n--" + boundary + "\r\nContent-type: " + attachment.getContentType() + "\r\nContent-Disposition: attachment; filename=\"" + attachment.getFileName() + "\"\r\nContent-Transfer-Encoding: " + attachment.getTransferEncoding() + "\r\n\r\n" );
-					body.append( attachment.getData() );
-				}
-				body.append( "\r\n--" + boundary + "--\r\n" );
-			}
-			
-			// TODO set to the StringBuilder instead so SMTP can replace() in place
-			sessionObject.sentMail = body.toString();	
+			// set to the StringBuilder so SMTP can replace() in place
+			sessionObject.sentMail = body;	
 			
 			if( ok ) {
 				SMTPClient relay = new SMTPClient();
 				if( relay.sendMail( sessionObject.host, sessionObject.smtpPort,
 						sessionObject.user, sessionObject.pass,
-						sender, recipients.toArray(), sessionObject.sentMail ) ) {
-					
+						sender, recipients.toArray(), sessionObject.sentMail,
+				                sessionObject.attachments, boundary)) {
 					sessionObject.info += _t("Mail sent.");
-					
 					sessionObject.sentMail = null;	
-					if( sessionObject.attachments != null )
-						sessionObject.attachments.clear();
+					sessionObject.clearAttachments();
 				}
 				else {
 						ok = false;
