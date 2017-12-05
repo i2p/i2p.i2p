@@ -42,9 +42,6 @@ public class LeaseSetTest extends StructureTest {
 
         // should contain no leases now.
         exception.expect(IndexOutOfBoundsException.class);
-        // Good for Java 7/8, but Java 9 message is "Index 0 out-of-bounds for length 0"
-        // and do we really need to verify the message?
-        //exception.expectMessage("Index: 0, Size: 0");
         subj.getLease(0);
     }
 
@@ -55,7 +52,6 @@ public class LeaseSetTest extends StructureTest {
 
         // this shouldn't work either
         exception.expect(IndexOutOfBoundsException.class);
-        exception.expectMessage("-1");
         subj.getLease(-1);
     }
 
