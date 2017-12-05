@@ -21,3 +21,9 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+notifications:
+  irc:
+    channels: "irc.oftc.net#i2p-dev"
+    on_success: change
+    on_failure: always
