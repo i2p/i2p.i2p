@@ -26,6 +26,5 @@ notifications:
   irc:
     channels:
       - "chat.freenode.net#i2p-dev"
-      - "irc.oftc.net#i2p-dev"
     on_success: change
     on_failure: always
