@@ -448,7 +448,7 @@
         <!-- Add multipart config to servlets that need them -->
         <property name="__match1" value="&lt;servlet-class&gt;net.i2p.router.web.jsp." />
         <property name="__match2" value="_jsp&lt;/servlet-class&gt;" />
-        <property name="__class1" value="${__match1}configclients${__match2}" />
+        <property name="__class1" value="${__match1}configplugins${__match2}" />
         <property name="__class2" value="${__match1}configfamily${__match2}" />
         <property name="__class3" value="${__match1}configreseed${__match2}" />
         <property name="__multipart" value="&#10;

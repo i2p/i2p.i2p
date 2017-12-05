@@ -47,6 +47,20 @@ import net.i2p.data.DataHelper;
  */
 public class SMTPClient {
 	
+	/**
+	 *  31.84 MB
+	 *  smtp.postman.i2p as of 2017-12.
+	 *  @since 0.9.33
+	 */
+	public static final long DEFAULT_MAX_SIZE = 33388608;
+
+	/**
+	 *  About 23.25 MB.
+	 *  Base64 encodes 57 chars to 76 + \r\n on a line
+	 *  @since 0.9.33
+	 */
+	public static final long BINARY_MAX_SIZE = (long) ((DEFAULT_MAX_SIZE * 57.0d / 78) - 32*1024);
+
 	private Socket socket;
 	public String error;
 	private String lastResponse;

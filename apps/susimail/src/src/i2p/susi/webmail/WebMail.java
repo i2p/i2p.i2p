@@ -1648,16 +1648,22 @@ public class WebMail extends HttpServlet
 			sessionObject.isMobile = isMobile;
 			
 			if (isPOST) {
-				String nonce = request.getParameter(SUSI_NONCE);
-				if (nonce == null || !sessionObject.isValidNonce(nonce)) {
-					// These two strings are already in the router console FormHandler,
-					// so translate with that bundle.
-					sessionObject.error = consoleGetString(
-						"Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.",
-						ctx)
-						+ '\n' +
-						consoleGetString("If the problem persists, verify that you have cookies enabled in your browser.",
-						ctx);
+				try {
+					String nonce = request.getParameter(SUSI_NONCE);
+					if (nonce == null || !sessionObject.isValidNonce(nonce)) {
+						// These two strings are already in the router console FormHandler,
+						// so translate with that bundle.
+						sessionObject.error = consoleGetString(
+							"Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.",
+							ctx)
+							+ '\n' +
+							consoleGetString("If the problem persists, verify that you have cookies enabled in your browser.",
+							ctx);
+						isPOST = false;
+					}
+				} catch (IllegalStateException ise) {
+					// too big, can't get any parameters
+					sessionObject.error += ise.getMessage() + '\n';
 					isPOST = false;
 				}
 			}
@@ -2027,6 +2033,19 @@ public class WebMail extends HttpServlet
 			sessionObject.error += "Internal error: Header line encoder not available.";
 		}
 
+		long total = text.length();
+		boolean multipart = sessionObject.attachments != null && !sessionObject.attachments.isEmpty();
+		if (multipart) {
+			for(Attachment a : sessionObject.attachments) {
+				total += a.getSize();
+			}
+		}
+		if (total > SMTPClient.BINARY_MAX_SIZE) {
+			ok = false;
+			sessionObject.error += _t("Email is too large, max is {0}",
+			                          DataHelper.formatSize2(SMTPClient.BINARY_MAX_SIZE, false) + 'B') + '\n';
+		}
+
 		if( ok ) {
 			StringBuilder body = new StringBuilder(1024);
 			body.append( "From: " + from + "\r\n" );
@@ -2040,9 +2059,7 @@ public class WebMail extends HttpServlet
 				sessionObject.error += e.getMessage();
 			}
 			String boundary = "_=" + I2PAppContext.getGlobalContext().random().nextLong();
-			boolean multipart = false;
-			if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
-				multipart = true;
+			if (multipart) {
 				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
 			}
 			else {

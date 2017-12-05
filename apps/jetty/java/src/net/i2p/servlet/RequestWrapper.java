@@ -101,6 +101,7 @@ public class RequestWrapper {
 
 	/**
 	 * @return List of request parameter names
+	 * @throws IllegalStateException if the request is too large
 	 */
 	public Enumeration<String> getParameterNames() {
 		if (isMultiPartRequest) {
@@ -117,6 +118,7 @@ public class RequestWrapper {
 					log(se);
 				} catch (IllegalStateException ise) {
 					log(ise);
+					throw ise;
 				}
 			}
 			return cachedParameterNames.keys();
@@ -139,6 +141,9 @@ public class RequestWrapper {
 		return httpRequest.getContentType();
 	}
 
+	/**
+	 * @throws IllegalStateException if the request is too large
+	 */
 	public String getContentType( String partName )
 	{
 		String result = null;
@@ -153,6 +158,7 @@ public class RequestWrapper {
 				log(se);
 			} catch (IllegalStateException ise) {
 				log(ise);
+				throw ise;
 			}
 		}
 		return result;
@@ -162,6 +168,9 @@ public class RequestWrapper {
 		return httpRequest.getAttribute( string );
 	}
 
+	/**
+	 * @throws IllegalStateException if the request is too large
+	 */
 	public String getParameter( String name, String defaultValue )
 	{
 		String result = defaultValue;
@@ -192,6 +201,7 @@ public class RequestWrapper {
 					log(se);
 				} catch (IllegalStateException ise) {
 					log(ise);
+					throw ise;
 				} finally {
 					if (in != null) try { in.close(); } catch (IOException ioe) {}
 				}
@@ -204,6 +214,9 @@ public class RequestWrapper {
 		return result;
 	}
 
+	/**
+	 * @throws IllegalStateException if the request is too large
+	 */
 	public String getFilename(String partName )
 	{
 		String result = null;
@@ -218,11 +231,15 @@ public class RequestWrapper {
 				log(se);
 			} catch (IllegalStateException ise) {
 				log(ise);
+				throw ise;
 			}
 		}
 		return result;
 	}
 
+	/**
+	 * @throws IllegalStateException if the request is too large
+	 */
 	public InputStream getInputStream(String partName )
 	{
 		InputStream result = null;
@@ -237,6 +254,7 @@ public class RequestWrapper {
 				log(se);
 			} catch (IllegalStateException ise) {
 				log(ise);
+				throw ise;
 			}
 		}
 		return result;

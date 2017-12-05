@@ -73,7 +73,15 @@ public class Attachment {
 	}
 
 	/**
-         * Delete the data file
+	 * The unencoded size
+	 * @since 0.9.33
+	 */
+	public long getSize() {
+		return data.length();
+	}
+
+	/**
+	 * Delete the data file
 	 * @since 0.9.33
 	 */
 	public void deleteData() {
