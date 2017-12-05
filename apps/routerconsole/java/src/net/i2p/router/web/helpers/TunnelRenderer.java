@@ -150,19 +150,24 @@ class TunnelRenderer {
         out.write("<h3 class=\"tabletitle\">" + _t("Bandwidth Tiers") + "</h3>\n");
         out.write("<table id=\"tunnel_defs\"><tbody>");
         out.write("<tr><td>&nbsp;</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>L</b></span></td><td>" + _t("{0} shared bandwidth", "12 - 32KBps") + "</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>M</b></span></td><td>" + _t("{0} shared bandwidth", "32 - 64KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>L</b></span></td><td>" + _t("{0} shared bandwidth", range(Router.MIN_BW_L, Router.MIN_BW_M)) + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>M</b></span></td><td>" + _t("{0} shared bandwidth", range(Router.MIN_BW_M, Router.MIN_BW_N)) + "</td>"
                   + "<td>&nbsp;</td></tr>");
         out.write("<tr><td>&nbsp;</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>N</b></span></td><td>" + _t("{0} shared bandwidth", "64 - 128KBps") + "</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>O</b></span></td><td>" + _t("{0} shared bandwidth", "128 - 256KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>N</b></span></td><td>" + _t("{0} shared bandwidth", range(Router.MIN_BW_N, Router.MIN_BW_O)) + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>O</b></span></td><td>" + _t("{0} shared bandwidth", range(Router.MIN_BW_O, Router.MIN_BW_P)) + "</td>"
                   + "<td>&nbsp;</td></tr>");
         out.write("<tr><td>&nbsp;</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>P</b></span></td><td>" + _t("{0} shared bandwidth", "256 - 2000KBps") + "</td>"
-                  + "<td><span class=\"tunnel_cap\"><b>X</b></span></td><td>" + _t("Over {0} shared bandwidth", "2000KBps") + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>P</b></span></td><td>" + _t("{0} shared bandwidth", range(Router.MIN_BW_P, Router.MIN_BW_X)) + "</td>"
+                  + "<td><span class=\"tunnel_cap\"><b>X</b></span></td><td>" + _t("Over {0} shared bandwidth", Router.MIN_BW_X + " KBps") + "</td>"
                   + "<td>&nbsp;</td></tr>");
         out.write("</tbody></table>");
 
+    }
+
+    /** @since 0.9.33 */
+    private static String range(int f, int t) {
+        return f + " - " + t + " KBps";
     }
 
     private static class TunnelComparator implements Comparator<HopConfig>, Serializable {

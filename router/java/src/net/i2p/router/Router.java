@@ -952,6 +952,21 @@ public class Router implements RouterClock.ClockShiftListener {
     @Deprecated
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
+    /** @since 0.9.33 */
+    public static final int MIN_BW_K = 0;
+    /** @since 0.9.33 */
+    public static final int MIN_BW_L = 12;
+    /** @since 0.9.33 */
+    public static final int MIN_BW_M = 48;
+    /** @since 0.9.33 */
+    public static final int MIN_BW_N = 64;
+    /** @since 0.9.33 */
+    public static final int MIN_BW_O = 128;
+    /** @since 0.9.33 */
+    public static final int MIN_BW_P = 256;
+    /** @since 0.9.33 */
+    public static final int MIN_BW_X = 2000;
+
     /**
      *  The current bandwidth class.
      *  For building our RI. Not for external use.
@@ -967,17 +982,17 @@ public class Router implements RouterClock.ClockShiftListener {
         String force = _context.getProperty(PROP_FORCE_BWCLASS);
         if (force != null && force.length() > 0) {
             return force.charAt(0);
-        } else if (bwLim < 12) {
+        } else if (bwLim < MIN_BW_L) {
             return CAPABILITY_BW12;
-        } else if (bwLim <= 48) {
+        } else if (bwLim <= MIN_BW_M) {
             return CAPABILITY_BW32;
-        } else if (bwLim <= 64) {
+        } else if (bwLim <= MIN_BW_N) {
             return CAPABILITY_BW64;
-        } else if (bwLim <= 128) {
+        } else if (bwLim <= MIN_BW_O) {
             return CAPABILITY_BW128;
-        } else if (bwLim <= 256) {
+        } else if (bwLim <= MIN_BW_P) {
             return CAPABILITY_BW256;
-        } else if (bwLim <= 2000) {    // TODO adjust threshold
+        } else if (bwLim <= MIN_BW_X) {    // TODO adjust threshold
             // 512 supported as of 0.9.18;
             return CAPABILITY_BW512;
         } else {
