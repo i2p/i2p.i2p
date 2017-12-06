@@ -87,21 +87,11 @@ public class MessageInputStreamTest {
 
     @Test
     public void testCanAccept_locallyClosed() {
-        // Fill the buffer
-        int numMsgs = _options.getInboundBufferSize() / _options.getMaxMessageSize();
-        byte orig[] = new byte[_options.getInboundBufferSize()];
-        _context.random().nextBytes(orig);
-        for (int i = 0; i < numMsgs; i++) {
-            byte msg[] = new byte[_options.getMaxMessageSize()];
-            System.arraycopy(orig, i*_options.getMaxMessageSize(), msg, 0, _options.getMaxMessageSize());
-            in.messageReceived(i, new ByteArray(msg));
-        }
-        // Check that new messages won't be accepted
-        assertFalse(in.canAccept(numMsgs, 1));
         // Close
         in.close();
-        // Check that new messages will now be accepted
-        assertTrue(in.canAccept(numMsgs, 1));
+        assertTrue(in.isLocallyClosed());
+        // Check that new messages will not be accepted
+        assertFalse(in.canAccept(2, 1));
     }
 
     @Test
