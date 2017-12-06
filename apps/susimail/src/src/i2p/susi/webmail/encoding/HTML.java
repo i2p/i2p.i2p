@@ -47,6 +47,7 @@ public class HTML extends Encoding {
 	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
 	 */
+	@Override
 	public String encode(String str) throws EncodingException
 	{
 		return  str.replace("&", "&amp;")  // must be first
@@ -56,32 +57,10 @@ public class HTML extends Encoding {
 	}
 
 	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[])
-	 */
-	public ReadBuffer decode(byte[] in) throws DecodingException {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[], int, int)
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length)
 		throws DecodingException {
 		throw new DecodingException("unsupported");
 	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
-	 */
-	public ReadBuffer decode(String str) throws DecodingException {
-		throw new DecodingException("unsupported");
-	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(i2p.susi.webmail.util.ReadBuffer)
-	 */
-	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
-		throw new DecodingException("unsupported");
-	}
-
 }

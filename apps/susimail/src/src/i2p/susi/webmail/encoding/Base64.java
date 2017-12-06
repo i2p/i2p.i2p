@@ -61,19 +61,6 @@ public class Base64 extends Encoding {
 	}
 
 	/**
-	 * @see Base64#encode(byte[])
-	 */
-	public String encode(String str) throws EncodingException {
-		try {
-			StringWriter strBuf = new StringWriter();
-			encode(new ByteArrayInputStream(DataHelper.getUTF8(str)), strBuf);
-			return strBuf.toString();
-		}catch (IOException e) {
-			throw new EncodingException("encode error",  e);
-		}
-	}
-
-	/**
 	 * More efficient than super
 	 * 
 	 * @param in
@@ -180,21 +167,6 @@ public class Base64 extends Encoding {
 	}
 
 	/**
-	 * @param text 
-	 * @return Buffer containing a decoded String.
-	 */
-	public ReadBuffer decode(String text) throws DecodingException {
-		return text != null ? decode( DataHelper.getUTF8(text) ) : null;
-	}
-
-	/**
-	 * @see Base64#decode(String)
-	 */
-	public ReadBuffer decode(byte[] in) throws DecodingException {
-		return decode( in, 0, in.length );
-	}
-
-	/**
 	 * @see Base64#decode(String)
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length) throws DecodingException {
@@ -230,12 +202,5 @@ public class Base64 extends Encoding {
 			}
 		}
 		return new ReadBuffer(out, 0, written);
-	}
-
-	/*
-	 * @see Base64#decode(String)
-	 */
-	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
-		return decode( in.content, in.offset, in.length );
 	}
 }

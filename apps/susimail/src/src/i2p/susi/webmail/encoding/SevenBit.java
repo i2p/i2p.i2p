@@ -47,20 +47,6 @@ public class SevenBit extends Encoding {
 	}
 
 	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#encode(java.lang.String)
-	 */
-	public String encode(String str) throws EncodingException {
-		throw new EncodingException("unsupported");
-	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#decode(byte[])
-	 */
-	public ReadBuffer decode(byte[] in) throws DecodingException {
-		return decode( in, 0, in.length );
-	}
-
-	/* (non-Javadoc)
 	 * @see i2p.susi23.mail.encoding.Encoding#decode(byte[], int, int)
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length)
@@ -79,19 +65,4 @@ public class SevenBit extends Encoding {
 		}
 		return new ReadBuffer(in, backupOffset, backupLength);
 	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#decode(java.lang.String)
-	 */
-	public ReadBuffer decode(String str) throws DecodingException {
-		return decode( DataHelper.getUTF8(str) );
-	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#decode(i2p.susi.webmail.util.ReadBuffer)
-	 */
-	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
-		return decode( in.content, in.offset, in.length );
-	}
-
 }

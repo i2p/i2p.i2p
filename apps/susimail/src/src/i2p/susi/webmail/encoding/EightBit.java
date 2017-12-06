@@ -47,20 +47,6 @@ public class EightBit extends Encoding {
 	}
 
 	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
-	 */
-	public String encode(String str) throws EncodingException {
-		throw new EncodingException("unsupported");
-	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[])
-	 */
-	public ReadBuffer decode(byte[] in) throws DecodingException {
-		return decode( in, 0, in.length );
-	}
-
-	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[], int, int)
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length)
@@ -68,18 +54,11 @@ public class EightBit extends Encoding {
 		return new ReadBuffer(in, offset, length);
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
+	/**
+	 * @return in unchanged
 	 */
-	public ReadBuffer decode(String str) throws DecodingException {
-		return decode( DataHelper.getUTF8(str) );
-	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(i2p.susi.webmail.util.ReadBuffer)
-	 */
+	@Override
 	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
 		return in;
 	}
-
 }

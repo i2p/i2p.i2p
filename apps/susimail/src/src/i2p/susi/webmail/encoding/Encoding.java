@@ -36,23 +36,35 @@ import net.i2p.data.DataHelper;
  * Interface to encode/decode content transfer encodings like quoted-printable, base64 etc.
  * 
  * @author susi
+ * @since 0.9.33 changed from interface to abstract class
  */
 public abstract class Encoding {
 	public abstract String getName();
+
 	/**
+	 * Encode a byte array to a ASCII or ISO-8859-1 String
 	 * 
 	 * @param in
 	 * @return Encoded string.
 	 * @throws EncodingException 
 	 */
 	public abstract String encode( byte in[] ) throws EncodingException;
+
 	/**
+	 * Encode a (UTF-8) String to a ASCII or ISO-8859-1 String
+	 * 
+	 * This implementation just converts the string to a byte array
+	 * and then calls encode(byte[]).
+	 * Most classes will not need to override.
 	 * 
 	 * @param str
 	 * @see Encoding#encode(byte[])
 	 * @throws EncodingException 
+	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public abstract String encode( String str ) throws EncodingException;
+	public String encode(String str) throws EncodingException {
+		return encode(DataHelper.getUTF8(str));
+	}
 
 	/**
 	 *  This implementation just reads the whole stream into memory
@@ -69,12 +81,18 @@ public abstract class Encoding {
 	}
 
 	/**
+	 * This implementation just calls decode(in, 0, in.length).
+	 * Most classes will not need to override.
 	 * 
 	 * @param in
 	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
+	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public abstract ReadBuffer decode( byte in[] ) throws DecodingException;
+	public ReadBuffer decode(byte in[]) throws DecodingException {
+		return decode(in, 0, in.length);
+	}
+
 	/**
 	 * 
 	 * @param in
@@ -84,18 +102,32 @@ public abstract class Encoding {
 	 * @throws DecodingException 
 	 */
 	public abstract ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException;
+
 	/**
+	 * This implementation just converts the string to a byte array
+	 * and then calls encode(byte[]).
+	 * Most classes will not need to override.
 	 * 
 	 * @param str
+	 * @return null if str is null
 	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
+	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public abstract ReadBuffer decode( String str ) throws DecodingException;
+	public ReadBuffer decode(String str) throws DecodingException {
+		return str != null ? decode(DataHelper.getUTF8(str)) : null;
+	}
+
 	/**
+	 * This implementation just calls decode(in.content, in.offset, in.length).
+	 * Most classes will not need to override.
 	 * 
 	 * @param in
 	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
+	 * @since 0.9.33 implementation moved from subclasses
 	 */
-	public abstract ReadBuffer decode( ReadBuffer in ) throws DecodingException;
+	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
+		return decode(in.content, in.offset, in.length);
+	}
 }

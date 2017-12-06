@@ -46,12 +46,6 @@ public class QuotedPrintable extends Encoding {
 	public String getName() {
 		return "quoted-printable";
 	}
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
-	 */
-	public String encode(String text) throws EncodingException {
-		return encode( DataHelper.getUTF8(text) );
-	}
 
 	private static int BUFSIZE = 2;
 
@@ -149,19 +143,6 @@ public class QuotedPrintable extends Encoding {
 	}
 
 	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
-	 */
-	public ReadBuffer decode( byte in[] ) {
-		return decode( in, 0, in.length );
-	}
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
-	 */
-	public ReadBuffer decode(String text) {
-		return text != null ? decode( DataHelper.getUTF8(text) ) : null;
-	}
-
-	/* (non-Javadoc)
 	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[], int, int)
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length) {
@@ -215,12 +196,5 @@ public class QuotedPrintable extends Encoding {
 		}
 		
 		return new ReadBuffer(out, 0, written);
-	}
-
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(i2p.susi.webmail.util.ReadBuffer)
-	 */
-	public ReadBuffer decode(ReadBuffer in) {
-		return decode( in.content, in.offset, in.length );
 	}
 }
