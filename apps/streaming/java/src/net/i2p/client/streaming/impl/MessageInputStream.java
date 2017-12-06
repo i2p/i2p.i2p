@@ -124,8 +124,6 @@ class MessageInputStream extends InputStream {
     public boolean canAccept(long messageId, int payloadSize) { 
         if (payloadSize <= 0)
             return true;
-        if (messageId < MIN_READY_BUFFERS)
-            return true;
         synchronized (_dataLock) {
             // ready dup check
             // we always allow sequence numbers less than or equal to highest received
@@ -136,6 +134,8 @@ class MessageInputStream extends InputStream {
                 // return true if a not-ready dup, false if not
                 return _notYetReadyBlocks.containsKey(Long.valueOf(messageId));
             }
+            if (messageId < MIN_READY_BUFFERS)
+                return true;
             // shortcut test, assuming all ready and not ready blocks are max size,
             // to avoid iterating through all the ready blocks in getTotalReadySize()
             if ((_readyDataBlocks.size() + _notYetReadyBlocks.size()) * _maxMessageSize < _maxBufferSize)
