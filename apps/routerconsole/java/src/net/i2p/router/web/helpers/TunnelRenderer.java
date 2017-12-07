@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -50,6 +51,11 @@ class TunnelRenderer {
                 continue;
             TunnelPool in = clientInboundPools.get(client);
             TunnelPool outPool = clientOutboundPools.get(client);
+            if ((in != null && in.getSettings().getAliasOf() != null) ||
+                (outPool != null && outPool.getSettings().getAliasOf() != null)) {
+                // skip aliases, we will print a header under the main tunnel pool below
+                continue;
+            }
             // TODO the following code is duplicated in SummaryHelper
             String name = (in != null) ? in.getSettings().getDestinationNickname() : null;
             if ( (name == null) && (outPool != null) )
@@ -62,6 +68,26 @@ class TunnelRenderer {
                 out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
             else
                 out.write(" (" + _t("dead") + ")</h3>\n");
+            if (in != null) {
+                // list aliases
+                Set<Hash> aliases = in.getSettings().getAliases();
+                if (aliases != null) {
+                    for (Hash a : aliases) {
+                        TunnelPool ain = clientInboundPools.get(a);
+                        if (ain != null) {
+                            String aname = ain.getSettings().getDestinationNickname();
+                            if (aname == null)
+                                aname = a.toBase64().substring(0,4);
+                            out.write("<h3 class=\"tabletitle\" id=\"" + a.toBase64().substring(0,4)
+                                      + "\" >" + _t("Client tunnels for") + ' ' + DataHelper.escapeHTML(_t(aname)));
+                            if (isLocal)
+                                out.write(" <a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\" title=\"" + _t("Configure tunnels for session") + "\">[" + _t("configure") + "]</a></h3>\n");
+                            else
+                                out.write(" (" + _t("dead") + ")</h3>\n");
+                        }
+                    }
+                }     
+            }         
             renderPool(out, in, outPool);
         }
 

@@ -38,7 +38,9 @@ public class ConfigTunnelsHelper extends HelperBase {
             TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(dest.calculateHash());
             TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(dest.calculateHash());
             
-            if ( (in == null) || (out == null) ) continue;
+            if (in == null || in.getAliasOf() != null ||
+                out == null || out.getAliasOf() != null)
+                continue;
             
             String name = in.getDestinationNickname();
             if (name == null)
