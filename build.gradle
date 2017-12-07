@@ -1,6 +1,9 @@
 // Exclude apps/ dir itself, but include its subdirs
-configure(subprojects - project(':apps')) {
+def javaProjects = subprojects - project(':apps')
+
+configure(javaProjects) {
     apply plugin: 'java'
+    apply plugin: 'jacoco'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
@@ -26,6 +29,27 @@ configure(subprojects - project(':apps')) {
         tasks.withType(AbstractCompile, { AbstractCompile ac ->
             ac.options.bootstrapClasspath = files(i2pBootClasspath)
         })
+    }
+}
+
+task codeCoverageReport(type: JacocoReport) {
+    dependsOn(javaProjects.test)
+
+    jacocoClasspath = project(':core').configurations.jacocoAnt
+    additionalSourceDirs = files(javaProjects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(javaProjects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(javaProjects.sourceSets.main.output)
+    executionData = files(javaProjects.jacocoTestReport.executionData)
+
+    doFirst {
+        executionData = files(executionData.findAll { it.exists() })
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination "${buildDir}/reports/jacoco/report.xml"
+        html.enabled true
+        html.destination "${buildDir}/reports/jacoco/html"
     }
 }
 
