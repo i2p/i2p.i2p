@@ -94,17 +94,18 @@ class MailPart {
 
 		for( int i = 0; i < headerLines.length; i++ )
 		{
-			if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-transfer-encoding: " ) ) {
+			String hlc = headerLines[i].toLowerCase(Locale.US);
+			if( hlc.startsWith( "content-transfer-encoding: " ) ) {
 				x_encoding = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 			}
-			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-disposition: " ) ) {
+			else if( hlc.startsWith( "content-disposition: " ) ) {
 				x_disposition = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				String str;
 				str = getHeaderLineAttribute( headerLines[i], "filename" );
 				if( str != null )
 					x_name = str;
 			}
-			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-type: " ) ) {
+			else if( hlc.startsWith( "content-type: " ) ) {
 				x_type = getFirstAttribute( headerLines[i] ).toLowerCase(Locale.US);
 				/*
 				 * extract boundary, name and charset from content type
@@ -124,10 +125,10 @@ class MailPart {
 				if( str != null )
 					x_charset = str.toUpperCase(Locale.US);
 			}
-			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "content-description: " ) ) {
+			else if( hlc.startsWith( "content-description: " ) ) {
 				x_description = getFirstAttribute( headerLines[i] );
 			}
-			else if( headerLines[i].toLowerCase(Locale.US).startsWith( "mime-version: " ) ) {
+			else if( hlc.startsWith( "mime-version: " ) ) {
 				x_version = getFirstAttribute( headerLines[i] );
 			}
 		}

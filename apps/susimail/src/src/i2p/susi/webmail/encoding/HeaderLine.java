@@ -44,17 +44,13 @@ import net.i2p.data.DataHelper;
  */
 public class HeaderLine extends Encoding {
 	public static final String NAME = "HEADERLINE";
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#getName()
-	 */
+
 	public String getName() {
 		return NAME;
 	}
 
 	private static final int BUFSIZE = 2;
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
-	 */
+
 	public String encode( byte in[] ) throws EncodingException {
 		StringBuilder out = new StringBuilder();
 		int l = 0, buffered = 0, tmp[] = new int[BUFSIZE];
@@ -148,9 +144,6 @@ public class HeaderLine extends Encoding {
 		return out.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(java.lang.String)
-	 */
 	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
 		int written = 0;

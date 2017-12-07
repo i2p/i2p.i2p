@@ -32,26 +32,18 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import net.i2p.data.DataHelper;
-
 /**
  * ref: https://en.wikipedia.org/wiki/Quoted-printable
  * @author susi
  */
 public class QuotedPrintable extends Encoding {
 	
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#getName()
-	 */
 	public String getName() {
 		return "quoted-printable";
 	}
 
 	private static int BUFSIZE = 2;
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
-	 */
 	public String encode( byte in[] ) throws EncodingException {
 		try {
 			StringWriter strBuf = new StringWriter();
@@ -142,9 +134,6 @@ public class QuotedPrintable extends Encoding {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[], int, int)
-	 */
 	public ReadBuffer decode(byte[] in, int offset, int length) {
 		byte[] out = new byte[length];
 		int written = 0;

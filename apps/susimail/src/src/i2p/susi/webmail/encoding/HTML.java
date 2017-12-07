@@ -30,23 +30,14 @@ import i2p.susi.util.ReadBuffer;
  */
 public class HTML extends Encoding {
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#getName()
-	 */
 	public String getName() {
 		return "HTML";
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(byte[])
-	 */
 	public String encode(byte[] in) throws EncodingException {
 		throw new EncodingException("unsupported");
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#encode(java.lang.String)
-	 */
 	@Override
 	public String encode(String str) throws EncodingException
 	{
@@ -56,9 +47,6 @@ public class HTML extends Encoding {
 			   .replaceAll( "\r{0,1}\n", "<br>\r\n" );
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi.webmail.encoding.Encoding#decode(byte[], int, int)
-	 */
 	public ReadBuffer decode(byte[] in, int offset, int length)
 		throws DecodingException {
 		throw new DecodingException("unsupported");

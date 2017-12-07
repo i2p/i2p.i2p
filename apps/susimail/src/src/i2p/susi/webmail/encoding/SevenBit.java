@@ -25,29 +25,25 @@ package i2p.susi.webmail.encoding;
 
 import i2p.susi.util.ReadBuffer;
 
-import net.i2p.data.DataHelper;
-
 /**
+ * Decode only.
  * @author susi
  */
 public class SevenBit extends Encoding {
 
-	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#getName()
-	 */
 	public String getName() {
 		return "7bit";
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#encode(byte[])
+        /**
+	 * @throws EncodingException always
 	 */
 	public String encode(byte[] in) throws EncodingException {
 		throw new EncodingException("unsupported");
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi23.mail.encoding.Encoding#decode(byte[], int, int)
+        /**
+	 * @throws DecodingException on illegal characters
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length)
 			throws DecodingException {

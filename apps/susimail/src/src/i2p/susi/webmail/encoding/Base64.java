@@ -31,16 +31,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import net.i2p.data.DataHelper;
-
 /**
  * @author susi
  */
 public class Base64 extends Encoding {
 	
-	/* (non-Javadoc)
-	 * @see i2p.susi23.util.Encoding#getName()
-	 */
 	public String getName() {
 		return "base64";
 	}
@@ -166,9 +161,6 @@ public class Base64 extends Encoding {
 		return b;
 	}
 
-	/**
-	 * @see Base64#decode(String)
-	 */
 	public ReadBuffer decode(byte[] in, int offset, int length) throws DecodingException {
 		byte out[] = new byte[length * 3 / 4 + 1 ];
 		int written = 0;
@@ -197,7 +189,7 @@ public class Base64 extends Encoding {
 				length -= 4;
 			}
 			else {
-				System.err.println( "" );
+				//System.err.println( "" );
 				throw new DecodingException( "Decoding base64 failed (trailing garbage)." );
 			}
 		}

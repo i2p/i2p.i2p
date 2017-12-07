@@ -64,7 +64,8 @@ public class SMTPClient {
 	private Socket socket;
 	public String error;
 	private String lastResponse;
-	private boolean supportsPipelining;
+	private boolean supportsPipelining, eightBitMime;
+	private long maxSize = DEFAULT_MAX_SIZE;
 	
 	private static final Encoding base64;
 	
@@ -258,10 +259,42 @@ public class SMTPClient {
 				socket.setSoTimeout(60*1000);
 				Result r = getFullResult();
 				if (r.result == 250) {
-					supportsPipelining = r.recv.contains("PIPELINING");
+					String[] caps = DataHelper.split(r.recv, "\r");
+					for (String c : caps) {
+						if (c.equals("PIPELINING")) {
+							supportsPipelining = true;
+							Debug.debug(Debug.DEBUG, "Server supports pipelining");
+						} else if (c.startsWith("SIZE ")) {
+							try {
+								maxSize = Long.parseLong(c.substring(5));
+								Debug.debug(Debug.DEBUG, "Server max size: " + maxSize);
+							} catch (NumberFormatException nfe) {}
+						} else if (c.equals("8BITMIME")) {
+							// unused, see encoding/EightBit.java
+							eightBitMime = true;
+							Debug.debug(Debug.DEBUG, "Server supports 8bitmime");
+						}
+					}
 				} else {
 					error += _t("Server refused connection") + " (" + r +  ")\n";
 					ok = false;
+				}
+			}
+			if (ok && maxSize < DEFAULT_MAX_SIZE) {
+				Debug.debug(Debug.DEBUG, "Rechecking with new max size");
+				// recalculate whether we'll fit
+				// copied from WebMail
+				long total = body.length();
+				if (attachments != null && !attachments.isEmpty()) {
+					for(Attachment a : attachments) {
+						total += a.getSize();
+					}
+				}
+				long binaryMax = (long) ((maxSize * 57.0d / 78) - 32*1024);
+				if (total > binaryMax) {
+					ok = false;
+					error += _t("Email is too large, max is {0}",
+				                    DataHelper.formatSize2(binaryMax, false) + 'B') + '\n';
 				}
 			}
 			if (ok) {

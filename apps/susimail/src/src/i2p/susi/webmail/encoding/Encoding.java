@@ -42,7 +42,12 @@ public abstract class Encoding {
 	public abstract String getName();
 
 	/**
-	 * Encode a byte array to a ASCII or ISO-8859-1 String
+	 * Encode a byte array to a ASCII or ISO-8859-1 String.
+	 * Output must be SMTP-safe: Line length of 998 or less,
+	 * using SMTP-safe characters,
+	 * followed by \r\n, and must not start with a '.'
+	 * unless escaped by a 2nd dot.
+	 * For some encodings, max line length is 76.
 	 * 
 	 * @param in
 	 * @return Encoded string.
@@ -51,7 +56,12 @@ public abstract class Encoding {
 	public abstract String encode( byte in[] ) throws EncodingException;
 
 	/**
-	 * Encode a (UTF-8) String to a ASCII or ISO-8859-1 String
+	 * Encode a (UTF-8) String to a ASCII or ISO-8859-1 String.
+	 * Output must be SMTP-safe: Line length of 998 or less,
+	 * using SMTP-safe characters,
+	 * followed by \r\n, and must not start with a '.'
+	 * unless escaped by a 2nd dot.
+	 * For some encodings, max line length is 76.
 	 * 
 	 * This implementation just converts the string to a byte array
 	 * and then calls encode(byte[]).
@@ -67,6 +77,13 @@ public abstract class Encoding {
 	}
 
 	/**
+	 * Encode an input stream of bytes to a ASCII or ISO-8859-1 String.
+	 * Output must be SMTP-safe: Line length of 998 or less,
+	 * using SMTP-safe characters,
+	 * followed by \r\n, and must not start with a '.'
+	 * unless escaped by a 2nd dot.
+	 * For some encodings, max line length is 76.
+	 * 
 	 *  This implementation just reads the whole stream into memory
 	 *  and then calls encode(byte[]).
 	 *  Subclasses should implement a more memory-efficient method
