@@ -17,6 +17,16 @@ matrix:
         - sudo perl -pi.bak -e 's/^(security\.provider\.)([0-9]+)/$1.($2+1)/ge' /etc/java-7-openjdk/security/java.security
         - echo "security.provider.1=org.bouncycastle.jce.provider.BouncyCastleProvider" | sudo tee -a /etc/java-7-openjdk/security/java.security
 
+before_install:
+ - |
+    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
+      echo "plugins {
+    id 'org.sonarqube' version '2.6.1'
+}
+" | cat - build.gradle > build.gradle.temp
+      mv build.gradle.temp build.gradle
+    fi
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
