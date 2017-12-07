@@ -1,3 +1,7 @@
+plugins {
+    id "org.sonarqube" version "2.6.1"
+}
+
 // Exclude apps/ dir itself, but include its subdirs
 def javaProjects = subprojects - project(':apps')
 

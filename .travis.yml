@@ -1,5 +1,9 @@
 language: java
 
+addons:
+  sonarcloud:
+    organization: "i2p"
+
 jdk:
   - oraclejdk9
   - oraclejdk8
@@ -21,9 +25,11 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+    - $HOME/.sonar/cache/
+    - .gradle
 
 script:
-  - ./gradlew check
+  - ./gradlew sonarqube
   - ./gradlew codeCoverageReport
 
 after_success:
