@@ -1671,7 +1671,8 @@ public class SnarkManager implements CompleteListener, ClientApp {
         }
         if (autoStart) {
             startTorrent(ih);
-            addMessage(_t("Fetching {0}", name));
+            if (false)
+                addMessage(_t("Fetching {0}", name));
             DHT dht = _util.getDHT();
             boolean shouldWarn = _util.connected() &&
                                  _util.getOpenTrackers().isEmpty() &&
@@ -2053,14 +2054,16 @@ public class SnarkManager implements CompleteListener, ClientApp {
         if (config.getProperty(PROP_META_ADDED) == null)
             config.setProperty(PROP_META_ADDED, now);
         String bfs;
-        if (bitfield.complete()) {
-          bfs = ".";
-          if (config.getProperty(PROP_META_COMPLETED) == null)
-              config.setProperty(PROP_META_COMPLETED, now);
-        } else {
-          byte[] bf = bitfield.getFieldBytes();
-          bfs = Base64.encode(bf);
-          config.remove(PROP_META_COMPLETED);
+        synchronized(bitfield) {
+            if (bitfield.complete()) {
+              bfs = ".";
+              if (config.getProperty(PROP_META_COMPLETED) == null)
+                  config.setProperty(PROP_META_COMPLETED, now);
+            } else {
+              byte[] bf = bitfield.getFieldBytes();
+              bfs = Base64.encode(bf);
+              config.remove(PROP_META_COMPLETED);
+            }
         }
         config.setProperty(PROP_META_BITFIELD, bfs);
         config.setProperty(PROP_META_PRESERVE_NAMES, Boolean.toString(preserveNames));

@@ -22,6 +22,7 @@ package org.klomp.snark;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -355,12 +356,25 @@ class PeerConnectionOut implements Runnable
   void sendBitfield(BitField bitfield)
   {
     boolean fast = peer.supportsFast();
-    if (fast && bitfield.complete()) {
+    boolean all = false;
+    boolean none = false;
+    byte[] data = null;
+    synchronized(bitfield) {
+        if (fast && bitfield.complete()) {
+            all = true;
+        } else if (fast && bitfield.count() <= 0) {
+            none = true;
+        } else {
+           byte[] d = bitfield.getFieldBytes();
+           data =  Arrays.copyOf(d, d.length);
+        }
+    }
+    if (all) {
         sendHaveAll();
-    } else if (fast && bitfield.count() <= 0) {
+    } else if (none) {
         sendHaveNone();
     } else {
-       Message m = new Message(bitfield.getFieldBytes());
+       Message m = new Message(data);
        addMessage(m);
     }
   }

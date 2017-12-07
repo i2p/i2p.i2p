@@ -71,6 +71,8 @@ public class BitField
    * affect this BitField.  Note that some bits at the end of the byte
    * array are supposed to be always unset if they represent bits
    * bigger then the size of the bitfield.
+   *
+   * Caller should synch on this and copy!
    */
   public byte[] getFieldBytes()
   {
