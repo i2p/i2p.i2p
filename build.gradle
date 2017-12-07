@@ -1,5 +1,9 @@
-plugins {
-    id "org.sonarqube" version "2.6.1"
+// SonarQube is currently only supported on Java 8
+// https://docs.sonarqube.org/display/SONAR/Requirements#Requirements-SupportedPlatforms
+if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+    plugins {
+        id "org.sonarqube" version "2.6.1"
+    }
 }
 
 // Exclude apps/ dir itself, but include its subdirs

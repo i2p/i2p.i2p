@@ -1,12 +1,12 @@
 language: java
 
 jdk:
-  - oraclejdk8
+  - oraclejdk9
   - openjdk8
 
 matrix:
   include:
-    - jdk: oraclejdk9
+    - jdk: oraclejdk8
       addons:
         sonarcloud:
           organization: "i2p"
@@ -29,7 +29,7 @@ cache:
 
 script:
   - |
-    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk9" ]; then
+    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
       ./gradlew sonarqube codeCoverageReport
     else
       ./gradlew check codeCoverageReport
