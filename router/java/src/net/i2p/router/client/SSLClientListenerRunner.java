@@ -35,7 +35,6 @@ class SSLClientListenerRunner extends ClientListenerRunner {
     private SSLServerSocketFactory _factory;
 
     private static final String PROP_KEYSTORE_PASSWORD = "i2cp.keystorePassword";
-    private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String PROP_KEY_PASSWORD = "i2cp.keyPassword";
     private static final String KEY_ALIAS = "i2cp";
     private static final String ASCII_KEYFILE = "i2cp.local.crt";
@@ -91,7 +90,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
             success = ks.exists();
             if (success) {
                 Map<String, String> changes = new HashMap<String, String>();
-                changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+                changes.put(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
                 changes.put(PROP_KEY_PASSWORD, keyPassword);
                 _context.router().saveConfig(changes, null);
             }
@@ -116,7 +115,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
     private void exportCert(File ks) {
         File sdir = new SecureDirectory(_context.getConfigDir(), "certificates/i2cp");
         if (sdir.exists() || sdir.mkdirs()) {
-            String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+            String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
             File out = new File(sdir, ASCII_KEYFILE);
             boolean success = KeyStoreUtil.exportCert(ks, ksPass, KEY_ALIAS, out);
             if (!success)
@@ -131,7 +130,7 @@ class SSLClientListenerRunner extends ClientListenerRunner {
      * @return success
      */
     private boolean initializeFactory(File ks) {
-        String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+        String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
         String keyPass = _context.getProperty(PROP_KEY_PASSWORD);
         if (keyPass == null) {
             _log.error("No key password, set " + PROP_KEY_PASSWORD +

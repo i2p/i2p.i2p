@@ -126,7 +126,6 @@ public class RouterConsoleRunner implements RouterApp {
     public static final String PREFIX = "webapps.";
     public static final String ENABLED = ".startOnLoad";
     private static final String PROP_KEYSTORE_PASSWORD = "routerconsole.keystorePassword";
-    private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String PROP_KEY_PASSWORD = "routerconsole.keyPassword";
     public static final int DEFAULT_LISTEN_PORT = 7657;
     private static final String DEFAULT_LISTEN_HOST = "127.0.0.1";
@@ -578,7 +577,7 @@ public class RouterConsoleRunner implements RouterApp {
                 if (verifyKeyStore(keyStore)) {
                     // the keystore path and password
                     SslContextFactory sslFactory = new SslContextFactory(keyStore.getAbsolutePath());
-                    sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
+                    sslFactory.setKeyStorePassword(_context.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD));
                     // the X.509 cert password (if not present, verifyKeyStore() returned false)
                     sslFactory.setKeyManagerPassword(_context.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
                     sslFactory.addExcludeProtocols(I2PSSLSocketFactory.EXCLUDE_PROTOCOLS.toArray(
@@ -870,7 +869,7 @@ public class RouterConsoleRunner implements RouterApp {
             if (success) {
                 try {
                     Map<String, String> changes = new HashMap<String, String>();
-                    changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+                    changes.put(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
                     changes.put(PROP_KEY_PASSWORD, keyPassword);
                     _context.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
@@ -880,7 +879,7 @@ public class RouterConsoleRunner implements RouterApp {
                 dir = new SecureDirectory(dir, "console");
                 dir.mkdir();
                 File certFile = new File(dir, "console.local.crt");
-                KeyStoreUtil.exportCert(ks, DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
+                KeyStoreUtil.exportCert(ks, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD, "console", certFile);
             }
         }
         if (success) {

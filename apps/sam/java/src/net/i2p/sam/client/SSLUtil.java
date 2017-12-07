@@ -26,7 +26,6 @@ class SSLUtil {
 
     public static final String DEFAULT_SAMCLIENT_CONFIGFILE = "samclient.config";
     private static final String PROP_KEYSTORE_PASSWORD = "samclient.keystorePassword";
-    private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
     private static final String PROP_KEY_PASSWORD = "samclient.keyPassword";
     private static final String PROP_KEY_ALIAS = "samclient.keyAlias";
     private static final String ASCII_KEYFILE_SUFFIX = ".local.crt";
@@ -98,7 +97,7 @@ class SSLUtil {
         if (success) {
             success = ks.exists();
             if (success) {
-                opts.setProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+                opts.setProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
                 opts.setProperty(PROP_KEY_PASSWORD, keyPassword);
             }
         }
@@ -125,7 +124,7 @@ class SSLUtil {
         File sdir = new SecureDirectory(I2PAppContext.getGlobalContext().getConfigDir(), CERT_DIR);
         if (sdir.exists() || sdir.mkdirs()) {
             String keyAlias = opts.getProperty(PROP_KEY_ALIAS);
-            String ksPass = opts.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+            String ksPass = opts.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
             File out = new File(sdir, PREFIX + name + ASCII_KEYFILE_SUFFIX);
             boolean success = KeyStoreUtil.exportCert(ks, ksPass, keyAlias, out);
             if (!success)
@@ -143,7 +142,7 @@ class SSLUtil {
      * @return factory, throws on all errors
      */
     public static SSLServerSocketFactory initializeFactory(Properties opts) throws IOException {
-        String ksPass = opts.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+        String ksPass = opts.getProperty(PROP_KEYSTORE_PASSWORD, KeyStoreUtil.DEFAULT_KEYSTORE_PASSWORD);
         String keyPass = opts.getProperty(PROP_KEY_PASSWORD);
         if (keyPass == null) {
             throw new IOException("No key password, set " + PROP_KEY_PASSWORD + " in " +
