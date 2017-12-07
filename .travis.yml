@@ -29,7 +29,12 @@ cache:
     - .gradle
 
 script:
-  - ./gradlew sonarqube
+  - |
+    if [ "$TRAVIS_JDK_VERSION" == "oraclejdk9" ]; then
+      ./gradlew sonarqube
+    else
+      ./gradlew check
+    fi
   - ./gradlew codeCoverageReport
 
 after_success:
