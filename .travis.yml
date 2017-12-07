@@ -1,16 +1,15 @@
 language: java
 
-addons:
-  sonarcloud:
-    organization: "i2p"
-
 jdk:
-  - oraclejdk9
   - oraclejdk8
   - openjdk8
 
 matrix:
   include:
+    - jdk: oraclejdk9
+      addons:
+        sonarcloud:
+          organization: "i2p"
     - jdk: openjdk7
       sudo: required
       before_install: # Work around missing crypto in openjdk7
