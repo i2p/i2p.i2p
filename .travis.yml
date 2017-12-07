@@ -30,11 +30,10 @@ cache:
 script:
   - |
     if [ "$TRAVIS_JDK_VERSION" == "oraclejdk9" ]; then
-      ./gradlew sonarqube
+      ./gradlew sonarqube codeCoverageReport
     else
-      ./gradlew check
+      ./gradlew check codeCoverageReport
     fi
-  - ./gradlew codeCoverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
