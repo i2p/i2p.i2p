@@ -20,11 +20,7 @@ matrix:
 before_install:
  - |
     if [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ]; then
-      echo "plugins {
-    id 'org.sonarqube' version '2.6.1'
-}
-" | cat - build.gradle > build.gradle.temp
-      mv build.gradle.temp build.gradle
+      sed -i "1iplugins {\n    id 'org.sonarqube' version '2.6.1'\n}\n" build.gradle
     fi
 
 before_cache:
