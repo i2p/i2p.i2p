@@ -93,8 +93,8 @@ public class InternalServerSocket extends ServerSocket {
         InternalServerSocket iss = _sockets.get(Integer.valueOf(port));
         if (iss == null)
              throw new IOException("No server for port: " + port);
-        PipedInputStream cis = BigPipedInputStream.getInstance();
-        PipedInputStream sis = BigPipedInputStream.getInstance();
+        PipedInputStream cis = new PipedInputStream(64*1024);
+        PipedInputStream sis = new PipedInputStream(64*1024);
         PipedOutputStream cos = new PipedOutputStream(sis);
         PipedOutputStream sos = new PipedOutputStream(cis);
         clientSock.setInputStream(cis);

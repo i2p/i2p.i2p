@@ -793,7 +793,7 @@ public class EepGet {
         if (_isGzippedResponse) {
             if (_log.shouldInfo())
                 _log.info("Gzipped response, starting decompressor");
-            PipedInputStream pi = BigPipedInputStream.getInstance();
+            PipedInputStream pi = new PipedInputStream(64*1024);
             PipedOutputStream po = new PipedOutputStream(pi);
             pusher = new I2PAppThread(new Gunzipper(pi, _out), "EepGet Decompressor");
             _out = po;
