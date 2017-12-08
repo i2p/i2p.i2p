@@ -1725,14 +1725,13 @@ public class WebMail extends HttpServlet
 			if( sessionObject.state == STATE_SHOW ) {
 				if (isPOST)
 					showUIDL = processMessageButtons(sessionObject, showUIDL, request);
-				// ?download=nnn link should be valid in any state
-				// but depends on current UIDL
+				// ?download=nnn&amp;b64uidl link (same for ?att) should be valid in any state
 				if (processDownloadLink(sessionObject, showUIDL, request, response)) {
 					// download or raw view sent, or 404
 					return;
 				}
 				if (isPOST && processSaveAsLink(sessionObject, showUIDL, request, response)) {
-					// download or sent, or 404
+					// download sent, or 404
 					return;
 				}
 				// If the last message has just been deleted then
@@ -1776,10 +1775,14 @@ public class WebMail extends HttpServlet
 					subtitle = ngettext("1 Message", "{0} Messages", sessionObject.folder.getSize());
 				} else if( sessionObject.state == STATE_SHOW ) {
 					Mail mail = showUIDL != null ? sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.HEADER) : null;
-					if (mail != null && mail.shortSubject != null)
-						subtitle = mail.shortSubject; // already HTML encoded
-					else
-						subtitle = _t("Show Message");
+					if (mail != null && mail.hasHeader()) {
+						if (mail.shortSubject != null)
+							subtitle = mail.shortSubject; // already HTML encoded
+						else
+							subtitle = _t("Show Message");
+					} else {
+						subtitle = _t("Message not found.");
+					}
 				} else if( sessionObject.state == STATE_NEW ) {
 					subtitle = _t("New Message");
 				} else if( sessionObject.state == STATE_CONFIG ) {
@@ -2277,13 +2280,14 @@ public class WebMail extends HttpServlet
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println(button( LOGOUT, _t("Logout") ));
-		if (sessionObject.folder.getPages() > 1)
-			showPageButtons(out, sessionObject.folder);
+		Folder<String> folder = sessionObject.folder;
+		if (folder.getPages() > 1)
+			showPageButtons(out, folder);
 		out.println("</div>");
 
 
-		String curSort = sessionObject.folder.getCurrentSortBy();
-		Folder.SortOrder curOrder = sessionObject.folder.getCurrentSortingDirection();
+		String curSort = folder.getCurrentSortBy();
+		Folder.SortOrder curOrder = folder.getCurrentSortingDirection();
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
 			thSpacer + "<th>" + sortHeader( SORT_SENDER, _t("From"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
@@ -2294,11 +2298,10 @@ public class WebMail extends HttpServlet
 			thSpacer + "<th>" + sortHeader( SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder ) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
-		for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
+		for (Iterator<String> it = folder.currentPageIterator(); it != null && it.hasNext(); ) {
 			String uidl = it.next();
 			Mail mail = sessionObject.mailCache.getMail( uidl, MailCache.FetchMode.HEADER );
-			if (mail == null) {
-				i++;
+			if (mail == null || !mail.hasHeader()) {
 				continue;
 			}
 			String type;
@@ -2349,10 +2352,10 @@ public class WebMail extends HttpServlet
 		if (i == 0)
 			out.println("<tr><td colspan=\"9\" align=\"center\"><div id=\"emptymailbox\"><i>" + _t("No messages") + "</i></div></td></tr>");
 		out.println( "<tr class=\"bottombuttons\"></tr>");
-		if (sessionObject.folder.getPages() > 1 && i > 30) {
+		if (folder.getPages() > 1 && i > 30) {
 			// show the buttons again if page is big
 			out.println("<tr class=\"bottombuttons\"><td colspan=\"9\" align=\"center\">");
-			showPageButtons(out, sessionObject.folder);
+			showPageButtons(out, folder);
 			out.println("</td></tr>");
 		}
 		out.println("<tr class=\"bottombuttons\"><td colspan=\"5\" align=\"left\">");
@@ -2425,26 +2428,36 @@ public class WebMail extends HttpServlet
 			out.println( "-->" );
 		}
 		out.println("<div class=\"topbuttons\">");
-		out.println( button( NEW, _t("New") ) + spacer +
-			button( REPLY, _t("Reply") ) +
-			button( REPLYALL, _t("Reply All") ) +
-			button( FORWARD, _t("Forward") ) + spacer +
-			button( SAVE_AS, _t("Save As") ) + spacer);
-		if (sessionObject.reallyDelete)
-			out.println(button2(DELETE, _t("Delete")));
-		else
-			out.println(button(DELETE, _t("Delete")));
+		out.println( button( NEW, _t("New") ) + spacer);
+		boolean hasHeader = mail != null && mail.hasHeader();
+		if (hasHeader) {
+			out.println(button( REPLY, _t("Reply") ) +
+				button( REPLYALL, _t("Reply All") ) +
+				button( FORWARD, _t("Forward") ) + spacer +
+				button( SAVE_AS, _t("Save As") ) + spacer);
+			if (sessionObject.reallyDelete)
+				out.println(button2(DELETE, _t("Delete")));
+			else
+				out.println(button(DELETE, _t("Delete")));
+		}
 		out.println(button(LOGOUT, _t("Logout") ));
 		// TODO make these GETs not POSTs so we have a consistent URL
-		out.println("<div id=\"messagenav\">" +
-			( sessionObject.folder.isFirstElement(showUIDL) ? button2( PREV, _t("Previous") ) : button( PREV, _t("Previous") ) ) + spacer +
-			button( LIST, _t("Back to Folder") ) + spacer +
-			( sessionObject.folder.isLastElement(showUIDL) ? button2( NEXT, _t("Next") ) : button( NEXT, _t("Next") ) ));
+		out.println("<div id=\"messagenav\">");
+		if (hasHeader) {
+			out.println(
+				( sessionObject.folder.isFirstElement(showUIDL) ? button2(PREV, _t("Previous")) : button(PREV, _t("Previous")))
+				 + spacer);
+		}
+		out.println(button( LIST, _t("Back to Folder") ) + spacer);
+		if (hasHeader) {
+			out.println(
+				( sessionObject.folder.isLastElement(showUIDL) ? button2(NEXT, _t("Next")) : button(NEXT, _t("Next"))));
+		}
 		out.println("</div></div>");
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		out.println( "<div id=\"viewmail\"><table id=\"message_full\" cellspacing=\"0\" cellpadding=\"5\">\n");
-		if( mail != null ) {
+		if (hasHeader) {
 			out.println("<tr><td colspan=\"2\"><table id=\"mailhead\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("From") +
@@ -2464,7 +2477,7 @@ public class WebMail extends HttpServlet
 			}
 		}
 		else {
-			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail.") + "</p></td></tr>\n" );
+			out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Message not found.") + "</p></td></tr>\n" );
 		}
 		out.println( "</table></div>" );
 	}

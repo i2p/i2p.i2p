@@ -90,9 +90,9 @@ class Mail {
 	}
 
 	/**
-         *  This may or may not contain the body also.
-         *  @return may be null
-         */
+	 *  This may or may not contain the body also.
+	 *  @return if null, nothing has been loaded yet for this UIDL
+	 */
 	public synchronized ReadBuffer getHeader() {
 		return header;
 	}
@@ -104,6 +104,9 @@ class Mail {
 		parseHeaders();
 	}
 
+	/**
+	 *  @return if false, nothing has been loaded yet for this UIDL
+	 */
 	public synchronized boolean hasHeader() {
 		return header != null;
 	}

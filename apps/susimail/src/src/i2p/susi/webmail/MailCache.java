@@ -121,6 +121,7 @@ class MailCache {
 			mail = mails.get( uidl );
 			if( mail == null ) {
 				newMail = new Mail(uidl);
+				// TODO really?
 				mails.put( uidl, newMail );
 			}
 		}
