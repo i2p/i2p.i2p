@@ -124,7 +124,7 @@ class Mail {
 		body = rb;
 		size = rb.length;
 		try {
-			part = new MailPart(rb);
+			part = new MailPart(uidl, rb);
 		} catch (DecodingException de) {
 			Debug.debug(Debug.ERROR, "Decode error: " + de);
 		} catch (RuntimeException e) {

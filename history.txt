@@ -1,4 +1,21 @@
+2017-12-08 zzz
+ * SusiMail:
+   - Reference mails by UIDL, not index on page, put UIDL in
+     attachment links, remove session object UIDL (ticket #1373)
+   - Fix download of attachments without a Content-Transfer-Encoding
+   - Fix error return for attachment not found
+   - Set encoding for text attachments
+   - Add more safe mime types for downloading
+
+2017-12-07 zzz
+ * Console: Don't list aliased tunnels separately on
+   /tunnels and /configtunnels
+ * i2psnark: Better locking on BitField byte array
+ * SusiMail: Recheck max size if SMTP server reports less than default
+ * Util: Deprecate BigPipedInputStream
+
 2017-12-05 zzz
+ * Console: Fix multipart config for /configplugins
  * SusiMail:
    - Don't store attachments of composed email in-memory (ticket #1668)
    - Fix bug corrupting sent text and text attachments
@@ -8,6 +25,9 @@
    - Fix handling of unimplemented encoders
    - Add test code for encoders
    - Error message improvements
+   - Adjust multipart size limits
+   - Better handling of errors when multipart limits are exceeded
+   - Test for total size limit
 
 2017-12-04 zzz
  * Servlet: Refactor RequestWrapper to use Servlet 3.0 API (ticket #2109)
