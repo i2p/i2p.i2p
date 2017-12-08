@@ -61,7 +61,10 @@ class PersistentMailCache {
 	private static final String DIR_SUSI = "susimail";
 	private static final String DIR_CACHE = "cache";
 	private static final String CACHE_PREFIX = "cache-";
-	private static final String DIR_FOLDER = "cur"; // MailDir-like
+	public static final String DIR_FOLDER = "cur"; // MailDir-like
+	public static final String DIR_DRAFTS = "Drafts"; // MailDir-like
+	public static final String DIR_SENT = "Sent"; // MailDir-like
+	public static final String DIR_TRASH = "Trash"; // MailDir-like
 	private static final String DIR_PREFIX = "s";
 	private static final String FILE_PREFIX = "mail-";
 	private static final String HDR_SUFFIX = ".hdr.txt.gz";
@@ -71,11 +74,12 @@ class PersistentMailCache {
 	/**
 	 *  Use the params to generate a unique directory name.
 	 *  @param pass ignored
+	 *  @param folder use DIR_FOLDER
 	 */
-	public PersistentMailCache(String host, int port, String user, String pass) throws IOException {
+	public PersistentMailCache(String host, int port, String user, String pass, String folder) throws IOException {
 		_lock = getLock(host, port, user, pass);
 		synchronized(_lock) {
-			_cacheDir = makeCacheDirs(host, port, user, pass);
+			_cacheDir = makeCacheDirs(host, port, user, pass, folder);
 		}
 	}
 
@@ -202,7 +206,7 @@ class PersistentMailCache {
 	 *   ~/.i2p/susimail/cache/cache-xxxxx/cur/s[b64char]/mail-xxxxx.full.txt.gz
 	 *   folder1 is the base.
 	 */
-	private static File makeCacheDirs(String host, int port, String user, String pass) throws IOException {
+	private static File makeCacheDirs(String host, int port, String user, String pass, String folder) throws IOException {
 		File f = new SecureDirectory(I2PAppContext.getGlobalContext().getConfigDir(), DIR_SUSI);
 		if (!f.exists() && !f.mkdir())
 			throw new IOException("Cannot create " + f);
@@ -212,7 +216,7 @@ class PersistentMailCache {
 		f = new SecureDirectory(f, CACHE_PREFIX + Base64.encode(user + host + port));
 		if (!f.exists() && !f.mkdir())
 			throw new IOException("Cannot create " + f);
-		File base = new SecureDirectory(f, DIR_FOLDER);
+		File base = new SecureDirectory(f, folder);
 		if (!base.exists() && !base.mkdir())
 			throw new IOException("Cannot create " + base);
 		for (int i = 0; i < B64.length(); i++) {

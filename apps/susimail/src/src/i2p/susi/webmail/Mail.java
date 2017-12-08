@@ -83,6 +83,7 @@ class Mail {
 		formattedSubject = unknown;
 		formattedDate = unknown;
 		localFormattedDate = unknown;
+		sender = unknown;
 		shortSender = unknown;
 		shortSubject = unknown;
 		quotedDate = unknown;

@@ -65,7 +65,8 @@ class MailCache {
 		mails = new Hashtable<String, Mail>();
 		PersistentMailCache pmc = null;
 		try {
-			pmc = new PersistentMailCache(host, port, user, pass);
+			pmc = new PersistentMailCache(host, port, user, pass, PersistentMailCache.DIR_FOLDER);
+			// TODO Drafts, Sent, Trash
 		} catch (IOException ioe) {
 			Debug.debug(Debug.ERROR, "Error creating disk cache: " + ioe);
 		}

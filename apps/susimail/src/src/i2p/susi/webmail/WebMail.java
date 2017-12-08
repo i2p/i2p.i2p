@@ -509,6 +509,10 @@ public class WebMail extends HttpServlet
 		   .append(name).append("\" value=\"").append(label).append('"');
 		if (name.equals(SEND) || name.equals(CANCEL) || name.equals(DELETE_ATTACHMENT) || name.equals(NEW_UPLOAD))
 			buf.append(" onclick=\"cancelPopup()\"");
+		// These are icons only now, via the CSS, so add a tooltip
+		if (name.equals(FIRSTPAGE) || name.equals(PREVPAGE) || name.equals(NEXTPAGE) || name.equals(LASTPAGE) ||
+		    name.equals(PREV) || name.equals(LIST) || name.equals(NEXT))
+			buf.append(" title=\"").append(label).append('"');
 		buf.append('>');
 		return buf.toString();
 	}
@@ -2463,7 +2467,7 @@ public class WebMail extends HttpServlet
 					"<tr><td align=\"right\">" + _t("From") +
 					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("Subject") +
-					":</td><td align=\"left\">" + quoteHTML( mail.formattedSubject ) + "</td></tr>\n" +
+					":</td><td align=\"left\"><b>" + quoteHTML( mail.formattedSubject ) + "</b></td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("Date") +
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" +
