@@ -199,7 +199,7 @@ class PersistentMailCache {
 	}
 
 	/**
-	 *   ~/.i2p/susimail/cache/cache-xxxxx/cur/s[a-z]/mail-xxxxx.full.txt.gz
+	 *   ~/.i2p/susimail/cache/cache-xxxxx/cur/s[b64char]/mail-xxxxx.full.txt.gz
 	 *   folder1 is the base.
 	 */
 	private static File makeCacheDirs(String host, int port, String user, String pass) throws IOException {

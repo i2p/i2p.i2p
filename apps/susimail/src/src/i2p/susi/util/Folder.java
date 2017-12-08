@@ -352,6 +352,7 @@ public class Folder<O extends Object> {
 	 * @param x Position of the element on the current page.
 	 * @return Element on the current page on the given position.
 	 */
+/****  unused, we now fetch by UIDL, not position
 	public synchronized O getElementAtPosXonCurrentPage( int x )
 	{
 		O result = null;
@@ -364,6 +365,7 @@ public class Folder<O extends Object> {
 		}
 		return result;
 	}
+****/
 
 	/**
 	 * Sets the sorting direction of the folder.

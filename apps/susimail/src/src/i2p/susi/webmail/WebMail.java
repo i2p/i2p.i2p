@@ -70,6 +70,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.servlet.RequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
@@ -118,6 +119,12 @@ public class WebMail extends HttpServlet
 	private static final String SMTP = "smtp";
 	
 	/*
+	 * hidden params
+	 */
+	private static final String SUSI_NONCE = "susiNonce";
+	private static final String B64UIDL = "b64uidl";
+
+	/*
 	 * button names
 	 */
 	private static final String LOGOUT = "logout";
@@ -135,7 +142,6 @@ public class WebMail extends HttpServlet
 	private static final String SHOW = "show";
 	private static final String DOWNLOAD = "download";
 	private static final String RAW_ATTACHMENT = "att";
-	private static final String SUSI_NONCE = "susiNonce";
 	
 	private static final String MARKALL = "markall";
 	private static final String CLEAR = "clearselection";
@@ -635,7 +641,7 @@ public class WebMail extends HttpServlet
 			if( showBody ) {			
 					String charset = mailPart.charset;
 					if( charset == null ) {
-						charset = "US-ASCII";
+						charset = "ISO-8859-1";
 						// don't show this in text mode which is used to include the mail in the reply or forward
 						if (html)
 							reason += _t("Warning: no charset found, fallback to US-ASCII.") + br;
@@ -687,10 +693,13 @@ public class WebMail extends HttpServlet
 						// type list from snark
 						type.startsWith("audio/") || type.equals("application/ogg") ||
 					        type.startsWith("video/") ||
+						(type.startsWith("text/") && !type.equals("text/html")) ||
 						type.equals("application/zip") || type.equals("application/x-gtar") ||
 						type.equals("application/compress") || type.equals("application/gzip") ||
 						type.equals("application/x-7z-compressed") || type.equals("application/x-rar-compressed") ||
-						type.equals("application/x-tar") || type.equals("application/x-bzip2"))) {
+						type.equals("application/x-tar") || type.equals("application/x-bzip2") ||
+						type.equals("application/pdf") || type.equals("application/x-bittorrent") ||
+						type.equals("application/pgp-signature"))) {
 						out.println( "<a href=\"" + myself + "?" + RAW_ATTACHMENT + "=" +
 							 mailPart.hashCode() + "\">" + _t("Download attachment {0}", ident) + "</a>");
 					} else {
@@ -1004,10 +1013,11 @@ public class WebMail extends HttpServlet
 				if( sessionObject.state == STATE_LIST ) {
 					// these buttons are now hidden on the folder page,
 					// but the idea is to use the first checked message
-					List<Integer> items = getCheckedItems(request);
+					List<String> items = getCheckedItems(request);
 					if (!items.isEmpty()) {
-						int pos = items.get(0).intValue();
-						uidl = sessionObject.folder.getElementAtPosXonCurrentPage( pos );
+						String b64UIDL = items.get(0);
+						// This is the I2P Base64, not the encoder
+						uidl = Base64.decodeToString(b64UIDL);
 					}
 				}
 				else {
@@ -1121,20 +1131,12 @@ public class WebMail extends HttpServlet
 			 */
 			String show = request.getParameter( SHOW );
 			if( show != null && show.length() > 0 ) {
-				try {
-
-					int id = Integer.parseInt( show );
-					
-					if( id >= 0 && id < sessionObject.folder.getPageSize() ) {
-						String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( id );
-						if( uidl != null ) {
-							sessionObject.state = STATE_SHOW;
-							sessionObject.showUIDL = uidl;
-						}
-					}
-				}
-				catch( NumberFormatException nfe )
-				{
+				// This is the I2P Base64, not the encoder
+				String uidl = Base64.decodeToString(show);
+				if(uidl != null) {
+					sessionObject.state = STATE_SHOW;
+					sessionObject.showUIDL = uidl;
+				} else {
 					sessionObject.error += _t("Message id not valid.") + '\n';
 				}
 			}
@@ -1144,17 +1146,15 @@ public class WebMail extends HttpServlet
 	/**
 	 * Returns e.g. 3,5 for ?check3=1&check5=1 (or POST equivalent)
 	 * @param request
-	 * @return non-null
+	 * @return non-null List of Base64 UIDLs, or attachment numbers as Strings
 	 */
-	private static List<Integer> getCheckedItems(RequestWrapper request) {
-		List<Integer> rv = new ArrayList<Integer>(8);
+	private static List<String> getCheckedItems(RequestWrapper request) {
+		List<String> rv = new ArrayList<String>(8);
 		for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 			String parameter = e.nextElement();
 			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
-				String number = parameter.substring( 5 );
-				try {
-					rv.add(Integer.valueOf(number));
-				} catch( NumberFormatException nfe ) {}
+				String item = parameter.substring(5);
+				rv.add(item);
 			}
 		}
 		return rv;
@@ -1227,10 +1227,17 @@ public class WebMail extends HttpServlet
 					DataHelper.copy(in, out);
 					String contentType = request.getContentType( NEW_FILENAME );
 					String encodeTo;
-					if( contentType.toLowerCase(Locale.US).startsWith( "text/" ) )
+					String ctlc = contentType.toLowerCase(Locale.US);
+					if (ctlc.startsWith("text/")) {
 						encodeTo = "quoted-printable";
-					else
+						// Is this a better guess than the platform encoding?
+						// Either is a better guess than letting the receiver
+						// interpret it as ISO-8859-1
+						if (!ctlc.contains("charset="))
+							contentType += "; charset=\"utf-8\"";
+					} else {
 						encodeTo = "base64";
+					}
 					Encoding encoding = EncodingFactory.getEncoding(encodeTo);
 					if (encoding != null) {
 						if (sessionObject.attachments == null)
@@ -1251,15 +1258,17 @@ public class WebMail extends HttpServlet
 			}
 		}
 		else if( sessionObject.attachments != null && buttonPressed( request, DELETE_ATTACHMENT ) ) {
-			for (Integer item : getCheckedItems(request)) {
-				int n = item.intValue();
-				for( int i = 0; i < sessionObject.attachments.size(); i++ ) {
-					Attachment attachment = sessionObject.attachments.get(i);
-					if( attachment.hashCode() == n ) {
-						sessionObject.attachments.remove( i );
-						break;
+			for (String item : getCheckedItems(request)) {
+				try {
+					int n = Integer.parseInt(item);
+					for( int i = 0; i < sessionObject.attachments.size(); i++ ) {
+						Attachment attachment = sessionObject.attachments.get(i);
+						if( attachment.hashCode() == n ) {
+							sessionObject.attachments.remove( i );
+							break;
+						}
 					}
-				}
+				} catch (NumberFormatException nfe) {}
 			}			
 		}
 	}
@@ -1437,10 +1446,10 @@ public class WebMail extends HttpServlet
 		else {
 			if( buttonPressed( request, REALLYDELETE ) ) {
 				List<String> toDelete = new ArrayList<String>();
-				for (Integer item : getCheckedItems(request)) {
-					int n = item.intValue();
-					String uidl = sessionObject.folder.getElementAtPosXonCurrentPage( n );
-					if( uidl != null )
+				for (String b64UIDL : getCheckedItems(request)) {
+					// This is the I2P Base64, not the encoder
+					String uidl = Base64.decodeToString(b64UIDL);
+					if (uidl != null)
 						toDelete.add(uidl);
 				}
 				int numberDeleted = toDelete.size();
@@ -1805,7 +1814,10 @@ public class WebMail extends HttpServlet
 					"<div class=\"page\"><div class=\"header\"><img class=\"header\" src=\"" + sessionObject.imgPath + "susimail.png\" alt=\"Susimail\"></div>\n" +
 					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
 					"<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">");
-
+				if( sessionObject.state == STATE_SHOW && sessionObject.showUIDL != null) {
+					String b64UIDL = Base64.encode(sessionObject.showUIDL);
+					out.println("<input type=\"hidden\" name=\"" + B64UIDL + "\" value=\"" + b64UIDL + "\">");
+				}
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
 				}
@@ -2286,11 +2298,13 @@ public class WebMail extends HttpServlet
 				type = "linknew";
 			else
 				type = "linkold";
-			String link = "<a href=\"" + myself + "?" + SHOW + "=" + i + "\" class=\"" + type + "\">";
-			String jslink = " onclick=\"document.location='" + myself + '?' + SHOW + '=' + i + "';\" ";
+			// this is I2P Base64, not the encoder
+			String b64UIDL = Base64.encode(uidl);
+			String link = "<a href=\"" + myself + "?" + SHOW + "=" + b64UIDL + "\" class=\"" + type + "\">";
+			String jslink = " onclick=\"document.location='" + myself + '?' + SHOW + '=' + b64UIDL + "';\" ";
 			
 			boolean idChecked = false;
-			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + i );
+			String checkId = sessionObject.pageChanged ? null : request.getParameter( "check" + b64UIDL );
 			
 			if( checkId != null && checkId.equals("1"))
 				idChecked = true;
@@ -2307,7 +2321,7 @@ public class WebMail extends HttpServlet
 			//		", invert=" + sessionObject.invert +
 			//		", clear=" + sessionObject.clear );
 			out.println( "<tr class=\"list" + bg + "\">" +
-					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + i + "\" value=\"1\"" + 
+					"<td><input type=\"checkbox\" class=\"optbox\" name=\"check" + b64UIDL + "\" value=\"1\"" + 
 					" onclick=\"deleteboxclicked();\" " +
 					( idChecked ? "checked" : "" ) + ">" + "</td><td " + jslink + ">" +
 					(mail.isNew() ? "<img src=\"/susimail/icons/flag_green.png\" alt=\"\" title=\"" + _t("Message is new") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
