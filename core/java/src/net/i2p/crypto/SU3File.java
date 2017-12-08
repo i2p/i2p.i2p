@@ -386,7 +386,7 @@ public class SU3File {
      */
     public boolean verifyAndMigrate(File migrateTo) throws IOException {
         InputStream in = null;
-        OutputStream out = null;
+        FileOutputStream out = null;
         boolean rv = false;
         try {
             in = new BufferedInputStream(new FileInputStream(_file));
@@ -421,7 +421,7 @@ public class SU3File {
                     throw new IOException("unknown signer: " + _signer + " for content type: " + _contentType.getName());
             }
             if (migrateTo != null)  // else verify only
-                out = new FileOutputStream(migrateTo);
+                out = new SecureFileOutputStream(migrateTo);
             byte[] buf = new byte[16*1024];
             long tot = 0;
             while (tot < _contentLength) {
@@ -454,7 +454,15 @@ public class SU3File {
             throw ioe;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
-            if (out != null) try { out.close(); } catch (IOException ioe) {}
+            if (out != null) {
+                // We will generally be reading this file right back in,
+                // so do a POSIX flush and sync to ensure it will be there.
+                try {
+                    out.flush();
+                    out.getFD().sync();
+                } catch (IOException ioe) {}
+                try { out.close(); } catch (IOException ioe) {}
+            }
             if (migrateTo != null && !rv)
                 migrateTo.delete();
         }
