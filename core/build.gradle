@@ -31,9 +31,6 @@ sourceSets {
             include 'net/i2p/crypto/eddsa/math/baseDblPrecmp'
             include 'net/i2p/crypto/eddsa/math/basePrecmp'
         }
-        scala {
-            srcDir 'java/test/scalatest'
-        }
     }
 }
 
@@ -46,6 +43,13 @@ dependencies {
 }
 
 if (JavaVersion.current() != JavaVersion.VERSION_1_7) {
+    sourceSets {
+        test {
+            scala {
+                srcDir 'java/test/scalatest'
+            }
+        }
+    }
     task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
         main = 'org.scalatest.tools.Runner'
         args = ['-R', 'build/classes/scala/test', '-o']
