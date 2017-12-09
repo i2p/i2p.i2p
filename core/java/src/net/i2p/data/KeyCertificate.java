@@ -9,6 +9,8 @@ import net.i2p.crypto.SigType;
 /**
  * This certificate type gets its own class because it's going to be used a lot.
  *
+ * Format is: 2 byte sig type, 2 byte crypto type, excess sig data, excess crypto data.
+ *
  * The crypto type is assumed to be always 0x0000 (ElG) for now.
  *
  * @since 0.9.12

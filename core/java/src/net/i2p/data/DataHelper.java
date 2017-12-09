@@ -1526,7 +1526,7 @@ public class DataHelper {
 
     /**
      * Caller should append 'B' or 'b' as appropriate
-     * NOTE: formatDuration2() recommended in most cases for readability
+     * NOTE: formatSize2() recommended in most cases for readability
      */
     public static String formatSize(long bytes) {
         float val = bytes;
