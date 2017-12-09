@@ -45,12 +45,14 @@ dependencies {
     testCompile 'org.scalatest:scalatest_2.12:3.0.4'
 }
 
-task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
-    main = 'org.scalatest.tools.Runner'
-    args = ['-R', 'build/classes/scala/test', '-o']
-    classpath = sourceSets.test.runtimeClasspath
+if (JavaVersion.current() != JavaVersion.VERSION_1_7) {
+    task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
+        main = 'org.scalatest.tools.Runner'
+        args = ['-R', 'build/classes/scala/test', '-o']
+        classpath = sourceSets.test.runtimeClasspath
+    }
+    test.dependsOn scalaTest
 }
-test.dependsOn scalaTest
 
 configurations {
     tests
