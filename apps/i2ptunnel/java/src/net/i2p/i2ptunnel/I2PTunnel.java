@@ -1607,8 +1607,9 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
      */
     private void runRun(String args[], Logging l) {
         if (args.length == 1) {
+            BufferedReader br = null;
             try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
                     runCommand(line, l);
@@ -1619,6 +1620,8 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 l.log("IO error running the file");
                 _log.error(getPrefix() + "Error running the file", ioe);
                 notifyEvent("runResult", "error");
+            } finally {
+                if (br != null) try { br.close(); } catch (IOException ioe) {}
             }
         } else {
             l.log("run <commandfile>\n" +

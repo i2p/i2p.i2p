@@ -764,13 +764,8 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
 
             return null;
         } finally {
-            if (bytesToSignInputStream != null)
-                try {
-                    bytesToSignInputStream.close();
-                    fileInputStream.close();
-                } catch (IOException ioe) {
-                }
-
+            if (bytesToSignInputStream != null) try { bytesToSignInputStream.close(); } catch (IOException ioe) {}
+            if (fileInputStream != null) try { fileInputStream.close(); } catch (IOException ioe) {}
         }
 
         FileOutputStream fileOutputStream = null;

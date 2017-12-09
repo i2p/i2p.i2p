@@ -494,11 +494,12 @@ public class DataHelper {
      *                                  or a value contains '#' or '\n'
      */
     public static void storeProps(Properties props, File file) throws IOException {
+        FileOutputStream fos = null;
         PrintWriter out = null;
         IllegalArgumentException iae = null;
         File tmpFile = new File(file.getPath() + ".tmp");
         try {
-            FileOutputStream fos = new SecureFileOutputStream(tmpFile);
+            fos = new SecureFileOutputStream(tmpFile);
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fos, "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
@@ -533,6 +534,7 @@ public class DataHelper {
                 throw new IOException("Failed rename from " + tmpFile + " to " + file);
         } finally {
             if (out != null) out.close();
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
         if (iae != null)
             throw iae;

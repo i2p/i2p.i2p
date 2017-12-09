@@ -194,8 +194,8 @@ public class HTTPMUSocket
 
 	public boolean send(String msg, String bindAddr, int bindPort)
 	{
+		MulticastSocket msock = null;
 		try {
-			MulticastSocket msock;
 			if ((bindAddr) != null && (0 < bindPort)) {
 				msock = new MulticastSocket(null);
 				msock.bind(new InetSocketAddress(bindAddr, bindPort));
@@ -206,11 +206,12 @@ public class HTTPMUSocket
 			// Thnaks for Theo Beisch (11/09/04)
 			msock.setTimeToLive(UPnP.getTimeToLive());
 			msock.send(dgmPacket);
-			msock.close();
 		}
 		catch (Exception e) {
 			Debug.warning(e);
 			return false;
+		} finally {
+			if (msock != null) msock.close();
 		}
 		return true;
 	}

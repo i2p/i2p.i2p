@@ -144,14 +144,17 @@ public class BlockFile implements Closeable {
 			return;
 		}
 		boolean init = !(new File(args[0])).exists();
+		RAIFile raif = null;
+		BlockFile bf = null;
 		try {
-			RAIFile raif = new RAIFile(new File(args[0]), true, true);
-			BlockFile bf = new BlockFile(raif, init);
+			raif = new RAIFile(new File(args[0]), true, true);
+			bf = new BlockFile(raif, init);
 			bf.bfck(true);
-			bf.close();
-			raif.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (bf != null) try { bf.close(); } catch (IOException ioe) {}
+			if (raif != null) try { raif.close(); } catch (IOException ioe) {}
 		}
 	}
 

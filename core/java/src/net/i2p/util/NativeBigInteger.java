@@ -1119,11 +1119,12 @@ public class NativeBigInteger extends BigInteger {
             return false;
         }
 
+        InputStream libStream = null;
         File outFile = null;
         FileOutputStream fos = null;
         String filename =  _libPrefix + "jbigi" + _libSuffix;
         try {
-            InputStream libStream = resource.openStream();
+            libStream = resource.openStream();
             outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
             DataHelper.copy(libStream, fos);
@@ -1143,6 +1144,7 @@ public class NativeBigInteger extends BigInteger {
                 outFile.delete();
             return false;
         } finally {
+            if (libStream != null) try { libStream.close(); } catch (IOException ioe) {}
             if (fos != null) {
                 try { fos.close(); } catch (IOException ioe) {}
             }

@@ -395,15 +395,19 @@ public class TranslateReader extends FilterReader {
 
     private static void test(String file) throws IOException {
         FileInputStream fio = new FileInputStream(file);
-        TranslateReader r = new TranslateReader(I2PAppContext.getGlobalContext(),
-                                                "net.i2p.router.web.messages",
-                                                fio);
-        int c;
-        while ((c = r.read()) >= 0) {
-            System.out.print((char)c);
+        TranslateReader r = null;
+        try {
+            r = new TranslateReader(I2PAppContext.getGlobalContext(),
+                                    "net.i2p.router.web.messages",
+                                    fio);
+            int c;
+            while ((c = r.read()) >= 0) {
+                System.out.print((char)c);
+            }
+            System.out.flush();
+        } finally {
+            if (r != null) try { r.close(); } catch (IOException ioe) {}
         }
-        System.out.flush();
-        r.close();
     }
 
     /** @param files ignore 0 */

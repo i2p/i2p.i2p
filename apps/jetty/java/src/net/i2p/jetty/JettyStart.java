@@ -1,5 +1,7 @@
 package net.i2p.jetty;
 
+import java.io.IOException;
+
 // Contains code from org.mortbay.xml.XmlConfiguation:
 
 // ========================================================================
@@ -17,6 +19,7 @@ package net.i2p.jetty;
 // ========================================================================
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,14 +82,24 @@ public class JettyStart implements ClientApp {
     public void parseArgs(String[] args) throws Exception {
         Properties properties=new Properties();
         XmlConfiguration last=null;
-        InputStream in = null;
+        Resource r = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].toLowerCase().endsWith(".properties")) {
-                in = Resource.newResource(args[i]).getInputStream();
-                properties.load(in);
-                in.close();
+                try {
+                    r = Resource.newResource(args[i]);
+                    properties.load(r.getInputStream());
+                } finally {
+                    if (r != null) r.close();
+                }
             } else {
-                XmlConfiguration configuration = new XmlConfiguration(Resource.newResource(args[i]).getURL());
+                URL configUrl;
+                try {
+                    r = Resource.newResource(args[i]);
+                    configUrl = r.getURL();
+                } finally {
+                    if (r != null) r.close();
+                }
+                XmlConfiguration configuration = new XmlConfiguration(configUrl);
                 if (last!=null)
                     configuration.getIdMap().putAll(last.getIdMap());
                 if (properties.size()>0) {

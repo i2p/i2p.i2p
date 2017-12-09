@@ -210,11 +210,13 @@ public class SingleFileNamingService extends NamingService {
             }
             return success;
         } catch (IOException ioe) {
-            if (in != null) try { in.close(); } catch (IOException e) {}
-            if (out != null) try { out.close(); } catch (IOException e) {}
             _log.error("Error adding " + hostname, ioe);
             return false;
-        } finally { releaseWriteLock(); }
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException e) {}
+            if (out != null) try { out.close(); } catch (IOException e) {}
+            releaseWriteLock();
+        }
     }
 
     /** 
@@ -333,11 +335,11 @@ public class SingleFileNamingService extends NamingService {
             }
             return success;
         } catch (IOException ioe) {
-            if (in != null) try { in.close(); } catch (IOException e) {}
-            if (out != null) try { out.close(); } catch (IOException e) {}
             _log.error("Error removing " + hostname, ioe);
             return false;
         } finally {
+            if (in != null) try { in.close(); } catch (IOException e) {}
+            if (out != null) try { out.close(); } catch (IOException e) {}
             releaseWriteLock();
         }
     }

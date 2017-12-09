@@ -136,13 +136,15 @@ public class UrlLauncher implements ClientApp {
         long done = System.currentTimeMillis() + MAX_WAIT_TIME;
         for (int i = 0; i < MAX_TRIES; i++) {
             try {
-                Socket test = new Socket();
-                // this will usually fail right away if it's going to fail since it's local
-                test.connect(sa, WAIT_TIME);
-                // it worked
+                Socket test = null;
                 try {
-                   test.close();
-                } catch (IOException ioe) {}
+                    test = new Socket();
+                    // this will usually fail right away if it's going to fail since it's local
+                    test.connect(sa, WAIT_TIME);
+                    // it worked
+                } finally {
+                    if (test != null) try { test.close(); } catch (IOException ioe) {}
+                }
                 // Jetty 6 seems to start the Connector before the
                 // webapp is completely ready
                 try {

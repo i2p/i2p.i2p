@@ -243,10 +243,11 @@ public class SAMStreamSink {
         }
 
         public void run() {
+            DatagramSocket dg = null;
             byte[] buf = new byte[32768];
             try {
                 Sink sink = new Sink("FAKE", "FAKEFROM");
-                DatagramSocket dg = new DatagramSocket(V3DGPORT);
+                dg = new DatagramSocket(V3DGPORT);
                 while (true) {
                     DatagramPacket p = new DatagramPacket(buf, 32768);
                     dg.receive(p);
@@ -283,6 +284,8 @@ public class SAMStreamSink {
                 }
             } catch (IOException ioe) {
                 _log.error("DGRcvr", ioe);
+            } finally {
+                if (dg != null) dg.close();
             }
         }
     }

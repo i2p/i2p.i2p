@@ -173,11 +173,9 @@ public class LogsHelper extends HelperBase {
      */
     private static String readTextFile(File f, int maxNumLines) {
         if (!f.exists()) return null;
-        FileInputStream fis = null;
         BufferedReader in = null;
         try {
-            fis = new FileInputStream(f);
-            in = new BufferedReader(new InputStreamReader(fis));
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
             List<String> lines = new ArrayList<String>(maxNumLines);
             String line = null;
             while ( (line = in.readLine()) != null) {
