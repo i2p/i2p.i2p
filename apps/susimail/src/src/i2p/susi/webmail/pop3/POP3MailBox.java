@@ -34,7 +34,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -611,12 +610,9 @@ public class POP3MailBox implements NewMailListener {
 		
 		try {
 			socket = new Socket(host, port);
-		} catch (UnknownHostException e) {
-			lastError = e.toString();
-			return;
 		} catch (IOException e) {
 			Debug.debug( Debug.DEBUG, "Error connecting: " + e);
-			lastError = e.toString();
+			lastError = _t("Cannot connect") + " (" + host + ':' + port + ") - " + e.getLocalizedMessage();
 			return;
 		}
 		if (socket != null) {
