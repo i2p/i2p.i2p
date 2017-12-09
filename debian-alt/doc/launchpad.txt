@@ -3,6 +3,23 @@ Instructions to upload to launchpad PPA
 You must have a GPG key already uploaded to the
 usual public key servers, where launchpad can find it.
 
+Overview
+--------
+
+We currently copy the launchpad builds to our debian repo both
+for use in both the ubuntu and debian distros. This is much easier
+than doing debian builds ourselves.
+
+Versions are as follows:
+
+Min version	Max version	Uses src pkg	Copied to Debian
+-----------	-----------	------------	----------------
+precise		saucy   	precise		wheezy
+trusty		wily		precise		jessie
+xenial		yakkety		xenial		--
+zesty		bionic		zesty		stretch, buster, sid
+
+
 Prep
 ----
 
@@ -130,10 +147,11 @@ Release
 -------
 
 Then copy from your PPA to the i2p-maintainers PPA.
-Then in the i2p-maintainers PPA, copy trusty to vivid. Copy xenial to yakkety, zesty.
+Then in the i2p-maintainers PPA, copy zesty to artful, bionic.
 Did a new series open up since the last time you did this? Copy to the new one also.
   (select "copy existing binaries")
   Copy xenial first and wait for it to be published in i2p-maintainers or the others will fail.
+For xenial, build and copy it separately. It is built from the "ant xenial-release-tarball" source.
 For precise and trusty, build and copy it separately. Both precise and trusty are built
 from the "ant precise-release-tarball" source.
 

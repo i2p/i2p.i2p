@@ -68,7 +68,7 @@ Current Runtime Dependencies
 * service-wrapper
   In non-Debian builds we bundle the jars; it's removed in the Debian source package.
   For some Debian and Ubuntu releases, these seem to be much older than what we're bundling,
-  which is 3.5.30, but there's no particular version that we need.
+  but there's no particular version that we need.
 
 * libgmp-dev
   In non-Debian builds we bundle compiled C code; in the Debian packages we have a small
