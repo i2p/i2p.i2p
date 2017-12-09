@@ -1,3 +1,5 @@
+apply plugin: 'idea'
+
 // Exclude apps/ dir itself, but include its subdirs
 def javaProjects = subprojects - project(':apps')
 

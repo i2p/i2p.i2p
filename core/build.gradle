@@ -1,4 +1,5 @@
 apply plugin: 'java-library'
+apply plugin: 'scala'
 
 archivesBaseName = 'i2p'
 
@@ -30,13 +31,26 @@ sourceSets {
             include 'net/i2p/crypto/eddsa/math/baseDblPrecmp'
             include 'net/i2p/crypto/eddsa/math/basePrecmp'
         }
+        scala {
+            srcDir 'java/test/scalatest'
+        }
     }
 }
 
 dependencies {
     implementation 'gnu.getopt:java-getopt:1.0.13'
     implementation 'org.gnu.gettext:libintl:0.18.3'
+
+    testCompile "org.scala-lang:scala-library:2.12.4"
+    testCompile 'org.scalatest:scalatest_2.12:3.0.4'
 }
+
+task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
+    main = 'org.scalatest.tools.Runner'
+    args = ['-R', 'build/classes/scala/test', '-o']
+    classpath = sourceSets.test.runtimeClasspath
+}
+test.dependsOn scalaTest
 
 configurations {
     tests

@@ -1,9 +1,15 @@
 apply plugin: 'war'
+apply plugin: 'scala'
 
 sourceSets {
     main {
         java {
             srcDir 'java/src'
+        }
+    }
+    test {
+        scala {
+            srcDir 'java/test/scalatest'
         }
     }
 }
@@ -16,7 +22,17 @@ dependencies {
     providedCompile project(':apps:systray')
     providedCompile project(':apps:jetty')
     providedCompile project(':apps:jrobin')
+
+    testCompile "org.scala-lang:scala-library:2.12.4"
+    testCompile 'org.scalatest:scalatest_2.12:3.0.4'
 }
+
+task scalaTest(dependsOn: ['testClasses'], type: JavaExec) {
+    main = 'org.scalatest.tools.Runner'
+    args = ['-R', 'build/classes/scala/test', '-o']
+    classpath = sourceSets.test.runtimeClasspath
+}
+test.dependsOn scalaTest
 
 jar {
     manifest {
