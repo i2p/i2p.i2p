@@ -1,7 +1,7 @@
 package net.i2p.router.update
 
 import org.scalatest.FunSpec
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 
 import java.net.URI
 import java.util.Collections
