@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import gnu.getopt.Getopt;
 
@@ -76,7 +77,7 @@ public class Router implements RouterClock.ClockShiftListener {
     /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
-    private final Object _routerInfoLock = new Object();
+    private final ReentrantReadWriteLock _routerInfoLock = new ReentrantReadWriteLock(false);
     /** not for external use */
     public final Object routerInfoFileLock = new Object();
     private final Object _configFileLock = new Object();
@@ -517,10 +518,17 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  Warning - risk of deadlock - do not call while holding locks
      *
+     *  Note: Due to lock contention, especially during a
+     *  rebuild of the router info, this may take a long time.
+     *  For determining the current status of the router, use
+     *  RouterContext.commSystem().getStatus().
      */
     public RouterInfo getRouterInfo() {
-        synchronized (_routerInfoLock) {
+        _routerInfoLock.readLock().lock();
+        try {
             return _routerInfo;
+        } finally {
+            _routerInfoLock.readLock().unlock();
         }
     }
 
@@ -532,8 +540,11 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      */
     public void setRouterInfo(RouterInfo info) { 
-        synchronized (_routerInfoLock) {
+        _routerInfoLock.writeLock().lock();
+        try {
             _routerInfo = info; 
+        } finally {
+            _routerInfoLock.writeLock().unlock();
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("setRouterInfo() : " + info, new Exception("I did it"));
@@ -845,7 +856,12 @@ public class Router implements RouterClock.ClockShiftListener {
     /**
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
+     * This is a non-blocking rebuild.
+     *
      * Not for external use.
+     *
+     * Warning - risk of deadlock - do not call while holding locks
+     *
      */
     public void rebuildRouterInfo() { rebuildRouterInfo(false); }
 
@@ -856,12 +872,17 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      *  Warning - risk of deadlock - do not call while holding locks
      *
+     * @param blockingRebuild If true, netdb publish will happen in-line.
+     *                        This may take a long time.
      */
     public void rebuildRouterInfo(boolean blockingRebuild) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Rebuilding new routerInfo");
-        synchronized (_routerInfoLock) {
+        _routerInfoLock.writeLock().lock();
+        try {
             locked_rebuildRouterInfo(blockingRebuild);
+        } finally {
+            _routerInfoLock.writeLock().unlock();
         }
     }
         
