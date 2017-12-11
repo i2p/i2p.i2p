@@ -1,10 +1,5 @@
 package net.i2p.router.tasks;
 
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-
 import net.i2p.crypto.CryptoCheck;
 import net.i2p.crypto.SigType;
 import net.i2p.router.RouterContext;
