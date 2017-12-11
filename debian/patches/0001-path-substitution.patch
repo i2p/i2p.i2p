@@ -76,7 +76,7 @@ Index: b/installer/resources/i2prouter
  
  # Priority at which to run the wrapper.  See "man nice" for valid priorities.
  #  nice is only used if a priority is specified.
-@@ -177,77 +168,8 @@ if [ ! -e "$WRAPPER_CONF" ]; then
+@@ -180,77 +171,8 @@ if [ ! -e "$WRAPPER_CONF" ]; then
         exit 1
  fi
  
@@ -154,7 +154,7 @@ Index: b/installer/resources/i2prouter
  if [ -n "$FIXED_COMMAND" ]
  then
      COMMAND="$FIXED_COMMAND"
-@@ -1068,7 +990,6 @@ startwait() {
+@@ -1078,7 +1000,6 @@ startwait() {
          if [ "X$pid" = "X" ]
          then
              eval echo " `gettext 'WARNING: $APP_LONG_NAME may have failed to start.'`"
@@ -162,7 +162,7 @@ Index: b/installer/resources/i2prouter
          else
              eval echo ' running: PID:$pid'
          fi
-@@ -1871,7 +1792,7 @@ showUsage() {
+@@ -1881,7 +1802,7 @@ showUsage() {
  }
  
  showsetusermesg()  {
@@ -171,7 +171,7 @@ Index: b/installer/resources/i2prouter
  }
  
  checkifstartingasroot() {
-@@ -1879,7 +1800,7 @@ checkifstartingasroot() {
+@@ -1889,7 +1810,7 @@ checkifstartingasroot() {
          echo "`gettext 'Running I2P as the root user is *not* recommended.'`"
          showsetusermesg
          echo
@@ -180,7 +180,7 @@ Index: b/installer/resources/i2prouter
          exit 1
      fi
  }
-@@ -1946,24 +1867,10 @@ docommand() {
+@@ -1981,24 +1902,10 @@ docommand() {
              status
              ;;
  

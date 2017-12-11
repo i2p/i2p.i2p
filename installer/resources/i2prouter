@@ -127,6 +127,9 @@ WAIT_FOR_STARTED_TIMEOUT=120
 # flag for using upstart when installing (rather than init.d rc.d)
 USE_UPSTART=
 
+# Raise the soft open files soft ulimit to this value, if able
+OPEN_FILES_ULIMIT=2048
+
 # Source the environment variables for the locale if $LANG isn't set
 # If you want to set custom locale variables for I2P,
 # you may comment out this block and set them yourself here.
@@ -1891,6 +1894,28 @@ checkifstartingasroot() {
     fi
 }
 
+raiseopenfilesulimit() {
+    OPEN_FILES_SOFT=`ulimit -S -n` 2> /dev/null || return
+    if [ "$OPEN_FILES_SOFT" != "unlimited" ]
+    then
+        if [ "$OPEN_FILES_ULIMIT" -gt "$OPEN_FILES_SOFT" ]
+        then
+            OPEN_FILES_HARD=`ulimit -H -n` 2> /dev/null || return
+            if [ "$OPEN_FILES_HARD" != "unlimited" ]
+            then
+                if [ "$OPEN_FILES_ULIMIT" -gt "$OPEN_FILES_HARD" ]
+                then
+                    OPEN_FILES_ULIMIT="$OPEN_FILES_HARD"
+                fi
+            fi
+            if [ "$OPEN_FILES_ULIMIT" -gt "$OPEN_FILES_SOFT" ]
+            then
+                ulimit -S -n "$OPEN_FILES_ULIMIT" > /dev/null 2>&1
+            fi
+        fi
+    fi
+}
+
 docommand() {
     case "$COMMAND" in
         'console')
@@ -1904,6 +1929,7 @@ docommand() {
 
         'start')
             checkifstartingasroot
+            raiseopenfilesulimit
             if [ "$DIST_OS" = "macosx" -a -f "/Library/LaunchDaemons/${APP_PLIST}" ] ; then
                 macosxstart
             elif [ "$DIST_OS" = "linux" -a -f "/etc/init/${APP_NAME}.conf" ] ; then
@@ -1930,6 +1956,7 @@ docommand() {
 
         'restart')
             checkifstartingasroot
+            raiseopenfilesulimit
             checkUser touchlock "$COMMAND"
             if [ ! -n "$FIXED_COMMAND" ] ; then
                 shift
@@ -1940,6 +1967,7 @@ docommand() {
 
         'condrestart')
             checkifstartingasroot
+            raiseopenfilesulimit
             checkUser touchlock "$COMMAND"
             if [ ! -n "$FIXED_COMMAND" ] ; then
                 shift
