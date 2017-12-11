@@ -331,6 +331,17 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
 
 
                 long responseLength=response.getContentCount();
+                // The above is what Jetty used before 9, but now
+                // it often (for large content?) returns 0 for non-cgi responses.
+                // Now, Jetty uses getLongContentLength(), but according to
+                // these threads it returns 0 for streaming (cgi) responses.
+                // So we take whichever one is nonzero, if the result was 200.
+                // See:
+                // https://dev.eclipse.org/mhonarc/lists/jetty-dev/msg02261.html
+                // and followups including this workaround:
+                // https://dev.eclipse.org/mhonarc/lists/jetty-dev/msg02267.html
+                if (responseLength == 0 && status == 200 && !"HEAD".equals(request.getMethod()))
+                    responseLength = response.getLongContentLength();
                 if (responseLength >=0)
                 {
                     buf.append(' ');
