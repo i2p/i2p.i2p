@@ -1,11 +1,25 @@
+2017-12-13 zzz
+ * i2ptunnel: Add internal sockets for SMTP and POP3 (ticket #2118)
+ * Util: InternalSocket improvements
+
+2017-12-11 zzz
+ * Jetty: Fix request log showing zero length for static content
+ * Startup: Raise open files ulimit (ticket #1967)
+
+2017-12-10 zzz
+ * Router: Change RI locking to a read/write lock (ticket #2096)
+
 2017-12-08 zzz
+ * SU3File: Flush and sync on extract (ticket #1941)
  * SusiMail:
    - Reference mails by UIDL, not index on page, put UIDL in
      attachment links, remove session object UIDL (ticket #1373)
    - Fix download of attachments without a Content-Transfer-Encoding
    - Fix error return for attachment not found
+   - Fix handling of requests for unknown messages
    - Set encoding for text attachments
    - Add more safe mime types for downloading
+   - Add tooltips for icon-only buttons
 
 2017-12-07 zzz
  * Console: Don't list aliased tunnels separately on

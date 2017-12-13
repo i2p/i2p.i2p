@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.InternalSocket;
 
 /**
  * @author susi
@@ -233,7 +234,7 @@ public class SMTPClient {
 		Writer out = null;
 		
 		try {
-			socket = new Socket( host, port );
+			socket = InternalSocket.getSocket(host, port);
 		} catch (IOException e) {
 			error += _t("Cannot connect") + " (" + host + ':' + port + ") : " + e.getMessage() + '\n';
 			ok = false;

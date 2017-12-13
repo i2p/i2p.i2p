@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.InternalSocket;
 
 /**
  * @author susi23
@@ -609,7 +610,7 @@ public class POP3MailBox implements NewMailListener {
 			close();
 		
 		try {
-			socket = new Socket(host, port);
+			socket = InternalSocket.getSocket(host, port);
 		} catch (IOException e) {
 			Debug.debug( Debug.DEBUG, "Error connecting: " + e);
 			lastError = _t("Cannot connect") + " (" + host + ':' + port + ") - " + e.getLocalizedMessage();
