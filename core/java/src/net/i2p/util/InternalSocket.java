@@ -244,18 +244,22 @@ public class InternalSocket extends Socket {
         return _is != null || _os != null;
     }
 
-    /** @deprecated unsupported */
-    @Deprecated
+    /**
+     * Supported as of 0.9.33, prior to that threw UnsupportedOperationException
+     */
     @Override
-    public boolean isInputShutdown() {
-        throw new UnsupportedOperationException();
+    public synchronized boolean isInputShutdown() {
+        return _is == null;
     }
-    /** @deprecated unsupported */
-    @Deprecated
+
+    /**
+     * Supported as of 0.9.33, prior to that threw UnsupportedOperationException
+     */
     @Override
-    public boolean isOutputShutdown() {
-        throw new UnsupportedOperationException();
+    public synchronized boolean isOutputShutdown() {
+        return _os == null;
     }
+
     /** @deprecated unsupported */
     @Deprecated
     @Override
@@ -310,16 +314,38 @@ public class InternalSocket extends Socket {
     public void setTrafficClass(int cize) {
         throw new UnsupportedOperationException();
     }
-    /** @deprecated unsupported */
-    @Deprecated
+
+    /**
+     * Supported as of 0.9.33, prior to that threw UnsupportedOperationException
+     */
     @Override
-    public void shutdownInput() {
-        throw new UnsupportedOperationException();
+    public synchronized void shutdownInput() throws IOException {
+        if (_is != null) {
+            _is.close();
+            _is = null;
+        }
     }
-    /** @deprecated unsupported */
-    @Deprecated
+
+    /**
+     * Flushes (as the Socket javadocs advise) and closes.
+     * Supported as of 0.9.33, prior to that threw UnsupportedOperationException
+     */
     @Override
-    public void shutdownOutput() {
-        throw new UnsupportedOperationException();
+    public void shutdownOutput() throws IOException {
+        OutputStream out;
+        synchronized(this) {
+            out = _os;
+        }
+        if (out == null)
+            return;
+        // PipedOutputStream may not flush on close, not clear from javadocs
+        try {
+            out.flush();
+            out.close();
+        } finally {
+            synchronized(this) {
+                _os = null;
+            }
+        }
     }
 }

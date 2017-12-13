@@ -36,6 +36,11 @@
     ctx.portMapper().renderStatusHTML(out);
 
     /*
+     *  Print out the status for the InternalServerSockets
+     */
+    net.i2p.util.InternalServerSocket.renderStatusHTML(out);
+
+    /*
      *  Print out the status for the AppManager
      */
 

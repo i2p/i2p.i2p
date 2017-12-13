@@ -43,8 +43,8 @@ class InternalSocketRunner extends I2PAppThread {
             if (this.open) {
                 Log log = new Log(InternalSocketRunner.class);
                 log.error("Error listening for internal connections on port " + this.port, ex);
+                stopRunning();
             }
-            this.open = false;
         }
     }
 
