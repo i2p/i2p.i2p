@@ -141,6 +141,7 @@ public class WebMail extends HttpServlet
 	private static final String SAVE = "save";
 	private static final String SAVE_AS = "saveas";
 	private static final String REFRESH = "refresh";
+	// also a GET param
 	private static final String CONFIGURE = "configure";
 	private static final String NEW = "new";
 	private static final String REPLY = "reply";
@@ -578,7 +579,7 @@ public class WebMail extends HttpServlet
 	private static boolean buttonPressed( RequestWrapper request, String key )
 	{
 		String value = request.getParameter( key );
-		return value != null && value.length() > 0;
+		return value != null && (value.length() > 0 || key.equals(CONFIGURE));
 	}
 	/**
 	 * recursively render all mail body parts
@@ -1544,22 +1545,22 @@ public class WebMail extends HttpServlet
 
 	/*
 	 * process config buttons, both entering and exiting
+	 * @param isPOST disallow button pushes if false
+	 * @return true if we should go to config page
 	 */
-	private static void processConfigButtons(SessionObject sessionObject, RequestWrapper request) {
+	private static boolean processConfigButtons(SessionObject sessionObject, RequestWrapper request, boolean isPOST) {
 		if (buttonPressed(request, CONFIGURE)) {
 			sessionObject.state = STATE_CONFIG;
-			return;
+			return true;
 		}
 		// If no config text, we can't be on the config page,
 		// and we don't want to process the CANCEL button which
 		// is also on the compose page.
-		if (request.getParameter(CONFIG_TEXT) == null)
-			return;
+		if (!isPOST || request.getParameter(CONFIG_TEXT) == null)
+			return false;
 		if (buttonPressed(request, SAVE)) {
 			try {
 				String raw = request.getParameter(CONFIG_TEXT);
-				if (raw == null)
-					return;
 				Properties props = new Properties();
 				DataHelper.loadProps(props, new ByteArrayInputStream(DataHelper.getUTF8(raw)));
 				// for safety, disallow changing host via UI
@@ -1611,6 +1612,7 @@ public class WebMail extends HttpServlet
 		} else if (buttonPressed(request, CANCEL)) {
 			sessionObject.state = (sessionObject.folder != null) ? STATE_LIST : STATE_AUTH;
 		}
+		return false;
 	}
 
 	/**
@@ -1733,8 +1735,14 @@ public class WebMail extends HttpServlet
 		
 			int oldState = sessionObject.state;
 			processStateChangeButtons( sessionObject, request, isPOST );
-			if (isPOST)
-				processConfigButtons( sessionObject, request );
+			if (processConfigButtons(sessionObject, request, isPOST)) {
+				if (isPOST) {
+					// P-R-G
+					String q = '?' + CONFIGURE;
+					sendRedirect(httpRequest, response, q);
+					return;
+				}
+			}
 			int newState = sessionObject.state;
 			if (oldState != newState)
 				Debug.debug(Debug.DEBUG, "STATE CHANGE from " + oldState + " to " + newState);
