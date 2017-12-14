@@ -26,6 +26,7 @@ package i2p.susi.webmail;
 import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
 import i2p.susi.util.Folder;
+import i2p.susi.util.Folder.SortOrder;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.webmail.Messages;
 import i2p.susi.webmail.encoding.DecodingException;
@@ -49,6 +50,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
@@ -132,6 +134,7 @@ public class WebMail extends HttpServlet
 	private static final String NEXT_B64UIDL = "nextb64uidl";
 	private static final String PREV_PAGE_NUM = "prevpagenum";
 	private static final String NEXT_PAGE_NUM = "nextpagenum";
+	private static final String CURRENT_SORT = "currentsort";
 
 	/*
 	 * button names
@@ -182,11 +185,19 @@ public class WebMail extends HttpServlet
 	private static final String LIST = "list";
 	private static final String PREV = "prev";
 	private static final String NEXT = "next";
-	private static final String SORT_ID = "sort_id";
-	private static final String SORT_SENDER = "sort_sender";
-	private static final String SORT_SUBJECT = "sort_subject";
-	private static final String SORT_DATE = "sort_date";
-	private static final String SORT_SIZE = "sort_size";
+
+	// SORT is a GET or POST param, SORT_XX are the values, possibly prefixed by '-'
+	private static final String SORT = "sort";
+	private static final String SORT_ID = "id";
+	private static final String SORT_SENDER = "sender";
+	private static final String SORT_SUBJECT = "subject";
+	private static final String SORT_DATE = "date";
+	private static final String SORT_SIZE = "size";
+	private static final String SORT_DEFAULT = SORT_DATE;
+	// for XSS
+	private static final List<String> VALID_SORTS = Arrays.asList(new String[] {
+	                         SORT_ID, SORT_SENDER, SORT_SUBJECT, SORT_DATE, SORT_SIZE,
+	                         '-' + SORT_ID, '-' + SORT_SENDER, '-' + SORT_SUBJECT, '-' + SORT_DATE, '-' + SORT_SIZE });
 
 	private static final String CONFIG_TEXT = "config_text";
 
@@ -548,21 +559,22 @@ public class WebMail extends HttpServlet
 	 * @param label
 	 * @return the string
 	 */
-	private static String sortHeader( String name, String label, String imgPath, String currentName, Folder.SortOrder currentOrder)
+	private static String sortHeader(String name, String label, String imgPath,
+	                                 String currentName, SortOrder currentOrder, int page)
 	{
 		StringBuilder buf = new StringBuilder(128);
 		buf.append(label).append("&nbsp;&nbsp;");
-		if (name.equals(currentName) && currentOrder == Folder.SortOrder.UP) {
+		if (name.equals(currentName) && currentOrder == SortOrder.UP) {
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\">\n");
 		} else {
-			buf.append("<a class=\"sort\" href=\"").append(myself).append('?').append(name).append("=up\">");
+			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=").append(name).append("\">");
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3up.png\" border=\"0\" alt=\"^\" style=\"opacity: 0.4;\">");
 			buf.append("</a>\n");
 		}
-		if (name.equals(currentName) && currentOrder == Folder.SortOrder.DOWN) {
+		if (name.equals(currentName) && currentOrder == SortOrder.DOWN) {
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\">");
 		} else {
-			buf.append("<a class=\"sort\" href=\"").append(myself).append('?').append(name).append("=down\">");
+			buf.append("<a class=\"sort\" href=\"").append(myself).append("?page=").append(page).append("&amp;sort=-").append(name).append("\">");
 			buf.append("<img class=\"sort\" src=\"").append(imgPath).append("3down.png\" border=\"0\" alt=\"v\" style=\"opacity: 0.4;\">");
 			buf.append("</a>");
 		}
@@ -863,8 +875,8 @@ public class WebMail extends HttpServlet
 						sessionObject.folder.addSorter( SORT_DATE, new DateSorter( sessionObject.mailCache ) );
 						sessionObject.folder.addSorter( SORT_SIZE, new SizeSorter( sessionObject.mailCache ) );
 						// reverse sort, latest mail first
-						sessionObject.folder.setSortingDirection(Folder.SortOrder.UP);
-						sessionObject.folder.sortBy(SORT_DATE);
+						sessionObject.folder.setSortingDirection(SortOrder.UP);
+						sessionObject.folder.sortBy(SORT_DEFAULT);
 						sessionObject.reallyDelete = false;
 						if (offline)
 							Debug.debug(Debug.DEBUG, "OFFLINE MODE");
@@ -964,11 +976,7 @@ public class WebMail extends HttpServlet
 			    buttonPressed( request, MARKALL ) ||
 			    buttonPressed( request, CLEAR ) ||
 			    buttonPressed( request, INVERT ) ||
-			    buttonPressed( request, SORT_ID ) ||
-			    buttonPressed( request, SORT_SENDER ) ||
-			    buttonPressed( request, SORT_SUBJECT ) ||
-			    buttonPressed( request, SORT_DATE ) ||
-			    buttonPressed( request, SORT_SIZE ) ||
+			    buttonPressed( request, SORT ) ||
 			    buttonPressed( request, REFRESH ) ||
 			    buttonPressed( request, LIST )) {
 				sessionObject.state = STATE_LIST;
@@ -998,11 +1006,7 @@ public class WebMail extends HttpServlet
 			    buttonPressed( request, MARKALL ) ||
 			    buttonPressed( request, CLEAR ) ||
 			    buttonPressed( request, INVERT ) ||
-			    buttonPressed( request, SORT_ID ) ||
-			    buttonPressed( request, SORT_SENDER ) ||
-			    buttonPressed( request, SORT_SUBJECT ) ||
-			    buttonPressed( request, SORT_DATE ) ||
-			    buttonPressed( request, SORT_SIZE ) ||
+			    buttonPressed( request, SORT ) ||
 			    buttonPressed( request, REFRESH )) {
 				sessionObject.state = STATE_LIST;
 			}
@@ -1517,29 +1521,18 @@ public class WebMail extends HttpServlet
 	 */
 	private static void processSortingButtons(SessionObject sessionObject, RequestWrapper request)
 	{
-		//processSortingButton( sessionObject, request, SORT_ID );
-		processSortingButton( sessionObject, request, SORT_SENDER );
-		processSortingButton( sessionObject, request, SORT_SUBJECT );
-		processSortingButton( sessionObject, request, SORT_DATE );
-		processSortingButton( sessionObject, request, SORT_SIZE );		
-	}
-
-	/**
-	 * @param sessionObject
-	 * @param request
-	 * @param sort_id
-	 */
-	private static void processSortingButton(SessionObject sessionObject, RequestWrapper request, String sort_id )
-	{
-		String str = request.getParameter( sort_id );
-		if( str != null ) {
-			if( str.equalsIgnoreCase("up")) {
-				sessionObject.folder.setSortingDirection(Folder.SortOrder.UP);
-				sessionObject.folder.sortBy( sort_id );
-			} else 	if( str.equalsIgnoreCase("down")) {
-				sessionObject.folder.setSortingDirection(Folder.SortOrder.DOWN);
-				sessionObject.folder.sortBy( sort_id );
+		String str = request.getParameter(SORT);
+		if (str != null && VALID_SORTS.contains(str)) {
+			SortOrder order;
+			if (str.startsWith("-")) {
+				order = SortOrder.DOWN;
+				str = str.substring(1);
+			} else {
+				order = SortOrder.UP;
 			}
+			// TODO don't store in session
+			sessionObject.folder.setSortingDirection(order);
+			sessionObject.folder.sortBy(str);
 		}
 	}
 
@@ -1776,10 +1769,15 @@ public class WebMail extends HttpServlet
 					    buttonPressed(request, LOGIN) || buttonPressed(request, OFFLINE)) {
 						// P-R-G
 						String q = '?' + CUR_PAGE + '=' + newPage;
+						// CURRENT_SORT is only in page POSTs
+						String str = request.getParameter(CURRENT_SORT);
+						if (str != null && !str.equals(SORT_DEFAULT) && VALID_SORTS.contains(str))
+							q += "&sort=" + str;
 						sendRedirect(httpRequest, response, q);
 						return;
 					}
 				}
+				// sort buttons are GETs
 				processSortingButtons( sessionObject, request );
 				for( Iterator<String> it = sessionObject.folder.currentPageIterator(); it != null && it.hasNext(); ) {
 					String uidl = it.next();
@@ -1837,12 +1835,13 @@ public class WebMail extends HttpServlet
 			/*
 			 * update folder content
 			 */
+			Folder<String> folder = sessionObject.folder;
 			if( sessionObject.state == STATE_LIST ) {
 				// get through cache so we have the disk-only ones too
 				String[] uidls = sessionObject.mailCache.getUIDLs();
 				if (uidls != null) {
 					// TODO why every time?
-					sessionObject.folder.setElements(uidls);
+					folder.setElements(uidls);
 				}
 			}
 
@@ -1857,7 +1856,7 @@ public class WebMail extends HttpServlet
 					// mailbox.getNumMails() forces a connection, don't use it
 					// Not only does it slow things down, but a failure causes all our messages to "vanish"
 					//subtitle = ngettext("1 Message", "{0} Messages", sessionObject.mailbox.getNumMails());
-					subtitle = ngettext("1 Message", "{0} Messages", sessionObject.folder.getSize());
+					subtitle = ngettext("1 Message", "{0} Messages", folder.getSize());
 				} else if( sessionObject.state == STATE_SHOW ) {
 					Mail mail = showUIDL != null ? sessionObject.mailCache.getMail(showUIDL, MailCache.FetchMode.HEADER) : null;
 					if (mail != null && mail.hasHeader()) {
@@ -1917,7 +1916,22 @@ public class WebMail extends HttpServlet
 						// reencode, as showUIDL may have changed, and also for XSS
 						b64UIDL = Base64.encode(showUIDL);
 						out.println("<input type=\"hidden\" name=\"" + B64UIDL + "\" value=\"" + b64UIDL + "\">");
+					} else if (sessionObject.state == STATE_NEW) {
+						// for NEW, try to get back to the current page if we weren't replying
+						int page = 1;
+						String sp = request.getParameter(CUR_PAGE);
+						if (sp != null) {
+							try {
+								page = Integer.parseInt(sp);
+							} catch (NumberFormatException nfe) {}
+						}
+						out.println("<input type=\"hidden\" name=\"" + CUR_PAGE + "\" value=\"" + page + "\">");
 					}
+					// Save sort order in case it changes later
+					String curSort = folder.getCurrentSortBy();
+					SortOrder curOrder = folder.getCurrentSortingDirection();
+					String fullSort = curOrder == SortOrder.DOWN ? '-' + curSort : curSort;
+					out.println("<input type=\"hidden\" name=\"" + CURRENT_SORT + "\" value=\"" + fullSort + "\">");
 				}
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<div class=\"notifications\" onclick=\"this.remove()\"><p class=\"error\">" + quoteHTML(sessionObject.error).replace("\n", "<br>") + "</p></div>" );
@@ -2399,16 +2413,40 @@ public class WebMail extends HttpServlet
 		out.println("</div>");
 
 
-		String curSort = folder.getCurrentSortBy();
-		Folder.SortOrder curOrder = folder.getCurrentSortingDirection();
+		SortOrder curOrder;
+		String curSort = request.getParameter(SORT);
+		String fullSort;
+		if (curSort == null)
+			curSort = request.getParameter(CURRENT_SORT);
+		if (curSort != null && VALID_SORTS.contains(curSort)) {
+                        fullSort = curSort;
+			if (curSort.startsWith("-")) {
+				curSort = curSort.substring(1);
+				curOrder = SortOrder.DOWN;
+			} else {
+				curOrder = SortOrder.UP;
+			}
+			// TODO don't store in session
+			if (curOrder != folder.getCurrentSortingDirection() || !curSort.equals(folder.getCurrentSortBy())) {
+			    folder.setSortingDirection(curOrder);
+			    folder.sortBy(curSort);
+			}
+		} else {
+			curSort = folder.getCurrentSortBy();
+			curOrder = folder.getCurrentSortingDirection();
+			fullSort = curOrder == SortOrder.DOWN ? '-' + curSort : curSort;
+		}
+		out.println("<input type=\"hidden\" name=\"" + CURRENT_SORT + "\" value=\"" + fullSort + "\">");
+		if (curSort.startsWith("-"))
+			curSort = curSort.substring(1);
 		out.println("<table id=\"mailbox\" cellspacing=\"0\" cellpadding=\"5\">\n" +
 			"<tr><td colspan=\"9\"><hr></td></tr>\n<tr><th title=\"" + _t("Mark for deletion") + "\">&nbsp;</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SENDER, _t("From"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder ) + "</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder ) +
+			thSpacer + "<th>" + sortHeader(SORT_SENDER, _t("From"), sessionObject.imgPath, curSort, curOrder, page) + "</th>" +
+			thSpacer + "<th>" + sortHeader(SORT_SUBJECT, _t("Subject"), sessionObject.imgPath, curSort, curOrder, page) + "</th>" +
+			thSpacer + "<th>" + sortHeader(SORT_DATE, _t("Date"), sessionObject.imgPath, curSort, curOrder, page) +
 			//sortHeader( SORT_ID, "", sessionObject.imgPath ) +
 			"</th>" +
-			thSpacer + "<th>" + sortHeader( SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder ) + "</th></tr>" );
+			thSpacer + "<th>" + sortHeader(SORT_SIZE, _t("Size"), sessionObject.imgPath, curSort, curOrder, page) + "</th></tr>" );
 		int bg = 0;
 		int i = 0;
 		for (Iterator<String> it = folder.currentPageIterator(); it != null && it.hasNext(); ) {
@@ -2493,7 +2531,7 @@ public class WebMail extends HttpServlet
 		// moved to config page
 		//out.print(
 		//	_t("Page Size") + ":&nbsp;<input type=\"text\" style=\"text-align: right;\" name=\"" + PAGESIZE + "\" size=\"4\" value=\"" +  sessionObject.folder.getPageSize() + "\">" +
-		//	"&nbsp;" + 
+		//	"&nbsp;" +
 		//	button( SETPAGESIZE, _t("Set") ) );
 		out.print("<br>");
 		out.print(button(CONFIGURE, _t("Settings")));
